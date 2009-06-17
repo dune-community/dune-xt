@@ -1,0 +1,12 @@
+html/
+man/
+*~
+*.orig
+#comment
+doxygen-tag
+*.log
+*BASE*
+*LOCAL*
+*REMOTE*
+doxy-header.html
+*.svn
