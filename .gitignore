@@ -29,3 +29,4 @@ install-sh
 dependencies.m4
 am
 *.swp
+CMakeLists.txt.user
