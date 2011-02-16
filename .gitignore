@@ -1,3 +1,10 @@
+CMakeCache.txt
+CMakeFiles
+cmake_config.h
+cmake_install.cmake
+Doxyfile
+CTestTestfile.cmake
+doc/doxygen
 build/
 html
 man
