@@ -17,7 +17,7 @@
 #if !defined(POLORDER)
 #define POLORDER 0
 #warning("using default polorder 0 for all spaces")
-#endif
+#endif // if !defined (POLORDER)
 
 #if !defined(PRESSURE_POLORDER)
 #define PRESSURE_POLORDER POLORDER
@@ -37,7 +37,8 @@
     || defined(YASPGRID)
 // this is no mistake, ALU is indeed only incompatible in 3d
 #define OLD_DUNE_GRID_VERSION
-#endif
+#endif // if ( ( defined (SGRID) || defined (ALUGRID_SIMPLEX) || defined (ALUGRID_CUBE ) ) && (GRIDDIM == 3 ) ) ||
+// defined (UGGRID) || defined (YASPGRID)
 
 #define USE_GRPAE_VISUALISATION (HAVE_GRAPE && !defined(AORTA_PROBLEM))
 
@@ -49,8 +50,7 @@
 #include <dune/fem/misc/mpimanager.hh> // An initializer of MPI
 #include <dune/common/exceptions.hh> // We use exceptions
 
-
-//! ATTENTION: undef's GRIDDIM
+// !ATTENTION: undef's GRIDDIM
 
 #include <dune/grid/io/file/dgfparser/dgfgridtype.hh> // for the grid
 
@@ -69,7 +69,6 @@
 #include <dune/stuff/datawriter.hh>
 #include <dune/stuff/customprojection.hh>
 #include <dune/common/collectivecommunication.hh>
-
 
 #include <stdio.h>
 #include <dune/fem/misc/mpimanager.hh> // An initializer of MPI
@@ -97,8 +96,8 @@ int main(int argc, char** argv)
   RF rf("func", fSpace);
 
   /* ********************************************************************** *
-   * initialize the grid                                                    *
-   * ********************************************************************** */
+    * initialize the grid                                                    *
+    * ********************************************************************** */
   Logging::LogStream& infoStream  = Logger().Info();
   Logging::LogStream& debugStream = Logger().Dbg();
   infoStream << "\n- initialising grid" << std::endl;
@@ -121,6 +120,5 @@ int main(int argc, char** argv)
   DataWriterType dt(gridPart_.grid(), "dummy", out, 0, 0);
   dt.write(0.0, 0);
 
-
   return 0;
-}
+} // main
