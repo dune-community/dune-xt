@@ -638,6 +638,11 @@ public:
     , constant_(constant)
   {
   }
+  ConstantFunction(const double constant = 0.0)
+    : BaseType()
+    , constant_(constant)
+  {
+  }
 
   ~ConstantFunction()
   {
@@ -765,8 +770,12 @@ private:
   template <class T>                                                                                                   \
   struct classname : public Stuff::ConstantFunction<T>                                                                 \
   {                                                                                                                    \
-    classname(const double d, const T& t, double = 0.0, double = 0.0)                                                  \
+    classname(const double /*d*/, const T& t, double = 0.0, double = 0.0)                                              \
       : Stuff::ConstantFunction<T>(t)                                                                                  \
+    {                                                                                                                  \
+    }                                                                                                                  \
+    classname()                                                                                                        \
+      : Stuff::ConstantFunction<T>()                                                                                   \
     {                                                                                                                  \
     }                                                                                                                  \
     classname(const T& t)                                                                                              \
