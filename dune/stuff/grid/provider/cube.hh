@@ -1,5 +1,5 @@
-#ifndef DUNE_HELPER_TOOLS_GRID_PROVIDER_CUBE_HH
-#define DUNE_HELPER_TOOLS_GRID_PROVIDER_CUBE_HH
+#ifndef DUNE_STUFF_GRID_PROVIDER_CUBE_HH
+#define DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 
 // dune-common
 #include <dune/common/parametertree.hh>
@@ -17,7 +17,7 @@
 
 namespace Dune {
 
-namespace HelperTools {
+namespace Stuff {
 
 namespace Grid {
 
@@ -53,7 +53,7 @@ public:
   //! Type of the grids coordinates.
   typedef Dune::FieldVector<typename GridType::ctype, dim> CoordinateType;
 
-  //! Unique identifier: \c helper-tools.grid.provider.cube
+  //! Unique identifier: \c stuff.grid.provider.cube
   static const std::string id;
 
   /**
@@ -214,7 +214,7 @@ private:
 }; // class GenericCube
 
 template <typename GridImp, int variant>
-const std::string GenericCube<GridImp, variant>::id = "helper-tools.grid.provider.cube";
+const std::string GenericCube<GridImp, variant>::id = "stuff.grid.provider.cube";
 
 // default implementation of a cube for any grid
 // tested for
@@ -351,8 +351,8 @@ public:
 
 } // namespace Grid
 
-} // namespace HelperTools
+} // namespace Stuff
 
 } // namespace Dune
 
-#endif // DUNE_HELPER_TOOLS_GRID_PROVIDER_CUBE_HH
+#endif // DUNE_STUFF_GRID_PROVIDER_CUBE_HH

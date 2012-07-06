@@ -1,9 +1,9 @@
-#ifndef DUNE_HELPER_TOOLS_GRID_INFORMATION_HH
-#define DUNE_HELPER_TOOLS_GRID_INFORMATION_HH
+#ifndef DUNE_STUFF_GRID_INFORMATION_HH
+#define DUNE_STUFF_GRID_INFORMATION_HH
 
 namespace Dune {
 
-namespace HelperTools {
+namespace Stuff {
 
 namespace Grid {
 
@@ -43,8 +43,8 @@ unsigned int maxNumberOfNeighbors(const GridPartType& gridPart)
 
 } // namespace Grid
 
-} // namespace HelperTools
+} // namespace Stuff
 
 } // namespace Dune
 
-#endif // DUNE_HELPER_TOOLS_GRID_INFORMATION_HH
+#endif // DUNE_STUFF_GRID_INFORMATION_HH
