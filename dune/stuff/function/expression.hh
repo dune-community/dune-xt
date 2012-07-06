@@ -249,6 +249,11 @@ const std::string Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDim
 
 } // namespace Stuff
 
+
+} // end of namespace Stuff
+#ifndef DUNE_NEW_NAMESPACES
+using namespace Stuff;
+#endif
 } // namespace Dune
 
 #endif // DUNE_STUFF_FUNCTION_EXPRESSION_HH
