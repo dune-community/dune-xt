@@ -1,12 +1,12 @@
 #ifndef DUNE_HELPER_TOOLS_GRID_ENTITY_HH
 #define DUNE_HELPER_TOOLS_GRID_ENTITY_HH
 
-// dune-helper-tools includes
-#include <dune/helper-tools/common/string.hh>
+// dune-stuff includes
+#include <dune/stuff/common/string.hh>
 
 namespace Dune {
 
-namespace HelperTools {
+namespace Stuff {
 
 namespace Grid {
 
@@ -55,12 +55,41 @@ void print(const EntityType& entity, StreamType& stream = std::cout)
 
 } // end function print
 
-} // end namespace Entity
+template <class GridImp, template <int, int, class> class EntityImp>
+double geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
+{
+  typedef Dune::Entity<0, 2, GridImp, EntityImp> EntityType;
+  typedef typename EntityType::LeafIntersectionIterator IntersectionIteratorType;
+  IntersectionIteratorType end = entity.ileafend();
+  double factor = 1.0;
+  for (IntersectionIteratorType it = entity.ileafbegin(); it != end; ++it) {
+    const typename IntersectionIteratorType::Intersection& intersection = *it;
+    factor *= intersection.geometry().volume();
+  }
+  return factor / (2.0 * entity.geometry().volume());
+} // geometryDiameter
 
-} // end namespace Grid
+template <class GridImp, template <int, int, class> class EntityImp>
+double geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& entity)
+{
+  DUNE_THROW(Dune::Exception, "copypasta from 2D");
+  typedef Dune::Entity<0, 3, GridImp, EntityImp> EntityType;
+  typedef typename EntityType::LeafIntersectionIterator IntersectionIteratorType;
+  IntersectionIteratorType end = entity.ileafend();
+  double factor = 1.0;
+  for (IntersectionIteratorType it = entity.ileafbegin(); it != end; ++it) {
+    const typename IntersectionIteratorType::Intersection& intersection = *it;
+    factor *= intersection.geometry().volume();
+  }
+  return factor / (2.0 * entity.geometry().volume());
+} // geometryDiameter
 
-} // end namespace HelperTools
+} // namespace Entity
 
-} // end namespace Dune
+} // namespace Grid
+
+} // namespace Stuff
+
+} // namespace Dune
 
 #endif // DUNE_HELPER_TOOLS_GRID_ENTITY_HH

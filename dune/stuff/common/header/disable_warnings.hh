@@ -3,6 +3,7 @@
 #pragma GCC diagnostic ignored "-Wextra"
 #pragma GCC diagnostic ignored "-Wignored-qualifiers"
 #pragma GCC diagnostic ignored "-Wtype-limits"
+
 /** Copyright (c) 2012, Rene Milk
    * All rights reserved.
    *
