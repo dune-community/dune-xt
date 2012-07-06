@@ -1,5 +1,5 @@
-#ifndef DUNE_HELPER_TOOLS_FUNCTION_EXPRESSION_HH
-#define DUNE_HELPER_TOOLS_FUNCTION_EXPRESSION_HH
+#ifndef DUNE_STUFF_FUNCTION_EXPRESSION_HH
+#define DUNE_STUFF_FUNCTION_EXPRESSION_HH
 
 // system
 #include <sstream>
@@ -20,7 +20,7 @@
 
 namespace Dune {
 
-namespace HelperTools {
+namespace Stuff {
 
 namespace Function {
 
@@ -243,12 +243,12 @@ private:
 
 template <class DomainFieldImp, int maxDimDomain, class RangeFieldImp, int maxDimRange>
 const std::string Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>::id =
-    "helper-tools.function.expression";
+    "stuff.function.expression";
 
 } // namespace Function
 
-} // namespace HelperTools
+} // namespace Stuff
 
 } // namespace Dune
 
-#endif // DUNE_HELPER_TOOLS_FUNCTION_EXPRESSION_HH
+#endif // DUNE_STUFF_FUNCTION_EXPRESSION_HH
