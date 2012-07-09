@@ -67,16 +67,17 @@ public:
                 <li> \c upperRight: \a double that is used as a upper right corner in each dimension.</ul>
     **/
   GenericCube(const Dune::ParameterTree& paramTree)
+    : lowerLeft_(0.0)
+    , upperRight_(0.0)
   {
-    // get correct parameters
-    Dune::ParameterTree* paramsP = const_cast<Dune::ParameterTree*>(&paramTree);
-    if (paramsP->hasSub(id))
-      paramsP                         = &(paramsP->sub(id));
-    const Dune::ParameterTree& params = const_cast<const Dune::ParameterTree&>(*paramsP);
-    const double lowerLeft            = params.get("lowerLeft", 0.0);
-    const double upperRight           = params.get("upperRight", 1.0);
-    const int level = params.get("level", 1);
-    buildGrid(CoordinateType(lowerLeft), CoordinateType(upperRight), level);
+    // check for parameters
+    const double lowerLeft  = paramTree.get("lowerLeft", 0.0);
+    const double upperRight = paramTree.get("upperRight", 1.0);
+    assert(lowerLeft < upperRight);
+    const int level = paramTree.get("level", 1);
+    lowerLeft_      = lowerLeft;
+    upperRight_ = upperRight;
+    buildGrid(lowerLeft_, upperRight_, level);
   } // Cube(const Dune::ParameterTree& paramTree)
 
   /**
@@ -87,8 +88,10 @@ public:
                 A vector that is used as a upper right corner.
     **/
   GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
+    : lowerLeft_(lowerLeft)
+    , upperRight_(upperRight)
   {
-    buildGrid(lowerLeft, upperRight, level);
+    buildGrid(lowerLeft_, upperRight_, level);
   }
 
   /**
@@ -98,9 +101,11 @@ public:
     \param[in]  upperRight
                 A double that is used as a upper right corner in each dimension.
     **/
-  GenericCube(double lowerLeft, double upperRight, const int level = 1)
+  GenericCube(const double lowerLeft, const double upperRight, const int level = 1)
+    : lowerLeft_(lowerLeft)
+    , upperRight_(upperRight)
   {
-    buildGrid(CoordinateType(lowerLeft), CoordinateType(upperRight), level);
+    buildGrid(lowerLeft_, upperRight_, level);
   }
 
   /**
@@ -143,7 +148,7 @@ private:
                   obtained via mdGrid() is visualized (\a if \a not \a specified: \a no \a visualization).</ul>
     **/
 public:
-  void visualize(Dune::ParameterTree& paramTree)
+  void visualize(Dune::ParameterTree& paramTree) const
   {
     const std::string localId = "visualize";
     // get correct parameters
@@ -210,6 +215,11 @@ private:
     return;
   } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
 
+protected:
+  CoordinateType lowerLeft_;
+  CoordinateType upperRight_;
+
+private:
   Dune::shared_ptr<GridType> grid_;
 }; // class GenericCube
 
@@ -232,7 +242,7 @@ private:
 public:
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(Dune::ParameterTree& paramTree)
+  Cube(const Dune::ParameterTree& paramTree)
     : BaseType(paramTree)
   {
   }
@@ -259,7 +269,7 @@ private:
 public:
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(Dune::ParameterTree& paramTree)
+  Cube(const Dune::ParameterTree& paramTree)
     : BaseType(paramTree)
   {
   }
@@ -286,7 +296,7 @@ private:
 public:
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(Dune::ParameterTree& paramTree)
+  Cube(const Dune::ParameterTree& paramTree)
     : BaseType(paramTree)
   {
   }
@@ -313,7 +323,7 @@ private:
 public:
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(Dune::ParameterTree& paramTree)
+  Cube(const Dune::ParameterTree& paramTree)
     : BaseType(paramTree)
   {
   }
@@ -336,7 +346,7 @@ private:
   typedef Cube<GridType> BaseType;
 
 public:
-  UnitCube(Dune::ParameterTree& paramTree)
+  UnitCube(const Dune::ParameterTree& paramTree)
     : BaseType(0.0, 1.0, paramTree.get("level", 1))
   {
   }
