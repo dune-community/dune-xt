@@ -1,6 +1,9 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 #define DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 
+// system
+#include <sstream>
+
 // dune-common
 #include <dune/common/parametertree.hh>
 #include <dune/common/shared_ptr.hh>
@@ -70,14 +73,23 @@ public:
     : lowerLeft_(0.0)
     , upperRight_(0.0)
   {
-    // check for parameters
+    // get outer bounds
     const double lowerLeft  = paramTree.get("lowerLeft", 0.0);
     const double upperRight = paramTree.get("upperRight", 1.0);
     assert(lowerLeft < upperRight);
-    const int level = paramTree.get("level", 1);
-    lowerLeft_      = lowerLeft;
+    lowerLeft_  = lowerLeft;
     upperRight_ = upperRight;
-    buildGrid(lowerLeft_, upperRight_, level);
+    // get number of elements per dim
+    if (paramTree.hasKey("level"))
+      std::fill(numElements_.begin(), numElements_.end(), std::pow(2, paramTree.get("level", 1)));
+    else {
+      for (unsigned int d = 0; d < dim; ++d) {
+        std::stringstream s;
+        s << "numElements." << d;
+        numElements_[d] = paramTree.get(s.str(), 1);
+      }
+    }
+    buildGrid();
   } // Cube(const Dune::ParameterTree& paramTree)
 
   /**
@@ -91,7 +103,8 @@ public:
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
-    buildGrid(lowerLeft_, upperRight_, level);
+    std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
+    buildGrid();
   }
 
   /**
@@ -105,7 +118,8 @@ public:
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
-    buildGrid(lowerLeft_, upperRight_, level);
+    std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
+    buildGrid();
   }
 
   /**
@@ -207,26 +221,24 @@ public:
   } // void visualize(Dune::ParameterTree& paramTree)
 
 private:
-  void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level)
+  void buildGrid()
   {
-    Dune::array<unsigned int, dim> numElements;
-    std::fill(numElements.begin(), numElements.end(), 1);
     switch (variant) {
       case 1:
-        grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, numElements);
+        grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements_);
         break;
       case 2:
-        grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, numElements);
+        grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft_, upperRight_, numElements_);
         break;
       default:
         DUNE_THROW(Dune::NotImplemented, "Variant " << variant << " of cube not implemented.");
     }
-    grid_->globalRefine(level);
     return;
   } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
 
   CoordinateType lowerLeft_;
   CoordinateType upperRight_;
+  Dune::array<unsigned int, dim> numElements_;
   Dune::shared_ptr<GridType> grid_;
 }; // class GenericCube
 
