@@ -122,6 +122,16 @@ public:
     return *grid_;
   }
 
+  const CoordinateType& lowerLeft() const
+  {
+    return lowerLeft_;
+  }
+
+  const CoordinateType& upperRight() const
+  {
+    return upperRight_;
+  }
+
 private:
   template <int dim>
   struct P0Layout
@@ -215,11 +225,8 @@ private:
     return;
   } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
 
-protected:
   CoordinateType lowerLeft_;
   CoordinateType upperRight_;
-
-private:
   Dune::shared_ptr<GridType> grid_;
 }; // class GenericCube
 
