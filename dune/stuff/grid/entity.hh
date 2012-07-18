@@ -12,8 +12,8 @@ namespace Grid {
 
 namespace Entity {
 
-template <class EntityType, class StreamType = std::ostream>
-void print(const EntityType& entity, StreamType& stream = std::cout)
+template <class EntityType>
+void print(const EntityType& entity, std::ostream& stream = std::cout)
 {
   typedef typename EntityType::Geometry GeometryType;
 

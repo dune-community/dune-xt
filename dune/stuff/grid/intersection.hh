@@ -20,15 +20,13 @@ namespace Intersection {
               coordinates of those corners.
   \tparam     IntersectionType
               Dune::Intersection compatible
-  \tparam     StreamType
-              std::ostream compatible
   \param[in]  intersection
               Dune::Intersection, whose information should be printed
   \param[out] stream
               std::ostream, into which the information is printed
   **/
-template <class IntersectionType, class StreamType = std::ostream>
-void print(const IntersectionType& intersection, StreamType& stream = std::cout)
+template <class IntersectionType>
+void print(const IntersectionType& intersection, std::ostream& stream = std::cout)
 {
   typedef typename IntersectionType::Geometry GeometryType;
 

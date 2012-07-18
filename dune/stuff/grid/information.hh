@@ -1,6 +1,8 @@
 #ifndef DUNE_STUFF_GRID_INFORMATION_HH
 #define DUNE_STUFF_GRID_INFORMATION_HH
 
+#include <ostream>
+
 namespace Dune {
 
 namespace Stuff {
@@ -14,8 +16,8 @@ namespace Information {
 /** \brief grid statistic output to given stream
    * \todo not require a space to be passed
    */
-template <class GridPartType, class DiscreteFunctionSpaceType, class OutStream>
-void print(GridPartType& gridPart, DiscreteFunctionSpaceType& space, OutStream& out)
+template <class GridPartType, class DiscreteFunctionSpaceType>
+void print(GridPartType& gridPart, DiscreteFunctionSpaceType& space, std::ostream& out)
 {
   int numberOfEntities(0);
   int numberOfIntersections(0);
@@ -143,8 +145,8 @@ struct Dimensions
   }
 };
 
-template <class Stream, class T>
-inline Stream& operator<<(Stream& s, const Dimensions<T>& d)
+template <class T>
+inline std::ostream& operator<<(std::ostream& s, const Dimensions<T>& d)
 {
   for (size_t k = 0; k < T::dimensionworld; ++k) {
     const typename GridDimensions<T>::MinMaxAvgType& mma = d.coord_limits[k];
