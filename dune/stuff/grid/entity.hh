@@ -12,8 +12,8 @@ namespace Grid {
 
 namespace Entity {
 
-template <class EntityType>
-void print(const EntityType& entity, std::ostream& stream = std::cout)
+template <class EntityType, class StreamType = std::ostream>
+void print(const EntityType& entity, StreamType& stream = std::cout, std::string prefix = "")
 {
   typedef typename EntityType::Geometry GeometryType;
 
@@ -23,25 +23,25 @@ void print(const EntityType& entity, std::ostream& stream = std::cout)
 
   const int numCorners = geometry.corners();
 
-  std::string prefix = "Dune::Entity (" + Dune::HelperTools::Common::String::toString(numCorners) + " corner";
+  std::string header = "Dune::Entity (" + Dune::Stuff::Common::String::convertTo(numCorners) + " corner";
   if (numCorners != 1) {
-    prefix += "s";
+    header += "s";
   }
-  prefix += "): ";
-  const unsigned int missing = 32 - prefix.size();
+  header += "): ";
+  const unsigned int missing = 32 - header.size();
   if (missing > 0) {
     for (unsigned int i = 0; i < missing; ++i) {
-      prefix += " ";
+      header += " ";
     }
   }
-  const std::string whitespace = Dune::FemTools::String::whitespaceify(prefix);
+  const std::string whitespace = Dune::Stuff::Common::String::whitespaceify(header);
 
-  stream << prefix << "[ (";
+  stream << prefix << header << "[ (";
   for (int i = 0; i < numCorners; ++i) {
-    const GlobalPointType corner = geometry.corner(i);
-    for (unsigned int j = 0; j < corner.size; ++j) {
+    const GlobalPointType& corner = geometry.corner(i);
+    for (unsigned int j = 0; j < corner.size(); ++j) {
       stream << corner[j];
-      if (j < corner.size - 1) {
+      if (j < corner.size() - 1) {
         stream << ", ";
       }
     }
