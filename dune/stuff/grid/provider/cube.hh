@@ -51,7 +51,7 @@ public:
   typedef GridImp GridType;
 
   //! Dimension of the provided grid.
-  static const int dim = GridType::dimension;
+  static const unsigned int dim = GridType::dimension;
 
   //! Type of the grids coordinates.
   typedef Dune::FieldVector<typename GridType::ctype, dim> CoordinateType;
