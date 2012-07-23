@@ -9,7 +9,7 @@
 #include <config.h>
 #endif // ifdef HAVE_CMAKE_CONFIG
 
-//#if HAVE_DUNE_FEM
+#if HAVE_DUNE_FEM
 #include <dune/fem/misc/mpimanager.hh>
 #include <dune/fem/space/fvspace/fvspace.hh>
 #include <dune/fem/space/dgspace.hh>
@@ -18,7 +18,7 @@
 #include <dune/fem/operator/projection/l2projection.hh>
 #include <dune/fem/io/file/datawriter.hh>
 #include <dune/stuff/fem/customprojection.hh>
-//#endif
+#endif
 
 // system
 #include <iostream>
@@ -117,7 +117,7 @@ int main(int argc, char** argv)
     parameterFunction.evaluate(mu, result);
     std::cout << "evaluate(" << mu << ") = " << result << std::endl;
 
-    //#if HAVE_DUNE_FEM
+#if HAVE_DUNE_FEM
     Dune::GridPtr<GridType> gridPtr(paramTree.get("dgf_file", "dummy"));
     typedef Dune::AdaptiveLeafGridPart<GridType> GridPartType;
     GridPartType gridPart_(*gridPtr);
@@ -133,9 +133,10 @@ int main(int argc, char** argv)
     OutputTupleType out(&rf_disc);
     DataWriterType dt(gridPart_.grid(), out);
     dt.write();
-    //#endif
+#endif
   } catch (Dune::Exception& e) {
     std::cout << e.what() << std::endl;
+    return 1;
   }
   return 0;
 }
