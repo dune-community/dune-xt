@@ -2,15 +2,12 @@
 #define DUNE_STUFF_GRID_INFORMATION_HH
 
 #include <ostream>
+#include <boost/format.hh>
+#include <dune/stuff/common/math.hh>
 
 namespace Dune {
-
 namespace Stuff {
-
-namespace Stuff {
-
 namespace Grid {
-
 namespace Information {
 
 /** \brief grid statistic output to given stream
@@ -145,11 +142,17 @@ struct Dimensions
   }
 };
 
+
+} // namespace Information
+} // namespace Grid
+} // end of namespace Stuff
+} // namespace Dune
+
 template <class T>
-inline std::ostream& operator<<(std::ostream& s, const Dimensions<T>& d)
+inline std::ostream& operator<<(std::ostream& s, const Dune::Stuff::Grid::Information::Dimensions<T>& d)
 {
   for (size_t k = 0; k < T::dimensionworld; ++k) {
-    const typename GridDimensions<T>::MinMaxAvgType& mma = d.coord_limits[k];
+    const typename Dune::Stuff::Grid::Information::Dimensions<T>::MinMaxAvgType& mma = d.coord_limits[k];
     s << boost::format("x%d\tmin: %e\tavg: %e\tmax: %e\n") % k % mma.min() % mma.average() % mma.max();
   }
   s << boost::format("Entity vol min: %e\tavg: %e\tmax: %e\tQout: %e") % d.entity_volume.min()
@@ -157,17 +160,4 @@ inline std::ostream& operator<<(std::ostream& s, const Dimensions<T>& d)
   s << std::endl;
   return s;
 } // <<
-
-} // namespace Information
-
-} // namespace Grid
-
-} // namespace Stuff
-
-} // end of namespace Stuff
-#ifndef DUNE_NEW_NAMESPACES
-using namespace Stuff;
-#endif
-} // namespace Dune
-
 #endif // DUNE_STUFF_GRID_INFORMATION_HH
