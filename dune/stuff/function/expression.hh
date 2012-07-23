@@ -15,6 +15,10 @@
 #include <Eigen/Core>
 #endif // HAVE_EIGEN
 
+#ifdef HAVE_DUNE_FEM
+#include <dune/fem/function/common/function.hh>
+#endif
+
 // local
 #include "expression/mathexpr.hh"
 
@@ -47,6 +51,10 @@ expression.1: sin(x[1])*x[0]\endcode
  **/
 template <class DomainFieldImp, int maxDimDomain, class RangeFieldImp, int maxDimRange>
 class Expression
+#ifdef HAVE_DUNE_FEM
+    : public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, maxDimDomain, maxDimRange>,
+                                 Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>>
+#endif
 {
 public:
   typedef DomainFieldImp DomainFieldType;
@@ -168,35 +176,18 @@ public:
     DUNE_THROW(Dune::NotImplemented, "Not implemented for arbitrary DomainType and RangeType");
   }
 
-  template <class DomainFieldType, int domainSize, class RangeFieldType, int rangeSize>
-  void evaluate(const Dune::FieldVector<DomainFieldType, domainSize>& arg,
-                Dune::FieldVector<RangeFieldType, rangeSize>& ret) const
+  template <class DomainVectorType, class RangeVectorType>
+  void evaluate(const Dune::DenseVector<DomainVectorType>& arg, Dune::DenseVector<RangeVectorType>& ret) const
   {
     // ensure right dimensions
     assert(arg.size() <= maxDimDomain);
     assert(ret.size() <= dimRange());
     // arg
-    for (unsigned int i = 0; i < arg.size(); ++i) {
+    for (typename Dune::DenseVector<DomainVectorType>::size_t i = 0; i < arg.size(); ++i) {
       *(arg_[i]) = arg[i];
     }
     // ret
-    for (unsigned int i = 0; i < ret.size(); ++i) {
-      ret[i] = op_[i]->Val();
-    }
-  }
-
-  template <class DomainFieldType, class RangeFieldType>
-  void evaluate(const Dune::DynamicVector<DomainFieldType>& arg, Dune::DynamicVector<RangeFieldType>& ret) const
-  {
-    // ensure right dimensions
-    assert(arg.size() <= maxDimDomain);
-    assert(ret.size() <= dimRange());
-    // arg
-    for (int i = 0; i < arg.size(); ++i) {
-      *(arg_[i]) = arg[i];
-    }
-    // ret
-    for (int i = 0; i < ret.size(); ++i) {
+    for (typename Dune::DenseVector<RangeVectorType>::size_t i = 0; i < ret.size(); ++i) {
       ret[i] = op_[i]->Val();
     }
   }
