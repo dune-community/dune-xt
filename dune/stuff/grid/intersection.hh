@@ -36,7 +36,7 @@ void print(const IntersectionType& intersection, std::ostream& stream = std::cou
 
   const int numCorners = geometry.corners();
 
-  std::string prefix = "Dune::Intersection (" + Dune::HelperTools::Common::String::toString(numCorners) + " corner";
+  std::string prefix = "Dune::Intersection (" + Dune::Stuff::Common::String::convertTo(numCorners) + " corner";
   if (numCorners != 1) {
     prefix += "s";
   }
@@ -47,7 +47,7 @@ void print(const IntersectionType& intersection, std::ostream& stream = std::cou
       prefix += " ";
     }
   }
-  const std::string whitespace = Dune::HelperTools::Common::String::whitespaceify(prefix);
+  const std::string whitespace = Dune::Stuff::Common::String::whitespaceify(prefix);
 
   stream << prefix << "[ (";
   for (int i = 0; i < numCorners; ++i) {
