@@ -2,3 +2,7 @@ test_validation
 *.o
 *.gcda
 *.gcno
+common_color
+common_logger
+common_parameter_validation
+function_expression_2
