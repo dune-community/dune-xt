@@ -18,8 +18,10 @@
 #include <dune/common/timer.hh>
 
 // dune-rb
+#ifdef HAVE_DUNE_RB
 #include <dune/rb/grid/provider/cornerpoint.hh>
 #include <dune/rb/grid/provider/cube.hh>
+#endif
 
 /**
   \brief      Creates a parameter file if it does not exist.
@@ -144,7 +146,8 @@ int main(int argc, char** argv)
     ensureParamFile("provider.param");
     Dune::ParameterTree paramTree;
     initParamTree(argc, argv, paramTree);
-    // unitcube
+// unitcube
+#ifdef HAVE_DUNE_RB
     typedef Dune::RB::Grid::Provider::Cube<Dune::GridSelector::GridType,
                                            Dune::RB::Grid::Multiscale::Multidomain<Dune::GridSelector::GridType>>
         CubeProviderType;
@@ -162,8 +165,10 @@ int main(int argc, char** argv)
     // measure timing
     std::cout << std::endl;
     measureTiming(cubeProvider);
+#endif
   } catch (Dune::Exception& e) {
     std::cout << e.what() << std::endl;
+    return 1;
   }
   return 0;
 }
