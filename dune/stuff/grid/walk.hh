@@ -1,5 +1,5 @@
-#ifndef STUFF_GRID_HH_INCLUDED
-#define STUFF_GRID_HH_INCLUDED
+#ifndef DUNE_STUFF_WALK_HH_INCLUDED
+#define DUNE_STUFF_WALK_HH_INCLUDED
 
 #include <dune/common/static_assert.hh>
 #include <dune/common/fvector.hh>
@@ -11,9 +11,7 @@
 #include <boost/format.hpp>
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Grid {
 
 // ! Base class for Gridwalk Functors that don't want to reimplement pre/postWalk
@@ -78,55 +76,11 @@ private:
   const GridView& gridView_;
 };
 
-// ! GridWalk functor that refines all entitites above given volume
-template <class GridType>
-struct MaximumEntityVolumeRefineFunctor
-{
-  MaximumEntityVolumeRefineFunctor(GridType& grid, double volume, double factor)
-    : threshold_volume_(volume * factor)
-    , grid_(grid)
-  {
-  }
-
-  template <class Entity>
-  void operator()(const Entity& ent, const int /*ent_idx*/)
-  {
-    const double volume = ent.geometry().volume();
-
-    if (volume > threshold_volume_)
-      grid_.mark(1, ent);
-  }
-
-  const double threshold_volume_;
-  GridType& grid_;
-};
-
-// ! refine entities until all have volume < size_factor * unrefined_minimum_volume
-template <class GridType>
-void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
-{
-  const GridDimensions<GridType> unrefined_dimensions(grid);
-  const double unrefined_min_volume = unrefined_dimensions.entity_volume.min();
-  typedef typename GridType::LeafGridView View;
-  View view = grid.leafView();
-  MaximumEntityVolumeRefineFunctor<GridType> f(grid, unrefined_min_volume, size_factor);
-  while (true) {
-    grid.preAdapt();
-    Walk<View>(view).walkCodim0(f);
-    if (!grid.adapt())
-      break;
-    grid.postAdapt();
-    std::cout << Stuff::GridDimensions<GridType>(grid);
-  }
-} // EnforceMaximumEntityVolume
-
 } // namespace Grid
-
 } // namespace Stud
-
 } // namespace Dune
 
-#endif // ifndef STUFF_GRID_HH_INCLUDED
+#endif // ifndef DUNE_STUFF_WALK_HH_INCLUDED
 /** Copyright (c) 2012, Felix Albrecht, Rene Milk
    * All rights reserved.
    *
