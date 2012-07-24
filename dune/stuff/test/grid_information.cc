@@ -4,11 +4,17 @@
 #include <config.h>
 #endif // ifdef HAVE_CMAKE_CONFIG
 
+#include <dune/stuff/grid/information.hh>
+#include <dune/common/mpihelper.hh>
+
 int main(int argc, char** argv)
 {
+
+
   try {
     // mpi
     Dune::MPIHelper::instance(argc, argv);
+
 
   } catch (Dune::Exception& e) {
     std::cout << e.what() << std::endl;
