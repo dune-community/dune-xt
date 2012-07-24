@@ -79,19 +79,19 @@ public:
       DUNE_THROW(Dune::InvalidStateException, msg.str());
     }
     for (unsigned int i = 0; i < maxDimDomain; ++i) {
-      std::stringstream variable;
-      variable << variable_ << "[" << i << "]";
-      variables_.push_back(variable.str());
+      std::stringstream tmp_variable;
+      tmp_variable << variable_ << "[" << i << "]";
+      variables_.push_back(tmp_variable.str());
     }
     // get expressions
     bool goOn      = true;
     unsigned int i = 0;
     while (goOn) {
       if (i < maxDimRange) {
-        std::stringstream expression;
-        expression << "expression." << i;
-        if (paramTree.hasKey(expression.str())) {
-          expressions_.push_back(paramTree.get(expression.str(), ""));
+        std::stringstream tmp_expression;
+        tmp_expression << "expression." << i;
+        if (paramTree.hasKey(tmp_expression.str())) {
+          expressions_.push_back(paramTree.get(tmp_expression.str(), ""));
           ++i;
         } else {
           goOn = false;
@@ -113,10 +113,10 @@ public:
   } // Expression(Dune::ParameterTree& paramTree)
 
 
-  Expression(const std::string variable, const std::vector<std::string>& expressions)
-    : variable_(variable)
-    , expressions_(expressions)
-    , actualDimRange_(expressions.size())
+  Expression(const std::string variable_in, const std::vector<std::string>& expressions_in)
+    : variable_(variable_in)
+    , expressions_(expressions_in)
+    , actualDimRange_(expressions_.size())
   {
     // assert dims
     assert(maxDimDomain > 0);
@@ -155,7 +155,6 @@ public:
 
   std::string expression(unsigned int i) const
   {
-    assert(0 <= i);
     assert(i < dimRange());
     return expressions_[i];
   } // std::string expression(int i) const
@@ -171,7 +170,7 @@ public:
   }
 
   template <class DomainType, class RangeType>
-  void evaluate(const DomainType& arg, RangeType& ret) const
+  void evaluate(const DomainType& /*arg*/, RangeType& /*ret*/) const
   {
     DUNE_THROW(Dune::NotImplemented, "Not implemented for arbitrary DomainType and RangeType");
   }

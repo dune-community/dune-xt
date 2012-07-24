@@ -639,7 +639,7 @@ ROperation ApplyOperator(int n, ROperation** pops, ROperation (*func)(const ROpe
   return (*func)(*pops[0], ApplyOperator(n - 1, pops + 1, func));
 }
 
-ROperation RFunction::operator()(const ROperation& op)
+ROperation RFunction::operator()(const ROperation& _op)
 {
   /* Code to use to replace explcitly instead of using a pointer to
      if(nvars!=op.NMembers()||type==-1||type==0)return ErrVal;
@@ -660,7 +660,7 @@ ROperation RFunction::operator()(const ROperation& op)
   ROperation op2;
   op2.op    = Fun;
   op2.pfunc = this;
-  op2.mmb2  = new ROperation(op);
+  op2.mmb2  = new ROperation(_op);
   return op2;
 }
 
