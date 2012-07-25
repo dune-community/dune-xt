@@ -1,11 +1,6 @@
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#elif defined(HAVE_CONFIG_H)
-#include <config.h>
-#endif // ifdef HAVE_CMAKE_CONFIG
+#include "test_common.hh"
 
 #include <dune/stuff/grid/information.hh>
-#include <dune/common/mpihelper.hh>
 
 int main(int argc, char** argv)
 {
