@@ -169,12 +169,6 @@ public:
     return actualDimRange_;
   }
 
-  template <class DomainType, class RangeType>
-  void evaluate(const DomainType& /*arg*/, RangeType& /*ret*/) const
-  {
-    DUNE_THROW(Dune::NotImplemented, "Not implemented for arbitrary DomainType and RangeType");
-  }
-
   template <class DomainVectorType, class RangeVectorType>
   void evaluate(const Dune::DenseVector<DomainVectorType>& arg, Dune::DenseVector<RangeVectorType>& ret) const
   {
@@ -182,11 +176,11 @@ public:
     assert(arg.size() <= maxDimDomain);
     assert(ret.size() <= dimRange());
     // arg
-    for (typename Dune::DenseVector<DomainVectorType>::size_t i = 0; i < arg.size(); ++i) {
+    for (typename Dune::DenseVector<DomainVectorType>::size_type i = 0; i < arg.size(); ++i) {
       *(arg_[i]) = arg[i];
     }
     // ret
-    for (typename Dune::DenseVector<RangeVectorType>::size_t i = 0; i < ret.size(); ++i) {
+    for (typename Dune::DenseVector<RangeVectorType>::size_type i = 0; i < ret.size(); ++i) {
       ret[i] = op_[i]->Val();
     }
   }
