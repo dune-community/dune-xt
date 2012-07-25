@@ -3,11 +3,7 @@
   \brief  Demonstrates the capabilities of some Dune::RB::Grid::Providers.
   **/
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#elif defined(HAVE_CONFIG_H)
-#include <config.h>
-#endif // ifdef HAVE_CMAKE_CONFIG
+#include "test_common.hh"
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/misc/mpimanager.hh>
@@ -26,7 +22,6 @@
 
 // boost
 #include <boost/filesystem.hpp>
-
 
 #include <dune/common/mpihelper.hh>
 #include <dune/common/parametertreeparser.hh>
