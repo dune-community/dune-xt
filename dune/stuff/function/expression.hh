@@ -17,6 +17,7 @@
 
 #ifdef HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
+#include <dune/fem/space/common/functionspace.hh>
 #endif
 
 // local
