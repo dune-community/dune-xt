@@ -3,6 +3,7 @@
 
 // system
 #include <sstream>
+#include <type_traits>
 #include <boost/assign/list_of.hpp>
 
 // dune-common
