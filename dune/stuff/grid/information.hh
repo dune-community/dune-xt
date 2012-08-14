@@ -92,17 +92,17 @@ unsigned int maxNumberOfNeighbors(const GridPartType& gridPart)
   return maxNeighbours;
 } // unsigned int maxNumberOfNeighbors(const GridPartType& gridPart)
 
-// ! Provide min/max coordinates for all space dimensions of a Grid (in the leafView)
+//! Provide min/max coordinates for all space dimensions of a Grid (in the leafView)
 template <class GridType>
 struct Dimensions
 {
-  // ! automatic running min/max
+  //! automatic running min/max
   typedef Dune::Stuff::Common::Math::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
   typedef Dune::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
   CoordLimitsType coord_limits;
   MinMaxAvgType entity_volume;
 
-  // ! gridwalk functor that does the actual work for \ref GridDimensions
+  //! gridwalk functor that does the actual work for \ref GridDimensions
   class GridDimensionsFunctor
   {
     CoordLimitsType& coord_limits_;

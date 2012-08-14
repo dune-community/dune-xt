@@ -14,7 +14,7 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
-// ! Base class for Gridwalk Functors that don't want to reimplement pre/postWalk
+//! Base class for Gridwalk Functors that don't want to reimplement pre/postWalk
 struct WalkFunctorDefault
 {
   void preWalk() const

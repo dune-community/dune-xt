@@ -79,7 +79,7 @@ public:
     : lowerLeft_(0.0)
     , upperRight_(1.0)
   {
-    // select subtree
+    // select subtree (if necessary)
     Dune::ParameterTree paramTree_ = paramTree;
     if (paramTree.hasSub(id))
       paramTree_ = paramTree.sub(id);
@@ -168,13 +168,15 @@ private:
   template <int dim>
   struct P0Layout
   {
-    bool contains(Dune::GeometryType& geometry)
+    bool DUNE_DEPRECATED_MSG("geometries should be passed by value") contains(Dune::GeometryType& geometry)
     {
-      if (geometry.dim() == dim)
-        return true;
-      return false;
+      return geometry.dim() == dim;
     }
-  }; // struct P0Layout
+    bool contains(const Dune::GeometryType geometry)
+    {
+      return geometry.dim() == dim;
+    }
+  }; // layout class for codim 0 mapper
 
 public:
   /**
@@ -241,6 +243,32 @@ private:
 template <typename GridImp, int variant>
 const std::string GenericCube<GridImp, variant>::id = "stuff.grid.provider.cube";
 
+template <typename GridType>
+struct ElementVariant
+{
+  static const int id = 2;
+};
+
+template <int dim>
+struct ElementVariant<Dune::YaspGrid<dim>>
+{
+  static const int id = 1;
+};
+
+template <int dim>
+struct ElementVariant<Dune::SGrid<dim, dim>>
+{
+  static const int id = 1;
+};
+
+#ifdef HAVE_ALUGRID
+template <int dim>
+struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
+{
+  static const int id = 1;
+};
+#endif
+
 // default implementation of a cube for any grid
 // tested for
 // dim = 2
@@ -249,10 +277,10 @@ const std::string GenericCube<GridImp, variant>::id = "stuff.grid.provider.cube"
 // dim = 3
 //  ALUGRID_SIMPLEX, variant 2
 template <typename GridType>
-class Cube : public GenericCube<GridType, 2>
+class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
 {
 private:
-  typedef GenericCube<GridType, 2> BaseType;
+  typedef GenericCube<GridType, ElementVariant<GridType>::id> BaseType;
 
 public:
   typedef typename BaseType::CoordinateType CoordinateType;
@@ -272,87 +300,6 @@ public:
   {
   }
 }; // class Cube
-
-// specialization of Cube for YaspGrid
-// tested for dim = 1, 2, 3
-template <int dim>
-class Cube<Dune::YaspGrid<dim>> : public GenericCube<Dune::YaspGrid<dim>, 1>
-{
-private:
-  typedef GenericCube<Dune::YaspGrid<dim>, 1> BaseType;
-
-public:
-  typedef typename BaseType::CoordinateType CoordinateType;
-
-  Cube(const Dune::ParameterTree& paramTree)
-    : BaseType(paramTree)
-  {
-  }
-
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
-  {
-  }
-
-  Cube(const double lowerLeft, const double upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
-  {
-  }
-}; // class Cube< Dune::YaspGrid< dim > >
-
-// specialization of Cube for SGrid
-// tested for dim = 1, 2, 3
-template <int dim>
-class Cube<Dune::SGrid<dim, dim>> : public GenericCube<Dune::SGrid<dim, dim>, 1>
-{
-private:
-  typedef GenericCube<Dune::SGrid<dim, dim>, 1> BaseType;
-
-public:
-  typedef typename BaseType::CoordinateType CoordinateType;
-
-  Cube(const Dune::ParameterTree& paramTree)
-    : BaseType(paramTree)
-  {
-  }
-
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
-  {
-  }
-
-  Cube(const double lowerLeft, const double upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
-  {
-  }
-}; // class Cube< Dune::SGrid< dim, dim > >
-
-// specialization of Cube for ALUCubeGrid
-// tested for dim = 2, 3
-template <int dim>
-class Cube<Dune::ALUCubeGrid<dim, dim>> : public GenericCube<Dune::ALUCubeGrid<dim, dim>, 1>
-{
-private:
-  typedef GenericCube<Dune::ALUCubeGrid<dim, dim>, 1> BaseType;
-
-public:
-  typedef typename BaseType::CoordinateType CoordinateType;
-
-  Cube(const Dune::ParameterTree& paramTree)
-    : BaseType(paramTree)
-  {
-  }
-
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
-  {
-  }
-
-  Cube(const double lowerLeft, const double upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
-  {
-  }
-}; // class Cube< Dune::ALUCubeGrid< dim, dim > >
 
 template <typename GridType>
 class UnitCube : public Cube<GridType>
