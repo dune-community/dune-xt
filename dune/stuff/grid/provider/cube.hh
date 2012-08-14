@@ -3,6 +3,7 @@
 
 // system
 #include <sstream>
+#include <boost/assign/list_of.hpp>
 
 // dune-common
 #include <dune/common/parametertree.hh>
@@ -19,11 +20,8 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Grid {
-
 namespace Provider {
 
 /**
@@ -91,7 +89,7 @@ public:
     upperRight_ = upperRight;
     // get number of elements per dim
     if (paramTree.hasKey("level"))
-      std::fill(numElements_.begin(), numElements_.end(), std::pow(2, paramTree_.get("level", 1)));
+      std::fill(std::begin(numElements_), std::end(numElements_), std::pow(2, paramTree.get("level", 1)));
     else {
       for (unsigned int d = 0; d < dim; ++d) {
         std::stringstream s;
@@ -132,14 +130,43 @@ public:
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
-    std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
+    std::fill(std::begin(numElements_), std::end(numElements_), std::pow(2, level));
     buildGrid();
   }
 
   /**
-   *  \brief  Provides access to the created grid.
-   *  \return Reference to the grid.
-   **/
+    \brief      Creates a cube. This signature allows to prescribe anisotopic refinement
+    \param[in]  lowerLeft
+                A double that is used as a lower left corner in each dimension.
+    \param[in]  upperRight
+                A double that is used as a upper right corner in each dimension.
+    \param[in]  elements_per_dim number of elements in each dimension.
+                can contain 0 to dim elements (missing dimension are initialized to 1)
+    \tparam Coord anything that CoordinateType allows to copy construct from
+    \tparam ContainerType some sequence type that functions with std::begin/end
+    \tparam T an unsigned integral Type
+    **/
+  template <class Coord, class ContainerType>
+  GenericCube(const Coord lowerLeft, const Coord upperRight,
+              const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>()
+                                                         .repeat(GridType::dimensionworld,
+                                                                 typename ContainerType::value_type(1)))
+    : lowerLeft_(lowerLeft)
+    , upperRight_(upperRight)
+  {
+    static_assert(std::is_unsigned<typename ContainerType::value_type>::value
+                      && std::is_integral<typename ContainerType::value_type>::value,
+                  "only unsigned integral number of elements per dimension allowed");
+    // base init in case input is shorter
+    std::fill(std::begin(numElements_), std::end(numElements_), 1);
+    std::copy(std::begin(elements_per_dim), std::end(elements_per_dim), std::begin(numElements_));
+    buildGrid();
+  }
+
+  /**
+    \brief  Provides access to the created grid.
+    \return Reference to the grid.
+    **/
   GridType& grid()
   {
     return *grid_;
@@ -299,6 +326,14 @@ public:
     : BaseType(lowerLeft, upperRight, level)
   {
   }
+
+  template <class Coord, class ContainerType>
+  Cube(const Coord lowerLeft, const Coord upperRight,
+       const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>().repeat(
+           GridType::dimensionworld, typename ContainerType::value_type(1)))
+    : BaseType(lowerLeft, upperRight, elements_per_dim)
+  {
+  }
 }; // class Cube
 
 template <typename GridType>
@@ -320,11 +355,8 @@ public:
 }; // class UnitCube
 
 } // namespace Provider
-
 } // namespace Grid
-
 } // namespace Stuff
-
 } // namespace Dune
 
 #endif // DUNE_STUFF_GRID_PROVIDER_CUBE_HH
