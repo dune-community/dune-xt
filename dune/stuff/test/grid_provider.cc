@@ -1,8 +1,4 @@
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#elif defined(HAVE_CONFIG_H)
-#include <config.h>
-#endif // ifdef HAVE_CMAKE_CONFIG
+#include "test_common.hh"
 
 // system
 #include <iostream>
@@ -17,7 +13,7 @@
 #include <dune/common/timer.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
-//#include <dune/stuff/grid/provider/cornerpoint.hh>
+#include <dune/stuff/grid/provider/cornerpoint.hh>
 #include <dune/stuff/grid/provider/cube.hh>
 
 using namespace Dune::Stuff;
@@ -40,12 +36,37 @@ void ensureParamFile(std::string filename)
     file.open(filename);
     file << "[stuff.grid.provider.cube]" << std::endl;
     file << "level = 2" << std::endl;
+    file << "visualize.grid = rb_grid_provider_cube_grid" << std::endl;
+    file << "visualize.msGrid = rb_grid_provider_cube_msGrid" << std::endl;
     file << std::endl;
     file << "[stuff.grid.provider.cornerpoint]" << std::endl;
     file << "filename = /dune-stuff/data/grid/johansen_formation.grdecl" << std::endl; // has to be an absolute path
     file.close();
   } // only write param file if there is none
 } // void ensureParamFile()
+
+/**
+  \brief      Fills a Dune::ParameterTree given a parameter file or command line arguments.
+  \param[in]  argc
+              From \c main()
+  \param[in]  argv
+              From \c main()
+  \param[out] paramTree
+              The Dune::ParameterTree that is to be filled.
+  **/
+void initParamTree(int argc, char** argv, Dune::ParameterTree& paramTree)
+{
+  if (argc == 1) {
+    Dune::ParameterTreeParser::readINITree("provider.param", paramTree);
+  } else if (argc == 2) {
+    Dune::ParameterTreeParser::readINITree(argv[1], paramTree);
+  } else {
+    Dune::ParameterTreeParser::readOptions(argc, argv, paramTree);
+  }
+  if (paramTree.hasKey("paramfile")) {
+    Dune::ParameterTreeParser::readINITree(paramTree.get<std::string>("paramfile"), paramTree, false);
+  }
+}
 
 template <class GridViewType>
 int walkGridView(const GridViewType& gridView)
@@ -58,7 +79,44 @@ int walkGridView(const GridViewType& gridView)
     ++numElements;
   }
   return numElements;
-} // int walkGridView(GridViewType& gridView)
+} // void walkGrid(const GridType& grid)
+
+/*template< class MDGridType >
+int walkMDGrid(MDGridType& mdGrid)
+{
+  int numElements = 0;
+  // loop over all subdomains
+  for (typename MDGridType::SubDomainIndexType subdomainIndex = 0;
+       subdomainIndex <= mdGrid.maxSubDomainIndex;
+       ++subdomainIndex) {
+    // subdomain grid
+    typedef typename MDGridType::SubDomainGrid SDGridType;
+    const SDGridType& sdGrid = mdGrid.subDomain(subdomainIndex);
+    // subdomain grid view
+    typedef typename SDGridType::LeafGridView SDGridViewType;
+    const SDGridViewType& sdGridView = sdGrid.leafView();
+    // walk the subdomain grid
+    typedef typename SDGridViewType::template Codim<0>::Iterator SDElementIteratorType;
+    typedef typename SDGridViewType::template Codim<0>::Entity SDElementType;
+    for (SDElementIteratorType sdElementIterator = sdGridView.template begin<0>();
+         sdElementIterator != sdGridView.template end<0>();
+         ++sdElementIterator) {
+      const SDElementType& sdElement = *sdElementIterator;
+      ++numElements;
+    } // walk the subdomain grid
+  } // loop over all subdomains
+  return numElements;
+} // void walkMDGrid(const GridType& grid)*/
+
+template <class GridProviderType>
+void measureTiming(GridProviderType& gridProvider)
+{
+  Dune::Timer timer;
+  typename GridProviderType::GridType::LeafGridView gridView = gridProvider.grid().leafView();
+  const int numHostGridElements = walkGrid(gridView);
+  std::cout << "  host grid:        " << timer.elapsed() << " sec, " << numHostGridElements << " elements" << std::endl;
+  timer.reset();
+}
 
 /**
   \brief  Main routine.
@@ -74,29 +132,20 @@ int main(int argc, char** argv)
     // timer
     Dune::Timer timer;
     // unitcube
-    std::cout << "creating Cube... ";
+
     typedef Grid::Provider::Cube<Dune::GridSelector::GridType> CubeProviderType;
     CubeProviderType cubeProvider(paramTree);
-    std::cout << "done (took " << timer.elapsed() << "s)" << std::endl;
-    std::cout << "timing... ";
-    timer.reset();
-    const int numElements = walkGridView(cubeProvider.grid().leafView());
-    std::cout << "done (took " << timer.elapsed() << "s, has " << numElements << " elements)" << std::endl;
-    std::cout << "visualizing... ";
-    timer.reset();
-    cubeProvider.visualize(id);
-    std::cout << "done (took " << timer.elapsed() << "s, see " << id;
-    if (CubeProviderType::dim == 1)
-      std::cout << ".vtp";
-    else
-      std::cout << ".vtu";
-    std::cout << ")" << std::endl;
-    //    // cornerpoint
-    //#ifdef HAVE_DUNE_CORNERPOINT
-    //    typedef Grid::Provider::Cornerpoint CornerpointGridProviderType;
-    //    CornerpointGridProviderType cornerpointGridProvider(paramTree);
-    //    cornerpointGridProvider.visualize(paramTree);
-    //#endif
+    cubeProvider.visualize(paramTree);
+// cornerpoint
+#ifdef HAVE_DUNE_CORNERPOINT
+    typedef Grid::Provider::Cornerpoint CornerpointGridProviderType;
+    CornerpointGridProviderType cornerpointGridProvider(paramTree);
+    cornerpointGridProvider.visualize(paramTree);
+#endif
+    // measure timing
+    std::cout << std::endl;
+    measureTiming(cubeProvider);
+
   } catch (Dune::Exception& e) {
     std::cout << e.what() << std::endl;
     return 1;
