@@ -247,6 +247,32 @@ private:
 template <typename GridImp, int variant>
 const std::string GenericCube<GridImp, variant>::id = "stuff.grid.provider.cube";
 
+template <typename GridType>
+struct ElementVariant
+{
+  static const int id = 2;
+};
+
+template <int dim>
+struct ElementVariant<Dune::YaspGrid<dim>>
+{
+  static const int id = 1;
+};
+
+template <int dim>
+struct ElementVariant<Dune::SGrid<dim, dim>>
+{
+  static const int id = 1;
+};
+
+#ifdef HAVE_ALUGRID
+template <int dim>
+struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
+{
+  static const int id = 1;
+};
+#endif
+
 // default implementation of a cube for any grid
 // tested for
 // dim = 2
@@ -255,10 +281,10 @@ const std::string GenericCube<GridImp, variant>::id = "stuff.grid.provider.cube"
 // dim = 3
 //  ALUGRID_SIMPLEX, variant 2
 template <typename GridType>
-class Cube : public GenericCube<GridType, 2>
+class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
 {
 private:
-  typedef GenericCube<GridType, 2> BaseType;
+  typedef GenericCube<GridType, ElementVariant<GridType>::id> BaseType;
 
 public:
   typedef typename BaseType::CoordinateType CoordinateType;
