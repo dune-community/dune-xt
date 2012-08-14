@@ -150,11 +150,13 @@ private:
   template <int dim>
   struct P0Layout
   {
-    bool contains(Dune::GeometryType& geometry)
+    bool DUNE_DEPRECATED_MSG("geometries should be passed by value") contains(Dune::GeometryType& geometry)
     {
-      if (geometry.dim() == dim)
-        return true;
-      return false;
+      return geometry.dim() == dim;
+    }
+    bool contains(const Dune::GeometryType geometry)
+    {
+      return geometry.dim() == dim;
     }
   }; // layout class for codim 0 mapper
 
@@ -187,7 +189,7 @@ public:
       const std::string filenameGrid = params.get("grid", id + ".grid");
       // grid view
       typedef GridImp GridType;
-      GridType& grid = this->grid();
+      const GridType& grid = this->grid();
       typedef typename GridType::LeafGridView GridView;
       GridView gridView = grid.leafView();
       // mapper

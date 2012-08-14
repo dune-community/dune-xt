@@ -1,9 +1,4 @@
-/**
-  \file   examples/grid/provider.cc
-  \brief  Demonstrates the capabilities of some Dune::RB::Grid::Providers.
-  **/
-
-#include "config.h"
+#include "test_common.hh"
 
 // system
 #include <iostream>
@@ -17,12 +12,10 @@
 #include <dune/common/parametertreeparser.hh>
 #include <dune/common/timer.hh>
 
-// dune-rb
-#ifdef HAVE_DUNE_RB
-#include <dune/rb/grid/provider/cornerpoint.hh>
-#include <dune/rb/grid/provider/cube.hh>
-#endif
+#include <dune/stuff/grid/provider/cornerpoint.hh>
+#include <dune/stuff/grid/provider/cube.hh>
 
+using namespace Dune::Stuff;
 /**
   \brief      Creates a parameter file if it does not exist.
 
@@ -122,16 +115,6 @@ void measureTiming(GridProviderType& gridProvider)
   const int numHostGridElements = walkGrid(gridView);
   std::cout << "  host grid:        " << timer.elapsed() << " sec, " << numHostGridElements << " elements" << std::endl;
   timer.reset();
-  typename GridProviderType::MsGridType::GridViewType wrappedGridView = gridProvider.msGrid().gridView();
-  const int numWrappedGridElements = walkGrid(wrappedGridView);
-  std::cout << "  wrapped grid:     " << timer.elapsed() << " sec, " << numWrappedGridElements << " elements"
-            << std::endl;
-  timer.reset();
-  typename GridProviderType::MsGridType::LocalGridViewType localGridView = gridProvider.msGrid().localGridView(0);
-  const int numLocalGridElements = walkGrid(localGridView);
-  std::cout << "  local grid:       " << timer.elapsed() << " sec, " << numLocalGridElements << " elements"
-            << std::endl;
-  timer.reset();
 }
 
 /**
@@ -146,26 +129,21 @@ int main(int argc, char** argv)
     ensureParamFile("provider.param");
     Dune::ParameterTree paramTree;
     initParamTree(argc, argv, paramTree);
-// unitcube
-#ifdef HAVE_DUNE_RB
-    typedef Dune::RB::Grid::Provider::Cube<Dune::GridSelector::GridType,
-                                           Dune::RB::Grid::Multiscale::Multidomain<Dune::GridSelector::GridType>>
-        CubeProviderType;
+    // unitcube
+
+    typedef Grid::Provider::Cube<Dune::GridSelector::GridType> CubeProviderType;
     CubeProviderType cubeProvider(paramTree);
+    cubeProvider.visualize(paramTree);
 // cornerpoint
 #ifdef HAVE_DUNE_CORNERPOINT
-    typedef Dune::RB::Grid::Provider::Cornerpoint CornerpointGridProviderType;
+    typedef Grid::Provider::Cornerpoint CornerpointGridProviderType;
     CornerpointGridProviderType cornerpointGridProvider(paramTree);
-#endif // HAVE_DUNE_CORNERPOINT
-    // visualize
-    cubeProvider.visualize(paramTree);
-#ifdef HAVE_DUNE_CORNERPOINT
     cornerpointGridProvider.visualize(paramTree);
 #endif
     // measure timing
     std::cout << std::endl;
     measureTiming(cubeProvider);
-#endif
+
   } catch (Dune::Exception& e) {
     std::cout << e.what() << std::endl;
     return 1;
