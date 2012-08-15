@@ -90,7 +90,7 @@ public:
     upperRight_ = upperRight;
     // get number of elements per dim
     if (paramTree.hasKey("level"))
-      std::fill(std::begin(numElements_), std::end(numElements_), std::pow(2, paramTree.get("level", 1)));
+      std::fill(numElements_.begin(), numElements_.end(), std::pow(2, paramTree.get("level", 1)));
     else {
       for (unsigned int d = 0; d < dim; ++d) {
         std::stringstream s;
@@ -131,7 +131,7 @@ public:
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
-    std::fill(std::begin(numElements_), std::end(numElements_), std::pow(2, level));
+    std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
     buildGrid();
   }
 
@@ -159,8 +159,8 @@ public:
                       && std::is_integral<typename ContainerType::value_type>::value,
                   "only unsigned integral number of elements per dimension allowed");
     // base init in case input is shorter
-    std::fill(std::begin(numElements_), std::end(numElements_), 1);
-    std::copy(std::begin(elements_per_dim), std::end(elements_per_dim), std::begin(numElements_));
+    std::fill(numElements_.begin(), numElements_.end(), 1);
+    std::copy(elements_per_dim.begin(), elements_per_dim.end(), numElements_.begin());
     buildGrid();
   }
 
