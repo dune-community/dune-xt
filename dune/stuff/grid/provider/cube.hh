@@ -304,7 +304,11 @@ struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 //  ALUGRID_CONFORM, variant 2
 // dim = 3
 //  ALUGRID_SIMPLEX, variant 2
-template <typename GridType>
+#ifdef HAVE_CONFIG_H
+template <class GridType = Dune::GridSelector::GridType>
+#else
+template <class GridType>
+#endif
 class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
 {
 private:
