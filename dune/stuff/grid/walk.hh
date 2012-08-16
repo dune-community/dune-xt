@@ -6,6 +6,7 @@
 #include <dune/common/deprecated.hh>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/common/misc.hh>
+#include <dune/stuff/grid/ranges.hh>
 #include <dune/grid/common/geometry.hh>
 #include <vector>
 #include <boost/format.hpp>
@@ -29,7 +30,7 @@ struct WalkFunctorDefault
    * \todo allow stacking of operators to save gridwalks
    * \todo threadsafe maps (haha:P)
    */
-template <class GridView, int codim = 0>
+template <class GridView>
 class Walk
 {
 private:
@@ -47,16 +48,14 @@ public:
   void operator()(Functor& f) const
   {
     f.preWalk();
-    for (ElementIterator it = gridView_.template begin<0>(); it != gridView_.template end<0>(); ++it) {
-      const int ent_idx = gridView_.indexSet().index(*it);
-      f(*it, *it, ent_idx, ent_idx);
-      IntersectionIteratorType intItEnd = gridView_.iend(*it);
-      for (IntersectionIteratorType intIt = gridView_.ibegin(*it); intIt != intItEnd; ++intIt) {
-        const auto& intersection = *intIt;
+    for (const auto& entity : ViewRange<GridView>(gridView_)) {
+      const int ent_idx = gridView_.indexSet().index(entity);
+      f(entity, entity, ent_idx, ent_idx);
+      for (const auto& intersection : IntersectionRange<GridView>(gridView_, entity)) {
         if (!intersection.boundary()) {
           const auto neighbour_ptr = intersection.outside();
           const int neigh_idx = gridView_.indexSet().index(*neighbour_ptr);
-          f(*it, *neighbour_ptr, ent_idx, neigh_idx);
+          f(entity, *neighbour_ptr, ent_idx, neigh_idx);
         }
       }
     }
@@ -66,9 +65,9 @@ public:
   template <class Functor>
   void walkCodim0(Functor& f) const
   {
-    for (ElementIterator it = gridView_.template begin<0>(); it != gridView_.template end<0>(); ++it) {
-      const int ent_idx = gridView_.indexSet().index(*it);
-      f(*it, ent_idx);
+    for (const auto& entity : ViewRange<GridView>(gridView_)) {
+      const int ent_idx = gridView_.indexSet().index(entity);
+      f(entity, ent_idx);
     }
   } // walkCodim0
 

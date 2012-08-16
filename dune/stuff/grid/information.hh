@@ -3,8 +3,10 @@
 
 #include <ostream>
 #include <boost/format.hpp>
+#include <boost/range/adaptor/reversed.hpp>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/grid/intersection.hh>
+#include <dune/stuff/grid/ranges.hh>
 #include <dune/stuff/grid/walk.hh>
 
 namespace Dune {
@@ -12,83 +14,63 @@ namespace Stuff {
 namespace Grid {
 namespace Information {
 
-/** \brief grid statistic output to given stream
-   * \todo not require a space to be passed
-   */
-template <class GridPartType, class DiscreteFunctionSpaceType>
-void print(GridPartType& gridPart, DiscreteFunctionSpaceType& space, std::ostream& out)
+struct Statistics
 {
-  int numberOfEntities(0);
-  int numberOfIntersections(0);
-  int numberOfInnerIntersections(0);
-  int numberOfBoundaryIntersections(0);
-  double maxGridWidth(0.0);
-
-  typedef typename GridPartType::GridType GridType;
-
-  typedef typename GridType::template Codim<0>::Entity EntityType;
-
-  typedef typename GridPartType::template Codim<0>::IteratorType EntityIteratorType;
-
-  typedef typename GridPartType::IntersectionIteratorType IntersectionIteratorType;
-
-  EntityIteratorType entityItEndLog = space.end();
-  for (EntityIteratorType entityItLog = space.begin(); entityItLog != entityItEndLog; ++entityItLog) {
-    const EntityType& entity = *entityItLog;
-    // count entities
-    ++numberOfEntities;
-    // walk the intersections
-    IntersectionIteratorType intItEnd = gridPart.iend(entity);
-    for (IntersectionIteratorType intIt = gridPart.ibegin(entity); intIt != intItEnd; ++intIt) {
-      // count intersections
-      ++numberOfIntersections;
-      maxGridWidth = std::max(intIt->geometry().volume(), maxGridWidth);
-      // if we are inside the grid
-      if (intIt.neighbor() && !intIt.boundary()) {
-        // count inner intersections
-        ++numberOfInnerIntersections;
-      }
-      // if we are on the boundary of the grid
-      if (!intIt.neighbor() && intIt.boundary()) {
-        // count boundary intersections
-        ++numberOfBoundaryIntersections;
+  int numberOfEntities;
+  int numberOfIntersections;
+  int numberOfInnerIntersections;
+  int numberOfBoundaryIntersections;
+  double maxGridWidth;
+  template <class GridViewType>
+  Statistics(const GridViewType& gridView)
+    : numberOfEntities(gridView.size(0))
+    , numberOfIntersections(0)
+    , numberOfInnerIntersections(0)
+    , numberOfBoundaryIntersections(0)
+    , maxGridWidth(0)
+  {
+    for (const auto& entity : ViewRange<GridViewType>(gridView)) {
+      for (const auto& intIt : IntersectionRange<GridViewType>(gridView, entity)) {
+        ++numberOfIntersections;
+        maxGridWidth = std::max(intIt.geometry().volume(), maxGridWidth);
+        // if we are inside the grid
+        numberOfInnerIntersections += (intIt.neighbor() && !intIt.boundary());
+        // if we are on the boundary of the grid
+        numberOfBoundaryIntersections += (!intIt.neighbor() && intIt.boundary());
       }
     }
   }
-  out << "found " << numberOfEntities << " entities," << std::endl;
-  out << "found " << numberOfIntersections << " intersections," << std::endl;
-  out << "      " << numberOfInnerIntersections << " intersections inside and" << std::endl;
-  out << "      " << numberOfBoundaryIntersections << " intersections on the boundary." << std::endl;
-  out << "      maxGridWidth is " << maxGridWidth << std::endl;
+};
+
+/** \brief grid statistic output to given stream
+   */
+template <class GridViewType>
+void print(const GridViewType& gridView, std::ostream& out)
+{
+  const Statistics st(gridView);
+  out << "found " << st.numberOfEntities << " entities," << std::endl;
+  out << "found " << st.numberOfIntersections << " intersections," << std::endl;
+  out << "      " << st.numberOfInnerIntersections << " intersections inside and" << std::endl;
+  out << "      " << st.numberOfBoundaryIntersections << " intersections on the boundary." << std::endl;
+  out << "      maxGridWidth is " << st.maxGridWidth << std::endl;
 } // printGridInformation
 
 /**
 * \attention Not optimal, does a whole grid walk!
 **/
-template <class GridPartType>
-unsigned int maxNumberOfNeighbors(const GridPartType& gridPart)
+template <class GridViewType>
+unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
 {
   // some preparations
   unsigned int maxNeighbours = 0;
-  unsigned int neighbours    = 0;
-  typedef typename GridPartType::template Codim<0>::IteratorType EntityIteratorType;
-  typedef typename GridPartType::template Codim<0>::EntityType EntityType;
-  typedef typename GridPartType::IntersectionIteratorType IntersectionIteratorType;
-  // walk over all entities
-  const EntityIteratorType entityIteratorEnd = gridPart.template end<0>();
-  for (EntityIteratorType entityIterator = gridPart.template begin<0>(); entityIterator != entityIteratorEnd;
-       ++entityIterator) {
-    const EntityType& entity = *entityIterator;
-    neighbours               = 0;
-    // walk over all neighbors
-    const IntersectionIteratorType intersectionIteratorEnd = gridPart.iend(entity);
-    for (IntersectionIteratorType intersectionIterator = gridPart.ibegin(entity);
-         intersectionIterator != intersectionIteratorEnd;
-         ++intersectionIterator) {
+  unsigned int neighbours = 0;
+  for (const auto& entity : ViewRange<GridViewType>(gridView)) {
+    neighbours = 0;
+    for (const auto& i : IntersectionRange<GridViewType>(gridView, entity)) {
       ++neighbours;
-    } // walk over all neighbors
+    }
     maxNeighbours = std::max(maxNeighbours, neighbours);
-  } // walk over all entities
+  }
   return maxNeighbours;
 } // unsigned int maxNumberOfNeighbors(const GridPartType& gridPart)
 
@@ -118,12 +100,10 @@ struct Dimensions
     template <class Entity>
     void operator()(const Entity& ent, const int /*ent_idx*/)
     {
-      typedef typename Entity::Geometry EntityGeometryType;
-      typedef Dune::FieldVector<typename EntityGeometryType::ctype, EntityGeometryType::coorddimension> DomainType;
-      const typename Entity::Geometry& geo = ent.geometry();
+      const auto& geo = ent.geometry();
       entity_volume_(geo.volume());
       for (int i = 0; i < geo.corners(); ++i) {
-        const DomainType& corner(geo.corner(i));
+        const auto& corner(geo.corner(i));
         for (size_t k = 0; k < GridType::dimensionworld; ++k)
           coord_limits_[k](corner[k]);
       }
@@ -138,7 +118,7 @@ struct Dimensions
   Dimensions(const GridType& grid)
   {
     typedef typename GridType::LeafGridView View;
-    const View& view = grid.leafView();
+    const auto& view = grid.leafView();
     GridDimensionsFunctor f(coord_limits, entity_volume);
     Dune::Stuff::Grid::Walk<View>(view).walkCodim0(f);
   }
