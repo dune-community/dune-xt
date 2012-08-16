@@ -61,11 +61,9 @@ void print(const GridViewType& gridView, std::ostream& out)
 template <class GridViewType>
 unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
 {
-  // some preparations
   unsigned int maxNeighbours = 0;
-  unsigned int neighbours = 0;
   for (const auto& entity : ViewRange<GridViewType>(gridView)) {
-    neighbours = 0;
+    unsigned int neighbours = 0;
     for (const auto& i : IntersectionRange<GridViewType>(gridView, entity)) {
       ++neighbours;
     }
