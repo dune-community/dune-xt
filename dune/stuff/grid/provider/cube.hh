@@ -15,7 +15,9 @@
 // dune-grid
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/yaspgrid.hh>
+#ifdef HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
+#endif
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/common/mcmgmapper.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
@@ -255,17 +257,16 @@ public:
 private:
   void buildGrid()
   {
+    static_assert(variant > 0 && variant < 2, "only variant 1 and 2 are valid");
     switch (variant) {
       case 1:
         grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements_);
         break;
       case 2:
+      default:
         grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft_, upperRight_, numElements_);
         break;
-      default:
-        DUNE_THROW(Dune::NotImplemented, "Variant " << variant << " not valid (only 1 and 2 are).");
     }
-    return;
   } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
 
   CoordinateType lowerLeft_;
