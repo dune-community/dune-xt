@@ -10,9 +10,7 @@
 
 namespace Dune {
 namespace Stuff {
-
 namespace Grid {
-
 namespace Intersection {
 
 /**
@@ -119,11 +117,8 @@ bool contains(const IntersectionType& intersection, const Dune::FieldVector<Fiel
 } // end function contains
 
 } // end namespace Intersection
-
 } // end namespace Grid
-
 } // end of namespace Stuff
-
 } // end namespace Dune
 
 #endif // DUNE_FEMTOOLS_GRID_INTERSECTION_HH
