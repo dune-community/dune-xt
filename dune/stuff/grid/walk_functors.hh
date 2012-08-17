@@ -52,6 +52,34 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
   }
 } // EnforceMaximumEntityVolume
 
+/** \brief Functor for a \ref GridWalk calculating minima and maxima of entities' coordinates
+ **/
+template <class EntityType>
+struct MinMaxCoordinateFunctor
+{
+  typedef typename EntityType::Geometry EntityGeometryType;
+  typedef typename EntityGeometryType::ctype ctype;
+  typedef FieldVector<ctype, EntityGeometryType::coorddimension> VectorType;
+  MinMaxCoordinateFunctor()
+    : minima_(VectorType(std::numeric_limits<ctype>::max()))
+    , maxima_(VectorType(std::numeric_limits<ctype>::min()))
+  {
+  }
+
+  void operator()(const EntityType& ent, const int)
+  {
+    const typename EntityType::Geometry& geo = ent.geometry();
+    for (int i = 0; i < geo.corners(); ++i) {
+      for (int k = 0; k < int(EntityGeometryType::coorddimension); ++k) {
+        minima_[k] = std::min(minima_[k], geo.corner(i)[k]);
+        maxima_[k] = std::max(maxima_[k], geo.corner(i)[k]);
+      }
+    }
+  }
+  VectorType minima_;
+  VectorType maxima_;
+};
+
 } // namespace Grid
 } // namespace Stud
 } // namespace Dune

@@ -18,3 +18,4 @@ grid_information
 grid_provider
 function.param
 provider.param
+pgfoutput_*
