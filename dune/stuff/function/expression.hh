@@ -24,9 +24,7 @@
 #include "expression/mathexpr.hh"
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Function {
 
 /**
@@ -231,9 +229,7 @@ const std::string Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDim
     "stuff.function.expression";
 
 } // namespace Function
-
 } // namespace Stuff
-
 } // namespace Dune
 
 #endif // DUNE_STUFF_FUNCTION_EXPRESSION_HH
