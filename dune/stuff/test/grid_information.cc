@@ -66,10 +66,6 @@ TYPED_TEST(GridInfoTest, Misc)
   this->print(Common::dev_null);
 }
 
-// TEST_F(GridInfoTest, Dimension) {
-//  Grid::Provider::UnitCube cube;
-//}
-
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);

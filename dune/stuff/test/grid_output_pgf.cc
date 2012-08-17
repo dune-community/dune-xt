@@ -1,4 +1,4 @@
-#include <config.h>
+#include "test_common.hh"
 
 #include <dune/stuff/grid/output/pgf.hh>
 #include <dune/grid/sgrid.hh>
@@ -9,7 +9,7 @@ using namespace Dune::Stuff::Grid;
 
 /** output files are compiled in test-compile-pgfoutput.sh target
  **/
-int main(int, char**)
+TEST(PgfOutput, Sgrid)
 {
   const int dim = 2;
   typedef Dune::SGrid<dim, dim> GridType;
@@ -30,5 +30,11 @@ int main(int, char**)
   output.stacked(fileC, max_refines, includable);
   std::ofstream fileA("pgfoutput_leaf.tex");
   output.leaf(fileA, includable);
-  return 0;
+}
+
+int main(int argc, char** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  Dune::MPIHelper::instance(argc, argv);
+  return RUN_ALL_TESTS();
 }
