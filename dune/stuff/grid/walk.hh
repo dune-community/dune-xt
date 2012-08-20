@@ -58,7 +58,7 @@ public:
   void operator()(EntityFunctor& entityFunctor, IntersectionFunctor& intersectionFunctor) const
   {
     dune_static_assert(codim == 0, "walking intersections is only possible for codim 0 entities");
-    for (const auto& entity : ViewRange<GridViewType>(gridView_)) {
+    for (const auto& entity : gridView_) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
       for (const auto& intersection : IntersectionRange<GridViewType>(gridView_, entity)) {
@@ -74,7 +74,7 @@ public:
   void operator()(EntityFunctor& entityFunctor) const
   {
     dune_static_assert(codim <= GridViewType::dimension, "codim too high to walk");
-    for (const auto& entity : ViewRange<GridViewType>(gridView_)) {
+    for (const auto& entity : gridView_) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
     }
