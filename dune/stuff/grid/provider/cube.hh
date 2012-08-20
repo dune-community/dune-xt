@@ -257,7 +257,7 @@ public:
 private:
   void buildGrid()
   {
-    static_assert(variant > 0 && variant < 2, "only variant 1 and 2 are valid");
+    static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
     switch (variant) {
       case 1:
         grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements_);
