@@ -1,6 +1,7 @@
 #include "test_common.hh"
 
 #include <dune/stuff/grid/information.hh>
+#include <dune/stuff/grid/ranges.hh>
 #include <dune/stuff/grid/provider/cube.hh>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/common/logstreams.hh>
