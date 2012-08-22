@@ -13,7 +13,6 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Grid {
 
 /** \brief Useful dummy functor if you don't have anything to do on entities/intersections
  **/
@@ -41,10 +40,10 @@ const GridWalkDummyFunctor gridWalkDummyFunctor;
  *  \tparam codim determines the codim of the Entities that are iterated on
  **/
 template <class GridViewType, int codim = 0>
-class Walk
+class GridWalk
 {
 public:
-  Walk(const GridViewType& gp)
+  GridWalk(const GridViewType& gp)
     : gridView_(gp)
   {
   }
@@ -61,7 +60,7 @@ public:
     for (const auto& entity : gridView_) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
-      for (const auto& intersection : IntersectionRange<GridViewType>(gridView_, entity)) {
+      for (const auto& intersection : Dune::Stuff::intersectionRange(gridView_, entity)) {
         intersectionFunctor(entity, intersection);
       }
     }
@@ -90,12 +89,12 @@ private:
 
 template <class V, int i>
 template <class Functor>
-void Walk<V, i>::walkCodim0(Functor& f) const
+void GridWalk<V, i>::walkCodim0(Functor& f) const
 {
   this->operator()(f);
 }
-} // namespace Grid
-} // namespace Stud
+
+} // namespace Stuff
 } // namespace Dune
 
 #endif // ifndef DUNE_STUFF_WALK_HH_INCLUDED

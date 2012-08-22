@@ -225,7 +225,7 @@ public:
               "\\begin{tikzpicture}[scale=\\gridplotscale]\n";
     } else
       file << "\\begin{tikzpicture}\n";
-    Dune::Stuff::Grid::Walk<typename GridType::LeafGridView> gridWalk(grid_.leafView());
+    Dune::Stuff::GridWalk<typename GridType::LeafGridView> gridWalk(grid_.leafView());
     PgfEntityFunctorIntersections pgf(file);
     gridWalk(pgf, pgf);
 
@@ -257,7 +257,7 @@ public:
     for (int i = 0; i < refineLevel; ++i) {
       typedef typename GridType::LevelGridView ViewType;
       const ViewType& view = grid_.levelView(i);
-      Dune::Stuff::Grid::Walk<ViewType> gridWalk(view);
+      Dune::Stuff::GridWalk<ViewType> gridWalk(view);
       PgfEntityFunctorIntersectionsWithShift pgf(file, texcolors_[std::min(i, int(texcolors_.size()))], i, true);
       gridWalk(pgf);
       file << "%%%%%%%%%%%%%%%" << view.size(0) << "%%%%%%%%%%%%%%%%\n";
@@ -297,12 +297,12 @@ public:
         char buffer[80] = {'\0'};
         std::snprintf(buffer, 80, "\\subfloat[Level %d]{\n\\begin{tikzpicture}[scale=\\gridplotscale]\n", i);
         file << buffer;
-        Dune::Stuff::Grid::Walk<ViewType> gridWalk(view);
+        Dune::Stuff::GridWalk<ViewType> gridWalk(view);
         PgfEntityFunctorIntersections thisLevel(file, "black", true);
         gridWalk(thisLevel, thisLevel);
       }
 
-      Dune::Stuff::Grid::Walk<typename GridType::LeafGridView> leafWalk(grid_.leafView());
+      Dune::Stuff::GridWalk<typename GridType::LeafGridView> leafWalk(grid_.leafView());
       typedef typename GridType::LeafGridView::Traits::template Codim<0>::Entity EntityType;
       MinMaxCoordinateFunctor<EntityType> minMaxCoord;
       leafWalk(minMaxCoord);

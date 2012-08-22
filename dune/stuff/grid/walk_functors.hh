@@ -44,7 +44,7 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
   MaximumEntityVolumeRefineFunctor<GridType> f(grid, unrefined_min_volume, size_factor);
   while (true) {
     grid.preAdapt();
-    Walk<View>(view).walkCodim0(f);
+    GridWalk<View>(view).walkCodim0(f);
     if (!grid.adapt())
       break;
     grid.postAdapt();
