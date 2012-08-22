@@ -64,7 +64,7 @@ unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
   unsigned int maxNeighbours = 0;
   for (const auto& entity : gridView) {
     unsigned int neighbours = 0;
-    for (const auto& i : IntersectionRange<GridViewType>(gridView, entity)) {
+    for (const auto& i : intersectionRange(gridView, entity)) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);
