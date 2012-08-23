@@ -2,19 +2,23 @@
 #ifndef DUNE_STUFF_GRID_BOUNDARYINFO_HH
 #define DUNE_STUFF_GRID_BOUNDARYINFO_HH
 
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#elif defined(HAVE_CONFIG_H)
+#include <config.h>
+#endif // ifdef HAVE_CMAKE_CONFIG
+
 // system
 #include <map>
 #include <set>
+#include <string>
 
 // dune-common
 #include <dune/common/shared_ptr.hh>
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Grid {
-
 namespace BoundaryInfo {
 
 class AllDirichlet
