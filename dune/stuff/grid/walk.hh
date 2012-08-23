@@ -60,7 +60,7 @@ public:
     for (const auto& entity : gridView_) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
-      for (const auto& intersection : Dune::Stuff::intersectionRange(gridView_, entity)) {
+      for (const auto& intersection : intersectionRange(gridView_, entity)) {
         intersectionFunctor(entity, intersection);
       }
     }
