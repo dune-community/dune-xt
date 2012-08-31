@@ -21,7 +21,7 @@ TEST(PgfOutput, Sgrid)
     h[i] = 1.0;
   }
   GridType grid(n, h);
-  Output::Pgf<GridType> output(grid);
+  PgfOutput<GridType> output(grid);
   const int max_refines = 2;
   const bool includable = false;
   std::ofstream fileB("pgfoutput_refineseries.tex");

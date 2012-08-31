@@ -57,7 +57,7 @@ void ensureParamFile(std::string filename)
   **/
 void initParamTree(int argc, char** argv, Dune::ParameterTree& paramTree)
 {
-  paramTree = Common::Parameter::Tree::init(argc, argv, "provider.param");
+  paramTree = Common::ExtendedParameterTree::init(argc, argv, "provider.param");
 }
 
 template <class GridViewType>
@@ -113,14 +113,14 @@ int GNAH(int argc, char** argv)
     Dune::MPIHelper::instance(argc, argv);
     // parameter
     ensureParamFile(id + ".param");
-    Common::Parameter::Tree::Extended paramTree = Common::Parameter::Tree::init(argc, argv, id + ".param");
+    Common::ExtendedParameterTree paramTree = Common::ExtendedParameterTree::init(argc, argv, id + ".param");
     std::ofstream new_param(id + ".param_new");
     paramTree.report(new_param);
     // timer
     Dune::Timer timer;
     // unitcube
 
-    typedef Grid::Provider::Cube<Dune::GridSelector::GridType> CubeProviderType;
+    typedef Grid::CubeProvider<Dune::GridSelector::GridType> CubeProviderType;
     CubeProviderType cubeProvider(paramTree.sub(cubeProvider.id));
     cubeProvider.visualize(id);
 // cornerpoint
@@ -174,7 +174,7 @@ struct CubeTest : public testing::Test
   void test_cube(const CoordinateType lower, const CoordinateType upper,
                  const std::vector<u_int16_t>& elements_per_dimension)
   {
-    Grid::Provider::Cube<GridType> cube(lower, upper, elements_per_dimension);
+    Grid::CubeProvider<GridType> cube(lower, upper, elements_per_dimension);
     EXPECT_GE(cube.grid().size(0), 0);
     EXPECT_GE(cube.grid().size(1), 0);
   }

@@ -25,7 +25,6 @@
 namespace Dune {
 namespace Stuff {
 namespace Grid {
-namespace Provider {
 
 /**
  *  \brief  Creates a grid of a cube in various dimensions.
@@ -45,7 +44,7 @@ namespace Provider {
  *          <li>2: simplices</ul>
  **/
 template <typename GridImp, int variant>
-class GenericCube
+class GenericCubeProvider
 {
 public:
   //! Type of the provided grid.
@@ -76,7 +75,7 @@ public:
    *elements per dimension.
    *              </ul>
    **/
-  GenericCube(const Dune::ParameterTree paramTree)
+  GenericCubeProvider(const Dune::ParameterTree paramTree)
     : lowerLeft_(0.0)
     , upperRight_(1.0)
   {
@@ -112,7 +111,7 @@ public:
    *  \param[in]  level (optional)
    *              Level of refinement (see constructor for details).
    **/
-  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
+  GenericCubeProvider(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
@@ -129,7 +128,7 @@ public:
    *  \param[in]  level (optional)
    *              Level of refinement (see constructor for details).
    **/
-  GenericCube(const double lowerLeft, const double upperRight, const int level = 1)
+  GenericCubeProvider(const double lowerLeft, const double upperRight, const int level = 1)
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
@@ -150,10 +149,10 @@ public:
     \tparam T an unsigned integral Type
     **/
   template <class Coord, class ContainerType>
-  GenericCube(const Coord lowerLeft, const Coord upperRight,
-              const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>()
-                                                         .repeat(GridType::dimensionworld,
-                                                                 typename ContainerType::value_type(1)))
+  GenericCubeProvider(
+      const Coord lowerLeft, const Coord upperRight,
+      const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>().repeat(
+          GridType::dimensionworld, typename ContainerType::value_type(1)))
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
@@ -273,10 +272,10 @@ private:
   CoordinateType upperRight_;
   Dune::array<unsigned int, dim> numElements_;
   Dune::shared_ptr<GridType> grid_;
-}; // class GenericCube
+}; // class GenericCubeProvider
 
 template <typename GridImp, int variant>
-const std::string GenericCube<GridImp, variant>::id = "stuff.grid.provider.cube";
+const std::string GenericCubeProvider<GridImp, variant>::id = "stuff.grid.provider.cube";
 
 template <typename GridType>
 struct ElementVariant
@@ -316,57 +315,57 @@ template <class GridType = Dune::GridSelector::GridType>
 #else
 template <class GridType>
 #endif
-class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
+class CubeProvider : public GenericCubeProvider<GridType, ElementVariant<GridType>::id>
 {
 private:
-  typedef GenericCube<GridType, ElementVariant<GridType>::id> BaseType;
+  typedef GenericCubeProvider<GridType, ElementVariant<GridType>::id> BaseType;
 
 public:
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(const Dune::ParameterTree& paramTree)
+  CubeProvider(const Dune::ParameterTree& paramTree)
     : BaseType(paramTree)
   {
   }
 
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
+  CubeProvider(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
     : BaseType(lowerLeft, upperRight, level)
   {
   }
 
-  Cube(const double lowerLeft, const double upperRight, const int level = 1)
+  CubeProvider(const double lowerLeft, const double upperRight, const int level = 1)
     : BaseType(lowerLeft, upperRight, level)
   {
   }
 
   template <class Coord, class ContainerType>
-  Cube(const Coord lowerLeft, const Coord upperRight,
-       const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>().repeat(
-           GridType::dimensionworld, typename ContainerType::value_type(1)))
+  CubeProvider(const Coord lowerLeft, const Coord upperRight,
+               const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>()
+                                                          .repeat(GridType::dimensionworld,
+                                                                  typename ContainerType::value_type(1)))
     : BaseType(lowerLeft, upperRight, elements_per_dim)
   {
   }
 }; // class Cube
 
 template <typename GridType>
-class UnitCube : public Cube<GridType>
+class UnitCubeProvider : public CubeProvider<GridType>
 {
 private:
-  typedef Cube<GridType> BaseType;
+  typedef CubeProvider<GridType> BaseType;
 
 public:
-  UnitCube(const Dune::ParameterTree& paramTree)
+  UnitCubeProvider(const Dune::ParameterTree& paramTree)
     : BaseType(0.0, 1.0, paramTree.get("level", 1))
   {
   }
 
-  UnitCube(const int level = 1)
+  UnitCubeProvider(const int level = 1)
     : BaseType(0.0, 1.0, level)
   {
   }
 }; // class UnitCube
 
-} // namespace Provider
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune

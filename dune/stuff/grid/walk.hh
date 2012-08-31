@@ -13,6 +13,9 @@
 
 namespace Dune {
 namespace Stuff {
+namespace Grid {
+
+using namespace Dune::Stuff::Common;
 
 /** \brief Useful dummy functor if you don't have anything to do on entities/intersections
  **/
@@ -63,7 +66,7 @@ public:
   void operator()(EntityFunctor& entityFunctor, IntersectionFunctor& intersectionFunctor) const
   {
     dune_static_assert(codim == 0, "walking intersections is only possible for codim 0 entities");
-    for (const auto& entity : viewRange(gridView_)) {
+    for (const auto& entity : Common::viewRange(gridView_)) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
       for (const auto& intersection : intersectionRange(gridView_, entity)) {
@@ -100,6 +103,7 @@ void GridWalk<V, i>::walkCodim0(Functor& f) const
   this->operator()(f);
 }
 
+} // namespace Grid
 } // namespace Stuff
 } // namespace Dune
 

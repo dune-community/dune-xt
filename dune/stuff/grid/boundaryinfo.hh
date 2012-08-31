@@ -19,9 +19,8 @@
 namespace Dune {
 namespace Stuff {
 namespace Grid {
-namespace BoundaryInfo {
 
-class AllDirichlet
+class AllDirichletBoundaryInfo
 {
 public:
   template <class IntersectionType>
@@ -31,7 +30,7 @@ public:
   }
 }; // class AllDirichlet
 
-class IdBased
+class IdBasedBoundaryInfo
 {
 public:
   typedef int IdType;
@@ -66,12 +65,9 @@ private:
   const bool hasDirichlet_;
 }; // class IdBased
 
-} // namespace BoundaryInfo
 
 } // namespace Grid
-
 } // namespace Stuff
-
 } // namespace Dune
 
 #endif // DUNE_STUFF_GRID_BOUNDARYINFO_HH
