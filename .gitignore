@@ -38,3 +38,4 @@ am
 *.swp
 CMakeLists.txt.user
 demos
+*.gch
