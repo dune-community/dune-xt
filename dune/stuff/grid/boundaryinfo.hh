@@ -24,7 +24,7 @@ class AllDirichletBoundaryInfo
 {
 public:
   template <class IntersectionType>
-  bool dirichlet(const IntersectionType& intersection) const
+  bool dirichlet(const IntersectionType& /*intersection*/) const
   {
     return true;
   }
@@ -39,7 +39,7 @@ public:
 
   typedef std::map<std::string, IdSetType> IdSetMapType;
 
-  IdBased(const Dune::shared_ptr<const IdSetMapType> boundaryInfoMap)
+  IdBasedBoundaryInfo(const Dune::shared_ptr<const IdSetMapType> boundaryInfoMap)
     : boundaryInfoMap_(boundaryInfoMap)
     , hasDirichlet_(boundaryInfoMap_->find("dirichlet") != boundaryInfoMap_->end())
   {

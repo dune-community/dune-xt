@@ -1,6 +1,12 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 #define DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#elif defined(HAVE_CONFIG_H)
+#include <config.h>
+#endif // ifdef HAVE_CMAKE_CONFIG
+
 // system
 #include <sstream>
 #include <type_traits>
@@ -15,7 +21,7 @@
 // dune-grid
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/yaspgrid.hh>
-#ifdef HAVE_ALUGRID
+#if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
 #include <dune/grid/sgrid.hh>
@@ -295,7 +301,7 @@ struct ElementVariant<Dune::SGrid<dim, dim>>
   static const int id = 1;
 };
 
-#ifdef HAVE_ALUGRID
+#if HAVE_ALUGRID
 template <int dim>
 struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 {

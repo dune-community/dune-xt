@@ -19,7 +19,7 @@ void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::
 
   const int numCorners = geometry.corners();
 
-  std::string header = "Dune::Entity (" + Dune::Stuff::Common::String::convertTo(numCorners) + " corner";
+  std::string header = "Dune::Entity (" + Dune::Stuff::Common::toString(numCorners) + " corner";
   if (numCorners != 1) {
     header += "s";
   }
@@ -30,7 +30,7 @@ void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::
       header += " ";
     }
   }
-  const std::string whitespace = Dune::Stuff::Common::String::whitespaceify(header);
+  const std::string whitespace = Dune::Stuff::Common::whitespaceify(header);
 
   stream << prefix << header << "[ (";
   for (int i = 0; i < numCorners; ++i) {

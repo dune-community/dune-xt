@@ -4,6 +4,12 @@
 #ifndef DUNE_STUFF_GRID_OUTPUT_PGF_HH
 #define DUNE_STUFF_GRID_OUTPUT_PGF_HH
 
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#else
+#include "config.h"
+#endif // ifdef HAVE_CMAKE_CONFIG
+
 #include <dune/common/fvector.hh>
 #include <dune/common/array.hh>
 #include <dune/stuff/grid/walk.hh>
@@ -58,18 +64,18 @@ public:
     typedef Dune::FieldVector<typename EntityGeometryType::ctype, EntityGeometryType::coorddimension> DomainType;
     const typename Entity::Geometry& geo = ent.geometry();
 
-    for (size_t i = 0; i < geo.corners(); ++i) {
+    for (std::size_t i = 0; i < geo.corners(); ++i) {
       const PgfCoordWrapper corner(geo.corner(i));
       char buffer[150] = {'\0'};
-      int c = std::snprintf(buffer, 150, "\\coordinate(C_%d_%d) at (%f,%f);\n", ent_idx, i, corner[0], corner[1]);
+      int c = std::snprintf(buffer, 150, "\\coordinate(C_%d_%lu) at (%f,%f);\n", ent_idx, i, corner[0], corner[1]);
       assert(c > 0);
       file_ << buffer;
     }
     // \draw (A)--(B)--(C)--cycle;
     file_ << "\\draw ";
-    for (size_t i = 0; i < geo.corners(); ++i) {
+    for (std::size_t i = 0; i < geo.corners(); ++i) {
       char buffer[50] = {'\0'};
-      std::snprintf(buffer, 50, "(C_%d_%d)--", ent_idx, i);
+      std::snprintf(buffer, 50, "(C_%d_%lu)--", ent_idx, i);
       file_ << buffer;
     }
     file_ << "cycle;\n ";
@@ -106,7 +112,7 @@ public:
   }
 
   template <class EntityType, class IntersectionType>
-  void operator()(const EntityType& ent, const IntersectionType& intersection)
+  void operator()(const EntityType& /*ent*/, const IntersectionType& intersection)
   {
     typedef typename IntersectionType::Geometry IntersectionGeometry;
     typedef Dune::FieldVector<typename IntersectionGeometry::ctype, IntersectionGeometry::coorddimension> CoordType;
