@@ -51,6 +51,10 @@ public:
   //! Type of the provided grid.
   typedef GridImp GridType;
 
+private:
+  typedef typename GridType::LeafGridView GridViewType;
+
+public:
   //! Dimension of the provided grid.
   static const unsigned int dim = GridType::dimension;
 
@@ -190,6 +194,10 @@ public:
     return grid_;
   }
 
+  //  const Dune::shared_ptr< const GridType > gridPtr() {
+  //    return grid_;
+  //  }
+
   const CoordinateType& lowerLeft() const
   {
     return lowerLeft_;
@@ -200,57 +208,22 @@ public:
     return upperRight_;
   }
 
-private:
-  template <int dim>
-  struct P0Layout
-  {
-    bool DUNE_DEPRECATED_MSG("geometries should be passed by value") contains(Dune::GeometryType& geometry)
-    {
-      return geometry.dim() == dim;
-    }
-    bool contains(const Dune::GeometryType geometry)
-    {
-      return geometry.dim() == dim;
-    }
-  }; // layout class for codim 0 mapper
-
-public:
   /**
    *  \brief      Visualizes the grid using Dune::VTKWriter.
    *  \param[in]  filename
    **/
   void visualize(const std::string filename = id + ".grid") const
   {
-    // grid view
-    typedef typename GridType::LeafGridView GridView;
-    GridView gridView = grid().leafView();
-    // mapper
-    Dune::LeafMultipleCodimMultipleGeomTypeMapper<GridType, P0Layout> mapper(grid());
-    std::vector<double> data(mapper.size());
-    // walk the grid
-    typedef typename GridView::template Codim<0>::Iterator ElementIterator;
-    typedef typename GridView::template Codim<0>::Entity ElementType;
-    typedef typename ElementType::LeafIntersectionIterator FacetIteratorType;
-    for (ElementIterator it = gridView.template begin<0>(); it != gridView.template end<0>(); ++it) {
-      ElementType& element = *it;
-      data[mapper.map(element)] = 0.0;
-      int numberOfBoundarySegments = 0;
-      bool isOnBoundary            = false;
-      // walk the intersections
-      for (FacetIteratorType facet = element.ileafbegin(); facet != element.ileafend(); ++facet) {
-        if (!facet->neighbor() && facet->boundary()) {
-          isOnBoundary = true;
-          numberOfBoundarySegments += 1;
-          data[mapper.map(element)] += double(facet->boundaryId());
-        }
-      } // walk the intersections
-      if (isOnBoundary) {
-        data[mapper.map(element)] /= double(numberOfBoundarySegments);
-      }
-    } // walk the grid
-    // write to vtk
-    Dune::VTKWriter<GridView> vtkwriter(gridView);
-    vtkwriter.addCellData(data, "boundaryId");
+    // vtk writer
+    GridViewType gridView = grid().leafView();
+    Dune::VTKWriter<GridViewType> vtkwriter(gridView);
+    // boundary id
+    std::vector<double> boundaryId = generateBoundaryIdVisualization(gridView);
+    vtkwriter.addCellData(boundaryId, "boundaryId");
+    // codim 0 entity id
+    std::vector<double> entityId = generateEntityVisualization(gridView);
+    vtkwriter.addCellData(entityId, "entityId");
+    // write
     vtkwriter.write(filename, Dune::VTK::ascii);
   } // void visualize(const std::string filename = id + ".grid") const
 
@@ -268,6 +241,52 @@ private:
         break;
     }
   } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
+
+  std::vector<double> generateBoundaryIdVisualization(const GridViewType& gridView) const
+  {
+    typedef typename GridViewType::IndexSet::IndexType IndexType;
+    typedef typename GridViewType::template Codim<0>::Entity EntityType;
+    std::vector<double> data(gridView.indexSet().size(0));
+    // walk the grid
+    for (typename GridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
+         it != gridView.template end<0>();
+         ++it) {
+      const EntityType& entity     = *it;
+      const IndexType& index       = gridView.indexSet().index(entity);
+      data[index]                  = 0.0;
+      int numberOfBoundarySegments = 0;
+      bool isOnBoundary = false;
+      for (typename GridViewType::IntersectionIterator intersectionIt = gridView.ibegin(entity);
+           intersectionIt != gridView.iend(entity);
+           ++intersectionIt) {
+        if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
+          isOnBoundary = true;
+          numberOfBoundarySegments += 1;
+          data[index] += double(intersectionIt->boundaryId());
+        }
+      }
+      if (isOnBoundary) {
+        data[index] /= double(numberOfBoundarySegments);
+      }
+    } // walk the grid
+    return data;
+  } // std::vector< double > generateBoundaryIdVisualization(const GridViewType& gridView) const
+
+  std::vector<double> generateEntityVisualization(const GridViewType& gridView) const
+  {
+    typedef typename GridViewType::IndexSet::IndexType IndexType;
+    typedef typename GridViewType::template Codim<0>::Entity EntityType;
+    std::vector<double> data(gridView.indexSet().size(0));
+    // walk the grid
+    for (typename GridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
+         it != gridView.template end<0>();
+         ++it) {
+      const EntityType& entity = *it;
+      const IndexType& index   = gridView.indexSet().index(entity);
+      data[index]              = double(index);
+    } // walk the grid
+    return data;
+  } // std::vector< double > generateEntityVisualization(const GridViewType& gridView) const
 
   CoordinateType lowerLeft_;
   CoordinateType upperRight_;
@@ -348,7 +367,11 @@ public:
   }
 }; // class Cube
 
-template <typename GridType>
+#ifdef HAVE_CONFIG_H
+template <class GridType = Dune::GridSelector::GridType>
+#else
+template <class GridType>
+#endif
 class UnitCube : public Cube<GridType>
 {
 private:
