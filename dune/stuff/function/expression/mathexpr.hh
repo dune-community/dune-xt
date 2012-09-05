@@ -19,8 +19,8 @@ This software comes with absolutely no warranty.
 
 */
 
-#ifndef DUNE_RB_PARAMETER_FUNCTION
-#define DUNE_RB_PARAMETER_FUNCTION
+#ifndef DUNE_STUFF_FUNCTION_EXPRESSION_EXPRESSION_HH
+#define DUNE_STUFF_FUNCTION_EXPRESSION_EXPRESSION_HH
 
 #include <string.h>
 #include <stdio.h>
@@ -198,4 +198,4 @@ char* DelStr(const char* s, int n);
 
 #include "mathexpr.cc"
 
-#endif // DUNE_RB_PARAMETER_FUNCTION
+#endif // DUNE_STUFF_FUNCTION_EXPRESSION_EXPRESSION_HH
