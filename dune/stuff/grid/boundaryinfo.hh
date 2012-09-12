@@ -23,7 +23,16 @@ public:
   template <class IntersectionType>
   bool dirichlet(const IntersectionType& intersection) const
   {
-    return true;
+    if (intersection.boundary())
+      return true;
+    else
+      return false;
+  }
+
+  template <class IntersectionType>
+  bool neumann(const IntersectionType& intersection) const
+  {
+    return false;
   }
 }; // class AllDirichlet
 
