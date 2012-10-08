@@ -57,29 +57,13 @@ void ensureParamFile(std::string filename)
   **/
 void initParamTree(int argc, char** argv, Dune::ParameterTree& paramTree)
 {
-  if (argc == 1) {
-    Dune::ParameterTreeParser::readINITree("provider.param", paramTree);
-  } else if (argc == 2) {
-    Dune::ParameterTreeParser::readINITree(argv[1], paramTree);
-  } else {
-    Dune::ParameterTreeParser::readOptions(argc, argv, paramTree);
-  }
-  if (paramTree.hasKey("paramfile")) {
-    Dune::ParameterTreeParser::readINITree(paramTree.get<std::string>("paramfile"), paramTree, false);
-  }
+  paramTree = Common::ExtendedParameterTree::init(argc, argv, "provider.param");
 }
 
 template <class GridViewType>
 int walkGridView(const GridViewType& gridView)
 {
-  int numElements = 0;
-  typedef typename GridViewType::template Codim<0>::Entity EntityType;
-  typedef typename GridViewType::template Codim<0>::Iterator IteratorType;
-  for (IteratorType iterator = gridView.template begin<0>(); iterator != gridView.template end<0>(); ++iterator) {
-    const EntityType& entity = *iterator;
-    ++numElements;
-  }
-  return numElements;
+  return gridView.size(0);
 } // void walkGrid(const GridType& grid)
 
 /*template< class MDGridType >
@@ -129,12 +113,14 @@ int GNAH(int argc, char** argv)
     Dune::MPIHelper::instance(argc, argv);
     // parameter
     ensureParamFile(id + ".param");
-    Dune::ParameterTree paramTree = Common::Parameter::Tree::init(argc, argv, id + ".param");
+    Common::ExtendedParameterTree paramTree = Common::ExtendedParameterTree::init(argc, argv, id + ".param");
+    std::ofstream new_param(id + ".param_new");
+    paramTree.report(new_param);
     // timer
     Dune::Timer timer;
     // unitcube
 
-    typedef Grid::Provider::Cube<Dune::GridSelector::GridType> CubeProviderType;
+    typedef Grid::CubeProvider<Dune::GridSelector::GridType> CubeProviderType;
     CubeProviderType cubeProvider(paramTree.sub(cubeProvider.id));
     cubeProvider.visualize(id);
 // cornerpoint
@@ -188,7 +174,7 @@ struct CubeTest : public testing::Test
   void test_cube(const CoordinateType lower, const CoordinateType upper,
                  const std::vector<u_int16_t>& elements_per_dimension)
   {
-    Grid::Provider::Cube<GridType> cube(lower, upper, elements_per_dimension);
+    Grid::CubeProvider<GridType> cube(lower, upper, elements_per_dimension);
     EXPECT_GE(cube.grid().size(0), 0);
     EXPECT_GE(cube.grid().size(1), 0);
   }
@@ -203,7 +189,8 @@ TYPED_TEST(CubeTest, All)
 
 TEST(OLD, gnah)
 {
-  EXPECT_EQ(0, GNAH(0, nullptr));
+  char* gnah[] = {"koko"};
+  EXPECT_EQ(0, GNAH(1, gnah));
 }
 
 int main(int argc, char** argv)

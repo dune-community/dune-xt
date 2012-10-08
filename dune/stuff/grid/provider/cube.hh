@@ -1,6 +1,12 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 #define DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#elif defined(HAVE_CONFIG_H)
+#include <config.h>
+#endif // ifdef HAVE_CMAKE_CONFIG
+
 // system
 #include <sstream>
 #include <type_traits>
@@ -394,8 +400,11 @@ public:
 }; // class UnitCube
 
 } // namespace Provider
+
 } // namespace Grid
+
 } // namespace Stuff
+
 } // namespace Dune
 
 #endif // DUNE_STUFF_GRID_PROVIDER_CUBE_HH

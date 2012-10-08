@@ -36,19 +36,19 @@ struct MaximumEntityVolumeRefineFunctor
 template <class GridType>
 void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
 {
-  namespace DSGI = Dune::Stuff::Grid::Information;
-  const typename DSGI::Dimensions<GridType> unrefined_dimensions(grid);
+  namespace DSG = Dune::Stuff::Grid;
+  const typename DSG::Dimensions<GridType> unrefined_dimensions(grid);
   const double unrefined_min_volume = unrefined_dimensions.entity_volume.min();
   typedef typename GridType::LeafGridView View;
   View view = grid.leafView();
   MaximumEntityVolumeRefineFunctor<GridType> f(grid, unrefined_min_volume, size_factor);
   while (true) {
     grid.preAdapt();
-    Walk<View>(view).walkCodim0(f);
+    GridWalk<View>(view).walkCodim0(f);
     if (!grid.adapt())
       break;
     grid.postAdapt();
-    std::cout << Dune::Stuff::Grid::Information::Dimensions<GridType>()(grid);
+    std::cout << DSG::Dimensions<GridType>()(grid);
   }
 } // EnforceMaximumEntityVolume
 
