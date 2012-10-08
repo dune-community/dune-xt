@@ -23,8 +23,11 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 
 namespace Dune {
+
 namespace Stuff {
+
 namespace Grid {
+
 namespace Provider {
 
 /**
@@ -194,9 +197,10 @@ public:
     return grid_;
   }
 
-  //  const Dune::shared_ptr< const GridType > gridPtr() {
-  //    return grid_;
-  //  }
+  const Dune::shared_ptr<const GridType> gridPtr() const
+  {
+    return grid_;
+  }
 
   const CoordinateType& lowerLeft() const
   {
