@@ -39,3 +39,4 @@ am
 CMakeLists.txt.user
 demos
 *.gch
+Makefile.in
