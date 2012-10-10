@@ -120,7 +120,7 @@ int GNAH(int argc, char** argv)
     Dune::Timer timer;
     // unitcube
 
-    typedef Grid::CubeProvider<Dune::GridSelector::GridType> CubeProviderType;
+    typedef Grid::Provider::Cube<Dune::GridSelector::GridType> CubeProviderType;
     CubeProviderType cubeProvider(paramTree.sub(cubeProvider.id));
     cubeProvider.visualize(id);
 // cornerpoint
@@ -174,7 +174,7 @@ struct CubeTest : public testing::Test
   void test_cube(const CoordinateType lower, const CoordinateType upper,
                  const std::vector<u_int16_t>& elements_per_dimension)
   {
-    Grid::CubeProvider<GridType> cube(lower, upper, elements_per_dimension);
+    Grid::Provider::Cube<GridType> cube(lower, upper, elements_per_dimension);
     EXPECT_GE(cube.grid().size(0), 0);
     EXPECT_GE(cube.grid().size(1), 0);
   }
