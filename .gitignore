@@ -39,6 +39,5 @@ am
 CMakeLists.txt.user
 demos
 *.gch
-Makefile.in
 *.lo
 dune/stuff/test/gtest/lib
