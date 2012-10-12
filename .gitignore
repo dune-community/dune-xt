@@ -41,3 +41,4 @@ demos
 *.gch
 *.lo
 dune/stuff/test/gtest/lib
+data
