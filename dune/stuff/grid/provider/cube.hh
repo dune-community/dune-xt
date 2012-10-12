@@ -7,6 +7,8 @@
 #include <config.h>
 #endif // ifdef HAVE_CMAKE_CONFIG
 
+#ifdef HAVE_DUNE_GRID
+
 // system
 #include <sstream>
 #include <type_traits>
@@ -340,7 +342,7 @@ struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 //  ALUGRID_CONFORM, variant 2
 // dim = 3
 //  ALUGRID_SIMPLEX, variant 2
-#ifdef HAVE_CONFIG_H
+#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridType = Dune::GridSelector::GridType>
 #else
 template <class GridType>
@@ -377,7 +379,7 @@ public:
   }
 }; // class Cube
 
-#ifdef HAVE_CONFIG_H
+#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridType = Dune::GridSelector::GridType>
 #else
 template <class GridType>
@@ -406,5 +408,7 @@ public:
 } // namespace Stuff
 
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_PROVIDER_CUBE_HH
