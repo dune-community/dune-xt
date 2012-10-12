@@ -28,9 +28,12 @@
 
 // local
 #include "expression/mathexpr.hh"
+#include "interface.hh"
 
 namespace Dune {
+
 namespace Stuff {
+
 namespace Function {
 
 /**
@@ -48,16 +51,15 @@ namespace Function {
 \code variable: x
 expression.0: 2*x[0]
 expression.1: sin(x[1])*x[0]\endcode
-          There have to exist at least \f$n\f$ expressions; the entries of the variable can are indexed by \f$[i]\f$ for
+          There have to exist at least \f$n\f$ expressions; the entries of the variable are indexed by \f$[i]\f$ for
           \f$ 0 \leq i \leq m - 1 \f$.
-  \tparam DomainTypeImp
-          Type of the
-  \tparam
  **/
 template <class DomainFieldImp, int maxDimDomain, class RangeFieldImp, int maxDimRange>
 class Expression
+    : public Interface<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>
 #ifdef HAVE_DUNE_FEM
-    : public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, maxDimDomain, maxDimRange>,
+      ,
+      public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, maxDimDomain, maxDimRange>,
                                  Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>>
 #endif
 {
@@ -172,6 +174,23 @@ public:
   unsigned int dimRange() const
   {
     return actualDimRange_;
+  }
+
+  //! needed for Interface
+  virtual void evaluate(const Dune::FieldVector<DomainFieldImp, maxDimDomain>& arg,
+                        Dune::FieldVector<RangeFieldImp, maxDimRange>& ret) const
+  {
+    // ensure right dimensions
+    assert(arg.size() <= maxDimDomain);
+    assert(ret.size() <= dimRange());
+    // arg
+    for (typename Dune::FieldVector<DomainFieldImp, maxDimDomain>::size_type i = 0; i < arg.size(); ++i) {
+      *(arg_[i]) = arg[i];
+    }
+    // ret
+    for (typename Dune::FieldVector<RangeFieldImp, maxDimRange>::size_type i = 0; i < ret.size(); ++i) {
+      ret[i] = op_[i]->Val();
+    }
   }
 
   template <class DomainVectorType, class RangeVectorType>
