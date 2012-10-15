@@ -30,6 +30,9 @@
 #include <dune/grid/common/mcmgmapper.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 
+// local
+#include "interface.hh"
+
 namespace Dune {
 
 namespace Stuff {
@@ -56,7 +59,7 @@ namespace Provider {
  *          <li>2: simplices</ul>
  **/
 template <typename GridImp, int variant>
-class GenericCube
+class GenericCube : public Interface<GridImp>
 {
 public:
   //! Type of the provided grid.
@@ -73,7 +76,7 @@ public:
   typedef Dune::FieldVector<typename GridType::ctype, dim> CoordinateType;
 
   //! Unique identifier: \c stuff.grid.provider.cube
-  static const std::string id;
+  static const std::string static_id;
 
   /**
    *  \brief      Creates a cube.
@@ -97,8 +100,8 @@ public:
   {
     // select subtree (if necessary)
     Dune::ParameterTree paramTree_ = paramTree;
-    if (paramTree.hasSub(id))
-      paramTree_ = paramTree.sub(id);
+    if (paramTree.hasSub(static_id))
+      paramTree_ = paramTree.sub(static_id);
     // get outer bounds
     const double lowerLeft  = paramTree_.get("lowerLeft", 0.0);
     const double upperRight = paramTree_.get("upperRight", 1.0);
@@ -181,11 +184,16 @@ public:
     buildGrid();
   }
 
+  virtual std::string id() const
+  {
+    return static_id;
+  }
+
   /**
     \brief  Provides access to the created grid.
     \return Reference to the grid.
     **/
-  GridType& grid()
+  virtual GridType& grid()
   {
     return *grid_;
   }
@@ -194,18 +202,18 @@ public:
    *  \brief  Provides const access to the created grid.
    *  \return Reference to the grid.
    **/
-  const GridType& grid() const
+  virtual const GridType& grid() const
   {
     return *grid_;
   }
 
   //! access to shared ptr
-  Dune::shared_ptr<GridType> gridPtr()
+  virtual Dune::shared_ptr<GridType> gridPtr()
   {
     return grid_;
   }
 
-  const Dune::shared_ptr<const GridType> gridPtr() const
+  virtual const Dune::shared_ptr<const GridType> gridPtr() const
   {
     return grid_;
   }
@@ -224,7 +232,7 @@ public:
    *  \brief      Visualizes the grid using Dune::VTKWriter.
    *  \param[in]  filename
    **/
-  void visualize(const std::string filename = id + ".grid") const
+  virtual void visualize(const std::string filename = id + ".grid") const
   {
     // vtk writer
     GridViewType gridView = grid().leafView();
@@ -307,7 +315,7 @@ private:
 }; // class GenericCube
 
 template <typename GridImp, int variant>
-const std::string GenericCube<GridImp, variant>::id = "stuff.grid.provider.cube";
+const std::string GenericCube<GridImp, variant>::static_id = "stuff.grid.provider.cube";
 
 template <typename GridType>
 struct ElementVariant
