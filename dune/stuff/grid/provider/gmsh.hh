@@ -35,9 +35,9 @@ namespace Provider {
  * \brief   Gmsh grid provider
  */
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridType = Dune::GridSelector::GridType>
+template <class GridImp = Dune::GridSelector::GridType>
 #else
-template <class GridType>
+template <class GridImp>
 #endif
 class Gmsh : public Interface<GridImp>
 {
