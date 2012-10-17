@@ -11,11 +11,8 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Grid {
-
 namespace Provider {
 
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
@@ -44,7 +41,7 @@ private:
   typedef typename GridType::LeafGridView GridViewType;
 
 public:
-  void visualize(const std::string filename = id + ".grid") const
+  void visualize(const std::string filename) const
   {
     // vtk writer
     GridViewType gridView = grid().leafView();
@@ -109,11 +106,8 @@ private:
 }; // class Interface
 
 } // namespace Provider
-
 } // namespace Grid
-
 } // namespace Stuff
-
 } // namespace Dune
 
 #endif // DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
