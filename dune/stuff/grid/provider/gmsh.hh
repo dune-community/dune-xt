@@ -56,6 +56,7 @@ public:
 
   Gmsh(const Dune::ParameterTree paramTree)
   {
+    dune_static_assert(!(Dune::is_same<GridType, Dune::YaspGrid<dim>>::value), "GmshReader doesn't work with YaspGrid");
     const std::string filename = paramTree.get("mshfile", "sample.msh");
     // read gmshfile
     grid_ = Dune::shared_ptr<GridType>(GmshReader<GridType>::read(filename));
