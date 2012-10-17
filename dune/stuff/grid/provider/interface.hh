@@ -18,6 +18,12 @@ namespace Grid {
 
 namespace Provider {
 
+/**
+ *  \brief      Interface for all grid providers.
+ *
+ *  \attention  The method id() has to be implemented by the derived class, althoug it is not marked virtual (since it
+ *              has to be static)
+ **/
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridImp = Dune::GridSelector::GridType>
 #else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
@@ -30,7 +36,10 @@ public:
 
   typedef Dune::FieldVector<typename GridType::ctype, GridType::dimension> CoordinateType;
 
-  virtual std::string id() const = 0;
+  static const std::string id()
+  {
+    return "stuff.grid.provider.interface";
+  }
 
   virtual GridType& grid() = 0;
 

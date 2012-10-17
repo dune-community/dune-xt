@@ -51,9 +51,6 @@ public:
   //! Type of the grids coordinates.
   typedef Dune::FieldVector<typename GridType::ctype, dim> CoordinateType;
 
-  //! Unique identifier: \c stuff.grid.provider.gmsh
-  static const std::string static_id;
-
   Gmsh(const Dune::ParameterTree paramTree)
   {
     const std::string filename = paramTree.get("mshfile", "sample.msh");
@@ -61,9 +58,10 @@ public:
     grid_ = Dune::shared_ptr<GridType>(GmshReader<GridType>::read(filename));
   }
 
-  virtual std::string id() const
+  //! Unique identifier: \c stuff.grid.provider.gmsh
+  static const std::string id()
   {
-    return static_id;
+    return "stuff.grid.provider.gmsh";
   }
 
   /**
@@ -100,10 +98,6 @@ private:
   const std::string filename_;
   Dune::shared_ptr<GridType> grid_;
 }; // class Gmsh
-
-template <typename GridImp>
-const std::string Gmsh<GridImp>::static_id = "stuff.grid.provider.gmsh";
-
 
 } // namespace Provider
 } // namespace Grid

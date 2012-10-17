@@ -73,9 +73,6 @@ public:
   //! Type of the grids coordinates.
   typedef Dune::FieldVector<typename GridType::ctype, dim> CoordinateType;
 
-  //! Unique identifier: \c stuff.grid.provider.cube
-  static const std::string static_id;
-
   /**
    *  \brief      Creates a cube.
    *  \param[in]  paramTree
@@ -98,8 +95,8 @@ public:
   {
     // select subtree (if necessary)
     Dune::ParameterTree paramTree_ = paramTree;
-    if (paramTree.hasSub(static_id))
-      paramTree_ = paramTree.sub(static_id);
+    if (paramTree.hasSub(id()))
+      paramTree_ = paramTree.sub(id());
     // get outer bounds
     const double lowerLeft  = paramTree_.get("lowerLeft", 0.0);
     const double upperRight = paramTree_.get("upperRight", 1.0);
@@ -182,9 +179,10 @@ public:
     buildGrid();
   }
 
-  virtual std::string id() const
+  //! Unique identifier: \c stuff.grid.provider.cube
+  static const std::string id()
   {
-    return static_id;
+    return "stuff.grid.provider.cube";
   }
 
   /**
@@ -252,9 +250,6 @@ private:
   Dune::array<unsigned int, dim> numElements_;
   Dune::shared_ptr<GridType> grid_;
 }; // class GenericCube
-
-template <typename GridImp, int variant>
-const std::string GenericCube<GridImp, variant>::static_id = "stuff.grid.provider.cube";
 
 template <typename GridType>
 struct ElementVariant
