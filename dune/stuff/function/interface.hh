@@ -4,6 +4,11 @@
 // dune-common
 #include <dune/common/fvector.hh>
 
+#ifdef HAVE_DUNE_FEM
+#include <dune/fem/function/common/function.hh>
+#include <dune/fem/space/common/functionspace.hh>
+#endif
+
 namespace Dune {
 namespace Stuff {
 namespace Function {

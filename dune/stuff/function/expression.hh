@@ -21,10 +21,6 @@
 #include <Eigen/Core>
 #endif // HAVE_EIGEN
 
-#ifdef HAVE_DUNE_FEM
-#include <dune/fem/function/common/function.hh>
-#include <dune/fem/space/common/functionspace.hh>
-#endif
 
 // local
 #include "expression/mathexpr.hh"
@@ -63,7 +59,7 @@ public:
   static const std::string id;
 
 public:
-  Expression(const Dune::ParameterTree& paramTree)
+  Expression(const ParameterTree& paramTree)
   {
     // assert dims
     assert(maxDimDomain > 0);
