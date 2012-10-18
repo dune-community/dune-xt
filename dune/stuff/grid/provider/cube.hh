@@ -19,6 +19,7 @@
 #include <dune/common/shared_ptr.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
+#include <dune/common/static_assert.hh>
 
 // dune-grid
 #include <dune/grid/utility/structuredgridfactory.hh>
@@ -234,7 +235,7 @@ public:
 private:
   void buildGrid()
   {
-    static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
+    dune_static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
     switch (variant) {
       case 1:
         grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements_);
@@ -289,11 +290,7 @@ struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 //  ALUGRID_CONFORM, variant 2
 // dim = 3
 //  ALUGRID_SIMPLEX, variant 2
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridType = Dune::GridSelector::GridType>
-#else
 template <class GridType>
-#endif
 class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
 {
 private:
@@ -326,11 +323,7 @@ public:
   }
 }; // class Cube
 
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridType = Dune::GridSelector::GridType>
-#else
 template <class GridType>
-#endif
 class UnitCube : public Cube<GridType>
 {
 private:

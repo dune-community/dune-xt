@@ -15,11 +15,7 @@ namespace Stuff {
 namespace Grid {
 namespace Provider {
 
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridImp = Dune::GridSelector::GridType>
-#else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridImp>
-#endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 class Interface
 {
 public:
