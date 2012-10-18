@@ -122,6 +122,7 @@ int GNAH(int argc, char** argv)
 
     typedef Grid::Provider::Cube<Dune::GridSelector::GridType> CubeProviderType;
     CubeProviderType cubeProvider(paramTree.sub(cubeProvider.id));
+    DUNE_THROW(Dune::InvalidStateException, "cubeProvider self init");
     cubeProvider.visualize(id);
 // cornerpoint
 #ifdef HAVE_DUNE_CORNERPOINT
