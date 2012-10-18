@@ -1,6 +1,12 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 #define DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#else
+#include "config.h"
+#endif // ifdef HAVE_CMAKE_CONFIG
+
 // system
 #include <sstream>
 #include <type_traits>

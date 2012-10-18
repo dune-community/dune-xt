@@ -1,6 +1,11 @@
-
 #ifndef DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
 #define DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
+
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#else
+#include "config.h"
+#endif // ifdef HAVE_CMAKE_CONFIG
 
 // dune-common
 #include <dune/common/fvector.hh>
