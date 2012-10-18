@@ -31,9 +31,7 @@
 #include "interface.hh"
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Function {
 
 /**
@@ -55,13 +53,7 @@ expression.1: sin(x[1])*x[0]\endcode
           \f$ 0 \leq i \leq m - 1 \f$.
  **/
 template <class DomainFieldImp, int maxDimDomain, class RangeFieldImp, int maxDimRange>
-class Expression
-    : public Interface<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>
-#ifdef HAVE_DUNE_FEM
-      ,
-      public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, maxDimDomain, maxDimRange>,
-                                 Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>>
-#endif
+class Expression : public Interface<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>
 {
 public:
   typedef DomainFieldImp DomainFieldType;
