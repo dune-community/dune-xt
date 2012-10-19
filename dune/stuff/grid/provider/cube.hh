@@ -275,7 +275,7 @@ struct ElementVariant<Dune::SGrid<dim, dim>>
   static const int id = 1;
 };
 
-#ifdef HAVE_ALUGRID
+#if HAVE_ALUGRID
 template <int dim>
 struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 {
