@@ -19,6 +19,7 @@
 #include <dune/common/shared_ptr.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
+#include <dune/common/static_assert.hh>
 
 // dune-grid
 #include <dune/grid/utility/structuredgridfactory.hh>
@@ -98,11 +99,11 @@ public:
     if (paramTree.hasSub(id()))
       paramTree_ = paramTree.sub(id());
     // get outer bounds
-    const double lowerLeft  = paramTree_.get("lowerLeft", 0.0);
-    const double upperRight = paramTree_.get("upperRight", 1.0);
-    assert(lowerLeft < upperRight);
-    lowerLeft_  = lowerLeft;
-    upperRight_ = upperRight;
+    const double ll = paramTree_.get("lowerLeft", 0.0);
+    const double rr = paramTree_.get("upperRight", 1.0);
+    assert(ll < rr);
+    lowerLeft_  = ll;
+    upperRight_ = rr;
     // get number of elements per dim
     if (paramTree.hasKey("level"))
       std::fill(numElements_.begin(), numElements_.end(), std::pow(2, paramTree.get("level", 1)));
@@ -125,9 +126,9 @@ public:
    *  \param[in]  level (optional)
    *              Level of refinement (see constructor for details).
    **/
-  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
-    : lowerLeft_(lowerLeft)
-    , upperRight_(upperRight)
+  GenericCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight, const int level = 1)
+    : lowerLeft_(_lowerLeft)
+    , upperRight_(_upperRight)
   {
     std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
     buildGrid();
@@ -142,9 +143,9 @@ public:
    *  \param[in]  level (optional)
    *              Level of refinement (see constructor for details).
    **/
-  GenericCube(const double lowerLeft, const double upperRight, const int level = 1)
-    : lowerLeft_(lowerLeft)
-    , upperRight_(upperRight)
+  GenericCube(const double _lowerLeft, const double _upperRight, const int level = 1)
+    : lowerLeft_(_lowerLeft)
+    , upperRight_(_upperRight)
   {
     std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
     buildGrid();
@@ -163,12 +164,12 @@ public:
     \tparam T an unsigned integral Type
     **/
   template <class Coord, class ContainerType>
-  GenericCube(const Coord lowerLeft, const Coord upperRight,
+  GenericCube(const Coord _lowerLeft, const Coord _upperRight,
               const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>()
                                                          .repeat(GridType::dimensionworld,
                                                                  typename ContainerType::value_type(1)))
-    : lowerLeft_(lowerLeft)
-    , upperRight_(upperRight)
+    : lowerLeft_(_lowerLeft)
+    , upperRight_(_upperRight)
   {
     static_assert(std::is_unsigned<typename ContainerType::value_type>::value
                       && std::is_integral<typename ContainerType::value_type>::value,
@@ -232,7 +233,7 @@ public:
 private:
   void buildGrid()
   {
-    static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
+    dune_static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
     switch (variant) {
       case 1:
         grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements_);
@@ -269,7 +270,7 @@ struct ElementVariant<Dune::SGrid<dim, dim>>
   static const int id = 1;
 };
 
-#ifdef HAVE_ALUGRID
+#if HAVE_ALUGRID
 template <int dim>
 struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 {
@@ -286,9 +287,9 @@ struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 //  ALUGRID_SIMPLEX, variant 2
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridType = Dune::GridSelector::GridType>
-#else
-template <class GridType>
-#endif
+#else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
+template <class GridType = Dune::SGrid<2, 2>>
+#endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
 {
 private:
@@ -323,9 +324,9 @@ public:
 
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridType = Dune::GridSelector::GridType>
-#else
-template <class GridType>
-#endif
+#else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
+template <class GridType = Dune::SGrid<2, 2>>
+#endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 class UnitCube : public Cube<GridType>
 {
 private:

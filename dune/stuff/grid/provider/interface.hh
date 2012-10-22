@@ -1,6 +1,11 @@
-
 #ifndef DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
 #define DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
+
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#else
+#include "config.h"
+#endif // ifdef HAVE_CMAKE_CONFIG
 
 // dune-common
 #include <dune/common/fvector.hh>
@@ -9,25 +14,17 @@
 // dune-grid
 #include <dune/grid/common/mcmgmapper.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
+#include <dune/grid/sgrid.hh>
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Grid {
-
 namespace Provider {
 
-/**
- *  \brief      Interface for all grid providers.
- *
- *  \attention  The method id() has to be implemented by the derived class, althoug it is not marked virtual (since it
- *              has to be static)
- **/
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridImp = Dune::GridSelector::GridType>
 #else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridImp>
+template <class GridImp = Dune::SGrid<2, 2>>
 #endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 class Interface
 {
@@ -53,7 +50,7 @@ private:
   typedef typename GridType::LeafGridView GridViewType;
 
 public:
-  void visualize(const std::string filename = id + ".grid") const
+  void visualize(const std::string filename = id() + ".grid") const
   {
     // vtk writer
     GridViewType gridView = grid().leafView();
@@ -118,11 +115,8 @@ private:
 }; // class Interface
 
 } // namespace Provider
-
 } // namespace Grid
-
 } // namespace Stuff
-
 } // namespace Dune
 
 #endif // DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
