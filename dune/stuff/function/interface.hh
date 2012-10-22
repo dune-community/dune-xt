@@ -26,6 +26,11 @@ public:
 
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
+  static const std::string id()
+  {
+    return "stuff.function.interface";
+  }
+
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
 }; // class Interface
 

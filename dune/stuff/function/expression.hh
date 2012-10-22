@@ -68,9 +68,6 @@ public:
 
   typedef RangeFieldImp RangeFieldType;
 
-  static const std::string id;
-
-public:
   Expression(const Dune::ParameterTree& paramTree)
   {
     // assert dims
@@ -81,7 +78,7 @@ public:
       variable_ = paramTree.get("variable", "");
     } else {
       std::stringstream msg;
-      msg << "Error in " << id << ": key 'variable' not found in the following Dune::Parametertree" << std::endl;
+      msg << "Error in " << id() << ": key 'variable' not found in the following Dune::Parametertree" << std::endl;
       paramTree.report(msg);
       DUNE_THROW(Dune::InvalidStateException, msg.str());
     }
@@ -110,7 +107,7 @@ public:
     } // while (goOn)
     if (actualDimRange_ < 1) {
       std::stringstream msg;
-      msg << "Error in " << id
+      msg << "Error in " << id()
           << ": no subtree 'expression' with keys 0, 1, ... found in the following Dune::Parametertree" << std::endl;
       paramTree.report(msg);
       DUNE_THROW(Dune::InvalidStateException, msg.str());
@@ -154,6 +151,11 @@ public:
       delete arg_[i];
     }
   } // ~Expression()
+
+  static const std::string id()
+  {
+    return "stuff.function.expression";
+  }
 
   std::string variable() const
   {
@@ -248,10 +250,6 @@ private:
   RVar* vararray_[maxDimDomain];
   ROperation* op_[maxDimRange];
 }; // class Expression
-
-template <class DomainFieldImp, int maxDimDomain, class RangeFieldImp, int maxDimRange>
-const std::string Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange>::id =
-    "stuff.function.expression";
 
 } // namespace Function
 } // namespace Stuff
