@@ -62,9 +62,6 @@ public:
 
   typedef RangeFieldImp RangeFieldType;
 
-  static const std::string id;
-
-public:
   Expression(const Dune::ParameterTree& paramTree)
   {
     // assert dims
