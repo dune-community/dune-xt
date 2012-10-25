@@ -1,10 +1,13 @@
 #include "test_common.hh"
 
+#if HAVE_DUNE_GRID
+
 #include <dune/stuff/grid/information.hh>
-#include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/grid/provider/cube.hh>
+#include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/common/logstreams.hh>
+#include <dune/common/shared_ptr.hh>
 
 using namespace Dune::Stuff::Common;
 using namespace Dune::Stuff::Grid;
@@ -66,6 +69,8 @@ TYPED_TEST(GridInfoTest, Misc)
   this->check();
   this->print(dev_null);
 }
+
+#endif // #if HAVE_DUNE_GRID
 
 int main(int argc, char** argv)
 {
