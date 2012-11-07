@@ -20,3 +20,4 @@ function.param
 provider.param
 pgfoutput_*
 common_tuple
+grid_output_pgf
