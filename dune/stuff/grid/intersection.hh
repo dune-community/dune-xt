@@ -55,9 +55,9 @@ void printIntersection(const IntersectionType& intersection, std::ostream& strea
   stream << prefix << "[ (";
   for (int i = 0; i < numCorners; ++i) {
     const GlobalPointType corner = geometry.corner(i);
-    for (unsigned int j = 0; j < corner.size; ++j) {
+    for (unsigned int j = 0; j < corner.size(); ++j) {
       stream << corner[j];
-      if (j < corner.size - 1) {
+      if (j < corner.size() - 1) {
         stream << ", ";
       }
     }
