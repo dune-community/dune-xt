@@ -1,5 +1,5 @@
-#ifndef DUNE_HELPER_TOOLS_GRID_INTERSECTION_HH
-#define DUNE_FEMTOOLS_GRID_INTERSECTION_HH
+#ifndef DUNE_STUFF_GRID_INTERSECTION_HH
+#define DUNE_STUFF_GRID_INTERSECTION_HH
 
 #ifdef HAVE_CMAKE_CONFIG
 #include "cmake_config.h"
@@ -126,7 +126,7 @@ bool intersectionContains(const IntersectionType& intersection, const Dune::Fiel
 } // end of namespace Stuff
 } // end namespace Dune
 
-#endif // DUNE_FEMTOOLS_GRID_INTERSECTION_HH
+#endif // DUNE_STUFF_GRID_INTERSECTION_HH
 /** Copyright (c) 2012, Felix Albrecht
    * All rights reserved.
    *
