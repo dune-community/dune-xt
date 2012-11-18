@@ -109,6 +109,13 @@ void GridWalk<V, i>::walkCodim0(Functor& f) const
   this->operator()(f);
 }
 
+//!
+template <class ViewImp, int codim = 0>
+GridWalk<Dune::GridView<ViewImp>, codim> make_gridwalk(const Dune::GridView<ViewImp>& view)
+{
+  return GridWalk<Dune::GridView<ViewImp>, codim>(view);
+}
+
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune
