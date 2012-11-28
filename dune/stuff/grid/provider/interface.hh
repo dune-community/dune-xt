@@ -35,7 +35,7 @@ public:
 
   static const std::string id()
   {
-    return "stuff.grid.provider.interface";
+    return "stuff.grid.provider";
   }
 
   virtual GridType& grid() = 0;
