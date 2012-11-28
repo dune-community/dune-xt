@@ -29,6 +29,9 @@
 #endif
 #include <dune/grid/sgrid.hh>
 
+// dune-stuff
+#include <dune/stuff/common/parameter/tree.hh>
+
 // local
 #include "interface.hh"
 
@@ -64,6 +67,10 @@ public:
   //! Type of the provided grid.
   typedef GridImp GridType;
 
+  typedef Interface<GridType> BaseType;
+
+  typedef GenericCube<GridType, variant> ThisType;
+
 private:
   typedef typename GridType::LeafGridView GridViewType;
 
@@ -72,7 +79,8 @@ public:
   static const unsigned int dim = GridType::dimension;
 
   //! Type of the grids coordinates.
-  typedef Dune::FieldVector<typename GridType::ctype, dim> CoordinateType;
+  typedef typename GridType::ctype ctype;
+  typedef Dune::FieldVector<ctype, dim> CoordinateType;
 
   /**
    *  \brief      Creates a cube.
@@ -82,38 +90,64 @@ public:
    *              <li> a subtree named Cube::id, containing the following keys. If a subtree is present, it is always
    *selected. Also it is solely selceted, so that all keys in the supertree are ignored.</ul>
    *              The actual keys are:
-   *              <ul><li> \c lowerLeft: \a double that is used as a lower left corner in each dimension.
-   *              <li> \c upperRight: \a double that is used as an upper right corner in each dimension.
-   *              <li> \c numElements.D \a int to denote the number of elements in direction of dimension D (has to be
-   *given for each dimension seperately).
-   *              <li> \c level: \a int level of refinement. If given, overrides numElements and creates \f$ 2^level \f$
-   *elements per dimension.
+   *              <ul><li> \c lowerLeft: \a double or a vector that is used as lower left corners.
+   *              <li> \c upperRight: \a double or a vector that is used as upper right corners.
+   *              <li> \c numElements: \a int or vector to denote the number of elements.
    *              </ul>
    **/
-  GenericCube(const Dune::ParameterTree paramTree)
-    : lowerLeft_(0.0)
-    , upperRight_(1.0)
+  GenericCube(const Dune::Stuff::Common::ExtendedParameterTree& paramTree)
+    : lowerLeft_(ctype(0))
+    , upperRight_(ctype(1))
   {
-    // select subtree (if necessary)
-    Dune::ParameterTree paramTree_ = paramTree;
-    if (paramTree.hasSub(id()))
-      paramTree_ = paramTree.sub(id());
-    // get outer bounds
-    const double ll = paramTree_.get("lowerLeft", 0.0);
-    const double rr = paramTree_.get("upperRight", 1.0);
-    assert(ll < rr);
-    lowerLeft_  = ll;
-    upperRight_ = rr;
-    // get number of elements per dim
-    if (paramTree.hasKey("level"))
-      std::fill(numElements_.begin(), numElements_.end(), std::pow(2, paramTree.get("level", 1)));
-    else {
-      for (unsigned int d = 0; d < dim; ++d) {
-        std::stringstream s;
-        s << "numElements." << d;
-        numElements_[d] = paramTree.get(s.str(), 1);
-      }
+    // get lower left
+    std::vector<ctype> lowerLefts;
+    if (paramTree.hasVector("lowerLeft")) {
+      lowerLefts = paramTree.getVector("lowerLeft", ctype(0));
+      assert(lowerLefts.size() >= dim && "Given vector too short!");
+    } else if (paramTree.hasKey("lowerLeft")) {
+      const ctype lowerLeft = paramTree.get("lowerLeft", ctype(0));
+      lowerLefts            = std::vector<ctype>(dim, lowerLeft);
+    } else {
+      std::cout << "Warning in " << id() << ": neither vector nor key 'lowerLeft' given, defaulting to 0.0!"
+                << std::endl;
+      lowerLefts = std::vector<ctype>(dim, ctype(0));
     }
+    // get upper right
+    std::vector<ctype> upperRigths;
+    if (paramTree.hasVector("upperRight")) {
+      upperRigths = paramTree.getVector("upperRight", ctype(1));
+      assert(upperRigths.size() >= dim && "Given vector too short!");
+    } else if (paramTree.hasKey("upperRight")) {
+      const ctype upperRight = paramTree.get("upperRight", ctype(1));
+      upperRigths            = std::vector<ctype>(dim, upperRight);
+    } else {
+      std::cout << "Warning in " << id() << ": neither vector nor key 'upperRight' given, defaulting to 1.0!"
+                << std::endl;
+      upperRigths = std::vector<ctype>(dim, ctype(1));
+    }
+    // get number of elements
+    std::vector<ctype> numElements;
+    if (paramTree.hasVector("numElements")) {
+      numElements = paramTree.getVector("numElements", 1u);
+      assert(numElements.size() >= dim && "Given vector too short!");
+    } else if (paramTree.hasKey("numElements")) {
+      const unsigned int numElement = paramTree.get("numElements", ctype(1));
+      numElements                   = std::vector<unsigned int>(dim, numElement);
+    } else {
+      std::cout << "Warning in " << id() << ": neither vector nor key 'numElements' given, defaulting to 1!"
+                << std::endl;
+      numElements = std::vector<ctype>(dim, 1u);
+    }
+    // check and save
+    for (unsigned int d = 0; d < dim; ++d) {
+      assert(lowerLefts[d] < upperRigths[d]
+             && "Given 'upperRight' hast to be elementwise larger than given 'lowerLeft'!");
+      lowerLeft_[d]  = lowerLefts[d];
+      upperRight_[d] = upperRigths[d];
+      assert(numElements_[d] > 0 && "Given 'numElements' has to be elementwise positive!");
+      numElements_[d] = numElements[d];
+    }
+    // do the work
     buildGrid();
   } // Cube(const Dune::ParameterTree& paramTree)
 
@@ -123,14 +157,14 @@ public:
    *              A vector that is used as a lower left corner.
    *  \param[in]  upperRight
    *              A vector that is used as a upper right corner.
-   *  \param[in]  level (optional)
-   *              Level of refinement (see constructor for details).
+   *  \param[in]  numElements (optional)
+   *              number of elements.
    **/
-  GenericCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight, const int level = 1)
-    : lowerLeft_(_lowerLeft)
-    , upperRight_(_upperRight)
+  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1)
+    : lowerLeft_(lowerLeft)
+    , upperRight_(upperRight)
   {
-    std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
+    std::fill(numElements_.begin(), numElements_.end(), numElements);
     buildGrid();
   }
 
@@ -140,14 +174,14 @@ public:
    *              A double that is used as a lower left corner in each dimension.
    *  \param[in]  upperRight
    *              A double that is used as a upper right corner in each dimension.
-   *  \param[in]  level (optional)
-   *              Level of refinement (see constructor for details).
+   *  \param[in]  numElements (optional)
+   *              number of elements.
    **/
-  GenericCube(const double _lowerLeft, const double _upperRight, const int level = 1)
-    : lowerLeft_(_lowerLeft)
-    , upperRight_(_upperRight)
+  GenericCube(const double lowerLeft, const double upperRight, const unsigned int numElements = 1)
+    : lowerLeft_(lowerLeft)
+    , upperRight_(upperRight)
   {
-    std::fill(numElements_.begin(), numElements_.end(), std::pow(2, level));
+    std::fill(numElements_.begin(), numElements_.end(), numElements);
     buildGrid();
   }
 
@@ -157,33 +191,33 @@ public:
                 A double that is used as a lower left corner in each dimension.
     \param[in]  upperRight
                 A double that is used as a upper right corner in each dimension.
-    \param[in]  elements_per_dim number of elements in each dimension.
+    \param[in]  numElements
+                number of elements in each dimension.
                 can contain 0 to dim elements (missing dimension are initialized to 1)
     \tparam Coord anything that CoordinateType allows to copy construct from
     \tparam ContainerType some sequence type that functions with std::begin/end
     \tparam T an unsigned integral Type
     **/
-  template <class Coord, class ContainerType>
-  GenericCube(const Coord _lowerLeft, const Coord _upperRight,
-              const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>()
-                                                         .repeat(GridType::dimensionworld,
-                                                                 typename ContainerType::value_type(1)))
-    : lowerLeft_(_lowerLeft)
-    , upperRight_(_upperRight)
+  template <class ContainerType>
+  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight,
+              const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
+                  dim, typename ContainerType::value_type(1u)))
+    : lowerLeft_(lowerLeft)
+    , upperRight_(upperRight)
   {
     static_assert(std::is_unsigned<typename ContainerType::value_type>::value
                       && std::is_integral<typename ContainerType::value_type>::value,
                   "only unsigned integral number of elements per dimension allowed");
     // base init in case input is shorter
-    std::fill(numElements_.begin(), numElements_.end(), 1);
-    std::copy(elements_per_dim.begin(), elements_per_dim.end(), numElements_.begin());
+    std::fill(numElements_.begin(), numElements_.end(), 1u);
+    std::copy(numElements.begin(), numElements.end(), numElements_.begin());
     buildGrid();
   }
 
   //! Unique identifier: \c stuff.grid.provider.cube
   static const std::string id()
   {
-    return "stuff.grid.provider.cube";
+    return BaseType::id() + ".cube";
   }
 
   /**
@@ -231,6 +265,9 @@ public:
    **/
 
 private:
+  GenericCube(const ThisType&);
+  ThisType& operator=(const ThisType&);
+
   void buildGrid()
   {
     dune_static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
@@ -244,7 +281,6 @@ private:
         break;
     }
   } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
-
 
   CoordinateType lowerLeft_;
   CoordinateType upperRight_;
@@ -292,34 +328,39 @@ template <class GridType = Dune::SGrid<2, 2>>
 #endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
 {
-private:
+public:
   typedef GenericCube<GridType, ElementVariant<GridType>::id> BaseType;
 
-public:
+  typedef Cube<GridType> ThisType;
+
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(const Dune::ParameterTree& paramTree)
+  Cube(const Dune::Stuff::Common::ExtendedParameterTree& paramTree)
     : BaseType(paramTree)
   {
   }
 
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
+  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1)
+    : BaseType(lowerLeft, upperRight, numElements)
   {
   }
 
-  Cube(const double lowerLeft, const double upperRight, const int level = 1)
-    : BaseType(lowerLeft, upperRight, level)
+  Cube(const double lowerLeft, const double upperRight, const unsigned int numElements = 1)
+    : BaseType(lowerLeft, upperRight, numElements)
   {
   }
 
-  template <class Coord, class ContainerType>
-  Cube(const Coord lowerLeft, const Coord upperRight,
-       const ContainerType elements_per_dim = boost::assign::list_of<typename ContainerType::value_type>().repeat(
-           GridType::dimensionworld, typename ContainerType::value_type(1)))
-    : BaseType(lowerLeft, upperRight, elements_per_dim)
+  template <class ContainerType>
+  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight,
+       const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
+           GridType::dimensionworld, typename ContainerType::value_type(1u)))
+    : BaseType(lowerLeft, upperRight, numElements)
   {
   }
+
+private:
+  Cube(const ThisType&);
+  ThisType& operator=(const ThisType&);
 }; // class Cube
 
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
@@ -329,19 +370,30 @@ template <class GridType = Dune::SGrid<2, 2>>
 #endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 class UnitCube : public Cube<GridType>
 {
-private:
+public:
   typedef Cube<GridType> BaseType;
 
+  typedef UnitCube<GridType> ThisType;
+
+  typedef typename BaseType::CoordinateType CoordinateType;
+
+private:
+  typedef typename BaseType::ctype ctype;
+
 public:
-  UnitCube(const Dune::ParameterTree& paramTree)
-    : BaseType(0.0, 1.0, paramTree.get("level", 1))
+  UnitCube(const Dune::Stuff::Common::ExtendedParameterTree& paramTree)
+    : BaseType(ctype(0), ctype(1), paramTree.get("numElements", 1u))
   {
   }
 
-  UnitCube(const int level = 1)
-    : BaseType(0.0, 1.0, level)
+  UnitCube(const unsigned int numElements = 1)
+    : BaseType(ctype(0), ctype(1), numElements)
   {
   }
+
+private:
+  UnitCube(const ThisType&);
+  ThisType& operator=(const ThisType&);
 }; // class UnitCube
 
 } // namespace Provider
