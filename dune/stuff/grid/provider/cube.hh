@@ -113,17 +113,17 @@ public:
       lowerLefts = std::vector<ctype>(dim, ctype(0));
     }
     // get upper right
-    std::vector<ctype> upperRigths;
+    std::vector<ctype> upperRights;
     if (paramTree.hasVector("upperRight")) {
-      upperRigths = paramTree.getVector("upperRight", ctype(1));
-      assert(upperRigths.size() >= dim && "Given vector too short!");
+      upperRights = paramTree.getVector("upperRight", ctype(1));
+      assert(upperRights.size() >= dim && "Given vector too short!");
     } else if (paramTree.hasKey("upperRight")) {
       const ctype upperRight = paramTree.get("upperRight", ctype(1));
-      upperRigths            = std::vector<ctype>(dim, upperRight);
+      upperRights            = std::vector<ctype>(dim, upperRight);
     } else {
       std::cout << "Warning in " << id() << ": neither vector nor key 'upperRight' given, defaulting to 1.0!"
                 << std::endl;
-      upperRigths = std::vector<ctype>(dim, ctype(1));
+      upperRights = std::vector<ctype>(dim, ctype(1));
     }
     // get number of elements
     std::vector<unsigned int> numElements;
@@ -140,11 +140,11 @@ public:
     }
     // check and save
     for (unsigned int d = 0; d < dim; ++d) {
-      assert(lowerLefts[d] < upperRigths[d]
+      assert(lowerLefts[d] < upperRights[d]
              && "Given 'upperRight' hast to be elementwise larger than given 'lowerLeft'!");
       lowerLeft_[d]  = lowerLefts[d];
-      upperRight_[d] = upperRigths[d];
-      assert(numElements_[d] > 0 && "Given 'numElements' has to be elementwise positive!");
+      upperRight_[d] = upperRights[d];
+      assert(numElements[d] > 0 && "Given 'numElements' has to be elementwise positive!");
       numElements_[d] = numElements[d];
     }
     // do the work
