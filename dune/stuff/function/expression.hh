@@ -134,6 +134,24 @@ public:
     setUp();
   } // Expression(Dune::ParameterTree& paramTree)
 
+  Expression(const std::string variable, const std::string expression)
+    : variable_(variable)
+    , expressions_(std::vector<std::string>(1, expression))
+    , actualDimRange_(1)
+  {
+    // assert dims
+    assert(maxDimDomain > 0);
+    assert(maxDimRange > 0);
+    // set variable components
+    for (int i = 0; i < maxDimDomain; ++i) {
+      std::stringstream variableStream;
+      variableStream << variable_ << "[" << i << "]";
+      variables_.push_back(variableStream.str());
+    }
+    // set up
+    setUp();
+  } // Expression(const std::string variable, const std::string expression)
+
   Expression(const std::string variable_in, const std::vector<std::string>& expressions_in)
     : variable_(variable_in)
     , expressions_(expressions_in)
@@ -156,7 +174,6 @@ public:
     // set up
     setUp();
   } // Expression(const std::string variable_in, const std::vector< std::string >& expressions_in)
-
 
   ~Expression()
   {
