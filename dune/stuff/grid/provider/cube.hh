@@ -126,17 +126,17 @@ public:
       upperRigths = std::vector<ctype>(dim, ctype(1));
     }
     // get number of elements
-    std::vector<ctype> numElements;
+    std::vector<unsigned int> numElements;
     if (paramTree.hasVector("numElements")) {
       numElements = paramTree.getVector("numElements", 1u);
       assert(numElements.size() >= dim && "Given vector too short!");
     } else if (paramTree.hasKey("numElements")) {
-      const unsigned int numElement = paramTree.get("numElements", ctype(1));
+      const unsigned int numElement = paramTree.get("numElements", 1u);
       numElements                   = std::vector<unsigned int>(dim, numElement);
     } else {
       std::cout << "Warning in " << id() << ": neither vector nor key 'numElements' given, defaulting to 1!"
                 << std::endl;
-      numElements = std::vector<ctype>(dim, 1u);
+      numElements = std::vector<unsigned int>(dim, 1u);
     }
     // check and save
     for (unsigned int d = 0; d < dim; ++d) {
