@@ -7,11 +7,11 @@
 #include "config.h"
 #endif // ifdef HAVE_CMAKE_CONFIG
 
-// dune-common
+#if HAVE_DUNE_GRID
+
 #include <dune/common/fvector.hh>
 #include <dune/common/shared_ptr.hh>
 
-// dune-grid
 #include <dune/grid/common/mcmgmapper.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/sgrid.hh>
@@ -118,5 +118,7 @@ private:
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
