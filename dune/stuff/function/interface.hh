@@ -1,7 +1,6 @@
 #ifndef DUNE_STUFF_FUNCTION_INTERFACE_hh
 #define DUNE_STUFF_FUNCTION_INTERFACE_hh
 
-// dune-common
 #include <dune/common/fvector.hh>
 
 #ifdef HAVE_DUNE_FEM
@@ -34,11 +33,6 @@ public:
 
   typedef typename BaseType::RangeType RangeType;
 
-  static const std::string id()
-  {
-    return "stuff.function";
-  }
-
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
 };
 
@@ -62,11 +56,6 @@ public:
   static const int dimRange = rangeDim;
 
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
-
-  static const std::string id()
-  {
-    return "stuff.function";
-  }
 
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
 }; // class Interface
