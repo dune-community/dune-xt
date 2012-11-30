@@ -63,11 +63,6 @@ public:
 
   typedef Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange> ThisType;
 
-  //  static const std::string id()
-  //  {
-  //    return BaseType::id() + ".expression";
-  //  }
-
   Expression(const std::string _variable, const std::string _expression)
   {
     const std::vector<std::string> expressions(1, _expression);
@@ -113,6 +108,22 @@ public:
   {
     cleanup();
   } // ~Expression()
+
+  void report(const std::string name = "stuff.function.expression", std::ostream& stream = std::cout,
+              const std::string& prefix = "") const
+  {
+    const std::string tmp = name + "(" + variable() + ") = ";
+    stream << prefix << tmp;
+    if (expression().size() == 1)
+      stream << expression()[0] << std::endl;
+    else {
+      stream << "[ " << expression()[0] << ";" << std::endl;
+      const std::string whitespace = Dune::Stuff::Common::whitespaceify(tmp + "[ ");
+      for (unsigned int i = 1; i < expression().size() - 1; ++i)
+        stream << prefix << whitespace << expression()[i] << ";" << std::endl;
+      stream << prefix << whitespace << expression()[expression().size() - 1] << " ]" << std::endl;
+    }
+  } // void report(const std::string, std::ostream&, const std::string&) const
 
   std::string variable() const
   {
@@ -163,11 +174,14 @@ public:
   }
 
 #ifdef HAVE_EIGEN
+  /**
+   * \attention ret is resized to size dimRange()!
+   */
   void evaluate(const Eigen::VectorXd& arg, Eigen::VectorXd& ret) const
   {
     // ensure right dimensions
     assert(arg.size() <= maxDimDomain);
-    assert(ret.size() <= dimRange());
+    ret.resize(dimRange());
     // arg
     for (int i = 0; i < arg.size(); ++i) {
       *(arg_[i]) = arg(i);
@@ -176,7 +190,7 @@ public:
     for (int i = 0; i < ret.size(); ++i) {
       ret(i) = op_[i]->Val();
     }
-  }
+  } // void evaluate(const Eigen::VectorXd& arg, Eigen::VectorXd& ret) const
 #endif // HAVE_EIGEN
 
 private:
