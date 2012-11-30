@@ -354,39 +354,9 @@ private:
   Cube(const ThisType&);
   ThisType& operator=(const ThisType&);
 }; // class Cube
-
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridType = Dune::GridSelector::GridType>
-#else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridType = Dune::SGrid<2, 2>>
-#endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-class UnitCube : public Cube<GridType>
 {
-public:
-  typedef Cube<GridType> BaseType;
+}
 
-  typedef UnitCube<GridType> ThisType;
-
-  typedef typename BaseType::CoordinateType CoordinateType;
-
-private:
-  typedef typename BaseType::ctype ctype;
-
-public:
-  UnitCube(const Dune::Stuff::Common::ExtendedParameterTree& paramTree)
-    : BaseType(ctype(0), ctype(1), paramTree.get("numElements", 1u))
-  {
-  }
-
-  UnitCube(const unsigned int numElements = 1)
-    : BaseType(ctype(0), ctype(1), numElements)
-  {
-  }
-
-private:
-  UnitCube(const ThisType&);
-  ThisType& operator=(const ThisType&);
-}; // class UnitCube
 
 } // namespace Provider
 } // namespace Grid
