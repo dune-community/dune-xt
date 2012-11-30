@@ -74,74 +74,29 @@ public:
   typedef typename GridType::ctype ctype;
   typedef Dune::FieldVector<ctype, dim> CoordinateType;
 
+  //! Unique identifier: \c stuff.grid.provider.cube
+  static const std::string id()
+  {
+    return BaseType::id() + ".cube";
+  }
+
   /**
    *  \brief      Creates a cube.
-   *  \param[in]  paramTree
-   *              A Dune::ParameterTree containing
-   *              <ul><li> the following keys directly or
-   *              <li> a subtree named Cube::id, containing the following keys. If a subtree is present, it is always
-   *selected. Also it is solely selceted, so that all keys in the supertree are ignored.</ul>
-   *              The actual keys are:
-   *              <ul><li> \c lowerLeft: \a double or a vector that is used as lower left corners.
-   *              <li> \c upperRight: \a double or a vector that is used as upper right corners.
-   *              <li> \c numElements: \a int or vector to denote the number of elements.
-   *              </ul>
+   *  \param[in]  lowerLeft
+   *              A double that is used as a lower left corner in each dimension.
+   *  \param[in]  upperRight
+   *              A double that is used as a upper right corner in each dimension.
+   *  \param[in]  numElements (optional)
+   *              number of elements.
    **/
-  GenericCube(const Dune::Stuff::Common::ExtendedParameterTree& paramTree)
-    : lowerLeft_(ctype(0))
-    , upperRight_(ctype(1))
+  GenericCube(const double lowerLeft = 0.0, const double upperRight = 1.0, const unsigned int numElements = 1)
+    : lowerLeft_(lowerLeft)
+    , upperRight_(upperRight)
   {
-    // get lower left
-    std::vector<ctype> lowerLefts;
-    if (paramTree.hasVector("lowerLeft")) {
-      lowerLefts = paramTree.getVector("lowerLeft", ctype(0));
-      assert(lowerLefts.size() >= dim && "Given vector too short!");
-    } else if (paramTree.hasKey("lowerLeft")) {
-      const ctype lowerLeft = paramTree.get("lowerLeft", ctype(0));
-      lowerLefts            = std::vector<ctype>(dim, lowerLeft);
-    } else {
-      std::cout << "Warning in " << id() << ": neither vector nor key 'lowerLeft' given, defaulting to 0.0!"
-                << std::endl;
-      lowerLefts = std::vector<ctype>(dim, ctype(0));
-    }
-    // get upper right
-    std::vector<ctype> upperRights;
-    if (paramTree.hasVector("upperRight")) {
-      upperRights = paramTree.getVector("upperRight", ctype(1));
-      assert(upperRights.size() >= dim && "Given vector too short!");
-    } else if (paramTree.hasKey("upperRight")) {
-      const ctype upperRight = paramTree.get("upperRight", ctype(1));
-      upperRights            = std::vector<ctype>(dim, upperRight);
-    } else {
-      std::cout << "Warning in " << id() << ": neither vector nor key 'upperRight' given, defaulting to 1.0!"
-                << std::endl;
-      upperRights = std::vector<ctype>(dim, ctype(1));
-    }
-    // get number of elements
-    std::vector<unsigned int> numElements;
-    if (paramTree.hasVector("numElements")) {
-      numElements = paramTree.getVector("numElements", 1u);
-      assert(numElements.size() >= dim && "Given vector too short!");
-    } else if (paramTree.hasKey("numElements")) {
-      const unsigned int numElement = paramTree.get("numElements", 1u);
-      numElements                   = std::vector<unsigned int>(dim, numElement);
-    } else {
-      std::cout << "Warning in " << id() << ": neither vector nor key 'numElements' given, defaulting to 1!"
-                << std::endl;
-      numElements = std::vector<unsigned int>(dim, 1u);
-    }
-    // check and save
-    for (unsigned int d = 0; d < dim; ++d) {
-      assert(lowerLefts[d] < upperRights[d]
-             && "Given 'upperRight' hast to be elementwise larger than given 'lowerLeft'!");
-      lowerLeft_[d]  = lowerLefts[d];
-      upperRight_[d] = upperRights[d];
-      assert(numElements[d] > 0 && "Given 'numElements' has to be elementwise positive!");
-      numElements_[d] = numElements[d];
-    }
-    // do the work
-    buildGrid();
-  } // Cube(const Dune::ParameterTree& paramTree)
+    Dune::array<unsigned int, dim> tmpNumElements;
+    std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
+    buildGrid(tmpNumElements);
+  }
 
   /**
    *  \brief      Creates a cube.
@@ -156,25 +111,9 @@ public:
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
-    std::fill(numElements_.begin(), numElements_.end(), numElements);
-    buildGrid();
-  }
-
-  /**
-   *  \brief      Creates a cube.
-   *  \param[in]  lowerLeft
-   *              A double that is used as a lower left corner in each dimension.
-   *  \param[in]  upperRight
-   *              A double that is used as a upper right corner in each dimension.
-   *  \param[in]  numElements (optional)
-   *              number of elements.
-   **/
-  GenericCube(const double lowerLeft, const double upperRight, const unsigned int numElements = 1)
-    : lowerLeft_(lowerLeft)
-    , upperRight_(upperRight)
-  {
-    std::fill(numElements_.begin(), numElements_.end(), numElements);
-    buildGrid();
+    Dune::array<unsigned int, dim> tmpNumElements;
+    std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
+    buildGrid(tmpNumElements);
   }
 
   /**
@@ -197,46 +136,115 @@ public:
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
+    Dune::array<unsigned int, dim> tmpNumElements;
     static_assert(std::is_unsigned<typename ContainerType::value_type>::value
                       && std::is_integral<typename ContainerType::value_type>::value,
                   "only unsigned integral number of elements per dimension allowed");
     // base init in case input is shorter
-    std::fill(numElements_.begin(), numElements_.end(), 1u);
-    std::copy(numElements.begin(), numElements.end(), numElements_.begin());
-    buildGrid();
+    std::fill(tmpNumElements.begin(), tmpNumElements.end(), 1u);
+    std::copy(numElements.begin(), numElements.end(), tmpNumElements.begin());
+    buildGrid(tmpNumElements);
   }
 
-  //! Unique identifier: \c stuff.grid.provider.cube
-  static const std::string id()
+  GenericCube(const ThisType& other)
+    : lowerLeft_(other.lowerLeft_)
+    , upperRight_(other.upperRight_)
+    , grid_(other.grid_)
   {
-    return BaseType::id() + ".cube";
   }
 
   /**
-    \brief  Provides access to the created grid.
-    \return Reference to the grid.
-    **/
-  virtual GridType& grid()
-  {
-    return *grid_;
-  }
-
-  /**
-   *  \brief  Provides const access to the created grid.
-   *  \return Reference to the grid.
+   *  \brief      Creates a cube.
+   *  \param[in]  paramTree
+   *              A Dune::ParameterTree containing
+   *              <ul><li> the following keys directly or
+   *              <li> a subtree named Cube::id, containing the following keys. If a subtree is present, it is always
+   *selected. Also it is solely selceted, so that all keys in the supertree are ignored.</ul>
+   *              The actual keys are:
+   *              <ul><li> \c lowerLeft: \a double or a vector that is used as lower left corners.
+   *              <li> \c upperRight: \a double or a vector that is used as upper right corners.
+   *              <li> \c numElements: \a int or vector to denote the number of elements.
+   *              </ul>
    **/
-  virtual const GridType& grid() const
+  static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
-    return *grid_;
-  }
+    // get correct paramTree
+    Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
+    if (paramTree.hasSub(subName))
+      extendedParamTree = paramTree.sub(subName);
+    else
+      extendedParamTree = paramTree;
+    // get lower left
+    std::vector<ctype> lowerLefts;
+    if (extendedParamTree.hasVector("lowerLeft")) {
+      lowerLefts = extendedParamTree.getVector("lowerLeft", ctype(0));
+      assert(lowerLefts.size() >= dim && "Given vector too short!");
+    } else if (extendedParamTree.hasKey("lowerLeft")) {
+      const ctype lowerLeft = extendedParamTree.get("lowerLeft", ctype(0));
+      lowerLefts            = std::vector<ctype>(dim, lowerLeft);
+    } else {
+      std::cout << "Warning in " << id() << ": neither vector nor key 'lowerLeft' given, defaulting to 0.0!"
+                << std::endl;
+      lowerLefts = std::vector<ctype>(dim, ctype(0));
+    }
+    // get upper right
+    std::vector<ctype> upperRights;
+    if (extendedParamTree.hasVector("upperRight")) {
+      upperRights = extendedParamTree.getVector("upperRight", ctype(1));
+      assert(upperRights.size() >= dim && "Given vector too short!");
+    } else if (extendedParamTree.hasKey("upperRight")) {
+      const ctype upperRight = extendedParamTree.get("upperRight", ctype(1));
+      upperRights            = std::vector<ctype>(dim, upperRight);
+    } else {
+      std::cout << "Warning in " << id() << ": neither vector nor key 'upperRight' given, defaulting to 1.0!"
+                << std::endl;
+      upperRights = std::vector<ctype>(dim, ctype(1));
+    }
+    // get number of elements
+    std::vector<unsigned int> tmpNumElements;
+    if (extendedParamTree.hasVector("numElements")) {
+      tmpNumElements = extendedParamTree.getVector("numElements", 1u);
+      assert(tmpNumElements.size() >= dim && "Given vector too short!");
+    } else if (extendedParamTree.hasKey("numElements")) {
+      const unsigned int numElement = extendedParamTree.get("numElements", 1u);
+      tmpNumElements                = std::vector<unsigned int>(dim, numElement);
+    } else {
+      std::cout << "Warning in " << id() << ": neither vector nor key 'numElements' given, defaulting to 1!"
+                << std::endl;
+      tmpNumElements = std::vector<unsigned int>(dim, 1u);
+    }
+    // check and save
+    CoordinateType lowerLeft;
+    CoordinateType upperRight;
+    Dune::array<unsigned int, dim> numElements;
+    for (unsigned int d = 0; d < dim; ++d) {
+      assert(lowerLefts[d] < upperRights[d]
+             && "Given 'upperRight' hast to be elementwise larger than given 'lowerLeft'!");
+      lowerLeft[d]  = lowerLefts[d];
+      upperRight[d] = upperRights[d];
+      assert(tmpNumElements[d] > 0 && "Given 'numElements' has to be elementwise positive!");
+      numElements[d] = tmpNumElements[d];
+    }
+    return GenericCube(lowerLeft, upperRight, numElements);
+  } // static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
+
+  ThisType& operator=(ThisType& other)
+  {
+    if (this != &other) {
+      lowerLeft_  = other.lowerLeft();
+      upperRight_ = other.upperRight();
+      grid_       = other.grid();
+    }
+    return this;
+  } // ThisType& operator=(ThisType& other)
 
   //! access to shared ptr
-  virtual Dune::shared_ptr<GridType> gridPtr()
+  virtual Dune::shared_ptr<GridType> grid()
   {
     return grid_;
   }
 
-  virtual const Dune::shared_ptr<const GridType> gridPtr() const
+  virtual const Dune::shared_ptr<const GridType> grid() const
   {
     return grid_;
   }
@@ -257,26 +265,22 @@ public:
    **/
 
 private:
-  GenericCube(const ThisType&);
-  ThisType& operator=(const ThisType&);
-
-  void buildGrid()
+  void buildGrid(const Dune::array<unsigned int, dim>& numElements)
   {
     dune_static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
     switch (variant) {
       case 1:
-        grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements_);
+        grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements);
         break;
       case 2:
       default:
-        grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft_, upperRight_, numElements_);
+        grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft_, upperRight_, numElements);
         break;
     }
   } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
 
   CoordinateType lowerLeft_;
   CoordinateType upperRight_;
-  Dune::array<unsigned int, dim> numElements_;
   Dune::shared_ptr<GridType> grid_;
 }; // class GenericCube
 
@@ -304,7 +308,7 @@ struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 {
   static const int id = 1;
 };
-#endif
+#endif // HAVE_ALUGRID
 
 // default implementation of a cube for any grid
 // tested for
@@ -327,17 +331,12 @@ public:
 
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(const Dune::Stuff::Common::ExtendedParameterTree& paramTree)
-    : BaseType(paramTree)
-  {
-  }
-
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1)
+  Cube(const double lowerLeft = 0.0, const double upperRight = 1.0, const unsigned int numElements = 1)
     : BaseType(lowerLeft, upperRight, numElements)
   {
   }
 
-  Cube(const double lowerLeft, const double upperRight, const unsigned int numElements = 1)
+  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1)
     : BaseType(lowerLeft, upperRight, numElements)
   {
   }
@@ -350,13 +349,17 @@ public:
   {
   }
 
-private:
-  Cube(const ThisType&);
-  ThisType& operator=(const ThisType&);
-}; // class Cube
-{
-}
+  Cube(BaseType& other)
+    : BaseType(other)
+  {
+  }
 
+  static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = BaseType::id())
+  {
+    BaseType base = BaseType::createFromParamTree(paramTree, subName);
+    return ThisType(base);
+  }
+}; // class Cube
 
 } // namespace Provider
 } // namespace Grid
