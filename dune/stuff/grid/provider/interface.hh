@@ -38,13 +38,21 @@ public:
     return "stuff.grid.provider";
   }
 
-  virtual GridType& grid() = 0;
+  virtual Dune::shared_ptr<GridType> grid() = 0;
 
-  virtual const GridType& grid() const = 0;
+  virtual const Dune::shared_ptr<const GridType> grid() const = 0;
 
-  virtual Dune::shared_ptr<GridType> gridPtr() = 0;
+  //! \todo TODO Remove me in the future (i.e. on 01.01.2013)!
+  Dune::shared_ptr<GridType> gridPtr() DUNE_DEPRECATED_MSG("Use grid() instead!")
+  {
+    return grid();
+  }
 
-  virtual const Dune::shared_ptr<const GridType> gridPtr() const = 0;
+  //! \todo TODO Remove me in the future (i.e. on 01.01.2013)!
+  const Dune::shared_ptr<const GridType> gridPtr() const DUNE_DEPRECATED_MSG("Use grid() instead!")
+  {
+    return grid();
+  }
 
 private:
   typedef typename GridType::LeafGridView GridViewType;
@@ -53,7 +61,7 @@ public:
   void visualize(const std::string filename = id() + ".grid") const
   {
     // vtk writer
-    GridViewType gridView = grid().leafView();
+    GridViewType gridView = grid()->leafView();
     Dune::VTKWriter<GridViewType> vtkwriter(gridView);
     // boundary id
     std::vector<double> boundaryId = generateBoundaryIdVisualization(gridView);
