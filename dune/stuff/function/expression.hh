@@ -7,38 +7,30 @@
 #include "config.h"
 #endif // ifdef HAVE_CMAKE_CONFIG
 
-// system
 #include <sstream>
+#include <vector>
 
-// eigen
 #ifdef HAVE_EIGEN
 #include <Eigen/Core>
 #endif // HAVE_EIGEN
 
-// dune-common
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
-#include <dune/common/parametertree.hh>
 #include <dune/common/exceptions.hh>
 
-// dune-fem
 #ifdef HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
 #endif // HAVE_DUNE_FEM
 
-// dune-stuff
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/string.hh>
 
-// local
 #include "expression/mathexpr.hh"
 #include "interface.hh"
 
 namespace Dune {
-
 namespace Stuff {
-
 namespace Function {
 
 /**
@@ -69,140 +61,65 @@ public:
 
   typedef Interface<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange> BaseType;
 
-  Expression(const Dune::Stuff::Common::ExtendedParameterTree& paramTree)
-  {
-    // assert dims
-    assert(maxDimDomain > 0);
-    assert(maxDimRange > 0);
-    // get variable
-    paramTree.assertKey("variable");
-    variable_ = paramTree.get("variable", "");
-    for (unsigned int i = 0; i < maxDimDomain; ++i) {
-      std::stringstream tmp_variable;
-      tmp_variable << variable_ << "[" << i << "]";
-      variables_.push_back(tmp_variable.str());
-    }
-    // get expressions
-    if (paramTree.hasSub("expression")) {
-      const Dune::Stuff::Common::ExtendedParameterTree& subTree = paramTree.sub("expression");
-      bool goOn                                                 = true;
-      unsigned int i = 0;
-      while (goOn) {
-        if (i < maxDimRange) {
-          const std::string index = Dune::Stuff::Common::String::to(i);
-          if (subTree.hasKey(index)) {
-            expressions_.push_back(subTree.get(index, "default_value"));
-            ++i;
-          } else {
-            goOn = false;
-          }
-        } else {
-          goOn = false;
-        } // if (i < maxDimRange)
-        actualDimRange_ = i;
-      } // while (goOn)
-      if (actualDimRange_ < 1) {
-        std::stringstream msg;
-        msg << "Error in " << id()
-            << ": subtree 'expression' does not have any keys '0', '1', ... in the following Dune::Parametertree"
-            << std::endl;
-        paramTree.report(msg);
-        DUNE_THROW(Dune::InvalidStateException, msg.str());
-      } // if (actualDimRange_ < 1)
-    } else if (paramTree.hasVector("expression")) { // if (paramTree.hasSub("expression"))
-      const std::vector<std::string> expressions = paramTree.getVector<std::string>("expression", "default_value");
-      if (expressions.size() > 1) {
-        actualDimRange_ = std::min(int(expressions.size()), maxDimRange);
-        for (unsigned int i = 0; i < expressions.size(); ++i)
-          expressions_.push_back(expressions[i]);
-      } else {
-        std::stringstream msg;
-        msg << "Error in " << id()
-            << ": vector 'expression' does not have any entries in the following Dune::Parametertree" << std::endl;
-        paramTree.report(msg);
-        DUNE_THROW(Dune::InvalidStateException, msg.str());
-      }
-    } else { // if (paramTree.hasSub("expression"))
-      std::stringstream msg;
-      msg << "Error in " << id()
-          << ": there is neither a subtree nor a vector called 'expression' in the following Dune::Parametertree"
-          << std::endl;
-      paramTree.report(msg);
-      DUNE_THROW(Dune::InvalidStateException, msg.str());
-    } // if (paramTree.hasSub("expression"))
-    // set up
-    setUp();
-  } // Expression(Dune::ParameterTree& paramTree)
+  typedef Expression<DomainFieldImp, maxDimDomain, RangeFieldImp, maxDimRange> ThisType;
 
-  Expression(const std::string variable, const std::string expression)
-    : variable_(variable)
-    , expressions_(std::vector<std::string>(1, expression))
-    , actualDimRange_(1)
+  //  static const std::string id()
+  //  {
+  //    return BaseType::id() + ".expression";
+  //  }
+
+  Expression(const std::string _variable, const std::string _expression)
   {
-    // assert dims
-    assert(maxDimDomain > 0);
-    assert(maxDimRange > 0);
-    // set variable components
-    for (int i = 0; i < maxDimDomain; ++i) {
-      std::stringstream variableStream;
-      variableStream << variable_ << "[" << i << "]";
-      variables_.push_back(variableStream.str());
-    }
-    // set up
-    setUp();
+    const std::vector<std::string> expressions(1, _expression);
+    setup(_variable, expressions);
   } // Expression(const std::string variable, const std::string expression)
 
-  Expression(const std::string variable_in, const std::vector<std::string>& expressions_in)
-    : variable_(variable_in)
-    , expressions_(expressions_in)
-    , actualDimRange_(expressions_.size())
+  Expression(const std::string _variable, const std::vector<std::string> _expressions)
   {
-    // assert dims
-    assert(maxDimDomain > 0);
-    assert(maxDimRange > 0);
+    setup(_variable, _expressions);
+  } // Expression(const std::string variable, const std::vector< std::string >& expressions)
 
-    for (int i = 0; i < maxDimDomain; ++i) {
-      std::stringstream variableStream;
-      variableStream << variable_ << "[" << i << "]";
-      variables_.push_back(variableStream.str());
+  Expression(const ThisType& other)
+  {
+    setup(other.variable(), other.expression());
+  } // Expression(const ThisType& other)
+
+  static ThisType createFromParamTree(const Dune::ParameterTree& paramTree)
+  {
+    const Dune::Stuff::Common::ExtendedParameterTree extendedParamtree(paramTree);
+    // get variable
+    if (!extendedParamtree.hasKey("variable"))
+      DUNE_THROW(Dune::RangeError, "\nError: missing key 'variable'!");
+    const std::string variable = extendedParamtree.get("variable", "not_meaningful_default_value");
+    // get expressions
+    if (!extendedParamtree.hasKey("expression"))
+      DUNE_THROW(Dune::RangeError, "\nError: missing key or vector 'expression'!");
+    const std::vector<std::string> expressions =
+        extendedParamtree.getVector<std::string>("expression", "not_meaningful_default_value");
+    // create and return
+    return ThisType(variable, expressions);
+  } // static ThisType createFromParamTree(const Stuff::Common::ExtendedParameterTree& paramTree)
+
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      cleanup();
+      setup(other.variable(), other.expression());
     }
-    if (actualDimRange_ < 1) {
-      std::stringstream msg;
-      msg << "Error in " << id() << ": Given expressions-vector is empty!" << std::endl;
-      DUNE_THROW(Dune::InvalidStateException, msg.str());
-    }
-    // set up
-    setUp();
-  } // Expression(const std::string variable_in, const std::vector< std::string >& expressions_in)
+    return this;
+  } // ThisType& operator=(const ThisType& other)
 
   ~Expression()
   {
-    for (unsigned int i = 0; i < dimRange(); ++i) {
-      delete op_[i];
-    }
-    for (unsigned int i = 0; i < maxDimDomain; ++i) {
-      delete var_arg_[i];
-      delete arg_[i];
-    }
+    cleanup();
   } // ~Expression()
-
-  static const std::string id()
-  {
-    return BaseType::id() + ".expression";
-  }
 
   std::string variable() const
   {
     return variable_;
   }
 
-  std::string expression(unsigned int i) const
-  {
-    assert(i < dimRange());
-    return expressions_[i];
-  } // std::string expression(int i) const
-
-  const std::vector<std::string>& expressions() const
+  const std::vector<std::string> expression() const
   {
     return expressions_;
   }
@@ -263,8 +180,24 @@ public:
 #endif // HAVE_EIGEN
 
 private:
-  void setUp()
+  void setup(const std::string& _variable, const std::vector<std::string>& _expressions)
   {
+    assert(maxDimDomain > 0);
+    assert(maxDimRange > 0);
+    // set expressions
+    if (_expressions.size() < 1)
+      DUNE_THROW(Dune::InvalidStateException, "\nError: Given 'expressions'-vector is empty!");
+    actualDimRange_ = _expressions.size();
+    expressions_    = _expressions;
+    // set variable (i.e. "x")
+    variable_ = _variable;
+    // fill variables (i.e. "x[0]", "x[1]", ...)
+    for (int i = 0; i < maxDimDomain; ++i) {
+      std::stringstream variableStream;
+      variableStream << variable_ << "[" << i << "]";
+      variables_.push_back(variableStream.str());
+    }
+    // create epressions
     for (unsigned int i = 0; i < maxDimDomain; ++i) {
       arg_[i]      = new DomainFieldType(0.0);
       var_arg_[i]  = new RVar(variables_[i].c_str(), arg_[i]);
@@ -273,7 +206,18 @@ private:
     for (unsigned int i = 0; i < dimRange(); ++i) {
       op_[i] = new ROperation(expressions_[i].c_str(), maxDimDomain, vararray_);
     }
-  } // void setUp()
+  } // void setup(const std::string& variable, const std::vector< std::string >& expressions)
+
+  void cleanup()
+  {
+    for (unsigned int i = 0; i < dimRange(); ++i) {
+      delete op_[i];
+    }
+    for (unsigned int i = 0; i < maxDimDomain; ++i) {
+      delete var_arg_[i];
+      delete arg_[i];
+    }
+  } // void cleanup()
 
   std::string variable_;
   std::vector<std::string> variables_;
