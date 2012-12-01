@@ -33,6 +33,8 @@ public:
 
   typedef Dune::FieldVector<typename GridType::ctype, GridType::dimension> CoordinateType;
 
+  static const unsigned int dim = GridType::dimension;
+
   static const std::string id()
   {
     return "stuff.grid.provider";
