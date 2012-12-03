@@ -88,7 +88,7 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GenericCube(const double lowerLeft = 0.0, const double upperRight = 1.0, const unsigned int numElements = 1)
+  GenericCube(const double lowerLeft = 0.0, const double upperRight = 1.0, const unsigned int numElements = 1u)
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
@@ -106,7 +106,7 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1)
+  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1u)
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
   {
