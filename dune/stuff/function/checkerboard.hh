@@ -1,10 +1,8 @@
 #ifndef DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 #define DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 
-// system
 #include <vector>
 
-// local
 #include "interface.hh"
 
 namespace Dune {
@@ -55,9 +53,35 @@ public:
     // no cheks necessary, since they have been carried out in the constructor of other
   }
 
-  static const std::string id()
+  ThisType& operator=(const ThisType& other)
   {
-    return BaseType::id() + ".checkerboard";
+    if (this != &other) {
+      lowerLeft_   = other.lowerLeft();
+      upperRight_  = other.upperRight();
+      numElements_ = other.numElements();
+      components_  = other.components();
+    }
+    return this;
+  }
+
+  const DomainType& lowerLeft() const
+  {
+    return lowerLeft_;
+  }
+
+  const DomainType& upperRight() const
+  {
+    return upperRight_;
+  }
+
+  const std::vector<unsigned int>& numElements() const
+  {
+    return numElements_();
+  }
+
+  const std::vector<RangeFieldType>& components() const
+  {
+    return components_();
   }
 
   virtual void evaluate(const DomainType& x, RangeType& ret) const
@@ -77,21 +101,17 @@ public:
       subdomain = whichPartition[0] + whichPartition[1] * numElements_[0]
                   + whichPartition[2] * numElements_[1] * numElements_[0];
     else {
-      std::stringstream msg;
-      msg << "Error in " << id() << ": not implemented for grid dimensions other than 1, 2 or 3!";
-      DUNE_THROW(Dune::NotImplemented, msg.str());
+      DUNE_THROW(Dune::NotImplemented, "\nError: not implemented for grid dimensions other than 1, 2 or 3!");
     } // decide on the subdomain the point x belongs to
     // return the component that belongs to the subdomain of x
     ret = components_[subdomain];
   } // virtual void evaluate(const DomainType& x, RangeType& ret) const
 
 private:
-  ThisType& operator=(const ThisType&);
-
-  const DomainType lowerLeft_;
-  const DomainType upperRight_;
-  const std::vector<unsigned int> numElements_;
-  const std::vector<RangeFieldType> components_;
+  DomainType lowerLeft_;
+  DomainType upperRight_;
+  std::vector<unsigned int> numElements_;
+  std::vector<RangeFieldType> components_;
 }; // class Checkerboard
 
 } // namespace Function
