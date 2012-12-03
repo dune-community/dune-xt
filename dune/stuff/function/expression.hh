@@ -174,11 +174,14 @@ public:
   }
 
 #ifdef HAVE_EIGEN
+  /**
+   * \attention ret is resized to size dimRange()!
+   */
   void evaluate(const Eigen::VectorXd& arg, Eigen::VectorXd& ret) const
   {
     // ensure right dimensions
     assert(arg.size() <= maxDimDomain);
-    assert(ret.size() <= dimRange());
+    ret.resize(dimRange());
     // arg
     for (int i = 0; i < arg.size(); ++i) {
       *(arg_[i]) = arg(i);
@@ -187,7 +190,7 @@ public:
     for (int i = 0; i < ret.size(); ++i) {
       ret(i) = op_[i]->Val();
     }
-  }
+  } // void evaluate(const Eigen::VectorXd& arg, Eigen::VectorXd& ret) const
 #endif // HAVE_EIGEN
 
 private:
