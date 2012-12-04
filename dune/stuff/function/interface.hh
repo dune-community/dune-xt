@@ -34,6 +34,13 @@ public:
   typedef typename BaseType::RangeType RangeType;
 
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
+
+  RangeType evaluate(const DomainType& arg) const
+  {
+    RangeType ret;
+    evaluate(arg, ret);
+    return ret;
+  }
 };
 
 #else
@@ -58,6 +65,13 @@ public:
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
+
+  RangeType evaluate(const DomainType& arg) const
+  {
+    RangeType ret;
+    evaluate(arg, ret);
+    return ret;
+  }
 }; // class Interface
 
 #endif // HAVE_DUNE_FEM
