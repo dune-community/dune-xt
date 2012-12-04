@@ -85,12 +85,12 @@ public:
     // get variable
     if (!extendedParamtree.hasKey("variable"))
       DUNE_THROW(Dune::RangeError, "\nError: missing key 'variable'!");
-    const std::string variable = extendedParamtree.get("variable", "not_meaningful_default_value");
+    const std::string variable = extendedParamtree.get("variable", "meaningless_default_value");
     // get expressions
     if (!extendedParamtree.hasKey("expression"))
       DUNE_THROW(Dune::RangeError, "\nError: missing key or vector 'expression'!");
     const std::vector<std::string> expressions =
-        extendedParamtree.getVector<std::string>("expression", "not_meaningful_default_value");
+        extendedParamtree.getVector<std::string>("expression", "meaningless_default_value", 0);
     // create and return
     return ThisType(variable, expressions);
   } // static ThisType createFromParamTree(const Stuff::Common::ExtendedParameterTree& paramTree)
