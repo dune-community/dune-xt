@@ -130,44 +130,6 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#include "cube.hh"
-#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
-#include "gmsh.hh"
-#endif // HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
-
-namespace Dune {
-namespace Stuff {
-namespace Grid {
-namespace Provider {
-
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridImp = Dune::GridSelector::GridType>
-#else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridImp = Dune::SGrid<2, 2>>
-#endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-Interface<GridImp>* create(const std::string& type, const Dune::ParameterTree paramTree = Dune::ParameterTree())
-{
-  // choose provider
-  if (type == "stuff.grid.provider.cube") {
-    typedef Dune::Stuff::Grid::Provider::Cube<> CubeProviderType;
-    CubeProviderType* cubeProvider = new CubeProviderType(CubeProviderType::createFromParamTree(paramTree));
-    return cubeProvider;
-#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
-  } else if (type == "stuff.grid.provider.gmsh") {
-    typedef Dune::Stuff::Grid::Provider::Gmsh<> GmshProviderType;
-    GmshProviderType* gmshProvider = new GmshProviderType(GmshProviderType::createFromParamTree(paramTree));
-    return gmshProvider;
-#endif // HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
-  } else
-    DUNE_THROW(Dune::RangeError, "\nError: unknown grid provider '" << type << "' requested");
-
-} // Interface< GridImp >* create(const std::string& type, const Dune::ParameterTree paramTree = Dune::ParameterTree())
-
-} // namespace Provider
-} // namespace Grid
-} // namespace Stuff
-} // namespace Dune
-
 #endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
