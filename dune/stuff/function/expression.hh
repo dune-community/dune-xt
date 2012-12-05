@@ -83,14 +83,9 @@ public:
   {
     const Dune::Stuff::Common::ExtendedParameterTree extendedParamtree(paramTree);
     // get variable
-    if (!extendedParamtree.hasKey("variable"))
-      DUNE_THROW(Dune::RangeError, "\nError: missing key 'variable'!");
-    const std::string variable = extendedParamtree.get("variable", "meaningless_default_value");
+    const std::string variable = extendedParamtree.get<std::string>("variable");
     // get expressions
-    if (!extendedParamtree.hasKey("expression"))
-      DUNE_THROW(Dune::RangeError, "\nError: missing key or vector 'expression'!");
-    const std::vector<std::string> expressions =
-        extendedParamtree.getVector<std::string>("expression", "meaningless_default_value", 0);
+    const std::vector<std::string> expressions = extendedParamtree.getVector<std::string>("expression", 1);
     // create and return
     return ThisType(variable, expressions);
   } // static ThisType createFromParamTree(const Stuff::Common::ExtendedParameterTree& paramTree)
