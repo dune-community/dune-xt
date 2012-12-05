@@ -25,7 +25,8 @@ template <class GridType = Dune::GridSelector::GridType>
 #else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridType = Dune::SGrid<2, 2>>
 #endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-Interface<GridType>* create(const std::string& type, const Dune::ParameterTree paramTree = Dune::ParameterTree())
+Interface<GridType>* create(const std::string& type = "stuff.grid.provider.cube",
+                            const Dune::ParameterTree paramTree = Dune::ParameterTree())
 {
   // choose provider
   if (type == "stuff.grid.provider.cube") {
