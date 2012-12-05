@@ -33,9 +33,11 @@ public:
 
   typedef Interface<GridType> ThisType;
 
-  typedef Dune::FieldVector<typename GridType::ctype, GridType::dimension> CoordinateType;
-
   static const unsigned int dim = GridType::dimension;
+
+  typedef typename GridType::ctype ctype;
+
+  typedef Dune::FieldVector<ctype, dim> CoordinateType;
 
   static const std::string id()
   {
