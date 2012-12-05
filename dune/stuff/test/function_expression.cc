@@ -9,23 +9,23 @@
 #include <dune/common/parametertree.hh>
 #include <dune/common/fvector.hh>
 
-//#if HAVE_DUNE_FEM
-//  #include <dune/fem/misc/mpimanager.hh>
-//  #include <dune/fem/space/fvspace/fvspace.hh>
-//  #include <dune/fem/space/dgspace.hh>
-//  #include <dune/fem/gridpart/adaptiveleafgridpart.hh>
-//  #include <dune/fem/function/adaptivefunction.hh>
-//  #include <dune/fem/operator/projection/l2projection.hh>
-//  #include <dune/fem/io/file/datawriter.hh>
+#if HAVE_DUNE_FEM
+#include <dune/fem/misc/mpimanager.hh>
+#include <dune/fem/space/fvspace/fvspace.hh>
+#include <dune/fem/space/dgspace.hh>
+#include <dune/fem/gridpart/adaptiveleafgridpart.hh>
+#include <dune/fem/function/adaptivefunction.hh>
+#include <dune/fem/operator/projection/l2projection.hh>
+#include <dune/fem/io/file/datawriter.hh>
 
-//  #include <dune/stuff/fem/customprojection.hh>
-//#endif
-#include <dune/stuff/grid/provider/cube.hh>
+#include <dune/stuff/fem/customprojection.hh>
+#endif
+#include <dune/stuff/grid/provider.hh>
 #include <dune/stuff/function/expression.hh>
 
-//#if HAVE_EIGEN
+#if HAVE_EIGEN
 #include <Eigen/Core>
-//#endif // HAVE_EIGEN
+#endif // HAVE_EIGEN
 
 int main(int argc, char** argv)
 {
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
     std::cout << "vector_f_from_paramtree_with_expressions(" << vector_x << ") = " << vector_value
               << " (should be 3 -3)" << std::endl;
 
-    //#if HAVE_EIGEN
+#if HAVE_EIGEN
     std::cout << std::endl;
     typedef Dune::Stuff::Function::Expression<double, 50, double, 1> ParameterFunctionType;
     typedef Eigen::VectorXd ParameterType;
@@ -134,35 +134,31 @@ int main(int argc, char** argv)
               << " (should be 1, mu[1] .. mu[4] are treated as 0)" << std::endl;
     multiple_paramFunction.evaluate(vectorParam, paramValue);
     std::cout << "multiple_paramFunction(" << vectorParam << ") = " << paramValue << " (should be 20)" << std::endl;
-    // this will fail:
-    //    multiple_paramFunction.evaluate(tooLargeParam, paramValue);
-    //    std::cout << "scalar_paramFunction(" << tooLargeParam << ") = " << paramValue << " ()"<< std::endl;
-    //#endif // HAVE_EIGEN
+// this will fail:
+//    multiple_paramFunction.evaluate(tooLargeParam, paramValue);
+//    std::cout << "scalar_paramFunction(" << tooLargeParam << ") = " << paramValue << " ()"<< std::endl;
+#endif // HAVE_EIGEN
 
-    //#if HAVE_DUNE_FEM
-    //    Dune::GridPtr< GridType > gridPtr( paramTree.get("dgf_file", "dummy") );
-    //    typedef Dune::AdaptiveLeafGridPart< GridType >
-    //        GridPartType;
-    //    GridPartType gridPart_(*gridPtr);
-    //    typedef ParameterFunctionType::FunctionSpaceType FSpace;
-    //    typedef Dune::DiscontinuousGalerkinSpace< FSpace,
-    //                                              GridPartType,
-    //                                              1 >
-    //    DiscreteFunctionSpaceType;
-    //    typedef Dune::AdaptiveDiscreteFunction< DiscreteFunctionSpaceType >
-    //    DiscreteFunctionType;
-    //    DiscreteFunctionSpaceType disc_space(gridPart_);
-    //    DiscreteFunctionType rf_disc("rf", disc_space);
-    //    typedef Dune::tuple< const DiscreteFunctionType* >
-    //    OutputTupleType;
-    //    typedef Dune::DataWriter< GridPartType::GridType,
-    //                              OutputTupleType >
-    //    DataWriterType;
-    //    Dune::Stuff::Fem::BetterL2Projection::project(parameterFunction, rf_disc);
-    //    OutputTupleType out(&rf_disc);
-    //    DataWriterType dt(gridPart_.grid(), out);
-    //    dt.write();
-    //#endif
+#if HAVE_DUNE_FEM
+    Dune::MPIManager::initialize(argc, argv);
+    typedef Dune::Stuff::Grid::Provider::Interface<> GridProviderType;
+    GridProviderType* gridProvider = Dune::Stuff::Grid::Provider::create<>();
+    typedef typename GridProviderType::GridType GridType;
+    typedef Dune::AdaptiveLeafGridPart<GridType> GridPartType;
+    GridType& grid = *(gridProvider->grid());
+    GridPartType gridPart(grid);
+    typedef ScalarFunctionType::FunctionSpaceType FSpaceType;
+    typedef Dune::DiscontinuousGalerkinSpace<FSpaceType, GridPartType, 1> DiscreteFunctionSpaceType;
+    typedef Dune::AdaptiveDiscreteFunction<DiscreteFunctionSpaceType> DiscreteFunctionType;
+    DiscreteFunctionSpaceType disc_space(gridPart);
+    DiscreteFunctionType rf_disc("rf", disc_space);
+    typedef Dune::tuple<const DiscreteFunctionType*> OutputTupleType;
+    typedef Dune::DataWriter<GridType, OutputTupleType> DataWriterType;
+    Dune::Stuff::Fem::BetterL2Projection::project(scalar_f_from_single_expression, rf_disc);
+    OutputTupleType out(&rf_disc);
+    DataWriterType dt(grid, out);
+    dt.write();
+#endif
   } catch (Dune::Exception& e) {
     std::cout << e.what() << std::endl;
     return 1;
