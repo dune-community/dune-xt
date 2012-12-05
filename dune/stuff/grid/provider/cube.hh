@@ -88,9 +88,9 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GenericCube(const double lowerLeft = 0.0, const double upperRight = 1.0, const unsigned int numElements = 1u)
-    : lowerLeft_(lowerLeft)
-    , upperRight_(upperRight)
+  GenericCube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int numElements = 1u)
+    : lowerLeft_(_lowerLeft)
+    , upperRight_(_upperRight)
   {
     Dune::array<unsigned int, dim> tmpNumElements;
     std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
@@ -106,9 +106,9 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1u)
-    : lowerLeft_(lowerLeft)
-    , upperRight_(upperRight)
+  GenericCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight, const unsigned int numElements = 1u)
+    : lowerLeft_(_lowerLeft)
+    , upperRight_(_upperRight)
   {
     Dune::array<unsigned int, dim> tmpNumElements;
     std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
@@ -129,11 +129,11 @@ public:
     \tparam T an unsigned integral Type
     **/
   template <class ContainerType>
-  GenericCube(const CoordinateType& lowerLeft, const CoordinateType& upperRight,
+  GenericCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight,
               const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
                   dim, typename ContainerType::value_type(1u)))
-    : lowerLeft_(lowerLeft)
-    , upperRight_(upperRight)
+    : lowerLeft_(_lowerLeft)
+    , upperRight_(_upperRight)
   {
     Dune::array<unsigned int, dim> tmpNumElements;
     static_assert(std::is_unsigned<typename ContainerType::value_type>::value
