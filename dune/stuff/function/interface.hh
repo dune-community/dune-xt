@@ -3,6 +3,10 @@
 
 #include <dune/common/fvector.hh>
 
+#if HAVE_EIGEN
+#include <Eigen/Core>
+#endif // HAVE_EIGEN
+
 #ifdef HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
@@ -35,6 +39,10 @@ public:
 
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
 
+#if HAVE_EIGEN
+  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const;
+#endif // HAVE_EIGEN
+
   RangeType evaluate(const DomainType& arg) const
   {
     RangeType ret;
@@ -43,7 +51,7 @@ public:
   }
 };
 
-#else
+#else // HAVE_DUNE_FEM
 
 /**
  *  \todo This should have been replaced by Dune::Function? Investigate further!
@@ -65,6 +73,10 @@ public:
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
+
+#if HAVE_EIGEN
+  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const;
+#endif // HAVE_EIGEN
 
   RangeType evaluate(const DomainType& arg) const
   {
