@@ -1,6 +1,7 @@
 #ifndef DUNE_STUFF_FUNCTION_INTERFACE_hh
 #define DUNE_STUFF_FUNCTION_INTERFACE_hh
 
+#include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
 
 #if HAVE_EIGEN
@@ -40,7 +41,10 @@ public:
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
 
 #if HAVE_EIGEN
-  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const;
+  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const
+  {
+    DUNE_THROW(Dune::InvalidStateException, "I should have been implemented!");
+  }
 #endif // HAVE_EIGEN
 
   RangeType evaluate(const DomainType& arg) const
@@ -75,7 +79,10 @@ public:
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
 
 #if HAVE_EIGEN
-  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const;
+  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const
+  {
+    DUNE_THROW(Dune::InvalidStateException, "I should have been implemented!");
+  }
 #endif // HAVE_EIGEN
 
   RangeType evaluate(const DomainType& arg) const
