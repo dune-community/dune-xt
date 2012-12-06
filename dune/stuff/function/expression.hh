@@ -10,7 +10,7 @@
 #include <sstream>
 #include <vector>
 
-#ifdef HAVE_EIGEN
+#if HAVE_EIGEN
 #include <Eigen/Core>
 #endif // HAVE_EIGEN
 
