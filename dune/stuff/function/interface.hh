@@ -38,19 +38,57 @@ public:
 
   typedef typename BaseType::RangeType RangeType;
 
+#if HAVE_EIGEN
+  typedef typename Eigen::Matrix<RangeFieldType, Eigen::Dynamic, 1> EigenVectorType;
+#endif // HAVE_EIGEN
+
   virtual void evaluate(const DomainType&, RangeType&) const = 0;
 
 #if HAVE_EIGEN
-  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const
+  virtual void evaluate(const EigenVectorType& arg, EigenVectorType& ret) const
   {
-    DUNE_THROW(Dune::InvalidStateException, "I should have been implemented!");
+    // process input
+    assert(arg.size() == dimDomain);
+    DomainType arg_fvector;
+    for (int i = 0; i < dimDomain; ++i)
+      arg_fvector[i] = arg(i);
+    // evaluate
+    RangeType ret_fvector;
+    evaluate(arg_fvector, ret_fvector);
+    // process output
+    assert(ret.size() == dimRange);
+    for (int i = 0; i < dimRange; ++i)
+      ret(i) = ret_fvector[i];
   }
 
-  virtual Eigen::VectorXd evaluate(const Eigen::VectorXd& arg) const
+  virtual EigenVectorType evaluate(const EigenVectorType& arg) const
   {
-    Eigen::VectorXd ret;
+    EigenVectorType ret;
     evaluate(arg, ret);
     return ret;
+  }
+
+  virtual void evaluate(const DomainType& arg, EigenVectorType& ret) const
+  {
+    // evaluate
+    RangeType ret_fvector;
+    evaluate(arg, ret_fvector);
+    // process output
+    assert(ret.size() == dimRange);
+    for (int i = 0; i < dimRange; ++i)
+      ret(i) = ret_fvector[i];
+  }
+
+  virtual void evaluate(const EigenVectorType& arg, RangeType& ret) const
+  {
+    // process input
+    assert(arg.size() == dimDomain);
+    DomainType arg_fvector;
+    for (int i = 0; i < dimDomain; ++i)
+      arg_fvector[i] = arg(i);
+    // evaluate
+    RangeType ret_fvector;
+    evaluate(arg_fvector, ret);
   }
 #endif // HAVE_EIGEN
 
@@ -83,21 +121,11 @@ public:
 
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
-  virtual void evaluate(const DomainType&, RangeType&) const = 0;
-
 #if HAVE_EIGEN
-  virtual void evaluate(const Eigen::VectorXd&, Eigen::VectorXd&) const
-  {
-    DUNE_THROW(Dune::InvalidStateException, "I should have been implemented!");
-  }
-
-  virtual Eigen::VectorXd evaluate(const Eigen::VectorXd& arg) const
-  {
-    Eigen::VectorXd ret;
-    evaluate(arg, ret);
-    return ret;
-  }
+  typedef typename Eigen::Matrix<RangeFieldType, Eigen::Dynamic, 1> EigenVectorType;
 #endif // HAVE_EIGEN
+
+  virtual void evaluate(const DomainType&, RangeType&) const = 0;
 
   virtual RangeType evaluate(const DomainType& arg) const
   {
@@ -105,6 +133,54 @@ public:
     evaluate(arg, ret);
     return ret;
   }
+
+#if HAVE_EIGEN
+  virtual void evaluate(const EigenVectorType& arg, EigenVectorType& ret) const
+  {
+    // process input
+    assert(arg.size() == dimDomain);
+    DomainType arg_fvector;
+    for (int i = 0; i < dimDomain; ++i)
+      arg_fvector[i] = arg(i);
+    // evaluate
+    RangeType ret_fvector;
+    evaluate(arg_fvector, ret_fvector);
+    // process output
+    assert(ret.size() == dimRange);
+    for (int i = 0; i < dimRange; ++i)
+      ret(i) = ret_fvector[i];
+  }
+
+  virtual EigenVectorType evaluate(const EigenVectorType& arg) const
+  {
+    EigenVectorType ret;
+    evaluate(arg, ret);
+    return ret;
+  }
+
+  virtual void evaluate(const DomainType& arg, EigenVectorType& ret) const
+  {
+    // evaluate
+    RangeType ret_fvector;
+    evaluate(arg, ret_fvector);
+    // process output
+    assert(ret.size() == dimRange);
+    for (int i = 0; i < dimRange; ++i)
+      ret(i) = ret_fvector[i];
+  }
+
+  virtual void evaluate(const EigenVectorType& arg, RangeType& ret) const
+  {
+    // process input
+    assert(arg.size() == dimDomain);
+    DomainType arg_fvector;
+    for (int i = 0; i < dimDomain; ++i)
+      arg_fvector[i] = arg(i);
+    // evaluate
+    RangeType ret_fvector;
+    evaluate(arg_fvector, ret);
+  }
+#endif // HAVE_EIGEN
 }; // class Interface
 
 #endif // HAVE_DUNE_FEM
