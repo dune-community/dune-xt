@@ -64,7 +64,7 @@ private:
   typedef typename GridType::LeafGridView GridViewType;
 
 public:
-  void visualize(const std::string filename = id()) const
+  virtual void visualize(const std::string filename = id()) const
   {
     // vtk writer
     GridViewType gridView = grid()->leafView();
