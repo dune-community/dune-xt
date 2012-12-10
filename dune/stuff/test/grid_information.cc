@@ -29,7 +29,7 @@ struct GridInfoTest : public ::testing::Test
   typedef Dune::YaspGrid<griddim> GridType;
   Dune::shared_ptr<GridType> gridPtr;
   GridInfoTest()
-    : gridPtr(Provider::UnitCube<GridType>(level).gridPtr())
+    : gridPtr(Provider::Cube<GridType>(level).grid())
   {
   }
 
