@@ -11,9 +11,7 @@
 
 #include "provider/interface.hh"
 #include "provider/cube.hh"
-#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #include "provider/gmsh.hh"
-#endif // HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 
 namespace Dune {
 namespace Stuff {
@@ -34,10 +32,13 @@ Interface<GridType>* create(const std::string& type = "stuff.grid.provider.cube"
     CubeProviderType* cubeProvider = new CubeProviderType(CubeProviderType::createFromParamTree(paramTree));
     return cubeProvider;
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
+#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
   } else if (type == "stuff.grid.provider.gmsh") {
     typedef Dune::Stuff::Grid::Provider::Gmsh<GridType> GmshProviderType;
     GmshProviderType* gmshProvider = new GmshProviderType(GmshProviderType::createFromParamTree(paramTree));
     return gmshProvider;
+#endif // defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined
+// UGGRID
 #endif // HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
   } else
     DUNE_THROW(Dune::RangeError, "\nERROR: unknown grid provider '" << type << "' requested!");

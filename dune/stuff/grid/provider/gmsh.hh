@@ -8,6 +8,8 @@
 #endif // ifdef HAVE_CMAKE_CONFIG
 
 #if HAVE_DUNE_GRID
+#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
+#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
 
 #include <sstream>
 #include <type_traits>
@@ -20,10 +22,6 @@
 #include <dune/common/fvector.hh>
 
 #include <dune/grid/utility/structuredgridfactory.hh>
-#include <dune/grid/yaspgrid.hh>
-#ifdef HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
-#endif
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/io/file/gmshreader.hh>
 
@@ -131,5 +129,8 @@ private:
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID
+#endif // defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined
+// UGGRID
+#endif // HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 
 #endif // DUNE_STUFF_GRID_PROVIDER_GMSH_HH
