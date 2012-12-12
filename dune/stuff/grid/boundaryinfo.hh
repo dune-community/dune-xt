@@ -12,6 +12,7 @@
 #include <string>
 
 #include <dune/common/shared_ptr.hh>
+#include <dune/common/exceptions.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
 
@@ -20,47 +21,92 @@ namespace Stuff {
 namespace Grid {
 namespace BoundaryInfo {
 
-class AllDirichlet
+template <class GridViewImp>
+class Interface
 {
 public:
-  template <class IntersectionType>
-  bool dirichlet(const IntersectionType& intersection) const
+  typedef GridViewImp GridViewType;
+
+  typedef typename GridViewType::Intersection IntersectionType;
+
+  static const std::string id()
+  {
+    return "stuff.grid.boundaryinfo";
+  }
+
+  virtual bool dirichlet(const IntersectionType&) const = 0;
+
+  virtual bool neumann(const IntersectionType&) const = 0;
+}; // class Interface
+
+
+template <class GridViewImp>
+class AllDirichlet : public Interface<GridViewImp>
+{
+public:
+  typedef Interface<GridViewImp> BaseType;
+
+  typedef typename BaseType::IntersectionType IntersectionType;
+
+  static const std::string id()
+  {
+    return BaseType::id() + ".alldirichlet";
+  }
+
+  virtual bool dirichlet(const IntersectionType& intersection) const
   {
     if (intersection.boundary())
       return true;
     else
       return false;
-  }
+  } // virtual bool dirichlet(const IntersectionType& intersection) const
 
-  template <class IntersectionType>
-  bool neumann(const IntersectionType&) const
+  virtual bool neumann(const IntersectionType&) const
   {
     return false;
   }
 }; // class AllDirichlet
 
-class AllNeumann
+template <class GridViewImp>
+class AllNeumann : public Interface<GridViewImp>
 {
 public:
-  template <class IntersectionType>
-  bool dirichlet(const IntersectionType& intersection) const
+  typedef Interface<GridViewImp> BaseType;
+
+  typedef typename BaseType::IntersectionType IntersectionType;
+
+  static const std::string id()
+  {
+    return BaseType::id() + ".allneumann";
+  }
+
+  virtual bool dirichlet(const IntersectionType& intersection) const
   {
     return false;
   }
 
-  template <class IntersectionType>
-  bool neumann(const IntersectionType& intersection) const
+  virtual bool neumann(const IntersectionType& intersection) const
   {
     if (intersection.boundary())
       return true;
     else
       return false;
-  }
+  } // virtual bool neumann(const IntersectionType& intersection) const
 }; // class AllNeumann
 
-class IdBased
+template <class GridViewImp>
+class IdBased : public Interface<GridViewImp>
 {
 public:
+  typedef Interface<GridViewImp> BaseType;
+
+  typedef typename BaseType::IntersectionType IntersectionType;
+
+  static const std::string id()
+  {
+    return BaseType::id() + ".idbased";
+  }
+
   typedef IdBased ThisType;
 
   typedef int IdType;
@@ -68,11 +114,6 @@ public:
   typedef std::set<IdType> IdSetType;
 
   typedef std::map<std::string, IdSetType> IdSetMapType;
-
-  static const std::string id()
-  {
-    return "stuff.boundaryinfo.idbased";
-  }
 
   IdBased(const Dune::shared_ptr<const IdSetMapType> _boundaryInfoMap)
     : boundaryInfoMap_(_boundaryInfoMap)
@@ -125,8 +166,7 @@ public:
     return boundaryInfoMap_;
   }
 
-  template <class IntersectionType>
-  bool dirichlet(const IntersectionType& intersection) const
+  virtual bool dirichlet(const IntersectionType& intersection) const
   {
     if (hasDirichlet_ && intersection.boundary()) {
       // get boundary id
@@ -140,8 +180,7 @@ public:
       return false;
   } // bool dirichlet(const IntersectionType& intersection) const
 
-  template <class IntersectionType>
-  bool neumann(const IntersectionType& intersection) const
+  virtual bool neumann(const IntersectionType& intersection) const
   {
     if (hasNeumann_ && intersection.boundary()) {
       // get boundary id
@@ -166,6 +205,26 @@ private:
   bool hasDirichlet_;
   bool hasNeumann_;
 }; // class IdBased
+
+template <class GridViewType>
+Interface<GridViewType>* create(const std::string& type = "stuff.grid.boundaryinfo.alldirichlet",
+                                const Dune::ParameterTree paramTree = Dune::ParameterTree())
+{
+  if (type == "stuff.grid.boundaryinfo.alldirichlet") {
+    typedef AllDirichlet<GridViewType> AllDirichletType;
+    AllDirichletType* allDirichlet = new AllDirichletType(AllDirichletType());
+    return allDirichlet;
+  } else if (type == "stuff.grid.boundaryinfo.allneumann") {
+    typedef AllNeumann<GridViewType> AllNeumannType;
+    AllNeumannType* allNeumann = new AllNeumannType(AllNeumannType());
+    return allNeumann;
+  } else if (type == "stuff.grid.boundaryinfo.idbased") {
+    typedef IdBased<GridViewType> IdBasedType;
+    IdBasedType* idBased = new IdBasedType(IdBasedType::createFromParamTree(paramTree));
+    return idBased;
+  } else
+    DUNE_THROW(Dune::RangeError, "\nERROR: unknown boundaryinfo '" << type << "' requested!");
+} // Interface< GridViewType >* create(...)
 
 } // namespace BoundaryInfo
 } // namespace Grid
