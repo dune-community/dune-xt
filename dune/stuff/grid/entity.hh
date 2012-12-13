@@ -1,5 +1,5 @@
-#ifndef DUNE_HELPER_TOOLS_GRID_ENTITY_HH
-#define DUNE_HELPER_TOOLS_GRID_ENTITY_HH
+#ifndef DUNE_STUFF_GRID_ENTITY_HH
+#define DUNE_STUFF_GRID_ENTITY_HH
 
 // dune-stuff includes
 #include <dune/stuff/common/string.hh>
@@ -84,7 +84,8 @@ double geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& entity)
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_HELPER_TOOLS_GRID_ENTITY_HH
+#endif // DUNE_STUFF_GRID_ENTITY_HH
+
 /** Copyright (c) 2012, Felix Albrecht
    * All rights reserved.
    *
