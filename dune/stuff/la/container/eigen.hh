@@ -1,7 +1,7 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_EIGEN_HH
 #define DUNE_STUFF_LA_CONTAINER_EIGEN_HH
 
-#ifdef HAVE_EIGEN
+#if HAVE_EIGEN
 
 #include <Eigen/Core>
 #include <Eigen/Sparse>
