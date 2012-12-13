@@ -169,8 +169,10 @@ public:
   virtual bool dirichlet(const IntersectionType& intersection) const
   {
     if (hasDirichlet_ && intersection.boundary()) {
-      // get boundary id
+// get boundary id
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
       const IdType boundaryId = intersection.boundaryId();
+#pragma GCC diagnostic warning "-Wdeprecated-declarations"
       // get set of dirichlet ids (has to be found, otherwise hasDirichlet_ would be false)
       const typename IdSetMapType::const_iterator result = boundaryInfoMap_->find("dirichlet");
       assert(result != boundaryInfoMap_->end());
@@ -183,8 +185,10 @@ public:
   virtual bool neumann(const IntersectionType& intersection) const
   {
     if (hasNeumann_ && intersection.boundary()) {
-      // get boundary id
+// get boundary id
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
       const IdType boundaryId = intersection.boundaryId();
+#pragma GCC diagnostic warning "-Wdeprecated-declarations"
       // get set of neumann ids (has to be found, otherwise hasNeumann_ would be false)
       const typename IdSetMapType::const_iterator result = boundaryInfoMap_->find("neumann");
       assert(result != boundaryInfoMap_->end());
