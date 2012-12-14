@@ -9,6 +9,8 @@
 
 #if HAVE_EIGEN
 
+#include <dune/stuff/common/color.hh>
+
 #include "eigen/interface.hh"
 #include "eigen/iterative.hh"
 //#include "eigen/direct.hh"
@@ -28,11 +30,12 @@ Interface<MatrixType>* create(const std::string type = "eigen.iterative.bicgstab
   } else if (type == "eigen.iterative.bicgstab.incompletelut") {
     return new BicgstabIncompleteLUT<MatrixType>;
   } else if (type == "eigen.iterative.cg.diagonal") {
-    std::cout << "\nWARNING: you selected the solver '" << type << "' which is believed to produce strange results!"
-              << std::endl;
+    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", 9) << " you selected the solver '" << type
+              << "' which is believed to produce strange results!" << std::endl;
     return new CgDiagonal<MatrixType>;
   } else if (type == "eigen.iterative.cg.incompletelut") {
-    std::cout << "\nWARNING: you selected the solver '" << type << "' which is believed to not converge!" << std::endl;
+    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", 9) << " you selected the solver '" << type
+              << "' which is believed to not converge!" << std::endl;
     return new CgIncompleteLUT<MatrixType>;
     //  } else if (type == "eigen.direct.simplicialllt") {
     //    return new SimplicialLLT< MatrixType >;
