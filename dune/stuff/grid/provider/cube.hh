@@ -27,6 +27,7 @@
 #include <dune/grid/sgrid.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/color.hh>
 
 #include "interface.hh"
 
@@ -189,8 +190,9 @@ public:
       const ctype lowerLeft = extendedParamTree.get("lowerLeft", ctype(0));
       lowerLefts            = std::vector<ctype>(dim, lowerLeft);
     } else {
-      std::cout << "Warning in " << id() << ": neither vector nor key 'lowerLeft' given, defaulting to 0.0!"
-                << std::endl;
+      std::cout << "\n"
+                << Dune::Stuff::Common::highlightString("WARNING in " + id() + ":", Dune::Stuff::Common::Colors::brown)
+                << " neither vector nor key 'lowerLeft' given, defaulting to 0.0!" << std::flush;
       lowerLefts = std::vector<ctype>(dim, ctype(0));
     }
     // get upper right
@@ -202,8 +204,9 @@ public:
       const ctype upperRight = extendedParamTree.get("upperRight", ctype(1));
       upperRights            = std::vector<ctype>(dim, upperRight);
     } else {
-      std::cout << "Warning in " << id() << ": neither vector nor key 'upperRight' given, defaulting to 1.0!"
-                << std::endl;
+      std::cout << "\n"
+                << Dune::Stuff::Common::highlightString("WARNING in " + id() + ":", Dune::Stuff::Common::Colors::brown)
+                << " neither vector nor key 'upperRight' given, defaulting to 1.0!" << std::flush;
       upperRights = std::vector<ctype>(dim, ctype(1));
     }
     // get number of elements
@@ -215,8 +218,9 @@ public:
       const unsigned int numElement = extendedParamTree.get("numElements", 1u);
       tmpNumElements                = std::vector<unsigned int>(dim, numElement);
     } else {
-      std::cout << "Warning in " << id() << ": neither vector nor key 'numElements' given, defaulting to 1!"
-                << std::endl;
+      std::cout << "\n"
+                << Dune::Stuff::Common::highlightString("WARNING in " + id() + ":", Dune::Stuff::Common::Colors::brown)
+                << " neither vector nor key 'numElements' given, defaulting to 1!" << std::flush;
       tmpNumElements = std::vector<unsigned int>(dim, 1u);
     }
     // check and save
