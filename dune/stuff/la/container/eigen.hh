@@ -4,7 +4,7 @@
 #if HAVE_EIGEN
 
 #include <Eigen/Core>
-#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
 
 #include "pattern.hh"
 
@@ -51,20 +51,17 @@ public:
     }
     BaseType::finalize();
     BaseType::makeCompressed();
-    BaseType::setZero();
   } // SparseMatrix(...)
 
   SparseMatrix(const size_type _rows, const size_type _cols, const size_type _nonZerosPerRow)
     : BaseType(_rows, _cols)
   {
     BaseType::reserve(_nonZerosPerRow);
-    BaseType::setZero();
   }
 
   void reserve(const size_type _nonZerosPerRow)
   {
     BaseType::reserve(_nonZerosPerRow);
-    BaseType::setZero();
   }
 
   size_type rows() const
@@ -119,24 +116,20 @@ public:
   DenseMatrix(const size_type _rows, const size_type _cols)
     : BaseType(_rows, _cols)
   {
-    BaseType::setZero();
   }
 
   DenseMatrix(const size_type _rows, const size_type _cols, const Dune::Stuff::LA::Container::Pattern::Default&)
     : BaseType(_rows, _cols)
   {
-    BaseType::setZero();
   } // SparseMatrix(...)
 
   DenseMatrix(const size_type _rows, const size_type _cols, const size_type)
     : BaseType(_rows, _cols)
   {
-    BaseType::setZero();
   }
 
   void reserve(const size_type)
   {
-    BaseType::setZero();
   }
 
   size_type rows() const
