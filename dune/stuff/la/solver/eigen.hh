@@ -30,12 +30,13 @@ Interface<MatrixType>* create(const std::string type = "eigen.iterative.bicgstab
   } else if (type == "eigen.iterative.bicgstab.incompletelut") {
     return new BicgstabIncompleteLUT<MatrixType>;
   } else if (type == "eigen.iterative.cg.diagonal") {
-    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", 9) << " you selected the solver '" << type
-              << "' which is believed to produce strange results!" << std::endl;
+    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", Dune::Stuff::Common::Colors::brown)
+              << " you selected the solver '" << type << "' which is believed to produce strange results! "
+              << std::flush;
     return new CgDiagonal<MatrixType>;
   } else if (type == "eigen.iterative.cg.incompletelut") {
-    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", 9) << " you selected the solver '" << type
-              << "' which is believed to not converge!" << std::endl;
+    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", Dune::Stuff::Common::Colors::brown)
+              << " you selected the solver '" << type << "' which is believed to not converge! " << std::flush;
     return new CgIncompleteLUT<MatrixType>;
     //  } else if (type == "eigen.direct.simplicialllt") {
     //    return new SimplicialLLT< MatrixType >;
