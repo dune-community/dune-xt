@@ -188,6 +188,8 @@ public:
   } // void evaluate(const Eigen::VectorXd& arg, Eigen::VectorXd& ret) const
 #endif // HAVE_EIGEN
 
+  using BaseType::evaluate;
+
 private:
   void setup(const std::string& _variable, const std::vector<std::string>& _expressions)
   {
