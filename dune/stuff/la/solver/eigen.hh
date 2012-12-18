@@ -22,22 +22,25 @@ namespace Solver {
 namespace Eigen {
 
 
-template <class MatrixType>
-Interface<MatrixType>* create(const std::string type = "eigen.iterative.bicgstab.diagonal")
+template <class MatrixType, class VectorType>
+Interface<MatrixType, VectorType>* create(const std::string type = "eigen.iterative.bicgstab.diagonal")
 {
   if (type == "eigen.iterative.bicgstab.diagonal") {
-    return new BicgstabDiagonal<MatrixType>;
+    return new BicgstabDiagonal<MatrixType, VectorType>;
   } else if (type == "eigen.iterative.bicgstab.incompletelut") {
-    return new BicgstabIncompleteLUT<MatrixType>;
-  } else if (type == "eigen.iterative.cg.diagonal") {
-    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", Dune::Stuff::Common::Colors::brown)
-              << " you selected the solver '" << type << "' which is believed to produce strange results! "
-              << std::flush;
-    return new CgDiagonal<MatrixType>;
-  } else if (type == "eigen.iterative.cg.incompletelut") {
-    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", Dune::Stuff::Common::Colors::brown)
-              << " you selected the solver '" << type << "' which is believed to not converge! " << std::flush;
-    return new CgIncompleteLUT<MatrixType>;
+    return new BicgstabIncompleteLUT<MatrixType, VectorType>;
+  } else if (type == "eigen.iterative.cg") {
+    return new CG<MatrixType, VectorType>;
+    //  } else if (type == "eigen.iterative.cg.diagonal") {
+    //    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", Dune::Stuff::Common::Colors::brown) << "
+    //    you selected the solver '" << type
+    //              << "' which is believed to produce strange results! " << std::flush;
+    //    return new CgDiagonal< MatrixType >;
+    //  } else if (type == "eigen.iterative.cg.incompletelut") {
+    //    std::cout << "\n" << Dune::Stuff::Common::highlightString("WARNING:", Dune::Stuff::Common::Colors::brown) << "
+    //    you selected the solver '" << type
+    //              << "' which is believed to not converge! " << std::flush;
+    //    return new CgIncompleteLUT< MatrixType >;
     //  } else if (type == "eigen.direct.simplicialllt") {
     //    return new SimplicialLLT< MatrixType >;
     //  } else if (type == "eigen.direct.simplicialldlt") {
