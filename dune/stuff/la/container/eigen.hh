@@ -6,6 +6,8 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
+#include <dune/common/bartonnackmanifcheck.hh>
+
 #include "pattern.hh"
 
 namespace Dune {
@@ -14,25 +16,112 @@ namespace LA {
 namespace Container {
 namespace Eigen {
 
+template <class MatrixImpTraits>
+class MatrixInterface : virtual public MatrixImpTraits::BaseType
+{
+public:
+  typedef MatrixInterface<MatrixImpTraits> ThisType;
+
+  typedef MatrixImpTraits Traits;
+
+  typedef typename Traits::derived_type derived_type;
+
+  typedef typename Traits::BaseType BaseType;
+
+  typedef typename Traits::ElementType ElementType;
+
+  typedef typename Traits::size_type size_type;
+
+  size_type rows() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().rows());
+    return asImp().rows();
+  }
+
+  size_type cols() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().cols());
+    return asImp().cols();
+  }
+
+  void add(const size_type i, const size_type j, const ElementType& val)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().add(i, j, val));
+    asImp().add(i, j, val);
+  }
+
+  void set(const size_type i, const size_type j, const ElementType& val)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().set(i, j, val));
+    asImp().set(i, j, val);
+  }
+
+  const ElementType get(const size_type i, const size_type j) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().get(i, j));
+    return asImp().get(i, j);
+  }
+
+  BaseType& base()
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
+    return asImp().base();
+  }
+
+  const BaseType& base() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
+    return asImp().base();
+  }
+
+private:
+  derived_type& asImp()
+  {
+    return static_cast<derived_type&>(*this);
+  }
+
+  const derived_type& asImp() const
+  {
+    return static_cast<const derived_type&>(*this);
+  }
+}; // class MatrixInterface
+
+
+template <class ElementType>
+class RowMajorSparseMatrix;
+
+
 template <class ElementImp = double>
-class SparseMatrix : ::Eigen::SparseMatrix<ElementImp, ::Eigen::RowMajor>
+class RowMajorSparseMatrixTraits
 {
 public:
   typedef ElementImp ElementType;
 
-  typedef ::Eigen::SparseMatrix<ElementType, ::Eigen::RowMajor> BaseType;
+  typedef RowMajorSparseMatrix<ElementType> derived_type;
 
-  typedef SparseMatrix<ElementType> ThisType;
+  typedef typename ::Eigen::SparseMatrix<ElementType, ::Eigen::RowMajor> BaseType;
 
   typedef typename BaseType::Index size_type;
+}; // class RowMajorSparseMatrixTraits
 
-  SparseMatrix(const size_type _rows, const size_type _cols)
-    : BaseType(_rows, _cols)
-  {
-  }
 
-  SparseMatrix(const size_type _rows, const size_type _cols,
-               const Dune::Stuff::LA::Container::Pattern::Default& _pattern)
+template <class ElementImp = double>
+class RowMajorSparseMatrix : public MatrixInterface<RowMajorSparseMatrixTraits<ElementImp>>,
+                             virtual public RowMajorSparseMatrixTraits<ElementImp>::BaseType
+{
+public:
+  typedef RowMajorSparseMatrixTraits<ElementImp> Traits;
+
+  typedef typename Traits::derived_type derived_type;
+
+  typedef typename Traits::BaseType BaseType;
+
+  typedef typename Traits::ElementType ElementType;
+
+  typedef typename Traits::size_type size_type;
+
+  RowMajorSparseMatrix(const size_type _rows, const size_type _cols,
+                       const Dune::Stuff::LA::Container::Pattern::Default& _pattern)
     : BaseType(_rows, _cols)
   {
     assert(size_type(_pattern.rows()) == _rows && "Given pattern too short!");
@@ -51,18 +140,7 @@ public:
     }
     BaseType::finalize();
     BaseType::makeCompressed();
-  } // SparseMatrix(...)
-
-  SparseMatrix(const size_type _rows, const size_type _cols, const size_type _nonZerosPerRow)
-    : BaseType(_rows, _cols)
-  {
-    BaseType::reserve(_nonZerosPerRow);
-  }
-
-  void reserve(const size_type _nonZerosPerRow)
-  {
-    BaseType::reserve(_nonZerosPerRow);
-  }
+  } // RowMajorSparseMatrix(...)
 
   size_type rows() const
   {
@@ -98,37 +176,44 @@ public:
   {
     return *this;
   }
-}; // class SparseMatrix
+}; // class RowMajorSparseMatrix
+
+
+template <class ElementImp>
+class DenseMatrix;
 
 
 template <class ElementImp = double>
-class DenseMatrix : ::Eigen::Matrix<ElementImp, ::Eigen::Dynamic, ::Eigen::Dynamic>
+class DenseMatrixTraits
 {
 public:
   typedef ElementImp ElementType;
 
-  typedef ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, ::Eigen::Dynamic> BaseType;
+  typedef DenseMatrix<ElementType> derived_type;
 
-  typedef DenseMatrix<ElementType> ThisType;
+  typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, ::Eigen::Dynamic> BaseType;
 
   typedef typename BaseType::Index size_type;
+}; // class DenseMatrixTraits
+
+
+template <class ElementImp = double>
+class DenseMatrix : public MatrixInterface<DenseMatrixTraits<ElementImp>>,
+                    virtual public DenseMatrixTraits<ElementImp>::BaseType
+{
+public:
+  typedef DenseMatrixTraits<ElementImp> Traits;
+
+  typedef typename Traits::derived_type derived_type;
+
+  typedef typename Traits::BaseType BaseType;
+
+  typedef typename Traits::ElementType ElementType;
+
+  typedef typename Traits::size_type size_type;
 
   DenseMatrix(const size_type _rows, const size_type _cols)
     : BaseType(_rows, _cols)
-  {
-  }
-
-  DenseMatrix(const size_type _rows, const size_type _cols, const Dune::Stuff::LA::Container::Pattern::Default&)
-    : BaseType(_rows, _cols)
-  {
-  } // SparseMatrix(...)
-
-  DenseMatrix(const size_type _rows, const size_type _cols, const size_type)
-    : BaseType(_rows, _cols)
-  {
-  }
-
-  void reserve(const size_type)
   {
   }
 
@@ -169,15 +254,103 @@ public:
 }; // class DenseMatrix
 
 
+template <class VectorImpTraits>
+class VectorInterface : virtual public VectorImpTraits::BaseType
+{
+public:
+  typedef VectorInterface<VectorImpTraits> ThisType;
+
+  typedef VectorImpTraits Traits;
+
+  typedef typename Traits::derived_type derived_type;
+
+  typedef typename Traits::BaseType BaseType;
+
+  typedef typename Traits::ElementType ElementType;
+
+  typedef typename Traits::size_type size_type;
+
+  size_type size() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().rows());
+    return asImp().size();
+  }
+
+  void add(const size_type i, const ElementType& val)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().add(i, val));
+    asImp().add(i, val);
+  }
+
+  void set(const size_type i, const ElementType& val)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().set(i, val));
+    asImp().set(i, val);
+  }
+
+  const ElementType get(const size_type i) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().get(i));
+    return asImp().get(i);
+  }
+
+  BaseType& base()
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
+    return asImp().base();
+  }
+
+  const BaseType& base() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
+    return asImp().base();
+  }
+
+private:
+  derived_type& asImp()
+  {
+    return static_cast<derived_type&>(*this);
+  }
+
+  const derived_type& asImp() const
+  {
+    return static_cast<const derived_type&>(*this);
+  }
+}; // class VectorInterface
+
+
+template <class ElementImp>
+class DenseVector;
+
+
 template <class ElementImp = double>
-class DenseVector : public ::Eigen::Matrix<ElementImp, ::Eigen::Dynamic, 1>
+class DenseVectorTraits
 {
 public:
   typedef ElementImp ElementType;
 
+  typedef DenseVector<ElementType> derived_type;
+
   typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, 1> BaseType;
 
   typedef typename BaseType::Index size_type;
+}; // class DenseVectorTraits
+
+
+template <class ElementImp = double>
+class DenseVector : public VectorInterface<DenseVectorTraits<ElementImp>>,
+                    virtual public DenseVectorTraits<ElementImp>::BaseType
+{
+public:
+  typedef DenseVectorTraits<ElementImp> Traits;
+
+  typedef typename Traits::derived_type derived_type;
+
+  typedef typename Traits::BaseType BaseType;
+
+  typedef typename Traits::ElementType ElementType;
+
+  typedef typename Traits::size_type size_type;
 
   DenseVector(const size_type _size)
     : BaseType(_size)
@@ -205,14 +378,14 @@ public:
     return BaseType::operator()(i);
   }
 
-  const ElementType& operator[](const size_type i) const
+  BaseType& base()
   {
-    return BaseType::coeff(i);
+    return *this;
   }
 
-  ElementType& operator[](const size_type i)
+  const BaseType& base() const
   {
-    return BaseType::coeffRef(i);
+    return *this;
   }
 }; // class DenseVector
 
