@@ -11,7 +11,7 @@
 
 #include <dune/stuff/common/color.hh>
 
-#include "eigen/interface.hh"
+#include "interface.hh"
 #include "eigen/iterative.hh"
 //#include "eigen/direct.hh"
 
