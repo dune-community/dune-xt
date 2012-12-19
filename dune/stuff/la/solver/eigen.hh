@@ -29,6 +29,8 @@ Interface<MatrixType, VectorType>* create(const std::string type = "eigen.iterat
     return new BicgstabDiagonal<MatrixType, VectorType>;
   } else if (type == "eigen.iterative.bicgstab.incompletelut") {
     return new BicgstabIncompleteLUT<MatrixType, VectorType>;
+  } else if (type == "eigen.iterative.bicgstab") {
+    return new Bicgstab<MatrixType, VectorType>;
   } else if (type == "eigen.iterative.cg") {
     return new CG<MatrixType, VectorType>;
     //  } else if (type == "eigen.iterative.cg.diagonal") {
