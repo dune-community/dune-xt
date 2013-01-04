@@ -341,13 +341,13 @@ public:
 
   typedef typename BaseType::CoordinateType CoordinateType;
 
-  Cube(const double lowerLeft = 0.0, const double upperRight = 1.0, const unsigned int numElements = 1)
-    : BaseType(lowerLeft, upperRight, numElements)
+  Cube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int _numElements = 1)
+    : BaseType(_lowerLeft, _upperRight, _numElements)
   {
   }
 
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight, const unsigned int numElements = 1)
-    : BaseType(lowerLeft, upperRight, numElements)
+  Cube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight, const unsigned int _numElements = 1)
+    : BaseType(_lowerLeft, _upperRight, _numElements)
   {
   }
 
