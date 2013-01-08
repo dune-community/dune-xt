@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <set>
+#include <assert.h>
 
 namespace Dune {
 namespace Stuff {
