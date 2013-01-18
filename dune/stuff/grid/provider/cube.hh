@@ -1,17 +1,14 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 #define DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 
-#include <dune/stuff/common/header/disable_warnings.hh>
 #ifdef HAVE_CMAKE_CONFIG
 #include "cmake_config.h"
 #elif defined(HAVE_CONFIG_H)
 #include <config.h>
 #endif // ifdef HAVE_CMAKE_CONFIG
-#include <dune/stuff/common/header/reenable_warnings.hh>
 
 #if HAVE_DUNE_GRID
 
-#include <dune/stuff/common/header/disable_warnings.hh>
 #include <sstream>
 #include <type_traits>
 #include <boost/assign/list_of.hpp>
@@ -28,7 +25,6 @@
 #include <dune/grid/alugrid.hh>
 #endif
 #include <dune/grid/sgrid.hh>
-#include <dune/stuff/common/header/reenable_warnings.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
