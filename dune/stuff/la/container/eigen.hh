@@ -183,9 +183,21 @@ public:
 
   typedef typename Traits::size_type size_type;
 
+  DenseMatrix()
+    : BaseType()
+  {
+  }
+
+
   DenseMatrix(const size_type _rows, const size_type _cols)
     : BaseType(_rows, _cols)
   {
+  }
+
+  DenseMatrix(const BaseType& _other)
+    : BaseType(_other.rows(), _other.cols())
+  {
+    base() = _other;
   }
 
   size_type rows() const
