@@ -103,7 +103,7 @@ public:
       assert(items.size() == dim + 1);
       for (unsigned int ii = 0; ii < dim; ++ii)
         position[ii] = items[ii + 1];
-      std::cout << position << std::endl;
+      //        std::cout << position << std::endl;
       factory.insertVertex(position);
     }
     std::cout << numberOfVertices << " vertices read." << std::endl;
@@ -138,8 +138,8 @@ public:
     std::string secondLine;
     while (std::getline(elementFile, firstLine)) {
       std::getline(elementFile, secondLine);
-      std::cout << firstLine << std::endl;
-      std::cout << secondLine << std::endl;
+      //        std::cout << firstLine << std::endl;
+      //        std::cout << secondLine << std::endl;
       numberOfElements++;
 
       const std::vector<int> items1 = Dune::Stuff::Common::tokenize<int>(firstLine, " ");
@@ -170,32 +170,19 @@ public:
       {
         numberOfCubes++;
         for (unsigned int k = 0; k < numberOfVerticesCube; k++) {
-          cubeVertices[k] = items2[k + 1];
+          cubeVertices[k] = items2[k + 1] - 1;
           //            std::cout << "cubeVertices[k]: " << cubeVertices[k] << std::endl;
         }
-        // im StarCDReader werden cubes so eingelesen:
-        //        std::vector<unsigned int> cubeVertices(8);
-        //        for (int k = 0; k < 8; k++)
-        //            cubeVertices[k] = vertices[k] - 1;
-        //        std::swap(cubeVertices[2], cubeVertices[3]);
-        //        std::swap(cubeVertices[6], cubeVertices[7]);
-        // warum werden die vertices vertauscht und warum wird von ihnen immer 1 abgezogen?
-
+        std::swap(cubeVertices[2], cubeVertices[3]);
+        std::swap(cubeVertices[6], cubeVertices[7]);
         factory.insertElement(Dune::GeometryType(Dune::GeometryType::cube, dim), cubeVertices);
       } else if (items2.size() == numberOfVerticesPrism + 1) // prism
       {
         numberOfPrisms++;
         for (unsigned int k = 0; k < numberOfVerticesPrism; k++) {
-          prismVertices[k] = items2[k + 1];
+          prismVertices[k] = items2[k + 1] - 1;
           //            std::cout << "prismVertices[k]: " << prismVertices[k] << std::endl;
         }
-        // im StarCDReader werden prisms so eingelesen:
-        //       std::vector<unsigned int> prismVertices(6);
-        //       for (int k = 0; k < 3; k++)
-        //         prismVertices[k] = vertices[k] - 1;  // warum wird 1 abgezogen?
-        //       for (int k = 3; k < 6; k++)
-        //         prismVertices[k] =vertices[k+1] - 1; // warum wird 1 abgezogen?
-
         //          factory.insertElement(Dune::GeometryType(Dune::GeometryType::prism,dim), prismVertices);
       } else // not cube or prism
       {
