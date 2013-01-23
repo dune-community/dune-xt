@@ -12,6 +12,8 @@
 //#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined
 // UGGRID
 
+#include <iostream>
+#include <fstream>
 #include <sstream>
 #include <type_traits>
 
@@ -22,11 +24,14 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
 
+#include <dune/geometry/type.hh>
+
+#include <dune/grid/common/gridfactory.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
-#include <dune/grid/io/file/starcdreader.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/string.hh>
 
 #include "interface.hh"
 
@@ -67,12 +72,160 @@ public:
 
   StarCD(const std::string filename)
   {
+    // set up the grid factory
+    GridFactory<GridType> factory;
+
+    // set the name of the vertex file
+    const std::string vertexFileName = filename + ".vrt";
+
+    // set the vertex input stream
+    std::ifstream vertexFile(vertexFileName);
+    if (!vertexFile)
+      DUNE_THROW(Dune::IOError, "Could not open " << vertexFileName);
+
+    std::string line;
+
+    if (!std::getline(vertexFile, line))
+      DUNE_THROW(Dune::IOError, "File " << vertexFileName << " is too short!");
+    if (!(line == "PROSTAR_VERTEX"))
+      DUNE_THROW(Dune::IOError,
+                 "First line of File " << vertexFileName << " (" << line << "is not equal to 'PROSTAR_VERTEX' !");
+    if (!std::getline(vertexFile, line))
+      DUNE_THROW(Dune::IOError, "File " << vertexFileName << " is too short!");
+
+    // read the vertices
+    int numberOfVertices = 0;
+    Dune::FieldVector<double, dim> position;
+
+    while (std::getline(vertexFile, line)) {
+      numberOfVertices++;
+      const std::vector<double> items = Dune::Stuff::Common::tokenize<double>(line, " ");
+      assert(items.size() == dim + 1);
+      for (unsigned int ii = 0; ii < dim; ++ii)
+        position[ii] = items[ii + 1];
+      std::cout << position << std::endl;
+      factory.insertVertex(position);
+    }
+    std::cout << numberOfVertices << " vertices read." << std::endl;
+
+
+    // set the name of the element file
+    std::string elementFileName = filename + ".cel";
+
+    // set the element input stream
+    std::ifstream elementFile(elementFileName);
+    if (!elementFile)
+      DUNE_THROW(Dune::IOError, "Could not open " << elementFileName);
+
+    if (!std::getline(elementFile, line))
+      DUNE_THROW(Dune::IOError, "File " << elementFileName << " is too short!");
+    if (!(line == "PROSTAR_CELL"))
+      DUNE_THROW(Dune::IOError,
+                 "First line of File " << elementFileName << " (" << line << "is not equal to 'PROSTAR_CELL' !");
+    if (!std::getline(elementFile, line))
+      DUNE_THROW(Dune::IOError, "File " << elementFileName << " is too short!");
+
+    // read the elements
+    unsigned int numberOfElements      = 0;
+    unsigned int numberOfPrisms        = 0;
+    unsigned int numberOfCubes         = 0;
+    unsigned int numberOfVerticesCube  = (unsigned int)pow(2, dim);
+    unsigned int numberOfVerticesPrism = 6;
+
+    std::vector<unsigned int> cubeVertices(numberOfVerticesCube);
+    std::vector<unsigned int> prismVertices(numberOfVerticesPrism);
+    std::string firstLine;
+    std::string secondLine;
+    while (std::getline(elementFile, firstLine)) {
+      std::getline(elementFile, secondLine);
+      std::cout << firstLine << std::endl;
+      std::cout << secondLine << std::endl;
+      numberOfElements++;
+
+      const std::vector<int> items1 = Dune::Stuff::Common::tokenize<int>(firstLine, " ");
+      std::vector<int> items2       = Dune::Stuff::Common::tokenize<int>(secondLine, " ");
+
+      //        for (unsigned int j=0; j<items1.size(); j++)
+      //        {
+      //            std::cout << "items1[j]: " << items1[j] << std::endl;
+      //        }
+      //        for (unsigned int j=0; j<items2.size(); j++)
+      //        {
+      //            std::cout << "items2[j]: " << items2[j] << std::endl;
+      //        }
+
+      // Erase zeros at the beginning of the line
+      items2.erase(std::remove(items2.begin(), items2.end(), 0), items2.end());
+
+      //        std::cout << "second line without zeros:"  << std::endl;
+      //        for (unsigned int j=0; j<items2.size(); j++)
+      //        {
+      //            std::cout << "items2[j]: " << items2[j] << std::endl;
+      //        }
+
+      if ((!items1[0] == items2[0]) || (!numberOfElements == items2[0]))
+        DUNE_THROW(Dune::IOError, "Elementindices do not correspond!");
+
+      if (items2.size() == numberOfVerticesCube + 1) // cube
+      {
+        numberOfCubes++;
+        for (unsigned int k = 0; k < numberOfVerticesCube; k++) {
+          cubeVertices[k] = items2[k + 1];
+          //            std::cout << "cubeVertices[k]: " << cubeVertices[k] << std::endl;
+        }
+        // im StarCDReader werden cubes so eingelesen:
+        //        std::vector<unsigned int> cubeVertices(8);
+        //        for (int k = 0; k < 8; k++)
+        //            cubeVertices[k] = vertices[k] - 1;
+        //        std::swap(cubeVertices[2], cubeVertices[3]);
+        //        std::swap(cubeVertices[6], cubeVertices[7]);
+        // warum werden die vertices vertauscht und warum wird von ihnen immer 1 abgezogen?
+
+        factory.insertElement(Dune::GeometryType(Dune::GeometryType::cube, dim), cubeVertices);
+      } else if (items2.size() == numberOfVerticesPrism + 1) // prism
+      {
+        numberOfPrisms++;
+        for (unsigned int k = 0; k < numberOfVerticesPrism; k++) {
+          prismVertices[k] = items2[k + 1];
+          //            std::cout << "prismVertices[k]: " << prismVertices[k] << std::endl;
+        }
+        // im StarCDReader werden prisms so eingelesen:
+        //       std::vector<unsigned int> prismVertices(6);
+        //       for (int k = 0; k < 3; k++)
+        //         prismVertices[k] = vertices[k] - 1;  // warum wird 1 abgezogen?
+        //       for (int k = 3; k < 6; k++)
+        //         prismVertices[k] =vertices[k+1] - 1; // warum wird 1 abgezogen?
+
+        //          factory.insertElement(Dune::GeometryType(Dune::GeometryType::prism,dim), prismVertices);
+      } else // not cube or prism
+      {
+        DUNE_THROW(Dune::IOError, "Type of element " << numberOfElements << " is not cube or prism!");
+      }
+    } // while loop
+
+    if (!numberOfElements == (numberOfCubes + numberOfPrisms))
+      DUNE_THROW(Dune::IOError,
+                 "Number of Elements (" << numberOfElements << ") is not equal to number of cubes (" << numberOfCubes
+                                        << ") and number of prisms ("
+                                        << numberOfPrisms
+                                        << ").");
+
+    std::cout << numberOfElements << " elements read: " << numberOfPrisms << " prisms and " << numberOfCubes
+              << " cubes." << std::endl;
+
+    // finish off the construction of the grid object
+    std::cout << "Starting createGrid() ... " << std::endl;
+    factory.createGrid();
+
+
     //    dune_static_assert(!(Dune::is_same< GridType, Dune::YaspGrid< dim > >::value), "StarCDReader does not work
     //    with YaspGrid!");
     //    dune_static_assert(!(Dune::is_same< GridType, Dune::SGrid< 2, 2 > >::value), "StarCDReader does not work with
     //    SGrid!");
-    grid_ = Dune::shared_ptr<GridType>(StarCDReader<GridType>::read(filename));
-  }
+
+    //    grid_ = Dune::shared_ptr< GridType >(factory.createGrid());
+  } // constructor
+
 
   StarCD(ThisType& other)
     : grid_(other.grid_)
