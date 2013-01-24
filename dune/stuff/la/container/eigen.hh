@@ -45,6 +45,22 @@ public:
 }; // class VectorBase
 
 
+template <class Traits>
+class SparseBase : public Base<Traits>
+{
+public:
+  typedef typename Base<Traits>::derived_type derived_type;
+}; // class SparseBase
+
+
+template <class Traits>
+class DenseBase : public Base<Traits>
+{
+public:
+  typedef typename Base<Traits>::derived_type derived_type;
+}; // class SparseBase
+
+
 template <class ElementType>
 class RowMajorSparseMatrix;
 
@@ -66,9 +82,12 @@ public:
 template <class ElementImp = double>
 class RowMajorSparseMatrix : public MatrixInterface<RowMajorSparseMatrixTraits<ElementImp>>,
                              virtual public RowMajorSparseMatrixTraits<ElementImp>::BaseType,
-                             public MatrixBase<RowMajorSparseMatrixTraits<ElementImp>>
+                             public MatrixBase<RowMajorSparseMatrixTraits<ElementImp>>,
+                             public SparseBase<RowMajorSparseMatrixTraits<ElementImp>>
 {
 public:
+  typedef RowMajorSparseMatrix<ElementImp> ThisType;
+
   typedef RowMajorSparseMatrixTraits<ElementImp> Traits;
 
   typedef typename Traits::derived_type derived_type;
@@ -84,6 +103,12 @@ public:
   {
   }
 
+private:
+  RowMajorSparseMatrix(const ThisType& /*other*/);
+
+  ThisType& operator=(const ThisType& /*other*/);
+
+public:
   RowMajorSparseMatrix(const BaseType& _other)
     : BaseType(_other.rows(), _other.cols())
   {
@@ -170,9 +195,12 @@ public:
 template <class ElementImp = double>
 class DenseMatrix : public MatrixInterface<DenseMatrixTraits<ElementImp>>,
                     virtual public DenseMatrixTraits<ElementImp>::BaseType,
-                    public MatrixBase<DenseMatrixTraits<ElementImp>>
+                    public MatrixBase<DenseMatrixTraits<ElementImp>>,
+                    public DenseBase<DenseMatrixTraits<ElementImp>>
 {
 public:
+  typedef DenseMatrix<ElementImp> ThisType;
+
   typedef DenseMatrixTraits<ElementImp> Traits;
 
   typedef typename Traits::derived_type derived_type;
@@ -188,12 +216,17 @@ public:
   {
   }
 
-
   DenseMatrix(const size_type _rows, const size_type _cols)
     : BaseType(_rows, _cols)
   {
   }
 
+private:
+  DenseMatrix(const ThisType& /*other*/);
+
+  ThisType& operator=(const ThisType& /*other*/);
+
+public:
   DenseMatrix(const BaseType& _other)
     : BaseType(_other.rows(), _other.cols())
   {
@@ -258,9 +291,12 @@ public:
 template <class ElementImp = double>
 class DenseVector : public VectorInterface<DenseVectorTraits<ElementImp>>,
                     virtual public DenseVectorTraits<ElementImp>::BaseType,
-                    public VectorBase<DenseVectorTraits<ElementImp>>
+                    public VectorBase<DenseVectorTraits<ElementImp>>,
+                    public DenseBase<DenseVectorTraits<ElementImp>>
 {
 public:
+  typedef DenseVector<ElementImp> ThisType;
+
   typedef DenseVectorTraits<ElementImp> Traits;
 
   typedef typename Traits::derived_type derived_type;
@@ -271,6 +307,17 @@ public:
 
   typedef typename Traits::size_type size_type;
 
+  DenseVector()
+    : BaseType()
+  {
+  }
+
+private:
+  DenseVector(const ThisType& /*other*/);
+
+  ThisType& operator=(const ThisType& /*other*/);
+
+public:
   DenseVector(const size_type _size)
     : BaseType(_size)
   {
