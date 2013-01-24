@@ -103,7 +103,6 @@ public:
       assert(items.size() == dim + 1);
       for (unsigned int ii = 0; ii < dim; ++ii)
         position[ii] = items[ii + 1];
-      //        std::cout << position << std::endl;
       factory.insertVertex(position);
     }
     std::cout << numberOfVertices << " vertices read." << std::endl;
@@ -137,31 +136,17 @@ public:
     std::string firstLine;
     std::string secondLine;
     while (std::getline(elementFile, firstLine)) {
-      std::getline(elementFile, secondLine);
-      //        std::cout << firstLine << std::endl;
-      //        std::cout << secondLine << std::endl;
+      if (!std::getline(elementFile, secondLine))
+        DUNE_THROW(Dune::IOError,
+                   "No vertex data available in file " << elementFileName << " for element " << numberOfElements + 1
+                                                       << "!");
       numberOfElements++;
 
       const std::vector<int> items1 = Dune::Stuff::Common::tokenize<int>(firstLine, " ");
       std::vector<int> items2       = Dune::Stuff::Common::tokenize<int>(secondLine, " ");
 
-      //        for (unsigned int j=0; j<items1.size(); j++)
-      //        {
-      //            std::cout << "items1[j]: " << items1[j] << std::endl;
-      //        }
-      //        for (unsigned int j=0; j<items2.size(); j++)
-      //        {
-      //            std::cout << "items2[j]: " << items2[j] << std::endl;
-      //        }
-
       // Erase zeros at the beginning of the line
       items2.erase(std::remove(items2.begin(), items2.end(), 0), items2.end());
-
-      //        std::cout << "second line without zeros:"  << std::endl;
-      //        for (unsigned int j=0; j<items2.size(); j++)
-      //        {
-      //            std::cout << "items2[j]: " << items2[j] << std::endl;
-      //        }
 
       if ((!items1[0] == items2[0]) || (!numberOfElements == items2[0]))
         DUNE_THROW(Dune::IOError, "Elementindices do not correspond!");
@@ -171,7 +156,6 @@ public:
         numberOfCubes++;
         for (unsigned int k = 0; k < numberOfVerticesCube; k++) {
           cubeVertices[k] = items2[k + 1] - 1;
-          //            std::cout << "cubeVertices[k]: " << cubeVertices[k] << std::endl;
         }
         std::swap(cubeVertices[2], cubeVertices[3]);
         std::swap(cubeVertices[6], cubeVertices[7]);
@@ -181,9 +165,8 @@ public:
         numberOfPrisms++;
         for (unsigned int k = 0; k < numberOfVerticesPrism; k++) {
           prismVertices[k] = items2[k + 1] - 1;
-          //            std::cout << "prismVertices[k]: " << prismVertices[k] << std::endl;
         }
-        //          factory.insertElement(Dune::GeometryType(Dune::GeometryType::prism,dim), prismVertices);
+        factory.insertElement(Dune::GeometryType(Dune::GeometryType::prism, dim), prismVertices);
       } else // not cube or prism
       {
         DUNE_THROW(Dune::IOError, "Type of element " << numberOfElements << " is not cube or prism!");
@@ -202,15 +185,8 @@ public:
 
     // finish off the construction of the grid object
     std::cout << "Starting createGrid() ... " << std::endl;
-    factory.createGrid();
 
-
-    //    dune_static_assert(!(Dune::is_same< GridType, Dune::YaspGrid< dim > >::value), "StarCDReader does not work
-    //    with YaspGrid!");
-    //    dune_static_assert(!(Dune::is_same< GridType, Dune::SGrid< 2, 2 > >::value), "StarCDReader does not work with
-    //    SGrid!");
-
-    //    grid_ = Dune::shared_ptr< GridType >(factory.createGrid());
+    grid_ = Dune::shared_ptr<GridType>(factory.createGrid());
   } // constructor
 
 
