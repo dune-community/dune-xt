@@ -9,7 +9,7 @@ namespace LA {
 namespace Container {
 
 template <class MatrixImpTraits>
-class MatrixInterface : virtual public MatrixImpTraits::BaseType
+class MatrixInterface
 {
 public:
   typedef MatrixInterface<MatrixImpTraits> ThisType;
@@ -18,7 +18,7 @@ public:
 
   typedef typename Traits::derived_type derived_type;
 
-  typedef typename Traits::BaseType BaseType;
+  typedef typename Traits::BackendType BackendType;
 
   typedef typename Traits::ElementType ElementType;
 
@@ -54,13 +54,13 @@ public:
     return asImp().get(i, j);
   }
 
-  BaseType& base()
+  BackendType& base()
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
     return asImp().base();
   }
 
-  const BaseType& base() const
+  const BackendType& base() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
     return asImp().base();
@@ -80,7 +80,7 @@ private:
 
 
 template <class VectorImpTraits>
-class VectorInterface : virtual public VectorImpTraits::BaseType
+class VectorInterface
 {
 public:
   typedef VectorInterface<VectorImpTraits> ThisType;
@@ -89,7 +89,7 @@ public:
 
   typedef typename Traits::derived_type derived_type;
 
-  typedef typename Traits::BaseType BaseType;
+  typedef typename Traits::BackendType BackendType;
 
   typedef typename Traits::ElementType ElementType;
 
@@ -119,13 +119,13 @@ public:
     return asImp().get(i);
   }
 
-  BaseType& base()
+  BackendType& base()
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
     return asImp().base();
   }
 
-  const BaseType& base() const
+  const BackendType& base() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
     return asImp().base();
