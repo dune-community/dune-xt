@@ -15,354 +15,356 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 namespace Container {
-namespace Eigen {
-
-
-/**
- *  \todo add base()
- */
-template <class Traits>
-class Base
-{
-public:
-  typedef typename Traits::derived_type derived_type;
-}; // class Base
 
 
 template <class Traits>
-class MatrixBase : public Base<Traits>
+class EigenInterface
 {
 public:
-  typedef typename Base<Traits>::derived_type derived_type;
-}; // class MatrixBase
+  typedef typename Traits::BackendType BackendType;
+
+  virtual BackendType& base() = 0;
+
+  virtual const BackendType& base() const = 0;
+}; // class EigenInterface
 
 
 template <class Traits>
-class VectorBase : public Base<Traits>
+class EigenMatrixInterface : public EigenInterface<Traits>
 {
-public:
-  typedef typename Base<Traits>::derived_type derived_type;
-}; // class VectorBase
+}; // class EigenMatrixInterface
 
 
 template <class Traits>
-class SparseBase : public Base<Traits>
+class EigenVectorInterface
 {
-public:
-  typedef typename Base<Traits>::derived_type derived_type;
-}; // class SparseBase
-
-
-template <class Traits>
-class DenseBase : public Base<Traits>
-{
-public:
-  typedef typename Base<Traits>::derived_type derived_type;
-}; // class SparseBase
+}; // class EigenVectorInterface
 
 
 template <class ElementType>
-class RowMajorSparseMatrix;
+class EigenRowMajorSparseMatrix;
 
 
 template <class ElementImp = double>
-class RowMajorSparseMatrixTraits
+class EigenRowMajorSparseMatrixTraits
 {
 public:
   typedef ElementImp ElementType;
 
-  typedef RowMajorSparseMatrix<ElementType> derived_type;
+  typedef EigenRowMajorSparseMatrix<ElementType> derived_type;
 
-  typedef typename ::Eigen::SparseMatrix<ElementType, ::Eigen::RowMajor> BaseType;
+  typedef typename ::Eigen::SparseMatrix<ElementType, ::Eigen::RowMajor> BackendType;
 
-  typedef typename BaseType::Index size_type;
+  typedef typename BackendType::Index size_type;
 }; // class RowMajorSparseMatrixTraits
 
 
 template <class ElementImp = double>
-class RowMajorSparseMatrix : public MatrixInterface<RowMajorSparseMatrixTraits<ElementImp>>,
-                             virtual public RowMajorSparseMatrixTraits<ElementImp>::BaseType,
-                             public MatrixBase<RowMajorSparseMatrixTraits<ElementImp>>,
-                             public SparseBase<RowMajorSparseMatrixTraits<ElementImp>>
+class EigenRowMajorSparseMatrix : public MatrixInterface<EigenRowMajorSparseMatrixTraits<ElementImp>>,
+                                  public EigenMatrixInterface<EigenRowMajorSparseMatrixTraits<ElementImp>>
 {
 public:
-  typedef RowMajorSparseMatrix<ElementImp> ThisType;
+  typedef EigenRowMajorSparseMatrix<ElementImp> ThisType;
 
-  typedef RowMajorSparseMatrixTraits<ElementImp> Traits;
+  typedef EigenRowMajorSparseMatrixTraits<ElementImp> Traits;
 
-  typedef typename Traits::derived_type derived_type;
-
-  typedef typename Traits::BaseType BaseType;
+  typedef typename Traits::BackendType BackendType;
 
   typedef typename Traits::ElementType ElementType;
 
   typedef typename Traits::size_type size_type;
 
-  RowMajorSparseMatrix()
-    : BaseType()
+  EigenRowMajorSparseMatrix()
   {
   }
 
-private:
-  RowMajorSparseMatrix(const ThisType& /*other*/);
-
-  ThisType& operator=(const ThisType& /*other*/);
-
-public:
-  RowMajorSparseMatrix(const BaseType& _other)
-    : BaseType(_other.rows(), _other.cols())
+  EigenRowMajorSparseMatrix(const ThisType& _other)
+    : eigenMatrix_(_other.base())
   {
-    base() = _other;
   }
 
-  RowMajorSparseMatrix(const size_type _rows, const size_type _cols,
-                       const Dune::Stuff::LA::Container::Pattern::Default& _pattern)
-    : BaseType(_rows, _cols)
+  EigenRowMajorSparseMatrix(const BackendType& _otherEigenMatrix)
+    : eigenMatrix_(_otherEigenMatrix)
   {
-    assert(size_type(_pattern.rows()) == _rows && "Given pattern too short!");
+  }
+
+  ThisType& operator=(const ThisType& _other)
+  {
+    eigenMatrix_ = _other.base();
+    return *this;
+  }
+
+  ThisType& operator=(const BackendType& _otherEigenMatrix)
+  {
+    eigenMatrix_ = _otherEigenMatrix;
+    return *this;
+  }
+
+  EigenRowMajorSparseMatrix(const size_type _rows, const size_type _cols,
+                            const Dune::Stuff::LA::Container::Pattern::Default& _pattern)
+    : eigenMatrix_(_rows, _cols)
+  {
+    assert(size_type(_pattern.size()) == _rows && "Given pattern too short!");
     typedef Dune::Stuff::LA::Container::Pattern::Default PatternType;
-    typedef PatternType::ColumnsType ColumnsType;
-    for (size_type row = 0; row < size_type(_pattern.rows()); ++row) {
-      BaseType::startVec(row);
-      const ColumnsType& columns = _pattern.columns(row);
+    typedef PatternType::SetType ColumnsType;
+    for (size_type row = 0; row < size_type(_pattern.size()); ++row) {
+      eigenMatrix_.startVec(row);
+      const ColumnsType& columns = _pattern.set(row);
       for (typename ColumnsType::const_iterator columnIt = columns.begin(); columnIt != columns.end(); ++columnIt) {
         const size_type column = *columnIt;
-        BaseType::insertBackByOuterInner(row, column);
+        eigenMatrix_.insertBackByOuterInner(row, column);
       }
       // create diagonal entry (insertBackByOuterInner() can not handle empty rows)
       if (columns.size() == 0)
-        BaseType::insertBackByOuterInner(row, row);
+        eigenMatrix_.insertBackByOuterInner(row, row);
     }
-    BaseType::finalize();
-    BaseType::makeCompressed();
+    eigenMatrix_.finalize();
+    eigenMatrix_.makeCompressed();
   } // RowMajorSparseMatrix(...)
 
   size_type rows() const
   {
-    return BaseType::rows();
+    return eigenMatrix_.rows();
   }
 
   size_type cols() const
   {
-    return BaseType::cols();
+    return eigenMatrix_.cols();
   }
 
   void add(const size_type i, const size_type j, const ElementType& val)
   {
-    BaseType::coeffRef(i, j) += val;
+    eigenMatrix_.coeffRef(i, j) += val;
   }
 
   void set(const size_type i, const size_type j, const ElementType& val)
   {
-    BaseType::coeffRef(i, j) = val;
+    eigenMatrix_.coeffRef(i, j) = val;
   }
 
   const ElementType get(const size_type i, const size_type j) const
   {
-    return BaseType::coeff(i, j);
+    return eigenMatrix_.coeff(i, j);
   }
 
-  BaseType& base()
+  BackendType& base()
   {
-    return *this;
+    return eigenMatrix_;
   }
 
-  const BaseType& base() const
+  const BackendType& base() const
   {
-    return *this;
+    return eigenMatrix_;
   }
-}; // class RowMajorSparseMatrix
+
+private:
+  BackendType eigenMatrix_;
+}; // class EigenRowMajorSparseMatrix
 
 
 template <class ElementImp>
-class DenseMatrix;
+class EigenDenseMatrix;
 
 
 template <class ElementImp = double>
-class DenseMatrixTraits
+class EigenDenseMatrixTraits
 {
 public:
   typedef ElementImp ElementType;
 
-  typedef DenseMatrix<ElementType> derived_type;
+  typedef EigenDenseMatrix<ElementType> derived_type;
 
-  typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, ::Eigen::Dynamic> BaseType;
+  typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
 
-  typedef typename BaseType::Index size_type;
+  typedef typename BackendType::Index size_type;
 }; // class DenseMatrixTraits
 
 
 template <class ElementImp = double>
-class DenseMatrix : public MatrixInterface<DenseMatrixTraits<ElementImp>>,
-                    virtual public DenseMatrixTraits<ElementImp>::BaseType,
-                    public MatrixBase<DenseMatrixTraits<ElementImp>>,
-                    public DenseBase<DenseMatrixTraits<ElementImp>>
+class EigenDenseMatrix : public MatrixInterface<EigenDenseMatrixTraits<ElementImp>>,
+                         public EigenMatrixInterface<EigenDenseMatrixTraits<ElementImp>>
 {
 public:
-  typedef DenseMatrix<ElementImp> ThisType;
+  typedef EigenDenseMatrix<ElementImp> ThisType;
 
-  typedef DenseMatrixTraits<ElementImp> Traits;
+  typedef EigenDenseMatrixTraits<ElementImp> Traits;
 
-  typedef typename Traits::derived_type derived_type;
-
-  typedef typename Traits::BaseType BaseType;
+  typedef typename Traits::BackendType BackendType;
 
   typedef typename Traits::ElementType ElementType;
 
   typedef typename Traits::size_type size_type;
 
-  DenseMatrix()
-    : BaseType()
+  EigenDenseMatrix()
   {
   }
 
-  DenseMatrix(const size_type _rows, const size_type _cols)
-    : BaseType(_rows, _cols)
+  EigenDenseMatrix(const ThisType& _other)
+    : eigenMatrix_(_other.base())
   {
   }
 
-private:
-  DenseMatrix(const ThisType& /*other*/);
-
-  ThisType& operator=(const ThisType& /*other*/);
-
-public:
-  DenseMatrix(const BaseType& _other)
-    : BaseType(_other.rows(), _other.cols())
+  EigenDenseMatrix(const BackendType& _otherEigenMatrix)
+    : eigenMatrix_(_otherEigenMatrix)
   {
-    base() = _other;
+  }
+
+  EigenDenseMatrix(const size_type _rows, const size_type _cols)
+    : eigenMatrix_(_rows, _cols)
+  {
+  }
+
+  ThisType& operator=(const ThisType& _other)
+  {
+    eigenMatrix_ = _other.base();
+    return *this;
+  }
+
+  ThisType& operator=(const BackendType& _otherEigenMatrix)
+  {
+    eigenMatrix_ = _otherEigenMatrix;
+    return *this;
   }
 
   size_type rows() const
   {
-    return BaseType::rows();
+    return eigenMatrix_.rows();
   }
 
   size_type cols() const
   {
-    return BaseType::cols();
+    return eigenMatrix_.cols();
   }
 
   void add(const size_type i, const size_type j, const ElementType& val)
   {
-    BaseType::operator()(i, j) += val;
+    eigenMatrix_(i, j) += val;
   }
 
   void set(const size_type i, const size_type j, const ElementType& val)
   {
-    BaseType::operator()(i, j) = val;
+    eigenMatrix_(i, j) = val;
   }
 
   const ElementType get(const size_type i, const size_type j) const
   {
-    return BaseType::operator()(i, j);
+    return eigenMatrix_(i, j);
   }
 
-  BaseType& base()
+  BackendType& base()
   {
-    return *this;
+    return eigenMatrix_;
   }
 
-  const BaseType& base() const
+  const BackendType& base() const
   {
-    return *this;
+    return eigenMatrix_;
   }
-}; // class DenseMatrix
+
+private:
+  BackendType eigenMatrix_;
+}; // class EigenDenseMatrix
 
 
 template <class ElementImp>
-class DenseVector;
+class EigenDenseVector;
 
 
 template <class ElementImp = double>
-class DenseVectorTraits
+class EigenDenseVectorTraits
 {
 public:
   typedef ElementImp ElementType;
 
-  typedef DenseVector<ElementType> derived_type;
+  typedef EigenDenseVector<ElementType> derived_type;
 
-  typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, 1> BaseType;
+  typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, 1> BackendType;
 
-  typedef typename BaseType::Index size_type;
+  typedef typename BackendType::Index size_type;
 }; // class DenseVectorTraits
 
 
 template <class ElementImp = double>
-class DenseVector : public VectorInterface<DenseVectorTraits<ElementImp>>,
-                    virtual public DenseVectorTraits<ElementImp>::BaseType,
-                    public VectorBase<DenseVectorTraits<ElementImp>>,
-                    public DenseBase<DenseVectorTraits<ElementImp>>
+class EigenDenseVector : public VectorInterface<EigenDenseVectorTraits<ElementImp>>,
+                         public EigenVectorInterface<EigenDenseVectorTraits<ElementImp>>
 {
 public:
-  typedef DenseVector<ElementImp> ThisType;
+  typedef EigenDenseVector<ElementImp> ThisType;
 
-  typedef DenseVectorTraits<ElementImp> Traits;
+  typedef EigenDenseVectorTraits<ElementImp> Traits;
 
-  typedef typename Traits::derived_type derived_type;
-
-  typedef typename Traits::BaseType BaseType;
+  typedef typename Traits::BackendType BackendType;
 
   typedef typename Traits::ElementType ElementType;
 
   typedef typename Traits::size_type size_type;
 
-  DenseVector()
-    : BaseType()
+  EigenDenseVector()
   {
   }
 
-private:
-  DenseVector(const ThisType& /*other*/);
-
-  ThisType& operator=(const ThisType& /*other*/);
-
-public:
-  DenseVector(const size_type _size)
-    : BaseType(_size)
+  EigenDenseVector(const ThisType& _other)
+    : eigenVector_(_other.base())
   {
-    BaseType::setZero();
   }
 
-  DenseVector(const BaseType& _other)
-    : BaseType(_other.size())
+  EigenDenseVector(const BackendType& _otherEigenVector)
+    : eigenVector_(_otherEigenVector)
   {
-    base() = _other;
+  }
+
+  EigenDenseVector(const size_type _size)
+    : eigenVector_(_size)
+  {
+  }
+
+  ThisType& operator=(const ThisType& _other)
+  {
+    eigenVector_ = _other.base();
+    return *this;
+  }
+
+  ThisType& operator=(const BackendType& _otherEigenVector)
+  {
+    eigenVector_ = _otherEigenVector;
+    return *this;
   }
 
   size_type size() const
   {
-    return BaseType::size();
+    return eigenVector_.size();
   }
 
   void add(const size_type i, const ElementType& val)
   {
-    BaseType::operator()(i) += val;
+    eigenVector_(i) += val;
   }
 
   void set(const size_type i, const ElementType& val)
   {
-    BaseType::operator()(i) = val;
+    eigenVector_(i) = val;
   }
 
   const ElementType get(const size_type i) const
   {
-    return BaseType::operator()(i);
+    return eigenVector_(i);
   }
 
-  BaseType& base()
+  BackendType& base()
   {
-    return *this;
+    return eigenVector_;
   }
 
-  const BaseType& base() const
+  const BackendType& base() const
   {
-    return *this;
+    return eigenVector_;
   }
+
+private:
+  BackendType eigenVector_;
 }; // class DenseVector
 
 } // namespace Container
-} // namespace Eigen
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
