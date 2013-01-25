@@ -11,36 +11,40 @@ namespace LA {
 namespace Container {
 namespace Pattern {
 
-class Default : public std::vector<std::set<unsigned int>>
+class Default
 {
-public:
+private:
   typedef std::vector<std::set<unsigned int>> BaseType;
 
+public:
   typedef BaseType::size_type size_type;
 
-  typedef BaseType::value_type ColumnsType;
+  typedef BaseType::value_type SetType;
 
-  Default(const size_type _rows)
-    : BaseType(_rows)
+  Default(const size_type _size)
+    : vectorOfSets_(_size)
   {
   }
 
-  size_type rows() const
+  size_type size() const
   {
-    return BaseType::size();
+    return vectorOfSets_.size();
   }
 
-  ColumnsType& columns(const size_type _row)
+  SetType& set(const size_type _index)
   {
-    assert(_row < rows() && "Wrong row requested!");
-    return BaseType::operator[](_row);
+    assert(_index < size() && "Wrong index requested!");
+    return vectorOfSets_[_index];
   }
 
-  const ColumnsType& columns(const size_type _row) const
+  const SetType& set(const size_type _index) const
   {
-    assert(_row < rows() && "Wrong row requested!");
-    return BaseType::operator[](_row);
+    assert(_index < size() && "Wrong index requested!");
+    return vectorOfSets_[_index];
   }
+
+private:
+  BaseType vectorOfSets_;
 }; // class Default
 
 } // namespace Pattern
