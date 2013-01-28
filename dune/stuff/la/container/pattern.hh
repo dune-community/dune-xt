@@ -9,9 +9,8 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 namespace Container {
-namespace Pattern {
 
-class Default
+class SparsityPatternDefault
 {
 private:
   typedef std::vector<std::set<unsigned int>> BaseType;
@@ -21,7 +20,7 @@ public:
 
   typedef BaseType::value_type SetType;
 
-  Default(const size_type _size)
+  SparsityPatternDefault(const size_type _size)
     : vectorOfSets_(_size)
   {
   }
@@ -45,9 +44,8 @@ public:
 
 private:
   BaseType vectorOfSets_;
-}; // class Default
+}; // class SparsityPatternDefault
 
-} // namespace Pattern
 } // namespace Container
 } // namespace LA
 } // namespace Stuff
