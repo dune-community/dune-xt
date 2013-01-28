@@ -55,9 +55,9 @@ public:
   virtual bool apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
                      const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
-    auto& x_i      = solutionVector.base();
-    const auto& b  = rhsVector.base();
-    const auto& A  = systemMatrix.base();
+    auto& x_i      = solutionVector.backend();
+    const auto& b  = rhsVector.backend();
+    const auto& A  = systemMatrix.backend();
     const int cols = A.cols();
     size_type iteration(1);
     ElementType rho(0), rho_prev(1), beta, alpha;
@@ -120,10 +120,10 @@ public:
     typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                        ::Eigen::Lower,
                                        ::Eigen::DiagonalPreconditioner<ElementType>> EigenSolverType;
-    EigenSolverType eigenSolver(systemMatrix.base());
+    EigenSolverType eigenSolver(systemMatrix.backend());
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
-    solutionVector.base() = eigenSolver.solve(rhsVector.base());
+    solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
     return (info == ::Eigen::Success);
   } // virtual bool apply(...)
@@ -156,10 +156,10 @@ public:
                      const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> EigenSolverType;
-    EigenSolverType eigenSolver(systemMatrix.base());
+    EigenSolverType eigenSolver(systemMatrix.backend());
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
-    solutionVector.base() = eigenSolver.solve(rhsVector.base());
+    solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
     return (info == ::Eigen::Success);
   } // virtual bool apply(...)
@@ -193,10 +193,10 @@ public:
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<ElementType>>
         EigenSolverType;
-    EigenSolverType eigenSolver(systemMatrix.base());
+    EigenSolverType eigenSolver(systemMatrix.backend());
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
-    solutionVector.base() = eigenSolver.solve(rhsVector.base());
+    solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
     return (info == ::Eigen::Success);
   } // virtual bool apply(...)static_assert
@@ -229,10 +229,10 @@ public:
                      const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<ElementType>> EigenSolverType;
-    EigenSolverType eigenSolver(systemMatrix.base());
+    EigenSolverType eigenSolver(systemMatrix.backend());
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
-    solutionVector.base() = eigenSolver.solve(rhsVector.base());
+    solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
     return (info == ::Eigen::Success);
   } // virtual bool apply(...)
@@ -254,7 +254,7 @@ public:
       BaseType;
 
   SimplicialLLT()
-    : BaseType("\nERROR: only implemented for matrices of type 'EigenColMajorSparseMatrix'!")
+    : BaseType("\nERROR: only implemented for eigen matrices of type 'EigenColMajorSparseMatrix'!")
   {
   }
 }; // class SimplicialLLT
@@ -312,7 +312,7 @@ public:
       BaseType;
 
   SimplicialLDLT()
-    : BaseType("\nERROR: only implemented for matrices of type 'EigenColMajorSparseMatrix'!")
+    : BaseType("\nERROR: only implemented for eigen matrices of type 'EigenColMajorSparseMatrix'!")
   {
   }
 }; // class SimplicialLDLT

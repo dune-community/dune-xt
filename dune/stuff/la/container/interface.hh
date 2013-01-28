@@ -8,20 +8,27 @@ namespace Stuff {
 namespace LA {
 namespace Container {
 
-template <class MatrixImpTraits>
-class MatrixInterface
+
+template <class Traits>
+class Interface
 {
 public:
-  typedef MatrixInterface<MatrixImpTraits> ThisType;
-
-  typedef MatrixImpTraits Traits;
-
-  typedef typename Traits::derived_type derived_type;
-
   typedef typename Traits::BackendType BackendType;
 
-  typedef typename Traits::ElementType ElementType;
+  virtual BackendType& backend() = 0;
 
+  virtual const BackendType& backend() const = 0;
+}; // class Interface
+
+
+template <class Traits>
+class MatrixInterface : public Interface<Traits>
+{
+public:
+  typedef MatrixInterface<Traits> ThisType;
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::BackendType BackendType;
+  typedef typename Traits::ElementType ElementType;
   typedef typename Traits::size_type size_type;
 
   size_type rows() const
@@ -54,19 +61,6 @@ public:
     return asImp().get(i, j);
   }
 
-  BackendType& base()
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
-    return asImp().base();
-  }
-
-  const BackendType& base() const
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
-    return asImp().base();
-  }
-
-private:
   derived_type& asImp()
   {
     return static_cast<derived_type&>(*this);
@@ -79,20 +73,14 @@ private:
 }; // class MatrixInterface
 
 
-template <class VectorImpTraits>
-class VectorInterface
+template <class Traits>
+class VectorInterface : public Interface<Traits>
 {
 public:
-  typedef VectorInterface<VectorImpTraits> ThisType;
-
-  typedef VectorImpTraits Traits;
-
+  typedef VectorInterface<Traits> ThisType;
   typedef typename Traits::derived_type derived_type;
-
   typedef typename Traits::BackendType BackendType;
-
   typedef typename Traits::ElementType ElementType;
-
   typedef typename Traits::size_type size_type;
 
   size_type size() const
@@ -119,19 +107,6 @@ public:
     return asImp().get(i);
   }
 
-  BackendType& base()
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
-    return asImp().base();
-  }
-
-  const BackendType& base() const
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().base());
-    return asImp().base();
-  }
-
-private:
   derived_type& asImp()
   {
     return static_cast<derived_type&>(*this);
