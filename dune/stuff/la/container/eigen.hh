@@ -6,7 +6,7 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
-#include <dune/common/bartonnackmanifcheck.hh>
+#include <dune/common/shared_ptr.hh>
 
 #include "interface.hh"
 #include "pattern.hh"
@@ -45,12 +45,21 @@ template <class ElementType>
 class EigenRowMajorSparseMatrix;
 
 
+template <class ElementImp>
+class EigenDenseMatrix;
+
+
+template <class ElementImp>
+class EigenDenseVector;
+
+
 template <class ElementImp = double>
 class EigenRowMajorSparseMatrixTraits
 {
 public:
   typedef ElementImp ElementType;
   typedef EigenRowMajorSparseMatrix<ElementType> derived_type;
+  //  typedef derived_type EigenMatrix_derived_type;
   typedef typename ::Eigen::SparseMatrix<ElementType, ::Eigen::RowMajor> BackendType;
   typedef typename BackendType::Index size_type;
 }; // class RowMajorSparseMatrixTraits
@@ -155,16 +164,13 @@ private:
 }; // class EigenRowMajorSparseMatrix
 
 
-template <class ElementImp>
-class EigenDenseMatrix;
-
-
 template <class ElementImp = double>
 class EigenDenseMatrixTraits
 {
 public:
   typedef ElementImp ElementType;
   typedef EigenDenseMatrix<ElementType> derived_type;
+  //  typedef derived_type EigenMatrix_derived_type;
   typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
   typedef typename BackendType::Index size_type;
 }; // class DenseMatrixTraits
@@ -192,6 +198,16 @@ public:
 
   EigenDenseMatrix(const BackendType& _otherEigenMatrix)
     : eigenMatrix_(_otherEigenMatrix)
+  {
+  }
+
+  EigenDenseMatrix(const EigenRowMajorSparseMatrix<ElementType>& _other)
+    : eigenMatrix_(_other.backend())
+  {
+  }
+
+  EigenDenseMatrix(const EigenDenseVector<ElementType>& _other)
+    : eigenMatrix_(_other.backend())
   {
   }
 
@@ -252,16 +268,13 @@ private:
 }; // class EigenDenseMatrix
 
 
-template <class ElementImp>
-class EigenDenseVector;
-
-
 template <class ElementImp = double>
 class EigenDenseVectorTraits
 {
 public:
   typedef ElementImp ElementType;
   typedef EigenDenseVector<ElementType> derived_type;
+  //  typedef derived_type EigenVector_derived_type;
   typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, 1> BackendType;
   typedef typename BackendType::Index size_type;
 }; // class DenseVectorTraits
@@ -342,6 +355,22 @@ public:
 private:
   BackendType eigenVector_;
 }; // class DenseVector
+
+
+template <class ElementType = double, class size_type = unsigned int>
+Dune::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_type _size)
+{
+  // create the sparsity pattern
+  SparsityPatternDefault pattern(_size);
+  for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
+    pattern.set(ii).insert(ii);
+  Dune::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> ret =
+      Dune::make_shared<EigenRowMajorSparseMatrix<ElementType>>(_size, _size, pattern);
+  for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
+    ret->set(ii, ii, 1.0);
+  return ret;
+}
+
 
 } // namespace Container
 } // namespace LA
