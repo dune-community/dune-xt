@@ -48,18 +48,6 @@ public:
 
   virtual const Dune::shared_ptr<const GridType> grid() const = 0;
 
-  //! \todo TODO Remove me in the future (i.e. on 01.01.2013)!
-  Dune::shared_ptr<GridType> gridPtr() DUNE_DEPRECATED_MSG("Use grid() instead!")
-  {
-    return grid();
-  }
-
-  //! \todo TODO Remove me in the future (i.e. on 01.01.2013)!
-  const Dune::shared_ptr<const GridType> gridPtr() const DUNE_DEPRECATED_MSG("Use grid() instead!")
-  {
-    return grid();
-  }
-
 private:
   typedef typename GridType::LeafGridView GridViewType;
 
