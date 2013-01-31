@@ -82,9 +82,9 @@ public:
 
   /**
    *  \brief      Creates a cube.
-   *  \param[in]  lowerLeft
+   *  \param[in]  _lowerLeft
    *              A double that is used as a lower left corner in each dimension.
-   *  \param[in]  upperRight
+   *  \param[in]  _upperRight
    *              A double that is used as a upper right corner in each dimension.
    *  \param[in]  numElements (optional)
    *              number of elements.
@@ -100,9 +100,9 @@ public:
 
   /**
    *  \brief      Creates a cube.
-   *  \param[in]  lowerLeft
+   *  \param[in]  _lowerLeft
    *              A vector that is used as a lower left corner.
-   *  \param[in]  upperRight
+   *  \param[in]  _upperRight
    *              A vector that is used as a upper right corner.
    *  \param[in]  numElements (optional)
    *              number of elements.
@@ -118,16 +118,14 @@ public:
 
   /**
     \brief      Creates a cube. This signature allows to prescribe anisotopic refinement
-    \param[in]  lowerLeft
+    \param[in]  _lowerLeft
                 A double that is used as a lower left corner in each dimension.
-    \param[in]  upperRight
+    \param[in]  _upperRight
                 A double that is used as a upper right corner in each dimension.
     \param[in]  numElements
                 number of elements in each dimension.
                 can contain 0 to dim elements (missing dimension are initialized to 1)
-    \tparam Coord anything that CoordinateType allows to copy construct from
     \tparam ContainerType some sequence type that functions with std::begin/end
-    \tparam T an unsigned integral Type
     **/
   template <class ContainerType>
   GenericCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight,
@@ -265,11 +263,6 @@ public:
   {
     return upperRight_;
   }
-
-  /**
-   *  \brief      Visualizes the grid using Dune::VTKWriter.
-   *  \param[in]  filename
-   **/
 
 private:
   void buildGrid(const Dune::array<unsigned int, dim>& numElements)

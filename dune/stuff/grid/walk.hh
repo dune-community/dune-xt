@@ -49,7 +49,7 @@ const GridWalkDummyFunctor gridWalkDummyFunctor;
 
 /** \brief applies Functors on each \ref Entity/\ref Intersection of a given \ref GridView
  *  \todo allow stacking of functor to save gridwalks?
- *  \tparam GridViewType any \ref GridView interface compliant type
+ *  \tparam GridViewImp any \ref GridView interface compliant type
  *  \tparam codim determines the codim of the Entities that are iterated on
  **/
 template <class GridViewImp, int codim = 0>
