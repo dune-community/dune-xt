@@ -29,14 +29,11 @@ template <class GridImp = Dune::SGrid<2, 2>>
 class Interface
 {
 public:
+  static const unsigned int dim = GridImp::dimension;
+
   typedef GridImp GridType;
-
   typedef Interface<GridType> ThisType;
-
-  static const unsigned int dim = GridType::dimension;
-
   typedef typename GridType::ctype ctype;
-
   typedef Dune::FieldVector<ctype, dim> CoordinateType;
 
   static const std::string id()
@@ -45,8 +42,11 @@ public:
   }
 
   virtual Dune::shared_ptr<GridType> grid() = 0;
-
   virtual const Dune::shared_ptr<const GridType> grid() const = 0;
+
+  virtual ~Interface()
+  {
+  }
 
 private:
   typedef typename GridType::LeafGridView GridViewType;
