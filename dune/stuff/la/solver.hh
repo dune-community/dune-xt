@@ -9,7 +9,6 @@
 
 #include <dune/common/shared_ptr.hh>
 #include <dune/stuff/common/color.hh>
-#include <dune/stuff/common/logging.hh>
 
 #include "solver/interface.hh"
 #include "solver/eigen.hh"
@@ -38,7 +37,11 @@ Dune::shared_ptr<Interface<MatrixType, VectorType>> create(const std::string typ
   } else if (type == "simplicialldlt") {
     return Dune::make_shared<Dune::Stuff::LA::Solver::SimplicialLDLT<MatrixType, VectorType>>();
   } else
-    DUNE_THROW(Dune::RangeError, "\nERROR: unknown linear solver '" << type << "' requested!");
+    DUNE_THROW(Dune::RangeError,
+               "\n" << Dune::Stuff::Common::colorString("ERROR:", Dune::Stuff::Common::Colors::red)
+                    << " unknown linear solver '"
+                    << type
+                    << "' requested!");
 } // Interface< ElementType >* create(const std::string type = "eigen.bicgstab.incompletelut")
 
 
