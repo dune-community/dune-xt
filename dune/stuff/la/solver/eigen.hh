@@ -52,8 +52,8 @@ public:
           << std::flush;
   }
 
-  virtual bool apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                     const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+  virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
     auto& x_i      = solutionVector.backend();
     const auto& b  = rhsVector.backend();
@@ -79,10 +79,10 @@ public:
       residuum -= alpha * correction_q;
       rho = residuum.squaredNorm();
       if (rho < tolerance)
-        return true;
+        return 0;
       rho_prev = rho;
     }
-    return false;
+    return 1;
   } // virtual bool apply(...)
 }; // class Cg
 
@@ -114,8 +114,8 @@ public:
           << " this solver is believed to produce utterly wrong results! " << std::flush;
   }
 
-  virtual bool apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                     const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+  virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
     typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                        ::Eigen::Lower,
@@ -125,7 +125,14 @@ public:
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
-    return (info == ::Eigen::Success);
+    if (info == ::Eigen::Success)
+      return 0;
+    else if (info == ::Eigen::NoConvergence)
+      return 1;
+    else if (info == ::Eigen::NumericalIssue)
+      return 2;
+    else
+      return 3;
   } // virtual bool apply(...)
 }; // class CgDiagonal
 
@@ -152,8 +159,8 @@ public:
   {
   }
 
-  virtual bool apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                     const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+  virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> EigenSolverType;
     EigenSolverType eigenSolver(systemMatrix.backend());
@@ -161,7 +168,14 @@ public:
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
-    return (info == ::Eigen::Success);
+    if (info == ::Eigen::Success)
+      return 0;
+    else if (info == ::Eigen::NoConvergence)
+      return 1;
+    else if (info == ::Eigen::NumericalIssue)
+      return 2;
+    else
+      return 3;
   } // virtual bool apply(...)
 }; // class Bicgstab
 
@@ -188,8 +202,8 @@ public:
   {
   }
 
-  virtual bool apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                     const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+  virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<ElementType>>
         EigenSolverType;
@@ -198,7 +212,14 @@ public:
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
-    return (info == ::Eigen::Success);
+    if (info == ::Eigen::Success)
+      return 0;
+    else if (info == ::Eigen::NoConvergence)
+      return 1;
+    else if (info == ::Eigen::NumericalIssue)
+      return 2;
+    else
+      return 3;
   } // virtual bool apply(...)static_assert
 }; // class BicgstabDiagonal
 
@@ -225,8 +246,8 @@ public:
   {
   }
 
-  virtual bool apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                     const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+  virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<ElementType>> EigenSolverType;
     EigenSolverType eigenSolver(systemMatrix.backend());
@@ -234,7 +255,14 @@ public:
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     const ::Eigen::ComputationInfo info = eigenSolver.info();
-    return (info == ::Eigen::Success);
+    if (info == ::Eigen::Success)
+      return 0;
+    else if (info == ::Eigen::NoConvergence)
+      return 1;
+    else if (info == ::Eigen::NumericalIssue)
+      return 2;
+    else
+      return 3;
   } // virtual bool apply(...)
 }; // class BicgstabILUT
 
