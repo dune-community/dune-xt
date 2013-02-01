@@ -214,21 +214,18 @@ private:
 }; // class IdBased
 
 template <class GridViewType>
-Interface<GridViewType>* create(const std::string& type = "stuff.grid.boundaryinfo.alldirichlet",
-                                const Dune::ParameterTree paramTree = Dune::ParameterTree())
+Dune::shared_ptr<Interface<GridViewType>> create(const std::string& type = "stuff.grid.boundaryinfo.alldirichlet",
+                                                 const Dune::ParameterTree paramTree = Dune::ParameterTree())
 {
   if (type == "stuff.grid.boundaryinfo.alldirichlet") {
     typedef AllDirichlet<GridViewType> AllDirichletType;
-    AllDirichletType* allDirichlet = new AllDirichletType(AllDirichletType());
-    return allDirichlet;
+    return Dune::make_shared<AllDirichletType>();
   } else if (type == "stuff.grid.boundaryinfo.allneumann") {
     typedef AllNeumann<GridViewType> AllNeumannType;
-    AllNeumannType* allNeumann = new AllNeumannType(AllNeumannType());
-    return allNeumann;
+    return Dune::make_shared<AllNeumannType>();
   } else if (type == "stuff.grid.boundaryinfo.idbased") {
     typedef IdBased<GridViewType> IdBasedType;
-    IdBasedType* idBased = new IdBasedType(IdBasedType::createFromParamTree(paramTree));
-    return idBased;
+    return Dune::make_shared<IdBasedType>(IdBasedType::createFromParamTree(paramTree));
   } else
     DUNE_THROW(Dune::RangeError, "\nERROR: unknown boundaryinfo '" << type << "' requested!");
 } // Interface< GridViewType >* create(...)
