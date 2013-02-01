@@ -176,6 +176,10 @@ public:
 }; // class DenseMatrixTraits
 
 
+/**
+ *  \brief  A dense matrix using the eigen backend
+ *          If the nontrivial constructors is used, the storage is initialized with zero.
+ */
 template <class ElementImp = double>
 class EigenDenseMatrix : public MatrixInterface<EigenDenseMatrixTraits<ElementImp>>,
                          public EigenMatrixInterface<EigenDenseMatrixTraits<ElementImp>>
@@ -214,6 +218,7 @@ public:
   EigenDenseMatrix(const size_type _rows, const size_type _cols)
     : eigenMatrix_(_rows, _cols)
   {
+    eigenMatrix_.setZero(_rows, _cols);
   }
 
   ThisType& operator=(const ThisType& _other)
@@ -279,7 +284,10 @@ public:
   typedef typename BackendType::Index size_type;
 }; // class DenseVectorTraits
 
-
+/**
+ *  \brief  A dense vector using the eigen backend
+ *          If the nontrivial constructors is used, the storage is initialized with zero.
+ */
 template <class ElementImp = double>
 class EigenDenseVector : public VectorInterface<EigenDenseVectorTraits<ElementImp>>,
                          public EigenVectorInterface<EigenDenseVectorTraits<ElementImp>>
@@ -308,6 +316,7 @@ public:
   EigenDenseVector(const size_type _size)
     : eigenVector_(_size)
   {
+    eigenVector_.setZero(_size);
   }
 
   ThisType& operator=(const ThisType& _other)
