@@ -118,6 +118,7 @@ public:
   IdBased(const Dune::shared_ptr<const IdSetMapType> _boundaryInfoMap)
     : boundaryInfoMap_(_boundaryInfoMap)
   {
+    setup();
   }
 
   IdBased(const ThisType& other)
