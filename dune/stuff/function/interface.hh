@@ -139,10 +139,14 @@ public:
   }
   /* @} */
 
-  /** \defgroup functional ´´These methods are provided by the interface itself.'' */
+  /** \defgroup provided ´´These methods are provided by the interface itself, but may not be implemented optimal.'' */
   /* @{ */
-  //  // first of all, import all the nonparametric evaluate()s
-  //  using ComponentType::evaluate;
+  virtual RangeType evaluate(const DomainType& _x) const
+  {
+    RangeType ret;
+    evaluate(_x, ret);
+    return ret;
+  }
 
   //  virtual RangeType evaluate(const DomainType& x, const ParamType& mu) const
   //  {
