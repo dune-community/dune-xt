@@ -15,6 +15,7 @@
 #include <dune/common/exceptions.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/color.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -26,7 +27,6 @@ class Interface
 {
 public:
   typedef GridViewImp GridViewType;
-
   typedef typename GridViewType::Intersection IntersectionType;
 
   static const std::string id()
@@ -45,7 +45,9 @@ class AllDirichlet : public Interface<GridViewImp>
 {
 public:
   typedef Interface<GridViewImp> BaseType;
+  typedef AllDirichlet<GridViewImp> ThisType;
 
+  typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string id()
@@ -72,7 +74,9 @@ class AllNeumann : public Interface<GridViewImp>
 {
 public:
   typedef Interface<GridViewImp> BaseType;
+  typedef AllNeumann<GridViewImp> ThisType;
 
+  typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string id()
@@ -99,7 +103,9 @@ class IdBased : public Interface<GridViewImp>
 {
 public:
   typedef Interface<GridViewImp> BaseType;
+  typedef IdBased<GridViewImp> ThisType;
 
+  typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string id()
@@ -107,12 +113,8 @@ public:
     return BaseType::id() + ".idbased";
   }
 
-  typedef IdBased ThisType;
-
   typedef int IdType;
-
   typedef std::set<IdType> IdSetType;
-
   typedef std::map<std::string, IdSetType> IdSetMapType;
 
   IdBased(const Dune::shared_ptr<const IdSetMapType> _boundaryInfoMap)
@@ -126,6 +128,15 @@ public:
     , hasDirichlet_(other.hasDirichlet_)
     , hasNeumann_(other.hasNeumann_)
   {
+  }
+
+  ThisType& operator=(ThisType& other)
+  {
+    if (this != &other) {
+      boundaryInfoMap_ = other.boundaryInfoMap();
+      setup();
+    }
+    return *this;
   }
 
   static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
@@ -151,15 +162,6 @@ public:
     idSetMap->insert(std::pair<std::string, IdSetType>("dirichlet", dirichletSet));
     idSetMap->insert(std::pair<std::string, IdSetType>("neumann", neumannSet));
     return ThisType(idSetMap);
-  }
-
-  ThisType& operator=(ThisType& other)
-  {
-    if (this != &other) {
-      boundaryInfoMap_ = other.boundaryInfoMap();
-      setup();
-    }
-    return *this;
   }
 
   const Dune::shared_ptr<const IdSetMapType> boundaryInfoMap()
@@ -227,7 +229,9 @@ Dune::shared_ptr<Interface<GridViewType>> create(const std::string& type = "stuf
     typedef IdBased<GridViewType> IdBasedType;
     return Dune::make_shared<IdBasedType>(IdBasedType::createFromParamTree(paramTree));
   } else
-    DUNE_THROW(Dune::RangeError, "\nERROR: unknown boundaryinfo '" << type << "' requested!");
+    DUNE_THROW(Dune::RangeError,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
+                    << "' requested!");
 } // Interface< GridViewType >* create(...)
 
 } // namespace BoundaryInfo
