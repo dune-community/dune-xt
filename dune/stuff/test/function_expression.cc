@@ -21,8 +21,10 @@
 
 //  #include <dune/stuff/fem/customprojection.hh>
 //#endif
+
 #include <dune/stuff/grid/provider.hh>
-#include <dune/stuff/function/nonparametric/expression.hh>
+#include <dune/stuff/function/expression.hh>
+#include <dune/stuff/function/parametric/separable/coefficient.hh>
 
 #if HAVE_EIGEN
 #include <Eigen/Core>
@@ -33,9 +35,9 @@ int main(int argc, char** argv)
   try {
     Dune::MPIHelper::instance(argc, argv);
 
-    typedef Dune::Stuff::Function::NonparametricExpression<double, 2, double, 1> ScalarFunctionType;
-    typename ScalarFunctionType::DomainType scalar_x;
-    typename ScalarFunctionType::RangeType scalar_value;
+    typedef Dune::Stuff::Function::Expression<double, 2, double, 1> ScalarFunctionType;
+    typename Dune::FieldVector<double, 2> scalar_x;
+    typename Dune::FieldVector<double, 1> scalar_value;
     scalar_x[0] = 1.0;
     scalar_x[1] = 2.0;
     ScalarFunctionType scalar_f_from_single_expression("x", "x[0] + x[1]");
@@ -60,7 +62,7 @@ int main(int argc, char** argv)
     scalar_paramTree_single_expression["order"]      = "5";
     scalar_paramTree_single_expression["name"] = "scalar_f_from_paramtree_with_expressions";
     ScalarFunctionType scalar_f_from_paramtree_with_single_expression =
-        ScalarFunctionType::createFromParamTree(scalar_paramTree_single_expression);
+        ScalarFunctionType::createFromDescription(scalar_paramTree_single_expression);
     scalar_f_from_paramtree_with_single_expression.report("scalar_f_from_paramtree_with_single_expression");
     scalar_f_from_paramtree_with_single_expression.evaluate(scalar_x, scalar_value);
     std::cout << "scalar_f_from_paramtree_with_single_expression(" << scalar_x << ") = " << scalar_value
@@ -73,7 +75,7 @@ int main(int argc, char** argv)
     scalar_paramTree_expressions["name"]       = "scalar_f_from_paramtree_with_expressions";
     scalar_paramTree_expressions["expression"] = "[x[0] + x[1]*sin(pi/2)]";
     ScalarFunctionType scalar_f_from_paramtree_with_expressions =
-        ScalarFunctionType::createFromParamTree(scalar_paramTree_expressions);
+        ScalarFunctionType::createFromDescription(scalar_paramTree_expressions);
     scalar_f_from_paramtree_with_expressions.report("scalar_f_from_paramtree_with_expressions");
     scalar_f_from_paramtree_with_expressions.evaluate(scalar_x, scalar_value);
     std::cout << "scalar_f_from_paramtree_with_expressions(" << scalar_x << ") = " << scalar_value << " (should be 3)"
@@ -81,9 +83,9 @@ int main(int argc, char** argv)
     std::cout << std::endl;
     std::cout << std::endl;
 
-    typedef Dune::Stuff::Function::NonparametricExpression<double, 2, double, 2> VectorFunctionType;
-    typename VectorFunctionType::DomainType vector_x;
-    typename VectorFunctionType::RangeType vector_value;
+    typedef Dune::Stuff::Function::Expression<double, 2, double, 2> VectorFunctionType;
+    typename Dune::FieldVector<double, 2> vector_x;
+    typename Dune::FieldVector<double, 2> vector_value;
     vector_x[0]                 = 1.0;
     vector_x[1]                 = 2.0;
     std::string vector_variable = "x";
@@ -100,11 +102,23 @@ int main(int argc, char** argv)
     vector_paramTree_expressions["variable"]   = "x";
     vector_paramTree_expressions["expression"] = "[x[0] + x[1]*sin(pi/2); -1*(x[0] + x[1]*sin(pi/2))]";
     VectorFunctionType vector_f_from_paramtree_with_expressions =
-        VectorFunctionType::createFromParamTree(vector_paramTree_expressions);
+        VectorFunctionType::createFromDescription(vector_paramTree_expressions);
     vector_f_from_paramtree_with_expressions.report("vector_f_from_paramtree_with_expressions");
     vector_f_from_paramtree_with_expressions.evaluate(vector_x, vector_value);
     std::cout << "vector_f_from_paramtree_with_expressions(" << vector_x << ") = " << vector_value
               << " (should be 3 -3)" << std::endl;
+    std::cout << std::endl;
+
+    typedef Dune::Stuff::Function::Parametric::Separable::Coefficient<double> CoefficientFunctionType;
+    const CoefficientFunctionType coefficientFunction("2*mu[0] + sin(mu[1])");
+    typedef CoefficientFunctionType::ParamType ParamType;
+    ParamType mu(2), coefficient_value;
+    mu[0] = 1.0;
+    mu[1] = 0.0;
+    coefficientFunction.report("coefficientFunction");
+    coefficientFunction.evaluate(mu, coefficient_value);
+    std::cout << "coefficientFunction(" << mu << ") = " << coefficient_value << " (should be 2)" << std::endl;
+    std::cout << std::endl;
 
     //#if HAVE_EIGEN
     //    std::cout << std::endl;
