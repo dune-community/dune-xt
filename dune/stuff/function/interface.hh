@@ -12,29 +12,26 @@
 #include <dune/common/shared_ptr.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
+#include <dune/common/function.hh>
 
 #include <dune/stuff/common/color.hh>
-
-//#if HAVE_EIGEN
-//  #include <Eigen/Core>
-//#endif // HAVE_EIGEN
+#include <dune/stuff/common/parameter.hh>
 
 namespace Dune {
 namespace Stuff {
 namespace Function {
 
 
-// forward
-template <class ParamFieldImp, int maxParamDim, class RangeFieldImp>
+//! forward
+template <class RangeFieldImp>
 class Coefficient;
 
 
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, class ParamFieldImp = double,
-          int maxParamDim                                                                             = 0>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class Interface
 {
 public:
-  typedef Interface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, ParamFieldImp, maxParamDim> ThisType;
+  typedef Interface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
 
   typedef DomainFieldImp DomainFieldType;
   static const int dimDomain = domainDim;
@@ -44,25 +41,39 @@ public:
   static const int dimRange = rangeDim;
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
-  typedef ParamFieldImp ParamFieldType;
-  static const int maxDimParam = maxParamDim;
-  typedef Dune::DynamicVector<ParamFieldType> ParamType;
-  typedef typename ParamType::size_type size_type;
+  typedef Common::Parameter::FieldType ParamFieldType;
+  static const int maxParamDim = Common::Parameter::maxDim;
+  typedef Common::Parameter::Type ParamType;
 
-  typedef Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> ComponentType;
-  typedef Coefficient<ParamFieldType, maxParamDim, RangeFieldType> CoefficientType;
+  typedef ThisType ComponentType;
+  typedef Coefficient<RangeFieldType> CoefficientType;
 
-  /** \defgroup purevirtual-type ´´These methods have to be implemented and determine the type of the function (and
-   * also, which of the below methods have to be implemented).'' */
+  static const std::string id()
+  {
+    return "function";
+  }
+
+  /** \defgroup type ´´Theis method has to be implemented for parametric functions and determines,
+   *                   which evaluate() is callable.''
+   */
   /* @{ */
-  virtual bool parametric() const = 0;
+  virtual bool parametric() const
+  {
+    return false;
+  }
   /* @} */
 
-  /** \defgroup purevirtual ´´These methods have to be implemented.'' */
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
-  virtual std::string name() const = 0;
+  virtual std::string name() const
+  {
+    return id();
+  }
 
-  virtual int order() const = 0;
+  virtual int order() const
+  {
+    return -1;
+  }
   /* @} */
 
   /** \defgroup nonparametric-must ´´These methods have to be implemented, if parametric() == false.'' */
@@ -74,24 +85,15 @@ public:
   }
   /* @} */
 
-  /** \defgroup nonparametric-can ´´These methods are provided by the interface, but not optimal. You can provide an
-   * implementation if parametric() == false'' */
-  /* @{ */
-  virtual void evaluate(const ParamType& /*_mu*/, RangeType& /*_ret*/) const
-  {
-    assert(false && "I should be implemented!");
-  }
-  /* @} */
-
   /** \defgroup parametric-must ´´These methods have to be implemented, if parametric() == true.'' */
   /* @{ */
-  virtual bool separable() const
+  virtual void evaluate(const DomainType& /*_x*/, const ParamType& /*_mu*/, RangeType& /*_ret*/) const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
   }
 
-  virtual size_type paramSize() const
+  virtual size_t paramSize() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
@@ -109,16 +111,15 @@ public:
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
   }
 
-  virtual void evaluate(const DomainType& /*_x*/, const ParamType& /*_mu*/, RangeType& /*_ret*/) const
+  virtual bool separable() const
   {
-    DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
+    return false;
   }
   /* @} */
 
   /** \defgroup separable ´´These methods have to be implemented, if separable() == true.'' */
   /* @{ */
-  virtual size_type numComponents() const
+  virtual size_t numComponents() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if separable() == true!");
@@ -130,7 +131,7 @@ public:
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if separable() == true!");
   }
 
-  virtual unsigned int numCoefficients() const
+  virtual size_t numCoefficients() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if separable() == true!");
@@ -147,6 +148,7 @@ public:
   /* @{ */
   virtual RangeType evaluate(const DomainType& _x) const
   {
+    assert(!parametric());
     RangeType ret;
     evaluate(_x, ret);
     return ret;
