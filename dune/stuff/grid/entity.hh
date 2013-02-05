@@ -54,12 +54,10 @@ void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::
 template <class GridImp, template <int, int, class> class EntityImp>
 double geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
 {
-  typedef Dune::Entity<0, 2, GridImp, EntityImp> EntityType;
-  typedef typename EntityType::LeafIntersectionIterator IntersectionIteratorType;
-  IntersectionIteratorType end = entity.ileafend();
+  const auto end = entity.ileafend();
   double factor = 1.0;
-  for (IntersectionIteratorType it = entity.ileafbegin(); it != end; ++it) {
-    const typename IntersectionIteratorType::Intersection& intersection = *it;
+  for (auto it = entity.ileafbegin(); it != end; ++it) {
+    const auto& intersection = *it;
     factor *= intersection.geometry().volume();
   }
   return factor / (2.0 * entity.geometry().volume());
