@@ -95,8 +95,11 @@ public:
 
   virtual size_t paramSize() const
   {
-    DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
+    if (!parametric())
+      return 0;
+    else
+      DUNE_THROW(Dune::NotImplemented,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
   }
 
   virtual const std::vector<ParamType>& paramRange() const
