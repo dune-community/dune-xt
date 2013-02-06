@@ -15,6 +15,11 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/static_assert.hh>
 
+#if HAVE_DUNE_FEM
+#include <dune/fem/function/common/function.hh>
+#include <dune/fem/space/common/functionspace.hh>
+#endif
+
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/color.hh>
@@ -28,7 +33,13 @@ namespace Function {
 
 
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class Expression : public ExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>,
+class Expression : public ExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+#if HAVE_DUNE_FEM
+                   ,
+                   public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+                                              Expression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
+#endif
+                   ,
                    public Interface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 {
 public:
