@@ -3,17 +3,14 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/shared_ptr.hh>
 
-#include <dune/stuff/function/interface.hh>
-#include <dune/stuff/function/expression.hh>
-#include <dune/stuff/function/checkerboard.hh>
-#include <dune/stuff/function/parametric/separable/checkerboard.hh>
-#include <dune/stuff/function/parametric/separable/default.hh>
+#include <dune/stuff/function.hh>
 
 
 typedef testing::Types<Dune::Stuff::Function::Expression<double, 1, double, 1>,
                        Dune::Stuff::Function::Checkerboard<double, 1, double, 1>> NonparametricFunctions;
 
-typedef testing::Types<Dune::Stuff::Function::SeparableCheckerboard<double, 1, double, 1>> SeparableFunctions;
+typedef testing::Types<Dune::Stuff::Function::SeparableCheckerboard<double, 1, double, 1>,
+                       Dune::Stuff::Function::SeparableDefault<double, 1, double, 1>> SeparableFunctions;
 
 
 template <class T>
@@ -28,15 +25,11 @@ struct NonparametricTest : public ::testing::Test
   typedef typename FunctionType::RangeType RangeType;
   typedef Dune::Stuff::Function::Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
 
-  static Dune::shared_ptr<InterfaceType> create()
-  {
-    const Dune::ParameterTree description = FunctionType::createSampleDescription();
-    return Dune::make_shared<FunctionType>(FunctionType::createFromDescription(description));
-  }
-
   void check() const
   {
-    const Dune::shared_ptr<InterfaceType> function = create();
+    const Dune::shared_ptr<InterfaceType> function =
+        Dune::Stuff::Function::create<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
+            FunctionType::id(), FunctionType::createSampleDescription());
     DomainType x(1);
     RangeType ret;
     if (function->parametric())
@@ -66,15 +59,11 @@ struct SeparableTest : public ::testing::Test
   static const int maxParamDim = Dune::Stuff::Common::Parameter::maxDim;
   typedef Dune::Stuff::Common::Parameter::Type ParamType;
 
-  static Dune::shared_ptr<InterfaceType> create()
-  {
-    const Dune::ParameterTree description = FunctionType::createSampleDescription();
-    return Dune::make_shared<FunctionType>(FunctionType::createFromDescription(description));
-  }
-
   void check() const
   {
-    const Dune::shared_ptr<InterfaceType> function = create();
+    const Dune::shared_ptr<InterfaceType> function =
+        Dune::Stuff::Function::create<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
+            FunctionType::id(), FunctionType::createSampleDescription());
     if (!function->parametric())
       DUNE_THROW(Dune::InvalidStateException, "ERROR: separable function returned parametric() == false!");
     if (!function->separable())
