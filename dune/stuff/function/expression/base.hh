@@ -98,16 +98,6 @@ public:
     cleanup();
   } // ~NonparametricExpression()
 
-  static ThisType createFromDescription(const Dune::ParameterTree& _description)
-  {
-    const Dune::Stuff::Common::ExtendedParameterTree description(_description);
-    // get necessary
-    const std::string _variable                 = description.get<std::string>("variable");
-    const std::vector<std::string> _expressions = description.getVector<std::string>("expression", dimRange);
-    // create and return
-    return ThisType(_variable, _expressions);
-  } // static ThisType createFromDescription(const Dune::ParameterTree& _description)
-
   std::string variable() const
   {
     return variable_;
