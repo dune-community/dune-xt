@@ -76,23 +76,41 @@ public:
     return this;
   } // ThisType& operator=(const ThisType& other)
 
-  static Dune::ParameterTree createSampleDescription(const std::string prefix = "")
+  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
     Dune::ParameterTree description;
-    description[prefix + "variable"]   = "x";
-    description[prefix + "expression"] = "x[0]";
-    description[prefix + "order"]      = "1";
-    description[prefix + "name"]       = "function.expression";
-    return description;
+    description["variable"]   = "x";
+    description["expression"] = "[x[0]; sin(x[0])]";
+    description["order"]      = "1";
+    description["name"] = "function.expression";
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
   }
 
   static ThisType createFromDescription(const Dune::ParameterTree& _description)
   {
     const Dune::Stuff::Common::ExtendedParameterTree description(_description);
     // get necessary
-    const std::string _variable = description.get<std::string>("variable");
-    const std::vector<std::string> _expressions =
-        description.getVector<std::string>("expression", InterfaceType::dimRange);
+    const std::string _variable = description.get<std::string>("variable", "x");
+    std::vector<std::string> _expressions;
+    // lets see, if there is a key or vector
+    if (description.hasVector("expression")) {
+      const std::vector<std::string> expr = description.getVector<std::string>("expression", 1);
+      for (size_t ii = 0; ii < expr.size(); ++ii)
+        _expressions.push_back(expr[ii]);
+    } else if (description.hasKey("expression")) {
+      const std::string expr = description.get<std::string>("expression");
+      _expressions.push_back(expr);
+    } else
+      DUNE_THROW(Dune::IOError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+                      << " neither key nor vector 'expression' found in the following description:\n"
+                      << description.reportString("  "));
     // get optional
     const int _order        = description.get<int>("order", -1);
     const std::string _name = description.get<std::string>("name", "function.expression");
