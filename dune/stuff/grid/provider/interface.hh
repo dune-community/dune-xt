@@ -16,6 +16,8 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/sgrid.hh>
 
+#include <dune/stuff/grid/boundaryinfo.hh>
+
 namespace Dune {
 namespace Stuff {
 namespace Grid {
@@ -36,27 +38,27 @@ public:
   typedef typename GridType::ctype ctype;
   typedef Dune::FieldVector<ctype, dim> CoordinateType;
 
+private:
+  typedef typename GridType::LeafGridView LeafGridViewType;
+
+public:
   static const std::string id()
   {
     return "stuff.grid.provider";
   }
 
-  virtual Dune::shared_ptr<GridType> grid() = 0;
-  virtual const Dune::shared_ptr<const GridType> grid() const = 0;
-
   virtual ~Interface()
   {
   }
 
-private:
-  typedef typename GridType::LeafGridView GridViewType;
+  virtual Dune::shared_ptr<GridType> grid() = 0;
+  virtual const Dune::shared_ptr<const GridType> grid() const = 0;
 
-public:
   virtual void visualize(const std::string filename = id()) const
   {
     // vtk writer
-    GridViewType gridView = grid()->leafView();
-    Dune::VTKWriter<GridViewType> vtkwriter(gridView);
+    LeafGridViewType gridView = grid()->leafView();
+    Dune::VTKWriter<LeafGridViewType> vtkwriter(gridView);
     // boundary id
     std::vector<double> boundaryId = generateBoundaryIdVisualization(gridView);
     vtkwriter.addCellData(boundaryId, "boundaryId");
@@ -67,14 +69,38 @@ public:
     vtkwriter.write(filename, Dune::VTK::ascii);
   } // void visualize(const std::string filename = id + ".grid") const
 
-private:
-  std::vector<double> generateBoundaryIdVisualization(const GridViewType& gridView) const
+  virtual void visualize(const std::string boundaryInfoType, const Dune::ParameterTree& description,
+                         const std::string filename = id()) const
   {
-    typedef typename GridViewType::IndexSet::IndexType IndexType;
-    typedef typename GridViewType::template Codim<0>::Entity EntityType;
+    // vtk writer
+    LeafGridViewType gridView = grid()->leafView();
+    Dune::VTKWriter<LeafGridViewType> vtkwriter(gridView);
+    // boundary id
+    std::vector<double> boundaryId = generateBoundaryIdVisualization(gridView);
+    vtkwriter.addCellData(boundaryId, "boundaryId");
+    const Dune::shared_ptr<const typename Dune::Stuff::Grid::BoundaryInfo::Interface<LeafGridViewType>> boundaryInfo =
+        Dune::Stuff::Grid::BoundaryInfo::create<LeafGridViewType>(boundaryInfoType, description);
+    // dirichlet values
+    std::vector<double> dirichlet = generateBoundaryVisualization(gridView, *boundaryInfo, "dirichlet");
+    vtkwriter.addCellData(dirichlet, "isDirichletBoundary");
+    // neumann values
+    std::vector<double> neumann = generateBoundaryVisualization(gridView, *boundaryInfo, "neumann");
+    vtkwriter.addCellData(neumann, "isNeumannBoundary");
+    // codim 0 entity id
+    std::vector<double> entityId = generateEntityVisualization(gridView);
+    vtkwriter.addCellData(entityId, "entityId");
+    // write
+    vtkwriter.write(filename, Dune::VTK::ascii);
+  } // void visualize(const std::string filename = id + ".grid") const
+
+private:
+  std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
+  {
+    typedef typename LeafGridViewType::IndexSet::IndexType IndexType;
+    typedef typename LeafGridViewType::template Codim<0>::Entity EntityType;
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
-    for (typename GridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
+    for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
          it != gridView.template end<0>();
          ++it) {
       const EntityType& entity     = *it;
@@ -82,7 +108,7 @@ private:
       data[index]                  = 0.0;
       int numberOfBoundarySegments = 0;
       bool isOnBoundary = false;
-      for (typename GridViewType::IntersectionIterator intersectionIt = gridView.ibegin(entity);
+      for (typename LeafGridViewType::IntersectionIterator intersectionIt = gridView.ibegin(entity);
            intersectionIt != gridView.iend(entity);
            ++intersectionIt) {
         if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
@@ -99,15 +125,46 @@ private:
       }
     } // walk the grid
     return data;
-  } // std::vector< double > generateBoundaryIdVisualization(const GridViewType& gridView) const
+  } // std::vector< double > generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
 
-  std::vector<double> generateEntityVisualization(const GridViewType& gridView) const
+  std::vector<double>
+  generateBoundaryVisualization(const LeafGridViewType& gridView,
+                                const Dune::Stuff::Grid::BoundaryInfo::Interface<LeafGridViewType>& boundaryInfo,
+                                const std::string type) const
   {
-    typedef typename GridViewType::IndexSet::IndexType IndexType;
-    typedef typename GridViewType::template Codim<0>::Entity EntityType;
+    typedef typename LeafGridViewType::IndexSet::IndexType IndexType;
+    typedef typename LeafGridViewType::template Codim<0>::Entity EntityType;
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
-    for (typename GridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
+    for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
+         it != gridView.template end<0>();
+         ++it) {
+      const EntityType& entity = *it;
+      const IndexType& index   = gridView.indexSet().index(entity);
+      data[index] = 0.0;
+      for (typename LeafGridViewType::IntersectionIterator intersectionIt = gridView.ibegin(entity);
+           intersectionIt != gridView.iend(entity);
+           ++intersectionIt) {
+        if (type == "dirichlet") {
+          if (boundaryInfo.dirichlet(*intersectionIt))
+            data[index] = 1.0;
+        } else if (type == "neumann") {
+          if (boundaryInfo.neumann(*intersectionIt))
+            data[index] = 1.0;
+        } else
+          DUNE_THROW(Dune::InvalidStateException, "BOOM");
+      }
+    } // walk the grid
+    return data;
+  } // std::vector< double > generateBoundaryVisualization(...) const
+
+  std::vector<double> generateEntityVisualization(const LeafGridViewType& gridView) const
+  {
+    typedef typename LeafGridViewType::IndexSet::IndexType IndexType;
+    typedef typename LeafGridViewType::template Codim<0>::Entity EntityType;
+    std::vector<double> data(gridView.indexSet().size(0));
+    // walk the grid
+    for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
          it != gridView.template end<0>();
          ++it) {
       const EntityType& entity = *it;
@@ -115,7 +172,7 @@ private:
       data[index]              = double(index);
     } // walk the grid
     return data;
-  } // std::vector< double > generateEntityVisualization(const GridViewType& gridView) const
+  } // std::vector< double > generateEntityVisualization(const LeafGridViewType& gridView) const
 }; // class Interface
 
 } // namespace Provider
