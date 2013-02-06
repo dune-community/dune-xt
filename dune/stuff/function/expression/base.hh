@@ -30,6 +30,11 @@ namespace Stuff {
 namespace Function {
 
 
+// forward
+template <class RangeFieldImp>
+class Coefficient;
+
+
 ///**
 //  \brief  Provides a function which evaluates a given mathematical expression at runtime.
 
@@ -183,6 +188,18 @@ public:
   } // void report(const std::string, std::ostream&, const std::string&) const
 
 private:
+  friend class Coefficient<RangeFieldType>;
+
+  void evaluate(const Dune::DynamicVector<DomainFieldType>& _arg, RangeFieldType& _ret) const
+  {
+    assert(dimRange == 1 && "I'm only here to be used by Function::Parametric::Coefficient, which has dimrange == 1");
+    // copy arg
+    for (int ii = 0; ii < std::min(domainDim, int(_arg.size())); ++ii)
+      *(arg_[ii]) = _arg[ii];
+    // copy ret
+    _ret = op_[0]->Val();
+  }
+
   void setup(const std::string& _variable, const std::vector<std::string>& _expression)
   {
     dune_static_assert((dimDomain > 0), "Really?");
