@@ -43,6 +43,11 @@ public:
   using InterfaceType::dimRange;
   typedef typename InterfaceType::RangeType RangeType;
 
+  static const std::string id()
+  {
+    return InterfaceType::id() + ".expression";
+  }
+
   Expression(const std::string _variable, const std::string _expression, const int _order = -1,
              const std::string _name = "function.expression")
     : BaseType(_variable, _expression)
