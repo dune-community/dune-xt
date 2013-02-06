@@ -84,15 +84,21 @@ public:
     return this;
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string prefix = "")
+  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
     Dune::ParameterTree description;
-    description[prefix + "lowerLeft"]   = "[0.0; 0.0; 0.0]";
-    description[prefix + "upperRight"]  = "[1.0; 1.0; 1.0]";
-    description[prefix + "numElements"] = "[2; 2; 2]";
-    description[prefix + "values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
-    description[prefix + "name"]        = id();
-    return description;
+    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
+    description["upperRight"]  = "[1.0; 1.0; 1.0]";
+    description["numElements"] = "[2; 2; 2]";
+    description["values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
+    description["name"] = id();
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
   }
 
   static ThisType createFromDescription(const Dune::ParameterTree _description)
