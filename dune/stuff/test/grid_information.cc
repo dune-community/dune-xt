@@ -13,12 +13,6 @@ using namespace Dune::Stuff::Common;
 using namespace Dune::Stuff::Grid;
 using namespace std;
 
-template <int i>
-struct Int
-{
-  static const int value = i;
-};
-
 typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
 
 template <class T>
