@@ -31,7 +31,6 @@ namespace Dune {
 namespace Stuff {
 namespace Function {
 
-
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class Expression : public ExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 #if HAVE_DUNE_FEM
