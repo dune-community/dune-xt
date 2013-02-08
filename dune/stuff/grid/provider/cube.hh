@@ -174,7 +174,7 @@ public:
   static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
-    Dune::Stuff::Common::ParameterTreeX extendedParamTree;
+    Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
     if (paramTree.hasSub(subName))
       extendedParamTree = paramTree.sub(subName);
     else
