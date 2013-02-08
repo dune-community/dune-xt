@@ -158,6 +158,31 @@ public:
   {
   }
 
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      lowerLeft_  = other.lowerLeft();
+      upperRight_ = other.upperRight();
+      grid_       = other.grid();
+    }
+    return this;
+  }
+
+  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  {
+    Dune::ParameterTree description;
+    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
+    description["upperRight"]  = "[1.0; 1.0; 1.0]";
+    description["numElements"] = "[2; 2; 2]";
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
+  }
+
   /**
    *  \brief      Creates a cube.
    *  \param[in]  paramTree
@@ -171,7 +196,7 @@ public:
    *              <li> \c numElements: \a int or vector to denote the number of elements.
    *              </ul>
    **/
-  static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
     Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
@@ -354,9 +379,15 @@ public:
   {
   }
 
-  static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = BaseType::id())
+  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
-    BaseType base = BaseType::createFromParamTree(paramTree, subName);
+    return BaseType::createSampleDescription(subName);
+  }
+
+  static ThisType createFromDescription(const Dune::ParameterTree& paramTree,
+                                        const std::string subName = BaseType::id())
+  {
+    BaseType base = BaseType::createFromDescription(paramTree, subName);
     return ThisType(base);
   }
 }; // class Cube
