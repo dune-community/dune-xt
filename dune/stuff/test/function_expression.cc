@@ -1,191 +1,135 @@
-/**
-  \file   examples/grid/provider.cc
-  \brief  Demonstrates the capabilities of some Dune::RB::Grid::Providers.
-  **/
-
 #include "test_common.hh"
 
-#include <dune/common/mpihelper.hh>
-#include <dune/common/parametertree.hh>
+#include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
 
-//#if HAVE_DUNE_FEM
-//  #include <dune/fem/misc/mpimanager.hh>
-//  #include <dune/fem/space/fvspace/fvspace.hh>
-//  #include <dune/fem/space/dgspace.hh>
-//  #include <dune/fem/gridpart/adaptiveleafgridpart.hh>
-//  #include <dune/fem/function/adaptivefunction.hh>
-//  #include <dune/fem/operator/projection/l2projection.hh>
-//  #include <dune/fem/io/file/datawriter.hh>
+#include <dune/stuff/common/tuple.hh>
+#include <dune/stuff/function/expression/base.hh>
 
-//  #include <dune/stuff/fem/customprojection.hh>
-//#endif
 
-#include <dune/stuff/grid/provider.hh>
-#include <dune/stuff/function/expression.hh>
-#include <dune/stuff/function/parametric/separable/coefficient.hh>
+struct RunExpressionBaseTest
+{
+  template <class DimDomain, class DimRange>
+  static void run()
+  {
+    typedef double DomainFieldType;
+    static const int dimDomain = DimDomain::value;
+    typedef double RangeFieldType;
+    static const int dimRange = DimRange::value;
 
-#if HAVE_EIGEN
-#include <Eigen/Core>
-#endif // HAVE_EIGEN
+    typedef Dune::Stuff::Function::ExpressionBase<DomainFieldType, dimDomain, RangeFieldType, dimRange> FunctionType;
+    const std::string variable                 = "x";
+    const std::vector<std::string> expressions = {"0", "1", "2"};
+    const FunctionType function(variable, expressions);
+    // test fieldvector/fieldvector
+    Dune::FieldVector<DomainFieldType, dimDomain> argFieldVector;
+    for (size_t ii = 0; ii < dimDomain; ++ii)
+      argFieldVector[ii] = RangeFieldType(ii);
+    Dune::FieldVector<DomainFieldType, dimRange> retFieldVector;
+    function.evaluate(argFieldVector, retFieldVector);
+    for (size_t ii = 0; ii < dimRange; ++ii)
+      if (retFieldVector[ii] < ii || retFieldVector[ii] > ii)
+        DUNE_THROW(Dune::RangeError,
+                   "\nERROR (dimDomain = " << dimDomain << ", dimRange = " << dimRange
+                                           << "): wrong result,  retFieldVector["
+                                           << ii
+                                           << "] is "
+                                           << retFieldVector[ii]
+                                           << ", should be "
+                                           << ii
+                                           << "!");
+    // test dynvector/dynvector
+    Dune::DynamicVector<DomainFieldType> argDynVector(dimDomain);
+    Dune::DynamicVector<DomainFieldType> retDynVector;
+    for (size_t dd = 1; dd <= dimDomain; ++dd) {
+      argDynVector = Dune::DynamicVector<DomainFieldType>(dd);
+      retDynVector = Dune::DynamicVector<DomainFieldType>();
+      for (size_t ii = 0; ii < dd; ++ii)
+        argDynVector[ii] = RangeFieldType(ii);
+      function.evaluate(argDynVector, retDynVector);
+      if (retDynVector.size() != dimRange)
+        DUNE_THROW(Dune::RangeError,
+                   "\nERROR: retDynVector has wrong size, is " << retDynVector.size() << ", should be " << dimRange
+                                                               << "!");
+      for (size_t ii = 0; ii < dimRange; ++ii)
+        if (retDynVector[ii] < ii || retDynVector[ii] > ii)
+          DUNE_THROW(Dune::RangeError,
+                     "\nERROR (dimDomain = " << dimDomain << ", dimRange = " << dimRange
+                                             << "): wrong result,  retDynVector["
+                                             << ii
+                                             << "] is "
+                                             << retFieldVector[ii]
+                                             << ", should be "
+                                             << ii
+                                             << "!");
+    }
+    // test fieldvector/dynvector
+    retDynVector = Dune::DynamicVector<DomainFieldType>();
+    function.evaluate(argFieldVector, retDynVector);
+    if (retDynVector.size() != dimRange)
+      DUNE_THROW(Dune::RangeError,
+                 "\nERROR: retDynVector has wrong size, is " << retDynVector.size() << ", should be " << dimRange
+                                                             << "!");
+    for (size_t ii = 0; ii < dimRange; ++ii)
+      if (retDynVector[ii] < ii || retDynVector[ii] > ii)
+        DUNE_THROW(Dune::RangeError,
+                   "\nERROR (dimDomain = " << dimDomain << ", dimRange = " << dimRange
+                                           << "): wrong result,  retDynVector["
+                                           << ii
+                                           << "] is "
+                                           << retDynVector[ii]
+                                           << ", should be "
+                                           << ii
+                                           << "!");
+    // test dynvector/fieldvector
+    for (size_t dd = 1; dd <= dimDomain; ++dd) {
+      argDynVector   = Dune::DynamicVector<DomainFieldType>(dd);
+      retFieldVector = Dune::FieldVector<DomainFieldType, dimRange>();
+      for (size_t ii = 0; ii < dd; ++ii)
+        argDynVector[ii] = RangeFieldType(ii);
+      function.evaluate(argDynVector, retFieldVector);
+      for (size_t ii = 0; ii < dimRange; ++ii)
+        if (retFieldVector[ii] < ii || retFieldVector[ii] > ii)
+          DUNE_THROW(Dune::RangeError,
+                     "\nERROR (dimDomain = " << dimDomain << ", dimRange = " << dimRange
+                                             << "): wrong result,  retFieldVector["
+                                             << ii
+                                             << "] is "
+                                             << retFieldVector[ii]
+                                             << ", should be "
+                                             << ii
+                                             << "!");
+    }
+  }
+}; // struct RunExpressionBaseTest
+
+
+template <class TestFunctor>
+struct FunctionTest : public ::testing::Test
+{
+  typedef boost::mpl::vector<Int<1>, Int<2>, Int<3>> DomainDims;
+  typedef DomainDims RangeDims;
+  typedef typename Dune::Stuff::Common::TupleProduct::Combine<DomainDims, RangeDims, TestFunctor>::template Generate<>
+      base_generator_type;
+  void run()
+  {
+    base_generator_type::Run();
+  }
+}; // struct FunctionTest
+
+
+typedef ::testing::Types<RunExpressionBaseTest> FunctionTestTypes;
+TYPED_TEST_CASE(FunctionTest, FunctionTestTypes);
+TYPED_TEST(FunctionTest, All)
+{
+  this->run();
+}
+
 
 int main(int argc, char** argv)
 {
-  try {
-    Dune::MPIHelper::instance(argc, argv);
-
-    typedef Dune::Stuff::Function::Expression<double, 2, double, 1> ScalarFunctionType;
-    typename Dune::FieldVector<double, 2> scalar_x;
-    typename Dune::FieldVector<double, 1> scalar_value;
-    scalar_x[0] = 1.0;
-    scalar_x[1] = 2.0;
-    ScalarFunctionType scalar_f_from_single_expression("x", "x[0] + x[1]");
-    scalar_f_from_single_expression.report("scalar_f_from_single_expression");
-    scalar_f_from_single_expression.evaluate(scalar_x, scalar_value);
-    std::cout << "scalar_f_from_single_expression(" << scalar_x << ") = " << scalar_value << " (should be 3)"
-              << std::endl;
-    std::cout << std::endl;
-
-    std::string scalar_variable = "x";
-    std::vector<std::string> scalar_expressions;
-    scalar_expressions.push_back("2*x[0] + x[1]*x[1]");
-    ScalarFunctionType scalar_f_from_expressions(scalar_variable, scalar_expressions, 2, "scalar_f_from_expressions");
-    scalar_f_from_expressions.report(scalar_f_from_expressions.name());
-    scalar_f_from_expressions.evaluate(scalar_x, scalar_value);
-    std::cout << "scalar_f_from_expressions(" << scalar_x << ") = " << scalar_value << " (should be 6)" << std::endl;
-    std::cout << std::endl;
-
-    Dune::ParameterTree scalar_paramTree_single_expression;
-    scalar_paramTree_single_expression["variable"]   = "x";
-    scalar_paramTree_single_expression["expression"] = "x[0] + x[1]*sin(pi/2)";
-    scalar_paramTree_single_expression["order"]      = "5";
-    scalar_paramTree_single_expression["name"] = "scalar_f_from_paramtree_with_expressions";
-    ScalarFunctionType scalar_f_from_paramtree_with_single_expression =
-        ScalarFunctionType::createFromDescription(scalar_paramTree_single_expression);
-    scalar_f_from_paramtree_with_single_expression.report("scalar_f_from_paramtree_with_single_expression");
-    scalar_f_from_paramtree_with_single_expression.evaluate(scalar_x, scalar_value);
-    std::cout << "scalar_f_from_paramtree_with_single_expression(" << scalar_x << ") = " << scalar_value
-              << " (should be 3)" << std::endl;
-    std::cout << std::endl;
-
-    Dune::ParameterTree scalar_paramTree_expressions;
-    scalar_paramTree_expressions["variable"]   = "x";
-    scalar_paramTree_expressions["order"]      = "5";
-    scalar_paramTree_expressions["name"]       = "scalar_f_from_paramtree_with_expressions";
-    scalar_paramTree_expressions["expression"] = "[x[0] + x[1]*sin(pi/2)]";
-    ScalarFunctionType scalar_f_from_paramtree_with_expressions =
-        ScalarFunctionType::createFromDescription(scalar_paramTree_expressions);
-    scalar_f_from_paramtree_with_expressions.report("scalar_f_from_paramtree_with_expressions");
-    scalar_f_from_paramtree_with_expressions.evaluate(scalar_x, scalar_value);
-    std::cout << "scalar_f_from_paramtree_with_expressions(" << scalar_x << ") = " << scalar_value << " (should be 3)"
-              << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-
-    typedef Dune::Stuff::Function::Expression<double, 2, double, 2> VectorFunctionType;
-    typename Dune::FieldVector<double, 2> vector_x;
-    typename Dune::FieldVector<double, 2> vector_value;
-    vector_x[0]                 = 1.0;
-    vector_x[1]                 = 2.0;
-    std::string vector_variable = "x";
-    std::vector<std::string> vector_expressions;
-    vector_expressions.push_back("2*x[0] + x[1]*x[1]");
-    vector_expressions.push_back("-2*x[0] - x[1]*x[1]");
-    VectorFunctionType vector_f_from_expressions(vector_variable, vector_expressions);
-    vector_f_from_expressions.report("vector_f_from_expressions");
-    vector_f_from_expressions.evaluate(vector_x, vector_value);
-    std::cout << "vector_f_from_expressions(" << vector_x << ") = " << vector_value << " (should be 6 -6)" << std::endl;
-    std::cout << std::endl;
-
-    Dune::ParameterTree vector_paramTree_expressions;
-    vector_paramTree_expressions["variable"]   = "x";
-    vector_paramTree_expressions["expression"] = "[x[0] + x[1]*sin(pi/2); -1*(x[0] + x[1]*sin(pi/2))]";
-    VectorFunctionType vector_f_from_paramtree_with_expressions =
-        VectorFunctionType::createFromDescription(vector_paramTree_expressions);
-    vector_f_from_paramtree_with_expressions.report("vector_f_from_paramtree_with_expressions");
-    vector_f_from_paramtree_with_expressions.evaluate(vector_x, vector_value);
-    std::cout << "vector_f_from_paramtree_with_expressions(" << vector_x << ") = " << vector_value
-              << " (should be 3 -3)" << std::endl;
-    std::cout << std::endl;
-
-    typedef Dune::Stuff::Function::Parametric::Separable::Coefficient<double> CoefficientFunctionType;
-    const CoefficientFunctionType coefficientFunction("2*mu[0] + sin(mu[1])");
-    typedef CoefficientFunctionType::ParamType ParamType;
-    ParamType mu(2), coefficient_value;
-    mu[0] = 1.0;
-    mu[1] = 0.0;
-    coefficientFunction.report("coefficientFunction");
-    coefficientFunction.evaluate(mu, coefficient_value);
-    std::cout << "coefficientFunction(" << mu << ") = " << coefficient_value << " (should be 2)" << std::endl;
-    std::cout << std::endl;
-
-    //#if HAVE_EIGEN
-    //    std::cout << std::endl;
-    //    typedef Dune::Stuff::Function::Expression< double, 50, double, 1 > ParameterFunctionType;
-    //    typedef Eigen::VectorXd ParameterType;
-    //    ParameterType scalarParam(1);
-    //    scalarParam(0) = 1.0;
-    //    ParameterType vectorParam(5);
-    //    for (unsigned int i = 0; i < 5; ++i)
-    //      vectorParam(i) = double(i + 2);
-    //    ParameterType tooLargeParam(51);
-    //    for (unsigned int i = 0; i < 51; ++i)
-    //      tooLargeParam(i) = double(i);
-    //    ParameterType paramValue;
-    //    std::cout << std::endl;
-
-    //    ParameterFunctionType single_paramFunction("mu", "mu[0]");
-    //    single_paramFunction.report("single_paramFunction");
-    //    single_paramFunction.evaluate(scalarParam, paramValue);
-    //    std::cout << "single_paramFunction(" << scalarParam << ") = " << paramValue << " (should be 1)"<< std::endl;
-    //    single_paramFunction.evaluate(vectorParam, paramValue);
-    //    std::cout << "single_paramFunction(" << vectorParam << ") = " << paramValue << " (should be 2)"<< std::endl;
-    //    // this will fail:
-    ////    scalar_paramFunction.evaluate(tooLargeParam, paramValue);
-    ////    std::cout << "scalar_paramFunction(" << tooLargeParam << ") = " << paramValue << " (should fail)"<<
-    /// std::endl;
-    //    std::cout << std::endl;
-
-    //    ParameterFunctionType multiple_paramFunction("mu", "mu[0] + mu[1] + mu[2] + mu[3] + mu[4]");
-    //    multiple_paramFunction.report("multiple_paramFunction");
-    //    multiple_paramFunction.evaluate(scalarParam, paramValue);
-    //    std::cout << "multiple_paramFunction(" << scalarParam << ") = " << paramValue << " (should be 1, mu[1] ..
-    //    mu[4] are treated as 0)"<< std::endl;
-    //    multiple_paramFunction.evaluate(vectorParam, paramValue);
-    //    std::cout << "multiple_paramFunction(" << vectorParam << ") = " << paramValue << " (should be 20)"<<
-    //    std::endl;
-    //    // this will fail:
-    ////    multiple_paramFunction.evaluate(tooLargeParam, paramValue);
-    ////    std::cout << "scalar_paramFunction(" << tooLargeParam << ") = " << paramValue << " ()"<< std::endl;
-    //#endif // HAVE_EIGEN
-
-    //#if HAVE_DUNE_FEM
-    //    Dune::MPIManager::initialize(argc, argv);
-    //    typedef Dune::Stuff::Grid::Provider::Interface<> GridProviderType;
-    //    GridProviderType* gridProvider = Dune::Stuff::Grid::Provider::create<>();
-    //    typedef typename GridProviderType::GridType GridType;
-    //    typedef Dune::AdaptiveLeafGridPart< GridType > GridPartType;
-    //    GridType& grid = *(gridProvider->grid());
-    //    GridPartType gridPart(grid);
-    //    typedef ScalarFunctionType::FunctionSpaceType FSpaceType;
-    //    typedef Dune::DiscontinuousGalerkinSpace< FSpaceType,
-    //                                              GridPartType,
-    //                                              1 >
-    //      DiscreteFunctionSpaceType;
-    //    typedef Dune::AdaptiveDiscreteFunction< DiscreteFunctionSpaceType > DiscreteFunctionType;
-    //    DiscreteFunctionSpaceType disc_space(gridPart);
-    //    DiscreteFunctionType rf_disc("rf", disc_space);
-    //    typedef Dune::tuple< const DiscreteFunctionType* > OutputTupleType;
-    //    typedef Dune::DataWriter< GridType, OutputTupleType > DataWriterType;
-    //    Dune::Stuff::Fem::BetterL2Projection::project(scalar_f_from_single_expression, rf_disc);
-    //    OutputTupleType out(&rf_disc);
-    //    DataWriterType dt(grid, out);
-    //    dt.write();
-    //#endif
-  } catch (Dune::Exception& e) {
-    std::cout << e.what() << std::endl;
-    return 1;
-  }
-  return 0;
+  testing::InitGoogleTest(&argc, argv);
+  Dune::MPIHelper::instance(argc, argv);
+  return RUN_ALL_TESTS();
 }
