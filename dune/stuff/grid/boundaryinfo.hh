@@ -10,6 +10,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 #include <dune/common/shared_ptr.hh>
 #include <dune/common/exceptions.hh>
@@ -21,6 +22,7 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 namespace BoundaryInfo {
+
 
 template <class GridViewImp>
 class Interface
@@ -55,6 +57,11 @@ public:
     return BaseType::id() + ".alldirichlet";
   }
 
+  static Dune::ParameterTree createSampleDescription(const std::string /*subName*/ = "")
+  {
+    return Dune::ParameterTree();
+  }
+
   virtual bool dirichlet(const IntersectionType& intersection) const
   {
     if (intersection.boundary())
@@ -68,6 +75,7 @@ public:
     return false;
   }
 }; // class AllDirichlet
+
 
 template <class GridViewImp>
 class AllNeumann : public Interface<GridViewImp>
@@ -84,6 +92,11 @@ public:
     return BaseType::id() + ".allneumann";
   }
 
+  static Dune::ParameterTree createSampleDescription(const std::string /*subName*/ = "")
+  {
+    return Dune::ParameterTree();
+  }
+
   virtual bool dirichlet(const IntersectionType& /*intersection*/) const
   {
     return false;
@@ -97,6 +110,7 @@ public:
       return false;
   } // virtual bool neumann(const IntersectionType& intersection) const
 }; // class AllNeumann
+
 
 template <class GridViewImp>
 class IdBased : public Interface<GridViewImp>
@@ -139,7 +153,21 @@ public:
     return *this;
   }
 
-  static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  {
+    Dune::ParameterTree description;
+    description["dirichlet"] = "[1; 2; 3]";
+    description["neumann"] = "[4]";
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
+  }
+
+  static ThisType createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
     Common::ExtendedParameterTree paramTreeX;
@@ -215,19 +243,49 @@ private:
   bool hasNeumann_;
 }; // class IdBased
 
+
+std::vector<std::string> types()
+{
+  std::vector<std::string> ret;
+  ret.push_back("stuff.grid.boundaryinfo.alldirichlet");
+  ret.push_back("stuff.grid.boundaryinfo.allneumann");
+  ret.push_back("stuff.grid.boundaryinfo.idbased");
+  return ret;
+}
+
+
 template <class GridViewType>
-Dune::shared_ptr<Interface<GridViewType>> create(const std::string& type = "stuff.grid.boundaryinfo.alldirichlet",
-                                                 const Dune::ParameterTree paramTree = Dune::ParameterTree())
+Dune::ParameterTree createSampleDescription(const std::string type)
 {
   if (type == "stuff.grid.boundaryinfo.alldirichlet") {
-    typedef AllDirichlet<GridViewType> AllDirichletType;
-    return Dune::make_shared<AllDirichletType>();
+    typedef AllDirichlet<GridViewType> BoundaryInfoType;
+    return BoundaryInfoType::createSampleDescription();
   } else if (type == "stuff.grid.boundaryinfo.allneumann") {
-    typedef AllNeumann<GridViewType> AllNeumannType;
-    return Dune::make_shared<AllNeumannType>();
+    typedef AllNeumann<GridViewType> BoundaryInfoType;
+    return BoundaryInfoType::createSampleDescription();
   } else if (type == "stuff.grid.boundaryinfo.idbased") {
-    typedef IdBased<GridViewType> IdBasedType;
-    return Dune::make_shared<IdBasedType>(IdBasedType::createFromParamTree(paramTree));
+    typedef IdBased<GridViewType> BoundaryInfoType;
+    return BoundaryInfoType::createSampleDescription();
+  } else
+    DUNE_THROW(Dune::RangeError,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
+                    << "' requested!");
+} // ... create(...)
+
+
+template <class GridViewType>
+Dune::shared_ptr<Interface<GridViewType>> create(const std::string& type = "stuff.grid.boundaryinfo.alldirichlet",
+                                                 const Dune::ParameterTree description = Dune::ParameterTree())
+{
+  if (type == "stuff.grid.boundaryinfo.alldirichlet") {
+    typedef AllDirichlet<GridViewType> BoundaryInfoType;
+    return Dune::make_shared<BoundaryInfoType>();
+  } else if (type == "stuff.grid.boundaryinfo.allneumann") {
+    typedef AllNeumann<GridViewType> BoundaryInfoType;
+    return Dune::make_shared<BoundaryInfoType>();
+  } else if (type == "stuff.grid.boundaryinfo.idbased") {
+    typedef IdBased<GridViewType> BoundaryInfoType;
+    return Dune::make_shared<BoundaryInfoType>(BoundaryInfoType::createFromDescription(description));
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
