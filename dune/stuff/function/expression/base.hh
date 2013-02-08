@@ -130,13 +130,29 @@ public:
   void evaluate(const Dune::DynamicVector<DomainFieldType>& _arg, Dune::DynamicVector<RangeFieldType>& _ret) const
   {
     // check for sizes
+    assert(_arg.size() > 0);
     if (_ret.size() != dimRange)
       _ret = Dune::DynamicVector<RangeFieldType>(dimRange);
     // copy arg
-    for (int ii = 0; ii < std::min(domainDim, int(_arg.size())); ++ii)
+    for (typename Dune::DynamicVector<DomainFieldType>::size_type ii = 0; ii < std::min(domainDim, int(_arg.size()));
+         ++ii)
       *(arg_[ii]) = _arg[ii];
     // copy ret
-    for (int ii = 0; ii < dimRange; ++ii)
+    for (typename Dune::DynamicVector<RangeFieldType>::size_type ii = 0; ii < dimRange; ++ii)
+      _ret[ii] = op_[ii]->Val();
+  }
+
+  void evaluate(const Dune::FieldVector<DomainFieldType, dimDomain>& _arg,
+                Dune::DynamicVector<RangeFieldType>& _ret) const
+  {
+    // check for sizes
+    if (_ret.size() != dimRange)
+      _ret = Dune::DynamicVector<RangeFieldType>(dimRange);
+    // copy arg
+    for (typename Dune::FieldVector<DomainFieldType, dimDomain>::size_type ii = 0; ii < dimDomain; ++ii)
+      *(arg_[ii]) = _arg[ii];
+    // copy ret
+    for (typename Dune::DynamicVector<RangeFieldType>::size_type ii = 0; ii < dimRange; ++ii)
       _ret[ii] = op_[ii]->Val();
   }
 
@@ -146,11 +162,13 @@ public:
   void evaluate(const Dune::DynamicVector<DomainFieldType>& _arg,
                 Dune::FieldVector<RangeFieldType, dimRange>& _ret) const
   {
+    assert(_arg.size() > 0);
     // copy arg
-    for (int ii = 0; ii < std::min(domainDim, int(_arg.size())); ++ii)
+    for (typename Dune::DynamicVector<DomainFieldType>::size_type ii = 0; ii < std::min(domainDim, int(_arg.size()));
+         ++ii)
       *(arg_[ii]) = _arg[ii];
     // copy ret
-    for (int ii = 0; ii < dimRange; ++ii)
+    for (typename Dune::FieldVector<RangeFieldType, dimRange>::size_type ii = 0; ii < dimRange; ++ii)
       _ret[ii] = op_[ii]->Val();
   }
 
