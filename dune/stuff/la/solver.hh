@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 
-#include <dune/common/shared_ptr.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/parameter/tree.hh>
 
@@ -47,22 +46,22 @@ Dune::ParameterTree createSampleDescription()
 
 
 template <class MatrixType, class VectorType>
-Dune::shared_ptr<Interface<MatrixType, VectorType>> create(const std::string type = "bicgstab")
+Interface<MatrixType, VectorType>* create(const std::string type = "bicgstab.diagonal")
 {
   if (type == "cg") {
-    return Dune::make_shared<Dune::Stuff::LA::Solver::Cg<MatrixType, VectorType>>();
+    return new Dune::Stuff::LA::Solver::Cg<MatrixType, VectorType>();
   } else if (type == "cg.diagonal") {
-    return Dune::make_shared<Dune::Stuff::LA::Solver::CgDiagonal<MatrixType, VectorType>>();
+    return new Dune::Stuff::LA::Solver::CgDiagonal<MatrixType, VectorType>();
   } else if (type == "bicgstab") {
-    return Dune::make_shared<Dune::Stuff::LA::Solver::Bicgstab<MatrixType, VectorType>>();
+    return new Dune::Stuff::LA::Solver::Bicgstab<MatrixType, VectorType>();
   } else if (type == "bicgstab.diagonal") {
-    return Dune::make_shared<Dune::Stuff::LA::Solver::BicgstabDiagonal<MatrixType, VectorType>>();
+    return new Dune::Stuff::LA::Solver::BicgstabDiagonal<MatrixType, VectorType>();
   } else if (type == "bicgstab.ilut") {
-    return Dune::make_shared<Dune::Stuff::LA::Solver::BicgstabILUT<MatrixType, VectorType>>();
+    return new Dune::Stuff::LA::Solver::BicgstabILUT<MatrixType, VectorType>();
   } else if (type == "simplicialllt") {
-    return Dune::make_shared<Dune::Stuff::LA::Solver::SimplicialLLT<MatrixType, VectorType>>();
+    return new Dune::Stuff::LA::Solver::SimplicialLLT<MatrixType, VectorType>();
   } else if (type == "simplicialldlt") {
-    return Dune::make_shared<Dune::Stuff::LA::Solver::SimplicialLDLT<MatrixType, VectorType>>();
+    return new Dune::Stuff::LA::Solver::SimplicialLDLT<MatrixType, VectorType>();
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorString("ERROR:", Dune::Stuff::Common::Colors::red)
