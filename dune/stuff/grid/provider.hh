@@ -47,8 +47,7 @@ template <class GridType = Dune::SGrid<2, 2>>
 Dune::ParameterTree createSampleDescription(const std::string type)
 {
   if (type == "stuff.grid.provider.cube") {
-    typedef Dune::Stuff::Grid::Provider::Cube<GridType> ProviderType;
-    return ProviderType::createSampleDescription();
+    return Dune::Stuff::Grid::Provider::GenericCube<GridType>::createSampleDescription();
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
   } else if (type == "stuff.grid.provider.gmsh") {
@@ -66,6 +65,21 @@ Dune::ParameterTree createSampleDescription(const std::string type)
                     << "' requested!");
 } // ... create(...)
 
+template <class GridType>
+struct FunctionObject
+{
+  typedef std::function<Interface<GridType>*(const std::string)> Type;
+};
+
+template <class ProviderType>
+std::pair<std::string, typename FunctionObject<typename ProviderType::GridType>::Type>
+make(const Dune::ParameterTree paramTree)
+{
+  return std::make_pair(ProviderType::id(),
+                        std::bind(&ProviderType::createFromDescription, paramTree, std::placeholders::_1));
+}
+
+#define DSGP_MAKE(type) make<type<GridType>>(paramTree)
 
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridType = Dune::GridSelector::GridType>
