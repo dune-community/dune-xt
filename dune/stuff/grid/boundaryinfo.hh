@@ -35,6 +35,9 @@ public:
     return "stuff.grid.boundaryinfo";
   }
 
+  virtual ~Interface()
+  {
+  }
   virtual bool dirichlet(const IntersectionType&) const = 0;
 
   virtual bool neumann(const IntersectionType&) const = 0;
