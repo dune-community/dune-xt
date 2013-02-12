@@ -48,10 +48,10 @@ Dune::ParameterTree createSampleDescription(const std::string type)
   } else if (type == "function.expression") {
     typedef Stuff::Function::Expression<D, d, R, r> FunctionType;
     return FunctionType::createSampleDescription();
-  } else if (type == "function.parametric.separable.default") {
+  } else if (type == "function.separable.default") {
     typedef Stuff::Function::SeparableDefault<D, d, R, r> FunctionType;
     return FunctionType::createSampleDescription();
-  } else if (type == "function.parametric.separable.checkerboard") {
+  } else if (type == "function.separable.checkerboard") {
     typedef Stuff::Function::SeparableCheckerboard<D, d, R, r> FunctionType;
     return FunctionType::createSampleDescription();
   } else
