@@ -78,13 +78,14 @@ public:
     // boundary id
     std::vector<double> boundaryId = generateBoundaryIdVisualization(gridView);
     vtkwriter.addCellData(boundaryId, "boundaryId");
-    const Dune::shared_ptr<const typename Dune::Stuff::Grid::BoundaryInfo::Interface<LeafGridViewType>> boundaryInfo =
+    const typename Dune::Stuff::Grid::BoundaryInfo::Interface<LeafGridViewType>* boundaryInfo =
         Dune::Stuff::Grid::BoundaryInfo::create<LeafGridViewType>(boundaryInfoType, description);
     // dirichlet values
     std::vector<double> dirichlet = generateBoundaryVisualization(gridView, *boundaryInfo, "dirichlet");
     vtkwriter.addCellData(dirichlet, "isDirichletBoundary");
     // neumann values
     std::vector<double> neumann = generateBoundaryVisualization(gridView, *boundaryInfo, "neumann");
+    delete boundaryInfo;
     vtkwriter.addCellData(neumann, "isNeumannBoundary");
     // codim 0 entity id
     std::vector<double> entityId = generateEntityVisualization(gridView);
