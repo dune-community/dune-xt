@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 
-#include <dune/common/shared_ptr.hh>
 #include <dune/common/exceptions.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
@@ -274,18 +273,18 @@ Dune::ParameterTree createSampleDescription(const std::string type)
 
 
 template <class GridViewType>
-Dune::shared_ptr<Interface<GridViewType>> create(const std::string& type = "stuff.grid.boundaryinfo.alldirichlet",
-                                                 const Dune::ParameterTree description = Dune::ParameterTree())
+Interface<GridViewType>* create(const std::string& type = "stuff.grid.boundaryinfo.alldirichlet",
+                                const Dune::ParameterTree description = Dune::ParameterTree())
 {
   if (type == "stuff.grid.boundaryinfo.alldirichlet") {
     typedef AllDirichlet<GridViewType> BoundaryInfoType;
-    return Dune::make_shared<BoundaryInfoType>();
+    return new BoundaryInfoType();
   } else if (type == "stuff.grid.boundaryinfo.allneumann") {
     typedef AllNeumann<GridViewType> BoundaryInfoType;
-    return Dune::make_shared<BoundaryInfoType>();
+    return new BoundaryInfoType();
   } else if (type == "stuff.grid.boundaryinfo.idbased") {
     typedef IdBased<GridViewType> BoundaryInfoType;
-    return Dune::make_shared<BoundaryInfoType>(BoundaryInfoType::createFromDescription(description));
+    return new BoundaryInfoType(BoundaryInfoType::createFromDescription(description));
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
