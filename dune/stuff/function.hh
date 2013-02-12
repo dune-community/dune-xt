@@ -62,21 +62,20 @@ Dune::ParameterTree createSampleDescription(const std::string type)
 
 
 template <class D, int d, class R, int r>
-Dune::shared_ptr<Interface<D, d, R, r>> create(const std::string type,
-                                               const Dune::ParameterTree description = Dune::ParameterTree())
+Interface<D, d, R, r>* create(const std::string type, const Dune::ParameterTree description = Dune::ParameterTree())
 {
   if (type == "function.checkerboard") {
     typedef Stuff::Function::Checkerboard<D, d, R, r> FunctionType;
-    return Dune::make_shared<FunctionType>(FunctionType::createFromDescription(description));
+    return new FunctionType(FunctionType::createFromDescription(description));
   } else if (type == "function.expression") {
     typedef Stuff::Function::Expression<D, d, R, r> FunctionType;
-    return Dune::make_shared<FunctionType>(FunctionType::createFromDescription(description));
-  } else if (type == "function.parametric.separable.default") {
+    return new FunctionType(FunctionType::createFromDescription(description));
+  } else if (type == "function.separable.default") {
     typedef Stuff::Function::SeparableDefault<D, d, R, r> FunctionType;
-    return Dune::make_shared<FunctionType>(FunctionType::createFromDescription(description));
-  } else if (type == "function.parametric.separable.checkerboard") {
+    return new FunctionType(FunctionType::createFromDescription(description));
+  } else if (type == "function.separable.checkerboard") {
     typedef Stuff::Function::SeparableCheckerboard<D, d, R, r> FunctionType;
-    return Dune::make_shared<FunctionType>(FunctionType::createFromDescription(description));
+    return new FunctionType(FunctionType::createFromDescription(description));
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
