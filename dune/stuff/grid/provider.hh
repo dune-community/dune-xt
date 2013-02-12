@@ -9,8 +9,6 @@
 
 #if HAVE_DUNE_GRID
 
-#include <dune/common/shared_ptr.hh>
-
 #include "provider/interface.hh"
 #include "provider/cube.hh"
 #include "provider/gmsh.hh"
@@ -76,20 +74,20 @@ Interface<GridType>* create(const std::string& type = "stuff.grid.provider.cube"
   // choose provider
   if (type == "stuff.grid.provider.cube") {
     typedef Dune::Stuff::Grid::Provider::Cube<GridType> CubeProviderType;
-    CubeProviderType* cubeProvider = new CubeProviderType(CubeProviderType::createFromParamTree(paramTree));
+    CubeProviderType* cubeProvider = new CubeProviderType(CubeProviderType::createFromDescription(paramTree));
     return cubeProvider;
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
   } else if (type == "stuff.grid.provider.gmsh") {
     typedef Dune::Stuff::Grid::Provider::Gmsh<GridType> GmshProviderType;
-    GmshProviderType* gmshProvider = new GmshProviderType(GmshProviderType::createFromParamTree(paramTree));
+    GmshProviderType* gmshProvider = new GmshProviderType(GmshProviderType::createFromDescription(paramTree));
     return gmshProvider;
 #endif // defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined
 // UGGRID
 #endif // HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
   } else if (type == "stuff.grid.provider.starcd") {
     typedef Dune::Stuff::Grid::Provider::StarCD<GridType> StarCDProviderType;
-    StarCDProviderType* starCDProvider = new StarCDProviderType(StarCDProviderType::createFromParamTree(paramTree));
+    StarCDProviderType* starCDProvider = new StarCDProviderType(StarCDProviderType::createFromDescription(paramTree));
     return starCDProvider;
   } else
     DUNE_THROW(Dune::RangeError, "\nERROR: unknown grid provider '" << type << "' requested!");
