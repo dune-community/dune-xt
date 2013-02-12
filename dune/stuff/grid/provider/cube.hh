@@ -199,7 +199,7 @@ public:
    *              <li> \c numElements: \a int or vector to denote the number of elements.
    *              </ul>
    **/
-  static ThisType createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
     Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
@@ -258,7 +258,7 @@ public:
       assert(tmpNumElements[d] > 0 && "Given 'numElements' has to be elementwise positive!");
       numElements[d] = tmpNumElements[d];
     }
-    return GenericCube(lowerLeft, upperRight, numElements);
+    return new ThisType(lowerLeft, upperRight, numElements);
   } // static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
 
   ThisType& operator=(ThisType& other)
