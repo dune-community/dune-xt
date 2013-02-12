@@ -9,6 +9,7 @@
 
 #include <dune/common/shared_ptr.hh>
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/parameter/tree.hh>
 
 #include "solver/interface.hh"
 #include "solver/eigen.hh"
@@ -17,6 +18,15 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 namespace Solver {
+
+
+Dune::ParameterTree createSampleDescription()
+{
+  Dune::ParameterTree description;
+  description["maxIter"]   = "5000";
+  description["precision"] = "1e-12";
+  return description;
+} // Dune::ParameterTree createSampleDescription(const std::string type)
 
 
 template <class MatrixType, class VectorType>
