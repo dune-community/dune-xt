@@ -1,6 +1,9 @@
 #ifndef DUNE_STUFF_FUNCTION_HH
 #define DUNE_STUFF_FUNCTION_HH
 
+#include <string>
+#include <vector>
+
 #include <dune/common/shared_ptr.hh>
 #include <dune/common/parametertree.hh>
 #include <dune/common/exceptions.hh>
@@ -10,6 +13,17 @@
 namespace Dune {
 namespace Stuff {
 namespace Function {
+
+
+std::vector<std::string> types()
+{
+  std::vector<std::string> ret;
+  ret.push_back("function.checkerboard");
+  ret.push_back("function.expression");
+  ret.push_back("function.separable.default");
+  ret.push_back("function.separable.checkerboard");
+  return ret;
+} // std::vector< std::string > types()
 
 
 // some forwards, includes are below
