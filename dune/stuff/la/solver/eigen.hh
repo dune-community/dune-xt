@@ -45,8 +45,8 @@ public:
 
   Cg()
   {
-    if (!Dune::Stuff::Common::Logger().created())
-      Dune::Stuff::Common::Logger().create(Dune::Stuff::Common::LOG_CONSOLE | Dune::Stuff::Common::LOG_DEBUG);
+    //    if (!Dune::Stuff::Common::Logger().created())
+    //      Dune::Stuff::Common::Logger().create(Dune::Stuff::Common::LOG_CONSOLE | Dune::Stuff::Common::LOG_DEBUG);
     Dune::Stuff::Common::LogStream& debug = Dune::Stuff::Common::Logger().debug();
     debug << "\n" << Dune::Stuff::Common::colorString("WARNING:") << " this solver is believed to be slow! "
           << std::flush;
@@ -107,8 +107,8 @@ public:
 
   CgDiagonal()
   {
-    if (!Dune::Stuff::Common::Logger().created())
-      Dune::Stuff::Common::Logger().create(Dune::Stuff::Common::LOG_CONSOLE | Dune::Stuff::Common::LOG_DEBUG);
+    //    if (!Dune::Stuff::Common::Logger().created())
+    //      Dune::Stuff::Common::Logger().create(Dune::Stuff::Common::LOG_CONSOLE | Dune::Stuff::Common::LOG_DEBUG);
     Dune::Stuff::Common::LogStream& debug = Dune::Stuff::Common::Logger().debug();
     debug << "\n" << Dune::Stuff::Common::colorString("WARNING:", Dune::Stuff::Common::Colors::red)
           << " this solver is believed to produce utterly wrong results! " << std::flush;
