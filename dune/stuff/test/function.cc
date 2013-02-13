@@ -7,11 +7,11 @@
 
 using namespace Dune::Stuff;
 
-typedef testing::Types<Dune::Stuff::Function::Expression<double, 1, double, 1>,
-                       Dune::Stuff::Function::Checkerboard<double, 1, double, 1>> NonparametricFunctions;
+typedef testing::Types<Function::Expression<double, 1, double, 1>, Function::Checkerboard<double, 1, double, 1>>
+    NonparametricFunctions;
 
-typedef testing::Types<Dune::Stuff::Function::SeparableCheckerboard<double, 1, double, 1>,
-                       Dune::Stuff::Function::SeparableDefault<double, 1, double, 1>> SeparableFunctions;
+typedef testing::Types<Function::SeparableCheckerboard<double, 1, double, 1>,
+                       Function::SeparableDefault<double, 1, double, 1>> SeparableFunctions;
 
 
 template <class T>
@@ -24,7 +24,7 @@ struct NonparametricTest : public ::testing::Test
   typedef typename FunctionType::RangeFieldType RangeFieldType;
   static const int dimRange = FunctionType::dimRange;
   typedef typename FunctionType::RangeType RangeType;
-  typedef Dune::Stuff::Function::Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
+  typedef Function::Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
 
   void check() const
   {
@@ -53,12 +53,12 @@ struct SeparableTest : public ::testing::Test
   static const int dimRange = FunctionType::dimRange;
   typedef typename FunctionType::RangeType RangeType;
 
-  typedef Dune::Stuff::Function::Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
-  typedef Dune::Stuff::Function::SeparableDefault<DomainFieldType, dimDomain, RangeFieldType, dimRange> DefaultType;
+  typedef Function::Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
+  typedef Function::SeparableDefault<DomainFieldType, dimDomain, RangeFieldType, dimRange> DefaultType;
 
-  typedef Dune::Stuff::Common::Parameter::FieldType ParamFieldType;
-  static const int maxParamDim = Dune::Stuff::Common::Parameter::maxDim;
-  typedef Dune::Stuff::Common::Parameter::Type ParamType;
+  typedef Common::Parameter::FieldType ParamFieldType;
+  static const int maxParamDim = Common::Parameter::maxDim;
+  typedef Common::Parameter::Type ParamType;
 
   void check() const
   {
