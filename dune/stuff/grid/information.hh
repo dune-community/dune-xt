@@ -128,7 +128,7 @@ struct Dimensions
 } // namespace Dune
 
 template <class T>
-inline std::ostream& operator<<(std::ostream& s, const Dune::Stuff::Grid::Dimensions<T>& d)
+inline std::ostream& operator<<(std::ostream& s, const DSG::Dimensions<T>& d)
 {
   for (size_t k = 0; k < T::dimensionworld; ++k) {
     const auto& mma = d.coord_limits[k];
