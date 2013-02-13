@@ -21,8 +21,6 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
-using namespace Dune::Stuff::Common;
-
 /** \brief Useful dummy functor if you don't have anything to do on entities/intersections
  **/
 struct GridWalkDummyFunctor
@@ -75,7 +73,7 @@ public:
     for (const auto& entity : Common::viewRange(gridView_)) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
-      for (const auto& intersection : intersectionRange(gridView_, entity)) {
+      for (const auto& intersection : DSC::intersectionRange(gridView_, entity)) {
         intersectionFunctor(entity, intersection);
       }
     }
@@ -88,7 +86,7 @@ public:
   void operator()(EntityFunctor& entityFunctor) const
   {
     dune_static_assert(codim <= GridViewType::dimension, "codim too high to walk");
-    for (const auto& entity : viewRange(gridView_)) {
+    for (const auto& entity : DSC::viewRange(gridView_)) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
     }

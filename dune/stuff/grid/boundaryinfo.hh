@@ -248,11 +248,8 @@ private:
 
 std::vector<std::string> types()
 {
-  std::vector<std::string> ret;
-  ret.push_back("stuff.grid.boundaryinfo.alldirichlet");
-  ret.push_back("stuff.grid.boundaryinfo.allneumann");
-  ret.push_back("stuff.grid.boundaryinfo.idbased");
-  return ret;
+  return {
+      "stuff.grid.boundaryinfo.alldirichlet", "stuff.grid.boundaryinfo.allneumann", "stuff.grid.boundaryinfo.idbased"};
 }
 
 

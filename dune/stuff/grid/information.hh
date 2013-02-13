@@ -131,7 +131,7 @@ template <class T>
 inline std::ostream& operator<<(std::ostream& s, const Dune::Stuff::Grid::Dimensions<T>& d)
 {
   for (size_t k = 0; k < T::dimensionworld; ++k) {
-    const typename Dune::Stuff::Grid::Dimensions<T>::MinMaxAvgType& mma = d.coord_limits[k];
+    const auto& mma = d.coord_limits[k];
     s << boost::format("x%d\tmin: %e\tavg: %e\tmax: %e\n") % k % mma.min() % mma.average() % mma.max();
   }
   s << boost::format("Entity vol min: %e\tavg: %e\tmax: %e\tQout: %e") % d.entity_volume.min()

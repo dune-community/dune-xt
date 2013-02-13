@@ -17,6 +17,7 @@
 #include <dune/grid/sgrid.hh>
 
 #include <dune/stuff/grid/boundaryinfo.hh>
+#include <dune/stuff/common/ranges.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -97,21 +98,17 @@ public:
 private:
   std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
   {
-    typedef typename LeafGridViewType::IndexSet::IndexType IndexType;
-    typedef typename LeafGridViewType::template Codim<0>::Entity EntityType;
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
     for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
          it != gridView.template end<0>();
          ++it) {
-      const EntityType& entity     = *it;
-      const IndexType& index       = gridView.indexSet().index(entity);
+      const auto& entity           = *it;
+      const auto& index            = gridView.indexSet().index(entity);
       data[index]                  = 0.0;
       int numberOfBoundarySegments = 0;
       bool isOnBoundary = false;
-      for (typename LeafGridViewType::IntersectionIterator intersectionIt = gridView.ibegin(entity);
-           intersectionIt != gridView.iend(entity);
-           ++intersectionIt) {
+      for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
         if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
           isOnBoundary = true;
           numberOfBoundarySegments += 1;
@@ -133,19 +130,12 @@ private:
                                 const Dune::Stuff::Grid::BoundaryInfo::Interface<LeafGridViewType>& boundaryInfo,
                                 const std::string type) const
   {
-    typedef typename LeafGridViewType::IndexSet::IndexType IndexType;
-    typedef typename LeafGridViewType::template Codim<0>::Entity EntityType;
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
-    for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
-         it != gridView.template end<0>();
-         ++it) {
-      const EntityType& entity = *it;
-      const IndexType& index   = gridView.indexSet().index(entity);
+    for (const auto& entity : DSC::viewRange(gridView)) {
+      const auto& index = gridView.indexSet().index(entity);
       data[index] = 0.0;
-      for (typename LeafGridViewType::IntersectionIterator intersectionIt = gridView.ibegin(entity);
-           intersectionIt != gridView.iend(entity);
-           ++intersectionIt) {
+      for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
         if (type == "dirichlet") {
           if (boundaryInfo.dirichlet(*intersectionIt))
             data[index] = 1.0;
@@ -161,16 +151,10 @@ private:
 
   std::vector<double> generateEntityVisualization(const LeafGridViewType& gridView) const
   {
-    typedef typename LeafGridViewType::IndexSet::IndexType IndexType;
-    typedef typename LeafGridViewType::template Codim<0>::Entity EntityType;
     std::vector<double> data(gridView.indexSet().size(0));
-    // walk the grid
-    for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
-         it != gridView.template end<0>();
-         ++it) {
-      const EntityType& entity = *it;
-      const IndexType& index   = gridView.indexSet().index(entity);
-      data[index]              = double(index);
+    for (const auto& entity : DSC::viewRange(gridView)) {
+      const auto& index = gridView.indexSet().index(entity);
+      data[index]       = double(index);
     } // walk the grid
     return data;
   } // std::vector< double > generateEntityVisualization(const LeafGridViewType& gridView) const

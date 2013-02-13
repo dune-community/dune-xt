@@ -60,14 +60,12 @@ public:
   template <class Entity>
   void operator()(const Entity& ent, const int ent_idx)
   {
-    typedef typename Entity::Geometry EntityGeometryType;
-    typedef Dune::FieldVector<typename EntityGeometryType::ctype, EntityGeometryType::coorddimension> DomainType;
-    const typename Entity::Geometry& geo = ent.geometry();
-
+    const auto& geo = ent.geometry();
     for (std::size_t i = 0; i < geo.corners(); ++i) {
       const PgfCoordWrapper corner(geo.corner(i));
       char buffer[150] = {'\0'};
-      int c = std::snprintf(buffer, 150, "\\coordinate(C_%d_%lu) at (%f,%f);\n", ent_idx, i, corner[0], corner[1]);
+      const int c =
+          std::snprintf(buffer, 150, "\\coordinate(C_%d_%lu) at (%f,%f);\n", ent_idx, i, corner[0], corner[1]);
       assert(c > 0);
       file_ << buffer;
     }
