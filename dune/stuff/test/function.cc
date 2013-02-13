@@ -111,5 +111,6 @@ TYPED_TEST(SeparableTest, Separable)
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
+  DSC::Logger().create(DSC::LOG_CONSOLE | DSC::LOG_ERROR);
   return RUN_ALL_TESTS();
 }
