@@ -23,6 +23,20 @@ namespace Stuff {
 namespace LA {
 namespace Solver {
 
+size_type translateInfo(const ::Eigen::ComputationInfo& info)
+{
+  switch (info) {
+    case ::Eigen::Success:
+      return 0;
+    case ::Eigen::NoConvergence:
+      return 1;
+    case ::Eigen::NumericalIssue:
+      return 2;
+    default return
+      3;
+  }
+}
+
 //! \attention Slow!
 //! \todo Implement via Eigen::CG and identity preconditioner!
 template <class ElementImp>
@@ -112,15 +126,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class CgDiagonal
 
@@ -148,15 +154,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class Bicgstab
 
@@ -185,15 +183,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)static_assert
 }; // class BicgstabDiagonal
 
@@ -221,15 +211,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class BicgstabILUT
 
