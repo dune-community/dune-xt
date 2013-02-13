@@ -5,6 +5,7 @@
 
 #include <dune/stuff/function.hh>
 
+using namespace Dune::Stuff;
 
 typedef testing::Types<Dune::Stuff::Function::Expression<double, 1, double, 1>,
                        Dune::Stuff::Function::Checkerboard<double, 1, double, 1>> NonparametricFunctions;
@@ -27,9 +28,9 @@ struct NonparametricTest : public ::testing::Test
 
   void check() const
   {
-    const Dune::shared_ptr<InterfaceType> function =
-        Dune::Stuff::Function::create<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
-            FunctionType::id(), FunctionType::createSampleDescription());
+    const std::unique_ptr<InterfaceType> function(
+        Function::create<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
+            FunctionType::id(), FunctionType::createSampleDescription()));
     DomainType x(1);
     RangeType ret;
     if (function->parametric())
@@ -61,9 +62,9 @@ struct SeparableTest : public ::testing::Test
 
   void check() const
   {
-    const Dune::shared_ptr<InterfaceType> function =
-        Dune::Stuff::Function::create<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
-            FunctionType::id(), FunctionType::createSampleDescription());
+    const std::unique_ptr<InterfaceType> function(
+        Function::create<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
+            FunctionType::id(), FunctionType::createSampleDescription()));
     if (!function->parametric())
       DUNE_THROW(Dune::InvalidStateException, "ERROR: separable function returned parametric() == false!");
     if (!function->separable())
