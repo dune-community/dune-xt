@@ -113,73 +113,70 @@ public:
     return expressions_;
   }
 
-  void evaluate(const Dune::FieldVector<DomainFieldType, dimDomain>& _arg,
-                Dune::FieldVector<RangeFieldType, dimRange>& _ret) const
+  void evaluate(const Dune::FieldVector<DomainFieldType, dimDomain>& arg,
+                Dune::FieldVector<RangeFieldType, dimRange>& ret) const
   {
     // copy arg
     for (typename Dune::FieldVector<DomainFieldType, dimDomain>::size_type ii = 0; ii < dimDomain; ++ii)
-      *(arg_[ii]) = _arg[ii];
+      *(arg_[ii]) = arg[ii];
     // copy ret
     for (typename Dune::FieldVector<RangeFieldType, dimRange>::size_type ii = 0; ii < dimRange; ++ii)
-      _ret[ii] = op_[ii]->Val();
+      ret[ii] = op_[ii]->Val();
   }
 
   /**
-   *  \attention  _arg will be used up to its size, _ret will be resized!
+   *  \attention  arg will be used up to its size, ret will be resized!
    */
-  void evaluate(const Dune::DynamicVector<DomainFieldType>& _arg, Dune::DynamicVector<RangeFieldType>& _ret) const
+  void evaluate(const Dune::DynamicVector<DomainFieldType>& arg, Dune::DynamicVector<RangeFieldType>& ret) const
   {
     // check for sizes
-    assert(_arg.size() > 0);
-    if (_ret.size() != dimRange)
-      _ret = Dune::DynamicVector<RangeFieldType>(dimRange);
+    assert(arg.size() > 0);
+    if (ret.size() != dimRange)
+      ret = Dune::DynamicVector<RangeFieldType>(dimRange);
     // copy arg
-    for (typename Dune::DynamicVector<DomainFieldType>::size_type ii = 0; ii < std::min(domainDim, int(_arg.size()));
-         ++ii)
-      *(arg_[ii]) = _arg[ii];
+    for (int ii = 0; ii < std::min(domainDim, int(arg.size())); ++ii)
+      *(arg_[ii]) = arg[ii];
     // copy ret
     for (typename Dune::DynamicVector<RangeFieldType>::size_type ii = 0; ii < dimRange; ++ii)
-      _ret[ii] = op_[ii]->Val();
+      ret[ii] = op_[ii]->Val();
   }
 
-  void evaluate(const Dune::FieldVector<DomainFieldType, dimDomain>& _arg,
-                Dune::DynamicVector<RangeFieldType>& _ret) const
+  void evaluate(const Dune::FieldVector<DomainFieldType, dimDomain>& arg,
+                Dune::DynamicVector<RangeFieldType>& ret) const
   {
     // check for sizes
-    if (_ret.size() != dimRange)
-      _ret = Dune::DynamicVector<RangeFieldType>(dimRange);
+    if (ret.size() != dimRange)
+      ret = Dune::DynamicVector<RangeFieldType>(dimRange);
     // copy arg
     for (typename Dune::FieldVector<DomainFieldType, dimDomain>::size_type ii = 0; ii < dimDomain; ++ii)
-      *(arg_[ii]) = _arg[ii];
+      *(arg_[ii]) = arg[ii];
     // copy ret
     for (typename Dune::DynamicVector<RangeFieldType>::size_type ii = 0; ii < dimRange; ++ii)
-      _ret[ii] = op_[ii]->Val();
+      ret[ii] = op_[ii]->Val();
   }
 
   /**
-   *  \attention  _arg will be used up to its size
+   *  \attention  arg will be used up to its size
    */
-  void evaluate(const Dune::DynamicVector<DomainFieldType>& _arg,
-                Dune::FieldVector<RangeFieldType, dimRange>& _ret) const
+  void evaluate(const Dune::DynamicVector<DomainFieldType>& arg, Dune::FieldVector<RangeFieldType, dimRange>& ret) const
   {
-    assert(_arg.size() > 0);
+    assert(arg.size() > 0);
     // copy arg
-    for (typename Dune::DynamicVector<DomainFieldType>::size_type ii = 0; ii < std::min(domainDim, int(_arg.size()));
-         ++ii)
-      *(arg_[ii]) = _arg[ii];
+    for (int ii = 0; ii < std::min(domainDim, int(arg.size())); ++ii)
+      *(arg_[ii]) = arg[ii];
     // copy ret
     for (typename Dune::FieldVector<RangeFieldType, dimRange>::size_type ii = 0; ii < dimRange; ++ii)
-      _ret[ii] = op_[ii]->Val();
+      ret[ii] = op_[ii]->Val();
   }
 
   //#if HAVE_EIGEN
-  //  void evaluate(const Eigen::Matrix< Eigen::Dynamic, 1, DomainFieldType >& _arg,
-  //                Eigen::Matrix< Eigen::Dynamic, 1, RangeFieldType >& _ret)
+  //  void evaluate(const Eigen::Matrix< Eigen::Dynamic, 1, DomainFieldType >& arg,
+  //                Eigen::Matrix< Eigen::Dynamic, 1, RangeFieldType >& ret)
   //  {
   //    // check for sizes
   //    assert(_arg.size() <= dimDomain);
   //    if (_ret.size != dimRange)
-  //      _ret.resize(dimRange);
+  //      ret.resize(dimRange);
   //    // copy arg
   //    for (typename Dune::DynamicVector< DomainFieldType >::size_type ii = 0; ii < dimDomain; ++ii)
   //      *(arg_[ii]) = arg[ii];
@@ -189,36 +186,36 @@ public:
   //  }
   //#endif // HAVE_EIGEN
 
-  void report(const std::string _name = "function.nonparametric.expression", std::ostream& _stream = std::cout,
+  void report(const std::string _name = "function.nonparametric.expression", std::ostream& stream = std::cout,
               const std::string& _prefix = "") const
   {
     const std::string tmp = _name + "(" + variable() + ") = ";
-    _stream << _prefix << tmp;
+    stream << _prefix << tmp;
     if (expression().size() == 1)
-      _stream << expression()[0] << std::endl;
+      stream << expression()[0] << std::endl;
     else {
-      _stream << "[ " << expression()[0] << ";" << std::endl;
+      stream << "[ " << expression()[0] << ";" << std::endl;
       const std::string whitespace = Dune::Stuff::Common::whitespaceify(tmp + "[ ");
       for (unsigned int i = 1; i < expression().size() - 1; ++i)
-        _stream << _prefix << whitespace << expression()[i] << ";" << std::endl;
-      _stream << _prefix << whitespace << expression()[expression().size() - 1] << " ]" << std::endl;
+        stream << _prefix << whitespace << expression()[i] << ";" << std::endl;
+      stream << _prefix << whitespace << expression()[expression().size() - 1] << " ]" << std::endl;
     }
   } // void report(const std::string, std::ostream&, const std::string&) const
 
 private:
   friend class Coefficient<RangeFieldType>;
 
-  void evaluate(const Dune::DynamicVector<DomainFieldType>& _arg, RangeFieldType& _ret) const
+  void evaluate(const Dune::DynamicVector<DomainFieldType>& arg, RangeFieldType& ret) const
   {
     assert(dimRange == 1 && "I'm only here to be used by Function::Parametric::Coefficient, which has dimrange == 1");
     // copy arg
-    for (int ii = 0; ii < std::min(domainDim, int(_arg.size())); ++ii)
-      *(arg_[ii]) = _arg[ii];
+    for (int ii = 0; ii < std::min(domainDim, int(arg.size())); ++ii)
+      *(arg_[ii]) = arg[ii];
     // copy ret
-    _ret = op_[0]->Val();
+    ret = op_[0]->Val();
   }
 
-  void setup(const std::string& _variable, const std::vector<std::string>& _expression)
+  void setup(const std::string& variable, const std::vector<std::string>& _expression)
   {
     dune_static_assert((dimDomain > 0), "Really?");
     dune_static_assert((dimRange > 0), "Really?");
@@ -233,7 +230,7 @@ private:
     for (int ii = 0; ii < dimRange; ++ii)
       expressions_.push_back(_expression[ii]);
     // set variable (i.e. "x")
-    variable_ = _variable;
+    variable_ = variable;
     // fill variables (i.e. "x[0]", "x[1]", ...)
     for (int ii = 0; ii < dimDomain; ++ii) {
       std::stringstream variableStream;
@@ -271,10 +268,6 @@ private:
   RVar* vararray_[dimDomain];
   ROperation* op_[dimRange];
 }; // class ExpressionBase
-
-// template< class DomainFieldImp, int domainDim,
-//          class RangeFieldImp, int rangeDim >
-// const int ExpressionBase< DomainFieldImp, domainDim, RangeFieldImp, rangeDim >::dimDomain = domainDim;
 
 } // namespace Function
 } // namespace Stuff
