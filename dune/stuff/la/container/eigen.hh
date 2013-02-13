@@ -107,12 +107,10 @@ public:
     : eigenMatrix_(_rows, _cols)
   {
     assert(size_type(_pattern.size()) == _rows && "Given pattern too short!");
-    typedef Dune::Stuff::LA::Container::SparsityPatternDefault PatternType;
-    typedef PatternType::SetType ColumnsType;
     for (size_type row = 0; row < size_type(_pattern.size()); ++row) {
       eigenMatrix_.startVec(row);
-      const ColumnsType& columns = _pattern.set(row);
-      for (typename ColumnsType::const_iterator columnIt = columns.begin(); columnIt != columns.end(); ++columnIt) {
+      const auto& columns = _pattern.set(row);
+      for (auto columnIt = columns.begin(); columnIt != columns.end(); ++columnIt) {
         const size_type column = *columnIt;
         eigenMatrix_.insertBackByOuterInner(row, column);
       }
