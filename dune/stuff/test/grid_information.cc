@@ -21,7 +21,7 @@ struct GridInfoTest : public ::testing::Test
   static const int griddim = T::value;
   static const int level   = 1;
   typedef Dune::YaspGrid<griddim> GridType;
-  Dune::shared_ptr<GridType> gridPtr;
+  std::shared_ptr<GridType> gridPtr;
   GridInfoTest()
     : gridPtr(Provider::GenericCube<GridType>(level).grid())
   {
