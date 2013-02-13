@@ -195,23 +195,23 @@ public:
   {
   }
 
-  EigenDenseMatrix(const ThisType& _other)
-    : eigenMatrix_(_other.backend())
+  EigenDenseMatrix(const ThisType& other)
+    : eigenMatrix_(other.backend())
   {
   }
 
-  EigenDenseMatrix(const BackendType& _otherEigenMatrix)
-    : eigenMatrix_(_otherEigenMatrix)
+  EigenDenseMatrix(const BackendType& otherEigenMatrix)
+    : eigenMatrix_(otherEigenMatrix)
   {
   }
 
-  EigenDenseMatrix(const EigenRowMajorSparseMatrix<ElementType>& _other)
-    : eigenMatrix_(_other.backend())
+  EigenDenseMatrix(const EigenRowMajorSparseMatrix<ElementType>& other)
+    : eigenMatrix_(other.backend())
   {
   }
 
-  EigenDenseMatrix(const EigenDenseVector<ElementType>& _other)
-    : eigenMatrix_(_other.backend())
+  EigenDenseMatrix(const EigenDenseVector<ElementType>& other)
+    : eigenMatrix_(other.backend())
   {
   }
 
@@ -303,13 +303,13 @@ public:
   {
   }
 
-  EigenDenseVector(const ThisType& _other)
-    : eigenVector_(_other.backend())
+  EigenDenseVector(const ThisType& other)
+    : eigenVector_(other.backend())
   {
   }
 
-  EigenDenseVector(const BackendType& _otherEigenVector)
-    : eigenVector_(_otherEigenVector)
+  EigenDenseVector(const BackendType& otherEigenVector)
+    : eigenVector_(otherEigenVector)
   {
   }
 
@@ -319,9 +319,9 @@ public:
     eigenVector_.setZero(_size);
   }
 
-  ThisType& operator=(const ThisType& _other)
+  ThisType& operator=(const ThisType& other)
   {
-    eigenVector_ = _other.backend();
+    eigenVector_ = other.backend();
     return *this;
   }
 
