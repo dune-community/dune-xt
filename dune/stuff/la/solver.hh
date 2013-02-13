@@ -24,15 +24,7 @@ namespace Solver {
 
 std::vector<std::string> types()
 {
-  std::vector<std::string> ret;
-  ret.push_back("bicgstab.diagonal");
-  ret.push_back("bicgstab");
-  ret.push_back("bicgstab.ilut");
-  ret.push_back("cg");
-  ret.push_back("cg.diagonal");
-  ret.push_back("simplicialllt");
-  ret.push_back("simplicialldlt");
-  return ret;
+  return {"bicgstab.diagonal", "bicgstab", "bicgstab.ilut", "cg", "cg.diagonal", "simplicialllt", "simplicialldlt"};
 } // std::vector< std::string > types()
 
 
