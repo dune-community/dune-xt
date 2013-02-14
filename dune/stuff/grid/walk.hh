@@ -14,6 +14,8 @@
 #include <dune/stuff/common/misc.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/grid/common/geometry.hh>
+#include <dune/stuff/aliases.hh>
+
 #include <vector>
 #include <boost/format.hpp>
 

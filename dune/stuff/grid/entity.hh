@@ -3,6 +3,7 @@
 
 // dune-stuff includes
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/aliases.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -59,9 +60,9 @@ double geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
 } // geometryDiameter
 
 template <class GridImp, template <int, int, class> class EntityImp>
-double geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& entity)
+double geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& /*entity*/)
 {
-  DUNE_THROW(Dune::NotImplementedError, "");
+  DUNE_THROW(Dune::NotImplemented, "geometryDiameter not implemented for dim 3");
 } // geometryDiameter
 
 } // namespace Grid
