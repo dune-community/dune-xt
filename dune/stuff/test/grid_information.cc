@@ -16,7 +16,7 @@ using namespace std;
 typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
 
 template <class T>
-struct GridInfoTest //: public ::testing::Test
+struct GridInfoTest : public ::testing::Test
 {
   static const int griddim        = T::value;
   static const unsigned int level = 1;
@@ -68,8 +68,6 @@ TYPED_TEST(GridInfoTest, Misc)
 
 int main(int argc, char** argv)
 {
-  testing::InitGoogleTest(&argc, argv);
-  Dune::MPIManager::initialize(argc, argv);
-  DSC::Logger().create(DSC::LOG_CONSOLE | DSC::LOG_ERROR);
+  test_init(argc, argv);
   return RUN_ALL_TESTS();
 }
