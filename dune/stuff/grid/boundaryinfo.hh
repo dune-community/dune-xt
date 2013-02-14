@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <dune/common/exceptions.hh>
+#include <dune/common/shared_ptr.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
@@ -169,7 +170,7 @@ public:
     }
   }
 
-  static ThisType createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
     Common::ExtendedParameterTree paramTreeX;
@@ -191,7 +192,7 @@ public:
     shared_ptr<IdSetMapType> idSetMap(new IdSetMapType());
     idSetMap->insert(std::pair<std::string, IdSetType>("dirichlet", dirichletSet));
     idSetMap->insert(std::pair<std::string, IdSetType>("neumann", neumannSet));
-    return ThisType(idSetMap);
+    return new ThisType(idSetMap);
   }
 
   const Dune::shared_ptr<const IdSetMapType> boundaryInfoMap()
