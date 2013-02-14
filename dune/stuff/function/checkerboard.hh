@@ -5,7 +5,6 @@
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/static_assert.hh>
-
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 
@@ -61,27 +60,6 @@ public:
       DUNE_THROW(Dune::InvalidStateException,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
                       << " please provide at least as many '_values' as subdomains given by '_numElements'!");
-  }
-
-  Checkerboard(const ThisType& _other)
-    : lowerLeft_(_other.lowerLeft_)
-    , upperRight_(_other.upperRight_)
-    , numElements_(_other.numElements_)
-    , values_(_other.values_)
-    , name_(_other.name_)
-  {
-  }
-
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      lowerLeft_   = other.lowerLeft();
-      upperRight_  = other.upperRight();
-      numElements_ = other.numElements();
-      values_      = other.values();
-      name_        = other.name();
-    }
-    return this;
   }
 
   static Dune::ParameterTree createSampleDescription(const std::string subName = "")
