@@ -16,14 +16,14 @@ using namespace std;
 typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
 
 template <class T>
-struct GridInfoTest : public ::testing::Test
+struct GridInfoTest //: public ::testing::Test
 {
-  static const int griddim = T::value;
-  static const int level   = 1;
-  typedef Dune::YaspGrid<griddim> GridType;
+  static const int griddim        = T::value;
+  static const unsigned int level = 1;
+  typedef Dune::SGrid<griddim, griddim> GridType;
   std::shared_ptr<GridType> gridPtr;
   GridInfoTest()
-    : gridPtr(Provider::GenericCube<GridType>(level).grid())
+    : gridPtr(Provider::GenericCube<GridType>(0.f, 1.f, level).grid())
   {
   }
 
@@ -69,7 +69,7 @@ TYPED_TEST(GridInfoTest, Misc)
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  Dune::MPIHelper::instance(argc, argv);
+  Dune::MPIManager::initialize(argc, argv);
   DSC::Logger().create(DSC::LOG_CONSOLE | DSC::LOG_ERROR);
   return RUN_ALL_TESTS();
 }
