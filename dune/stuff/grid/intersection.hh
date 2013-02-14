@@ -7,12 +7,11 @@
 #include "config.h"
 #endif // ifdef HAVE_CMAKE_CONFIG
 
-// dune-common includes
 #include <dune/common/fvector.hh>
 #include <dune/common/static_assert.hh>
 
-// dune-stuff
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/aliases.hh>
 
 namespace Dune {
 namespace Stuff {

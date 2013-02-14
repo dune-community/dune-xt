@@ -8,6 +8,7 @@
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/grid/walk.hh>
+#include <dune/stuff/aliases.hh>
 
 namespace Dune {
 namespace Stuff {
