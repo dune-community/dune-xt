@@ -1,6 +1,12 @@
 #ifndef DUNE_STUFF_FUNCTION_HH
 #define DUNE_STUFF_FUNCTION_HH
 
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#elif defined(HAVE_CONFIG_H)
+#include <config.h>
+#endif // ifdef HAVE_CMAKE_CONFIG
+
 #include <string>
 #include <vector>
 
@@ -9,20 +15,16 @@
 #include <dune/common/exceptions.hh>
 
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/aliases.hh>
 
 namespace Dune {
 namespace Stuff {
 namespace Function {
 
-
 std::vector<std::string> types()
 {
-  std::vector<std::string> ret;
-  ret.push_back("function.checkerboard");
-  ret.push_back("function.expression");
-  ret.push_back("function.separable.default");
-  ret.push_back("function.separable.checkerboard");
-  return ret;
+  return {
+      "function.checkerboard", "function.expression", "function.separable.default", "function.separable.checkerboard"};
 } // std::vector< std::string > types()
 
 
@@ -64,18 +66,15 @@ Dune::ParameterTree createSampleDescription(const std::string type)
 template <class D, int d, class R, int r>
 Interface<D, d, R, r>* create(const std::string type, const Dune::ParameterTree description = Dune::ParameterTree())
 {
+  using namespace DSFu;
   if (type == "function.checkerboard") {
-    typedef Stuff::Function::Checkerboard<D, d, R, r> FunctionType;
-    return new FunctionType(FunctionType::createFromDescription(description));
+    return Checkerboard<D, d, R, r>::createFromDescription(description);
   } else if (type == "function.expression") {
-    typedef Stuff::Function::Expression<D, d, R, r> FunctionType;
-    return new FunctionType(FunctionType::createFromDescription(description));
+    return Expression<D, d, R, r>::createFromDescription(description);
   } else if (type == "function.separable.default") {
-    typedef Stuff::Function::SeparableDefault<D, d, R, r> FunctionType;
-    return new FunctionType(FunctionType::createFromDescription(description));
+    return SeparableDefault<D, d, R, r>::createFromDescription(description);
   } else if (type == "function.separable.checkerboard") {
-    typedef Stuff::Function::SeparableCheckerboard<D, d, R, r> FunctionType;
-    return new FunctionType(FunctionType::createFromDescription(description));
+    return SeparableCheckerboard<D, d, R, r>::createFromDescription(description);
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
