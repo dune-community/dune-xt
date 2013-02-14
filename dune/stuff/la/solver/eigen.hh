@@ -14,6 +14,8 @@
 #include <Eigen/SparseCholesky>
 
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/logging.hh>
+#include <dune/stuff/aliases.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
 #include "interface.hh"
@@ -22,20 +24,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 namespace Solver {
-
-size_type translateInfo(const ::Eigen::ComputationInfo& info)
-{
-  switch (info) {
-    case ::Eigen::Success:
-      return 0;
-    case ::Eigen::NoConvergence:
-      return 1;
-    case ::Eigen::NumericalIssue:
-      return 2;
-    default return
-      3;
-  }
-}
 
 //! \attention Slow!
 //! \todo Implement via Eigen::CG and identity preconditioner!
