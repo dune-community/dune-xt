@@ -44,7 +44,7 @@ struct GridInfoTest : public ::testing::Test
     }
     const Statistics st(gv);
     const int line = std::pow(2, level);
-    EXPECT_EQ(std::pow(line, griddim - 1) * 2 * griddim, st.numberOfBoundaryIntersections);
+    EXPECT_EQ(line * (griddim), st.numberOfBoundaryIntersections);
     EXPECT_EQ(entities * (2 * griddim), st.numberOfIntersections);
     EXPECT_EQ(st.numberOfIntersections - st.numberOfBoundaryIntersections, st.numberOfInnerIntersections);
     EXPECT_EQ(griddim * 2, maxNumberOfNeighbors(gv));
