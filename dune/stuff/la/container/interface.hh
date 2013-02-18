@@ -85,7 +85,7 @@ public:
 
   size_type size() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().rows());
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().size());
     return asImp().size();
   }
 
