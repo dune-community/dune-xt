@@ -3,6 +3,7 @@
 
 // dune-stuff includes
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/aliases.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -11,15 +12,10 @@ namespace Grid {
 template <class EntityType, class StreamType = std::ostream>
 void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::string prefix = "")
 {
-  typedef typename EntityType::Geometry GeometryType;
-
-  typedef typename GeometryType::GlobalCoordinate GlobalPointType;
-
-  const GeometryType& geometry = entity.geometry();
-
+  const auto& geometry = entity.geometry();
   const int numCorners = geometry.corners();
 
-  std::string header = "Dune::Entity (" + Dune::Stuff::Common::toString(numCorners) + " corner";
+  std::string header = "Dune::Entity (" + DSC::toString(numCorners) + " corner";
   if (numCorners != 1) {
     header += "s";
   }
@@ -30,11 +26,11 @@ void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::
       header += " ";
     }
   }
-  const std::string whitespace = Dune::Stuff::Common::whitespaceify(header);
+  const std::string whitespace = DSC::whitespaceify(header);
 
   stream << prefix << header << "[ (";
   for (int i = 0; i < numCorners; ++i) {
-    const GlobalPointType& corner = geometry.corner(i);
+    const auto& corner = geometry.corner(i);
     for (unsigned int j = 0; j < corner.size(); ++j) {
       stream << corner[j];
       if (j < corner.size() - 1) {
@@ -64,18 +60,9 @@ double geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
 } // geometryDiameter
 
 template <class GridImp, template <int, int, class> class EntityImp>
-double geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& entity)
+double geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& /*entity*/)
 {
-  DUNE_THROW(Dune::Exception, "copypasta from 2D");
-  typedef Dune::Entity<0, 3, GridImp, EntityImp> EntityType;
-  typedef typename EntityType::LeafIntersectionIterator IntersectionIteratorType;
-  IntersectionIteratorType end = entity.ileafend();
-  double factor = 1.0;
-  for (IntersectionIteratorType it = entity.ileafbegin(); it != end; ++it) {
-    const typename IntersectionIteratorType::Intersection& intersection = *it;
-    factor *= intersection.geometry().volume();
-  }
-  return factor / (2.0 * entity.geometry().volume());
+  DUNE_THROW(Dune::NotImplemented, "geometryDiameter not implemented for dim 3");
 } // geometryDiameter
 
 } // namespace Grid

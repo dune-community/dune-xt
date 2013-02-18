@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <dune/common/exceptions.hh>
+#include <dune/common/shared_ptr.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
@@ -35,6 +36,9 @@ public:
     return "stuff.grid.boundaryinfo";
   }
 
+  virtual ~Interface()
+  {
+  }
   virtual bool dirichlet(const IntersectionType&) const = 0;
 
   virtual bool neumann(const IntersectionType&) const = 0;
@@ -166,7 +170,7 @@ public:
     }
   }
 
-  static ThisType createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
     Common::ExtendedParameterTree paramTreeX;
@@ -188,7 +192,7 @@ public:
     shared_ptr<IdSetMapType> idSetMap(new IdSetMapType());
     idSetMap->insert(std::pair<std::string, IdSetType>("dirichlet", dirichletSet));
     idSetMap->insert(std::pair<std::string, IdSetType>("neumann", neumannSet));
-    return ThisType(idSetMap);
+    return new ThisType(idSetMap);
   }
 
   const Dune::shared_ptr<const IdSetMapType> boundaryInfoMap()
@@ -245,11 +249,8 @@ private:
 
 std::vector<std::string> types()
 {
-  std::vector<std::string> ret;
-  ret.push_back("stuff.grid.boundaryinfo.alldirichlet");
-  ret.push_back("stuff.grid.boundaryinfo.allneumann");
-  ret.push_back("stuff.grid.boundaryinfo.idbased");
-  return ret;
+  return {
+      "stuff.grid.boundaryinfo.alldirichlet", "stuff.grid.boundaryinfo.allneumann", "stuff.grid.boundaryinfo.idbased"};
 }
 
 
@@ -257,14 +258,11 @@ template <class GridViewType>
 Dune::ParameterTree createSampleDescription(const std::string type)
 {
   if (type == "stuff.grid.boundaryinfo.alldirichlet") {
-    typedef AllDirichlet<GridViewType> BoundaryInfoType;
-    return BoundaryInfoType::createSampleDescription();
+    return AllDirichlet<GridViewType>::createSampleDescription();
   } else if (type == "stuff.grid.boundaryinfo.allneumann") {
-    typedef AllNeumann<GridViewType> BoundaryInfoType;
-    return BoundaryInfoType::createSampleDescription();
+    return AllNeumann<GridViewType>::createSampleDescription();
   } else if (type == "stuff.grid.boundaryinfo.idbased") {
-    typedef IdBased<GridViewType> BoundaryInfoType;
-    return BoundaryInfoType::createSampleDescription();
+    return IdBased<GridViewType>::createSampleDescription();
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
@@ -277,14 +275,11 @@ Interface<GridViewType>* create(const std::string& type = "stuff.grid.boundaryin
                                 const Dune::ParameterTree description = Dune::ParameterTree())
 {
   if (type == "stuff.grid.boundaryinfo.alldirichlet") {
-    typedef AllDirichlet<GridViewType> BoundaryInfoType;
-    return new BoundaryInfoType();
+    return new AllDirichlet<GridViewType>();
   } else if (type == "stuff.grid.boundaryinfo.allneumann") {
-    typedef AllNeumann<GridViewType> BoundaryInfoType;
-    return new BoundaryInfoType();
+    return new AllNeumann<GridViewType>();
   } else if (type == "stuff.grid.boundaryinfo.idbased") {
-    typedef IdBased<GridViewType> BoundaryInfoType;
-    return new BoundaryInfoType(BoundaryInfoType::createFromDescription(description));
+    return IdBased<GridViewType>::createFromDescription(description);
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type

@@ -7,12 +7,11 @@
 #include "config.h"
 #endif // ifdef HAVE_CMAKE_CONFIG
 
-// dune-common includes
 #include <dune/common/fvector.hh>
 #include <dune/common/static_assert.hh>
 
-// dune-stuff
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/aliases.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -31,15 +30,9 @@ namespace Grid {
 template <class IntersectionType>
 void printIntersection(const IntersectionType& intersection, std::ostream& stream = std::cout)
 {
-  typedef typename IntersectionType::Geometry GeometryType;
-
-  typedef typename GeometryType::GlobalCoordinate GlobalPointType;
-
-  const GeometryType& geometry = intersection.geometry();
-
+  const auto& geometry = intersection.geometry();
   const int numCorners = geometry.corners();
-
-  std::string prefix = "Dune::Intersection (" + Dune::Stuff::Common::toString(numCorners) + " corner";
+  std::string prefix = "Dune::Intersection (" + DSC::toString(numCorners) + " corner";
   if (numCorners != 1) {
     prefix += "s";
   }
@@ -50,11 +43,11 @@ void printIntersection(const IntersectionType& intersection, std::ostream& strea
       prefix += " ";
     }
   }
-  const std::string whitespace = Dune::Stuff::Common::whitespaceify(prefix);
+  const std::string whitespace = DSC::whitespaceify(prefix);
 
   stream << prefix << "[ (";
   for (int i = 0; i < numCorners; ++i) {
-    const GlobalPointType corner = geometry.corner(i);
+    const auto corner = geometry.corner(i);
     for (unsigned int j = 0; j < corner.size(); ++j) {
       stream << corner[j];
       if (j < corner.size() - 1) {
@@ -83,43 +76,23 @@ bool intersectionContains(const IntersectionType& /*intersection*/,
 template <class IntersectionType, class FieldType>
 bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, 1>& globalPoint)
 {
-  typedef Dune::FieldVector<FieldType, 1> GlobalPointType;
-
-  typedef typename IntersectionType::Geometry GeometryType;
-
-  const GeometryType& geometry = intersection.geometry();
-
-  // get the only corner
-  const GlobalPointType corner = geometry.corner(0);
+  const auto& geometry = intersection.geometry();
+  const auto corner    = geometry.corner(0);
   // check if the point is the corner
-  if (corner == globalPoint) {
-    return true;
-  }
-
-  return false;
+  return corner == globalPoint;
 } // end function contains
 
 template <class IntersectionType, class FieldType>
 bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, 2>& globalPoint)
 {
-  typedef Dune::FieldVector<FieldType, 2> GlobalPointType;
-
-  typedef typename IntersectionType::Geometry GeometryType;
-
-  const GeometryType& geometry = intersection.geometry();
-
-  // get the two corners
-  const GlobalPointType firstCorner  = geometry.corner(0);
-  const GlobalPointType secondCorner = geometry.corner(1);
+  const auto& geometry    = intersection.geometry();
+  const auto firstCorner  = geometry.corner(0);
+  const auto secondCorner = geometry.corner(1);
 
   // check, that point is on the line between the two points
   const FieldType x1 = (globalPoint[0] - firstCorner[0]) / (secondCorner[0] - firstCorner[0]);
   const FieldType x2 = (globalPoint[1] - firstCorner[1]) / (secondCorner[1] - firstCorner[1]);
-  if (!(x1 > x2) && !(x1 < x2) && !(x1 < 0.0) && !(x1 > 1.0)) {
-    return true;
-  }
-
-  return false;
+  return (!(x1 > x2) && !(x1 < x2) && !(x1 < 0.0) && !(x1 > 1.0));
 } // end function contains
 
 } // end namespace Grid

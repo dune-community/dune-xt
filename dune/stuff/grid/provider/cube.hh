@@ -36,6 +36,9 @@ namespace Stuff {
 namespace Grid {
 namespace Provider {
 
+template <typename GridType>
+struct ElementVariant;
+
 /**
  *  \brief  Creates a grid of a cube in various dimensions.
  *
@@ -53,7 +56,7 @@ namespace Provider {
  *          <ul><li>\c 1: cubes
  *          <li>2: simplices</ul>
  **/
-template <typename GridImp, int variant>
+template <typename GridImp, int variant = ElementVariant<GridImp>::id>
 class GenericCube : public Interface<GridImp>
 {
 public:
@@ -144,29 +147,6 @@ public:
     buildGrid(tmpNumElements);
   }
 
-  GenericCube(ThisType& other)
-    : lowerLeft_(other.lowerLeft_)
-    , upperRight_(other.upperRight_)
-    , grid_(other.grid_)
-  {
-  }
-
-  GenericCube(const ThisType& other)
-    : lowerLeft_(other.lowerLeft_)
-    , upperRight_(other.upperRight_)
-    , grid_(other.grid_)
-  {
-  }
-
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      lowerLeft_  = other.lowerLeft();
-      upperRight_ = other.upperRight();
-      grid_       = other.grid();
-    }
-    return this;
-  }
 
   static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
@@ -196,7 +176,7 @@ public:
    *              <li> \c numElements: \a int or vector to denote the number of elements.
    *              </ul>
    **/
-  static ThisType createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
     Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
@@ -255,18 +235,8 @@ public:
       assert(tmpNumElements[d] > 0 && "Given 'numElements' has to be elementwise positive!");
       numElements[d] = tmpNumElements[d];
     }
-    return GenericCube(lowerLeft, upperRight, numElements);
+    return new ThisType(lowerLeft, upperRight, numElements);
   } // static ThisType createFromParamTree(const Dune::ParameterTree& paramTree, const std::string subName = id())
-
-  ThisType& operator=(ThisType& other)
-  {
-    if (this != &other) {
-      lowerLeft_  = other.lowerLeft();
-      upperRight_ = other.upperRight();
-      grid_       = other.grid();
-    }
-    return this;
-  } // ThisType& operator=(ThisType& other)
 
   //! access to shared ptr
   virtual Dune::shared_ptr<GridType> grid()
@@ -335,62 +305,6 @@ struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
 };
 #endif // HAVE_ALUGRID
 
-// default implementation of a cube for any grid
-// tested for
-// dim = 2
-//  ALUGRID_SIMPLEX, variant 2
-//  ALUGRID_CONFORM, variant 2
-// dim = 3
-//  ALUGRID_SIMPLEX, variant 2
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridType = Dune::GridSelector::GridType>
-#else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridType = Dune::SGrid<2, 2>>
-#endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-class Cube : public GenericCube<GridType, ElementVariant<GridType>::id>
-{
-public:
-  typedef GenericCube<GridType, ElementVariant<GridType>::id> BaseType;
-
-  typedef Cube<GridType> ThisType;
-
-  typedef typename BaseType::CoordinateType CoordinateType;
-
-  Cube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int _numElements = 1)
-    : BaseType(_lowerLeft, _upperRight, _numElements)
-  {
-  }
-
-  Cube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight, const unsigned int _numElements = 1)
-    : BaseType(_lowerLeft, _upperRight, _numElements)
-  {
-  }
-
-  template <class ContainerType>
-  Cube(const CoordinateType& lowerLeft, const CoordinateType& upperRight,
-       const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
-           GridType::dimensionworld, typename ContainerType::value_type(1u)))
-    : BaseType(lowerLeft, upperRight, numElements)
-  {
-  }
-
-  Cube(BaseType& other)
-    : BaseType(other)
-  {
-  }
-
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
-  {
-    return BaseType::createSampleDescription(subName);
-  }
-
-  static ThisType createFromDescription(const Dune::ParameterTree& paramTree,
-                                        const std::string subName = BaseType::id())
-  {
-    BaseType base = BaseType::createFromDescription(paramTree, subName);
-    return ThisType(base);
-  }
-}; // class Cube
 
 } // namespace Provider
 } // namespace Grid
