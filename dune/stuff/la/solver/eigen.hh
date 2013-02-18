@@ -14,6 +14,8 @@
 #include <Eigen/SparseCholesky>
 
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/logging.hh>
+#include <dune/stuff/aliases.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
 #include "interface.hh"
@@ -36,20 +38,14 @@ public:
                     Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
-
   typedef typename BaseType::VectorType VectorType;
-
   typedef typename BaseType::ElementType ElementType;
-
   typedef typename BaseType::size_type size_type;
 
   Cg()
   {
-    //    if (!Dune::Stuff::Common::Logger().created())
-    //      Dune::Stuff::Common::Logger().create(Dune::Stuff::Common::LOG_CONSOLE | Dune::Stuff::Common::LOG_DEBUG);
-    Dune::Stuff::Common::LogStream& debug = Dune::Stuff::Common::Logger().debug();
-    debug << "\n" << Dune::Stuff::Common::colorString("WARNING:") << " this solver is believed to be slow! "
-          << std::flush;
+    DSC_LOG_DEBUG << "\n" << Dune::Stuff::Common::colorString("WARNING:") << " this solver is believed to be slow! "
+                  << std::flush;
   }
 
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
@@ -98,20 +94,14 @@ public:
                     Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
-
   typedef typename BaseType::VectorType VectorType;
-
   typedef typename BaseType::ElementType ElementType;
-
   typedef typename BaseType::size_type size_type;
 
   CgDiagonal()
   {
-    //    if (!Dune::Stuff::Common::Logger().created())
-    //      Dune::Stuff::Common::Logger().create(Dune::Stuff::Common::LOG_CONSOLE | Dune::Stuff::Common::LOG_DEBUG);
-    Dune::Stuff::Common::LogStream& debug = Dune::Stuff::Common::Logger().debug();
-    debug << "\n" << Dune::Stuff::Common::colorString("WARNING:", Dune::Stuff::Common::Colors::red)
-          << " this solver is believed to produce utterly wrong results! " << std::flush;
+    DSC_LOG_DEBUG << "\n" << Dune::Stuff::Common::colorString("WARNING:", Dune::Stuff::Common::Colors::red)
+                  << " this solver is believed to produce utterly wrong results! " << std::flush;
   }
 
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
@@ -124,15 +114,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class CgDiagonal
 
@@ -148,16 +130,9 @@ public:
                     Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
-
   typedef typename BaseType::VectorType VectorType;
-
   typedef typename BaseType::ElementType ElementType;
-
   typedef typename BaseType::size_type size_type;
-
-  Bicgstab()
-  {
-  }
 
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
                           const size_type maxIter = 5000, const ElementType precision = 1e-12) const
@@ -167,15 +142,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class Bicgstab
 
@@ -191,16 +158,9 @@ public:
                     Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
-
   typedef typename BaseType::VectorType VectorType;
-
   typedef typename BaseType::ElementType ElementType;
-
   typedef typename BaseType::size_type size_type;
-
-  BicgstabDiagonal()
-  {
-  }
 
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
                           const size_type maxIter = 5000, const ElementType precision = 1e-12) const
@@ -211,15 +171,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)static_assert
 }; // class BicgstabDiagonal
 
@@ -235,16 +187,9 @@ public:
                     Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
-
   typedef typename BaseType::VectorType VectorType;
-
   typedef typename BaseType::ElementType ElementType;
-
   typedef typename BaseType::size_type size_type;
-
-  BicgstabILUT()
-  {
-  }
 
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
                           const size_type maxIter = 5000, const ElementType precision = 1e-12) const
@@ -254,15 +199,7 @@ public:
     eigenSolver.setMaxIterations(maxIter);
     eigenSolver.setTolerance(precision);
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    if (info == ::Eigen::Success)
-      return 0;
-    else if (info == ::Eigen::NoConvergence)
-      return 1;
-    else if (info == ::Eigen::NumericalIssue)
-      return 2;
-    else
-      return 3;
+    return translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class BicgstabILUT
 

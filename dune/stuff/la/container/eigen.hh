@@ -1,6 +1,12 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_EIGEN_HH
 #define DUNE_STUFF_LA_CONTAINER_EIGEN_HH
 
+#ifdef HAVE_CMAKE_CONFIG
+#include "cmake_config.h"
+#elif defined(HAVE_CONFIG_H)
+#include <config.h>
+#endif // ifdef HAVE_CMAKE_CONFIG
+
 #if HAVE_EIGEN
 
 #include <Eigen/Core>
@@ -107,12 +113,10 @@ public:
     : eigenMatrix_(_rows, _cols)
   {
     assert(size_type(_pattern.size()) == _rows && "Given pattern too short!");
-    typedef Dune::Stuff::LA::Container::SparsityPatternDefault PatternType;
-    typedef PatternType::SetType ColumnsType;
     for (size_type row = 0; row < size_type(_pattern.size()); ++row) {
       eigenMatrix_.startVec(row);
-      const ColumnsType& columns = _pattern.set(row);
-      for (typename ColumnsType::const_iterator columnIt = columns.begin(); columnIt != columns.end(); ++columnIt) {
+      const auto& columns = _pattern.set(row);
+      for (auto columnIt = columns.begin(); columnIt != columns.end(); ++columnIt) {
         const size_type column = *columnIt;
         eigenMatrix_.insertBackByOuterInner(row, column);
       }
@@ -195,23 +199,23 @@ public:
   {
   }
 
-  EigenDenseMatrix(const ThisType& _other)
-    : eigenMatrix_(_other.backend())
+  EigenDenseMatrix(const ThisType& other)
+    : eigenMatrix_(other.backend())
   {
   }
 
-  EigenDenseMatrix(const BackendType& _otherEigenMatrix)
-    : eigenMatrix_(_otherEigenMatrix)
+  EigenDenseMatrix(const BackendType& otherEigenMatrix)
+    : eigenMatrix_(otherEigenMatrix)
   {
   }
 
-  EigenDenseMatrix(const EigenRowMajorSparseMatrix<ElementType>& _other)
-    : eigenMatrix_(_other.backend())
+  EigenDenseMatrix(const EigenRowMajorSparseMatrix<ElementType>& other)
+    : eigenMatrix_(other.backend())
   {
   }
 
-  EigenDenseMatrix(const EigenDenseVector<ElementType>& _other)
-    : eigenMatrix_(_other.backend())
+  EigenDenseMatrix(const EigenDenseVector<ElementType>& other)
+    : eigenMatrix_(other.backend())
   {
   }
 
@@ -303,13 +307,13 @@ public:
   {
   }
 
-  EigenDenseVector(const ThisType& _other)
-    : eigenVector_(_other.backend())
+  EigenDenseVector(const ThisType& other)
+    : eigenVector_(other.backend())
   {
   }
 
-  EigenDenseVector(const BackendType& _otherEigenVector)
-    : eigenVector_(_otherEigenVector)
+  EigenDenseVector(const BackendType& otherEigenVector)
+    : eigenVector_(otherEigenVector)
   {
   }
 
@@ -319,9 +323,9 @@ public:
     eigenVector_.setZero(_size);
   }
 
-  ThisType& operator=(const ThisType& _other)
+  ThisType& operator=(const ThisType& other)
   {
-    eigenVector_ = _other.backend();
+    eigenVector_ = other.backend();
     return *this;
   }
 
