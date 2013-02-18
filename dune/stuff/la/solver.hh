@@ -15,6 +15,7 @@
 
 #include "solver/interface.hh"
 #include "solver/eigen.hh"
+//#include "solver/fasp.hh"
 
 namespace Dune {
 namespace Stuff {
@@ -32,6 +33,7 @@ std::vector<std::string> types()
   ret.push_back("cg.diagonal");
   ret.push_back("simplicialllt");
   ret.push_back("simplicialldlt");
+  //  ret.push_back("fasp");
   return ret;
 } // std::vector< std::string > types()
 
@@ -62,6 +64,8 @@ Interface<MatrixType, VectorType>* create(const std::string type = "bicgstab.dia
     return new Dune::Stuff::LA::Solver::SimplicialLLT<MatrixType, VectorType>();
   } else if (type == "simplicialldlt") {
     return new Dune::Stuff::LA::Solver::SimplicialLDLT<MatrixType, VectorType>();
+    //  } else if (type == "fasp") {
+    //    return new Dune::Stuff::LA::Solver::Fasp< MatrixType, VectorType >();
   } else
     DUNE_THROW(Dune::RangeError,
                "\n" << Dune::Stuff::Common::colorString("ERROR:", Dune::Stuff::Common::Colors::red)
