@@ -5,7 +5,6 @@
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/static_assert.hh>
-
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 
@@ -63,27 +62,6 @@ public:
                       << " please provide at least as many '_values' as subdomains given by '_numElements'!");
   }
 
-  Checkerboard(const ThisType& _other)
-    : lowerLeft_(_other.lowerLeft_)
-    , upperRight_(_other.upperRight_)
-    , numElements_(_other.numElements_)
-    , values_(_other.values_)
-    , name_(_other.name_)
-  {
-  }
-
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      lowerLeft_   = other.lowerLeft();
-      upperRight_  = other.upperRight();
-      numElements_ = other.numElements();
-      values_      = other.values();
-      name_        = other.name();
-    }
-    return this;
-  }
-
   static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
     Dune::ParameterTree description;
@@ -101,10 +79,8 @@ public:
     }
   }
 
-  static ThisType createFromDescription(const Dune::ParameterTree _description)
+  static ThisType* createFromDescription(const DSC::ExtendedParameterTree description)
   {
-    // get correct paramTree
-    Stuff::Common::ExtendedParameterTree description(_description);
     // get data
     const std::vector<DomainFieldType> lowerLefts  = description.getVector("lowerLeft", DomainFieldType(0), dimDomain);
     const std::vector<DomainFieldType> upperRights = description.getVector("upperRight", DomainFieldType(1), dimDomain);
@@ -121,7 +97,7 @@ public:
       upperRight[dd] = upperRights[dd];
     }
     // create and return
-    return ThisType(lowerLeft, upperRight, numElements, values);
+    return new ThisType(lowerLeft, upperRight, numElements, values);
   } // static ThisType createFromParamTree(const Dune::ParameterTree paramTree)
 
 

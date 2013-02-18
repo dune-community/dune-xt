@@ -107,9 +107,8 @@ public:
     }
   }
 
-  static ThisType createFromDescription(const Dune::ParameterTree& _description)
+  static ThisType* createFromDescription(const DSC::ExtendedParameterTree description)
   {
-    const Dune::Stuff::Common::ExtendedParameterTree description(_description);
     // get necessary
     const std::string _variable = description.get<std::string>("variable", "x");
     std::vector<std::string> _expressions;
@@ -130,7 +129,7 @@ public:
     const int _order        = description.get<int>("order", -1);
     const std::string _name = description.get<std::string>("name", "function.expression");
     // create and return
-    return ThisType(_variable, _expressions, _order, _name);
+    return new ThisType(_variable, _expressions, _order, _name);
   } // static ThisType createFromDescription(const Dune::ParameterTree& _description)
 
   virtual int order() const
