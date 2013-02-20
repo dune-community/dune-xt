@@ -46,7 +46,7 @@ template <class GridType = Dune::SGrid<2, 2>>
 Dune::ParameterTree createSampleDescription(const std::string type)
 {
   if (type == "stuff.grid.provider.cube") {
-    return DSG::Provider::GenericCube<GridType>::createSampleDescription();
+    return DSG::Provider::Cube<GridType>::createSampleDescription();
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
   } else if (type == "stuff.grid.provider.gmsh") {
@@ -89,7 +89,7 @@ Interface<GridType>* create(const std::string& type = "stuff.grid.provider.cube"
   using namespace DSG::Provider;
   typedef std::map<std::string, std::pair<std::string, typename FunctionObject<GridType>::Type>> MapType;
 
-  MapType ptr_map = {{"stuff.grid.provider.cube", DSGP_MAKE(GenericCube)},
+  MapType ptr_map = {{"stuff.grid.provider.cube", DSGP_MAKE(Cube)},
 #ifdef HAVE_UNSTRUCTURED_GRIDFACTORY
                      {"stuff.grid.provider.gmsh", DSGP_MAKE(Gmsh)},
 #endif
