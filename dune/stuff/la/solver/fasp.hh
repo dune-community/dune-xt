@@ -1,10 +1,11 @@
 #ifndef DUNE_STUFF_LA_SOLVER_FASP_HH
 #define DUNE_STUFF_LA_SOLVER_FASP_HH
 
-//#if HAVE_EIGEN
+#if HAVE_FASP
+#if HAVE_EIGEN
 
 extern "C" {
-#include "fasp.h"
+#include "fasp/fasp_functs.h"
 }
 
 #include <dune/stuff/la/container/eigen.hh>
@@ -18,8 +19,8 @@ namespace Solver {
 
 
 template <class ElementImp>
-class Fasp<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-           Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+class AmgFasp<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
+              Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
     : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
                        Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
 {
@@ -45,7 +46,6 @@ public:
     Schwarz_param swzparam;
     fasp_param_init("input.dat", &inparam, &itparam, &amgparam, &iluparam, &swzparam);
 
-
     const int row = systemMatrix.rows();
     const int col = systemMatrix.cols();
     const int nnz = systemMatrix.backend().nonZeros();
@@ -59,12 +59,11 @@ public:
     A.JA  = ja;
 
     dvector b, x;
-    b.row      = rhsVector.size();
-    b.val      = rhsVector.backend().data();
-    x.row      = rhsVector.backend().rows();
-    x.val      = solutionVector.backend().data();
-    int status = fasp_solver_dcsr_krylov_amg(&A, &b, &x, &itparam, &amgparam);
-
+    b.row = rhsVector.size();
+    b.val = rhsVector.backend().data();
+    x.row = rhsVector.backend().rows();
+    x.val = solutionVector.backend().data();
+    return fasp_solver_dcsr_krylov_amg(&A, &b, &x, &itparam, &amgparam);
 
   } // ... apply(...)
 
@@ -75,6 +74,7 @@ public:
 } // namespace Stuff
 } // namespace Dune
 
-//#endif // HAVE_EIGEN
+#endif // HAVE_EIGEN
+#endif // HAVE_FASP
 
 #endif // DUNE_STUFF_LA_SOLVER_FASP_HH
