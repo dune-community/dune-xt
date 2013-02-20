@@ -57,7 +57,7 @@ struct ElementVariant;
  *          <li>2: simplices</ul>
  **/
 template <typename GridImp, int variant = ElementVariant<GridImp>::id>
-class GenericCube : public Interface<GridImp>
+class Cube : public Interface<GridImp>
 {
 public:
   //! Type of the provided grid.
@@ -65,7 +65,7 @@ public:
 
   typedef Interface<GridType> BaseType;
 
-  typedef GenericCube<GridType, variant> ThisType;
+  typedef Cube<GridType, variant> ThisType;
 
 private:
   typedef typename GridType::LeafGridView GridViewType;
@@ -92,7 +92,7 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GenericCube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int numElements = 1u)
+  Cube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int numElements = 1u)
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
   {
@@ -110,7 +110,7 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GenericCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight, const unsigned int numElements = 1u)
+  Cube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight, const unsigned int numElements = 1u)
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
   {
@@ -131,9 +131,9 @@ public:
     \tparam ContainerType some sequence type that functions with std::begin/end
     **/
   template <class ContainerType>
-  GenericCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight,
-              const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
-                  dim, typename ContainerType::value_type(1u)))
+  Cube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight,
+       const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
+           dim, typename ContainerType::value_type(1u)))
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
   {
@@ -277,7 +277,7 @@ private:
   CoordinateType lowerLeft_;
   CoordinateType upperRight_;
   Dune::shared_ptr<GridType> grid_;
-}; // class GenericCube
+}; // class Cube
 
 template <typename GridType>
 struct ElementVariant
