@@ -18,18 +18,6 @@
 using namespace Dune;
 using namespace Dune::Stuff;
 
-const std::string id = "grid_provider";
-
-ParameterTree sampleParamTree()
-{
-  ParameterTree paramTree;
-  paramTree[id + ".grid"]                           = "stuff.grid.provider.cube";
-  paramTree["stuff.grid.provider.cube.lowerLeft"]   = "[0.0; 0.0; 0.0]";
-  paramTree["stuff.grid.provider.cube.upperRight"]  = "[1.0; 1.0; 1.0]";
-  paramTree["stuff.grid.provider.cube.numElements"] = "[1; 1; 1]";
-  return paramTree;
-}
-
 static const int dim = 2;
 
 typedef testing::Types<Dune::YaspGrid<dim>
@@ -57,10 +45,12 @@ struct CubeTest : public testing::Test
   {
   }
 
-  void test_cube(const ParameterTree& paramTree)
+  void test_cube()
   {
-    const Dune::Stuff::Grid::Provider::Interface<>* gridProvider =
-        Dune::Stuff::Grid::Provider::create(paramTree.get(id + ".grid", "stuff.grid.provider.cube"), paramTree);
+    const std::vector<std::string> types = Dune::Stuff::Grid::Provider::types();
+    const ParameterTree description = Dune::Stuff::Grid::Provider::createSampleDescription<GridType>(types[0]);
+    const Dune::Stuff::Grid::Provider::Interface<GridType>* gridProvider =
+        Dune::Stuff::Grid::Provider::create<GridType>(types[0], description);
     EXPECT_GT(gridProvider->grid()->size(0), 0);
     EXPECT_GT(gridProvider->grid()->size(1), 0);
   }
@@ -69,8 +59,7 @@ struct CubeTest : public testing::Test
 TYPED_TEST_CASE(CubeTest, GridTypes);
 TYPED_TEST(CubeTest, All)
 {
-  ParameterTree paramTree = sampleParamTree();
-  this->test_cube(paramTree);
+  this->test_cube();
 }
 
 #endif // #if HAVE_DUNE_GRID
