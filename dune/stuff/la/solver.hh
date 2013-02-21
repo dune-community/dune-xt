@@ -36,12 +36,33 @@ std::vector<std::string> types()
 } // std::vector< std::string > types()
 
 
-Dune::ParameterTree createSampleDescription()
+template <class MatrixType, class VectorType>
+Dune::ParameterTree createSampleDescription(const std::string type)
 {
-  Dune::ParameterTree description;
-  description["maxIter"]   = "5000";
-  description["precision"] = "1e-12";
-  return description;
+  if (type == "cg") {
+    return Dune::Stuff::LA::Solver::Cg<MatrixType, VectorType>::createSampleDescription();
+  } else if (type == "cg.diagonal") {
+    return Dune::Stuff::LA::Solver::CgDiagonal<MatrixType, VectorType>::createSampleDescription();
+  } else if (type == "bicgstab") {
+    return Dune::Stuff::LA::Solver::Bicgstab<MatrixType, VectorType>::createSampleDescription();
+  } else if (type == "bicgstab.diagonal") {
+    return Dune::Stuff::LA::Solver::BicgstabDiagonal<MatrixType, VectorType>::createSampleDescription();
+  } else if (type == "bicgstab.ilut") {
+    return Dune::Stuff::LA::Solver::BicgstabILUT<MatrixType, VectorType>::createSampleDescription();
+  } else if (type == "simplicialllt") {
+    return Dune::Stuff::LA::Solver::SimplicialLLT<MatrixType, VectorType>::createSampleDescription();
+  } else if (type == "simplicialldlt") {
+    return Dune::Stuff::LA::Solver::SimplicialLDLT<MatrixType, VectorType>::createSampleDescription();
+#if HAVE_FASP
+  } else if (type == "amg.fasp") {
+    return Dune::Stuff::LA::Solver::AmgFasp<MatrixType, VectorType>::createSampleDescription();
+#endif // HAVE_FASP
+  } else
+    DUNE_THROW(Dune::RangeError,
+               "\n" << Dune::Stuff::Common::colorString("ERROR:", Dune::Stuff::Common::Colors::red)
+                    << " unknown linear solver '"
+                    << type
+                    << "' requested!");
 } // Dune::ParameterTree createSampleDescription(const std::string type)
 
 

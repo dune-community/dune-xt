@@ -48,8 +48,17 @@ public:
                   << std::flush;
   }
 
+  static Dune::ParameterTree createSampleDescription()
+  {
+    Dune::ParameterTree description;
+    description["maxIter"]   = "5000";
+    description["precision"] = "1e-12";
+    return description;
+  } // Dune::ParameterTree createSampleDescription()
+
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12,
+                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
   {
     auto& x_i      = solutionVector.backend();
     const auto& b  = rhsVector.backend();
@@ -104,8 +113,17 @@ public:
                   << " this solver is believed to produce utterly wrong results! " << std::flush;
   }
 
+  static Dune::ParameterTree createSampleDescription()
+  {
+    Dune::ParameterTree description;
+    description["maxIter"]   = "5000";
+    description["precision"] = "1e-12";
+    return description;
+  } // Dune::ParameterTree createSampleDescription()
+
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12,
+                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
   {
     typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                        ::Eigen::Lower,
@@ -134,8 +152,17 @@ public:
   typedef typename BaseType::ElementType ElementType;
   typedef typename BaseType::size_type size_type;
 
+  static Dune::ParameterTree createSampleDescription()
+  {
+    Dune::ParameterTree description;
+    description["maxIter"]   = "5000";
+    description["precision"] = "1e-12";
+    return description;
+  } // Dune::ParameterTree createSampleDescription()
+
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12,
+                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> EigenSolverType;
     EigenSolverType eigenSolver(systemMatrix.backend());
@@ -162,8 +189,17 @@ public:
   typedef typename BaseType::ElementType ElementType;
   typedef typename BaseType::size_type size_type;
 
+  static Dune::ParameterTree createSampleDescription()
+  {
+    Dune::ParameterTree description;
+    description["maxIter"]   = "5000";
+    description["precision"] = "1e-12";
+    return description;
+  } // Dune::ParameterTree createSampleDescription()
+
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12,
+                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<ElementType>>
         EigenSolverType;
@@ -191,8 +227,17 @@ public:
   typedef typename BaseType::ElementType ElementType;
   typedef typename BaseType::size_type size_type;
 
+  static Dune::ParameterTree createSampleDescription()
+  {
+    Dune::ParameterTree description;
+    description["maxIter"]   = "5000";
+    description["precision"] = "1e-12";
+    return description;
+  } // Dune::ParameterTree createSampleDescription()
+
   virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                          const size_type maxIter = 5000, const ElementType precision = 1e-12) const
+                          const size_type maxIter = 5000, const ElementType precision = 1e-12,
+                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<ElementType>> EigenSolverType;
     EigenSolverType eigenSolver(systemMatrix.backend());
@@ -222,6 +267,11 @@ public:
     : BaseType("\nERROR: only implemented for eigen matrices of type 'EigenColMajorSparseMatrix'!")
   {
   }
+
+  static Dune::ParameterTree createSampleDescription()
+  {
+    return Dune::ParameterTree();
+  } // Dune::ParameterTree createSampleDescription()
 }; // class SimplicialLLT
 
 
@@ -280,6 +330,11 @@ public:
     : BaseType("\nERROR: only implemented for eigen matrices of type 'EigenColMajorSparseMatrix'!")
   {
   }
+
+  static Dune::ParameterTree createSampleDescription()
+  {
+    return Dune::ParameterTree();
+  } // Dune::ParameterTree createSampleDescription()
 }; // class SimplicialLDLT
 
 
