@@ -96,18 +96,6 @@ public:
   {
   }
 
-  ThisType& operator=(const ThisType& _other)
-  {
-    eigenMatrix_ = _other.backend();
-    return *this;
-  }
-
-  ThisType& operator=(const BackendType& _otherEigenMatrix)
-  {
-    eigenMatrix_ = _otherEigenMatrix;
-    return *this;
-  }
-
   EigenRowMajorSparseMatrix(const size_type _rows, const size_type _cols,
                             const Dune::Stuff::LA::Container::SparsityPatternDefault& _pattern)
     : eigenMatrix_(_rows, _cols)
@@ -127,6 +115,33 @@ public:
     eigenMatrix_.finalize();
     eigenMatrix_.makeCompressed();
   } // RowMajorSparseMatrix(...)
+
+  /**
+   *  \attention  This is not optimal, since we create a new triplet vector inbetween!
+   */
+  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::Container::SparsityPatternDefault& _pattern)
+    : eigenMatrix_(other.rows(), other.cols())
+  {
+    typedef ::Eigen::Triplet<ElementType> TripletType;
+    std::vector<TripletType> triplets;
+    triplets.reserve(_pattern.size());
+    for (size_t row = 0; row < _pattern.size(); ++row)
+      for (size_t col : _pattern.set(row))
+        triplets.push_back(TripletType(row, col, other.get(row, col)));
+    eigenMatrix_.setFromTriplets(triplets.begin(), triplets.end());
+  }
+
+  ThisType& operator=(const ThisType& _other)
+  {
+    eigenMatrix_ = _other.backend();
+    return *this;
+  }
+
+  ThisType& operator=(const BackendType& _otherEigenMatrix)
+  {
+    eigenMatrix_ = _otherEigenMatrix;
+    return *this;
+  }
 
   size_type rows() const
   {
