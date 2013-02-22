@@ -124,7 +124,7 @@ public:
   {
     typedef ::Eigen::Triplet<ElementType> TripletType;
     std::vector<TripletType> triplets;
-    triplets.reserve(_pattern.size());
+    triplets.reserve(other.nonZeros());
     for (size_t row = 0; row < _pattern.size(); ++row)
       for (size_t col : _pattern.set(row))
         triplets.push_back(TripletType(row, col, other.get(row, col)));
