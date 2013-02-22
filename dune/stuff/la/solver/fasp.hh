@@ -5,7 +5,7 @@
 #if HAVE_EIGEN
 
 extern "C" {
-#include "fasp/fasp_functs.h"
+#include "fasp_functs.h"
 }
 
 #include <dune/stuff/la/container/eigen.hh>
