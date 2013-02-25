@@ -96,8 +96,7 @@ public:
   {
   }
 
-  EigenRowMajorSparseMatrix(const size_type _rows, const size_type _cols,
-                            const Dune::Stuff::LA::Container::SparsityPatternDefault& _pattern)
+  EigenRowMajorSparseMatrix(const size_type _rows, const size_type _cols, const SparsityPatternDefault& _pattern)
     : eigenMatrix_(_rows, _cols)
   {
     assert(size_type(_pattern.size()) == _rows && "Given pattern too short!");
@@ -166,6 +165,12 @@ public:
   const ElementType get(const size_type i, const size_type j) const
   {
     return eigenMatrix_.coeff(i, j);
+  }
+
+  void unitRow(const size_t row)
+  {
+    for (const auto i : DSC::valueRange(cols()))
+      set(row, i, row == i);
   }
 
   BackendType& backend()
