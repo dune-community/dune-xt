@@ -89,7 +89,7 @@ public:
     size_t subdomains = 1;
     for (size_t ii = 0; ii < numElements.size(); ++ii)
       subdomains *= numElements[ii];
-    const std::vector<RangeFieldType> values = description.getVector("values", RangeFieldType(0), subdomains);
+    const std::vector<RangeFieldType> values = description.getVector("values", RangeFieldType(1), subdomains);
     // convert and leave the checks to the constructor
     DomainType lowerLeft;
     DomainType upperRight;
