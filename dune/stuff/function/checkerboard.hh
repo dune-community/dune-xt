@@ -132,13 +132,19 @@ public:
     return 0;
   }
 
+  /**
+   *  \todo put this stuff in an expression, that is expanded at compile time (dimension dependent)
+   */
   virtual void evaluate(const DomainType& x, RangeType& ret) const
   {
     // decide on the subdomain the point x belongs to
     std::vector<size_t> whichPartition;
     for (int d = 0; d < dimDomain; ++d) {
+      // for points that are on upperRight_[d], this selects one partition too much
+      // so we need to cap this
       whichPartition.push_back(
-          std::floor(numElements_[d] * ((x[d] - lowerLeft_[d]) / (upperRight_[d] - lowerLeft_[d]))));
+          std::min(size_t(std::floor(numElements_[d] * ((x[d] - lowerLeft_[d]) / (upperRight_[d] - lowerLeft_[d])))),
+                   numElements_[d] - 1));
     }
     size_t subdomain = 0;
     if (dimDomain == 1)
