@@ -50,12 +50,13 @@ private:
 public:
   Spe10Model1(const std::string filename, const DomainType& _lowerLeft, const DomainType& _upperRight,
               //              const std::vector< size_t >& _numElements,
-              const std::string _name = id(), const int _order = 0)
+              const std::string _name = id(), const int _order = 0, const double _regularization = 0.0)
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
     //    , numElements_(_numElements)
     , name_(_name)
     , order_(_order)
+    , regularization_(_regularization)
   {
     // sanity checks
     std::stringstream msg;
@@ -82,6 +83,11 @@ public:
     //      msg << "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
     //          << " numElements[1] has to be smaller than " << numZelements << " (is " << numElements_[1] << ")!";
     //    }
+    if (regularization_ < 0.0) {
+      ++throw_up;
+      msg << "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " regularization must not be negative (is "
+          << regularization_ << ")!";
+    }
     // read all the data from the file
     std::ifstream datafile(filename);
     if (datafile.is_open()) {
@@ -123,9 +129,10 @@ public:
   static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
     Dune::ParameterTree description;
-    description["filename"]   = "perm_case1.dat";
-    description["lowerLeft"]  = "[0.0; 0.0]";
-    description["upperRight"] = "[762.0; 15.24]";
+    description["filename"]       = "perm_case1.dat";
+    description["lowerLeft"]      = "[0.0; 0.0]";
+    description["upperRight"]     = "[762.0; 15.24]";
+    description["regularization"] = "0.0";
     //    description["numElements"] = "[100; 20]";
     description["name"]  = id();
     description["order"] = "0";
@@ -146,6 +153,9 @@ public:
     const std::vector<DomainFieldType> upperRightIn = description.getVector<DomainFieldType>("upperRight", dimDomain);
     //    const std::vector< size_t >          numElements  = description.getVector< size_t >(         "numElements",
     //                                                                                                 dimDomain);
+    double regularizationIn = 0.0;
+    if (description.hasKey("regularization"))
+      regularizationIn       = description.get<double>("regularization");
     const std::string nameIn = description.get<std::string>("name", id());
     const int orderIn        = description.get<int>("order", 0);
     // convert and leave the checks to the constructor
@@ -156,7 +166,7 @@ public:
       upperRight[dd] = upperRightIn[dd];
     }
     // create and return
-    return new ThisType(filenameIn, lowerLeft, upperRight, /*numElements,*/ nameIn, orderIn);
+    return new ThisType(filenameIn, lowerLeft, upperRight, /*numElements,*/ nameIn, orderIn, regularizationIn);
   } // static ThisType createFromParamTree(const Dune::ParameterTree paramTree)
 
   const DomainType& lowerLeft() const
@@ -199,7 +209,7 @@ public:
       ret[0] = 0;
     } else {
       const size_t index = interval[0] + numXelements * 0 + numXelements * numYelements * interval[1];
-      ret[0]             = data_[index];
+      ret[0]             = data_[index] + regularization_;
     }
   } // virtual void evaluate(const DomainType& x, RangeType& ret) const
 
@@ -210,6 +220,7 @@ private:
   //  const std::vector< size_t > numElements_;
   const std::string name_;
   const int order_;
+  const double regularization_;
   double* data_;
 }; // class Spe10Model1< DomainFieldImp, 2, RangeFieldImp, 1 >
 
