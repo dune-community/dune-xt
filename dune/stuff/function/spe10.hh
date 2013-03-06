@@ -8,6 +8,7 @@
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/string.hh>
 
 #include "interface.hh"
 
@@ -46,17 +47,20 @@ private:
   static const size_t numXelements = 100;
   static const size_t numYelements = 1;
   static const size_t numZelements = 20;
+  static const double minValue     = 0.001;
+  static const double maxValue     = 998.915;
 
 public:
   Spe10Model1(const std::string filename, const DomainType& _lowerLeft, const DomainType& _upperRight,
               //              const std::vector< size_t >& _numElements,
-              const std::string _name = id(), const int _order = 0, const double _regularization = 0.0)
+              const std::string _name = id(), const int _order = 0, const double _minValue = minValue,
+              const double _maxValue = maxValue)
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
     //    , numElements_(_numElements)
     , name_(_name)
     , order_(_order)
-    , regularization_(_regularization)
+    , minValue_(_minValue)
   {
     // sanity checks
     std::stringstream msg;
@@ -83,11 +87,13 @@ public:
     //      msg << "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
     //          << " numElements[1] has to be smaller than " << numZelements << " (is " << numElements_[1] << ")!";
     //    }
-    if (regularization_ < 0.0) {
+    if (!(_maxValue > minValue_)) {
       ++throw_up;
-      msg << "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " regularization must not be negative (is "
-          << regularization_ << ")!";
+      msg << "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " maxValue_ (is " << _maxValue
+          << ") has to be larger than minValue_ (is " << _minValue << ")!";
     }
+    scale_ = (_maxValue - minValue_) / (maxValue - minValue);
+    shift_ = minValue_ - scale_ * minValue;
     // read all the data from the file
     std::ifstream datafile(filename);
     if (datafile.is_open()) {
@@ -129,10 +135,11 @@ public:
   static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
     Dune::ParameterTree description;
-    description["filename"]       = "perm_case1.dat";
-    description["lowerLeft"]      = "[0.0; 0.0]";
-    description["upperRight"]     = "[762.0; 15.24]";
-    description["regularization"] = "0.0";
+    description["filename"]   = "perm_case1.dat";
+    description["lowerLeft"]  = "[0.0; 0.0]";
+    description["upperRight"] = "[762.0; 15.24]";
+    description["minValue"]   = Dune::Stuff::Common::toString(minValue);
+    description["maxValue"]   = Dune::Stuff::Common::toString(maxValue);
     //    description["numElements"] = "[100; 20]";
     description["name"]  = id();
     description["order"] = "0";
@@ -153,9 +160,12 @@ public:
     const std::vector<DomainFieldType> upperRightIn = description.getVector<DomainFieldType>("upperRight", dimDomain);
     //    const std::vector< size_t >          numElements  = description.getVector< size_t >(         "numElements",
     //                                                                                                 dimDomain);
-    double regularizationIn = 0.0;
-    if (description.hasKey("regularization"))
-      regularizationIn       = description.get<double>("regularization");
+    double minValueIn = minValue;
+    if (description.hasKey("minValue"))
+      minValueIn      = description.get<double>("minValue");
+    double maxValueIn = maxValue;
+    if (description.hasKey("maxValue"))
+      maxValueIn             = description.get<double>("maxValue");
     const std::string nameIn = description.get<std::string>("name", id());
     const int orderIn        = description.get<int>("order", 0);
     // convert and leave the checks to the constructor
@@ -166,7 +176,7 @@ public:
       upperRight[dd] = upperRightIn[dd];
     }
     // create and return
-    return new ThisType(filenameIn, lowerLeft, upperRight, /*numElements,*/ nameIn, orderIn, regularizationIn);
+    return new ThisType(filenameIn, lowerLeft, upperRight, /*numElements,*/ nameIn, orderIn, minValueIn, maxValueIn);
   } // static ThisType createFromParamTree(const Dune::ParameterTree paramTree)
 
   const DomainType& lowerLeft() const
@@ -206,10 +216,10 @@ public:
     //    }
     //    if (interval[0] >= numElements_[0] || interval[1] >= numElements_[1]) {
     if (interval[0] >= numXelements || interval[1] >= numZelements) {
-      ret[0] = 0;
+      ret[0] = minValue_;
     } else {
       const size_t index = interval[0] + numXelements * 0 + numXelements * numYelements * interval[1];
-      ret[0]             = data_[index] + regularization_;
+      ret[0]             = (scale_ * data_[index]) + shift_;
     }
   } // virtual void evaluate(const DomainType& x, RangeType& ret) const
 
@@ -220,8 +230,10 @@ private:
   //  const std::vector< size_t > numElements_;
   const std::string name_;
   const int order_;
-  const double regularization_;
+  const double minValue_;
   double* data_;
+  double scale_;
+  double shift_;
 }; // class Spe10Model1< DomainFieldImp, 2, RangeFieldImp, 1 >
 
 
