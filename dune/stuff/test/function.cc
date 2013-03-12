@@ -7,11 +7,11 @@
 
 using namespace Dune::Stuff;
 
-typedef testing::Types<Function::Expression<double, 1, double, 1>, Function::Checkerboard<double, 1, double, 1>>
+typedef testing::Types<FunctionExpression<double, 1, double, 1>, FunctionCheckerboard<double, 1, double, 1>>
     NonparametricFunctions;
 
-typedef testing::Types<Function::SeparableCheckerboard<double, 1, double, 1>,
-                       Function::SeparableDefault<double, 1, double, 1>> SeparableFunctions;
+typedef testing::Types<FunctionAffineParametricCheckerboard<double, 1, double, 1>,
+                       FunctionAffineParametricDefault<double, 1, double, 1>> SeparableFunctions;
 
 
 template <class T>
@@ -24,13 +24,12 @@ struct NonparametricTest : public ::testing::Test
   typedef typename FunctionType::RangeFieldType RangeFieldType;
   static const int dimRange = FunctionType::dimRange;
   typedef typename FunctionType::RangeType RangeType;
-  typedef Function::Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
+  typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
 
   void check() const
   {
-    const std::unique_ptr<InterfaceType> function(
-        Function::create<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
-            FunctionType::id(), FunctionType::createSampleDescription()));
+    const std::unique_ptr<InterfaceType> function(createFunction<DomainFieldType, dimDomain, RangeFieldType, dimRange>(
+        FunctionType::id(), FunctionType::createSampleDescription()));
     DomainType x(1);
     RangeType ret;
     if (function->parametric())
@@ -53,8 +52,8 @@ struct SeparableTest : public ::testing::Test
   static const int dimRange = FunctionType::dimRange;
   typedef typename FunctionType::RangeType RangeType;
 
-  typedef Function::Interface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
-  typedef Function::SeparableDefault<DomainFieldType, dimDomain, RangeFieldType, dimRange> DefaultType;
+  typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
+  typedef FunctionAffineParametricDefault<DomainFieldType, dimDomain, RangeFieldType, dimRange> DefaultType;
 
   typedef Common::Parameter::FieldType ParamFieldType;
   static const int maxParamDim = Common::Parameter::maxDim;
@@ -62,8 +61,7 @@ struct SeparableTest : public ::testing::Test
 
   void check() const
   {
-    const std::unique_ptr<InterfaceType> function(
-        FunctionType::createFromDescription(FunctionType::createSampleDescription()));
+    const std::unique_ptr<InterfaceType> function(FunctionType::create(FunctionType::createSampleDescription()));
     if (!function->parametric())
       DUNE_THROW(Dune::InvalidStateException, "ERROR: separable function returned parametric() == false!");
     if (!function->separable())
