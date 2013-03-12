@@ -64,13 +64,13 @@ createCompressedSparsityPattern(const SparsityPatternDefault& uncompressedPatter
   SparsityPatternDefault* compressedPattern = new SparsityPatternDefault(uncompressedPattern.size());
   typename T::ElementType absValue(0);
   // * therefore we loop over the uncompressed pattern
-  for (size_t row = 0; row < uncompressedPattern.size(); ++row) {
+  for (typename SparsityPatternDefault::size_type row = 0; row < uncompressedPattern.size(); ++row) {
     // * get the uncompressed row,
     const auto& uncompressedRowSet = uncompressedPattern.set(row);
     // * get the new one
     auto& compressedRowSet = compressedPattern->set(row);
     // * and loop over the uncompressed row
-    for (size_t col : uncompressedRowSet) {
+    for (auto col : uncompressedRowSet) {
       // * get the value in the matric
       absValue = std::abs(matrix.get(row, col));
       // * and add the column to the new pattern, if the value is large enough
