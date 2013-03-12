@@ -21,21 +21,20 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Grid {
-namespace Provider {
+
 
 #if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridImp = Dune::GridSelector::GridType>
-#else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
+#else
 template <class GridImp = Dune::SGrid<2, 2>>
-#endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-class Interface
+#endif
+class GridProviderInterface
 {
 public:
   static const unsigned int dim = GridImp::dimension;
 
   typedef GridImp GridType;
-  typedef Interface<GridType> ThisType;
+  typedef GridProviderInterface<GridType> ThisType;
   typedef typename GridType::ctype ctype;
   typedef Dune::FieldVector<ctype, dim> CoordinateType;
 
@@ -45,10 +44,10 @@ private:
 public:
   static const std::string id()
   {
-    return "stuff.grid.provider";
+    return "gridprovider";
   }
 
-  virtual ~Interface()
+  virtual ~GridProviderInterface()
   {
   }
 
@@ -158,12 +157,11 @@ private:
     } // walk the grid
     return data;
   } // std::vector< double > generateEntityVisualization(const LeafGridViewType& gridView) const
-}; // class Interface
+}; // class GridProviderInterface
+
 
 } // namespace Provider
 } // namespace Grid
-} // namespace Stuff
-} // namespace Dune
 
 #endif // HAVE_DUNE_GRID
 

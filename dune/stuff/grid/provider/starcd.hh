@@ -37,8 +37,7 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Grid {
-namespace Provider {
+
 
 /**
  * \brief   StarCD grid provider
@@ -48,15 +47,15 @@ template <class GridImp = Dune::GridSelector::GridType>
 #else // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
 template <class GridImp = Dune::SGrid<2, 2>>
 #endif // defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-class StarCD : public Interface<GridImp>
+class GridProviderStarCD : public GridProviderInterface<GridImp>
 {
 public:
   //! Type of the provided grid.
   typedef GridImp GridType;
 
-  typedef Interface<GridType> BaseType;
+  typedef GridProviderInterface<GridType> BaseType;
 
-  typedef StarCD<GridType> ThisType;
+  typedef GridProviderStarCD<GridType> ThisType;
 
   //! Dimension of the provided grid.
   static const unsigned int dim = BaseType::dim;
@@ -70,7 +69,7 @@ public:
     return BaseType::id() + ".starcd";
   }
 
-  StarCD(const std::string filename)
+  GridProviderStarCD(const std::string filename)
   {
     // set up the grid factory
     GridFactory<GridType> factory;
@@ -191,12 +190,12 @@ public:
   } // constructor
 
 
-  StarCD(ThisType& other)
+  GridProviderStarCD(ThisType& other)
     : grid_(other.grid_)
   {
   }
 
-  StarCD(const ThisType& other)
+  GridProviderStarCD(const ThisType& other)
     : grid_(other.grid_)
   {
   }
@@ -212,9 +211,9 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  }
+  } // ... createSampleDescription(...)
 
-  static ThisType* createFromDescription(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* create(const Dune::ParameterTree& paramTree, const std::string subName = id())
   {
     // get correct paramTree
     Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
@@ -229,7 +228,7 @@ public:
                      << extendedParamTree.reportString("  "));
     const std::string filename = extendedParamTree.get("filename", "meaningless_default_value");
     return new ThisType(filename);
-  }
+  } // ... create(...)
 
   ThisType& operator=(ThisType& other)
   {
@@ -253,10 +252,8 @@ public:
 
 private:
   Dune::shared_ptr<GridType> grid_;
-}; // class StarCD
+}; // class GridProviderStarCD
 
-} // namespace Provider
-} // namespace Grid
 } // namespace Stuff
 } // namespace Dune
 
