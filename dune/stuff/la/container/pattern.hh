@@ -1,6 +1,7 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_PATTERN_HH
 #define DUNE_STUFF_LA_CONTAINER_PATTERN_HH
 
+#include <cmath>
 #include <vector>
 #include <set>
 #include <assert.h>
