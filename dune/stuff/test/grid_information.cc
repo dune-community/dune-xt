@@ -9,6 +9,7 @@
 #include <dune/stuff/common/logstreams.hh>
 #include <dune/common/shared_ptr.hh>
 
+using namespace Dune::Stuff;
 using namespace Dune::Stuff::Common;
 using namespace Dune::Stuff::Grid;
 using namespace std;
@@ -23,7 +24,7 @@ struct GridInfoTest : public ::testing::Test
   typedef Dune::SGrid<griddim, griddim> GridType;
   std::shared_ptr<GridType> gridPtr;
   GridInfoTest()
-    : gridPtr(Provider::GenericCube<GridType>(0.f, 1.f, level).grid())
+    : gridPtr(GridProviderCube<GridType>(0.f, 1.f, level).grid())
   {
   }
 
