@@ -14,12 +14,13 @@ struct RunExpressionBaseTest
   static void run()
   {
     using namespace Dune;
+    using namespace Dune::Stuff;
     typedef double DomainFieldType;
     static const int dimDomain = DimDomain::value;
     typedef double RangeFieldType;
     static const int dimRange = DimRange::value;
 
-    typedef DSFu::ExpressionBase<DomainFieldType, dimDomain, RangeFieldType, dimRange> FunctionType;
+    typedef FunctionExpressionBase<DomainFieldType, dimDomain, RangeFieldType, dimRange> FunctionType;
     const std::string variable                 = "x";
     const std::vector<std::string> expressions = {"0", "1", "2"};
     const FunctionType function(variable, expressions);
