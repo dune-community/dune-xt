@@ -27,12 +27,11 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
 
 
-// forward
+// forward, to be friends
 template <class RangeFieldImp>
-class Coefficient;
+class FunctionAffineSeparablCoefficient;
 
 
 ///**
@@ -59,10 +58,10 @@ class Coefficient;
  *  \attention  Most surely you do not want to use this class directly!
  */
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class ExpressionBase
+class FunctionExpressionBase
 {
 public:
-  typedef ExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
+  typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
 
   typedef DomainFieldImp DomainFieldType;
   static const int dimDomain = domainDim;
@@ -70,18 +69,18 @@ public:
   typedef RangeFieldImp RangeFieldType;
   static const int dimRange = rangeDim;
 
-  ExpressionBase(const std::string _variable, const std::string _expression)
+  FunctionExpressionBase(const std::string _variable, const std::string _expression)
   {
     const std::vector<std::string> expressions(1, _expression);
     setup(_variable, expressions);
   } // NonparametricExpression(const std::string variable, const std::string expression)
 
-  ExpressionBase(const std::string _variable, const std::vector<std::string> _expressions)
+  FunctionExpressionBase(const std::string _variable, const std::vector<std::string> _expressions)
   {
     setup(_variable, _expressions);
   } // NonparametricExpression(const std::string variable, const std::vector< std::string >& expressions)
 
-  ExpressionBase(const ThisType& _other)
+  FunctionExpressionBase(const ThisType& _other)
   {
     setup(_other.variable(), _other.expression());
   } // NonparametricExpression(const ThisType& other)
@@ -98,7 +97,7 @@ public:
     return this;
   } // ThisType& operator=(const ThisType& other)
 
-  ~ExpressionBase()
+  ~FunctionExpressionBase()
   {
     cleanup();
   } // ~NonparametricExpression()
@@ -203,7 +202,7 @@ public:
   } // void report(const std::string, std::ostream&, const std::string&) const
 
 private:
-  friend class Coefficient<RangeFieldType>;
+  friend class FunctionAffineSeparablCoefficient<RangeFieldType>;
 
   void evaluate(const Dune::DynamicVector<DomainFieldType>& arg, RangeFieldType& ret) const
   {
@@ -267,9 +266,8 @@ private:
   RVar* var_arg_[dimDomain];
   RVar* vararray_[dimDomain];
   ROperation* op_[dimRange];
-}; // class ExpressionBase
+}; // class FunctionExpressionBase
 
-} // namespace Function
 } // namespace Stuff
 } // namespace Dune
 

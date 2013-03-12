@@ -29,22 +29,23 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
+
 
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class Expression : public ExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+class FunctionExpression
+    : public FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 #if HAVE_DUNE_FEM
-                   ,
-                   public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                              Expression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
+      ,
+      public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+                                 FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
 #endif
-                   ,
-                   public Interface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+      ,
+      public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 {
 public:
-  typedef Expression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
-  typedef ExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
-  typedef Interface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> InterfaceType;
+  typedef FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
+  typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
+  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> InterfaceType;
 
   using typename InterfaceType::DomainFieldType;
   using InterfaceType::dimDomain;
@@ -58,23 +59,23 @@ public:
     return InterfaceType::id() + ".expression";
   }
 
-  Expression(const std::string _variable, const std::string _expression, const int _order = -1,
-             const std::string _name = "function.expression")
+  FunctionExpression(const std::string _variable, const std::string _expression, const int _order = -1,
+                     const std::string _name = id())
     : BaseType(_variable, _expression)
     , order_(_order)
     , name_(_name)
   {
   }
 
-  Expression(const std::string _variable, const std::vector<std::string> _expressions, const int _order = -1,
-             const std::string _name = "function.expression")
+  FunctionExpression(const std::string _variable, const std::vector<std::string> _expressions, const int _order = -1,
+                     const std::string _name = id())
     : BaseType(_variable, _expressions)
     , order_(_order)
     , name_(_name)
   {
   }
 
-  Expression(const ThisType& other)
+  FunctionExpression(const ThisType& other)
     : BaseType(other)
     , order_(other.order())
     , name_(other.name())
@@ -105,9 +106,9 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  }
+  } // ... createSampleDescription(...)
 
-  static ThisType* createFromDescription(const DSC::ExtendedParameterTree description)
+  static ThisType* create(const DSC::ExtendedParameterTree description)
   {
     // get necessary
     const std::string _variable = description.get<std::string>("variable", "x");
@@ -130,7 +131,7 @@ public:
     const std::string _name = description.get<std::string>("name", "function.expression");
     // create and return
     return new ThisType(_variable, _expressions, _order, _name);
-  } // static ThisType createFromDescription(const Dune::ParameterTree& _description)
+  } // ... create(...)
 
   virtual int order() const
   {
@@ -150,10 +151,9 @@ public:
 private:
   int order_;
   std::string name_;
-}; // class Expression
+}; // class FunctionExpression
 
 
-} // namespace Function
 } // namespace Stuff
 } // namespace Dune
 

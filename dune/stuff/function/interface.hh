@@ -19,19 +19,18 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
 
 
 //! forward
 template <class RangeFieldImp>
-class Coefficient;
+class FunctionAffineSeparablCoefficient;
 
 
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class Interface
+class FunctionInterface
 {
 public:
-  typedef Interface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
+  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
 
   typedef DomainFieldImp DomainFieldType;
   static const int dimDomain = domainDim;
@@ -46,9 +45,9 @@ public:
   typedef Common::Parameter::Type ParamType;
 
   typedef ThisType ComponentType;
-  typedef Coefficient<RangeFieldType> CoefficientType;
+  typedef FunctionAffineSeparablCoefficient<RangeFieldType> CoefficientType;
 
-  virtual ~Interface()
+  virtual ~FunctionInterface()
   {
   }
 
@@ -160,74 +159,9 @@ public:
     evaluate(_x, ret);
     return ret;
   }
+}; // class FunctionInterface
 
-  //  virtual RangeType evaluate(const DomainType& x, const ParamType& mu) const
-  //  {
-  //    RangeType ret;
-  //    evaluate(x, mu, ret);
-  //    return ret;
-  //  }
 
-  //  virtual void evaluate(const ParamType& x, const ParamType& mu, RangeType& ret) const
-  //  {
-  //    // process input
-  //    assert(x.size() == dimDomain);
-  //    DomainType x_fvector;
-  //    for (int i = 0; i < dimDomain; ++i)
-  //      x_fvector[i] = x(i);
-  //    // evaluate
-  //    evaluate(x_fvector, mu, ret);
-  //  }
-
-  //  virtual void evaluate(const DomainType& x, const ParamType& mu, ParamType& ret) const
-  //  {
-  //    // evaluate
-  //    RangeType ret_fvector;
-  //    evaluate(x, mu, ret_fvector);
-  //    // process output
-  //    assert(ret.size() == dimRange);
-  //    for (int i = 0; i < dimRange; ++i)
-  //      ret(i) = ret_fvector[i];
-  //  }
-
-  //  virtual void evaluate(const ParamType& x, const ParamType& mu, ParamType& ret) const
-  //  {
-  //    // process input
-  //    assert(x.size() == dimDomain);
-  //    DomainType x_fvector;
-  //    for (int i = 0; i < dimDomain; ++i)
-  //      x_fvector[i] = x(i);
-  //    // evaluate
-  //    RangeType ret_fvector;
-  //    evaluate(x_fvector, mu, ret_fvector);
-  //    // process output
-  //    assert(ret.size() == dimRange);
-  //    for (int i = 0; i < dimRange; ++i)
-  //      ret(i) = ret_fvector[i];
-  //  }
-
-  //  virtual ParamType evaluate(const ParamType& x, const ParamType& mu) const
-  //  {
-  //    ParamType ret;
-  //    evaluate(x, mu, ret);
-  //    return ret;
-  //  }
-
-  //  void report(std::ostream& out = std::cout, std::string prefix = "") const
-  //  {
-  //    out << prefix << "parameter explanation:" << std::endl;
-  //    assert(paramExplanation().size() == paramSize());
-  //    assert(paramRange().size() == 2);
-  //    assert(paramRange()[0].size() == paramSize());
-  //    assert(paramRange()[1].size() == paramSize());
-  //    for (unsigned int pp = 0; pp < paramSize(); ++pp)
-  //      out << prefix << "  " << paramExplanation()[pp] << ", between " << paramRange()[0](pp) << " and " <<
-  //      paramRange()[1](pp) << std::endl;
-  //  }
-  /* @} */
-}; // class Interface
-
-} // namespace Function
 } // namespace Stuff
 } // namespace Dune
 
