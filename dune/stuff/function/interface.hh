@@ -117,36 +117,36 @@ public:
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
   }
 
-  virtual bool separable() const
+  virtual bool affineparametric() const
   {
     return false;
   }
   /* @} */
 
-  /** \defgroup separable ´´These methods have to be implemented, if separable() == true.'' */
+  /** \defgroup affineparametric ´´These methods have to be implemented, if affineparametric() == true.'' */
   /* @{ */
   virtual size_t numComponents() const
   {
     DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if separable() == true!");
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
   }
 
   virtual const std::vector<Dune::shared_ptr<const ComponentType>>& components() const
   {
     DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if separable() == true!");
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
   }
 
   virtual size_t numCoefficients() const
   {
     DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if separable() == true!");
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
   }
 
   virtual const std::vector<Dune::shared_ptr<const CoefficientType>>& coefficients() const
   {
     DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if separable() == true!");
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
   }
   /* @} */
 
