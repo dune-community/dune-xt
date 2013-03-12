@@ -14,6 +14,9 @@
 
 #include <dune/common/shared_ptr.hh>
 
+#include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/aliases.hh>
+
 #include "interface.hh"
 #include "pattern.hh"
 
