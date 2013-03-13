@@ -172,8 +172,24 @@ public:
 
   void unitRow(const size_t row)
   {
-    for (const auto i : DSC::valueRange(cols()))
-      set(row, i, row == i);
+    clearRow(row);
+    set(row, row, ElementType(1));
+  }
+
+  void unitCol(const size_t col)
+  {
+    for (size_t row : DSC::valueRange(rows())) {
+      if (row == col)
+        set(row, col, ElementType(1));
+      else if (eigenMatrix_.coeff(row, col) != ElementType(0))
+        set(row, col, ElementType(0));
+    }
+  }
+
+  void clearRow(const size_t i)
+  {
+    auto row = eigenMatrix_.row(i);
+    row *= 0;
   }
 
   BackendType& backend()
