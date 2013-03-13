@@ -47,11 +47,11 @@ public:
   typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
   typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> InterfaceType;
 
-  using typename InterfaceType::DomainFieldType;
-  using InterfaceType::dimDomain;
+  typedef typename InterfaceType::DomainFieldType DomainFieldType;
+  static const int dimDomain = InterfaceType::dimDomain;
   typedef typename InterfaceType::DomainType DomainType;
-  using typename InterfaceType::RangeFieldType;
-  using InterfaceType::dimRange;
+  typedef typename InterfaceType::RangeFieldType RangeFieldType;
+  static const int dimRange = InterfaceType::dimRange;
   typedef typename InterfaceType::RangeType RangeType;
 
   static const std::string id()
