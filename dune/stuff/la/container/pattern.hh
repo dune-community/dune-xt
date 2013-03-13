@@ -16,6 +16,7 @@ class SparsityPatternDefault
 {
 private:
   typedef std::vector<std::set<unsigned int>> BaseType;
+  typedef typename BaseType::const_iterator ConstRowIteratorType;
 
 public:
   typedef BaseType::size_type size_type;
@@ -42,6 +43,16 @@ public:
   {
     assert(_index < size() && "Wrong index requested!");
     return vectorOfSets_[_index];
+  }
+
+  ConstRowIteratorType begin() const
+  {
+    return vectorOfSets_.begin();
+  }
+
+  ConstRowIteratorType end() const
+  {
+    return vectorOfSets_.end();
   }
 
 private:
