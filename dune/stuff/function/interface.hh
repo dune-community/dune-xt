@@ -165,6 +165,6 @@ public:
 } // namespace Stuff
 } // namespace Dune
 
-#include "parametric/separable/coefficient.hh"
+#include "affineparametric/coefficient.hh"
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
