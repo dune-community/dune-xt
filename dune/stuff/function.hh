@@ -19,6 +19,7 @@
 namespace Dune {
 namespace Stuff {
 
+
 // some forwards, includes are below
 template <class D, int d, class R, int r>
 class FunctionInterface;
@@ -34,60 +35,106 @@ template <class D, int d, class R, int r>
 class FunctionAffineParametricCheckerboard;
 
 
-std::vector<std::string> availableFunctions()
-{
-  return {"function.expression",
-          "function.checkerboard",
-          "function.spe10.model1",
-          "function.affineparametric.default",
-          "function.affineparametric.checkerboard"};
-} // std::vector< std::string > types()
-
-
 template <class D, int d, class R, int r>
-Dune::ParameterTree createSampleFunctionDescription(const std::string type)
+class Functions
 {
-  if (type == "function.checkerboard") {
-    typedef FunctionCheckerboard<D, d, R, r> FunctionType;
-    return FunctionType::createSampleDescription();
-  } else if (type == "function.expression") {
-    typedef FunctionExpression<D, d, R, r> FunctionType;
-    return FunctionType::createSampleDescription();
-  } else if (type == "function.spe10.model1") {
-    typedef FunctionSpe10Model1<D, d, R, r> FunctionType;
-    return FunctionType::createSampleDescription();
-  } else if (type == "function.affineparametric.default") {
-    typedef FunctionAffineParametricDefault<D, d, R, r> FunctionType;
-    return FunctionType::createSampleDescription();
-  } else if (type == "function.affineparametric.checkerboard") {
-    typedef FunctionAffineParametricCheckerboard<D, d, R, r> FunctionType;
-    return FunctionType::createSampleDescription();
-  } else
-    DUNE_THROW(Dune::RangeError,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
-                    << "' requested!");
-} // ... createSampleFunctionDescription(...)
+public:
+  static std::vector<std::string> available()
+  {
+    return {"function.expression",
+            "function.checkerboard",
+            "function.affineparametric.default",
+            "function.affineparametric.checkerboard"};
+  } // ... available(...)
+
+  static Dune::ParameterTree createSampleDescription(const std::string type)
+  {
+    if (type == "function.checkerboard")
+      return FunctionCheckerboard<D, d, R, r>::createSampleDescription();
+    else if (type == "function.expression")
+      return FunctionExpression<D, d, R, r>::createSampleDescription();
+    else if (type == "function.affineparametric.default")
+      return FunctionAffineParametricDefault<D, d, R, r>::createSampleDescription();
+    else if (type == "function.affineparametric.checkerboard")
+      return FunctionAffineParametricCheckerboard<D, d, R, r>::createSampleDescription();
+    else
+      DUNE_THROW(Dune::RangeError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
+                      << "' requested!");
+  } // ... createSampleDescription(...)
+
+  static FunctionInterface<D, d, R, r>* create(const std::string type,
+                                               const Dune::ParameterTree description = Dune::ParameterTree())
+  {
+    if (type == "function.checkerboard")
+      return FunctionCheckerboard<D, d, R, r>::create(description);
+    else if (type == "function.expression")
+      return FunctionExpression<D, d, R, r>::create(description);
+    else if (type == "function.affineparametric.default")
+      return FunctionAffineParametricDefault<D, d, R, r>::create(description);
+    else if (type == "function.affineparametric.checkerboard")
+      return FunctionAffineParametricCheckerboard<D, d, R, r>::create(description);
+    else
+      DUNE_THROW(Dune::RangeError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
+                      << "' requested!");
+  } // ... create(...)
+}; // class Functions
 
 
-template <class D, int d, class R, int r>
-FunctionInterface<D, d, R, r>* createFunction(const std::string type,
-                                              const Dune::ParameterTree description = Dune::ParameterTree())
+// ============================================== //
+// ==== begin spezialization for dims 2 -> 1 ==== //
+// ============================================== //
+template <class D, class R>
+class Functions<D, 2, R, 1>
 {
-  if (type == "function.checkerboard") {
-    return FunctionCheckerboard<D, d, R, r>::create(description);
-  } else if (type == "function.expression") {
-    return FunctionExpression<D, d, R, r>::create(description);
-  } else if (type == "function.spe10.model1") {
-    return FunctionSpe10Model1<D, d, R, r>::create(description);
-  } else if (type == "function.affineparametric.default") {
-    return FunctionAffineParametricDefault<D, d, R, r>::create(description);
-  } else if (type == "function.affineparametric.checkerboard") {
-    return FunctionAffineParametricCheckerboard<D, d, R, r>::create(description);
-  } else
-    DUNE_THROW(Dune::RangeError,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
-                    << "' requested!");
-} // ... createFunction(...)
+public:
+  static std::vector<std::string> available()
+  {
+    return {"function.expression",
+            "function.checkerboard",
+            "function.spe10.model1",
+            "function.affineparametric.default",
+            "function.affineparametric.checkerboard"};
+  } // ... available(...)
+
+  Dune::ParameterTree createSampleDescription(const std::string type)
+  {
+    if (type == "function.checkerboard")
+      return FunctionCheckerboard<D, 2, R, 1>::createSampleDescription();
+    else if (type == "function.expression")
+      return FunctionExpression<D, 2, R, 1>::createSampleDescription();
+    else if (type == "function.spe10.model1")
+      return FunctionSpe10Model1<D, 2, R, 1>::createSampleDescription();
+    else if (type == "function.affineparametric.default")
+      return FunctionAffineParametricDefault<D, 2, R, 1>::createSampleDescription();
+    else if (type == "function.affineparametric.checkerboard")
+      return FunctionAffineParametricCheckerboard<D, 2, R, 1>::createSampleDescription();
+    else
+      DUNE_THROW(Dune::RangeError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
+                      << "' requested!");
+  } // ... createSampleDescription(...)
+
+  static FunctionInterface<D, 2, R, 1>* create(const std::string type,
+                                               const Dune::ParameterTree description = Dune::ParameterTree())
+  {
+    if (type == "function.checkerboard")
+      return FunctionCheckerboard<D, 2, R, 1>::create(description);
+    else if (type == "function.expression")
+      return FunctionExpression<D, 2, R, 1>::create(description);
+    else if (type == "function.spe10.model1")
+      return FunctionSpe10Model1<D, 2, R, 1>::create(description);
+    else if (type == "function.affineparametric.default")
+      return FunctionAffineParametricDefault<D, 2, R, 1>::create(description);
+    else if (type == "function.affineparametric.checkerboard")
+      return FunctionAffineParametricCheckerboard<D, 2, R, 1>::create(description);
+    else
+      DUNE_THROW(Dune::RangeError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
+                      << "' requested!");
+  } // ... create(...)
+}; // class Functions< D, 2, R, 1 >
 
 
 } // namespace Stuff
