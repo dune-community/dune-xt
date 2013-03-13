@@ -20,33 +20,10 @@ namespace Stuff {
 
 // default, to allow for specialization
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class FunctionSpe10Model1 : public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+class FunctionSpe10Model1
 {
 public:
   FunctionSpe10Model1() = delete;
-
-  static Dune::ParameterTree createSampleDescription(const std::string /*subName*/ = "")
-  {
-    DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-                    << " FunctionSpe10Model1 not implemented for this combination of dimDomain = "
-                    << domainDim
-                    << " and rangeDim = "
-                    << rangeDim
-                    << "!");
-  }
-
-  static FunctionSpe10Model1<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>*
-  create(const Dune::Stuff::Common::ExtendedParameterTree /*description*/)
-  {
-    DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-                    << " FunctionSpe10Model1 not implemented for this combination of dimDomain = "
-                    << domainDim
-                    << " and rangeDim = "
-                    << rangeDim
-                    << "!");
-  }
 }; // class FunctionSpe10Model1
 
 
