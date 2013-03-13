@@ -78,7 +78,7 @@ FunctionInterface<D, d, R, r>* createFunction(const std::string type,
   } else if (type == "function.expression") {
     return FunctionExpression<D, d, R, r>::create(description);
   } else if (type == "function.spe10.model1") {
-    return Spe10Model1<D, d, R, r>::create(description);
+    return FunctionSpe10Model1<D, d, R, r>::create(description);
   } else if (type == "function.affineparametric.default") {
     return FunctionAffineParametricDefault<D, d, R, r>::create(description);
   } else if (type == "function.affineparametric.checkerboard") {
