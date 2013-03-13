@@ -47,9 +47,9 @@ struct CubeTest : public testing::Test
 
   void test_cube()
   {
-    const std::vector<std::string> types                = Dune::Stuff::availableGridProviders();
-    const ParameterTree description                     = Dune::Stuff::createSampleGridProviderDescription<GridType>(types[0]);
-    const GridProviderInterface<GridType>* gridProvider = createGridProvider<GridType>(types[0], description);
+    const std::vector<std::string> types                = Dune::Stuff::GridProviders<GridType>::available();
+    const ParameterTree description                     = Dune::Stuff::GridProviders<GridType>::createSampleDescription(types[0]);
+    const GridProviderInterface<GridType>* gridProvider = GridProviders<GridType>::create(types[0], description);
     EXPECT_GT(gridProvider->grid()->size(0), 0);
     EXPECT_GT(gridProvider->grid()->size(1), 0);
   }
