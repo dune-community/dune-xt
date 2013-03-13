@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include <dune/common/exceptions.hh>
 
@@ -15,20 +16,47 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
 
 
-// forward, to allow for specialization
+// default, to allow for specialization
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class Spe10Model1;
+class FunctionSpe10Model1 : public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+{
+public:
+  FunctionSpe10Model1() = delete;
+
+  static Dune::ParameterTree createSampleDescription(const std::string /*subName*/ = "")
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+                    << " FunctionSpe10Model1 not implemented for this combination of dimDomain = "
+                    << domainDim
+                    << " and rangeDim = "
+                    << rangeDim
+                    << "!");
+  }
+
+  static FunctionSpe10Model1<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>*
+  create(const Dune::Stuff::Common::ExtendedParameterTree /*description*/)
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+                    << " FunctionSpe10Model1 not implemented for this combination of dimDomain = "
+                    << domainDim
+                    << " and rangeDim = "
+                    << rangeDim
+                    << "!");
+  }
+}; // class FunctionSpe10Model1
 
 
 template <class DomainFieldImp, class RangeFieldImp>
-class Spe10Model1<DomainFieldImp, 2, RangeFieldImp, 1> : public Interface<DomainFieldImp, 2, RangeFieldImp, 1>
+class FunctionSpe10Model1<DomainFieldImp, 2, RangeFieldImp, 1>
+    : public FunctionInterface<DomainFieldImp, 2, RangeFieldImp, 1>
 {
 public:
-  typedef Spe10Model1<DomainFieldImp, 2, RangeFieldImp, 1> ThisType;
-  typedef Interface<DomainFieldImp, 2, RangeFieldImp, 1> BaseType;
+  typedef FunctionSpe10Model1<DomainFieldImp, 2, RangeFieldImp, 1> ThisType;
+  typedef FunctionInterface<DomainFieldImp, 2, RangeFieldImp, 1> BaseType;
 
   typedef typename BaseType::DomainFieldType DomainFieldType;
   static const int dimDomain = BaseType::dimDomain;
@@ -51,10 +79,10 @@ private:
   static const double maxValue     = 998.915;
 
 public:
-  Spe10Model1(const std::string filename, const DomainType& _lowerLeft, const DomainType& _upperRight,
-              //              const std::vector< size_t >& _numElements,
-              const std::string _name = id(), const int _order = 0, const double _minValue = minValue,
-              const double _maxValue = maxValue)
+  FunctionSpe10Model1(const std::string filename, const DomainType& _lowerLeft, const DomainType& _upperRight,
+                      //                      const std::vector< size_t >& _numElements,
+                      const std::string _name = id(), const int _order = 0, const double _minValue = minValue,
+                      const double _maxValue = maxValue)
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
     //    , numElements_(_numElements)
@@ -125,9 +153,9 @@ public:
 
     //    // clean up
     //    delete data;
-  } // Spe10Model1
+  } // FunctionSpe10Model1()
 
-  ~Spe10Model1()
+  ~FunctionSpe10Model1()
   {
     delete data_;
   }
@@ -152,7 +180,7 @@ public:
     }
   } // ... createSampleDescription(...)
 
-  static ThisType* createFromDescription(const Dune::Stuff::Common::ExtendedParameterTree description)
+  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree description)
   {
     // get data
     const std::string filenameIn                    = description.get<std::string>("filename");
@@ -177,7 +205,7 @@ public:
     }
     // create and return
     return new ThisType(filenameIn, lowerLeft, upperRight, /*numElements,*/ nameIn, orderIn, minValueIn, maxValueIn);
-  } // static ThisType createFromParamTree(const Dune::ParameterTree paramTree)
+  } // ... create(...)
 
   const DomainType& lowerLeft() const
   {
@@ -234,10 +262,9 @@ private:
   double* data_;
   double scale_;
   double shift_;
-}; // class Spe10Model1< DomainFieldImp, 2, RangeFieldImp, 1 >
+}; // class FunctionSpe10Model1< DomainFieldImp, 2, RangeFieldImp, 1 >
 
 
-} // namespace Function
 } // namespace Stuff
 } // namespace Dune
 
