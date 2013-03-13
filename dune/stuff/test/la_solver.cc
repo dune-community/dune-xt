@@ -14,6 +14,7 @@ static const size_t dimension = 5;
 template <class MatrixType>
 MatrixType* createIdentityMatrix(const MatrixType& /*emptyDummy*/);
 
+#if HAVE_EIGEN
 template <class ElementType>
 LA::Container::EigenDenseMatrix<ElementType>*
 createIdentityMatrix(const LA::Container::EigenDenseMatrix<ElementType>& /*emptyDummy*/)
@@ -38,11 +39,12 @@ createIdentityMatrix(const LA::Container::EigenRowMajorSparseMatrix<ElementType>
     matrix->set(ii, ii, ElementType(1));
   return matrix;
 }
-
+#endif // HAVE_EIGEN
 
 template <class VectorType>
 VectorType* createVector(const VectorType& /*emptyDummy*/);
 
+#if HAVE_EIGEN
 template <class ElementType>
 LA::Container::EigenDenseVector<ElementType>*
 createVector(const LA::Container::EigenDenseVector<ElementType>& /*emptyDummy*/)
@@ -53,6 +55,7 @@ createVector(const LA::Container::EigenDenseVector<ElementType>& /*emptyDummy*/)
     vector->set(ii, ElementType(1));
   return vector;
 }
+#endif // HAVE_EIGEN
 
 
 struct SolverBaseTest
@@ -75,6 +78,7 @@ struct SolverBaseTest
 };
 
 
+#if HAVE_EIGEN
 template <class TestFunctor>
 struct SolverTest : public ::testing::Test
 {
@@ -88,16 +92,18 @@ struct SolverTest : public ::testing::Test
     base_generator_type::Run();
   }
 }; // struct FunctionTest
+#endif // HAVE_EIGEN
 
 
 typedef ::testing::Types<SolverBaseTest> SolverTestTypes;
 
-
+#if HAVE_EIGEN
 TYPED_TEST_CASE(SolverTest, SolverTestTypes);
 TYPED_TEST(SolverTest, All)
 {
   this->run();
 }
+#endif // HAVE_EIGEN
 
 
 int main(int argc, char** argv)
