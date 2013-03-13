@@ -49,11 +49,11 @@ public:
   }
 
 private:
-  static const size_t numXelements       = 100;
-  static const size_t numYelements       = 1;
-  static const size_t numZelements       = 20;
-  static const constexpr double minValue = 0.001;
-  static const constexpr double maxValue = 998.915;
+  static const size_t numXelements = 100;
+  static const size_t numYelements = 1;
+  static const size_t numZelements = 20;
+  static constexpr double minValue = 0.001;
+  static constexpr double maxValue = 998.915;
 
 public:
   FunctionSpe10Model1(const std::string filename, const DomainType& _lowerLeft, const DomainType& _upperRight,
