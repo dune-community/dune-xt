@@ -36,11 +36,10 @@ class FunctionAffineSeparablCoefficient;
 
 ///**
 //  \brief  Provides a function which evaluates a given mathematical expression at runtime.
-
 //          Given a mathematical expression as a string, a domain \f$ K_d^{m \geq 1} \f$ and a range \f$ K_r^{n \geq 1}
 //          \f$ this function represents the map
 //          \f{eqnarray}
-//            f:K_d^m \to K_r^n\\
+//            f:K_d^m \to K_r^n
 //            x = (x_1, \dots, x_m)' \mapsto (f_1(x), \dots f_n(x))',
 //          \f}
 //          where \f$ K_d \f$ is the DomainType and \f$ K_r \f$ is the RangeType, usually a power of \f$ \mathcal{R}
@@ -54,8 +53,8 @@ class FunctionAffineSeparablCoefficient;
 //          \f$ 0 \leq i \leq m - 1 \f$.
 // **/
 /**
- *  \brief base class that wraps makes a function out of the stuff from mathexpr.hh
- *  \attention  Most surely you do not want to use this class directly!
+ *  \brief base class that makes a function out of the stuff from mathexpr.hh
+ *  \attention  Most surely you do not want to use this class directly, but FunctionExpression!
  */
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class FunctionExpressionBase
@@ -214,7 +213,7 @@ private:
     ret = op_[0]->Val();
   }
 
-  void setup(const std::string& variable, const std::vector<std::string>& _expression)
+  void setup(const std::string& _variable, const std::vector<std::string>& _expression)
   {
     dune_static_assert((dimDomain > 0), "Really?");
     dune_static_assert((dimRange > 0), "Really?");
@@ -229,7 +228,7 @@ private:
     for (int ii = 0; ii < dimRange; ++ii)
       expressions_.push_back(_expression[ii]);
     // set variable (i.e. "x")
-    variable_ = variable;
+    variable_ = _variable;
     // fill variables (i.e. "x[0]", "x[1]", ...)
     for (int ii = 0; ii < dimDomain; ++ii) {
       std::stringstream variableStream;
@@ -245,7 +244,7 @@ private:
     for (int ii = 0; ii < dimRange; ++ii) {
       op_[ii] = new ROperation(expressions_[ii].c_str(), dimDomain, vararray_);
     }
-  } // void setup(const std::string& variable, const std::vector< std::string >& expressions)
+  } // void setup(const std::string& _variable, const std::vector< std::string >& expressions)
 
   void cleanup()
   {
