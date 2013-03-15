@@ -143,8 +143,8 @@ public:
     description["filename"]   = "perm_case1.dat";
     description["lowerLeft"]  = "[0.0; 0.0]";
     description["upperRight"] = "[762.0; 15.24]";
-    description["minValue"]   = Dune::Stuff::Common::toString(minValue);
-    description["maxValue"]   = Dune::Stuff::Common::toString(maxValue);
+    description["minValue"]   = "0.001"; // Dune::Stuff::Common::toString(minValue);
+    description["maxValue"]   = "998.915"; // Dune::Stuff::Common::toString(maxValue);
     //    description["numElements"] = "[100; 20]";
     description["name"]  = id();
     description["order"] = "0";
