@@ -45,16 +45,16 @@ public:
             "gridprovider.starcd"};
   } // ... available()
 
-  static Dune::ParameterTree createSampleDescription(const std::string type)
+  static Dune::ParameterTree createSampleDescription(const std::string type, const std::string subname = "")
   {
     if (type == "gridprovider.cube") {
-      return GridProviderCube<GridType>::createSampleDescription();
+      return GridProviderCube<GridType>::createSampleDescription(subname);
 #ifdef HAVE_UNSTRUCTURED_GRIDFACTORY
     } else if (type == "gridprovider.gmsh") {
-      return GridProviderGmsh<GridType>::createSampleDescription();
+      return GridProviderGmsh<GridType>::createSampleDescription(subname);
 #endif
     } else if (type == "gridprovider.starcd") {
-      return GridProviderStarCD<GridType>::createSampleDescription();
+      return GridProviderStarCD<GridType>::createSampleDescription(subname);
     } else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Common::colorStringRed("ERROR:") << " unknown gridprovider '" << type << "' requested!");
