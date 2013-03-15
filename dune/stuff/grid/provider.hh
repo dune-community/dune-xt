@@ -60,7 +60,7 @@ public:
                  "\n" << Common::colorStringRed("ERROR:") << " unknown gridprovider '" << type << "' requested!");
   } // ... createSampleDescription(...)
 
-  static GridProviderInterface<GridType>* create(const std::string& type = "gridprovider.cube",
+  static GridProviderInterface<GridType>* create(const std::string& type = available()[0],
                                                  const Dune::ParameterTree description = Dune::ParameterTree())
   {
     if (type == "gridprovider.cube")
