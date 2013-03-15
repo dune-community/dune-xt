@@ -255,14 +255,14 @@ public:
     return {"boundaryinfo.alldirichlet", "boundaryinfo.allneumann", "boundaryinfo.idbased"};
   } // ... available(...)
 
-  static Dune::ParameterTree createSampleDescription(const std::string type)
+  static Dune::ParameterTree createSampleDescription(const std::string type, const std::string subname = "")
   {
     if (type == "boundaryinfo.alldirichlet")
-      return GridboundaryAllDirichlet<GridViewType>::createSampleDescription();
+      return GridboundaryAllDirichlet<GridViewType>::createSampleDescription(subname);
     else if (type == "boundaryinfo.allneumann")
-      return GridboundaryAllNeumann<GridViewType>::createSampleDescription();
+      return GridboundaryAllNeumann<GridViewType>::createSampleDescription(subname);
     else if (type == "boundaryinfo.idbased")
-      return GridboundaryIdBased<GridViewType>::createSampleDescription();
+      return GridboundaryIdBased<GridViewType>::createSampleDescription(subname);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
