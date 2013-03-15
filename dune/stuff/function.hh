@@ -1,16 +1,9 @@
 #ifndef DUNE_STUFF_FUNCTION_HH
 #define DUNE_STUFF_FUNCTION_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#elif defined(HAVE_CONFIG_H)
-#include <config.h>
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #include <string>
 #include <vector>
 
-#include <dune/common/shared_ptr.hh>
 #include <dune/common/parametertree.hh>
 #include <dune/common/exceptions.hh>
 
@@ -82,9 +75,7 @@ public:
 }; // class Functions
 
 
-// ============================================== //
-// ==== begin spezialization for dims 2 -> 1 ==== //
-// ============================================== //
+// spezialization for dims 2 -> 1
 template <class D, class R>
 class Functions<D, 2, R, 1>
 {
@@ -98,7 +89,7 @@ public:
             "function.affineparametric.checkerboard"};
   } // ... available(...)
 
-  Dune::ParameterTree createSampleDescription(const std::string type)
+  static Dune::ParameterTree createSampleDescription(const std::string type)
   {
     if (type == "function.checkerboard")
       return FunctionCheckerboard<D, 2, R, 1>::createSampleDescription();
