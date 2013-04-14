@@ -410,13 +410,13 @@ private:
 
 
 template <class ElementType = double, class size_type = unsigned int>
-Dune::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_type _size)
+std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_type _size)
 {
   // create the sparsity pattern
   SparsityPatternDefault pattern(_size);
   for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
     pattern.set(ii).insert(ii);
-  Dune::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> ret =
+  std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> ret =
       Dune::make_shared<EigenRowMajorSparseMatrix<ElementType>>(_size, _size, pattern);
   for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
     ret->set(ii, ii, 1.0);
