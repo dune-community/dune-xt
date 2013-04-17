@@ -9,14 +9,15 @@
 
 #if HAVE_EIGEN
 
+#include <algorithm>
+#include <memory>
+
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
-#include <dune/common/shared_ptr.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
 
-#include <algorithm>
 #include "interface.hh"
 #include "pattern.hh"
 
