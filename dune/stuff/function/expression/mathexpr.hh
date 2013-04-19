@@ -196,6 +196,4 @@ signed char EqStr(const char* s, const char* s2);
 signed char CompStr(const char* s, int n, const char* s2);
 char* DelStr(const char* s, int n);
 
-#include "mathexpr.cc"
-
 #endif // DUNE_STUFF_FUNCTION_NONPARAMETRIC_EXPRESSION_MATHEXPRESSION_HH
