@@ -43,3 +43,6 @@ demos
 dune/stuff/test/gtest/lib
 data
 !dune/stuff/data
+.libs
+*.o
+*.la
