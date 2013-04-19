@@ -23,7 +23,7 @@ namespace LA {
 namespace Solver {
 
 
-std::vector<std::string> types()
+static std::vector<std::string> types()
 {
   return
   {
