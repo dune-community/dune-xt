@@ -35,8 +35,13 @@ template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim
 class FunctionExpression
     : public FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 #if HAVE_DUNE_FEM
+#if DUNE_VERSION_NEWER(DUNE_FEM, 1, 4)
+      ,
+      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+#else
       ,
       public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+#endif
                                  FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
 #endif
       ,
