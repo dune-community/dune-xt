@@ -16,12 +16,13 @@
 
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/parameter.hh>
+#include <dune/stuff/localfunction/interface.hh>
 
 namespace Dune {
 namespace Stuff {
 
 
-//! forward
+// forward, needed in the interface, included below
 template <class RangeFieldImp>
 class FunctionAffineSeparablCoefficient;
 
@@ -56,7 +57,7 @@ public:
     return "function";
   }
 
-  /** \defgroup type ´´Theis method has to be implemented for parametric functions and determines,
+  /** \defgroup type ´´This method has to be implemented for parametric functions and determines
    *                   which evaluate() is callable.''
    */
   /* @{ */
@@ -158,6 +159,60 @@ public:
     RangeType ret;
     evaluate(_x, ret);
     return ret;
+  }
+
+  // forward, needed for the traits
+  template <class EntityImp>
+  class LocalFunctionAdapter;
+
+  template <class EntityImp>
+  class LocalFunctionAdapterTraits
+  {
+  public:
+    typedef LocalFunctionAdapter<EntityImp> derived_type;
+    typedef EntityImp EntityType;
+  };
+
+  template <class EntityImp>
+  class LocalFunctionAdapter : public LocalFunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRange,
+                                                             LocalFunctionAdapterTraits<EntityImp>>
+  {
+  public:
+    typedef LocalFunctionAdapterTraits<EntityImp> Traits;
+
+    typedef typename Traits::EntityType EntityType;
+
+    LocalFunctionAdapter(const ThisType& function, const EntityType& en)
+      : wrapped_(function)
+      , entity_(en)
+    {
+      assert(!wrapped_.parametric());
+    }
+
+    virtual int order() const
+    {
+      return wrapped_.order();
+    }
+
+    const EntityType& entity() const
+    {
+      return entity_;
+    }
+
+    void evaluate(const DomainType& x, RangeType& ret) const
+    {
+      wrapped_.evaluate(entity_.geometry().global(x), ret);
+    }
+
+  private:
+    const ThisType& wrapped_;
+    const EntityType& entity_;
+  };
+
+  template <class EntityType>
+  LocalFunctionAdapter<EntityType> localFunction(const EntityType& entity) const
+  {
+    return LocalFunctionAdapter<EntityType>(*this, entity);
   }
 }; // class FunctionInterface
 
