@@ -14,24 +14,19 @@ namespace Dune {
 namespace Stuff {
 
 
-// forward, to allow for specialization
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class FunctionCheckerboard;
-
-
-template <class DomainFieldImp, int domainDim, class RangeFieldImp>
-class FunctionCheckerboard<DomainFieldImp, domainDim, RangeFieldImp, 1>
-    : public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, 1>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+class FunctionCheckerboardBase
+    : public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
 {
-public:
-  typedef FunctionCheckerboard<DomainFieldImp, domainDim, RangeFieldImp, 1> ThisType;
-  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, 1> BaseType;
+  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols> BaseType;
 
+public:
   typedef typename BaseType::DomainFieldType DomainFieldType;
   static const int dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
   typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const int dimRange = BaseType::dimRange;
+  static const int dimRangeRows = BaseType::dimRangeRows;
+  static const int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
 
   static const std::string id()
@@ -39,9 +34,9 @@ public:
     return BaseType::id() + ".checkerboard";
   }
 
-  FunctionCheckerboard(const DomainType _lowerLeft, const DomainType _upperRight,
-                       const std::vector<size_t> _numElements, const std::vector<RangeFieldType> _values,
-                       const std::string _name = id())
+  FunctionCheckerboardBase(const DomainType _lowerLeft, const DomainType _upperRight,
+                           const std::vector<size_t> _numElements, const std::vector<RangeType> _values,
+                           const std::string _name = id())
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
     , numElements_(_numElements)
@@ -51,7 +46,7 @@ public:
     // checks
     dune_static_assert((dimDomain > 0), "Really?");
     dune_static_assert((dimDomain <= 3), "Not implemented!");
-    dune_static_assert((dimRange > 0), "Really?");
+    dune_static_assert((dimRangeRows > 0), "Really?");
     // get total number of subdomains
     size_t totalSubdomains = 1;
     for (int dd = 0; dd < dimDomain; ++dd) {
@@ -62,45 +57,6 @@ public:
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
                       << " please provide at least as many '_values' as subdomains given by '_numElements'!");
   } // FunctionCheckerboard(...)
-
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
-  {
-    Dune::ParameterTree description;
-    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
-    description["upperRight"]  = "[1.0; 1.0; 1.0]";
-    description["numElements"] = "[2; 2; 2]";
-    description["values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
-    description["name"] = id();
-    if (subName.empty())
-      return description;
-    else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
-    }
-  } // ... createSampleDescription(...)
-
-  static ThisType* create(const DSC::ExtendedParameterTree description)
-  {
-    // get data
-    const std::vector<DomainFieldType> lowerLefts  = description.getVector("lowerLeft", DomainFieldType(0), dimDomain);
-    const std::vector<DomainFieldType> upperRights = description.getVector("upperRight", DomainFieldType(1), dimDomain);
-    const std::vector<size_t> numElements          = description.getVector("numElements", size_t(1), dimDomain);
-    size_t subdomains = 1;
-    for (size_t ii = 0; ii < numElements.size(); ++ii)
-      subdomains *= numElements[ii];
-    const std::vector<RangeFieldType> values = description.getVector("values", RangeFieldType(1), subdomains);
-    // convert and leave the checks to the constructor
-    DomainType lowerLeft;
-    DomainType upperRight;
-    for (int dd = 0; dd < dimDomain; ++dd) {
-      lowerLeft[dd]  = lowerLefts[dd];
-      upperRight[dd] = upperRights[dd];
-    }
-    // create and return
-    return new ThisType(lowerLeft, upperRight, numElements, values);
-  } // ... create(...)
-
 
   const DomainType& lowerLeft() const
   {
@@ -117,7 +73,7 @@ public:
     return numElements_;
   }
 
-  const std::vector<RangeFieldType>& values() const
+  const std::vector<RangeType>& values() const
   {
     return values_;
   }
@@ -162,9 +118,87 @@ private:
   DomainType lowerLeft_;
   DomainType upperRight_;
   std::vector<size_t> numElements_;
-  std::vector<RangeFieldType> values_;
+  std::vector<RangeType> values_;
   std::string name_;
-}; // class FunctionCheckerboard
+}; // class FunctionCheckerboardBase
+
+
+// forward, to allow for specialization
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
+class FunctionCheckerboard
+{
+public:
+  FunctionCheckerboard() = delete;
+};
+
+
+template <class DomainFieldImp, int domainDim, class RangeFieldImp>
+class FunctionCheckerboard<DomainFieldImp, domainDim, RangeFieldImp, 1, 1>
+    : public FunctionCheckerboardBase<DomainFieldImp, domainDim, RangeFieldImp, 1, 1>
+{
+  typedef FunctionCheckerboardBase<DomainFieldImp, domainDim, RangeFieldImp, 1, 1> BaseType;
+
+public:
+  typedef FunctionCheckerboard<DomainFieldImp, domainDim, RangeFieldImp, 1, 1> ThisType;
+
+  typedef typename BaseType::DomainFieldType DomainFieldType;
+  static const unsigned int dimDomain = BaseType::dimDomain;
+  typedef typename BaseType::DomainType DomainType;
+  typedef typename BaseType::RangeFieldType RangeFieldType;
+  typedef typename BaseType::RangeType RangeType;
+
+  using BaseType::id;
+
+  FunctionCheckerboard(const DomainType _lowerLeft, const DomainType _upperRight,
+                       const std::vector<size_t> _numElements, const std::vector<RangeType> _values,
+                       const std::string _name = id())
+    : BaseType(_lowerLeft, _upperRight, _numElements, _values, _name)
+  {
+  }
+
+  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  {
+    Dune::ParameterTree description;
+    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
+    description["upperRight"]  = "[1.0; 1.0; 1.0]";
+    description["numElements"] = "[2; 2; 2]";
+    description["values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
+    description["name"] = id();
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
+  } // ... createSampleDescription(...)
+
+  static ThisType* create(const DSC::ExtendedParameterTree description)
+  {
+    // get data
+    const std::vector<DomainFieldType> lowerLefts  = description.getVector("lowerLeft", DomainFieldType(0), dimDomain);
+    const std::vector<DomainFieldType> upperRights = description.getVector("upperRight", DomainFieldType(1), dimDomain);
+    const std::vector<size_t> numElements          = description.getVector("numElements", size_t(1), dimDomain);
+    size_t subdomains = 1;
+    for (size_t ii = 0; ii < numElements.size(); ++ii)
+      subdomains *= numElements[ii];
+    const std::vector<RangeFieldType> rangeFieldTypeValues =
+        description.getVector("values", RangeFieldType(1), subdomains);
+    std::vector<RangeType> rangeTypeValues(rangeFieldTypeValues.size(), RangeType(0));
+    for (size_t ii = 0; ii < rangeFieldTypeValues.size(); ++ii)
+      rangeTypeValues[ii] = rangeFieldTypeValues[ii];
+    // convert and leave the checks to the base constructor
+    DomainType lowerLeft;
+    DomainType upperRight;
+    for (int dd = 0; dd < dimDomain; ++dd) {
+      lowerLeft[dd]  = lowerLefts[dd];
+      upperRight[dd] = upperRights[dd];
+    }
+    // create and return
+    return new ThisType(lowerLeft, upperRight, numElements, rangeTypeValues);
+  } // ... create(...)
+};
+
 
 } // namespace Stuff
 } // namespace Dune
