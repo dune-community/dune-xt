@@ -19,7 +19,7 @@ namespace Stuff {
 
 
 // default, to allow for specialization
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class FunctionSpe10Model1
 {
 public:
@@ -28,12 +28,13 @@ public:
 
 
 template <class DomainFieldImp, class RangeFieldImp>
-class FunctionSpe10Model1<DomainFieldImp, 2, RangeFieldImp, 1>
-    : public FunctionInterface<DomainFieldImp, 2, RangeFieldImp, 1>
+class FunctionSpe10Model1<DomainFieldImp, 2, RangeFieldImp, 1, 1>
+    : public FunctionInterface<DomainFieldImp, 2, RangeFieldImp, 1, 1>
 {
+  typedef FunctionInterface<DomainFieldImp, 2, RangeFieldImp, 1, 1> BaseType;
+
 public:
-  typedef FunctionSpe10Model1<DomainFieldImp, 2, RangeFieldImp, 1> ThisType;
-  typedef FunctionInterface<DomainFieldImp, 2, RangeFieldImp, 1> BaseType;
+  typedef FunctionSpe10Model1<DomainFieldImp, 2, RangeFieldImp, 1, 1> ThisType;
 
   typedef typename BaseType::DomainFieldType DomainFieldType;
   static const int dimDomain = BaseType::dimDomain;
@@ -239,7 +240,7 @@ private:
   double* data_;
   double scale_;
   double shift_;
-}; // class FunctionSpe10Model1< DomainFieldImp, 2, RangeFieldImp, 1 >
+}; // class FunctionSpe10Model1< DomainFieldImp, 2, RangeFieldImp, 1, 1 >
 
 
 } // namespace Stuff
