@@ -197,6 +197,7 @@ public:
  */
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+    : public LocalizableFunction
 {
   typedef GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
 
