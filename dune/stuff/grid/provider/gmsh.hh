@@ -11,6 +11,7 @@
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
 
+#include <memory>
 #include <sstream>
 #include <type_traits>
 
@@ -68,7 +69,7 @@ public:
     dune_static_assert(!(Dune::is_same<GridType, Dune::YaspGrid<dim>>::value),
                        "GmshReader does not work with YaspGrid!");
     dune_static_assert(!(Dune::is_same<GridType, Dune::SGrid<2, 2>>::value), "GmshReader does not work with SGrid!");
-    grid_ = Dune::shared_ptr<GridType>(GmshReader<GridType>::read(filename));
+    grid_ = std::shared_ptr<GridType>(GmshReader<GridType>::read(filename));
   }
 
   GridProviderGmsh(ThisType& other)
@@ -120,19 +121,19 @@ public:
   }
 
   //! access to shared ptr
-  virtual Dune::shared_ptr<GridType> grid()
+  virtual std::shared_ptr<GridType> grid()
   {
     return grid_;
   }
 
   //! const access to shared ptr
-  virtual const Dune::shared_ptr<const GridType> grid() const
+  virtual const std::shared_ptr<const GridType> grid() const
   {
     return grid_;
   }
 
 private:
-  Dune::shared_ptr<GridType> grid_;
+  std::shared_ptr<GridType> grid_;
 }; // class GridProviderGmsh
 
 

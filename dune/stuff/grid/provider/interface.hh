@@ -9,8 +9,9 @@
 
 #if HAVE_DUNE_GRID
 
+#include <memory>
+
 #include <dune/common/fvector.hh>
-#include <dune/common/shared_ptr.hh>
 #include <dune/common/parametertree.hh>
 
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
@@ -51,8 +52,8 @@ public:
   {
   }
 
-  virtual Dune::shared_ptr<GridType> grid() = 0;
-  virtual const Dune::shared_ptr<const GridType> grid() const = 0;
+  virtual std::shared_ptr<GridType> grid() = 0;
+  virtual const std::shared_ptr<const GridType> grid() const = 0;
 
   virtual void visualize(const std::string filename = id()) const
   {

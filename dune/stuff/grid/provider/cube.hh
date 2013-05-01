@@ -9,8 +9,10 @@
 
 #if HAVE_DUNE_GRID
 
+#include <memory>
 #include <sstream>
 #include <type_traits>
+
 #include <boost/assign/list_of.hpp>
 
 #include <dune/common/parametertree.hh>
