@@ -509,6 +509,99 @@ public:
 }; // class AffineParametricFunctionInterface
 
 
+/**
+ *  \brief  Interface for matrix valued nonparametric timedependent function.
+ *
+ *          See spezialization for rangeDimCols = 1 for scalar and vector valued functions.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows>
+class TimedependentFunctionInterface
+{
+public:
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRangeRows = rangeDimRows;
+  static const unsigned int dimRangeCols = rangeDimCols;
+  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
+
+  virtual ~TimedependentFunctionInterface()
+  {
+  }
+
+  static std::string id()
+  {
+    return "function.timedependent";
+  }
+
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /* @{ */
+  virtual std::string name() const
+  {
+    return "function.timedependent";
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+  /* @} */
+
+  /** \defgroup must ´´This method has to be implemented.'' */
+  /* @{ */
+  virtual void evaluate(const DomainType& /*_x*/, const double& /*_t*/, RangeType& /*_ret*/) const = 0;
+  /* @} */
+}; // class TimedependentFunctionInterface
+
+
+/**
+ *  \brief  Interface for scalar and vector valued nonparametric timedependent function.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class TimedependentFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+{
+public:
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRange     = rangeDim;
+  static const unsigned int dimRangeRows = dimRange;
+  static const unsigned int dimRangeCols = 1;
+  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
+
+  virtual ~TimedependentFunctionInterface()
+  {
+  }
+
+  static std::string id()
+  {
+    return "function.timedependent";
+  }
+
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /* @{ */
+  virtual std::string name() const
+  {
+    return "function.timedependent";
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+  /* @} */
+
+  /** \defgroup must ´´This method has to be implemented.'' */
+  /* @{ */
+  virtual void evaluate(const DomainType& /*_x*/, const double& /*_t*/, RangeType& /*_ret*/) const = 0;
+  /* @} */
+}; // class TimedependentFunctionInterface
+
+
 } // namespace Stuff
 } // namespace Dune
 
