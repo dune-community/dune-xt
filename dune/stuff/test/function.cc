@@ -3,38 +3,37 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/shared_ptr.hh>
 
-#include <dune/stuff/function.hh>
+#include <dune/stuff/function/interface.hh>
+#include <dune/stuff/function/expression.hh>
+#include <dune/stuff/function/checkerboard.hh>
+#include <dune/stuff/function/spe10.hh>
+
 
 using namespace Dune::Stuff;
 
-typedef testing::Types<FunctionExpression<double, 1, double, 1>, FunctionCheckerboard<double, 1, double, 1>>
-    NonparametricFunctions;
 
-typedef testing::Types<FunctionAffineParametricCheckerboard<double, 1, double, 1>,
-                       FunctionAffineParametricDefault<double, 1, double, 1>> SeparableFunctions;
+typedef testing::Types<FunctionExpression<double, 1, double, 1>, FunctionCheckerboard<double, 1, double, 1>,
+                       FunctionCheckerboard<double, 2, double, 1>, FunctionCheckerboard<double, 3, double, 1>
+                       //                      , FunctionSpe10Model1< double, 2, double, 1 > // <- this makes only
+                       //                      sense, if the data file is present
+                       > Functions;
 
-
-template <class T>
-struct NonparametricTest : public ::testing::Test
+template <class FunctionType>
+struct FunctionTest : public ::testing::Test
 {
-  typedef T FunctionType;
   typedef typename FunctionType::DomainFieldType DomainFieldType;
   static const int dimDomain = FunctionType::dimDomain;
   typedef typename FunctionType::DomainType DomainType;
   typedef typename FunctionType::RangeFieldType RangeFieldType;
-  static const int dimRange = FunctionType::dimRange;
+  static const int dimRangeRows = FunctionType::dimRangeRows;
+  static const int dimRangeCols = FunctionType::dimRangeCols;
   typedef typename FunctionType::RangeType RangeType;
-  typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
 
   void check() const
   {
-    const std::unique_ptr<InterfaceType> function(
-        Functions<DomainFieldType, dimDomain, RangeFieldType, dimRange>::create(
-            FunctionType::id(), FunctionType::createSampleDescription()));
     DomainType x(1);
-    RangeType ret;
-    if (function->parametric())
-      DUNE_THROW(Dune::InvalidStateException, "ERROR: nonparametric function returned parametric() == true");
+    RangeType ret(0);
+    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::createSampleDescription()));
     const std::string DUNE_UNUSED(name) = function->name();
     const int DUNE_UNUSED(order) = function->order();
     function->evaluate(x, ret);
@@ -42,65 +41,8 @@ struct NonparametricTest : public ::testing::Test
 };
 
 
-template <class T>
-struct SeparableTest : public ::testing::Test
-{
-  typedef T FunctionType;
-  typedef typename FunctionType::DomainFieldType DomainFieldType;
-  static const int dimDomain = FunctionType::dimDomain;
-  typedef typename FunctionType::DomainType DomainType;
-  typedef typename FunctionType::RangeFieldType RangeFieldType;
-  static const int dimRange = FunctionType::dimRange;
-  typedef typename FunctionType::RangeType RangeType;
-
-  typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRange> InterfaceType;
-  typedef FunctionAffineParametricDefault<DomainFieldType, dimDomain, RangeFieldType, dimRange> DefaultType;
-
-  typedef Common::Parameter::FieldType ParamFieldType;
-  static const int maxParamDim = Common::Parameter::maxDim;
-  typedef Common::Parameter::Type ParamType;
-
-  void check() const
-  {
-    const std::unique_ptr<InterfaceType> function(FunctionType::create(FunctionType::createSampleDescription()));
-    if (!function->parametric())
-      DUNE_THROW(Dune::InvalidStateException, "ERROR: separable function returned parametric() == false!");
-    if (!function->affineparametric())
-      DUNE_THROW(Dune::InvalidStateException, "ERROR: separable function returned affineparametric() == false!");
-    const std::string name = function->name();
-    const int order        = function->order();
-    const size_t paramSize = function->paramSize();
-    ParamType mu(paramSize);
-    const std::vector<ParamType> paramRange = function->paramRange();
-    if (paramRange.size() != 2)
-      DUNE_THROW(Dune::InvalidStateException, "ERROR: paramRange() has wrong size!");
-    if (paramRange[0].size() != paramSize)
-      DUNE_THROW(Dune::InvalidStateException, "ERROR: paramRange()[0] has wrong size!");
-    if (paramRange[1].size() != paramSize)
-      DUNE_THROW(Dune::InvalidStateException, "ERROR: paramRange()[1] has wrong size!");
-    for (size_t pp = 0; pp < paramSize; ++pp)
-      mu[pp] = paramRange[0][pp] + 0.5 * (paramRange[1][pp] - paramRange[0][pp]);
-    DomainType x(1);
-    RangeType ret;
-    function->evaluate(x, mu, ret);
-    const std::vector<std::string>& paramExplanation = function->paramExplanation();
-    if (paramExplanation.size() != paramSize)
-      DUNE_THROW(Dune::InvalidStateException, "ERROR: paramExplanation() has wrong size!");
-    DefaultType DUNE_UNUSED(separableDefault)(
-        paramSize, paramRange, function->components(), function->coefficients(), paramExplanation, order, name);
-  }
-};
-
-
-TYPED_TEST_CASE(NonparametricTest, NonparametricFunctions);
-TYPED_TEST(NonparametricTest, Nonparametric)
-{
-  this->check();
-}
-
-
-TYPED_TEST_CASE(SeparableTest, SeparableFunctions);
-TYPED_TEST(SeparableTest, Separable)
+TYPED_TEST_CASE(FunctionTest, Functions);
+TYPED_TEST(FunctionTest, Function)
 {
   this->check();
 }
