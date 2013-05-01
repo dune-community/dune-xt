@@ -24,7 +24,7 @@ namespace Stuff {
 
 // forward, needed in the interface, included below
 template <class RangeFieldImp>
-class AffineSeparableCoefficientFunction;
+class AffineParametricCoefficientFunction;
 
 
 // forward, needed in the interface
@@ -58,7 +58,7 @@ public:
   typedef Common::Parameter::Type ParamType;
 
   typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols> ComponentType;
-  typedef AffineSeparableCoefficientFunction<RangeFieldType> CoefficientType;
+  typedef AffineParametricCoefficientFunction<RangeFieldType> CoefficientType;
 
   virtual ~GenericStationaryFunctionInterface()
   {
