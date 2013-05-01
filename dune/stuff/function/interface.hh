@@ -1,18 +1,18 @@
 ﻿#ifndef DUNE_STUFF_FUNCTION_INTERFACE_HH
 #define DUNE_STUFF_FUNCTION_INTERFACE_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#elif defined(HAVE_CONFIG_H)
-#include <config.h>
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #include <vector>
+#include <memory>
+#include <string>
 
-#include <dune/common/shared_ptr.hh>
 #include <dune/common/fvector.hh>
+#include <dune/common/fmatrix.hh>
 #include <dune/common/dynvector.hh>
-#include <dune/common/function.hh>
+
+#if HAVE_DUNE_FEM
+#include <dune/fem/function/common/function.hh>
+#include <dune/fem/space/common/functionspace.hh>
+#endif
 
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/parameter.hh>
@@ -24,31 +24,43 @@ namespace Stuff {
 
 // forward, needed in the interface, included below
 template <class RangeFieldImp>
-class FunctionAffineSeparablCoefficient;
+class AffineSeparableCoefficientFunction;
 
 
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class FunctionInterface
+// forward, needed in the interface
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows>
+class FunctionInterface;
+
+
+/**
+ *  \brief  Interface for stationary matrix valued functions, nonparametric, parametric and affineparametric.
+ *
+ *          See spezialization for rangeDimCols = 1 for scalar and vector valued functions.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows>
+class GenericStationaryFunctionInterface
 {
 public:
-  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
+  typedef GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
+      ThisType;
 
   typedef DomainFieldImp DomainFieldType;
-  static const int dimDomain = domainDim;
+  static const unsigned int dimDomain = domainDim;
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
-  static const int dimRange = rangeDim;
-  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
+  static const unsigned int dimRangeRows = rangeDimRows;
+  static const unsigned int dimRangeCols = rangeDimCols;
+  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
 
   typedef Common::Parameter::FieldType ParamFieldType;
-  static const int maxParamDim = Common::Parameter::maxDim;
+  static const unsigned int maxParamDim = Common::Parameter::maxDim;
   typedef Common::Parameter::Type ParamType;
 
-  typedef ThisType ComponentType;
-  typedef FunctionAffineSeparablCoefficient<RangeFieldType> CoefficientType;
+  typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols> ComponentType;
+  typedef AffineSeparableCoefficientFunction<RangeFieldType> CoefficientType;
 
-  virtual ~FunctionInterface()
+  virtual ~GenericStationaryFunctionInterface()
   {
   }
 
@@ -56,16 +68,6 @@ public:
   {
     return "function";
   }
-
-  /** \defgroup type ´´This method has to be implemented for parametric functions and determines
-   *                   which evaluate() is callable.''
-   */
-  /* @{ */
-  virtual bool parametric() const
-  {
-    return false;
-  }
-  /* @} */
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
@@ -80,7 +82,17 @@ public:
   }
   /* @} */
 
-  /** \defgroup nonparametric-must ´´These methods have to be implemented, if parametric() == false.'' */
+  /** \defgroup type ´´This method has to be implemented for parametric functions and determines which evaluate() is
+   *            callable.''
+   */
+  /* @{ */
+  virtual bool parametric() const
+  {
+    return false;
+  }
+  /* @} */
+
+  /** \defgroup nonparametric-must This method has to be implemented, if parametric() == false.'' */
   /* @{ */
   virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const
   {
@@ -89,7 +101,7 @@ public:
   }
   /* @} */
 
-  /** \defgroup parametric-must ´´These methods have to be implemented, if parametric() == true.'' */
+  /** \defgroup parametric-must This method has to be implemented, if parametric() == true.'' */
   /* @{ */
   virtual void evaluate(const DomainType& /*_x*/, const ParamType& /*_mu*/, RangeType& /*_ret*/) const
   {
@@ -126,28 +138,30 @@ public:
 
   /** \defgroup affineparametric ´´These methods have to be implemented, if affineparametric() == true.'' */
   /* @{ */
-  virtual size_t numComponents() const
+  virtual const std::vector<std::shared_ptr<const ComponentType>>& components() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
   }
 
-  virtual const std::vector<Dune::shared_ptr<const ComponentType>>& components() const
+  virtual const std::vector<std::shared_ptr<const CoefficientType>>& coefficients() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
   }
 
-  virtual size_t numCoefficients() const
+  virtual bool hasAffinePart() const
   {
-    DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
+    return false;
   }
+  /* @} */
 
-  virtual const std::vector<Dune::shared_ptr<const CoefficientType>>& coefficients() const
+  /** \defgroup affineparametric-affinepart This method has to be implemented, if hasAffinePart() == true.'' */
+  /* @{ */
+  virtual const std::shared_ptr<ComponentType>& affinePart() const
   {
     DUNE_THROW(Dune::NotImplemented,
-               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if hasAffinePart() == true!");
   }
   /* @} */
 
@@ -161,59 +175,270 @@ public:
     return ret;
   }
 
-  // forward, needed for the traits
-  template <class EntityImp>
-  class LocalFunctionAdapter;
-
-  template <class EntityImp>
-  class LocalFunctionAdapterTraits
+  virtual RangeType evaluate(const DomainType& _x, const ParamType& _mu) const
   {
-  public:
-    typedef LocalFunctionAdapter<EntityImp> derived_type;
-    typedef EntityImp EntityType;
-  };
-
-  template <class EntityImp>
-  class LocalFunctionAdapter : public LocalFunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRange,
-                                                             LocalFunctionAdapterTraits<EntityImp>>
-  {
-  public:
-    typedef LocalFunctionAdapterTraits<EntityImp> Traits;
-
-    typedef typename Traits::EntityType EntityType;
-
-    LocalFunctionAdapter(const ThisType& function, const EntityType& en)
-      : wrapped_(function)
-      , entity_(en)
-    {
-      assert(!wrapped_.parametric());
-    }
-
-    virtual int order() const
-    {
-      return wrapped_.order();
-    }
-
-    const EntityType& entity() const
-    {
-      return entity_;
-    }
-
-    void evaluate(const DomainType& x, RangeType& ret) const
-    {
-      wrapped_.evaluate(entity_.geometry().global(x), ret);
-    }
-
-  private:
-    const ThisType& wrapped_;
-    const EntityType& entity_;
-  };
-
-  template <class EntityType>
-  LocalFunctionAdapter<EntityType> localFunction(const EntityType& entity) const
-  {
-    return LocalFunctionAdapter<EntityType>(*this, entity);
+    assert(parametric());
+    RangeType ret;
+    evaluate(_x, _mu, ret);
+    return ret;
   }
+  /* @} */
+}; // class GenericStationaryFunctionInterface
+
+
+/**
+ *  \brief  Interface for stationary scalar and vector valued functions, nonparametric, parametric and affineparametric.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+{
+public:
+  typedef GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
+
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRange     = rangeDim;
+  static const unsigned int dimRangeRows = dimRange;
+  static const unsigned int dimRangeCols = 1;
+  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
+
+  typedef Common::Parameter::FieldType ParamFieldType;
+  static const unsigned int maxParamDim = Common::Parameter::maxDim;
+  typedef Common::Parameter::Type ParamType;
+
+  typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols> ComponentType;
+  typedef AffineSeparableCoefficientFunction<RangeFieldType> CoefficientType;
+
+  virtual ~GenericStationaryFunctionInterface()
+  {
+  }
+
+  static std::string id()
+  {
+    return "function";
+  }
+
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /* @{ */
+  virtual std::string name() const
+  {
+    return id();
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+  /* @} */
+
+  /** \defgroup type ´´This method has to be implemented for parametric functions and determines which evaluate() is
+   *            callable.''
+   */
+  /* @{ */
+  virtual bool parametric() const
+  {
+    return false;
+  }
+  /* @} */
+
+  /** \defgroup nonparametric-must This method has to be implemented, if parametric() == false.'' */
+  /* @{ */
+  virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == false!");
+  }
+  /* @} */
+
+  /** \defgroup parametric-must This method has to be implemented, if parametric() == true.'' */
+  /* @{ */
+  virtual void evaluate(const DomainType& /*_x*/, const ParamType& /*_mu*/, RangeType& /*_ret*/) const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
+  }
+
+  virtual size_t paramSize() const
+  {
+    if (!parametric())
+      return 0;
+    else
+      DUNE_THROW(Dune::NotImplemented,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
+  }
+
+  virtual const std::vector<ParamType>& paramRange() const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
+  }
+
+  virtual const std::vector<std::string>& paramExplanation() const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if parametric() == true!");
+  }
+
+  virtual bool affineparametric() const
+  {
+    return false;
+  }
+  /* @} */
+
+  /** \defgroup affineparametric ´´These methods have to be implemented, if affineparametric() == true.'' */
+  /* @{ */
+  virtual const std::vector<std::shared_ptr<const ComponentType>>& components() const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
+  }
+
+  virtual const std::vector<std::shared_ptr<const CoefficientType>>& coefficients() const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if affineparametric() == true!");
+  }
+
+  virtual bool hasAffinePart() const
+  {
+    return false;
+  }
+  /* @} */
+
+  /** \defgroup affineparametric-affinepart This method has to be implemented, if hasAffinePart() == true.'' */
+  /* @{ */
+  virtual const std::shared_ptr<ComponentType>& affinePart() const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if hasAffinePart() == true!");
+  }
+  /* @} */
+
+  /** \defgroup provided ´´These methods are provided by the interface itself, but may not be implemented optimal.'' */
+  /* @{ */
+  virtual RangeType evaluate(const DomainType& _x) const
+  {
+    assert(!parametric());
+    RangeType ret;
+    evaluate(_x, ret);
+    return ret;
+  }
+
+  virtual RangeType evaluate(const DomainType& _x, const ParamType& _mu) const
+  {
+    assert(parametric());
+    RangeType ret;
+    evaluate(_x, _mu, ret);
+    return ret;
+  }
+  /* @} */
+}; // class GenericStationaryFunctionInterface< ..., 1 >
+
+
+/**
+ *  \brief  Interface for matrix valued nonparametric stationary function.
+ *
+ *          See specialization for rangeDimRows = 1 for scalar and vector valued functions.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows>
+class FunctionInterface
+    : public GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimCols, rangeDimRows>
+{
+  typedef GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimCols, rangeDimRows>
+      BaseType;
+
+public:
+  typedef typename BaseType::DomainFieldType DomainFieldType;
+  static const unsigned int dimDomain = BaseType::dimDomain;
+  typedef typename BaseType::DomainType DomainType;
+
+  typedef typename BaseType::RangeFieldType RangeFieldType;
+  static const unsigned int dimRangeRows = BaseType::dimRangeRows;
+  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
+  typedef typename BaseType::RangeType RangeType;
+
+  virtual ~FunctionInterface()
+  {
+  }
+
+  static std::string id()
+  {
+    return "function";
+  }
+
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /* @{ */
+  virtual std::string name() const
+  {
+    return id();
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+  /* @} */
+
+  virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const = 0;
+}; // class FunctionInterface
+
+
+/**
+ *  \brief  Interface for scalar and vector valued nonparametric stationary function.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+    : public GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+#if HAVE_DUNE_FEM
+#if DUNE_VERSION_NEWER(DUNE_FEM, 1, 4)
+      ,
+      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+#else
+      ,
+      public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+#endif
+                                 FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
+#endif // HAVE_DUNE_FEM
+{
+  typedef GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
+
+public:
+  typedef typename BaseType::DomainFieldType DomainFieldType;
+  static const unsigned int dimDomain = BaseType::dimDomain;
+  typedef typename BaseType::DomainType DomainType;
+
+  typedef typename BaseType::RangeFieldType RangeFieldType;
+  static const unsigned int dimRange     = BaseType::dimRange;
+  static const unsigned int dimRangeRows = BaseType::dimRangeRows;
+  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
+  typedef typename BaseType::RangeType RangeType;
+
+  virtual ~FunctionInterface()
+  {
+  }
+
+  static std::string id()
+  {
+    return "function";
+  }
+
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /* @{ */
+  virtual std::string name() const
+  {
+    return id();
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+  /* @} */
+
+  virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const = 0;
 }; // class FunctionInterface
 
 
