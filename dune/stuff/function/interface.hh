@@ -64,16 +64,11 @@ public:
   {
   }
 
-  static std::string id()
-  {
-    return "function";
-  }
-
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
   virtual std::string name() const
   {
-    return id();
+    return "function";
   }
 
   virtual int order() const
@@ -92,7 +87,7 @@ public:
   }
   /* @} */
 
-  /** \defgroup nonparametric-must This method has to be implemented, if parametric() == false.'' */
+  /** \defgroup nonparametric-must ´´This method has to be implemented, if parametric() == false.'' */
   /* @{ */
   virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const
   {
@@ -101,7 +96,7 @@ public:
   }
   /* @} */
 
-  /** \defgroup parametric-must This method has to be implemented, if parametric() == true.'' */
+  /** \defgroup parametric-must ´´This method has to be implemented, if parametric() == true.'' */
   /* @{ */
   virtual void evaluate(const DomainType& /*_x*/, const ParamType& /*_mu*/, RangeType& /*_ret*/) const
   {
@@ -156,7 +151,7 @@ public:
   }
   /* @} */
 
-  /** \defgroup affineparametric-affinepart This method has to be implemented, if hasAffinePart() == true.'' */
+  /** \defgroup affineparametric-affinepart ´´This method has to be implemented, if hasAffinePart() == true.'' */
   /* @{ */
   virtual const std::shared_ptr<ComponentType>& affinePart() const
   {
@@ -210,7 +205,7 @@ public:
   typedef Common::Parameter::Type ParamType;
 
   typedef FunctionInterface<DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols> ComponentType;
-  typedef AffineSeparableCoefficientFunction<RangeFieldType> CoefficientType;
+  typedef AffineParametricCoefficientFunction<RangeFieldType> CoefficientType;
 
   virtual ~GenericStationaryFunctionInterface()
   {
@@ -244,7 +239,7 @@ public:
   }
   /* @} */
 
-  /** \defgroup nonparametric-must This method has to be implemented, if parametric() == false.'' */
+  /** \defgroup nonparametric-must ´´This method has to be implemented, if parametric() == false.'' */
   /* @{ */
   virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const
   {
@@ -253,7 +248,7 @@ public:
   }
   /* @} */
 
-  /** \defgroup parametric-must This method has to be implemented, if parametric() == true.'' */
+  /** \defgroup parametric-must ´´This method has to be implemented, if parametric() == true.'' */
   /* @{ */
   virtual void evaluate(const DomainType& /*_x*/, const ParamType& /*_mu*/, RangeType& /*_ret*/) const
   {
@@ -308,7 +303,7 @@ public:
   }
   /* @} */
 
-  /** \defgroup affineparametric-affinepart This method has to be implemented, if hasAffinePart() == true.'' */
+  /** \defgroup affineparametric-affinepart ´´This method has to be implemented, if hasAffinePart() == true.'' */
   /* @{ */
   virtual const std::shared_ptr<ComponentType>& affinePart() const
   {
@@ -369,20 +364,10 @@ public:
     return "function";
   }
 
-  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /** \defgroup must ´´This method has to be implemented.'' */
   /* @{ */
-  virtual std::string name() const
-  {
-    return id();
-  }
-
-  virtual int order() const
-  {
-    return -1;
-  }
-  /* @} */
-
   virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const = 0;
+  /* @} */
 }; // class FunctionInterface
 
 
@@ -425,21 +410,98 @@ public:
     return "function";
   }
 
-  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /** \defgroup must This method has to be implemented.'' */
   /* @{ */
-  virtual std::string name() const
+  virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const = 0;
+  /* @} */
+}; // class FunctionInterface
+
+
+/**
+ *  \brief  Interface for parametric functions.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows>
+class ParametricFunctionInterface
+    : public GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimCols, rangeDimRows>
+{
+  typedef GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimCols, rangeDimRows>
+      BaseType;
+
+public:
+  typedef typename BaseType::DomainType DomainType;
+  typedef typename BaseType::RangeType RangeType;
+  typedef typename BaseType::ParamType ParamType;
+
+  virtual ~ParametricFunctionInterface()
   {
-    return id();
   }
 
-  virtual int order() const
+  static std::string id()
   {
-    return -1;
+    return "function.parametric";
   }
+
+  virtual bool parametric() const
+  {
+    return true;
+  }
+
+  /** \defgroup must ´´This methods have to be implemented.'' */
+  /* @{ */
+  virtual void evaluate(const DomainType& /*_x*/, const ParamType& /*_mu*/, RangeType& /*_ret*/) const = 0;
+
+  virtual size_t paramSize() const = 0;
+
+  virtual const std::vector<ParamType>& paramRange() const = 0;
+
+  virtual const std::vector<std::string>& paramExplanation() const = 0;
+  /* @} */
+}; // class ParametricFunctionInterface
+
+
+/**
+ *  \brief  Interface for affine parametric functions.
+ */
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows>
+class AffineParametricFunctionInterface
+    : public ParametricFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
+{
+  typedef ParametricFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols> BaseType;
+
+public:
+  typedef typename BaseType::ComponentType ComponentType;
+  typedef typename BaseType::CoefficientType CoefficientType;
+
+  virtual ~AffineParametricFunctionInterface()
+  {
+  }
+
+  virtual bool affineparametric() const
+  {
+    return true;
+  }
+
+  /** \defgroup must ´´These methods have to be implemented.'' */
+  /* @{ */
+  virtual const std::vector<std::shared_ptr<const ComponentType>>& components() const = 0;
+
+  virtual const std::vector<std::shared_ptr<const CoefficientType>>& coefficients() const = 0;
   /* @} */
 
-  virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const = 0;
-}; // class FunctionInterface
+  virtual bool hasAffinePart() const
+  {
+    return false;
+  }
+
+  /** \defgroup affineparametric-affinepart ´´This method has to be implemented, if hasAffinePart() == true.'' */
+  /* @{ */
+  virtual const std::shared_ptr<ComponentType>& affinePart() const
+  {
+    DUNE_THROW(Dune::NotImplemented,
+               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if hasAffinePart() == true!");
+  }
+  /* @} */
+}; // class AffineParametricFunctionInterface
 
 
 } // namespace Stuff
