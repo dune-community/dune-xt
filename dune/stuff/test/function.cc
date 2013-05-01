@@ -11,6 +11,7 @@
 #include <dune/stuff/function/spe10.hh>
 #include <dune/stuff/function/constant.hh>
 #include <dune/stuff/function/affineparametric/checkerboard.hh>
+#include <dune/stuff/function/fixed.hh>
 
 
 using namespace Dune::Stuff;
@@ -68,6 +69,9 @@ struct ParametricFunctionTest : public ::testing::Test
   static const int maxParamDim = FunctionType::maxParamDim;
   typedef typename FunctionType::ParamType ParamType;
 
+  typedef FunctionFixedParameter<DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>
+      FixedParameterFunctionType;
+
   void check() const
   {
     DomainType x(1);
@@ -86,6 +90,12 @@ struct ParametricFunctionTest : public ::testing::Test
     const std::vector<std::string>& paramExplanation = function->paramExplanation();
     assert(paramExplanation.size() == paramSize);
     function->evaluate(x, paramRange[0], ret);
+    const FixedParameterFunctionType fixedFunction(function, paramRange[0]);
+    const std::string DUNE_UNUSED(f_name) = fixedFunction.name();
+    const int DUNE_UNUSED(f_order) = fixedFunction.order();
+    const bool f_parametric = fixedFunction.parametric();
+    assert(!f_parametric);
+    fixedFunction.evaluate(x, ret);
   }
 }; // struct ParametricFunctionTest
 
@@ -147,6 +157,9 @@ struct TimedependentFunctionTest : public ::testing::Test
   static const int dimRangeCols = FunctionType::dimRangeCols;
   typedef typename FunctionType::RangeType RangeType;
 
+  typedef FunctionFixedTime<DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>
+      FixedTimeFunctionType;
+
   void check() const
   {
     DomainType x(1);
@@ -156,6 +169,10 @@ struct TimedependentFunctionTest : public ::testing::Test
     const std::string DUNE_UNUSED(name) = function->name();
     const int DUNE_UNUSED(order) = function->order();
     function->evaluate(x, t, ret);
+    const FixedTimeFunctionType fixedFunction(function, 0);
+    const std::string DUNE_UNUSED(f_name) = fixedFunction.name();
+    const int DUNE_UNUSED(f_order) = fixedFunction.order();
+    fixedFunction.evaluate(x, ret);
   }
 }; // struct TimedependentFunctionTest
 
