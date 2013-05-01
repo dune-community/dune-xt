@@ -26,6 +26,9 @@ typedef testing::Types<AffineParametricFunctionCheckerboard<double, 1, double>,
                        AffineParametricFunctionCheckerboard<double, 2, double>,
                        AffineParametricFunctionCheckerboard<double, 3, double>> AffineParametricFunctions;
 
+typedef testing::Types<FunctionConstant<double, 1, double, 1>, FunctionConstant<double, 2, double, 1>,
+                       FunctionConstant<double, 3, double, 1>> TimedependentFunctions;
+
 template <class FunctionType>
 struct FunctionTest : public ::testing::Test
 {
@@ -95,6 +98,30 @@ struct AffineParametricFunctionTest : public ::testing::Test
 }; // struct AffineParametricFunctionTest
 
 
+template <class FunctionType>
+struct TimedependentFunctionTest : public ::testing::Test
+{
+  typedef typename FunctionType::DomainFieldType DomainFieldType;
+  static const int dimDomain = FunctionType::dimDomain;
+  typedef typename FunctionType::DomainType DomainType;
+  typedef typename FunctionType::RangeFieldType RangeFieldType;
+  static const int dimRangeRows = FunctionType::dimRangeRows;
+  static const int dimRangeCols = FunctionType::dimRangeCols;
+  typedef typename FunctionType::RangeType RangeType;
+
+  void check() const
+  {
+    DomainType x(1);
+    RangeType ret(0);
+    double t(0);
+    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::createSampleDescription()));
+    const std::string DUNE_UNUSED(name) = function->name();
+    const int DUNE_UNUSED(order) = function->order();
+    function->evaluate(x, t, ret);
+  }
+}; // struct TimedependentFunctionTest
+
+
 TYPED_TEST_CASE(FunctionTest, Functions);
 TYPED_TEST(FunctionTest, Function)
 {
@@ -104,6 +131,13 @@ TYPED_TEST(FunctionTest, Function)
 
 TYPED_TEST_CASE(AffineParametricFunctionTest, AffineParametricFunctions);
 TYPED_TEST(AffineParametricFunctionTest, AffineParametricFunction)
+{
+  this->check();
+}
+
+
+TYPED_TEST_CASE(TimedependentFunctionTest, TimedependentFunctions);
+TYPED_TEST(TimedependentFunctionTest, TimedependentFunction)
 {
   this->check();
 }
