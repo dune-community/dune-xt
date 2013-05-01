@@ -31,7 +31,7 @@ namespace Stuff {
 
 // forward, to be friends
 template <class RangeFieldImp>
-class FunctionAffineSeparablCoefficient;
+class AffineParametricCoefficientFunction;
 
 
 ///**
@@ -201,7 +201,7 @@ public:
   } // void report(const std::string, std::ostream&, const std::string&) const
 
 private:
-  friend class FunctionAffineSeparablCoefficient<RangeFieldType>;
+  friend class AffineParametricCoefficientFunction<RangeFieldType>;
 
   void evaluate(const Dune::DynamicVector<DomainFieldType>& arg, RangeFieldType& ret) const
   {
