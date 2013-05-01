@@ -1,24 +1,11 @@
 #ifndef DUNE_STUFF_FUNCTION_EXPRESSION_HH
 #define DUNE_STUFF_FUNCTION_EXPRESSION_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#else
-#include "config.h"
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #include <sstream>
 #include <vector>
 
 #include <dune/common/fvector.hh>
-#include <dune/common/dynvector.hh>
 #include <dune/common/exceptions.hh>
-#include <dune/common/static_assert.hh>
-
-#if HAVE_DUNE_FEM
-#include <dune/fem/function/common/function.hh>
-#include <dune/fem/space/common/functionspace.hh>
-#endif
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/string.hh>
@@ -32,25 +19,14 @@ namespace Stuff {
 
 
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class FunctionExpression
-    : public FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
-#if HAVE_DUNE_FEM
-#if DUNE_VERSION_NEWER(DUNE_FEM, 1, 4)
-      ,
-      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-#else
-      ,
-      public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-#endif
-                                 FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
-#endif
-      ,
-      public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+class FunctionExpression : public FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>,
+                           public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 {
+  typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
+  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> InterfaceType;
+
 public:
   typedef FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
-  typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
-  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> InterfaceType;
 
   typedef typename InterfaceType::DomainFieldType DomainFieldType;
   static const int dimDomain = InterfaceType::dimDomain;
@@ -79,23 +55,6 @@ public:
     , name_(_name)
   {
   }
-
-  FunctionExpression(const ThisType& other)
-    : BaseType(other)
-    , order_(other.order())
-    , name_(other.name())
-  {
-  }
-
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      BaseType::operator=(other);
-      order_            = other.order();
-      name_             = other.name();
-    }
-    return this;
-  } // ThisType& operator=(const ThisType& other)
 
   static Dune::ParameterTree createSampleDescription(const std::string subName = "")
   {
