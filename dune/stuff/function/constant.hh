@@ -86,6 +86,11 @@ public:
   typedef typename BaseType::RangeFieldType RangeFieldType;
   typedef typename BaseType::RangeType RangeType;
 
+  FunctionConstant(const RangeFieldType& constant)
+    : BaseType(constant)
+  {
+  }
+
   FunctionConstant(const RangeType& constant)
     : BaseType(constant)
   {
