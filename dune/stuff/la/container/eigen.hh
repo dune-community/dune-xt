@@ -106,13 +106,11 @@ public:
     assert(size_type(_pattern.size()) == _rows && "Given pattern too short!");
     for (size_type row = 0; row < size_type(_pattern.size()); ++row) {
       eigenMatrix_.startVec(row);
-      const auto& columns = _pattern.set(row);
-      for (auto columnIt = columns.begin(); columnIt != columns.end(); ++columnIt) {
-        const size_type column = *columnIt;
+      for (auto& column : _pattern.inner(row)) {
         eigenMatrix_.insertBackByOuterInner(row, column);
       }
       // create diagonal entry (insertBackByOuterInner() can not handle empty rows)
-      if (columns.size() == 0)
+      if (_pattern.inner(row).size() == 0)
         eigenMatrix_.insertBackByOuterInner(row, row);
     }
     eigenMatrix_.finalize();
@@ -129,7 +127,7 @@ public:
     std::vector<TripletType> triplets;
     triplets.reserve(other.nonZeros());
     for (size_t row = 0; row < _pattern.size(); ++row)
-      for (size_t col : _pattern.set(row))
+      for (size_t col : _pattern.inner(row))
         triplets.push_back(TripletType(row, col, other.get(row, col)));
     eigenMatrix_.setFromTriplets(triplets.begin(), triplets.end());
   }
@@ -416,7 +414,7 @@ std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMa
   // create the sparsity pattern
   SparsityPatternDefault pattern(_size);
   for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
-    pattern.set(ii).insert(ii);
+    pattern.inner(ii).insert(ii);
   std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> ret =
       Dune::make_shared<EigenRowMajorSparseMatrix<ElementType>>(_size, _size, pattern);
   for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
