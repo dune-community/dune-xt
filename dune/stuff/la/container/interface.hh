@@ -48,14 +48,12 @@ public:
 
   void add(const size_type i, const size_type j, const ElementType& val)
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().add(i, j, val));
-    asImp().add(i, j, val);
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().add(i, j, val));
   }
 
   void set(const size_type i, const size_type j, const ElementType& val)
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().set(i, j, val));
-    asImp().set(i, j, val);
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().set(i, j, val));
   }
 
   const ElementType get(const size_type i, const size_type j) const
@@ -94,14 +92,12 @@ public:
 
   void add(const size_type i, const ElementType& val)
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().add(i, val));
-    asImp().add(i, val);
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().add(i, val));
   }
 
   void set(const size_type i, const ElementType& val)
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().set(i, val));
-    asImp().set(i, val);
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().set(i, val));
   }
 
   const ElementType get(const size_type i) const
