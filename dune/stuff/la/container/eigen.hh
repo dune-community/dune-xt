@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <type_traits>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -409,6 +410,82 @@ private:
   BackendType eigenVector_;
 }; // class DenseVector
 
+
+template <class T>
+class EigenMappedDenseVector;
+
+template <class ElementImp = double>
+class EigenMappedDenseVectorTraits
+{
+  typedef typename ::Eigen::Matrix<ElementImp, ::Eigen::Dynamic, 1> PlainBackendType;
+
+public:
+  typedef ElementImp ElementType;
+  typedef EigenMappedDenseVector<ElementType> derived_type;
+  typedef Eigen::Map<PlainBackendType> BackendType;
+  typedef typename BackendType::Index size_type;
+};
+
+/**
+ *  \brief  A EigenMap backed Vector interface wrapping double*
+ *
+ */
+template <class ElementImp = double>
+class EigenMappedDenseVector : public VectorInterface<EigenMappedDenseVectorTraits<ElementImp>>,
+                               public EigenVectorInterface<EigenMappedDenseVectorTraits<ElementImp>>
+{
+public:
+  typedef EigenMappedDenseVector<ElementImp> ThisType;
+  typedef EigenMappedDenseVectorTraits<ElementImp> Traits;
+  typedef typename Traits::BackendType BackendType;
+  typedef typename Traits::ElementType ElementType;
+  typedef typename Traits::size_type size_type;
+
+  EigenMappedDenseVector(ElementImp* data, size_t data_size)
+    : eigenVector_(data, data_size)
+  {
+    static_assert(std::is_same<ElementType, double>::value, "undefined behaviour for non-double data");
+  }
+
+  virtual ~EigenMappedDenseVector()
+  {
+  }
+
+  EigenMappedDenseVector() = delete;
+
+  size_type size() const
+  {
+    return eigenVector_.size();
+  }
+
+  void add(const size_type i, const ElementType& val)
+  {
+    eigenVector_(i) += val;
+  }
+
+  void set(const size_type i, const ElementType& val)
+  {
+    eigenVector_(i) = val;
+  }
+
+  const ElementType get(const size_type i) const
+  {
+    return eigenVector_(i);
+  }
+
+  BackendType& backend()
+  {
+    return eigenVector_;
+  }
+
+  const BackendType& backend() const
+  {
+    return eigenVector_;
+  }
+
+private:
+  BackendType eigenVector_;
+}; // class DenseVector
 
 template <class ElementType = double, class size_type = unsigned int>
 std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_type _size)
