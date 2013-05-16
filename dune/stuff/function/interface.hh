@@ -8,6 +8,7 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/dynvector.hh>
+#include <dune/common/version.hh>
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
