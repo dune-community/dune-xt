@@ -32,31 +32,30 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
-  typedef typename Traits::size_type size_type;
 
-  size_type rows() const
+  size_t rows() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().rows());
     return asImp().rows();
   }
 
-  size_type cols() const
+  size_t cols() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().cols());
     return asImp().cols();
   }
 
-  void add(const size_type i, const size_type j, const ElementType& val)
+  void add(const size_t i, const size_t j, const ElementType& val)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().add(i, j, val));
   }
 
-  void set(const size_type i, const size_type j, const ElementType& val)
+  void set(const size_t i, const size_t j, const ElementType& val)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().set(i, j, val));
   }
 
-  const ElementType get(const size_type i, const size_type j) const
+  const ElementType get(const size_t i, const size_t j) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().get(i, j));
     return asImp().get(i, j);
@@ -82,25 +81,25 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
-  typedef typename Traits::size_type size_type;
+  typedef typename Traits::size_t size_t;
 
-  size_type size() const
+  size_t size() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().size());
     return asImp().size();
   }
 
-  void add(const size_type i, const ElementType& val)
+  void add(const size_t i, const ElementType& val)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().add(i, val));
   }
 
-  void set(const size_type i, const ElementType& val)
+  void set(const size_t i, const ElementType& val)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(asImp().set(i, val));
   }
 
-  const ElementType get(const size_type i) const
+  const ElementType get(const size_t i) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().get(i));
     return asImp().get(i);

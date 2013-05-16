@@ -18,27 +18,26 @@ private:
   typedef std::vector<std::set<unsigned int>> BaseType;
 
 public:
-  typedef BaseType::size_type size_type;
   typedef BaseType::value_type InnerType;
   typedef typename BaseType::const_iterator ConstOuterIteratorType;
 
-  SparsityPatternDefault(const size_type _size)
+  SparsityPatternDefault(const size_t _size)
     : vectorOfSets_(_size)
   {
   }
 
-  size_type size() const
+  size_t size() const
   {
     return vectorOfSets_.size();
   }
 
-  InnerType& inner(const size_type ii)
+  InnerType& inner(const size_t ii)
   {
     assert(ii < size() && "Wrong index requested!");
     return vectorOfSets_[ii];
   }
 
-  const InnerType& inner(const size_type ii) const
+  const InnerType& inner(const size_t ii) const
   {
     assert(ii < size() && "Wrong index requested!");
     return vectorOfSets_[ii];
@@ -75,7 +74,7 @@ private:
 //  SparsityPatternDefault* compressedPattern = new SparsityPatternDefault(uncompressedPattern.size());
 //  typename T::ElementType absValue(0);
 //  // * therefore we loop over the uncompressed pattern
-//  for (typename SparsityPatternDefault::size_type row = 0; row < uncompressedPattern.size(); ++row) {
+//  for (typename SparsityPatternDefault::size_t row = 0; row < uncompressedPattern.size(); ++row) {
 //    // * get the uncompressed row,
 //    const auto& uncompressedRowSet = uncompressedPattern.set(row);
 //    // * get the new one

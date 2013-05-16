@@ -69,9 +69,7 @@ class EigenRowMajorSparseMatrixTraits
 public:
   typedef ElementImp ElementType;
   typedef EigenRowMajorSparseMatrix<ElementType> derived_type;
-  //  typedef derived_type EigenMatrix_derived_type;
   typedef typename ::Eigen::SparseMatrix<ElementType, ::Eigen::RowMajor> BackendType;
-  typedef typename BackendType::Index size_type;
 }; // class RowMajorSparseMatrixTraits
 
 
@@ -84,7 +82,6 @@ public:
   typedef EigenRowMajorSparseMatrixTraits<ElementImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
-  typedef typename Traits::size_type size_type;
 
   EigenRowMajorSparseMatrix()
   {
@@ -100,11 +97,11 @@ public:
   {
   }
 
-  EigenRowMajorSparseMatrix(const size_type _rows, const size_type _cols, const SparsityPatternDefault& _pattern)
+  EigenRowMajorSparseMatrix(const size_t _rows, const size_t _cols, const SparsityPatternDefault& _pattern)
     : eigenMatrix_(_rows, _cols)
   {
-    assert(size_type(_pattern.size()) == _rows && "Given pattern too short!");
-    for (size_type row = 0; row < size_type(_pattern.size()); ++row) {
+    assert(size_t(_pattern.size()) == _rows && "Given pattern too short!");
+    for (size_t row = 0; row < size_t(_pattern.size()); ++row) {
       eigenMatrix_.startVec(row);
       for (auto& column : _pattern.inner(row)) {
         eigenMatrix_.insertBackByOuterInner(row, column);
@@ -144,27 +141,27 @@ public:
     return *this;
   }
 
-  size_type rows() const
+  size_t rows() const
   {
     return eigenMatrix_.rows();
   }
 
-  size_type cols() const
+  size_t cols() const
   {
     return eigenMatrix_.cols();
   }
 
-  void add(const size_type i, const size_type j, const ElementType& val)
+  void add(const size_t i, const size_t j, const ElementType& val)
   {
     eigenMatrix_.coeffRef(i, j) += val;
   }
 
-  void set(const size_type i, const size_type j, const ElementType& val)
+  void set(const size_t i, const size_t j, const ElementType& val)
   {
     eigenMatrix_.coeffRef(i, j) = val;
   }
 
-  const ElementType get(const size_type i, const size_type j) const
+  const ElementType get(const size_t i, const size_t j) const
   {
     return eigenMatrix_.coeff(i, j);
   }
@@ -214,7 +211,7 @@ public:
   typedef EigenDenseMatrix<ElementType> derived_type;
   //  typedef derived_type EigenMatrix_derived_type;
   typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
-  typedef typename BackendType::Index size_type;
+  typedef typename BackendType::Index size_t;
 }; // class DenseMatrixTraits
 
 
@@ -231,7 +228,6 @@ public:
   typedef EigenDenseMatrixTraits<ElementImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
-  typedef typename Traits::size_type size_type;
 
   EigenDenseMatrix()
   {
@@ -257,7 +253,7 @@ public:
   {
   }
 
-  EigenDenseMatrix(const size_type _rows, const size_type _cols)
+  EigenDenseMatrix(const size_t _rows, const size_t _cols)
     : eigenMatrix_(_rows, _cols)
   {
     eigenMatrix_.setZero(_rows, _cols);
@@ -275,27 +271,27 @@ public:
     return *this;
   }
 
-  size_type rows() const
+  size_t rows() const
   {
     return eigenMatrix_.rows();
   }
 
-  size_type cols() const
+  size_t cols() const
   {
     return eigenMatrix_.cols();
   }
 
-  void add(const size_type i, const size_type j, const ElementType& val)
+  void add(const size_t i, const size_t j, const ElementType& val)
   {
     eigenMatrix_(i, j) += val;
   }
 
-  void set(const size_type i, const size_type j, const ElementType& val)
+  void set(const size_t i, const size_t j, const ElementType& val)
   {
     eigenMatrix_(i, j) = val;
   }
 
-  const ElementType get(const size_type i, const size_type j) const
+  const ElementType get(const size_t i, const size_t j) const
   {
     return eigenMatrix_(i, j);
   }
@@ -323,7 +319,7 @@ public:
   typedef EigenDenseVector<ElementType> derived_type;
   //  typedef derived_type EigenVector_derived_type;
   typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, 1> BackendType;
-  typedef typename BackendType::Index size_type;
+  typedef typename BackendType::Index size_t;
 }; // class DenseVectorTraits
 
 /**
@@ -339,7 +335,6 @@ public:
   typedef EigenDenseVectorTraits<ElementImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
-  typedef typename Traits::size_type size_type;
 
   EigenDenseVector()
   {
@@ -355,7 +350,7 @@ public:
   {
   }
 
-  EigenDenseVector(const size_type _size)
+  EigenDenseVector(const size_t _size)
     : eigenVector_(_size)
   {
     eigenVector_.setZero(_size);
@@ -373,22 +368,22 @@ public:
     return *this;
   }
 
-  size_type size() const
+  size_t size() const
   {
     return eigenVector_.size();
   }
 
-  void add(const size_type i, const ElementType& val)
+  void add(const size_t i, const ElementType& val)
   {
     eigenVector_(i) += val;
   }
 
-  void set(const size_type i, const ElementType& val)
+  void set(const size_t i, const ElementType& val)
   {
     eigenVector_(i) = val;
   }
 
-  const ElementType get(const size_type i) const
+  const ElementType get(const size_t i) const
   {
     return eigenVector_(i);
   }
@@ -408,16 +403,16 @@ private:
 }; // class DenseVector
 
 
-template <class ElementType = double, class size_type = unsigned int>
-std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_type _size)
+template <class ElementType = double, class size_t = unsigned int>
+std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_t _size)
 {
   // create the sparsity pattern
   SparsityPatternDefault pattern(_size);
-  for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
+  for (size_t ii = 0; ii < _size; ++ii)
     pattern.inner(ii).insert(ii);
   std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> ret =
       Dune::make_shared<EigenRowMajorSparseMatrix<ElementType>>(_size, _size, pattern);
-  for (typename SparsityPatternDefault::size_type ii = 0; ii < _size; ++ii)
+  for (size_t ii = 0; ii < _size; ++ii)
     ret->set(ii, ii, 1.0);
   return ret;
 }
