@@ -14,6 +14,7 @@
 #include <Eigen/SparseCholesky>
 
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/logging.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/la/container/eigen.hh>
@@ -236,11 +237,22 @@ public:
                           const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<ElementType>> EigenSolverType;
-    EigenSolverType eigenSolver(systemMatrix.backend());
-    eigenSolver.setMaxIterations(maxIter);
-    eigenSolver.setTolerance(precision);
-    solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    return BaseType::translateInfo(eigenSolver.info());
+    EigenSolverType solver(systemMatrix.backend());
+    // configure solver and preconditioner
+    double solverEps = DSC_CONFIG_GET("algorithm.solver.eps", 1.0e-8);
+    solver.setTolerance(solverEps);
+    const int solverVerbose = DSC_CONFIG_GET("algorithm.solver.verbose", 0);
+    const int maxIterations = DSC_CONFIG_GET("algorithm.solver.maxIterations", solutionVector.size());
+    solver.setMaxIterations(maxIterations);
+    double dropTol =
+        DSC_CONFIG_GET("algorithm.solver.preconditioner.dropTol", Eigen::NumTraits<double>::dummy_precision());
+    int fillFactor = DSC_CONFIG_GET("algorithm.solver.preconditioner.fillFactor", 10);
+    solver.preconditioner().setDroptol(dropTol);
+    solver.preconditioner().setFillfactor(fillFactor);
+
+
+    solutionVector.backend() = solver.solve(rhsVector.backend());
+    return BaseType::translateInfo(solver.info());
   } // virtual bool apply(...)
 }; // class BicgstabILUT
 
