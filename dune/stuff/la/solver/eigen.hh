@@ -25,17 +25,24 @@ namespace Stuff {
 namespace LA {
 namespace Solver {
 
+template <class MatrixImp, class VectorImp>
+struct IsEigenMV
+{
+  typedef typename std::is_base_of<Dune::Stuff::LA::Container::EigenMatrixInterface<typename MatrixImp::Traits>,
+                                   MatrixImp>::type Mtype;
+  typedef typename std::is_base_of<Dune::Stuff::LA::Container::EigenVectorInterface<typename VectorImp::Traits>,
+                                   VectorImp>::type Vtype;
+  static constexpr bool value = Mtype::value && Vtype::value;
+};
+
 //! \attention Slow!
 //! \todo Implement via Eigen::CG and identity preconditioner!
-template <class ElementImp>
-class Cg<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-         Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class Cg<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public Interface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef Interface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
@@ -66,10 +73,11 @@ public:
     const int cols = A.cols();
     size_type iteration(1);
     ElementType rho(0), rho_prev(1), beta, alpha;
-    const ElementType tolerance               = precision * precision * b.squaredNorm();
-    typename VectorType::BackendType residuum = b - A * x_i;
-    typename VectorType::BackendType correction_p(cols);
-    typename VectorType::BackendType correction_q(cols);
+    const ElementType tolerance = precision * precision * b.squaredNorm();
+    typedef typename DSLC::EigenDenseVector<typename VectorType::ElementType>::BackendType RealEigenVector;
+    RealEigenVector residuum = b - A * x_i;
+    RealEigenVector correction_p(cols);
+    RealEigenVector correction_q(cols);
     rho = residuum.squaredNorm();
     while (iteration <= maxIter) {
       if (iteration == 1) {
@@ -92,15 +100,12 @@ public:
 }; // class Cg
 
 
-template <class ElementImp>
-class CgDiagonal<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                 Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class CgDiagonal<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public Interface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef Interface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
@@ -137,15 +142,12 @@ public:
 }; // class CgDiagonal
 
 
-template <class ElementImp>
-class Bicgstab<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-               Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class Bicgstab<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public Interface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef Interface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
@@ -174,15 +176,12 @@ public:
 }; // class Bicgstab
 
 
-template <class ElementImp>
-class BicgstabDiagonal<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class BicgstabDiagonal<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public Interface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef Interface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
@@ -212,15 +211,12 @@ public:
 }; // class BicgstabDiagonal
 
 
-template <class ElementImp>
-class BicgstabILUT<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                   Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class BicgstabILUT<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public Interface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef Interface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
