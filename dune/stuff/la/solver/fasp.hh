@@ -15,18 +15,17 @@ extern "C" {
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Solver {
 
 
 template <class ElementImp>
-class AmgFasp<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-              Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+class AmgFaspSolver<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
+                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+    : public SolverInterface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
+                             Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
+                          Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;

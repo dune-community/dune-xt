@@ -20,10 +20,9 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Solver {
 
 
-static std::vector<std::string> types()
+static std::vector<std::string> solverTypes()
 {
   return
   {
@@ -40,22 +39,22 @@ template <class MatrixType, class VectorType>
 Dune::ParameterTree createSampleDescription(const std::string type)
 {
   if (type == "cg") {
-    return Dune::Stuff::LA::Solver::Cg<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::CgSolver<MatrixType, VectorType>::createSampleDescription();
   } else if (type == "cg.diagonal") {
-    return Dune::Stuff::LA::Solver::CgDiagonal<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::CgDiagonalSolver<MatrixType, VectorType>::createSampleDescription();
   } else if (type == "bicgstab") {
-    return Dune::Stuff::LA::Solver::Bicgstab<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::BicgstabSolver<MatrixType, VectorType>::createSampleDescription();
   } else if (type == "bicgstab.diagonal") {
-    return Dune::Stuff::LA::Solver::BicgstabDiagonal<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::BicgstabDiagonalSolver<MatrixType, VectorType>::createSampleDescription();
   } else if (type == "bicgstab.ilut") {
-    return Dune::Stuff::LA::Solver::BicgstabILUT<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::BicgstabILUTSolver<MatrixType, VectorType>::createSampleDescription();
   } else if (type == "simplicialllt") {
-    return Dune::Stuff::LA::Solver::SimplicialLLT<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::SimplicialLLTSolver<MatrixType, VectorType>::createSampleDescription();
   } else if (type == "simplicialldlt") {
-    return Dune::Stuff::LA::Solver::SimplicialLDLT<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::SimplicialLDLTSolver<MatrixType, VectorType>::createSampleDescription();
 #if HAVE_FASP
   } else if (type == "amg.fasp") {
-    return Dune::Stuff::LA::Solver::AmgFasp<MatrixType, VectorType>::createSampleDescription();
+    return Dune::Stuff::LA::AmgFaspSolver<MatrixType, VectorType>::createSampleDescription();
 #endif // HAVE_FASP
   } else
     DUNE_THROW(Dune::RangeError,
@@ -67,25 +66,25 @@ Dune::ParameterTree createSampleDescription(const std::string type)
 
 
 template <class MatrixType, class VectorType>
-Interface<MatrixType, VectorType>* create(const std::string type = types()[0])
+SolverInterface<MatrixType, VectorType>* createSolver(const std::string type = solverTypes()[0])
 {
   if (type == "cg") {
-    return new Dune::Stuff::LA::Solver::Cg<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::CgSolver<MatrixType, VectorType>();
   } else if (type == "cg.diagonal") {
-    return new Dune::Stuff::LA::Solver::CgDiagonal<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::CgDiagonalSolver<MatrixType, VectorType>();
   } else if (type == "bicgstab") {
-    return new Dune::Stuff::LA::Solver::Bicgstab<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::BicgstabSolver<MatrixType, VectorType>();
   } else if (type == "bicgstab.diagonal") {
-    return new Dune::Stuff::LA::Solver::BicgstabDiagonal<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::BicgstabDiagonalSolver<MatrixType, VectorType>();
   } else if (type == "bicgstab.ilut") {
-    return new Dune::Stuff::LA::Solver::BicgstabILUT<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::BicgstabILUTSolver<MatrixType, VectorType>();
   } else if (type == "simplicialllt") {
-    return new Dune::Stuff::LA::Solver::SimplicialLLT<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::SimplicialLLTSolver<MatrixType, VectorType>();
   } else if (type == "simplicialldlt") {
-    return new Dune::Stuff::LA::Solver::SimplicialLDLT<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::SimplicialLDLTSolver<MatrixType, VectorType>();
 #if HAVE_FASP
   } else if (type == "amg.fasp") {
-    return new Dune::Stuff::LA::Solver::AmgFasp<MatrixType, VectorType>();
+    return new Dune::Stuff::LA::AmgFaspSolver<MatrixType, VectorType>();
 #endif // HAVE_FASP
   } else
     DUNE_THROW(Dune::RangeError,
@@ -93,10 +92,9 @@ Interface<MatrixType, VectorType>* create(const std::string type = types()[0])
                     << " unknown linear solver '"
                     << type
                     << "' requested!");
-} // Interface< ElementType >* create(const std::string type = "eigen.bicgstab.incompletelut")
+} // SolverInterface< ElementType >* create(const std::string type = "eigen.bicgstab.incompletelut")
 
 
-} // namespace Solver
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
