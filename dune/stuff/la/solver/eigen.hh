@@ -196,7 +196,10 @@ public:
 
   static Dune::ParameterTree defaultSettings()
   {
-    Dune::ParameterTree description = BaseType::defaultIterativeSettings();
+    Dune::ParameterTree description          = BaseType::defaultIterativeSettings();
+    description["precision"]                 = "1.0e-8";
+    description["preconditioner.dropTol"]    = Eigen::NumTraits<double>::dummy_precision();
+    description["preconditioner.fillFactor"] = 10;
     return description;
   } // Dune::ParameterTree defaultSettings()
 
@@ -206,17 +209,10 @@ public:
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<ElementType>> EigenSolverType;
     EigenSolverType solver(systemMatrix.backend());
     // configure solver and preconditioner
-    double solverEps = DSC_CONFIG_GET("algorithm.solver.eps", 1.0e-8);
-    solver.setTolerance(solverEps);
-    const int solverVerbose = DSC_CONFIG_GET("algorithm.solver.verbose", 0);
-    const int maxIterations = DSC_CONFIG_GET("algorithm.solver.maxIterations", solutionVector.size());
-    solver.setMaxIterations(maxIterations);
-    double dropTol =
-        DSC_CONFIG_GET("algorithm.solver.preconditioner.dropTol", Eigen::NumTraits<double>::dummy_precision());
-    int fillFactor = DSC_CONFIG_GET("algorithm.solver.preconditioner.fillFactor", 10);
-    solver.preconditioner().setDroptol(dropTol);
-    solver.preconditioner().setFillfactor(fillFactor);
-
+    solver.setTolerance(description.get<double>("precision"));
+    solver.setMaxIterations(description.get<size_type>("maxIter", solutionVector.size()));
+    solver.preconditioner().setDroptol(description.get<double>("preconditioner.dropTol"));
+    solver.preconditioner().setFillfactor(description.get<double>("preconditioner.fillFactor"));
 
     solutionVector.backend() = solver.solve(rhsVector.backend());
     return BaseType::translateInfo(solver.info());
