@@ -25,11 +25,10 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Container {
 
 
 template <class Traits>
-class EigenInterface : public Interface<Traits>
+class EigenContainerInterface : public ContainerInterface<Traits>
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -37,7 +36,7 @@ public:
 
 
 template <class Traits>
-class EigenMatrixInterface : public EigenInterface<Traits>
+class EigenMatrixInterface : public EigenContainerInterface<Traits>
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -45,7 +44,7 @@ public:
 
 
 template <class Traits>
-class EigenVectorInterface
+class EigenVectorInterface : public EigenContainerInterface<Traits>
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -123,7 +122,7 @@ public:
   /**
    *  \attention  This is not optimal, since we create a new triplet vector inbetween!
    */
-  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::Container::SparsityPatternDefault& _pattern)
+  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::SparsityPatternDefault& _pattern)
     : eigenMatrix_(other.rows(), other.cols())
   {
     typedef ::Eigen::Triplet<ElementType> TripletType;
@@ -502,7 +501,6 @@ std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMa
 }
 
 
-} // namespace Container
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune

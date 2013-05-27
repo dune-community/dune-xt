@@ -9,7 +9,6 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Container {
 
 
 class SparsityPatternDefault
@@ -93,7 +92,6 @@ createCompressedSparsityPattern(const SparsityPatternDefault& uncompressedPatter
 } // ... compressSparsityPattern(...)
 
 
-} // namespace Container
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune

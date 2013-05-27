@@ -31,10 +31,10 @@ namespace LA {
 template <class MatrixImp, class VectorImp>
 struct IsEigenMV
 {
-  typedef typename std::is_base_of<Dune::Stuff::LA::Container::EigenMatrixInterface<typename MatrixImp::Traits>,
-                                   MatrixImp>::type Mtype;
-  typedef typename std::is_base_of<Dune::Stuff::LA::Container::EigenVectorInterface<typename VectorImp::Traits>,
-                                   VectorImp>::type Vtype;
+  typedef typename std::is_base_of<Dune::Stuff::LA::EigenMatrixInterface<typename MatrixImp::Traits>, MatrixImp>::type
+      Mtype;
+  typedef typename std::is_base_of<Dune::Stuff::LA::EigenVectorInterface<typename VectorImp::Traits>, VectorImp>::type
+      Vtype;
   static constexpr bool value = Mtype::value && Vtype::value;
 };
 
@@ -77,7 +77,7 @@ public:
     size_type iteration(1);
     ElementType rho(0), rho_prev(1), beta, alpha;
     const ElementType tolerance = precision * precision * b.squaredNorm();
-    typedef typename DSLC::EigenDenseVector<typename VectorType::ElementType>::BackendType RealEigenVector;
+    typedef typename DSL::EigenDenseVector<typename VectorType::ElementType>::BackendType RealEigenVector;
     RealEigenVector residuum = b - A * x_i;
     RealEigenVector correction_p(cols);
     RealEigenVector correction_q(cols);
