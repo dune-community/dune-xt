@@ -13,9 +13,6 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCholesky>
 
-#include <Eigen/SuperLUSupport>
-
-
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/logging.hh>
@@ -220,6 +217,9 @@ public:
 }; // class BicgstabILUT
 
 
+/** Direct solvers seem below are broken, throwing weird compiler errors on solution assignment.
+  */
+
 // template< class MatrixImp, class VectorImp >
 // class SimplicialLLT< MatrixImp,
 //                      VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type >
@@ -244,7 +244,7 @@ public:
 //                          VectorType& solutionVector,
 //                          const size_type /*maxIter*/ = 5000,
 //                          const ElementType /*precision*/ = 1e-12,
-//                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const override
+//                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
 //  {
 //    typedef ::Eigen::SimplicialLLT< typename MatrixType::BackendType, ::Eigen::Lower > EigenSolverType;
 //    EigenSolverType eigenSolver(systemMatrix.backend());
@@ -255,36 +255,44 @@ public:
 //}; // class SimplicialLLT
 
 
-template <class MatrixImp, class VectorImp>
-class SimplicialLDLTSolver<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
-    : public SolverInterface<MatrixImp, VectorImp>
-{
-public:
-  typedef SolverInterface<MatrixImp, VectorImp> BaseType;
+// template< class MatrixImp, class VectorImp >
+// class SimplicialLDLTSolver< MatrixImp,
+//                      VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type >
+//  : public SolverInterface< MatrixImp,
+//                      VectorImp >
+//{
+// public:
+//  typedef SolverInterface<  MatrixImp,
+//                      VectorImp >
+//      BaseType;
 
-  typedef typename BaseType::MatrixType MatrixType;
-  typedef typename BaseType::VectorType VectorType;
-  typedef typename BaseType::ElementType ElementType;
-  typedef typename BaseType::size_type size_type;
+//  typedef typename BaseType::MatrixType MatrixType;
+//  typedef typename BaseType::VectorType VectorType;
+//  typedef typename BaseType::ElementType ElementType;
+//  typedef typename BaseType::size_type size_type;
 
-  SimplicialLDLTSolver()
-  {
-  }
+//  SimplicialLDLTSolver()
+//  {}
 
-  virtual size_type apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                          const Dune::ParameterTree description = Dune::ParameterTree()) const override
-  {
-    //    typedef ::Eigen::SimplicialLDLT< typename MatrixType::BackendType> EigenSolverType;
-    typedef ::Eigen::SuperLU<typename MatrixType::BackendType> EigenSolverType;
-    EigenSolverType eigenSolver;
-    eigenSolver.compute(systemMatrix.backend());
-    auto retval = eigenSolver.solve(rhsVector.backend());
-    //    retval.evalTo(solutionVector.backend());
-    solutionVector.backend() = retval;
-    const ::Eigen::ComputationInfo info = eigenSolver.info();
-    return (info == ::Eigen::Success);
-  } // virtual bool apply(...)
-}; // class SimplicialLDLT
+//  virtual size_type apply(const MatrixType& systemMatrix,
+//                          const VectorType& rhsVector,
+//                          VectorType& solutionVector,
+//                          const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
+//  {
+//    auto ko = const_cast<typename MatrixType::BackendType&>(systemMatrix.backend());
+////    typedef ::Eigen::SimplicialLDLT< typename MatrixType::BackendType> EigenSolverType;
+//    typedef ::Eigen::SimplicialCholesky<const typename MatrixType::BackendType> EigenSolverType;
+//    EigenSolverType eigenSolver;
+//    eigenSolver.compute(ko);
+//    typename DSL::EigenDenseVector<typename VectorType::ElementType>::BackendType retval =
+//    eigenSolver.solve(rhsVector.backend());
+
+////    retval.evalTo(solutionVector.backend());
+////    solutionVector.backend() = retval;
+//    const ::Eigen::ComputationInfo info = eigenSolver.info();
+//    return (info == ::Eigen::Success);
+//  } // virtual bool apply(...)
+//}; // class SimplicialLDLT
 
 
 } // namespace LA
