@@ -38,30 +38,14 @@ static std::vector<std::string> solverTypes()
 template <class MatrixType, class VectorType>
 Dune::ParameterTree solverDefaultSettings(const std::string type)
 {
-  if (type == "cg") {
-    return Dune::Stuff::LA::CgSolver<MatrixType, VectorType>::defaultSettings();
-  } else if (type == "cg.diagonal") {
-    return Dune::Stuff::LA::CgDiagonalSolver<MatrixType, VectorType>::defaultSettings();
-  } else if (type == "bicgstab") {
-    return Dune::Stuff::LA::BicgstabSolver<MatrixType, VectorType>::defaultSettings();
-  } else if (type == "bicgstab.diagonal") {
-    return Dune::Stuff::LA::BicgstabDiagonalSolver<MatrixType, VectorType>::defaultSettings();
-  } else if (type == "bicgstab.ilut") {
+  if (type == "bicgstab.ilut") {
     return Dune::Stuff::LA::BicgstabILUTSolver<MatrixType, VectorType>::defaultSettings();
-  } else if (type == "simplicialllt") {
-    return Dune::Stuff::LA::SimplicialLLTSolver<MatrixType, VectorType>::defaultSettings();
-  } else if (type == "simplicialldlt") {
-    return Dune::Stuff::LA::SimplicialLDLTSolver<MatrixType, VectorType>::defaultSettings();
 #if HAVE_FASP
   } else if (type == "amg.fasp") {
     return Dune::Stuff::LA::AmgFaspSolver<MatrixType, VectorType>::defaultSettings();
 #endif // HAVE_FASP
-  } else
-    DUNE_THROW(Dune::RangeError,
-               "\n" << Dune::Stuff::Common::colorString("ERROR:", Dune::Stuff::Common::Colors::red)
-                    << " unknown linear solver '"
-                    << type
-                    << "' requested!");
+  }
+  return SolverInterface<MatrixType, VectorType>::defaultIterativeSettings();
 } // Dune::ParameterTree defaultSettings(const std::string type)
 
 

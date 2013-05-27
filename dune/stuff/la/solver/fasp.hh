@@ -140,7 +140,6 @@ public:
    *              touch the matrix, but who knows...
    */
   virtual size_type apply(const MatrixType& _systemMatrix, const VectorType& _rhsVector, VectorType& solutionVector,
-                          const size_type maxIter = 5000, const ElementType precision = 1e-12,
                           const Dune::ParameterTree description = Dune::ParameterTree()) const
   {
     // init system matrix and right hand side
