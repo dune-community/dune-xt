@@ -32,7 +32,7 @@ public:
   typedef typename BaseType::ElementType ElementType;
   typedef typename BaseType::size_type size_type;
 
-  static Dune::ParameterTree createSampleDescription()
+  static Dune::ParameterTree defaultSettings()
   {
     // these parameters were taken from the init.dat, that Ludmil gave me...
     Dune::ParameterTree description;
@@ -133,7 +133,7 @@ public:
     description["Schwarz_param.schwarz_maxlvl"]         = "2";
     description["Schwarz_param.schwarz_mmsize"]         = "200";
     return description;
-  } // Dune::ParameterTree createSampleDescription()
+  } // Dune::ParameterTree defaultSettings()
 
   /**
    *  \attention  There is a const_cast inside, in order to forward non-const pointers to fasp. I hope they do not
