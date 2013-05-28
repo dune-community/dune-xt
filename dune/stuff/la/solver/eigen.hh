@@ -195,8 +195,8 @@ public:
   {
     Dune::ParameterTree description          = BaseType::defaultIterativeSettings();
     description["precision"]                 = "1.0e-8";
-    description["preconditioner.dropTol"]    = Eigen::NumTraits<double>::dummy_precision();
-    description["preconditioner.fillFactor"] = 10;
+    description["preconditioner.dropTol"]    = "1e-4";
+    description["preconditioner.fillFactor"] = "10";
     return description;
   } // Dune::ParameterTree defaultSettings()
 
