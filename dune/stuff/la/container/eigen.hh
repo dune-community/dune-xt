@@ -122,15 +122,15 @@ public:
   /**
    *  \attention  This is not optimal, since we create a new triplet vector inbetween!
    */
-  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::SparsityPatternDefault& _pattern)
+  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::SparsityPatternDefault& pattern)
     : eigenMatrix_(other.rows(), other.cols())
   {
     typedef ::Eigen::Triplet<ElementType> TripletType;
     std::vector<TripletType> triplets;
     triplets.reserve(other.nonZeros());
-    for (size_t row = 0; row < _pattern.size(); ++row)
-      for (size_t col : _pattern.set(row))
-        triplets.push_back(TripletType(row, col, other.get(row, col)));
+    for (size_t row = 0; row < pattern.size(); ++row)
+      for (size_t col : pattern.set(row))
+        triplets.emplace_back(row, col, other.get(row, col));
     eigenMatrix_.setFromTriplets(triplets.begin(), triplets.end());
   }
 
