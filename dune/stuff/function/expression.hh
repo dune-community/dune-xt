@@ -59,19 +59,19 @@ public:
     return InterfaceType::id() + ".expression";
   }
 
-  FunctionExpression(const std::string _variable, const std::string _expression, const int _order = -1,
-                     const std::string _name = id())
+  FunctionExpression(const std::string _variable, const std::string _expression, const int order = -1,
+                     const std::string name = id())
     : BaseType(_variable, _expression)
-    , order_(_order)
-    , name_(_name)
+    , order_(order)
+    , name_(name)
   {
   }
 
-  FunctionExpression(const std::string _variable, const std::vector<std::string> _expressions, const int _order = -1,
-                     const std::string _name = id())
+  FunctionExpression(const std::string _variable, const std::vector<std::string> _expressions, const int order = -1,
+                     const std::string name = id())
     : BaseType(_variable, _expressions)
-    , order_(_order)
-    , name_(_name)
+    , order_(order)
+    , name_(name)
   {
   }
 
@@ -127,10 +127,10 @@ public:
                       << " neither key nor vector 'expression' found in the following description:\n"
                       << description.reportString("  "));
     // get optional
-    const int _order        = description.get<int>("order", -1);
-    const std::string _name = description.get<std::string>("name", "function.expression");
+    const int order        = description.get<int>("order", -1);
+    const std::string name = description.get<std::string>("name", "function.expression");
     // create and return
-    return new ThisType(_variable, _expressions, _order, _name);
+    return new ThisType(_variable, _expressions, order, name);
   } // ... create(...)
 
   virtual int order() const
