@@ -14,9 +14,11 @@
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/shared_ptr.hh>
+#include <dune/common/fvector.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/vector.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -246,13 +248,168 @@ private:
 }; // class GridboundaryIdBased
 
 
+template <class GridViewImp>
+class GridboundaryNormalBased : public GridboundaryInterface<GridViewImp>
+{
+public:
+  typedef GridboundaryInterface<GridViewImp> BaseType;
+  typedef GridboundaryNormalBased<GridViewImp> ThisType;
+
+  typedef typename BaseType::GridViewType GridViewType;
+  typedef typename BaseType::IntersectionType IntersectionType;
+
+  typedef typename GridViewType::ctype DomainFieldType;
+  static const unsigned int dimDomain = GridViewType::dimension;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  static const std::string id()
+  {
+    return BaseType::id() + ".normalbased";
+  }
+
+  GridboundaryNormalBased(const bool defaultIsDirichlet = true,
+                          const std::vector<DomainType> dirichletNormals = std::vector<DomainType>(),
+                          const std::vector<DomainType> neumannNormals   = std::vector<DomainType>(),
+                          const DomainFieldType tol = 1e-10)
+    : defaultIsDirichlet_(defaultIsDirichlet)
+    , dirichletNormals_(dirichletNormals)
+    , neumannNormals_(neumannNormals)
+    , tol_(tol)
+  {
+    // normalize
+    for (auto& normal : dirichletNormals_)
+      normal /= normal.two_norm();
+    for (auto& normal : neumannNormals_)
+      normal /= normal.two_norm();
+    // sanity check
+    for (auto& dirichletNormal : dirichletNormals_) {
+      if (contains(dirichletNormal, neumannNormals_))
+        DUNE_THROW(Dune::InvalidStateException,
+                   "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " normals are too close!");
+    }
+  }
+
+  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  {
+    Dune::ParameterTree description;
+    description["default"]           = "dirichlet";
+    description["compare_tolerance"] = "1e-10";
+    description["neumann.0"]         = "[1.0; 0.0]";
+    description["dirichlet.0"] = "[0.0; 1.0]";
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
+  }
+
+  static ThisType* create(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  {
+    // get correct paramTree
+    Common::ExtendedParameterTree paramTreeX;
+    if (paramTree.hasSub(subName))
+      paramTreeX = paramTree.sub(subName);
+    else
+      paramTreeX = paramTree;
+    // get default
+    bool dirichletDef     = false;
+    const std::string def = paramTreeX.get("default", "dirichlet");
+    if (def == "dirichlet")
+      dirichletDef = true;
+    else if (def == "neumann")
+      dirichletDef = false;
+    else
+      DUNE_THROW(Dune::IOError, "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " wrong 'default'' given!");
+    // get tolerance
+    const DomainFieldType tol = paramTreeX.get("compare_tolerance", 1e-10);
+    // get dirichlet and neumann
+    std::vector<DomainType> dirichlets = getVectors(paramTreeX, "dirichlet");
+    std::vector<DomainType> neumanns   = getVectors(paramTreeX, "neumann");
+    // return
+    return new ThisType(dirichletDef, dirichlets, neumanns, tol);
+  }
+
+  virtual bool dirichlet(const IntersectionType& intersection) const
+  {
+    if (intersection.boundary()) {
+      const DomainType outerNormal = intersection.centerUnitOuterNormal();
+      if (contains(outerNormal, dirichletNormals_))
+        return true;
+      else if (contains(outerNormal, neumannNormals_))
+        return false;
+      else if (defaultIsDirichlet_)
+        return true;
+    }
+    return false;
+  } // bool dirichlet(const IntersectionType& intersection) const
+
+  virtual bool neumann(const IntersectionType& intersection) const
+  {
+    if (intersection.boundary()) {
+      const DomainType outerNormal = intersection.centerUnitOuterNormal();
+      if (contains(outerNormal, neumannNormals_))
+        return true;
+      else if (contains(outerNormal, dirichletNormals_))
+        return false;
+      else if (!defaultIsDirichlet_)
+        return true;
+    }
+    return false;
+  } // bool neumann(const IntersectionType& intersection) const
+
+private:
+  static std::vector<DomainType> getVectors(const Common::ExtendedParameterTree& paramTree, const std::string key)
+  {
+    std::vector<DomainType> ret;
+    if (paramTree.hasSub(key)) {
+      bool found           = true;
+      unsigned int counter = 0;
+      while (found) {
+        const std::string localKey = key + "." + Dune::Stuff::Common::toString(counter);
+        if (paramTree.hasKey(localKey)) {
+          std::vector<DomainFieldType> vec = paramTree.getVector<DomainFieldType>(key, dimDomain);
+          DomainType fvec(0);
+          for (size_t dd = 0; dd < dimDomain; ++dd)
+            fvec[dd] = vec[dd];
+          ret.push_back(fvec);
+        } else
+          found = false;
+        ++counter;
+      }
+    } else if (paramTree.hasKey(key)) {
+      std::vector<DomainFieldType> vec = paramTree.getVector<DomainFieldType>(key, dimDomain);
+      DomainType fvec(0);
+      for (size_t dd = 0; dd < dimDomain; ++dd)
+        fvec[dd] = vec[dd];
+      ret.push_back(fvec);
+    }
+    return ret;
+  }
+
+  bool contains(const DomainType& normal, const std::vector<DomainType>& vectors) const
+  {
+    for (auto& vector : vectors)
+      if (Dune::Stuff::Common::float_cmp(normal, vector, tol_))
+        return true;
+    return false;
+  }
+
+  const bool defaultIsDirichlet_;
+  std::vector<DomainType> dirichletNormals_;
+  std::vector<DomainType> neumannNormals_;
+  const DomainFieldType tol_;
+}; // class GridboundaryNormalBased
+
+
 template <class GridViewType>
 class Gridboundaries
 {
 public:
   static std::vector<std::string> available()
   {
-    return {"boundaryinfo.alldirichlet", "boundaryinfo.allneumann", "boundaryinfo.idbased"};
+    return {"boundaryinfo.alldirichlet", "boundaryinfo.allneumann", "boundaryinfo.idbased", "boundaryinfo.normalbased"};
   } // ... available(...)
 
   static Dune::ParameterTree createSampleDescription(const std::string type, const std::string subname = "")
@@ -263,6 +420,8 @@ public:
       return GridboundaryAllNeumann<GridViewType>::createSampleDescription(subname);
     else if (type == "boundaryinfo.idbased")
       return GridboundaryIdBased<GridViewType>::createSampleDescription(subname);
+    else if (type == "boundaryinfo.normalbased")
+      return GridboundaryNormalBased<GridViewType>::createSampleDescription(subname);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
@@ -278,6 +437,8 @@ public:
       return new GridboundaryAllNeumann<GridViewType>();
     } else if (type == "boundaryinfo.idbased") {
       return GridboundaryIdBased<GridViewType>::create(description);
+    } else if (type == "boundaryinfo.normalbased") {
+      return GridboundaryNormalBased<GridViewType>::create(description);
     } else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
