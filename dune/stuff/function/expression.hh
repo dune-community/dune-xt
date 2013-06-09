@@ -112,6 +112,8 @@ public:
     BaseType::evaluate(_x, _ret);
   }
 
+  using InterfaceType::localFunction;
+
 private:
   int order_;
   std::string name_;
