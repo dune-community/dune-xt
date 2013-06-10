@@ -444,6 +444,7 @@ public:
   virtual void evaluate(const DomainType& /*_x*/, RangeType& /*_ret*/) const = 0;
   /* @} */
 
+  using BaseType::evaluate;
   using BaseType::localFunction;
 }; // class FunctionInterface
 
