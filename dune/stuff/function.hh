@@ -35,7 +35,7 @@ class AffineParametricFunctionCheckerboard;
  *  \attention  This class will not compile for all dimensions. The errors should give you a hint which specializations
  *              are needed below.
  */
-template <class D, int d, class R, int rR, int rC>
+template <class D, int d, class R, int rR, int rC = 1>
 class Functions
 {
 public:
