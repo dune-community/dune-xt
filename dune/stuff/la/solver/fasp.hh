@@ -15,24 +15,23 @@ extern "C" {
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Solver {
 
 
 template <class ElementImp>
-class AmgFasp<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-              Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+class AmgFaspSolver<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
+                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+    : public SolverInterface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
+                             Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
+                          Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
   typedef typename BaseType::ElementType ElementType;
 
-  static Dune::ParameterTree createSampleDescription()
+  static Dune::ParameterTree defaultSettings()
   {
     // these parameters were taken from the init.dat, that Ludmil gave me...
     Dune::ParameterTree description;
@@ -133,14 +132,13 @@ public:
     description["Schwarz_param.schwarz_maxlvl"]         = "2";
     description["Schwarz_param.schwarz_mmsize"]         = "200";
     return description;
-  } // Dune::ParameterTree createSampleDescription()
+  } // Dune::ParameterTree defaultSettings()
 
   /**
    *  \attention  There is a const_cast inside, in order to forward non-const pointers to fasp. I hope they do not
    *              touch the matrix, but who knows...
    */
   virtual size_t apply(const MatrixType& _systemMatrix, const VectorType& _rhsVector, VectorType& solutionVector,
-                       const size_t maxIter = 5000, const ElementType precision = 1e-12,
                        const Dune::ParameterTree description = Dune::ParameterTree()) const
   {
     // init system matrix and right hand side

@@ -13,7 +13,12 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCholesky>
 
+#if HAVE_SUPERLU
+#include <Eigen/SuperLUSupport>
+#endif // HAVE_SUPERLU
+
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/logging.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/la/container/eigen.hh>
@@ -23,52 +28,52 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Solver {
+
+template <class MatrixImp, class VectorImp>
+struct IsEigenMV
+{
+  typedef typename std::is_base_of<Dune::Stuff::LA::EigenMatrixInterface<typename MatrixImp::Traits>, MatrixImp>::type
+      Mtype;
+  typedef typename std::is_base_of<Dune::Stuff::LA::EigenVectorInterface<typename VectorImp::Traits>, VectorImp>::type
+      Vtype;
+  static constexpr bool value = Mtype::value && Vtype::value;
+};
 
 //! \attention Slow!
 //! \todo Implement via Eigen::CG and identity preconditioner!
-template <class ElementImp>
-class Cg<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-         Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class CgSolver<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public SolverInterface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
   typedef typename BaseType::ElementType ElementType;
 
-  Cg()
+  CgSolver()
   {
     DSC_LOG_DEBUG << "\n" << Dune::Stuff::Common::colorString("WARNING:") << " this solver is believed to be slow! "
                   << std::flush;
   }
 
-  static Dune::ParameterTree createSampleDescription()
-  {
-    Dune::ParameterTree description;
-    description["maxIter"]   = "5000";
-    description["precision"] = "1e-12";
-    return description;
-  } // Dune::ParameterTree createSampleDescription()
-
   virtual size_t apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                       const size_t maxIter = 5000, const ElementType precision = 1e-12,
-                       const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
+                       const Dune::ParameterTree description = BaseType::defaultIterativeSettings()) const
   {
     auto& x_i      = solutionVector.backend();
     const auto& b  = rhsVector.backend();
     const auto& A  = systemMatrix.backend();
     const int cols = A.cols();
     size_t iteration(1);
+    const size_t maxIter        = description.get<size_type>("maxIter");
+    const ElementType precision = description.get<ElementType>("precision");
     ElementType rho(0), rho_prev(1), beta, alpha;
-    const ElementType tolerance               = precision * precision * b.squaredNorm();
-    typename VectorType::BackendType residuum = b - A * x_i;
-    typename VectorType::BackendType correction_p(cols);
-    typename VectorType::BackendType correction_q(cols);
+    const ElementType tolerance = precision * precision * b.squaredNorm();
+    typedef typename DSL::EigenDenseVector<typename VectorType::ElementType>::BackendType RealEigenVector;
+    RealEigenVector residuum = b - A * x_i;
+    RealEigenVector correction_p(cols);
+    RealEigenVector correction_q(cols);
     rho = residuum.squaredNorm();
     while (iteration <= maxIter) {
       if (iteration == 1) {
@@ -91,282 +96,158 @@ public:
 }; // class Cg
 
 
-template <class ElementImp>
-class CgDiagonal<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                 Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class CgDiagonalSolver<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public SolverInterface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
   typedef typename BaseType::ElementType ElementType;
 
-  CgDiagonal()
+  CgDiagonalSolver()
   {
     DSC_LOG_DEBUG << "\n" << Dune::Stuff::Common::colorString("WARNING:", Dune::Stuff::Common::Colors::red)
                   << " this solver is believed to produce utterly wrong results! " << std::flush;
   }
 
-  static Dune::ParameterTree createSampleDescription()
-  {
-    Dune::ParameterTree description;
-    description["maxIter"]   = "5000";
-    description["precision"] = "1e-12";
-    return description;
-  } // Dune::ParameterTree createSampleDescription()
-
   virtual size_t apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                       const size_t maxIter = 5000, const ElementType precision = 1e-12,
-                       const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
+                       const Dune::ParameterTree description = BaseType::defaultIterativeSettings()) const
   {
     typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                        ::Eigen::Lower,
                                        ::Eigen::DiagonalPreconditioner<ElementType>> EigenSolverType;
     EigenSolverType eigenSolver(systemMatrix.backend());
-    eigenSolver.setMaxIterations(maxIter);
-    eigenSolver.setTolerance(precision);
+    eigenSolver.setMaxIterations(description.get<size_t>("maxIter"));
+    eigenSolver.setTolerance(description.get<ElementType>("precision"));
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     return BaseType::translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class CgDiagonal
 
 
-template <class ElementImp>
-class Bicgstab<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-               Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class BicgstabSolver<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public SolverInterface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
   typedef typename BaseType::ElementType ElementType;
 
-  static Dune::ParameterTree createSampleDescription()
-  {
-    Dune::ParameterTree description;
-    description["maxIter"]   = "5000";
-    description["precision"] = "1e-12";
-    return description;
-  } // Dune::ParameterTree createSampleDescription()
 
   virtual size_t apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                       const size_t maxIter = 5000, const ElementType precision = 1e-12,
-                       const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
+                       const Dune::ParameterTree description = BaseType::defaultIterativeSettings()) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> EigenSolverType;
     EigenSolverType eigenSolver(systemMatrix.backend());
-    eigenSolver.setMaxIterations(maxIter);
-    eigenSolver.setTolerance(precision);
+    eigenSolver.setMaxIterations(description.get<size_t>("maxIter"));
+    eigenSolver.setTolerance(description.get<ElementType>("precision"));
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     return BaseType::translateInfo(eigenSolver.info());
   } // virtual bool apply(...)
 }; // class Bicgstab
 
 
-template <class ElementImp>
-class BicgstabDiagonal<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class BicgstabDiagonalSolver<MatrixImp, VectorImp,
+                             typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public SolverInterface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
   typedef typename BaseType::ElementType ElementType;
 
-  static Dune::ParameterTree createSampleDescription()
-  {
-    Dune::ParameterTree description;
-    description["maxIter"]   = "5000";
-    description["precision"] = "1e-12";
-    return description;
-  } // Dune::ParameterTree createSampleDescription()
-
   virtual size_t apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                       const size_t maxIter = 5000, const ElementType precision = 1e-12,
-                       const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
+                       const Dune::ParameterTree description = BaseType::defaultIterativeSettings()) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<ElementType>>
         EigenSolverType;
     EigenSolverType eigenSolver(systemMatrix.backend());
-    eigenSolver.setMaxIterations(maxIter);
-    eigenSolver.setTolerance(precision);
+    eigenSolver.setMaxIterations(description.get<size_type>("maxIter"));
+    eigenSolver.setTolerance(description.get<ElementType>("precision"));
     solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
     return BaseType::translateInfo(eigenSolver.info());
   } // virtual bool apply(...)static_assert
 }; // class BicgstabDiagonal
 
 
-template <class ElementImp>
-class BicgstabILUT<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                   Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                       Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+template <class MatrixImp, class VectorImp>
+class BicgstabILUTSolver<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public SolverInterface<MatrixImp, VectorImp>
 {
 public:
-  typedef Interface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<MatrixImp, VectorImp> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
   typedef typename BaseType::ElementType ElementType;
 
-  static Dune::ParameterTree createSampleDescription()
+  static Dune::ParameterTree defaultSettings()
   {
-    Dune::ParameterTree description;
-    description["maxIter"]   = "5000";
-    description["precision"] = "1e-12";
+    Dune::ParameterTree description          = BaseType::defaultIterativeSettings();
+    description["precision"]                 = "1.0e-8";
+    description["preconditioner.dropTol"]    = "1e-4";
+    description["preconditioner.fillFactor"] = "10";
     return description;
-  } // Dune::ParameterTree createSampleDescription()
+  } // Dune::ParameterTree defaultSettings()
 
   virtual size_t apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
-                       const size_t maxIter = 5000, const ElementType precision = 1e-12,
-                       const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
+                       const Dune::ParameterTree description = defaultSettings()) const
   {
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<ElementType>> EigenSolverType;
-    EigenSolverType eigenSolver(systemMatrix.backend());
-    eigenSolver.setMaxIterations(maxIter);
-    eigenSolver.setTolerance(precision);
-    solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
-    return BaseType::translateInfo(eigenSolver.info());
+    EigenSolverType solver(systemMatrix.backend());
+    // configure solver and preconditioner
+    solver.setTolerance(description.get<double>("precision"));
+    solver.setMaxIterations(description.get<size_t>("maxIter", solutionVector.size()));
+    solver.preconditioner().setDroptol(description.get<double>("preconditioner.dropTol"));
+    solver.preconditioner().setFillfactor(description.get<double>("preconditioner.fillFactor"));
+
+    solutionVector.backend() = solver.solve(rhsVector.backend());
+    return BaseType::translateInfo(solver.info());
   } // virtual bool apply(...)
 }; // class BicgstabILUT
 
 
-template <class ElementImp>
-class SimplicialLLT<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public SolverNotImplementedForThisMatrixVectorCombination<Dune::Stuff::LA::Container::
-                                                                    EigenRowMajorSparseMatrix<ElementImp>,
-                                                                Dune::Stuff::LA::Container::
-                                                                    EigenDenseVector<ElementImp>>
+#if HAVE_SUPERLU
+
+template <class MatrixImp, class VectorImp>
+class DirectSuperLuSolver<MatrixImp, VectorImp, typename std::enable_if<IsEigenMV<MatrixImp, VectorImp>::value>::type>
+    : public SolverInterface<MatrixImp, VectorImp>
 {
 public:
-  typedef SolverNotImplementedForThisMatrixVectorCombination<Dune::Stuff::LA::Container::
-                                                                 EigenRowMajorSparseMatrix<ElementImp>,
-                                                             Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-      BaseType;
+  typedef SolverInterface<MatrixImp, VectorImp> BaseType;
 
-  SimplicialLLT()
-    : BaseType("\nERROR: only implemented for eigen matrices of type 'EigenColMajorSparseMatrix'!")
+  typedef typename BaseType::MatrixType MatrixType;
+  typedef typename BaseType::VectorType VectorType;
+  typedef typename BaseType::ElementType ElementType;
+
+  DirectSuperLuSolver()
   {
   }
 
-  static Dune::ParameterTree createSampleDescription()
+  virtual size_t apply(const MatrixType& systemMatrix, const VectorType& rhsVector, VectorType& solutionVector,
+                       const Dune::ParameterTree /*description*/ = Dune::ParameterTree()) const
   {
-    return Dune::ParameterTree();
-  } // Dune::ParameterTree createSampleDescription()
-}; // class SimplicialLLT
 
-
-// template< class ElementImp >
-// class SimplicialLLT< Dune::Stuff::LA::Container::EigenColMajorSparseMatrix< ElementImp >,
-//                    Dune::Stuff::LA::Container::EigenDenseVector< ElementImp > >
-//  : public Interface< Dune::Stuff::LA::Container::EigenColMajorSparseMatrix< ElementImp >,
-//                      Dune::Stuff::LA::Container::EigenDenseVector< ElementImp > >
-//{
-// public:
-//  typedef Interface<  Dune::Stuff::LA::Container::EigenColMajorSparseMatrix< ElementImp >,
-//                      Dune::Stuff::LA::Container::EigenDenseVector< ElementImp > >
-//      BaseType;
-
-//  typedef typename BaseType::MatrixType MatrixType;
-
-//  typedef typename BaseType::VectorType VectorType;
-
-//  typedef typename BaseType::ElementType ElementType;
-
-//  SimplicialLLT()
-//  {}
-
-//  virtual bool apply(const MatrixType& systemMatrix,
-//                     const VectorType& rhsVector,
-//                     VectorType& solutionVector,
-//                     const size_type /*maxIter*/ = 0,
-//                     const ElementType /*precision*/ = 0) const
-//  {
-//    typedef ::Eigen::SimplicialLLT< typename MatrixType::BackendType, ::Eigen::Lower > EigenSolverType;
-//    EigenSolverType eigenSolver(systemMatrix.base());
-//    solutionVector.base() = eigenSolver.solve(rhsVector.base());
-//    const ::Eigen::ComputationInfo info = eigenSolver.info();
-//    return (info == ::Eigen::Success);
-//  } // virtual bool apply(...)
-//}; // class SimplicialLLT
-
-
-template <class ElementImp>
-class SimplicialLDLT<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                     Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public SolverNotImplementedForThisMatrixVectorCombination<Dune::Stuff::LA::Container::
-                                                                    EigenRowMajorSparseMatrix<ElementImp>,
-                                                                Dune::Stuff::LA::Container::
-                                                                    EigenDenseVector<ElementImp>>
-{
-public:
-  typedef SolverNotImplementedForThisMatrixVectorCombination<Dune::Stuff::LA::Container::
-                                                                 EigenRowMajorSparseMatrix<ElementImp>,
-                                                             Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-      BaseType;
-
-  SimplicialLDLT()
-    : BaseType("\nERROR: only implemented for eigen matrices of type 'EigenColMajorSparseMatrix'!")
-  {
-  }
-
-  static Dune::ParameterTree createSampleDescription()
-  {
-    return Dune::ParameterTree();
-  } // Dune::ParameterTree createSampleDescription()
+    typedef ::Eigen::SuperLU<const typename MatrixType::BackendType> EigenSolverType;
+    EigenSolverType eigenSolver;
+    eigenSolver.compute(systemMatrix.backend());
+    solutionVector.backend() = eigenSolver.solve(rhsVector.backend());
+    const ::Eigen::ComputationInfo info = eigenSolver.info();
+    return (info == ::Eigen::Success);
+  } // virtual bool apply(...)
 }; // class SimplicialLDLT
 
+#endif // HAVE_SUPERLU
 
-// template< class ElementImp >
-// class SimplicialLDLT< Dune::Stuff::LA::Container::EigenColMajorSparseMatrix< ElementImp >,
-//                      Dune::Stuff::LA::Container::EigenDenseVector< ElementImp > >
-//  : public Interface< Dune::Stuff::LA::Container::EigenColMajorSparseMatrix< ElementImp >,
-//                      Dune::Stuff::LA::Container::EigenDenseVector< ElementImp > >
-//{
-// public:
-//  typedef Interface<  Dune::Stuff::LA::Container::EigenColMajorSparseMatrix< ElementImp >,
-//                      Dune::Stuff::LA::Container::EigenDenseVector< ElementImp > >
-//      BaseType;
-
-//  typedef typename BaseType::MatrixType MatrixType;
-
-//  typedef typename BaseType::VectorType VectorType;
-
-//  typedef typename BaseType::ElementType ElementType;
-
-//  SimplicialLLT()
-//  {}
-
-//  virtual bool apply(const MatrixType& systemMatrix,
-//                     const VectorType& rhsVector,
-//                     VectorType& solutionVector,
-//                     const size_type /*maxIter*/ = 0,
-//                     const ElementType /*precision*/ = 0) const
-//  {
-//    typedef ::Eigen::SimplicialLDLT< typename MatrixType::BackendType, ::Eigen::Lower > EigenSolverType;
-//    EigenSolverType eigenSolver(systemMatrix.base());
-//    solutionVector.base() = eigenSolver.solve(rhsVector.base());
-//    const ::Eigen::ComputationInfo info = eigenSolver.info();
-//    return (info == ::Eigen::Success);
-//  } // virtual bool apply(...)
-//}; // class SimplicialLDLT
-
-
-} // namespace Solver
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune

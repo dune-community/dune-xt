@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <type_traits>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -24,11 +25,10 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Container {
 
 
 template <class Traits>
-class EigenInterface : public Interface<Traits>
+class EigenContainerInterface : public ContainerInterface<Traits>
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -36,7 +36,7 @@ public:
 
 
 template <class Traits>
-class EigenMatrixInterface : public EigenInterface<Traits>
+class EigenMatrixInterface : public EigenContainerInterface<Traits>
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -44,7 +44,7 @@ public:
 
 
 template <class Traits>
-class EigenVectorInterface
+class EigenVectorInterface : public EigenContainerInterface<Traits>
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -117,15 +117,15 @@ public:
   /**
    *  \attention  This is not optimal, since we create a new triplet vector inbetween!
    */
-  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::Container::SparsityPatternDefault& _pattern)
+  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::SparsityPatternDefault& pattern)
     : eigenMatrix_(other.rows(), other.cols())
   {
     typedef ::Eigen::Triplet<ElementType> TripletType;
     std::vector<TripletType> triplets;
     triplets.reserve(other.nonZeros());
-    for (size_t row = 0; row < _pattern.size(); ++row)
-      for (size_t col : _pattern.inner(row))
-        triplets.push_back(TripletType(row, col, other.get(row, col)));
+    for (size_t row = 0; row < pattern.size(); ++row)
+      for (size_t col : pattern.inner(row))
+        triplets.emplace_back(row, col, other.get(row, col));
     eigenMatrix_.setFromTriplets(triplets.begin(), triplets.end());
   }
 
@@ -209,9 +209,7 @@ class EigenDenseMatrixTraits
 public:
   typedef ElementImp ElementType;
   typedef EigenDenseMatrix<ElementType> derived_type;
-  //  typedef derived_type EigenMatrix_derived_type;
   typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
-  typedef typename BackendType::Index size_t;
 }; // class DenseMatrixTraits
 
 
@@ -317,9 +315,7 @@ class EigenDenseVectorTraits
 public:
   typedef ElementImp ElementType;
   typedef EigenDenseVector<ElementType> derived_type;
-  //  typedef derived_type EigenVector_derived_type;
   typedef typename ::Eigen::Matrix<ElementType, ::Eigen::Dynamic, 1> BackendType;
-  typedef typename BackendType::Index size_t;
 }; // class DenseVectorTraits
 
 /**
@@ -403,8 +399,82 @@ private:
 }; // class DenseVector
 
 
-template <class ElementType = double, class size_t = unsigned int>
-std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_t _size)
+template <class T>
+class EigenMappedDenseVector;
+
+template <class ElementImp = double>
+class EigenMappedDenseVectorTraits
+{
+  typedef typename ::Eigen::Matrix<ElementImp, ::Eigen::Dynamic, 1> PlainBackendType;
+
+public:
+  typedef ElementImp ElementType;
+  typedef EigenMappedDenseVector<ElementType> derived_type;
+  typedef Eigen::Map<PlainBackendType> BackendType;
+};
+
+/**
+ *  \brief  A EigenMap backed Vector interface wrapping double*
+ *
+ */
+template <class ElementImp = double>
+class EigenMappedDenseVector : public VectorInterface<EigenMappedDenseVectorTraits<ElementImp>>,
+                               public EigenVectorInterface<EigenMappedDenseVectorTraits<ElementImp>>
+{
+public:
+  typedef EigenMappedDenseVector<ElementImp> ThisType;
+  typedef EigenMappedDenseVectorTraits<ElementImp> Traits;
+  typedef typename Traits::BackendType BackendType;
+  typedef typename Traits::ElementType ElementType;
+
+  EigenMappedDenseVector(ElementImp* data, size_t data_size)
+    : eigenVector_(data, data_size)
+  {
+    static_assert(std::is_same<ElementType, double>::value, "undefined behaviour for non-double data");
+  }
+
+  virtual ~EigenMappedDenseVector()
+  {
+  }
+
+  EigenMappedDenseVector() = delete;
+
+  size_t size() const
+  {
+    return eigenVector_.size();
+  }
+
+  void add(const size_type i, const ElementType& val)
+  {
+    eigenVector_(i) += val;
+  }
+
+  void set(const size_t i, const ElementType& val)
+  {
+    eigenVector_(i) = val;
+  }
+
+  const ElementType get(const size_t i) const
+  {
+    return eigenVector_(i);
+  }
+
+  BackendType& backend()
+  {
+    return eigenVector_;
+  }
+
+  const BackendType& backend() const
+  {
+    return eigenVector_;
+  }
+
+private:
+  BackendType eigenVector_;
+}; // class DenseVector
+
+template <class ElementType = double>
+std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_type _size)
 {
   // create the sparsity pattern
   SparsityPatternDefault pattern(_size);
@@ -418,7 +488,6 @@ std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMa
 }
 
 
-} // namespace Container
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune

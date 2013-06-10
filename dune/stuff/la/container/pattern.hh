@@ -9,7 +9,6 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace Container {
 
 
 class SparsityPatternDefault
@@ -92,7 +91,6 @@ private:
 //} // ... compressSparsityPattern(...)
 
 
-} // namespace Container
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
