@@ -18,15 +18,20 @@ namespace Dune {
 namespace Stuff {
 
 
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+class FunctionExpression;
+
+
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class FunctionExpression : public FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>,
-                           public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+class FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+    : public FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>,
+      public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 {
   typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
   typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> InterfaceType;
 
 public:
-  typedef FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
+  typedef FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
 
   typedef typename InterfaceType::DomainFieldType DomainFieldType;
   static const int dimDomain = InterfaceType::dimDomain;
