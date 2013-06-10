@@ -10,6 +10,7 @@
 #include <dune/common/static_assert.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/deprecated.hh>
+#include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/common/misc.hh>
 #include <dune/stuff/common/ranges.hh>
@@ -72,7 +73,7 @@ public:
   void operator()(EntityFunctor& entityFunctor, IntersectionFunctor& intersectionFunctor) const
   {
     dune_static_assert(codim == 0, "walking intersections is only possible for codim 0 entities");
-    for (const auto& entity : Common::viewRange(gridView_)) {
+    for (const auto& entity : DSC::viewRange(gridView_)) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
       for (const auto& intersection : DSC::intersectionRange(gridView_, entity)) {
