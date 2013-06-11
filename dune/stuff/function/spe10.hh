@@ -138,7 +138,7 @@ public:
     delete data_;
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["filename"]   = "perm_case1.dat";
@@ -156,24 +156,24 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
-  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree description)
+  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree settings)
   {
     // get data
-    const std::string filenameIn                    = description.get<std::string>("filename");
-    const std::vector<DomainFieldType> lowerLeftIn  = description.getVector<DomainFieldType>("lowerLeft", dimDomain);
-    const std::vector<DomainFieldType> upperRightIn = description.getVector<DomainFieldType>("upperRight", dimDomain);
-    //    const std::vector< size_t >          numElements  = description.getVector< size_t >(         "numElements",
+    const std::string filenameIn                    = settings.get<std::string>("filename");
+    const std::vector<DomainFieldType> lowerLeftIn  = settings.getVector<DomainFieldType>("lowerLeft", dimDomain);
+    const std::vector<DomainFieldType> upperRightIn = settings.getVector<DomainFieldType>("upperRight", dimDomain);
+    //    const std::vector< size_t >          numElements  = settings.getVector< size_t >(         "numElements",
     //                                                                                                 dimDomain);
     double minValueIn = minValue;
-    if (description.hasKey("minValue"))
-      minValueIn      = description.get<double>("minValue");
+    if (settings.hasKey("minValue"))
+      minValueIn      = settings.get<double>("minValue");
     double maxValueIn = maxValue;
-    if (description.hasKey("maxValue"))
-      maxValueIn             = description.get<double>("maxValue");
-    const std::string nameIn = description.get<std::string>("name", id());
-    const int orderIn        = description.get<int>("order", 0);
+    if (settings.hasKey("maxValue"))
+      maxValueIn             = settings.get<double>("maxValue");
+    const std::string nameIn = settings.get<std::string>("name", id());
+    const int orderIn        = settings.get<int>("order", 0);
     // convert and leave the checks to the constructor
     DomainType lowerLeft;
     DomainType upperRight;

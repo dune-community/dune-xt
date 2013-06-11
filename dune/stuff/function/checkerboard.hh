@@ -156,7 +156,7 @@ public:
   {
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
@@ -171,19 +171,19 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree description)
+  static ThisType* create(const DSC::ExtendedParameterTree settings)
   {
     // get data
-    const std::vector<DomainFieldType> lowerLefts  = description.getVector("lowerLeft", DomainFieldType(0), dimDomain);
-    const std::vector<DomainFieldType> upperRights = description.getVector("upperRight", DomainFieldType(1), dimDomain);
-    const std::vector<size_t> numElements          = description.getVector("numElements", size_t(1), dimDomain);
+    const std::vector<DomainFieldType> lowerLefts  = settings.getVector("lowerLeft", DomainFieldType(0), dimDomain);
+    const std::vector<DomainFieldType> upperRights = settings.getVector("upperRight", DomainFieldType(1), dimDomain);
+    const std::vector<size_t> numElements          = settings.getVector("numElements", size_t(1), dimDomain);
     size_t subdomains = 1;
     for (size_t ii = 0; ii < numElements.size(); ++ii)
       subdomains *= numElements[ii];
     const std::vector<RangeFieldType> rangeFieldTypeValues =
-        description.getVector("values", RangeFieldType(1), subdomains);
+        settings.getVector("values", RangeFieldType(1), subdomains);
     std::vector<RangeType> rangeTypeValues(rangeFieldTypeValues.size(), RangeType(0));
     for (size_t ii = 0; ii < rangeFieldTypeValues.size(); ++ii)
       rangeTypeValues[ii] = rangeFieldTypeValues[ii];

@@ -61,7 +61,7 @@ public:
   {
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["variable"]   = "x";
@@ -75,29 +75,29 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree description)
+  static ThisType* create(const DSC::ExtendedParameterTree settings)
   {
     // get necessary
-    const std::string _variable = description.get<std::string>("variable", "x");
+    const std::string _variable = settings.get<std::string>("variable", "x");
     std::vector<std::string> _expressions;
     // lets see, if there is a key or vector
-    if (description.hasVector("expression")) {
-      const std::vector<std::string> expr = description.getVector<std::string>("expression", 1);
+    if (settings.hasVector("expression")) {
+      const std::vector<std::string> expr = settings.getVector<std::string>("expression", 1);
       for (size_t ii = 0; ii < expr.size(); ++ii)
         _expressions.push_back(expr[ii]);
-    } else if (description.hasKey("expression")) {
-      const std::string expr = description.get<std::string>("expression");
+    } else if (settings.hasKey("expression")) {
+      const std::string expr = settings.get<std::string>("expression");
       _expressions.push_back(expr);
     } else
       DUNE_THROW(Dune::IOError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-                      << " neither key nor vector 'expression' found in the following description:\n"
-                      << description.reportString("  "));
+                      << " neither key nor vector 'expression' found in the following settings:\n"
+                      << settings.reportString("  "));
     // get optional
-    const int order        = description.get<int>("order", -1);
-    const std::string name = description.get<std::string>("name", "function.expression");
+    const int order        = settings.get<int>("order", -1);
+    const std::string name = settings.get<std::string>("name", "function.expression");
     // create and return
     return new ThisType(_variable, _expressions, order, name);
   } // ... create(...)

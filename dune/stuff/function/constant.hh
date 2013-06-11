@@ -96,7 +96,7 @@ public:
   {
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["value"] = "1.0";
@@ -107,11 +107,11 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree description)
+  static ThisType* create(const DSC::ExtendedParameterTree settings)
   {
-    return new ThisType(description.get<RangeFieldType>("value", RangeFieldType(0)));
+    return new ThisType(settings.get<RangeFieldType>("value", RangeFieldType(0)));
   } // ... create(...)
 }; // class FunctionConstant< ..., 1 >
 
