@@ -1,6 +1,7 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_PATTERN_HH
 #define DUNE_STUFF_LA_CONTAINER_PATTERN_HH
 
+#include <cstddef>
 #include <cmath>
 #include <vector>
 #include <set>
@@ -14,7 +15,7 @@ namespace LA {
 class SparsityPatternDefault
 {
 private:
-  typedef std::vector<std::set<unsigned int>> BaseType;
+  typedef std::vector<std::set<size_t>> BaseType;
 
 public:
   typedef BaseType::value_type InnerType;
