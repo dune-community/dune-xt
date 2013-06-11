@@ -52,36 +52,36 @@ public:
     };
   } // ... available()
 
-  static Dune::ParameterTree createSampleDescription(const std::string type, const std::string subname = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string type, const std::string subname = "")
   {
     if (type == "gridprovider.cube") {
-      return GridProviderCube<GridType>::createSampleDescription(subname);
+      return GridProviderCube<GridType>::createDefaultSettings(subname);
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
     } else if (type == "gridprovider.gmsh") {
-      return GridProviderGmsh<GridType>::createSampleDescription(subname);
+      return GridProviderGmsh<GridType>::createDefaultSettings(subname);
 #endif
 #endif
     } else if (type == "gridprovider.starcd") {
-      return GridProviderStarCD<GridType>::createSampleDescription(subname);
+      return GridProviderStarCD<GridType>::createDefaultSettings(subname);
     } else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Common::colorStringRed("ERROR:") << " unknown gridprovider '" << type << "' requested!");
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
   static GridProviderInterface<GridType>* create(const std::string& type = available()[0],
-                                                 const Dune::ParameterTree description = Dune::ParameterTree())
+                                                 const Dune::ParameterTree settings = Dune::ParameterTree())
   {
     if (type == "gridprovider.cube")
-      return GridProviderCube<GridType>::create(description);
+      return GridProviderCube<GridType>::create(settings);
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
     else if (type == "gridprovider.gmsh")
-      return GridProviderGmsh<GridType>::create(description);
+      return GridProviderGmsh<GridType>::create(settings);
 #endif
 #endif
     else if (type == "gridprovider.starcd")
-      return GridProviderStarCD<GridType>::create(description);
+      return GridProviderStarCD<GridType>::create(settings);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Common::colorStringRed("ERROR:") << " unknown gridprovider '" << type << "' requested!");

@@ -61,7 +61,7 @@ public:
     return BaseType::id() + ".alldirichlet";
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string /*subName*/ = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string /*subName*/ = "")
   {
     return Dune::ParameterTree();
   }
@@ -96,7 +96,7 @@ public:
     return BaseType::id() + ".allneumann";
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string /*subName*/ = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string /*subName*/ = "")
   {
     return Dune::ParameterTree();
   }
@@ -157,7 +157,7 @@ public:
     return *this;
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["dirichlet"] = "[1; 2; 3]";
@@ -171,21 +171,21 @@ public:
     }
   }
 
-  static ThisType* create(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
   {
-    // get correct paramTree
-    Common::ExtendedParameterTree paramTreeX;
-    if (paramTree.hasSub(subName))
-      paramTreeX = paramTree.sub(subName);
+    // get correct settings
+    Common::ExtendedParameterTree settings;
+    if (_settings.hasSub(subName))
+      settings = _settings.sub(subName);
     else
-      paramTreeX = paramTree;
+      settings = _settings;
     // get dirichlet
-    const std::vector<int> dirichletIds = paramTreeX.getVector<int>("dirichlet", 0, 0);
+    const std::vector<int> dirichletIds = settings.getVector<int>("dirichlet", 0, 0);
     IdSetType dirichletSet;
     for (unsigned int i = 0; i < dirichletIds.size(); ++i)
       dirichletSet.insert(dirichletIds[i]);
     // get neumann
-    const std::vector<int> neumannIds = paramTreeX.getVector<int>("neumann", 0, 0);
+    const std::vector<int> neumannIds = settings.getVector<int>("neumann", 0, 0);
     IdSetType neumannSet;
     for (unsigned int i = 0; i < neumannIds.size(); ++i)
       neumannSet.insert(neumannIds[i]);
@@ -289,7 +289,7 @@ public:
     }
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["default"]           = "dirichlet";
@@ -305,17 +305,17 @@ public:
     }
   }
 
-  static ThisType* create(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
   {
-    // get correct paramTree
-    Common::ExtendedParameterTree paramTreeX;
-    if (paramTree.hasSub(subName))
-      paramTreeX = paramTree.sub(subName);
+    // get correct _settings
+    Common::ExtendedParameterTree settings;
+    if (_settings.hasSub(subName))
+      settings = _settings.sub(subName);
     else
-      paramTreeX = paramTree;
+      settings = _settings;
     // get default
     bool dirichletDef     = false;
-    const std::string def = paramTreeX.get("default", "dirichlet");
+    const std::string def = settings.get("default", "dirichlet");
     if (def == "dirichlet")
       dirichletDef = true;
     else if (def == "neumann")
@@ -323,10 +323,10 @@ public:
     else
       DUNE_THROW(Dune::IOError, "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " wrong 'default'' given!");
     // get tolerance
-    const DomainFieldType tol = paramTreeX.get("compare_tolerance", 1e-10);
+    const DomainFieldType tol = settings.get("compare_tolerance", 1e-10);
     // get dirichlet and neumann
-    std::vector<DomainType> dirichlets = getVectors(paramTreeX, "dirichlet");
-    std::vector<DomainType> neumanns   = getVectors(paramTreeX, "neumann");
+    std::vector<DomainType> dirichlets = getVectors(settings, "dirichlet");
+    std::vector<DomainType> neumanns   = getVectors(settings, "neumann");
     // return
     return new ThisType(dirichletDef, dirichlets, neumanns, tol);
   }
@@ -412,33 +412,33 @@ public:
     return {"boundaryinfo.alldirichlet", "boundaryinfo.allneumann", "boundaryinfo.idbased", "boundaryinfo.normalbased"};
   } // ... available(...)
 
-  static Dune::ParameterTree createSampleDescription(const std::string type, const std::string subname = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string type, const std::string subname = "")
   {
     if (type == "boundaryinfo.alldirichlet")
-      return GridboundaryAllDirichlet<GridViewType>::createSampleDescription(subname);
+      return GridboundaryAllDirichlet<GridViewType>::createDefaultSettings(subname);
     else if (type == "boundaryinfo.allneumann")
-      return GridboundaryAllNeumann<GridViewType>::createSampleDescription(subname);
+      return GridboundaryAllNeumann<GridViewType>::createDefaultSettings(subname);
     else if (type == "boundaryinfo.idbased")
-      return GridboundaryIdBased<GridViewType>::createSampleDescription(subname);
+      return GridboundaryIdBased<GridViewType>::createDefaultSettings(subname);
     else if (type == "boundaryinfo.normalbased")
-      return GridboundaryNormalBased<GridViewType>::createSampleDescription(subname);
+      return GridboundaryNormalBased<GridViewType>::createDefaultSettings(subname);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
                       << "' requested!");
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
   static GridboundaryInterface<GridViewType>* create(const std::string& type = available()[0],
-                                                     const Dune::ParameterTree description = Dune::ParameterTree())
+                                                     const Dune::ParameterTree settings = Dune::ParameterTree())
   {
     if (type == "boundaryinfo.alldirichlet") {
       return new GridboundaryAllDirichlet<GridViewType>();
     } else if (type == "boundaryinfo.allneumann") {
       return new GridboundaryAllNeumann<GridViewType>();
     } else if (type == "boundaryinfo.idbased") {
-      return GridboundaryIdBased<GridViewType>::create(description);
+      return GridboundaryIdBased<GridViewType>::create(settings);
     } else if (type == "boundaryinfo.normalbased") {
-      return GridboundaryNormalBased<GridViewType>::create(description);
+      return GridboundaryNormalBased<GridViewType>::create(settings);
     } else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type

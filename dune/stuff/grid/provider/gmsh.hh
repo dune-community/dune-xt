@@ -82,7 +82,7 @@ public:
   {
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["filename"] = "path_to_g.msh";
@@ -93,22 +93,21 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
-  static ThisType* create(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
   {
-    // get correct paramTree
-    Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
-    if (paramTree.hasSub(subName))
-      extendedParamTree = paramTree.sub(subName);
+    // get correct _settings
+    Dune::Stuff::Common::ExtendedParameterTree settings;
+    if (_settings.hasSub(subName))
+      settings = _settings.sub(subName);
     else
-      extendedParamTree = paramTree;
+      settings = _settings;
     // create and return
-    if (!extendedParamTree.hasKey("filename"))
+    if (!settings.hasKey("filename"))
       DUNE_THROW(Dune::RangeError,
-                 "\nMissing key 'filename' in the following Dune::ParameterTree:\n"
-                     << extendedParamTree.reportString("  "));
-    const std::string filename = extendedParamTree.get("filename", "meaningless_default_value");
+                 "\nMissing key 'filename' in the following Dune::ParameterTree:\n" << settings.reportString("  "));
+    const std::string filename = settings.get("filename", "meaningless_default_value");
     return new ThisType(filename);
   }
 

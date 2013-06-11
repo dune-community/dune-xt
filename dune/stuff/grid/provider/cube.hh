@@ -148,7 +148,7 @@ public:
     buildGrid(tmpNumElements);
   }
 
-  static Dune::ParameterTree createSampleDescription(const std::string subName = "")
+  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
@@ -161,7 +161,7 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  } // ... createSampleDescription(...)
+  } // ... createDefaultSettings(...)
 
   /**
    *  \brief      Creates a cube.
@@ -176,21 +176,21 @@ public:
    *              <li> \c numElements: \a int or vector to denote the number of elements.
    *              </ul>
    **/
-  static ThisType* create(const Dune::ParameterTree& paramTree, const std::string subName = id())
+  static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
   {
-    // get correct paramTree
-    Dune::Stuff::Common::ExtendedParameterTree extendedParamTree;
-    if (paramTree.hasSub(subName))
-      extendedParamTree = paramTree.sub(subName);
+    // get correct _settings
+    Dune::Stuff::Common::ExtendedParameterTree settings;
+    if (_settings.hasSub(subName))
+      settings = _settings.sub(subName);
     else
-      extendedParamTree = paramTree;
+      settings = _settings;
     // get lower left
     std::vector<ctype> lowerLefts;
-    if (extendedParamTree.hasVector("lowerLeft")) {
-      lowerLefts = extendedParamTree.getVector("lowerLeft", ctype(0), dim);
+    if (settings.hasVector("lowerLeft")) {
+      lowerLefts = settings.getVector("lowerLeft", ctype(0), dim);
       assert(lowerLefts.size() >= dim && "Given vector too short!");
-    } else if (extendedParamTree.hasKey("lowerLeft")) {
-      const ctype lowerLeft = extendedParamTree.get("lowerLeft", ctype(0));
+    } else if (settings.hasKey("lowerLeft")) {
+      const ctype lowerLeft = settings.get("lowerLeft", ctype(0));
       lowerLefts            = std::vector<ctype>(dim, lowerLeft);
     } else {
       std::cout << "\n" << Dune::Stuff::Common::colorString("WARNING in " + id() + ":")
@@ -199,11 +199,11 @@ public:
     }
     // get upper right
     std::vector<ctype> upperRights;
-    if (extendedParamTree.hasVector("upperRight")) {
-      upperRights = extendedParamTree.getVector("upperRight", ctype(1), dim);
+    if (settings.hasVector("upperRight")) {
+      upperRights = settings.getVector("upperRight", ctype(1), dim);
       assert(upperRights.size() >= dim && "Given vector too short!");
-    } else if (extendedParamTree.hasKey("upperRight")) {
-      const ctype upperRight = extendedParamTree.get("upperRight", ctype(1));
+    } else if (settings.hasKey("upperRight")) {
+      const ctype upperRight = settings.get("upperRight", ctype(1));
       upperRights            = std::vector<ctype>(dim, upperRight);
     } else {
       std::cout << "\n" << Dune::Stuff::Common::colorString("WARNING in " + id() + ":")
@@ -212,11 +212,11 @@ public:
     }
     // get number of elements
     std::vector<unsigned int> tmpNumElements;
-    if (extendedParamTree.hasVector("numElements")) {
-      tmpNumElements = extendedParamTree.getVector("numElements", 1u, dim);
+    if (settings.hasVector("numElements")) {
+      tmpNumElements = settings.getVector("numElements", 1u, dim);
       assert(tmpNumElements.size() >= dim && "Given vector too short!");
-    } else if (extendedParamTree.hasKey("numElements")) {
-      const unsigned int numElement = extendedParamTree.get("numElements", 1u);
+    } else if (settings.hasKey("numElements")) {
+      const unsigned int numElement = settings.get("numElements", 1u);
       tmpNumElements                = std::vector<unsigned int>(dim, numElement);
     } else {
       std::cout << "\n" << Dune::Stuff::Common::colorString("WARNING in " + id() + ":")
