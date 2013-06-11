@@ -80,7 +80,6 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
-  typedef typename Traits::size_t size_t;
 
   size_t size() const
   {

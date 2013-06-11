@@ -444,7 +444,7 @@ public:
     return eigenVector_.size();
   }
 
-  void add(const size_type i, const ElementType& val)
+  void add(const size_t i, const ElementType& val)
   {
     eigenVector_(i) += val;
   }
@@ -474,7 +474,7 @@ private:
 }; // class DenseVector
 
 template <class ElementType = double>
-std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_type _size)
+std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_t _size)
 {
   // create the sparsity pattern
   SparsityPatternDefault pattern(_size);
