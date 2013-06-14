@@ -45,7 +45,7 @@ struct ElementVisualization
     Dune::VTKWriter<typename Grid::LeafGridView> vtkwriter(gridView);
     vtkwriter.addCellData(values, "data");
     DSC::testCreateDirectory(f.filename());
-    vtkwriter.pwrite("visualization", f.filename(), "piecefiles", Dune::VTK::appendedraw);
+    vtkwriter.pwrite(f.filename(), f.dir(), "piecefiles", Dune::VTK::appendedraw);
   }
 
 
