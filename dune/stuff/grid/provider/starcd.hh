@@ -206,7 +206,7 @@ public:
   {
   }
 
-  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
+  static Dune::ParameterTree defaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["filename"] = "path_to_starcd_filename_prefix";

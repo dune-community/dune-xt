@@ -61,7 +61,7 @@ public:
     return BaseType::id() + ".alldirichlet";
   }
 
-  static Dune::ParameterTree createDefaultSettings(const std::string /*subName*/ = "")
+  static Dune::ParameterTree defaultSettings(const std::string /*subName*/ = "")
   {
     return Dune::ParameterTree();
   }
@@ -96,7 +96,7 @@ public:
     return BaseType::id() + ".allneumann";
   }
 
-  static Dune::ParameterTree createDefaultSettings(const std::string /*subName*/ = "")
+  static Dune::ParameterTree defaultSettings(const std::string /*subName*/ = "")
   {
     return Dune::ParameterTree();
   }
@@ -157,7 +157,7 @@ public:
     return *this;
   }
 
-  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
+  static Dune::ParameterTree defaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["dirichlet"] = "[1; 2; 3]";
@@ -289,7 +289,7 @@ public:
     }
   }
 
-  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
+  static Dune::ParameterTree defaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["default"]           = "dirichlet";
@@ -412,16 +412,16 @@ public:
     return {"boundaryinfo.alldirichlet", "boundaryinfo.allneumann", "boundaryinfo.idbased", "boundaryinfo.normalbased"};
   } // ... available(...)
 
-  static Dune::ParameterTree createDefaultSettings(const std::string type, const std::string subname = "")
+  static Dune::ParameterTree defaultSettings(const std::string type, const std::string subname = "")
   {
     if (type == "boundaryinfo.alldirichlet")
-      return GridboundaryAllDirichlet<GridViewType>::createDefaultSettings(subname);
+      return GridboundaryAllDirichlet<GridViewType>::defaultSettings(subname);
     else if (type == "boundaryinfo.allneumann")
-      return GridboundaryAllNeumann<GridViewType>::createDefaultSettings(subname);
+      return GridboundaryAllNeumann<GridViewType>::defaultSettings(subname);
     else if (type == "boundaryinfo.idbased")
-      return GridboundaryIdBased<GridViewType>::createDefaultSettings(subname);
+      return GridboundaryIdBased<GridViewType>::defaultSettings(subname);
     else if (type == "boundaryinfo.normalbased")
-      return GridboundaryNormalBased<GridViewType>::createDefaultSettings(subname);
+      return GridboundaryNormalBased<GridViewType>::defaultSettings(subname);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type

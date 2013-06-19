@@ -52,18 +52,18 @@ public:
     };
   } // ... available()
 
-  static Dune::ParameterTree createDefaultSettings(const std::string type, const std::string subname = "")
+  static Dune::ParameterTree defaultSettings(const std::string type, const std::string subname = "")
   {
     if (type == "gridprovider.cube") {
-      return GridProviderCube<GridType>::createDefaultSettings(subname);
+      return GridProviderCube<GridType>::defaultSettings(subname);
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
     } else if (type == "gridprovider.gmsh") {
-      return GridProviderGmsh<GridType>::createDefaultSettings(subname);
+      return GridProviderGmsh<GridType>::defaultSettings(subname);
 #endif
 #endif
     } else if (type == "gridprovider.starcd") {
-      return GridProviderStarCD<GridType>::createDefaultSettings(subname);
+      return GridProviderStarCD<GridType>::defaultSettings(subname);
     } else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Common::colorStringRed("ERROR:") << " unknown gridprovider '" << type << "' requested!");
