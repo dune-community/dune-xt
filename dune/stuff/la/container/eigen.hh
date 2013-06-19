@@ -1,12 +1,6 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_EIGEN_HH
 #define DUNE_STUFF_LA_CONTAINER_EIGEN_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#elif defined(HAVE_CONFIG_H)
-#include <config.h>
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #if HAVE_EIGEN
 
 #include <algorithm>
@@ -473,15 +467,18 @@ private:
   BackendType eigenVector_;
 }; // class DenseVector
 
+
+/**
+ *  \todo Get rid of the 2nd for loop by using the Eigen triplets directly.
+ */
 template <class ElementType = double>
-std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> createIdentityEigenRowMajorSparseMatrix(const size_t _size)
+EigenRowMajorSparseMatrix<ElementType>* createIdentityEigenRowMajorSparseMatrix(const size_t _size)
 {
   // create the sparsity pattern
   SparsityPatternDefault pattern(_size);
   for (size_t ii = 0; ii < _size; ++ii)
     pattern.inner(ii).insert(ii);
-  std::shared_ptr<EigenRowMajorSparseMatrix<ElementType>> ret =
-      Dune::make_shared<EigenRowMajorSparseMatrix<ElementType>>(_size, _size, pattern);
+  EigenRowMajorSparseMatrix<ElementType>* ret = new EigenRowMajorSparseMatrix<ElementType>(_size, _size, pattern);
   for (size_t ii = 0; ii < _size; ++ii)
     ret->set(ii, ii, 1.0);
   return ret;
