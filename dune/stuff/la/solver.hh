@@ -36,7 +36,7 @@ static std::vector<std::string> solverTypes()
 
 
 template <class MatrixType, class VectorType>
-Dune::ParameterTree solverDefaultSettings(const std::string type)
+Dune::ParameterTree solverDefaultSettings(const std::string type = solverTypes()[0])
 {
   if (type == "bicgstab.ilut") {
     return Dune::Stuff::LA::BicgstabILUTSolver<MatrixType, VectorType>::defaultSettings();
