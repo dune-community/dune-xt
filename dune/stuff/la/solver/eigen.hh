@@ -205,10 +205,14 @@ public:
     typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<ElementType>> EigenSolverType;
     EigenSolverType solver(systemMatrix.backend());
     // configure solver and preconditioner
-    solver.setTolerance(description.get<double>("precision"));
-    solver.setMaxIterations(description.get<size_t>("maxIter", solutionVector.size()));
-    solver.preconditioner().setDroptol(description.get<double>("preconditioner.dropTol"));
-    solver.preconditioner().setFillfactor(description.get<double>("preconditioner.fillFactor"));
+    // do not fail, but warn on non existing settings
+    const auto defaults = defaultSettings();
+    solver.setTolerance(description.get("precision", defaults.get<double>("precision")));
+    solver.setMaxIterations(description.get("maxIter", solutionVector.size()));
+    solver.preconditioner().setDroptol(
+        description.get("preconditioner.dropTol", defaults.get<double>("preconditioner.dropTol")));
+    solver.preconditioner().setFillfactor(
+        description.get("preconditioner.fillFactor", defaults.get<double>("preconditioner.fillFactor")));
 
     solutionVector.backend() = solver.solve(rhsVector.backend());
     return BaseType::translateInfo(solver.info());
