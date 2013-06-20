@@ -44,21 +44,21 @@ public:
     return {"function.expression", "function.checkerboard", "function.constant", "function.spe10.model1"};
   } // ... available(...)
 
-  static Dune::ParameterTree createDefaultSettings(const std::string type)
+  static Dune::ParameterTree defaultSettings(const std::string type)
   {
     if (type == "function.checkerboard")
-      return FunctionCheckerboard<D, d, R, rR, rC>::createDefaultSettings();
+      return FunctionCheckerboard<D, d, R, rR, rC>::defaultSettings();
     else if (type == "function.expression")
-      return FunctionExpression<D, d, R, rR, rC>::createDefaultSettings();
+      return FunctionExpression<D, d, R, rR, rC>::defaultSettings();
     else if (type == "function.constant")
-      return FunctionConstant<D, d, R, rR, rC>::createDefaultSettings();
+      return FunctionConstant<D, d, R, rR, rC>::defaultSettings();
     else if (type == "function.spe10.model1")
-      return FunctionSpe10Model1<D, d, R, rR, rC>::createDefaultSettings();
+      return FunctionSpe10Model1<D, d, R, rR, rC>::defaultSettings();
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
                       << "' requested!");
-  } // ... createDefaultSettings(...)
+  } // ... defaultSettings(...)
 
   static FunctionInterface<D, d, R, rR, rC>* create(const std::string type,
                                                     const Dune::ParameterTree settings = Dune::ParameterTree())
@@ -95,15 +95,15 @@ public:
     return {"function.affineparametric.checkerboard"};
   } // ... available(...)
 
-  static Dune::ParameterTree createDefaultSettings(const std::string type)
+  static Dune::ParameterTree defaultSettings(const std::string type)
   {
     if (type == "function.affineparametric.checkerboard")
-      return AffineParametricFunctionCheckerboard<D, d, R, rR, rC>::createDefaultSettings();
+      return AffineParametricFunctionCheckerboard<D, d, R, rR, rC>::defaultSettings();
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
                       << "' requested!");
-  } // ... createDefaultSettings(...)
+  } // ... defaultSettings(...)
 
   static FunctionInterface<D, d, R, rR, rC>* create(const std::string type,
                                                     const Dune::ParameterTree settings = Dune::ParameterTree())

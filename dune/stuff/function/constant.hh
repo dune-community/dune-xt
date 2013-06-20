@@ -96,7 +96,7 @@ public:
   {
   }
 
-  static Dune::ParameterTree createDefaultSettings(const std::string subName = "")
+  static Dune::ParameterTree defaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
     description["value"] = "1.0";
@@ -107,7 +107,7 @@ public:
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
-  } // ... createDefaultSettings(...)
+  } // ... defaultSettings(...)
 
   static ThisType* create(const DSC::ExtendedParameterTree settings)
   {
