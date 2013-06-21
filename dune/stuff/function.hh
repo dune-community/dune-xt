@@ -24,9 +24,12 @@ template <class D, int d, class R, int rR, int rC>
 class FunctionConstant;
 template <class D, int d, class R, int rR, int rC>
 class FunctionSpe10Model1;
-// affine parametric forwards, includes are below
+template <class D, int d, class R, int rR, int rC>
+class AffineParametricFunctionInterface;
 template <class D, int d, class R, int rR, int rC>
 class AffineParametricFunctionCheckerboard;
+template <class D, int d, class R, int rR, int rC>
+class AffineParametricFunctionDefault;
 
 
 /**
@@ -92,13 +95,15 @@ class AffineParametricFunctions
 public:
   static std::vector<std::string> available()
   {
-    return {"function.affineparametric.checkerboard"};
+    return {"function.affineparametric.checkerboard", "function.affineparametric.default"};
   } // ... available(...)
 
   static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
   {
     if (type == "function.affineparametric.checkerboard")
       return AffineParametricFunctionCheckerboard<D, d, R, rR, rC>::defaultSettings();
+    else if (type == "function.affineparametric.default")
+      return AffineParametricFunctionDefault<D, d, R, rR, rC>::defaultSettings();
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
@@ -110,6 +115,8 @@ public:
   {
     if (type == "function.affineparametric.checkerboard")
       return AffineParametricFunctionCheckerboard<D, d, R, rR, rC>::create(settings);
+    else if (type == "function.affineparametric.default")
+      return AffineParametricFunctionDefault<D, d, R, rR, rC>::create(settings);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
