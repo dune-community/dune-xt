@@ -157,7 +157,7 @@ public:
 
   /** \defgroup affineparametric-affinepart ´´This method has to be implemented, if hasAffinePart() == true.'' */
   /* @{ */
-  virtual const std::shared_ptr<ComponentType>& affinePart() const
+  virtual const std::shared_ptr<const ComponentType>& affinePart() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if hasAffinePart() == true!");
@@ -318,7 +318,7 @@ public:
 
   /** \defgroup affineparametric-affinepart ´´This method has to be implemented, if hasAffinePart() == true.'' */
   /* @{ */
-  virtual const std::shared_ptr<ComponentType>& affinePart() const
+  virtual const std::shared_ptr<const ComponentType>& affinePart() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if hasAffinePart() == true!");
@@ -532,7 +532,7 @@ public:
 
   /** \defgroup affineparametric-affinepart ´´This method has to be implemented, if hasAffinePart() == true.'' */
   /* @{ */
-  virtual const std::shared_ptr<ComponentType>& affinePart() const
+  virtual const std::shared_ptr<const ComponentType>& affinePart() const
   {
     DUNE_THROW(Dune::NotImplemented,
                "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " implement me if hasAffinePart() == true!");
