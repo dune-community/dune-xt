@@ -113,7 +113,8 @@ public:
   void operator()(const EntityType& /*ent*/, const IntersectionType& intersection)
   {
     typedef typename IntersectionType::Geometry IntersectionGeometry;
-    typedef Dune::FieldVector<typename IntersectionGeometry::ctype, IntersectionGeometry::coorddimension> CoordType;
+    //    typedef Dune::FieldVector< typename IntersectionGeometry::ctype, IntersectionGeometry::coorddimension>
+    //        CoordType;
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
     char buffer[250] = {'\0'};
@@ -134,7 +135,8 @@ public:
   {
     if (!printEntityIndex_)
       return;
-    typedef typename Entity::Geometry EntityGeometryType;
+    //    typedef typename Entity::Geometry
+    //        EntityGeometryType;
     PgfCoordWrapper center(entity.geometry().center());
     char buffer[50] = {'\0'};
     std::snprintf(buffer, 50, "\\node[circle] at (%f,%f) {%d};\n", center[0], center[1], idx);
