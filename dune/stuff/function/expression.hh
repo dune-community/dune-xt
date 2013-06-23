@@ -18,7 +18,7 @@ namespace Dune {
 namespace Stuff {
 
 
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class FunctionExpression;
 
 
