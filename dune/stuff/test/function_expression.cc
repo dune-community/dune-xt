@@ -16,9 +16,9 @@ struct RunExpressionBaseTest
     using namespace Dune;
     using namespace Dune::Stuff;
     typedef double DomainFieldType;
-    static const int dimDomain = DimDomain::value;
+    static const size_t dimDomain = DimDomain::value;
     typedef double RangeFieldType;
-    static const int dimRange = DimRange::value;
+    static const size_t dimRange = DimRange::value;
 
     typedef FunctionExpressionBase<DomainFieldType, dimDomain, RangeFieldType, dimRange> FunctionType;
     const std::string variable                 = "x";
