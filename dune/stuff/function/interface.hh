@@ -32,7 +32,7 @@ class AffineParametricCoefficientFunction;
 
 
 // forward, needed in the interface
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class FunctionInterface;
 
 
@@ -41,7 +41,7 @@ class FunctionInterface;
  *
  *          See spezialization for rangeDimCols = 1 for scalar and vector valued functions.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class GenericStationaryFunctionInterface : public LocalizableFunction
 {
 public:
@@ -452,7 +452,7 @@ public:
 /**
  *  \brief  Interface for parametric functions.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class ParametricFunctionInterface
     : public GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
 {
@@ -494,7 +494,7 @@ public:
 /**
  *  \brief  Interface for affine parametric functions.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class AffineParametricFunctionInterface
     : public ParametricFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
 {
@@ -546,7 +546,7 @@ public:
  *
  *          See spezialization for rangeDimCols = 1 for scalar and vector valued functions.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class TimedependentFunctionInterface
 {
 public:
