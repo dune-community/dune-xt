@@ -25,9 +25,9 @@ typedef testing::Types<FunctionExpression<double, 1, double, 1>, FunctionChecker
                        //                      sense, if the data file is present
                        > Functions;
 
-typedef testing::Types<AffineParametricFunctionCheckerboard<double, 1, double>,
-                       AffineParametricFunctionCheckerboard<double, 2, double>,
-                       AffineParametricFunctionCheckerboard<double, 3, double>> AffineParametricFunctions;
+typedef testing::Types<AffineParametricFunctionCheckerboard<double, 1, double, 1>,
+                       AffineParametricFunctionCheckerboard<double, 2, double, 1>,
+                       AffineParametricFunctionCheckerboard<double, 3, double, 1>> AffineParametricFunctions;
 
 typedef testing::Types<FunctionConstant<double, 1, double, 1>, FunctionConstant<double, 2, double, 1>,
                        FunctionConstant<double, 3, double, 1>> TimedependentFunctions;
@@ -47,7 +47,7 @@ struct FunctionTest : public ::testing::Test
   {
     DomainType x(1);
     RangeType ret(0);
-    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::createSampleDescription()));
+    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::defaultSettings()));
     const std::string DUNE_UNUSED(name) = function->name();
     const int DUNE_UNUSED(order) = function->order();
     function->evaluate(x, ret);
@@ -76,7 +76,7 @@ struct ParametricFunctionTest : public ::testing::Test
   {
     DomainType x(1);
     RangeType ret(0);
-    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::createSampleDescription()));
+    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::defaultSettings()));
     const std::string DUNE_UNUSED(name) = function->name();
     const int DUNE_UNUSED(order) = function->order();
     const bool parametric = function->parametric();
@@ -120,7 +120,7 @@ struct AffineParametricFunctionTest : public ::testing::Test
   {
     DomainType x(1);
     RangeType ret(0);
-    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::createSampleDescription()));
+    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::defaultSettings()));
     const std::string DUNE_UNUSED(name) = function->name();
     const int DUNE_UNUSED(order) = function->order();
     const bool parametric = function->parametric();
@@ -141,7 +141,7 @@ struct AffineParametricFunctionTest : public ::testing::Test
     assert(components.size() == coefficients.size());
     const bool hasAffinePart = function->hasAffinePart();
     if (hasAffinePart)
-      const std::shared_ptr<ComponentType>& DUNE_UNUSED(affinePart) = function->affinePart();
+      const std::shared_ptr<const ComponentType>& DUNE_UNUSED(affinePart) = function->affinePart();
   }
 }; // struct AffineParametricFunctionTest
 
@@ -165,7 +165,7 @@ struct TimedependentFunctionTest : public ::testing::Test
     DomainType x(1);
     RangeType ret(0);
     double t(0);
-    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::createSampleDescription()));
+    const std::shared_ptr<const FunctionType> function(FunctionType::create(FunctionType::defaultSettings()));
     const std::string DUNE_UNUSED(name) = function->name();
     const int DUNE_UNUSED(order) = function->order();
     function->evaluate(x, t, ret);
