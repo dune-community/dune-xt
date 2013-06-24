@@ -17,6 +17,7 @@
 
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/parameter.hh>
+#include <dune/stuff/fem/namespace.hh>
 
 #include <dune/stuff/localfunction/interface.hh>
 
@@ -407,12 +408,12 @@ template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim
 class FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     : public GenericStationaryFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 #if HAVE_DUNE_FEM
-#if DUNE_VERSION_NEWER(DUNE_FEM, 1, 4)
-      ,
-      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-#else
+#if DUNE_FEM_IS_MULTISCALE_COMPATIBLE
       ,
       public Dune::Fem::Function<Dune::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+#elif DUNE_FEM_IS_LOCALFUNCTIONS_COMPATIBLE
+      ,
+      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
 #endif
                                  FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
 #endif // HAVE_DUNE_FEM
