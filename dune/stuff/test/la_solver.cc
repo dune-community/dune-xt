@@ -16,10 +16,9 @@ MatrixType* createIdentityMatrix(const MatrixType& /*emptyDummy*/);
 
 #if HAVE_EIGEN
 template <class ElementType>
-LA::Container::EigenDenseMatrix<ElementType>*
-createIdentityMatrix(const LA::Container::EigenDenseMatrix<ElementType>& /*emptyDummy*/)
+LA::EigenDenseMatrix<ElementType>* createIdentityMatrix(const LA::EigenDenseMatrix<ElementType>& /*emptyDummy*/)
 {
-  typedef LA::Container::EigenDenseMatrix<ElementType> MatrixType;
+  typedef LA::EigenDenseMatrix<ElementType> MatrixType;
   MatrixType* matrix = new MatrixType(dimension, dimension);
   for (size_t ii = 0; ii < dimension; ++ii)
     matrix->set(ii, ii, ElementType(1));
@@ -27,13 +26,13 @@ createIdentityMatrix(const LA::Container::EigenDenseMatrix<ElementType>& /*empty
 }
 
 template <class ElementType>
-LA::Container::EigenRowMajorSparseMatrix<ElementType>*
-createIdentityMatrix(const LA::Container::EigenRowMajorSparseMatrix<ElementType>& /*emptyDummy*/)
+LA::EigenRowMajorSparseMatrix<ElementType>*
+createIdentityMatrix(const LA::EigenRowMajorSparseMatrix<ElementType>& /*emptyDummy*/)
 {
-  typedef LA::Container::EigenRowMajorSparseMatrix<ElementType> MatrixType;
-  typename LA::Container::SparsityPatternDefault pattern(dimension);
+  typedef LA::EigenRowMajorSparseMatrix<ElementType> MatrixType;
+  typename LA::SparsityPatternDefault pattern(dimension);
   for (size_t ii = 0; ii < dimension; ++ii)
-    pattern.set(ii).insert(ii);
+    pattern.inner(ii).insert(ii);
   MatrixType* matrix = new MatrixType(dimension, dimension, pattern);
   for (size_t ii = 0; ii < dimension; ++ii)
     matrix->set(ii, ii, ElementType(1));
@@ -46,10 +45,9 @@ VectorType* createVector(const VectorType& /*emptyDummy*/);
 
 #if HAVE_EIGEN
 template <class ElementType>
-LA::Container::EigenDenseVector<ElementType>*
-createVector(const LA::Container::EigenDenseVector<ElementType>& /*emptyDummy*/)
+LA::EigenDenseVector<ElementType>* createVector(const LA::EigenDenseVector<ElementType>& /*emptyDummy*/)
 {
-  typedef LA::Container::EigenDenseVector<ElementType> VectorType;
+  typedef LA::EigenDenseVector<ElementType> VectorType;
   VectorType* vector = new VectorType(dimension);
   for (size_t ii = 0; ii < dimension; ++ii)
     vector->set(ii, ElementType(1));
@@ -66,10 +64,10 @@ struct SolverBaseTest
     const MatrixType* A = createIdentityMatrix(MatrixType());
     const VectorType* f = createVector(VectorType());
     VectorType x;
-    for (std::string solverType : LA::Solver::types()) {
-      const LA::Solver::Interface<MatrixType, VectorType>* solver =
-          LA::Solver::create<MatrixType, VectorType>(solverType);
-      solver->apply(*A, *f, x);
+    for (std::string solverType : LA::solverTypes()) {
+      const LA::SolverInterface<MatrixType, VectorType>* solver = LA::createSolver<MatrixType, VectorType>(solverType);
+      const auto solverSettings = LA::solverDefaultSettings<MatrixType, VectorType>(solverType);
+      solver->apply(*A, *f, x, solverSettings);
       delete solver;
     }
     delete A;
@@ -82,9 +80,9 @@ struct SolverBaseTest
 template <class TestFunctor>
 struct SolverTest : public ::testing::Test
 {
-  typedef boost::mpl::vector<LA::Container::EigenDenseMatrix<double>, LA::Container::EigenRowMajorSparseMatrix<double>>
-      MatrixTypes;
-  typedef boost::mpl::vector<LA::Container::EigenDenseVector<double>> VectorTypes;
+  typedef boost::mpl::vector</*LA::EigenDenseMatrix< double >,*/
+                             LA::EigenRowMajorSparseMatrix<double>> MatrixTypes;
+  typedef boost::mpl::vector<LA::EigenDenseVector<double>> VectorTypes;
   typedef typename DSC::TupleProduct::Combine<MatrixTypes, VectorTypes, TestFunctor>::template Generate<>
       base_generator_type;
   void run()
