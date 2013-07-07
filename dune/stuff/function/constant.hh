@@ -66,7 +66,7 @@ private:
 
 
 // forward, to allow for specialization
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows = 1>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class FunctionConstant
 {
 public:

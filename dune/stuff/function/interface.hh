@@ -451,8 +451,6 @@ public:
   using BaseType::evaluate;
   using BaseType::localFunction;
 }; // class FunctionInterface
-
-
 /**
  *  \brief  Interface for parametric functions.
  */
@@ -637,6 +635,40 @@ public:
   /* @} */
 }; // class TimedependentFunctionInterface
 
+//! use this to throw a stationary function into an algorithm that expects an instationary one
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+struct TimeFunctionAdapter
+    : public Dune::Stuff::TimedependentFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows,
+                                                         rangeDimCols>
+{
+  typedef Dune::Stuff::FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
+      WrappedType;
+
+  TimeFunctionAdapter(const WrappedType& wr)
+    : wrapped_(wr)
+  {
+  }
+
+  virtual void evaluate(const typename WrappedType::DomainType& x, typename WrappedType::RangeType& ret) const
+  {
+    wrapped_(x, ret);
+  }
+
+  virtual void evaluate(const typename WrappedType::DomainType& x, const double& /*t*/,
+                        typename WrappedType::RangeType& ret) const
+  {
+    wrapped_(x, ret);
+  }
+
+  const WrappedType& wrapped_;
+};
+
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols> timefunctionAdapted(
+    const Dune::Stuff::FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>& wrapped)
+{
+  return TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>(wrapped);
+}
 
 } // namespace Stuff
 } // namespace Dune
