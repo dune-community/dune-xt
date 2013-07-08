@@ -14,8 +14,8 @@ namespace Stuff {
 
 
 // forwards, includes are below
-template <class D, int d, class R, int rR, int rC>
-class GenericStationaryFunctionInterface;
+// template< class D, int d, class R, int rR, int rC >
+// class GenericStationaryFunctionInterface;
 template <class D, int d, class R, int rR, int rC>
 class FunctionInterface;
 template <class D, int d, class R, int rR, int rC>
@@ -26,12 +26,12 @@ template <class D, int d, class R, int rR, int rC>
 class FunctionConstant;
 template <class D, int d, class R, int rR, int rC>
 class FunctionSpe10Model1;
-template <class D, int d, class R, int rR, int rC>
-class AffineParametricFunctionInterface;
-template <class D, int d, class R, int rR, int rC>
-class AffineParametricFunctionCheckerboard;
-template <class D, int d, class R, int rR, int rC>
-class AffineParametricFunctionDefault;
+// template< class D, int d, class R, int rR, int rC >
+// class AffineParametricFunctionInterface;
+// template< class D, int d, class R, int rR, int rC >
+// class AffineParametricFunctionCheckerboard;
+// template< class D, int d, class R, int rR, int rC >
+// class AffineParametricFunctionDefault;
 
 
 /**
@@ -84,104 +84,111 @@ public:
 }; // class Functions
 
 
-/**
- *  \brief      This is a way to create new affine parametric functions fulfilling the AffineParametricFunctionInterface
- *              using their string identifier.
- *
- *  \attention  This class will not compile for all dimensions. The errors should give you a hint which specializations
- *              are needed below.
- */
-template <class D, int d, class R, int rR, int rC = 1>
-class AffineParametricFunctions
-{
-public:
-  static std::vector<std::string> available()
-  {
-    return {"function.affineparametric.checkerboard", "function.affineparametric.default"};
-  } // ... available(...)
+///**
+// *  \brief      This is a way to create new affine parametric functions fulfilling the
+// AffineParametricFunctionInterface
+// *              using their string identifier.
+// *
+// *  \attention  This class will not compile for all dimensions. The errors should give you a hint which
+// specializations
+// *              are needed below.
+// */
+// template< class D, int d, class R, int rR, int rC = 1>
+// class AffineParametricFunctions
+//{
+// public:
+//  static std::vector< std::string > available()
+//  {
+//    return {
+//          "function.affineparametric.checkerboard"
+//        , "function.affineparametric.default"
+//    };
+//  } // ... available(...)
 
-  static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
-  {
-    if (type == "function.affineparametric.checkerboard")
-      return AffineParametricFunctionCheckerboard<D, d, R, rR, rC>::defaultSettings();
-    else if (type == "function.affineparametric.default")
-      return AffineParametricFunctionDefault<D, d, R, rR, rC>::defaultSettings();
-    else
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
-                      << "' requested!");
-  } // ... defaultSettings(...)
+//  static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
+//  {
+//    if (type == "function.affineparametric.checkerboard")
+//      return AffineParametricFunctionCheckerboard< D, d, R, rR, rC >::defaultSettings();
+//    else if (type == "function.affineparametric.default")
+//      return AffineParametricFunctionDefault< D, d, R, rR, rC >::defaultSettings();
+//    else
+//      DUNE_THROW(Dune::RangeError,
+//                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+//                 << " unknown function '" << type << "' requested!");
+//  } // ... defaultSettings(...)
 
-  static AffineParametricFunctionInterface<D, d, R, rR, rC>*
-  create(const std::string type = available()[0], const Dune::ParameterTree settings = defaultSettings())
-  {
-    if (type == "function.affineparametric.checkerboard")
-      return AffineParametricFunctionCheckerboard<D, d, R, rR, rC>::create(settings);
-    else if (type == "function.affineparametric.default")
-      return AffineParametricFunctionDefault<D, d, R, rR, rC>::create(settings);
-    else
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
-                      << "' requested!");
-  } // ... create(...)
-}; // class AffineParametricFunctions
+//  static AffineParametricFunctionInterface< D, d, R, rR, rC >* create(const std::string type = available()[0],
+//                                                                      const Dune::ParameterTree settings =
+//                                                                      defaultSettings())
+//  {
+//    if (type == "function.affineparametric.checkerboard")
+//      return AffineParametricFunctionCheckerboard< D, d, R, rR, rC >::create(settings);
+//    else if (type == "function.affineparametric.default")
+//      return AffineParametricFunctionDefault< D, d, R, rR, rC >::create(settings);
+//    else
+//      DUNE_THROW(Dune::RangeError,
+//                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+//                 << " unknown function '" << type << "' requested!");
+//  } // ... create(...)
+//}; // class AffineParametricFunctions
 
 
-template <class D, int d, class R, int rR, int rC = 1>
-class GenericStationaryFunctions
-{
-  typedef Functions<D, d, R, rR, rC> Funcs;
-  typedef AffineParametricFunctions<D, d, R, rR, rC> AffineFuncs;
+// template< class D, int d, class R, int rR, int rC = 1 >
+// class GenericStationaryFunctions
+//{
+//  typedef Functions< D, d, R, rR, rC > Funcs;
+//  typedef AffineParametricFunctions< D, d, R, rR, rC > AffineFuncs;
 
-public:
-  static std::vector<std::string> available()
-  {
-    return {Funcs::available(), AffineFuncs::available()};
-  }
+// public:
+//  static std::vector< std::string > available()
+//  {
+//    return {Funcs::available(), AffineFuncs::available() };
+//  }
 
-  static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
-  {
-    const auto funcs       = Funcs::available();
-    const auto affineFuncs = AffineFuncs::available();
-    bool found = true;
-    for (auto& func : funcs)
-      if (type == func)
-        found = true;
-    if (found)
-      return Funcs::defaultSettings(type);
-    for (auto& affineFunc : affineFuncs)
-      if (type == affineFunc)
-        found = true;
-    if (found)
-      return AffineFuncs::defaultSettings(type);
-    else
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
-                      << "' requested!");
-  }
+//  static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
+//  {
+//    const auto funcs = Funcs::available();
+//    const auto affineFuncs = AffineFuncs::available();
+//    bool found = true;
+//    for (auto& func : funcs)
+//      if (type == func)
+//        found = true;
+//    if (found)
+//      return Funcs::defaultSettings(type);
+//    for (auto& affineFunc : affineFuncs)
+//      if (type == affineFunc)
+//        found = true;
+//    if (found)
+//      return AffineFuncs::defaultSettings(type);
+//    else
+//      DUNE_THROW(Dune::RangeError,
+//                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+//                 << " unknown function '" << type << "' requested!");
+//  }
 
-  static GenericStationaryFunctionInterface<D, d, R, rR, rC>*
-  create(const std::string type = available()[0], const Dune::ParameterTree settings = defaultSettings())
-  {
-    const auto funcs       = Funcs::available();
-    const auto affineFuncs = AffineFuncs::available();
-    bool found = false;
-    for (auto& func : funcs)
-      if (type == func)
-        found = true;
-    if (found)
-      return Funcs::create(type, settings);
-    for (auto& affineFunc : affineFuncs)
-      if (type == affineFunc)
-        found = true;
-    if (found)
-      return AffineFuncs::create(type, settings);
-    else
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
-                      << "' requested!");
-  }
-}; // class GenericStationaryFunctions
+//  static GenericStationaryFunctionInterface< D, d, R, rR, rC >* create(const std::string type = available()[0],
+//                                                                       const Dune::ParameterTree settings =
+//                                                                       defaultSettings())
+//  {
+//    const auto funcs = Funcs::available();
+//    const auto affineFuncs = AffineFuncs::available();
+//    bool found = false;
+//    for (auto& func : funcs)
+//      if (type == func)
+//        found = true;
+//    if (found)
+//      return Funcs::create(type, settings);
+//    for (auto& affineFunc : affineFuncs)
+//      if (type == affineFunc)
+//        found = true;
+//    if (found)
+//      return AffineFuncs::create(type, settings);
+//    else
+//      DUNE_THROW(Dune::RangeError,
+//                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+//                 << " unknown function '" << type << "' requested!");
+//  }
+//}; // class GenericStationaryFunctions
 
 
 } // namespace Stuff
