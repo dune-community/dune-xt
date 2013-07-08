@@ -409,8 +409,8 @@ public:
   {
     return -1;
   }
-
   /* @} */
+
   /** \defgroup must ´´This method has to be implemented.'' */
   /* @{ */
   virtual void evaluate(const DomainType& /*x*/, RangeType& /*ret*/) const = 0;
@@ -475,6 +475,19 @@ public:
   {
     return "function";
   }
+
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /* @{ */
+  virtual std::string name() const
+  {
+    return id();
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+  /* @} */
 
   /** \defgroup must This method has to be implemented.'' */
   /* @{ */
