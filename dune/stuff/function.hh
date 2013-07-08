@@ -199,7 +199,7 @@ public:
 #include "function/expression.hh"
 #include "function/spe10.hh"
 #include "function/constant.hh"
-#include "function/affineparametric/checkerboard.hh"
-#include "function/affineparametric/default.hh"
+//#include "function/affineparametric/checkerboard.hh"
+//#include "function/affineparametric/default.hh"
 
 #endif // DUNE_STUFF_FUNCTION_HH
