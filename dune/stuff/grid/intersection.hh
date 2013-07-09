@@ -64,36 +64,19 @@ void printIntersection(const IntersectionType& intersection, std::ostream& strea
 
 } // end function print
 
+/** Check whether a spatial point lies on an intersection.
+*
+* @param[in] intersection The intersection
+* @param[in] globalPoint A Dune::FieldVector with the global coordinates of the point
+* @return Returns true if the point lies on the intersection, false otherwise.
+*/
 template <class IntersectionType, class FieldType, int size>
-bool intersectionContains(const IntersectionType& /*intersection*/,
-                          const Dune::FieldVector<FieldType, size>& /*globalPoint*/)
+bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, size>& globalPoint)
 {
-  dune_static_assert(size < 3,
-                     "Dune::FemTools::Grid::Intersection::contains() not implemented for more than 2 dimension!");
-  return false;
-}
-
-template <class IntersectionType, class FieldType>
-bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, 1>& globalPoint)
-{
-  const auto& geometry = intersection.geometry();
-  const auto corner    = geometry.corner(0);
-  // check if the point is the corner
-  return corner == globalPoint;
-} // end function contains
-
-template <class IntersectionType, class FieldType>
-bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, 2>& globalPoint)
-{
-  const auto& geometry    = intersection.geometry();
-  const auto firstCorner  = geometry.corner(0);
-  const auto secondCorner = geometry.corner(1);
-
-  // check, that point is on the line between the two points
-  const FieldType x1 = (globalPoint[0] - firstCorner[0]) / (secondCorner[0] - firstCorner[0]);
-  const FieldType x2 = (globalPoint[1] - firstCorner[1]) / (secondCorner[1] - firstCorner[1]);
-  return (!(x1 > x2) && !(x1 < x2) && !(x1 < 0.0) && !(x1 > 1.0));
-} // end function contains
+  const auto& intersectionGeometry = intersection.geometry();
+  const auto& refElement = ReferenceElements<FieldType, size>::general(intersectionGeometry.type());
+  return refElement.checkInside(intersectionGeometry.local(globalPoint));
+} // end function intersectionContains
 
 } // end namespace Grid
 } // end of namespace Stuff
