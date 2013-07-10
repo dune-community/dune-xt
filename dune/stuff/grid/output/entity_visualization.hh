@@ -44,8 +44,10 @@ struct ElementVisualization
 
     Dune::VTKWriter<typename Grid::LeafGridView> vtkwriter(gridView);
     vtkwriter.addCellData(values, "data");
-    DSC::testCreateDirectory(f.filename());
-    vtkwriter.pwrite(f.filename(), f.dir(), "piecefiles", Dune::VTK::appendedraw);
+    const std::string piecefilesFolderName = "piecefiles";
+    const std::string piecefilesPath = f.dir() + "/" + piecefilesFolderName + "/";
+    DSC::testCreateDirectory(piecefilesPath);
+    vtkwriter.pwrite(f.filename(), f.dir(), piecefilesFolderName, Dune::VTK::appendedraw);
   }
 
 
@@ -209,8 +211,8 @@ struct ElementVisualization
     VolumeFunctor volumeFunctor("volumeFunctor", outputDir);
 
     // call the visualization functions
-    elementdata(grid, areaMarker);
     elementdata(grid, boundaryFunctor);
+    elementdata(grid, areaMarker);
     elementdata(grid, geometryFunctor);
     elementdata(grid, processIdFunctor);
     elementdata(grid, volumeFunctor);
