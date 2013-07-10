@@ -70,12 +70,17 @@ void printIntersection(const IntersectionType& intersection, std::ostream& strea
 * @param[in] globalPoint A Dune::FieldVector with the global coordinates of the point
 * @return Returns true if the point lies on the intersection, false otherwise.
 */
-template <class IntersectionType, class FieldType, int size>
-bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, size>& globalPoint)
+template <class IntersectionType, class FieldType, int dim>
+bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, dim>& globalPoint)
 {
+  // map global coordinates to local coordinates of the intersection
   const auto& intersectionGeometry = intersection.geometry();
-  const auto& refElement = ReferenceElements<FieldType, size>::general(intersectionGeometry.type());
-  return refElement.checkInside(intersectionGeometry.local(globalPoint));
+  const auto& localPoint           = intersectionGeometry.local(globalPoint);
+
+  // get codim 1 reference element
+  const auto& refElement = ReferenceElements<FieldType, dim - 1>::general(intersectionGeometry.type());
+  // check whether reference element contains the local coordinates
+  return refElement.checkInside(localPoint);
 } // end function intersectionContains
 
 } // end namespace Grid
