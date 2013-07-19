@@ -112,10 +112,9 @@ private:
         if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
           isOnBoundary = true;
           numberOfBoundarySegments += 1;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#include <dune/stuff/common/header/disable_warnings.hh>
           data[index] += double(intersectionIt->boundaryId());
-#pragma GCC diagnostic pop
+#include <dune/stuff/common/header/reenable_warnings.hh>
         }
       }
       if (isOnBoundary) {
