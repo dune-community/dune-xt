@@ -1,5 +1,6 @@
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
-
+#endif
 /** Copyright (c) 2012, Rene Milk
    * All rights reserved.
    *

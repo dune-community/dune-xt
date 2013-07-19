@@ -1,3 +1,4 @@
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -6,7 +7,8 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #pragma GCC diagnostic ignored "-Wtype-limits"
 #pragma GCC diagnostic ignored "-Wshadow"
-
+#pragma GCC diagnostic ignored "-Wreorder"
+#endif
 /** Copyright (c) 2012, Rene Milk
    * All rights reserved.
    *
