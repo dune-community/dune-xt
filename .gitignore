@@ -46,3 +46,4 @@ data
 .libs
 *.o
 *.la
+*.user
