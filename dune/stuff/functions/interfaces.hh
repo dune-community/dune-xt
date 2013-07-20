@@ -249,10 +249,6 @@ template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim
 class FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     : public LocalizableFunction
 #if HAVE_DUNE_FEM
-#if DUNE_FEM_IS_LOCALFUNCTIONS_COMPATIBLE
-      ,
-      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-#else
       ,
       public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
 #endif
@@ -269,6 +265,8 @@ public:
   static const unsigned int dimRangeRows = dimRange;
   static const unsigned int dimRangeCols = 1;
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
+
+  typedef Dune::FieldMatrix<RangeFieldType, dimDomain, dimDomain> JacobianRangeType;
 
   virtual ~FunctionInterface()
   {
@@ -301,6 +299,18 @@ public:
   virtual RangeType evaluate(const DomainType& x) const
   {
     RangeType ret;
+    evaluate(x, ret);
+    return ret;
+  }
+
+  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const throw(Dune::NotImplemented)
+  {
+    DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
+  }
+
+  virtual JacobianRangeType evaluate(const DomainType& x) const
+  {
+    JacobianRangeType ret;
     evaluate(x, ret);
     return ret;
   }
