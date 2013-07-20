@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include <dune/common/bartonnackmanifcheck.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/dynvector.hh>
@@ -18,19 +19,167 @@
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/fem/namespace.hh>
 
-#include <dune/stuff/localfunction/interface.hh>
-
-#include "local.hh"
-
 namespace Dune {
 namespace Stuff {
+
+
+// forward, includes are below
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
+          int rangeDimCols = 1>
+class LocalizedFunction;
+
+
+/**
+ *  \brief  Interface for matrix valued globalvalued functions, which can be evaluated locally on one Entity.
+ *
+ *          This is the interface for matrixvalued functions, see the specialization for rangeDimCols = 1 for scalar
+ *          and vector valued functions.
+ */
+template <class Traits, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
+          int rangeDimCols = 1>
+class LocalFunctionInterface
+{
+public:
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::EntityType EntityType;
+
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRangeRows = rangeDimRows;
+  static const unsigned int dimRangeCols = rangeDimCols;
+  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
+
+  const EntityType& entity() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().entity());
+    return asImp().entity();
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+
+  void evaluate(const DomainType& x, RangeType& ret) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().evaluate(x, ret));
+    asImp().evaluate(x, ret);
+  }
+
+  RangeType evaluate(const DomainType& x) const
+  {
+    RangeType ret(0);
+    evaluate(x, ret);
+    return ret;
+  }
+
+  derived_type& asImp()
+  {
+    return static_cast<derived_type&>(*this);
+  }
+
+  const derived_type& asImp() const
+  {
+    return static_cast<const derived_type&>(*this);
+  }
+}; // class LocalFunctionInterface
+
+
+/**
+ *  \brief  Interface for scalar and vector valued globalvalued functions, which can be evaluated locally on one Entity.
+ */
+template <class Traits, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class LocalFunctionInterface<Traits, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+{
+public:
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::EntityType EntityType;
+
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRange     = rangeDim;
+  static const unsigned int dimRangeRows = dimRange;
+  static const unsigned int dimRangeCols = 1;
+  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
+
+  const EntityType& entity() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().entity());
+    return asImp().entity();
+  }
+
+  virtual int order() const
+  {
+    return -1;
+  }
+
+  void evaluate(const DomainType& x, RangeType& ret) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().evaluate(x, ret));
+    asImp().evaluate(x, ret);
+  }
+
+  RangeType evaluate(const DomainType& x) const
+  {
+    RangeType ret(0);
+    evaluate(x, ret);
+    return ret;
+  }
+
+  derived_type& asImp()
+  {
+    return static_cast<derived_type&>(*this);
+  }
+
+  const derived_type& asImp() const
+  {
+    return static_cast<const derived_type&>(*this);
+  }
+}; // class LocalFunctionInterface< ..., 1 >
+
+
+/**
+ *  \brief  Flag for all functions which provide a localFunction(entity) method.
+ *
+ *  The derived class has to provide a method with the following signature:
+\code
+template< class EntityType >
+ReturnType localFunction(const EntityType& entity) const
+{
+  ...
+}
+\endcode
+ *  and a struct to provide the ReturnType of this method:
+\code
+template< class EntityType >
+struct LocalFunction
+{
+  typedef ... Type;
+};
+\endcode
+ *  You can thus obtain the return type and the local function, if derived is an instance of a derived class
+ *  of this class with type derived_type:
+\code
+typedef typename derived_type::template LocalFunction< EntityType >::Type LocalFunctionType;
+const LocalFunctionType localfunction = derived.localFunction(entity);
+\endcode
+ */
+class LocalizableFunction
+{
+};
 
 
 /**
  * \brief Interface for matrix valued stationary function.
  * \note  See specialization (rangeDimRows = 1) for scalar and vector valued functions.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class FunctionInterface : public LocalizableFunction
 {
 public:
@@ -302,5 +451,7 @@ TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rang
 
 } // namespace Stuff
 } // namespace Dune
+
+#include "local.hh"
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
