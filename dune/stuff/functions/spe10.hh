@@ -158,7 +158,7 @@ public:
     }
   } // ... defaultSettings(...)
 
-  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree settings)
+  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree settings = defaultSettings())
   {
     // get data
     const std::string filenameIn                    = settings.get<std::string>("filename");

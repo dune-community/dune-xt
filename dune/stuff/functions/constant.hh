@@ -111,7 +111,7 @@ public:
     }
   } // ... defaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings)
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
   {
     return new ThisType(settings.get<RangeFieldType>("value", RangeFieldType(0)));
   } // ... create(...)

@@ -173,7 +173,7 @@ public:
     }
   } // ... defaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings)
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
   {
     // get data
     const std::vector<DomainFieldType> lowerLefts  = settings.getVector("lowerLeft", DomainFieldType(0), dimDomain);

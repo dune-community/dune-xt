@@ -77,7 +77,7 @@ public:
     }
   } // ... defaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings)
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
   {
     // get necessary
     const std::string _variable = settings.get<std::string>("variable", "x");
