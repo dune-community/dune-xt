@@ -35,9 +35,9 @@ public:
   {
   }
 
-  static const std::string id()
+  static std::string static_id()
   {
-    return BaseType::id() + ".constant";
+    return BaseType::static_id() + ".constant";
   }
 
   virtual int order() const
@@ -47,7 +47,7 @@ public:
 
   virtual std::string name() const
   {
-    return "function.constant";
+    return static_id();
   }
 
   virtual void evaluate(const DomainType& /*arg*/, RangeType& ret) const
@@ -95,6 +95,8 @@ public:
     : BaseType(constant)
   {
   }
+
+  using BaseType::static_id;
 
   static Dune::ParameterTree defaultSettings(const std::string subName = "")
   {

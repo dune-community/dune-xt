@@ -40,13 +40,13 @@ public:
   static const int dimRange = InterfaceType::dimRange;
   typedef typename InterfaceType::RangeType RangeType;
 
-  static const std::string id()
+  static std::string static_id()
   {
-    return InterfaceType::id() + ".expression";
+    return InterfaceType::static_id() + ".expression";
   }
 
   FunctionExpression(const std::string _variable, const std::string _expression, const int orderIn = -1,
-                     const std::string nameIn = id())
+                     const std::string nameIn = static_id())
     : BaseType(_variable, _expression)
     , order_(orderIn)
     , name_(nameIn)
@@ -54,7 +54,7 @@ public:
   }
 
   FunctionExpression(const std::string _variable, const std::vector<std::string> _expressions, const int orderIn = -1,
-                     const std::string nameIn = id())
+                     const std::string nameIn = static_id())
     : BaseType(_variable, _expressions)
     , order_(orderIn)
     , name_(nameIn)
@@ -67,7 +67,7 @@ public:
     description["variable"]   = "x";
     description["expression"] = "[x[0]; sin(x[0])]";
     description["order"]      = "1";
-    description["name"] = "function.expression";
+    description["name"] = static_id();
     if (subName.empty())
       return description;
     else {

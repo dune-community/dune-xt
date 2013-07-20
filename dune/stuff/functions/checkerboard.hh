@@ -29,14 +29,14 @@ public:
   static const int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
 
-  static const std::string id()
+  static std::string static_id()
   {
-    return BaseType::id() + ".checkerboard";
+    return BaseType::static_id() + ".checkerboard";
   }
 
   FunctionCheckerboardBase(const DomainType _lowerLeft, const DomainType _upperRight,
                            const std::vector<size_t> _numElements, const std::vector<RangeType> _values,
-                           const std::string _name = id())
+                           const std::string _name = static_id())
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
     , numElements_(_numElements)
@@ -147,11 +147,11 @@ public:
   typedef typename BaseType::RangeFieldType RangeFieldType;
   typedef typename BaseType::RangeType RangeType;
 
-  using BaseType::id;
+  using BaseType::static_id;
 
   FunctionCheckerboard(const DomainType _lowerLeft, const DomainType _upperRight,
                        const std::vector<size_t> _numElements, const std::vector<RangeType> _values,
-                       const std::string _name = id())
+                       const std::string _name = static_id())
     : BaseType(_lowerLeft, _upperRight, _numElements, _values, _name)
   {
   }
@@ -163,7 +163,7 @@ public:
     description["upperRight"]  = "[1.0; 1.0; 1.0]";
     description["numElements"] = "[2; 2; 2]";
     description["values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
-    description["name"] = id();
+    description["name"] = static_id();
     if (subName.empty())
       return description;
     else {
