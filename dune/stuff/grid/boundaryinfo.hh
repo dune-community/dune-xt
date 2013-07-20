@@ -204,10 +204,8 @@ public:
   virtual bool dirichlet(const IntersectionType& intersection) const
   {
     if (hasDirichlet_ && intersection.boundary()) {
-// get boundary id
-#include <dune/stuff/common/header/disable_warnings.hh>
+      // get boundary id
       const IdType boundaryId = intersection.boundaryId();
-#include <dune/stuff/common/header/reenable_warnings.hh>
       // get set of dirichlet ids (has to be found, otherwise hasDirichlet_ would be false)
       const typename IdSetMapType::const_iterator result = boundaryInfoMap_->find("dirichlet");
       assert(result != boundaryInfoMap_->end());
