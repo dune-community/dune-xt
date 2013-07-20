@@ -63,10 +63,10 @@ public:
   typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
 
   typedef DomainFieldImp DomainFieldType;
-  static const int dimDomain = domainDim;
+  static const unsigned int dimDomain = domainDim;
 
   typedef RangeFieldImp RangeFieldType;
-  static const int dimRange = rangeDim;
+  static const unsigned int dimRange = rangeDim;
 
   FunctionExpressionBase(const std::string _variable, const std::string _expression)
   {
@@ -225,33 +225,33 @@ private:
                       << ", should be "
                       << dimRange
                       << ")!");
-    for (int ii = 0; ii < dimRange; ++ii)
+    for (size_t ii = 0; ii < dimRange; ++ii)
       expressions_.push_back(_expression[ii]);
     // set variable (i.e. "x")
     variable_ = _variable;
     // fill variables (i.e. "x[0]", "x[1]", ...)
-    for (int ii = 0; ii < dimDomain; ++ii) {
+    for (size_t ii = 0; ii < dimDomain; ++ii) {
       std::stringstream variableStream;
       variableStream << variable_ << "[" << ii << "]";
       variables_.push_back(variableStream.str());
     }
     // create epressions
-    for (int ii = 0; ii < dimDomain; ++ii) {
+    for (size_t ii = 0; ii < dimDomain; ++ii) {
       arg_[ii]      = new DomainFieldType(0.0);
       var_arg_[ii]  = new RVar(variables_[ii].c_str(), arg_[ii]);
       vararray_[ii] = var_arg_[ii];
     }
-    for (int ii = 0; ii < dimRange; ++ii) {
+    for (size_t ii = 0; ii < dimRange; ++ii) {
       op_[ii] = new ROperation(expressions_[ii].c_str(), dimDomain, vararray_);
     }
   } // void setup(const std::string& _variable, const std::vector< std::string >& expressions)
 
   void cleanup()
   {
-    for (int ii = 0; ii < dimRange; ++ii) {
+    for (size_t ii = 0; ii < dimRange; ++ii) {
       delete op_[ii];
     }
-    for (int ii = 0; ii < dimDomain; ++ii) {
+    for (size_t ii = 0; ii < dimDomain; ++ii) {
       delete var_arg_[ii];
       delete arg_[ii];
     }
