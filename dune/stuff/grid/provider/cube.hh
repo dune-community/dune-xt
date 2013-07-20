@@ -153,7 +153,7 @@ public:
     Dune::ParameterTree description;
     description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
     description["upperRight"]  = "[1.0; 1.0; 1.0]";
-    description["numElements"] = "[4; 4; 4]";
+    description["numElements"] = "[8; 8; 8]";
     if (subName.empty())
       return description;
     else {
