@@ -190,7 +190,7 @@ public:
     // convert and leave the checks to the base constructor
     DomainType lowerLeft;
     DomainType upperRight;
-    for (int dd = 0; dd < dimDomain; ++dd) {
+    for (size_t dd = 0; dd < dimDomain; ++dd) {
       lowerLeft[dd]  = lowerLefts[dd];
       upperRight[dd] = upperRights[dd];
     }
