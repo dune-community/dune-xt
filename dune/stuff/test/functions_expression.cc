@@ -5,7 +5,7 @@
 #include <dune/common/dynvector.hh>
 
 #include <dune/stuff/common/tuple.hh>
-#include <dune/stuff/function/expression/base.hh>
+#include <dune/stuff/functions/expression/base.hh>
 
 
 struct RunExpressionBaseTest

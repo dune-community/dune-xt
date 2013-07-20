@@ -5,12 +5,12 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/shared_ptr.hh>
 
-#include <dune/stuff/function/interface.hh>
-#include <dune/stuff/function/expression.hh>
-#include <dune/stuff/function/checkerboard.hh>
-#include <dune/stuff/function/spe10.hh>
-#include <dune/stuff/function/constant.hh>
-#include <dune/stuff/function/fixed.hh>
+#include <dune/stuff/functions/interfaces.hh>
+#include <dune/stuff/functions/expression.hh>
+#include <dune/stuff/functions/checkerboard.hh>
+#include <dune/stuff/functions/spe10.hh>
+#include <dune/stuff/functions/constant.hh>
+#include <dune/stuff/functions/fixed.hh>
 
 
 using namespace Dune::Stuff;
