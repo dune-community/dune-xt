@@ -12,7 +12,7 @@
 #include <dune/stuff/common/color.hh>
 
 #include "expression/base.hh"
-#include "interface.hh"
+#include "interfaces.hh"
 
 namespace Dune {
 namespace Stuff {

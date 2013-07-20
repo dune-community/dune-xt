@@ -8,7 +8,7 @@
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 
-#include "interface.hh"
+#include "interfaces.hh"
 
 namespace Dune {
 namespace Stuff {

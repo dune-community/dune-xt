@@ -186,11 +186,11 @@ public:
 } // namespace Stuff
 } // namespace Dune
 
-#include "function/interface.hh"
-#include "function/checkerboard.hh"
-#include "function/expression.hh"
-#include "function/spe10.hh"
-#include "function/constant.hh"
+#include "functions/interfaces.hh"
+#include "functions/checkerboard.hh"
+#include "functions/expression.hh"
+#include "functions/spe10.hh"
+#include "functions/constant.hh"
 //#include "function/affineparametric/checkerboard.hh"
 //#include "function/affineparametric/default.hh"
 

@@ -11,7 +11,7 @@
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
 
-#include "interface.hh"
+#include "interfaces.hh"
 
 
 namespace Dune {
