@@ -251,7 +251,6 @@ class FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 #if HAVE_DUNE_FEM
       ,
       public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-#endif
                                  FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
 #endif // HAVE_DUNE_FEM
 {
@@ -308,10 +307,10 @@ public:
     DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
   }
 
-  virtual JacobianRangeType evaluate(const DomainType& x) const
+  virtual JacobianRangeType jacobian(const DomainType& x) const
   {
     JacobianRangeType ret;
-    evaluate(x, ret);
+    jacobian(x, ret);
     return ret;
   }
 
