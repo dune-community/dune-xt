@@ -218,10 +218,8 @@ public:
   virtual bool neumann(const IntersectionType& intersection) const
   {
     if (hasNeumann_ && intersection.boundary()) {
-// get boundary id
-#include <dune/stuff/common/header/disable_warnings.hh>
+      // get boundary id
       const IdType boundaryId = intersection.boundaryId();
-#include <dune/stuff/common/header/reenable_warnings.hh>
       // get set of neumann ids (has to be found, otherwise hasNeumann_ would be false)
       const typename IdSetMapType::const_iterator result = boundaryInfoMap_->find("neumann");
       assert(result != boundaryInfoMap_->end());
