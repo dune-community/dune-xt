@@ -10,6 +10,8 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/static_assert.hh>
 
+#include <dune/geometry/referenceelements.hh>
+
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/aliases.hh>
 
@@ -78,7 +80,7 @@ bool intersectionContains(const IntersectionType& intersection, const Dune::Fiel
   const auto& localPoint           = intersectionGeometry.local(globalPoint);
 
   // get codim 1 reference element
-  const auto& refElement = ReferenceElements<FieldType, dim - 1>::general(intersectionGeometry.type());
+  const auto& refElement = GenericReferenceElements<FieldType, dim - 1>::general(intersectionGeometry.type());
   // check whether reference element contains the local coordinates
   return refElement.checkInside(localPoint);
 } // end function intersectionContains
