@@ -79,8 +79,12 @@ bool intersectionContains(const IntersectionType& intersection, const Dune::Fiel
   const auto& intersectionGeometry = intersection.geometry();
   const auto& localPoint           = intersectionGeometry.local(globalPoint);
 
-  // get codim 1 reference element
+// get codim 1 reference element
+#if DUNE_VERSION_NEWER(DUNE_GEOMETRY, 2, 3)
+  const auto& refElement = ReferenceElements<FieldType, dim - 1>::general(intersectionGeometry.type());
+#else
   const auto& refElement = GenericReferenceElements<FieldType, dim - 1>::general(intersectionGeometry.type());
+#endif
   // check whether reference element contains the local coordinates
   return refElement.checkInside(localPoint);
 } // end function intersectionContains
