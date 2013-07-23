@@ -65,7 +65,7 @@ public:
   {
     Dune::ParameterTree description;
     description["variable"]   = "x";
-    description["expression"] = "[x[0]; sin(x[0])]";
+    description["expression"] = "[x[0]; sin(x[0]); exp(x[0])]";
     description["order"]      = "1";
     description["name"] = static_id();
     if (subName.empty())
