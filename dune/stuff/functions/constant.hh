@@ -9,12 +9,12 @@ namespace Dune {
 namespace Stuff {
 
 
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimCols, int rangeDimRows>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
 class FunctionConstantBase
-    : public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimCols, rangeDimRows>,
-      public TimedependentFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimCols, rangeDimRows>
+    : public FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>,
+      public TimedependentFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
 {
-  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimCols, rangeDimRows> BaseType;
+  typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols> BaseType;
 
 public:
   typedef typename BaseType::DomainFieldType DomainFieldType;
@@ -60,6 +60,8 @@ public:
     ret = constant_;
   }
 
+  using BaseType::localFunction;
+
 private:
   const RangeType constant_;
 }; // class FunctionConstantBase
@@ -68,9 +70,27 @@ private:
 // forward, to allow for specialization
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
 class FunctionConstant
+    : public FunctionConstantBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
 {
+  typedef FunctionConstantBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols> BaseType;
+
 public:
-  FunctionConstant() = delete;
+  typedef FunctionConstant<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols> ThisType;
+
+  typedef typename BaseType::RangeFieldType RangeFieldType;
+  typedef typename BaseType::RangeType RangeType;
+
+  FunctionConstant(const RangeFieldType& constant)
+    : BaseType(constant)
+  {
+  }
+
+  FunctionConstant(const RangeType& constant)
+    : BaseType(constant)
+  {
+  }
+
+  using BaseType::localFunction;
 }; // class FunctionConstant
 
 
