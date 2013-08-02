@@ -43,7 +43,7 @@ public:
     } else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Common::colorStringRed("ERROR:") << " unknown gridprovider '" << type << "' requested!");
-  } // ... createDefaultSettings(...)
+  } // ... defaultSettings(...)
 
   static GridProviderInterface<GridType>* create(const std::string& type = available()[0],
                                                  const Dune::ParameterTree settings = Dune::ParameterTree())
