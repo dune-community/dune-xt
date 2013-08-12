@@ -191,7 +191,6 @@ public:
   static const unsigned int dimRangeRows = rangeDimRows;
   static const unsigned int dimRangeCols = rangeDimCols;
   typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
-
   virtual ~FunctionInterface()
   {
   }
@@ -264,8 +263,13 @@ public:
   static const unsigned int dimRangeRows = dimRange;
   static const unsigned int dimRangeCols = 1;
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
-
+#if HAVE_DUNE_FEM
+  typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+                                       FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim,
+                                                         dimRangeCols>>::JacobianRangeType JacobianRangeType;
+#else
   typedef Dune::FieldMatrix<RangeFieldType, dimDomain, dimDomain> JacobianRangeType;
+#endif
 
   virtual ~FunctionInterface()
   {
@@ -302,7 +306,7 @@ public:
     return ret;
   }
 
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const throw(Dune::NotImplemented)
+  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
   {
     DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
   }
