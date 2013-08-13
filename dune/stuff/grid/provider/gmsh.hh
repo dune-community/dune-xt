@@ -1,12 +1,6 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 #define DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#else
-#include "config.h"
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #if HAVE_DUNE_GRID
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
@@ -37,11 +31,7 @@ namespace Stuff {
 /**
  * \brief   Gmsh grid provider
  */
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridImp = Dune::GridSelector::GridType>
-#else
 template <class GridImp = Dune::SGrid<2, 2>>
-#endif
 class GridProviderGmsh : public GridProviderInterface<GridImp>
 {
 public:
