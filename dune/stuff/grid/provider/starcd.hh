@@ -27,6 +27,7 @@
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/common/logging.hh>
 
 #include "interface.hh"
 
@@ -63,7 +64,7 @@ public:
     return BaseType::id() + ".starcd";
   }
 
-  GridProviderStarCD(const std::string filename)
+  GridProviderStarCD(const std::string filename, std::ostream& out = Dune::Stuff::Common::Logger().devnull())
   {
     // set up the grid factory
     GridFactory<GridType> factory;
@@ -90,16 +91,17 @@ public:
     int numberOfVertices = 0;
     Dune::FieldVector<double, dim> position;
 
-    std::cout << "Reading " << vertexFileName << " ...   " << std::flush;
+    out << "Reading " << vertexFileName << " ...   " << std::flush;
     while (std::getline(vertexFile, line)) {
       numberOfVertices++;
       const std::vector<double> items = Dune::Stuff::Common::tokenize<double>(line, " ");
-      assert(items.size() == dim + 1);
+      if (items.size() != dim + 1)
+        DUNE_THROW(Dune::IOError, "Error: " << items.size() << " = items.size() != dim + 1 = " << dim + 1 << "!");
       for (unsigned int ii = 0; ii < dim; ++ii)
         position[ii] = items[ii + 1];
       factory.insertVertex(position);
     }
-    std::cout << "done: " << numberOfVertices << " vertices read." << std::endl;
+    out << "done: " << numberOfVertices << " vertices read." << std::endl;
 
     // set the name of the element file
     std::string elementFileName = filename + ".cel";
@@ -128,7 +130,7 @@ public:
     std::vector<unsigned int> prismVertices(numberOfVerticesPrism);
     std::string firstLine;
     std::string secondLine;
-    std::cout << "Reading " << elementFileName << " ...   " << std::flush;
+    out << "Reading " << elementFileName << " ...   " << std::flush;
     while (std::getline(elementFile, firstLine)) {
       if (!std::getline(elementFile, secondLine))
         DUNE_THROW(Dune::IOError,
@@ -176,11 +178,11 @@ public:
                                         << numberOfPrisms
                                         << ").");
 
-    std::cout << "done: " << numberOfElements << " elements read (" << numberOfPrisms << " prisms and " << numberOfCubes
-              << " cubes)." << std::endl;
+    out << "done: " << numberOfElements << " elements read (" << numberOfPrisms << " prisms and " << numberOfCubes
+        << " cubes)." << std::endl;
 
     // finish off the construction of the grid object
-    std::cout << "Starting createGrid() ... " << std::endl;
+    out << "Starting createGrid() ... " << std::endl;
 
     grid_ = std::shared_ptr<GridType>(factory.createGrid());
   } // constructor

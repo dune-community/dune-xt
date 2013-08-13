@@ -102,9 +102,7 @@ private:
         if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
           isOnBoundary = true;
           numberOfBoundarySegments += 1;
-#include <dune/stuff/common/header/disable_warnings.hh>
           data[index] += double(intersectionIt->boundaryId());
-#include <dune/stuff/common/header/reenable_warnings.hh>
         }
       }
       if (isOnBoundary) {
