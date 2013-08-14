@@ -1,6 +1,7 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
 #define DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
 
+#include <config.h>
 #if HAVE_DUNE_GRID
 
 #include <memory>

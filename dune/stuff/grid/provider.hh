@@ -1,6 +1,7 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_HH
 #define DUNE_STUFF_GRID_PROVIDER_HH
 
+#include <config.h>
 #if HAVE_DUNE_GRID
 
 #include <dune/common/parametertree.hh>
@@ -24,16 +25,33 @@ class GridProviders
 public:
   static std::vector<std::string> available()
   {
-    return {"gridprovider.cube", "gridprovider.gmsh", "gridprovider.starcd"};
+    return
+    {
+      "gridprovider.cube"
+#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
+#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
+          ,
+          "gridprovider.gmsh"
+#endif
+#endif
+          ,
+          "gridprovider.starcd"
+    };
   } // ... available()
 
   static Dune::ParameterTree defaultSettings(const std::string type, const std::string subname = "")
   {
     if (type == "gridprovider.cube") {
       return GridProviderCube<GridType>::defaultSettings(subname);
-    } else if (type == "gridprovider.gmsh") {
+    }
+#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
+#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
+    else if (type == "gridprovider.gmsh") {
       return GridProviderGmsh<GridType>::defaultSettings(subname);
-    } else if (type == "gridprovider.starcd") {
+    }
+#endif
+#endif
+    else if (type == "gridprovider.starcd") {
       return GridProviderStarCD<GridType>::defaultSettings(subname);
     } else
       DUNE_THROW(Dune::RangeError,
@@ -45,8 +63,12 @@ public:
   {
     if (type == "gridprovider.cube")
       return GridProviderCube<GridType>::create(settings);
+#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
+#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
     else if (type == "gridprovider.gmsh")
       return GridProviderGmsh<GridType>::create(settings);
+#endif
+#endif
     else if (type == "gridprovider.starcd")
       return GridProviderStarCD<GridType>::create(settings);
     else
