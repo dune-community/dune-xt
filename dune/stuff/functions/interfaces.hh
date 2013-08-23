@@ -268,7 +268,7 @@ public:
                                        FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim,
                                                          dimRangeCols>>::JacobianRangeType JacobianRangeType;
 #else
-  typedef Dune::FieldMatrix<RangeFieldType, dimDomain, dimDomain> JacobianRangeType;
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
 #endif
 
   virtual ~FunctionInterface()
