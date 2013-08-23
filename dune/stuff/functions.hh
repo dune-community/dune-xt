@@ -115,6 +115,48 @@ public:
 
 
 template <class D, class R>
+class Functions<D, 2, R, 1, 1>
+{
+public:
+  static std::vector<std::string> available()
+  {
+    return {FunctionExpression<D, 2, R, 1, 1>::static_id(),
+            FunctionCheckerboard<D, 2, R, 1, 1>::static_id(),
+            FunctionConstant<D, 2, R, 1, 1>::static_id()};
+  } // ... available(...)
+
+  static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
+  {
+    if (type == FunctionCheckerboard<D, 2, R, 1, 1>::static_id())
+      return FunctionCheckerboard<D, 2, R, 1, 1>::defaultSettings();
+    else if (type == FunctionExpression<D, 2, R, 1, 1>::static_id())
+      return FunctionExpression<D, 2, R, 1, 1>::defaultSettings();
+    else if (type == FunctionConstant<D, 2, R, 1, 1>::static_id())
+      return FunctionConstant<D, 2, R, 1, 1>::defaultSettings();
+    else
+      DUNE_THROW(Dune::RangeError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
+                      << "' requested!");
+  } // ... defaultSettings(...)
+
+  static FunctionInterface<D, 2, R, 1, 1>* create(const std::string type = available()[0],
+                                                  const Dune::ParameterTree settings = defaultSettings())
+  {
+    if (type == FunctionCheckerboard<D, 2, R, 1, 1>::static_id())
+      return FunctionCheckerboard<D, 2, R, 1, 1>::create(settings);
+    else if (type == FunctionExpression<D, 2, R, 1, 1>::static_id())
+      return FunctionExpression<D, 2, R, 1, 1>::create(settings);
+    else if (type == FunctionConstant<D, 2, R, 1, 1>::static_id())
+      return FunctionConstant<D, 2, R, 1, 1>::create(settings);
+    else
+      DUNE_THROW(Dune::RangeError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
+                      << "' requested!");
+  } // ... create(...)
+}; // class Functions< D, 2, R, 1, 1 >
+
+
+template <class D, class R>
 class Functions<D, 3, R, 1, 1>
 {
 public:
