@@ -135,6 +135,7 @@ class FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 {
   typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
   typedef FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> InterfaceType;
+  typedef FunctionExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, domainDim> GradientType;
 
 public:
   typedef FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
@@ -145,6 +146,7 @@ public:
   typedef typename InterfaceType::RangeFieldType RangeFieldType;
   static const int dimRange = InterfaceType::dimRange;
   typedef typename InterfaceType::RangeType RangeType;
+  typedef typename InterfaceType::JacobianRangeType JacobianRangeType;
 
   static std::string static_id()
   {
@@ -156,6 +158,7 @@ public:
     : BaseType(_variable, _expression)
     , order_(orderIn)
     , name_(nameIn)
+    , has_gradient_(false)
   {
   }
 
@@ -164,6 +167,18 @@ public:
     : BaseType(_variable, _expressions)
     , order_(orderIn)
     , name_(nameIn)
+    , has_gradient_(false)
+  {
+  }
+
+  FunctionExpression(const std::string _variable, const std::string _expression,
+                     const std::vector<std::string> gradient_expression, const int orderIn = -1,
+                     const std::string nameIn = static_id())
+    : BaseType(_variable, _expression)
+    , order_((orderIn < 1) ? orderIn : (orderIn - 1))
+    , name_("gradient of " + nameIn)
+    , has_gradient_(true)
+    , gradient_(new GradientType(_variable, gradient_expression))
   {
   }
 
@@ -223,11 +238,20 @@ public:
     BaseType::evaluate(_x, _ret);
   }
 
+  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const
+  {
+    if (!has_gradient_)
+      DUNE_THROW(NotImplemented, "This function does not provide a gradient!");
+    gradient_->evaluate(xx, ret[0]);
+  }
+
   using InterfaceType::localFunction;
 
 private:
   int order_;
   std::string name_;
+  bool has_gradient_;
+  std::unique_ptr<const GradientType> gradient_;
 }; // class FunctionExpression< ..., 1 >
 
 
