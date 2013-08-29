@@ -108,6 +108,8 @@ public:
   static const unsigned int dimRangeCols = 1;
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
+
   const EntityType& entity() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(asImp().entity());
@@ -129,6 +131,19 @@ public:
   {
     RangeType ret(0);
     evaluate(x, ret);
+    return ret;
+  }
+
+  void jacobian(const DomainType& x, JacobianRangeType& ret) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(asImp().jacobian(x, ret));
+    asImp().jacobian(x, ret);
+  }
+
+  JacobianRangeType jacobian(const DomainType& x) const
+  {
+    JacobianRangeType ret(0);
+    jacobian(x, ret);
     return ret;
   }
 
