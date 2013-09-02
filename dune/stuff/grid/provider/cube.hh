@@ -95,6 +95,23 @@ public:
     buildGrid(tmpNumElements);
   }
 
+  GridProviderCube(const std::vector<double>& lL, const std::vector<double>& uR, const std::vector<unsigned int>& nE)
+  {
+    if (lL.size() < dim)
+      DUNE_THROW(Dune::RangeError, "lL has to be at least of size " << dim << " (is " << lL.size() << ")!");
+    if (uR.size() < dim)
+      DUNE_THROW(Dune::RangeError, "uR has to be at least of size " << dim << " (is " << uR.size() << ")!");
+    if (nE.size() < dim)
+      DUNE_THROW(Dune::RangeError, "nE has to be at least of size " << dim << " (is " << nE.size() << ")!");
+    Dune::array<unsigned int, dim> num_elements;
+    for (size_t ii = 0; ii < dim; ++ii) {
+      lowerLeft_[ii]   = lL[ii];
+      upperRight_[ii]  = uR[ii];
+      num_elements[ii] = nE[ii];
+    }
+    buildGrid(num_elements);
+  }
+
   /**
    *  \brief      Creates a cube.
    *  \param[in]  _lowerLeft
