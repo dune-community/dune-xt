@@ -95,7 +95,7 @@ public:
     buildGrid(tmpNumElements);
   }
 
-  GridProviderCube(const std::vector<double>& lL, const std::vector<double>& uR, const std::vector<unsigned int>& nE)
+  GridProviderCube(const std::vector<double>& lL, const std::vector<double>& uR, const std::vector<size_t>& nE)
   {
     if (lL.size() < dim)
       DUNE_THROW(Dune::RangeError, "lL has to be at least of size " << dim << " (is " << lL.size() << ")!");
