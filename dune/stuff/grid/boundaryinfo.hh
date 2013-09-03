@@ -284,6 +284,25 @@ public:
     }
   }
 
+  GridboundaryNormalBased(const ThisType& other)
+    : defaultIsDirichlet_(other.defaultIsDirichlet_)
+    , dirichletNormals_(other.dirichletNormals_)
+    , neumannNormals_(other.neumannNormals_)
+    , tol_(other.tol_)
+  {
+  }
+
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      defaultIsDirichlet_ = other.defaultIsDirichlet_;
+      dirichletNormals_   = other.dirichletNormals_;
+      neumannNormals_     = other.neumannNormals_;
+      tol_                = other.tol_;
+    }
+    return this;
+  }
+
   static Dune::ParameterTree defaultSettings(const std::string subName = "")
   {
     Dune::ParameterTree description;
