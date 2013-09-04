@@ -19,6 +19,7 @@
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/vector.hh>
+#include <dune/stuff/common/float_cmp.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -333,8 +334,8 @@ public:
         return true;
       else if (contains(outerNormal, neumannNormals_))
         return false;
-      else if (defaultIsDirichlet_)
-        return true;
+      else
+        return defaultIsDirichlet_;
     }
     return false;
   } // bool dirichlet(const IntersectionType& intersection) const
@@ -347,8 +348,8 @@ public:
         return true;
       else if (contains(outerNormal, dirichletNormals_))
         return false;
-      else if (!defaultIsDirichlet_)
-        return true;
+      else
+        return !defaultIsDirichlet_;
     }
     return false;
   } // bool neumann(const IntersectionType& intersection) const
@@ -385,7 +386,7 @@ private:
   bool contains(const DomainType& normal, const std::vector<DomainType>& vectors) const
   {
     for (auto& vector : vectors)
-      if (Dune::Stuff::Common::float_cmp(normal, vector, tol_))
+      if (Dune::Stuff::Common::FloatCmp::eq(normal, vector, tol_))
         return true;
     return false;
   }
