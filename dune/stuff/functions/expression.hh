@@ -10,6 +10,7 @@
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/print.hh>
 
 #include "expression/base.hh"
 #include "interfaces.hh"
@@ -141,10 +142,12 @@ public:
   typedef FunctionExpression<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
 
   typedef typename InterfaceType::DomainFieldType DomainFieldType;
-  static const int dimDomain = InterfaceType::dimDomain;
+  static const unsigned int dimDomain = InterfaceType::dimDomain;
   typedef typename InterfaceType::DomainType DomainType;
   typedef typename InterfaceType::RangeFieldType RangeFieldType;
-  static const int dimRange = InterfaceType::dimRange;
+  static const unsigned int dimRange     = InterfaceType::dimRange;
+  static const unsigned int dimRangeRows = InterfaceType::dimRangeRows;
+  static const unsigned int dimRangeCols = InterfaceType::dimRangeCols;
   typedef typename InterfaceType::RangeType RangeType;
   typedef typename InterfaceType::JacobianRangeType JacobianRangeType;
 
@@ -233,9 +236,22 @@ public:
     return name_;
   }
 
-  virtual void evaluate(const DomainType& _x, RangeType& _ret) const
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const
   {
-    BaseType::evaluate(_x, _ret);
+    BaseType::evaluate(xx, ret);
+#ifndef NDEBUG
+    // perform sanity check
+    for (size_t rr = 0; rr < dimRange; ++rr)
+      if (std::abs(ret[rr]) > (0.9 * std::numeric_limits<double>::max())) {
+        std::stringstream ss;
+        ss << "evaluating this function yielded an unlikely value!\n"
+           << "The variable() of this function is: " << BaseType::variable() << ",\n";
+        Stuff::Common::print(BaseType::expression(), "the expression() of this function is", ss);
+        Stuff::Common::print(xx, "you tried to evaluate it with xx", ss);
+        Stuff::Common::print(ret, "and the result was", ss);
+        DUNE_THROW(InvalidStateException, ss.str());
+      }
+#endif
   }
 
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const
