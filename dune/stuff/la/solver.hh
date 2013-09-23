@@ -22,7 +22,7 @@ namespace Stuff {
 namespace LA {
 
 
-static std::vector<std::string> solverTypes()
+static inline std::vector<std::string> solverTypes()
 {
   return
   {
