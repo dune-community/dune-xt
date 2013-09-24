@@ -1,12 +1,7 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
 #define DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#else
-#include "config.h"
-#endif // ifdef HAVE_CMAKE_CONFIG
-
+#include <config.h>
 #if HAVE_DUNE_GRID
 
 #include <memory>
@@ -24,11 +19,7 @@ namespace Dune {
 namespace Stuff {
 
 
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridImp = Dune::GridSelector::GridType>
-#else
 template <class GridImp = Dune::SGrid<2, 2>>
-#endif
 class GridProviderInterface
 {
 public:

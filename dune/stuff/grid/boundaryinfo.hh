@@ -364,7 +364,7 @@ private:
       while (found) {
         const std::string localKey = key + "." + Dune::Stuff::Common::toString(counter);
         if (paramTree.hasKey(localKey)) {
-          std::vector<DomainFieldType> vec = paramTree.getVector<DomainFieldType>(key, dimDomain);
+          std::vector<DomainFieldType> vec = paramTree.getVector<DomainFieldType>(localKey, dimDomain);
           DomainType fvec(0);
           for (size_t dd = 0; dd < dimDomain; ++dd)
             fvec[dd] = vec[dd];

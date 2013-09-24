@@ -96,7 +96,7 @@ public:
   } // ... operator()
 
 private:
-  const GridViewType& gridview_;
+  const GridViewType gridview_;
   IteratorType it_last_;
 }; // class EntityInlevelSearch
 
@@ -106,7 +106,7 @@ class EntityHierarchicSearch : public EntitySearchBase<GridViewType>
 {
   typedef EntitySearchBase<GridViewType> BaseType;
 
-  const GridViewType& gridview_;
+  const GridViewType gridview_;
   const int start_level_;
 
 public:

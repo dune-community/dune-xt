@@ -1,12 +1,19 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 #define DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 
+#include <config.h>
 #if HAVE_DUNE_GRID
+#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
+#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID
 
 #include <memory>
 #include <sstream>
 #include <type_traits>
 
+#include <boost/assign/list_of.hpp>
+
+#include <dune/common/parametertree.hh>
+#include <dune/common/shared_ptr.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
 
@@ -25,11 +32,7 @@ namespace Stuff {
 /**
  * \brief   Gmsh grid provider
  */
-#if defined HAVE_CONFIG_H || defined HAVE_CMAKE_CONFIG
-template <class GridImp = Dune::GridSelector::GridType>
-#else
-template <class GridImp>
-#endif
+template <class GridImp = Dune::SGrid<2, 2>>
 class GridProviderGmsh : public GridProviderInterface<GridImp>
 {
 public:
@@ -128,5 +131,8 @@ private:
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID
+#endif // defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined
+// UGGRID
+#endif // HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 
 #endif // DUNE_STUFF_GRID_PROVIDER_GMSH_HH
