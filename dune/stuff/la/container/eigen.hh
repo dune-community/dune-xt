@@ -145,29 +145,35 @@ public:
     return eigenMatrix_.cols();
   }
 
-  void add(const size_t i, const size_t j, const ElementType& val)
+  void add(const size_t ii, const size_t jj, const ElementType& val)
   {
-    eigenMatrix_.coeffRef(i, j) += val;
+    assert(these_are_valid_indices(ii, jj));
+    eigenMatrix_.coeffRef(ii, jj) += val;
   }
 
-  void set(const size_t i, const size_t j, const ElementType& val)
+  void set(const size_t ii, const size_t jj, const ElementType& val)
   {
-    eigenMatrix_.coeffRef(i, j) = val;
+    assert(these_are_valid_indices(ii, jj));
+    eigenMatrix_.coeffRef(ii, jj) = val;
   }
 
-  const ElementType get(const size_t i, const size_t j) const
+  const ElementType get(const size_t ii, const size_t jj) const
   {
-    return eigenMatrix_.coeff(i, j);
+    assert(ii < rows());
+    assert(jj < cols());
+    return eigenMatrix_.coeff(ii, jj);
   }
 
   void unitRow(const size_t row)
   {
+    assert(row < rows());
     clearRow(row);
     set(row, row, ElementType(1));
   }
 
   void unitCol(const size_t col)
   {
+    assert(col < cols());
     for (size_t row : DSC::valueRange(rows())) {
       if (row == col)
         set(row, col, ElementType(1));
@@ -176,10 +182,11 @@ public:
     }
   }
 
-  void clearRow(const size_t i)
+  void clearRow(const size_t ii)
   {
-    auto row = eigenMatrix_.row(i);
-    row *= 0;
+    assert(ii < rows());
+    auto row = eigenMatrix_.row(ii);
+    row *= ElementType(0);
   }
 
   BackendType& backend()
@@ -193,6 +200,24 @@ public:
   }
 
 private:
+  bool these_are_valid_indices(const size_t ii, const size_t jj)
+  {
+    if (ii >= rows())
+      return false;
+    if (jj >= cols())
+      return false;
+    for (size_t row = 0; row < eigenMatrix_.outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(eigenMatrix_, row); row_it; ++row_it) {
+        const size_t col = row_it.col();
+        if ((ii == row) && (jj == col))
+          return true;
+        else if ((row > ii) && (col > jj))
+          return false;
+      }
+    }
+    return false;
+  } // ... these_are_valid_indices(...)
+
   BackendType eigenMatrix_;
 }; // class EigenRowMajorSparseMatrix
 
@@ -273,19 +298,25 @@ public:
     return eigenMatrix_.cols();
   }
 
-  void add(const size_t i, const size_t j, const ElementType& val)
+  void add(const size_t ii, const size_t jj, const ElementType& val)
   {
-    eigenMatrix_(i, j) += val;
+    assert(ii < rows());
+    assert(jj < cols());
+    eigenMatrix_(ii, jj) += val;
   }
 
-  void set(const size_t i, const size_t j, const ElementType& val)
+  void set(const size_t ii, const size_t jj, const ElementType& val)
   {
-    eigenMatrix_(i, j) = val;
+    assert(ii < rows());
+    assert(jj < cols());
+    eigenMatrix_(ii, jj) = val;
   }
 
-  const ElementType get(const size_t i, const size_t j) const
+  const ElementType get(const size_t ii, const size_t jj) const
   {
-    return eigenMatrix_(i, j);
+    assert(ii < rows());
+    assert(jj < cols());
+    return eigenMatrix_(ii, jj);
   }
 
   BackendType& backend()
@@ -370,19 +401,22 @@ public:
     return eigenVector_.size();
   }
 
-  void add(const size_t i, const ElementType& val)
+  void add(const size_t ii, const ElementType& val)
   {
-    eigenVector_(i) += val;
+    assert(ii < size());
+    eigenVector_(ii) += val;
   }
 
-  void set(const size_t i, const ElementType& val)
+  void set(const size_t ii, const ElementType& val)
   {
-    eigenVector_(i) = val;
+    assert(ii < size());
+    eigenVector_(ii) = val;
   }
 
-  const ElementType get(const size_t i) const
+  const ElementType get(const size_t ii) const
   {
-    return eigenVector_(i);
+    assert(ii < size());
+    return eigenVector_(ii);
   }
 
   BackendType& backend()
@@ -445,19 +479,22 @@ public:
     return eigenVector_.size();
   }
 
-  void add(const size_t i, const ElementType& val)
+  void add(const size_t ii, const ElementType& val)
   {
-    eigenVector_(i) += val;
+    assert(ii < size());
+    eigenVector_(ii) += val;
   }
 
-  void set(const size_t i, const ElementType& val)
+  void set(const size_t ii, const ElementType& val)
   {
-    eigenVector_(i) = val;
+    assert(ii < size());
+    eigenVector_(ii) = val;
   }
 
-  const ElementType get(const size_t i) const
+  const ElementType get(const size_t ii) const
   {
-    return eigenVector_(i);
+    assert(ii < size());
+    return eigenVector_(ii);
   }
 
   BackendType& backend()
