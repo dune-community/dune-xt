@@ -48,7 +48,8 @@ void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::
 } // end function print
 
 template <class GridImp, template <int, int, class> class EntityImp>
-double geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
+double DUNE_DEPRECATED_MSG("use entityDiameter instead")
+    geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
 {
   const auto end = entity.ileafend();
   double factor = 1.0;
@@ -60,9 +61,26 @@ double geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
 } // geometryDiameter
 
 template <class GridImp, template <int, int, class> class EntityImp>
-double geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& /*entity*/)
+double DUNE_DEPRECATED_MSG("use entityDiameter instead")
+    geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& /*entity*/)
 {
   DUNE_THROW(Dune::NotImplemented, "geometryDiameter not implemented for dim 3");
+} // geometryDiameter
+
+template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
+double entityDiameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
+{
+  const auto& geometry = entity.geometry();
+  auto max_dist = std::numeric_limits<typename GridImp::ctype>::min();
+  for (int i = 0; i < geometry.corners(); ++i) {
+    const auto xi = geometry.corner(i);
+    for (int j = i + 1; j < geometry.corners(); ++j) {
+      auto xj = geometry.corner(j);
+      xj -= xi;
+      max_dist = std::max(max_dist, xj.two_norm());
+    }
+  }
+  return max_dist;
 } // geometryDiameter
 
 } // namespace Grid
