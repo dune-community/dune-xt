@@ -344,11 +344,9 @@ public:
   };
 
   template <class EntityType>
-  LocalizedFunction<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>
-  localFunction(const EntityType& entity) const
+  typename LocalFunction<EntityType>::Type localFunction(const EntityType& entity) const
   {
-    return LocalizedFunction<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>(
-        *this, entity);
+    return typename LocalFunction<EntityType>::Type(*this, entity);
   }
 }; // class FunctionInterface
 
