@@ -5,43 +5,32 @@
 #include <memory>
 #include <string>
 
-#include <dune/common/bartonnackmanifcheck.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/version.hh>
+#include <dune/common/deprecated.hh>
 
-#if HAVE_DUNE_FEM
-#include <dune/fem/function/common/function.hh>
-#include <dune/fem/space/common/functionspace.hh>
-#endif
-
-#include <dune/stuff/common/color.hh>
-#include <dune/stuff/fem/namespace.hh>
+//#if HAVE_DUNE_FEM
+//  #include <dune/fem/function/common/function.hh>
+//  #include <dune/fem/space/common/functionspace.hh>
+//#endif
 
 namespace Dune {
 namespace Stuff {
 
 
-// forward, includes are below
+/**
+ *  \brief  Interface for a set of matrix valued globalvalued functions, which can be evaluated locally on one Entity.
+ *
+ *  \note   see specialization for rangeDimCols = 1 for vector and scalar valued localfunction sets.
+ */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
           int rangeDimCols = 1>
-class LocalizedFunction;
-
-
-/**
- *  \brief  Interface for matrix valued globalvalued functions, which can be evaluated locally on one Entity.
- *
- *          This is the interface for matrixvalued functions, see the specialization for rangeDimCols = 1 for scalar
- *          and vector valued functions.
- */
-template <class Traits, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
-          int rangeDimCols = 1>
-class LocalFunctionInterface
+class LocalfunctionSetInterface
 {
 public:
-  typedef typename Traits::derived_type derived_type;
-  typedef typename Traits::EntityType EntityType;
+  typedef EntityImp EntityType;
 
   typedef DomainFieldImp DomainFieldType;
   static const unsigned int dimDomain = domainDim;
@@ -52,51 +41,200 @@ public:
   static const unsigned int dimRangeCols = rangeDimCols;
   typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
 
-  const EntityType& entity() const
+  //  typedef Dune::FieldMatrix< RangeFieldType, dimRange, dimDomain > JacobianRangeType; // <- this is yet unclear
+
+  virtual ~LocalfunctionSetInterface()
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().entity());
-    return asImp().entity();
   }
 
-  virtual int order() const
-  {
-    return -1;
-  }
+  /**
+   * \defgroup haveto ´´These methods have to be implemented.''
+   * @{
+   **/
+  virtual const EntityType& entity() const = 0;
 
-  void evaluate(const DomainType& x, RangeType& ret) const
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().evaluate(x, ret));
-    asImp().evaluate(x, ret);
-  }
+  virtual size_t size() const = 0;
 
-  RangeType evaluate(const DomainType& x) const
+  virtual size_t order() const = 0;
+
+  virtual void evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/) const = 0;
+
+  //  virtual void jacobian(const DomainType& /*xx*/, std::vector< JacobianRangeType >& /*ret*/) const = 0;
+  /* @} */
+
+  /**
+   * \defgroup provided ´´These methods are provided by the interface.''
+   * @{
+   **/
+  std::vector<RangeType> evaluate(const DomainType& xx) const
   {
-    RangeType ret(0);
-    evaluate(x, ret);
+    std::vector<RangeType> ret(size(), RangeType(0));
+    evaluate(xx, ret);
     return ret;
   }
 
-  derived_type& asImp()
+  //  std::vector< JacobianRangeType > jacobian(const DomainType& xx) const
+  //  {
+  //    std::vector< JacobianRangeType > ret(size(), JacobianRangeType(0));
+  //    jacobian(xx, ret);
+  //    return ret;
+  //  }
+  /* @} */
+}; // class LocalfunctionSetInterface
+
+
+/**
+ *  \brief  Interface for a set of scalar or vector globalvalued functions, which can be evaluated locally on one
+ * Entity.
+ */
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+{
+public:
+  typedef EntityImp EntityType;
+
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRange     = rangeDim;
+  static const unsigned int dimRangeRows = rangeDim;
+  static const unsigned int dimRangeCols = 1;
+  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
+
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
+
+  virtual ~LocalfunctionSetInterface()
   {
-    return static_cast<derived_type&>(*this);
   }
 
-  const derived_type& asImp() const
+  /**
+   * \defgroup haveto ´´These methods have to be implemented.''
+   * @{
+   **/
+  virtual const EntityType& entity() const = 0;
+
+  virtual size_t size() const = 0;
+
+  virtual size_t order() const = 0;
+
+  virtual void evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/) const = 0;
+
+  virtual void jacobian(const DomainType& /*xx*/, std::vector<JacobianRangeType>& /*ret*/) const = 0;
+  /* @} */
+
+  /**
+   * \defgroup provided ´´These methods are provided by the interface.''
+   * @{
+   **/
+  std::vector<RangeType> evaluate(const DomainType& xx) const
   {
-    return static_cast<const derived_type&>(*this);
+    std::vector<RangeType> ret(size(), RangeType(0));
+    evaluate(xx, ret);
+    return ret;
   }
-}; // class LocalFunctionInterface
+
+  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const
+  {
+    std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
+    jacobian(xx, ret);
+    return ret;
+  }
+  /* @} */
+}; // class LocalfunctionSetInterface< ...., 1 >
+
+
+/**
+ *  \brief  Interface for matrix valued globalvalued functions, which can be evaluated locally on one Entity.
+ *
+ *          This is the interface for matrixvalued functions, see the specialization for rangeDimCols = 1 for scalar
+ *          and vector valued functions.
+ */
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
+          int rangeDimCols = 1>
+class LocalfunctionInterface
+    : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
+{
+public:
+  typedef EntityImp EntityType;
+
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRangeRows = rangeDimRows;
+  static const unsigned int dimRangeCols = rangeDimCols;
+  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
+
+  //  typedef Dune::FieldMatrix< RangeFieldType, dimRange, dimDomain > JacobianRangeType; // <- this is yet unclear
+
+  virtual ~LocalfunctionInterface()
+  {
+  }
+
+  /**
+   * \defgroup haveto ´´These methods have to be implemented in addition to entity() and order().''
+   * @{
+   **/
+  virtual void evaluate(const DomainType& /*xx*/, RangeType& /*ret*/) const = 0;
+
+  //  virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const = 0;
+  /* @} */
+
+  /**
+   * \defgroup providedbase ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
+   * @{
+   **/
+  virtual size_t size() const
+  {
+    return 1;
+  }
+
+  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const
+  {
+    assert(ret.size() >= 1);
+    evaluate(xx, ret[0]);
+  }
+
+  //  virtual void jacobian(const DomainType& xx, std::vector< JacobianRangeType >& ret) const
+  //  {
+  //    assert(ret.size() >= 1);
+  //    jacobian(xx, ret[0]);
+  //  }
+  /* @} */
+
+  /**
+   * \defgroup provided ´´These methods are provided by the interface.''
+   * @{
+   **/
+  RangeType evaluate(const DomainType& xx) const
+  {
+    RangeType ret(0);
+    evaluate(xx, ret);
+    return ret;
+  }
+
+  //  JacobianRangeType jacobian(const DomainType& xx) const
+  //  {
+  //    JacobianRangeType ret(0);
+  //    jacobian(xx, ret);
+  //    return ret;
+  //  }
+  /* @} */
+}; // class LocalfunctionInterface
 
 
 /**
  *  \brief  Interface for scalar and vector valued globalvalued functions, which can be evaluated locally on one Entity.
  */
-template <class Traits, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class LocalFunctionInterface<Traits, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+    : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 {
 public:
-  typedef typename Traits::derived_type derived_type;
-  typedef typename Traits::EntityType EntityType;
+  typedef EntityImp EntityType;
 
   typedef DomainFieldImp DomainFieldType;
   static const unsigned int dimDomain = domainDim;
@@ -110,107 +248,93 @@ public:
 
   typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
 
-  virtual ~LocalFunctionInterface()
+  virtual ~LocalfunctionInterface()
   {
   }
 
-  const EntityType& entity() const
+  /**
+   * \defgroup haveto ´´These methods have to be implemented in addition to entity() and and order().''
+   * @{
+   **/
+  virtual void evaluate(const DomainType& /*xx*/, RangeType& ret) const = 0;
+
+  virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const = 0;
+  /* @} */
+
+  /**
+   * \defgroup providedbase ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
+   * @{
+   **/
+  virtual size_t size() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().entity());
-    return asImp().entity();
+    return 1;
   }
 
-  virtual int order() const
+  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const
   {
-    return -1;
+    assert(ret.size() >= 1);
+    evaluate(xx, ret[0]);
   }
 
-  void evaluate(const DomainType& x, RangeType& ret) const
+  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().evaluate(x, ret));
-    asImp().evaluate(x, ret);
+    assert(ret.size() >= 1);
+    jacobian(xx, ret[0]);
   }
+  /* @} */
 
-  RangeType evaluate(const DomainType& x) const
+  /**
+   * \defgroup provided ´´These methods are provided by the interface.''
+   * @{
+   **/
+  RangeType evaluate(const DomainType& xx) const
   {
     RangeType ret(0);
-    evaluate(x, ret);
+    evaluate(xx, ret);
     return ret;
   }
 
-  void jacobian(const DomainType& x, JacobianRangeType& ret) const
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(asImp().jacobian(x, ret));
-    asImp().jacobian(x, ret);
-  }
-
-  JacobianRangeType jacobian(const DomainType& x) const
+  JacobianRangeType jacobian(const DomainType& xx) const
   {
     JacobianRangeType ret(0);
-    jacobian(x, ret);
+    jacobian(xx, ret);
     return ret;
   }
-
-  derived_type& asImp()
-  {
-    return static_cast<derived_type&>(*this);
-  }
-
-  const derived_type& asImp() const
-  {
-    return static_cast<const derived_type&>(*this);
-  }
-}; // class LocalFunctionInterface< ..., 1 >
+}; // class LocalfunctionInterface< ..., 1 >
 
 
-/**
- *  \brief  Flag for all functions which provide a localFunction(entity) method.
- *
- *  The derived class has to provide a method with the following signature:
-\code
-template< class EntityType >
-ReturnType localFunction(const EntityType& entity) const
-{
-  ...
-}
-\endcode
- *  and a struct to provide the ReturnType of this method:
-\code
-template< class EntityType >
-struct LocalFunction
-{
-  typedef ... Type;
-};
-\endcode
- *  You can thus obtain the return type and the local function, if derived is an instance of a derived class
- *  of this class with type derived_type:
-\code
-typedef typename derived_type::template LocalFunction< EntityType >::Type LocalFunctionType;
-const LocalFunctionType localfunction = derived.localFunction(entity);
-\endcode
- */
-class LocalizableFunction
+class IsLocalizableFunction
 {
 };
 
 
 /**
- * \brief Interface for matrix valued stationary function.
- * \note  See specialization (rangeDimRows = 1) for scalar and vector valued functions.
+ * \brief Interface for functions which provide a LocalfunctionInterface for an entity.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
-class FunctionInterface : public LocalizableFunction
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
+          int rangeDimCols = 1>
+class LocalizableFunctionInterface : public IsLocalizableFunction
 {
+  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
+      ThisType;
+
 public:
+  typedef EntityImp EntityType;
+
   typedef DomainFieldImp DomainFieldType;
   static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
   static const unsigned int dimRangeRows = rangeDimRows;
   static const unsigned int dimRangeCols = rangeDimCols;
-  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
-  virtual ~FunctionInterface()
+  static const unsigned int dimRange     = rangeDimRows;
+
+  typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>
+      LocalfunctionType;
+
+  typedef typename LocalfunctionType::DomainType DomainType;
+
+  virtual ~LocalizableFunctionInterface()
   {
   }
 
@@ -219,57 +343,34 @@ public:
     return "dune.stuff.function";
   }
 
+  /**
+   * \defgroup haveto ´´These methods have to be implemented in addition to the ones required by the base classes.''
+   * @{
+   **/
+  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) = 0;
+
+  virtual ThisType* copy() const = 0;
+  /* @} */
+
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
   virtual std::string name() const
   {
     return static_id();
   }
-
-  virtual int order() const
-  {
-    return -1;
-  }
   /* @} */
-
-  /** \defgroup must ´´This method has to be implemented.'' */
-  /* @{ */
-  virtual void evaluate(const DomainType& /*x*/, RangeType& /*ret*/) const = 0;
-  /* @} */
-
-  virtual RangeType evaluate(const DomainType& x) const
-  {
-    RangeType ret;
-    evaluate(x, ret);
-    return ret;
-  }
-
-  template <class EntityType>
-  struct LocalFunction
-  {
-    typedef LocalizedFunction<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols> Type;
-  };
-
-  template <class EntityType>
-  LocalizedFunction<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>
-  localFunction(const EntityType& entity) const
-  {
-    return LocalizedFunction<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>(
-        *this, entity);
-  }
-}; // class FunctionInterface
+}; // class LocalizableFunctionInterface
 
 
 /**
  * \brief Interface for scalar and vector valued stationary function.
  */
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-    : public LocalizableFunction
+class DUNE_DEPRECATED_MSG("Please derive your functions from LocalizableFunctionInterface in the future!")
+    FunctionInterface
 #if HAVE_DUNE_FEM
-      ,
-      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                 FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
+    : public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+                                 FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
 #endif // HAVE_DUNE_FEM
 {
 public:
@@ -278,14 +379,12 @@ public:
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeRows = dimRange;
-  static const unsigned int dimRangeCols = 1;
+  static const unsigned int dimRange = rangeDim;
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 #if HAVE_DUNE_FEM
   typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                       FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim,
-                                                         dimRangeCols>>::JacobianRangeType JacobianRangeType;
+                                       FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp,
+                                                         rangeDim>>::JacobianRangeType JacobianRangeType;
 #else
   typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
 #endif
@@ -298,7 +397,6 @@ public:
   {
     return "dune.stuff.function";
   }
-
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
@@ -336,26 +434,13 @@ public:
     jacobian(x, ret);
     return ret;
   }
-
-  template <class EntityType>
-  struct LocalFunction
-  {
-    typedef LocalizedFunction<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols> Type;
-  };
-
-  template <class EntityType>
-  typename LocalFunction<EntityType>::Type localFunction(const EntityType& entity) const
-  {
-    return typename LocalFunction<EntityType>::Type(*this, entity);
-  }
 }; // class FunctionInterface
 
 
 /**
- * \brief Interface for matrix valued timedependent function.
- * \note  See spezialization (rangeDimCols = 1) for scalar and vector valued functions.
+ * \brief Interface for scalar and vector valued timedependent functions.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class TimedependentFunctionInterface
 {
 public:
@@ -364,54 +449,7 @@ public:
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRangeRows = rangeDimRows;
-  static const unsigned int dimRangeCols = rangeDimCols;
-  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
-
-  virtual ~TimedependentFunctionInterface()
-  {
-  }
-
-  static std::string static_id()
-  {
-    return "dune.stuff.timedependentfunction";
-  }
-
-  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
-  /* @{ */
-  virtual std::string name() const
-  {
-    return static_id();
-  }
-
-  virtual int order() const
-  {
-    return -1;
-  }
-  /* @} */
-
-  /** \defgroup must ´´This method has to be implemented.'' */
-  /* @{ */
-  virtual void evaluate(const DomainType& /*_x*/, const double& /*_t*/, RangeType& /*_ret*/) const = 0;
-  /* @} */
-}; // class TimedependentFunctionInterface
-
-
-/**
- * \brief Interface for scalar and vector valued timedependent functions.
- */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class TimedependentFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-{
-public:
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
-
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeRows = dimRange;
-  static const unsigned int dimRangeCols = 1;
+  static const unsigned int dimRange = rangeDim;
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
   virtual ~TimedependentFunctionInterface()
@@ -438,19 +476,17 @@ public:
 
   /** \defgroup must ´´This method has to be implemented.'' */
   /* @{ */
-  virtual void evaluate(const DomainType& /*_x*/, const double& /*_t*/, RangeType& /*_ret*/) const = 0;
+  virtual void evaluate(const DomainType& /*xx*/, const double& /*tt*/, RangeType& /*ret*/) const = 0;
   /* @} */
 }; // class TimedependentFunctionInterface
 
 
 //! use this to throw a stationary function into an algorithm that expects an instationary one
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows>
 struct TimeFunctionAdapter
-    : public Dune::Stuff::TimedependentFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows,
-                                                         rangeDimCols>
+    : public Dune::Stuff::TimedependentFunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows>
 {
-  typedef Dune::Stuff::FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
-      WrappedType;
+  typedef Dune::Stuff::FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows> WrappedType;
 
   TimeFunctionAdapter(const WrappedType& wr)
     : wrapped_(wr)
@@ -471,17 +507,15 @@ struct TimeFunctionAdapter
   const WrappedType& wrapped_;
 };
 
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols>
-TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols> timefunctionAdapted(
-    const Dune::Stuff::FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>& wrapped)
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows>
+TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows> timefunctionAdapted(
+    const Dune::Stuff::FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows>& wrapped)
 {
-  return TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>(wrapped);
+  return TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows>(wrapped);
 }
 
 
 } // namespace Stuff
 } // namespace Dune
-
-#include "local.hh"
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
