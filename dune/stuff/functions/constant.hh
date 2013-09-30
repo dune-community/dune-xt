@@ -153,7 +153,7 @@ public:
     return name_;
   }
 
-  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& entity) override
+  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
   {
     return std::shared_ptr<Localfunction>(new Localfunction(entity, value_));
   }
