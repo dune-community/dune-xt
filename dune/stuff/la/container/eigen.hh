@@ -512,23 +512,6 @@ private:
 }; // class DenseVector
 
 
-/**
- *  \todo Get rid of the 2nd for loop by using the Eigen triplets directly.
- */
-template <class ElementType = double>
-EigenRowMajorSparseMatrix<ElementType>* createIdentityEigenRowMajorSparseMatrix(const size_t _size)
-{
-  // create the sparsity pattern
-  SparsityPatternDefault pattern(_size);
-  for (size_t ii = 0; ii < _size; ++ii)
-    pattern.inner(ii).insert(ii);
-  EigenRowMajorSparseMatrix<ElementType>* ret = new EigenRowMajorSparseMatrix<ElementType>(_size, _size, pattern);
-  for (size_t ii = 0; ii < _size; ++ii)
-    ret->set(ii, ii, 1.0);
-  return ret;
-}
-
-
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
