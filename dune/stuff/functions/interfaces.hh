@@ -347,7 +347,7 @@ public:
    * \defgroup haveto ´´These methods have to be implemented in addition to the ones required by the base classes.''
    * @{
    **/
-  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) = 0;
+  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
 
   virtual ThisType* copy() const = 0;
   /* @} */
