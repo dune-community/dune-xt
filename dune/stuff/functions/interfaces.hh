@@ -327,12 +327,64 @@ public:
   typedef RangeFieldImp RangeFieldType;
   static const unsigned int dimRangeRows = rangeDimRows;
   static const unsigned int dimRangeCols = rangeDimCols;
-  static const unsigned int dimRange     = rangeDimRows;
 
   typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>
       LocalfunctionType;
 
   typedef typename LocalfunctionType::DomainType DomainType;
+  typedef typename LocalfunctionType::RangeType RangeType;
+  //  typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
+
+  virtual ~LocalizableFunctionInterface()
+  {
+  }
+
+  static std::string static_id()
+  {
+    return "dune.stuff.function";
+  }
+
+  /**
+   * \defgroup haveto ´´These methods have to be implemented in addition to the ones required by the base classes.''
+   * @{
+   **/
+  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
+
+  virtual ThisType* copy() const = 0;
+  /* @} */
+
+  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
+  /* @{ */
+  virtual std::string name() const
+  {
+    return static_id();
+  }
+  /* @} */
+}; // class LocalizableFunctionInterface
+
+
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+    : public IsLocalizableFunction
+{
+  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
+
+public:
+  typedef EntityImp EntityType;
+
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRange     = rangeDim;
+  static const unsigned int dimRangeRows = rangeDim;
+  static const unsigned int dimRangeCols = 1;
+
+  typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, 1> LocalfunctionType;
+
+  typedef typename LocalfunctionType::DomainType DomainType;
+  typedef typename LocalfunctionType::RangeType RangeType;
+  typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
   virtual ~LocalizableFunctionInterface()
   {
