@@ -11,10 +11,10 @@
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
-//#if HAVE_DUNE_FEM
-//  #include <dune/fem/function/common/function.hh>
-//  #include <dune/fem/space/common/functionspace.hh>
-//#endif
+#if HAVE_DUNE_FEM
+#include <dune/fem/function/common/function.hh>
+#include <dune/fem/space/common/functionspace.hh>
+#endif
 
 namespace Dune {
 namespace Stuff {
