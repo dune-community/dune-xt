@@ -351,7 +351,7 @@ public:
   }
 
   /**
-   * \defgroup haveto ´´These methods have to be implemented in addition to the ones required by the base classes.''
+   * \defgroup haveto ´´These methods have to be implemented.''
    * @{
    **/
   virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
