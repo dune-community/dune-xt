@@ -58,13 +58,15 @@ class Constant : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, 
       return 0;
     }
 
-    virtual void evaluate(const DomainType& /*xx*/, RangeType& ret) const override
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
     {
+      assert(this->is_a_valid_point(xx));
       ret = *value_;
     }
 
-    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const override
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
     {
+      assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
     }
 
