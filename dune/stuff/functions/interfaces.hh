@@ -11,6 +11,8 @@
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
+#include <dune/grid/io/file/vtk/vtkwriter.hh>
+
 #if HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
@@ -587,6 +589,6 @@ TimeFunctionAdapter<DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows> time
 } // namespace Stuff
 } // namespace Dune
 
-#include "visualization.hh"
+#include "default.hh"
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
