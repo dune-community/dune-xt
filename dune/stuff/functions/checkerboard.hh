@@ -99,6 +99,34 @@ public:
     return BaseType::static_id() + ".checkerboard";
   }
 
+  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  {
+    Dune::ParameterTree description;
+    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
+    description["upperRight"]  = "[1.0; 1.0; 1.0]";
+    description["numElements"] = "[2; 2; 2]";
+    description["values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
+    description["name"] = static_id();
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
+  } // ... defaultSettings(...)
+
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
+  {
+    // get data
+    const std::vector<DomainFieldType> lowerLeft  = settings.getVector("lowerLeft", DomainFieldType(0), dimDomain);
+    const std::vector<DomainFieldType> upperRight = settings.getVector("upperRight", DomainFieldType(1), dimDomain);
+    const std::vector<size_t> numElements         = settings.getVector("numElements", size_t(1), dimDomain);
+    const std::vector<RangeType> values           = settings.getVector("values", RangeType(1), 1);
+    // create and return, leave the checks to the base constructor
+    return new ThisType(std::move(lowerLeft), std::move(upperRight), std::move(numElements), std::move(values));
+  } // ... create(...)
+
   Checkerboard(std::vector<DomainFieldType>&& lowerLeft, std::vector<DomainFieldType>&& upperRight,
                std::vector<size_t>&& numElements, std::vector<RangeType>&& values, std::string nm = static_id())
     : lowerLeft_(new std::vector<DomainFieldType>(std::move(lowerLeft)))
@@ -194,85 +222,6 @@ private:
   std::shared_ptr<const std::vector<RangeType>> values_;
   std::string name_;
 }; // class Checkerboard
-
-
-//// forward, to allow for specialization
-// template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
-// class FunctionCheckerboard
-//{
-// public:
-//  FunctionCheckerboard() = delete;
-//};
-
-
-// template< class DomainFieldImp, int domainDim, class RangeFieldImp >
-// class FunctionCheckerboard< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 >
-//  : public FunctionCheckerboardBase< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 >
-//{
-//  typedef FunctionCheckerboardBase< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 > BaseType;
-// public:
-//  typedef FunctionCheckerboard< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 > ThisType;
-
-//  typedef typename BaseType::DomainFieldType  DomainFieldType;
-//  static const unsigned int                   dimDomain =BaseType::dimDomain;
-//  typedef typename BaseType::DomainType       DomainType;
-//  typedef typename BaseType::RangeFieldType   RangeFieldType;
-//  typedef typename BaseType::RangeType        RangeType;
-
-//  using BaseType::static_id;
-
-//  FunctionCheckerboard(const DomainType _lowerLeft,
-//                       const DomainType _upperRight,
-//                       const std::vector< size_t > _numElements,
-//                       const std::vector< RangeType > _values,
-//                       const std::string _name = static_id())
-//    : BaseType(_lowerLeft, _upperRight, _numElements, _values, _name)
-//  {}
-
-//  static Dune::ParameterTree defaultSettings(const std::string subName = "")
-//  {
-//    Dune::ParameterTree description;
-//    description["lowerLeft"] = "[0.0; 0.0; 0.0]";
-//    description["upperRight"] = "[1.0; 1.0; 1.0]";
-//    description["numElements"] = "[2; 2; 2]";
-//    description["values"] = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
-//    description["name"] = static_id();
-//    if (subName.empty())
-//      return description;
-//    else {
-//      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-//      extendedDescription.add(description, subName);
-//      return extendedDescription;
-//    }
-//  } // ... defaultSettings(...)
-
-//  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
-//  {
-//    // get data
-//    const std::vector< DomainFieldType > lowerLefts = settings.getVector("lowerLeft", DomainFieldType(0), dimDomain);
-//    const std::vector< DomainFieldType > upperRights = settings.getVector("upperRight",
-//                                                                             DomainFieldType(1),
-//                                                                             dimDomain);
-//    const std::vector< size_t > numElements = settings.getVector("numElements", size_t(1), dimDomain);
-//    size_t subdomains = 1;
-//    for (size_t ii = 0; ii < numElements.size(); ++ii)
-//      subdomains *= numElements[ii];
-//    const std::vector< RangeFieldType > rangeFieldTypeValues = settings.getVector("values", RangeFieldType(1),
-//    subdomains);
-//    std::vector< RangeType > rangeTypeValues(rangeFieldTypeValues.size(), RangeType(0));
-//    for (size_t ii = 0; ii < rangeFieldTypeValues.size(); ++ii)
-//      rangeTypeValues[ii] = rangeFieldTypeValues[ii];
-//    // convert and leave the checks to the base constructor
-//    DomainType lowerLeft;
-//    DomainType upperRight;
-//    for (size_t dd = 0; dd < dimDomain; ++dd) {
-//      lowerLeft[dd] = lowerLefts[dd];
-//      upperRight[dd] = upperRights[dd];
-//    }
-//    // create and return
-//    return new ThisType(lowerLeft, upperRight, numElements, rangeTypeValues);
-//  } // ... create(...)
-//};
 
 
 } // namespace Function
