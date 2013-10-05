@@ -35,8 +35,7 @@ class VisualizationAdapter;
  *
  *  \note   see specialization for rangeDimCols = 1 for vector and scalar valued localfunction sets.
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
-          int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionSetInterface
 {
 public:
@@ -47,11 +46,11 @@ public:
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRangeRows = rangeDimRows;
+  static const unsigned int dimRange     = rangeDim;
   static const unsigned int dimRangeCols = rangeDimCols;
-  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> RangeType;
 
-  //  typedef Dune::FieldMatrix< RangeFieldType, dimRange, dimDomain > JacobianRangeType; // <- this is yet unclear
+  typedef std::string JacobianRangeType; // <- this is yet unclear, but we need a type
 
   virtual ~LocalfunctionSetInterface()
   {
@@ -116,7 +115,6 @@ public:
 
   typedef RangeFieldImp RangeFieldType;
   static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeRows = rangeDim;
   static const unsigned int dimRangeCols = 1;
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 
@@ -175,114 +173,38 @@ protected:
  *          This is the interface for matrixvalued functions, see the specialization for rangeDimCols = 1 for scalar
  *          and vector valued functions.
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
-          int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionInterface
-    : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
+    : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
+  typedef LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+      BaseType;
+
 public:
   typedef EntityImp EntityType;
 
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+  typedef typename BaseType::DomainFieldType DomainFieldType;
+  static const unsigned int dimDomain = BaseType::dimDomain;
+  typedef typename BaseType::DomainType DomainType;
 
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRangeRows = rangeDimRows;
-  static const unsigned int dimRangeCols = rangeDimCols;
-  typedef Dune::FieldMatrix<RangeFieldType, dimRangeRows, dimRangeCols> RangeType;
+  typedef typename BaseType::RangeFieldType RangeFieldType;
+  static const unsigned int dimRange     = BaseType::dimRange;
+  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
+  typedef typename BaseType::RangeType RangeType;
 
-  //  typedef Dune::FieldMatrix< RangeFieldType, dimRange, dimDomain > JacobianRangeType; // <- this is yet unclear
+  typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
   virtual ~LocalfunctionInterface()
   {
   }
 
   /**
-   * \defgroup haveto ´´These methods have to be implemented in addition to entity() and order().''
+   * \defgroup haveto ´´These methods have to be implemented in addition to the ones required from the BaseType.''
    * @{
    **/
   virtual void evaluate(const DomainType& /*xx*/, RangeType& /*ret*/) const = 0;
 
-  //  virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const = 0;
-  /* @} */
-
-  /**
-   * \defgroup providedbase ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
-   * @{
-   **/
-  virtual size_t size() const
-  {
-    return 1;
-  }
-
-  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const
-  {
-    assert(ret.size() >= 1);
-    evaluate(xx, ret[0]);
-  }
-
-  //  virtual void jacobian(const DomainType& xx, std::vector< JacobianRangeType >& ret) const
-  //  {
-  //    assert(ret.size() >= 1);
-  //    jacobian(xx, ret[0]);
-  //  }
-  /* @} */
-
-  /**
-   * \defgroup provided ´´These methods are provided by the interface.''
-   * @{
-   **/
-  RangeType evaluate(const DomainType& xx) const
-  {
-    RangeType ret(0);
-    evaluate(xx, ret);
-    return ret;
-  }
-
-  //  JacobianRangeType jacobian(const DomainType& xx) const
-  //  {
-  //    JacobianRangeType ret(0);
-  //    jacobian(xx, ret);
-  //    return ret;
-  //  }
-  /* @} */
-}; // class LocalfunctionInterface
-
-
-/**
- *  \brief  Interface for scalar and vector valued globalvalued functions, which can be evaluated locally on one Entity.
- */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-    : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-{
-public:
-  typedef EntityImp EntityType;
-
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
-
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeRows = dimRange;
-  static const unsigned int dimRangeCols = 1;
-  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
-
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
-
-  virtual ~LocalfunctionInterface()
-  {
-  }
-
-  /**
-   * \defgroup haveto ´´These methods have to be implemented in addition to entity() and and order().''
-   * @{
-   **/
-  virtual void evaluate(const DomainType& /*xx*/, RangeType& ret) const = 0;
-
-  virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const = 0;
+  virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const = 0;
   /* @} */
 
   /**
@@ -324,7 +246,8 @@ public:
     jacobian(xx, ret);
     return ret;
   }
-}; // class LocalfunctionInterface< ..., 1 >
+  /* @} */
+}; // class LocalfunctionInterface
 
 
 class IsLocalizableFunction
@@ -335,11 +258,10 @@ class IsLocalizableFunction
 /**
  * \brief Interface for functions which provide a LocalfunctionInterface for an entity.
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
-          int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalizableFunctionInterface : public IsLocalizableFunction
 {
-  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols>
+  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       ThisType;
 
 public:
@@ -349,62 +271,11 @@ public:
   static const unsigned int dimDomain = domainDim;
 
   typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRangeRows = rangeDimRows;
+  static const unsigned int dimRange     = rangeDim;
   static const unsigned int dimRangeCols = rangeDimCols;
 
-  typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRangeRows, dimRangeCols>
+  typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
       LocalfunctionType;
-
-  typedef typename LocalfunctionType::DomainType DomainType;
-  typedef typename LocalfunctionType::RangeType RangeType;
-  //  typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
-
-  virtual ~LocalizableFunctionInterface()
-  {
-  }
-
-  static std::string static_id()
-  {
-    return "dune.stuff.function";
-  }
-
-  /**
-   * \defgroup haveto ´´These methods have to be implemented.''
-   * @{
-   **/
-  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
-
-  virtual ThisType* copy() const = 0;
-  /* @} */
-
-  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
-  /* @{ */
-  virtual std::string name() const
-  {
-    return static_id();
-  }
-  /* @} */
-}; // class LocalizableFunctionInterface
-
-
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-    : public IsLocalizableFunction
-{
-  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
-
-public:
-  typedef EntityImp EntityType;
-
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeRows = rangeDim;
-  static const unsigned int dimRangeCols = 1;
-
-  typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, 1> LocalfunctionType;
 
   typedef typename LocalfunctionType::DomainType DomainType;
   typedef typename LocalfunctionType::RangeType RangeType;
@@ -420,10 +291,10 @@ public:
   }
 
   /**
-   * \defgroup haveto ´´These methods have to be implemented in addition to the ones required by the base classes.''
+   * \defgroup haveto ´´These methods have to be implemented.''
    * @{
    **/
-  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
 
   virtual ThisType* copy() const = 0;
   /* @} */
@@ -441,7 +312,7 @@ public:
   {
     if (filename.empty())
       DUNE_THROW(RangeError, "Empty filename given!");
-    auto adapter = std::make_shared<Function::VisualizationAdapter<GridViewType, dimRange>>(*this);
+    auto adapter = std::make_shared<Stuff::Function::VisualizationAdapter<GridViewType, dimRange>>(*this);
     VTKWriter<GridViewType> vtk_writer(grid_view, VTK::nonconforming);
     vtk_writer.addVertexData(adapter);
     vtk_writer.write(filename);
