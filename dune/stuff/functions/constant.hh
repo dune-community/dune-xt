@@ -12,14 +12,12 @@ namespace Stuff {
 namespace Function {
 
 
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
-          int rangeDimCols = 1>
-class Constant;
-
-
 /**
  *  \note Only implemented scalar and vector valued at the moment!
  */
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+class Constant;
+
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
@@ -40,7 +38,6 @@ class Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 
     typedef typename BaseType::RangeFieldType RangeFieldType;
     static const unsigned int dimRange     = BaseType::dimRange;
-    static const unsigned int dimRangeRows = BaseType::dimRangeRows;
     static const unsigned int dimRangeCols = BaseType::dimRangeCols;
     typedef typename BaseType::RangeType RangeType;
 
@@ -93,7 +90,6 @@ public:
 
   typedef typename BaseType::RangeFieldType RangeFieldType;
   static const unsigned int dimRange     = BaseType::dimRange;
-  static const unsigned int dimRangeRows = BaseType::dimRangeRows;
   static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
 
@@ -147,17 +143,9 @@ public:
     return *this;
   }
 
-private:
-  Constant(const std::shared_ptr<const RangeType>& val, const std::string nm = static_id())
-    : value_(val)
-    , name_(nm)
-  {
-  }
-
-public:
   virtual ThisType* copy() const override
   {
-    return new ThisType(value_, name_);
+    return new ThisType(*this);
   }
 
   virtual std::string name() const override
@@ -165,9 +153,9 @@ public:
     return name_;
   }
 
-  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
   {
-    return std::shared_ptr<Localfunction>(new Localfunction(entity, value_));
+    return std::unique_ptr<Localfunction>(new Localfunction(entity, value_));
   }
 
 private:
