@@ -12,18 +12,24 @@ namespace Stuff {
 namespace Function {
 
 
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows,
+          int rangeDimCols = 1>
+class Constant;
+
+
 /**
  *  \note Only implemented scalar and vector valued at the moment!
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class Constant : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+class Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+    : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 {
-  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
-  typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
+  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
+  typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
 
-  class Localfunction : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+  class Localfunction : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
   {
-    typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
+    typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
 
   public:
     typedef typename BaseType::EntityType EntityType;
@@ -33,7 +39,9 @@ class Constant : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, 
     typedef typename BaseType::DomainType DomainType;
 
     typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const unsigned int dimRange = BaseType::dimRange;
+    static const unsigned int dimRange     = BaseType::dimRange;
+    static const unsigned int dimRangeRows = BaseType::dimRangeRows;
+    static const unsigned int dimRangeCols = BaseType::dimRangeCols;
     typedef typename BaseType::RangeType RangeType;
 
     typedef typename BaseType::JacobianRangeType JacobianRangeType;
@@ -84,8 +92,10 @@ public:
   typedef typename BaseType::DomainType DomainType;
 
   typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange = BaseType::dimRange;
-  typedef typename LocalfunctionType::RangeType RangeType;
+  static const unsigned int dimRange     = BaseType::dimRange;
+  static const unsigned int dimRangeRows = BaseType::dimRangeRows;
+  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
+  typedef typename BaseType::RangeType RangeType;
 
   static std::string static_id()
   {
@@ -164,71 +174,6 @@ private:
   std::shared_ptr<const RangeType> value_;
   std::string name_;
 }; // class ConstantBase
-
-
-//// forward, to allow for specialization
-// template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
-// class FunctionConstant
-//  : public FunctionConstantBase< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
-//{
-//  typedef FunctionConstantBase< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >  BaseType;
-// public:
-//  typedef FunctionConstant< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >      ThisType;
-
-//  typedef typename BaseType::RangeFieldType RangeFieldType;
-//  typedef typename BaseType::RangeType      RangeType;
-
-//  FunctionConstant(const RangeFieldType& constant)
-//    : BaseType(constant)
-//  {}
-
-//  FunctionConstant(const RangeType& constant)
-//    : BaseType(constant)
-//  {}
-
-//  using BaseType::localFunction;
-//}; // class FunctionConstant
-
-
-// template< class DomainFieldImp, int domainDim, class RangeFieldImp >
-// class FunctionConstant< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 >
-//  : public FunctionConstantBase< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 >
-//{
-//  typedef FunctionConstantBase< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 >  BaseType;
-// public:
-//  typedef FunctionConstant< DomainFieldImp, domainDim, RangeFieldImp, 1, 1 >      ThisType;
-
-//  typedef typename BaseType::RangeFieldType RangeFieldType;
-//  typedef typename BaseType::RangeType      RangeType;
-
-//  FunctionConstant(const RangeFieldType& constant)
-//    : BaseType(constant)
-//  {}
-
-//  FunctionConstant(const RangeType& constant)
-//    : BaseType(constant)
-//  {}
-
-//  using BaseType::static_id;
-
-//  static Dune::ParameterTree defaultSettings(const std::string subName = "")
-//  {
-//    Dune::ParameterTree description;
-//    description["value"] = "1.0";
-//    if (subName.empty())
-//      return description;
-//    else {
-//      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-//      extendedDescription.add(description, subName);
-//      return extendedDescription;
-//    }
-//  } // ... defaultSettings(...)
-
-//  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
-//  {
-//    return new ThisType(settings.get< RangeFieldType >("value", RangeFieldType(0)));
-//  } // ... create(...)
-//}; // class FunctionConstant< ..., 1 >
 
 
 } // namespace Function
