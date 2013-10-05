@@ -161,7 +161,7 @@ public:
 private:
   std::shared_ptr<const RangeType> value_;
   std::string name_;
-}; // class ConstantBase
+}; // class Constant
 
 
 } // namespace Function
