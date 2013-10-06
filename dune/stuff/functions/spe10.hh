@@ -108,7 +108,7 @@ public:
   {
   }
 
-  ThisType* copy() const override
+  virtual ThisType* copy() const override
   {
     return new ThisType(*this);
   }
