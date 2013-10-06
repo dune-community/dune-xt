@@ -12,8 +12,8 @@
 #include "functions/interfaces.hh"
 #include "functions/checkerboard.hh"
 #include "functions/expression.hh"
-//#include "functions/spe10.hh"
 #include "functions/constant.hh"
+#include "functions/spe10.hh"
 
 namespace Dune {
 namespace Stuff {
@@ -33,7 +33,8 @@ public:
   {
     return {Function::Constant<E, D, d, R, rR, rC>::static_id(),
             Function::Expression<E, D, d, R, rR, rC>::static_id(),
-            Function::Checkerboard<E, D, d, R, rR, rC>::static_id()};
+            Function::Checkerboard<E, D, d, R, rR, rC>::static_id(),
+            Function::Spe10Model1<E, D, d, R, rR, rC>::static_id()};
   } // ... available(...)
 
   static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
@@ -44,6 +45,8 @@ public:
       return Function::Expression<E, D, d, R, rR, rC>::defaultSettings();
     else if (type == Function::Checkerboard<E, D, d, R, rR, rC>::static_id())
       return Function::Checkerboard<E, D, d, R, rR, rC>::defaultSettings();
+    else if (type == Function::Spe10Model1<E, D, d, R, rR, rC>::static_id())
+      return Function::Spe10Model1<E, D, d, R, rR, rC>::defaultSettings();
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
@@ -59,6 +62,8 @@ public:
       return Function::Expression<E, D, d, R, rR, rC>::create(settings);
     else if (type == Function::Checkerboard<E, D, d, R, rR, rC>::static_id())
       return Function::Checkerboard<E, D, d, R, rR, rC>::create(settings);
+    else if (type == Function::Spe10Model1<E, D, d, R, rR, rC>::static_id())
+      return Function::Spe10Model1<E, D, d, R, rR, rC>::create(settings);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
@@ -79,7 +84,8 @@ public:
   {
     return {Function::Constant<E, D, d, R, rR, rC>::static_id(),
             Function::Expression<E, D, d, R, rR, rC>::static_id(),
-            Function::Checkerboard<E, D, d, R, rR, rC>::static_id()};
+            Function::Checkerboard<E, D, d, R, rR, rC>::static_id(),
+            Function::Spe10Model1<E, D, d, R, rR, rC>::static_id()};
   } // ... available(...)
 
   static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
@@ -90,6 +96,8 @@ public:
       return Function::Expression<E, D, d, R, rR, rC>::defaultSettings();
     else if (type == Function::Checkerboard<E, D, d, R, rR, rC>::static_id())
       return Function::Checkerboard<E, D, d, R, rR, rC>::defaultSettings();
+    else if (type == Function::Spe10Model1<E, D, d, R, rR, rC>::static_id())
+      return Function::Spe10Model1<E, D, d, R, rR, rC>::defaultSettings();
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
@@ -105,6 +113,8 @@ public:
       return Function::Expression<E, D, d, R, rR, rC>::create(settings);
     else if (type == Function::Checkerboard<E, D, d, R, rR, rC>::static_id())
       return Function::Checkerboard<E, D, d, R, rR, rC>::create(settings);
+    else if (type == Function::Spe10Model1<E, D, d, R, rR, rC>::static_id())
+      return Function::Spe10Model1<E, D, d, R, rR, rC>::create(settings);
     else
       DUNE_THROW(Dune::RangeError,
                  "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown function '" << type
