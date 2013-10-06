@@ -2,7 +2,7 @@
 #define DUNE_STUFF_LA_SOLVER_FASP_HH
 
 #if HAVE_FASP
-#if HAVE_EIGEN
+//#if HAVE_EIGEN
 
 extern "C" {
 #include "fasp_functs.h"
@@ -18,14 +18,13 @@ namespace LA {
 
 
 template <class ElementImp>
-class AmgFaspSolver<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                    Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
-    : public SolverInterface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                             Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>>
+class AmgSolver<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>, Dune::Stuff::LA::EigenDenseVector<ElementImp>>
+    : public SolverInterface<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>,
+                             Dune::Stuff::LA::EigenDenseVector<ElementImp>>
 {
 public:
-  typedef SolverInterface<Dune::Stuff::LA::Container::EigenRowMajorSparseMatrix<ElementImp>,
-                          Dune::Stuff::LA::Container::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>,
+                          Dune::Stuff::LA::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
@@ -33,8 +32,8 @@ public:
 
   static Dune::ParameterTree defaultSettings()
   {
-    // these parameters were taken from the init.dat, that Ludmil gave me...
-    Dune::ParameterTree description;
+    Dune::ParameterTree description = BaseType::defaultIterativeSettings();
+    // these parameters were taken from the init.dat that Ludmil gave me...
     description["input_param.print_level"]              = "3";
     description["input_param.output_type"]              = "0";
     description["input_param.workdir"]                  = "./";
@@ -139,8 +138,10 @@ public:
    *              touch the matrix, but who knows...
    */
   virtual size_t apply(const MatrixType& _systemMatrix, const VectorType& _rhsVector, VectorType& solutionVector,
-                       const Dune::ParameterTree description = Dune::ParameterTree()) const
+                       const Dune::ParameterTree description = defaultSettings()) const
   {
+    const size_t maxIter        = description.get<size_t>("maxIter");
+    const ElementType precision = description.get<ElementType>("precision");
     // init system matrix and right hand side
     MatrixType& systemMatrix = const_cast<MatrixType&>(_systemMatrix);
     VectorType& rhsVector    = const_cast<VectorType&>(_rhsVector);
@@ -349,14 +350,13 @@ private:
     schwarzParams.schwarz_mmsize = description.get<int>("schwarzParams.schwarz_mmsize", 200);
     return schwarzParams;
   } // ... initSchwarzParams(...)
-}; // class Fasp
+}; // class AmgSolver
 
-} // namespace Solver
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
 
-#endif // HAVE_EIGEN
+//#endif // HAVE_EIGEN
 #endif // HAVE_FASP
 
 #endif // DUNE_STUFF_LA_SOLVER_FASP_HH
