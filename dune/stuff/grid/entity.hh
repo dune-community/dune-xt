@@ -1,7 +1,10 @@
 #ifndef DUNE_STUFF_GRID_ENTITY_HH
 #define DUNE_STUFF_GRID_ENTITY_HH
 
-// dune-stuff includes
+#if HAVE_DUNE_GRID
+#include <dune/grid/common/entity.hh>
+#endif
+
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/aliases.hh>
 
@@ -47,6 +50,8 @@ void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::
 
 } // end function print
 
+
+#if HAVE_DUNE_GRID
 template <class GridImp, template <int, int, class> class EntityImp>
 double DUNE_DEPRECATED_MSG("use entityDiameter instead")
     geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
@@ -59,6 +64,7 @@ double DUNE_DEPRECATED_MSG("use entityDiameter instead")
   }
   return factor / (2.0 * entity.geometry().volume());
 } // geometryDiameter
+
 
 template <class GridImp, template <int, int, class> class EntityImp>
 double DUNE_DEPRECATED_MSG("use entityDiameter instead")
@@ -82,6 +88,8 @@ double entityDiameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& e
   }
   return max_dist;
 } // geometryDiameter
+#endif // HAVE_DUNE_GRID
+
 
 } // namespace Grid
 } // namespace Stuff
