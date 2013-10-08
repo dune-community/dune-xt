@@ -1,9 +1,9 @@
 ﻿#ifndef DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
 #define DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
 
-#include <dune/geometry/genericreferenceelements.hh>ge
-
+#if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/function.hh>
+#endif
 
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/grid/entity.hh>
@@ -15,6 +15,7 @@ namespace Stuff {
 namespace Function {
 
 
+#if HAVE_DUNE_GRID
 template <class GridViewType, int dimRange>
 class VisualizationAdapter : public VTKFunction<GridViewType>
 {
@@ -56,6 +57,7 @@ private:
   const FunctionType& function_;
   mutable FieldVector<double, dimRange> tmp_value_;
 }; // class VisualizationAdapter
+#endif // HAVE_DUNE_GRID
 
 
 // template< class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int

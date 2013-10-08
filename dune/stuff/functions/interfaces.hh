@@ -13,7 +13,9 @@
 
 #include <dune/geometry/genericreferenceelements.hh>
 
+#if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
+#endif
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
@@ -22,12 +24,14 @@
 
 namespace Dune {
 namespace Stuff {
+#if HAVE_DUNE_GRID
 namespace Function {
 
 // forward, include is below
 template <class GridViewType, int dimRange>
 class VisualizationAdapter;
 }
+#endif // HAVE_DUNE_GRID
 
 
 /**
@@ -305,8 +309,9 @@ public:
   {
     return static_id();
   }
-  /* @} */
+/* @} */
 
+#if HAVE_DUNE_GRID
   template <class GridViewType>
   void visualize(const GridViewType& grid_view, const std::string filename) const
   {
@@ -317,6 +322,7 @@ public:
     vtk_writer.addVertexData(adapter);
     vtk_writer.write(filename);
   } // ... visualize(...)
+#endif // HAVE_DUNE_GRID
 }; // class LocalizableFunctionInterface
 
 
