@@ -44,7 +44,7 @@ class Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
     Localfunction(const EntityType& ent, const std::shared_ptr<const RangeType> value)
-      : entity_(ent)
+      : BaseType(ent)
       , value_(value)
     {
     }
@@ -52,11 +52,6 @@ class Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     Localfunction(const Localfunction& /*other*/) = delete;
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
-
-    virtual const EntityType& entity() const override
-    {
-      return entity_;
-    }
 
     virtual size_t order() const override
     {
@@ -76,7 +71,6 @@ class Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     }
 
   private:
-    const EntityType& entity_;
     const std::shared_ptr<const RangeType> value_;
   }; // class Localfunction
 

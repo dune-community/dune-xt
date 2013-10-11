@@ -71,10 +71,10 @@ class Difference
     typedef typename SubtrahendType::LocalfunctionType LocalSubtrahendType;
 
   public:
-    LocalFunction(const MinuendType& minuend, const SubtrahendType& subtrahend, const EntityType& en)
-      : entity_(en)
-      , local_minuend_(minuend.local_function(entity_))
-      , local_subtrahend_(subtrahend.local_function(entity_))
+    LocalFunction(const MinuendType& minuend, const SubtrahendType& subtrahend, const EntityType& ent)
+      : BaseType(ent)
+      , local_minuend_(minuend.local_function(this->entity()))
+      , local_subtrahend_(subtrahend.local_function(this->entity()))
       , tmp_range_(RangeFieldType(0))
       , tmp_jacobian_range_(RangeFieldType(0))
     {
@@ -83,11 +83,6 @@ class Difference
     LocalFunction(const LocalFunction& /*other*/) = delete;
 
     LocalFunction& operator=(const LocalFunction& /*other*/) = delete;
-
-    virtual const EntityType& entity() const override
-    {
-      return entity_;
-    }
 
     virtual size_t order() const override
     {
@@ -109,7 +104,6 @@ class Difference
     } // ... jacobian(...)
 
   private:
-    const EntityType& entity_;
     const std::shared_ptr<const LocalMinuendType> local_minuend_;
     const std::shared_ptr<const LocalSubtrahendType> local_subtrahend_;
     mutable RangeType tmp_range_;

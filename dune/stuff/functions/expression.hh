@@ -53,7 +53,7 @@ class Expression
 
     Localfunction(const EntityType& ent, const std::shared_ptr<const MathExpressionFunctionType>& function,
                   const size_t ord)
-      : entity_(ent)
+      : BaseType(ent)
       , function_(function)
       , order_(ord)
       , tmp_vector_(0)
@@ -64,11 +64,6 @@ class Expression
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual const EntityType& entity() const override
-    {
-      return entity_;
-    }
-
     virtual size_t order() const override
     {
       return order_;
@@ -76,7 +71,7 @@ class Expression
 
     virtual void evaluate(const DomainType& xx, RangeType& ret) const override
     {
-      function_->evaluate(entity_.geometry().global(xx), tmp_vector_);
+      function_->evaluate(this->entity().geometry().global(xx), tmp_vector_);
       for (size_t ii = 0; ii < dimRange; ++ii) {
         auto& retRow = ret[ii];
         for (size_t jj = 0; jj < dimRangeCols; ++jj) {
@@ -91,7 +86,6 @@ class Expression
     //    }
 
   private:
-    const EntityType& entity_;
     const std::shared_ptr<const MathExpressionFunctionType> function_;
     const size_t order_;
     mutable FieldVector<RangeFieldType, dimRange * dimRangeCols> tmp_vector_;
@@ -236,7 +230,7 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
 
     Localfunction(const EntityType& entity, const std::shared_ptr<const MathExpressionFunctionType>& function,
                   std::vector<std::shared_ptr<const MathExpressionGradientType>> gradients, const size_t ord)
-      : entity_(entity)
+      : BaseType(entity)
       , function_(function)
       , gradients_(gradients)
       , order_(ord)
@@ -248,11 +242,6 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual const EntityType& entity() const
-    {
-      return entity_;
-    }
-
     virtual size_t order() const override
     {
       return order_;
@@ -261,7 +250,7 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
     virtual void evaluate(const DomainType& xx, RangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
-      global_point_ = entity_.geometry().global(xx);
+      global_point_ = this->entity().geometry().global(xx);
       function_->evaluate(global_point_, ret);
       assert(this_value_is_sane(ret));
     }
@@ -272,7 +261,7 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
         DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
       else {
         assert(gradients_.size() == dimRange);
-        global_point_ = entity_.geometry().global(xx);
+        global_point_ = this->entity().geometry().global(xx);
         for (size_t ii = 0; ii < dimRange; ++ii) {
           gradients_[ii]->evaluate(global_point_, ret[ii]);
           assert(this_value_is_sane(ret[ii]));
@@ -298,7 +287,6 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
       return true;
     }
 
-    const EntityType& entity_;
     const std::shared_ptr<const MathExpressionFunctionType> function_;
     std::vector<std::shared_ptr<const MathExpressionGradientType>> gradients_;
     const size_t order_;
