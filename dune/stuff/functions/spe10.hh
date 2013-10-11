@@ -108,7 +108,7 @@ public:
   {
   }
 
-  virtual ThisType* copy() const override
+  virtual ThisType* copy() const DS_OVERRIDE
   {
     return new ThisType(*this);
   }

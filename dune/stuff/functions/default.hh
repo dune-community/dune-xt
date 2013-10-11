@@ -34,17 +34,17 @@ public:
   {
   }
 
-  virtual int ncomps() const override
+  virtual int ncomps() const DS_OVERRIDE
   {
     return dimRange;
   }
 
-  virtual std::string name() const override
+  virtual std::string name() const DS_OVERRIDE
   {
     return function_.name();
   }
 
-  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const override
+  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const DS_OVERRIDE
   {
     assert(comp >= 0);
     assert(comp < dimRange);
@@ -114,14 +114,14 @@ private:
 
 //  virtual ~LocalDifferentiableFunctionDefault() {}
 
-//  virtual const EntityType& entity() const override
+//  virtual const EntityType& entity() const DS_OVERRIDE
 //  {
 //    return entity_;
 //  }
 
 //  virtual void evaluate(const DomainType& /*xx*/, RangeType& /*ret*/) const = 0;
 
-//  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
+//  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
 //  {
 //    assert(this->is_a_valid_point(xx));
 //    // clear

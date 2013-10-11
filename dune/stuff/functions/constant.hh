@@ -53,18 +53,18 @@ class Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const override
+    virtual size_t order() const DS_OVERRIDE
     {
       return 0;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
     {
       assert(this->is_a_valid_point(xx));
       ret = *value_;
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -137,17 +137,17 @@ public:
     return *this;
   }
 
-  virtual ThisType* copy() const override
+  virtual ThisType* copy() const DS_OVERRIDE
   {
     return new ThisType(*this);
   }
 
-  virtual std::string name() const override
+  virtual std::string name() const DS_OVERRIDE
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
   {
     return std::unique_ptr<Localfunction>(new Localfunction(entity, value_));
   }

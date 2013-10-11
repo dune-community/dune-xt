@@ -125,17 +125,17 @@ public:
   {
   }
 
-  virtual size_t order() const final override
+  virtual size_t order() const DS_FINAL DS_OVERRIDE
   {
     return 0;
   }
 
-  virtual void evaluate(const DomainType& /*x*/, RangeType& ret) const final
+  virtual void evaluate(const DomainType& /*x*/, RangeType& ret) const DS_FINAL
   {
     ret = constant_;
   }
 
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& ret) const final
+  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& ret) const DS_FINAL
   {
     ret = JacobianRangeType(0);
   }

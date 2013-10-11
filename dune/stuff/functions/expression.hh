@@ -64,12 +64,12 @@ class Expression
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const override
+    virtual size_t order() const DS_OVERRIDE
     {
       return order_;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
     {
       function_->evaluate(this->entity().geometry().global(xx), tmp_vector_);
       for (size_t ii = 0; ii < dimRange; ++ii) {
@@ -80,7 +80,7 @@ class Expression
       }
     } // ... evaluate(...)
 
-    //    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const override
+    //    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const DS_OVERRIDE
     //    {
     //      assert(false);
     //    }
@@ -184,12 +184,12 @@ public:
     return *this;
   }
 
-  virtual std::string name() const override
+  virtual std::string name() const DS_OVERRIDE
   {
     return name_;
   }
 
-  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
+  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
   {
     return std::shared_ptr<Localfunction>(new Localfunction(entity, function_, order_));
   }
@@ -242,12 +242,12 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const override
+    virtual size_t order() const DS_OVERRIDE
     {
       return order_;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
     {
       assert(this->is_a_valid_point(xx));
       global_point_ = this->entity().geometry().global(xx);
@@ -255,7 +255,7 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
       assert(this_value_is_sane(ret));
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
     {
       if (gradients_.size() == 0)
         DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
@@ -393,17 +393,17 @@ public:
     return *this;
   }
 
-  virtual ThisType* copy() const override
+  virtual ThisType* copy() const DS_OVERRIDE
   {
     return new ThisType(*this);
   }
 
-  virtual std::string name() const override
+  virtual std::string name() const DS_OVERRIDE
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
   {
     return std::unique_ptr<Localfunction>(new Localfunction(entity, function_, gradients_, order_));
   }
