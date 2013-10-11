@@ -71,97 +71,117 @@ template <class ElementImp = double>
 class EigenRowMajorSparseMatrix : public MatrixInterface<EigenRowMajorSparseMatrixTraits<ElementImp>>,
                                   public EigenMatrixInterface<EigenRowMajorSparseMatrixTraits<ElementImp>>
 {
-public:
   typedef EigenRowMajorSparseMatrix<ElementImp> ThisType;
+
+public:
   typedef EigenRowMajorSparseMatrixTraits<ElementImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
 
   EigenRowMajorSparseMatrix()
+    : eigenMatrix_(new BackendType(0, 0))
   {
   }
 
-  EigenRowMajorSparseMatrix(const ThisType& _other)
-    : eigenMatrix_(_other.backend())
+  EigenRowMajorSparseMatrix(const ThisType& other)
+    : eigenMatrix_(new BackendType(*(other.eigenMatrix_)))
   {
   }
 
-  EigenRowMajorSparseMatrix(const BackendType& _otherEigenMatrix)
-    : eigenMatrix_(_otherEigenMatrix)
+  EigenRowMajorSparseMatrix(const BackendType& other)
+    : eigenMatrix_(new BackendType(other))
   {
   }
 
-  EigenRowMajorSparseMatrix(const size_t _rows, const size_t _cols, const SparsityPatternDefault& _pattern)
-    : eigenMatrix_(_rows, _cols)
+  EigenRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern)
+    : eigenMatrix_(new BackendType(rr, cc))
   {
-    assert(size_t(_pattern.size()) == _rows && "Given pattern too short!");
-    for (size_t row = 0; row < size_t(_pattern.size()); ++row) {
-      eigenMatrix_.startVec(row);
-      for (auto& column : _pattern.inner(row)) {
-        eigenMatrix_.insertBackByOuterInner(row, column);
+    assert(size_t(pattern.size()) == rr && "Given pattern too short!");
+    for (size_t row = 0; row < size_t(pattern.size()); ++row) {
+      eigenMatrix_->startVec(row);
+      for (auto& column : pattern.inner(row)) {
+        eigenMatrix_->insertBackByOuterInner(row, column);
       }
       // create diagonal entry (insertBackByOuterInner() can not handle empty rows)
-      if (_pattern.inner(row).size() == 0)
-        eigenMatrix_.insertBackByOuterInner(row, row);
+      if (pattern.inner(row).size() == 0)
+        eigenMatrix_->insertBackByOuterInner(row, row);
     }
-    eigenMatrix_.finalize();
-    eigenMatrix_.makeCompressed();
-  } // RowMajorSparseMatrix(...)
-
-  /**
-   *  \attention  This is not optimal, since we create a new triplet vector inbetween!
-   */
-  EigenRowMajorSparseMatrix(const ThisType& other, const Dune::Stuff::LA::SparsityPatternDefault& pattern)
-    : eigenMatrix_(other.rows(), other.cols())
-  {
-    typedef ::Eigen::Triplet<ElementType> TripletType;
-    std::vector<TripletType> triplets;
-    triplets.reserve(other.nonZeros());
-    for (size_t row = 0; row < pattern.size(); ++row)
-      for (size_t col : pattern.inner(row))
-        triplets.emplace_back(row, col, other.get(row, col));
-    eigenMatrix_.setFromTriplets(triplets.begin(), triplets.end());
+    eigenMatrix_->finalize();
+    eigenMatrix_->makeCompressed();
   }
 
-  ThisType& operator=(const ThisType& _other)
+  EigenRowMajorSparseMatrix(ThisType&& source)
+    : eigenMatrix_(std::move(source.eigenMatrix_))
   {
-    eigenMatrix_ = _other.backend();
+  }
+
+  //  /**
+  //   *  \attention  This is not optimal, since we create a new triplet vector inbetween!
+  //   */
+  //  EigenRowMajorSparseMatrix(const ThisType& other,
+  //                            const Dune::Stuff::LA::SparsityPatternDefault& pattern)
+  //    : eigenMatrix_(other.rows(), other.cols())
+  //  {
+  //    typedef ::Eigen::Triplet< ElementType > TripletType;
+  //    std::vector< TripletType > triplets;
+  //    triplets.reserve(other.nonZeros());
+  //    for (size_t row = 0; row < pattern.size(); ++row)
+  //      for (size_t col : pattern.inner(row))
+  //        triplets.emplace_back(row, col, other.get(row, col));
+  //    eigenMatrix_->setFromTriplets(triplets.begin(), triplets.end());
+  //  }
+
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      eigenMatrix_->operator=(*(other.eigenMatrix_));
+    }
     return *this;
   }
 
-  ThisType& operator=(const BackendType& _otherEigenMatrix)
+  ThisType& operator=(const BackendType& other)
   {
-    eigenMatrix_ = _otherEigenMatrix;
+    if (this != &other) {
+      eigenMatrix_->operator=(other.eigenMatrix_);
+    }
+    return *this;
+  }
+
+  ThisType& operator=(ThisType&& source)
+  {
+    if (this != &source) {
+      eigenMatrix_ = std::move(source.eigenMatrix_);
+    }
     return *this;
   }
 
   size_t rows() const
   {
-    return eigenMatrix_.rows();
+    return eigenMatrix_->rows();
   }
 
   size_t cols() const
   {
-    return eigenMatrix_.cols();
+    return eigenMatrix_->cols();
   }
 
   void add(const size_t ii, const size_t jj, const ElementType& val)
   {
     assert(these_are_valid_indices(ii, jj));
-    eigenMatrix_.coeffRef(ii, jj) += val;
+    eigenMatrix_->coeffRef(ii, jj) += val;
   }
 
   void set(const size_t ii, const size_t jj, const ElementType& val)
   {
     assert(these_are_valid_indices(ii, jj));
-    eigenMatrix_.coeffRef(ii, jj) = val;
+    eigenMatrix_->coeffRef(ii, jj) = val;
   }
 
   const ElementType get(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
-    return eigenMatrix_.coeff(ii, jj);
+    return eigenMatrix_->coeff(ii, jj);
   }
 
   void unitRow(const size_t row)
@@ -177,7 +197,7 @@ public:
     for (size_t row : DSC::valueRange(rows())) {
       if (row == col)
         set(row, col, ElementType(1));
-      else if (eigenMatrix_.coeff(row, col) != ElementType(0))
+      else if (eigenMatrix_->coeff(row, col) != ElementType(0))
         set(row, col, ElementType(0));
     }
   }
@@ -185,18 +205,18 @@ public:
   void clearRow(const size_t ii)
   {
     assert(ii < rows());
-    auto row = eigenMatrix_.row(ii);
+    auto row = eigenMatrix_->row(ii);
     row *= ElementType(0);
   }
 
   BackendType& backend()
   {
-    return eigenMatrix_;
+    return *eigenMatrix_;
   }
 
   const BackendType& backend() const
   {
-    return eigenMatrix_;
+    return *eigenMatrix_;
   }
 
 private:
@@ -206,8 +226,8 @@ private:
       return false;
     if (jj >= cols())
       return false;
-    for (size_t row = 0; row < eigenMatrix_.outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(eigenMatrix_, row); row_it; ++row_it) {
+    for (size_t row = 0; row < eigenMatrix_->outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(*eigenMatrix_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
           return true;
@@ -218,7 +238,7 @@ private:
     return false;
   } // ... these_are_valid_indices(...)
 
-  BackendType eigenMatrix_;
+  std::unique_ptr<BackendType> eigenMatrix_;
 }; // class EigenRowMajorSparseMatrix
 
 
@@ -240,23 +260,26 @@ template <class ElementImp = double>
 class EigenDenseMatrix : public MatrixInterface<EigenDenseMatrixTraits<ElementImp>>,
                          public EigenMatrixInterface<EigenDenseMatrixTraits<ElementImp>>
 {
-public:
   typedef EigenDenseMatrix<ElementImp> ThisType;
+
+public:
   typedef EigenDenseMatrixTraits<ElementImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
 
-  EigenDenseMatrix()
+  EigenDenseMatrix(const size_t rr = 0, const size_t cc = 0)
+    : eigenMatrix_(new BackendType(rr, cc))
   {
+    eigenMatrix_->setZero(rr, cc);
   }
 
   EigenDenseMatrix(const ThisType& other)
-    : eigenMatrix_(other.backend())
+    : eigenMatrix_(*(other.eigenMatrix_))
   {
   }
 
-  EigenDenseMatrix(const BackendType& otherEigenMatrix)
-    : eigenMatrix_(otherEigenMatrix)
+  EigenDenseMatrix(const BackendType& other)
+    : eigenMatrix_(other)
   {
   }
 
@@ -270,32 +293,43 @@ public:
   {
   }
 
-  EigenDenseMatrix(const size_t _rows, const size_t _cols)
-    : eigenMatrix_(_rows, _cols)
+  EigenDenseMatrix(ThisType&& source)
+    : eigenMatrix_(std::move(source.eigenMatrix_))
   {
-    eigenMatrix_.setZero(_rows, _cols);
   }
 
-  ThisType& operator=(const ThisType& _other)
+  ThisType& operator=(const ThisType& other)
   {
-    eigenMatrix_ = _other.backend();
+    if (this != &other) {
+      eigenMatrix_->operator=(*(other.eigenMatrix_));
+    }
     return *this;
   }
 
-  ThisType& operator=(const BackendType& _otherEigenMatrix)
+  ThisType& operator=(const BackendType& other)
   {
-    eigenMatrix_ = _otherEigenMatrix;
+    if (this != &other) {
+      eigenMatrix_->operator=(other);
+    }
+    return *this;
+  }
+
+  ThisType& operator=(ThisType&& source)
+  {
+    if (this != &source) {
+      eigenMatrix_ = std::move(source.eigenMatrix_);
+    }
     return *this;
   }
 
   size_t rows() const
   {
-    return eigenMatrix_.rows();
+    return eigenMatrix_->rows();
   }
 
   size_t cols() const
   {
-    return eigenMatrix_.cols();
+    return eigenMatrix_->cols();
   }
 
   void add(const size_t ii, const size_t jj, const ElementType& val)
@@ -330,7 +364,7 @@ public:
   }
 
 private:
-  BackendType eigenMatrix_;
+  std::unique_ptr<BackendType> eigenMatrix_;
 }; // class EigenDenseMatrix
 
 
@@ -357,80 +391,87 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
 
-  EigenDenseVector()
+  EigenDenseVector(const size_t ss = 0, const ElementType value = ElementType(0))
+    : eigenVector_(new BackendType(ss))
   {
+    eigenVector_->setOnes();
+    eigenVector_->operator*=(value);
   }
 
   EigenDenseVector(const ThisType& other)
-    : eigenVector_(other.backend())
+    : eigenVector_(new BackendType(*(other.eigenVector_)))
   {
   }
 
-  EigenDenseVector(const BackendType& otherEigenVector)
-    : eigenVector_(otherEigenVector)
+  EigenDenseVector(const BackendType& other)
+    : eigenVector_(new BackendType(other))
   {
   }
 
-  EigenDenseVector(const size_t _size)
-    : eigenVector_(_size)
+  EigenDenseVector(ThisType&& source)
+    : eigenVector_(std::move(source.eigenVector_))
   {
-    eigenVector_.setZero(_size);
-  }
-
-  EigenDenseVector(const size_t _size, const ElementType value)
-    : eigenVector_(_size)
-  {
-    eigenVector_.setOnes();
-    eigenVector_ *= value;
   }
 
   ThisType& operator=(const ThisType& other)
   {
-    eigenVector_ = other.backend();
+    if (this != &other) {
+      eigenVector_->operator=(*(other.eigenVector_));
+    }
     return *this;
   }
 
-  ThisType& operator=(const BackendType& _otherEigenVector)
+  ThisType& operator=(ThisType&& source)
   {
-    eigenVector_ = _otherEigenVector;
+    if (this != &source) {
+      eigenVector_ = std::move(source.eigenVector_);
+    }
+    return *this;
+  }
+
+  ThisType& operator=(const BackendType& other)
+  {
+    if (this != &other) {
+      eigenVector_->operator=(other);
+    }
     return *this;
   }
 
   size_t size() const
   {
-    return eigenVector_.size();
+    return eigenVector_->size();
   }
 
   void add(const size_t ii, const ElementType& val)
   {
     assert(ii < size());
-    eigenVector_(ii) += val;
+    backend()(ii) += val;
   }
 
   void set(const size_t ii, const ElementType& val)
   {
     assert(ii < size());
-    eigenVector_(ii) = val;
+    backend()(ii) = val;
   }
 
   const ElementType get(const size_t ii) const
   {
     assert(ii < size());
-    return eigenVector_(ii);
+    return backend()(ii);
   }
 
   BackendType& backend()
   {
-    return eigenVector_;
+    return *eigenVector_;
   }
 
   const BackendType& backend() const
   {
-    return eigenVector_;
+    return *eigenVector_;
   }
 
 private:
-  BackendType eigenVector_;
+  std::unique_ptr<BackendType> eigenVector_;
 }; // class DenseVector
 
 
@@ -456,8 +497,9 @@ template <class ElementImp = double>
 class EigenMappedDenseVector : public VectorInterface<EigenMappedDenseVectorTraits<ElementImp>>,
                                public EigenVectorInterface<EigenMappedDenseVectorTraits<ElementImp>>
 {
-public:
   typedef EigenMappedDenseVector<ElementImp> ThisType;
+
+public:
   typedef EigenMappedDenseVectorTraits<ElementImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ElementType ElementType;
@@ -473,6 +515,8 @@ public:
   }
 
   EigenMappedDenseVector() = delete;
+
+  ThisType& operator=(const ThisType& /*other*/) = delete;
 
   size_t size() const
   {
@@ -509,24 +553,7 @@ public:
 
 private:
   BackendType eigenVector_;
-}; // class DenseVector
-
-
-/**
- *  \todo Get rid of the 2nd for loop by using the Eigen triplets directly.
- */
-template <class ElementType = double>
-EigenRowMajorSparseMatrix<ElementType>* createIdentityEigenRowMajorSparseMatrix(const size_t _size)
-{
-  // create the sparsity pattern
-  SparsityPatternDefault pattern(_size);
-  for (size_t ii = 0; ii < _size; ++ii)
-    pattern.inner(ii).insert(ii);
-  EigenRowMajorSparseMatrix<ElementType>* ret = new EigenRowMajorSparseMatrix<ElementType>(_size, _size, pattern);
-  for (size_t ii = 0; ii < _size; ++ii)
-    ret->set(ii, ii, 1.0);
-  return ret;
-}
+}; // class EigenMappedDenseVector
 
 
 } // namespace LA
