@@ -71,8 +71,8 @@ public:
   {
   public:
     Localfunction(const EntityImp& entity, const ThisType& global_function)
-      : geometry_(entity.geometry())
-      , entity_(entity)
+      : LocalfunctionBaseType(entity)
+      , geometry_(entity.geometry())
       , global_function_(global_function)
     {
     }
@@ -94,14 +94,8 @@ public:
       return global_function_.order();
     }
 
-    const EntityImp& entity() const
-    {
-      return entity_;
-    }
-
   private:
     const typename EntityImp::Geometry& geometry_;
-    const EntityImp& entity_;
     const ThisType& global_function_;
   };
 
