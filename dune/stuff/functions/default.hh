@@ -1,6 +1,8 @@
 ﻿#ifndef DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
 #define DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
 
+#include <config.h>
+
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/function.hh>
 #endif
