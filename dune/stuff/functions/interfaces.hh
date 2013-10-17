@@ -1,4 +1,9 @@
-﻿#ifndef DUNE_STUFF_FUNCTION_INTERFACE_HH
+﻿// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff/
+// Copyright Holders: Felix Albrecht, Rene Milk
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+
+#ifndef DUNE_STUFF_FUNCTION_INTERFACE_HH
 #define DUNE_STUFF_FUNCTION_INTERFACE_HH
 
 #include <vector>
@@ -11,8 +16,6 @@
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
-#include <dune/geometry/genericreferenceelements.hh>
-
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #endif
@@ -21,8 +24,6 @@
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
 #endif
-
-#include <dune/stuff/common/memory.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -37,7 +38,7 @@ class VisualizationAdapter;
 
 
 /**
- *  \brief  Interface for a set of matrix valued globalvalued functions, which can be evaluated locally on one Entity.
+ *  \brief  Interface for a set of matrix valued functions, which can be evaluated locally on one Entity.
  *
  *  \note   see specialization for rangeDimCols = 1 for vector and scalar valued localfunction sets.
  */
@@ -58,97 +59,11 @@ public:
 
   typedef std::string JacobianRangeType; // <- this is yet unclear, but we need a type
 
-  LocalfunctionSetInterface(const EntityType& ent)
-    : entity_(ent)
-  {
-  }
+  LocalfunctionSetInterface(const EntityType& ent);
 
-  virtual ~LocalfunctionSetInterface()
-  {
-  }
+  virtual ~LocalfunctionSetInterface();
 
-  virtual const EntityType& entity() const
-  {
-    return entity_;
-  }
-
-  /**
-   * \defgroup haveto ´´These methods have to be implemented.''
-   * @{
-   **/
-  virtual size_t size() const = 0;
-
-  virtual size_t order() const = 0;
-
-  virtual void evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/) const = 0;
-
-  //  virtual void jacobian(const DomainType& /*xx*/, std::vector< JacobianRangeType >& /*ret*/) const = 0;
-  /* @} */
-
-  /**
-   * \defgroup provided ´´These methods are provided by the interface.''
-   * @{
-   **/
-  std::vector<RangeType> evaluate(const DomainType& xx) const
-  {
-    std::vector<RangeType> ret(size(), RangeType(0));
-    evaluate(xx, ret);
-    return ret;
-  }
-
-  //  std::vector< JacobianRangeType > jacobian(const DomainType& xx) const
-  //  {
-  //    std::vector< JacobianRangeType > ret(size(), JacobianRangeType(0));
-  //    jacobian(xx, ret);
-  //    return ret;
-  //  }
-  /* @} */
-
-protected:
-  bool is_a_valid_point(const DomainType& xx) const
-  {
-    const auto& reference_element = GenericReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
-    return reference_element.checkInside(xx);
-  }
-
-  const EntityType& entity_;
-}; // class LocalfunctionSetInterface
-
-
-/**
- *  \brief  Interface for a set of scalar or vector globalvalued functions, which can be evaluated locally on one
- * Entity.
- */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-{
-public:
-  typedef EntityImp EntityType;
-
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
-
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeCols = 1;
-  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
-
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
-
-  LocalfunctionSetInterface(const EntityType& ent)
-    : entity_(ent)
-  {
-  }
-
-  virtual ~LocalfunctionSetInterface()
-  {
-  }
-
-  const EntityType& entity() const
-  {
-    return entity_;
-  }
+  virtual const EntityType& entity() const;
 
   /**
    * \defgroup haveto ´´These methods have to be implemented.''
@@ -167,37 +82,75 @@ public:
    * \defgroup provided ´´These methods are provided by the interface.''
    * @{
    **/
-  std::vector<RangeType> evaluate(const DomainType& xx) const
-  {
-    std::vector<RangeType> ret(size(), RangeType(0));
-    evaluate(xx, ret);
-    return ret;
-  }
+  std::vector<RangeType> evaluate(const DomainType& xx) const;
 
-  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const
-  {
-    std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
-    jacobian(xx, ret);
-    return ret;
-  }
+  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const;
   /* @} */
 
 protected:
-  bool is_a_valid_point(const DomainType& xx) const
-  {
-    const auto& reference_element = GenericReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
-    return reference_element.checkInside(xx);
-  }
+  bool is_a_valid_point(const DomainType& xx) const;
+
+  const EntityType& entity_;
+}; // class LocalfunctionSetInterface
+
+
+/**
+ *  \brief  Interface for a set of scalar or vector functions, which can be evaluated locally on one Entity.
+ */
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+class LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+{
+public:
+  typedef EntityImp EntityType;
+
+  typedef DomainFieldImp DomainFieldType;
+  static const unsigned int dimDomain = domainDim;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  typedef RangeFieldImp RangeFieldType;
+  static const unsigned int dimRange     = rangeDim;
+  static const unsigned int dimRangeCols = 1;
+  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
+
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
+
+  LocalfunctionSetInterface(const EntityType& ent);
+
+  virtual ~LocalfunctionSetInterface();
+
+  const EntityType& entity() const;
+
+  /**
+   * \defgroup haveto ´´These methods have to be implemented.''
+   * @{
+   **/
+  virtual size_t size() const = 0;
+
+  virtual size_t order() const = 0;
+
+  virtual void evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/) const = 0;
+
+  virtual void jacobian(const DomainType& /*xx*/, std::vector<JacobianRangeType>& /*ret*/) const = 0;
+  /* @} */
+
+  /**
+   * \defgroup provided ´´These methods are provided by the interface.''
+   * @{
+   **/
+  std::vector<RangeType> evaluate(const DomainType& xx) const;
+
+  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const;
+  /* @} */
+
+protected:
+  bool is_a_valid_point(const DomainType& xx) const;
 
   const EntityType& entity_;
 }; // class LocalfunctionSetInterface< ...., 1 >
 
 
 /**
- *  \brief  Interface for matrix valued globalvalued functions, which can be evaluated locally on one Entity.
- *
- *          This is the interface for matrixvalued functions, see the specialization for rangeDimCols = 1 for scalar
- *          and vector valued functions.
+ *  \brief  Interface for functions, which can be evaluated locally on one Entity.
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionInterface
@@ -220,14 +173,9 @@ public:
 
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
-  LocalfunctionInterface(const EntityType& ent)
-    : BaseType(ent)
-  {
-  }
+  LocalfunctionInterface(const EntityType& ent);
 
-  virtual ~LocalfunctionInterface()
-  {
-  }
+  virtual ~LocalfunctionInterface();
 
   /**
    * \defgroup haveto ´´These methods have to be implemented in addition to the ones required from the BaseType.''
@@ -242,41 +190,20 @@ public:
    * \defgroup providedbase ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
    * @{
    **/
-  virtual size_t size() const
-  {
-    return 1;
-  }
+  virtual size_t size() const;
 
-  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const
-  {
-    assert(ret.size() >= 1);
-    evaluate(xx, ret[0]);
-  }
+  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const;
 
-  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const
-  {
-    assert(ret.size() >= 1);
-    jacobian(xx, ret[0]);
-  }
+  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const;
   /* @} */
 
   /**
    * \defgroup provided ´´These methods are provided by the interface.''
    * @{
    **/
-  RangeType evaluate(const DomainType& xx) const
-  {
-    RangeType ret(0);
-    evaluate(xx, ret);
-    return ret;
-  }
+  RangeType evaluate(const DomainType& xx) const;
 
-  JacobianRangeType jacobian(const DomainType& xx) const
-  {
-    JacobianRangeType ret(0);
-    jacobian(xx, ret);
-    return ret;
-  }
+  JacobianRangeType jacobian(const DomainType& xx) const;
   /* @} */
 }; // class LocalfunctionInterface
 
@@ -312,14 +239,9 @@ public:
   typedef typename LocalfunctionType::RangeType RangeType;
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
-  virtual ~LocalizableFunctionInterface()
-  {
-  }
+  virtual ~LocalizableFunctionInterface();
 
-  static std::string static_id()
-  {
-    return "dune.stuff.function";
-  }
+  static std::string static_id();
 
   /**
    * \defgroup haveto ´´These methods have to be implemented.''
@@ -332,10 +254,7 @@ public:
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
-  virtual std::string name() const
-  {
-    return static_id();
-  }
+  virtual std::string name() const;
 /* @} */
 
 #if HAVE_DUNE_GRID
@@ -380,26 +299,15 @@ public:
   typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
 #endif
 
-  virtual ~FunctionInterface()
-  {
-  }
+  virtual ~FunctionInterface();
 
-  static std::string static_id()
-  {
-    return "dune.stuff.function";
-  }
+  static std::string static_id();
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
-  virtual std::string name() const
-  {
-    return static_id();
-  }
+  virtual std::string name() const;
 
-  virtual int order() const
-  {
-    return -1;
-  }
+  virtual int order() const;
   /* @} */
 
   /** \defgroup must This method has to be implemented.'' */
@@ -407,24 +315,11 @@ public:
   virtual void evaluate(const DomainType& /*x*/, RangeType& /*ret*/) const = 0;
   /* @} */
 
-  virtual RangeType evaluate(const DomainType& x) const
-  {
-    RangeType ret;
-    evaluate(x, ret);
-    return ret;
-  }
+  virtual RangeType evaluate(const DomainType& x) const;
 
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
-  {
-    DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
-  }
+  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const;
 
-  virtual JacobianRangeType jacobian(const DomainType& x) const
-  {
-    JacobianRangeType ret;
-    jacobian(x, ret);
-    return ret;
-  }
+  virtual JacobianRangeType jacobian(const DomainType& x) const;
 }; // class FunctionInterface
 
 
