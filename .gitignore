@@ -47,3 +47,4 @@ data
 *.o
 *.la
 *.user
+.dirstamp
