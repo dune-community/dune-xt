@@ -37,6 +37,31 @@ class VisualizationAdapter;
 #endif // HAVE_DUNE_GRID
 
 
+template <class RangeFieldType, int dimRange, int dimRangeCols = 1>
+struct RangeTypeSelector
+{
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> value;
+};
+
+template <class RangeFieldType, int dimRange>
+struct RangeTypeSelector<RangeFieldType, dimRange, 1>
+{
+  typedef Dune::FieldVector<RangeFieldType, dimRange> value;
+};
+
+template <int dimDomain, class RangeFieldType, int dimRange, int dimRangeCols = 1>
+struct JacobianRangeTypeSelector
+{
+  typedef std::string value;
+};
+
+template <int dimDomain, class RangeFieldType, int dimRange>
+struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
+{
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> value;
+};
+
+
 /**
  *  \brief  Interface for a set of matrix valued functions, which can be evaluated locally on one Entity.
  *
@@ -45,6 +70,7 @@ class VisualizationAdapter;
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionSetInterface
 {
+
 public:
   typedef EntityImp EntityType;
 
@@ -55,9 +81,9 @@ public:
   typedef RangeFieldImp RangeFieldType;
   static const unsigned int dimRange     = rangeDim;
   static const unsigned int dimRangeCols = rangeDimCols;
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> RangeType;
-
-  typedef std::string JacobianRangeType; // <- this is yet unclear, but we need a type
+  typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::value RangeType;
+  typedef
+      typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::value JacobianRangeType;
 
   LocalfunctionSetInterface(const EntityType& ent);
 
@@ -92,62 +118,6 @@ protected:
 
   const EntityType& entity_;
 }; // class LocalfunctionSetInterface
-
-
-/**
- *  \brief  Interface for a set of scalar or vector functions, which can be evaluated locally on one Entity.
- *  \attention missing function definitons for this specialization
- */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-{
-public:
-  typedef EntityImp EntityType;
-
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
-
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeCols = 1;
-  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
-
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
-
-  LocalfunctionSetInterface(const EntityType& ent);
-
-  virtual ~LocalfunctionSetInterface();
-
-  const EntityType& entity() const;
-
-  /**
-   * \defgroup haveto ´´These methods have to be implemented.''
-   * @{
-   **/
-  virtual size_t size() const = 0;
-
-  virtual size_t order() const = 0;
-
-  virtual void evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/) const = 0;
-
-  virtual void jacobian(const DomainType& /*xx*/, std::vector<JacobianRangeType>& /*ret*/) const = 0;
-  /* @} */
-
-  /**
-   * \defgroup provided ´´These methods are provided by the interface.''
-   * @{
-   **/
-  std::vector<RangeType> evaluate(const DomainType& xx) const;
-
-  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const;
-  /* @} */
-
-protected:
-  bool is_a_valid_point(const DomainType& xx) const;
-
-  const EntityType& entity_;
-}; // class LocalfunctionSetInterface< ...., 1 >
 
 
 /**
