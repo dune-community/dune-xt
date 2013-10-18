@@ -37,31 +37,6 @@ class VisualizationAdapter;
 #endif // HAVE_DUNE_GRID
 
 
-template <class RangeFieldType, int dimRange, int dimRangeCols = 1>
-struct RangeTypeSelector
-{
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> value;
-};
-
-template <class RangeFieldType, int dimRange>
-struct RangeTypeSelector<RangeFieldType, dimRange, 1>
-{
-  typedef Dune::FieldVector<RangeFieldType, dimRange> value;
-};
-
-template <int dimDomain, class RangeFieldType, int dimRange, int dimRangeCols = 1>
-struct JacobianRangeTypeSelector
-{
-  typedef std::string value;
-};
-
-template <int dimDomain, class RangeFieldType, int dimRange>
-struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
-{
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> value;
-};
-
-
 /**
  *  \brief  Interface for a set of matrix valued functions, which can be evaluated locally on one Entity.
  *
@@ -70,6 +45,29 @@ struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionSetInterface
 {
+  template <class RangeFieldType, int dimRange, int dimRangeCols>
+  struct RangeTypeSelector
+  {
+    typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> type;
+  };
+
+  template <class RangeFieldType, int dimRange>
+  struct RangeTypeSelector<RangeFieldType, dimRange, 1>
+  {
+    typedef Dune::FieldVector<RangeFieldType, dimRange> type;
+  };
+
+  template <int dimDomain, class RangeFieldType, int dimRange, int dimRangeCols>
+  struct JacobianRangeTypeSelector
+  {
+    typedef std::string type;
+  };
+
+  template <int dimDomain, class RangeFieldType, int dimRange>
+  struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
+  {
+    typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> type;
+  };
 
 public:
   typedef EntityImp EntityType;
@@ -81,9 +79,8 @@ public:
   typedef RangeFieldImp RangeFieldType;
   static const unsigned int dimRange     = rangeDim;
   static const unsigned int dimRangeCols = rangeDimCols;
-  typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::value RangeType;
-  typedef
-      typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::value JacobianRangeType;
+  typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::type RangeType;
+  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::type JacobianRangeType;
 
   LocalfunctionSetInterface(const EntityType& ent);
 
