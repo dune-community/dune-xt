@@ -96,6 +96,7 @@ protected:
 
 /**
  *  \brief  Interface for a set of scalar or vector functions, which can be evaluated locally on one Entity.
+ *  \attention missing function definitons for this specialization
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
