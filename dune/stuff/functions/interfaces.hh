@@ -37,7 +37,7 @@ class VisualizationAdapter;
 #endif // HAVE_DUNE_GRID
 
 
-template <class RangeFieldType, int dimRange, int dimRangeCols>
+template <class RangeFieldType, int dimRange, int dimRangeCols = 1>
 struct RangeTypeSelector
 {
   typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> value;
