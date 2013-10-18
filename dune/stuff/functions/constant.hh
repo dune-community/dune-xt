@@ -87,70 +87,25 @@ public:
   static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
 
-  static std::string static_id()
-  {
-    return BaseType::static_id() + ".constant";
-  }
+  static std::string static_id();
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
-  {
-    Dune::ParameterTree description;
-    description["value"] = "1.0";
-    if (subName.empty())
-      return description;
-    else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
-    }
-  } // ... defaultSettings(...)
+  static Dune::ParameterTree defaultSettings(const std::string subName = "");
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
-  {
-    return new ThisType(settings.get<RangeFieldType>("value", RangeFieldType(0)));
-  } // ... create(...)
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings());
 
-  Constant(const RangeFieldType& val, const std::string nm = static_id())
-    : value_(std::make_shared<RangeType>(val))
-    , name_(nm)
-  {
-  }
+  Constant(const RangeFieldType& val, const std::string nm = static_id());
 
-  Constant(const RangeType& val, const std::string nm = static_id())
-    : value_(std::make_shared<RangeType>(val))
-    , name_(nm)
-  {
-  }
+  Constant(const RangeType& val, const std::string nm = static_id());
 
-  Constant(const ThisType& other)
-    : value_(other.value_)
-    , name_(other.name_)
-  {
-  }
+  Constant(const ThisType& other);
 
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      value_ = other.value_;
-      name_  = other.name_;
-    }
-    return *this;
-  }
+  ThisType& operator=(const ThisType& other);
 
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
+  virtual ThisType* copy() const DS_OVERRIDE;
 
-  virtual std::string name() const DS_OVERRIDE
-  {
-    return name_;
-  }
+  virtual std::string name() const DS_OVERRIDE;
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
-  {
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, value_));
-  }
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE;
 
 private:
   std::shared_ptr<const RangeType> value_;
