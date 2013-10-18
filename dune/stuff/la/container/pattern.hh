@@ -2,10 +2,8 @@
 #define DUNE_STUFF_LA_CONTAINER_PATTERN_HH
 
 #include <cstddef>
-#include <cmath>
 #include <vector>
 #include <set>
-#include <assert.h>
 
 namespace Dune {
 namespace Stuff {
@@ -21,37 +19,17 @@ public:
   typedef BaseType::value_type InnerType;
   typedef typename BaseType::const_iterator ConstOuterIteratorType;
 
-  SparsityPatternDefault(const size_t _size)
-    : vectorOfSets_(_size)
-  {
-  }
+  SparsityPatternDefault(const size_t _size);
 
-  size_t size() const
-  {
-    return vectorOfSets_.size();
-  }
+  size_t size() const;
 
-  InnerType& inner(const size_t ii)
-  {
-    assert(ii < size() && "Wrong index requested!");
-    return vectorOfSets_[ii];
-  }
+  InnerType& inner(const size_t ii);
 
-  const InnerType& inner(const size_t ii) const
-  {
-    assert(ii < size() && "Wrong index requested!");
-    return vectorOfSets_[ii];
-  }
+  const InnerType& inner(const size_t ii) const;
 
-  ConstOuterIteratorType begin() const
-  {
-    return vectorOfSets_.begin();
-  }
+  ConstOuterIteratorType begin() const;
 
-  ConstOuterIteratorType end() const
-  {
-    return vectorOfSets_.end();
-  }
+  ConstOuterIteratorType end() const;
 
 private:
   BaseType vectorOfSets_;
