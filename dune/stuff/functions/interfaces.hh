@@ -60,7 +60,7 @@ class LocalfunctionSetInterface
   template <int dimDomain, class RangeFieldType, int dimRange, int dimRangeCols>
   struct JacobianRangeTypeSelector
   {
-    typedef std::string type;
+    typedef double type;
   };
 
   template <int dimDomain, class RangeFieldType, int dimRange>
