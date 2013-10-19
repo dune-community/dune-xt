@@ -1,16 +1,12 @@
 #ifndef DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 #define DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 
-#include <sstream>
 #include <vector>
 
 #include <dune/common/fvector.hh>
 #include <dune/common/exceptions.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/color.hh>
-#include <dune/stuff/common/print.hh>
 
 #include "expression/base.hh"
 #include "interfaces.hh"
@@ -21,6 +17,10 @@ namespace Stuff {
 namespace Function {
 
 
+/**
+ *  \attention  If you add the create() and defaultSettings() method, do not forget to enable the matrix valued
+ *              versions in test/function_expression.cc
+ */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class Expression
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -80,10 +80,12 @@ class Expression
       }
     } // ... evaluate(...)
 
-    //    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const DS_OVERRIDE
-    //    {
-    //      assert(false);
-    //    }
+    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const DS_OVERRIDE
+    {
+      DUNE_THROW(NotImplemented,
+                 "If we decided on the JacobianRangeType of matrix valued functions we havo to implement gradients for "
+                     << "this function!");
+    }
 
   private:
     const std::shared_ptr<const MathExpressionFunctionType> function_;
@@ -100,99 +102,25 @@ public:
   typedef typename BaseType::DomainType DomainType;
 
   typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange     = BaseType::rangeDim;
-  static const unsigned int dimRangeCols = BaseType::rangeDimCols;
+  static const unsigned int dimRange     = BaseType::dimRange;
+  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename LocalfunctionType::RangeType RangeType;
 
-  static const std::string static_id()
-  {
-    return BaseType::static_id() + ".expression";
-  }
-
-  //  static Dune::ParameterTree defaultSettings(const std::string subName = "")
-  //  {
-  //    Dune::ParameterTree description;
-  //    description["variable"] = "x";
-  //    description["expression"] = "[x[0]; sin(x[0]); x[0]; x[0]]";
-  //    description["order"] = "1";
-  //    description["name"] = "function.expression";
-  //    if (subName.empty())
-  //      return description;
-  //    else {
-  //      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-  //      extendedDescription.add(description, subName);
-  //      return extendedDescription;
-  //    }
-  //  } // ... defaultSettings(...)
-
-  //  static ThisType* create(const DSC::ExtendedParameterTree settings)
-  //  {
-  //    // get necessary
-  //    const std::string _variable = settings.get< std::string >("variable", "x");
-  //    std::vector< std::string > _expressions;
-  //    // lets see, if there is a key or vector
-  //    if (settings.hasVector("expression")) {
-  //      const std::vector< std::string > expr = settings.getVector< std::string >("expression", 1);
-  //      for (auto vector: expr){
-  //        _expressions.emplace_back(vector);
-  //      }
-  //    } else if (settings.hasKey("expression")) {
-  //      const std::string expr = settings.get< std::string >("expression");
-  //      _expressions.push_back(expr);
-  //    } else
-  //      DUNE_THROW(Dune::IOError,
-  //                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-  //                 << " neither key nor vector 'expression' found in the following settings:\n"
-  //                 << settings.reportString("  "));
-  //    // get optional
-  //    const size_t order = settings.get< size_t >("order", 0);
-  //    const std::string name = settings.get< std::string >("name", "function.expression");
-  //    // create and return
-  //    return new ThisType(_variable, _expressions, order, name);
-  //  } // ... create(...)
+  static std::string static_id();
 
   Expression(const std::string variable, const std::string expression, const size_t ord = 0,
-             const std::string nm = static_id())
-    : function_(new MathExpressionFunctionType(variable, expression))
-    , order_(ord)
-    , name_(nm)
-  {
-  }
+             const std::string nm = static_id());
 
   Expression(const std::string variable, const std::vector<std::string> expressions, const size_t ord = 0,
-             const std::string nm = static_id())
-    : function_(new MathExpressionFunctionType(variable, expressions))
-    , order_(ord)
-    , name_(nm)
-  {
-  }
+             const std::string nm = static_id());
 
-  Expression(const ThisType& other)
-    : function_(other.function_)
-    , order_(other.order_)
-    , name_(other.name_)
-  {
-  }
+  Expression(const ThisType& other);
 
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      function_ = other.function_;
-      order_    = other.order_;
-      name_     = other.name_;
-    }
-    return *this;
-  }
+  ThisType& operator=(const ThisType& other);
 
-  virtual std::string name() const DS_OVERRIDE
-  {
-    return name_;
-  }
+  virtual std::string name() const DS_OVERRIDE;
 
-  virtual std::shared_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
-  {
-    return std::shared_ptr<Localfunction>(new Localfunction(entity, function_, order_));
-  }
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE;
 
 private:
   std::shared_ptr<const MathExpressionFunctionType> function_;
@@ -308,115 +236,32 @@ public:
 
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
-  static std::string static_id()
-  {
-    return BaseType::static_id() + ".expression";
-  }
+  static std::string static_id();
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
-  {
-    Dune::ParameterTree description;
-    description["variable"]   = "x";
-    description["expression"] = "[x[0]; sin(x[0]); exp(x[0])]";
-    description["order"]      = "1";
-    description["name"] = static_id();
-    if (subName.empty())
-      return description;
-    else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
-    }
-  } // ... defaultSettings(...)
+  static Dune::ParameterTree defaultSettings(const std::string subName = "");
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
-  {
-    // get necessary
-    const std::string _variable = settings.get<std::string>("variable", "x");
-    std::vector<std::string> _expressions;
-    // lets see, if there is a key or vector
-    if (settings.hasVector("expression")) {
-      const std::vector<std::string> expr = settings.getVector<std::string>("expression", 1);
-      for (size_t ii = 0; ii < expr.size(); ++ii)
-        _expressions.push_back(expr[ii]);
-    } else if (settings.hasKey("expression")) {
-      const std::string expr = settings.get<std::string>("expression");
-      _expressions.push_back(expr);
-    } else
-      DUNE_THROW(Dune::IOError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-                      << " neither key nor vector 'expression' found in the following settings:\n"
-                      << settings.reportString("  "));
-    // get optional
-    const int order        = settings.get<int>("order", -1);
-    const std::string name = settings.get<std::string>("name", "function.expression");
-    // create and return
-    return new ThisType(_variable, _expressions, order, name);
-  } // ... create(...)
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings());
 
   Expression(const std::string variable, const std::string expression, const size_t ord = 0,
-             const std::string nm                                             = static_id(),
-             const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
-    : function_(new MathExpressionFunctionType(variable, expression))
-    , order_(ord)
-    , name_(nm)
-  {
-    build_gradients(variable, gradient_expressions);
-  }
+             const std::string nm = static_id(), const std::vector<std::vector<std::string>> gradient_expressions =
+                                                     std::vector<std::vector<std::string>>());
 
   Expression(const std::string variable, const std::vector<std::string> expressions, const size_t ord = 0,
-             const std::string nm                                             = static_id(),
-             const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
-    : function_(new MathExpressionFunctionType(variable, expressions))
-    , order_(ord)
-    , name_(nm)
-  {
-    build_gradients(variable, gradient_expressions);
-  }
+             const std::string nm = static_id(), const std::vector<std::vector<std::string>> gradient_expressions =
+                                                     std::vector<std::vector<std::string>>());
 
-  Expression(const ThisType& other)
-    : function_(other.function_)
-    , order_(other.order_)
-    , name_(other.name_)
-    , gradients_(other.gradients_)
-  {
-  }
+  Expression(const ThisType& other);
 
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      function_  = other.function_;
-      order_     = other.order_;
-      name_      = other.name_;
-      gradients_ = other.gradients_;
-    }
-    return *this;
-  }
+  ThisType& operator=(const ThisType& other);
 
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
+  virtual ThisType* copy() const DS_OVERRIDE;
 
-  virtual std::string name() const DS_OVERRIDE
-  {
-    return name_;
-  }
+  virtual std::string name() const DS_OVERRIDE;
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
-  {
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, function_, gradients_, order_));
-  }
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE;
 
 private:
-  void build_gradients(const std::string variable, const std::vector<std::vector<std::string>> gradient_expressions)
-  {
-    assert(gradient_expressions.size() == 0 || gradient_expressions.size() == dimRange);
-    for (const auto& gradient_expression : gradient_expressions) {
-      assert(gradient_expression.size() == dimDomain);
-      gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expression));
-    }
-  } // ... build_gradients(...)
+  void build_gradients(const std::string variable, const std::vector<std::vector<std::string>>& gradient_expressions);
 
   std::shared_ptr<const MathExpressionFunctionType> function_;
   size_t order_;
