@@ -1,10 +1,15 @@
+// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff/
+// Copyright Holders: Felix Albrecht, Rene Milk
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+
 #ifndef DUNE_STUFF_GRID_BOUNDARYINFO_HH
 #define DUNE_STUFF_GRID_BOUNDARYINFO_HH
 
 #ifdef HAVE_CMAKE_CONFIG
 #include "cmake_config.h"
 #elif defined(HAVE_CONFIG_H)
-#include <config.h>
+#include "config.h"
 #endif // ifdef HAVE_CMAKE_CONFIG
 
 #include <map>
