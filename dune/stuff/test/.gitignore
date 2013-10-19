@@ -23,3 +23,4 @@ common_tuple
 grid_output_pgf
 functions_constant
 functions_expression
+functions_checkerboard
