@@ -1,4 +1,9 @@
-﻿#ifndef DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
+﻿// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff/
+// Copyright Holders: Felix Albrecht
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+
+#ifndef DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 #define DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 
 #include <vector>
@@ -24,9 +29,11 @@ class Checkerboard
       BaseType;
   typedef Checkerboard<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
 
-  class Localfunction : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+  class Localfunction
+      : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
   {
-    typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
+    typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+        BaseType;
 
   public:
     typedef typename BaseType::EntityType EntityType;
@@ -88,126 +95,24 @@ public:
 
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
-  static std::string static_id()
-  {
-    return BaseType::static_id() + ".checkerboard";
-  }
+  static std::string static_id();
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
-  {
-    Dune::ParameterTree description;
-    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
-    description["upperRight"]  = "[1.0; 1.0; 1.0]";
-    description["numElements"] = "[2; 2; 2]";
-    description["values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
-    description["name"] = static_id();
-    if (subName.empty())
-      return description;
-    else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
-    }
-  } // ... defaultSettings(...)
+  static Dune::ParameterTree defaultSettings(const std::string subName = "");
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
-  {
-    // get data
-    const std::vector<DomainFieldType> lowerLeft  = settings.getVector("lowerLeft", DomainFieldType(0), dimDomain);
-    const std::vector<DomainFieldType> upperRight = settings.getVector("upperRight", DomainFieldType(1), dimDomain);
-    const std::vector<size_t> numElements         = settings.getVector("numElements", size_t(1), dimDomain);
-    const std::vector<RangeType> values           = settings.getVector("values", RangeType(1), 1);
-    // create and return, leave the checks to the base constructor
-    return new ThisType(std::move(lowerLeft), std::move(upperRight), std::move(numElements), std::move(values));
-  } // ... create(...)
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings());
 
   Checkerboard(std::vector<DomainFieldType>&& lowerLeft, std::vector<DomainFieldType>&& upperRight,
-               std::vector<size_t>&& numElements, std::vector<RangeType>&& values, std::string nm = static_id())
-    : lowerLeft_(new std::vector<DomainFieldType>(std::move(lowerLeft)))
-    , upperRight_(new std::vector<DomainFieldType>(std::move(upperRight)))
-    , numElements_(new std::vector<size_t>(std::move(numElements)))
-    , values_(new std::vector<RangeType>(std::move(values)))
-    , name_(nm)
-  {
-    // checks
-    if (lowerLeft_->size() < dimDomain)
-      DUNE_THROW(Dune::RangeError,
-                 "lowerLeft too small (is " << lowerLeft_->size() << ", should be " << dimDomain << ")");
-    if (upperRight_->size() < dimDomain)
-      DUNE_THROW(Dune::RangeError,
-                 "upperRight too small (is " << upperRight_->size() << ", should be " << dimDomain << ")");
-    if (numElements_->size() < dimDomain)
-      DUNE_THROW(Dune::RangeError,
-                 "numElements too small (is " << numElements_->size() << ", should be " << dimDomain << ")");
-    size_t totalSubdomains = 1;
-    for (size_t dd = 0; dd < dimDomain; ++dd) {
-      const auto& ll = (*lowerLeft_)[dd];
-      const auto& ur = (*upperRight_)[dd];
-      const auto& ne = (*numElements_)[dd];
-      if (!(ll < ur))
-        DUNE_THROW(Dune::RangeError, "lowerLeft has to be elementwise smaller than upperRight!");
-      totalSubdomains *= ne;
-    }
-    if (values_->size() < totalSubdomains)
-      DUNE_THROW(Dune::RangeError,
-                 "values too small (is " << values_->size() << ", should be " << totalSubdomains << ")");
-  } // Checkerboard(...)
+               std::vector<size_t>&& numElements, std::vector<RangeType>&& values, std::string nm = static_id());
 
-  Checkerboard(const ThisType& other)
-    : lowerLeft_(other.lowerLeft_)
-    , upperRight_(other.upperRight_)
-    , numElements_(other.numElements_)
-    , values_(other.values_)
-    , name_(other.name_)
-  {
-  }
+  Checkerboard(const ThisType& other);
 
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      lowerLeft_   = other.lowerLeft_;
-      upperRight_  = other.upperRight_;
-      numElements_ = other.numElements_;
-      values_      = other.values_;
-      name_        = other.name_;
-    }
-    return *this;
-  }
+  ThisType& operator=(const ThisType& other);
 
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
+  virtual ThisType* copy() const DS_OVERRIDE;
 
-  virtual std::string name() const DS_OVERRIDE
-  {
-    return name_;
-  }
+  virtual std::string name() const DS_OVERRIDE;
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
-  {
-    // decide on the subdomain the center of the entity belongs to
-    const auto center = entity.geometry().center();
-    std::vector<size_t> whichPartition(dimDomain, 0);
-    const auto& ll = *lowerLeft_;
-    const auto& ur = *upperRight_;
-    const auto& ne = *numElements_;
-    for (size_t dd = 0; dd < dimDomain; ++dd) {
-      // for points that are on upperRight_[d], this selects one partition too much
-      // so we need to cap this
-      whichPartition[dd] =
-          std::min(size_t(std::floor(ne[dd] * ((center[dd] - ll[dd]) / (ur[dd] - ll[dd])))), (ne[dd] - 1));
-    }
-    size_t subdomain = 0;
-    if (dimDomain == 1)
-      subdomain = whichPartition[0];
-    else if (dimDomain == 2)
-      subdomain = whichPartition[0] + whichPartition[1] * ne[0];
-    else
-      subdomain = whichPartition[0] + whichPartition[1] * ne[0] + whichPartition[2] * ne[1] * ne[0];
-    // return the component that belongs to the subdomain
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, (*values_)[subdomain]));
-  } // ... local_function(...)
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE;
 
 private:
   std::shared_ptr<const std::vector<DomainFieldType>> lowerLeft_;
