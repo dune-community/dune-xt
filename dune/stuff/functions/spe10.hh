@@ -1,3 +1,8 @@
+// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff/
+// Copyright Holders: Felix Albrecht
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+
 #ifndef DUNE_STUFF_FUNCTIONS_SPE10_HH
 #define DUNE_STUFF_FUNCTIONS_SPE10_HH
 
@@ -49,10 +54,7 @@ public:
   static const int dimRange = BaseType::dimRange;
   typedef typename BaseType::RangeType RangeType;
 
-  static std::string static_id()
-  {
-    return BaseType::static_id() + ".spe10.model1";
-  }
+  static std::string static_id();
 
 private:
   static const size_t numXelements         = 100;
@@ -62,87 +64,18 @@ private:
   static constexpr RangeFieldType maxValue = 998.915;
 
   static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
-                                                      const RangeFieldType& max)
-  {
-    if (!(max > min))
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " max (is " << max
-                      << ") has to be larger than min (is "
-                      << min
-                      << ")!");
-    const RangeFieldType scale = (max - min) / (maxValue - minValue);
-    const RangeType shift      = min - scale * minValue;
-    // read all the data from the file
-    std::ifstream datafile(filename);
-    if (datafile.is_open()) {
-      static const size_t entriesPerDim = numXelements * numYelements * numZelements;
-      // create storage (there should be exactly 6000 values in the file, but we onyl read the first 2000)
-      std::vector<RangeType> data(entriesPerDim, RangeFieldType(0));
-      double tmp     = 0;
-      size_t counter = 0;
-      while (datafile >> tmp && counter < entriesPerDim) {
-        data[counter] = (tmp * scale) + shift;
-        ++counter;
-      }
-      datafile.close();
-      if (counter != entriesPerDim)
-        DUNE_THROW(Dune::IOError,
-                   "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " wrong number of entries in '" << filename
-                        << "' (are "
-                        << counter
-                        << ", should be "
-                        << entriesPerDim
-                        << ")!");
-      return data;
-    } else
-      DUNE_THROW(Dune::IOError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " could not open '" << filename << "'!");
-  } // Spe10Model1()
+                                                      const RangeFieldType& max);
 
 public:
   Spe10Model1(const std::string& filename, std::vector<DomainFieldType>&& lowerLeft,
               std::vector<DomainFieldType>&& upperRight, const RangeFieldType min = minValue,
-              const RangeFieldType max = maxValue, const std::string nm = static_id())
-    : BaseType(std::move(lowerLeft), std::move(upperRight), {numXelements, numZelements},
-               read_values_from_file(filename, min, max), nm)
-  {
-  }
+              const RangeFieldType max = maxValue, const std::string nm = static_id());
 
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
+  virtual ThisType* copy() const DS_OVERRIDE;
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
-  {
-    Dune::ParameterTree description;
-    description["filename"]   = "perm_case1.dat";
-    description["lowerLeft"]  = "[0.0; 0.0]";
-    description["upperRight"] = "[762.0; 15.24]";
-    description["minValue"]   = "0.001";
-    description["maxValue"]   = "998.915";
-    description["name"] = static_id();
-    if (subName.empty())
-      return description;
-    else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
-    }
-  } // ... defaultSettings(...)
+  static Dune::ParameterTree defaultSettings(const std::string subName = "");
 
-  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree settings = defaultSettings())
-  {
-    // get data
-    const std::string filename                    = settings.get<std::string>("filename");
-    const std::vector<DomainFieldType> lowerLeft  = settings.getVector<DomainFieldType>("lowerLeft", dimDomain);
-    const std::vector<DomainFieldType> upperRight = settings.getVector<DomainFieldType>("upperRight", dimDomain);
-    const RangeFieldType minVal                   = settings.get<RangeFieldType>("minValue", minValue);
-    const RangeFieldType maxVal                   = settings.get<RangeFieldType>("maxValue", maxValue);
-    const std::string nm                          = settings.get<std::string>("name", static_id());
-    // create and return, leave the checks to the constructor
-    return new ThisType(filename, std::move(lowerLeft), std::move(upperRight), nm, minVal, maxVal);
-  } // ... create(...)
+  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree settings = defaultSettings());
 }; // class Spe10Model1< ..., 2, ..., 1, 1 >
 
 
