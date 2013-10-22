@@ -24,3 +24,5 @@ grid_output_pgf
 functions_constant
 functions_expression
 functions_checkerboard
+functions_functions
+perm_case1.dat
