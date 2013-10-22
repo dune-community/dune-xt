@@ -106,21 +106,54 @@ public:
   static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename LocalfunctionType::RangeType RangeType;
 
-  static std::string static_id();
+  static std::string static_id()
+  {
+    return BaseType::static_id() + ".expression";
+  }
+
 
   Expression(const std::string variable, const std::string expression, const size_t ord = 0,
-             const std::string nm = static_id());
+             const std::string nm = static_id())
+    : function_(new MathExpressionFunctionType(variable, expression))
+    , order_(ord)
+    , name_(nm)
+  {
+  }
 
   Expression(const std::string variable, const std::vector<std::string> expressions, const size_t ord = 0,
-             const std::string nm = static_id());
+             const std::string nm = static_id())
+    : function_(new MathExpressionFunctionType(variable, expressions))
+    , order_(ord)
+    , name_(nm)
+  {
+  }
 
-  Expression(const ThisType& other);
+  Expression(const ThisType& other)
+    : function_(other.function_)
+    , order_(other.order_)
+    , name_(other.name_)
+  {
+  }
 
-  ThisType& operator=(const ThisType& other);
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      function_ = other.function_;
+      order_    = other.order_;
+      name_     = other.name_;
+    }
+    return *this;
+  }
 
-  virtual std::string name() const DS_OVERRIDE;
+  virtual std::string name() const DS_OVERRIDE
+  {
+    return name_;
+  }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE;
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
+  {
+    return std::unique_ptr<Localfunction>(new Localfunction(entity, function_, order_));
+  }
 
 private:
   std::shared_ptr<const MathExpressionFunctionType> function_;
@@ -236,32 +269,115 @@ public:
 
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
-  static std::string static_id();
+  static std::string static_id()
+  {
+    return BaseType::static_id() + ".expression";
+  }
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "");
+  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  {
+    Dune::ParameterTree description;
+    description["variable"]   = "x";
+    description["expression"] = "[x[0]; sin(x[0]); exp(x[0])]";
+    description["order"]      = "1";
+    description["name"] = static_id();
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
+  } // ... defaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings());
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
+  {
+    // get necessary
+    const std::string _variable = settings.get<std::string>("variable", "x");
+    std::vector<std::string> _expressions;
+    // lets see, if there is a key or vector
+    if (settings.hasVector("expression")) {
+      const std::vector<std::string> expr = settings.getVector<std::string>("expression", 1);
+      for (size_t ii = 0; ii < expr.size(); ++ii)
+        _expressions.push_back(expr[ii]);
+    } else if (settings.hasKey("expression")) {
+      const std::string expr = settings.get<std::string>("expression");
+      _expressions.push_back(expr);
+    } else
+      DUNE_THROW(Dune::IOError,
+                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+                      << " neither key nor vector 'expression' found in the following settings:\n"
+                      << settings.reportString("  "));
+    // get optional
+    const int order        = settings.get<int>("order", -1);
+    const std::string name = settings.get<std::string>("name", "function.expression");
+    // create and return
+    return new ThisType(_variable, _expressions, order, name);
+  } // ... create(...)
 
   Expression(const std::string variable, const std::string expression, const size_t ord = 0,
-             const std::string nm = static_id(), const std::vector<std::vector<std::string>> gradient_expressions =
-                                                     std::vector<std::vector<std::string>>());
+             const std::string nm                                             = static_id(),
+             const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
+    : function_(new MathExpressionFunctionType(variable, expression))
+    , order_(ord)
+    , name_(nm)
+  {
+    build_gradients(variable, gradient_expressions);
+  }
 
   Expression(const std::string variable, const std::vector<std::string> expressions, const size_t ord = 0,
-             const std::string nm = static_id(), const std::vector<std::vector<std::string>> gradient_expressions =
-                                                     std::vector<std::vector<std::string>>());
+             const std::string nm                                             = static_id(),
+             const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
+    : function_(new MathExpressionFunctionType(variable, expressions))
+    , order_(ord)
+    , name_(nm)
+  {
+    build_gradients(variable, gradient_expressions);
+  }
 
-  Expression(const ThisType& other);
+  Expression(const ThisType& other)
+    : function_(other.function_)
+    , order_(other.order_)
+    , name_(other.name_)
+    , gradients_(other.gradients_)
+  {
+  }
 
-  ThisType& operator=(const ThisType& other);
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      function_  = other.function_;
+      order_     = other.order_;
+      name_      = other.name_;
+      gradients_ = other.gradients_;
+    }
+    return *this;
+  }
 
-  virtual ThisType* copy() const DS_OVERRIDE;
+  virtual ThisType* copy() const DS_OVERRIDE
+  {
+    return new ThisType(*this);
+  }
 
-  virtual std::string name() const DS_OVERRIDE;
+  virtual std::string name() const DS_OVERRIDE
+  {
+    return name_;
+  }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE;
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
+  {
+    return std::unique_ptr<Localfunction>(new Localfunction(entity, function_, gradients_, order_));
+  }
 
 private:
-  void build_gradients(const std::string variable, const std::vector<std::vector<std::string>>& gradient_expressions);
+  void build_gradients(const std::string variable, const std::vector<std::vector<std::string>>& gradient_expressions)
+  {
+    assert(gradient_expressions.size() == 0 || gradient_expressions.size() == dimRange);
+    for (const auto& gradient_expression : gradient_expressions) {
+      assert(gradient_expression.size() == dimDomain);
+      gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expression));
+    }
+  } // ... build_gradients(...)
 
   std::shared_ptr<const MathExpressionFunctionType> function_;
   size_t order_;
@@ -273,5 +389,74 @@ private:
 } // namespace Function
 } // namespace Stuff
 } // namespace Dune
+
+#define DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(etype, ddim)                                                     \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGECOLS(etype, ddim, 1)                                                    \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGECOLS(etype, ddim, 2)                                                    \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGECOLS(etype, ddim, 3)
+
+#define DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGECOLS(etype, ddim, rdim)                                           \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, 2)                                          \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, 3)
+
+#define DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, rcdim)                                \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_RANGEFIELDTYPES(etype, double, ddim, rdim, rcdim)
+
+#define DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_RANGEFIELDTYPES(etype, dftype, ddim, rdim, rcdim)                         \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LAST_EXPANSION(etype, dftype, ddim, double, rdim, rcdim)                             \
+  DUNE_STUFF_FUNCTIONS_EXPRESSION_LAST_EXPANSION(etype, dftype, ddim, long double, rdim, rcdim)
+
+#define DUNE_STUFF_FUNCTIONS_EXPRESSION_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim)                       \
+  extern template class Dune::Stuff::Function::Expression<etype, dftype, ddim, rftype, rdim, rcdim>;
+
+#ifdef HAVE_DUNE_GRID
+
+#include <dune/grid/sgrid.hh>
+
+typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneStuffFunctionsExpressionSGrid1dEntityType;
+typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneStuffFunctionsExpressionSGrid2dEntityType;
+typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionsExpressionSGrid3dEntityType;
+
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionSGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionSGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionSGrid3dEntityType, 3)
+
+#include <dune/grid/yaspgrid.hh>
+
+typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneStuffFunctionsExpressionYaspGrid1dEntityType;
+typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneStuffFunctionsExpressionYaspGrid2dEntityType;
+typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneStuffFunctionsExpressionYaspGrid3dEntityType;
+
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionYaspGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionYaspGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionYaspGrid3dEntityType, 3)
+
+#if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
+#define ALUGRID_CONFORM 1
+#define ENABLE_ALUGRID 1
+
+#include <dune/grid/alugrid.hh>
+
+typedef typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity
+    DuneStuffFunctionsExpressionAluSimplexGrid2dEntityType;
+typedef typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity
+    DuneStuffFunctionsExpressionAluSimplexGrid3dEntityType;
+typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionsExpressionAluCubeGrid3dEntityType;
+
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionAluSimplexGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionAluSimplexGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsExpressionAluCubeGrid3dEntityType, 3)
+
+#undef ENABLE_ALUGRID
+#undef ALUGRID_CONFORM
+
+#endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
+#endif // HAVE_DUNE_GRID
+
+#undef DUNE_STUFF_FUNCTIONS_EXPRESSION_LAST_EXPANSION
+#undef DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_RANGEFIELDTYPES
+#undef DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DOMAINFIELDTYPES
+#undef DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGECOLS
+#undef DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE
 
 #endif // DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
