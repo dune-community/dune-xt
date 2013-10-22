@@ -16,6 +16,8 @@
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
+#include <dune/geometry/genericreferenceelements.hh>
+
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #endif
@@ -291,9 +293,292 @@ public:
 }; // class FunctionInterface
 
 
+// =====================================
+// ===== LocalfunctionSetInterface =====
+// =====================================
+template <class E, class D, int d, class R, int r, int rC>
+LocalfunctionSetInterface<E, D, d, R, r, rC>::LocalfunctionSetInterface(const EntityType& ent)
+  : entity_(ent)
+{
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+LocalfunctionSetInterface<E, D, d, R, r, rC>::~LocalfunctionSetInterface()
+{
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+const typename LocalfunctionSetInterface<E, D, d, R, r, rC>::EntityType&
+LocalfunctionSetInterface<E, D, d, R, r, rC>::entity() const
+{
+  return entity_;
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+std::vector<typename LocalfunctionSetInterface<E, D, d, R, r, rC>::RangeType>
+LocalfunctionSetInterface<E, D, d, R, r, rC>::evaluate(const DomainType& xx) const
+{
+  std::vector<RangeType> ret(size(), RangeType(0));
+  evaluate(xx, ret);
+  return ret;
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+std::vector<typename LocalfunctionSetInterface<E, D, d, R, r, rC>::JacobianRangeType>
+LocalfunctionSetInterface<E, D, d, R, r, rC>::jacobian(const DomainType& xx) const
+{
+  std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
+  jacobian(xx, ret);
+  return ret;
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+bool LocalfunctionSetInterface<E, D, d, R, r, rC>::is_a_valid_point(const DomainType& xx) const
+{
+  const auto& reference_element = GenericReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
+  return reference_element.checkInside(xx);
+}
+
+
+// ==================================
+// ===== LocalfunctionInterface =====
+// ==================================
+template <class E, class D, int d, class R, int r, int rC>
+LocalfunctionInterface<E, D, d, R, r, rC>::LocalfunctionInterface(const EntityType& ent)
+  : BaseType(ent)
+{
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+LocalfunctionInterface<E, D, d, R, r, rC>::~LocalfunctionInterface()
+{
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+size_t LocalfunctionInterface<E, D, d, R, r, rC>::size() const
+{
+  return 1;
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+void LocalfunctionInterface<E, D, d, R, r, rC>::evaluate(const DomainType& xx, std::vector<RangeType>& ret) const
+{
+  assert(ret.size() >= 1);
+  evaluate(xx, ret[0]);
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+void LocalfunctionInterface<E, D, d, R, r, rC>::jacobian(const DomainType& xx,
+                                                         std::vector<JacobianRangeType>& ret) const
+{
+  assert(ret.size() >= 1);
+  jacobian(xx, ret[0]);
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+typename LocalfunctionInterface<E, D, d, R, r, rC>::RangeType
+LocalfunctionInterface<E, D, d, R, r, rC>::evaluate(const DomainType& xx) const
+{
+  RangeType ret(0);
+  evaluate(xx, ret);
+  return ret;
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+typename LocalfunctionInterface<E, D, d, R, r, rC>::JacobianRangeType
+LocalfunctionInterface<E, D, d, R, r, rC>::jacobian(const DomainType& xx) const
+{
+  JacobianRangeType ret(0);
+  jacobian(xx, ret);
+  return ret;
+}
+
+
+// ========================================
+// ===== LocalizableFunctionInterface =====
+// ========================================
+template <class E, class D, int d, class R, int r, int rC>
+LocalizableFunctionInterface<E, D, d, R, r, rC>::~LocalizableFunctionInterface()
+{
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+std::string LocalizableFunctionInterface<E, D, d, R, r, rC>::static_id()
+{
+  return "dune.stuff.function";
+}
+
+template <class E, class D, int d, class R, int r, int rC>
+std::string LocalizableFunctionInterface<E, D, d, R, r, rC>::name() const
+{
+  return "dune.stuff.function";
+}
+
+
+// =============================
+// ===== FunctionInterface =====
+// =============================
+template <class D, int d, class R, int r>
+FunctionInterface<D, d, R, r>::~FunctionInterface()
+{
+}
+
+template <class D, int d, class R, int r>
+std::string FunctionInterface<D, d, R, r>::static_id()
+{
+  return "dune.stuff.function";
+}
+
+template <class D, int d, class R, int r>
+std::string FunctionInterface<D, d, R, r>::name() const
+{
+  return "dune.stuff.function";
+}
+
+template <class D, int d, class R, int r>
+int FunctionInterface<D, d, R, r>::order() const
+{
+  return -1;
+}
+
+template <class D, int d, class R, int r>
+typename FunctionInterface<D, d, R, r>::RangeType FunctionInterface<D, d, R, r>::evaluate(const DomainType& x) const
+{
+  RangeType ret;
+  evaluate(x, ret);
+  return ret;
+}
+
+template <class D, int d, class R, int r>
+void FunctionInterface<D, d, R, r>::jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
+{
+  DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
+}
+
+template <class D, int d, class R, int r>
+typename FunctionInterface<D, d, R, r>::JacobianRangeType
+FunctionInterface<D, d, R, r>::jacobian(const DomainType& x) const
+{
+  JacobianRangeType ret;
+  jacobian(x, ret);
+  return ret;
+}
+
+
 } // namespace Stuff
 } // namespace Dune
 
 #include "default.hh"
+
+#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(etype, ddim)                                                        \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalfunctionSetInterface, etype, ddim)                     \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalfunctionInterface, etype, ddim)                        \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalizableFunctionInterface, etype, ddim)
+
+#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(cname, etype, ddim)                                                \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, 1)                                               \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, 2)                                               \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, 3)
+
+#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, rdim)                                      \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 1)                                     \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 2)                                     \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 3)
+
+#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, rcdim)                           \
+  DUNE_STUFF_FUNCTION_INTERFACE_LIST_RANGEFIELDTYPES(cname, etype, double, ddim, rdim, rcdim)
+
+#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_RANGEFIELDTYPES(cname, etype, dftype, ddim, rdim, rcdim)                    \
+  DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION(cname, etype, dftype, ddim, double, rdim, rcdim)                        \
+  DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION(cname, etype, dftype, ddim, long double, rdim, rcdim)
+
+#define DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION(cname, etype, dftype, ddim, rftype, rdim, rcdim)                  \
+  extern template class cname<etype, dftype, ddim, rftype, rdim, rcdim>;
+
+#include <dune/stuff/grid/fakeentity.hh>
+
+typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFake1dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFake2dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<3> DuneStuffFake3dEntityType;
+
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFake1dEntityType, 1)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFake2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFake3dEntityType, 3)
+
+#ifdef HAVE_DUNE_GRID
+
+#include <dune/grid/sgrid.hh>
+
+typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneSGrid1dEntityType;
+typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneSGrid2dEntityType;
+typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneSGrid3dEntityType;
+
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneSGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneSGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneSGrid3dEntityType, 3)
+
+#include <dune/grid/yaspgrid.hh>
+
+typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneYaspGrid1dEntityType;
+typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneYaspGrid2dEntityType;
+typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneYaspGrid3dEntityType;
+
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneYaspGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneYaspGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneYaspGrid3dEntityType, 3)
+
+#if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
+#ifdef ALUGRID_CONFORM
+#define DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#else
+#define ALUGRID_CONFORM 1
+#endif
+#ifdef ENABLE_ALUGRID
+#define DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#else
+#define ENABLE_ALUGRID 1
+#endif
+
+#include <dune/grid/alugrid.hh>
+
+typedef typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
+typedef typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
+typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneAluCubeGrid3dEntityType;
+
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneAluSimplexGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneAluSimplexGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneAluCubeGrid3dEntityType, 3)
+
+#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#undef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#else
+#undef ALUGRID_CONFORM
+#endif
+#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#undef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#else
+#undef ENABLE_ALUGRID
+#endif
+
+#endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
+#endif // HAVE_DUNE_GRID
+
+#undef DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION
+#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_RANGEFIELDTYPES
+#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES
+#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE
+#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES
+
+extern template class Dune::Stuff::FunctionInterface<double, 1, double, 1>;
+extern template class Dune::Stuff::FunctionInterface<double, 1, double, 2>;
+extern template class Dune::Stuff::FunctionInterface<double, 1, double, 3>;
+
+extern template class Dune::Stuff::FunctionInterface<double, 2, double, 1>;
+extern template class Dune::Stuff::FunctionInterface<double, 2, double, 2>;
+extern template class Dune::Stuff::FunctionInterface<double, 2, double, 3>;
+
+extern template class Dune::Stuff::FunctionInterface<double, 3, double, 1>;
+extern template class Dune::Stuff::FunctionInterface<double, 3, double, 2>;
+extern template class Dune::Stuff::FunctionInterface<double, 3, double, 3>;
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
