@@ -497,35 +497,35 @@ FunctionInterface<D, d, R, r>::jacobian(const DomainType& x) const
 
 #include <dune/stuff/grid/fakeentity.hh>
 
-typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFake1dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFake2dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<3> DuneStuffFake3dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFunctionInterfaceFake1dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFunctionInterfaceFake2dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<3> DuneStuffFunctionInterfaceFake3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFake1dEntityType, 1)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFake2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFake3dEntityType, 3)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceFake1dEntityType, 1)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceFake2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceFake3dEntityType, 3)
 
 #ifdef HAVE_DUNE_GRID
 
 #include <dune/grid/sgrid.hh>
 
-typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneSGrid1dEntityType;
-typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneSGrid2dEntityType;
-typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneSGrid3dEntityType;
+typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneStuffFunctionInterfaceSGrid1dEntityType;
+typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneStuffFunctionInterfaceSGrid2dEntityType;
+typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionInterfaceSGrid3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneSGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneSGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneSGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceSGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceSGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceSGrid3dEntityType, 3)
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneYaspGrid1dEntityType;
-typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneYaspGrid2dEntityType;
-typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneYaspGrid3dEntityType;
+typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneStuffFunctionInterfaceYaspGrid1dEntityType;
+typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneStuffFunctionInterfaceYaspGrid2dEntityType;
+typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneStuffFunctionInterfaceYaspGrid3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneYaspGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneYaspGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneYaspGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceYaspGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceYaspGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceYaspGrid3dEntityType, 3)
 
 #if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 #ifdef ALUGRID_CONFORM
@@ -541,13 +541,15 @@ DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneYaspGrid3dEntityType, 3)
 
 #include <dune/grid/alugrid.hh>
 
-typedef typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
-typedef typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
-typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneAluCubeGrid3dEntityType;
+typedef
+    typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneStuffFunctionInterfaceAluSimplexGrid2dEntityType;
+typedef
+    typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionInterfaceAluSimplexGrid3dEntityType;
+typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionInterfaceAluCubeGrid3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneAluSimplexGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneAluSimplexGrid3dEntityType, 3)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneAluCubeGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceAluSimplexGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceAluSimplexGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceAluCubeGrid3dEntityType, 3)
 
 #ifdef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
 #undef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
