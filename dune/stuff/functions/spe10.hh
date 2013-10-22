@@ -57,11 +57,11 @@ public:
   static std::string static_id();
 
 private:
-  static const size_t numXelements         = 100;
-  static const size_t numYelements         = 1;
-  static const size_t numZelements         = 20;
-  static constexpr RangeFieldType minValue = 0.001;
-  static constexpr RangeFieldType maxValue = 998.915;
+  static const size_t numXelements;
+  static const size_t numYelements;
+  static const size_t numZelements;
+  static const RangeFieldType minValue;
+  static const RangeFieldType maxValue;
 
   static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
                                                       const RangeFieldType& max);
