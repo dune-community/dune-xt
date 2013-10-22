@@ -10,6 +10,7 @@
 #endif
 
 #include <dune/stuff/functions/interfaces.hh>
+#include <dune/stuff/common/memory.hh>
 
 namespace Dune {
 namespace Stuff {
