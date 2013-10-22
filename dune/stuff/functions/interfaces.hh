@@ -16,7 +16,7 @@
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
-#include <dune/geometry/genericreferenceelements.hh>
+#include <dune/geometry/referenceelements.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
@@ -335,7 +335,7 @@ LocalfunctionSetInterface<E, D, d, R, r, rC>::jacobian(const DomainType& xx) con
 template <class E, class D, int d, class R, int r, int rC>
 bool LocalfunctionSetInterface<E, D, d, R, r, rC>::is_a_valid_point(const DomainType& xx) const
 {
-  const auto& reference_element = GenericReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
+  const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
   return reference_element.checkInside(xx);
 }
 
