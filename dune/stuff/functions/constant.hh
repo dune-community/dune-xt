@@ -84,113 +84,75 @@ public:
   static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
 
-  static std::string static_id();
+  static std::string static_id()
+  {
+    return BaseType::static_id() + ".constant";
+  }
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "");
+  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  {
+    Dune::ParameterTree description;
+    description["value"] = "1.0";
+    if (subName.empty())
+      return description;
+    else {
+      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      extendedDescription.add(description, subName);
+      return extendedDescription;
+    }
+  } // ... defaultSettings(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings());
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
+  {
+    return new ThisType(settings.get<RangeFieldType>("value", RangeFieldType(0)));
+  } // ... create(...)
 
-  Constant(const RangeFieldType& val, const std::string nm = static_id());
+  Constant(const RangeFieldType& val, const std::string nm = static_id())
+    : value_(std::make_shared<RangeType>(val))
+    , name_(nm)
+  {
+  }
 
-  Constant(const RangeType& val, const std::string nm = static_id());
+  Constant(const RangeType& val, const std::string nm = static_id())
+    : value_(std::make_shared<RangeType>(val))
+    , name_(nm)
+  {
+  }
 
-  Constant(const ThisType& other);
+  Constant(const ThisType& other)
+    : value_(other.value_)
+    , name_(other.name_)
+  {
+  }
 
-  ThisType& operator=(const ThisType& other);
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      value_ = other.value_;
+      name_  = other.name_;
+    }
+    return *this;
+  }
 
-  virtual ThisType* copy() const DS_OVERRIDE;
+  virtual ThisType* copy() const DS_OVERRIDE
+  {
+    return new ThisType(*this);
+  }
 
-  virtual std::string name() const DS_OVERRIDE;
+  virtual std::string name() const DS_OVERRIDE
+  {
+    return name_;
+  }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE;
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
+  {
+    return std::unique_ptr<Localfunction>(new Localfunction(entity, value_));
+  }
 
 private:
   std::shared_ptr<const RangeType> value_;
   std::string name_;
 }; // class Constant
-
-
-// ====================
-// ===== Constant =====
-// ====================
-template <class E, class D, int d, class R, int r, int rC>
-std::string Constant<E, D, d, R, r, rC>::static_id()
-{
-  return BaseType::static_id() + ".constant";
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-Dune::ParameterTree Constant<E, D, d, R, r, rC>::defaultSettings(const std::string subName)
-{
-  Dune::ParameterTree description;
-  description["value"] = "1.0";
-  if (subName.empty())
-    return description;
-  else {
-    Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-    extendedDescription.add(description, subName);
-    return extendedDescription;
-  }
-} // ... defaultSettings(...)
-
-template <class E, class D, int d, class R, int r, int rC>
-typename Constant<E, D, d, R, r, rC>::ThisType*
-Constant<E, D, d, R, r, rC>::create(const DSC::ExtendedParameterTree settings)
-{
-  typedef typename Constant<E, D, d, R, r, rC>::ThisType ThisType;
-  typedef typename Constant<E, D, d, R, r, rC>::RangeFieldType RangeFieldType;
-  return new ThisType(settings.get<RangeFieldType>("value", RangeFieldType(0)));
-} // ... create(...)
-
-template <class E, class D, int d, class R, int r, int rC>
-Constant<E, D, d, R, r, rC>::Constant(const RangeFieldType& val, const std::string nm)
-  : value_(std::make_shared<RangeType>(val))
-  , name_(nm)
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-Constant<E, D, d, R, r, rC>::Constant(const RangeType& val, const std::string nm)
-  : value_(std::make_shared<RangeType>(val))
-  , name_(nm)
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-Constant<E, D, d, R, r, rC>::Constant(const ThisType& other)
-  : value_(other.value_)
-  , name_(other.name_)
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-typename Constant<E, D, d, R, r, rC>::ThisType& Constant<E, D, d, R, r, rC>::operator=(const ThisType& other)
-{
-  if (this != &other) {
-    value_ = other.value_;
-    name_  = other.name_;
-  }
-  return *this;
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-typename Constant<E, D, d, R, r, rC>::ThisType* Constant<E, D, d, R, r, rC>::copy() const
-{
-  return new ThisType(*this);
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-std::string Constant<E, D, d, R, r, rC>::name() const
-{
-  return name_;
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-std::unique_ptr<typename Constant<E, D, d, R, r, rC>::LocalfunctionType>
-Constant<E, D, d, R, r, rC>::local_function(const EntityType& entity) const
-{
-  return std::unique_ptr<Localfunction>(new Localfunction(entity, value_));
-}
 
 
 } // namespace Function
@@ -251,12 +213,12 @@ DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(DuneStuffFunctionsConstantYaspGrid3d
 
 #if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 #ifdef ALUGRID_CONFORM
-#define DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#define DUNE_STUFF_FUNCTION_CONSTANT_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
 #else
 #define ALUGRID_CONFORM 1
 #endif
 #ifdef ENABLE_ALUGRID
-#define DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#define DUNE_STUFF_FUNCTION_CONSTANT_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
 #else
 #define ENABLE_ALUGRID 1
 #endif
@@ -273,13 +235,13 @@ DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(DuneStuffFunctionsConstantAluSimplex
 DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(DuneStuffFunctionsConstantAluSimplexGrid3dEntityType, 3)
 DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(DuneStuffFunctionsConstantAluCubeGrid3dEntityType, 3)
 
-#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#ifdef DUNE_STUFF_FUNCTION_CONSTANT_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#undef DUNE_STUFF_FUNCTION_CONSTANT_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
 #else
 #undef ALUGRID_CONFORM
 #endif
-#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#ifdef DUNE_STUFF_FUNCTION_CONSTANT_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#undef DUNE_STUFF_FUNCTION_CONSTANT_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
 #else
 #undef ENABLE_ALUGRID
 #endif
