@@ -575,6 +575,7 @@ DUNE_STUFF_FUNCTIONS_GENERATE_DIM_RANGE(3)
 } // namespace Dune
 
 
+#ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
 #define DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(etype, ddim)                                                                \
   DUNE_STUFF_FUNCTIONS_LIST_DIMRANGECOLS(etype, ddim, 1)                                                               \
   DUNE_STUFF_FUNCTIONS_LIST_DIMRANGECOLS(etype, ddim, 2)                                                               \
@@ -652,5 +653,6 @@ DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsAluCubeGrid3dEntityType, 3)
 
 #endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 #endif // HAVE_DUNE_GRID
+#endif // DUNE_STUFF_FUNCTIONS_TO_LIB
 
 #endif // DUNE_STUFF_FUNCTIONS_HH

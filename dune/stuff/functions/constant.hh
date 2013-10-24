@@ -159,6 +159,7 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
+#ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
 #define DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(etype, ddim)                                                       \
   DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGECOLS(etype, ddim, 1)                                                      \
   DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGECOLS(etype, ddim, 2)                                                      \
@@ -254,5 +255,6 @@ DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(DuneStuffFunctionsConstantAluCubeGri
 #undef DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DOMAINFIELDTYPES
 #undef DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGECOLS
 #undef DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE
+#endif // DUNE_STUFF_FUNCTIONS_TO_LIB
 
 #endif // DUNE_STUFF_FUNCTIONS_CONSTANT_HH

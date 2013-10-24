@@ -378,6 +378,7 @@ public:
 
 #include "default.hh"
 
+#ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
 #define DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(etype, ddim)                                                        \
   DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalfunctionSetInterface, etype, ddim)                     \
   DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalfunctionInterface, etype, ddim)                        \
@@ -490,5 +491,6 @@ extern template class Dune::Stuff::FunctionInterface<double, 2, double, 3>;
 extern template class Dune::Stuff::FunctionInterface<double, 3, double, 1>;
 extern template class Dune::Stuff::FunctionInterface<double, 3, double, 2>;
 extern template class Dune::Stuff::FunctionInterface<double, 3, double, 3>;
+#endif // DUNE_STUFF_FUNCTIONS_TO_LIB
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH

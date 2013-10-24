@@ -172,6 +172,7 @@ const typename Spe10Model1<E, D, 2, R, 1, 1>::RangeFieldType Spe10Model1<E, D, 2
 } // namespace Stuff
 } // namespace Dune
 
+#ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
 #define DUNE_STUFF_FUNCTIONS_SPE10_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, rcdim)                                     \
   DUNE_STUFF_FUNCTIONS_SPE10_LIST_RANGEFIELDTYPES(etype, double, ddim, rdim, rcdim)
 
@@ -231,5 +232,6 @@ DUNE_STUFF_FUNCTIONS_SPE10_LIST_DOMAINFIELDTYPES(DuneFunctionsSpe10AluSimplexGri
 #undef DUNE_STUFF_FUNCTIONS_SPE10_LAST_EXPANSION
 #undef DUNE_STUFF_FUNCTIONS_SPE10_LIST_RANGEFIELDTYPES
 #undef DUNE_STUFF_FUNCTIONS_SPE10_LIST_DOMAINFIELDTYPES
+#endif // DUNE_STUFF_FUNCTIONS_TO_LIB
 
 #endif // DUNE_STUFF_FUNCTIONS_SPE10_HH
