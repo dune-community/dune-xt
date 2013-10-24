@@ -84,11 +84,19 @@ public:
   typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::type RangeType;
   typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::type JacobianRangeType;
 
-  LocalfunctionSetInterface(const EntityType& ent);
+  LocalfunctionSetInterface(const EntityType& ent)
+    : entity_(ent)
+  {
+  }
 
-  virtual ~LocalfunctionSetInterface();
+  virtual ~LocalfunctionSetInterface()
+  {
+  }
 
-  virtual const EntityType& entity() const;
+  virtual const EntityType& entity() const
+  {
+    return entity_;
+  }
 
   /**
    * \defgroup haveto ´´These methods have to be implemented.''
@@ -107,13 +115,27 @@ public:
    * \defgroup provided ´´These methods are provided by the interface.''
    * @{
    **/
-  std::vector<RangeType> evaluate(const DomainType& xx) const;
+  std::vector<RangeType> evaluate(const DomainType& xx) const
+  {
+    std::vector<RangeType> ret(size(), RangeType(0));
+    evaluate(xx, ret);
+    return ret;
+  }
 
-  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const;
+  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const
+  {
+    std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
+    jacobian(xx, ret);
+    return ret;
+  }
   /* @} */
 
 protected:
-  bool is_a_valid_point(const DomainType& xx) const;
+  bool is_a_valid_point(const DomainType& xx) const
+  {
+    const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
+    return reference_element.checkInside(xx);
+  }
 
   const EntityType& entity_;
 }; // class LocalfunctionSetInterface
@@ -143,9 +165,14 @@ public:
 
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
-  LocalfunctionInterface(const EntityType& ent);
+  LocalfunctionInterface(const EntityType& ent)
+    : BaseType(ent)
+  {
+  }
 
-  virtual ~LocalfunctionInterface();
+  virtual ~LocalfunctionInterface()
+  {
+  }
 
   /**
    * \defgroup haveto ´´These methods have to be implemented in addition to the ones required from the BaseType.''
@@ -160,20 +187,41 @@ public:
    * \defgroup providedbase ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
    * @{
    **/
-  virtual size_t size() const;
+  virtual size_t size() const DS_FINAL
+  {
+    return 1;
+  }
 
-  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const;
+  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const DS_FINAL
+  {
+    assert(ret.size() >= 1);
+    evaluate(xx, ret[0]);
+  }
 
-  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const;
+  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const DS_FINAL
+  {
+    assert(ret.size() >= 1);
+    jacobian(xx, ret[0]);
+  }
   /* @} */
 
   /**
    * \defgroup provided ´´These methods are provided by the interface.''
    * @{
    **/
-  RangeType evaluate(const DomainType& xx) const;
+  RangeType evaluate(const DomainType& xx) const
+  {
+    RangeType ret(0);
+    evaluate(xx, ret);
+    return ret;
+  }
 
-  JacobianRangeType jacobian(const DomainType& xx) const;
+  JacobianRangeType jacobian(const DomainType& xx) const
+  {
+    JacobianRangeType ret(0);
+    jacobian(xx, ret);
+    return ret;
+  }
   /* @} */
 }; // class LocalfunctionInterface
 
@@ -209,9 +257,14 @@ public:
   typedef typename LocalfunctionType::RangeType RangeType;
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
-  virtual ~LocalizableFunctionInterface();
+  virtual ~LocalizableFunctionInterface()
+  {
+  }
 
-  static std::string static_id();
+  static std::string static_id()
+  {
+    return "dune.stuff.function";
+  }
 
   /**
    * \defgroup haveto ´´These methods have to be implemented.''
@@ -224,7 +277,10 @@ public:
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
-  virtual std::string name() const;
+  virtual std::string name() const
+  {
+    return "dune.stuff.function";
+  }
 /* @} */
 
 #if HAVE_DUNE_GRID
@@ -269,15 +325,26 @@ public:
   typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
 #endif
 
-  virtual ~FunctionInterface();
+  virtual ~FunctionInterface()
+  {
+  }
 
-  static std::string static_id();
+  static std::string static_id()
+  {
+    return "dune.stuff.function";
+  }
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
-  virtual std::string name() const;
+  virtual std::string name() const
+  {
+    return "dune.stuff.function";
+  }
 
-  virtual int order() const;
+  virtual int order() const
+  {
+    return -1;
+  }
   /* @} */
 
   /** \defgroup must This method has to be implemented.'' */
@@ -285,184 +352,25 @@ public:
   virtual void evaluate(const DomainType& /*x*/, RangeType& /*ret*/) const = 0;
   /* @} */
 
-  virtual RangeType evaluate(const DomainType& x) const;
+  virtual RangeType evaluate(const DomainType& x) const
+  {
+    RangeType ret;
+    evaluate(x, ret);
+    return ret;
+  }
 
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const;
+  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
+  {
+    DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
+  }
 
-  virtual JacobianRangeType jacobian(const DomainType& x) const;
+  virtual JacobianRangeType jacobian(const DomainType& x) const
+  {
+    JacobianRangeType ret;
+    jacobian(x, ret);
+    return ret;
+  }
 }; // class FunctionInterface
-
-
-// =====================================
-// ===== LocalfunctionSetInterface =====
-// =====================================
-template <class E, class D, int d, class R, int r, int rC>
-LocalfunctionSetInterface<E, D, d, R, r, rC>::LocalfunctionSetInterface(const EntityType& ent)
-  : entity_(ent)
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-LocalfunctionSetInterface<E, D, d, R, r, rC>::~LocalfunctionSetInterface()
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-const typename LocalfunctionSetInterface<E, D, d, R, r, rC>::EntityType&
-LocalfunctionSetInterface<E, D, d, R, r, rC>::entity() const
-{
-  return entity_;
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-std::vector<typename LocalfunctionSetInterface<E, D, d, R, r, rC>::RangeType>
-LocalfunctionSetInterface<E, D, d, R, r, rC>::evaluate(const DomainType& xx) const
-{
-  std::vector<RangeType> ret(size(), RangeType(0));
-  evaluate(xx, ret);
-  return ret;
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-std::vector<typename LocalfunctionSetInterface<E, D, d, R, r, rC>::JacobianRangeType>
-LocalfunctionSetInterface<E, D, d, R, r, rC>::jacobian(const DomainType& xx) const
-{
-  std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
-  jacobian(xx, ret);
-  return ret;
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-bool LocalfunctionSetInterface<E, D, d, R, r, rC>::is_a_valid_point(const DomainType& xx) const
-{
-  const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
-  return reference_element.checkInside(xx);
-}
-
-
-// ==================================
-// ===== LocalfunctionInterface =====
-// ==================================
-template <class E, class D, int d, class R, int r, int rC>
-LocalfunctionInterface<E, D, d, R, r, rC>::LocalfunctionInterface(const EntityType& ent)
-  : BaseType(ent)
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-LocalfunctionInterface<E, D, d, R, r, rC>::~LocalfunctionInterface()
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-size_t LocalfunctionInterface<E, D, d, R, r, rC>::size() const
-{
-  return 1;
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-void LocalfunctionInterface<E, D, d, R, r, rC>::evaluate(const DomainType& xx, std::vector<RangeType>& ret) const
-{
-  assert(ret.size() >= 1);
-  evaluate(xx, ret[0]);
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-void LocalfunctionInterface<E, D, d, R, r, rC>::jacobian(const DomainType& xx,
-                                                         std::vector<JacobianRangeType>& ret) const
-{
-  assert(ret.size() >= 1);
-  jacobian(xx, ret[0]);
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-typename LocalfunctionInterface<E, D, d, R, r, rC>::RangeType
-LocalfunctionInterface<E, D, d, R, r, rC>::evaluate(const DomainType& xx) const
-{
-  RangeType ret(0);
-  evaluate(xx, ret);
-  return ret;
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-typename LocalfunctionInterface<E, D, d, R, r, rC>::JacobianRangeType
-LocalfunctionInterface<E, D, d, R, r, rC>::jacobian(const DomainType& xx) const
-{
-  JacobianRangeType ret(0);
-  jacobian(xx, ret);
-  return ret;
-}
-
-
-// ========================================
-// ===== LocalizableFunctionInterface =====
-// ========================================
-template <class E, class D, int d, class R, int r, int rC>
-LocalizableFunctionInterface<E, D, d, R, r, rC>::~LocalizableFunctionInterface()
-{
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-std::string LocalizableFunctionInterface<E, D, d, R, r, rC>::static_id()
-{
-  return "dune.stuff.function";
-}
-
-template <class E, class D, int d, class R, int r, int rC>
-std::string LocalizableFunctionInterface<E, D, d, R, r, rC>::name() const
-{
-  return "dune.stuff.function";
-}
-
-
-// =============================
-// ===== FunctionInterface =====
-// =============================
-template <class D, int d, class R, int r>
-FunctionInterface<D, d, R, r>::~FunctionInterface()
-{
-}
-
-template <class D, int d, class R, int r>
-std::string FunctionInterface<D, d, R, r>::static_id()
-{
-  return "dune.stuff.function";
-}
-
-template <class D, int d, class R, int r>
-std::string FunctionInterface<D, d, R, r>::name() const
-{
-  return "dune.stuff.function";
-}
-
-template <class D, int d, class R, int r>
-int FunctionInterface<D, d, R, r>::order() const
-{
-  return -1;
-}
-
-template <class D, int d, class R, int r>
-typename FunctionInterface<D, d, R, r>::RangeType FunctionInterface<D, d, R, r>::evaluate(const DomainType& x) const
-{
-  RangeType ret;
-  evaluate(x, ret);
-  return ret;
-}
-
-template <class D, int d, class R, int r>
-void FunctionInterface<D, d, R, r>::jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
-{
-  DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
-}
-
-template <class D, int d, class R, int r>
-typename FunctionInterface<D, d, R, r>::JacobianRangeType
-FunctionInterface<D, d, R, r>::jacobian(const DomainType& x) const
-{
-  JacobianRangeType ret;
-  jacobian(x, ret);
-  return ret;
-}
 
 
 } // namespace Stuff
