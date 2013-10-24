@@ -38,9 +38,9 @@
 
 #include <dune/grid/sgrid.hh>
 
-typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneSGrid1dEntityType;
-typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneSGrid2dEntityType;
-typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneSGrid3dEntityType;
+typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneSGrid1dEntityType;
+typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneSGrid2dEntityType;
+typedef Dune::SGrid<3, 3>::Codim<0>::Entity DuneSGrid3dEntityType;
 
 // the matrix valued version is missing the create() and defaultSettings() method
 typedef testing::
@@ -90,9 +90,9 @@ TYPED_TEST(ExpressionFunctionSGridEntityTest, provides_required_methods)
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneYaspGrid1dEntityType;
-typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneYaspGrid2dEntityType;
-typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneYaspGrid3dEntityType;
+typedef Dune::YaspGrid<1>::Codim<0>::Entity DuneYaspGrid1dEntityType;
+typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneYaspGrid2dEntityType;
+typedef Dune::YaspGrid<3>::Codim<0>::Entity DuneYaspGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Function::Expression<DuneYaspGrid1dEntityType, double, 1, double, 1, 1>
                        //                      , Dune::Stuff::Function::Expression< DuneYaspGrid1dEntityType, double, 1,
@@ -169,9 +169,9 @@ TYPED_TEST(ExpressionFunctionYaspGridEntityTest, provides_required_methods)
 
 #include <dune/grid/alugrid.hh>
 
-typedef typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
-typedef typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
-typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneAluCubeGrid3dEntityType;
+typedef Dune::ALUSimplexGrid<2, 2>::Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
+typedef Dune::ALUSimplexGrid<3, 3>::Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
+typedef Dune::ALUCubeGrid<3, 3>::Codim<0>::Entity DuneAluCubeGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Function::Expression<DuneAluSimplexGrid2dEntityType, double, 2, double, 1, 1>
                        //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid2dEntityType,

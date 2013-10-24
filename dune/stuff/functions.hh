@@ -598,61 +598,28 @@ DUNE_STUFF_FUNCTIONS_GENERATE_DIM_RANGE(3)
 
 #ifdef HAVE_DUNE_GRID
 
-#include <dune/grid/sgrid.hh>
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid3dEntityType, 3)
 
-typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneStuffFunctionsSGrid1dEntityType;
-typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneStuffFunctionsSGrid2dEntityType;
-typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionsSGrid3dEntityType;
-
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsSGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsSGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsSGrid3dEntityType, 3)
-
-#include <dune/grid/yaspgrid.hh>
-
-typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneStuffFunctionsYaspGrid1dEntityType;
-typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneStuffFunctionsYaspGrid2dEntityType;
-typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneStuffFunctionsYaspGrid3dEntityType;
-
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsYaspGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsYaspGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsYaspGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesYaspGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesYaspGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesYaspGrid3dEntityType, 3)
 
 #if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
-#ifdef ALUGRID_CONFORM
-#define DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#else
-#define ALUGRID_CONFORM 1
-#endif
-#ifdef ENABLE_ALUGRID
-#define DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#else
-#define ENABLE_ALUGRID 1
-#endif
 
-#include <dune/grid/alugrid.hh>
-
-typedef typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneStuffFunctionsAluSimplexGrid2dEntityType;
-typedef typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionsAluSimplexGrid3dEntityType;
-typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionsAluCubeGrid3dEntityType;
-
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsAluSimplexGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsAluSimplexGrid3dEntityType, 3)
-DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsAluCubeGrid3dEntityType, 3)
-
-#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#else
-#undef ALUGRID_CONFORM
-#endif
-#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#else
-#undef ENABLE_ALUGRID
-#endif
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType, 3)
 
 #endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 #endif // HAVE_DUNE_GRID
-#endif // DUNE_STUFF_FUNCTIONS_TO_LIB
 
+#undef DUNE_STUFF_FUNCTIONS_LAST_EXPANSION
+#undef DUNE_STUFF_FUNCTIONS_LIST_RANGEFIELDTYPES
+#undef DUNE_STUFF_FUNCTIONS_LIST_DOMAINFIELDTYPES
+#undef DUNE_STUFF_FUNCTIONS_LIST_DIMRANGECOLS
+#undef DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE
+
+#endif // DUNE_STUFF_FUNCTIONS_TO_LIB
 #endif // DUNE_STUFF_FUNCTIONS_HH

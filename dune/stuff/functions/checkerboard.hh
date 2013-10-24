@@ -255,60 +255,20 @@ private:
 
 #ifdef HAVE_DUNE_GRID
 
-#include <dune/grid/sgrid.hh>
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid3dEntityType, 3)
 
-typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneFunctionsCheckerboardSGrid1dEntityType;
-typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneFunctionsCheckerboardSGrid2dEntityType;
-typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneFunctionsCheckerboardSGrid3dEntityType;
-
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardSGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardSGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardSGrid3dEntityType, 3)
-
-#include <dune/grid/yaspgrid.hh>
-
-typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneFunctionsCheckerboardYaspGrid1dEntityType;
-typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneFunctionsCheckerboardYaspGrid2dEntityType;
-typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneFunctionsCheckerboardYaspGrid3dEntityType;
-
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardYaspGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardYaspGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardYaspGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesYaspGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesYaspGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesYaspGrid3dEntityType, 3)
 
 #if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
-#ifdef ALUGRID_CONFORM
-#define DUNE_STUFF_FUNCTION_CHECKERBOARD_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#else
-#define ALUGRID_CONFORM 1
-#endif
-#ifdef ENABLE_ALUGRID
-#define DUNE_STUFF_FUNCTION_CHECKERBOARD_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#else
-#define ENABLE_ALUGRID 1
-#endif
 
-#include <dune/grid/alugrid.hh>
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType, 3)
 
-typedef
-    typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneFunctionsCheckerboardAluSimplexGrid2dEntityType;
-typedef
-    typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneFunctionsCheckerboardAluSimplexGrid3dEntityType;
-typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneFunctionsCheckerboardAluCubeGrid3dEntityType;
-
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardAluSimplexGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardAluSimplexGrid3dEntityType, 3)
-DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneFunctionsCheckerboardAluCubeGrid3dEntityType, 3)
-
-#ifdef DUNE_STUFF_FUNCTION_CHECKERBOARD_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_CHECKERBOARD_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#else
-#undef ALUGRID_CONFORM
-#endif
-#ifdef DUNE_STUFF_FUNCTION_CHECKERBOARD_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_CHECKERBOARD_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#else
-#undef ENABLE_ALUGRID
-#endif
 #endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 #endif // HAVE_DUNE_GRID
 

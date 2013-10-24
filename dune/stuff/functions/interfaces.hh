@@ -379,94 +379,92 @@ public:
 #include "default.hh"
 
 #ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
-#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(etype, ddim)                                                        \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalfunctionSetInterface, etype, ddim)                     \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalfunctionInterface, etype, ddim)                        \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(Dune::Stuff::LocalizableFunctionInterface, etype, ddim)
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(etype, ddim)                                                      \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE(Dune::Stuff::LocalfunctionSetInterface, etype, ddim)                   \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE(Dune::Stuff::LocalfunctionInterface, etype, ddim)                      \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE(Dune::Stuff::LocalizableFunctionInterface, etype, ddim)
 
-#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE(cname, etype, ddim)                                                \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, 1)                                               \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, 2)                                               \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, 3)
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE(cname, etype, ddim)                                              \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGECOLS(cname, etype, ddim, 1)                                             \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGECOLS(cname, etype, ddim, 2)                                             \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGECOLS(cname, etype, ddim, 3)
 
-#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGECOLS(cname, etype, ddim, rdim)                                      \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 1)                                     \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 2)                                     \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 3)
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGECOLS(cname, etype, ddim, rdim)                                    \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 1)                                   \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 2)                                   \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 3)
 
-#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, rcdim)                           \
-  DUNE_STUFF_FUNCTION_INTERFACE_LIST_RANGEFIELDTYPES(cname, etype, double, ddim, rdim, rcdim)
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, rcdim)                         \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_RANGEFIELDTYPES(cname, etype, double, ddim, rdim, rcdim)
 
-#define DUNE_STUFF_FUNCTION_INTERFACE_LIST_RANGEFIELDTYPES(cname, etype, dftype, ddim, rdim, rcdim)                    \
-  DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION(cname, etype, dftype, ddim, double, rdim, rcdim)                        \
-  DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION(cname, etype, dftype, ddim, long double, rdim, rcdim)
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_RANGEFIELDTYPES(cname, etype, dftype, ddim, rdim, rcdim)                  \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LAST_EXPANSION(cname, etype, dftype, ddim, double, rdim, rcdim)                      \
+  DUNE_STUFF_FUNCTIONS_INTERFACES_LAST_EXPANSION(cname, etype, dftype, ddim, long double, rdim, rcdim)
 
-#define DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION(cname, etype, dftype, ddim, rftype, rdim, rcdim)                  \
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_LAST_EXPANSION(cname, etype, dftype, ddim, rftype, rdim, rcdim)                \
   extern template class cname<etype, dftype, ddim, rftype, rdim, rcdim>;
 
 #include <dune/stuff/grid/fakeentity.hh>
 
-typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFunctionInterfaceFake1dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFunctionInterfaceFake2dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<3> DuneStuffFunctionInterfaceFake3dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFunctionsInterfacesFake1dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFunctionsInterfacesFake2dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity<3> DuneStuffFunctionsInterfacesFake3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceFake1dEntityType, 1)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceFake2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceFake3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake3dEntityType, 3)
 
 #ifdef HAVE_DUNE_GRID
 
 #include <dune/grid/sgrid.hh>
 
-typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneStuffFunctionInterfaceSGrid1dEntityType;
-typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneStuffFunctionInterfaceSGrid2dEntityType;
-typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionInterfaceSGrid3dEntityType;
+typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid1dEntityType;
+typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid2dEntityType;
+typedef Dune::SGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceSGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceSGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceSGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesSGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesSGrid3dEntityType, 3)
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneStuffFunctionInterfaceYaspGrid1dEntityType;
-typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneStuffFunctionInterfaceYaspGrid2dEntityType;
-typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneStuffFunctionInterfaceYaspGrid3dEntityType;
+typedef Dune::YaspGrid<1>::Codim<0>::Entity DuneStuffFunctionsInterfacesYaspGrid1dEntityType;
+typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneStuffFunctionsInterfacesYaspGrid2dEntityType;
+typedef Dune::YaspGrid<3>::Codim<0>::Entity DuneStuffFunctionsInterfacesYaspGrid3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceYaspGrid1dEntityType, 1)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceYaspGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceYaspGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGrid1dEntityType, 1)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGrid3dEntityType, 3)
 
 #if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 #ifdef ALUGRID_CONFORM
-#define DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
 #else
 #define ALUGRID_CONFORM 1
 #endif
 #ifdef ENABLE_ALUGRID
-#define DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#define DUNE_STUFF_FUNCTIONS_INTERFACES_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
 #else
 #define ENABLE_ALUGRID 1
 #endif
 
 #include <dune/grid/alugrid.hh>
 
-typedef
-    typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneStuffFunctionInterfaceAluSimplexGrid2dEntityType;
-typedef
-    typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionInterfaceAluSimplexGrid3dEntityType;
-typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneStuffFunctionInterfaceAluCubeGrid3dEntityType;
+typedef Dune::ALUSimplexGrid<2, 2>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType;
+typedef Dune::ALUSimplexGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType;
+typedef Dune::ALUCubeGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType;
 
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceAluSimplexGrid2dEntityType, 2)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceAluSimplexGrid3dEntityType, 3)
-DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceAluCubeGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType, 3)
+DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType, 3)
 
-#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_INTERFACE_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#ifdef DUNE_STUFF_FUNCTIONS_INTERFACES_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
+#undef DUNE_STUFF_FUNCTIONS_INTERFACES_ALUGRID_CONFORM_WAS_DEFINED_BEFORE
 #else
 #undef ALUGRID_CONFORM
 #endif
-#ifdef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
-#undef DUNE_STUFF_FUNCTION_INTERFACE_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#ifdef DUNE_STUFF_FUNCTIONS_INTERFACES_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
+#undef DUNE_STUFF_FUNCTIONS_INTERFACES_ENABLE_ALUGRID_WAS_DEFINED_BEFORE
 #else
 #undef ENABLE_ALUGRID
 #endif
@@ -474,11 +472,11 @@ DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES(DuneStuffFunctionInterfaceAluCubeGrid
 #endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 #endif // HAVE_DUNE_GRID
 
-#undef DUNE_STUFF_FUNCTION_INTERFACE_LAST_EXPANSION
-#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_RANGEFIELDTYPES
-#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_DOMAINFIELDTYPES
-#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_DIMRANGE
-#undef DUNE_STUFF_FUNCTION_INTERFACE_LIST_CLASSES
+#undef DUNE_STUFF_FUNCTIONS_INTERFACES_LAST_EXPANSION
+#undef DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_RANGEFIELDTYPES
+#undef DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DOMAINFIELDTYPES
+#undef DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE
+#undef DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES
 
 extern template class Dune::Stuff::FunctionInterface<double, 1, double, 1>;
 extern template class Dune::Stuff::FunctionInterface<double, 1, double, 2>;

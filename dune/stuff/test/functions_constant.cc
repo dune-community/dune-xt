@@ -76,13 +76,13 @@ TYPED_TEST(ConstantFunctionFakeEntityTest, provides_required_methods)
   this->check();
 }
 
-#ifdef HAVE_DUNE_GRID
+//#ifdef HAVE_DUNE_GRID
 
 #include <dune/grid/sgrid.hh>
 
-typedef typename Dune::SGrid<1, 1>::template Codim<0>::Entity DuneSGrid1dEntityType;
-typedef typename Dune::SGrid<2, 2>::template Codim<0>::Entity DuneSGrid2dEntityType;
-typedef typename Dune::SGrid<3, 3>::template Codim<0>::Entity DuneSGrid3dEntityType;
+typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneSGrid1dEntityType;
+typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneSGrid2dEntityType;
+typedef Dune::SGrid<3, 3>::Codim<0>::Entity DuneSGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Function::Constant<DuneSGrid1dEntityType, double, 1, double, 1, 1>,
                        Dune::Stuff::Function::Constant<DuneSGrid1dEntityType, double, 1, double, 1, 2>,
@@ -122,9 +122,9 @@ TYPED_TEST(ConstantFunctionSGridEntityTest, provides_required_methods)
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef typename Dune::YaspGrid<1>::template Codim<0>::Entity DuneYaspGrid1dEntityType;
-typedef typename Dune::YaspGrid<2>::template Codim<0>::Entity DuneYaspGrid2dEntityType;
-typedef typename Dune::YaspGrid<3>::template Codim<0>::Entity DuneYaspGrid3dEntityType;
+typedef Dune::YaspGrid<1>::Codim<0>::Entity DuneYaspGrid1dEntityType;
+typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneYaspGrid2dEntityType;
+typedef Dune::YaspGrid<3>::Codim<0>::Entity DuneYaspGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Function::Constant<DuneYaspGrid1dEntityType, double, 1, double, 1, 1>,
                        Dune::Stuff::Function::Constant<DuneYaspGrid1dEntityType, double, 1, double, 1, 2>,
@@ -173,9 +173,9 @@ TYPED_TEST(ConstantFunctionYaspGridEntityTest, provides_required_methods)
 #define HAVE_ALUGRID 1
 #include <dune/grid/alugrid.hh>
 
-typedef typename Dune::ALUSimplexGrid<2, 2>::template Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
-typedef typename Dune::ALUSimplexGrid<3, 3>::template Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
-typedef typename Dune::ALUCubeGrid<3, 3>::template Codim<0>::Entity DuneAluCubeGrid3dEntityType;
+typedef Dune::ALUSimplexGrid<2, 2>::Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
+typedef Dune::ALUSimplexGrid<3, 3>::Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
+typedef Dune::ALUCubeGrid<3, 3>::Codim<0>::Entity DuneAluCubeGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Function::Constant<DuneAluSimplexGrid2dEntityType, double, 2, double, 1, 1>,
                        Dune::Stuff::Function::Constant<DuneAluSimplexGrid2dEntityType, double, 2, double, 1, 2>,
@@ -218,7 +218,7 @@ TYPED_TEST(ConstantFunctionAluGridEntityTest, provides_required_methods)
 }
 
 #endif // HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
-#endif // HAVE_DUNE_GRID
+//#endif // HAVE_DUNE_GRID
 
 
 int main(int argc, char** argv)
