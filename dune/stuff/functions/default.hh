@@ -30,9 +30,10 @@ public:
 
   typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, double, dimRange> FunctionType;
 
-  VisualizationAdapter(const FunctionType& function)
+  VisualizationAdapter(const FunctionType& function, const std::string nm = "")
     : function_(function)
     , tmp_value_(0)
+    , name_(nm)
   {
   }
 
@@ -43,7 +44,10 @@ public:
 
   virtual std::string name() const DS_OVERRIDE
   {
-    return function_.name();
+    if (name_.empty())
+      return function_.name();
+    else
+      return name_;
   }
 
   virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const DS_OVERRIDE
@@ -58,6 +62,7 @@ public:
 private:
   const FunctionType& function_;
   mutable FieldVector<double, dimRange> tmp_value_;
+  const std::string name_;
 }; // class VisualizationAdapter
 #endif // HAVE_DUNE_GRID
 
