@@ -90,7 +90,7 @@ public:
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
   {
-    Dune::array<unsigned int, dim> tmpNumElements;
+    std::array<unsigned int, dim> tmpNumElements;
     std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
     buildGrid(tmpNumElements);
   }
@@ -103,7 +103,7 @@ public:
       DUNE_THROW(Dune::RangeError, "uR has to be at least of size " << dim << " (is " << uR.size() << ")!");
     if (nE.size() < dim)
       DUNE_THROW(Dune::RangeError, "nE has to be at least of size " << dim << " (is " << nE.size() << ")!");
-    Dune::array<unsigned int, dim> num_elements;
+    std::array<unsigned int, dim> num_elements;
     for (size_t ii = 0; ii < dim; ++ii) {
       lowerLeft_[ii]   = lL[ii];
       upperRight_[ii]  = uR[ii];
@@ -126,7 +126,7 @@ public:
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
   {
-    Dune::array<unsigned int, dim> tmpNumElements;
+    std::array<unsigned int, dim> tmpNumElements;
     std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
     buildGrid(tmpNumElements);
   }
@@ -149,7 +149,7 @@ public:
     : lowerLeft_(_lowerLeft)
     , upperRight_(_upperRight)
   {
-    Dune::array<unsigned int, dim> tmpNumElements;
+    std::array<unsigned int, dim> tmpNumElements;
     static_assert(std::is_unsigned<typename ContainerType::value_type>::value
                       && std::is_integral<typename ContainerType::value_type>::value,
                   "only unsigned integral number of elements per dimension allowed");
@@ -237,7 +237,7 @@ public:
     // check and save
     CoordinateType lowerLeft;
     CoordinateType upperRight;
-    Dune::array<unsigned int, dim> numElements;
+    std::array<unsigned int, dim> numElements;
     for (unsigned int d = 0; d < dim; ++d) {
       assert(lowerLefts[d] < upperRights[d]
              && "Given 'upperRight' hast to be elementwise larger than given 'lowerLeft'!");
@@ -250,12 +250,12 @@ public:
   } // ... create(...)
 
   //! access to shared ptr
-  virtual Dune::shared_ptr<GridType> grid()
+  virtual std::shared_ptr<GridType> grid()
   {
     return grid_;
   }
 
-  virtual const Dune::shared_ptr<const GridType> grid() const
+  virtual const std::shared_ptr<const GridType> grid() const
   {
     return grid_;
   }
@@ -271,7 +271,7 @@ public:
   }
 
 private:
-  void buildGrid(const Dune::array<unsigned int, dim>& numElements)
+  void buildGrid(const std::array<unsigned int, dim>& numElements)
   {
     dune_static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
     switch (variant) {
@@ -287,7 +287,7 @@ private:
 
   CoordinateType lowerLeft_;
   CoordinateType upperRight_;
-  Dune::shared_ptr<GridType> grid_;
+  std::shared_ptr<GridType> grid_;
 }; // class GridProviderCube
 
 template <typename GridType>
