@@ -372,11 +372,13 @@ public:
 private:
   void build_gradients(const std::string variable, const std::vector<std::vector<std::string>>& gradient_expressions)
   {
-    assert(gradient_expressions.size() == 0 || gradient_expressions.size() == dimRange);
-    for (const auto& gradient_expression : gradient_expressions) {
-      assert(gradient_expression.size() == dimDomain);
-      gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expression));
-    }
+    assert(gradient_expressions.size() == 0 || gradient_expressions.size() >= dimRange);
+    if (gradient_expressions.size() > 0)
+      for (size_t rr = 0; rr < dimRange; ++rr) {
+        const auto& gradient_expression = gradient_expressions[rr];
+        assert(gradient_expression.size() <= dimDomain);
+        gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expression));
+      }
   } // ... build_gradients(...)
 
   std::shared_ptr<const MathExpressionFunctionType> function_;
