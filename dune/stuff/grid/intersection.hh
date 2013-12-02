@@ -14,6 +14,8 @@
 
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/aliases.hh>
+#include <dune/stuff/common/type_utils.hh>
+#include <dune/stuff/common/print.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -30,41 +32,14 @@ namespace Grid {
               std::ostream, into which the information is printed
   **/
 template <class IntersectionType>
-void printIntersection(const IntersectionType& intersection, std::ostream& stream = std::cout)
+void printIntersection(const IntersectionType& intersection, std::ostream& out = std::cout,
+                       const std::string prefix = "")
 {
+  out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
   const auto& geometry = intersection.geometry();
-  const int numCorners = geometry.corners();
-  std::string prefix = "Dune::Intersection (" + DSC::toString(numCorners) + " corner";
-  if (numCorners != 1) {
-    prefix += "s";
-  }
-  prefix += "): ";
-  const unsigned int missing = 32 - prefix.size();
-  if (missing > 0) {
-    for (unsigned int i = 0; i < missing; ++i) {
-      prefix += " ";
-    }
-  }
-  const std::string whitespace = DSC::whitespaceify(prefix);
-
-  stream << prefix << "[ (";
-  for (int i = 0; i < numCorners; ++i) {
-    const auto corner = geometry.corner(i);
-    for (unsigned int j = 0; j < corner.size(); ++j) {
-      stream << corner[j];
-      if (j < corner.size() - 1) {
-        stream << ", ";
-      }
-    }
-    stream << ")";
-    if (i < geometry.corners() - 1) {
-      stream << "," << std::endl << whitespace << "  (";
-    } else {
-      stream << " ]" << std::endl;
-    }
-  }
-
-} // end function print
+  for (int ii = 0; ii < geometry.corners(); ++ii)
+    Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
+} // ... printIntersection(...)
 
 /** Check whether a spatial point lies on an intersection.
 *
