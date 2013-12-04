@@ -19,7 +19,7 @@
 #include <dune/geometry/referenceelements.hh>
 
 #if HAVE_DUNE_GRID
-#include <dune/grid/io/file/vtk/vtkwriter.hh>
+#include <dune/grid/io/file/vtk.hh>
 #endif
 
 #if HAVE_DUNE_FEM
@@ -284,6 +284,10 @@ public:
 /* @} */
 
 #if HAVE_DUNE_GRID
+  /**
+   * \note  We use the SubsamplingVTKWriter (which is better for higher orders). This means that the grid you see
+   *        in the visualization is a refinement of the real grid!
+   */
   template <class GridViewType>
   void visualize(const GridViewType& grid_view, const std::string filename) const
   {
