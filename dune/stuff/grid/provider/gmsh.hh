@@ -1,7 +1,6 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 #define DUNE_STUFF_GRID_PROVIDER_GMSH_HH
 
-#include <config.h>
 #if HAVE_DUNE_GRID
 #if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
 #if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined UGGRID

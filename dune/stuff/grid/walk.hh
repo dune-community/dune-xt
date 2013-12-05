@@ -1,12 +1,6 @@
 #ifndef DUNE_STUFF_WALK_HH_INCLUDED
 #define DUNE_STUFF_WALK_HH_INCLUDED
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#else
-#include "config.h"
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #include <dune/common/static_assert.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/deprecated.hh>

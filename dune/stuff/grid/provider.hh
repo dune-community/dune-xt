@@ -1,7 +1,6 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_HH
 #define DUNE_STUFF_GRID_PROVIDER_HH
 
-#include <config.h>
 #if HAVE_DUNE_GRID
 
 #include <dune/common/parametertree.hh>
