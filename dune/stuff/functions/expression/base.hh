@@ -1,12 +1,6 @@
 #ifndef DUNE_STUFF_FUNCTION_EXPRESSION_BASE_HH
 #define DUNE_STUFF_FUNCTION_EXPRESSION_BASE_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#else
-#include "config.h"
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #include <sstream>
 #include <vector>
 
