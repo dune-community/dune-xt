@@ -1,12 +1,6 @@
 #ifndef DUNE_STUFF_GRID_INTERSECTION_HH
 #define DUNE_STUFF_GRID_INTERSECTION_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#else
-#include "config.h"
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #include <dune/common/fvector.hh>
 #include <dune/common/static_assert.hh>
 
