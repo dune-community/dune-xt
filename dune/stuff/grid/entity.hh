@@ -12,43 +12,14 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
-template <class EntityType, class StreamType = std::ostream>
-void printEntity(const EntityType& entity, StreamType& stream = std::cout, std::string prefix = "")
+template <class EntityType>
+void printEntity(const EntityType& entity, std::ostream& out = std::cout, const std::string prefix = "")
 {
+  out << prefix << Common::Typename<EntityType>::value() << std::endl;
   const auto& geometry = entity.geometry();
-  const int numCorners = geometry.corners();
-
-  std::string header = "Dune::Entity (" + DSC::toString(numCorners) + " corner";
-  if (numCorners != 1) {
-    header += "s";
-  }
-  header += "): ";
-  const unsigned int missing = 32 - header.size();
-  if (missing > 0) {
-    for (unsigned int i = 0; i < missing; ++i) {
-      header += " ";
-    }
-  }
-  const std::string whitespace = DSC::whitespaceify(header);
-
-  stream << prefix << header << "[ (";
-  for (int i = 0; i < numCorners; ++i) {
-    const auto& corner = geometry.corner(i);
-    for (unsigned int j = 0; j < corner.size(); ++j) {
-      stream << corner[j];
-      if (j < corner.size() - 1) {
-        stream << ", ";
-      }
-    }
-    stream << ")";
-    if (i < geometry.corners() - 1) {
-      stream << "," << std::endl << whitespace << "  (";
-    } else {
-      stream << " ]" << std::endl;
-    }
-  }
-
-} // end function print
+  for (int ii = 0; ii < geometry.corners(); ++ii)
+    Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
+} // ... printEntity(...)
 
 
 #if HAVE_DUNE_GRID
