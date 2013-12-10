@@ -118,6 +118,25 @@ public:
 
 
 /// Needed for the python bindings.
+class ProvidesDataAccessDynamic
+{
+};
+
+template <class Traits>
+class ProvidesDataAccess : CRTPInterface<ProvidesDataAccess<Traits>, Traits>
+{
+public:
+  typedef typename Traits::ScalarType ScalarType;
+
+  inline ScalarType* data()
+  {
+    CHECK_CRTP(this->as_imp(*this).data());
+    return this->as_imp(*this).data();
+  }
+}; // class ProvidesDataAccess
+
+
+/// Needed for the python bindings.
 class VectorInterfaceDynamic
 {
 };
@@ -447,25 +466,6 @@ public:
 
 
 /// Needed for the python bindings.
-class ProvidesDataAccessDynamic
-{
-};
-
-template <class Traits>
-class ProvidesDataAccess : CRTPInterface<ProvidesDataAccess<Traits>, Traits>
-{
-public:
-  typedef typename Traits::ScalarType ScalarType;
-
-  inline ScalarType* data()
-  {
-    CHECK_CRTP(this->as_imp(*this).data());
-    return this->as_imp(*this).data();
-  }
-}; // class ProvidesDataAccess
-
-
-/// Needed for the python bindings.
 class MatrixInterfaceDynamic
 {
 };
@@ -485,30 +485,50 @@ public:
 
   inline size_t rows() const
   {
-    CHECK_CRTP(asImp().rows());
-    return asImp().rows();
+    CHECK_CRTP(this->as_imp(*this).rows());
+    return this->as_imp(*this).rows();
   }
 
   inline size_t cols() const
   {
-    CHECK_CRTP(asImp().cols());
-    return asImp().cols();
+    CHECK_CRTP(this->as_imp(*this).cols());
+    return this->as_imp(*this).cols();
   }
 
   inline void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    CHECK_AND_CALL_CRTP(asImp().add_to_entry(ii, jj, value));
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).add_to_entry(ii, jj, value));
   }
 
   inline void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    CHECK_AND_CALL_CRTP(asImp().set_entry(ii, jj, value));
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).set_entry(ii, jj, value));
   }
 
   inline ScalarType get_entry(const size_t ii, const size_t jj) const
   {
-    CHECK_CRTP(asImp().get_entry(ii, jj));
-    return asImp().get_entry(ii, jj);
+    CHECK_CRTP(this->as_imp(*this).get_entry(ii, jj));
+    return this->as_imp(*this).get_entry(ii, jj);
+  }
+
+  inline void clear_row(const size_t ii)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).clear_row(ii));
+  }
+
+  inline void clear_col(const size_t jj)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).clear_col(jj));
+  }
+
+  inline void unit_row(const size_t ii)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).unit_row(ii));
+  }
+
+  inline void unit_col(const size_t jj)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).unit_col(jj));
   }
 
   /**
