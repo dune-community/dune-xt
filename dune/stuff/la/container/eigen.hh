@@ -26,6 +26,18 @@
 #include "pattern.hh"
 
 namespace Dune {
+namespace Pymor {
+namespace Operators {
+
+// forwards, needed for friendlyness
+template <class ScalarImp>
+class EigenRowMajorSparseInverse;
+
+template <class ScalarImp>
+class EigenRowMajorSparse;
+
+} // namespace Operators
+} // namespace Pymor
 namespace Stuff {
 namespace LA {
 
@@ -334,7 +346,7 @@ public:
     return ThisType(backend_->operator-(*(other.backend_)));
   } // ... sub(...)
 
-  void isub(const ThisType& other) DS_OVERRIDE
+  virtual void isub(const ThisType& other) DS_OVERRIDE
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exception::shapes_do_not_match,
@@ -355,6 +367,9 @@ private:
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
+
+  friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
+  friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
   std::shared_ptr<BackendType> backend_;
 }; // class EigenDenseVector
@@ -647,6 +662,9 @@ private:
       backend_             = new_backend;
     }
   } // ... ensure_uniqueness(...)
+
+  friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
+  friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
   std::shared_ptr<BackendType> backend_;
 }; // class EigenMappedDenseVector
@@ -1168,6 +1186,9 @@ private:
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
+
+  friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
+  friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
   std::shared_ptr<BackendType> backend_;
 }; // class EigenRowMajorSparseMatrix
