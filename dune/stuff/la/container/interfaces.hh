@@ -50,8 +50,6 @@ class ContainerInterfaceDynamic
 template <class Traits>
 class ContainerInterface : public ContainerInterfaceDynamic, protected CRTPInterface<ContainerInterface<Traits>, Traits>
 {
-  typedef ContainerInterface<Traits> ThisType;
-
 public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType ScalarType;
