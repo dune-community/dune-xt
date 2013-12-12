@@ -22,7 +22,7 @@
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/exceptions.hh>
 
-#include "interface.hh"
+#include "interfaces.hh"
 #include "pattern.hh"
 
 namespace Dune {
@@ -87,6 +87,7 @@ class EigenDenseVector : public VectorInterface<EigenDenseVectorTraits<ScalarImp
                          public ProvidesDataAccess<EigenDenseVectorTraits<ScalarImp>>
 {
   typedef EigenDenseVector<ScalarImp> ThisType;
+  typedef VectorInterface<EigenDenseVectorTraits<ScalarImp>> VectorInterfaceType;
 
 public:
   typedef EigenDenseVectorTraits<ScalarImp> Traits;
@@ -95,6 +96,17 @@ public:
 
   EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(ss))
+  {
+    if (FloatCmp::eq(value, ScalarType(0)))
+      backend_->setZero();
+    else {
+      backend_->setOnes();
+      backend_->operator*=(value);
+    }
+  }
+
+  EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
+    : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss)))
   {
     if (FloatCmp::eq(value, ScalarType(0)))
       backend_->setZero();
@@ -838,21 +850,24 @@ public:
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    assert(ii < size());
+    assert(ii < rows());
+    assert(jj < cols());
     ensure_uniqueness();
     backend_->operator()(ii, jj) += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    assert(ii < size());
+    assert(ii < rows());
+    assert(jj < cols());
     ensure_uniqueness();
     backend_->operator()(ii, jj) = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
-    assert(ii < size());
+    assert(ii < rows());
+    assert(jj < cols());
     return backend_->operator()(ii, jj);
   } // ... get_entry(...)
 
