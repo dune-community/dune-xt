@@ -472,6 +472,24 @@ public:
     ret[1] = max.second;
     return ret;
   } // ... pb_amax(...)
+
+  std::vector<ScalarType> components(const std::vector<DUNE_STUFF_SSIZE_T> component_indices) const
+  {
+    if (component_indices.size() > dim())
+      DUNE_THROW_COLORFULLY(
+          Exception::index_out_of_range,
+          "size of component_indices (" << component_indices.size() << ") is larger than the dim of this (" << dim()
+                                        << ")!");
+    std::vector<ScalarType> values(component_indices.size(), ScalarType(0));
+    for (size_t ii = 0; ii < component_indices.size(); ++ii) {
+      const size_t component = assert_is_size_t_compatible_and_convert(component_indices[ii]);
+      if (component >= dim())
+        DUNE_THROW_COLORFULLY(Exception::index_out_of_range,
+                              "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
+      values[ii] = get_entry(component);
+    }
+    return values;
+  } // components(...)
   /**
    * \}
    */
