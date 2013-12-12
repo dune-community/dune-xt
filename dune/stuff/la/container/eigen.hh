@@ -135,7 +135,7 @@ public:
   }
 
   EigenDenseVector(std::shared_ptr<BackendType> backend_ptr)
-    : backend_(std::move(backend_ptr))
+    : backend_(backend_ptr)
   {
   }
 
@@ -466,7 +466,7 @@ public:
   }
 
   EigenMappedDenseVector(std::shared_ptr<BackendType> backend_ptr)
-    : backend_(std::move(backend_ptr))
+    : backend_(backend_ptr)
   {
   }
 
@@ -741,7 +741,7 @@ public:
   }
 
   EigenDenseMatrix(std::shared_ptr<BackendType> backend_ptr)
-    : backend_(std::move(backend_ptr))
+    : backend_(backend_ptr)
   {
   }
 
@@ -1000,7 +1000,7 @@ public:
   }
 
   EigenRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr)
-    : backend_(std::move(backend_ptr))
+    : backend_(backend_ptr)
   {
   }
 
