@@ -586,23 +586,6 @@ public:
    * \}
    */
 
-  /**
-   * \defgroup provided ´´These methods are provided by the interface for convenience!``
-   * \{
-   */
-
-  inline size_t dim_source() const
-  {
-    return cols();
-  }
-
-  inline size_t dim_range() const
-  {
-    return rows();
-  }
-  /**
-   * \}
-   */
 
   /**
    * \defgroup python_bindings ´´These methods are necesarry for the python bindings. They are provided by the
@@ -681,25 +664,6 @@ public:
     return get_entry(size_t(ii), size_t(jj));
   } // ... pb_get_entry(...)
 
-  DUNE_STUFF_SSIZE_T pb_dim_source() const
-  {
-    if (!(dim_source() <= std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()))
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range,
-                            "The source dimension of this does not fit into DUNE_STUFF_SSIZE_T (max "
-                                << std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()
-                                << ")!");
-    return dim_source();
-  }
-
-  DUNE_STUFF_SSIZE_T pb_dim_range() const
-  {
-    if (!(dim_range() <= std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()))
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range,
-                            "The range dimension of this does not fit into DUNE_STUFF_SSIZE_T (max "
-                                << std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()
-                                << ")!");
-    return dim_range();
-  }
   /**
    * \}
    */
