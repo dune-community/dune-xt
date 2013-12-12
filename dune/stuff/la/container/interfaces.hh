@@ -102,18 +102,30 @@ public:
 
 
 template <class Traits>
-class ProvidesContainer : protected CRTPInterface<ProvidesContainer<Traits>, Traits>
+class ProvidesConstContainer : protected CRTPInterface<ProvidesConstContainer<Traits>, Traits>
 {
 public:
   typedef typename Traits::ContainerType ContainerType;
 
-  inline std::shared_ptr<ContainerType> container()
+  inline std::shared_ptr<const ContainerType> container() const
   {
     CHECK_CRTP(this->as_imp(*this).container());
     return this->as_imp(*this).container();
   }
+}; // class ProvidesConstContainer
 
-  inline std::shared_ptr<const ContainerType> container() const
+
+template <class Traits>
+class ProvidesContainer : public ProvidesConstContainer<Traits>
+{
+  typedef ProvidesConstContainer<Traits> BaseType;
+
+public:
+  typedef typename Traits::ContainerType ContainerType;
+
+  using BaseType::container;
+
+  inline std::shared_ptr<ContainerType> container()
   {
     CHECK_CRTP(this->as_imp(*this).container());
     return this->as_imp(*this).container();
