@@ -98,6 +98,18 @@ public:
     CHECK_CRTP(this->as_imp(*this).has_equal_shape(other));
     return this->as_imp(*this).has_equal_shape(other);
   }
+
+protected:
+  static size_t assert_is_size_t_compatible_and_convert(const DUNE_STUFF_SSIZE_T& size)
+  {
+    if (size < 0)
+      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
+    if (size > std::numeric_limits<size_t>::max())
+      DUNE_THROW_COLORFULLY(
+          Exception::index_out_of_range,
+          "Given size (" << size << ") is to large for size_t (max " << std::numeric_limits<size_t>::max() << ")!");
+    return size_t(size);
+  } // ... ssize_t_is_valid(...)
 }; // class ContainerInterface
 
 
@@ -324,6 +336,7 @@ public:
    *  \param  other   The right summand.
    *  \param  result  Vector to write the result of this + other to
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
+   *  \note   If you are looking for the old (now deprecated) add() method, \see add_to_entry().
    */
   virtual void add(const derived_type& other, derived_type& result) const
   {
@@ -344,6 +357,7 @@ public:
    *  \param  other The right summand.
    *  \return The sum of this and other.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
+   *  \note   If you are looking for the old (now deprecated) add() method, \see add_to_entry().
    */
   virtual derived_type add(const derived_type& other) const
   {
@@ -444,7 +458,7 @@ public:
    */
   inline void pb_add_to_entry(const DUNE_STUFF_SSIZE_T ii, const ScalarType& value)
   {
-    add_to_entry(assert_is_size_t_compatible_and_convert(ii), value);
+    add_to_entry(this->assert_is_size_t_compatible_and_convert(ii), value);
   } // ... pb_add_to_entry(...)
 
   /**
@@ -453,7 +467,7 @@ public:
    */
   inline void pb_set_entry(const DUNE_STUFF_SSIZE_T ii, const ScalarType& value)
   {
-    set_entry(assert_is_size_t_compatible_and_convert(ii), value);
+    set_entry(this->assert_is_size_t_compatible_and_convert(ii), value);
   } // ... pb_set_entry(...)
 
   /**
@@ -462,7 +476,7 @@ public:
    */
   inline ScalarType pb_get_entry(const DUNE_STUFF_SSIZE_T ii)
   {
-    return get_entry(assert_is_size_t_compatible_and_convert(ii));
+    return get_entry(this->assert_is_size_t_compatible_and_convert(ii));
   } // ... pb_get_entry(...)
 
   /**
@@ -485,7 +499,7 @@ public:
     return ret;
   } // ... pb_amax(...)
 
-  std::vector<ScalarType> components(const std::vector<DUNE_STUFF_SSIZE_T> component_indices) const
+  std::vector<ScalarType> components(const std::vector<DUNE_STUFF_SSIZE_T>& component_indices) const
   {
     if (component_indices.size() > dim())
       DUNE_THROW_COLORFULLY(
@@ -494,7 +508,7 @@ public:
                                         << ")!");
     std::vector<ScalarType> values(component_indices.size(), ScalarType(0));
     for (size_t ii = 0; ii < component_indices.size(); ++ii) {
-      const size_t component = assert_is_size_t_compatible_and_convert(component_indices[ii]);
+      const size_t component = this->assert_is_size_t_compatible_and_convert(component_indices[ii]);
       if (component >= dim())
         DUNE_THROW_COLORFULLY(Exception::index_out_of_range,
                               "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
@@ -527,18 +541,6 @@ public:
   /**
    * \}
    */
-
-protected:
-  static size_t assert_is_size_t_compatible_and_convert(const DUNE_STUFF_SSIZE_T& size)
-  {
-    if (size < 0)
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
-    if (size > std::numeric_limits<size_t>::max())
-      DUNE_THROW_COLORFULLY(
-          Exception::index_out_of_range,
-          "Given size (" << size << ") is to large for size_t (max " << std::numeric_limits<size_t>::max() << ")!");
-    return size_t(size);
-  } // ... ssize_t_is_valid(...)
 }; // class VectorInterface
 
 
@@ -616,7 +618,6 @@ public:
    * \}
    */
 
-
   /**
    * \defgroup python_bindings ´´These methods are necesarry for the python bindings. They are provided by the
    * interface!``
@@ -630,7 +631,7 @@ public:
                             "The number of rows of this (" << rows() << ") do not fit into DUNE_STUFF_SSIZE_T (max "
                                                            << std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()
                                                            << ")!");
-    return rows();
+    return (DUNE_STUFF_SSIZE_T)(rows());
   } // ... pb_rows(...)
 
   inline DUNE_STUFF_SSIZE_T pb_cols() const
@@ -640,59 +641,46 @@ public:
                             "The number of columns of this (" << cols() << ") do not fit into DUNE_STUFF_SSIZE_T (max "
                                                               << std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()
                                                               << ")!");
-    return cols();
+    return (DUNE_STUFF_SSIZE_T)(cols());
   } // ... pb_cols(...)
 
   inline void pb_add_to_entry(const DUNE_STUFF_SSIZE_T ii, const DUNE_STUFF_SSIZE_T jj, const ScalarType& value)
   {
-    if (!(ii <= std::numeric_limits<size_t>::max()))
-      DUNE_THROW_COLORFULLY(
-          Exception::index_out_of_range,
-          "Given ii (" << ii << ") does not fit into size_t (max " << std::numeric_limits<size_t>::max() << ")!");
-    if (ii < 0)
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given ii (" << ii << ") has to be non-negative!");
-    if (!(jj <= std::numeric_limits<size_t>::max()))
-      DUNE_THROW_COLORFULLY(
-          Exception::index_out_of_range,
-          "Given jj (" << jj << ") does not fit into size_t (max " << std::numeric_limits<size_t>::max() << ")!");
-    if (ii < 0)
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given jj (" << jj << ") has to be non-negative!");
-    add_to_entry(size_t(ii), size_t(jj), value);
+    add_to_entry(
+        this->assert_is_size_t_compatible_and_convert(ii), this->assert_is_size_t_compatible_and_convert(jj), value);
   } // ... pb_add_to_entry(...)
 
   inline void pb_set_entry(const DUNE_STUFF_SSIZE_T ii, const DUNE_STUFF_SSIZE_T jj, const ScalarType& value)
   {
-    if (!(ii <= std::numeric_limits<size_t>::max()))
-      DUNE_THROW_COLORFULLY(
-          Exception::index_out_of_range,
-          "Given ii (" << ii << ") does not fit into size_t (max " << std::numeric_limits<size_t>::max() << ")!");
-    if (ii < 0)
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given ii (" << ii << ") has to be non-negative!");
-    if (!(jj <= std::numeric_limits<size_t>::max()))
-      DUNE_THROW_COLORFULLY(
-          Exception::index_out_of_range,
-          "Given jj (" << jj << ") does not fit into size_t (max " << std::numeric_limits<size_t>::max() << ")!");
-    if (ii < 0)
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given jj (" << jj << ") has to be non-negative!");
-    set_entry(size_t(ii), size_t(jj), value);
+    set_entry(
+        this->assert_is_size_t_compatible_and_convert(ii), this->assert_is_size_t_compatible_and_convert(jj), value);
   } // ... pb_set_entry(...)
 
   inline ScalarType pb_get_entry(const DUNE_STUFF_SSIZE_T ii, const DUNE_STUFF_SSIZE_T jj) const
   {
-    if (!(ii <= std::numeric_limits<size_t>::max()))
-      DUNE_THROW_COLORFULLY(
-          Exception::index_out_of_range,
-          "Given ii (" << ii << ") does not fit into size_t (max " << std::numeric_limits<size_t>::max() << ")!");
-    if (ii < 0)
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given ii (" << ii << ") has to be non-negative!");
-    if (!(jj <= std::numeric_limits<size_t>::max()))
-      DUNE_THROW_COLORFULLY(
-          Exception::index_out_of_range,
-          "Given jj (" << jj << ") does not fit into size_t (max " << std::numeric_limits<size_t>::max() << ")!");
-    if (ii < 0)
-      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given jj (" << jj << ") has to be non-negative!");
-    return get_entry(size_t(ii), size_t(jj));
+    return get_entry(this->assert_is_size_t_compatible_and_convert(ii),
+                     this->assert_is_size_t_compatible_and_convert(jj));
   } // ... pb_get_entry(...)
+
+  inline void pb_clear_row(const size_t ii)
+  {
+    clear_row(this->assert_is_size_t_compatible_and_convert(ii));
+  }
+
+  inline void pb_clear_col(const size_t jj)
+  {
+    clear_col(this->assert_is_size_t_compatible_and_convert(jj));
+  }
+
+  inline void pb_unit_row(const size_t ii)
+  {
+    unit_row(this->assert_is_size_t_compatible_and_convert(ii));
+  }
+
+  inline void pb_unit_col(const size_t jj)
+  {
+    unit_col(this->assert_is_size_t_compatible_and_convert(jj));
+  }
 
   /**
    * \}
