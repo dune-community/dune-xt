@@ -42,6 +42,7 @@ public:
   }
 }; // class ProvidesBackend
 
+
 /// Needed for the python bindings.
 class ContainerInterfaceDynamic
 {
@@ -426,6 +427,33 @@ public:
   } // ... pb_dim(...)
 
   /**
+   * \brief Variant of add_to_entry() needed for the python bindings.
+   * \see   add_to_entry()
+   */
+  inline void pb_add_to_entry(const DUNE_STUFF_SSIZE_T ii, const ScalarType& value)
+  {
+    add_to_entry(assert_is_size_t_compatible_and_convert(ii), value);
+  } // ... pb_add_to_entry(...)
+
+  /**
+   * \brief Variant of set_entry() needed for the python bindings.
+   * \see   set_entry()
+   */
+  inline void pb_set_entry(const DUNE_STUFF_SSIZE_T ii, const ScalarType& value)
+  {
+    set_entry(assert_is_size_t_compatible_and_convert(ii), value);
+  } // ... pb_set_entry(...)
+
+  /**
+   * \brief Variant of get_entry() needed for the python bindings.
+   * \see   get_entry()
+   */
+  inline ScalarType pb_get_entry(const DUNE_STUFF_SSIZE_T ii)
+  {
+    return get_entry(assert_is_size_t_compatible_and_convert(ii));
+  } // ... pb_get_entry(...)
+
+  /**
    * \brief Variant of amax() needed for the python bindings.
    * \see   amax()
    */
@@ -469,6 +497,18 @@ public:
   /**
    * \}
    */
+
+protected:
+  static size_t assert_is_size_t_compatible_and_convert(const DUNE_STUFF_SSIZE_T& size)
+  {
+    if (size < 0)
+      DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
+    if (size > std::numeric_limits<size_t>::max())
+      DUNE_THROW_COLORFULLY(
+          Exception::index_out_of_range,
+          "Given size (" << size << ") is to large for size_t (max " << std::numeric_limits<size_t>::max() << ")!");
+    return size_t(size);
+  } // ... ssize_t_is_valid(...)
 }; // class VectorInterface
 
 
