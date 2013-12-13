@@ -9,6 +9,7 @@
 #include <dune/common/typetraits.hh>
 
 #include "container/interfaces.hh"
+#include "container/dunedynamic.hh"
 #include "container/eigen.hh"
 
 namespace Dune {
@@ -23,6 +24,30 @@ public:
   static ContainerImp create(const size_t /*size*/)
   {
     static_assert(Dune::AlwaysFalse<ContainerImp>::value, "Please specialize this class for this ContainerImp!");
+  }
+};
+
+
+template <class S>
+class Container<DuneDynamicVector<S>>
+{
+public:
+  static DuneDynamicVector<S> create(const size_t size)
+  {
+    return DuneDynamicVector<S>(size, S(1));
+  }
+};
+
+template <class S>
+class Container<DuneDynamicMatrix<S>>
+{
+public:
+  static DuneDynamicMatrix<S> create(const size_t size)
+  {
+    DuneDynamicMatrix<S> matrix(size, size);
+    for (size_t ii = 0; ii < size; ++ii)
+      matrix.unit_row(ii);
+    return matrix;
   }
 };
 
