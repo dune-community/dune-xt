@@ -100,7 +100,8 @@ public:
   }
 
 protected:
-  static size_t assert_is_size_t_compatible_and_convert(const DUNE_STUFF_SSIZE_T& size)
+  template <class SignedSizeType>
+  static size_t assert_is_size_t_compatible_and_convert(const SignedSizeType& size)
   {
     if (size < 0)
       DUNE_THROW_COLORFULLY(Exception::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
