@@ -6,6 +6,8 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_ISTL_HH
 #define DUNE_STUFF_LA_CONTAINER_ISTL_HH
 
+#include <dune/common/static_assert.hh>
+
 #if HAVE_DUNE_ISTL
 
 #include <dune/common/fvector.hh>
@@ -590,6 +592,30 @@ private:
 
   std::shared_ptr<BackendType> backend_;
 }; // class IstlRowMajorSparseMatrix
+
+
+} // namespace LA
+} // namespace Stuff
+} // namespace Dune
+
+#else // HAVE_DUNE_ISTL
+
+namespace Dune {
+namespace Stuff {
+namespace LA {
+
+
+template <class ScalarImp>
+class IstlDenseVector
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing dune-istl!");
+};
+
+template <class ScalarImp>
+class IstlRowMajorSparseMatrix
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing dune-istl!");
+};
 
 
 } // namespace LA
