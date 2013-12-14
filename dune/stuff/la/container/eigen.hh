@@ -1168,10 +1168,7 @@ public:
     if (ii >= rows())
       DUNE_THROW_COLORFULLY(Exception::index_out_of_range,
                             "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    for (typename BackendType::InnerIterator row_it(*backend_, ii); row_it; ++row_it) {
-      const size_t jj = row_it.col();
-      backend_->coeffRef(ii, jj) = ScalarType(0);
-    }
+    backend_->row(ii) *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
@@ -1196,13 +1193,11 @@ public:
     if (ii >= rows())
       DUNE_THROW_COLORFULLY(Exception::index_out_of_range,
                             "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    for (typename BackendType::InnerIterator row_it(*backend_, ii); row_it; ++row_it) {
-      const size_t jj = row_it.col();
-      if (ii == jj)
-        backend_->coeffRef(ii, jj) = ScalarType(1);
-      else
-        backend_->coeffRef(ii, jj) = ScalarType(0);
-    }
+    if (!these_are_valid_indices(ii, ii))
+      DUNE_THROW_COLORFULLY(Exception::index_out_of_range,
+                            "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
+    backend_->row(ii) *= ScalarType(0);
+    set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
@@ -1235,7 +1230,7 @@ private:
       return false;
     if (jj >= cols())
       return false;
-    for (size_t row = 0; row < backend_->outerSize(); ++row) {
+    for (size_t row = ii; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
