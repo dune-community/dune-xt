@@ -11,6 +11,7 @@
 #include "container/interfaces.hh"
 #include "container/dunedynamic.hh"
 #include "container/eigen.hh"
+#include "container/istl.hh"
 
 namespace Dune {
 namespace Stuff {
@@ -52,6 +53,35 @@ public:
 };
 
 
+#if HAVE_DUNE_ISTL
+template <class S>
+class Container<IstlDenseVector<S>>
+{
+public:
+  static IstlDenseVector<S> create(const size_t size)
+  {
+    return IstlDenseVector<S>(size, S(1));
+  }
+};
+
+template <class S>
+class Container<IstlRowMajorSparseMatrix<S>>
+{
+public:
+  static IstlRowMajorSparseMatrix<S> create(const size_t size)
+  {
+    Dune::Stuff::LA::SparsityPatternDefault pattern(size);
+    for (size_t ii = 0; ii < size; ++ii)
+      pattern.inner(ii).insert(ii);
+    Dune::Stuff::LA::IstlRowMajorSparseMatrix<S> matrix(size, size, pattern);
+    for (size_t ii = 0; ii < size; ++ii)
+      matrix.unit_row(ii);
+    return matrix;
+  }
+};
+#endif // HAVE_DUNE_ISTL
+
+
 #if HAVE_EIGEN
 template <class S>
 class Container<EigenDenseVector<S>>
@@ -74,6 +104,19 @@ public:
 };
 
 template <class S>
+class Container<EigenDenseMatrix<S>>
+{
+public:
+  static EigenDenseMatrix<S> create(const size_t size)
+  {
+    Dune::Stuff::LA::EigenDenseMatrix<S> matrix(size, size);
+    for (size_t ii = 0; ii < size; ++ii)
+      matrix.unit_row(ii);
+    return matrix;
+  }
+};
+
+template <class S>
 class Container<EigenRowMajorSparseMatrix<S>>
 {
 public:
@@ -83,19 +126,6 @@ public:
     for (size_t ii = 0; ii < size; ++ii)
       pattern.inner(ii).insert(ii);
     Dune::Stuff::LA::EigenRowMajorSparseMatrix<S> matrix(size, size, pattern);
-    for (size_t ii = 0; ii < size; ++ii)
-      matrix.unit_row(ii);
-    return matrix;
-  }
-};
-
-template <class S>
-class Container<EigenDenseMatrix<S>>
-{
-public:
-  static EigenDenseMatrix<S> create(const size_t size)
-  {
-    Dune::Stuff::LA::EigenDenseMatrix<S> matrix(size, size);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
     return matrix;
