@@ -109,7 +109,7 @@ public:
   {
   }
 
-  /// This constructor is needed because marking the above one as explicit had not effect.
+  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
     : EigenDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
   {
@@ -448,7 +448,7 @@ public:
   {
   }
 
-  /// This constructor is needed because marking the above one as explicit had not effect.
+  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
     : EigenMappedDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
   {
@@ -747,7 +747,7 @@ public:
   {
   }
 
-  /// This constructor is needed because marking the above one as explicit had not effect.
+  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
     : EigenDenseMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
                        MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value)
@@ -1026,12 +1026,11 @@ public:
   {
   }
 
-  /// This constructor is needed because marking the above one as explicit had not effect.
+  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
     : EigenRowMajorSparseMatrix(rr, cc)
   {
   }
-
 
   EigenRowMajorSparseMatrix(const ThisType& other)
     : backend_(other.backend_)
