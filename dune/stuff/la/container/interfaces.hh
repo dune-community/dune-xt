@@ -579,6 +579,12 @@ public:
     return this->as_imp(*this).cols();
   }
 
+  template <class SourceType, class RangeType>
+  inline void mv(const SourceType& xx, RangeType& yy) const
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).mv(xx, yy));
+  }
+
   inline void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     CHECK_AND_CALL_CRTP(this->as_imp(*this).add_to_entry(ii, jj, value));

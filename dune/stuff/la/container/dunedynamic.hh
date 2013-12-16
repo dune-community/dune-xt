@@ -14,6 +14,7 @@
 #include <dune/common/dynmatrix.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/float_cmp.hh>
+#include <dune/common/typetraits.hh>
 
 #include "interfaces.hh"
 
@@ -313,6 +314,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+  friend class DuneDynamicMatrix<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;
 
@@ -475,6 +477,17 @@ public:
   inline size_t cols() const
   {
     return backend_->cols();
+  }
+
+  template <class SourceType, class RangeType>
+  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
+  {
+    static_assert(Dune::AlwaysFalse<SourceType>::value, "Not available for this combination of xx and yy!");
+  }
+
+  inline void mv(const DuneDynamicVector<ScalarType>& xx, DuneDynamicVector<ScalarType>& yy) const
+  {
+    backend_->mv(*(xx.backend_), *(yy.backend_));
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)

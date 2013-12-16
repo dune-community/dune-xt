@@ -14,6 +14,8 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
+#include <dune/common/typetraits.hh>
+
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -379,6 +381,8 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+  friend class EigenDenseMatrix<ScalarType>;
+  friend class EigenRowMajorSparseMatrix<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
@@ -690,6 +694,8 @@ private:
     }
   } // ... ensure_uniqueness(...)
 
+  friend class EigenDenseMatrix<ScalarType>;
+  friend class EigenRowMajorSparseMatrix<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
@@ -879,6 +885,32 @@ public:
   inline size_t cols() const
   {
     return backend_->cols();
+  }
+
+  template <class SourceType, class RangeType>
+  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
+  {
+    static_assert(Dune::AlwaysFalse<SourceType>::value, "Not available for this combination of xx and yy!");
+  }
+
+  inline void mv(const EigenDenseVector<ScalarType>& xx, EigenDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
+  }
+
+  inline void mv(const EigenDenseVector<ScalarType>& xx, EigenMappedDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
+  }
+
+  inline void mv(const EigenMappedDenseVector<ScalarType>& xx, EigenDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
+  }
+
+  inline void mv(const EigenMappedDenseVector<ScalarType>& xx, EigenMappedDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -1142,6 +1174,32 @@ public:
   inline size_t cols() const
   {
     return backend_->cols();
+  }
+
+  template <class SourceType, class RangeType>
+  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
+  {
+    static_assert(Dune::AlwaysFalse<SourceType>::value, "Not available for this combination of xx and yy!");
+  }
+
+  inline void mv(const EigenDenseVector<ScalarType>& xx, EigenDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
+  }
+
+  inline void mv(const EigenDenseVector<ScalarType>& xx, EigenMappedDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
+  }
+
+  inline void mv(const EigenMappedDenseVector<ScalarType>& xx, EigenDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
+  }
+
+  inline void mv(const EigenMappedDenseVector<ScalarType>& xx, EigenMappedDenseVector<ScalarType>& yy) const
+  {
+    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)

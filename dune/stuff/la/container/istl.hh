@@ -12,6 +12,7 @@
 
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
+#include <dune/common/typetraits.hh>
 
 #include <dune/istl/bvector.hh>
 #include <dune/istl/bcrsmatrix.hh>
@@ -314,6 +315,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+  friend class IstlRowMajorSparseMatrix<ScalarType>;
   friend class BicgstabILUTSolver<IstlRowMajorSparseMatrix<ScalarType>, ThisType>;
   friend class AmgSolver<IstlRowMajorSparseMatrix<ScalarType>, ThisType>;
 
@@ -497,6 +499,17 @@ public:
   inline size_t cols() const
   {
     return backend_->M();
+  }
+
+  template <class SourceType, class RangeType>
+  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
+  {
+    static_assert(Dune::AlwaysFalse<SourceType>::value, "Not available for this combination of xx and yy!");
+  }
+
+  inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
+  {
+    backend_->mv(*(xx.backend_), *(yy.backend_));
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
