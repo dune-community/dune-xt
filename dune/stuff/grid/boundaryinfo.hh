@@ -10,9 +10,9 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <dune/common/exceptions.hh>
-#include <dune/common/shared_ptr.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
@@ -137,7 +137,7 @@ public:
   typedef std::set<IdType> IdSetType;
   typedef std::map<std::string, IdSetType> IdSetMapType;
 
-  GridboundaryIdBased(const Dune::shared_ptr<const IdSetMapType> _boundaryInfoMap)
+  GridboundaryIdBased(const std::shared_ptr<const IdSetMapType> _boundaryInfoMap)
     : boundaryInfoMap_(_boundaryInfoMap)
   {
     setup();
@@ -198,7 +198,7 @@ public:
     return new ThisType(idSetMap);
   }
 
-  const Dune::shared_ptr<const IdSetMapType> boundaryInfoMap()
+  const std::shared_ptr<const IdSetMapType> boundaryInfoMap()
   {
     return boundaryInfoMap_;
   }
@@ -238,7 +238,7 @@ private:
     hasNeumann_   = boundaryInfoMap_->find("neumann") != boundaryInfoMap_->end();
   }
 
-  Dune::shared_ptr<const IdSetMapType> boundaryInfoMap_;
+  std::shared_ptr<const IdSetMapType> boundaryInfoMap_;
   bool hasDirichlet_;
   bool hasNeumann_;
 }; // class GridboundaryIdBased
