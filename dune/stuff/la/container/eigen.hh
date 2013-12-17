@@ -1014,7 +1014,6 @@ class EigenRowMajorSparseMatrix : public MatrixInterface<EigenRowMajorSparseMatr
                                   public ProvidesBackend<EigenRowMajorSparseMatrixTraits<ScalarImp>>
 {
   typedef EigenRowMajorSparseMatrix<ScalarImp> ThisType;
-  typedef MatrixInterface<EigenRowMajorSparseMatrixTraits<ScalarImp>> MatrixInterface;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
