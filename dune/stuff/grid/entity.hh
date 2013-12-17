@@ -6,6 +6,7 @@
 #endif
 
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/common/print.hh>
 #include <dune/stuff/aliases.hh>
 
 namespace Dune {
