@@ -201,6 +201,19 @@ public:
     assert(ii < size());
     return backend_->operator[](ii)[0];
   } // ... get_entry(...)
+
+private:
+  inline ScalarType& get_entry_ref(const size_t ii)
+  {
+    return backend_->operator[](ii)[0];
+  }
+
+  inline const ScalarType& get_entry_ref(const size_t ii) const
+  {
+    return backend_->operator[](ii)[0];
+  }
+
+public:
   /**
    * \}
    */
@@ -315,6 +328,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+  friend class VectorInterface<IstlDenseVectorTraits<ScalarType>>;
   friend class IstlRowMajorSparseMatrix<ScalarType>;
   friend class BicgstabILUTSolver<IstlRowMajorSparseMatrix<ScalarType>, ThisType>;
   friend class AmgSolver<IstlRowMajorSparseMatrix<ScalarType>, ThisType>;

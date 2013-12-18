@@ -212,6 +212,19 @@ public:
     assert(ii < size());
     return backend_->operator[](ii);
   } // ... get_entry(...)
+
+private:
+  inline ScalarType& get_entry_ref(const size_t ii)
+  {
+    return backend_->operator[](ii);
+  }
+
+  inline const ScalarType& get_entry_ref(const size_t ii) const
+  {
+    return backend_->operator[](ii);
+  }
+
+public:
   /**
    * \}
    */
@@ -314,6 +327,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+  friend class VectorInterface<DuneDynamicVectorTraits<ScalarType>>;
   friend class DuneDynamicMatrix<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;

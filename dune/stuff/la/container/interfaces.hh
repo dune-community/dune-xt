@@ -221,6 +221,19 @@ public:
     CHECK_CRTP(this->as_imp(*this).get_entry(ii));
     return this->as_imp(*this).get_entry(ii);
   } // ... get_entry(...)
+
+  inline ScalarType& get_entry_ref(const size_t ii)
+  {
+    CHECK_CRTP(this->as_imp(*this).get_entry_ref(ii));
+    return this->as_imp(*this).get_entry_ref(ii);
+  } // ... get_entry(...)
+
+  inline const ScalarType& get_entry_ref(const size_t ii) const
+  {
+    CHECK_CRTP(this->as_imp(*this).get_entry_ref(ii));
+    return this->as_imp(*this).get_entry_ref(ii);
+  } // ... get_entry(...)
+
   /**
    * \}
    */
@@ -230,6 +243,15 @@ public:
    * implemented more efficiently in a derived class!``
    * \{
    */
+  inline ScalarType& operator[](const size_t ii)
+  {
+    return get_entry_ref(ii);
+  }
+
+  inline const ScalarType& operator[](const size_t ii) const
+  {
+    return get_entry_ref(ii);
+  }
 
   /**
    * \brief   The dimension of the vector.
