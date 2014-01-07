@@ -1381,6 +1381,42 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
+#else // HAVE_EIGEN
+
+namespace Dune {
+namespace Stuff {
+namespace LA {
+
+
+template <class ScalarImp>
+class EigenDenseVector
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+};
+
+template <class ScalarImp>
+class EigenMappedDenseVector
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+};
+
+template <class ScalarImp>
+class EigenDenseMatrix
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+};
+
+template <class ScalarImp>
+class EigenRowMajorSparseMatrix
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+};
+
+
+} // namespace LA
+} // namespace Stuff
+} // namespace Dune
+
 #endif // HAVE_EIGEN
 
 #endif // DUNE_STUFF_LA_CONTAINER_EIGEN_HH
