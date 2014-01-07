@@ -479,7 +479,7 @@ private:
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
 // check
 #ifndef NDEBUG
-    if (!rhs.backend_->isApprox(matrix_.backend_->operator*(*(solution.backend_))))
+    if (!rhs.backend().isApprox(matrix_.backend() * solution.backend()))
       return 4;
 #endif // NDEBUG
     return 0;
