@@ -17,7 +17,6 @@
 #include <dune/istl/bvector.hh>
 #include <dune/istl/bcrsmatrix.hh>
 
-
 #include "interfaces.hh"
 #include "pattern.hh"
 
@@ -520,7 +519,7 @@ public:
 
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
-    backend_->mv(*(xx.backend_), *(yy.backend_));
+    backend_->mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -610,7 +609,6 @@ private:
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
-
 
   std::shared_ptr<BackendType> backend_;
 }; // class IstlRowMajorSparseMatrix
