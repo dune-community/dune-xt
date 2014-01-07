@@ -6,13 +6,12 @@
 #ifndef DUNE_STUFF_LA_SOLVER_EIGEN_HH
 #define DUNE_STUFF_LA_SOLVER_EIGEN_HH
 
-#if HAVE_EIGEN
-
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <sstream>
 
+#if HAVE_EIGEN
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 #include <Eigen/IterativeLinearSolvers>
@@ -22,11 +21,12 @@
 #if HAVE_UMFPACK
 #include <Eigen/UmfPackSupport>
 #endif
-//#include <Eigen/SPQRSupport>
-//#include <Eigen/CholmodSupport>
+//# include <Eigen/SPQRSupport>
+//# include <Eigen/CholmodSupport>
 #if HAVE_SUPERLU
 #include <Eigen/SuperLUSupport>
 #endif
+#endif // HAVE_EIGEN
 
 #if HAVE_FASP
 extern "C" {
@@ -44,6 +44,8 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
+
+#if HAVE_EIGEN
 
 template <class S>
 class Solver<EigenDenseMatrix<S>> : protected SolverUtils
@@ -495,10 +497,26 @@ private:
 }; // class Solver
 
 
+#else // HAVE_EIGEN
+
+
+template <class S>
+class Solver<EigenDenseMatrix<S>>
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+};
+
+template <class S>
+class Solver<EigenRowMajorSparseMatrix<S>>
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+};
+
+
+#endif // HAVE_EIGEN
+
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
-
-#endif // HAVE_EIGEN
 
 #endif // DUNE_STUFF_LA_SOLVER_EIGEN_HH

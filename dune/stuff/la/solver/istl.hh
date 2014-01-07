@@ -6,14 +6,14 @@
 #ifndef DUNE_STUFF_LA_SOLVER_STUFF_HH
 #define DUNE_STUFF_LA_SOLVER_STUFF_HH
 
-//#if HAVE_DUNE_ISTL
-
 #include <type_traits>
 
+#if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
 #include <dune/istl/paamg/amg.hh>
+#endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
@@ -24,6 +24,8 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
+
+#if HAVE_DUNE_ISTL
 
 
 template <class S>
@@ -166,10 +168,18 @@ private:
 }; // class Solver
 
 
+#else // HAVE_DUNE_ISTL
+
+template <class S>
+class Solver<IstlRowMajorSparseMatrix<S>>
+{
+  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing dune-istl!");
+};
+
+#endif // HAVE_DUNE_ISTL
+
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
-
-//#endif // HAVE_DUNE_ISTL
 
 #endif // DUNE_STUFF_LA_SOLVER_STUFF_HH
