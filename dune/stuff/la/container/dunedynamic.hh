@@ -17,6 +17,7 @@
 #include <dune/common/typetraits.hh>
 
 #include "interfaces.hh"
+#include "pattern.hh"
 
 namespace Dune {
 namespace Pymor {
@@ -42,6 +43,9 @@ class DuneDynamicVector;
 
 template <class ScalarImp>
 class DuneDynamicMatrix;
+
+template <class MatrixImp>
+class Solver;
 
 
 /// Traits for DuneDynamicVector
@@ -329,6 +333,7 @@ private:
 
   friend class VectorInterface<DuneDynamicVectorTraits<ScalarType>>;
   friend class DuneDynamicMatrix<ScalarType>;
+  friend class Solver<DuneDynamicMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;
 
@@ -380,6 +385,12 @@ public:
   DuneDynamicMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
     : DuneDynamicMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
                         MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value)
+  {
+  }
+
+  /// This constructors ignores the given pattern and initializes the matrix with 0.
+  DuneDynamicMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
+    : DuneDynamicMatrix(rr, cc)
   {
   }
 
@@ -576,6 +587,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+  friend class Solver<DuneDynamicMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;
 
