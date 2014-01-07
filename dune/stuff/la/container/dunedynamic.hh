@@ -508,7 +508,7 @@ public:
 
   inline void mv(const DuneDynamicVector<ScalarType>& xx, DuneDynamicVector<ScalarType>& yy) const
   {
-    backend_->mv(*(xx.backend_), *(yy.backend_));
+    backend_->mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
