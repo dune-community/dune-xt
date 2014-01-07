@@ -173,7 +173,7 @@ private:
 template <class S>
 class Solver<IstlRowMajorSparseMatrix<S>>
 {
-  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing dune-istl!");
+  static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
 };
 
 #endif // HAVE_DUNE_ISTL

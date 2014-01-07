@@ -503,13 +503,13 @@ private:
 template <class S>
 class Solver<EigenDenseMatrix<S>>
 {
-  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+  static_assert(Dune::AlwaysFalse<S>::value, "You are missing Eigen!");
 };
 
 template <class S>
 class Solver<EigenRowMajorSparseMatrix<S>>
 {
-  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
+  static_assert(Dune::AlwaysFalse<S>::value, "You are missing Eigen!");
 };
 
 
