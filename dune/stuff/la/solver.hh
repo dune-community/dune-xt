@@ -122,5 +122,6 @@ public:
 
 #include "solver/dunedynamic.hh"
 #include "solver/eigen.hh"
+#include "solver/istl.hh"
 
 #endif // DUNE_STUFF_LA_SOLVER_HH
