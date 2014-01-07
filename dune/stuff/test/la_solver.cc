@@ -1,111 +1,105 @@
-#include "test_common.hh"
+// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff/
+// Copyright Holders: Felix Albrecht, Rene Milk
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include <dune/stuff/la/container/eigen.hh>
+// This one has to come first (includes the config.h)!
+#include <dune/stuff/test/test_common.hh>
+
+#include <tuple>
+
+#include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/logging.hh>
+#include <dune/stuff/la/container.hh>
 #include <dune/stuff/la/solver.hh>
 
-#include <dune/stuff/common/tuple.hh>
+// toggle output
+std::ostream& out = std::cout;
+// std::ostream& out = DSC_LOG.devnull();
 
-using namespace Dune;
 using namespace Dune::Stuff;
+using namespace Dune::Stuff::LA;
 
-static const size_t dimension = 5;
-
-
-template <class MatrixType>
-MatrixType* createIdentityMatrix(const MatrixType& /*emptyDummy*/);
-
+typedef testing::Types<std::tuple<DuneDynamicMatrix<double>, DuneDynamicVector<double>, DuneDynamicVector<double>>
 #if HAVE_EIGEN
-template <class ElementType>
-LA::EigenDenseMatrix<ElementType>* createIdentityMatrix(const LA::EigenDenseMatrix<ElementType>& /*emptyDummy*/)
-{
-  typedef LA::EigenDenseMatrix<ElementType> MatrixType;
-  MatrixType* matrix = new MatrixType(dimension, dimension);
-  for (size_t ii = 0; ii < dimension; ++ii)
-    matrix->set(ii, ii, ElementType(1));
-  return matrix;
-}
-
-template <class ElementType>
-LA::EigenRowMajorSparseMatrix<ElementType>*
-createIdentityMatrix(const LA::EigenRowMajorSparseMatrix<ElementType>& /*emptyDummy*/)
-{
-  typedef LA::EigenRowMajorSparseMatrix<ElementType> MatrixType;
-  typename LA::SparsityPatternDefault pattern(dimension);
-  for (size_t ii = 0; ii < dimension; ++ii)
-    pattern.inner(ii).insert(ii);
-  MatrixType* matrix = new MatrixType(dimension, dimension, pattern);
-  for (size_t ii = 0; ii < dimension; ++ii)
-    matrix->set(ii, ii, ElementType(1));
-  return matrix;
-}
+                       ,
+                       std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>,
+                       std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenMappedDenseVector<double>>,
+                       std::tuple<EigenDenseMatrix<double>, EigenMappedDenseVector<double>, EigenDenseVector<double>>,
+                       std::tuple<EigenDenseMatrix<double>, EigenMappedDenseVector<double>,
+                                  EigenMappedDenseVector<double>>,
+                       std::tuple<EigenRowMajorSparseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>
 #endif // HAVE_EIGEN
+                       > MatrixVectorCombinations;
 
-template <class VectorType>
-VectorType* createVector(const VectorType& /*emptyDummy*/);
-
-#if HAVE_EIGEN
-template <class ElementType>
-LA::EigenDenseVector<ElementType>* createVector(const LA::EigenDenseVector<ElementType>& /*emptyDummy*/)
-{
-  typedef LA::EigenDenseVector<ElementType> VectorType;
-  VectorType* vector = new VectorType(dimension);
-  for (size_t ii = 0; ii < dimension; ++ii)
-    vector->set(ii, ElementType(1));
-  return vector;
-}
-#endif // HAVE_EIGEN
-
-
-struct SolverBaseTest
-{
-  template <class MatrixType, class VectorType>
-  static void run()
-  {
-    const MatrixType* A = createIdentityMatrix(MatrixType());
-    const VectorType* f = createVector(VectorType());
-    VectorType x;
-    for (std::string solverType : LA::solverTypes()) {
-      const LA::SolverInterface<MatrixType, VectorType>* solver = LA::createSolver<MatrixType, VectorType>(solverType);
-      const auto solverSettings = LA::solverDefaultSettings<MatrixType, VectorType>(solverType);
-      solver->apply(*A, *f, x, solverSettings);
-      delete solver;
-    }
-    delete A;
-    delete f;
-  }
-};
-
-
-#if HAVE_EIGEN
-template <class TestFunctor>
+template <class MatrixVectorCombination>
 struct SolverTest : public ::testing::Test
 {
-  typedef boost::mpl::vector</*LA::EigenDenseMatrix< double >,*/
-                             LA::EigenRowMajorSparseMatrix<double>> MatrixTypes;
-  typedef boost::mpl::vector<LA::EigenDenseVector<double>> VectorTypes;
-  typedef typename DSC::TupleProduct::Combine<MatrixTypes, VectorTypes, TestFunctor>::template Generate<>
-      base_generator_type;
-  void run()
+  typedef typename std::tuple_element<0, MatrixVectorCombination>::type MatrixType;
+  typedef typename std::tuple_element<1, MatrixVectorCombination>::type RhsType;
+  typedef typename std::tuple_element<2, MatrixVectorCombination>::type SolutionType;
+
+  typedef Solver<MatrixType> SolverType;
+
+  static void produces_correct_results()
   {
-    base_generator_type::Run();
-  }
-}; // struct FunctionTest
-#endif // HAVE_EIGEN
+    const size_t dim        = 10;
+    const MatrixType matrix = Container<MatrixType>::create(dim);
+    const RhsType rhs       = Container<RhsType>::create(dim);
+    SolutionType solution = Container<SolutionType>::create(dim);
+    solution.scal(0);
 
+    // dynamic test
+    const SolverType solver(matrix);
+    solver.apply(rhs, solution);
+    if (!solution.almost_equal(rhs))
+      DUNE_THROW_COLORFULLY(Exception::results_are_not_as_expected, "Wrong solution!");
+    solution.scal(0);
 
-typedef ::testing::Types<SolverBaseTest> SolverTestTypes;
+    // static tests
+    typedef typename SolverType::MatrixType M;
+    std::vector<std::string> opts = SolverType::options();
+    if (opts.size() == 0)
+      DUNE_THROW_COLORFULLY(Exception::results_are_not_as_expected, "Solver has no options!");
+    for (auto opt : opts) {
+      out << "solving with option '" << opt << "' and detailed options" << std::endl;
+      Common::ConfigTree detailed_opts = SolverType::options(opt);
+      detailed_opts.report(out, "  ");
 
-#if HAVE_EIGEN
-TYPED_TEST_CASE(SolverTest, SolverTestTypes);
-TYPED_TEST(SolverTest, All)
+      // dynamic tests
+      solver.apply(rhs, solution, opt);
+      if (!solution.almost_equal(rhs))
+        DUNE_THROW_COLORFULLY(Exception::results_are_not_as_expected, "Wrong solution!");
+      solution.scal(0);
+
+      solver.apply(rhs, solution, detailed_opts);
+      if (!solution.almost_equal(rhs))
+        DUNE_THROW_COLORFULLY(Exception::results_are_not_as_expected, "Wrong solution!");
+      solution.scal(0);
+    }
+  } // ... produces_correct_results(...)
+}; // struct SolverTest
+
+TYPED_TEST_CASE(SolverTest, MatrixVectorCombinations);
+TYPED_TEST(SolverTest, behaves_correctly)
 {
-  this->run();
+  this->produces_correct_results();
 }
-#endif // HAVE_EIGEN
 
 
 int main(int argc, char** argv)
 {
-  test_init(argc, argv);
-  return RUN_ALL_TESTS();
+  try {
+    test_init(argc, argv);
+    return RUN_ALL_TESTS();
+  } catch (Dune::Exception& e) {
+    std::cerr << e.what() << std::endl;
+    std::abort();
+  } catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    std::abort();
+  } catch (...) {
+    std::cerr << "Unknown exception thrown!" << std::endl;
+    std::abort();
+  } // try
 }
