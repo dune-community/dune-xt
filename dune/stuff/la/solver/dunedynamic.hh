@@ -61,7 +61,9 @@ public:
     }
 // check
 #ifndef NDEBUG
-    if (!rhs.almost_equal(matrix_.mv(solution)))
+    DuneDynamicVector<S> tmp = rhs.copy();
+    matrix_.mv(solution, tmp);
+    if (!rhs.almost_equal(tmp))
       return 4;
 #endif // NDEBUG
     return 0;
