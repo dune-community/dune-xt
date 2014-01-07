@@ -108,14 +108,25 @@ public:
 
   /// This constructor is needed for the python bindings.
   EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : EigenDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
+    : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss)))
   {
+    if (FloatCmp::eq(value, ScalarType(0)))
+      backend_->setZero();
+    else {
+      backend_->setOnes();
+      backend_->operator*=(value);
+    }
   }
 
-  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : EigenDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
+    : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss)))
   {
+    if (FloatCmp::eq(value, ScalarType(0)))
+      backend_->setZero();
+    else {
+      backend_->setOnes();
+      backend_->operator*=(value);
+    }
   }
 
   EigenDenseVector(const ThisType& other)
@@ -456,7 +467,7 @@ public:
   typedef typename Traits::ScalarType ScalarType;
 
   /**
-   *  \brief  This is the constructor of interest which wrappes a rar array.
+   *  \brief  This is the constructor of interest which wrappes a raw array.
    */
   EigenMappedDenseVector(ScalarType* data, size_t data_size)
     : backend_(new BackendType(data, data_size))
@@ -479,14 +490,27 @@ public:
 
   /// This constructor is needed for the python bindings.
   EigenMappedDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : EigenMappedDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
+    : backend_(new BackendType(new ScalarType[VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss)],
+                               VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss)))
   {
+    if (FloatCmp::eq(value, ScalarType(0)))
+      backend_->setZero();
+    else {
+      backend_->setOnes();
+      backend_->operator*=(value);
+    }
   }
 
-  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : EigenMappedDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
+    : backend_(new BackendType(new ScalarType[VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss)],
+                               VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss)))
   {
+    if (FloatCmp::eq(value, ScalarType(0)))
+      backend_->setZero();
+    else {
+      backend_->setOnes();
+      backend_->operator*=(value);
+    }
   }
 
 
@@ -809,22 +833,35 @@ public:
 
   /// This constructor is needed for the python bindings.
   EigenDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0, const ScalarType value = ScalarType(0))
-    : EigenDenseMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                       MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value)
+    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
+                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
+    if (FloatCmp::eq(value, ScalarType(0)))
+      backend_->setZero();
+    else {
+      backend_->setOnes();
+      backend_->operator*=(value);
+    }
   }
 
-  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : EigenDenseMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                       MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value)
+    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
+                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
+    if (FloatCmp::eq(value, ScalarType(0)))
+      backend_->setZero();
+    else {
+      backend_->setOnes();
+      backend_->operator*=(value);
+    }
   }
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   EigenDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
-    : EigenDenseMatrix(rr, cc)
+    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
+                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
+    backend_->setZero();
   }
 
   EigenDenseMatrix(const ThisType& other)
@@ -1080,6 +1117,7 @@ class EigenRowMajorSparseMatrix : public MatrixInterface<EigenRowMajorSparseMatr
                                   public ProvidesBackend<EigenRowMajorSparseMatrixTraits<ScalarImp>>
 {
   typedef EigenRowMajorSparseMatrix<ScalarImp> ThisType;
+  typedef MatrixInterface<EigenRowMajorSparseMatrixTraits<ScalarImp>> MatrixInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
@@ -1119,13 +1157,14 @@ public:
 
   /// This constructor is needed for the python bindings.
   EigenRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
-    : EigenRowMajorSparseMatrix(rr, cc)
+    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
+                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
   }
 
-  /// This constructor is needed because marking the above one as explicit had no effect.
   EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : EigenRowMajorSparseMatrix(rr, cc)
+    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
+                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
   }
 
