@@ -53,9 +53,6 @@ class EigenDenseMatrix;
 template <class ScalarType>
 class EigenRowMajorSparseMatrix;
 
-template <class MatrixImp>
-class Solver;
-
 
 class EigenVectorInterfaceDynamic
 {
@@ -416,8 +413,6 @@ private:
   friend class EigenMappedDenseVector<ScalarType>;
   friend class EigenDenseMatrix<ScalarType>;
   friend class EigenRowMajorSparseMatrix<ScalarType>;
-  friend class Solver<EigenDenseMatrix<ScalarType>>;
-  friend class Solver<EigenRowMajorSparseMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
@@ -761,8 +756,6 @@ private:
   friend class EigenDenseVector<ScalarType>;
   friend class EigenDenseMatrix<ScalarType>;
   friend class EigenRowMajorSparseMatrix<ScalarType>;
-  friend class Solver<EigenDenseMatrix<ScalarType>>;
-  friend class Solver<EigenRowMajorSparseMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
@@ -1057,7 +1050,6 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  friend class Solver<EigenDenseMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
@@ -1378,7 +1370,6 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  friend class Solver<EigenRowMajorSparseMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 

@@ -44,9 +44,6 @@ class DuneDynamicVector;
 template <class ScalarImp>
 class DuneDynamicMatrix;
 
-template <class MatrixImp>
-class Solver;
-
 
 /// Traits for DuneDynamicVector
 template <class ScalarImp = double>
@@ -333,7 +330,6 @@ private:
 
   friend class VectorInterface<DuneDynamicVectorTraits<ScalarType>>;
   friend class DuneDynamicMatrix<ScalarType>;
-  friend class Solver<DuneDynamicMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;
 
@@ -587,7 +583,6 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  friend class Solver<DuneDynamicMatrix<ScalarType>>;
   friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
   friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;
 

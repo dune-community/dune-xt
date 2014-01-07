@@ -55,7 +55,7 @@ public:
     this->check_given(type, options());
     // solve
     try {
-      matrix_.backend().solve(solution.backend(), *(rhs.backend_));
+      matrix_.backend().solve(solution.backend(), rhs.backend());
     } catch (FMatrixError&) {
       return 1;
     }
