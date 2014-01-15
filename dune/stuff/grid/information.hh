@@ -80,7 +80,8 @@ struct Dimensions
 {
   //! automatic running min/max
   typedef Dune::Stuff::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
-  typedef Dune::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
+  typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
+  typedef typename GridType::template Codim<0>::Entity EntityType;
   CoordLimitsType coord_limits;
   MinMaxAvgType entity_volume;
 
@@ -122,12 +123,24 @@ struct Dimensions
     GridDimensionsFunctor f(coord_limits, entity_volume);
     GridWalk<View>(view).walkCodim0(f);
   }
+
+  Dimensions(const EntityType& entity)
+  {
+    GridDimensionsFunctor f(coord_limits, entity_volume);
+    f(entity, 0);
+  }
 };
 
 template <class GridType>
 Dimensions<GridType> dimensions(const GridType& grid)
 {
   return Dimensions<GridType>(grid);
+}
+
+template <class GridType>
+Dimensions<GridType> dimensions(const typename GridType::template Codim<0>::Entity& entity)
+{
+  return Dimensions<GridType>(entity);
 }
 
 } // namespace Grid
