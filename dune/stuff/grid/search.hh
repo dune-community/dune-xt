@@ -14,6 +14,7 @@
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/common/memory.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -31,7 +32,7 @@ public:
   typedef typename ViewTraits::template Codim<0>::Entity EntityType;
   typedef typename EntityType::Geometry::LocalCoordinate LocalCoordinateType;
   typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
-  typedef std::vector<typename EntityType::EntityPointer> EntityPointerVectorType;
+  typedef std::vector<std::unique_ptr<typename EntityType::EntityPointer>> EntityPointerVectorType;
 }; // class EntitySearchBase
 
 
@@ -47,16 +48,15 @@ public:
   typedef typename BaseType::EntityPointerVectorType EntityPointerVectorType;
 
 private:
-  inline bool check_add(const typename BaseType::EntityType& entity,
-                        const typename BaseType::GlobalCoordinateType& point, EntityPointerVectorType& ret) const
+  inline typename EntityPointerVectorType::value_type
+  check_add(const typename BaseType::EntityType& entity, const typename BaseType::GlobalCoordinateType& point) const
   {
     const auto& geometry   = entity.geometry();
     const auto& refElement = RefElementType::general(geometry.type());
     if (refElement.checkInside(geometry.local(point))) {
-      ret.emplace_back(entity);
-      return true;
+      return DSC::make_unique<typename BaseType::EntityType::EntityPointer>(entity);
     }
-    return false;
+    return nullptr;
   }
 
 public:
@@ -72,28 +72,33 @@ public:
     const auto max_size = points.size();
 
     const IteratorType begin = gridview_.template begin<0>();
-    const IteratorType end   = gridview_.template end<0>();
-    EntityPointerVectorType ret;
+    const IteratorType end = gridview_.template end<0>();
+    EntityPointerVectorType ret(points.size());
+    typename EntityPointerVectorType::size_type idx(0);
     for (const auto& point : points) {
       IteratorType it_current = it_last_;
       bool it_reset = true;
+      typename EntityPointerVectorType::value_type tmp_ptr(nullptr);
       for (; it_current != end && ret.size() < max_size; ++it_current) {
-        if (check_add(*it_current, point, ret)) {
-          it_reset = false;
-          it_last_ = it_current;
+        if ((tmp_ptr = check_add(*it_current, point))) {
+          ret[idx++] = std::move(tmp_ptr);
+          tmp_ptr    = nullptr;
+          it_reset   = false;
+          it_last_   = it_current;
           break;
         }
       }
       if (!it_reset)
         continue;
       for (it_current = begin; it_current != it_last_ && ret.size() < max_size; ++it_current) {
-        if (check_add(*it_current, point, ret)) {
-          it_reset = false;
-          it_last_ = it_current;
+        if ((tmp_ptr = check_add(*it_current, point))) {
+          ret[idx++] = std::move(tmp_ptr);
+          tmp_ptr    = nullptr;
+          it_reset   = false;
+          it_last_   = it_current;
           break;
         }
       }
-      assert(!it_reset);
     }
     return ret;
   } // ... operator()
