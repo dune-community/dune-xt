@@ -2,7 +2,7 @@
 #define DUNE_STUFF_FUNCTION_FEMADAPTER_HH
 
 
-#if 1 // HAVE_DUNE_FEM
+#if HAVE_DUNE_FEM
 
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
@@ -21,7 +21,7 @@ template <class EntityImp, class DomainFieldImp, int domainDim, class RangeField
 class FemFunctionAdapter
     : public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
                                  FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>,
-      Dune::Fem::HasLocalFunction
+      public Dune::Fem::HasLocalFunction
 {
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> InterfaceType;
   typedef FemFunctionAdapter<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
