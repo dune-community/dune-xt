@@ -79,7 +79,7 @@ public:
       IteratorType it_current = it_last_;
       bool it_reset = true;
       typename EntityPointerVectorType::value_type tmp_ptr(nullptr);
-      for (; it_current != end && ret.size() < max_size; ++it_current) {
+      for (; it_current != end; ++it_current) {
         if ((tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
           tmp_ptr    = nullptr;
@@ -90,7 +90,7 @@ public:
       }
       if (!it_reset)
         continue;
-      for (it_current = begin; it_current != it_last_ && ret.size() < max_size; ++it_current) {
+      for (it_current = begin; it_current != it_last_; ++it_current) {
         if ((tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
           tmp_ptr    = nullptr;
