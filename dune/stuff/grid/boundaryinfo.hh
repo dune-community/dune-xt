@@ -111,10 +111,7 @@ public:
 
   virtual bool neumann(const IntersectionType& intersection) const
   {
-    if (intersection.boundary())
-      return true;
-    else
-      return false;
+    return intersection.boundary();
   } // virtual bool neumann(const IntersectionType& intersection) const
 }; // class GridboundaryAllNeumann
 
@@ -137,26 +134,23 @@ public:
   typedef std::set<IdType> IdSetType;
   typedef std::map<std::string, IdSetType> IdSetMapType;
 
-  GridboundaryIdBased(const std::shared_ptr<const IdSetMapType> _boundaryInfoMap)
-    : boundaryInfoMap_(_boundaryInfoMap)
-  {
-    setup();
-  }
-
-  GridboundaryIdBased(const ThisType& other)
-    : boundaryInfoMap_(other.boundaryInfoMap_)
-    , hasDirichlet_(other.hasDirichlet_)
-    , hasNeumann_(other.hasNeumann_)
+  GridboundaryIdBased(const std::shared_ptr<const IdSetMapType> boundaryInfoMap)
+    : boundaryInfoMap_(*boundaryInfoMap)
+    , hasDirichlet_(boundaryInfoMap_.find("dirichlet") != boundaryInfoMap_.end())
+    , hasNeumann_(boundaryInfoMap_.find("neumann") != boundaryInfoMap_.end())
   {
   }
 
-  ThisType& operator=(ThisType& other)
+  GridboundaryIdBased(const Dune::ParameterTree& settings, const std::string subName = id())
   {
-    if (this != &other) {
-      boundaryInfoMap_ = other.boundaryInfoMap();
-      setup();
-    }
-    return *this;
+    const Common::ExtendedParameterTree ext_settings = settings.hasSub(subName) ? settings.sub(subName) : settings;
+    const std::vector<int> dirichletIds              = ext_settings.getVector<int>("dirichlet", 0, 0);
+    const std::vector<int> neumannIds = ext_settings.getVector<int>("neumann", 0, 0);
+    boundaryInfoMap_.insert(
+        std::pair<std::string, IdSetType>("dirichlet", IdSetType(dirichletIds.begin(), dirichletIds.end())));
+    boundaryInfoMap_.emplace("neumann", IdSetType(neumannIds.begin(), neumannIds.end()));
+    hasDirichlet_ = boundaryInfoMap_.find("dirichlet") != boundaryInfoMap_.end();
+    hasNeumann_   = boundaryInfoMap_.find("neumann") != boundaryInfoMap_.end();
   }
 
   static Dune::ParameterTree defaultSettings(const std::string subName = "")
@@ -173,32 +167,12 @@ public:
     }
   }
 
-  static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
+  static ThisType* create(const Dune::ParameterTree& settings, const std::string subName = id())
   {
-    // get correct settings
-    Common::ExtendedParameterTree settings;
-    if (_settings.hasSub(subName))
-      settings = _settings.sub(subName);
-    else
-      settings = _settings;
-    // get dirichlet
-    const std::vector<int> dirichletIds = settings.getVector<int>("dirichlet", 0, 0);
-    IdSetType dirichletSet;
-    for (unsigned int i = 0; i < dirichletIds.size(); ++i)
-      dirichletSet.insert(dirichletIds[i]);
-    // get neumann
-    const std::vector<int> neumannIds = settings.getVector<int>("neumann", 0, 0);
-    IdSetType neumannSet;
-    for (unsigned int i = 0; i < neumannIds.size(); ++i)
-      neumannSet.insert(neumannIds[i]);
-    // create map and return
-    shared_ptr<IdSetMapType> idSetMap(new IdSetMapType());
-    idSetMap->insert(std::pair<std::string, IdSetType>("dirichlet", dirichletSet));
-    idSetMap->insert(std::pair<std::string, IdSetType>("neumann", neumannSet));
-    return new ThisType(idSetMap);
+    return new ThisType(settings, subName);
   }
 
-  const std::shared_ptr<const IdSetMapType> boundaryInfoMap()
+  const IdSetMapType& boundaryInfoMap() const
   {
     return boundaryInfoMap_;
   }
@@ -206,11 +180,10 @@ public:
   virtual bool dirichlet(const IntersectionType& intersection) const
   {
     if (hasDirichlet_ && intersection.boundary()) {
-      // get boundary id
       const IdType boundaryId = intersection.boundaryId();
       // get set of dirichlet ids (has to be found, otherwise hasDirichlet_ would be false)
-      const typename IdSetMapType::const_iterator result = boundaryInfoMap_->find("dirichlet");
-      assert(result != boundaryInfoMap_->end());
+      const auto result = boundaryInfoMap_.find("dirichlet");
+      assert(result != boundaryInfoMap_.end());
       const IdSetType& idSet = result->second;
       return (idSet.count(boundaryId) > 0);
     } else
@@ -223,8 +196,8 @@ public:
       // get boundary id
       const IdType boundaryId = intersection.boundaryId();
       // get set of neumann ids (has to be found, otherwise hasNeumann_ would be false)
-      const typename IdSetMapType::const_iterator result = boundaryInfoMap_->find("neumann");
-      assert(result != boundaryInfoMap_->end());
+      const typename IdSetMapType::const_iterator result = boundaryInfoMap_.find("neumann");
+      assert(result != boundaryInfoMap_.end());
       const IdSetType& idSet = result->second;
       return (idSet.count(boundaryId) > 0);
     } else
@@ -232,13 +205,7 @@ public:
   } // bool neumann(const IntersectionType& intersection) const
 
 private:
-  void setup()
-  {
-    hasDirichlet_ = boundaryInfoMap_->find("dirichlet") != boundaryInfoMap_->end();
-    hasNeumann_   = boundaryInfoMap_->find("neumann") != boundaryInfoMap_->end();
-  }
-
-  std::shared_ptr<const IdSetMapType> boundaryInfoMap_;
+  IdSetMapType boundaryInfoMap_;
   bool hasDirichlet_;
   bool hasNeumann_;
 }; // class GridboundaryIdBased
@@ -271,36 +238,23 @@ public:
     , neumannNormals_(neumannNormals)
     , tol_(tol)
   {
-    // normalize
-    for (auto& normal : dirichletNormals_)
-      normal /= normal.two_norm();
-    for (auto& normal : neumannNormals_)
-      normal /= normal.two_norm();
-    // sanity check
-    for (auto& dirichletNormal : dirichletNormals_) {
-      if (contains(dirichletNormal, neumannNormals_))
-        DUNE_THROW(Dune::InvalidStateException,
-                   "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " normals are too close!");
-    }
+    normalize();
   }
 
-  GridboundaryNormalBased(const ThisType& other)
-    : defaultIsDirichlet_(other.defaultIsDirichlet_)
-    , dirichletNormals_(other.dirichletNormals_)
-    , neumannNormals_(other.neumannNormals_)
-    , tol_(other.tol_)
+  GridboundaryNormalBased(const Dune::ParameterTree& _settings, const std::string subName = id())
   {
-  }
-
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      defaultIsDirichlet_ = other.defaultIsDirichlet_;
-      dirichletNormals_   = other.dirichletNormals_;
-      neumannNormals_     = other.neumannNormals_;
-      tol_                = other.tol_;
-    }
-    return this;
+    const Common::ExtendedParameterTree settings = _settings.hasSub(subName) ? _settings.sub(subName) : _settings;
+    const std::string def = settings.get("default", "dirichlet");
+    if (def == "dirichlet")
+      defaultIsDirichlet_ = true;
+    else if (def == "neumann")
+      defaultIsDirichlet_ = false;
+    else
+      DUNE_THROW(Dune::IOError, "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " wrong 'default' given!");
+    tol_              = settings.get("compare_tolerance", 1e-10);
+    dirichletNormals_ = getVectors(settings, "dirichlet");
+    neumannNormals_ = getVectors(settings, "neumann");
+    normalize();
   }
 
   static Dune::ParameterTree defaultSettings(const std::string subName = "")
@@ -319,30 +273,9 @@ public:
     }
   }
 
-  static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
+  static ThisType* create(const Dune::ParameterTree& settings, const std::string subName = id())
   {
-    // get correct _settings
-    Common::ExtendedParameterTree settings;
-    if (_settings.hasSub(subName))
-      settings = _settings.sub(subName);
-    else
-      settings = _settings;
-    // get default
-    bool dirichletDef     = false;
-    const std::string def = settings.get("default", "dirichlet");
-    if (def == "dirichlet")
-      dirichletDef = true;
-    else if (def == "neumann")
-      dirichletDef = false;
-    else
-      DUNE_THROW(Dune::IOError, "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " wrong 'default' given!");
-    // get tolerance
-    const DomainFieldType tol = settings.get("compare_tolerance", 1e-10);
-    // get dirichlet and neumann
-    std::vector<DomainType> dirichlets = getVectors(settings, "dirichlet");
-    std::vector<DomainType> neumanns   = getVectors(settings, "neumann");
-    // return
-    return new ThisType(dirichletDef, dirichlets, neumanns, tol);
+    return new ThisType(settings, subName);
   }
 
   virtual bool dirichlet(const IntersectionType& intersection) const
@@ -361,16 +294,7 @@ public:
 
   virtual bool neumann(const IntersectionType& intersection) const
   {
-    if (intersection.boundary()) {
-      const DomainType outerNormal = intersection.centerUnitOuterNormal();
-      if (contains(outerNormal, neumannNormals_))
-        return true;
-      else if (contains(outerNormal, dirichletNormals_))
-        return false;
-      else
-        return !defaultIsDirichlet_;
-    }
-    return false;
+    return !dirichlet(intersection);
   } // bool neumann(const IntersectionType& intersection) const
 
 private:
@@ -410,10 +334,25 @@ private:
     return false;
   }
 
-  const bool defaultIsDirichlet_;
+  void normalize()
+  {
+    // normalize
+    for (auto& normal : dirichletNormals_)
+      normal /= normal.two_norm();
+    for (auto& normal : neumannNormals_)
+      normal /= normal.two_norm();
+    // sanity check
+    for (auto& dirichletNormal : dirichletNormals_) {
+      if (contains(dirichletNormal, neumannNormals_))
+        DUNE_THROW(Dune::InvalidStateException,
+                   "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " normals are too close!");
+    }
+  }
+
+  bool defaultIsDirichlet_;
   std::vector<DomainType> dirichletNormals_;
   std::vector<DomainType> neumannNormals_;
-  const DomainFieldType tol_;
+  DomainFieldType tol_;
 }; // class GridboundaryNormalBased
 
 
