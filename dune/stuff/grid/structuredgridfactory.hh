@@ -8,6 +8,7 @@
 #if HAVE_DUNE_SPGRID
 
 #include <dune/grid/spgrid.hh>
+#include <dune/stuff/aliases.hh>
 
 namespace Dune {
 
