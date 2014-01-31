@@ -234,20 +234,22 @@ public:
   {
     // check
     SolverUtils::check_given(type, options());
+    // default config
+    Common::ConfigTree default_options({"type", "DEBUG_post_solve_test"}, {type, "1e-8"});
+    Common::ConfigTree iterative_options({"type", "max_iter", "precision", "DEBUG_post_solve_test"},
+                                         {type, "10000", "1e-10", "1e-8"});
     // direct solvers
     if (type == "lu.sparse" || type == "qr.sparse" || type == "ldlt.simplicial" || type == "llt.simplicial"
         || type == "lu.umfpack"
         || type == "spqr"
         || type == "llt.cholmodsupernodal"
         || type == "superlu")
-      return Common::ConfigTree("type", type);
+      return default_options;
     // iterative solvers
-    Common::ConfigTree iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     if (type == "bicgstab.ilut") {
       iterative_options.add("preconditioner.fill_factor", "10");
       iterative_options.add("preconditioner.drop_tol", "1e-4");
     }
-    iterative_options.add("type", type);
     return iterative_options;
   } // ... options(...)
 
@@ -481,8 +483,13 @@ private:
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
 // check
 #ifndef NDEBUG
-    if (!rhs.backend().isApprox(matrix_.backend() * solution.backend()))
-      return 4;
+    const post_solve_check_accuracy = opts.get("DEBUG_post_solve_test", default_opts.get<S>("DEBUG_post_solve_test"));
+    if (post_solve_check_accuracy > 0) {
+      auto tmp = rhs.copy();
+      tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
+      if (tmp.sup_norm() > post_solve_check_accuracy)
+        return 4;
+    }
 #endif // NDEBUG
     return 0;
   } // ... redirect_to_appropriate_apply(...)
