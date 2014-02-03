@@ -134,8 +134,8 @@ public:
   typedef std::set<IdType> IdSetType;
   typedef std::map<std::string, IdSetType> IdSetMapType;
 
-  GridboundaryIdBased(const IdSetMapType boundaryInfoMap)
-    : boundaryInfoMap_(boundaryInfoMap)
+  GridboundaryIdBased(const std::shared_ptr<const IdSetMapType> boundaryInfoMap)
+    : boundaryInfoMap_(*boundaryInfoMap)
     , hasDirichlet_(boundaryInfoMap_.find("dirichlet") != boundaryInfoMap_.end())
     , hasNeumann_(boundaryInfoMap_.find("neumann") != boundaryInfoMap_.end())
   {
