@@ -91,7 +91,7 @@ public:
 
   /**
    * \brief Test for equal sizes.
-   * \param other Container the sizes of which are to be compared.
+   * \param other Container the sizes of which this is to be compared to.
    */
   inline bool has_equal_shape(const derived_type& other) const
   {
