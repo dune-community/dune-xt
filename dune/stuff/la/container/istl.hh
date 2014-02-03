@@ -393,13 +393,15 @@ public:
 
   /// This constructor is needed for the python bindings.
   IstlRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
-    : IstlRowMajorSparseMatrix(rr, cc)
+    : backend_(new BackendType(this->assert_is_size_t_compatible_and_convert(rr),
+                               this->assert_is_size_t_compatible_and_convert(cc), BackendType::row_wise))
   {
   }
 
   /// This constructor is needed because marking the above one as explicit had no effect.
   IstlRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : IstlRowMajorSparseMatrix(rr, cc)
+    : backend_(new BackendType(this->assert_is_size_t_compatible_and_convert(rr),
+                               this->assert_is_size_t_compatible_and_convert(cc), BackendType::row_wise))
   {
   }
 
