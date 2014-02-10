@@ -88,6 +88,13 @@ femFunctionAdapter(const F& function)
                             F::dimRange>(function);
 }
 
+template <class DataType, class GridPartType>
+Dune::Fem::GridFunctionAdapter<DataType, GridPartType> gridFunctionAdapter(const DataType& data,
+                                                                           const GridPartType& grid_part)
+{
+  return Dune::Fem::GridFunctionAdapter<DataType, GridPartType>("", data, grid_part);
+}
+
 } // namespace Stuff
 } // namespace Dune
 
