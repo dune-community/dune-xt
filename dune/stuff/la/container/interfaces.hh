@@ -451,6 +451,38 @@ public:
     for (size_t ii = 0; ii < size(); ++ii)
       set_entry(ii, get_entry(ii) - other.get_entry(ii));
   } // ... isub(...)
+
+  virtual derived_type& operator+=(const derived_type& other)
+  {
+    this->as_imp(*this).iadd(other);
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type& operator-=(const derived_type& other)
+  {
+    this->as_imp(*this).isub(other);
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type operator+(const derived_type& other) const
+  {
+    return this->as_imp(*this).add(other);
+  }
+
+  virtual derived_type operator-(const derived_type& other) const
+  {
+    return this->as_imp(*this).sub(other);
+  }
+
+  virtual bool operator==(const derived_type& other) const
+  {
+    return this->as_imp(*this).almost_equal(other);
+  }
+
+  virtual bool operator!=(const derived_type& other) const
+  {
+    return !(this->as_imp(*this).operator==(other));
+  }
   /**
    * \}
    */
