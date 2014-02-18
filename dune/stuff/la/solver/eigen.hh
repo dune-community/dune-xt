@@ -192,10 +192,6 @@ private:
 /**
  *  \note lu.sparse will copy the matrix to column major
  *  \note qr.sparse will copy the matrix to column major
- *  \note ldlt.simplicial will copy the matrix to column major
- *  \note llt.simplicial will copy the matrix to column major
- *  \note llt.simplicial will copy the matrix to column major
- *  \note spqr will copy the matrix to column major
  */
 template <class S>
 class Solver<EigenRowMajorSparseMatrix<S>> : protected SolverUtils
@@ -215,8 +211,8 @@ public:
   {
     return
     {
-      "bicgstab.ilut", "bicgstab.diagonal", "bicgstab.identity", "lu.sparse"
-//           , "qr.sparse"             // <- produces correct results, but is painfully slow
+      "bicgstab.ilut", "bicgstab.diagonal", "bicgstab.identity", "lu.sparse",
+          "qr.sparse" // <- produces correct results, but is painfully slow
 //           , "ldlt.simplicial"       // <- does not produce correct results
 //           , "llt.simplicial"        // <- does not produce correct results
 //           , "spqr"                  // <- does not compile
@@ -230,13 +226,17 @@ public:
           "superlu" // <- untested
 #endif
           ,
-          "cg.diagonal.lower" // <- does only work with symmetric matrices
+          "cg.diagonal.lower" // <- does only work with symmetric matrices, may produce correct results but takes a lot
+          // of memory
           ,
-          "cg.diagonal.upper" // <- does only work with symmetric matrices
+          "cg.diagonal.upper" // <- does only work with symmetric matrices, may produce correct results but takes a lot
+          // of memory
           ,
-          "cg.identity.lower" // <- does only work with symmetric matrices
+          "cg.identity.lower" // <- does only work with symmetric matrices, may produce correct results but takes a lot
+          // of memory
           ,
-          "cg.identity.upper" // <- does only work with symmetric matrices
+          "cg.identity.upper" // <- does only work with symmetric matrices, may produce correct results but takes a lot
+      // of memory
     };
   }
 
@@ -245,9 +245,9 @@ public:
     // check
     SolverUtils::check_given(type, options());
     // default config
-    Common::ConfigTree default_options({"type", "DEBUG_post_solve_test"}, {type, "1e-8"});
-    Common::ConfigTree iterative_options({"type", "max_iter", "precision", "DEBUG_post_solve_test"},
-                                         {type, "10000", "1e-10", "1e-8"});
+    Common::ConfigTree default_options({"type", "post_check_solves_system"}, {type, "1e-6"});
+    Common::ConfigTree iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
+    iterative_options += default_options;
     // direct solvers
     if (type == "lu.sparse" || type == "qr.sparse" || type == "ldlt.simplicial" || type == "llt.simplicial"
         || type == "lu.umfpack"
@@ -264,93 +264,98 @@ public:
     return iterative_options;
   } // ... options(...)
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
+  void apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
   {
     return redirect_to_appropriate_apply(rhs, solution);
   }
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
+  void apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
   {
     return redirect_to_appropriate_apply(rhs, solution);
   }
 
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
+  void apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
   {
     return redirect_to_appropriate_apply(rhs, solution);
   }
 
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
+  void apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
   {
     return redirect_to_appropriate_apply(rhs, solution);
   }
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
+  void apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
   {
     return redirect_to_appropriate_apply(rhs, solution, type);
   }
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
+  void apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
   {
     return redirect_to_appropriate_apply(rhs, solution, type);
   }
 
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
+  void apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
   {
     return redirect_to_appropriate_apply(rhs, solution, type);
   }
 
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
+  void apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
   {
     return redirect_to_appropriate_apply(rhs, solution, type);
   }
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const Common::ConfigTree& opts) const
+  void apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const Common::ConfigTree& opts) const
   {
     return redirect_to_appropriate_apply(rhs, solution, opts);
   }
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution,
-               const Common::ConfigTree& opts) const
+  void apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const Common::ConfigTree& opts) const
   {
     return redirect_to_appropriate_apply(rhs, solution, opts);
   }
 
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution,
-               const Common::ConfigTree& opts) const
+  void apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution, const Common::ConfigTree& opts) const
   {
     return redirect_to_appropriate_apply(rhs, solution, opts);
   }
 
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution,
-               const Common::ConfigTree& opts) const
+  void apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution,
+             const Common::ConfigTree& opts) const
   {
     return redirect_to_appropriate_apply(rhs, solution, opts);
   }
 
 private:
   template <class RhsType, class SolutionType>
-  size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution) const
+  void redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution) const
   {
     return redirect_to_appropriate_apply(rhs, solution, options()[0]);
   }
 
   template <class RhsType, class SolutionType>
-  size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const Common::ConfigTree& opts) const
+  void redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type                       = opts.get<std::string>("type");
     const Common::ConfigTree default_opts = options(type);
-    if (type == "cg.diagonal.lower") {
-#ifndef NDEBUG
-      const S symmetry_check_accuracy = opts.get("DEBUG_symmetry_check", default_opts.get<S>("DEBUG_symmetry_check"));
-      if (symmetry_check_accuracy > 0) {
+    // check for symmetry (if solver needs it)
+    if (type.substr(0, 3) == "cg.") {
+      const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
+      if (pre_check_symmetry_threshhold > 0) {
         const ColMajorBackendType colmajor_copy(matrix_.backend());
-        if (!colmajor_copy.isApprox(matrix_.backend().transpose(), symmetry_check_accuracy))
-          return 1;
+        if (!colmajor_copy.isApprox(matrix_.backend().transpose(), pre_check_symmetry_threshhold))
+          DUNE_THROW_COLORFULLY(
+              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+              "Given matrix is not symmetric and you requested checking (see options below)!\n"
+                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n"
+                  << "Those were the given options:\n\n"
+                  << opts);
       }
-#endif
+    }
+    ::Eigen::ComputationInfo info;
+    if (type == "cg.diagonal.lower") {
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Lower,
                                          ::Eigen::DiagonalPreconditioner<S>> SolverType;
@@ -358,17 +363,8 @@ private:
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "cg.diagonal.upper") {
-#ifndef NDEBUG
-      const S symmetry_check_accuracy = opts.get("DEBUG_symmetry_check", default_opts.get<S>("DEBUG_symmetry_check"));
-      if (symmetry_check_accuracy > 0) {
-        const ColMajorBackendType colmajor_copy(matrix_.backend());
-        if (!colmajor_copy.isApprox(matrix_.backend().transpose(), symmetry_check_accuracy))
-          return 1;
-      }
-#endif
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Upper,
                                          ::Eigen::DiagonalPreconditioner<double>> SolverType;
@@ -376,17 +372,8 @@ private:
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "cg.identity.lower") {
-#ifndef NDEBUG
-      const S symmetry_check_accuracy = opts.get("DEBUG_symmetry_check", default_opts.get<S>("DEBUG_symmetry_check"));
-      if (symmetry_check_accuracy > 0) {
-        const ColMajorBackendType colmajor_copy(matrix_.backend());
-        if (!colmajor_copy.isApprox(matrix_.backend().transpose(), symmetry_check_accuracy))
-          return 1;
-      }
-#endif
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Lower,
                                          ::Eigen::IdentityPreconditioner> SolverType;
@@ -394,17 +381,8 @@ private:
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "cg.identity.upper") {
-#ifndef NDEBUG
-      const S symmetry_check_accuracy = opts.get("DEBUG_symmetry_check", default_opts.get<S>("DEBUG_symmetry_check"));
-      if (symmetry_check_accuracy > 0) {
-        const ColMajorBackendType colmajor_copy(matrix_.backend());
-        if (!colmajor_copy.isApprox(matrix_.backend().transpose(), symmetry_check_accuracy))
-          return 1;
-      }
-#endif
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Lower,
                                          ::Eigen::IdentityPreconditioner> SolverType;
@@ -412,8 +390,7 @@ private:
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "bicgstab.ilut") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<S>> SolverType;
       SolverType solver(matrix_.backend());
@@ -424,24 +401,21 @@ private:
       solver.preconditioner().setFillfactor(
           opts.get("preconditioner.fill_factor", default_opts.get<size_t>("preconditioner.fill_factor")));
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "bicgstab.diagonal") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<S>> SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "bicgstab.identity") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "lu.sparse") {
       ColMajorBackendType colmajor_copy(matrix_.backend());
       colmajor_copy.makeCompressed();
@@ -450,8 +424,7 @@ private:
       solver.analyzePattern(colmajor_copy);
       solver.factorize(colmajor_copy);
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
     } else if (type == "qr.sparse") {
       ColMajorBackendType colmajor_copy(matrix_.backend());
       colmajor_copy.makeCompressed();
@@ -460,28 +433,25 @@ private:
       solver.analyzePattern(colmajor_copy);
       solver.factorize(colmajor_copy);
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
-    } else if (type == "ldlt.simplicial") {
-      ColMajorBackendType colmajor_copy(matrix_.backend());
-      colmajor_copy.makeCompressed();
-      typedef ::Eigen::SimplicialLDLT<ColMajorBackendType> SolverType;
-      SolverType solver;
-      solver.analyzePattern(colmajor_copy);
-      solver.factorize(colmajor_copy);
-      solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
-    } else if (type == "llt.simplicial") {
-      ColMajorBackendType colmajor_copy(matrix_.backend());
-      colmajor_copy.makeCompressed();
-      typedef ::Eigen::SimplicialLLT<ColMajorBackendType> SolverType;
-      SolverType solver;
-      solver.analyzePattern(colmajor_copy);
-      solver.factorize(colmajor_copy);
-      solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
+//    } else if (type == "ldlt.simplicial") {
+//      ColMajorBackendType colmajor_copy(matrix_.backend());
+//      colmajor_copy.makeCompressed();
+//      typedef ::Eigen::SimplicialLDLT< ColMajorBackendType > SolverType;
+//      SolverType solver;
+//      solver.analyzePattern(colmajor_copy);
+//      solver.factorize(colmajor_copy);
+//      solution.backend() = solver.solve(rhs.backend());
+//      info = solver.info();
+//    } else if (type == "llt.simplicial") {
+//      ColMajorBackendType colmajor_copy(matrix_.backend());
+//      colmajor_copy.makeCompressed();
+//      typedef ::Eigen::SimplicialLLT< ColMajorBackendType > SolverType;
+//      SolverType solver;
+//      solver.analyzePattern(colmajor_copy);
+//      solver.factorize(colmajor_copy);
+//      solution.backend() = solver.solve(rhs.backend());
+//      info = solver.info();
 #if HAVE_UMFPACK
     } else if (type == "lu.umfpack") {
       typedef ::Eigen::UmfPackLU<typename MatrixType::BackendType> SolverType;
@@ -489,8 +459,7 @@ private:
       solver.analyzePattern(matrix_.backend());
       solver.factorize(matrix_.backend());
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
 #endif // HAVE_UMFPACK
 //    } else if (type == "spqr") {
 //      ColMajorBackendType colmajor_copy(matrix_.backend());
@@ -517,29 +486,63 @@ private:
       solver.analyzePattern(matrix_.backend());
       solver.factorize(matrix_.backend());
       solution.backend() = solver.solve(rhs.backend());
-      if (solver.info() != ::Eigen::Success)
-        return solver.info();
+      info = solver.info();
 #endif // HAVE_SUPERLU
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
-// check
-#ifndef NDEBUG
-    const S post_solve_check_accuracy = opts.get("DEBUG_post_solve_test", default_opts.get<S>("DEBUG_post_solve_test"));
-    if (post_solve_check_accuracy > 0) {
+    // handle eigens info
+    if (info != ::Eigen::Success) {
+      if (info == ::Eigen::NumericalIssue)
+        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+                              "The eigen backend reported 'NumericalIssue'!\n"
+                                  << "=> see "
+                                     "http://eigen.tuxfamily.org/dox/"
+                                     "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
+                                  << "Those were the given options:\n\n"
+                                  << opts);
+      else if (info == ::Eigen::NoConvergence)
+        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                              "The eigen backend reported 'NoConvergence'!"
+                                  << "=> see "
+                                     "http://eigen.tuxfamily.org/dox/"
+                                     "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
+                                  << "Those were the given options:\n\n"
+                                  << opts);
+      else if (info == ::Eigen::InvalidInput)
+        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_was_not_set_up_correctly,
+                              "The eigen backend reported 'InvalidInput'!"
+                                  << "=> see "
+                                     "http://eigen.tuxfamily.org/dox/"
+                                     "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
+                                  << "Those were the given options:\n\n"
+                                  << opts);
+      else
+        DUNE_THROW_COLORFULLY(Exceptions::internal_error,
+                              "The eigen backend reported an unknown status!\n"
+                                  << "Please report this to the dune-stuff developers!");
+    }
+    // check
+    const S post_check_solves_system_theshhold =
+        opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
+    if (post_check_solves_system_theshhold > 0) {
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
-      if (tmp.sup_norm() > post_solve_check_accuracy)
-        return 4;
+      if (tmp.sup_norm() > post_check_solves_system_theshhold)
+        DUNE_THROW_COLORFULLY(
+            Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
+            "The computed solution does not solve the system (although the eigen backend reported "
+                << "'Success') and you requested checking (see options below)!"
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                << "\nThose were the given options:\n\n"
+                << opts);
     }
-#endif // NDEBUG
-    return 0;
   } // ... redirect_to_appropriate_apply(...)
 
   template <class RhsType, class SolutionType>
-  size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const std::string& type) const
+  void redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const std::string& type) const
   {
-    return redirect_to_appropriate_apply(rhs, solution, options(type));
+    redirect_to_appropriate_apply(rhs, solution, options(type));
   }
 
   const MatrixType& matrix_;
