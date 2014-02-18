@@ -9,8 +9,7 @@
 #include <iostream>
 #include <memory>
 
-#include <dune/common/exceptions.hh>
-
+#include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
@@ -71,11 +70,7 @@ private:
 
   {
     if (!(max > min))
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " max (is " << max
-                      << ") has to be larger than min (is "
-                      << min
-                      << ")!");
+      DUNE_THROW_COLORFULLY(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
     const RangeFieldType scale = (max - min) / (maxValue - minValue);
     const RangeType shift      = min - scale * minValue;
     // read all the data from the file
@@ -92,17 +87,13 @@ private:
       }
       datafile.close();
       if (counter != entriesPerDim)
-        DUNE_THROW(Dune::IOError,
-                   "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " wrong number of entries in '" << filename
-                        << "' (are "
-                        << counter
-                        << ", should be "
-                        << entriesPerDim
-                        << ")!");
+        DUNE_THROW_COLORFULLY(Dune::IOError,
+                              "wrong number of entries in '" << filename << "' (are " << counter << ", should be "
+                                                             << entriesPerDim
+                                                             << ")!");
       return data;
     } else
-      DUNE_THROW(Dune::IOError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " could not open '" << filename << "'!");
+      DUNE_THROW_COLORFULLY(Dune::IOError, "could not open '" << filename << "'!");
   } // Spe10Model1()
 
 public:
