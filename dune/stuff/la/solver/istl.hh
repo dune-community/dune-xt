@@ -61,7 +61,7 @@ public:
       iterative_options.add("smoother.anisotropy_dim", "2");
       iterative_options.add("smoother.verbose", "0");
     } else
-      DUNE_THROW_COLORFULLY(Exception::internal_error,
+      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
     iterative_options.add("type", type);
     return iterative_options;
@@ -83,7 +83,7 @@ public:
   size_t apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW_COLORFULLY(Exception::configuration_error,
+      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     this->check_given(type, options());
@@ -152,7 +152,7 @@ public:
       if (!stat.converged)
         return 2;
     } else
-      DUNE_THROW_COLORFULLY(Exception::internal_error,
+      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
 // check
 #ifndef NDEBUG

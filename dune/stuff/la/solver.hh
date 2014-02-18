@@ -32,7 +32,7 @@ protected:
       std::stringstream ss;
       for (auto opt : opts)
         ss << opt << " ";
-      DUNE_THROW_COLORFULLY(Exception::configuration_error,
+      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given type '" << type << "' not supported (see below for a list of supported ones). "
                                            << "Call options() first!\n"
                                            << ss.str());

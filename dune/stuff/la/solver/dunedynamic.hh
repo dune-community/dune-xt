@@ -72,7 +72,7 @@ public:
   size_t apply(const DuneDynamicVector<S>& rhs, DuneDynamicVector<S>& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW_COLORFULLY(Exception::configuration_error,
+      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     return apply(rhs, solution, type);

@@ -149,7 +149,7 @@ private:
   size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW_COLORFULLY(Exception::configuration_error,
+      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     return apply(rhs, solution, type);
@@ -175,7 +175,7 @@ private:
     else if (type == "lu.partialpiv")
       solution.backend() = matrix_.backend().partialPivLu().solve(rhs.backend());
     else
-      DUNE_THROW_COLORFULLY(Exception::internal_error,
+      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
 // check
 #ifndef NDEBUG
@@ -338,7 +338,7 @@ private:
   size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW_COLORFULLY(Exception::configuration_error,
+      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type                       = opts.get<std::string>("type");
     const Common::ConfigTree default_opts = options(type);
@@ -521,7 +521,7 @@ private:
         return solver.info();
 #endif // HAVE_SUPERLU
     } else
-      DUNE_THROW_COLORFULLY(Exception::internal_error,
+      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
 // check
 #ifndef NDEBUG
