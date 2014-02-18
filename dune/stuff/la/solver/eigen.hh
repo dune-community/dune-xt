@@ -257,10 +257,10 @@ public:
       return default_options;
     // iterative solvers
     if (type == "bicgstab.ilut") {
-      iterative_options.add("preconditioner.fill_factor", "10");
-      iterative_options.add("preconditioner.drop_tol", "1e-4");
+      iterative_options.set("preconditioner.fill_factor", "10");
+      iterative_options.set("preconditioner.drop_tol", "1e-4");
     } else if (type.substr(0, 3) == "cg.")
-      iterative_options.add("DEBUG_symmetry_check", "1e-8");
+      iterative_options.set("pre_check_symmetry", "1e-8");
     return iterative_options;
   } // ... options(...)
 

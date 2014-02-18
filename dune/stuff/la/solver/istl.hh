@@ -49,21 +49,21 @@ public:
     SolverUtils::check_given(type, options());
     Common::ConfigTree iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
     if (type == "bicgstab.ilut") {
-      iterative_options.add("preconditioner.iterations", "10");
-      iterative_options.add("preconditioner.relaxation_factor", "1.0");
+      iterative_options.set("preconditioner.iterations", "10");
+      iterative_options.set("preconditioner.relaxation_factor", "1.0");
     } else if (type == "bicgstab.amg.ilu0") {
-      iterative_options.add("smoother.iterations", "1");
-      iterative_options.add("smoother.relaxation_factor", "1");
-      iterative_options.add("smoother.max_level", "15");
-      iterative_options.add("smoother.coarse_target", "2000");
-      iterative_options.add("smoother.min_coarse_rate", "1.2");
-      iterative_options.add("smoother.prolong_damp", "1.6");
-      iterative_options.add("smoother.anisotropy_dim", "2");
-      iterative_options.add("smoother.verbose", "0");
+      iterative_options.set("smoother.iterations", "1");
+      iterative_options.set("smoother.relaxation_factor", "1");
+      iterative_options.set("smoother.max_level", "15");
+      iterative_options.set("smoother.coarse_target", "2000");
+      iterative_options.set("smoother.min_coarse_rate", "1.2");
+      iterative_options.set("smoother.prolong_damp", "1.6");
+      iterative_options.set("smoother.anisotropy_dim", "2");
+      iterative_options.set("smoother.verbose", "0");
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
-    iterative_options.add("type", type);
+    iterative_options.set("type", type);
     return iterative_options;
   } // ... options(...)
 
