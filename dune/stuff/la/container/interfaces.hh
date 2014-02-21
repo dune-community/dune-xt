@@ -479,34 +479,34 @@ public:
 
   virtual derived_type& operator+=(const derived_type& other)
   {
-    this->as_imp(*this).iadd(other);
+    iadd(other);
     return this->as_imp(*this);
   }
 
   virtual derived_type& operator-=(const derived_type& other)
   {
-    this->as_imp(*this).isub(other);
+    isub(other);
     return this->as_imp(*this);
   }
 
   virtual derived_type operator+(const derived_type& other) const
   {
-    return this->as_imp(*this).add(other);
+    return add(other);
   }
 
   virtual derived_type operator-(const derived_type& other) const
   {
-    return this->as_imp(*this).sub(other);
+    return sub(other);
   }
 
   virtual bool operator==(const derived_type& other) const
   {
-    return this->as_imp(*this).almost_equal(other);
+    return almost_equal(other);
   }
 
   virtual bool operator!=(const derived_type& other) const
   {
-    return !(this->as_imp(*this).operator==(other));
+    return !(this->operator==(other));
   }
   /**
    * \}
