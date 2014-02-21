@@ -55,10 +55,10 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType ScalarType;
 
-  static std::string type_this()
-  {
-    return Stuff::Common::Typename<derived_type>::value();
-  }
+  /**
+   * \defgroup haveto ´´These methods have to be implemented by a derived class!``
+   * \{
+   */
 
   /**
    * \brief   Creates a (deep) copy of the underlying resource
@@ -98,6 +98,31 @@ public:
     CHECK_CRTP(this->as_imp(*this).has_equal_shape(other));
     return this->as_imp(*this).has_equal_shape(other);
   }
+
+  /**
+   * \}
+   */
+
+  /**
+   * \defgroup provided ´´These methods are provided by the interface for convenience! Those marked as virtual may be
+   * implemented more efficiently in a derived class!``
+   * \{
+   */
+
+  static std::string type_this()
+  {
+    return Stuff::Common::Typename<derived_type>::value();
+  }
+
+  virtual derived_type& operator*=(const ScalarType alpha)
+  {
+    scal(alpha);
+    return this->as_imp(*this);
+  }
+
+  /**
+   * \}
+   */
 
 protected:
   template <class SignedSizeType>
