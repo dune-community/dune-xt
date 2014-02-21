@@ -477,6 +477,18 @@ public:
       set_entry(ii, get_entry(ii) - other.get_entry(ii));
   } // ... isub(...)
 
+  virtual derived_type operator*(const ScalarType& alpha)
+  {
+    derived_type ret = this->copy();
+    ret *= alpha;
+    return ret;
+  }
+
+  virtual ScalarType operator*(const derived_type& other)
+  {
+    return dot(other);
+  }
+
   virtual derived_type& operator+=(const derived_type& other)
   {
     iadd(other);
