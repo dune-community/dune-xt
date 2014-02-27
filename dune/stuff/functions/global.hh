@@ -9,11 +9,20 @@
 #include <dune/fem/space/common/functionspace.hh>
 #endif
 
+#if HAVE_DUNE_PDELAB
+#include <dune/typetree/nodetags.hh>
+#include <dune/pdelab/common/function.hh>
+#endif
+
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/common/memory.hh>
 
 namespace Dune {
 namespace Stuff {
+
+#if HAVE_DUNE_PDELAB
+
+#endif
 
 /**
  * base class for global valued functions that provides automatic local functions via LocalizableFunctionInterface
@@ -26,6 +35,14 @@ class GlobalFunction
       public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
                                  GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
 #endif // HAVE_DUNE_FEM
+#if HAVE_DUNE_PDELAB
+      ,
+      public TypeTree::LeafNode,
+      public PDELab::FunctionInterface<PDELab::FunctionTraits<DomainFieldImp, domainDim,
+                                                              FieldVector<DomainFieldImp, domainDim>, RangeFieldImp,
+                                                              rangeDim, FieldVector<RangeFieldImp, rangeDim>>,
+                                       GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
+#endif
 {
   typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
   typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
