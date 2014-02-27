@@ -20,13 +20,27 @@
 #include <dune/stuff/common/vector.hh>
 #include <dune/stuff/common/float_cmp.hh>
 
+#if HAVE_DUNE_PDELAB
+#include <dune/typetree/leafnode.hh>
+#include <dune/pdelab/common/geometrywrapper.hh>
+#endif
+
 namespace Dune {
 namespace Stuff {
 
 
 template <class IntersectionImp>
 class GridboundaryInterface
+#if HAVE_DUNE_PDELAB
+    : public TypeTree::LeafNode // makes this usable as BoundaryCondition type directly in PDElab
+#endif
 {
+#if HAVE_DUNE_PDELAB
+  typedef PDELab::IntersectionGeometry<IntersectionImp> IntersectionGeometryType;
+  typedef FieldVector<typename IntersectionGeometryType::ctype, IntersectionGeometryType::dimension - 1>
+      Codim1DomainType;
+#endif
+
 public:
   typedef IntersectionImp IntersectionType;
 
@@ -40,8 +54,22 @@ public:
   }
 
   virtual bool dirichlet(const IntersectionType&) const = 0;
-
   virtual bool neumann(const IntersectionType&) const = 0;
+
+#if HAVE_DUNE_PDELAB
+  //! default implementation for signature used in PDELab
+  virtual bool isDirichlet(const IntersectionGeometryType& intersection_geometry,
+                           const Codim1DomainType& /*coord*/) const
+  {
+    return dirichlet(intersection_geometry.intersection());
+  }
+
+  //! default implementation for signature used in PDELab
+  virtual bool isNeumann(const IntersectionGeometryType& intersection_geometry, const Codim1DomainType& /*coord*/) const
+  {
+    return neumann(intersection_geometry.intersection());
+  }
+#endif // HAVE_DUNE_PDELAB
 }; // class GridboundaryInterface
 
 
@@ -69,10 +97,7 @@ public:
 
   virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE
   {
-    if (intersection.boundary())
-      return true;
-    else
-      return false;
+    return intersection.boundary();
   } // virtual bool dirichlet(const IntersectionType& intersection) const
 
   virtual bool neumann(const IntersectionType&) const DS_OVERRIDE
