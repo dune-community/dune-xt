@@ -11,6 +11,7 @@
 #include "expression/base.hh"
 #include "interfaces.hh"
 #include "default.hh"
+#include "global.hh"
 
 namespace Dune {
 namespace Stuff {
@@ -164,9 +165,9 @@ private:
 
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-    : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+    : public GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 {
-  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
+  typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
   typedef Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> MathExpressionFunctionType;
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, domainDim> MathExpressionGradientType;
@@ -220,13 +221,11 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
     {
       if (gradients_.size() == 0)
         DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
-      else {
-        assert(gradients_.size() == dimRange);
-        global_point_ = this->entity().geometry().global(xx);
-        for (size_t ii = 0; ii < dimRange; ++ii) {
-          gradients_[ii]->evaluate(global_point_, ret[ii]);
-          assert(this_value_is_sane(ret[ii]));
-        }
+      assert(gradients_.size() == dimRange);
+      global_point_ = this->entity().geometry().global(xx);
+      for (size_t ii = 0; ii < dimRange; ++ii) {
+        gradients_[ii]->evaluate(global_point_, ret[ii]);
+        assert(this_value_is_sane(ret[ii]));
       }
     } // ... jacobian(...)
 
@@ -237,13 +236,6 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
       for (size_t rr = 0; rr < value.size(); ++rr)
         if (std::abs(value[rr]) > (0.9 * std::numeric_limits<RangeFieldType>::max())) {
           return false;
-          //          std::stringstream ss;
-          //          ss << "evaluating this function yielded an unlikely value!\n"
-          //             << "The variable of this function is: " << function_->variable() << ",\n";
-          //          Stuff::Common::print(function_->expression(),"the expression() of this function is", ss);
-          //          Stuff::Common::print(xx, "you tried to evaluate it with xx", ss);
-          //          Stuff::Common::print(value, "and the result was", ss);
-          //          DUNE_THROW(InvalidStateException, ss.str());
         }
       return true;
     }
@@ -335,25 +327,6 @@ public:
     build_gradients(variable, gradient_expressions);
   }
 
-  Expression(const ThisType& other)
-    : function_(other.function_)
-    , order_(other.order_)
-    , name_(other.name_)
-    , gradients_(other.gradients_)
-  {
-  }
-
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      function_  = other.function_;
-      order_     = other.order_;
-      name_      = other.name_;
-      gradients_ = other.gradients_;
-    }
-    return *this;
-  }
-
   virtual ThisType* copy() const DS_OVERRIDE
   {
     return new ThisType(*this);
@@ -369,6 +342,20 @@ public:
     return std::unique_ptr<Localfunction>(new Localfunction(entity, function_, gradients_, order_));
   }
 
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
+  {
+    function_->evaluate(xx, ret);
+  }
+
+  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
+  {
+    if (gradients_.size() == 0)
+      DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
+    assert(gradients_.size() == dimRange);
+    for (size_t ii = 0; ii < dimRange; ++ii) {
+      gradients_[ii]->evaluate(xx, ret[ii]);
+    }
+  } // ... jacobian(...)
 private:
   void build_gradients(const std::string variable, const std::vector<std::vector<std::string>>& gradient_expressions)
   {
