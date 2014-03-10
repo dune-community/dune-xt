@@ -60,105 +60,67 @@ public:
 
   static std::vector<std::string> options()
   {
-    return {"qr.colpivhouseholder",
-            "qr.fullpivhouseholder",
+    return {"lu.partialpiv",
             "qr.householder",
+            "qr.colpivhouseholder",
+            "qr.fullpivhouseholder",
             "lu.fullpiv",
             "llt",
-            "ldlt",
-            "lu.partialpiv"};
-  }
+            "ldlt"};
+  } // ... options()
 
   static Common::ConfigTree options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    return Common::ConfigTree("type", type);
+    Common::ConfigTree default_options({"type", "post_check_solves_system"}, {type, "1e-6"});
+    // * for symmetric matrices
+    if (type == "ldlt" || type == "llt") {
+      default_options.set("pre_check_symmetry", "1e-8");
+    }
+    return default_options;
   } // ... options(...)
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
+
+  template <class T1, class T2>
+  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution) const
   {
-    return redirect_to_appropriate_apply(rhs, solution);
+    apply(rhs, solution, options()[0]);
   }
 
-  size_t apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
+  template <class T1, class T2>
+  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution, const std::string& type) const
   {
-    return redirect_to_appropriate_apply(rhs, solution);
+    apply(rhs, solution, options(type));
   }
 
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution);
-  }
-
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution);
-  }
-
-  size_t apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  size_t apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  size_t apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-  size_t apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution,
-               const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution,
-               const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-  size_t apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution,
-               const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-private:
-  template <class RhsType, class SolutionType>
-  size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution) const
-  {
-    return apply(rhs, solution, options()[0]);
-  } // ... redirect_to_appropriate_apply(...)
-
-  template <class RhsType, class SolutionType>
-  size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const Common::ConfigTree& opts) const
+  template <class T1, class T2>
+  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
-    return apply(rhs, solution, type);
-  } // ... redirect_to_appropriate_apply(...)
-
-  template <class RhsType, class SolutionType>
-  size_t redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const std::string& type) const
-  {
-    this->check_given(type, options());
+    SolverUtils::check_given(type, options());
+    const Common::ConfigTree default_opts = options(type);
+    // check for symmetry (if solver needs it)
+    if (type == "ldlt" || type == "llt") {
+      const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
+      if (pre_check_symmetry_threshhold > 0) {
+        const MatrixType tmp(matrix_.backend() - matrix_.backend().transpose());
+        // serialize difference to compute L^\infty error (no copy done here)
+        const S error = std::max(std::abs(tmp.backend().minCoeff()), std::abs(tmp.backend().maxCoeff()));
+        if (error > pre_check_symmetry_threshhold)
+          DUNE_THROW_COLORFULLY(
+              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+              "Given matrix is not symmetric and you requested checking (see options below)!\n"
+                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n"
+                  << "  (A - A').sup_norm() = "
+                  << error
+                  << "\n"
+                  << "Those were the given options:\n\n"
+                  << opts);
+      }
+    }
     // solve
     if (type == "qr.colpivhouseholder") {
       solution.backend() = matrix_.backend().colPivHouseholderQr().solve(rhs.backend());
@@ -177,14 +139,27 @@ private:
     else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
-// check
-#ifndef NDEBUG
-    if (!rhs.backend().isApprox(matrix_.backend() * solution.backend()))
-      return 4;
-#endif // NDEBUG
-    return 0;
-  } // ... redirect_to_appropriate_apply(...)
+    // check
+    const S post_check_solves_system_theshhold =
+        opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
+    if (post_check_solves_system_theshhold > 0) {
+      auto tmp = rhs.copy();
+      tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
+      if (tmp.sup_norm() > post_check_solves_system_theshhold)
+        DUNE_THROW_COLORFULLY(
+            Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
+            "The computed solution does not solve the system (although the eigen backend reported "
+                << "'Success') and you requested checking (see options below)!"
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options.\n"
+                << "  (A * x - b).sup_norm() = "
+                << tmp.sup_norm()
+                << "\n"
+                << "Those were the given options:\n\n"
+                << opts);
+    }
+  } // ... apply(...)
 
+private:
   const MatrixType& matrix_;
 }; // class Solver
 
@@ -271,7 +246,7 @@ public:
   template <class T1, class T2>
   void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution) const
   {
-    return apply(rhs, solution, options()[0]);
+    apply(rhs, solution, options()[0]);
   }
 
   template <class T1, class T2>
@@ -286,7 +261,8 @@ public:
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
-    const auto type                       = opts.get<std::string>("type");
+    const auto type = opts.get<std::string>("type");
+    SolverUtils::check_given(type, options());
     const Common::ConfigTree default_opts = options(type);
     // check for symmetry (if solver needs it)
     if (type.substr(0, 3) == "cg." || type == "ldlt.simplicial" || type == "llt.simplicial") {
