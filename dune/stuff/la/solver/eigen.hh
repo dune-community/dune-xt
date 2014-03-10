@@ -239,7 +239,7 @@ public:
 //           , "superlu"               // <- untested
 #endif
     };
-  }
+  } // ... options()
 
   static Common::ConfigTree options(const std::string& type)
   {
@@ -268,76 +268,20 @@ public:
     return iterative_options;
   } // ... options(...)
 
-  void apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
+  template <class T1, class T2>
+  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution) const
   {
-    return redirect_to_appropriate_apply(rhs, solution);
+    return apply(rhs, solution, options()[0]);
   }
 
-  void apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
+  template <class T1, class T2>
+  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution, const std::string& type) const
   {
-    return redirect_to_appropriate_apply(rhs, solution);
+    apply(rhs, solution, options(type));
   }
 
-  void apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution);
-  }
-
-  void apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution);
-  }
-
-  void apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  void apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  void apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  void apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const std::string& type) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, type);
-  }
-
-  void apply(const EigenDenseVector<S>& rhs, EigenDenseVector<S>& solution, const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-  void apply(const EigenDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution, const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-  void apply(const EigenMappedDenseVector<S>& rhs, EigenDenseVector<S>& solution, const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-  void apply(const EigenMappedDenseVector<S>& rhs, EigenMappedDenseVector<S>& solution,
-             const Common::ConfigTree& opts) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, opts);
-  }
-
-private:
-  template <class RhsType, class SolutionType>
-  void redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution) const
-  {
-    return redirect_to_appropriate_apply(rhs, solution, options()[0]);
-  }
-
-  template <class RhsType, class SolutionType>
-  void redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const Common::ConfigTree& opts) const
+  template <class T1, class T2>
+  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
@@ -550,14 +494,9 @@ private:
                 << "Those were the given options:\n\n"
                 << opts);
     }
-  } // ... redirect_to_appropriate_apply(...)
+  } // ... apply(...)
 
-  template <class RhsType, class SolutionType>
-  void redirect_to_appropriate_apply(const RhsType& rhs, SolutionType& solution, const std::string& type) const
-  {
-    redirect_to_appropriate_apply(rhs, solution, options(type));
-  }
-
+private:
   const MatrixType& matrix_;
 }; // class Solver
 
