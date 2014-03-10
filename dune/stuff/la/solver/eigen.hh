@@ -192,6 +192,8 @@ private:
 /**
  *  \note lu.sparse will copy the matrix to column major
  *  \note qr.sparse will copy the matrix to column major
+ *  \note ldlt.simplicial will copy the matrix to column major
+ *  \note llt.simplicial will copy the matrix to column major
  */
 template <class S>
 class Solver<EigenRowMajorSparseMatrix<S>> : protected SolverUtils
@@ -211,32 +213,31 @@ public:
   {
     return
     {
-      "bicgstab.ilut", "bicgstab.diagonal", "bicgstab.identity", "lu.sparse",
+      "bicgstab.ilut", "lu.sparse", "llt.simplicial" // <- does only work with symmetric matrices
+          ,
+          "ldlt.simplicial" // <- does only work with symmetric matrices
+          ,
+          "bicgstab.diagonal" // <- slow for complicated matrices
+          ,
+          "bicgstab.identity" // <- slow for complicated matrices
+          ,
           "qr.sparse" // <- produces correct results, but is painfully slow
-//           , "ldlt.simplicial"       // <- does not produce correct results
-//           , "llt.simplicial"        // <- does not produce correct results
+          ,
+          "cg.diagonal.lower" // <- does only work with symmetric matrices, may produce correct results
+          ,
+          "cg.diagonal.upper" // <- does only work with symmetric matrices, may produce correct results
+          ,
+          "cg.identity.lower" // <- does only work with symmetric matrices, may produce correct results
+          ,
+          "cg.identity.upper" // <- does only work with symmetric matrices, may produce correct results
 //           , "spqr"                  // <- does not compile
 //           , "llt.cholmodsupernodal" // <- does not compile
 #if HAVE_UMFPACK
-          ,
-          "lu.umfpack" // <-untested
+//           , "lu.umfpack"            // <- untested
 #endif
 #if HAVE_SUPERLU
-          ,
-          "superlu" // <- untested
+//           , "superlu"               // <- untested
 #endif
-          ,
-          "cg.diagonal.lower" // <- does only work with symmetric matrices, may produce correct results but takes a lot
-          // of memory
-          ,
-          "cg.diagonal.upper" // <- does only work with symmetric matrices, may produce correct results but takes a lot
-          // of memory
-          ,
-          "cg.identity.lower" // <- does only work with symmetric matrices, may produce correct results but takes a lot
-          // of memory
-          ,
-          "cg.identity.upper" // <- does only work with symmetric matrices, may produce correct results but takes a lot
-      // of memory
     };
   }
 
@@ -249,12 +250,15 @@ public:
     Common::ConfigTree iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += default_options;
     // direct solvers
-    if (type == "lu.sparse" || type == "qr.sparse" || type == "ldlt.simplicial" || type == "llt.simplicial"
-        || type == "lu.umfpack"
-        || type == "spqr"
+    if (type == "lu.sparse" || type == "qr.sparse" || type == "lu.umfpack" || type == "spqr"
         || type == "llt.cholmodsupernodal"
         || type == "superlu")
       return default_options;
+    // * for symmetric matrices
+    if (type == "ldlt.simplicial" || type == "llt.simplicial") {
+      default_options.set("pre_check_symmetry", "1e-8");
+      return default_options;
+    }
     // iterative solvers
     if (type == "bicgstab.ilut") {
       iterative_options.set("preconditioner.fill_factor", "10");
@@ -341,15 +345,21 @@ private:
     const auto type                       = opts.get<std::string>("type");
     const Common::ConfigTree default_opts = options(type);
     // check for symmetry (if solver needs it)
-    if (type.substr(0, 3) == "cg.") {
+    if (type.substr(0, 3) == "cg." || type == "ldlt.simplicial" || type == "llt.simplicial") {
       const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
       if (pre_check_symmetry_threshhold > 0) {
-        const ColMajorBackendType colmajor_copy(matrix_.backend());
-        if (!colmajor_copy.isApprox(matrix_.backend().transpose(), pre_check_symmetry_threshhold))
+        ColMajorBackendType colmajor_copy(matrix_.backend());
+        colmajor_copy -= matrix_.backend().transpose();
+        // serialize difference to compute L^\infty error (no copy done here)
+        EigenMappedDenseVector<S> differences(colmajor_copy.valuePtr(), colmajor_copy.nonZeros());
+        if (differences.sup_norm() > pre_check_symmetry_threshhold)
           DUNE_THROW_COLORFULLY(
               Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
               "Given matrix is not symmetric and you requested checking (see options below)!\n"
                   << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n"
+                  << "  (A - A').sup_norm() = "
+                  << differences.sup_norm()
+                  << "\n"
                   << "Those were the given options:\n\n"
                   << opts);
       }
@@ -434,24 +444,24 @@ private:
       solver.factorize(colmajor_copy);
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
-//    } else if (type == "ldlt.simplicial") {
-//      ColMajorBackendType colmajor_copy(matrix_.backend());
-//      colmajor_copy.makeCompressed();
-//      typedef ::Eigen::SimplicialLDLT< ColMajorBackendType > SolverType;
-//      SolverType solver;
-//      solver.analyzePattern(colmajor_copy);
-//      solver.factorize(colmajor_copy);
-//      solution.backend() = solver.solve(rhs.backend());
-//      info = solver.info();
-//    } else if (type == "llt.simplicial") {
-//      ColMajorBackendType colmajor_copy(matrix_.backend());
-//      colmajor_copy.makeCompressed();
-//      typedef ::Eigen::SimplicialLLT< ColMajorBackendType > SolverType;
-//      SolverType solver;
-//      solver.analyzePattern(colmajor_copy);
-//      solver.factorize(colmajor_copy);
-//      solution.backend() = solver.solve(rhs.backend());
-//      info = solver.info();
+    } else if (type == "ldlt.simplicial") {
+      ColMajorBackendType colmajor_copy(matrix_.backend());
+      colmajor_copy.makeCompressed();
+      typedef ::Eigen::SimplicialLDLT<ColMajorBackendType> SolverType;
+      SolverType solver;
+      solver.analyzePattern(colmajor_copy);
+      solver.factorize(colmajor_copy);
+      solution.backend() = solver.solve(rhs.backend());
+      info = solver.info();
+    } else if (type == "llt.simplicial") {
+      ColMajorBackendType colmajor_copy(matrix_.backend());
+      colmajor_copy.makeCompressed();
+      typedef ::Eigen::SimplicialLLT<ColMajorBackendType> SolverType;
+      SolverType solver;
+      solver.analyzePattern(colmajor_copy);
+      solver.factorize(colmajor_copy);
+      solution.backend() = solver.solve(rhs.backend());
+      info = solver.info();
 #if HAVE_UMFPACK
     } else if (type == "lu.umfpack") {
       typedef ::Eigen::UmfPackLU<typename MatrixType::BackendType> SolverType;
@@ -533,8 +543,11 @@ private:
             Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
             "The computed solution does not solve the system (although the eigen backend reported "
                 << "'Success') and you requested checking (see options below)!"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
-                << "\nThose were the given options:\n\n"
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options.\n"
+                << "  (A * x - b).sup_norm() = "
+                << tmp.sup_norm()
+                << "\n"
+                << "Those were the given options:\n\n"
                 << opts);
     }
   } // ... redirect_to_appropriate_apply(...)
