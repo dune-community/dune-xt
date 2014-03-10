@@ -1090,30 +1090,10 @@ public:
     return backend_->cols();
   }
 
-  template <class SourceType, class RangeType>
-  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
+  template <class T1, class T2>
+  inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
-    static_assert(Dune::AlwaysFalse<SourceType>::value, "Not available for this combination of xx and yy!");
-  }
-
-  inline void mv(const EigenDenseVector<ScalarType>& xx, EigenDenseVector<ScalarType>& yy) const
-  {
-    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
-  }
-
-  inline void mv(const EigenDenseVector<ScalarType>& xx, EigenMappedDenseVector<ScalarType>& yy) const
-  {
-    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
-  }
-
-  inline void mv(const EigenMappedDenseVector<ScalarType>& xx, EigenDenseVector<ScalarType>& yy) const
-  {
-    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
-  }
-
-  inline void mv(const EigenMappedDenseVector<ScalarType>& xx, EigenMappedDenseVector<ScalarType>& yy) const
-  {
-    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
+    yy.backend().transpose() = backend_->operator*(xx.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -1380,32 +1360,11 @@ public:
     return backend_->cols();
   }
 
-  //  template< class SourceType, class RangeType >
-  //  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
-  //  {
-  //    static_assert(Dune::AlwaysFalse< SourceType >::value, "Not available for this combination of xx and yy!");
-  //  }
-
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
     yy.backend().transpose() = backend_->operator*(xx.backend());
   }
-
-  //  inline void mv(const EigenDenseVector< ScalarType >& xx, EigenMappedDenseVector< ScalarType >& yy) const
-  //  {
-  //    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
-  //  }
-
-  //  inline void mv(const EigenMappedDenseVector< ScalarType >& xx, EigenDenseVector< ScalarType >& yy) const
-  //  {
-  //    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
-  //  }
-
-  //  inline void mv(const EigenMappedDenseVector< ScalarType >& xx, EigenMappedDenseVector< ScalarType >& yy) const
-  //  {
-  //    yy.backend_->transpose() = backend_->operator*(*(xx.backend_));
-  //  }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
