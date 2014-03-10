@@ -70,7 +70,7 @@ class EigenMatrixInterfaceDynamic
 
 
 /**
- *  \brief Traits for EigenDenseVector.
+ *  \brief Traits for EigenBaseVector.
  */
 template <class VectorImpTraits, class ScalarImp = double>
 class EigenBaseVectorTraits
@@ -86,7 +86,7 @@ public:
 
 
 /**
- *  \brief A dense vector implementation of VectorInterface using the eigen backend.
+ *  \brief Base class for all eigen implementations of VectorInterface.
  */
 template <class VectorImpTraits, class ScalarImp = double>
 class EigenBaseVector : public VectorInterface<EigenBaseVectorTraits<VectorImpTraits, ScalarImp>>,
@@ -293,21 +293,6 @@ public:
   }
 
   template <class T>
-  VectorImpType add(const EigenBaseVector<T, ScalarType>& other) const
-  {
-    if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
-    return VectorImpType(backend() + other.backend());
-  } // ... add(...)
-
-  virtual ThisType add(const ThisType& other) const DS_OVERRIDE
-  {
-    return this->template add<VectorImpTraits>(other);
-  }
-
-  template <class T>
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
     if (other.size() != size())
@@ -339,21 +324,6 @@ public:
   virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE
   {
     return this->template sub<VectorImpTraits, VectorImpTraits>(other, result);
-  }
-
-  template <class T>
-  VectorImpType sub(const EigenBaseVector<T, ScalarType>& other) const
-  {
-    if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
-    return VectorImpType(backend() - other.backend());
-  } // ... sub(...)
-
-  virtual ThisType sub(const ThisType& other) const DS_OVERRIDE
-  {
-    return this->template sub<VectorImpTraits>(other);
   }
 
   template <class T>
@@ -569,10 +539,18 @@ public:
 
   virtual ThisType add(const ThisType& other) const DS_OVERRIDE
   {
-    return BaseType::template add<Traits>(other);
+    return this->template add<Traits>(other);
   }
 
-  using BaseType::add;
+  template <class T>
+  ThisType add(const EigenBaseVector<T, ScalarType>& other) const
+  {
+    if (other.size() != size())
+      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
+                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
+                                                  << ")!");
+    return ThisType(backend() + other.backend());
+  } // ... add(...)
 
   virtual void iadd(const ThisType& other) DS_OVERRIDE
   {
@@ -586,12 +564,20 @@ public:
     BaseType::template sub<Traits, Traits>(other, result);
   }
 
+  template <class T>
+  ThisType sub(const EigenBaseVector<T, ScalarType>& other) const
+  {
+    if (other.size() != size())
+      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
+                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
+                                                  << ")!");
+    return ThisType(backend() - other.backend());
+  } // ... sub(...)
+
   virtual ThisType sub(const ThisType& other) const DS_OVERRIDE
   {
-    return BaseType::template sub<Traits>(other);
+    return this->template sub<Traits>(other);
   }
-
-  using BaseType::sub;
 
   virtual void isub(const ThisType& other) DS_OVERRIDE
   {
@@ -639,11 +625,12 @@ public:
  */
 template <class ScalarImp = double>
 class EigenMappedDenseVector : public VectorInterface<EigenMappedDenseVectorTraits<ScalarImp>>,
-                               public EigenVectorInterfaceDynamic,
+                               public EigenBaseVector<EigenMappedDenseVectorTraits<ScalarImp>>,
                                public ProvidesBackend<EigenMappedDenseVectorTraits<ScalarImp>>
 {
   typedef EigenMappedDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<EigenMappedDenseVectorTraits<ScalarImp>> VectorInterfaceType;
+  typedef EigenBaseVector<EigenMappedDenseVectorTraits<ScalarImp>> BaseType;
   static_assert(std::is_same<ScalarImp, double>::value, "Undefined behaviour for non-double data!");
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
@@ -744,7 +731,6 @@ public:
    * \defgroup backend ´´These methods are required by the ProvidesBackend interface.``
    * \{
    */
-
   BackendType& backend()
   {
     ensure_uniqueness();
@@ -756,40 +742,17 @@ public:
     const_cast<ThisType&>(*this).ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
-
   /**
    * \}
    */
 
   /**
-   * \defgroup container ´´These methods are required by ContainerInterface.``
+   * \defgroup data ´´These methods are required by the ProvidesDataAccess interface.``
    * \{
    */
-  ThisType copy() const
+  ScalarType* data()
   {
-    return ThisType(*backend_);
-  }
-
-  void scal(const ScalarType& alpha)
-  {
-    ensure_uniqueness();
-    backend_->operator*=(alpha);
-  } // ... scal(...)
-
-  void axpy(const ScalarType& alpha, const ThisType& xx)
-  {
-    if (xx.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    ensure_uniqueness();
-    auto& this_ref     = *backend_;
-    const auto& xx_ref = *(xx.backend_);
-    this_ref += alpha * xx_ref;
-  } // ... axpy(...)
-
-  bool has_equal_shape(const ThisType& other) const
-  {
-    return size() == other.size();
+    return backend_->data();
   }
   /**
    * \}
@@ -799,161 +762,115 @@ public:
    * \defgroup vector_required ´´These methods are required by VectorInterface.``
    * \{
    */
-
-  inline size_t size() const
-  {
-    return backend_->size();
-  }
-
-  void add_to_entry(const size_t ii, const ScalarType& value)
-  {
-    assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator()(ii) += value;
-  } // ... add_to_entry(...)
-
-  void set_entry(const size_t ii, const ScalarType& value)
-  {
-    assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator()(ii) = value;
-  } // ... set_entry(...)
-
-  ScalarType get_entry(const size_t ii) const
-  {
-    assert(ii < size());
-    return backend_->operator()(ii);
-  } // ... get_entry(...)
-
-private:
-  inline ScalarType& get_entry_ref(const size_t ii)
-  {
-    return backend_->operator()(ii);
-  }
-
-  inline const ScalarType& get_entry_ref(const size_t ii) const
-  {
-    return backend_->operator()(ii);
-  }
-
-public:
+  using BaseType::copy;
+  using BaseType::scal;
   /**
    * \}
    */
 
+  /**
+   * \defgroup vector_required ´´These methods are required by VectorInterface.``
+   * \{
+   */
+  using BaseType::size;
+  using BaseType::add_to_entry;
+  using BaseType::set_entry;
+  using BaseType::get_entry;
+
+protected:
+  using BaseType::get_entry_ref;
+  /**
+   * \}
+   */
+
+public:
   /**
    * \defgroup vector_overrides ´´These methods override default implementations from VectorInterface.``
    * \{
    */
-
-  virtual std::pair<size_t, ScalarType> amax() const DS_OVERRIDE
+  virtual bool
+  almost_equal(const ThisType& other,
+               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const DS_OVERRIDE
   {
-    auto result              = std::make_pair(size_t(0), ScalarType(0));
-    size_t min_index         = 0;
-    size_t max_index         = 0;
-    const ScalarType minimum = backend_->minCoeff(&min_index);
-    const ScalarType maximum = backend_->maxCoeff(&max_index);
-    if (std::abs(maximum) >= std::abs(minimum)) {
-      result.first  = min_index;
-      result.second = std::abs(minimum);
-    } else {
-      result.first  = max_index;
-      result.second = maximum;
-    }
-    return result;
-  } // ... amax(...)
+    return BaseType::template almost_equal<Traits>(other, epsilon);
+  }
 
-  bool almost_equal(const EigenDenseVector<ScalarType>& other,
-                    const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
-  {
-    if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
-    for (size_t ii = 0; ii < size(); ++ii)
-      if (!Dune::FloatCmp::eq<ScalarType>(backend_->operator()(ii), other.backend_->operator()(ii), epsilon))
-        return false;
-    return true;
-  } // ... almost_equal(...)
-
-  using VectorInterfaceType::almost_equal;
+  using BaseType::almost_equal;
 
   virtual ScalarType dot(const ThisType& other) const DS_OVERRIDE
   {
-    if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
-    const auto& other_ref = *(other.backend_);
-    return backend_->transpose() * other_ref;
-  } // ... dot(...)
-
-  virtual ScalarType l1_norm() const DS_OVERRIDE
-  {
-    return backend_->template lpNorm<1>();
+    BaseType::template dot<Traits>(other);
   }
 
-  virtual ScalarType l2_norm() const DS_OVERRIDE
-  {
-    return backend_->template lpNorm<2>();
-  }
-
-  virtual ScalarType sup_norm() const DS_OVERRIDE
-  {
-    return backend_->template lpNorm<::Eigen::Infinity>();
-  }
+  using BaseType::dot;
 
   virtual void add(const ThisType& other, ThisType& result) const DS_OVERRIDE
   {
+    BaseType::template add<Traits, Traits>(other, result);
+  }
+
+  using BaseType::sup_norm;
+
+  virtual ThisType add(const ThisType& other) const DS_OVERRIDE
+  {
+    return this->template add<Traits>(other);
+  }
+
+  template <class T>
+  ThisType add(const EigenBaseVector<T, ScalarType>& other) const
+  {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of other (" << other.size() << ") does not match the size of this (" << size()
                                                   << ")!");
-    if (result.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of result (" << result.size() << ") does not match the size of this (" << size()
-                                                   << ")!");
-    result.backend() = backend_->operator+(*(other.backend_));
+    ThisType ret(backend());
+    ret.backend() += other.backend();
+    return ret;
   } // ... add(...)
 
   virtual void iadd(const ThisType& other) DS_OVERRIDE
   {
-    if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
-    ensure_uniqueness();
-    const auto& other_ref = *(other.backend_);
-    backend_->operator+=(other_ref);
-  } // ... iadd(...)
+    BaseType::template iadd<Traits>(other);
+  }
+
+  using BaseType::iadd;
 
   virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE
   {
-    if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
-    if (result.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of result (" << result.size() << ") does not match the size of this (" << size()
-                                                   << ")!");
-    result.backend() = backend_->operator-(*(other.backend_));
-  } // ... sub(...)
+    BaseType::template sub<Traits, Traits>(other, result);
+  }
 
-  void isub(const ThisType& other) DS_OVERRIDE
+  template <class T>
+  ThisType sub(const EigenBaseVector<T, ScalarType>& other) const
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of other (" << other.size() << ") does not match the size of this (" << size()
                                                   << ")!");
-    ensure_uniqueness();
-    const auto& other_ref = *(other.backend_);
-    backend_->operator-=(other_ref);
-  } // ... isub(...)
+    ThisType ret(backend());
+    ret.backend() -= other.backend();
+    return ret;
+  } // ... sub(...)
 
+  virtual ThisType sub(const ThisType& other) const DS_OVERRIDE
+  {
+    return this->template sub<Traits>(other);
+  }
+
+  using BaseType::sub;
+
+  virtual void isub(const ThisType& other) DS_OVERRIDE
+  {
+    BaseType::template isub<Traits>(other);
+  }
+
+  using BaseType::isub;
   /**
    * \}
    */
+
+  using BaseType::operator*=;
+
 private:
   inline void ensure_uniqueness()
   {
@@ -965,11 +882,7 @@ private:
   } // ... ensure_uniqueness(...)
 
   friend class VectorInterface<EigenMappedDenseVectorTraits<ScalarType>>;
-  friend class EigenDenseVector<ScalarType>;
-  friend class EigenDenseMatrix<ScalarType>;
-  friend class EigenRowMajorSparseMatrix<ScalarType>;
-  friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
-  friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
+  friend class EigenBaseVector<EigenDenseVectorTraits<ScalarType>>;
 
   std::shared_ptr<BackendType> backend_;
 }; // class EigenMappedDenseVector
