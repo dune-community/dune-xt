@@ -14,7 +14,7 @@
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
 
-#include <dune/stuff/la/container/dunedynamic.hh>
+#include <dune/stuff/la/container/common.hh>
 
 #include "../solver.hh"
 
