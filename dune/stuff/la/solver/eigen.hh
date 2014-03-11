@@ -62,11 +62,11 @@ public:
   {
     return {"lu.partialpiv",
             "qr.householder",
+            "llt",
+            "ldlt",
             "qr.colpivhouseholder",
             "qr.fullpivhouseholder",
-            "lu.fullpiv",
-            "llt",
-            "ldlt"};
+            "lu.fullpiv"};
   } // ... options()
 
   static Common::ConfigTree options(const std::string& type)
