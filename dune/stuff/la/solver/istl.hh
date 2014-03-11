@@ -41,15 +41,16 @@ public:
 
   static std::vector<std::string> options()
   {
-    return {"bicgstab.ilut", "bicgstab.amg.ilu0"};
-  }
+    return {"bicgstab.amg.ilu0", "bicgstab.ilut"};
+  } // ... options()
 
   static Common::ConfigTree options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    Common::ConfigTree iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
+    Common::ConfigTree iterative_options({"max_iter", "precision", "verbose", "post_check_solves_system"},
+                                         {"10000", "1e-10", "0", "1e-6"});
     if (type == "bicgstab.ilut") {
-      iterative_options.set("preconditioner.iterations", "10");
+      iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
     } else if (type == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
@@ -67,26 +68,26 @@ public:
     return iterative_options;
   } // ... options(...)
 
-  size_t apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution) const
+  void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution) const
   {
-    return apply(rhs, solution, options()[0]);
+    apply(rhs, solution, options()[0]);
   }
 
-  size_t apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const std::string& type) const
+  void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const std::string& type) const
   {
-    return apply(rhs, solution, options(type));
-  } // ... apply(...)
+    apply(rhs, solution, options(type));
+  }
 
   /**
    *  \note does a copy of the rhs
    */
-  size_t apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts) const
+  void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
-    this->check_given(type, options());
+    SolverUtils::check_given(type, options());
     const Common::ConfigTree default_opts = options(type);
     IstlDenseVector<S> writable_rhs       = rhs.copy();
     // solve
@@ -111,7 +112,10 @@ public:
       InverseOperatorResult stat;
       solver.apply(solution.backend(), writable_rhs.backend(), stat);
       if (!stat.converged)
-        return 2;
+        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                                  << "Those were the given options:\n\n"
+                                  << opts);
     } else if (type == "bicgstab.amg.ilu0") {
       typedef MatrixAdapter<typename MatrixType::BackendType,
                             typename IstlDenseVector<S>::BackendType,
@@ -150,17 +154,31 @@ public:
       InverseOperatorResult stat;
       solver.apply(solution.backend(), writable_rhs.backend(), stat);
       if (!stat.converged)
-        return 2;
+        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                                  << "Those were the given options:\n\n"
+                                  << opts);
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
-// check
-#ifndef NDEBUG
-    matrix_.mv(solution, writable_rhs);
-    if (!rhs.almost_equal(writable_rhs))
-      return 4;
-#endif // NDEBUG
-    return 0;
+    // check (use writable_rhs as tmp)
+    const S post_check_solves_system_theshhold =
+        opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
+    if (post_check_solves_system_theshhold > 0) {
+      matrix_.mv(solution, writable_rhs);
+      writable_rhs -= rhs;
+      if (writable_rhs.sup_norm() > post_check_solves_system_theshhold)
+        DUNE_THROW_COLORFULLY(
+            Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
+            "The computed solution does not solve the system (although the dune-istl backend "
+                << "reported no error) and you requested checking (see options below)!"
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options.\n"
+                << "  (A * x - b).sup_norm() = "
+                << writable_rhs.sup_norm()
+                << "\n"
+                << "Those were the given options:\n\n"
+                << opts);
+    }
   } // ... apply(...)
 
 private:
