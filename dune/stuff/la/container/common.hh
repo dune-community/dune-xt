@@ -499,10 +499,11 @@ public:
     return backend_->cols();
   }
 
-  template <class SourceType, class RangeType>
-  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
+  inline void mv(const VectorInterface<CommonDenseVectorTraits<ScalarType>>& xx,
+                 VectorInterface<CommonDenseVectorTraits<ScalarType>>& yy) const
   {
-    static_assert(Dune::AlwaysFalse<SourceType>::value, "Not available for this combination of xx and yy!");
+    mv(static_cast<const typename CommonDenseVectorTraits<ScalarType>::derived_type&>(xx),
+       static_cast<typename CommonDenseVectorTraits<ScalarType>::derived_type&>(yy));
   }
 
   inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
