@@ -670,8 +670,8 @@ public:
     return this->as_imp(*this).cols();
   }
 
-  template <class SourceType, class RangeType>
-  inline void mv(const SourceType& xx, RangeType& yy) const
+  template <class XX, class YY>
+  inline void mv(const XX& xx, YY& yy) const
   {
     CHECK_AND_CALL_CRTP(this->as_imp(*this).mv(xx, yy));
   }
