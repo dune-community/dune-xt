@@ -4,9 +4,9 @@
 #include <vector>
 
 #include <dune/common/fvector.hh>
-#include <dune/common/exceptions.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/exceptions.hh>
 
 #include "expression/base.hh"
 #include "interfaces.hh"
@@ -83,9 +83,9 @@ class Expression
 
     virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const DS_OVERRIDE
     {
-      DUNE_THROW(NotImplemented,
-                 "If we decided on the JacobianRangeType of matrix valued functions we havo to implement gradients for "
-                     << "this function!");
+      DUNE_THROW_COLORFULLY(NotImplemented,
+                            "If we decided on the JacobianRangeType of matrix valued functions we havo to implement "
+                                << "gradients for this function!");
     }
 
   private:
@@ -220,7 +220,7 @@ class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 
     virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
     {
       if (gradients_.size() == 0)
-        DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
+        DUNE_THROW_COLORFULLY(NotImplemented, "This function does not provide any gradients!");
       assert(gradients_.size() == dimRange);
       global_point_ = this->entity().geometry().global(xx);
       for (size_t ii = 0; ii < dimRange; ++ii) {
@@ -296,10 +296,10 @@ public:
       const std::string expr = settings.get<std::string>("expression");
       _expressions.push_back(expr);
     } else
-      DUNE_THROW(Dune::IOError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-                      << " neither key nor vector 'expression' found in the following settings:\n"
-                      << settings.reportString("  "));
+      DUNE_THROW_COLORFULLY(Dune::IOError,
+                            "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
+                                 << " neither key nor vector 'expression' found in the following settings:\n"
+                                 << settings.reportString("  "));
     // get optional
     const int order        = settings.get<int>("order", -1);
     const std::string name = settings.get<std::string>("name", "function.expression");
@@ -350,7 +350,7 @@ public:
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
   {
     if (gradients_.size() == 0)
-      DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
+      DUNE_THROW_COLORFULLY(NotImplemented, "This function does not provide any gradients!");
     assert(gradients_.size() == dimRange);
     for (size_t ii = 0; ii < dimRange; ++ii) {
       gradients_[ii]->evaluate(xx, ret[ii]);
@@ -363,7 +363,7 @@ private:
     if (gradient_expressions.size() > 0)
       for (size_t rr = 0; rr < dimRange; ++rr) {
         const auto& gradient_expression = gradient_expressions[rr];
-        assert(gradient_expression.size() <= dimDomain);
+        assert(gradient_expression.size() >= dimDomain);
         gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expression));
       }
   } // ... build_gradients(...)
