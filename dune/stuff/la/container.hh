@@ -9,7 +9,7 @@
 #include <dune/common/typetraits.hh>
 
 #include "container/interfaces.hh"
-#include "container/dunedynamic.hh"
+#include "container/common.hh"
 #include "container/eigen.hh"
 #include "container/istl.hh"
 
@@ -30,22 +30,22 @@ public:
 
 
 template <class S>
-class Container<DuneDynamicVector<S>>
+class Container<CommonDenseVector<S>>
 {
 public:
-  static DuneDynamicVector<S> create(const size_t size)
+  static CommonDenseVector<S> create(const size_t size)
   {
-    return DuneDynamicVector<S>(size, S(1));
+    return CommonDenseVector<S>(size, S(1));
   }
 };
 
 template <class S>
-class Container<DuneDynamicMatrix<S>>
+class Container<CommonDenseMatrix<S>>
 {
 public:
-  static DuneDynamicMatrix<S> create(const size_t size)
+  static CommonDenseMatrix<S> create(const size_t size)
   {
-    DuneDynamicMatrix<S> matrix(size, size);
+    CommonDenseMatrix<S> matrix(size, size);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
     return matrix;
