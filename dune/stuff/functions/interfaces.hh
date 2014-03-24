@@ -131,10 +131,20 @@ public:
   /* @} */
 
 protected:
-  bool is_a_valid_point(const DomainType& xx) const
+  bool is_a_valid_point(const DomainType&
+#ifndef DUNE_STUFF_FUNCTIONS_DISABLE_CHECKS
+                            xx
+#else
+/*xx*/
+#endif
+                        ) const
   {
+#ifndef DUNE_STUFF_FUNCTIONS_DISABLE_CHECKS
     const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
     return reference_element.checkInside(xx);
+#else // DUNE_STUFF_FUNCTIONS_DISABLE_CHECKS
+    return true;
+#endif
   }
 
   const EntityType& entity_;
