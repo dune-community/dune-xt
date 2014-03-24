@@ -76,20 +76,20 @@ public:
   public:
     Localfunction(const EntityImp& entity, const ThisType& global_function)
       : LocalfunctionBaseType(entity)
-      , geometry_(entity.geometry())
+      //      , geometry_(entity.geometry())
       , global_function_(global_function)
     {
     }
 
     virtual void evaluate(const DomainType& xx, RangeType& ret) const
     {
-      const auto xx_global = geometry_.global(xx);
+      const auto xx_global = /*geometry_*/ this->entity().geometry().global(xx);
       global_function_.evaluate(xx_global, ret);
     }
 
     virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const
     {
-      const auto xx_global = geometry_.global(xx);
+      const auto xx_global = /*geometry_*/ this->entity().geometry().global(xx);
       global_function_.jacobian(xx_global, ret);
     }
 
@@ -99,7 +99,7 @@ public:
     }
 
   private:
-    const typename EntityImp::Geometry& geometry_;
+    //      const typename EntityImp::Geometry& geometry_;
     const ThisType& global_function_;
   };
 
@@ -182,20 +182,20 @@ public:
   public:
     Localfunction(const EntityImp& entity, const ThisType& global_function)
       : LocalfunctionBaseType(entity)
-      , geometry_(entity.geometry())
+      //      , geometry_(entity.geometry())
       , global_function_(global_function)
     {
     }
 
     virtual void evaluate(const DomainType& xx, RangeType& ret) const
     {
-      const auto xx_global = geometry_.global(xx);
+      const auto xx_global = /*geometry_*/ this->entity().geometry().global(xx);
       global_function_.evaluate(xx_global, ret);
     }
 
     virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const
     {
-      const auto xx_global = geometry_.global(xx);
+      const auto xx_global = /*geometry_*/ this->entity().geometry().global(xx);
       global_function_.jacobian(xx_global, ret);
     }
 
@@ -205,7 +205,7 @@ public:
     }
 
   private:
-    const typename EntityImp::Geometry& geometry_;
+    //      const typename EntityImp::Geometry& geometry_;
     const ThisType& global_function_;
   };
 
