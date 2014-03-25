@@ -25,7 +25,7 @@ namespace Stuff {
  * base class for global matrix-valued valued functions that provides automatic local functions via
  * LocalizableFunctionInterface
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols>
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class GlobalFunction
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
