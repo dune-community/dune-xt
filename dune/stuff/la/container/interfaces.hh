@@ -11,6 +11,7 @@
 #endif
 
 #include <limits>
+#include <iostream>
 
 #include <dune/common/float_cmp.hh>
 
@@ -633,7 +634,27 @@ public:
   /**
    * \}
    */
+
+private:
+  template <class T>
+  friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T>& /*vector*/);
 }; // class VectorInterface
+
+
+template <class T>
+std::ostream& operator<<(std::ostream& out, const VectorInterface<T>& vector)
+{
+  out << "[";
+  const size_t sz = vector.size();
+  if (sz > 0) {
+    out << vector[0];
+    for (size_t ii = 1; ii < sz; ++ii)
+      out << ", " << vector[ii];
+  } else
+    out << " ";
+  out << "]";
+  return out;
+}
 
 
 /// Needed for the python bindings.
