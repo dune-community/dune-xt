@@ -42,7 +42,7 @@ namespace LA {
 
 
 // forwards
-template <class VectorImpTraits, class ScalarImp>
+template <class Traits, class ScalarImp>
 class EigenBaseVector;
 
 template <class ScalarImp>
@@ -70,41 +70,24 @@ class EigenMatrixInterfaceDynamic
 
 
 /**
- *  \brief Traits for EigenBaseVector.
- */
-template <class VectorImpTraits, class ScalarImp = double>
-class EigenBaseVectorTraits
-{
-  static_assert(std::is_same<ScalarImp, typename VectorImpTraits::ScalarType>::value, "Types do not match!");
-
-public:
-  typedef ScalarImp ScalarType;
-  typedef EigenBaseVector<VectorImpTraits, ScalarType> derived_type;
-  typedef typename VectorImpTraits::BackendType BackendType;
-  typedef typename VectorImpTraits::derived_type VectorImpType;
-}; // class EigenBaseVectorTraits
-
-
-/**
  *  \brief Base class for all eigen implementations of VectorInterface.
  */
-template <class VectorImpTraits, class ScalarImp = double>
-class EigenBaseVector : public VectorInterface<EigenBaseVectorTraits<VectorImpTraits, ScalarImp>>,
+template <class Traits, class ScalarImp = double>
+class EigenBaseVector : public VectorInterface<Traits>,
                         public EigenVectorInterfaceDynamic,
-                        public ProvidesBackend<EigenBaseVectorTraits<VectorImpTraits, ScalarImp>>,
-                        protected CRTPInterface<EigenBaseVector<VectorImpTraits, ScalarImp>, VectorImpTraits>
+                        public ProvidesBackend<Traits>,
+                        protected CRTPInterface<EigenBaseVector<Traits, ScalarImp>, Traits>
 {
-  typedef EigenBaseVector<VectorImpTraits, ScalarImp> ThisType;
-  typedef VectorInterface<EigenBaseVectorTraits<VectorImpTraits, ScalarImp>> VectorInterfaceType;
+  typedef EigenBaseVector<Traits, ScalarImp> ThisType;
+  typedef VectorInterface<Traits> VectorInterfaceType;
 
 public:
-  typedef EigenBaseVectorTraits<VectorImpTraits> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::BackendType BackendType;
-  typedef typename Traits::VectorImpType VectorImpType;
+  typedef typename Traits::derived_type VectorImpType;
 
 protected:
-  typedef CRTPInterface<EigenBaseVector<VectorImpTraits, ScalarImp>, VectorImpTraits> CRTP;
+  typedef CRTPInterface<EigenBaseVector<Traits, ScalarImp>, Traits> CRTP;
 
 public:
   /**
@@ -203,7 +186,7 @@ public:
    * \defgroup vector_overrides ´´These methods override default implementations from VectorInterface.``
    * \{
    */
-  virtual std::pair<size_t, ScalarType> amax() const DS_OVERRIDE
+  virtual std::pair<size_t, ScalarType> amax() const /*DS_OVERRIDE*/
   {
     auto result              = std::make_pair(size_t(0), ScalarType(0));
     size_t min_index         = 0;
@@ -236,9 +219,9 @@ public:
 
   virtual bool
   almost_equal(const ThisType& other,
-               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const DS_OVERRIDE
+               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const /*DS_OVERRIDE*/
   {
-    return this->template almost_equal<VectorImpTraits>(other, epsilon);
+    return this->template almost_equal<Traits>(other, epsilon);
   }
 
   using VectorInterfaceType::almost_equal;
@@ -253,22 +236,22 @@ public:
     return backend().transpose() * other.backend();
   } // ... dot(...)
 
-  virtual ScalarType dot(const ThisType& other) const DS_OVERRIDE
+  virtual ScalarType dot(const ThisType& other) const /*DS_OVERRIDE*/
   {
-    return this->template dot<VectorImpTraits>(other);
+    return this->template dot<Traits>(other);
   }
 
-  virtual ScalarType l1_norm() const DS_OVERRIDE
+  virtual ScalarType l1_norm() const /*DS_OVERRIDE*/
   {
     return backend().template lpNorm<1>();
   }
 
-  virtual ScalarType l2_norm() const DS_OVERRIDE
+  virtual ScalarType l2_norm() const /*DS_OVERRIDE*/
   {
     return backend().template lpNorm<2>();
   }
 
-  virtual ScalarType sup_norm() const DS_OVERRIDE
+  virtual ScalarType sup_norm() const /*DS_OVERRIDE*/
   {
     return backend().template lpNorm<::Eigen::Infinity>();
   }
@@ -287,9 +270,9 @@ public:
     result.backend() = backend() + other.backend();
   } // ... add(...)
 
-  virtual void add(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void add(const ThisType& other, ThisType& result) const /*DS_OVERRIDE*/
   {
-    return this->template add<VectorImpTraits, VectorImpTraits>(other, result);
+    return this->template add<Traits, Traits>(other, result);
   }
 
   template <class T>
@@ -302,9 +285,9 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  virtual void iadd(const ThisType& other) DS_OVERRIDE
+  virtual void iadd(const ThisType& other) /*DS_OVERRIDE*/
   {
-    return this->template iadd<VectorImpTraits>(other);
+    return this->template iadd<Traits>(other);
   }
 
   template <class T1, class T2>
@@ -321,9 +304,9 @@ public:
     result.backend() = backend() - other.backend();
   } // ... sub(...)
 
-  virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void sub(const ThisType& other, ThisType& result) const /*DS_OVERRIDE*/
   {
-    return this->template sub<VectorImpTraits, VectorImpTraits>(other, result);
+    return this->template sub<Traits, Traits>(other, result);
   }
 
   template <class T>
@@ -336,16 +319,16 @@ public:
     backend() -= other.backend();
   } // ... isub(...)
 
-  virtual void isub(const ThisType& other) DS_OVERRIDE
+  virtual void isub(const ThisType& other) /*DS_OVERRIDE*/
   {
-    this->template isub<VectorImpTraits>(other);
+    this->template isub<Traits>(other);
   }
   /**
    * \}
    */
 
 private:
-  friend class VectorInterface<EigenBaseVectorTraits<VectorImpTraits, ScalarType>>;
+  friend class VectorInterface<Traits>;
 }; // class EigenBaseVector
 
 
@@ -366,9 +349,10 @@ public:
  *  \brief A dense vector implementation of VectorInterface using the eigen backend.
  */
 template <class ScalarImp = double>
-class EigenDenseVector : public VectorInterface<EigenDenseVectorTraits<ScalarImp>>,
-                         public EigenBaseVector<EigenDenseVectorTraits<ScalarImp>>,
-                         public ProvidesDataAccess<EigenDenseVectorTraits<ScalarImp>>
+class EigenDenseVector
+    : /*public VectorInterface< EigenDenseVectorTraits< ScalarImp > >
+  , */ public EigenBaseVector<EigenDenseVectorTraits<ScalarImp>>,
+      public ProvidesDataAccess<EigenDenseVectorTraits<ScalarImp>>
 {
   typedef EigenDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<EigenDenseVectorTraits<ScalarImp>> VectorInterfaceType;
@@ -516,28 +500,28 @@ public:
    */
   virtual bool
   almost_equal(const ThisType& other,
-               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const DS_OVERRIDE
+               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const /*DS_OVERRIDE*/
   {
     return BaseType::template almost_equal<Traits>(other, epsilon);
   }
 
   using BaseType::almost_equal;
 
-  virtual ScalarType dot(const ThisType& other) const DS_OVERRIDE
+  virtual ScalarType dot(const ThisType& other) const /*DS_OVERRIDE*/
   {
     BaseType::template dot<Traits>(other);
   }
 
   using BaseType::dot;
 
-  virtual void add(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void add(const ThisType& other, ThisType& result) const /*DS_OVERRIDE*/
   {
     BaseType::template add<Traits, Traits>(other, result);
   }
 
   using BaseType::sup_norm;
 
-  virtual ThisType add(const ThisType& other) const DS_OVERRIDE
+  virtual ThisType add(const ThisType& other) const /*DS_OVERRIDE*/
   {
     return this->template add<Traits>(other);
   }
@@ -552,14 +536,14 @@ public:
     return ThisType(backend() + other.backend());
   } // ... add(...)
 
-  virtual void iadd(const ThisType& other) DS_OVERRIDE
+  virtual void iadd(const ThisType& other) /*DS_OVERRIDE*/
   {
     BaseType::template iadd<Traits>(other);
   }
 
   using BaseType::iadd;
 
-  virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void sub(const ThisType& other, ThisType& result) const /*DS_OVERRIDE*/
   {
     BaseType::template sub<Traits, Traits>(other, result);
   }
@@ -574,12 +558,12 @@ public:
     return ThisType(backend() - other.backend());
   } // ... sub(...)
 
-  virtual ThisType sub(const ThisType& other) const DS_OVERRIDE
+  virtual ThisType sub(const ThisType& other) const /*DS_OVERRIDE*/
   {
     return this->template sub<Traits>(other);
   }
 
-  virtual void isub(const ThisType& other) DS_OVERRIDE
+  virtual void isub(const ThisType& other) /*DS_OVERRIDE*/
   {
     BaseType::template isub<Traits>(other);
   }
@@ -624,9 +608,10 @@ public:
  *  \brief  A dense vector implementation of VectorInterface using the eigen backend which wrappes a raw array.
  */
 template <class ScalarImp = double>
-class EigenMappedDenseVector : public VectorInterface<EigenMappedDenseVectorTraits<ScalarImp>>,
-                               public EigenBaseVector<EigenMappedDenseVectorTraits<ScalarImp>>,
-                               public ProvidesBackend<EigenMappedDenseVectorTraits<ScalarImp>>
+class EigenMappedDenseVector
+    : /*public VectorInterface< EigenMappedDenseVectorTraits< ScalarImp > >
+  , */ public EigenBaseVector<EigenMappedDenseVectorTraits<ScalarImp>>,
+      public ProvidesBackend<EigenMappedDenseVectorTraits<ScalarImp>>
 {
   typedef EigenMappedDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<EigenMappedDenseVectorTraits<ScalarImp>> VectorInterfaceType;
@@ -790,28 +775,28 @@ public:
    */
   virtual bool
   almost_equal(const ThisType& other,
-               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const DS_OVERRIDE
+               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const /*DS_OVERRIDE*/
   {
     return BaseType::template almost_equal<Traits>(other, epsilon);
   }
 
   using BaseType::almost_equal;
 
-  virtual ScalarType dot(const ThisType& other) const DS_OVERRIDE
+  virtual ScalarType dot(const ThisType& other) const /*DS_OVERRIDE*/
   {
     BaseType::template dot<Traits>(other);
   }
 
   using BaseType::dot;
 
-  virtual void add(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void add(const ThisType& other, ThisType& result) const /*DS_OVERRIDE*/
   {
     BaseType::template add<Traits, Traits>(other, result);
   }
 
   using BaseType::sup_norm;
 
-  virtual ThisType add(const ThisType& other) const DS_OVERRIDE
+  virtual ThisType add(const ThisType& other) const /*DS_OVERRIDE*/
   {
     return this->template add<Traits>(other);
   }
@@ -828,14 +813,14 @@ public:
     return ret;
   } // ... add(...)
 
-  virtual void iadd(const ThisType& other) DS_OVERRIDE
+  virtual void iadd(const ThisType& other) /*DS_OVERRIDE*/
   {
     BaseType::template iadd<Traits>(other);
   }
 
   using BaseType::iadd;
 
-  virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void sub(const ThisType& other, ThisType& result) const /*DS_OVERRIDE*/
   {
     BaseType::template sub<Traits, Traits>(other, result);
   }
@@ -852,14 +837,14 @@ public:
     return ret;
   } // ... sub(...)
 
-  virtual ThisType sub(const ThisType& other) const DS_OVERRIDE
+  virtual ThisType sub(const ThisType& other) const /*DS_OVERRIDE*/
   {
     return this->template sub<Traits>(other);
   }
 
   using BaseType::sub;
 
-  virtual void isub(const ThisType& other) DS_OVERRIDE
+  virtual void isub(const ThisType& other) /*DS_OVERRIDE*/
   {
     BaseType::template isub<Traits>(other);
   }
@@ -1480,7 +1465,7 @@ private:
 #else // HAVE_EIGEN
 
 
-template <class VectorImpTraits, class ScalarImp>
+template <class Traits, class ScalarImp>
 class EigenBaseVector
 {
   static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
