@@ -654,7 +654,7 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T>& vector)
     out << " ";
   out << "]";
   return out;
-}
+} // ... operator<<(...)
 
 
 /// Needed for the python bindings.
@@ -844,7 +844,33 @@ public:
   /**
    * \}
    */
+
+private:
+  template <class T>
+  friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T>& /*vector*/);
 }; // class MatrixInterface
+
+
+template <class T>
+std::ostream& operator<<(std::ostream& out, const MatrixInterface<T>& matrix)
+{
+  out << "[";
+  const size_t rows = matrix.rows();
+  const size_t cols = matrix.cols();
+  if (rows > 0 && cols > 0) {
+    for (size_t ii = 0; ii < rows; ++ii) {
+      out << "[" << matrix.get(ii, 0);
+      for (size_t jj = 1; jj < cols; ++jj)
+        out << ", " << matrix.get(ii, jj);
+      out << "]";
+      if (rows > 1 && ii == rows)
+        out << ";";
+      out << std::endl;
+    }
+  } else
+    out << "[ ]]";
+  return out;
+} // ... operator<<(...)
 
 
 } // namespace LA
