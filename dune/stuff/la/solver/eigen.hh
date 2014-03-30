@@ -10,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <cmath>
 
 #if HAVE_EIGEN
 #include <Eigen/Dense>
@@ -113,10 +114,10 @@ public:
           DUNE_THROW_COLORFULLY(
               Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
               "Given matrix is not symmetric and you requested checking (see options below)!\n"
-                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n"
+                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
                   << "  (A - A').sup_norm() = "
                   << error
-                  << "\n"
+                  << "\n\n"
                   << "Those were the given options:\n\n"
                   << opts);
       }
@@ -145,15 +146,17 @@ public:
     if (post_check_solves_system_theshhold > 0) {
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
-      if (tmp.sup_norm() > post_check_solves_system_theshhold)
+      const S sup_norm = tmp.sup_norm();
+      if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
         DUNE_THROW_COLORFULLY(
             Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
             "The computed solution does not solve the system (although the eigen backend reported "
-                << "'Success') and you requested checking (see options below)!"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options.\n"
+                << "'Success') and you requested checking (see options below)!\n"
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                << "\n\n"
                 << "  (A * x - b).sup_norm() = "
                 << tmp.sup_norm()
-                << "\n"
+                << "\n\n"
                 << "Those were the given options:\n\n"
                 << opts);
     }
@@ -276,10 +279,10 @@ public:
           DUNE_THROW_COLORFULLY(
               Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
               "Given matrix is not symmetric and you requested checking (see options below)!\n"
-                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n"
+                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
                   << "  (A - A').sup_norm() = "
                   << differences.sup_norm()
-                  << "\n"
+                  << "\n\n"
                   << "Those were the given options:\n\n"
                   << opts);
       }
@@ -458,15 +461,17 @@ public:
     if (post_check_solves_system_theshhold > 0) {
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
-      if (tmp.sup_norm() > post_check_solves_system_theshhold)
+      const S sup_norm = tmp.sup_norm();
+      if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
         DUNE_THROW_COLORFULLY(
             Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
             "The computed solution does not solve the system (although the eigen backend reported "
-                << "'Success') and you requested checking (see options below)!"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options.\n"
+                << "'Success') and you requested checking (see options below)!\n"
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                << "\n\n"
                 << "  (A * x - b).sup_norm() = "
                 << tmp.sup_norm()
-                << "\n"
+                << "\n\n"
                 << "Those were the given options:\n\n"
                 << opts);
     }

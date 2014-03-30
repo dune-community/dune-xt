@@ -7,6 +7,7 @@
 #define DUNE_STUFF_LA_SOLVER_STUFF_HH
 
 #include <type_traits>
+#include <cmath>
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
@@ -167,15 +168,17 @@ public:
     if (post_check_solves_system_theshhold > 0) {
       matrix_.mv(solution, writable_rhs);
       writable_rhs -= rhs;
-      if (writable_rhs.sup_norm() > post_check_solves_system_theshhold)
+      const S sup_norm = writable_rhs.sup_norm();
+      if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
         DUNE_THROW_COLORFULLY(
             Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
             "The computed solution does not solve the system (although the dune-istl backend "
-                << "reported no error) and you requested checking (see options below)!"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options.\n"
+                << "reported no error) and you requested checking (see options below)!\n"
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                << "\n\n"
                 << "  (A * x - b).sup_norm() = "
                 << writable_rhs.sup_norm()
-                << "\n"
+                << "\n\n"
                 << "Those were the given options:\n\n"
                 << opts);
     }

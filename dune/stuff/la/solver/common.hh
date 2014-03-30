@@ -10,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <cmath>
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
@@ -41,7 +42,6 @@ public:
 
   static Common::ConfigTree options(const std::string& type)
   {
-    SolverUtils::check_given(type, options());
     SolverUtils::check_given(type, options());
     return Common::ConfigTree({"type", "post_check_solves_system"}, {type, "1e-6"});
   } // ... options(...)
@@ -80,15 +80,17 @@ public:
       auto tmp = rhs.copy();
       matrix_.mv(solution, tmp);
       tmp -= rhs;
-      if (tmp.sup_norm() > post_check_solves_system_theshhold)
+      const S sup_norm = tmp.sup_norm();
+      if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
         DUNE_THROW_COLORFULLY(
             Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
             "The computed solution does not solve the system (although the dune-common backend "
-                << "reported no error) and you requested checking (see options below)!"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options.\n"
+                << "reported no error) and you requested checking (see options below)! "
+                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                << "\n\n"
                 << "  (A * x - b).sup_norm() = "
                 << tmp.sup_norm()
-                << "\n"
+                << "\n\n"
                 << "Those were the given options:\n\n"
                 << opts);
     }
