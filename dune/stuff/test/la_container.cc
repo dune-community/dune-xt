@@ -12,7 +12,7 @@
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/la/container/interfaces.hh>
-#include <dune/stuff/la/container/dunedynamic.hh>
+#include <dune/stuff/la/container/common.hh>
 #include <dune/stuff/la/container/eigen.hh>
 #include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/container.hh>
@@ -22,7 +22,7 @@ using namespace Dune;
 
 static const size_t dim = 4;
 
-typedef testing::Types<Dune::Stuff::LA::DuneDynamicVector<double>
+typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>
 #if HAVE_EIGEN
                        ,
                        Dune::Stuff::LA::EigenDenseVector<double>
@@ -33,7 +33,7 @@ typedef testing::Types<Dune::Stuff::LA::DuneDynamicVector<double>
 #endif
                        > VectorTypes;
 
-typedef testing::Types<Dune::Stuff::LA::DuneDynamicMatrix<double>
+typedef testing::Types<Dune::Stuff::LA::CommonDenseMatrix<double>
 #if HAVE_EIGEN
                        ,
                        Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>
@@ -44,7 +44,7 @@ typedef testing::Types<Dune::Stuff::LA::DuneDynamicMatrix<double>
 #endif
                        > MatrixTypes;
 
-typedef testing::Types<Dune::Stuff::LA::DuneDynamicVector<double>, Dune::Stuff::LA::DuneDynamicMatrix<double>
+typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>, Dune::Stuff::LA::CommonDenseMatrix<double>
 #if HAVE_EIGEN
                        ,
                        Dune::Stuff::LA::EigenDenseVector<double>, Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>
