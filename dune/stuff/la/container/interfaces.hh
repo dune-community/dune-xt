@@ -847,7 +847,7 @@ public:
 
 private:
   template <class T>
-  friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T>& /*vector*/);
+  friend std::ostream& operator<<(std::ostream& /*out*/, const MatrixInterface<T>& /*matrix*/);
 }; // class MatrixInterface
 
 
