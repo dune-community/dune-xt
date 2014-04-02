@@ -43,7 +43,7 @@ public:
   static Common::ConfigTree options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    return Common::ConfigTree({"type", "post_check_solves_system"}, {type, "1e-6"});
+    return Common::ConfigTree({"type", "post_check_solves_system"}, {type, "1e-5"});
   } // ... options(...)
 
   void apply(const CommonDenseVector<S>& rhs, CommonDenseVector<S>& solution) const

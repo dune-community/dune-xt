@@ -73,7 +73,7 @@ public:
   static Common::ConfigTree options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    Common::ConfigTree default_options({"type", "post_check_solves_system"}, {type, "1e-6"});
+    Common::ConfigTree default_options({"type", "post_check_solves_system"}, {type, "1e-5"});
     // * for symmetric matrices
     if (type == "ldlt" || type == "llt") {
       default_options.set("pre_check_symmetry", "1e-8");
@@ -224,7 +224,7 @@ public:
     // check
     SolverUtils::check_given(type, options());
     // default config
-    Common::ConfigTree default_options({"type", "post_check_solves_system"}, {type, "1e-6"});
+    Common::ConfigTree default_options({"type", "post_check_solves_system"}, {type, "1e-5"});
     Common::ConfigTree iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += default_options;
     // direct solvers

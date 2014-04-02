@@ -49,7 +49,7 @@ public:
   {
     SolverUtils::check_given(type, options());
     Common::ConfigTree iterative_options({"max_iter", "precision", "verbose", "post_check_solves_system"},
-                                         {"10000", "1e-10", "0", "1e-6"});
+                                         {"10000", "1e-10", "0", "1e-5"});
     if (type == "bicgstab.ilut") {
       iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
