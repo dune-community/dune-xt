@@ -295,18 +295,25 @@ public:
 
 #if HAVE_DUNE_GRID
   /**
-   * \note  We use the SubsamplingVTKWriter (which is better for higher orders). This means that the grid you see
-   *        in the visualization is a refinement of the real grid!
+   * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default. This means that the grid you
+   *        see in the visualization is a refinement of the actual grid!
    */
   template <class GridViewType>
-  void visualize(const GridViewType& grid_view, const std::string filename) const
+  void visualize(const GridViewType& grid_view, const std::string filename, const bool subsampling = true,
+                 VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
     if (filename.empty())
       DUNE_THROW(RangeError, "Empty filename given!");
     auto adapter = std::make_shared<Stuff::Function::VisualizationAdapter<GridViewType, dimRange>>(*this);
-    SubsamplingVTKWriter<GridViewType> vtk_writer(grid_view, VTK::nonconforming);
-    vtk_writer.addVertexData(adapter);
-    vtk_writer.write(filename);
+    if (subsampling) {
+      SubsamplingVTKWriter<GridViewType> vtk_writer(grid_view, VTK::nonconforming);
+      vtk_writer.addVertexData(adapter);
+      vtk_writer.write(filename, vtk_output_type);
+    } else {
+      VTKWriter<GridViewType> vtk_writer(grid_view, VTK::nonconforming);
+      vtk_writer.addVertexData(adapter);
+      vtk_writer.write(filename, vtk_output_type);
+    }
   } // ... visualize(...)
 #endif // HAVE_DUNE_GRID
 }; // class LocalizableFunctionInterface
