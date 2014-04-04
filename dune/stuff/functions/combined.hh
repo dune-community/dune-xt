@@ -153,7 +153,7 @@ public:
 
   virtual std::string name() const DS_OVERRIDE
   {
-    return "Difference of '" + minuend_.name() + "' and '" + subtrahend_.name() + "'";
+    return "difference between '" + minuend_.name() + "' and '" + subtrahend_.name() + "'";
   }
 
 private:
