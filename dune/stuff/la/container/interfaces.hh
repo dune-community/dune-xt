@@ -25,7 +25,7 @@ namespace LA {
 
 
 template <class Traits>
-class ProvidesBackend : protected CRTPInterface<ProvidesBackend<Traits>, Traits>
+class ProvidesBackend : public CRTPInterface<ProvidesBackend<Traits>, Traits>
 {
 public:
   typedef typename Traits::BackendType BackendType;
@@ -50,11 +50,14 @@ class ContainerInterfaceDynamic
 };
 
 template <class Traits>
-class ContainerInterface : public ContainerInterfaceDynamic, protected CRTPInterface<ContainerInterface<Traits>, Traits>
+class ContainerInterface : public ContainerInterfaceDynamic, public CRTPInterface<ContainerInterface<Traits>, Traits>
 {
+  typedef CRTPInterface<ContainerInterface<Traits>, Traits> CRTP;
+
 public:
-  typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType ScalarType;
+
+  using typename CRTP::derived_type;
 
   /**
    * \defgroup haveto ´´These methods have to be implemented by a derived class!``
@@ -141,7 +144,7 @@ protected:
 
 
 template <class Traits>
-class ProvidesConstContainer : protected CRTPInterface<ProvidesConstContainer<Traits>, Traits>
+class ProvidesConstContainer : public CRTPInterface<ProvidesConstContainer<Traits>, Traits>
 {
 public:
   typedef typename Traits::ContainerType ContainerType;
@@ -178,7 +181,7 @@ class ProvidesDataAccessDynamic
 };
 
 template <class Traits>
-class ProvidesDataAccess : protected CRTPInterface<ProvidesDataAccess<Traits>, Traits>
+class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>
 {
 public:
   typedef typename Traits::ScalarType ScalarType;
