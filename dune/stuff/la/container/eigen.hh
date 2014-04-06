@@ -509,7 +509,7 @@ public:
 
   virtual ScalarType dot(const ThisType& other) const /*DS_OVERRIDE*/
   {
-    BaseType::template dot<Traits>(other);
+    return BaseType::template dot<Traits>(other);
   }
 
   using BaseType::dot;
