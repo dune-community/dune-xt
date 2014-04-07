@@ -193,12 +193,12 @@ public:
     size_t max_index         = 0;
     const ScalarType minimum = backend().minCoeff(&min_index);
     const ScalarType maximum = backend().maxCoeff(&max_index);
-    if (std::abs(maximum) >= std::abs(minimum)) {
+    if (std::abs(maximum) < std::abs(minimum) || (std::abs(maximum) == std::abs(minimum) && max_index > min_index)) {
       result.first  = min_index;
       result.second = std::abs(minimum);
     } else {
       result.first  = max_index;
-      result.second = maximum;
+      result.second = std::abs(maximum);
     }
     return result;
   } // ... amax(...)
