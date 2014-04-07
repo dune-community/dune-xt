@@ -234,6 +234,11 @@ struct VectorTest : public ::testing::Test
     if (!i_subtracted.almost_equal(i_ones))
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
   } // void fulfills_interface() const
+
+  void produces_correct_results() const
+  {
+
+  } // void produces_correct_results() const
 }; // struct VectorTest
 
 
