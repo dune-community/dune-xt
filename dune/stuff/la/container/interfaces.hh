@@ -255,13 +255,13 @@ public:
   {
     CHECK_CRTP(this->as_imp(*this).get_entry_ref(ii));
     return this->as_imp(*this).get_entry_ref(ii);
-  } // ... get_entry(...)
+  } // ... get_entry_ref(...)
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
   {
     CHECK_CRTP(this->as_imp(*this).get_entry_ref(ii));
     return this->as_imp(*this).get_entry_ref(ii);
-  } // ... get_entry(...)
+  } // ... get_entry_ref(...)
 
   /**
    * \}
@@ -271,6 +271,10 @@ public:
    * \defgroup provided ´´These methods are provided by the interface for convenience! Those marked as virtual may be
    * implemented more efficiently in a derived class!``
    * \{
+   */
+
+  /**
+   * \brief Get reference to the iith entry.
    */
   inline ScalarType& operator[](const size_t ii)
   {
@@ -294,7 +298,7 @@ public:
 
   /**
    *  \brief  The maximum absolute value of the vector.
-   *  \return A pair of the index at which the maximum is attained and the absolute maximum value.
+   *  \return A pair of the lowest index at which the maximum is attained and the absolute maximum value.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
   virtual std::pair<size_t, ScalarType> amax() const
@@ -481,45 +485,87 @@ public:
       set_entry(ii, get_entry(ii) - other.get_entry(ii));
   } // ... isub(...)
 
+  /**
+   *  \brief  Multiplies every component of this by a scalar.
+   *  \param  alpha The scalar.
+   *  \return The product.
+   */
   virtual derived_type operator*(const ScalarType& alpha)
   {
     derived_type ret = this->copy();
     ret *= alpha;
     return ret;
-  }
+  } // ... operator*() ...
 
+  /**
+   *  \brief  Computes the scalar products between this and another vector.
+   *  \param  other The second factor.
+   *  \return The scalar product.
+   *  \see dot()
+   */
   virtual ScalarType operator*(const derived_type& other)
   {
     return dot(other);
   }
 
+  /**
+   *  \brief  Adds another vector to this.
+   *  \param  other The second summand.
+   *  \return The sum of this and other.
+   */
   virtual derived_type& operator+=(const derived_type& other)
   {
     iadd(other);
     return this->as_imp(*this);
   }
 
+  /**
+   *  \brief  Subtracts another vector from this.
+   *  \param  other The subtrahend.
+   *  \return The difference between this and other.
+   */
   virtual derived_type& operator-=(const derived_type& other)
   {
     isub(other);
     return this->as_imp(*this);
   }
 
+  /**
+   *  \brief  Adds two vectors.
+   *  \param  other The second summand.
+   *  \return The sum of the two vectors.
+   */
   virtual derived_type operator+(const derived_type& other) const
   {
     return add(other);
   }
 
+  /**
+   *  \brief  Substracts two vectors.
+   *  \param  other The subtrahend
+   *  \return The difference.
+   */
   virtual derived_type operator-(const derived_type& other) const
   {
     return sub(other);
   }
 
+  /**
+   *  \brief  Check vectors for equality (componentwise) using almost_equal()
+   *  \param  other   A vector of same dimension to compare with.
+   *  \return Truth value of the comparison.
+   *  \see    almost_equal()
+   */
   virtual bool operator==(const derived_type& other) const
   {
     return almost_equal(other);
   }
 
+  /**
+   *  \brief  Check vectors for inequality using !almost_equal()
+   *  \param  other   A vector of same dimension to compare with.
+   *  \return Truth value of the comparison.
+   */
   virtual bool operator!=(const derived_type& other) const
   {
     return !(this->operator==(other));
