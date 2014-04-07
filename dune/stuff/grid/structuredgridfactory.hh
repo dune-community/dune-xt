@@ -42,6 +42,27 @@ public:
     return std::make_shared<GridType>(lowerLeft, upperRight, cells);
   }
 
+  /** \brief Create a structured cube grid
+   *
+   *  \param lowerLeft  Lower left corner of the grid
+   *  \param upperRight Upper right corner of the grid
+   *  \param elements   Number of elements in each coordinate direction
+   *  \param overlap    Size of overlap in each coordinate direction
+   */
+  static std::shared_ptr<GridType> createCubeGrid(const FieldVector<ctype, dimworld>& lowerLeft,
+                                                  const FieldVector<ctype, dimworld>& upperRight,
+                                                  const array<unsigned int, dim>& elements,
+                                                  const array<unsigned int, dim>& overlap)
+  {
+    Dune::array<int, dim> cells;
+    Dune::array<int, dim> over;
+    for (const auto i : DSC::valueRange(dim)) {
+      cells[i] = elements[i];
+      over[i]  = overlap[i];
+    }
+    return std::make_shared<GridType>(lowerLeft, upperRight, cells, over);
+  }
+
   /** \brief Create a structured simplex grid
    *
    *  \param lowerLeft  Lower left corner of the grid
