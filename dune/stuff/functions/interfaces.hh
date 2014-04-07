@@ -32,17 +32,18 @@ namespace Stuff {
 #if HAVE_DUNE_GRID
 namespace Function {
 
-// forward, include is below
+// forwards, include is below
 template <class GridViewType, int dimRange>
 class VisualizationAdapter;
+
+template <class MinuendType, class SubtrahendType>
+class Difference;
 }
 #endif // HAVE_DUNE_GRID
 
 
 /**
- *  \brief  Interface for a set of matrix valued functions, which can be evaluated locally on one Entity.
- *
- *  \note   see specialization for rangeDimCols = 1 for vector and scalar valued localfunction sets.
+ *  \brief  Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionSetInterface
@@ -267,6 +268,8 @@ public:
   typedef typename LocalfunctionType::RangeType RangeType;
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
+  typedef Function::Difference<ThisType, ThisType> DifferenceType;
+
   virtual ~LocalizableFunctionInterface()
   {
   }
@@ -291,7 +294,12 @@ public:
   {
     return "dune.stuff.function";
   }
-/* @} */
+  /* @} */
+
+  DifferenceType operator-(const ThisType& other) const
+  {
+    return DifferenceType(*this, other);
+  }
 
 #if HAVE_DUNE_GRID
   /**
@@ -398,6 +406,7 @@ public:
 } // namespace Dune
 
 #include "default.hh"
+#include "combined.hh"
 
 #ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
 #define DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(etype, ddim)                                                      \
