@@ -237,7 +237,33 @@ struct VectorTest : public ::testing::Test
 
   void produces_correct_results() const
   {
+    typedef typename VectorImp::ScalarType ScalarType;
 
+    // test vectors for amax()
+    VectorImp vector_amax_1(dim); // [0, -2, 2, 1]
+    vector_amax_1.set_entry(0, ScalarType(0)), vector_amax_1.set_entry(1, ScalarType(-2)),
+        vector_amax_1.set_entry(2, ScalarType(2)), vector_amax_1.set_entry(3, ScalarType(1));
+
+    VectorImp vector_amax_2(dim); // [0, 2, -2, 1]
+    vector_amax_2.set_entry(0, ScalarType(0)), vector_amax_2.set_entry(1, ScalarType(2)),
+        vector_amax_2.set_entry(2, ScalarType(-2)), vector_amax_2.set_entry(3, ScalarType(1));
+
+    VectorImp vector_amax_3(dim); // [-1, 1, -1, 1]
+    vector_amax_3.set_entry(0, ScalarType(-1)), vector_amax_3.set_entry(1, ScalarType(1)),
+        vector_amax_3.set_entry(2, ScalarType(-1)), vector_amax_3.set_entry(3, ScalarType(1));
+
+    // compute amax
+    std::pair<size_t, ScalarType> amax = vector_amax_1.amax();
+    if (amax.first != 1 || !Dune::FloatCmp::eq(amax.second, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+
+    amax = vector_amax_2.amax();
+    if (amax.first != 1 || !Dune::FloatCmp::eq(amax.second, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+
+    amax = vector_amax_3.amax();
+    if (amax.first != 0 || !Dune::FloatCmp::eq(amax.second, ScalarType(1)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
   } // void produces_correct_results() const
 }; // struct VectorTest
 
