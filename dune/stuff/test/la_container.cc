@@ -59,7 +59,7 @@ typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>, Dune::Stuff::
 template <class ContainerImp>
 struct ContainerTest : public ::testing::Test
 {
-  void check() const
+  void fulfills_interface() const
   {
     // static tests
     typedef typename ContainerImp::Traits Traits;
@@ -96,21 +96,21 @@ struct ContainerTest : public ::testing::Test
     ContainerImp i_deep_copy = i_by_size.copy();
     i_by_size.scal(I_ScalarType(1));
     i_by_size.axpy(I_ScalarType(1), i_deep_copy);
-  } // void check() const
+  } // void fulfills_interface() const
 }; // struct ContainerTest
 
 
 TYPED_TEST_CASE(ContainerTest, ContainerTypes);
-TYPED_TEST(ContainerTest, LA_CONTAINER)
+TYPED_TEST(ContainerTest, fulfills_interface)
 {
-  this->check();
+  this->fulfills_interface();
 }
 
 
 template <class VectorImp>
 struct VectorTest : public ::testing::Test
 {
-  void check() const
+  void fulfills_interface() const
   {
     // static tests
     typedef typename VectorImp::Traits Traits;
@@ -233,14 +233,19 @@ struct VectorTest : public ::testing::Test
     i_subtracted.isub(d_by_size_2);
     if (!i_subtracted.almost_equal(i_ones))
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
-  }
+  } // void fulfills_interface() const
 }; // struct VectorTest
 
 
 TYPED_TEST_CASE(VectorTest, VectorTypes);
 TYPED_TEST(VectorTest, LA_CONTAINER)
 {
-  this->check();
+  this->fulfills_interface();
+}
+TYPED_TEST_CASE(VectorTest, VectorTypes);
+TYPED_TEST(VectorTest, produces_correct_results)
+{
+  this->produces_correct_results();
 }
 
 
