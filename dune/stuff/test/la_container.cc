@@ -69,10 +69,17 @@ struct ContainerTest : public ::testing::Test
     typedef typename Traits::ScalarType T_ScalarType;
     // * of the container as itself (aka the derived type)
     typedef typename ContainerImp::ScalarType D_ScalarType;
+    static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
+                  "ScalarType of derived_type has to be the correct Type!");
     // * of the container as the interface
     typedef typename Stuff::LA::ContainerInterface<Traits> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
+    static_assert(std::is_same<ContainerImp, I_derived_type>::value, "derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
+                  "ScalarType of derived_type has to be the correct Type!");
+
+
     // dynamic tests
     // * of the container as itself (aka the derived type)
     ContainerImp DUNE_UNUSED(d_empty);
@@ -89,7 +96,7 @@ struct ContainerTest : public ::testing::Test
     ContainerImp i_deep_copy = i_by_size.copy();
     i_by_size.scal(I_ScalarType(1));
     i_by_size.axpy(I_ScalarType(1), i_deep_copy);
-  }
+  } // void check() const
 }; // struct ContainerTest
 
 
@@ -113,10 +120,15 @@ struct VectorTest : public ::testing::Test
     typedef typename Traits::ScalarType T_ScalarType;
     // * of the vector as itself (aka the derived type)
     typedef typename VectorImp::ScalarType D_ScalarType;
+    static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
+                  "ScalarType of derived_type has to be the correct Type!");
     // * of the vector as the interface
     typedef typename Stuff::LA::VectorInterface<Traits> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
+    static_assert(std::is_same<VectorImp, I_derived_type>::value, "derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
+                  "ScalarType of derived_type has to be the correct Type!");
     // dynamic tests
     // * of the vector as itself (aka the derived type)
     VectorImp d_by_size(dim);
@@ -125,12 +137,16 @@ struct VectorTest : public ::testing::Test
     if (d_size != dim)
       DUNE_THROW_COLORFULLY(Dune::Exception, d_size << " vs. " << dim);
     for (size_t ii = 0; ii < d_size; ++ii) {
-      d_by_size_and_value.set_entry(ii, D_ScalarType(0.5));
-      d_by_size_and_value.add_to_entry(ii, D_ScalarType(0.5));
-      if (FloatCmp::ne(d_by_size_and_value.get_entry(ii), D_ScalarType(1)))
+      d_by_size_and_value.set_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
+      d_by_size_and_value.add_to_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
+      if (FloatCmp::ne(d_by_size_and_value.get_entry(ii), 2 * D_ScalarType(ii) + D_ScalarType(1)))
         DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_value.get_entry(ii));
+      if (FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_value[ii]);
     }
-    size_t DUNE_UNUSED(d_dim) = d_by_size.dim();
+    size_t d_dim = d_by_size.dim();
+    if (d_dim != dim)
+      DUNE_THROW_COLORFULLY(Dune::Exception, d_dim << " vs. " << dim);
     bool d_almost_equal = d_by_size.almost_equal(d_by_size);
     if (!d_almost_equal)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
