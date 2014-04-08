@@ -488,7 +488,7 @@ public:
   /**
    *  \brief  Multiplies every component of this by a scalar.
    *  \param  alpha The scalar.
-   *  \return The product.
+   *  \return The scaled copy of this.
    */
   virtual derived_type operator*(const ScalarType& alpha)
   {
@@ -509,7 +509,7 @@ public:
   }
 
   /**
-   *  \brief  Adds another vector to this.
+   *  \brief  Adds another vector to this, in-place variant.
    *  \param  other The second summand.
    *  \return The sum of this and other.
    */
@@ -520,7 +520,7 @@ public:
   }
 
   /**
-   *  \brief  Subtracts another vector from this.
+   *  \brief  Subtracts another vector from this, in-place variant.
    *  \param  other The subtrahend.
    *  \return The difference between this and other.
    */
