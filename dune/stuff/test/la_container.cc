@@ -239,37 +239,236 @@ struct VectorTest : public ::testing::Test
   {
     typedef typename VectorImp::ScalarType ScalarType;
 
-    // test vectors for amax()
-    VectorImp vector_amax_1(dim); // [0, -2, 2, 1]
-    vector_amax_1.set_entry(0, ScalarType(0)), vector_amax_1.set_entry(1, ScalarType(-2)),
-        vector_amax_1.set_entry(2, ScalarType(2)), vector_amax_1.set_entry(3, ScalarType(1));
+    // definition of test vectors
+    VectorImp zeros(dim); // [0, 0, 0, 0]
+    VectorImp ones(dim, ScalarType(1)); // [1, 1, 1, 1]
+    VectorImp countingup(dim); //[0, 1, 2, 3]
+    for (size_t ii = 0; ii < dim; ++ii)
+      countingup.set_entry(ii, ScalarType(ii));
+    VectorImp testvector_1(dim); // [0, -2, 2, 1]
+    testvector_1[0] = ScalarType(0);
+    testvector_1[1] = ScalarType(-2);
+    testvector_1[2] = ScalarType(2);
+    testvector_1[3] = ScalarType(1);
+    VectorImp testvector_2(dim); // [0, 2, -2, 1]
+    testvector_2[0] = ScalarType(0);
+    testvector_2[1] = ScalarType(2);
+    testvector_2[2] = ScalarType(-2);
+    testvector_2[3] = ScalarType(1);
+    VectorImp testvector_3(dim); // [-1, 1, -1, 1]
+    testvector_3[0] = ScalarType(-1);
+    testvector_3[1] = ScalarType(1);
+    testvector_3[2] = ScalarType(-1);
+    testvector_3[3] = ScalarType(1);
+    VectorImp testvector_4(dim); // [0, 3, -2, 0]
+    testvector_4[0] = ScalarType(0);
+    testvector_4[1] = ScalarType(3);
+    testvector_4[2] = ScalarType(-2);
+    testvector_4[3] = ScalarType(0);
+    VectorImp testvector_5(dim); // [1.25, 0, 2.5, -3.5]
+    testvector_5[0] = ScalarType(1.25);
+    testvector_5[1] = ScalarType(0);
+    testvector_5[2] = ScalarType(2.5);
+    testvector_5[3] = ScalarType(-3.5);
 
-    VectorImp vector_amax_2(dim); // [0, 2, -2, 1]
-    vector_amax_2.set_entry(0, ScalarType(0)), vector_amax_2.set_entry(1, ScalarType(2)),
-        vector_amax_2.set_entry(2, ScalarType(-2)), vector_amax_2.set_entry(3, ScalarType(1));
 
-    VectorImp vector_amax_3(dim); // [-1, 1, -1, 1]
-    vector_amax_3.set_entry(0, ScalarType(-1)), vector_amax_3.set_entry(1, ScalarType(1)),
-        vector_amax_3.set_entry(2, ScalarType(-1)), vector_amax_3.set_entry(3, ScalarType(1));
-
-    // compute amax
-    std::pair<size_t, ScalarType> amax = vector_amax_1.amax();
-    if (amax.first != 1 || !Dune::FloatCmp::eq(amax.second, ScalarType(2)))
+    // test amax()
+    std::pair<size_t, ScalarType> amax = zeros.amax();
+    if (amax.first != 0 || !Dune::FloatCmp::eq(amax.second, ScalarType(0)))
       DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
-
-    amax = vector_amax_2.amax();
-    if (amax.first != 1 || !Dune::FloatCmp::eq(amax.second, ScalarType(2)))
-      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
-
-    amax = vector_amax_3.amax();
+    amax = ones.amax();
     if (amax.first != 0 || !Dune::FloatCmp::eq(amax.second, ScalarType(1)))
       DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+    amax = countingup.amax();
+    if (amax.first != 3 || !Dune::FloatCmp::eq(amax.second, ScalarType(3)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+    amax = testvector_1.amax();
+    if (amax.first != 1 || !Dune::FloatCmp::eq(amax.second, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+    amax = testvector_2.amax();
+    if (amax.first != 1 || !Dune::FloatCmp::eq(amax.second, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+    amax = testvector_3.amax();
+    if (amax.first != 0 || !Dune::FloatCmp::eq(amax.second, ScalarType(1)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+    amax = testvector_4.amax();
+    if (amax.first != 1 || !Dune::FloatCmp::eq(amax.second, ScalarType(3)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+    amax = testvector_5.amax();
+    if (amax.first != 3 || !Dune::FloatCmp::eq(amax.second, ScalarType(3.5)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, amax.first << " , " << amax.second);
+
+    // test l1_norm()
+    ScalarType l1_norm = zeros.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(0)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+    l1_norm = ones.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(4)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+    l1_norm = countingup.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(6)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+    l1_norm = testvector_1.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(5)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+    l1_norm = testvector_2.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(5)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+    l1_norm = testvector_3.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(4)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+    l1_norm = testvector_4.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(5)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+    l1_norm = testvector_5.l1_norm();
+    if (!Dune::FloatCmp::eq(l1_norm, ScalarType(7.25)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l1_norm);
+
+    // test l2_norm()
+    ScalarType l2_norm = zeros.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(0)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+    l2_norm = ones.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+    l2_norm = countingup.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(std::sqrt(14))))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+    l2_norm = testvector_1.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(3)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+    l2_norm = testvector_2.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(3)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+    l2_norm = testvector_3.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+    l2_norm = testvector_4.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(std::sqrt(13))))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+    l2_norm = testvector_5.l2_norm();
+    if (!Dune::FloatCmp::eq(l2_norm, ScalarType(std::sqrt(20.0625))))
+      DUNE_THROW_COLORFULLY(Dune::Exception, l2_norm);
+
+    // test sup_norm()
+    ScalarType sup_norm = zeros.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(0)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+    sup_norm = ones.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(1)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+    sup_norm = countingup.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(3)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+    sup_norm = testvector_1.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+    sup_norm = testvector_2.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(2)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+    sup_norm = testvector_3.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(1)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+    sup_norm = testvector_4.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(3)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+    sup_norm = testvector_5.sup_norm();
+    if (!Dune::FloatCmp::eq(sup_norm, ScalarType(3.5)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
+
+    // test dot()
+    ScalarType dot  = ones.dot(zeros);
+    ScalarType dot2 = zeros.dot(ones);
+    if (!Dune::FloatCmp::eq(dot, ScalarType(0)) || !Dune::FloatCmp::eq(dot, dot2))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
+    dot = ones.dot(ones);
+    if (!Dune::FloatCmp::eq(dot, ScalarType(4)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
+    dot  = ones.dot(testvector_3);
+    dot2 = testvector_3.dot(ones);
+    if (!Dune::FloatCmp::eq(dot, ScalarType(0)) || !Dune::FloatCmp::eq(dot, dot2))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
+    dot  = countingup.dot(testvector_5);
+    dot2 = testvector_5.dot(countingup);
+    if (!Dune::FloatCmp::eq(dot, ScalarType(-5.5)) || !Dune::FloatCmp::eq(dot, dot2))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
+    dot  = testvector_3.dot(testvector_5);
+    dot2 = testvector_5.dot(testvector_3);
+    if (!Dune::FloatCmp::eq(dot, ScalarType(-7.25)) || !Dune::FloatCmp::eq(dot, dot2))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
+
+    // test operator==
+    if (!(zeros == zeros))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(ones == ones))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(countingup == countingup))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_1 == testvector_1))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_2 == testvector_2))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_3 == testvector_3))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_4 == testvector_4))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_5 == testvector_5))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+
+    // test operator!=
+    if (!(zeros != ones))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_1 != testvector_2))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_3 != testvector_4))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_3 != ones))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    if (!(testvector_4 != testvector_5))
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+
+    // test scal
+    VectorImp scaled_copy = zeros;
+    scaled_copy.scal(1);
+    if (scaled_copy != zeros)
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    scaled_copy = ones;
+    scaled_copy.scal(1);
+    if (scaled_copy != ones)
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    scaled_copy.scal(0);
+    if (scaled_copy != zeros)
+      DUNE_THROW_COLORFULLY(Dune::Exception, "");
+    scaled_copy = testvector_1;
+    scaled_copy.scal(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], 2 * testvector_1[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_1[ii]);
+    }
+    scaled_copy = testvector_3;
+    scaled_copy.scal(-2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], -2 * testvector_3[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_3[ii]);
+    }
+    scaled_copy = countingup;
+    scaled_copy.scal(2.2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], 2.2 * countingup[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << countingup[ii]);
+    }
+    scaled_copy = testvector_5;
+    scaled_copy.scal(-3.75);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], -3.75 * testvector_5[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_5[ii]);
+    }
   } // void produces_correct_results() const
 }; // struct VectorTest
 
 
 TYPED_TEST_CASE(VectorTest, VectorTypes);
-TYPED_TEST(VectorTest, LA_CONTAINER)
+TYPED_TEST(VectorTest, fulfills_interface)
 {
   this->fulfills_interface();
 }
