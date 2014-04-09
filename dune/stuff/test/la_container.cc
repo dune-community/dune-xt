@@ -37,7 +37,11 @@ typedef testing::
     Types<std::pair<Dune::Stuff::LA::CommonDenseMatrix<double>, Dune::Stuff::LA::CommonDenseVector<double>>
 #if HAVE_EIGEN
           ,
-          std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>
+          std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>,
+          std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>,
+                    Dune::Stuff::LA::EigenMappedDenseVector<double>>,
+          std::pair<Dune::Stuff::LA::EigenDenseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>,
+          std::pair<Dune::Stuff::LA::EigenDenseMatrix<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>>
 #endif
 #if HAVE_DUNE_ISTL
           ,
@@ -45,15 +49,24 @@ typedef testing::
 #endif
           > MatrixVectorCombinations;
 
-typedef testing::Types<std::pair<Dune::Stuff::LA::CommonDenseMatrix<double>,
-                                 Dune::Stuff::LA::CommonDenseVector<double>>> DenseMatrixVectorCombinations;
+typedef testing::Types<std::pair<Dune::Stuff::LA::CommonDenseMatrix<double>, Dune::Stuff::LA::CommonDenseVector<double>>
+#if HAVE_EIGEN
+                       ,
+                       std::pair<Dune::Stuff::LA::EigenDenseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>,
+                       std::pair<Dune::Stuff::LA::EigenDenseMatrix<double>,
+                                 Dune::Stuff::LA::EigenMappedDenseVector<double>>
+#endif
+                       > DenseMatrixVectorCombinations;
 
 typedef testing::Types<
 #if HAVE_EIGEN
-    std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>
-#endif
+    std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>,
+    std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>>
 #if HAVE_DUNE_ISTL
     ,
+#endif
+#endif // HAVE_EIGEN
+#if HAVE_DUNE_ISTL
     std::pair<Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>, Dune::Stuff::LA::IstlDenseVector<double>>
 #endif
     > SparseMatrixVectorCombinations;
@@ -154,7 +167,7 @@ struct VectorTest : public ::testing::Test
     for (size_t ii = 0; ii < d_size; ++ii) {
       d_by_size_and_value.set_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
       d_by_size_and_value.add_to_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
-      if (FloatCmp::ne(d_by_size_and_value.get_entry(ii), 2 * D_ScalarType(ii) + D_ScalarType(1)))
+      if (FloatCmp::ne(d_by_size_and_value.get_entry(ii), D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(1)))
         DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_value.get_entry(ii));
       if (FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_value[ii]);
@@ -444,7 +457,7 @@ struct VectorTest : public ::testing::Test
 
     // test scal
     VectorImp scaled_copy = zeros;
-    scaled_copy.scal(1);
+    scaled_copy.scal(ScalarType(1));
     if (scaled_copy != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
     scaled_copy = ones;
@@ -455,27 +468,27 @@ struct VectorTest : public ::testing::Test
     if (scaled_copy != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
     scaled_copy = testvector_1;
-    scaled_copy.scal(2);
+    scaled_copy.scal(ScalarType(2));
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], 2 * testvector_1[ii]))
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(2) * testvector_1[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_1[ii]);
     }
     scaled_copy = testvector_3;
-    scaled_copy.scal(-2);
+    scaled_copy.scal(ScalarType(-2));
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], -2 * testvector_3[ii]))
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(-2) * testvector_3[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_3[ii]);
     }
     scaled_copy = countingup;
-    scaled_copy.scal(2.2);
+    scaled_copy.scal(ScalarType(2.2));
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], 2.2 * countingup[ii]))
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(2.2) * countingup[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << countingup[ii]);
     }
     scaled_copy = testvector_5;
-    scaled_copy.scal(-3.75);
+    scaled_copy.scal(ScalarType(-3.75));
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], -3.75 * testvector_5[ii]))
+      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(-3.75) * testvector_5[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_5[ii]);
     }
 
@@ -593,7 +606,7 @@ struct MatrixTestBase : public ::testing::Test
         d_by_size_and_pattern.set_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
         d_by_size_and_pattern.add_to_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
         if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj),
-                         2 * D_ScalarType(ii) + 2 * D_ScalarType(jj) + D_ScalarType(1)))
+                         D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(2) * D_ScalarType(jj) + D_ScalarType(1)))
           DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj));
       }
     }
