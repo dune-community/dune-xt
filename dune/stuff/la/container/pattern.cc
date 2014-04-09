@@ -47,6 +47,16 @@ typename SparsityPatternDefault::ConstOuterIteratorType SparsityPatternDefault::
   return vectorOfSets_.end();
 }
 
+bool SparsityPatternDefault::operator==(const SparsityPatternDefault& other) const
+{
+  return vectorOfSets_ == other.vectorOfSets_;
+}
+
+bool SparsityPatternDefault::operator!=(const SparsityPatternDefault& other) const
+{
+  return vectorOfSets_ != other.vectorOfSets_;
+}
+
 
 } // namespace LA
 } // namespace Stuff

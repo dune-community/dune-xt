@@ -31,6 +31,10 @@ public:
 
   ConstOuterIteratorType end() const;
 
+  bool operator==(const SparsityPatternDefault& other) const;
+
+  bool operator!=(const SparsityPatternDefault& other) const;
+
 private:
   BaseType vectorOfSets_;
 }; // class SparsityPatternDefault
