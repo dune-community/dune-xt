@@ -481,24 +481,82 @@ TYPED_TEST(VectorTest, produces_correct_results)
 }
 
 template <class MatrixImp>
-struct MatrixTest : public ::testing::Test
+struct MatrixTestBase : public ::testing::Test
 {
   void fulfills_interface() const
   {
+    // static tests
+    typedef typename MatrixImp::Traits Traits;
+    // * of the traits
+    typedef typename Traits::derived_type T_derived_type;
+    static_assert(std::is_same<MatrixImp, T_derived_type>::value, "derived_type has to be the correct Type!");
+    typedef typename Traits::ScalarType T_ScalarType;
+    // * of the matrix as itself (aka the derived type)
+    typedef typename MatrixImp::ScalarType D_ScalarType;
+    static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
+                  "ScalarType of derived_type has to be the correct Type!");
+    // * of the matrix as the interface
+    typedef typename Stuff::LA::MatrixInterface<Traits> InterfaceType;
+    typedef typename InterfaceType::derived_type I_derived_type;
+    typedef typename InterfaceType::ScalarType I_ScalarType;
+    static_assert(std::is_same<MatrixImp, I_derived_type>::value, "derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
+                  "ScalarType of derived_type has to be the correct Type!");
+    // dynamic tests
+    // * of the matrix as itself (aka the derived type)
+    MatrixImp d_by_size(dim, dim);
+    MatrixImp d_by_size_and_pattern(dim, dim);
+    size_t d_rows = d_by_size.rows();
+    if (d_rows != dim)
+      DUNE_THROW_COLORFULLY(Dune::Exception, d_rows << " vs. " << dim);
+    size_t d_cols = d_by_size.cols();
+    if (d_cols != dim)
+      DUNE_THROW_COLORFULLY(Dune::Exception, d_cols << " vs. " << dim);
+    typedef typename MatrixImp::AssociatedVectorType VectorType;
+    VectorType zeros(dim);
+    VectorType ones(dim, D_ScalarType(1));
+    VectorType result(dim);
+    d_by_size_and_pattern.mv(ones, result);
+    if (result != zeros)
+      DUNE_THROW_COLORFULLY(Dune::Exception, "check mv");
+
+
+    /*
+    for (size_t ii = 0; ii < d_rows; ++ii) {
+      for (size_t jj = 0; jj < d_cols; ++jj) {
+        d_by_size_and_value.set_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
+        d_by_size_and_value.add_to_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
+        if (FloatCmp::ne(d_by_size_and_value.get_entry(ii, jj)
+                         , 2*D_ScalarType(ii) + 2* D_ScalarType(jj) + D_ScalarType(1)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_value.get_entry(ii, jj));
+      }
+    }*/
   }
 
   void produces_correct_results() const
   {
   }
-}; // struct MatrixTest
+}; // struct MatrixTestBase
 
-TYPED_TEST_CASE(MatrixTest, MatrixTypes);
-TYPED_TEST(MatrixTest, fulfills_interface)
+template <class DenseMatrixImp>
+struct DenseMatrixTest : public MatrixTestBase<DenseMatrixImp>
+{
+
+}; // struct DenseMatrixTest
+
+template <class SparseMatrixImp>
+struct SparseMatrixTest : public MatrixTestBase<SparseMatrixImp>
+{
+
+}; // struct SparseMatrixTest
+
+TYPED_TEST_CASE(MatrixTestBase, MatrixTypes);
+TYPED_TEST(MatrixTestBase, fulfills_interface)
 {
   this->fulfills_interface();
 }
-TYPED_TEST_CASE(MatrixTest, MatrixTypes);
-TYPED_TEST(MatrixTest, produces_correct_results)
+TYPED_TEST_CASE(MatrixTestBase, MatrixTypes);
+TYPED_TEST(MatrixTestBase, produces_correct_results)
 {
   this->produces_correct_results();
 }
