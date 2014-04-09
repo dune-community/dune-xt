@@ -559,10 +559,10 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     for (size_t ii = 0; ii < rows(); ++ii) {
-      const auto& row          = backend_->operator[](ii);
+      auto& row                = backend_->operator[](ii);
       const auto search_result = row.find(jj);
       if (search_result != row.end())
-        row->operator[](0)[0] = ScalarType(0);
+        row.operator[](jj)[0][0] = ScalarType(0);
     }
   } // ... clear_col(...)
 
@@ -587,10 +587,10 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
     for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
-      const auto& row          = backend_->operator[](ii);
+      auto& row                = backend_->operator[](ii);
       const auto search_result = row.find(jj);
       if (search_result != row.end())
-        row->operator[](0)[0] = ScalarType(0);
+        row.operator[](jj)[0][0] = ScalarType(0);
     }
     set_entry(jj, jj, ScalarType(1));
   } // ... unit_col(...)
