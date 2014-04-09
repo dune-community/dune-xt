@@ -1383,7 +1383,7 @@ public:
     if (jj >= cols())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    for (size_t row = 0; row < backend_->outerSize(); ++row) {
+    for (size_t row = 0; row < static_cast<size_t>(backend_->outerSize()); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
@@ -1412,7 +1412,7 @@ public:
     if (jj >= cols())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    for (size_t row = 0; row < backend_->outerSize(); ++row) {
+    for (size_t row = 0; row < static_cast<size_t>(backend_->outerSize()); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
