@@ -548,18 +548,55 @@ struct MatrixTestBase : public ::testing::Test
     d_by_size_and_pattern.mv(ones, result);
     if (result != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "check mv");
-
-
-    /*
+    for (size_t ii = 0; ii < d_rows; ++ii) {
+      d_by_size_and_pattern.unit_row(ii);
+      if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, ii), D_ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, ii) << " vs " << D_ScalarType(1));
+      for (size_t jj = 0; jj < ii; ++jj) {
+        if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj), D_ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj) << " vs " << D_ScalarType(0));
+      }
+      for (size_t jj = ii + 1; jj < d_cols; ++jj) {
+        if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj), D_ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj) << " vs " << D_ScalarType(0));
+      }
+    }
+    for (size_t ii = 0; ii < d_rows; ++ii) {
+      d_by_size_and_pattern.clear_row(ii);
+      for (size_t jj = 0; jj < d_cols; ++jj) {
+        if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj), D_ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj) << " vs " << D_ScalarType(0));
+      }
+    }
+    for (size_t jj = 0; jj < d_cols; ++jj) {
+      d_by_size_and_pattern.unit_col(jj);
+      if (FloatCmp::ne(d_by_size_and_pattern.get_entry(jj, jj), D_ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(jj, jj) << " vs " << D_ScalarType(1));
+      for (size_t ii = 0; ii < jj; ++ii) {
+        if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj), D_ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj) << " vs " << D_ScalarType(0));
+      }
+      for (size_t ii = jj + 1; ii < d_rows; ++ii) {
+        if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj), D_ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj) << " vs " << D_ScalarType(0));
+      }
+    }
+    for (size_t jj = 0; jj < d_cols; ++jj) {
+      d_by_size_and_pattern.clear_col(jj);
+      for (size_t ii = 0; ii < d_rows; ++ii) {
+        if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj), D_ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj) << " vs " << D_ScalarType(0));
+      }
+    }
     for (size_t ii = 0; ii < d_rows; ++ii) {
       for (size_t jj = 0; jj < d_cols; ++jj) {
-        d_by_size_and_value.set_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
-        d_by_size_and_value.add_to_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
-        if (FloatCmp::ne(d_by_size_and_value.get_entry(ii, jj)
-                         , 2*D_ScalarType(ii) + 2* D_ScalarType(jj) + D_ScalarType(1)))
-          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_value.get_entry(ii, jj));
+        d_by_size_and_pattern.set_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
+        d_by_size_and_pattern.add_to_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
+        if (FloatCmp::ne(d_by_size_and_pattern.get_entry(ii, jj),
+                         2 * D_ScalarType(ii) + 2 * D_ScalarType(jj) + D_ScalarType(1)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj));
       }
-    }*/
+    }
   }
 
   void produces_correct_results() const
