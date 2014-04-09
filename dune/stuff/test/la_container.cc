@@ -33,16 +33,31 @@ typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>
 #endif
                        > VectorTypes;
 
-typedef testing::Types<Dune::Stuff::LA::CommonDenseMatrix<double>
+typedef testing::
+    Types<std::pair<Dune::Stuff::LA::CommonDenseMatrix<double>, Dune::Stuff::LA::CommonDenseVector<double>>
 #if HAVE_EIGEN
-                       ,
-                       Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>
+          ,
+          std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>
 #endif
 #if HAVE_DUNE_ISTL
-                       ,
-                       Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>
+          ,
+          std::pair<Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>, Dune::Stuff::LA::IstlDenseVector<double>>
 #endif
-                       > MatrixTypes;
+          > MatrixVectorCombinations;
+
+typedef testing::Types<std::pair<Dune::Stuff::LA::CommonDenseMatrix<double>,
+                                 Dune::Stuff::LA::CommonDenseVector<double>>> DenseMatrixVectorCombinations;
+
+typedef testing::Types<
+#if HAVE_EIGEN
+    std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>
+#endif
+#if HAVE_DUNE_ISTL
+    ,
+    std::pair<Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>, Dune::Stuff::LA::IstlDenseVector<double>>
+#endif
+    > SparseMatrixVectorCombinations;
+
 
 typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>, Dune::Stuff::LA::CommonDenseMatrix<double>
 #if HAVE_EIGEN
@@ -480,11 +495,15 @@ TYPED_TEST(VectorTest, produces_correct_results)
   this->produces_correct_results();
 }
 
-template <class MatrixImp>
+template <class MatrixVectorCombination>
 struct MatrixTestBase : public ::testing::Test
 {
   void fulfills_interface() const
   {
+    typedef typename MatrixVectorCombination::first_type MatrixImp;
+    typedef typename MatrixVectorCombination::second_type VectorImp;
+    typedef typename Dune::Stuff::LA::SparsityPatternDefault PatternType;
+
     // static tests
     typedef typename MatrixImp::Traits Traits;
     // * of the traits
@@ -505,17 +524,27 @@ struct MatrixTestBase : public ::testing::Test
     // dynamic tests
     // * of the matrix as itself (aka the derived type)
     MatrixImp d_by_size(dim, dim);
-    MatrixImp d_by_size_and_pattern(dim, dim);
+    PatternType pattern(dim);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (size_t jj = 0; jj < dim; ++jj)
+        pattern.inner(ii).insert(jj);
+    }
+    MatrixImp d_by_size_and_pattern(dim, dim, pattern);
     size_t d_rows = d_by_size.rows();
     if (d_rows != dim)
       DUNE_THROW_COLORFULLY(Dune::Exception, d_rows << " vs. " << dim);
     size_t d_cols = d_by_size.cols();
     if (d_cols != dim)
       DUNE_THROW_COLORFULLY(Dune::Exception, d_cols << " vs. " << dim);
-    typedef typename MatrixImp::AssociatedVectorType VectorType;
-    VectorType zeros(dim);
-    VectorType ones(dim, D_ScalarType(1));
-    VectorType result(dim);
+    d_rows = d_by_size_and_pattern.rows();
+    if (d_rows != dim)
+      DUNE_THROW_COLORFULLY(Dune::Exception, d_rows << " vs. " << dim);
+    d_cols = d_by_size_and_pattern.cols();
+    if (d_cols != dim)
+      DUNE_THROW_COLORFULLY(Dune::Exception, d_cols << " vs. " << dim);
+    VectorImp zeros(dim);
+    VectorImp ones(dim, D_ScalarType(1));
+    VectorImp result(dim);
     d_by_size_and_pattern.mv(ones, result);
     if (result != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "check mv");
@@ -538,24 +567,24 @@ struct MatrixTestBase : public ::testing::Test
   }
 }; // struct MatrixTestBase
 
-template <class DenseMatrixImp>
-struct DenseMatrixTest : public MatrixTestBase<DenseMatrixImp>
+template <class DenseMatrixVectorCombination>
+struct DenseMatrixTest : public MatrixTestBase<DenseMatrixVectorCombination>
 {
 
 }; // struct DenseMatrixTest
 
-template <class SparseMatrixImp>
-struct SparseMatrixTest : public MatrixTestBase<SparseMatrixImp>
+template <class SparseMatrixVectorCombination>
+struct SparseMatrixTest : public MatrixTestBase<SparseMatrixVectorCombination>
 {
 
 }; // struct SparseMatrixTest
 
-TYPED_TEST_CASE(MatrixTestBase, MatrixTypes);
+TYPED_TEST_CASE(MatrixTestBase, MatrixVectorCombinations);
 TYPED_TEST(MatrixTestBase, fulfills_interface)
 {
   this->fulfills_interface();
 }
-TYPED_TEST_CASE(MatrixTestBase, MatrixTypes);
+TYPED_TEST_CASE(MatrixTestBase, MatrixVectorCombinations);
 TYPED_TEST(MatrixTestBase, produces_correct_results)
 {
   this->produces_correct_results();
