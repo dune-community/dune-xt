@@ -267,7 +267,7 @@ struct VectorTest : public ::testing::Test
   {
     typedef typename VectorImp::ScalarType ScalarType;
 
-    // definition of test vectors
+    // create test vectors
     VectorImp zeros(dim); // [0, 0, 0, 0]
     VectorImp ones(dim, ScalarType(1)); // [1, 1, 1, 1]
     VectorImp countingup(dim); //[0, 1, 2, 3]
@@ -404,26 +404,43 @@ struct VectorTest : public ::testing::Test
     if (!Dune::FloatCmp::eq(sup_norm, ScalarType(3.5)))
       DUNE_THROW_COLORFULLY(Dune::Exception, sup_norm);
 
-    // test dot()
-    ScalarType dot  = ones.dot(zeros);
-    ScalarType dot2 = zeros.dot(ones);
-    if (!Dune::FloatCmp::eq(dot, ScalarType(0)) || !Dune::FloatCmp::eq(dot, dot2))
-      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
-    dot = ones.dot(ones);
-    if (!Dune::FloatCmp::eq(dot, ScalarType(4)))
-      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
-    dot  = ones.dot(testvector_3);
-    dot2 = testvector_3.dot(ones);
-    if (!Dune::FloatCmp::eq(dot, ScalarType(0)) || !Dune::FloatCmp::eq(dot, dot2))
-      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
-    dot  = countingup.dot(testvector_5);
-    dot2 = testvector_5.dot(countingup);
-    if (!Dune::FloatCmp::eq(dot, ScalarType(-5.5)) || !Dune::FloatCmp::eq(dot, dot2))
-      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
-    dot  = testvector_3.dot(testvector_5);
-    dot2 = testvector_5.dot(testvector_3);
-    if (!Dune::FloatCmp::eq(dot, ScalarType(-7.25)) || !Dune::FloatCmp::eq(dot, dot2))
-      DUNE_THROW_COLORFULLY(Dune::Exception, dot << " , " << dot2);
+    // test dot(), operator*
+    ScalarType dot            = ones.dot(zeros);
+    ScalarType dot_operator   = ones * zeros;
+    ScalarType dot2           = zeros.dot(ones);
+    ScalarType dot_operator_2 = zeros * ones;
+    if (!Dune::FloatCmp::eq(dot, ScalarType(0)) || !Dune::FloatCmp::eq(dot, dot2)
+        || !Dune::FloatCmp::eq(dot_operator, dot_operator_2)
+        || !Dune::FloatCmp::eq(dot, dot_operator))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2);
+    dot          = ones.dot(ones);
+    dot_operator = ones * ones;
+    if (!Dune::FloatCmp::eq(dot, ScalarType(4)) || !Dune::FloatCmp::eq(dot_operator, ScalarType(4)))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << ", " << dot_operator);
+    dot            = ones.dot(testvector_3);
+    dot_operator   = ones * testvector_3;
+    dot2           = testvector_3.dot(ones);
+    dot_operator_2 = testvector_3 * ones;
+    if (!Dune::FloatCmp::eq(dot, ScalarType(0)) || !Dune::FloatCmp::eq(dot, dot2)
+        || !Dune::FloatCmp::eq(dot_operator, dot_operator_2)
+        || !Dune::FloatCmp::eq(dot, dot_operator))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2);
+    dot            = countingup.dot(testvector_5);
+    dot_operator   = countingup * testvector_5;
+    dot2           = testvector_5.dot(countingup);
+    dot_operator_2 = testvector_5 * countingup;
+    if (!Dune::FloatCmp::eq(dot, ScalarType(-5.5)) || !Dune::FloatCmp::eq(dot, dot2)
+        || !Dune::FloatCmp::eq(dot_operator, dot_operator_2)
+        || !Dune::FloatCmp::eq(dot, dot_operator))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2);
+    dot            = testvector_3.dot(testvector_5);
+    dot_operator   = testvector_3 * testvector_5;
+    dot2           = testvector_5.dot(testvector_3);
+    dot_operator_2 = testvector_5 * testvector_3;
+    if (!Dune::FloatCmp::eq(dot, ScalarType(-7.25)) || !Dune::FloatCmp::eq(dot, dot2)
+        || !Dune::FloatCmp::eq(dot_operator, dot_operator_2)
+        || !Dune::FloatCmp::eq(dot, dot_operator))
+      DUNE_THROW_COLORFULLY(Dune::Exception, dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2);
 
     // test operator==
     if (!(zeros == zeros))
@@ -455,44 +472,223 @@ struct VectorTest : public ::testing::Test
     if (!(testvector_4 != testvector_5))
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
 
-    // test scal
-    VectorImp scaled_copy = zeros;
-    scaled_copy.scal(ScalarType(1));
-    if (scaled_copy != zeros)
+    // test scal, operator*=
+    VectorImp scaled          = zeros;
+    VectorImp scaled_operator = zeros;
+    scaled.scal(ScalarType(1));
+    scaled_operator *= ScalarType(1);
+    if (scaled != zeros || scaled_operator != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
-    scaled_copy = ones;
-    scaled_copy.scal(1);
-    if (scaled_copy != ones)
+    scaled          = ones;
+    scaled_operator = ones;
+    scaled.scal(ScalarType(1));
+    scaled_operator *= ScalarType(1);
+    if (scaled != ones || scaled_operator != ones)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
-    scaled_copy.scal(0);
-    if (scaled_copy != zeros)
+    scaled.scal(ScalarType(0));
+    scaled_operator *= ScalarType(0);
+    if (scaled != zeros || scaled_operator != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
-    scaled_copy = testvector_1;
-    scaled_copy.scal(ScalarType(2));
+    scaled = testvector_1;
+    scaled.scal(ScalarType(2));
+    scaled_operator = testvector_1;
+    scaled_operator *= ScalarType(2);
+
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(2) * testvector_1[ii]))
-        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_1[ii]);
+      if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(2) * testvector_1[ii])
+          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(2) * testvector_1[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception,
+                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << testvector_1[ii]);
     }
-    scaled_copy = testvector_3;
-    scaled_copy.scal(ScalarType(-2));
+    scaled = testvector_3;
+    scaled.scal(ScalarType(-2));
+    scaled_operator = testvector_3;
+    scaled_operator *= ScalarType(-2);
+
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(-2) * testvector_3[ii]))
-        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_3[ii]);
+      if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(-2) * testvector_3[ii])
+          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(-2) * testvector_3[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception,
+                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << testvector_3[ii]);
     }
-    scaled_copy = countingup;
-    scaled_copy.scal(ScalarType(2.2));
+    scaled = countingup;
+    scaled.scal(ScalarType(2.2));
+    scaled_operator = countingup;
+    scaled_operator *= ScalarType(2.2);
+
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(2.2) * countingup[ii]))
-        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << countingup[ii]);
+      if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(2.2) * countingup[ii])
+          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(2.2) * countingup[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception,
+                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << countingup[ii]);
     }
-    scaled_copy = testvector_5;
-    scaled_copy.scal(ScalarType(-3.75));
+    scaled = testvector_5;
+    scaled.scal(ScalarType(-3.75));
+    scaled_operator = testvector_5;
+    scaled_operator *= ScalarType(-3.75);
+
     for (size_t ii = 0; ii < dim; ++ii) {
-      if (!Dune::FloatCmp::eq(scaled_copy[ii], ScalarType(-3.75) * testvector_5[ii]))
-        DUNE_THROW_COLORFULLY(Dune::Exception, scaled_copy[ii] << " vs. " << testvector_5[ii]);
+      if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(-3.75) * testvector_5[ii])
+          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(-3.75) * testvector_5[ii]))
+        DUNE_THROW_COLORFULLY(Dune::Exception,
+                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << testvector_5[ii]);
     }
 
+    // test operator+, operator+=, add, iadd
+    VectorImp sum_operator_plus  = zeros + ones;
+    VectorImp sum_operator_iplus = zeros;
+    sum_operator_iplus += ones;
+    VectorImp sum_add_1 = zeros.add(ones);
+    VectorImp sum_add_2(dim);
+    zeros.add(ones, sum_add_2);
+    VectorImp sum_iadd = zeros;
+    sum_iadd.iadd(ones);
+    VectorImp sum_correct(dim);
+    sum_correct[0] = ScalarType(1);
+    sum_correct[1] = ScalarType(1);
+    sum_correct[2] = ScalarType(1);
+    sum_correct[3] = ScalarType(1);
+    if (sum_operator_iplus != sum_operator_plus || sum_add_1 != sum_add_2 || sum_iadd != sum_add_1
+        || sum_add_1 != sum_operator_plus
+        || sum_add_1 != sum_correct)
+      DUNE_THROW_COLORFULLY(
+          Dune::Exception,
+          sum_add_1 << ", " << sum_add_2 << ", " << sum_operator_iplus << ", " << sum_operator_plus << ", " << sum_iadd
+                    << ", "
+                    << sum_correct);
 
+    sum_operator_plus  = countingup + testvector_1;
+    sum_operator_iplus = countingup;
+    sum_operator_iplus += testvector_1;
+    sum_add_1 = countingup.add(testvector_1);
+    countingup.add(testvector_1, sum_add_2);
+    sum_iadd = countingup;
+    sum_iadd.iadd(testvector_1);
+    sum_correct[0] = ScalarType(0);
+    sum_correct[1] = ScalarType(-1);
+    sum_correct[2] = ScalarType(4);
+    sum_correct[3] = ScalarType(4);
+    if (sum_operator_iplus != sum_operator_plus || sum_add_1 != sum_add_2 || sum_iadd != sum_add_1
+        || sum_add_1 != sum_operator_plus
+        || sum_add_1 != sum_correct)
+      DUNE_THROW_COLORFULLY(
+          Dune::Exception,
+          sum_add_1 << ", " << sum_add_2 << ", " << sum_operator_iplus << ", " << sum_operator_plus << ", " << sum_iadd
+                    << ", "
+                    << sum_correct);
+
+    sum_operator_plus  = testvector_3 + testvector_5;
+    sum_operator_iplus = testvector_3;
+    sum_operator_iplus += testvector_5;
+    sum_add_1 = testvector_3.add(testvector_5);
+    testvector_3.add(testvector_5, sum_add_2);
+    sum_iadd = testvector_3;
+    sum_iadd.iadd(testvector_5);
+    sum_correct[0] = ScalarType(0.25);
+    sum_correct[1] = ScalarType(1);
+    sum_correct[2] = ScalarType(1.5);
+    sum_correct[3] = ScalarType(-2.5);
+    if (sum_operator_iplus != sum_operator_plus || sum_add_1 != sum_add_2 || sum_iadd != sum_add_1
+        || sum_add_1 != sum_operator_plus
+        || sum_add_1 != sum_correct)
+      DUNE_THROW_COLORFULLY(
+          Dune::Exception,
+          sum_add_1 << ", " << sum_add_2 << ", " << sum_operator_iplus << ", " << sum_operator_plus << ", " << sum_iadd
+                    << ", "
+                    << sum_correct);
+
+    // test operator-, operator-=, sub, isub
+    VectorImp diff_operator_minus  = zeros - ones;
+    VectorImp diff_operator_iminus = zeros;
+    diff_operator_iminus -= ones;
+    VectorImp diff_sub_1 = zeros.sub(ones);
+    VectorImp diff_sub_2(dim);
+    zeros.sub(ones, diff_sub_2);
+    VectorImp diff_isub = zeros;
+    diff_isub.isub(ones);
+    VectorImp diff_correct(dim);
+    diff_correct[0] = ScalarType(-1);
+    diff_correct[1] = ScalarType(-1);
+    diff_correct[2] = ScalarType(-1);
+    diff_correct[3] = ScalarType(-1);
+    if (diff_operator_iminus != diff_operator_minus || diff_sub_1 != diff_sub_2 || diff_isub != diff_sub_1
+        || diff_sub_1 != diff_operator_minus
+        || diff_sub_1 != diff_correct)
+      DUNE_THROW_COLORFULLY(
+          Dune::Exception,
+          diff_sub_1 << ", " << diff_sub_2 << ", " << diff_operator_iminus << ", " << diff_operator_minus << ", "
+                     << diff_isub
+                     << ", "
+                     << diff_correct);
+
+    diff_operator_minus  = testvector_1 - testvector_4;
+    diff_operator_iminus = testvector_1;
+    diff_operator_iminus -= testvector_4;
+    diff_sub_1 = testvector_1.sub(testvector_4);
+    testvector_1.sub(testvector_4, diff_sub_2);
+    diff_isub = testvector_1;
+    diff_isub.isub(testvector_4);
+    diff_correct[0] = ScalarType(-0);
+    diff_correct[1] = ScalarType(-5);
+    diff_correct[2] = ScalarType(4);
+    diff_correct[3] = ScalarType(1);
+    if (diff_operator_iminus != diff_operator_minus || diff_sub_1 != diff_sub_2 || diff_isub != diff_sub_1
+        || diff_sub_1 != diff_operator_minus
+        || diff_sub_1 != diff_correct)
+      DUNE_THROW_COLORFULLY(
+          Dune::Exception,
+          diff_sub_1 << ", " << diff_sub_2 << ", " << diff_operator_iminus << ", " << diff_operator_minus << ", "
+                     << diff_isub
+                     << ", "
+                     << diff_correct);
+
+    diff_operator_minus  = testvector_5 - testvector_2;
+    diff_operator_iminus = testvector_5;
+    diff_operator_iminus -= testvector_2;
+    diff_sub_1 = testvector_5.sub(testvector_2);
+    testvector_5.sub(testvector_2, diff_sub_2);
+    diff_isub = testvector_5;
+    diff_isub.isub(testvector_2);
+    diff_correct[0] = ScalarType(1.25);
+    diff_correct[1] = ScalarType(-2);
+    diff_correct[2] = ScalarType(4.5);
+    diff_correct[3] = ScalarType(-4.5);
+    if (diff_operator_iminus != diff_operator_minus || diff_sub_1 != diff_sub_2 || diff_isub != diff_sub_1
+        || diff_sub_1 != diff_operator_minus
+        || diff_sub_1 != diff_correct)
+      DUNE_THROW_COLORFULLY(
+          Dune::Exception,
+          diff_sub_1 << ", " << diff_sub_2 << ", " << diff_operator_iminus << ", " << diff_operator_minus << ", "
+                     << diff_isub
+                     << ", "
+                     << diff_correct);
+
+    // test axpy
+    VectorImp result_axpy = zeros;
+    result_axpy.axpy(ScalarType(1), ones);
+    if (result_axpy != ones)
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_axpy << " vs. " << ones);
+    result_axpy = testvector_5;
+    result_axpy.axpy(ScalarType(2.75), testvector_3);
+    VectorImp correct_result = testvector_3;
+    correct_result.scal(ScalarType(2.75));
+    correct_result += testvector_5;
+    if (result_axpy != correct_result)
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_axpy << " vs. " << correct_result);
+    result_axpy = testvector_2;
+    result_axpy.axpy(ScalarType(-0.25), countingup);
+    correct_result = countingup;
+    correct_result.scal(ScalarType(-0.25));
+    correct_result += testvector_2;
+    if (result_axpy != correct_result)
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_axpy << " vs. " << correct_result);
+    result_axpy = testvector_4;
+    result_axpy.axpy(ScalarType(-3), testvector_1);
+    correct_result = testvector_1;
+    correct_result.scal(ScalarType(-3));
+    correct_result += testvector_4;
+    if (result_axpy != correct_result)
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_axpy << " vs. " << correct_result);
   } // void produces_correct_results() const
 }; // struct VectorTest
 
@@ -511,12 +707,12 @@ TYPED_TEST(VectorTest, produces_correct_results)
 template <class MatrixVectorCombination>
 struct MatrixTestBase : public ::testing::Test
 {
+  typedef typename MatrixVectorCombination::first_type MatrixImp;
+  typedef typename MatrixVectorCombination::second_type VectorImp;
+  typedef typename Dune::Stuff::LA::SparsityPatternDefault PatternType;
+
   void fulfills_interface() const
   {
-    typedef typename MatrixVectorCombination::first_type MatrixImp;
-    typedef typename MatrixVectorCombination::second_type VectorImp;
-    typedef typename Dune::Stuff::LA::SparsityPatternDefault PatternType;
-
     // static tests
     typedef typename MatrixImp::Traits Traits;
     // * of the traits
@@ -614,6 +810,73 @@ struct MatrixTestBase : public ::testing::Test
 
   void produces_correct_results() const
   {
+    typedef typename MatrixImp::ScalarType ScalarType;
+    PatternType pattern(dim);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (size_t jj = 0; jj < dim; ++jj)
+        pattern.inner(ii).insert(jj);
+    }
+
+    // create test matrizes
+    MatrixImp matrix_zeros(dim, dim, pattern); // |0, 0, 0, 0|
+    for (size_t ii = 0; ii < dim; ++ii) { // |0, 0, 0, 0|
+      for (size_t jj = 0; jj < dim; ++jj) // |0, 0, 0, 0|
+        matrix_zeros.set_entry(ii, jj, ScalarType(0)); // |0, 0, 0, 0|
+    }
+    MatrixImp matrix_ones(dim, dim, pattern); // |1, 1, 1, 1|
+    for (size_t ii = 0; ii < dim; ++ii) { // |1, 1, 1, 1|
+      for (size_t jj = 0; jj < dim; ++jj) // |1, 1, 1, 1|
+        matrix_ones.set_entry(ii, jj, ScalarType(1)); // |1, 1, 1, 1|
+    }
+    MatrixImp testmatrix_1(dim, dim, pattern); // |0, 1, 2, 3|
+    for (size_t ii = 0; ii < dim; ++ii) { // |1, 2, 3, 4|
+      for (size_t jj = 0; jj < dim; ++jj) // |2, 3, 4, 5|
+        matrix_ones.set_entry(ii, jj, ScalarType(ii) + ScalarType(jj)); // |3, 4, 5, 6|
+    }
+    MatrixImp testmatrix_2(dim, dim, pattern); // |0, 1, 2, 3|
+    for (size_t ii = 0; ii < dim; ++ii) { // |1, 2, 3, 4|
+      for (size_t jj = 0; jj < dim; ++jj) // |2, 3, 4, 5|
+        matrix_ones.set_entry(
+            ii, jj, ScalarType(-0.5) * ScalarType(ii) + ScalarType(1.5) * ScalarType(jj)); // |3, 4, 5, 6|
+    }
+
+    // create test vectors
+    VectorImp vector_zeros(dim); // [0, 0, 0, 0]
+    VectorImp vector_ones(dim, ScalarType(1)); // [1, 1, 1, 1]
+    VectorImp vector_countingup(dim); //[0, 1, 2, 3]
+    for (size_t ii = 0; ii < dim; ++ii)
+      vector_countingup.set_entry(ii, ScalarType(ii));
+    VectorImp testvector_1(dim); // [0, -2, 2, 1]
+    testvector_1[0] = ScalarType(0);
+    testvector_1[1] = ScalarType(-2);
+    testvector_1[2] = ScalarType(2);
+    testvector_1[3] = ScalarType(1);
+    VectorImp testvector_2(dim); // [0, 2, -2, 1]
+    testvector_2[0] = ScalarType(0);
+    testvector_2[1] = ScalarType(2);
+    testvector_2[2] = ScalarType(-2);
+    testvector_2[3] = ScalarType(1);
+    VectorImp testvector_3(dim); // [-1, 1, -1, 1]
+    testvector_3[0] = ScalarType(-1);
+    testvector_3[1] = ScalarType(1);
+    testvector_3[2] = ScalarType(-1);
+    testvector_3[3] = ScalarType(1);
+    VectorImp testvector_4(dim); // [0, 3, -2, 0]
+    testvector_4[0] = ScalarType(0);
+    testvector_4[1] = ScalarType(3);
+    testvector_4[2] = ScalarType(-2);
+    testvector_4[3] = ScalarType(0);
+    VectorImp testvector_5(dim); // [1.25, 0, 2.5, -3.5]
+    testvector_5[0] = ScalarType(1.25);
+    testvector_5[1] = ScalarType(0);
+    testvector_5[2] = ScalarType(2.5);
+    testvector_5[3] = ScalarType(-3.5);
+
+    // test mv
+
+    // test axpy
+
+    // test scal
   }
 }; // struct MatrixTestBase
 
