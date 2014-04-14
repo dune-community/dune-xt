@@ -29,17 +29,17 @@
 
 namespace Dune {
 namespace Stuff {
-#if HAVE_DUNE_GRID
 namespace Function {
 
 // forwards, include is below
+#if HAVE_DUNE_GRID
 template <class GridViewType, int dimRange>
 class VisualizationAdapter;
+#endif // HAVE_DUNE_GRID
 
 template <class MinuendType, class SubtrahendType>
 class Difference;
 }
-#endif // HAVE_DUNE_GRID
 
 namespace Tags {
 
