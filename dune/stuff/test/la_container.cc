@@ -806,34 +806,51 @@ struct MatrixTestBase : public ::testing::Test
   void produces_correct_results() const
   {
     typedef typename MatrixImp::ScalarType ScalarType;
-    PatternType pattern(dim);
+
+    // create test patterns
+    PatternType dense_pattern(dim);
     for (size_t ii = 0; ii < dim; ++ii) {
       for (size_t jj = 0; jj < dim; ++jj)
-        pattern.inner(ii).insert(jj);
+        dense_pattern.inner(ii).insert(jj);
     }
+    PatternType sparse_pattern(dim);
+    sparse_pattern.inner(0).insert(2); //|-, -, x, -|
+    sparse_pattern.inner(1).insert(0); //|x, x, -, -|
+    sparse_pattern.inner(1).insert(1); //|-, -, -, x|
+    sparse_pattern.inner(2).insert(3); //|-, -, -, -|
 
     // create test matrizes
-    MatrixImp matrix_zeros(dim, dim, pattern); // |0, 0, 0, 0|
+    MatrixImp matrix_zeros_dense(dim, dim, dense_pattern); // |0, 0, 0, 0|
     for (size_t ii = 0; ii < dim; ++ii) { // |0, 0, 0, 0|
       for (size_t jj = 0; jj < dim; ++jj) // |0, 0, 0, 0|
-        matrix_zeros.set_entry(ii, jj, ScalarType(0)); // |0, 0, 0, 0|
+        matrix_zeros_dense.set_entry(ii, jj, ScalarType(0)); // |0, 0, 0, 0|
     }
-    MatrixImp matrix_ones(dim, dim, pattern); // |1, 1, 1, 1|
+    MatrixImp matrix_zeros_sparse(dim, dim, sparse_pattern); //|-, -, 0, -|
+    matrix_zeros_sparse.set_entry(0, 2, ScalarType(0)); //|0, 0, -, -|
+    matrix_zeros_sparse.set_entry(1, 0, ScalarType(0)); //|-, -, -, 0|
+    matrix_zeros_sparse.set_entry(1, 1, ScalarType(0)); //|-, -, -, -|
+    matrix_zeros_sparse.set_entry(2, 3, ScalarType(0));
+    MatrixImp matrix_ones(dim, dim, dense_pattern); // |1, 1, 1, 1|
     for (size_t ii = 0; ii < dim; ++ii) { // |1, 1, 1, 1|
       for (size_t jj = 0; jj < dim; ++jj) // |1, 1, 1, 1|
         matrix_ones.set_entry(ii, jj, ScalarType(1)); // |1, 1, 1, 1|
     }
-    MatrixImp testmatrix_1(dim, dim, pattern); // |0, 1, 2, 3|
+    MatrixImp testmatrix_1(dim, dim, dense_pattern); // |0, 1, 2, 3|
     for (size_t ii = 0; ii < dim; ++ii) { // |1, 2, 3, 4|
       for (size_t jj = 0; jj < dim; ++jj) // |2, 3, 4, 5|
-        matrix_ones.set_entry(ii, jj, ScalarType(ii) + ScalarType(jj)); // |3, 4, 5, 6|
+        testmatrix_1.set_entry(ii, jj, ScalarType(ii) + ScalarType(jj)); // |3, 4, 5, 6|
     }
-    MatrixImp testmatrix_2(dim, dim, pattern); // |0, 1, 2, 3|
-    for (size_t ii = 0; ii < dim; ++ii) { // |1, 2, 3, 4|
-      for (size_t jj = 0; jj < dim; ++jj) // |2, 3, 4, 5|
-        matrix_ones.set_entry(
-            ii, jj, ScalarType(-0.5) * ScalarType(ii) + ScalarType(1.5) * ScalarType(jj)); // |3, 4, 5, 6|
+    MatrixImp testmatrix_2(dim, dim, dense_pattern); // | 0.0, 1.5, 3.0, 4.5|
+    for (size_t ii = 0; ii < dim; ++ii) { // |-0.5, 1.0, 2.5, 4.0|
+      for (size_t jj = 0; jj < dim; ++jj) // |-1.0, 0.5, 2.0, 3.5|
+        testmatrix_2.set_entry(
+            ii, jj, ScalarType(-0.5) * ScalarType(ii) + ScalarType(1.5) * ScalarType(jj)); // |-1.5, 0.0, 1.5, 3.0|
     }
+    MatrixImp testmatrix_sparse(dim, dim, sparse_pattern); //|-,   -, 0.5,    -|
+    testmatrix_sparse.set_entry(0, 2, ScalarType(0.5)); //|1, 1.5,   -,    -|
+    testmatrix_sparse.set_entry(1, 0, ScalarType(1)); //|-,   -,   -, -0.5|
+    testmatrix_sparse.set_entry(1, 1, ScalarType(1.5)); //|-,   -,   -,    -|
+    testmatrix_sparse.set_entry(2, 3, ScalarType(-0.5));
 
     // create test vectors
     VectorImp vector_zeros(dim); // [0, 0, 0, 0]
@@ -846,21 +863,11 @@ struct MatrixTestBase : public ::testing::Test
     testvector_1[1] = ScalarType(-2);
     testvector_1[2] = ScalarType(2);
     testvector_1[3] = ScalarType(1);
-    VectorImp testvector_2(dim); // [0, 2, -2, 1]
-    testvector_2[0] = ScalarType(0);
-    testvector_2[1] = ScalarType(2);
-    testvector_2[2] = ScalarType(-2);
-    testvector_2[3] = ScalarType(1);
     VectorImp testvector_3(dim); // [-1, 1, -1, 1]
     testvector_3[0] = ScalarType(-1);
     testvector_3[1] = ScalarType(1);
     testvector_3[2] = ScalarType(-1);
     testvector_3[3] = ScalarType(1);
-    VectorImp testvector_4(dim); // [0, 3, -2, 0]
-    testvector_4[0] = ScalarType(0);
-    testvector_4[1] = ScalarType(3);
-    testvector_4[2] = ScalarType(-2);
-    testvector_4[3] = ScalarType(0);
     VectorImp testvector_5(dim); // [1.25, 0, 2.5, -3.5]
     testvector_5[0] = ScalarType(1.25);
     testvector_5[1] = ScalarType(0);
@@ -868,12 +875,133 @@ struct MatrixTestBase : public ::testing::Test
     testvector_5[3] = ScalarType(-3.5);
 
     // test mv
+    VectorImp result_mv_1(dim);
+    matrix_zeros_dense.mv(vector_zeros, result_mv_1);
+    VectorImp result_mv_2(dim);
+    matrix_zeros_sparse.mv(vector_zeros, result_mv_2);
+    if (result_mv_1 != vector_zeros || result_mv_2 != vector_zeros)
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1 << " vs " << result_mv_2 << " vs. " << vector_zeros);
+    testmatrix_sparse.mv(testvector_5, result_mv_1);
+    if (result_mv_1[0] != ScalarType(1.25) || result_mv_1[1] != ScalarType(1.25) || result_mv_1[2] != ScalarType(1.75)
+        || result_mv_1[3] != ScalarType(0))
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1);
+    testmatrix_2.mv(testvector_3, result_mv_1);
+    result_mv_2 = vector_ones;
+    result_mv_2.scal(ScalarType(3));
+    if (result_mv_1 != result_mv_2)
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1 << " vs. " << result_mv_2);
+    testmatrix_1.mv(testvector_1, result_mv_1);
+    if (result_mv_1[0] != ScalarType(5) || result_mv_1[1] != ScalarType(6) || result_mv_1[2] != ScalarType(7)
+        || result_mv_1[3] != ScalarType(8))
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1);
+    testmatrix_sparse.mv(vector_ones, result_mv_1);
+    if (result_mv_1[0] != ScalarType(0.5) || result_mv_1[1] != ScalarType(2.5) || result_mv_1[2] != ScalarType(-0.5)
+        || result_mv_1[3] != ScalarType(0))
+      DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1);
+
+    // test scal, operator*
+    MatrixImp scaled             = matrix_zeros_dense;
+    MatrixImp scaled_by_operator = matrix_zeros_dense;
+    size_t rows                  = scaled.rows();
+    size_t cols = scaled.cols();
+    scaled.scal(ScalarType(1));
+    scaled_by_operator *= ScalarType(1);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(scaled.get_entry(ii, jj), ScalarType(0))
+            || FloatCmp::ne(scaled_by_operator.get_entry(ii, jj), ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, "");
+      }
+    }
+    scaled             = matrix_zeros_sparse;
+    scaled_by_operator = matrix_zeros_sparse;
+    scaled.scal(ScalarType(1));
+    scaled_by_operator *= ScalarType(1);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(scaled.get_entry(ii, jj), ScalarType(0))
+            || FloatCmp::ne(scaled_by_operator.get_entry(ii, jj), ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, "");
+      }
+    }
+    scaled             = matrix_ones;
+    scaled_by_operator = matrix_ones;
+    scaled.scal(ScalarType(0.5));
+    scaled_by_operator *= ScalarType(0.5);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(scaled.get_entry(ii, jj), ScalarType(0.5))
+            || FloatCmp::ne(scaled_by_operator.get_entry(ii, jj), ScalarType(0.5)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, "");
+      }
+    }
+    scaled             = testmatrix_sparse;
+    scaled_by_operator = testmatrix_sparse;
+    scaled.scal(ScalarType(-1.25));
+    scaled_by_operator *= ScalarType(-1.25);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(scaled.get_entry(ii, jj), testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25))
+            || FloatCmp::ne(scaled_by_operator.get_entry(ii, jj),
+                            testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, "");
+      }
+    }
+    scaled             = testmatrix_1;
+    scaled_by_operator = testmatrix_1;
+    scaled.scal(ScalarType(10));
+    scaled_by_operator *= ScalarType(10);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(scaled.get_entry(ii, jj), testmatrix_1.get_entry(ii, jj) * ScalarType(10))
+            || FloatCmp::ne(scaled_by_operator.get_entry(ii, jj), testmatrix_1.get_entry(ii, jj) * ScalarType(10)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, "");
+      }
+    }
 
     // test axpy
-
-    // test scal
-  }
-}; // struct MatrixTestBase
+    MatrixImp result_axpy = matrix_zeros_dense;
+    result_axpy.axpy(ScalarType(1.5), matrix_ones);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(result_axpy.get_entry(ii, jj), ScalarType(1.5)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, result_axpy.get_entry(ii, jj) << " vs. " << ScalarType(1.5));
+      }
+    }
+    result_axpy = matrix_zeros_sparse;
+    result_axpy.axpy(ScalarType(-1.5), matrix_zeros_sparse);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(result_axpy.get_entry(ii, jj), ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, result_axpy.get_entry(ii, jj) << " vs. " << ScalarType(0));
+      }
+    }
+    result_axpy = testmatrix_sparse;
+    result_axpy.axpy(ScalarType(-0.5), testmatrix_sparse);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(result_axpy.get_entry(ii, jj), ScalarType(0.5) * testmatrix_sparse.get_entry(ii, jj)))
+          DUNE_THROW_COLORFULLY(Dune::Exception,
+                                result_axpy.get_entry(ii, jj) << " vs. "
+                                                              << ScalarType(0.5) * testmatrix_sparse.get_entry(ii, jj));
+      }
+    }
+    result_axpy = testmatrix_1;
+    result_axpy.axpy(ScalarType(2), testmatrix_2);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(result_axpy.get_entry(ii, jj),
+                         ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj)))
+          DUNE_THROW_COLORFULLY(Dune::Exception,
+                                result_axpy.get_entry(ii, jj)
+                                    << " vs. "
+                                    << ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj));
+      }
+    }
+  } // void produces_correct_results() const
+}; // struct MatrixTest
+}
+; // struct MatrixTestBase
 
 template <class DenseMatrixVectorCombination>
 struct DenseMatrixTest : public MatrixTestBase<DenseMatrixVectorCombination>
