@@ -25,7 +25,7 @@ static const size_t dim = 4;
 typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>
 #if HAVE_EIGEN
                        ,
-                       Dune::Stuff::LA::EigenDenseVector<double>
+                       Dune::Stuff::LA::EigenDenseVector<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>
 #endif
 #if HAVE_DUNE_ISTL
                        ,
@@ -299,7 +299,6 @@ struct VectorTest : public ::testing::Test
     testvector_5[2] = ScalarType(2.5);
     testvector_5[3] = ScalarType(-3.5);
 
-
     // test amax()
     std::pair<size_t, ScalarType> amax = zeros.amax();
     if (amax.first != 0 || !Dune::FloatCmp::eq(amax.second, ScalarType(0)))
@@ -473,65 +472,61 @@ struct VectorTest : public ::testing::Test
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
 
     // test scal, operator*=
-    VectorImp scaled          = zeros;
-    VectorImp scaled_operator = zeros;
+    VectorImp scaled             = zeros;
+    VectorImp scaled_by_operator = zeros;
     scaled.scal(ScalarType(1));
-    scaled_operator *= ScalarType(1);
-    if (scaled != zeros || scaled_operator != zeros)
+    scaled_by_operator *= ScalarType(1);
+    if (scaled != zeros || scaled_by_operator != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
-    scaled          = ones;
-    scaled_operator = ones;
+    scaled             = ones;
+    scaled_by_operator = ones;
     scaled.scal(ScalarType(1));
-    scaled_operator *= ScalarType(1);
-    if (scaled != ones || scaled_operator != ones)
+    scaled_by_operator *= ScalarType(1);
+    if (scaled != ones || scaled_by_operator != ones)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
     scaled.scal(ScalarType(0));
-    scaled_operator *= ScalarType(0);
-    if (scaled != zeros || scaled_operator != zeros)
+    scaled_by_operator *= ScalarType(0);
+    if (scaled != zeros || scaled_by_operator != zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, "");
     scaled = testvector_1;
     scaled.scal(ScalarType(2));
-    scaled_operator = testvector_1;
-    scaled_operator *= ScalarType(2);
-
+    scaled_by_operator = testvector_1;
+    scaled_by_operator *= ScalarType(2);
     for (size_t ii = 0; ii < dim; ++ii) {
       if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(2) * testvector_1[ii])
-          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(2) * testvector_1[ii]))
+          || !Dune::FloatCmp::eq(scaled_by_operator[ii], ScalarType(2) * testvector_1[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception,
-                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << testvector_1[ii]);
+                              scaled[ii] << " vs. " << scaled_by_operator[ii] << " vs." << testvector_1[ii]);
     }
     scaled = testvector_3;
     scaled.scal(ScalarType(-2));
-    scaled_operator = testvector_3;
-    scaled_operator *= ScalarType(-2);
-
+    scaled_by_operator = testvector_3;
+    scaled_by_operator *= ScalarType(-2);
     for (size_t ii = 0; ii < dim; ++ii) {
       if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(-2) * testvector_3[ii])
-          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(-2) * testvector_3[ii]))
+          || !Dune::FloatCmp::eq(scaled_by_operator[ii], ScalarType(-2) * testvector_3[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception,
-                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << testvector_3[ii]);
+                              scaled[ii] << " vs. " << scaled_by_operator[ii] << " vs." << testvector_3[ii]);
     }
     scaled = countingup;
     scaled.scal(ScalarType(2.2));
-    scaled_operator = countingup;
-    scaled_operator *= ScalarType(2.2);
-
+    scaled_by_operator = countingup;
+    scaled_by_operator *= ScalarType(2.2);
     for (size_t ii = 0; ii < dim; ++ii) {
       if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(2.2) * countingup[ii])
-          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(2.2) * countingup[ii]))
+          || !Dune::FloatCmp::eq(scaled_by_operator[ii], ScalarType(2.2) * countingup[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception,
-                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << countingup[ii]);
+                              scaled[ii] << " vs. " << scaled_by_operator[ii] << " vs." << countingup[ii]);
     }
     scaled = testvector_5;
     scaled.scal(ScalarType(-3.75));
-    scaled_operator = testvector_5;
-    scaled_operator *= ScalarType(-3.75);
-
+    scaled_by_operator = testvector_5;
+    scaled_by_operator *= ScalarType(-3.75);
     for (size_t ii = 0; ii < dim; ++ii) {
       if (!Dune::FloatCmp::eq(scaled[ii], ScalarType(-3.75) * testvector_5[ii])
-          || !Dune::FloatCmp::eq(scaled_operator[ii], ScalarType(-3.75) * testvector_5[ii]))
+          || !Dune::FloatCmp::eq(scaled_by_operator[ii], ScalarType(-3.75) * testvector_5[ii]))
         DUNE_THROW_COLORFULLY(Dune::Exception,
-                              scaled[ii] << " vs. " << scaled_operator[ii] << " vs." << testvector_5[ii]);
+                              scaled[ii] << " vs. " << scaled_by_operator[ii] << " vs." << testvector_5[ii]);
     }
 
     // test operator+, operator+=, add, iadd
@@ -806,7 +801,7 @@ struct MatrixTestBase : public ::testing::Test
           DUNE_THROW_COLORFULLY(Dune::Exception, d_by_size_and_pattern.get_entry(ii, jj));
       }
     }
-  }
+  } // void fulfills_interface() const
 
   void produces_correct_results() const
   {
