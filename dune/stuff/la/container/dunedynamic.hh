@@ -3,5 +3,5 @@
 // Copyright Holders: Felix Albrecht, Rene Milk
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#warning This header is deprecated, use '#include <dune/stuff/la/container/common.hh' instead!
+#warning This header is deprecated, use '#include <dune/stuff/la/container/common.hh>' instead!
 #include "common.hh"
