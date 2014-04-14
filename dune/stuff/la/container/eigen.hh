@@ -106,6 +106,12 @@ public:
     CHECK_CRTP(CRTP::as_imp(*this).backend());
     return CRTP::as_imp(*this).backend();
   } // ... backend(...)
+
+  const BackendType& raw_backend() const
+  {
+    CHECK_CRTP(CRTP::as_imp(*this).raw_backend());
+    return CRTP::as_imp(*this).raw_backend();
+  } // ... backend(...)
   /**
    * \}
    */
@@ -147,7 +153,7 @@ public:
    */
   inline size_t size() const
   {
-    return backend().size();
+    return raw_backend().size();
   }
 
   void add_to_entry(const size_t ii, const ScalarType& value)
@@ -453,6 +459,12 @@ public:
     const_cast<ThisType&>(*this).ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
+
+  const BackendType& raw_backend() const
+  {
+    return *backend_;
+  } // ... backend(...)
+
   /**
    * \}
    */
@@ -728,6 +740,12 @@ public:
     const_cast<ThisType&>(*this).ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
+
+  const BackendType& raw_backend() const
+  {
+    return *backend_;
+  } // ... backend(...)
+
   /**
    * \}
    */
