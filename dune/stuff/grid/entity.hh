@@ -84,7 +84,7 @@ auto reference_element(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
 
 #endif // DUNE_STUFF_GRID_ENTITY_HH
 
-/** Copyright (c) 2012, Felix Albrecht
+/** Copyright (c) 2012, Rene Milk, Felix Schindler
    * All rights reserved.
    *
    * Redistribution and use in source and binary forms, with or without

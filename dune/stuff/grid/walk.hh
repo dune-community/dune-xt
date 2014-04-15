@@ -116,7 +116,7 @@ GridWalk<Dune::GridView<ViewImp>, codim> make_gridwalk(const Dune::GridView<View
 } // namespace Dune
 
 #endif // ifndef DUNE_STUFF_WALK_HH_INCLUDED
-/** Copyright (c) 2012, Felix Albrecht, Rene Milk
+/** Copyright (c) 2012, Rene Milk, Felix Schindler
    * All rights reserved.
    *
    * Redistribution and use in source and binary forms, with or without

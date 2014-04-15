@@ -160,7 +160,7 @@ inline std::ostream& operator<<(std::ostream& s, const DSG::Dimensions<T>& d)
   return s;
 } // <<
 #endif // DUNE_STUFF_GRID_INFORMATION_HH
-/** Copyright (c) 2012, Felix Albrecht, Rene Milk
+/** Copyright (c) 2012, Rene Milk, Felix Schindler
    * All rights reserved.
    *
    * Redistribution and use in source and binary forms, with or without
