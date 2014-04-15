@@ -38,7 +38,7 @@ namespace LA {
 
 class SolverUtils
 {
-protected:
+public:
   static void check_given(const std::string& type, const std::vector<std::string>& opts)
   {
     if (std::find(opts.begin(), opts.end(), type) == opts.end()) {
