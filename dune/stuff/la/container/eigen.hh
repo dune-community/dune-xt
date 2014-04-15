@@ -10,8 +10,10 @@
 #include <type_traits>
 
 #if HAVE_EIGEN
+#include <dune/stuff/common/disable_warnings.hh>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_EIGEN
 
 #include <dune/common/typetraits.hh>
