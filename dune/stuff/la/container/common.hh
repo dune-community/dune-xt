@@ -22,19 +22,6 @@
 #include "pattern.hh"
 
 namespace Dune {
-namespace Pymor {
-namespace Operators {
-
-// forwards, needed for friendlyness
-template <class ScalarImp>
-class DuneDynamic;
-
-template <class ScalarImp>
-class DuneDynamicInverse;
-
-} // namespace Operators
-} // namespace Pymor
-
 namespace Stuff {
 namespace LA {
 
@@ -331,8 +318,6 @@ private:
 
   friend class VectorInterface<CommonDenseVectorTraits<ScalarType>>;
   friend class CommonDenseMatrix<ScalarType>;
-  friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
-  friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;
 
   std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseVector
@@ -349,7 +334,7 @@ public:
 
 
 /**
- *  \brief  A dense metrix implementation of MatrixInterface using the eigen backend.
+ *  \brief  A dense matrix implementation of MatrixInterface using the dune-common.
  */
 template <class ScalarImp = double>
 class CommonDenseMatrix : public MatrixInterface<CommonDenseMatrixTraits<ScalarImp>>,
@@ -584,9 +569,6 @@ private:
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
-
-  friend class Dune::Pymor::Operators::DuneDynamicInverse<ScalarType>;
-  friend class Dune::Pymor::Operators::DuneDynamic<ScalarType>;
 
   std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseMatrix
