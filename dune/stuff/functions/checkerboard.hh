@@ -253,7 +253,7 @@ private:
 #define DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim)                     \
   extern template class Dune::Stuff::Function::Checkerboard<etype, dftype, ddim, rftype, rdim, rcdim>;
 
-#ifdef HAVE_DUNE_GRID
+#if HAVE_DUNE_GRID
 
 DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid1dEntityType, 1)
 DUNE_STUFF_FUNCTIONS_CHECKERBOARD_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2)

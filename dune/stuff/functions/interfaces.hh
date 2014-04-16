@@ -451,7 +451,7 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake1dE
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake2dEntityType, 2)
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake3dEntityType, 3)
 
-#ifdef HAVE_DUNE_GRID
+#if HAVE_DUNE_GRID
 
 #include <dune/grid/sgrid.hh>
 

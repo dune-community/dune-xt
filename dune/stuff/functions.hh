@@ -596,7 +596,7 @@ DUNE_STUFF_FUNCTIONS_GENERATE_DIM_RANGE(3)
 #define DUNE_STUFF_FUNCTIONS_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim)                                  \
   extern template class Dune::Stuff::Functions<etype, dftype, ddim, rftype, rdim, rcdim>;
 
-#ifdef HAVE_DUNE_GRID
+#if HAVE_DUNE_GRID
 
 DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid1dEntityType, 1)
 DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2)
