@@ -1,5 +1,7 @@
-// -*- tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-// vi: set et ts=8 sw=2 sts=2:
+// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff
+// Copyright holders: Rene Milk, Felix Schindler
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 #ifndef DUNE_STUFF_GRID_OUTPUT_PGF_HH
 #define DUNE_STUFF_GRID_OUTPUT_PGF_HH
