@@ -132,7 +132,7 @@ public:
 
   const BackendType& backend() const
   {
-    const_cast<ThisType&>(*this).ensure_uniqueness();
+    ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
   /**
@@ -223,7 +223,7 @@ public:
    * \{
    */
 
-  virtual ScalarType dot(const ThisType& other) const DS_OVERRIDE
+  virtual ScalarType dot(const ThisType& other) const DS_OVERRIDE DS_FINAL
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
@@ -232,22 +232,22 @@ public:
     return backend_->dot(*(other.backend_));
   } // ... dot(...)
 
-  virtual ScalarType l1_norm() const DS_OVERRIDE
+  virtual ScalarType l1_norm() const DS_OVERRIDE DS_FINAL
   {
     return backend_->one_norm();
   }
 
-  virtual ScalarType l2_norm() const DS_OVERRIDE
+  virtual ScalarType l2_norm() const DS_OVERRIDE DS_FINAL
   {
     return backend_->two_norm();
   }
 
-  virtual ScalarType sup_norm() const DS_OVERRIDE
+  virtual ScalarType sup_norm() const DS_OVERRIDE DS_FINAL
   {
     return backend_->infinity_norm();
   }
 
-  virtual void add(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void add(const ThisType& other, ThisType& result) const DS_OVERRIDE DS_FINAL
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
@@ -261,7 +261,7 @@ public:
     result.backend() += *(other.backend_);
   } // ... add(...)
 
-  virtual ThisType add(const ThisType& other) const DS_OVERRIDE
+  virtual ThisType add(const ThisType& other) const DS_OVERRIDE DS_FINAL
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
@@ -272,7 +272,7 @@ public:
     return result;
   } // ... add(...)
 
-  virtual void iadd(const ThisType& other) DS_OVERRIDE
+  virtual void iadd(const ThisType& other) DS_OVERRIDE DS_FINAL
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
@@ -282,7 +282,7 @@ public:
     backend_->operator+=(*(other.backend_));
   } // ... iadd(...)
 
-  virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE
+  virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE DS_FINAL
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
@@ -296,7 +296,7 @@ public:
     result.backend() -= *(other.backend_);
   } // ... sub(...)
 
-  virtual ThisType sub(const ThisType& other) const DS_OVERRIDE
+  virtual ThisType sub(const ThisType& other) const DS_OVERRIDE DS_FINAL
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
@@ -307,7 +307,7 @@ public:
     return result;
   } // ... sub(...)
 
-  virtual void isub(const ThisType& other) DS_OVERRIDE
+  virtual void isub(const ThisType& other) DS_OVERRIDE DS_FINAL
   {
     if (other.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
@@ -322,7 +322,7 @@ public:
    */
 
 private:
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
@@ -331,7 +331,7 @@ private:
   friend class VectorInterface<IstlDenseVectorTraits<ScalarType>>;
   friend class IstlRowMajorSparseMatrix<ScalarType>;
 
-  std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<BackendType> backend_;
 }; // class IstlDenseVector
 
 
@@ -456,7 +456,7 @@ public:
 
   const BackendType& backend() const
   {
-    const_cast<ThisType&>(*this).ensure_uniqueness();
+    ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
   /**
@@ -523,19 +523,19 @@ public:
 
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
-    backend_->mv(xx.backend(), yy.backend());
+    backend_->mv(*(xx.backend_), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend_->operator[](ii)[jj][0][0] += value;
+    backend()[ii][jj][0][0] += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend_->operator[](ii)[jj][0][0] = value;
+    backend()[ii][jj][0][0] = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
@@ -553,7 +553,7 @@ public:
     if (ii >= rows())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend_->operator[](ii) *= ScalarType(0);
+    backend()[ii] *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
@@ -561,6 +561,7 @@ public:
     if (jj >= cols())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+    ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii) {
       auto& row                = backend_->operator[](ii);
       const auto search_result = row.find(jj);
@@ -577,6 +578,7 @@ public:
     if (!backend_->exists(ii, ii))
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
+    ensure_uniqueness();
     backend_->operator[](ii) *= ScalarType(0);
     backend_->operator[](ii)[ii] = ScalarType(1);
   } // ... unit_row(...)
@@ -589,6 +591,7 @@ public:
     if (!backend_->exists(jj, jj))
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
+    ensure_uniqueness();
     for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
       auto& row                = backend_->operator[](ii);
       const auto search_result = row.find(jj);
@@ -611,13 +614,13 @@ private:
     return backend_->exists(ii, jj);
   } // ... these_are_valid_indices(...)
 
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<BackendType> backend_;
 }; // class IstlRowMajorSparseMatrix
 
 
