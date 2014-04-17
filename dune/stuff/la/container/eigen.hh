@@ -156,7 +156,7 @@ public:
    */
   inline size_t size() const
   {
-    return backend().size();
+    return backend_->size();
   }
 
   void add_to_entry(const size_t ii, const ScalarType& value)
@@ -174,18 +174,18 @@ public:
   ScalarType get_entry(const size_t ii) const
   {
     assert(ii < size());
-    return backend()(ii);
+    return backend_->operator[](ii);
   } // ... get_entry(...)
 
 protected:
   inline ScalarType& get_entry_ref(const size_t ii)
   {
-    return backend()(ii);
+    return (*backend_)(ii);
   }
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
   {
-    return backend()(ii);
+    return (*backend_)(ii);
   }
   /**
    * \}
@@ -196,13 +196,13 @@ public:
    * \defgroup vector_overrides ´´These methods override default implementations from VectorInterface.``
    * \{
    */
-  virtual std::pair<size_t, ScalarType> amax() const DS_OVERRIDE
+  virtual std::pair<size_t, ScalarType> amax() const DS_OVERRIDE DS_FINAL
   {
     auto result              = std::make_pair(size_t(0), ScalarType(0));
     size_t min_index         = 0;
     size_t max_index         = 0;
-    const ScalarType minimum = backend().minCoeff(&min_index);
-    const ScalarType maximum = backend().maxCoeff(&max_index);
+    const ScalarType minimum = backend_->minCoeff(&min_index);
+    const ScalarType maximum = backend_->maxCoeff(&max_index);
     if (std::abs(maximum) < std::abs(minimum) || (std::abs(maximum) == std::abs(minimum) && max_index > min_index)) {
       result.first  = min_index;
       result.second = std::abs(minimum);
@@ -227,9 +227,9 @@ public:
     return true;
   } // ... almost_equal(...)
 
-  virtual bool
-  almost_equal(const VectorImpType& other,
-               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const DS_OVERRIDE
+  virtual bool almost_equal(const VectorImpType& other,
+                            const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+      DS_OVERRIDE DS_FINAL
   {
     return this->template almost_equal<Traits>(other, epsilon);
   }
@@ -243,27 +243,27 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of other (" << other.size() << ") does not match the size of this (" << size()
                                                   << ")!");
-    return backend().transpose() * other.backend();
+    return backend_->transpose() * (*other.backend_);
   } // ... dot(...)
 
-  virtual ScalarType dot(const VectorImpType& other) const DS_OVERRIDE
+  virtual ScalarType dot(const VectorImpType& other) const DS_OVERRIDE DS_FINAL
   {
     return this->template dot<Traits>(other);
   }
 
-  virtual ScalarType l1_norm() const DS_OVERRIDE
+  virtual ScalarType l1_norm() const DS_OVERRIDE DS_FINAL
   {
-    return backend().template lpNorm<1>();
+    return backend_->template lpNorm<1>();
   }
 
-  virtual ScalarType l2_norm() const DS_OVERRIDE
+  virtual ScalarType l2_norm() const DS_OVERRIDE DS_FINAL
   {
-    return backend().template lpNorm<2>();
+    return backend_->template lpNorm<2>();
   }
 
-  virtual ScalarType sup_norm() const DS_OVERRIDE
+  virtual ScalarType sup_norm() const DS_OVERRIDE DS_FINAL
   {
-    return backend().template lpNorm<::Eigen::Infinity>();
+    return backend_->template lpNorm<::Eigen::Infinity>();
   }
 
   template <class T1, class T2>
@@ -277,10 +277,10 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of result (" << result.size() << ") does not match the size of this (" << size()
                                                    << ")!");
-    result.backend() = backend() + other.backend();
+    result.backend() = *backend_ + *other.backend_;
   } // ... add(...)
 
-  virtual void add(const VectorImpType& other, VectorImpType& result) const DS_OVERRIDE
+  virtual void add(const VectorImpType& other, VectorImpType& result) const DS_OVERRIDE DS_FINAL
   {
     return this->template add<Traits, Traits>(other, result);
   }
@@ -292,10 +292,10 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of other (" << other.size() << ") does not match the size of this (" << size()
                                                   << ")!");
-    backend() += other.backend();
+    backend() += *other.backend_;
   } // ... iadd(...)
 
-  virtual void iadd(const VectorImpType& other) DS_OVERRIDE
+  virtual void iadd(const VectorImpType& other) DS_OVERRIDE DS_FINAL
   {
     return this->template iadd<Traits>(other);
   }
@@ -311,10 +311,10 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of result (" << result.size() << ") does not match the size of this (" << size()
                                                    << ")!");
-    result.backend() = backend() - other.backend();
+    result.backend() = *backend_ - *other.backend_;
   } // ... sub(...)
 
-  virtual void sub(const VectorImpType& other, VectorImpType& result) const DS_OVERRIDE
+  virtual void sub(const VectorImpType& other, VectorImpType& result) const DS_OVERRIDE DS_FINAL
   {
     return this->template sub<Traits, Traits>(other, result);
   }
@@ -326,10 +326,10 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of other (" << other.size() << ") does not match the size of this (" << size()
                                                   << ")!");
-    backend() -= other.backend();
+    backend() -= *other.backend_;
   } // ... isub(...)
 
-  virtual void isub(const VectorImpType& other) DS_OVERRIDE
+  virtual void isub(const VectorImpType& other) DS_OVERRIDE DS_FINAL
   {
     this->template isub<Traits>(other);
   }
@@ -717,7 +717,7 @@ public:
 
   const BackendType& backend() const
   {
-    const_cast<ThisType&>(*this).ensure_uniqueness();
+    ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
   /**
@@ -826,6 +826,7 @@ public:
     if (ii >= rows())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
+    ensure_uniqueness();
     for (size_t jj = 0; jj < cols(); ++jj)
       backend_->operator()(ii, jj) = ScalarType(0);
   } // ... clear_row(...)
@@ -835,6 +836,7 @@ public:
     if (jj >= cols())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+    ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_->operator()(ii, jj) = ScalarType(0);
   } // ... clear_col(...)
@@ -844,6 +846,7 @@ public:
     if (ii >= rows())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
+    ensure_uniqueness();
     for (size_t jj = 0; jj < cols(); ++jj)
       backend_->operator()(ii, jj) = ScalarType(0);
     backend_->operator()(ii, ii) = ScalarType(1);
@@ -854,6 +857,7 @@ public:
     if (jj >= cols())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+    ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_->operator()(ii, jj) = ScalarType(0);
     backend_->operator()(jj, jj) = ScalarType(1);
@@ -864,7 +868,7 @@ public:
    */
 
 private:
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
@@ -873,7 +877,7 @@ private:
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
-  std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<BackendType> backend_;
 }; // class EigenDenseMatrix
 
 
@@ -1001,7 +1005,7 @@ public:
 
   const BackendType& backend() const
   {
-    const_cast<ThisType&>(*this).ensure_uniqueness();
+    ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
   /**
@@ -1071,13 +1075,13 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend_->coeffRef(ii, jj) += value;
+    backend().coeffRef(ii, jj) += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend_->coeffRef(ii, jj) = value;
+    backend().coeffRef(ii, jj) = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
@@ -1092,7 +1096,7 @@ public:
     if (ii >= rows())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend_->row(ii) *= ScalarType(0);
+    backend().row(ii) *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
@@ -1100,7 +1104,8 @@ public:
     if (jj >= cols())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    for (size_t row = 0; row < static_cast<size_t>(backend_->outerSize()); ++row) {
+    ensure_uniqueness();
+    for (typename BackendType::Index row = 0; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
@@ -1120,7 +1125,7 @@ public:
     if (!these_are_valid_indices(ii, ii))
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
-    backend_->row(ii) *= ScalarType(0);
+    backend().row(ii) *= ScalarType(0);
     set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
 
@@ -1129,7 +1134,8 @@ public:
     if (jj >= cols())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    for (size_t row = 0; row < static_cast<size_t>(backend_->outerSize()); ++row) {
+    ensure_uniqueness();
+    for (size_t row = 0; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
@@ -1148,7 +1154,7 @@ public:
    */
 
 private:
-  bool these_are_valid_indices(const size_t ii, const size_t jj)
+  bool these_are_valid_indices(const size_t ii, const size_t jj) const
   {
     if (ii >= rows())
       return false;
@@ -1166,7 +1172,7 @@ private:
     return false;
   } // ... these_are_valid_indices(...)
 
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
@@ -1175,7 +1181,7 @@ private:
   friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
   friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
-  std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<BackendType> backend_;
 }; // class EigenRowMajorSparseMatrix
 
 
