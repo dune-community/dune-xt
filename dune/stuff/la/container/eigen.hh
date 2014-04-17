@@ -339,6 +339,8 @@ public:
 
 private:
   friend class VectorInterface<Traits>;
+  friend class EigenDenseMatrix<ScalarType>;
+  friend class EigenRowMajorSparseMatrix<ScalarType>;
 
 protected:
   mutable std::shared_ptr<BackendType> backend_;
@@ -750,8 +752,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    ensure_uniqueness();
-    backend_->operator*=(alpha);
+    backend() *= alpha;
   } // ... scal(...)
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
@@ -763,10 +764,8 @@ public:
                               << "x"
                               << cols()
                               << ")!");
-    ensure_uniqueness();
-    auto& this_ref     = *backend_;
     const auto& xx_ref = *(xx.backend_);
-    this_ref += alpha * xx_ref;
+    backend() += alpha * xx_ref;
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -795,23 +794,21 @@ public:
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
-    yy.backend().transpose() = backend_->operator*(xx.backend());
+    yy.backend().transpose() = backend_->operator*(*xx.backend_);
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(ii < rows());
     assert(jj < cols());
-    ensure_uniqueness();
-    backend_->operator()(ii, jj) += value;
+    backend()(ii, jj) += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(ii < rows());
     assert(jj < cols());
-    ensure_uniqueness();
-    backend_->operator()(ii, jj) = value;
+    backend()(ii, jj) = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
@@ -911,6 +908,7 @@ public:
   typedef EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename BackendType::Index Index;
 
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
@@ -1024,8 +1022,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    ensure_uniqueness();
-    backend_->operator*=(alpha);
+    backend() *= alpha;
   } // ... scal(...)
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
@@ -1037,10 +1034,8 @@ public:
                               << "x"
                               << cols()
                               << ")!");
-    ensure_uniqueness();
-    auto& this_ref     = *backend_;
     const auto& xx_ref = *(xx.backend_);
-    this_ref += alpha * xx_ref;
+    backend() += alpha * xx_ref;
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -1069,7 +1064,7 @@ public:
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
-    yy.backend().transpose() = backend_->operator*(xx.backend());
+    yy.backend().transpose() = backend_->operator*(*xx.backend_);
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -1105,7 +1100,7 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
-    for (typename BackendType::Index row = 0; row < backend_->outerSize(); ++row) {
+    for (Index row = 0; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
@@ -1129,15 +1124,15 @@ public:
     set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
 
-  void unit_col(const size_t jj)
+  void unit_col(const Index jj)
   {
-    if (jj >= cols())
+    if (jj >= backend_->rows())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
-    for (size_t row = 0; row < backend_->outerSize(); ++row) {
+    for (Index row = 0; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
-        const size_t col = row_it.col();
+        const Index col = row_it.col();
         if (col == jj) {
           if (col == row)
             backend_->coeffRef(row, col) = ScalarType(1);
@@ -1154,15 +1149,15 @@ public:
    */
 
 private:
-  bool these_are_valid_indices(const size_t ii, const size_t jj) const
+  bool these_are_valid_indices(const Index ii, const Index jj) const
   {
-    if (ii >= rows())
+    if (ii >= backend_->rows())
       return false;
-    if (jj >= cols())
+    if (jj >= backend_->cols())
       return false;
-    for (size_t row = ii; row < backend_->outerSize(); ++row) {
+    for (Index row = ii; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
-        const size_t col = row_it.col();
+        const Index col = row_it.col();
         if ((ii == row) && (jj == col))
           return true;
         else if ((row > ii) && (col > jj))
