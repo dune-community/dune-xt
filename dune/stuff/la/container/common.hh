@@ -204,7 +204,7 @@ public:
 private:
   inline ScalarType& get_entry_ref(const size_t ii)
   {
-    return backend_->operator[](ii);
+    return backend()[ii];
   }
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
