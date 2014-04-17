@@ -2,6 +2,8 @@
 //   https://users.dune-project.org/projects/dune-stuff/
 // Copyright Holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//
+// Contributors: Tobias Leibner
 
 #include <dune/stuff/test/test_common.hh>
 

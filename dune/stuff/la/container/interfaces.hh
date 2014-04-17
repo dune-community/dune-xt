@@ -2,6 +2,8 @@
 //   https://users.dune-project.org/projects/dune-stuff/
 // Copyright Holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//
+// Contributors: Tobias Leibner
 
 #ifndef DUNE_STUFF_LA_CONTAINER_INTERFACE_HH
 #define DUNE_STUFF_LA_CONTAINER_INTERFACE_HH
@@ -22,6 +24,28 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
+
+/**
+ *  \brief  Contains tags mostly needed for python bindings.
+ */
+namespace Tags {
+
+
+class ContainerInterface
+{
+};
+class ProvidesDataAccess
+{
+};
+class VectorInterface
+{
+};
+class MatrixInterface
+{
+};
+
+
+} // namespace Tagss
 
 
 template <class Traits>
@@ -44,13 +68,8 @@ public:
 }; // class ProvidesBackend
 
 
-/// Needed for the python bindings.
-class ContainerInterfaceDynamic
-{
-};
-
 template <class Traits>
-class ContainerInterface : public ContainerInterfaceDynamic, public CRTPInterface<ContainerInterface<Traits>, Traits>
+class ContainerInterface : public Tags::ContainerInterface, public CRTPInterface<ContainerInterface<Traits>, Traits>
 {
   typedef CRTPInterface<ContainerInterface<Traits>, Traits> CRTP;
 
@@ -175,13 +194,8 @@ public:
 }; // class ProvidesContainer
 
 
-/// Needed for the python bindings.
-class ProvidesDataAccessDynamic
-{
-};
-
 template <class Traits>
-class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>
+class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>, public Tags::ProvidesDataAccess
 {
 public:
   typedef typename Traits::ScalarType ScalarType;
@@ -194,13 +208,8 @@ public:
 }; // class ProvidesDataAccess
 
 
-/// Needed for the python bindings.
-class VectorInterfaceDynamic
-{
-};
-
 template <class Traits>
-class VectorInterface : public ContainerInterface<Traits>, public VectorInterfaceDynamic
+class VectorInterface : public ContainerInterface<Traits>, public Tags::VectorInterface
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -706,13 +715,8 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T>& vector)
 } // ... operator<<(...)
 
 
-/// Needed for the python bindings.
-class MatrixInterfaceDynamic
-{
-};
-
 template <class Traits>
-class MatrixInterface : public ContainerInterface<Traits>, public MatrixInterfaceDynamic
+class MatrixInterface : public ContainerInterface<Traits>, public Tags::MatrixInterface
 {
 public:
   typedef typename Traits::derived_type derived_type;

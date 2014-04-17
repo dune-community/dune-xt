@@ -13,20 +13,22 @@
 #include <cmath>
 
 #if HAVE_EIGEN
+#include <dune/stuff/common/disable_warnings.hh>
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseLU>
 #include <Eigen/SparseQR>
-#if HAVE_UMFPACK
-#include <Eigen/UmfPackSupport>
-#endif
-//# include <Eigen/SPQRSupport>
-//# include <Eigen/CholmodSupport>
-#if HAVE_SUPERLU
-#include <Eigen/SuperLUSupport>
-#endif
+//#   if HAVE_UMFPACK
+//#     include <Eigen/UmfPackSupport>
+//#   endif
+//#   include <Eigen/SPQRSupport>
+//#   include <Eigen/CholmodSupport>
+//#   if HAVE_SUPERLU
+//#     include <Eigen/SuperLUSupport>
+//#   endif
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_EIGEN
 
 #if HAVE_FASP
