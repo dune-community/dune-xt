@@ -1,3 +1,10 @@
+// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff
+// Copyright holders: Rene Milk, Felix Schindler
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//
+// Contributors: Kirsten Weber
+
 #ifndef DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 #define DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 
@@ -399,7 +406,7 @@ private:
 #define DUNE_STUFF_FUNCTIONS_EXPRESSION_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim)                       \
   extern template class Dune::Stuff::Function::Expression<etype, dftype, ddim, rftype, rdim, rcdim>;
 
-#ifdef HAVE_DUNE_GRID
+#if HAVE_DUNE_GRID
 
 DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid1dEntityType, 1)
 DUNE_STUFF_FUNCTIONS_EXPRESSION_LIST_DIMRANGE(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2)

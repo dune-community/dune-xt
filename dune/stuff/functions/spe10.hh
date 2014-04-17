@@ -174,7 +174,7 @@ const typename Spe10Model1<E, D, 2, R, 1, 1>::RangeFieldType Spe10Model1<E, D, 2
 #define DUNE_STUFF_FUNCTIONS_SPE10_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim)                            \
   extern template class Dune::Stuff::Function::Spe10Model1<etype, dftype, ddim, rftype, rdim, rcdim>;
 
-#ifdef HAVE_DUNE_GRID
+#if HAVE_DUNE_GRID
 
 DUNE_STUFF_FUNCTIONS_SPE10_LIST_DOMAINFIELDTYPES(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2, 1, 1)
 
