@@ -1,3 +1,8 @@
+// This file is part of the dune-stuff project:
+//   http://users.dune-project.org/projects/dune-stuff
+// Copyright holders: Rene Milk, Felix Schindler
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+
 #ifndef DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 #define DUNE_STUFF_GRID_PROVIDER_CUBE_HH
 
@@ -17,7 +22,7 @@
 
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/yaspgrid.hh>
-#ifdef HAVE_ALUGRID
+#if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
 #include <dune/grid/sgrid.hh>
