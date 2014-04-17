@@ -153,8 +153,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    ensure_uniqueness();
-    backend_->operator*=(alpha);
+    backend() *= (alpha);
   } // ... scal(...)
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
@@ -162,8 +161,7 @@ public:
     if (xx.size() != size())
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    ensure_uniqueness();
-    backend_->axpy(alpha, *(xx.backend_));
+    backend().axpy(alpha, *(xx.backend_));
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -187,15 +185,13 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator[](ii)[0] += value;
+    backend()[ii][0] += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator[](ii)[0] = value;
+    backend()[ii][0] = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii) const
@@ -280,8 +276,7 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of other (" << other.size() << ") does not match the size of this (" << size()
                                                   << ")!");
-    ensure_uniqueness();
-    backend_->operator+=(*(other.backend_));
+    backend() += (*(other.backend_));
   } // ... iadd(...)
 
   virtual void sub(const ThisType& other, ThisType& result) const DS_OVERRIDE DS_FINAL
@@ -315,8 +310,7 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
                             "The size of other (" << other.size() << ") does not match the size of this (" << size()
                                                   << ")!");
-    ensure_uniqueness();
-    backend_->operator-=(*(other.backend_));
+    backend() -= (*(other.backend_));
   } // ... isub(...)
 
   /**
@@ -477,8 +471,7 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    ensure_uniqueness();
-    backend_->operator*=(alpha);
+    backend() *= (alpha);
   } // ... scal(...)
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
@@ -490,8 +483,7 @@ public:
                               << "x"
                               << cols()
                               << ")!");
-    ensure_uniqueness();
-    backend_->axpy(alpha, *(xx.backend_));
+    backend().axpy(alpha, *(xx.backend_));
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
