@@ -507,6 +507,12 @@ struct VectorTest : public ::testing::Test
         DUNE_THROW_COLORFULLY(Dune::Exception,
                               scaled[ii] << " vs. " << scaled_by_operator[ii] << " vs." << testvector_5[ii]);
     }
+    VectorImp a = ones;
+    a.scal(ScalarType(0));
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
 
     // test operator+, operator+=, add, iadd
     VectorImp sum_operator_plus  = zeros + ones;
@@ -570,6 +576,25 @@ struct VectorTest : public ::testing::Test
           sum_add_1 << ", " << sum_add_2 << ", " << sum_operator_iplus << ", " << sum_operator_plus << ", " << sum_iadd
                     << ", "
                     << sum_correct);
+
+    a = ones;
+    a += testvector_3;
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
+    a = ones;
+    a.iadd(testvector_3);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
+    a = ones;
+    ones.add(testvector_3, a);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
 
     // test operator-, operator-=, sub, isub
     VectorImp diff_operator_minus  = zeros - ones;
@@ -637,6 +662,25 @@ struct VectorTest : public ::testing::Test
                      << ", "
                      << diff_correct);
 
+    a = ones;
+    a -= testvector_3;
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
+    a = ones;
+    a.isub(testvector_3);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
+    a = ones;
+    ones.sub(testvector_3, a);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
+
     // test axpy
     VectorImp result_axpy = zeros;
     result_axpy.axpy(ScalarType(1), ones);
@@ -663,6 +707,12 @@ struct VectorTest : public ::testing::Test
     correct_result += testvector_4;
     if (result_axpy != correct_result)
       DUNE_THROW_COLORFULLY(Dune::Exception, result_axpy << " vs. " << correct_result);
+    a = ones;
+    a.axpy(ScalarType(2), testvector_3);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
   } // void produces_correct_results() const
 }; // struct VectorTest
 
@@ -877,6 +927,12 @@ struct MatrixTest : public ::testing::Test
     if (result_mv_1[0] != ScalarType(0.5) || result_mv_1[1] != ScalarType(2.5) || result_mv_1[2] != ScalarType(-0.5)
         || result_mv_1[3] != ScalarType(0))
       DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1);
+    VectorImp a = vector_ones;
+    matrix_zeros_dense.mv(vector_zeros, a);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      if (!Dune::FloatCmp::eq(vector_ones[ii], ScalarType(1)))
+        DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+    }
 
     // test scal, operator*
     MatrixImp scaled             = matrix_zeros_dense;
@@ -937,6 +993,14 @@ struct MatrixTest : public ::testing::Test
           DUNE_THROW_COLORFULLY(Dune::Exception, "");
       }
     }
+    MatrixImp b = matrix_ones;
+    b.scal(ScalarType(0));
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(matrix_ones.get_entry(ii, jj), ScalarType(1)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
+      }
+    }
 
     // test axpy
     MatrixImp result_axpy = matrix_zeros_dense;
@@ -975,6 +1039,14 @@ struct MatrixTest : public ::testing::Test
                                 result_axpy.get_entry(ii, jj)
                                     << " vs. "
                                     << ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj));
+      }
+    }
+    b = matrix_zeros_dense;
+    b.axpy(ScalarType(1), matrix_ones);
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        if (FloatCmp::ne(matrix_zeros_dense.get_entry(ii, jj), ScalarType(0)))
+          DUNE_THROW_COLORFULLY(Dune::Exception, "check copy-on-write");
       }
     }
   } // void produces_correct_results() const
