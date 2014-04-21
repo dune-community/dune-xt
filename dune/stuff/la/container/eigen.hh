@@ -908,7 +908,6 @@ public:
   typedef EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
-  typedef typename BackendType::Index Index;
 
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
@@ -1100,7 +1099,7 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
-    for (Index row = 0; row < backend_->outerSize(); ++row) {
+    for (size_t row = 0; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
@@ -1124,15 +1123,15 @@ public:
     set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
 
-  void unit_col(const Index jj)
+  void unit_col(const size_t jj)
   {
-    if (jj >= backend_->rows())
+    if (jj >= rows())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
-    for (Index row = 0; row < backend_->outerSize(); ++row) {
+    for (size_t row = 0; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
-        const Index col = row_it.col();
+        const size_t col = row_it.col();
         if (col == jj) {
           if (col == row)
             backend_->coeffRef(row, col) = ScalarType(1);
@@ -1149,15 +1148,15 @@ public:
    */
 
 private:
-  bool these_are_valid_indices(const Index ii, const Index jj) const
+  bool these_are_valid_indices(const size_t ii, const size_t jj) const
   {
-    if (ii >= backend_->rows())
+    if (ii >= rows())
       return false;
-    if (jj >= backend_->cols())
+    if (jj >= cols())
       return false;
-    for (Index row = ii; row < backend_->outerSize(); ++row) {
+    for (size_t row = ii; row < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
-        const Index col = row_it.col();
+        const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
           return true;
         else if ((row > ii) && (col > jj))
