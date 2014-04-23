@@ -7,7 +7,7 @@
 
 #if HAVE_DUNE_GRID
 
-#include <dune/stuff/grid/output/pgf.hh>
+#include <dune/stuff/grids/output/pgf.hh>
 #include <dune/grid/sgrid.hh>
 
 #include <fstream>

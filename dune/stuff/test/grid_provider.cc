@@ -18,7 +18,7 @@
 #include <dune/common/timer.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
-#include <dune/stuff/grid/provider.hh>
+#include <dune/stuff/grids/provider.hh>
 
 using namespace Dune;
 using namespace Dune::Stuff;
