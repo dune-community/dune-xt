@@ -17,59 +17,108 @@
 #include <dune/common/parametertree.hh>
 #include <dune/common/timer.hh>
 
+#include <dune/grid/sgrid.hh>
+#include <dune/grid/yaspgrid.hh>
+
 #include <dune/stuff/common/parameter/tree.hh>
-#include <dune/stuff/grids/provider.hh>
+#include <dune/stuff/grids/provider/interface.hh>
+#include <dune/stuff/grids/provider/cube.hh>
 
 using namespace Dune;
 using namespace Dune::Stuff;
 
-static const int dim = 2;
-
-typedef testing::Types<Dune::YaspGrid<dim>
-#if HAVE_ALUGRID
-                       ,
-                       Dune::ALUCubeGrid<dim, dim>, Dune::ALUConformGrid<dim, dim>, Dune::ALUSimplexGrid<dim, dim>
-#endif
-#if HAVE_ALBERTA
-                       ,
-                       Dune::AlbertaGrid<dim>
-#endif
-#if HAVE_UG
-                       ,
-                       Dune::UGGrid<dim>
-#endif
-                       ,
-                       Dune::SGrid<dim, dim>> GridTypes;
+typedef testing::Types<Dune::SGrid<1, 1>
+                       //                      , Dune::SGrid< 2, 2 >
+                       //                      , Dune::SGrid< 3, 3 >
+                       //                      , Dune::YaspGrid< 1 >
+                       //                      , Dune::YaspGrid< 2 >
+                       //                      , Dune::YaspGrid< 3 >
+                       > GridTypes;
 
 template <class GridType>
-struct CubeTest : public testing::Test
+struct GridProviderBaseTest : public testing::Test
 {
-  typedef Dune::FieldVector<typename GridType::ctype, dim> CoordinateType;
+  typedef Grids::ProviderInterface<GridType> GridProviderType;
 
-  CubeTest()
+  template <class GridProviderImp>
+  static void can_be_created_by_config()
   {
+    std::unique_ptr<GridProviderImp> grid_provider = GridProviderImp::create();
   }
 
-  void test_cube()
+  static void fulfills_interface(GridProviderType& grid_provider)
   {
-    const std::vector<std::string> types                = Dune::Stuff::GridProviders<GridType>::available();
-    const ParameterTree settings                        = Dune::Stuff::GridProviders<GridType>::defaultSettings(types[0]);
-    const GridProviderInterface<GridType>* gridProvider = GridProviders<GridType>::create(types[0], settings);
-    EXPECT_GT(gridProvider->grid()->size(0), 0);
-    EXPECT_GT(gridProvider->grid()->size(1), 0);
-  }
-};
+    std::string id                  = grid_provider.id();
+    std::shared_ptr<GridType>& grid = grid_provider.grid();
+    std::shared_ptr<typename GridProviderType::template Leaf<Grids::ChoosePartView::view>::Type> leaf_view_1 =
+        grid_provider.template leaf<Grids::ChoosePartView::view>();
+    std::shared_ptr<typename GridProviderType::LeafGridViewType> leaf_view_2 = grid_provider.leaf_view();
+#if HAVE_DUNE_FEM
+    std::shared_ptr<typename GridProviderType::template Leaf<Grids::ChoosePartView::part>::Type> leaf_part_1 =
+        grid_provider.template leaf<Grids::ChoosePartView::part>();
+    std::shared_ptr<typename GridProviderType::LeafGridPartType> leaf_part_2 = grid_provider.leaf_part();
+#endif // HAVE_DUNE_FEM
+    for (int level = 0; level <= grid->maxLevel(); ++level) {
+      std::shared_ptr<typename GridProviderType::template Level<Grids::ChoosePartView::view>::Type> level_view_1 =
+          grid_provider.template level<Grids::ChoosePartView::view>(level);
+      std::shared_ptr<typename GridProviderType::LevelGridViewType> level_view_2 = grid_provider.level_view(level);
+#if HAVE_DUNE_FEM
+      std::shared_ptr<typename GridProviderType::template Level<Grids::ChoosePartView::part>::Type> level_part_1 =
+          grid_provider.template level<Grids::ChoosePartView::part>(level);
+      std::shared_ptr<typename GridProviderType::LevelGridPartType> level_part_2 = grid_provider.level_part(level);
+#endif // HAVE_DUNE_FEM
+      grid_provider.visualize();
+    }
+  } // ... fulfills_interface()
+}; // struct GridProviderTest
 
-TYPED_TEST_CASE(CubeTest, GridTypes);
-TYPED_TEST(CubeTest, All)
+
+template <class GridType>
+struct CubeProviderTest : public GridProviderBaseTest<GridType>
 {
-  this->test_cube();
+  typedef GridProviderBaseTest<GridType> BaseType;
+  typedef Grids::CubeProvider<GridType> CubeProviderType;
+
+  void can_be_created_by_config() const
+  {
+    BaseType::template can_be_created_by_config<CubeProviderType>();
+  }
+
+  void fulfills_interface() const
+  {
+    std::string static_id = CubeProviderType::static_id();
+    BaseType::fulfills_interface(*(CubeProviderType::create()));
+  }
+}; // struct CubeProviderTest
+
+
+TYPED_TEST_CASE(CubeProviderTest, GridTypes);
+TYPED_TEST(CubeProviderTest, can_be_created_by_config)
+{
+  this->can_be_created_by_config();
+}
+
+TYPED_TEST_CASE(CubeProviderTest, GridTypes);
+TYPED_TEST(CubeProviderTest, fulfills_interface)
+{
+  this->fulfills_interface();
 }
 
 #endif // #if HAVE_DUNE_GRID
 
 int main(int argc, char** argv)
 {
-  test_init(argc, argv);
-  return RUN_ALL_TESTS();
+  try {
+    test_init(argc, argv);
+    return RUN_ALL_TESTS();
+  } catch (Dune::Exception& e) {
+    std::cerr << "Dune reported error:\n" << e.what() << std::endl;
+    std::abort();
+  } catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    std::abort();
+  } catch (...) {
+    std::cerr << "Unknown exception thrown!" << std::endl;
+    std::abort();
+  } // try
 }
