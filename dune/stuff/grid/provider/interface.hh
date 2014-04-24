@@ -17,95 +17,12 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #endif
 
-#if HAVE_DUNE_FEM
-#include <dune/fem/gridpart/leafgridpart.hh>
-#include <dune/fem/gridpart/levelgridpart.hh>
-#endif // HAVE_DUNE_FEM
-
 #include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/grid/partview.hh>
 
 namespace Dune {
 namespace Stuff {
-namespace Grids {
-
-
-enum class ChoosePartView
-{
-  part,
-  view
-}; // enum class ChoosePartView
-
-
-namespace internal {
-
-
-// forwards
-template <class GridType, ChoosePartView type>
-struct LevelGridPartView;
-
-template <class GridType, ChoosePartView type>
-struct LeafGridPartView;
-
-
-template <class GridType>
-struct LevelGridPartView<GridType, ChoosePartView::view>
-{
-  typedef typename GridType::LevelGridView Type;
-
-  static std::shared_ptr<Type> create(GridType& grid, const int level)
-  {
-    assert(level >= 0);
-    assert(level <= grid.maxLevel());
-    return std::make_shared<Type>(grid.levelGridView(level));
-  } // ... create(...)
-}; // struct LevelGridPartView< ..., view >
-
-
-template <class GridType>
-struct LeafGridPartView<GridType, ChoosePartView::view>
-{
-  typedef typename GridType::LeafGridView Type;
-
-  static std::shared_ptr<Type> create(GridType& grid)
-  {
-    return std::make_shared<Type>(grid.leafGridView());
-  }
-}; // struct LeafGridPartView< ..., view >
-
-
-#if HAVE_DUNE_FEM
-
-
-template <class GridType>
-struct LevelGridPartView<GridType, ChoosePartView::part>
-{
-  typedef Dune::Fem::LevelGridPart<GridType> Type;
-
-  static std::shared_ptr<Type> create(GridType& grid, const int level)
-  {
-    assert(level >= 0);
-    assert(level <= grid.maxLevel());
-    return std::make_shared<Type>(grid, level);
-  } // ... create(...)
-}; // struct LevelGridPartView< ..., part >
-
-
-template <class GridType>
-struct LeafGridPartView<GridType, ChoosePartView::part>
-{
-  typedef Dune::Fem::LeafGridPart<GridType> Type;
-
-  static std::shared_ptr<Type> create(GridType& grid)
-  {
-    return std::make_shared<Type>(grid);
-  }
-}; // struct LeafGridPartView< ..., part >
-
-
-#endif // HAVE_DUNE_FEM
-
-} // namespace internal
-
+namespace Grid {
 
 #if HAVE_DUNE_GRID
 
@@ -123,13 +40,13 @@ public:
   template <ChoosePartView type>
   struct Level
   {
-    typedef typename internal::LevelGridPartView<GridType, type>::Type Type;
+    typedef typename LevelPartView<GridType, type>::Type Type;
   };
 
   template <ChoosePartView type>
   struct Leaf
   {
-    typedef typename internal::LeafGridPartView<GridType, type>::Type Type;
+    typedef typename LeafPartView<GridType, type>::Type Type;
   };
 
   typedef typename Level<ChoosePartView::view>::Type LevelGridViewType;
@@ -163,14 +80,14 @@ public:
   template <ChoosePartView type>
   std::shared_ptr<typename Level<type>::Type> level(const int level)
   {
-    return internal::LevelGridPartView<GridType, type>::create(*(grid()), level);
+    return LevelPartView<GridType, type>::create(*(grid()), level);
   }
 
   template <ChoosePartView type>
   std::shared_ptr<const typename Level<type>::Type> level(const int level) const
   {
     GridType& non_const_grid = const_cast<GridType&>(*(grid()));
-    return internal::LevelGridPartView<GridType, type>::create(non_const_grid, level);
+    return LevelPartView<GridType, type>::create(non_const_grid, level);
   }
 
   std::shared_ptr<LevelGridViewType> level_view(const int level)
@@ -198,14 +115,14 @@ public:
   template <ChoosePartView type>
   std::shared_ptr<typename Leaf<type>::Type> leaf()
   {
-    return internal::LeafGridPartView<GridType, type>::create(*(grid()));
+    return LeafPartView<GridType, type>::create(*(grid()));
   }
 
   template <ChoosePartView type>
   std::shared_ptr<const typename Leaf<type>::Type> leaf() const
   {
     GridType& non_const_grid = const_cast<GridType&>(*(grid()));
-    return internal::LeafGridPartView<GridType, type>::create(non_const_grid);
+    return LeafPartView<GridType, type>::create(non_const_grid);
   }
 
   std::shared_ptr<LeafGridViewType> leaf_view()
@@ -350,7 +267,7 @@ class ProviderInterface
 
 #endif // HAVE_DUNE_GRID
 
-} // namespace Grids
+} // namespace Grid
 } // namespace Stuff
 } // namespace Dune
 
