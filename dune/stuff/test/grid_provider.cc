@@ -21,8 +21,8 @@
 #include <dune/grid/yaspgrid.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
-#include <dune/stuff/grids/provider/interface.hh>
-#include <dune/stuff/grids/provider/cube.hh>
+#include <dune/stuff/grid/provider/interface.hh>
+#include <dune/stuff/grid/provider/cube.hh>
 
 using namespace Dune;
 using namespace Dune::Stuff;
