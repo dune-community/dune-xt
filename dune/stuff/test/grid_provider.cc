@@ -73,7 +73,7 @@ template <class GridType>
 struct CubeProviderTest : public GridProviderBaseTest<GridType>
 {
   typedef GridProviderBaseTest<GridType> BaseType;
-  typedef Stuff::Grid::CubeProvider<GridType> CubeProviderType;
+  typedef Stuff::Grid::Providers::Cube<GridType> CubeProviderType;
 
   void can_be_created_by_config() const
   {
