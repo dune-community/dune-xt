@@ -441,7 +441,7 @@ public:
 #define DUNE_STUFF_FUNCTIONS_INTERFACES_LAST_EXPANSION(cname, etype, dftype, ddim, rftype, rdim, rcdim)                \
   extern template class cname<etype, dftype, ddim, rftype, rdim, rcdim>;
 
-#include <dune/stuff/grids/fakeentity.hh>
+#include <dune/stuff/grid/fakeentity.hh>
 
 typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFunctionsInterfacesFake1dEntityType;
 typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFunctionsInterfacesFake2dEntityType;

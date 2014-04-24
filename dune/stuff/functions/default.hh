@@ -11,7 +11,7 @@
 #endif
 
 #include <dune/stuff/common/float_cmp.hh>
-//#include <dune/stuff/grids/entity.hh>
+//#include <dune/stuff/grid/entity.hh>
 
 #include "interfaces.hh"
 

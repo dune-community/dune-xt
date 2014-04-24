@@ -39,7 +39,7 @@
 // TEST_STRUCT_GENERATOR
 
 
-#include <dune/stuff/grids/fakeentity.hh>
+#include <dune/stuff/grid/fakeentity.hh>
 
 typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFake1dEntityType;
 typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFake2dEntityType;
