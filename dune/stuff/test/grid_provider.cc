@@ -27,18 +27,13 @@
 using namespace Dune;
 using namespace Dune::Stuff;
 
-typedef testing::Types<Dune::SGrid<1, 1>
-                       //                      , Dune::SGrid< 2, 2 >
-                       //                      , Dune::SGrid< 3, 3 >
-                       //                      , Dune::YaspGrid< 1 >
-                       //                      , Dune::YaspGrid< 2 >
-                       //                      , Dune::YaspGrid< 3 >
-                       > GridTypes;
+typedef testing::Types<Dune::SGrid<1, 1>, Dune::SGrid<2, 2>, Dune::SGrid<3, 3>, Dune::YaspGrid<1>, Dune::YaspGrid<2>,
+                       Dune::YaspGrid<3>> GridTypes;
 
 template <class GridType>
 struct GridProviderBaseTest : public testing::Test
 {
-  typedef Grids::ProviderInterface<GridType> GridProviderType;
+  typedef Stuff::Grid::ProviderInterface<GridType> GridProviderType;
 
   template <class GridProviderImp>
   static void can_be_created_by_config()
@@ -48,24 +43,25 @@ struct GridProviderBaseTest : public testing::Test
 
   static void fulfills_interface(GridProviderType& grid_provider)
   {
+    using Stuff::Grid::ChoosePartView;
     std::string id                  = grid_provider.id();
     std::shared_ptr<GridType>& grid = grid_provider.grid();
-    std::shared_ptr<typename GridProviderType::template Leaf<Grids::ChoosePartView::view>::Type> leaf_view_1 =
-        grid_provider.template leaf<Grids::ChoosePartView::view>();
-    std::shared_ptr<typename GridProviderType::LeafGridViewType> leaf_view_2 = grid_provider.leaf_view();
+    std::shared_ptr<typename GridProviderType::template Leaf<ChoosePartView::view>::Type> leaf_view_auto =
+        grid_provider.template leaf<ChoosePartView::view>();
+    std::shared_ptr<typename GridProviderType::LeafGridViewType> leaf_view = grid_provider.leaf_view();
 #if HAVE_DUNE_FEM
-    std::shared_ptr<typename GridProviderType::template Leaf<Grids::ChoosePartView::part>::Type> leaf_part_1 =
-        grid_provider.template leaf<Grids::ChoosePartView::part>();
-    std::shared_ptr<typename GridProviderType::LeafGridPartType> leaf_part_2 = grid_provider.leaf_part();
+    std::shared_ptr<typename GridProviderType::template Leaf<ChoosePartView::part>::Type> leaf_part_auto =
+        grid_provider.template leaf<ChoosePartView::part>();
+    std::shared_ptr<typename GridProviderType::LeafGridPartType> leaf_part = grid_provider.leaf_part();
 #endif // HAVE_DUNE_FEM
     for (int level = 0; level <= grid->maxLevel(); ++level) {
-      std::shared_ptr<typename GridProviderType::template Level<Grids::ChoosePartView::view>::Type> level_view_1 =
-          grid_provider.template level<Grids::ChoosePartView::view>(level);
-      std::shared_ptr<typename GridProviderType::LevelGridViewType> level_view_2 = grid_provider.level_view(level);
+      std::shared_ptr<typename GridProviderType::template Level<ChoosePartView::view>::Type> level_view_auto =
+          grid_provider.template level<ChoosePartView::view>(level);
+      std::shared_ptr<typename GridProviderType::LevelGridViewType> level_view = grid_provider.level_view(level);
 #if HAVE_DUNE_FEM
-      std::shared_ptr<typename GridProviderType::template Level<Grids::ChoosePartView::part>::Type> level_part_1 =
-          grid_provider.template level<Grids::ChoosePartView::part>(level);
-      std::shared_ptr<typename GridProviderType::LevelGridPartType> level_part_2 = grid_provider.level_part(level);
+      std::shared_ptr<typename GridProviderType::template Level<ChoosePartView::part>::Type> level_part_auto =
+          grid_provider.template level<ChoosePartView::part>(level);
+      std::shared_ptr<typename GridProviderType::LevelGridPartType> level_part = grid_provider.level_part(level);
 #endif // HAVE_DUNE_FEM
       grid_provider.visualize();
     }
@@ -77,7 +73,7 @@ template <class GridType>
 struct CubeProviderTest : public GridProviderBaseTest<GridType>
 {
   typedef GridProviderBaseTest<GridType> BaseType;
-  typedef Grids::CubeProvider<GridType> CubeProviderType;
+  typedef Stuff::Grid::CubeProvider<GridType> CubeProviderType;
 
   void can_be_created_by_config() const
   {
