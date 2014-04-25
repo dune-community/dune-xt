@@ -17,10 +17,13 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
 
+#include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/vector.hh>
 #include <dune/stuff/common/float_cmp.hh>
+#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/memory.hh>
 
 #if HAVE_DUNE_PDELAB
 #include <dune/typetree/leafnode.hh>
@@ -29,10 +32,445 @@
 
 namespace Dune {
 namespace Stuff {
+namespace Grid {
 
 
 template <class IntersectionImp>
-class GridboundaryInterface
+class BoundaryInfoInterface
+#if HAVE_DUNE_PDELAB
+    : public TypeTree::LeafNode
+#endif
+{
+#if HAVE_DUNE_PDELAB
+  typedef PDELab::IntersectionGeometry<IntersectionImp> IntersectionGeometryType;
+  typedef FieldVector<typename IntersectionGeometryType::ctype, IntersectionGeometryType::dimension - 1>
+      Codim1DomainType;
+#endif
+public:
+  typedef IntersectionImp IntersectionType;
+
+  static const std::string static_id()
+  {
+    return "stuff.grid.boundaryinfo";
+  }
+
+  virtual ~BoundaryInfoInterface()
+  {
+  }
+
+  virtual bool dirichlet(const IntersectionType& intersection) const = 0;
+
+  virtual bool neumann(const IntersectionType& intersection) const = 0;
+
+#if HAVE_DUNE_PDELAB
+  //! default implementation for signature used in PDELab
+  virtual bool isDirichlet(const IntersectionGeometryType& intersection_geometry,
+                           const Codim1DomainType& /*coord*/) const
+  {
+    return dirichlet(intersection_geometry.intersection());
+  }
+
+  //! default implementation for signature used in PDELab
+  virtual bool isNeumann(const IntersectionGeometryType& intersection_geometry, const Codim1DomainType& /*coord*/) const
+  {
+    return neumann(intersection_geometry.intersection());
+  }
+#endif // HAVE_DUNE_PDELAB
+}; // class BoundaryInfoInterface
+
+
+namespace BoundaryInfos {
+
+
+template <class IntersectionImp>
+class AllDirichlet : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+{
+  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef AllDirichlet<IntersectionImp> ThisType;
+
+public:
+  using typename BaseType::IntersectionType;
+
+  static const std::string static_id()
+  {
+    return BaseType::static_id() + ".alldirichlet";
+  }
+
+  static Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    if (sub_name.empty())
+      return Common::ConfigTree("type", static_id());
+    else
+      return Common::ConfigTree(sub_name + ".type", static_id());
+  }
+
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree /*config*/ = default_config(),
+                                          const std::string /*sub_name*/ = static_id())
+  {
+    return Common::make_unique<ThisType>();
+  }
+
+  AllDirichlet()
+  {
+  }
+
+  virtual ~AllDirichlet()
+  {
+  }
+
+  virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  {
+    return intersection.boundary();
+  }
+
+  virtual bool neumann(const IntersectionType& /*intersection*/) const DS_OVERRIDE DS_FINAL
+  {
+    return false;
+  }
+}; // class AllDirichlet
+
+
+template <class IntersectionImp>
+class AllNeumann : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+{
+  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef AllNeumann<IntersectionImp> ThisType;
+
+public:
+  using typename BaseType::IntersectionType;
+
+  static const std::string static_id()
+  {
+    return BaseType::static_id() + ".allneumann";
+  }
+
+  static Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    if (sub_name.empty())
+      return Common::ConfigTree("type", static_id());
+    else
+      return Common::ConfigTree(sub_name + ".type", static_id());
+  }
+
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree /*config*/ = default_config(),
+                                          const std::string /*sub_name*/ = static_id())
+  {
+    return Common::make_unique<ThisType>();
+  }
+
+  AllNeumann()
+  {
+  }
+
+  virtual ~AllNeumann()
+  {
+  }
+
+  virtual bool dirichlet(const IntersectionType& /*intersection*/) const DS_OVERRIDE DS_FINAL
+  {
+    return false;
+  }
+
+  virtual bool neumann(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  {
+    return intersection.boundary();
+  }
+}; // class AllNeumann
+
+
+template <class IntersectionImp>
+class IdBased : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+{
+  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef IdBased<IntersectionImp> ThisType;
+
+public:
+  using typename BaseType::IntersectionType;
+
+  static const std::string static_id()
+  {
+    return BaseType::static_id() + ".idbased";
+  }
+
+  static Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    Common::ConfigTree config("type", static_id());
+    config["dirichlet"] = "[1; 2; 3]";
+    config["neumann"] = "[4]";
+    if (sub_name.empty())
+      return config;
+    else {
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  static ThisType* create(const Common::ConfigTree config = default_config(), const std::string sub_name = static_id())
+  {
+    const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const auto dirichlet_ids     = cfg.get<std::vector<int>>("dirichlet", 0);
+    const auto neumann_ids       = cfg.get<std::vector<int>>("neumann", 0);
+    std::map<std::string, std::set<int>> id_to_type_map;
+    id_to_type_map.insert(std::make_pair("dirichlet", std::set<int>(dirichlet_ids.begin(), dirichlet_ids.end())));
+    id_to_type_map.insert(std::make_pair("neumann", std::set<int>(neumann_ids.begin(), neumann_ids.end())));
+    return Common::make_unique<ThisType>(id_to_type_map);
+  }
+
+  IdBased(const std::map<std::string, std::set<int>> id_to_type_map)
+    : id_to_type_map_(id_to_type_map)
+    , hasDirichlet_(id_to_type_map_.find("dirichlet") != id_to_type_map_.end())
+    , hasNeumann_(id_to_type_map_.find("neumann") != id_to_type_map_.end())
+  {
+  }
+
+  virtual ~IdBased()
+  {
+  }
+
+  const std::map<std::string, std::set<int>>& id_to_type_map() const
+  {
+    return id_to_type_map_;
+  }
+
+  virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  {
+    if (hasDirichlet_ && intersection.boundary()) {
+#include <dune/stuff/common/disable_warnings.hh>
+      const int boundaryId = intersection.boundaryId();
+#include <dune/stuff/common/reenable_warnings.hh>
+      // get set of dirichlet ids (has to be found, otherwise hasDirichlet_ would be false)
+      const auto result = id_to_type_map_.find("dirichlet");
+      assert(result != id_to_type_map_.end());
+      const auto& idSet = result->second;
+      return (idSet.count(boundaryId) > 0);
+    } else
+      return false;
+  } // bool dirichlet(const IntersectionType& intersection) const
+
+  virtual bool neumann(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  {
+    if (hasNeumann_ && intersection.boundary()) {
+// get boundary id
+#include <dune/stuff/common/disable_warnings.hh>
+      const int boundaryId = intersection.boundaryId();
+#include <dune/stuff/common/reenable_warnings.hh>
+      // get set of neumann ids (has to be found, otherwise hasNeumann_ would be false)
+      const auto result = id_to_type_map_.find("neumann");
+      assert(result != id_to_type_map_.end());
+      const auto& idSet = result->second;
+      return (idSet.count(boundaryId) > 0);
+    } else
+      return false;
+  } // bool neumann(const IntersectionType& intersection) const
+
+private:
+  std::map<std::string, std::set<int>> id_to_type_map_;
+  bool hasDirichlet_;
+  bool hasNeumann_;
+}; // class IdBased
+
+
+template <class IntersectionImp>
+class NormalBased : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+{
+  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef NormalBased<IntersectionImp> ThisType;
+
+public:
+  using typename BaseType::IntersectionType;
+
+  typedef typename IntersectionType::ctype DomainFieldType;
+  static const unsigned int dimDomain = IntersectionType::dimension;
+  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+
+  static const std::string static_id()
+  {
+    return BaseType::static_id() + ".normalbased";
+  }
+
+  static Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    Common::ConfigTree config("type", static_id());
+    config["default"]           = "dirichlet";
+    config["compare_tolerance"] = "1e-10";
+    config["neumann.0"]         = "[1.0; 0.0]";
+    config["dirichlet.0"] = "[0.0; 1.0]";
+    if (sub_name.empty())
+      return config;
+    else {
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
+  {
+    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigTree default_cfg = default_config();
+    // get default
+    const std::string default_type = cfg.get("default", default_cfg.get<std::string>("dirichlet"));
+    if (default_type != "dirichlet" && default_type != "neumann")
+      DUNE_THROW_COLORFULLY(Exceptions::configuration_error, "Wrong default '" << default_type << "' given!");
+    const bool default_to_dirichlet = default_type == "dirichlet";
+    // get tolerance
+    const DomainFieldType tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
+    // get dirichlet and neumann
+    std::vector<DomainType> dirichlets = getVectors(cfg, "dirichlet");
+    std::vector<DomainType> neumanns   = getVectors(cfg, "neumann");
+    // return
+    return new ThisType(default_to_dirichlet, dirichlets, neumanns, tol);
+  } // ... create(...)
+
+  NormalBased(const bool default_to_dirichlet = true,
+              const std::vector<DomainType> dirichlet_normals = std::vector<DomainType>(),
+              const std::vector<DomainType> neumann_normals   = std::vector<DomainType>(),
+              const DomainFieldType tol = 1e-10)
+    : default_to_dirichlet_(default_to_dirichlet)
+    , dirichlet_normals_(dirichlet_normals)
+    , neumann_normals_(neumann_normals)
+    , tol_(tol)
+  {
+    // normalize
+    for (auto& normal : dirichlet_normals_)
+      normal /= normal.two_norm();
+    for (auto& normal : neumann_normals_)
+      normal /= normal.two_norm();
+    // sanity check
+    for (auto& dirichletNormal : dirichlet_normals_) {
+      if (contains(dirichletNormal, neumann_normals_))
+        DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                              "Given normals are too close for given tolerance '" << tol << "'!");
+    }
+  } // NormalBased(...)
+
+  virtual ~NormalBased()
+  {
+  }
+
+  virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  {
+    if (intersection.boundary()) {
+      const DomainType outerNormal = intersection.centerUnitOuterNormal();
+      if (contains(outerNormal, dirichlet_normals_))
+        return true;
+      else if (contains(outerNormal, neumann_normals_))
+        return false;
+      else
+        return default_to_dirichlet_;
+    }
+    return false;
+  } // ... dirichlet(...)
+
+  virtual bool neumann(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  {
+    if (intersection.boundary()) {
+      const DomainType outerNormal = intersection.centerUnitOuterNormal();
+      if (contains(outerNormal, neumann_normals_))
+        return true;
+      else if (contains(outerNormal, dirichlet_normals_))
+        return false;
+      else
+        return !default_to_dirichlet_;
+    }
+    return false;
+  } // ... neumann(...)
+
+private:
+  static std::vector<DomainType> getVectors(const Common::ConfigTree& config, const std::string key)
+  {
+    std::vector<DomainType> ret;
+    if (config.has_sub(key)) {
+      bool found           = true;
+      unsigned int counter = 0;
+      while (found) {
+        const std::string localKey = key + "." + Dune::Stuff::Common::toString(counter);
+        if (config.has_key(localKey))
+          ret.push_back(config.get<DomainType>(localKey, dimDomain));
+        else
+          found = false;
+        ++counter;
+      }
+    } else if (config.has_key(key))
+      ret.push_back(config.get<DomainType>(key, dimDomain));
+    return ret;
+  } // ... getVectors(...)
+
+  bool contains(const DomainType& normal, const std::vector<DomainType>& vectors) const
+  {
+    for (auto& vector : vectors)
+      if (Dune::Stuff::Common::FloatCmp::eq(normal, vector, tol_))
+        return true;
+    return false;
+  }
+
+  const bool default_to_dirichlet_;
+  std::vector<DomainType> dirichlet_normals_;
+  std::vector<DomainType> neumann_normals_;
+  const DomainFieldType tol_;
+}; // class NormalBased
+
+
+} // namespace BoundaryInfos
+
+
+template <class I>
+class BoundaryInfoProvider
+{
+public:
+  typedef BoundaryInfoInterface<I> InterfaceType;
+
+  static std::vector<std::string> available()
+  {
+    using namespace Stuff::Grid::BoundaryInfos;
+    return {BoundaryInfos::AllDirichlet<I>::static_id(),
+            BoundaryInfos::AllNeumann<I>::static_id(),
+            BoundaryInfos::IdBased<I>::static_id(),
+            BoundaryInfos::NormalBased<I>::static_id()};
+  } // ... available(...)
+
+  static Common::ConfigTree default_config(const std::string type, const std::string subname = "")
+  {
+    using namespace Stuff::Grid::BoundaryInfos;
+    if (type == BoundaryInfos::AllDirichlet<I>::static_id())
+      return BoundaryInfos::AllDirichlet<I>::default_config(subname);
+    else if (type == BoundaryInfos::AllNeumann<I>::static_id())
+      return BoundaryInfos::AllNeumann<I>::default_config(subname);
+    else if (type == BoundaryInfos::IdBased<I>::static_id())
+      return BoundaryInfos::IdBased<I>::default_config(subname);
+    else if (type == BoundaryInfos::NormalBased<I>::static_id())
+      return BoundaryInfos::NormalBased<I>::default_config(subname);
+    else
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+  } // ... default_config(...)
+
+  static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
+                                               const Common::ConfigTree config = default_config(available()[0]))
+  {
+    using namespace Stuff::Grid::BoundaryInfos;
+    if (type == BoundaryInfos::AllDirichlet<I>::static_id())
+      return BoundaryInfos::AllDirichlet<I>::create(config);
+    else if (type == BoundaryInfos::AllNeumann<I>::static_id())
+      return BoundaryInfos::AllNeumann<I>::create(config);
+    else if (type == BoundaryInfos::IdBased<I>::static_id())
+      return BoundaryInfos::IdBased<I>::create(config);
+    else if (type == BoundaryInfos::NormalBased<I>::static_id())
+      return BoundaryInfos::NormalBased<I>::create(config);
+    else
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+  } // ... create(...)
+}; // class BoundaryInfoProvider
+
+
+} // namespace Grid
+
+
+template <class IntersectionImp>
+class DUNE_DEPRECATED_MSG("Use Stuff::Grid::BoundaryInfoInterface instead!") GridboundaryInterface
 #if HAVE_DUNE_PDELAB
     : public TypeTree::LeafNode // makes this usable as BoundaryCondition type directly in PDElab
 #endif
@@ -76,7 +514,8 @@ public:
 
 
 template <class IntersectionImp>
-class GridboundaryAllDirichlet : public GridboundaryInterface<IntersectionImp>
+class DUNE_DEPRECATED_MSG("Use Stuff::Grid::BoundaryInfos::AllDirichlet instead!") GridboundaryAllDirichlet
+    : public GridboundaryInterface<IntersectionImp>
 {
   typedef GridboundaryInterface<IntersectionImp> BaseType;
 
@@ -110,7 +549,8 @@ public:
 
 
 template <class IntersectionImp>
-class GridboundaryAllNeumann : public GridboundaryInterface<IntersectionImp>
+class DUNE_DEPRECATED_MSG("Use Stuff::Grid::BoundaryInfos::AllNeumann instead!") GridboundaryAllNeumann
+    : public GridboundaryInterface<IntersectionImp>
 {
   typedef GridboundaryInterface<IntersectionImp> BaseType;
 
@@ -144,7 +584,8 @@ public:
 
 
 template <class IntersectionImp>
-class GridboundaryIdBased : public GridboundaryInterface<IntersectionImp>
+class DUNE_DEPRECATED_MSG("Use Stuff::Grid::BoundaryInfos::IdBased instead!") GridboundaryIdBased
+    : public GridboundaryInterface<IntersectionImp>
 {
   typedef GridboundaryInterface<IntersectionImp> BaseType;
 
@@ -240,7 +681,8 @@ private:
 
 
 template <class IntersectionImp>
-class GridboundaryNormalBased : public GridboundaryInterface<IntersectionImp>
+class DUNE_DEPRECATED_MSG("Use Stuff::Grid::BoundaryInfos::NormalBased instead!") GridboundaryNormalBased
+    : public GridboundaryInterface<IntersectionImp>
 {
   typedef GridboundaryInterface<IntersectionImp> BaseType;
 
@@ -410,50 +852,6 @@ private:
   std::vector<DomainType> neumannNormals_;
   const DomainFieldType tol_;
 }; // class GridboundaryNormalBased
-
-
-template <class IntersectionType>
-class Gridboundaries
-{
-public:
-  static std::vector<std::string> available()
-  {
-    return {"boundaryinfo.alldirichlet", "boundaryinfo.allneumann", "boundaryinfo.idbased", "boundaryinfo.normalbased"};
-  } // ... available(...)
-
-  static Dune::ParameterTree defaultSettings(const std::string type, const std::string subname = "")
-  {
-    if (type == "boundaryinfo.alldirichlet")
-      return GridboundaryAllDirichlet<IntersectionType>::defaultSettings(subname);
-    else if (type == "boundaryinfo.allneumann")
-      return GridboundaryAllNeumann<IntersectionType>::defaultSettings(subname);
-    else if (type == "boundaryinfo.idbased")
-      return GridboundaryIdBased<IntersectionType>::defaultSettings(subname);
-    else if (type == "boundaryinfo.normalbased")
-      return GridboundaryNormalBased<IntersectionType>::defaultSettings(subname);
-    else
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
-                      << "' requested!");
-  } // ... createDefaultSettings(...)
-
-  static GridboundaryInterface<IntersectionType>* create(const std::string& type = available()[0],
-                                                         const Dune::ParameterTree settings = Dune::ParameterTree())
-  {
-    if (type == "boundaryinfo.alldirichlet") {
-      return new GridboundaryAllDirichlet<IntersectionType>();
-    } else if (type == "boundaryinfo.allneumann") {
-      return new GridboundaryAllNeumann<IntersectionType>();
-    } else if (type == "boundaryinfo.idbased") {
-      return GridboundaryIdBased<IntersectionType>::create(settings);
-    } else if (type == "boundaryinfo.normalbased") {
-      return GridboundaryNormalBased<IntersectionType>::create(settings);
-    } else
-      DUNE_THROW(Dune::RangeError,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " unknown boundaryinfo '" << type
-                      << "' requested!");
-  } // ... create(...)
-}; // class Gridboundaries
 
 
 } // namespace Stuff
