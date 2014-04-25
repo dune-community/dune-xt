@@ -111,7 +111,9 @@ public:
 
   static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
   {
-    return new ThisType(settings.get<RangeFieldType>("value", RangeFieldType(0)));
+    const DSC::ExtendedParameterTree default_settings = defaultSettings();
+    return new ThisType(settings.get("value", default_settings.get<RangeFieldType>("value")),
+                        settings.get("name", static_id()));
   } // ... create(...)
 
   Constant(const RangeFieldType& val, const std::string nm = static_id())
