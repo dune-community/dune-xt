@@ -112,11 +112,6 @@ public:
     return BaseType::static_id() + ".cube";
   }
 
-  virtual std::string id() /*DS_OVERRIDE*/
-  {
-    return BaseType::static_id() + ".cube";
-  }
-
   /**
    *  \brief      Creates a cube.
    *  \param[in]  _lowerLeft

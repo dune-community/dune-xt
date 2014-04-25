@@ -61,12 +61,7 @@ public:
 
   static const std::string static_id()
   {
-    return "stuff.grids.provider";
-  }
-
-  virtual std::string id() const
-  {
-    return "stuff.grids.provider";
+    return "stuff.grid.provider";
   }
 
   virtual ~ProviderInterface()
