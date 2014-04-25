@@ -29,10 +29,13 @@ template <class GridType = Dune::SGrid<2, 2>>
 class GridProviders
 {
 public:
+  typedef Stuff::Grid::ProviderInterface<GridType> InterfaceType;
+
   static std::vector<std::string> available()
   {
+    namespace Providers = Stuff::Grid::Providers;
     return {
-        "gridprovider.cube"
+        Providers::Cube<GridType>::static_id()
         //#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
         //#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID ||
         // defined UGGRID
@@ -60,11 +63,12 @@ public:
       //    else if (type == "gridprovider.starcd") {
       //      return GridProviderStarCD< GridType >::default_config(subname);
     } else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given, "'" << type << "' is not a valid grid.provider!");
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... default_config(...)
 
-  static std::unique_ptr<Stuff::Grid::ProviderInterface<GridType>>
-  create(const std::string& type = available()[0], const Common::ConfigTree config = default_config(available()[0]))
+  static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
+                                               const Common::ConfigTree config = default_config(available()[0]))
   {
     namespace Providers = Stuff::Grid::Providers;
     if (type == Providers::Cube<GridType>::static_id())
@@ -79,7 +83,8 @@ public:
     //    else if (type == "gridprovider.starcd")
     //      return GridProviderStarCD< GridType >::create(config);
     else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given, "'" << type << "' is not a valid grid.provider!");
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... create(...)
 }; // class GridProviders
 
