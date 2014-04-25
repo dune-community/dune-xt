@@ -196,7 +196,7 @@ public:
     buildGrid(tmpNumElements);
   }
 
-  static ParameterTree default_config(const std::string sub_name = "")
+  static Common::ConfigTree default_config(const std::string sub_name = "")
   {
     Common::ConfigTree config;
     config["lower_left"]   = "[0.0; 0.0; 0.0]";
