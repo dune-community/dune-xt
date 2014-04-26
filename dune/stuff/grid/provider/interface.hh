@@ -18,7 +18,10 @@
 #endif
 
 #include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/grid/partview.hh>
+#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/grid/boundaryinfo.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -154,35 +157,33 @@ public:
     std::vector<double> boundaryId = generateBoundaryIdVisualization(*grid_view);
     vtkwriter.addCellData(boundaryId, "boundary_id");
     // write
-    vtkwriter.write(filename, Dune::VTK::appendedraw);
+    vtkwriter.write(filename, VTK::appendedraw);
   } // ... visualize(...)
 
-  //  virtual void visualize(const std::string boundaryInfoType,
-  //                         const Dune::ParameterTree& description,
-  //                         const std::string filename = id()) const
-  //  {
-  //    // vtk writer
-  //    LeafGridViewType gridView = grid()->leafView();
-  //    Dune::VTKWriter< LeafGridViewType > vtkwriter(gridView);
-  //    // boundary id
-  //    std::vector< double > boundaryId = generateBoundaryIdVisualization(gridView);
-  //    vtkwriter.addCellData(boundaryId, "boundaryId");
-  //    const GridboundaryInterface< typename LeafGridViewType::Intersection >*
-  //        boundaryInfo = Gridboundaries< typename LeafGridViewType::Intersection >::create(boundaryInfoType,
-  //        description);
-  //    // dirichlet values
-  //    std::vector< double > dirichlet = generateBoundaryVisualization(gridView, *boundaryInfo, "dirichlet");
-  //    vtkwriter.addCellData(dirichlet, "isDirichletBoundary");
-  //    // neumann values
-  //    std::vector< double > neumann = generateBoundaryVisualization(gridView, *boundaryInfo, "neumann");
-  //    delete boundaryInfo;
-  //    vtkwriter.addCellData(neumann, "isNeumannBoundary");
-  //    // codim 0 entity id
-  //    std::vector< double > entityId = generateEntityVisualization(gridView);
-  //    vtkwriter.addCellData(entityId, "entityId");
-  //    // write
-  //    vtkwriter.write(filename, Dune::VTK::ascii);
-  //  } // void visualize(const std::string filename = id + ".grid") const
+  virtual void visualize(const Common::ConfigTree& boundary_info_cfg, const std::string filename = static_id()) const
+  {
+    // boundary info
+    typedef Stuff::Grid::BoundaryInfoProvider<typename LeafGridViewType::Intersection> BoundaryInfoProvider;
+    auto boundary_info_ptr =
+        BoundaryInfoProvider::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
+    // vtk writer
+    auto grid_view = leaf_view();
+    Dune::VTKWriter<LeafGridViewType> vtkwriter(*grid_view);
+    // codim 0 entity id
+    std::vector<double> entityId = generateEntityVisualization(*grid_view);
+    vtkwriter.addCellData(entityId, "entityId");
+    // boundary id
+    std::vector<double> boundaryId = generateBoundaryIdVisualization(*grid_view);
+    vtkwriter.addCellData(boundaryId, "boundaryId");
+    // dirichlet values
+    std::vector<double> dirichlet = generateBoundaryVisualization(*grid_view, *boundary_info_ptr, "dirichlet");
+    vtkwriter.addCellData(dirichlet, "isDirichletBoundary");
+    // neumann values
+    std::vector<double> neumann = generateBoundaryVisualization(*grid_view, *boundary_info_ptr, "neumann");
+    vtkwriter.addCellData(neumann, "isNeumannBoundary");
+    // write
+    vtkwriter.write(filename, VTK::appendedraw);
+  } // ... visualize(...)
 
 private:
   std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
@@ -211,32 +212,28 @@ private:
     return data;
   } // std::vector< double > generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
 
-  //  std::vector< double > generateBoundaryVisualization(const LeafGridViewType& gridView,
-  //                                                      const Dune::Stuff::GridboundaryInterface< typename
-  //                                                      LeafGridViewType::Intersection >& boundaryInfo,
-  //                                                      const std::string type) const
-  //  {
-  //    std::vector< double > data(gridView.indexSet().size(0));
-  //    // walk the grid
-  //    for (const auto& entity : DSC::viewRange(gridView))
-  //    {
-  //      const auto& index = gridView.indexSet().index(entity);
-  //      data[index] = 0.0;
-  //      for (auto intersectionIt = gridView.ibegin(entity);
-  //           intersectionIt != gridView.iend(entity);
-  //           ++intersectionIt) {
-  //        if (type == "dirichlet") {
-  //          if (boundaryInfo.dirichlet(*intersectionIt))
-  //            data[index] = 1.0;
-  //        } else if (type == "neumann") {
-  //          if (boundaryInfo.neumann(*intersectionIt))
-  //            data[index] = 1.0;
-  //        } else
-  //          DUNE_THROW(Dune::InvalidStateException, "BOOM");
-  //      }
-  //    } // walk the grid
-  //    return data;
-  //  } // std::vector< double > generateBoundaryVisualization(...) const
+  template <class BoundaryInfoType>
+  std::vector<double> generateBoundaryVisualization(const LeafGridViewType& gridView,
+                                                    const BoundaryInfoType& boundaryInfo, const std::string type) const
+  {
+    std::vector<double> data(gridView.indexSet().size(0));
+    // walk the grid
+    for (const auto& entity : DSC::viewRange(gridView)) {
+      const auto& index = gridView.indexSet().index(entity);
+      data[index] = 0.0;
+      for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
+        if (type == "dirichlet") {
+          if (boundaryInfo.dirichlet(*intersectionIt))
+            data[index] = 1.0;
+        } else if (type == "neumann") {
+          if (boundaryInfo.neumann(*intersectionIt))
+            data[index] = 1.0;
+        } else
+          DUNE_THROW_COLORFULLY(Exceptions::internal_error, "Unknown type '" << type << "'!");
+      }
+    } // walk the grid
+    return data;
+  } // std::vector< double > generateBoundaryVisualization(...) const
 
   std::vector<double> generateEntityVisualization(const LeafGridViewType& gridView) const
   {
