@@ -206,7 +206,8 @@ public:
     }
   } // ... default_config(...)
 
-  static ThisType* create(const Common::ConfigTree config = default_config(), const std::string sub_name = static_id())
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
   {
     const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const auto dirichlet_ids     = cfg.get<std::vector<int>>("dirichlet", 0);
@@ -321,7 +322,7 @@ public:
     std::vector<DomainType> dirichlets = getVectors(cfg, "dirichlet");
     std::vector<DomainType> neumanns   = getVectors(cfg, "neumann");
     // return
-    return new ThisType(default_to_dirichlet, dirichlets, neumanns, tol);
+    return Common::make_unique<ThisType>(default_to_dirichlet, dirichlets, neumanns, tol);
   } // ... create(...)
 
   NormalBased(const bool default_to_dirichlet = true,
