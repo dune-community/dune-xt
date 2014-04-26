@@ -25,6 +25,16 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
+
+enum class ChooseBackend
+{
+  common_dense,
+  istl_sparse,
+  eigen_dense,
+  eigen_sparse
+}; // enum class ChooseBackend
+
+
 /**
  *  \brief  Contains tags mostly needed for python bindings.
  */
