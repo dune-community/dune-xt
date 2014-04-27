@@ -1,5 +1,5 @@
 // This file is part of the dune-stuff project:
-//   http://users.dune-project.org/projects/dune-stuff
+//   https://users.dune-project.org/projects/dune-stuff
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //
@@ -91,7 +91,9 @@ public:
 
   static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
   {
-    return new ThisType(settings.get<RangeFieldImp>("value", RangeFieldImp(0)));
+    const DSC::ExtendedParameterTree default_settings = defaultSettings();
+    return new ThisType(settings.get("value", default_settings.get<RangeFieldType>("value")),
+                        settings.get("name", static_id()));
   } // ... create(...)
 
 private:

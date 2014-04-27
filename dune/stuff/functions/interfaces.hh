@@ -1,6 +1,6 @@
 ﻿// This file is part of the dune-stuff project:
-//   http://users.dune-project.org/projects/dune-stuff/
-// Copyright Holders: Rene Milk, Felix Schindler
+//   https://users.dune-project.org/projects/dune-stuff/
+// Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 #ifndef DUNE_STUFF_FUNCTION_INTERFACE_HH
@@ -317,7 +317,7 @@ public:
    */
   template <class GridViewType>
   void visualize(const GridViewType& grid_view, const std::string filename, const bool subsampling = true,
-                 VTK::OutputType vtk_output_type = VTK::appendedraw) const
+                 const VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
     if (filename.empty())
       DUNE_THROW(RangeError, "Empty filename given!");
