@@ -38,49 +38,6 @@
   };
 // TEST_STRUCT_GENERATOR
 
-
-#include <dune/stuff/grid/fakeentity.hh>
-
-typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFake1dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFake2dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<3> DuneStuffFake3dEntityType;
-
-typedef testing::Types<Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 1, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 1, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 1, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 2, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 2, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 2, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 3, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 3, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake1dEntityType, double, 1, double, 3, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 1, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 1, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 1, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 2, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 2, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 2, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 3, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 3, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake2dEntityType, double, 2, double, 3, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 1, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 1, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 1, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 2, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 2, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 2, 3>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 3, 1>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 3, 2>,
-                       Dune::Stuff::Function::Constant<DuneStuffFake3dEntityType, double, 3, double, 3, 3>>
-    ConstantFunctionFakeEntityTypes;
-
-TEST_STRUCT_GENERATOR(ConstantFunction, FakeEntity)
-TYPED_TEST_CASE(ConstantFunctionFakeEntityTest, ConstantFunctionFakeEntityTypes);
-TYPED_TEST(ConstantFunctionFakeEntityTest, provides_required_methods)
-{
-  this->check();
-}
-
 //#if HAVE_DUNE_GRID
 
 #include <dune/grid/sgrid.hh>
