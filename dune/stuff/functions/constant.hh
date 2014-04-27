@@ -21,75 +21,55 @@ namespace Functions {
 
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class Constant
-    : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+    : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
-  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-      BaseType;
-  typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
-
-  class Localfunction
-      : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-  {
-    typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-        BaseType;
-
-  public:
-    typedef typename BaseType::EntityType EntityType;
-
-    typedef typename BaseType::DomainFieldType DomainFieldType;
-    static const unsigned int dimDomain = BaseType::dimDomain;
-    typedef typename BaseType::DomainType DomainType;
-
-    typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const unsigned int dimRange     = BaseType::dimRange;
-    static const unsigned int dimRangeCols = BaseType::dimRangeCols;
-    typedef typename BaseType::RangeType RangeType;
-
-    typedef typename BaseType::JacobianRangeType JacobianRangeType;
-
-    Localfunction(const EntityType& ent, const std::shared_ptr<const RangeType> value)
-      : BaseType(ent)
-      , value_(value)
-    {
-    }
-
-    Localfunction(const Localfunction& /*other*/) = delete;
-
-    Localfunction& operator=(const Localfunction& /*other*/) = delete;
-
-    virtual size_t order() const DS_OVERRIDE
-    {
-      return 0;
-    }
-
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
-    {
-      assert(this->is_a_valid_point(xx));
-      ret = *value_;
-    }
-
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
-    {
-      assert(this->is_a_valid_point(xx));
-      ret *= RangeFieldType(0);
-    }
-
-  private:
-    const std::shared_ptr<const RangeType> value_;
-  }; // class Localfunction
 
 public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::LocalfunctionType LocalfunctionType;
-
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const unsigned int dimDomain = BaseType::dimDomain;
-  typedef typename BaseType::DomainType DomainType;
-
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange     = BaseType::dimRange;
-  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
+  typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
   typedef typename BaseType::RangeType RangeType;
+  typedef typename BaseType::DomainType DomainType;
+  typedef typename BaseType::JacobianRangeType JacobianRangeType;
+
+  using typename BaseType::LocalfunctionType;
+
+  explicit Constant(const RangeType& constant, const std::string name = static_id())
+    : constant_(constant)
+    , name_(name)
+  {
+  }
+
+  explicit Constant(const RangeFieldImp& constant, const std::string name = static_id())
+    : constant_(constant)
+    , name_(name)
+  {
+  }
+
+  Constant(const ThisType& other)
+    : constant_(other.constant_)
+    , name_(other.name_)
+  {
+  }
+
+  virtual size_t order() const DS_OVERRIDE DS_FINAL
+  {
+    return 0;
+  }
+
+  virtual void evaluate(const DomainType& /*x*/, RangeType& ret) const DS_OVERRIDE DS_FINAL
+  {
+    ret = constant_;
+  }
+
+  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+  {
+    ret *= 0.0;
+  }
+
+  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  {
+    return name_;
+  }
 
   static std::string static_id()
   {
@@ -111,55 +91,13 @@ public:
 
   static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
   {
-    return new ThisType(settings.get<RangeFieldType>("value", RangeFieldType(0)));
+    return new ThisType(settings.get<RangeFieldImp>("value", RangeFieldImp(0)));
   } // ... create(...)
 
-  Constant(const RangeFieldType& val, const std::string nm = static_id())
-    : value_(std::make_shared<RangeType>(val))
-    , name_(nm)
-  {
-  }
-
-  Constant(const RangeType& val, const std::string nm = static_id())
-    : value_(std::make_shared<RangeType>(val))
-    , name_(nm)
-  {
-  }
-
-  Constant(const ThisType& other)
-    : value_(other.value_)
-    , name_(other.name_)
-  {
-  }
-
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      value_ = other.value_;
-      name_  = other.name_;
-    }
-    return *this;
-  }
-
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
-
-  virtual std::string name() const DS_OVERRIDE
-  {
-    return name_;
-  }
-
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
-  {
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, value_));
-  }
-
 private:
-  std::shared_ptr<const RangeType> value_;
-  std::string name_;
-}; // class Constant
+  const RangeType constant_;
+  const std::string name_;
+};
 
 
 } // namespace Functions
