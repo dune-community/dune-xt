@@ -1,6 +1,6 @@
 // This file is part of the dune-stuff project:
 //   https://users.dune-project.org/projects/dune-stuff/
-// Copyright Holders: Rene Milk, Felix Schindler
+// Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //
 // Contributors: Tobias Leibner
@@ -24,6 +24,16 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
+
+
+enum class ChooseBackend
+{
+  common_dense,
+  istl_sparse,
+  eigen_dense,
+  eigen_sparse
+}; // enum class ChooseBackend
+
 
 /**
  *  \brief  Contains tags mostly needed for python bindings.
