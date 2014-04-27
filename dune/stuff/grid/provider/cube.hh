@@ -1,42 +1,82 @@
 // This file is part of the dune-stuff project:
-//   http://users.dune-project.org/projects/dune-stuff
+//   https://users.dune-project.org/projects/dune-stuff
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_STUFF_GRID_PROVIDER_CUBE_HH
-#define DUNE_STUFF_GRID_PROVIDER_CUBE_HH
-
-#if HAVE_DUNE_GRID
+#ifndef DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
+#define DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
 
 #include <memory>
 #include <sstream>
 #include <type_traits>
+#include <vector>
+#include <array>
 
 #include <boost/assign/list_of.hpp>
 
-#include <dune/common/parametertree.hh>
-#include <dune/common/shared_ptr.hh>
-#include <dune/common/exceptions.hh>
-#include <dune/common/fvector.hh>
 #include <dune/common/static_assert.hh>
 
 #include <dune/grid/utility/structuredgridfactory.hh>
+#include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
-#include <dune/grid/sgrid.hh>
 
-#include <dune/stuff/common/parameter/tree.hh>
-#include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/memory.hh>
 
 #include "interface.hh"
 
 namespace Dune {
 namespace Stuff {
+namespace Grid {
+namespace Providers {
+namespace internal {
+
 
 template <typename GridType>
 struct ElementVariant;
+
+
+template <typename GridType>
+struct ElementVariant
+{
+  static const int id = 2;
+};
+
+
+template <int dim>
+struct ElementVariant<Dune::YaspGrid<dim>>
+{
+  static const int id = 1;
+};
+
+
+template <int dim>
+struct ElementVariant<Dune::SGrid<dim, dim>>
+{
+  static const int id = 1;
+};
+
+
+#if HAVE_ALUGRID
+
+
+template <int dim>
+struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
+{
+  static const int id = 1;
+};
+
+
+#endif // HAVE_ALUGRID
+
+} // namespace internal
+
+#if HAVE_DUNE_GRID
+
 
 /**
  *  \brief  Creates a grid of a cube in various dimensions.
@@ -55,31 +95,21 @@ struct ElementVariant;
  *          <ul><li>\c 1: cubes
  *          <li>2: simplices</ul>
  **/
-template <typename GridImp, int variant = ElementVariant<GridImp>::id>
-class GridProviderCube : public GridProviderInterface<GridImp>
+template <typename GridImp, int variant = internal::ElementVariant<GridImp>::id>
+class Cube : public ProviderInterface<GridImp>
 {
-public:
-  //! Type of the provided grid.
-  typedef GridImp GridType;
-
-  typedef GridProviderInterface<GridType> BaseType;
-
-  typedef GridProviderCube<GridType, variant> ThisType;
-
-private:
-  typedef typename GridType::LeafGridView GridViewType;
+  typedef ProviderInterface<GridImp> BaseType;
+  typedef Cube<GridImp, variant> ThisType;
 
 public:
-  static const unsigned int dim = BaseType::dim;
+  using typename BaseType::GridType;
+  static const unsigned int dimDomain = BaseType::dimDomain;
+  using typename BaseType::DomainFieldType;
+  using typename BaseType::DomainType;
 
-  //! Type of the grids coordinates.
-  typedef typename GridType::ctype ctype;
-  typedef Dune::FieldVector<ctype, dim> CoordinateType;
-
-  //! Unique identifier: \c stuff.grid.provider.cube
-  static const std::string id()
+  static const std::string static_id()
   {
-    return BaseType::id() + ".cube";
+    return BaseType::static_id() + ".cube";
   }
 
   /**
@@ -91,27 +121,30 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GridProviderCube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int numElements = 1u)
-    : lowerLeft_(_lowerLeft)
-    , upperRight_(_upperRight)
+  Cube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int numElements = 1u)
+    : lower_left_(_lowerLeft)
+    , upper_right_(_upperRight)
   {
-    std::array<unsigned int, dim> tmpNumElements;
+    std::array<unsigned int, dimDomain> tmpNumElements;
     std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
     buildGrid(tmpNumElements);
   }
 
-  GridProviderCube(const std::vector<double>& lL, const std::vector<double>& uR, const std::vector<size_t>& nE)
+  Cube(const std::vector<double>& lL, const std::vector<double>& uR, const std::vector<unsigned int>& nE)
   {
-    if (lL.size() < dim)
-      DUNE_THROW(Dune::RangeError, "lL has to be at least of size " << dim << " (is " << lL.size() << ")!");
-    if (uR.size() < dim)
-      DUNE_THROW(Dune::RangeError, "uR has to be at least of size " << dim << " (is " << uR.size() << ")!");
-    if (nE.size() < dim)
-      DUNE_THROW(Dune::RangeError, "nE has to be at least of size " << dim << " (is " << nE.size() << ")!");
-    std::array<unsigned int, dim> num_elements;
-    for (size_t ii = 0; ii < dim; ++ii) {
-      lowerLeft_[ii]   = lL[ii];
-      upperRight_[ii]  = uR[ii];
+    if (lL.size() < dimDomain)
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "lL has to be at least of size " << dimDomain << " (is " << lL.size() << ")!");
+    if (uR.size() < dimDomain)
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "uR has to be at least of size " << dimDomain << " (is " << uR.size() << ")!");
+    if (nE.size() < dimDomain)
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "nE has to be at least of size " << dimDomain << " (is " << nE.size() << ")!");
+    std::array<unsigned int, dimDomain> num_elements;
+    for (unsigned int ii = 0; ii < dimDomain; ++ii) {
+      lower_left_[ii]  = lL[ii];
+      upper_right_[ii] = uR[ii];
       num_elements[ii] = nE[ii];
     }
     buildGrid(num_elements);
@@ -126,12 +159,11 @@ public:
    *  \param[in]  numElements (optional)
    *              number of elements.
    **/
-  GridProviderCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight,
-                   const unsigned int numElements = 1u)
-    : lowerLeft_(_lowerLeft)
-    , upperRight_(_upperRight)
+  Cube(const DomainType& _lowerLeft, const DomainType& _upperRight, const unsigned int numElements = 1u)
+    : lower_left_(_lowerLeft)
+    , upper_right_(_upperRight)
   {
-    std::array<unsigned int, dim> tmpNumElements;
+    std::array<unsigned int, dimDomain> tmpNumElements;
     std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
     buildGrid(tmpNumElements);
   }
@@ -148,13 +180,13 @@ public:
     \tparam ContainerType some sequence type that functions with std::begin/end
     **/
   template <class ContainerType>
-  GridProviderCube(const CoordinateType& _lowerLeft, const CoordinateType& _upperRight,
-                   const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>()
-                                                         .repeat(dim, typename ContainerType::value_type(1u)))
-    : lowerLeft_(_lowerLeft)
-    , upperRight_(_upperRight)
+  Cube(const DomainType& _lowerLeft, const DomainType& _upperRight,
+       const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
+           dimDomain, typename ContainerType::value_type(1u)))
+    : lower_left_(_lowerLeft)
+    , upper_right_(_upperRight)
   {
-    std::array<unsigned int, dim> tmpNumElements;
+    std::array<unsigned int, dimDomain> tmpNumElements;
     static_assert(std::is_unsigned<typename ContainerType::value_type>::value
                       && std::is_integral<typename ContainerType::value_type>::value,
                   "only unsigned integral number of elements per dimension allowed");
@@ -164,167 +196,109 @@ public:
     buildGrid(tmpNumElements);
   }
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  static Common::ConfigTree default_config(const std::string sub_name = "")
   {
-    Dune::ParameterTree description;
-    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
-    description["upperRight"]  = "[1.0; 1.0; 1.0]";
-    description["numElements"] = "[8; 8; 8]";
-    if (subName.empty())
-      return description;
+    Common::ConfigTree config;
+    config["lower_left"]   = "[0.0; 0.0; 0.0]";
+    config["upper_right"]  = "[1.0; 1.0; 1.0]";
+    config["num_elements"] = "[8; 8; 8]";
+    if (sub_name.empty())
+      return config;
     else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
     }
-  } // ... createDefaultSettings(...)
+  } // ... default_config(...)
 
-  /**
-   *  \brief      Creates a cube.
-   *  \param[in]  paramTree
-   *              A Dune::ParameterTree containing
-   *              <ul><li> the following keys directly or
-   *              <li> a subtree named Cube::id, containing the following keys. If a subtree is present, it is always
-   *selected. Also it is solely selceted, so that all keys in the supertree are ignored.</ul>
-   *              The actual keys are:
-   *              <ul><li> \c lowerLeft: \a double or a vector that is used as lower left corners.
-   *              <li> \c upperRight: \a double or a vector that is used as upper right corners.
-   *              <li> \c numElements: \a int or vector to denote the number of elements.
-   *              </ul>
-   **/
-  static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
   {
-    // get correct _settings
-    Dune::Stuff::Common::ExtendedParameterTree settings;
-    if (_settings.hasSub(subName))
-      settings = _settings.sub(subName);
+    // get correct config
+    Common::ConfigTree cfg;
+    if (config.has_sub(sub_name))
+      cfg = config.sub(sub_name);
     else
-      settings = _settings;
-    // get lower left
-    std::vector<ctype> lowerLefts;
-    if (settings.hasVector("lowerLeft")) {
-      lowerLefts = settings.getVector("lowerLeft", ctype(0), dim);
-      assert(lowerLefts.size() >= dim && "Given vector too short!");
-    } else if (settings.hasKey("lowerLeft")) {
-      const ctype lowerLeft = settings.get("lowerLeft", ctype(0));
-      lowerLefts            = std::vector<ctype>(dim, lowerLeft);
-    } else {
-      std::cout << "\n" << Dune::Stuff::Common::colorString("WARNING in " + id() + ":")
-                << " neither vector nor key 'lowerLeft' given, defaulting to 0.0!" << std::flush;
-      lowerLefts = std::vector<ctype>(dim, ctype(0));
+      cfg = config;
+    // extract needed data
+    try {
+      // try to get vectors
+      auto lower_left   = cfg.get<DomainType>("lower_left", dimDomain);
+      auto upper_right  = cfg.get<DomainType>("upper_right", dimDomain);
+      auto num_elements = cfg.get<std::vector<unsigned int>>("num_elements", dimDomain);
+      return Common::make_unique<ThisType>(lower_left, upper_right, num_elements);
+    } catch (Exceptions::configuration_error&) {
+      // get scalars
+      auto lower_left   = cfg.get<DomainFieldType>("lower_left");
+      auto upper_right  = cfg.get<DomainFieldType>("upper_right");
+      auto num_elements = cfg.get<unsigned int>("num_elements");
+      return Common::make_unique<ThisType>(lower_left, upper_right, num_elements);
     }
-    // get upper right
-    std::vector<ctype> upperRights;
-    if (settings.hasVector("upperRight")) {
-      upperRights = settings.getVector("upperRight", ctype(1), dim);
-      assert(upperRights.size() >= dim && "Given vector too short!");
-    } else if (settings.hasKey("upperRight")) {
-      const ctype upperRight = settings.get("upperRight", ctype(1));
-      upperRights            = std::vector<ctype>(dim, upperRight);
-    } else {
-      std::cout << "\n" << Dune::Stuff::Common::colorString("WARNING in " + id() + ":")
-                << " neither vector nor key 'upperRight' given, defaulting to 1.0!" << std::flush;
-      upperRights = std::vector<ctype>(dim, ctype(1));
-    }
-    // get number of elements
-    std::vector<unsigned int> tmpNumElements;
-    if (settings.hasVector("numElements")) {
-      tmpNumElements = settings.getVector("numElements", 1u, dim);
-      assert(tmpNumElements.size() >= dim && "Given vector too short!");
-    } else if (settings.hasKey("numElements")) {
-      const unsigned int numElement = settings.get("numElements", 1u);
-      tmpNumElements                = std::vector<unsigned int>(dim, numElement);
-    } else {
-      std::cout << "\n" << Dune::Stuff::Common::colorString("WARNING in " + id() + ":")
-                << " neither vector nor key 'numElements' given, defaulting to 1!" << std::flush;
-      tmpNumElements = std::vector<unsigned int>(dim, 1u);
-    }
-    // check and save
-    CoordinateType lowerLeft;
-    CoordinateType upperRight;
-    std::array<unsigned int, dim> numElements;
-    for (unsigned int d = 0; d < dim; ++d) {
-      assert(lowerLefts[d] < upperRights[d]
-             && "Given 'upperRight' hast to be elementwise larger than given 'lowerLeft'!");
-      lowerLeft[d]  = lowerLefts[d];
-      upperRight[d] = upperRights[d];
-      assert(tmpNumElements[d] > 0 && "Given 'numElements' has to be elementwise positive!");
-      numElements[d] = tmpNumElements[d];
-    }
-    return new ThisType(lowerLeft, upperRight, numElements);
   } // ... create(...)
 
-  //! access to shared ptr
-  virtual std::shared_ptr<GridType> grid()
+  virtual std::shared_ptr<GridType>& grid() /*DS_OVERRIDE*/
   {
     return grid_;
   }
 
-  virtual const std::shared_ptr<const GridType> grid() const
+  virtual const std::shared_ptr<const GridType>& grid() const /*DS_OVERRIDE*/
   {
     return grid_;
   }
 
-  const CoordinateType& lowerLeft() const
+  const DomainType& lower_left() const
   {
-    return lowerLeft_;
+    return lower_left_;
   }
 
-  const CoordinateType& upperRight() const
+  const DomainType& upper_right() const
   {
-    return upperRight_;
+    return upper_right_;
   }
 
 private:
-  void buildGrid(const std::array<unsigned int, dim>& numElements)
+  void buildGrid(const std::array<unsigned int, dimDomain>& numElements)
   {
-    dune_static_assert(variant >= 1 && variant <= 2, "only variant 1 and 2 are valid");
+    static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
+    for (unsigned int dd = 0; dd < dimDomain; ++dd) {
+      if (!(lower_left_[dd] < upper_right_[dd]))
+        DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                              "lower_left has to be elementwise smaller than upper_right!\n\n" << lower_left_[dd]
+                                                                                               << " vs. "
+                                                                                               << upper_right_[dd]);
+    }
     switch (variant) {
       case 1:
-        grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft_, upperRight_, numElements);
+        grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left_, upper_right_, numElements);
         break;
       case 2:
       default:
-        grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft_, upperRight_, numElements);
+        grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lower_left_, upper_right_, numElements);
         break;
     }
-  } // void buildGrid(const CoordinateType& lowerLeft, const CoordinateType& upperRight)
+  } // void buildGrid(const DomainType& lowerLeft, const DomainType& upperRight)
 
-  CoordinateType lowerLeft_;
-  CoordinateType upperRight_;
+  DomainType lower_left_;
+  DomainType upper_right_;
   std::shared_ptr<GridType> grid_;
-}; // class GridProviderCube
+}; // class Cube
 
-template <typename GridType>
-struct ElementVariant
+
+#else // HAVE_DUNE_GRID
+
+
+template <typename GridImp, int variant = 1>
+class Cube
 {
-  static const int id = 2;
+  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
 };
 
-template <int dim>
-struct ElementVariant<Dune::YaspGrid<dim>>
-{
-  static const int id = 1;
-};
-
-template <int dim>
-struct ElementVariant<Dune::SGrid<dim, dim>>
-{
-  static const int id = 1;
-};
-
-#if HAVE_ALUGRID
-template <int dim>
-struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
-{
-  static const int id = 1;
-};
-#endif // HAVE_ALUGRID
-
-
-} // namespace Stuff
-} // namespace Dune
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_PROVIDER_CUBE_HH
+} // namespace Providers
+} // namespace Grid
+} // namespace Stuff
+} // namespace Dune
+
+#endif // DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
