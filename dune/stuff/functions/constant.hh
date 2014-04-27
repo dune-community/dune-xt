@@ -92,7 +92,7 @@ public:
   static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
   {
     const DSC::ExtendedParameterTree default_settings = defaultSettings();
-    return new ThisType(settings.get("value", default_settings.get<RangeFieldType>("value")),
+    return new ThisType(settings.get("value", default_settings.get<RangeFieldImp>("value")),
                         settings.get("name", static_id()));
   } // ... create(...)
 
