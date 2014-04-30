@@ -188,6 +188,17 @@ TYPED_TEST(FunctionsAluGridEntityTest, provides_required_methods)
 
 int main(int argc, char** argv)
 {
-  test_init(argc, argv);
-  return RUN_ALL_TESTS();
+  try {
+    test_init(argc, argv);
+    return RUN_ALL_TESTS();
+  } catch (Dune::Exception& e) {
+    std::cerr << "Dune reported error:\n" << e.what() << std::endl;
+    std::abort();
+  } catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    std::abort();
+  } catch (...) {
+    std::cerr << "Unknown exception thrown!" << std::endl;
+    std::abort();
+  } // try
 }
