@@ -172,7 +172,7 @@ const typename Spe10Model1<E, D, 2, R, 1, 1>::RangeFieldType Spe10Model1<E, D, 2
   DUNE_STUFF_FUNCTIONS_SPE10_LAST_EXPANSION(etype, dftype, ddim, long double, rdim, rcdim)
 
 #define DUNE_STUFF_FUNCTIONS_SPE10_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim)                            \
-  extern template class Dune::Stuff::Function::Spe10Model1<etype, dftype, ddim, rftype, rdim, rcdim>;
+  extern template class Dune::Stuff::Functions::Spe10Model1<etype, dftype, ddim, rftype, rdim, rcdim>;
 
 #if HAVE_DUNE_GRID
 
