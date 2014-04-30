@@ -441,6 +441,7 @@ public:
 
   using VectorInterfaceType::add;
   using VectorInterfaceType::sub;
+  using BaseType::backend;
 
 private:
   inline void ensure_uniqueness() const
@@ -577,6 +578,7 @@ public:
 
   using VectorInterfaceType::add;
   using VectorInterfaceType::sub;
+  using BaseType::backend;
 
 private:
   inline void ensure_uniqueness() const
