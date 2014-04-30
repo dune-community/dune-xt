@@ -12,7 +12,7 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
+namespace Functions {
 
 
 template <class DiffusionImp>
@@ -174,7 +174,7 @@ private:
 }; // class ESV2007Cutoff
 
 
-} // namespace Function
+} // namespace Functions
 } // namespace Stuff
 } // namespace Dune
 

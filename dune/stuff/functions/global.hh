@@ -8,6 +8,10 @@
 #ifndef DUNE_STUFF_FUNCTION_GLOBAL_HH
 #define DUNE_STUFF_FUNCTION_GLOBAL_HH
 
+#warning This header is deprecated, use '#include <dune/stuff/functions/interfaces.hh>' and #include <dune/stuff/functions/constant.hh instead!
+#include "interfaces.hh"
+#include "constant.hh"
+
 #include <memory>
 #include <string>
 
@@ -33,7 +37,7 @@ namespace Stuff {
  * LocalizableFunctionInterface
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
-class GlobalFunction
+class DUNE_DEPRECATED_MSG("Use GlobalFunctionInterface instead!") GlobalFunction
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
   typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
@@ -224,7 +228,7 @@ public:
 
 
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
-class GlobalConstantFunction
+class DUNE_DEPRECATED_MSG("Use Functions::Constant instead") GlobalConstantFunction
     : public GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
   typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;

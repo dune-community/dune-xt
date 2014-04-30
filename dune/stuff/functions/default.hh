@@ -17,7 +17,7 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
+namespace Functions {
 
 
 #if HAVE_DUNE_GRID
@@ -170,7 +170,7 @@ private:
 //}; // class LocalDifferentiableFunctionDefault< ..., 1 >
 
 
-} // namespace Function
+} // namespace Functions
 } // namespace Stuff
 } // namespace Dune
 

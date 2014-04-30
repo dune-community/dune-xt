@@ -24,12 +24,12 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
+namespace Functions {
 
 
 /**
  *  \brief base class that makes a function out of the stuff from mathexpr.hh
- *  \attention  Most surely you do not want to use this class directly, but Function::Expression!
+ *  \attention  Most surely you do not want to use this class directly, but Functions::Expression!
  */
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class MathExpressionBase
@@ -161,7 +161,7 @@ public:
 private:
   //  void evaluate(const Dune::DynamicVector< DomainFieldType >& arg, RangeFieldType& ret) const
   //  {
-  //    assert(dimRange == 1 && "I'm only here to be used by Function::Parametric::Coefficient, which has dimrange ==
+  //    assert(dimRange == 1 && "I'm only here to be used by Functions::Parametric::Coefficient, which has dimrange ==
   //    1");
   //    // copy arg
   //    for (int ii = 0; ii < std::min(domainDim, int(arg.size())); ++ii)
@@ -225,7 +225,7 @@ private:
 }; // class MathExpressionBase
 
 
-} // namespace Function
+} // namespace Functions
 } // namespace Stuff
 } // namespace Dune
 

@@ -19,7 +19,7 @@
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
+namespace Functions {
 
 
 // default, to allow for specialization
@@ -159,7 +159,7 @@ template <class E, class D, class R>
 const typename Spe10Model1<E, D, 2, R, 1, 1>::RangeFieldType Spe10Model1<E, D, 2, R, 1, 1>::maxValue = 998.915;
 
 
-} // namespace Function
+} // namespace Functions
 } // namespace Stuff
 } // namespace Dune
 

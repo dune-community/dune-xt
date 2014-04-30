@@ -18,11 +18,11 @@
 #include "expression/base.hh"
 #include "interfaces.hh"
 #include "default.hh"
-#include "global.hh"
+#include "constant.hh"
 
 namespace Dune {
 namespace Stuff {
-namespace Function {
+namespace Functions {
 
 
 /**
@@ -172,86 +172,12 @@ private:
 
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
 class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-    : public GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
+    : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 {
-  typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim> BaseType;
   typedef Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> MathExpressionFunctionType;
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, domainDim> MathExpressionGradientType;
-
-  class Localfunction : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-  {
-    typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
-
-  public:
-    typedef typename BaseType::EntityType EntityType;
-
-    typedef typename BaseType::DomainFieldType DomainFieldType;
-    static const unsigned int dimDomain = BaseType::dimDomain;
-    typedef typename BaseType::DomainType DomainType;
-
-    typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const unsigned int dimRange     = BaseType::dimRange;
-    static const unsigned int dimRangeCols = BaseType::dimRangeCols;
-    typedef typename BaseType::RangeType RangeType;
-
-    typedef typename BaseType::JacobianRangeType JacobianRangeType;
-
-    Localfunction(const EntityType& entity, const std::shared_ptr<const MathExpressionFunctionType>& function,
-                  std::vector<std::shared_ptr<const MathExpressionGradientType>> gradients, const size_t ord)
-      : BaseType(entity)
-      , function_(function)
-      , gradients_(gradients)
-      , order_(ord)
-      , global_point_(DomainFieldType(0))
-    {
-    }
-
-    Localfunction(const Localfunction& /*other*/) = delete;
-
-    Localfunction& operator=(const Localfunction& /*other*/) = delete;
-
-    virtual size_t order() const DS_OVERRIDE
-    {
-      return order_;
-    }
-
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
-    {
-      assert(this->is_a_valid_point(xx));
-      global_point_ = this->entity().geometry().global(xx);
-      function_->evaluate(global_point_, ret);
-      assert(this_value_is_sane(ret));
-    }
-
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
-    {
-      if (gradients_.size() == 0)
-        DUNE_THROW_COLORFULLY(NotImplemented, "This function does not provide any gradients!");
-      assert(gradients_.size() == dimRange);
-      global_point_ = this->entity().geometry().global(xx);
-      for (size_t ii = 0; ii < dimRange; ++ii) {
-        gradients_[ii]->evaluate(global_point_, ret[ii]);
-        assert(this_value_is_sane(ret[ii]));
-      }
-    } // ... jacobian(...)
-
-  private:
-    template <class VectorType>
-    bool this_value_is_sane(const VectorType& value) const
-    {
-      for (size_t rr = 0; rr < value.size(); ++rr)
-        if (std::abs(value[rr]) > (0.9 * std::numeric_limits<RangeFieldType>::max())) {
-          return false;
-        }
-      return true;
-    }
-
-    const std::shared_ptr<const MathExpressionFunctionType> function_;
-    std::vector<std::shared_ptr<const MathExpressionGradientType>> gradients_;
-    const size_t order_;
-    mutable DomainType global_point_;
-  }; // class Localfunction
 
 public:
   typedef typename BaseType::EntityType EntityType;
@@ -344,11 +270,6 @@ public:
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
-  {
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, function_, gradients_, order_));
-  }
-
   virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
   {
     function_->evaluate(xx, ret);
@@ -382,7 +303,7 @@ private:
 }; // class Expression< ..., 1 >
 
 
-} // namespace Function
+} // namespace Functions
 } // namespace Stuff
 } // namespace Dune
 

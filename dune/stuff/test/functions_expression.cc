@@ -49,41 +49,41 @@ typedef Dune::SGrid<3, 3>::Codim<0>::Entity DuneSGrid3dEntityType;
 
 // the matrix valued version is missing the create() and defaultSettings() method
 typedef testing::
-    Types<Dune::Stuff::Function::Expression<DuneSGrid1dEntityType, double, 1, double, 1, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid1dEntityType, double, 1, double, 1, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid1dEntityType, double, 1, double, 1, 3 >
+    Types<Dune::Stuff::Functions::Expression<DuneSGrid1dEntityType, double, 1, double, 1, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid1dEntityType, double, 1, double, 1, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid1dEntityType, double, 1, double, 1, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid1dEntityType, double, 1, double, 2, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid1dEntityType, double, 1, double, 2, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid1dEntityType, double, 1, double, 2, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid1dEntityType, double, 1, double, 2, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid1dEntityType, double, 1, double, 2, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid1dEntityType, double, 1, double, 2, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid1dEntityType, double, 1, double, 3, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid1dEntityType, double, 1, double, 3, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid1dEntityType, double, 1, double, 3, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid1dEntityType, double, 1, double, 3, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid1dEntityType, double, 1, double, 3, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid1dEntityType, double, 1, double, 3, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid2dEntityType, double, 2, double, 1, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid2dEntityType, double, 2, double, 1, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid2dEntityType, double, 2, double, 1, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid2dEntityType, double, 2, double, 1, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid2dEntityType, double, 2, double, 1, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid2dEntityType, double, 2, double, 1, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid2dEntityType, double, 2, double, 2, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid2dEntityType, double, 2, double, 2, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid2dEntityType, double, 2, double, 2, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid2dEntityType, double, 2, double, 2, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid2dEntityType, double, 2, double, 2, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid2dEntityType, double, 2, double, 2, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid2dEntityType, double, 2, double, 3, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid2dEntityType, double, 2, double, 3, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid2dEntityType, double, 2, double, 3, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid2dEntityType, double, 2, double, 3, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid2dEntityType, double, 2, double, 3, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid2dEntityType, double, 2, double, 3, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid3dEntityType, double, 3, double, 1, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid3dEntityType, double, 3, double, 1, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid3dEntityType, double, 3, double, 1, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid3dEntityType, double, 3, double, 1, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid3dEntityType, double, 3, double, 1, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid3dEntityType, double, 3, double, 1, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid3dEntityType, double, 3, double, 2, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid3dEntityType, double, 3, double, 2, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid3dEntityType, double, 3, double, 2, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid3dEntityType, double, 3, double, 2, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid3dEntityType, double, 3, double, 2, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid3dEntityType, double, 3, double, 2, 3 >
           ,
-          Dune::Stuff::Function::Expression<DuneSGrid3dEntityType, double, 3, double, 3, 1>
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid3dEntityType, double, 3, double, 3, 2 >
-          //                      , Dune::Stuff::Function::Expression< DuneSGrid3dEntityType, double, 3, double, 3, 3 >
+          Dune::Stuff::Functions::Expression<DuneSGrid3dEntityType, double, 3, double, 3, 1>
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid3dEntityType, double, 3, double, 3, 2 >
+          //                      , Dune::Stuff::Functions::Expression< DuneSGrid3dEntityType, double, 3, double, 3, 3 >
           > ExpressionFunctionSGridEntityTypes;
 
 TEST_STRUCT_GENERATOR(ExpressionFunction, SGridEntity)
@@ -99,59 +99,59 @@ typedef Dune::YaspGrid<1>::Codim<0>::Entity DuneYaspGrid1dEntityType;
 typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneYaspGrid2dEntityType;
 typedef Dune::YaspGrid<3>::Codim<0>::Entity DuneYaspGrid3dEntityType;
 
-typedef testing::Types<Dune::Stuff::Function::Expression<DuneYaspGrid1dEntityType, double, 1, double, 1, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid1dEntityType, double, 1,
-                       //                      double, 1, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid1dEntityType, double, 1,
-                       //                      double, 1, 3 >
+typedef testing::Types<Dune::Stuff::Functions::Expression<DuneYaspGrid1dEntityType, double, 1, double, 1, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid1dEntityType, double,
+                       //                      1, double, 1, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid1dEntityType, double,
+                       //                      1, double, 1, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid1dEntityType, double, 1, double, 2, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid1dEntityType, double, 1,
-                       //                      double, 2, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid1dEntityType, double, 1,
-                       //                      double, 2, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid1dEntityType, double, 1, double, 2, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid1dEntityType, double,
+                       //                      1, double, 2, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid1dEntityType, double,
+                       //                      1, double, 2, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid1dEntityType, double, 1, double, 3, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid1dEntityType, double, 1,
-                       //                      double, 3, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid1dEntityType, double, 1,
-                       //                      double, 3, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid1dEntityType, double, 1, double, 3, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid1dEntityType, double,
+                       //                      1, double, 3, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid1dEntityType, double,
+                       //                      1, double, 3, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid2dEntityType, double, 2, double, 1, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid2dEntityType, double, 2,
-                       //                      double, 1, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid2dEntityType, double, 2,
-                       //                      double, 1, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid2dEntityType, double, 2, double, 1, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid2dEntityType, double,
+                       //                      2, double, 1, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid2dEntityType, double,
+                       //                      2, double, 1, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid2dEntityType, double, 2, double, 2, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid2dEntityType, double, 2,
-                       //                      double, 2, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid2dEntityType, double, 2,
-                       //                      double, 2, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid2dEntityType, double, 2, double, 2, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid2dEntityType, double,
+                       //                      2, double, 2, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid2dEntityType, double,
+                       //                      2, double, 2, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid2dEntityType, double, 2, double, 3, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid2dEntityType, double, 2,
-                       //                      double, 3, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid2dEntityType, double, 2,
-                       //                      double, 3, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid2dEntityType, double, 2, double, 3, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid2dEntityType, double,
+                       //                      2, double, 3, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid2dEntityType, double,
+                       //                      2, double, 3, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid3dEntityType, double, 3, double, 1, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid3dEntityType, double, 3,
-                       //                      double, 1, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid3dEntityType, double, 3,
-                       //                      double, 1, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid3dEntityType, double, 3, double, 1, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid3dEntityType, double,
+                       //                      3, double, 1, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid3dEntityType, double,
+                       //                      3, double, 1, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid3dEntityType, double, 3, double, 2, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid3dEntityType, double, 3,
-                       //                      double, 2, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid3dEntityType, double, 3,
-                       //                      double, 2, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid3dEntityType, double, 3, double, 2, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid3dEntityType, double,
+                       //                      3, double, 2, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid3dEntityType, double,
+                       //                      3, double, 2, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneYaspGrid3dEntityType, double, 3, double, 3, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid3dEntityType, double, 3,
-                       //                      double, 3, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneYaspGrid3dEntityType, double, 3,
-                       //                      double, 3, 3 >
+                       Dune::Stuff::Functions::Expression<DuneYaspGrid3dEntityType, double, 3, double, 3, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid3dEntityType, double,
+                       //                      3, double, 3, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneYaspGrid3dEntityType, double,
+                       //                      3, double, 3, 3 >
                        > ExpressionFunctionYaspGridEntityTypes;
 
 TEST_STRUCT_GENERATOR(ExpressionFunction, YaspGridEntity)
@@ -178,61 +178,61 @@ typedef Dune::ALUSimplexGrid<2, 2>::Codim<0>::Entity DuneAluSimplexGrid2dEntityT
 typedef Dune::ALUSimplexGrid<3, 3>::Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
 typedef Dune::ALUCubeGrid<3, 3>::Codim<0>::Entity DuneAluCubeGrid3dEntityType;
 
-typedef testing::Types<Dune::Stuff::Function::Expression<DuneAluSimplexGrid2dEntityType, double, 2, double, 1, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid2dEntityType,
+typedef testing::Types<Dune::Stuff::Functions::Expression<DuneAluSimplexGrid2dEntityType, double, 2, double, 1, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid2dEntityType,
                        //                      double, 2, double, 1, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid2dEntityType,
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid2dEntityType,
                        //                      double, 2, double, 1, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluSimplexGrid2dEntityType, double, 2, double, 2, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid2dEntityType,
+                       Dune::Stuff::Functions::Expression<DuneAluSimplexGrid2dEntityType, double, 2, double, 2, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid2dEntityType,
                        //                      double, 2, double, 2, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid2dEntityType,
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid2dEntityType,
                        //                      double, 2, double, 2, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluSimplexGrid2dEntityType, double, 2, double, 3, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid2dEntityType,
+                       Dune::Stuff::Functions::Expression<DuneAluSimplexGrid2dEntityType, double, 2, double, 3, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid2dEntityType,
                        //                      double, 2, double, 3, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid2dEntityType,
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid2dEntityType,
                        //                      double, 2, double, 3, 3 >
 
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluSimplexGrid3dEntityType, double, 3, double, 1, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid3dEntityType,
+                       Dune::Stuff::Functions::Expression<DuneAluSimplexGrid3dEntityType, double, 3, double, 1, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid3dEntityType,
                        //                      double, 3, double, 1, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid3dEntityType,
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid3dEntityType,
                        //                      double, 3, double, 1, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluSimplexGrid3dEntityType, double, 3, double, 2, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid3dEntityType,
+                       Dune::Stuff::Functions::Expression<DuneAluSimplexGrid3dEntityType, double, 3, double, 2, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid3dEntityType,
                        //                      double, 3, double, 2, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid3dEntityType,
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid3dEntityType,
                        //                      double, 3, double, 2, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluSimplexGrid3dEntityType, double, 3, double, 3, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid3dEntityType,
+                       Dune::Stuff::Functions::Expression<DuneAluSimplexGrid3dEntityType, double, 3, double, 3, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid3dEntityType,
                        //                      double, 3, double, 3, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluSimplexGrid3dEntityType,
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluSimplexGrid3dEntityType,
                        //                      double, 3, double, 3, 3 >
 
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluCubeGrid3dEntityType, double, 3, double, 1, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluCubeGrid3dEntityType, double,
-                       //                      3, double, 1, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluCubeGrid3dEntityType, double,
-                       //                      3, double, 1, 3 >
+                       Dune::Stuff::Functions::Expression<DuneAluCubeGrid3dEntityType, double, 3, double, 1, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluCubeGrid3dEntityType,
+                       //                      double, 3, double, 1, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluCubeGrid3dEntityType,
+                       //                      double, 3, double, 1, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluCubeGrid3dEntityType, double, 3, double, 2, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluCubeGrid3dEntityType, double,
-                       //                      3, double, 2, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluCubeGrid3dEntityType, double,
-                       //                      3, double, 2, 3 >
+                       Dune::Stuff::Functions::Expression<DuneAluCubeGrid3dEntityType, double, 3, double, 2, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluCubeGrid3dEntityType,
+                       //                      double, 3, double, 2, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluCubeGrid3dEntityType,
+                       //                      double, 3, double, 2, 3 >
                        ,
-                       Dune::Stuff::Function::Expression<DuneAluCubeGrid3dEntityType, double, 3, double, 3, 1>
-                       //                      , Dune::Stuff::Function::Expression< DuneAluCubeGrid3dEntityType, double,
-                       //                      3, double, 3, 2 >
-                       //                      , Dune::Stuff::Function::Expression< DuneAluCubeGrid3dEntityType, double,
-                       //                      3, double, 3, 3 >
+                       Dune::Stuff::Functions::Expression<DuneAluCubeGrid3dEntityType, double, 3, double, 3, 1>
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluCubeGrid3dEntityType,
+                       //                      double, 3, double, 3, 2 >
+                       //                      , Dune::Stuff::Functions::Expression< DuneAluCubeGrid3dEntityType,
+                       //                      double, 3, double, 3, 3 >
                        > ExpressionFunctionAluGridEntityTypes;
 
 TEST_STRUCT_GENERATOR(ExpressionFunction, AluGridEntity)
