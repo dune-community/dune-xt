@@ -29,6 +29,11 @@
 #include <dune/fem/space/common/functionspace.hh>
 #endif
 
+#if HAVE_DUNE_PDELAB
+#include <dune/typetree/nodetags.hh>
+#include <dune/pdelab/common/function.hh>
+#endif
+
 namespace Dune {
 namespace Stuff {
 namespace Functions {
