@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-#include <dune/common/parametertree.hh>
 #include <dune/common/exceptions.hh>
 
 #include <dune/stuff/common/color.hh>
+#include <dune/stuff/common/configtree.hh>
 
 #include "functions/interfaces.hh"
 #include "functions/checkerboard.hh"
@@ -35,7 +35,7 @@ namespace Stuff {
  *        Yust copy each of those and replace Expression by the class name of your Function. In addition, below the
  *        DUNE_STUFF_FUNCTIONS_GENERATE_CLASS macro you will find a very long list of macro definitions like
  *          DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_1_ ... (E, D, ddim, R, rdim, rCdim)
- *        for each function with ... replaced by STATIC_ID, SETTINGS and CREATE. You will have to copy those 81 lines of
+ *        for each function with ... replaced by STATIC_ID, CONFIG and CREATE. You will have to copy those 81 lines of
  *        code for your function and insert which combination of dimensions you did implement and which not. This might
  *        seem totally ridiculous but it can be acchieved quite fast by a few find and replace commands of your favorite
  *        text editor. Patches welcome if you have a better idea!
@@ -46,10 +46,10 @@ class FunctionsProvider
 public:
   static std::vector<std::string> available() = delete;
 
-  static Dune::ParameterTree defaultSettings(const std::string /*type = available()[0]*/) = delete;
+  static Common::ConfigTree default_config(const std::string /*type = available()[0]*/) = delete;
 
-  static LocalizableFunctionInterface<E, D, d, R, r, rC>*
-  create(const std::string /*type = available()[0]*/, const ParameterTree /*settings = defaultSettings()*/) = delete;
+  static std::unique_ptr<GlobalFunctionInterface<E, D, d, R, r, rC>>
+  create(const std::string /*type = available()[0]*/, const Common::ConfigTree /*config = default_config()*/) = delete;
 }; // class FunctionsProvider
 
 #define DUNE_STUFF_FUNCTIONS_GENERATE_DIM_RANGE(ddim)                                                                  \
@@ -82,37 +82,36 @@ public:
                               E, D, ddim, R, rdim, rCdim)};                                                            \
     } /* ... available(...) */                                                                                         \
                                                                                                                        \
-    static Dune::ParameterTree defaultSettings(const std::string type = available()[0])                                \
+    static Common::ConfigTree default_config(const std::string type = available()[0])                                  \
     {                                                                                                                  \
       if (type.compare(Functions::Constant<E, D, d, R, r, rC>::static_id()) == 0)                                      \
-        return Functions::Constant<E, D, d, R, r, rC>::defaultSettings();                                              \
-      DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_##ddim##_##rdim##_##rCdim##_SETTINGS(E, D, ddim, R, rdim, rCdim)     \
-          DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_##ddim##_##rdim##_##rCdim##_SETTINGS(                          \
-              E, D, ddim, R, rdim, rCdim)                                                                              \
-              DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_##ddim##_##rdim##_##rCdim##_SETTINGS(                       \
+        return Functions::Constant<E, D, d, R, r, rC>::default_config();                                               \
+      DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_##ddim##_##rdim##_##rCdim##_CONFIG(E, D, ddim, R, rdim, rCdim)       \
+          DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_##ddim##_##rdim##_##rCdim##_CONFIG(E, D, ddim, R, rdim, rCdim) \
+              DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_##ddim##_##rdim##_##rCdim##_CONFIG(                         \
                   E, D, ddim, R, rdim, rCdim) else DUNE_THROW(Dune::RangeError,                                        \
                                                               "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")    \
                                                                    << " unknown function '"                            \
                                                                    << type                                             \
                                                                    << "' requested!");                                 \
-    } /* ... defaultSettings(...) */                                                                                   \
+    } /* ... default_config(...) */                                                                                    \
                                                                                                                        \
-    static LocalizableFunctionInterface<E, D, ddim, R, rdim, rCdim>*                                                   \
-    create(const std::string type = available()[0], const ParameterTree settings = defaultSettings())                  \
+    static std::unique_ptr<GlobalFunctionInterface<E, D, ddim, R, rdim, rCdim>>                                        \
+    create(const std::string type = available()[0], const ParameterTree config = default_config())                     \
     {                                                                                                                  \
       if (type.compare(Functions::Constant<E, D, d, R, r, rC>::static_id()) == 0)                                      \
-        return Functions::Constant<E, D, d, R, r, rC>::create(settings);                                               \
+        return Functions::Constant<E, D, d, R, r, rC>::create(config);                                                 \
       DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_##ddim##_##rdim##_##rCdim##_CREATE(                                  \
-          E, D, ddim, R, rdim, rCdim, settings)                                                                        \
+          E, D, ddim, R, rdim, rCdim, config)                                                                          \
           DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_##ddim##_##rdim##_##rCdim##_CREATE(                            \
-              E, D, ddim, R, rdim, rCdim, settings)                                                                    \
+              E, D, ddim, R, rdim, rCdim, config)                                                                      \
               DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_##ddim##_##rdim##_##rCdim##_CREATE(                         \
-                  E, D, ddim, R, rdim, rCdim, settings) else DUNE_THROW(Dune::RangeError,                              \
-                                                                        "\n" << Dune::Stuff::Common::colorStringRed(   \
-                                                                                    "ERROR:")                          \
-                                                                             << " unknown function '"                  \
-                                                                             << type                                   \
-                                                                             << "' requested!");                       \
+                  E, D, ddim, R, rdim, rCdim, config) else DUNE_THROW(Dune::RangeError,                                \
+                                                                      "\n" << Dune::Stuff::Common::colorStringRed(     \
+                                                                                  "ERROR:")                            \
+                                                                           << " unknown function '"                    \
+                                                                           << type                                     \
+                                                                           << "' requested!");                         \
     } /* ... create(...) */                                                                                            \
   }; // class FunctionsProvider< ..., ddim, ..., rdim, rCdim >
 // DUNE_STUFF_FUNCTIONS_GENERATE_CLASS
@@ -157,97 +156,97 @@ public:
 #define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_2_STATIC_ID(E, D, ddim, R, rdim, rCdim) /**/
 #define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_3_STATIC_ID(E, D, ddim, R, rdim, rCdim) /**/
 
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                         \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_1_CONFIG(E, D, ddim, R, rdim, rCdim)                           \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
 
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_1_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_2_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                 \
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                   \
   else if (type.compare(Functions::Expression<E, D, d, R, r, rC>::static_id())                                         \
-           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
+           == 0) return Functions::Expression<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Expression_3_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
 
 // ======================
 // ==== Checkerboard ====
@@ -307,169 +306,169 @@ public:
 #define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_3_STATIC_ID(E, D, ddim, R, rdim, rCdim)                      \
   , Functions::Checkerboard<E, D, ddim, R, rdim, rCdim>::static_id()
 
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_1_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_2_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim)                       \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_3_CONFIG(E, D, ddim, R, rdim, rCdim)                         \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::defaultSettings();
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::default_config();
 
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_1_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_2_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings)               \
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Checkerboard_3_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config)                 \
   else if (type.compare(Functions::Checkerboard<E, D, d, R, r, rC>::static_id())                                       \
-           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(settings);
+           == 0) return Functions::Checkerboard<E, D, d, R, r, rC>::create(config);
 
 // =====================
 // ==== Spe10Model1 ====
@@ -503,65 +502,65 @@ public:
 #define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_2_STATIC_ID(E, D, ddim, R, rdim, rCdim) /**/
 #define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_3_STATIC_ID(E, D, ddim, R, rdim, rCdim) /**/
 
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim)                        \
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_1_CONFIG(E, D, ddim, R, rdim, rCdim)                          \
   else if (type.compare(Functions::Spe10Model1<E, D, d, R, r, rC>::static_id())                                        \
-           == 0) return Functions::Spe10Model1<E, D, d, R, r, rC>::defaultSettings();
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_1_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_2_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_3_SETTINGS(E, D, ddim, R, rdim, rCdim) /**/
+           == 0) return Functions::Spe10Model1<E, D, d, R, r, rC>::default_config();
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_1_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_2_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_3_CONFIG(E, D, ddim, R, rdim, rCdim) /**/
 
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings)                \
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_1_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config)                  \
   else if (type.compare(Functions::Spe10Model1<E, D, d, R, r, rC>::static_id())                                        \
-           == 0) return Functions::Spe10Model1<E, D, d, R, r, rC>::create(settings);
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_1_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_2_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
-#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_3_CREATE(E, D, ddim, R, rdim, rCdim, settings) /**/
+           == 0) return Functions::Spe10Model1<E, D, d, R, r, rC>::create(config);
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_2_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_1_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_2_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_1_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_2_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
+#define DUNE_STUFF_FUNCTIONS_HH_FUNCTION_Spe10Model1_3_3_3_CREATE(E, D, ddim, R, rdim, rCdim, config) /**/
 
 DUNE_STUFF_FUNCTIONS_GENERATE_DIM_RANGE(1)
 DUNE_STUFF_FUNCTIONS_GENERATE_DIM_RANGE(2)
