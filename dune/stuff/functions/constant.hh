@@ -33,6 +33,40 @@ public:
 
   using typename BaseType::LocalfunctionType;
 
+  static std::string static_id()
+  {
+    return BaseType::static_id() + ".constant";
+  }
+
+  static Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    Common::ConfigTree config;
+    config["value"] = "1.0";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
+    else {
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
+  {
+    // get correct config
+    Common::ConfigTree cfg;
+    if (config.has_sub(sub_name))
+      cfg = config.sub(sub_name);
+    else
+      cfg = config;
+    // extract data
+    auto value = cfg.get<RangeFieldImp>("value");
+    auto nm = cfg.get<std::string>("name", static_id());
+    return Common::make_unique<ThisType>(value, nm);
+  } // ... create(...)
+
   explicit Constant(const RangeType& constant, const std::string name = static_id())
     : constant_(constant)
     , name_(name)
@@ -70,40 +104,6 @@ public:
   {
     return name_;
   }
-
-  static std::string static_id()
-  {
-    return BaseType::static_id() + ".constant";
-  }
-
-  static Common::ConfigTree default_config(const std::string sub_name = "")
-  {
-    Common::ConfigTree config;
-    config["value"] = "1.0";
-    config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::ConfigTree tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
-                                          const std::string sub_name = static_id())
-  {
-    // get correct config
-    Common::ConfigTree cfg;
-    if (config.has_sub(sub_name))
-      cfg = config.sub(sub_name);
-    else
-      cfg = config;
-    // extract data
-    auto value = cfg.get<RangeFieldImp>("value");
-    auto nm = cfg.get<std::string>("name", static_id());
-    return Common::make_unique<ThisType>(value, nm);
-  } // ... create(...)
 
 private:
   const RangeType constant_;
