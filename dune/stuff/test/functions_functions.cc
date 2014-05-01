@@ -27,14 +27,13 @@
     static const unsigned int r  = ConstantFunctionType::dimRange;                                                     \
     static const unsigned int rC = ConstantFunctionType::dimRangeCols;                                                 \
     typedef Dune::Stuff::FunctionsProvider<E, D, d, R, r, rC> FunctionsProvider;                                       \
-    typedef Dune::Stuff::LocalizableFunctionInterface<E, D, d, R, r, rC> InterfaceType;                                \
+    typedef Dune::Stuff::GlobalFunctionInterface<E, D, d, R, r, rC> InterfaceType;                                     \
                                                                                                                        \
     void check() const                                                                                                 \
     {                                                                                                                  \
       for (const std::string& type : FunctionsProvider::available()) {                                                 \
-        const Dune::ParameterTree& settings = FunctionsProvider::defaultSettings(type);                                \
-        const InterfaceType* function       = FunctionsProvider::create(type, settings);                               \
-        delete function;                                                                                               \
+        const Dune::Stuff::Common::ConfigTree& config = FunctionsProvider::default_config(type);                       \
+        const std::unique_ptr<InterfaceType> function = FunctionsProvider::create(type, config);                       \
       }                                                                                                                \
     }                                                                                                                  \
   };

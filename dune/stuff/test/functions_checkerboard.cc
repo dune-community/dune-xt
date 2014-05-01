@@ -33,7 +33,7 @@
     void check() const                                                                                                 \
     {                                                                                                                  \
       const std::unique_ptr<const LocalizableFunctionType> function(                                                   \
-          LocalizableFunctionType::create(LocalizableFunctionType::defaultSettings()));                                \
+          LocalizableFunctionType::create(LocalizableFunctionType::default_config()));                                 \
     }                                                                                                                  \
   };
 // TEST_STRUCT_GENERATOR
