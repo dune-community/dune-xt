@@ -6,13 +6,16 @@
 #ifndef DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 #define DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 
+#include "config.h"
+
 #include <vector>
 #include <cmath>
+#include <memory>
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/static_assert.hh>
 
-#include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/configtree.hh>
 
 #include "interfaces.hh"
 
@@ -100,35 +103,45 @@ public:
     return BaseType::static_id() + ".checkerboard";
   }
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  static Common::ConfigTree default_config(const std::string sub_name = "")
   {
-    Dune::ParameterTree description;
-    description["lowerLeft"]   = "[0.0; 0.0; 0.0]";
-    description["upperRight"]  = "[1.0; 1.0; 1.0]";
-    description["numElements"] = "[2; 2; 2]";
-    description["values"]      = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
-    description["name"] = static_id();
-    if (subName.empty())
-      return description;
+    Common::ConfigTree config;
+    config["lower_left"]   = "[0.0; 0.0; 0.0]";
+    config["upper_right"]  = "[1.0; 1.0; 1.0]";
+    config["num_elements"] = "[2; 2; 2]";
+    config["values"]       = "[1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0]";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
     else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
     }
-  } // ... defaultSettings(...)
+  } // ... default_config(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
   {
-    // get data
-    std::vector<DomainFieldType> lowerLeft  = settings.getVector("lowerLeft", DomainFieldType(0), dimDomain);
-    std::vector<DomainFieldType> upperRight = settings.getVector("upperRight", DomainFieldType(1), dimDomain);
-    std::vector<size_t> numElements         = settings.getVector("numElements", size_t(1), dimDomain);
-    std::vector<RangeFieldType> values_rf = settings.getVector("values", RangeFieldType(1), 1);
-    std::vector<RangeType> values(values_rf.size());
-    for (size_t ii = 0; ii < values_rf.size(); ++ii)
-      values[ii] = RangeType(values_rf[ii]);
-    // create and return, leave the checks to the base constructor
-    return new ThisType(std::move(lowerLeft), std::move(upperRight), std::move(numElements), std::move(values));
+    // get correct config
+    Common::ConfigTree cfg;
+    if (config.has_sub(sub_name))
+      cfg = config.sub(sub_name);
+    else
+      cfg = config;
+    // extract needed data
+    auto lower_left   = cfg.get<std::vector<DomainFieldType>>("lower_left", dimDomain);
+    auto upper_right  = cfg.get<std::vector<DomainFieldType>>("upper_right", dimDomain);
+    auto num_elements = cfg.get<std::vector<size_t>>("num_elements");
+    size_t num_values = 1;
+    for (size_t ii = 0; ii < num_elements.size(); ++ii)
+      num_values *= num_elements[ii];
+    auto values = cfg.get<std::vector<RangeType>>("values", num_values);
+    auto nm = static_id();
+    if (cfg.has_key("name"))
+      nm = cfg.get<std::string>("name");
+    return Common::make_unique<ThisType>(
+        std::move(lower_left), std::move(upper_right), std::move(num_elements), std::move(values), nm);
   } // ... create(...)
 
   Checkerboard(std::vector<DomainFieldType>&& lowerLeft, std::vector<DomainFieldType>&& upperRight,
