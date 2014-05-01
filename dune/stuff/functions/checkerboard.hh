@@ -6,8 +6,6 @@
 #ifndef DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 #define DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 
-#include "config.h"
-
 #include <vector>
 #include <cmath>
 #include <memory>
@@ -26,62 +24,10 @@ namespace Functions {
 
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class Checkerboard
-    : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+    : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
-  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-      BaseType;
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
   typedef Checkerboard<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
-
-  class Localfunction
-      : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-  {
-    typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-        BaseType;
-
-  public:
-    typedef typename BaseType::EntityType EntityType;
-
-    typedef typename BaseType::DomainFieldType DomainFieldType;
-    static const unsigned int dimDomain = BaseType::dimDomain;
-    typedef typename BaseType::DomainType DomainType;
-
-    typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const unsigned int dimRange     = BaseType::dimRange;
-    static const unsigned int dimRangeCols = BaseType::dimRangeCols;
-    typedef typename BaseType::RangeType RangeType;
-
-    typedef typename BaseType::JacobianRangeType JacobianRangeType;
-
-    Localfunction(const EntityType& ent, const RangeType value)
-      : BaseType(ent)
-      , value_(value)
-    {
-    }
-
-    Localfunction(const Localfunction& /*other*/) = delete;
-
-    Localfunction& operator=(const Localfunction& /*other*/) = delete;
-
-    virtual size_t order() const DS_OVERRIDE
-    {
-      return 0;
-    }
-
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
-    {
-      assert(this->is_a_valid_point(xx));
-      ret = value_;
-    }
-
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
-    {
-      assert(this->is_a_valid_point(xx));
-      ret *= RangeFieldType(0);
-    }
-
-  private:
-    const RangeType value_;
-  }; // class Localfunction
 
 public:
   typedef typename BaseType::EntityType EntityType;
@@ -207,10 +153,9 @@ public:
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
   {
-    // decide on the subdomain the center of the entity belongs to
-    const auto center = entity.geometry().center();
+    // decide on the subdomain xx belongs to
     std::vector<size_t> whichPartition(dimDomain, 0);
     const auto& ll = *lowerLeft_;
     const auto& ur = *upperRight_;
@@ -218,8 +163,7 @@ public:
     for (size_t dd = 0; dd < dimDomain; ++dd) {
       // for points that are on upperRight_[d], this selects one partition too much
       // so we need to cap this
-      whichPartition[dd] =
-          std::min(size_t(std::floor(ne[dd] * ((center[dd] - ll[dd]) / (ur[dd] - ll[dd])))), ne[dd] - 1);
+      whichPartition[dd] = std::min(size_t(std::floor(ne[dd] * ((xx[dd] - ll[dd]) / (ur[dd] - ll[dd])))), ne[dd] - 1);
     }
     size_t subdomain = 0;
     if (dimDomain == 1)
@@ -229,8 +173,8 @@ public:
     else
       subdomain = whichPartition[0] + whichPartition[1] * ne[0] + whichPartition[2] * ne[1] * ne[0];
     // return the component that belongs to the subdomain
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, (*values_)[subdomain]));
-  } // ... local_function(...)
+    ret = (*values_)[subdomain];
+  } // ... evaluate(...)
 
 private:
   std::shared_ptr<const std::vector<DomainFieldType>> lowerLeft_;
