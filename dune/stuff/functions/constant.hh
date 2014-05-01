@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/configtree.hh>
 
 #include "interfaces.hh"
 
@@ -76,24 +76,33 @@ public:
     return BaseType::static_id() + ".constant";
   }
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  static Common::ConfigTree default_config(const std::string sub_name = "")
   {
-    Dune::ParameterTree description;
-    description["value"] = "1.0";
-    if (subName.empty())
-      return description;
+    Common::ConfigTree config;
+    config["value"] = "1.0";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
     else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
     }
-  } // ... defaultSettings(...)
+  } // ... default_config(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
   {
-    const DSC::ExtendedParameterTree default_settings = defaultSettings();
-    return new ThisType(settings.get("value", default_settings.get<RangeFieldImp>("value")),
-                        settings.get("name", static_id()));
+    // get correct config
+    Common::ConfigTree cfg;
+    if (config.has_sub(sub_name))
+      cfg = config.sub(sub_name);
+    else
+      cfg = config;
+    // extract data
+    auto value = cfg.get<RangeFieldImp>("value");
+    auto nm = cfg.get<std::string>("name", static_id());
+    return Common::make_unique<ThisType>(value, nm);
   } // ... create(...)
 
 private:
