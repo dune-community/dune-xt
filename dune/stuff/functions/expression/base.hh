@@ -16,7 +16,6 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/static_assert.hh>
 
-#include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/color.hh>
 
@@ -192,7 +191,7 @@ private:
       variableStream << variable_ << "[" << ii << "]";
       variables_.push_back(variableStream.str());
     }
-    // create epressions
+    // create expressions
     for (size_t ii = 0; ii < dimDomain; ++ii) {
       arg_[ii]      = new DomainFieldType(0.0);
       var_arg_[ii]  = new RVar(variables_[ii].c_str(), arg_[ii]);
