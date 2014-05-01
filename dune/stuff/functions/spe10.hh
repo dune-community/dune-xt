@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
 
@@ -110,35 +110,42 @@ public:
     return new ThisType(*this);
   }
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  static Common::ConfigTree default_config(const std::string sub_name = "")
   {
-    Dune::ParameterTree description;
-    description["filename"]   = "perm_case1.dat";
-    description["lowerLeft"]  = "[0.0; 0.0]";
-    description["upperRight"] = "[762.0; 15.24]";
-    description["minValue"]   = "0.001";
-    description["maxValue"]   = "998.915";
-    description["name"] = static_id();
-    if (subName.empty())
-      return description;
+    Common::ConfigTree config;
+    config["filename"]    = "perm_case1.dat";
+    config["lower_left"]  = "[0.0; 0.0]";
+    config["upper_right"] = "[762.0; 15.24]";
+    config["min_value"]   = "0.001";
+    config["max_value"]   = "998.915";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
     else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
     }
-  } // ... defaultSettings(...)
+  } // ... default_config(...)
 
-  static ThisType* create(const Dune::Stuff::Common::ExtendedParameterTree settings = defaultSettings())
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
   {
-    // get data
-    const std::string filename              = settings.get<std::string>("filename");
-    std::vector<DomainFieldType> lowerLeft  = settings.getVector<DomainFieldType>("lowerLeft", dimDomain);
-    std::vector<DomainFieldType> upperRight = settings.getVector<DomainFieldType>("upperRight", dimDomain);
-    const RangeFieldType minVal             = settings.get<RangeFieldType>("minValue", minValue);
-    const RangeFieldType maxVal             = settings.get<RangeFieldType>("maxValue", maxValue);
-    const std::string nm                    = settings.get<std::string>("name", static_id());
+    // get correct config
+    Common::ConfigTree cfg;
+    if (config.has_sub(sub_name))
+      cfg = config.sub(sub_name);
+    else
+      cfg = config;
+    // extract needed data
+    const auto filename = cfg.get<std::string>("filename");
+    auto lower_left     = cfg.get<std::vector<DomainFieldType>>("lower_left", dimDomain);
+    auto upper_right    = cfg.get<std::vector<DomainFieldType>>("upper_right", dimDomain);
+    const auto min_val  = cfg.get<RangeFieldType>("minValue", minValue);
+    const auto max_val  = cfg.get<RangeFieldType>("maxValue", maxValue);
+    const auto nm       = cfg.get<std::string>("name", static_id());
     // create and return, leave the checks to the constructor
-    return new ThisType(filename, std::move(lowerLeft), std::move(upperRight), minVal, maxVal, nm);
+    return Common::make_unique<ThisType>(filename, std::move(lower_left), std::move(upper_right), min_val, max_val, nm);
   } // ... create(...)
 }; // class Spe10Model1< ..., 2, ..., 1, 1 >
 
