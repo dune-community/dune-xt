@@ -12,7 +12,7 @@
 
 #include <dune/common/fvector.hh>
 
-#include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/common/exceptions.hh>
 
 #include "expression/base.hh"
@@ -26,7 +26,7 @@ namespace Functions {
 
 
 /**
- *  \attention  If you add the create() and defaultSettings() method, do not forget to enable the matrix valued
+ *  \attention  If you add the create() and default_config() method, do not forget to enable the matrix valued
  *              versions in test/function_expression.cc
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
@@ -199,45 +199,46 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  static Common::ConfigTree default_config(const std::string sub_name = "")
   {
-    Dune::ParameterTree description;
-    description["variable"]   = "x";
-    description["expression"] = "[x[0]; sin(x[0]); exp(x[0])]";
-    description["order"]      = "1";
-    description["name"] = static_id();
-    if (subName.empty())
-      return description;
+    Common::ConfigTree config;
+    config["variable"]   = "x";
+    config["expression"] = "[x[0]; sin(x[0]); exp(x[0])]";
+    config["order"]      = "1";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
     else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
     }
-  } // ... defaultSettings(...)
+  } // ... default_config(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
   {
-    // get necessary
-    const std::string _variable = settings.get<std::string>("variable", "x");
+    // get correct config
+    Common::ConfigTree cfg;
+    if (config.has_sub(sub_name))
+      cfg = config.sub(sub_name);
+    else
+      cfg = config;
+    // extract necessary data
+    const auto _variable = cfg.get<std::string>("variable", "x");
     std::vector<std::string> _expressions;
-    // lets see, if there is a key or vector
-    if (settings.hasVector("expression")) {
-      const std::vector<std::string> expr = settings.getVector<std::string>("expression", 1);
-      for (size_t ii = 0; ii < expr.size(); ++ii)
-        _expressions.push_back(expr[ii]);
-    } else if (settings.hasKey("expression")) {
-      const std::string expr = settings.get<std::string>("expression");
-      _expressions.push_back(expr);
+    if (cfg.has_key("expression")) {
+      _expressions = cfg.get<std::vector<std::string>>("expression");
     } else
       DUNE_THROW_COLORFULLY(Dune::IOError,
                             "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-                                 << " neither key nor vector 'expression' found in the following settings:\n"
-                                 << settings.reportString("  "));
+                                 << " No key 'expression' found in the following configuration:\n"
+                                 << config.report_string("  "));
     // get optional
-    const int order        = settings.get<int>("order", -1);
-    const std::string name = settings.get<std::string>("name", "function.expression");
+    const auto order = config.get<int>("order", -1);
+    const auto name  = config.get<std::string>("name", static_id());
     // create and return
-    return new ThisType(_variable, _expressions, order, name);
+    return Common::make_unique<ThisType>(_variable, _expressions, order, name);
   } // ... create(...)
 
   Expression(const std::string variable, const std::string expression, const size_t ord = 0,
