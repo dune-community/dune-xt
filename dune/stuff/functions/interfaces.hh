@@ -21,11 +21,15 @@
 #include <dune/geometry/referenceelements.hh>
 
 #if HAVE_DUNE_GRID
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/io/file/vtk.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #if HAVE_DUNE_FEM
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/fem/function/common/function.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/fem/space/common/functionspace.hh>
 #endif
 
