@@ -9,6 +9,7 @@
 #define DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 
 #include <vector>
+#include <limits>
 
 #include <dune/common/fvector.hh>
 
@@ -88,10 +89,10 @@ class Expression
       }
     } // ... evaluate(...)
 
-    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& ret) const DS_OVERRIDE
+    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& DUNE_UNUSED(ret)) const DS_OVERRIDE
     {
       DUNE_THROW_COLORFULLY(NotImplemented,
-                            "If we decided on the JacobianRangeType of matrix valued functions we havo to implement "
+                            "If we decided on the JacobianRangeType of matrix valued functions we have to implement "
                                 << "gradients for this function!");
     }
 
@@ -226,12 +227,12 @@ public:
     if (cfg.has_key("expression")) {
       _expressions = cfg.get<std::vector<std::string>>("expression");
     } else
-      DUNE_THROW_COLORFULLY(Dune::IOError,
+      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
                                  << " No key 'expression' found in the following configuration:\n"
                                  << config.report_string("  "));
     // get optional
-    const auto order = config.get<int>("order", -1);
+    const auto order = config.get<size_t>("order", std::numeric_limits<size_t>::max());
     const auto name  = config.get<std::string>("name", static_id());
     // create and return
     return Common::make_unique<ThisType>(_variable, _expressions, order, name);
