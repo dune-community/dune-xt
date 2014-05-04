@@ -134,7 +134,7 @@ private:
   DUNE_STUFF_FUNCTIONS_CONSTANT_LAST_EXPANSION(etype, dftype, ddim, long double, rdim, rcdim)
 
 #define DUNE_STUFF_FUNCTIONS_CONSTANT_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim)                         \
-  extern template class Dune::Stuff::Function::Constant<etype, dftype, ddim, rftype, rdim, rcdim>;
+  extern template class Dune::Stuff::Functions::Constant<etype, dftype, ddim, rftype, rdim, rcdim>;
 
 DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(DuneStuffFunctionsInterfacesFake1dEntityType, 1)
 DUNE_STUFF_FUNCTIONS_CONSTANT_LIST_DIMRANGE(DuneStuffFunctionsInterfacesFake2dEntityType, 2)
