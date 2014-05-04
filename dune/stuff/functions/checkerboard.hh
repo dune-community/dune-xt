@@ -124,11 +124,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    Common::ConfigTree cfg;
-    if (config.has_sub(sub_name))
-      cfg = config.sub(sub_name);
-    else
-      cfg = config;
+    const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     // extract needed data
     auto lower_left   = cfg.get<std::vector<DomainFieldType>>("lower_left", dimDomain);
     auto upper_right  = cfg.get<std::vector<DomainFieldType>>("upper_right", dimDomain);

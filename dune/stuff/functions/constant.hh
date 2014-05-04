@@ -56,11 +56,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    Common::ConfigTree cfg;
-    if (config.has_sub(sub_name))
-      cfg = config.sub(sub_name);
-    else
-      cfg = config;
+    const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     // extract data
     auto value = cfg.get<RangeFieldImp>("value");
     auto nm = cfg.get<std::string>("name", static_id());
