@@ -27,7 +27,7 @@
     static const unsigned int r  = ConstantFunctionType::dimRange;                                                     \
     static const unsigned int rC = ConstantFunctionType::dimRangeCols;                                                 \
     typedef Dune::Stuff::FunctionsProvider<E, D, d, R, r, rC> FunctionsProvider;                                       \
-    typedef Dune::Stuff::GlobalFunctionInterface<E, D, d, R, r, rC> InterfaceType;                                     \
+    typedef Dune::Stuff::LocalizableFunctionInterface<E, D, d, R, r, rC> InterfaceType;                                \
                                                                                                                        \
     void check() const                                                                                                 \
     {                                                                                                                  \

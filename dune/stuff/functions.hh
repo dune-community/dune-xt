@@ -48,7 +48,7 @@ public:
 
   static Common::ConfigTree default_config(const std::string /*type = available()[0]*/) = delete;
 
-  static std::unique_ptr<GlobalFunctionInterface<E, D, d, R, r, rC>>
+  static std::unique_ptr<LocalizableFunctionInterface<E, D, d, R, r, rC>>
   create(const std::string /*type = available()[0]*/, const Common::ConfigTree /*config = default_config()*/) = delete;
 }; // class FunctionsProvider
 
@@ -96,7 +96,7 @@ public:
                                                                    << "' requested!");                                 \
     } /* ... default_config(...) */                                                                                    \
                                                                                                                        \
-    static std::unique_ptr<GlobalFunctionInterface<E, D, ddim, R, rdim, rCdim>>                                        \
+    static std::unique_ptr<LocalizableFunctionInterface<E, D, ddim, R, rdim, rCdim>>                                   \
     create(const std::string type = available()[0], const ParameterTree config = default_config())                     \
     {                                                                                                                  \
       if (type.compare(Functions::Constant<E, D, d, R, r, rC>::static_id()) == 0)                                      \
