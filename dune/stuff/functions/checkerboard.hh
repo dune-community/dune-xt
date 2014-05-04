@@ -6,8 +6,6 @@
 #ifndef DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 #define DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
 
-#include "config.h"
-
 #include <vector>
 #include <cmath>
 #include <memory>
@@ -132,7 +130,10 @@ public:
     size_t num_values = 1;
     for (size_t ii = 0; ii < num_elements.size(); ++ii)
       num_values *= num_elements[ii];
-    auto values = cfg.get<std::vector<RangeType>>("values", num_values);
+    auto values_rf = cfg.get<std::vector<RangeFieldType>>("values", num_values);
+    std::vector<RangeType> values(values_rf.size());
+    for (size_t ii = 0; ii < values_rf.size(); ++ii)
+      values[ii] = RangeType(values_rf[ii]);
     auto nm = static_id();
     if (cfg.has_key("name"))
       nm = cfg.get<std::string>("name");
