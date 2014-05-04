@@ -16,7 +16,9 @@
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/bvector.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/istl/bcrsmatrix.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include "interfaces.hh"
