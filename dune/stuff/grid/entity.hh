@@ -54,17 +54,17 @@ double DUNE_DEPRECATED_MSG("use entityDiameter instead")
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 double entityDiameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
 {
+  auto min_dist        = std::numeric_limits<typename GridImp::ctype>::max();
   const auto& geometry = entity.geometry();
-  auto max_dist = std::numeric_limits<typename GridImp::ctype>::min();
   for (int i = 0; i < geometry.corners(); ++i) {
     const auto xi = geometry.corner(i);
     for (int j = i + 1; j < geometry.corners(); ++j) {
       auto xj = geometry.corner(j);
       xj -= xi;
-      max_dist = std::max(max_dist, xj.two_norm());
+      min_dist = std::min(min_dist, xj.two_norm());
     }
   }
-  return max_dist;
+  return min_dist;
 } // geometryDiameter
 #endif // HAVE_DUNE_GRID
 
