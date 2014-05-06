@@ -59,7 +59,7 @@ public:
     const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::ConfigTree default_cfg = default_config();
     // create
-    return Common::make_unique<ThisType>(cfg.get<RangeType>("value", default_cfg.get<RangeType>("value")),
+    return Common::make_unique<ThisType>(cfg.get("value", default_cfg.get<RangeType>("value")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
