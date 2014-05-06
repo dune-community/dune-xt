@@ -8,6 +8,8 @@
 #ifndef DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 #define DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 
+#include "config.h"
+
 #include <vector>
 #include <limits>
 
@@ -204,7 +206,7 @@ public:
   {
     Common::ConfigTree config;
     config["variable"]   = "x";
-    config["expression"] = "[x[0]; sin(x[0]); exp(x[0])]";
+    config["expression"] = "[x[0] sin(x[0]) exp(x[0])]";
     config["order"]      = "1";
     config["name"] = static_id();
     if (sub_name.empty())
@@ -220,22 +222,13 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    // extract necessary data
-    const auto _variable = cfg.get<std::string>("variable", "x");
-    std::vector<std::string> _expressions;
-    if (cfg.has_key("expression")) {
-      _expressions = cfg.get<std::vector<std::string>>("expression");
-    } else
-      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
-                            "\n" << Dune::Stuff::Common::colorStringRed("ERROR:")
-                                 << " No key 'expression' found in the following configuration:\n"
-                                 << config.report_string("  "));
-    // get optional
-    const auto order = config.get<size_t>("order", std::numeric_limits<size_t>::max());
-    const auto name  = config.get<std::string>("name", static_id());
-    // create and return
-    return Common::make_unique<ThisType>(_variable, _expressions, order, name);
+    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigTree default_cfg = default_config();
+    // create
+    return Common::make_unique<ThisType>(cfg.get("variable", default_cfg.get<std::string>("variable")),
+                                         cfg.get("expression", default_cfg.get<std::vector<std::string>>("expression")),
+                                         cfg.get("order", default_cfg.get<size_t>("order")),
+                                         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
   Expression(const std::string variable, const std::string expression, const size_t ord = 0,
