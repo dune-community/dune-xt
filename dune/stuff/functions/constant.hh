@@ -56,11 +56,11 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    // extract data
-    auto value = cfg.get<RangeFieldImp>("value");
-    auto nm = cfg.get<std::string>("name", static_id());
-    return Common::make_unique<ThisType>(value, nm);
+    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigTree default_cfg = default_config();
+    // create
+    return Common::make_unique<ThisType>(cfg.get<RangeType>("value", default_cfg.get<RangeType>("value")),
+                                         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
   explicit Constant(const RangeType& constant, const std::string name = static_id())
