@@ -114,8 +114,8 @@ public:
   {
     Common::ConfigTree config;
     config["filename"]    = "perm_case1.dat";
-    config["lower_left"]  = "[0.0; 0.0]";
-    config["upper_right"] = "[762.0; 15.24]";
+    config["lower_left"]  = "[0.0 0.0]";
+    config["upper_right"] = "[762.0 15.24]";
     config["min_value"]   = "0.001";
     config["max_value"]   = "998.915";
     config["name"] = static_id();
@@ -132,16 +132,16 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    // extract needed data
-    const auto filename = cfg.get<std::string>("filename");
-    auto lower_left     = cfg.get<std::vector<DomainFieldType>>("lower_left", dimDomain);
-    auto upper_right    = cfg.get<std::vector<DomainFieldType>>("upper_right", dimDomain);
-    const auto min_val  = cfg.get<RangeFieldType>("min_value", minValue);
-    const auto max_val  = cfg.get<RangeFieldType>("max_value", maxValue);
-    const auto nm       = cfg.get<std::string>("name", static_id());
-    // create and return, leave the checks to the constructor
-    return Common::make_unique<ThisType>(filename, std::move(lower_left), std::move(upper_right), min_val, max_val, nm);
+    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigTree default_cfg = default_config();
+    // create
+    return Common::make_unique<ThisType>(
+        cfg.get("filename", default_cfg.get<std::string>("filename")),
+        cfg.get("lower_left", default_cfg.get<std::vector<DomainFieldType>>("lower_left"), dimDomain),
+        cfg.get("upper_right", default_cfg.get<std::vector<DomainFieldType>>("upper_right"), dimDomain),
+        cfg.get("min_val", minValue),
+        cfg.get("max_val", maxValue),
+        cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 }; // class Spe10Model1< ..., 2, ..., 1, 1 >
 
