@@ -199,9 +199,9 @@ public:
   static Common::ConfigTree default_config(const std::string sub_name = "")
   {
     Common::ConfigTree config;
-    config["lower_left"]   = "[0.0; 0.0; 0.0]";
-    config["upper_right"]  = "[1.0; 1.0; 1.0]";
-    config["num_elements"] = "[8; 8; 8]";
+    config["lower_left"]   = "[0.0 0.0 0.0]";
+    config["upper_right"]  = "[1.0 1.0 1.0]";
+    config["num_elements"] = "[8 8 8]";
     if (sub_name.empty())
       return config;
     else {
