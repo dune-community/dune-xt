@@ -236,12 +236,12 @@ public:
     }
   } // ... create(...)
 
-  virtual std::shared_ptr<GridType>& grid() /*DS_OVERRIDE*/
+  virtual std::shared_ptr<GridType>& grid() DS_OVERRIDE
   {
     return grid_;
   }
 
-  virtual const std::shared_ptr<const GridType>& grid() const /*DS_OVERRIDE*/
+  virtual const std::shared_ptr<GridType>& grid() const DS_OVERRIDE
   {
     return grid_;
   }

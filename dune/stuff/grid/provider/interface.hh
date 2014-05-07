@@ -73,7 +73,7 @@ public:
 
   virtual std::shared_ptr<GridType>& grid() = 0;
 
-  virtual const std::shared_ptr<const GridType>& grid() const = 0;
+  virtual const std::shared_ptr<GridType>& grid() const = 0;
 
   template <ChoosePartView type>
   std::shared_ptr<typename Level<type>::Type> level(const int level)
