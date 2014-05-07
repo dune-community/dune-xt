@@ -14,7 +14,6 @@
 
 #include <boost/assign/list_of.hpp>
 
-#include <dune/common/static_assert.hh>
 
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>

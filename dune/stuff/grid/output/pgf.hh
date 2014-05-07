@@ -10,7 +10,6 @@
 #include <dune/common/array.hh>
 #include <dune/stuff/grid/walk.hh>
 #include <dune/stuff/grid/walk_functors.hh>
-#include <dune/common/static_assert.hh>
 
 #include <ostream>
 #include <cstdio>

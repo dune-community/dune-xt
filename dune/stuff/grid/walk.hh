@@ -6,7 +6,6 @@
 #ifndef DUNE_STUFF_WALK_HH_INCLUDED
 #define DUNE_STUFF_WALK_HH_INCLUDED
 
-#include <dune/common/static_assert.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/deprecated.hh>
 #include <dune/stuff/aliases.hh>
@@ -71,7 +70,7 @@ public:
   template <class EntityFunctor, class IntersectionFunctor>
   void operator()(EntityFunctor& entityFunctor, IntersectionFunctor& intersectionFunctor) const
   {
-    dune_static_assert(codim == 0, "walking intersections is only possible for codim 0 entities");
+    static_assert(codim == 0, "walking intersections is only possible for codim 0 entities");
     for (const auto& entity : DSC::viewRange(gridView_)) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
@@ -87,7 +86,7 @@ public:
   template <class EntityFunctor>
   void operator()(EntityFunctor& entityFunctor) const
   {
-    dune_static_assert(codim <= GridViewType::dimension, "codim too high to walk");
+    static_assert(codim <= GridViewType::dimension, "codim too high to walk");
     for (const auto& entity : DSC::viewRange(gridView_)) {
       const int entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);

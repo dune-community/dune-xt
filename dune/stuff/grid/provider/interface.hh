@@ -11,7 +11,6 @@
 #include <memory>
 
 #include <dune/common/fvector.hh>
-#include <dune/common/static_assert.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
