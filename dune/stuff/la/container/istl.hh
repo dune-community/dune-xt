@@ -8,7 +8,6 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_ISTL_HH
 #define DUNE_STUFF_LA_CONTAINER_ISTL_HH
 
-#include <dune/common/static_assert.hh>
 
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
