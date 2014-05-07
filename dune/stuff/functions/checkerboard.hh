@@ -11,7 +11,6 @@
 #include <memory>
 
 #include <dune/common/exceptions.hh>
-#include <dune/common/static_assert.hh>
 
 #include <dune/stuff/common/configtree.hh>
 

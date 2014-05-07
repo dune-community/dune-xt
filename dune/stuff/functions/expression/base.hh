@@ -14,7 +14,6 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/exceptions.hh>
-#include <dune/common/static_assert.hh>
 
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/color.hh>
@@ -171,8 +170,8 @@ private:
 
   void setup(const std::string& _variable, const std::vector<std::string>& _expression)
   {
-    dune_static_assert((dimDomain > 0), "Really?");
-    dune_static_assert((dimRange > 0), "Really?");
+    static_assert((dimDomain > 0), "Really?");
+    static_assert((dimRange > 0), "Really?");
     // set expressions
     if (_expression.size() < dimRange)
       DUNE_THROW(Dune::InvalidStateException,
