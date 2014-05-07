@@ -66,6 +66,8 @@ class LocalizableFunction
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionSetInterface
 {
+  static_assert(EntityImp::dimension == domainDim, "Dimensions do not match!");
+
   template <class RangeFieldType, int dimRange, int dimRangeCols>
   struct RangeTypeSelector
   {
