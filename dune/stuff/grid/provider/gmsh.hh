@@ -63,9 +63,8 @@ public:
 
   GridProviderGmsh(const std::string filename)
   {
-    dune_static_assert(!(Dune::is_same<GridType, Dune::YaspGrid<dim>>::value),
-                       "GmshReader does not work with YaspGrid!");
-    dune_static_assert(!(Dune::is_same<GridType, Dune::SGrid<2, 2>>::value), "GmshReader does not work with SGrid!");
+    static_assert(!(Dune::is_same<GridType, Dune::YaspGrid<dim>>::value), "GmshReader does not work with YaspGrid!");
+    static_assert(!(Dune::is_same<GridType, Dune::SGrid<2, 2>>::value), "GmshReader does not work with SGrid!");
     grid_ = std::shared_ptr<GridType>(GmshReader<GridType>::read(filename));
   }
 

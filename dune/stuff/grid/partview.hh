@@ -8,7 +8,6 @@
 
 #include <memory>
 
-#include <dune/common/static_assert.hh>
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/gridpart/leafgridpart.hh>

@@ -9,7 +9,6 @@
 #define DUNE_STUFF_GRID_INTERSECTION_HH
 
 #include <dune/common/fvector.hh>
-#include <dune/common/static_assert.hh>
 
 #include <dune/geometry/referenceelements.hh>
 
