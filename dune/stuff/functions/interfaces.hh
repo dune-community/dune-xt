@@ -296,7 +296,7 @@ public:
 
   static std::string static_id()
   {
-    return "dune.stuff.function";
+    return "stuff.function";
   }
 
   /**
@@ -312,7 +312,7 @@ public:
   /* @{ */
   virtual std::string name() const
   {
-    return "dune.stuff.function";
+    return "stuff.function";
   }
   /* @} */
 
@@ -373,11 +373,6 @@ public:
 
   virtual ~GlobalFunctionInterface()
   {
-  }
-
-  virtual std::string name() const
-  {
-    return "dune.stuff.function.global";
   }
 
   virtual ThisType* copy() const
@@ -482,11 +477,6 @@ public:
   {
   }
 
-  virtual std::string name() const
-  {
-    return "dune.stuff.function.global";
-  }
-
   virtual ThisType* copy() const
   {
     DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
@@ -548,8 +538,7 @@ private:
  * \brief Interface for scalar and vector valued stationary function.
  */
 template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class DUNE_DEPRECATED_MSG("Please derive your functions from LocalizableFunctionInterface in the future!")
-    FunctionInterface
+class DUNE_DEPRECATED_MSG("Please derive your functions from GlobalFunctionInterface in the future!") FunctionInterface
 #if HAVE_DUNE_FEM
     : public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
                                  FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
