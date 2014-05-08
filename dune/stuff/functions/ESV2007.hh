@@ -8,7 +8,11 @@
 
 #include <cmath>
 
+#include <dune/common/static_assert.hh>
+
 #include <dune/geometry/referenceelements.hh>
+
+#include <dune/stuff/common/configtree.hh>
 
 #include "interfaces.hh"
 
@@ -179,11 +183,19 @@ private:
 namespace ESV2007 {
 
 
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
-class Testcase1Force : public GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1>
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+class Testcase1Force
 {
-  typedef Testcase1Force<EntityImp, DomainFieldImp, RangeFieldImp> ThisType;
-  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1> BaseType;
+  static_assert(AlwaysFalse<EntityImp>::value, "Not available for these dimensions!");
+};
+
+
+template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
+class Testcase1Force<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
+    : public GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1>
+{
+  typedef Testcase1Force<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1> ThisType;
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1> BaseType;
 
 public:
   using typename BaseType::DomainFieldType;
@@ -196,7 +208,33 @@ public:
     return BaseType::static_id() + ".ESV2007.testcase1.force";
   }
 
-  Testcase1Force(const size_t ord = 3, const std::string nm = static_id())
+  static Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    Common::ConfigTree config;
+    config["integration_order"] = "3";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
+    else {
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
+  {
+    // get correct config
+    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigTree default_cfg = default_config();
+    // create
+    return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<size_t>("integration_order")),
+                                         cfg.get("name", default_cfg.get<std::string>("name")));
+  } // ... create(...)
+
+  Testcase1Force(const size_t ord = default_config().get<size_t>("integration_order"),
+                 const std::string nm = static_id())
     : order_(ord)
     , name_(nm)
   {
@@ -248,11 +286,19 @@ private:
 }; // class Testcase1Force
 
 
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
-class Testcase1ExactSolution : public GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1>
+template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+class Testcase1ExactSolution
 {
-  typedef Testcase1ExactSolution<EntityImp, DomainFieldImp, RangeFieldImp> ThisType;
-  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1> BaseType;
+  static_assert(AlwaysFalse<EntityImp>::value, "Not available for these dimensions!");
+};
+
+
+template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
+class Testcase1ExactSolution<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
+    : public GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
+{
+  typedef Testcase1ExactSolution<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1> ThisType;
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1> BaseType;
 
 public:
   using typename BaseType::DomainFieldType;
@@ -265,7 +311,33 @@ public:
     return BaseType::static_id() + ".ESV2007.testcase1.exactsolution";
   }
 
-  Testcase1ExactSolution(const size_t ord = 3, const std::string nm = static_id())
+  static Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    Common::ConfigTree config;
+    config["integration_order"] = "3";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
+    else {
+      Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+                                          const std::string sub_name = static_id())
+  {
+    // get correct config
+    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigTree default_cfg = default_config();
+    // create
+    return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<size_t>("integration_order")),
+                                         cfg.get("name", default_cfg.get<std::string>("name")));
+  } // ... create(...)
+
+  Testcase1ExactSolution(const size_t ord = default_config().get<size_t>("integration_order"),
+                         const std::string nm = static_id())
     : order_(ord)
     , name_(nm)
   {
