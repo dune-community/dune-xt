@@ -312,7 +312,7 @@ public:
     const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::ConfigTree default_cfg = default_config();
     // get default
-    const std::string default_type = cfg.get("default", default_cfg.get<std::string>("dirichlet"));
+    const std::string default_type = cfg.get("default", default_cfg.get<std::string>("default"));
     if (default_type != "dirichlet" && default_type != "neumann")
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error, "Wrong default '" << default_type << "' given!");
     const bool default_to_dirichlet = default_type == "dirichlet";
