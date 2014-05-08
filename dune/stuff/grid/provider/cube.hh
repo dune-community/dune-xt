@@ -26,7 +26,7 @@
 #include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/common/memory.hh>
 
-#include "interface.hh"
+#include "default.hh"
 
 namespace Dune {
 namespace Stuff {
@@ -95,9 +95,9 @@ struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
  *          <li>2: simplices</ul>
  **/
 template <typename GridImp, int variant = internal::ElementVariant<GridImp>::id>
-class Cube : public ProviderInterface<GridImp>
+class Cube : public Providers::Default<GridImp>
 {
-  typedef ProviderInterface<GridImp> BaseType;
+  typedef Providers::Default<GridImp> BaseType;
   typedef Cube<GridImp, variant> ThisType;
 
 public:
@@ -109,90 +109,6 @@ public:
   static const std::string static_id()
   {
     return BaseType::static_id() + ".cube";
-  }
-
-  /**
-   *  \brief      Creates a cube.
-   *  \param[in]  _lowerLeft
-   *              A double that is used as a lower left corner in each dimension.
-   *  \param[in]  _upperRight
-   *              A double that is used as a upper right corner in each dimension.
-   *  \param[in]  numElements (optional)
-   *              number of elements.
-   **/
-  Cube(const double _lowerLeft = 0.0, const double _upperRight = 1.0, const unsigned int numElements = 1u)
-    : lower_left_(_lowerLeft)
-    , upper_right_(_upperRight)
-  {
-    std::array<unsigned int, dimDomain> tmpNumElements;
-    std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
-    buildGrid(tmpNumElements);
-  }
-
-  Cube(const std::vector<double>& lL, const std::vector<double>& uR, const std::vector<unsigned int>& nE)
-  {
-    if (lL.size() < dimDomain)
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "lL has to be at least of size " << dimDomain << " (is " << lL.size() << ")!");
-    if (uR.size() < dimDomain)
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "uR has to be at least of size " << dimDomain << " (is " << uR.size() << ")!");
-    if (nE.size() < dimDomain)
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "nE has to be at least of size " << dimDomain << " (is " << nE.size() << ")!");
-    std::array<unsigned int, dimDomain> num_elements;
-    for (unsigned int ii = 0; ii < dimDomain; ++ii) {
-      lower_left_[ii]  = lL[ii];
-      upper_right_[ii] = uR[ii];
-      num_elements[ii] = nE[ii];
-    }
-    buildGrid(num_elements);
-  }
-
-  /**
-   *  \brief      Creates a cube.
-   *  \param[in]  _lowerLeft
-   *              A vector that is used as a lower left corner.
-   *  \param[in]  _upperRight
-   *              A vector that is used as a upper right corner.
-   *  \param[in]  numElements (optional)
-   *              number of elements.
-   **/
-  Cube(const DomainType& _lowerLeft, const DomainType& _upperRight, const unsigned int numElements = 1u)
-    : lower_left_(_lowerLeft)
-    , upper_right_(_upperRight)
-  {
-    std::array<unsigned int, dimDomain> tmpNumElements;
-    std::fill(tmpNumElements.begin(), tmpNumElements.end(), numElements);
-    buildGrid(tmpNumElements);
-  }
-
-  /**
-    \brief      Creates a cube. This signature allows to prescribe anisotopic refinement
-    \param[in]  _lowerLeft
-                A double that is used as a lower left corner in each dimension.
-    \param[in]  _upperRight
-                A double that is used as a upper right corner in each dimension.
-    \param[in]  numElements
-                number of elements in each dimension.
-                can contain 0 to dim elements (missing dimension are initialized to 1)
-    \tparam ContainerType some sequence type that functions with std::begin/end
-    **/
-  template <class ContainerType>
-  Cube(const DomainType& _lowerLeft, const DomainType& _upperRight,
-       const ContainerType numElements = boost::assign::list_of<typename ContainerType::value_type>().repeat(
-           dimDomain, typename ContainerType::value_type(1u)))
-    : lower_left_(_lowerLeft)
-    , upper_right_(_upperRight)
-  {
-    std::array<unsigned int, dimDomain> tmpNumElements;
-    static_assert(std::is_unsigned<typename ContainerType::value_type>::value
-                      && std::is_integral<typename ContainerType::value_type>::value,
-                  "only unsigned integral number of elements per dimension allowed");
-    // base init in case input is shorter
-    std::fill(tmpNumElements.begin(), tmpNumElements.end(), 1u);
-    std::copy(numElements.begin(), numElements.end(), tmpNumElements.begin());
-    buildGrid(tmpNumElements);
   }
 
   static Common::ConfigTree default_config(const std::string sub_name = "")
@@ -214,72 +130,99 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    Common::ConfigTree cfg;
-    if (config.has_sub(sub_name))
-      cfg = config.sub(sub_name);
-    else
-      cfg = config;
-    // extract needed data
-    try {
-      // try to get vectors
-      auto lower_left   = cfg.get<DomainType>("lower_left", dimDomain);
-      auto upper_right  = cfg.get<DomainType>("upper_right", dimDomain);
-      auto num_elements = cfg.get<std::vector<unsigned int>>("num_elements", dimDomain);
-      return Common::make_unique<ThisType>(lower_left, upper_right, num_elements);
-    } catch (Exceptions::configuration_error&) {
-      // get scalars
-      auto lower_left   = cfg.get<DomainFieldType>("lower_left");
-      auto upper_right  = cfg.get<DomainFieldType>("upper_right");
-      auto num_elements = cfg.get<unsigned int>("num_elements");
-      return Common::make_unique<ThisType>(lower_left, upper_right, num_elements);
-    }
+    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigTree default_cfg = default_config();
+    return Common::make_unique<ThisType>(
+        cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
+        cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
+        cfg.get("num_elements", default_cfg.get<std::vector<unsigned int>>("num_elements"), dimDomain));
   } // ... create(...)
 
-  virtual std::shared_ptr<GridType>& grid() DS_OVERRIDE
+  /**
+   *  \brief      Creates a cube.
+   *  \param[in]  lower_left
+   *              Used as a lower left corner (in each dimension, if scalar).
+   *  \param[in]  upper_right
+   *              Used as an upper right corner (in each dimension, if scalar).
+   *  \param[in]  num_elements (optional)
+   *              Number of elements.
+   **/
+  Cube(const DomainFieldType lower_left = default_config().get<DomainFieldType>("lower_left"),
+       const DomainFieldType upper_right = default_config().get<DomainFieldType>("upper_right"),
+       const unsigned int num_elements = default_config().get<std::vector<unsigned int>>("num_elements")[0])
+    : BaseType(create_grid(DomainType(lower_left), DomainType(upper_right), parse_array(num_elements)))
   {
-    return grid_;
   }
 
-  virtual const std::shared_ptr<GridType>& grid() const DS_OVERRIDE
+  Cube(const std::vector<DomainFieldType>& lower_left, const std::vector<DomainFieldType>& upper_right,
+       const std::vector<unsigned int> num_elements = default_config().get<std::vector<unsigned int>>("num_elements"))
+    : BaseType(create_grid(parse_vector(lower_left), parse_vector(upper_right), parse_array(num_elements)))
   {
-    return grid_;
   }
 
-  const DomainType& lower_left() const
+  Cube(const DomainType& lower_left, const DomainType& upper_right,
+       const unsigned int num_elements = default_config().get<std::vector<unsigned int>>("num_elements")[0])
+    : BaseType(create_grid(lower_left, upper_right, parse_array(num_elements)))
   {
-    return lower_left_;
   }
 
-  const DomainType& upper_right() const
+  Cube(const DomainType& lower_left, const DomainType& upper_right,
+       const std::vector<unsigned int> num_elements = default_config().get<std::vector<unsigned int>>("num_elements"))
+    : BaseType(create_grid(lower_left, upper_right, parse_array(num_elements)))
   {
-    return upper_right_;
   }
 
 private:
-  void buildGrid(const std::array<unsigned int, dimDomain>& numElements)
+  static std::array<unsigned int, dimDomain> parse_array(const unsigned int in)
+  {
+    std::array<unsigned int, dimDomain> ret;
+    std::fill(ret.begin(), ret.end(), in);
+    return ret;
+  } // ... parse_array(...)
+
+  static std::array<unsigned int, dimDomain> parse_array(const std::vector<unsigned int>& in)
+  {
+    if (in.size() < dimDomain)
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
+    std::array<unsigned int, dimDomain> ret;
+    for (unsigned int ii = 0; ii < dimDomain; ++ii)
+      ret[ii] = in[ii];
+    return ret;
+  } // ... parse_array(...)
+
+  static DomainType parse_vector(const std::vector<DomainFieldType>& in)
+  {
+    if (in.size() < dimDomain)
+      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
+                            "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
+    DomainType ret;
+    for (unsigned int ii = 0; ii < dimDomain; ++ii)
+      ret[ii] = in[ii];
+    return ret;
+  } // ... parse_vector(...)
+
+  static std::shared_ptr<GridType> create_grid(const DomainType& lower_left, const DomainType& upper_right,
+                                               const std::array<unsigned int, dimDomain>& num_elements)
   {
     static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
     for (unsigned int dd = 0; dd < dimDomain; ++dd) {
-      if (!(lower_left_[dd] < upper_right_[dd]))
+      if (!(lower_left[dd] < upper_right[dd]))
         DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                              "lower_left has to be elementwise smaller than upper_right!\n\n" << lower_left_[dd]
+                              "lower_left has to be elementwise smaller than upper_right!\n\n" << lower_left[dd]
                                                                                                << " vs. "
-                                                                                               << upper_right_[dd]);
+                                                                                               << upper_right[dd]);
     }
     switch (variant) {
       case 1:
-        grid_ = Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left_, upper_right_, numElements);
+        return Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left, upper_right, num_elements);
         break;
       case 2:
       default:
-        grid_ = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lower_left_, upper_right_, numElements);
+        return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lower_left, upper_right, num_elements);
         break;
     }
-  } // void buildGrid(const DomainType& lowerLeft, const DomainType& upperRight)
-
-  DomainType lower_left_;
-  DomainType upper_right_;
-  std::shared_ptr<GridType> grid_;
+  } // ... create_grid(...)
 }; // class Cube
 
 
