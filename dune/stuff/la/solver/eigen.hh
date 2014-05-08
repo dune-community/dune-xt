@@ -438,7 +438,7 @@ public:
                                   << opts);
       else if (info == ::Eigen::NoConvergence)
         DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                              "The eigen backend reported 'NoConvergence'!"
+                              "The eigen backend reported 'NoConvergence'!\n"
                                   << "=> see "
                                      "http://eigen.tuxfamily.org/dox/"
                                      "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
@@ -446,7 +446,7 @@ public:
                                   << opts);
       else if (info == ::Eigen::InvalidInput)
         DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_was_not_set_up_correctly,
-                              "The eigen backend reported 'InvalidInput'!"
+                              "The eigen backend reported 'InvalidInput'!\n"
                                   << "=> see "
                                      "http://eigen.tuxfamily.org/dox/"
                                      "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
