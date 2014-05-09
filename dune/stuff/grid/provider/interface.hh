@@ -261,7 +261,7 @@ public:
   virtual std::shared_ptr<GridType> grid() = 0;
 
   template <ChooseLayer layer, ChoosePartView type>
-  std::shared_ptr<const typename BaseType::template Layer<layer, type>::Type> layer(const int level = 0) const
+  std::shared_ptr<typename BaseType::template Layer<layer, type>::Type> layer(const int level = 0)
   {
     return Grid::Layer<GridType, layer, type>::create(*(grid()), level);
   }
