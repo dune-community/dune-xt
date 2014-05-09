@@ -30,7 +30,7 @@ namespace Grid {
 
 
 template <class GridImp>
-class ProviderInterface
+class ConstProviderInterface
 {
 public:
   typedef GridImp GridType;
@@ -38,6 +38,12 @@ public:
   typedef typename GridType::ctype DomainFieldType;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef typename GridType::template Codim<0>::Entity EntityType;
+
+  template <ChooseLayer layer, ChoosePartView type>
+  struct Layer
+  {
+    typedef typename Grid::Layer<GridType, layer, type>::Type Type;
+  };
 
   template <ChoosePartView type>
   struct Level
@@ -51,14 +57,26 @@ public:
     typedef typename LeafPartView<GridType, type>::Type Type;
   };
 
-  typedef typename Level<ChoosePartView::view>::Type LevelGridViewType;
+  template <ChooseLayer type>
+  struct View
+  {
+    typedef typename LayerView<GridType, type>::Type Type;
+  };
+
+  template <ChooseLayer type>
+  struct Part
+  {
+    typedef typename LayerView<GridType, type>::Type Type;
+  };
+
+  typedef typename Layer<ChooseLayer::level, ChoosePartView::view>::Type LevelGridViewType;
 #if HAVE_DUNE_FEM
-  typedef typename Level<ChoosePartView::part>::Type LevelGridPartType;
+  typedef typename Layer<ChooseLayer::level, ChoosePartView::part>::Type LevelGridPartType;
 #endif
 
-  typedef typename Leaf<ChoosePartView::view>::Type LeafGridViewType;
+  typedef typename Layer<ChooseLayer::leaf, ChoosePartView::view>::Type LeafGridViewType;
 #if HAVE_DUNE_FEM
-  typedef typename Leaf<ChoosePartView::part>::Type LeafGridPartType;
+  typedef typename Layer<ChooseLayer::leaf, ChoosePartView::part>::Type LeafGridPartType;
 #endif
 
   static const std::string static_id()
@@ -66,18 +84,17 @@ public:
     return "stuff.grid.provider";
   }
 
-  virtual ~ProviderInterface()
+  virtual ~ConstProviderInterface()
   {
   }
 
-  virtual std::shared_ptr<GridType>& grid() = 0;
+  virtual std::shared_ptr<const GridType> grid() const = 0;
 
-  virtual const std::shared_ptr<GridType>& grid() const = 0;
-
-  template <ChoosePartView type>
-  std::shared_ptr<typename Level<type>::Type> level(const int level)
+  template <ChooseLayer layer, ChoosePartView type>
+  std::shared_ptr<const typename Layer<layer, type>::Type> layer(const int level = 0) const
   {
-    return LevelPartView<GridType, type>::create(*(grid()), level);
+    GridType& non_const_grid = const_cast<GridType&>(*(grid()));
+    return Grid::Layer<GridType, layer, type>::create(non_const_grid, level);
   }
 
   template <ChoosePartView type>
@@ -87,33 +104,17 @@ public:
     return LevelPartView<GridType, type>::create(non_const_grid, level);
   }
 
-  std::shared_ptr<LevelGridViewType> level_view(const int level)
-  {
-    return this->template level<ChoosePartView::view>(level);
-  }
-
   std::shared_ptr<const LevelGridViewType> level_view(const int level) const
   {
     return this->template level<ChoosePartView::view>(level);
   }
 
 #if HAVE_DUNE_FEM
-  std::shared_ptr<LevelGridPartType> level_part(const int level)
-  {
-    return this->template level<ChoosePartView::part>(level);
-  }
-
   std::shared_ptr<const LevelGridPartType> level_part(const int level) const
   {
     return this->template level<ChoosePartView::part>(level);
   }
 #endif // HAVE_DUNE_FEM
-
-  template <ChoosePartView type>
-  std::shared_ptr<typename Leaf<type>::Type> leaf()
-  {
-    return LeafPartView<GridType, type>::create(*(grid()));
-  }
 
   template <ChoosePartView type>
   std::shared_ptr<const typename Leaf<type>::Type> leaf() const
@@ -122,22 +123,12 @@ public:
     return LeafPartView<GridType, type>::create(non_const_grid);
   }
 
-  std::shared_ptr<LeafGridViewType> leaf_view()
-  {
-    return this->template leaf<ChoosePartView::view>();
-  }
-
   std::shared_ptr<const LeafGridViewType> leaf_view() const
   {
     return this->template leaf<ChoosePartView::view>();
   }
 
 #if HAVE_DUNE_FEM
-  std::shared_ptr<LeafGridPartType> leaf_part()
-  {
-    return this->template leaf<ChoosePartView::part>();
-  }
-
   std::shared_ptr<const LeafGridPartType> leaf_part() const
   {
     return this->template leaf<ChoosePartView::part>();
@@ -243,10 +234,85 @@ private:
     } // walk the grid
     return data;
   } // ... generateEntityVisualization(...)
+}; // class ConstProviderInterface
+
+
+template <class GridImp>
+class ProviderInterface : public ConstProviderInterface<GridImp>
+{
+  typedef ConstProviderInterface<GridImp> BaseType;
+
+public:
+  using typename BaseType::GridType;
+  using typename BaseType::LevelGridViewType;
+  using typename BaseType::LevelGridPartType;
+  using typename BaseType::LeafGridViewType;
+  using typename BaseType::LeafGridPartType;
+
+  static const std::string static_id()
+  {
+    return BaseType::static_id();
+  }
+
+  virtual ~ProviderInterface()
+  {
+  }
+
+  virtual std::shared_ptr<GridType> grid() = 0;
+
+  template <ChooseLayer layer, ChoosePartView type>
+  std::shared_ptr<const typename BaseType::template Layer<layer, type>::Type> layer(const int level = 0) const
+  {
+    return Grid::Layer<GridType, layer, type>::create(*(grid()), level);
+  }
+
+  template <ChoosePartView type>
+  std::shared_ptr<typename BaseType::template Level<type>::Type> level(const int level)
+  {
+    return LevelPartView<GridType, type>::create(*(grid()), level);
+  }
+
+  std::shared_ptr<LevelGridViewType> level_view(const int level)
+  {
+    return this->template level<ChoosePartView::view>(level);
+  }
+
+#if HAVE_DUNE_FEM
+  std::shared_ptr<LevelGridPartType> level_part(const int level)
+  {
+    return this->template level<ChoosePartView::part>(level);
+  }
+#endif // HAVE_DUNE_FEM
+
+  template <ChoosePartView type>
+  std::shared_ptr<typename BaseType::template Leaf<type>::Type> leaf()
+  {
+    return LeafPartView<GridType, type>::create(*(grid()));
+  }
+
+  std::shared_ptr<LeafGridViewType> leaf_view()
+  {
+    return this->template leaf<ChoosePartView::view>();
+  }
+
+#if HAVE_DUNE_FEM
+  std::shared_ptr<LeafGridPartType> leaf_part()
+  {
+    return this->template leaf<ChoosePartView::part>();
+  }
+
+#endif // HAVE_DUNE_FEM
 }; // class ProviderInterface
 
 
 #else // HAVE_DUNE_GRID
+
+
+template <class GridImp>
+class ConstProviderInterface
+{
+  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
+};
 
 
 template <class GridImp>
