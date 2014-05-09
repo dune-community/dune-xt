@@ -90,11 +90,11 @@ public:
 
   virtual std::shared_ptr<const GridType> grid() const = 0;
 
-  template <ChooseLayer layer, ChoosePartView type>
-  std::shared_ptr<const typename Layer<layer, type>::Type> layer(const int level = 0) const
+  template <ChooseLayer layer_type, ChoosePartView part_view_type>
+  std::shared_ptr<const typename Layer<layer_type, part_view_type>::Type> layer(const int level = 0) const
   {
     GridType& non_const_grid = const_cast<GridType&>(*(grid()));
-    return Grid::Layer<GridType, layer, type>::create(non_const_grid, level);
+    return Grid::Layer<GridType, layer_type, part_view_type>::create(non_const_grid, level);
   }
 
   template <ChoosePartView type>
@@ -260,10 +260,10 @@ public:
 
   virtual std::shared_ptr<GridType> grid() = 0;
 
-  template <ChooseLayer layer, ChoosePartView type>
-  std::shared_ptr<typename BaseType::template Layer<layer, type>::Type> layer(const int level = 0)
+  template <ChooseLayer layer_type, ChoosePartView part_view_type>
+  std::shared_ptr<typename BaseType::template Layer<layer_type, part_view_type>::Type> layer(const int level = 0)
   {
-    return Grid::Layer<GridType, layer, type>::create(*(grid()), level);
+    return Grid::Layer<GridType, layer_type, part_view_type>::create(*(grid()), level);
   }
 
   template <ChoosePartView type>
