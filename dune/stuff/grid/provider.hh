@@ -10,19 +10,19 @@
 
 #include <memory>
 
+#include <dune/common/static_assert.hh>
+
 #include <dune/grid/sgrid.hh>
 
 #include <dune/stuff/common/configtree.hh>
 
 #include "provider/interface.hh"
 #include "provider/cube.hh"
-//#include "provider/gmsh.hh"
-//#include "provider/starcd.hh"
 
 namespace Dune {
 namespace Stuff {
 
-//#if HAVE_DUNE_GRID
+#if HAVE_DUNE_GRID
 
 
 template <class GridType = Dune::SGrid<2, 2>>
@@ -31,57 +31,39 @@ class GridProviders
 public:
   typedef Stuff::Grid::ProviderInterface<GridType> InterfaceType;
 
+protected:
+  template <class GridProviderType>
+  static std::unique_ptr<InterfaceType> call_create(const Common::ConfigTree& config)
+  {
+    if (config.empty())
+      return GridProviderType::create();
+    else
+      return GridProviderType::create(config);
+  } // ... call_create(...)
+
+public:
   static std::vector<std::string> available()
   {
     namespace Providers = Stuff::Grid::Providers;
-    return {
-        Providers::Cube<GridType>::static_id()
-        //#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
-        //#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID ||
-        // defined UGGRID
-        //      , "gridprovider.gmsh"
-        //#endif
-        //#endif
-        //      , "gridprovider.starcd"
-    };
+    return {Providers::Cube<GridType>::static_id()};
   } // ... available()
 
   static Common::ConfigTree default_config(const std::string type, const std::string subname = "")
   {
     namespace Providers = Stuff::Grid::Providers;
-    if (type == Providers::Cube<GridType>::static_id()) {
+    if (type == Providers::Cube<GridType>::static_id())
       return Providers::Cube<GridType>::default_config(subname);
-      //    }
-      //#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
-      //#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined
-      // UGGRID
-      //      else if (type == "gridprovider.gmsh") {
-      //      return GridProviderGmsh< GridType >::default_config(subname);
-      //    }
-      //#endif
-      //#endif
-      //    else if (type == "gridprovider.starcd") {
-      //      return GridProviderStarCD< GridType >::default_config(subname);
-    } else
+    else
       DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
                             "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
-                                               const Common::ConfigTree config = default_config(available()[0]))
+                                               const Common::ConfigTree config = Common::ConfigTree())
   {
     namespace Providers = Stuff::Grid::Providers;
     if (type == Providers::Cube<GridType>::static_id())
-      return Providers::Cube<GridType>::create(config);
-    //#if HAVE_ALUGRID || HAVE_ALBERTA || HAVE_UG
-    //#if defined ALUGRID_CONFORM || defined ALUGRID_CUBE || defined ALUGRID_SIMPLEX || defined ALBERTAGRID || defined
-    // UGGRID
-    //    else if (type == "gridprovider.gmsh")
-    //      return GridProviderGmsh< GridType >::create(config);
-    //#endif
-    //#endif
-    //    else if (type == "gridprovider.starcd")
-    //      return GridProviderStarCD< GridType >::create(config);
+      return call_create<Providers::Cube<GridType>>(config);
     else
       DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
                             "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
@@ -89,7 +71,17 @@ public:
 }; // class GridProviders
 
 
-//#endif // HAVE_DUNE_GRID
+#else // HAVE_DUNE_GRID
+
+
+template <class GridType>
+class GridProviders
+{
+  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
+};
+
+
+#endif // HAVE_DUNE_GRID
 
 } // namespace Stuff
 } // namespace Dune
