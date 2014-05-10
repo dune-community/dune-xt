@@ -20,7 +20,7 @@
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/grid/provider/interface.hh>
 #include <dune/stuff/grid/provider/cube.hh>
 
@@ -44,8 +44,8 @@ struct GridProviderBaseTest : public testing::Test
   static void fulfills_interface(GridProviderType& grid_provider)
   {
     using Stuff::Grid::ChoosePartView;
-    std::string id                  = grid_provider.id();
-    std::shared_ptr<GridType>& grid = grid_provider.grid();
+    std::string static_id          = grid_provider.static_id();
+    std::shared_ptr<GridType> grid = grid_provider.grid();
     std::shared_ptr<typename GridProviderType::template Leaf<ChoosePartView::view>::Type> leaf_view_auto =
         grid_provider.template leaf<ChoosePartView::view>();
     std::shared_ptr<typename GridProviderType::LeafGridViewType> leaf_view = grid_provider.leaf_view();
