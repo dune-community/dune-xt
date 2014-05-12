@@ -226,7 +226,7 @@ public:
     // check
     SolverUtils::check_given(type, options());
     // default config
-    Common::ConfigTree default_options({"type", "post_check_solves_system"}, {type, "1e-5"});
+    Common::ConfigTree default_options({"type", "post_check_solves_system", "check_for_inf_nan"}, {type, "1e-5", "1"});
     Common::ConfigTree iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += default_options;
     // direct solvers
@@ -285,6 +285,33 @@ public:
                   << "  (A - A').sup_norm() = "
                   << differences.sup_norm()
                   << "\n\n"
+                  << "Those were the given options:\n\n"
+                  << opts);
+      }
+    }
+    // check for inf or nan
+    const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
+    if (check_for_inf_nan) {
+      // serialize matrix (no copy done here)
+      MatrixType& non_const_ref = const_cast<MatrixType&>(matrix_);
+      const EigenMappedDenseVector<S> values(non_const_ref.backend().valuePtr(), non_const_ref.backend().nonZeros());
+      for (size_t ii = 0; ii < values.size(); ++ii) {
+        const S& val = values[ii];
+        if (std::isnan(val) || std::isinf(val))
+          DUNE_THROW_COLORFULLY(
+              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+              "Given matrix contains inf or nan and you requested checking (see options below)!\n"
+                  << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                  << "Those were the given options:\n\n"
+                  << opts);
+      }
+      for (size_t ii = 0; ii < rhs.size(); ++ii) {
+        const S& val = rhs[ii];
+        if (std::isnan(val) || std::isinf(val))
+          DUNE_THROW_COLORFULLY(
+              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+              "Given rhs contains inf or nan and you requested checking (see options below)!\n"
+                  << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
                   << "Those were the given options:\n\n"
                   << opts);
       }
@@ -477,6 +504,18 @@ public:
                 << "Those were the given options:\n\n"
                 << opts);
     }
+    if (check_for_inf_nan)
+      for (size_t ii = 0; ii < solution.size(); ++ii) {
+        const S& val = solution[ii];
+        if (std::isnan(val) || std::isinf(val))
+          DUNE_THROW_COLORFULLY(
+              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+              "The computed solution contains inf or nan and you requested checking (see options "
+                  << "below)!\n"
+                  << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                  << "Those were the given options:\n\n"
+                  << opts);
+      }
   } // ... apply(...)
 
 private:
