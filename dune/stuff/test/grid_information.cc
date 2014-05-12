@@ -29,7 +29,7 @@ struct GridInfoTest : public ::testing::Test
   typedef Dune::SGrid<griddim, griddim> GridType;
   std::shared_ptr<GridType> gridPtr;
   GridInfoTest()
-    : gridPtr(GridProviderCube<GridType>(0.f, 1.f, level).grid())
+    : gridPtr(DSG::Providers::Cube<GridType>(0.f, 1.f, level).grid())
   {
   }
 
