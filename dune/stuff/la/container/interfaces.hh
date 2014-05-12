@@ -88,6 +88,10 @@ public:
 
   using typename CRTP::derived_type;
 
+  virtual ~ContainerInterface()
+  {
+  }
+
   /**
    * \defgroup haveto ´´These methods have to be implemented by a derived class!``
    * \{
