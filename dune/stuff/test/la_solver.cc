@@ -13,6 +13,8 @@
 #include <dune/stuff/la/container.hh>
 #include <dune/stuff/la/solver.hh>
 
+#include "la_container.hh"
+
 // toggle output
 // std::ostream& out = std::cout;
 std::ostream& out = DSC_LOG.devnull();
@@ -20,7 +22,7 @@ std::ostream& out = DSC_LOG.devnull();
 using namespace Dune::Stuff;
 using namespace Dune::Stuff::LA;
 
-typedef testing::Types<std::tuple<Dune::DynamicMatrix<double>, Dune::DynamicVector<double>, Dune::DynamicVector<double>>
+typedef testing::Types<std::tuple<CommonDenseMatrix<double>, CommonDenseVector<double>, CommonDenseVector<double>>
 #if HAVE_EIGEN
                        ,
                        std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>,
@@ -48,9 +50,9 @@ struct SolverTest : public ::testing::Test
   static void produces_correct_results()
   {
     const size_t dim        = 10;
-    const MatrixType matrix = Container<MatrixType>::create(dim);
-    const RhsType rhs       = Container<RhsType>::create(dim);
-    SolutionType solution = Container<SolutionType>::create(dim);
+    const MatrixType matrix = ContainerFactory<MatrixType>::create(dim);
+    const RhsType rhs       = ContainerFactory<RhsType>::create(dim);
+    SolutionType solution = ContainerFactory<SolutionType>::create(dim);
     solution.scal(0);
 
     // dynamic test
@@ -79,7 +81,6 @@ struct SolverTest : public ::testing::Test
       solver.apply(rhs, solution, detailed_opts);
       if (!solution.almost_equal(rhs))
         DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Wrong solution!");
-      solution.scal(0);
     }
   } // ... produces_correct_results(...)
 }; // struct SolverTest
