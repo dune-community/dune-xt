@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <ostream>
 
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
@@ -349,7 +350,24 @@ public:
     }
   } // ... visualize(...)
 #endif // HAVE_DUNE_GRID
+
+  virtual void report(std::ostream& out, const std::string prefix = "") const
+  {
+    out << prefix << "function '" << name() << "' (of type " << type() << ")" << std::endl;
+  }
+
+private:
+  template <class T>
+  friend std::ostream& operator<<(std::ostream& /*out*/, const ThisType& /*function*/);
 }; // class LocalizableFunctionInterface
+
+
+template <class E, class D, int d, class R, int r, int rC>
+std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E, D, d, R, r, rC>& function)
+{
+  function.report(out);
+  return out;
+} // ... operator<<(...)
 
 
 /**
