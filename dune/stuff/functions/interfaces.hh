@@ -353,7 +353,7 @@ public:
 
   virtual void report(std::ostream& out, const std::string prefix = "") const
   {
-    out << prefix << "function '" << name() << "' (of type " << type() << ")" << std::endl;
+    out << prefix << "function '" << name() << "' (of type " << type() << ")";
   }
 
 private:
