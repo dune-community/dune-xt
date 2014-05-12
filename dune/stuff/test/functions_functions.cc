@@ -15,8 +15,8 @@
 // we need this nasty code generation because the testing::Types< ... > only accepts 50 arguments
 // and all combinations of functions and entities and dimensions and fieldtypes would be way too much
 #define TEST_STRUCT_GENERATOR(ftype, etype)                                                                            \
-  /* we just take the constant function as a container for the types we need*/                                         \
-  /* since this one always exists for all combinations*/                                                               \
+  /* we just take the constant function as a container for the types we need */                                        \
+  /* since this one always exists for all combinations */                                                              \
   template <class ConstantFunctionType>                                                                                \
   struct ftype##etype##Test : public ::testing::Test                                                                   \
   {                                                                                                                    \
@@ -32,8 +32,11 @@
     void check() const                                                                                                 \
     {                                                                                                                  \
       for (const std::string& type : FunctionsProvider::available()) {                                                 \
-        const Dune::Stuff::Common::ConfigTree& config = FunctionsProvider::default_config(type);                       \
-        const std::unique_ptr<InterfaceType> function = FunctionsProvider::create(type, config);                       \
+        const Dune::Stuff::Common::ConfigTree config = FunctionsProvider::default_config(type);                        \
+        try {                                                                                                          \
+          const std::unique_ptr<InterfaceType> function = FunctionsProvider::create(type, config);                     \
+        } catch (Dune::IOError&) {                                                                                     \
+        }                                                                                                              \
       }                                                                                                                \
     }                                                                                                                  \
   };
