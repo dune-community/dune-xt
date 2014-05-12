@@ -20,7 +20,7 @@ std::ostream& out = DSC_LOG.devnull();
 using namespace Dune::Stuff;
 using namespace Dune::Stuff::LA;
 
-typedef testing::Types<std::tuple<DuneDynamicMatrix<double>, DuneDynamicVector<double>, DuneDynamicVector<double>>
+typedef testing::Types<std::tuple<Dune::DynamicMatrix<double>, Dune::DynamicVector<double>, Dune::DynamicVector<double>>
 #if HAVE_EIGEN
                        ,
                        std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>,
