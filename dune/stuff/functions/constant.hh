@@ -81,6 +81,11 @@ public:
   {
   }
 
+  virtual std::string type() const DS_OVERRIDE
+  {
+    return BaseType::static_id() + ".constant";
+  }
+
   virtual size_t order() const DS_OVERRIDE DS_FINAL
   {
     return 0;

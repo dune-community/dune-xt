@@ -151,6 +151,11 @@ public:
     return new ThisType(minuend_, subtrahend_);
   }
 
+  virtual std::string type() const DS_OVERRIDE
+  {
+    return "difference between '" + minuend_.type() + "' and '" + subtrahend_.type() + "'";
+  }
+
   virtual std::string name() const DS_OVERRIDE
   {
     return "difference between '" + minuend_.name() + "' and '" + subtrahend_.name() + "'";

@@ -199,6 +199,11 @@ public:
     return new ThisType(*this);
   }
 
+  virtual std::string type() const DS_OVERRIDE
+  {
+    return BaseType::static_id() + ".checkerboard";
+  }
+
   virtual std::string name() const DS_OVERRIDE
   {
     return name_;

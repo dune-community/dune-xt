@@ -310,6 +310,11 @@ public:
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
   /* @{ */
+  virtual std::string type() const
+  {
+    return "stuff.function";
+  }
+
   virtual std::string name() const
   {
     return "stuff.function";

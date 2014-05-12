@@ -244,6 +244,11 @@ public:
 
   ThisType& operator=(const ThisType& /*other*/) = delete;
 
+  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  {
+    return BaseType::static_id() + ".ESV2007.testcase1.force";
+  }
+
   virtual std::string name() const DS_OVERRIDE DS_FINAL
   {
     return name_;
@@ -346,6 +351,11 @@ public:
   Testcase1ExactSolution(const ThisType& /*other*/) = default;
 
   ThisType& operator=(const ThisType& /*other*/) = delete;
+
+  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  {
+    return BaseType::static_id() + ".ESV2007.testcase1.exactsolution";
+  }
 
   virtual std::string name() const DS_OVERRIDE DS_FINAL
   {

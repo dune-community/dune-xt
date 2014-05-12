@@ -94,22 +94,9 @@ private:
       return data;
     } else
       DUNE_THROW_COLORFULLY(Dune::IOError, "could not open '" << filename << "'!");
-  } // Spe10Model1()
+  } // ... read_values_from_file(...)
 
 public:
-  Spe10Model1(const std::string& filename, std::vector<DomainFieldType>&& lowerLeft,
-              std::vector<DomainFieldType>&& upperRight, const RangeFieldType min = minValue,
-              const RangeFieldType max = maxValue, const std::string nm = static_id())
-    : BaseType(std::move(lowerLeft), std::move(upperRight), {numXelements, numZelements},
-               read_values_from_file(filename, min, max), nm)
-  {
-  }
-
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
-
   static Common::ConfigTree default_config(const std::string sub_name = "")
   {
     Common::ConfigTree config;
@@ -143,6 +130,24 @@ public:
         cfg.get("max_val", maxValue),
         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
+
+  Spe10Model1(const std::string& filename, std::vector<DomainFieldType>&& lowerLeft,
+              std::vector<DomainFieldType>&& upperRight, const RangeFieldType min = minValue,
+              const RangeFieldType max = maxValue, const std::string nm = static_id())
+    : BaseType(std::move(lowerLeft), std::move(upperRight), {numXelements, numZelements},
+               read_values_from_file(filename, min, max), nm)
+  {
+  }
+
+  virtual std::string type() const DS_OVERRIDE
+  {
+    return BaseType::static_id() + ".spe10.model1";
+  }
+
+  virtual ThisType* copy() const DS_OVERRIDE
+  {
+    return new ThisType(*this);
+  }
 }; // class Spe10Model1< ..., 2, ..., 1, 1 >
 
 
