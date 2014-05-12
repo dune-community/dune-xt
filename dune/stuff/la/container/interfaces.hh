@@ -926,14 +926,16 @@ std::ostream& operator<<(std::ostream& out, const MatrixInterface<T>& matrix)
   const size_t cols = matrix.cols();
   if (rows > 0 && cols > 0) {
     for (size_t ii = 0; ii < rows; ++ii) {
+      if (ii > 0)
+        out << "\n ";
       out << "[" << matrix.get(ii, 0);
       for (size_t jj = 1; jj < cols; ++jj)
         out << ", " << matrix.get(ii, jj);
       out << "]";
-      if (rows > 1 && ii == rows)
+      if (rows > 1 && ii < (rows - 1))
         out << ";";
-      out << std::endl;
     }
+    out << "]";
   } else
     out << "[ ]]";
   return out;
