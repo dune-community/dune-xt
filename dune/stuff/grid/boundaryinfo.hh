@@ -47,7 +47,7 @@ class BoundaryInfoInterface
       Codim1DomainType;
 #endif
 public:
-  typedef IntersectionImp IntersectionType;
+  typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string static_id()
   {
@@ -89,7 +89,7 @@ class AllDirichlet : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
   typedef AllDirichlet<IntersectionImp> ThisType;
 
 public:
-  using typename BaseType::IntersectionType;
+  typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string static_id()
   {
@@ -137,7 +137,7 @@ class AllNeumann : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
   typedef AllNeumann<IntersectionImp> ThisType;
 
 public:
-  using typename BaseType::IntersectionType;
+  typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string static_id()
   {
@@ -185,7 +185,7 @@ class IdBased : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
   typedef IdBased<IntersectionImp> ThisType;
 
 public:
-  using typename BaseType::IntersectionType;
+  typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string static_id()
   {
@@ -279,7 +279,7 @@ class NormalBased : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
   typedef NormalBased<IntersectionImp> ThisType;
 
 public:
-  using typename BaseType::IntersectionType;
+  typedef typename BaseType::IntersectionType IntersectionType;
 
   typedef typename IntersectionType::ctype DomainFieldType;
   static const unsigned int dimDomain = IntersectionType::dimension;
@@ -483,7 +483,7 @@ class DUNE_DEPRECATED_MSG("Use Stuff::Grid::BoundaryInfoInterface instead!") Gri
 #endif
 
 public:
-  typedef IntersectionImp IntersectionType;
+  typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string id()
   {
