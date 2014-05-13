@@ -23,12 +23,79 @@ template <class EntityImp, class DomainFieldImp, int domainDim, class RangeField
 class Constant
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
-
-public:
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
   typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
-  typedef typename BaseType::RangeType RangeType;
+
+  template <class R, int r, int rC>
+  struct Get
+  {
+    static std::string value_str()
+    {
+      std::string str = "[";
+      for (size_t rr = 0; rr < r; ++rr) {
+        if (rr > 0)
+          str += "; ";
+        str += "[";
+        for (size_t cc = 0; cc < rC; ++cc) {
+          if (cc > 0)
+            str += " ";
+          if (cc == rr)
+            str += "1";
+          else
+            str += "0";
+        }
+        str += "]";
+      }
+      str += "]";
+      return str;
+    }
+  };
+
+  template <class R, int rC>
+  struct Get<R, 1, rC>
+  {
+    static std::string value_str()
+    {
+      std::string str = "[";
+      for (size_t cc = 0; cc < rC; ++cc) {
+        if (cc > 0)
+          str += "; ";
+        str += "1";
+      }
+      str += "]";
+      return str;
+    }
+  };
+
+  template <class R, int r>
+  struct Get<R, r, 1>
+  {
+    static std::string value_str()
+    {
+      std::string str = "[";
+      for (size_t rr = 0; rr < r; ++rr) {
+        if (rr > 0)
+          str += " ";
+        str += "1";
+      }
+      str += "]";
+      return str;
+    }
+  };
+
+  template <class R>
+  struct Get<R, 1, 1>
+  {
+    static std::string value_str()
+    {
+      return "1";
+    }
+  };
+
+public:
   typedef typename BaseType::DomainType DomainType;
+  typedef typename BaseType::RangeType RangeFieldType;
+  typedef typename BaseType::RangeType RangeType;
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
   using typename BaseType::LocalfunctionType;
@@ -41,7 +108,7 @@ public:
   static Common::ConfigTree default_config(const std::string sub_name = "")
   {
     Common::ConfigTree config;
-    config["value"] = "1.0";
+    config["value"] = Get<RangeFieldImp, rangeDim, rangeDimCols>::value_str();
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
@@ -59,6 +126,12 @@ public:
     const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::ConfigTree default_cfg = default_config();
     // create
+    RangeType value;
+    try {
+      value = cfg.get("value", default_cfg.get<RangeType>("value"));
+    } catch (Stuff::Exceptions::configuration_error) {
+      value = RangeType(cfg.get("value", RangeFieldType(1)));
+    }
     return Common::make_unique<ThisType>(cfg.get("value", default_cfg.get<RangeType>("value")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
@@ -81,7 +154,7 @@ public:
   {
   }
 
-  virtual std::string type() const DS_OVERRIDE
+  virtual std::string type() const DS_OVERRIDE DS_FINAL
   {
     return BaseType::static_id() + ".constant";
   }
