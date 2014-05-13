@@ -521,7 +521,7 @@ class DUNE_DEPRECATED_MSG("Use Stuff::Grid::BoundaryInfos::AllDirichlet instead!
   typedef GridboundaryInterface<IntersectionImp> BaseType;
 
 public:
-  typedef typedef BaseType::IntersectionType IntersectionType;
+  typedef typename BaseType::IntersectionType IntersectionType;
 
   static const std::string id()
   {
