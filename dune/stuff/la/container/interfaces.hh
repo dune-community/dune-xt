@@ -14,6 +14,7 @@
 
 #include <limits>
 #include <iostream>
+#include <iterator>
 
 #include <dune/common/float_cmp.hh>
 
@@ -24,6 +25,11 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
+
+
+// forward
+template <class Traits>
+class VectorInterface;
 
 
 enum class ChooseBackend
@@ -56,6 +62,114 @@ class MatrixInterface
 
 
 } // namespace Tagss
+namespace internal {
+
+
+template <class Traits>
+class VectorInputIterator : public std::iterator<std::input_iterator_tag, typename Traits::ScalarType>
+{
+  typedef VectorInputIterator<Traits> ThisType;
+
+public:
+  typedef VectorInterface<Traits> VectorType;
+  typedef typename VectorType::ScalarType ScalarType;
+
+private:
+  struct ConstHolder
+  {
+    ConstHolder(const VectorType& vec)
+      : element(vec)
+    {
+    }
+
+    const VectorType& element;
+  };
+
+public:
+  VectorInputIterator(const VectorType& vec, const bool end = false)
+    : const_holder_(std::make_shared<ConstHolder>(vec))
+    , position_(0)
+    , end_(end)
+  {
+  }
+
+  ThisType& operator++()
+  {
+    if (!end_ && position_ < (const_holder_->element.size() - 1))
+      ++position_;
+    else
+      end_ = true;
+    return *this;
+  }
+
+  bool operator==(const ThisType& other)
+  {
+    return (end_ && other.end_) || ((!end_ && !other.end_) && (position_ == other.position_));
+  }
+
+  bool operator!=(const ThisType& other)
+  {
+    return !operator==(other);
+  }
+
+  const ScalarType& operator*() const
+  {
+    if (end_)
+      DUNE_THROW_COLORFULLY(Exceptions::you_are_using_this_wrong, "This is the end!");
+    return const_holder_->element[position_];
+  }
+
+private:
+  std::shared_ptr<ConstHolder> const_holder_;
+
+protected:
+  size_t position_;
+  bool end_;
+}; // class VectorInputIterator
+
+
+template <class Traits>
+class VectorOutputIterator : public VectorInputIterator<Traits>,
+                             public std::iterator<std::output_iterator_tag, typename Traits::ScalarType>
+{
+  typedef VectorInputIterator<Traits> BaseType;
+  typedef VectorOutputIterator<Traits> ThisType;
+
+public:
+  typedef VectorInterface<Traits> VectorType;
+  typedef typename VectorType::ScalarType ScalarType;
+
+private:
+  struct Holder
+  {
+    Holder(VectorType& vec)
+      : element(vec)
+    {
+    }
+
+    VectorType& element;
+  };
+
+public:
+  VectorOutputIterator(VectorType& vec, const bool end = false)
+    : BaseType(vec, end)
+    , holder_(std::make_shared<Holder>(vec))
+  {
+  }
+
+  ScalarType& operator*()
+  {
+    if (this->end_)
+      DUNE_THROW_COLORFULLY(Exceptions::you_are_using_this_wrong, "This is the end!");
+    return holder_->element[this->position_];
+  }
+
+private:
+  std::shared_ptr<Holder> holder_;
+}; // class VectorOutputIterator
+
+
+} // namespace internal
 
 
 template <class Traits>
@@ -228,6 +342,9 @@ class VectorInterface : public ContainerInterface<Traits>, public Tags::VectorIn
 public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType ScalarType;
+
+  typedef internal::VectorInputIterator<Traits> const_iterator;
+  typedef internal::VectorOutputIterator<Traits> iterator;
 
   virtual ~VectorInterface()
   {
@@ -706,6 +823,26 @@ public:
   /**
    * \}
    */
+
+  iterator begin()
+  {
+    return iterator(*this);
+  }
+
+  const_iterator begin() const
+  {
+    return const_iterator(*this);
+  }
+
+  iterator end()
+  {
+    return iterator(*this, true);
+  }
+
+  const_iterator end() const
+  {
+    return const_iterator(*this, true);
+  }
 
 private:
   template <class T>
