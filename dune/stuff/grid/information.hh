@@ -80,10 +80,11 @@ unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
   return maxNeighbours;
 } // unsigned int maxNumberOfNeighbors(const GridPartType& gridPart)
 
-//! Provide min/max coordinates for all space dimensions of a Grid (in the leafView)
-template <class GridType>
+//! Provide min/max coordinates for all space dimensions of a GridView
+template <class GridViewType>
 struct Dimensions
 {
+  typedef typename GridViewType::Grid GridType;
   //! automatic running min/max
   typedef Dune::Stuff::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
   typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
@@ -126,12 +127,10 @@ struct Dimensions
     return entity_volume.min() != 0.0 ? entity_volume.max() / entity_volume.min() : -1;
   }
 
-  Dimensions(const GridType& grid)
+  Dimensions(const GridViewType& gridView)
   {
-    typedef typename GridType::LeafGridView View;
-    const auto& view = grid.leafView();
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
-    GridWalk<View>(view).walkCodim0(f);
+    GridWalk<GridViewType>(gridView).walkCodim0(f);
   }
 
   Dimensions(const EntityType& entity)
@@ -142,15 +141,21 @@ struct Dimensions
 };
 
 template <class GridType>
-Dimensions<GridType> dimensions(const GridType& grid)
+Dimensions<typename GridType::LeafGridViewType> dimensions(const GridType& grid)
 {
-  return Dimensions<GridType>(grid);
+  return Dimensions<typename GridType::LeafGridViewType>(grid.leafGridView());
 }
 
-template <class GridType>
-Dimensions<GridType> dimensions(const typename GridType::template Codim<0>::Entity& entity)
+template <class GridViewType>
+Dimensions<GridViewType> dimensions(const GridViewType& gridView)
 {
-  return Dimensions<GridType>(entity);
+  return Dimensions<GridViewType>(gridView);
+}
+
+template <class GridViewType>
+Dimensions<GridViewType> dimensions(const typename GridViewType::Grid::template Codim<0>::Entity& entity)
+{
+  return Dimensions<GridViewType>(entity);
 }
 
 } // namespace Grid
