@@ -413,6 +413,15 @@ public:
    * \{
    */
 
+  virtual bool valid() const
+  {
+    for (const auto& val : *this) {
+      if (std::isnan(val) || std::isinf(val))
+        return false;
+    }
+    return true;
+  }
+
   /**
    * \brief Get reference to the iith entry.
    */
