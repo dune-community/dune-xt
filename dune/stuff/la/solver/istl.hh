@@ -9,11 +9,12 @@
 #include <type_traits>
 #include <cmath>
 
-#if 1 // HAVE_DUNE_ISTL
+#if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
 #include <dune/istl/paamg/amg.hh>
+#include <dune/istl/owneroverlapcopy.hh>
 #include <dune/common/parallel/collectivecommunication.hh>
 #endif // HAVE_DUNE_ISTL
 
@@ -27,7 +28,7 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-#if 1 // HAVE_DUNE_ISTL
+#if HAVE_DUNE_ISTL
 
 
 template <class S>
@@ -167,6 +168,9 @@ public:
       //! max bigunsignedint 96 bits for indexset (pdelab uses this value too)
       typedef OwnerOverlapCopyCommunication<bigunsignedint<96>, int> CommType;
       CommType comm;
+      //! needed to avoid runtime error, no idea what public/private indices mean
+      comm.remoteIndices().rebuild<false /*bool ignorePublic*/>();
+
       typedef typename IstlDenseVector<S>::BackendType DomainType;
       typedef OverlappingSchwarzOperator<typename MatrixType::BackendType, DomainType, DomainType, CommType>
           MatrixOperatorType;
