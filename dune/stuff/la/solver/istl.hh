@@ -6,8 +6,14 @@
 #ifndef DUNE_STUFF_LA_SOLVER_STUFF_HH
 #define DUNE_STUFF_LA_SOLVER_STUFF_HH
 
+#include "config.h"
+
 #include <type_traits>
 #include <cmath>
+
+#if HAVE_MPI
+#include <dune/common/parallel/collectivecommunication.hh>
+#endif
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
@@ -15,8 +21,11 @@
 #include <dune/istl/solvers.hh>
 #include <dune/istl/paamg/amg.hh>
 #include <dune/istl/owneroverlapcopy.hh>
-#include <dune/common/parallel/collectivecommunication.hh>
 #endif // HAVE_DUNE_ISTL
+
+#if HAVE_DUNE_PDELAB
+#include <dune/pdelab/backend/istl/parallelhelper.hh>
+#endif
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
@@ -31,14 +40,15 @@ namespace LA {
 #if HAVE_DUNE_ISTL
 
 
-template <class S>
-class Solver<IstlRowMajorSparseMatrix<S>> : protected SolverUtils
+template <class S, class GridView>
+class Solver<IstlRowMajorSparseMatrix<S>, GridView> : protected SolverUtils
 {
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
 
-  Solver(const MatrixType& matrix)
+  Solver(const MatrixType& matrix, const GridView* grid_view = nullptr)
     : matrix_(matrix)
+    , grid_view_(grid_view)
   {
   }
 
@@ -123,16 +133,45 @@ public:
                                   << "Those were the given options:\n\n"
                                   << opts);
     } else if (type == "bicgstab.amg.ilu0") {
+      typedef typename PDELab::istl::CommSelector<96, Dune::MPIHelper::isFake>::type CommunicationType;
+// preconditioner
+#if HAVE_MPI
+      if (!grid_view_)
+        DUNE_THROW_COLORFULLY(Exceptions::configuration_error, "You have to provide the grid view!");
+      CommunicationType communication(grid_view_->comm());
+      communication.remoteIndices().rebuild<false>();
+      typedef SeqILU0<typename MatrixType::BackendType,
+                      typename IstlDenseVector<S>::BackendType,
+                      typename IstlDenseVector<S>::BackendType> SequentialPreconditionerType;
+      typedef Dune::BlockPreconditioner<typename IstlDenseVector<S>::BackendType,
+                                        typename IstlDenseVector<S>::BackendType,
+                                        CommunicationType,
+                                        SequentialPreconditionerType> PreconditionerType;
+#else // HAVE_MPI
+      typedef SeqILU0<typename MatrixType::BackendType,
+                      typename IstlDenseVector<S>::BackendType,
+                      typename IstlDenseVector<S>::BackendType> PreconditionerType;
+#endif // HAVE_MPI
+
+// matrix operator
+#if HAVE_MPI
+      typedef Dune::OverlappingSchwarzOperator<typename MatrixType::BackendType,
+                                               typename IstlDenseVector<S>::BackendType,
+                                               typename IstlDenseVector<S>::BackendType,
+                                               CommunicationType> MatrixOperatorType;
+      MatrixOperatorType matrix_operator(matrix_.backend(), communication);
+#else // HAVE_MPI
       typedef MatrixAdapter<typename MatrixType::BackendType,
                             typename IstlDenseVector<S>::BackendType,
                             typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
       MatrixOperatorType matrix_operator(matrix_.backend());
-      typedef SeqILU0<typename MatrixType::BackendType,
-                      typename IstlDenseVector<S>::BackendType,
-                      typename IstlDenseVector<S>::BackendType> PreconditionerType;
-      typedef Dune::Amg::AMG<MatrixOperatorType, typename IstlDenseVector<S>::BackendType, PreconditionerType>
-          SmootherType;
-      Dune::SeqScalarProduct<typename IstlDenseVector<S>::BackendType> scalar_product;
+#endif // HAVE_MPI
+
+      // smoother
+      typedef Dune::Amg::AMG<MatrixOperatorType,
+                             typename IstlDenseVector<S>::BackendType,
+                             PreconditionerType,
+                             CommunicationType> SmootherType;
       typedef typename Dune::Amg::SmootherTraits<PreconditionerType>::Arguments SmootherArgs;
       SmootherArgs smootherArgs;
       smootherArgs.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
@@ -149,7 +188,17 @@ public:
                                                                         Dune::Amg::FirstDiagonal>> AmgCriterion;
       AmgCriterion amg_criterion(params);
       amg_criterion.setDebugLevel(opts.get("smoother.verbose", default_opts.get<size_t>("smoother.verbose")));
-      SmootherType smoother(matrix_operator, amg_criterion, smootherArgs);
+      SmootherType smoother(matrix_operator, amg_criterion, smootherArgs, communication);
+
+// scalar product
+#if HAVE_MPI
+      Dune::OverlappingSchwarzScalarProduct<typename IstlDenseVector<S>::BackendType, CommunicationType> scalar_product(
+          communication);
+#else // HAVE_MPI
+      Dune::SeqScalarProduct<typename IstlDenseVector<S>::BackendType> scalar_product;
+#endif
+
+      // solver
       typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
       SolverType solver(matrix_operator,
                         scalar_product,
@@ -165,9 +214,11 @@ public:
                                   << "Those were the given options:\n\n"
                                   << opts);
     } else if (type == "parallel.ssor.bicg") {
+      if (!grid_view_)
+        DUNE_THROW_COLORFULLY(Exceptions::configuration_error, "You have to provide the grid view!");
       //! max bigunsignedint 96 bits for indexset (pdelab uses this value too)
       typedef OwnerOverlapCopyCommunication<bigunsignedint<96>, int> CommType;
-      CommType comm;
+      CommType comm(grid_view_->comm());
       //! needed to avoid runtime error, no idea what public/private indices mean
       comm.remoteIndices().rebuild<false /*bool ignorePublic*/>();
 
@@ -182,13 +233,12 @@ public:
           opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")),
           comm);
       OverlappingSchwarzScalarProduct<DomainType, CommType> prod(comm);
-      typedef LoopSolver<DomainType> LoopType;
-      LoopType loop(matrix_operator,
-                    prod,
-                    preconditioner,
-                    opts.get("precision", default_opts.get<S>("precision")),
-                    opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-                    opts.get("verbose", default_opts.get<size_t>("verbose")));
+      //      typedef LoopSolver<DomainType> LoopType;
+      //      LoopType loop(matrix_operator, prod,
+      //                    preconditioner,
+      //                    opts.get("precision", default_opts.get< S >("precision")),
+      //                    opts.get("max_iter", default_opts.get< size_t >("max_iter")),
+      //                    opts.get("verbose", default_opts.get< size_t >("verbose")));
       typedef BiCGSTABSolver<DomainType> SolverType;
       SolverType solver(matrix_operator,
                         prod,
@@ -230,6 +280,7 @@ public:
 
 private:
   const MatrixType& matrix_;
+  const GridView* grid_view_;
 }; // class Solver
 
 
