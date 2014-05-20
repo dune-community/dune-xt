@@ -20,9 +20,11 @@ namespace Stuff {
 namespace Grid {
 
 template <class EntityType>
-void printEntity(const EntityType& entity, std::ostream& out = std::cout, const std::string prefix = "")
+void printEntity(const EntityType& entity, const std::string name = Common::Typename<EntityType>::value(),
+                 std::ostream& out = std::cout, const std::string prefix = "")
 {
-  out << prefix << Common::Typename<EntityType>::value() << std::endl;
+  if (!name.empty())
+    out << prefix << name << ":\n";
   const auto& geometry = entity.geometry();
   for (int ii = 0; ii < geometry.corners(); ++ii)
     Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
