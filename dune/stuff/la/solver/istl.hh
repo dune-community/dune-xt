@@ -9,12 +9,11 @@
 #include <type_traits>
 #include <cmath>
 
-#if 1 // HAVE_DUNE_ISTL
+#if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
 #include <dune/istl/paamg/amg.hh>
-#include <dune/common/parallel/collectivecommunication.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
@@ -27,7 +26,7 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-#if 1 // HAVE_DUNE_ISTL
+#if HAVE_DUNE_ISTL
 
 
 template <class S>
@@ -43,7 +42,7 @@ public:
 
   static std::vector<std::string> options()
   {
-    return {"bicgstab.amg.ilu0", "bicgstab.ilut", "parallel.ssor.bicg"};
+    return {"bicgstab.amg.ilu0", "bicgstab.ilut"};
   } // ... options()
 
   static Common::ConfigTree options(const std::string& type)
@@ -63,9 +62,6 @@ public:
       iterative_options.set("smoother.prolong_damp", "1.6");
       iterative_options.set("smoother.anisotropy_dim", "2");
       iterative_options.set("smoother.verbose", "0");
-    } else if (type == "parallel.ssor.bicg") {
-      iterative_options.set("preconditioner.iterations", "2");
-      iterative_options.set("preconditioner.relaxation_factor", "1.0");
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
@@ -156,42 +152,6 @@ public:
                         opts.get("precision", default_opts.get<S>("precision")),
                         opts.get("max_iter", default_opts.get<size_t>("max_iter")),
                         opts.get("verbose", default_opts.get<size_t>("verbose")));
-      InverseOperatorResult stat;
-      solver.apply(solution.backend(), writable_rhs.backend(), stat);
-      if (!stat.converged)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
-    } else if (type == "parallel.ssor.bicg") {
-      //! max bigunsignedint 96 bits for indexset (pdelab uses this value too)
-      typedef OwnerOverlapCopyCommunication<bigunsignedint<96>, int> CommType;
-      CommType comm;
-      typedef typename IstlDenseVector<S>::BackendType DomainType;
-      typedef OverlappingSchwarzOperator<typename MatrixType::BackendType, DomainType, DomainType, CommType>
-          MatrixOperatorType;
-      MatrixOperatorType matrix_operator(matrix_.backend(), comm);
-      typedef ParSSOR<typename MatrixType::BackendType, DomainType, DomainType, CommType> PreconditionerType;
-      PreconditionerType preconditioner(
-          matrix_.backend(),
-          opts.get("preconditioner.iterations", default_opts.get<size_t>("preconditioner.iterations")),
-          opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")),
-          comm);
-      OverlappingSchwarzScalarProduct<DomainType, CommType> prod(comm);
-      typedef LoopSolver<DomainType> LoopType;
-      LoopType loop(matrix_operator,
-                    prod,
-                    preconditioner,
-                    opts.get("precision", default_opts.get<S>("precision")),
-                    opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-                    opts.get("verbose", default_opts.get<size_t>("verbose")));
-      typedef BiCGSTABSolver<DomainType> SolverType;
-      SolverType solver(matrix_operator,
-                        prod,
-                        preconditioner,
-                        opts.get("precision", default_opts.get<S>("precision")),
-                        opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-                        opts.get("verbose", default_opts.get<int>("verbose")));
       InverseOperatorResult stat;
       solver.apply(solution.backend(), writable_rhs.backend(), stat);
       if (!stat.converged)
