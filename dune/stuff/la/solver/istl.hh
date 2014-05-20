@@ -37,10 +37,12 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUt
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
 
+#if !HAVE_MPI
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
   {
   }
+#endif // !HAVE_MPI
 
   Solver(const MatrixType& matrix, const CommunicatorType&
 #if HAVE_MPI
