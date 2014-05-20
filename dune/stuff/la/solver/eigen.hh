@@ -50,13 +50,18 @@ namespace LA {
 
 #if HAVE_EIGEN
 
-template <class S, class AdditionalArgument = void>
-class Solver<EigenDenseMatrix<S>, AdditionalArgument> : protected SolverUtils
+template <class S, class CommunicatorType>
+class Solver<EigenDenseMatrix<S>, CommunicatorType> : protected SolverUtils
 {
 public:
   typedef EigenDenseMatrix<S> MatrixType;
 
   Solver(const MatrixType& matrix)
+    : matrix_(matrix)
+  {
+  }
+
+  Solver(const MatrixType& matrix, const CommunicatorType& /*communicator*/)
     : matrix_(matrix)
   {
   }
@@ -175,8 +180,8 @@ private:
  *  \note ldlt.simplicial will copy the matrix to column major
  *  \note llt.simplicial will copy the matrix to column major
  */
-template <class S, class AdditionalArgument>
-class Solver<EigenRowMajorSparseMatrix<S>, AdditionalArgument> : protected SolverUtils
+template <class S, class CommunicatorType>
+class Solver<EigenRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUtils
 {
   typedef ::Eigen::SparseMatrix<S, ::Eigen::ColMajor> ColMajorBackendType;
 
@@ -185,6 +190,11 @@ public:
 
 
   Solver(const MatrixType& matrix)
+    : matrix_(matrix)
+  {
+  }
+
+  Solver(const MatrixType& matrix, const CommunicatorType& /*communicator*/)
     : matrix_(matrix)
   {
   }

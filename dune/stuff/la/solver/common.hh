@@ -24,13 +24,18 @@ namespace Stuff {
 namespace LA {
 
 
-template <class S, class AdditionalArgument>
-class Solver<CommonDenseMatrix<S>, AdditionalArgument> : protected SolverUtils
+template <class S, class CommunicatorType>
+class Solver<CommonDenseMatrix<S>, CommunicatorType> : protected SolverUtils
 {
 public:
   typedef CommonDenseMatrix<S> MatrixType;
 
   Solver(const MatrixType& matrix)
+    : matrix_(matrix)
+  {
+  }
+
+  Solver(const MatrixType& matrix, const CommunicatorType& /*communicator*/)
     : matrix_(matrix)
   {
   }

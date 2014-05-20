@@ -6,6 +6,8 @@
 #ifndef DUNE_STUFF_LA_SOLVER_STUFF_HH
 #define DUNE_STUFF_LA_SOLVER_STUFF_HH
 
+#include "config.h"
+
 #include <type_traits>
 #include <cmath>
 
@@ -29,14 +31,28 @@ namespace LA {
 #if HAVE_DUNE_ISTL
 
 
-template <class S, class OwnerOverlapCopyCommunicationType>
-class Solver<IstlRowMajorSparseMatrix<S>, OwnerOverlapCopyCommunicationType> : protected SolverUtils
+template <class S, class CommunicatorType>
+class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUtils
 {
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
+  {
+  }
+
+  Solver(const MatrixType& matrix, const CommunicatorType&
+#if HAVE_MPI
+                                       communicator
+#else
+/*communicator*/
+#endif
+         )
+    : matrix_(matrix)
+#if HAVE_MPI
+    , communicator_(communicator)
+#endif
   {
   }
 
@@ -104,6 +120,52 @@ public:
     IstlDenseVector<S> writable_rhs       = rhs.copy();
     // solve
     if (type == "bicgstab.amg.ilu0") {
+#if HAVE_MPI
+      typedef typename MatrixType::BackendType IstlMatrixType;
+      typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
+
+      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialPreconditionerType;
+      typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialPreconditionerType>
+          PreconditionerType;
+
+      typedef OverlappingSchwarzOperator<IstlMatrixType, IstlVectorType, IstlVectorType, CommunicatorType>
+          MatrixOperatorType;
+      MatrixOperatorType matrix_operator(matrix_.backend(), communicator_);
+
+      typedef Amg::AMG<MatrixOperatorType, IstlVectorType, PreconditionerType, CommunicatorType> SmootherType;
+      typename Amg::SmootherTraits<PreconditionerType>::Arguments smoother_arguments;
+      smoother_arguments.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
+      smoother_arguments.relaxationFactor =
+          opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
+      Amg::Parameters smoother_parameters(
+          opts.get("smoother.max_level", default_opts.get<size_t>("smoother.max_level")),
+          opts.get("smoother.coarse_target", default_opts.get<size_t>("smoother.coarse_target")),
+          opts.get("smoother.min_coarse_rate", default_opts.get<S>("smoother.min_coarse_rate")),
+          opts.get("smoother.prolong_damp", default_opts.get<S>("smoother.prolong_damp")));
+      smoother_parameters.setDefaultValuesAnisotropic(
+          opts.get("smoother.anisotropy_dim",
+                   default_opts.get<size_t>("smoother.anisotropy_dim"))); // <- dim
+      Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> smoother_criterion(
+          smoother_parameters);
+      SmootherType smoother(matrix_operator, smoother_criterion, smoother_arguments, communicator_);
+
+      OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
+
+      InverseOperatorResult statistics;
+      BiCGSTABSolver<IstlVectorType> solver(
+          matrix_operator,
+          scalar_product,
+          smoother,
+          opts.get("precision", default_opts.get<S>("precision")),
+          opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+          (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0);
+      solver.apply(solution.backend(), writable_rhs.backend(), statistics);
+      if (!statistics.converged)
+        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                                  << "Those were the given options:\n\n"
+                                  << opts);
+#else // HAVE_MPI
       typedef MatrixAdapter<typename MatrixType::BackendType,
                             typename IstlDenseVector<S>::BackendType,
                             typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
@@ -145,6 +207,7 @@ public:
                               "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
                                   << "Those were the given options:\n\n"
                                   << opts);
+#endif // HAVE_MPI
 #if !HAVE_MPI
     } else if (type == "bicgstab.ilut") {
       typedef MatrixAdapter<typename MatrixType::BackendType,
@@ -201,6 +264,9 @@ public:
 
 private:
   const MatrixType& matrix_;
+#if HAVE_MPI
+  const CommunicatorType& communicator_;
+#endif
 }; // class Solver
 
 

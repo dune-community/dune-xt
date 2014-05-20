@@ -54,7 +54,7 @@ public:
 };
 
 
-template <class MatrixImp, class AdditionalArgument = void>
+template <class MatrixImp, class CommunicatorType = double>
 class Solver
 {
   static_assert(AlwaysFalse<MatrixImp>::value, "This is the unspecialized version of LA::Solver< ... >. Please include "
