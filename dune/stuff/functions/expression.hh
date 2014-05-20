@@ -8,8 +8,6 @@
 #ifndef DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 #define DUNE_STUFF_FUNCTIONS_EXPRESSION_HH
 
-#include "config.h"
-
 #include <vector>
 #include <limits>
 
