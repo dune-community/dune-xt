@@ -27,18 +27,6 @@
 #include "pattern.hh"
 
 namespace Dune {
-namespace Pymor {
-namespace Operators {
-
-// forwards, needed for friendlyness
-template <class ScalarImp>
-class EigenRowMajorSparseInverse;
-
-template <class ScalarImp>
-class EigenRowMajorSparse;
-
-} // namespace Operators
-} // namespace Pymor
 namespace Stuff {
 namespace LA {
 
@@ -873,9 +861,6 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
-  friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
-
   mutable std::shared_ptr<BackendType> backend_;
 }; // class EigenDenseMatrix
 
@@ -1173,9 +1158,6 @@ private:
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
-
-  friend class Dune::Pymor::Operators::EigenRowMajorSparseInverse<ScalarType>;
-  friend class Dune::Pymor::Operators::EigenRowMajorSparse<ScalarType>;
 
   mutable std::shared_ptr<BackendType> backend_;
 }; // class EigenRowMajorSparseMatrix
