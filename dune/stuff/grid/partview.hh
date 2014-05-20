@@ -8,11 +8,15 @@
 
 #include <memory>
 
-
 #if HAVE_DUNE_FEM
 #include <dune/fem/gridpart/leafgridpart.hh>
 #include <dune/fem/gridpart/levelgridpart.hh>
 #endif // HAVE_DUNE_FEM
+
+#if HAVE_DUNE_GRID_MULTISCALE
+#include <dune/grid/multiscale/default.hh>
+#endif
+
 
 namespace Dune {
 namespace Stuff {
@@ -30,6 +34,10 @@ enum class ChooseLayer
 {
   level,
   leaf
+#if HAVE_DUNE_GRID_MULTISCALE
+  ,
+  local
+#endif
 }; // enum class ChooseLayer
 
 
@@ -77,6 +85,19 @@ struct Layer<GridType, ChooseLayer::leaf, ChoosePartView::view>
     return std::make_shared<Type>(grid.leafGridView());
   }
 }; // struct Layer< ..., leaf, view >
+
+
+#if HAVE_DUNE_GRID_MULTISCALE
+
+
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local, ChoosePartView::view>
+{
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridViewType Type;
+};
+
+
+#endif // HAVE_DUNE_GRID_MULTISCALE
 
 
 template <class GridType>
@@ -154,6 +175,19 @@ struct Layer<GridType, ChooseLayer::leaf, ChoosePartView::part>
     return std::make_shared<Type>(grid);
   }
 }; // struct Layer< ..., leaf, part >
+
+
+#if HAVE_DUNE_GRID_MULTISCALE
+
+
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local, ChoosePartView::part>
+{
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridPartType Type;
+};
+
+
+#endif // HAVE_DUNE_GRID_MULTISCALE
 
 
 template <class GridType>
