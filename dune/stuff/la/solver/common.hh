@@ -24,8 +24,8 @@ namespace Stuff {
 namespace LA {
 
 
-template <class S>
-class Solver<CommonDenseMatrix<S>> : protected SolverUtils
+template <class S, class AdditionalArgument>
+class Solver<CommonDenseMatrix<S>, AdditionalArgument> : protected SolverUtils
 {
 public:
   typedef CommonDenseMatrix<S> MatrixType;

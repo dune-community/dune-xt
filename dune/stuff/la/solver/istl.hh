@@ -29,8 +29,8 @@ namespace LA {
 #if HAVE_DUNE_ISTL
 
 
-template <class S>
-class Solver<IstlRowMajorSparseMatrix<S>> : protected SolverUtils
+template <class S, class OwnerOverlapCopyCommunicationType>
+class Solver<IstlRowMajorSparseMatrix<S>, OwnerOverlapCopyCommunicationType> : protected SolverUtils
 {
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
@@ -42,18 +42,24 @@ public:
 
   static std::vector<std::string> options()
   {
-    return {"bicgstab.amg.ilu0", "bicgstab.ilut"};
+    return
+    {
+      "bicgstab.amg.ilu0"
+#if !HAVE_MPI
+          ,
+          "bicgstab.ilut"
+#endif
+    };
   } // ... options()
 
   static Common::ConfigTree options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    Common::ConfigTree iterative_options({"max_iter", "precision", "verbose", "post_check_solves_system"},
-                                         {"10000", "1e-10", "0", "1e-5"});
-    if (type == "bicgstab.ilut") {
-      iterative_options.set("preconditioner.iterations", "2");
-      iterative_options.set("preconditioner.relaxation_factor", "1.0");
-    } else if (type == "bicgstab.amg.ilu0") {
+    Common::ConfigTree iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
+#if !HAVE_MPI
+    iterative_options.set("post_check_solves_system", "1e-5");
+#endif
+    if (type == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
       iterative_options.set("smoother.max_level", "15");
@@ -62,6 +68,11 @@ public:
       iterative_options.set("smoother.prolong_damp", "1.6");
       iterative_options.set("smoother.anisotropy_dim", "2");
       iterative_options.set("smoother.verbose", "0");
+#if !HAVE_MPI
+    } else if (type == "bicgstab.ilut") {
+      iterative_options.set("preconditioner.iterations", "2");
+      iterative_options.set("preconditioner.relaxation_factor", "1.0");
+#endif // !HAVE_MPI
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
@@ -92,32 +103,7 @@ public:
     const Common::ConfigTree default_opts = options(type);
     IstlDenseVector<S> writable_rhs       = rhs.copy();
     // solve
-    if (type == "bicgstab.ilut") {
-      typedef MatrixAdapter<typename MatrixType::BackendType,
-                            typename IstlDenseVector<S>::BackendType,
-                            typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
-      MatrixOperatorType matrix_operator(matrix_.backend());
-      typedef SeqILUn<typename MatrixType::BackendType,
-                      typename IstlDenseVector<S>::BackendType,
-                      typename IstlDenseVector<S>::BackendType> PreconditionerType;
-      PreconditionerType preconditioner(
-          matrix_.backend(),
-          opts.get("preconditioner.iterations", default_opts.get<size_t>("preconditioner.iterations")),
-          opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
-      typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
-      SolverType solver(matrix_operator,
-                        preconditioner,
-                        opts.get("precision", default_opts.get<S>("precision")),
-                        opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-                        opts.get("verbose", default_opts.get<int>("verbose")));
-      InverseOperatorResult stat;
-      solver.apply(solution.backend(), writable_rhs.backend(), stat);
-      if (!stat.converged)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
-    } else if (type == "bicgstab.amg.ilu0") {
+    if (type == "bicgstab.amg.ilu0") {
       typedef MatrixAdapter<typename MatrixType::BackendType,
                             typename IstlDenseVector<S>::BackendType,
                             typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
@@ -159,9 +145,37 @@ public:
                               "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
                                   << "Those were the given options:\n\n"
                                   << opts);
+#if !HAVE_MPI
+    } else if (type == "bicgstab.ilut") {
+      typedef MatrixAdapter<typename MatrixType::BackendType,
+                            typename IstlDenseVector<S>::BackendType,
+                            typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
+      MatrixOperatorType matrix_operator(matrix_.backend());
+      typedef SeqILUn<typename MatrixType::BackendType,
+                      typename IstlDenseVector<S>::BackendType,
+                      typename IstlDenseVector<S>::BackendType> PreconditionerType;
+      PreconditionerType preconditioner(
+          matrix_.backend(),
+          opts.get("preconditioner.iterations", default_opts.get<size_t>("preconditioner.iterations")),
+          opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
+      typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
+      SolverType solver(matrix_operator,
+                        preconditioner,
+                        opts.get("precision", default_opts.get<S>("precision")),
+                        opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+                        opts.get("verbose", default_opts.get<int>("verbose")));
+      InverseOperatorResult stat;
+      solver.apply(solution.backend(), writable_rhs.backend(), stat);
+      if (!stat.converged)
+        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                                  << "Those were the given options:\n\n"
+                                  << opts);
+#endif // !HAVE_MPI
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
+#if !HAVE_MPI
     // check (use writable_rhs as tmp)
     const S post_check_solves_system_theshhold =
         opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
@@ -182,6 +196,7 @@ public:
                 << "Those were the given options:\n\n"
                 << opts);
     }
+#endif // !HAVE_MPI
   } // ... apply(...)
 
 private:
