@@ -148,10 +148,10 @@ public:
     if (expression().size() == 1)
       stream << expression()[0] << std::endl;
     else {
-      stream << "[ " << expression()[0] << " " << std::endl;
+      stream << "[ " << expression()[0] << std::endl;
       const std::string whitespace = Dune::Stuff::Common::whitespaceify(tmp + "[ ");
       for (unsigned int i = 1; i < expression().size() - 1; ++i)
-        stream << _prefix << whitespace << expression()[i] << " " << std::endl;
+        stream << _prefix << whitespace << expression()[i] << std::endl;
       stream << _prefix << whitespace << expression()[expression().size() - 1] << " ]" << std::endl;
     }
   } // void report(const std::string, std::ostream&, const std::string&) const

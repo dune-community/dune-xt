@@ -173,7 +173,7 @@ private:
   std::shared_ptr<const MathExpressionFunctionType> function_;
   size_t order_;
   std::string name_;
-}; // class FunctionExpression
+}; // class Expression
 
 
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
