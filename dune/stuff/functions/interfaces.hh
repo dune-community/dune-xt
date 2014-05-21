@@ -405,11 +405,6 @@ public:
     DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
   }
 
-  virtual size_t order() const
-  {
-    return std::numeric_limits<size_t>::max();
-  }
-
   virtual void evaluate(const DomainType& xx, RangeType& ret) const = 0;
 
   virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
@@ -505,11 +500,6 @@ public:
   virtual ThisType* copy() const
   {
     DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
-  }
-
-  virtual size_t order() const
-  {
-    return std::numeric_limits<size_t>::max();
   }
 
   virtual void evaluate(const DomainType& x, RangeType& ret) const = 0;
