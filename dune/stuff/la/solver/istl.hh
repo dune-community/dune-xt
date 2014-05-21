@@ -80,12 +80,13 @@ public:
     if (type == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
-      iterative_options.set("smoother.max_level", "15");
-      iterative_options.set("smoother.coarse_target", "2000");
-      iterative_options.set("smoother.min_coarse_rate", "1.2");
-      iterative_options.set("smoother.prolong_damp", "1.6");
-      iterative_options.set("smoother.anisotropy_dim", "2");
-      iterative_options.set("smoother.verbose", "0");
+      iterative_options.set("criterion.max_level", "100");
+      iterative_options.set("criterion.coarse_target", "1000");
+      iterative_options.set("criterion.min_coarse_rate", "1.2");
+      iterative_options.set("criterion.prolong_damp", "1.6");
+      iterative_options.set("criterion.anisotropy_dim", "2");
+      iterative_options.set("criterion.verbose", "1");
+      iterative_options.set("smoother.verbose", "1");
 #if !HAVE_MPI
     } else if (type == "bicgstab.ilut") {
       iterative_options.set("preconditioner.iterations", "2");
@@ -134,21 +135,25 @@ public:
           MatrixOperatorType;
       MatrixOperatorType matrix_operator(matrix_.backend(), communicator_);
 
-      typedef Amg::AMG<MatrixOperatorType, IstlVectorType, PreconditionerType, CommunicatorType> SmootherType;
+      Amg::Parameters criterion_parameters(
+          opts.get("criterion.max_level", default_opts.get<size_t>("criterion.max_level")),
+          opts.get("criterion.coarse_target", default_opts.get<size_t>("criterion.coarse_target")),
+          opts.get("criterion.min_coarse_rate", default_opts.get<S>("criterion.min_coarse_rate")),
+          opts.get("criterion.prolong_damp", default_opts.get<S>("criterion.prolong_damp")));
+      criterion_parameters.setDefaultValuesIsotropic(2);
+      criterion_parameters.setDefaultValuesAnisotropic(
+          opts.get("criterion.anisotropy_dim",
+                   default_opts.get<size_t>("criterion.anisotropy_dim"))); // <- dim
+      criterion_parameters.setDebugLevel(opts.get("criterion.verbose", default_opts.get<size_t>("criterion.verbose")));
+
       typename Amg::SmootherTraits<PreconditionerType>::Arguments smoother_arguments;
       smoother_arguments.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
       smoother_arguments.relaxationFactor =
           opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
-      Amg::Parameters smoother_parameters(
-          opts.get("smoother.max_level", default_opts.get<size_t>("smoother.max_level")),
-          opts.get("smoother.coarse_target", default_opts.get<size_t>("smoother.coarse_target")),
-          opts.get("smoother.min_coarse_rate", default_opts.get<S>("smoother.min_coarse_rate")),
-          opts.get("smoother.prolong_damp", default_opts.get<S>("smoother.prolong_damp")));
-      smoother_parameters.setDefaultValuesAnisotropic(
-          opts.get("smoother.anisotropy_dim",
-                   default_opts.get<size_t>("smoother.anisotropy_dim"))); // <- dim
+
       Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> smoother_criterion(
-          smoother_parameters);
+          criterion_parameters);
+      typedef Amg::AMG<MatrixOperatorType, IstlVectorType, PreconditionerType, CommunicatorType> SmootherType;
       SmootherType smoother(matrix_operator, smoother_criterion, smoother_arguments, communicator_);
 
       OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
