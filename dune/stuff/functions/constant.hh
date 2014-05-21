@@ -94,7 +94,7 @@ class Constant
 
 public:
   typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeType RangeFieldType;
+  typedef typename BaseType::RangeFieldType RangeFieldType;
   typedef typename BaseType::RangeType RangeType;
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
