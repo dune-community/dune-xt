@@ -6,8 +6,6 @@
 #ifndef DUNE_STUFF_LA_SOLVER_STUFF_HH
 #define DUNE_STUFF_LA_SOLVER_STUFF_HH
 
-#include "config.h"
-
 #include <type_traits>
 #include <cmath>
 
