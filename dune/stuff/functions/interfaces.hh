@@ -405,10 +405,7 @@ public:
     DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
   }
 
-  virtual size_t order() const
-  {
-    return std::numeric_limits<size_t>::max();
-  }
+  virtual size_t order() const = 0;
 
   virtual void evaluate(const DomainType& xx, RangeType& ret) const = 0;
 
@@ -507,10 +504,7 @@ public:
     DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
   }
 
-  virtual size_t order() const
-  {
-    return std::numeric_limits<size_t>::max();
-  }
+  virtual size_t order() const = 0;
 
   virtual void evaluate(const DomainType& x, RangeType& ret) const = 0;
 
