@@ -78,14 +78,15 @@ public:
     if (type == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
+      iterative_options.set("smoother.verbose", "0");
       iterative_options.set("preconditioner.max_level", "100");
       iterative_options.set("preconditioner.coarse_target", "1000");
       iterative_options.set("preconditioner.min_coarse_rate", "1.2");
       iterative_options.set("preconditioner.prolong_damp", "1.6");
-      iterative_options.set("preconditioner.anisotropy_dim", "2");
-      iterative_options.set("preconditioner.isotropy_dim", "2");
-      iterative_options.set("preconditioner.verbose", "1");
-      iterative_options.set("smoother.verbose", "1");
+      iterative_options.set("preconditioner.anisotropy_dim",
+                            "2"); // <- this should be the dimDomain if the discretizations!
+      iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
+      iterative_options.set("preconditioner.verbose", "0");
 #if !HAVE_MPI
     } else if (type == "bicgstab.ilut") {
       iterative_options.set("preconditioner.iterations", "2");
@@ -122,104 +123,81 @@ public:
     IstlDenseVector<S> writable_rhs       = rhs.copy();
     // solve
     if (type == "bicgstab.amg.ilu0") {
-#if HAVE_MPI
+      // define the matrix operator
       typedef typename MatrixType::BackendType IstlMatrixType;
       typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
-
-      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType;
-      typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType>
-          SmootherType;
-
+#if HAVE_MPI
       typedef OverlappingSchwarzOperator<IstlMatrixType, IstlVectorType, IstlVectorType, CommunicatorType>
           MatrixOperatorType;
       MatrixOperatorType matrix_operator(matrix_.backend(), communicator_);
+#else // HAVE_MPI
+      typedef MatrixAdapter<IstlMatrixType, IstlVectorType, IstlVectorType> MatrixOperatorType;
+      MatrixOperatorType matrix_operator(matrix_.backend());
+#endif // HAVE_MPI
 
-      Amg::Parameters criterion_parameters(
+// define the scalar product
+#if HAVE_MPI
+      OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
+#else
+      Dune::SeqScalarProduct<typename IstlDenseVector<S>::BackendType> scalar_product;
+#endif
+
+// define ILU0 as the smoother for the AMG
+#if HAVE_MPI
+      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType;
+      typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType>
+          SmootherType;
+#else // HAVE_MPI
+      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
+#endif
+      typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
+      smoother_parameters.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
+      smoother_parameters.relaxationFactor =
+          opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
+
+      // define the AMG as the preconditioner for the BiCGStab solver
+      Amg::Parameters amg_parameters(
           opts.get("preconditioner.max_level", default_opts.get<size_t>("preconditioner.max_level")),
           opts.get("preconditioner.coarse_target", default_opts.get<size_t>("preconditioner.coarse_target")),
           opts.get("preconditioner.min_coarse_rate", default_opts.get<S>("preconditioner.min_coarse_rate")),
           opts.get("preconditioner.prolong_damp", default_opts.get<S>("preconditioner.prolong_damp")));
-      criterion_parameters.setDefaultValuesIsotropic(
+      amg_parameters.setDefaultValuesIsotropic(
           opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
-      criterion_parameters.setDefaultValuesAnisotropic(
-          opts.get("preconditioner.anisotropy_dim",
-                   default_opts.get<size_t>("preconditioner.anisotropy_dim"))); // <- dim
-      criterion_parameters.setDebugLevel(
+      amg_parameters.setDefaultValuesAnisotropic(
+          opts.get("preconditioner.anisotropy_dim", default_opts.get<size_t>("preconditioner.anisotropy_dim")));
+      amg_parameters.setDebugLevel(
           opts.get("preconditioner.verbose", default_opts.get<size_t>("preconditioner.verbose")));
-
-      typename Amg::SmootherTraits<SmootherType>::Arguments smoother_arguments;
-      smoother_arguments.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
-      smoother_arguments.relaxationFactor =
-          opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
-
-      Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> smoother_criterion(
-          criterion_parameters);
+      Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(amg_parameters);
+#if HAVE_MPI
       typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType, CommunicatorType> PreconditionerType;
-      PreconditionerType preconditioner(matrix_operator, smoother_criterion, smoother_arguments, communicator_);
+      PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters, communicator_);
+#else // HAVE_MPI
+      typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType> PreconditionerType;
+      PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters);
+#endif // HAVE_MPI
 
-      OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
-
-      InverseOperatorResult statistics;
+      // define the BiCGStab as the actual solver
       BiCGSTABSolver<IstlVectorType> solver(
           matrix_operator,
           scalar_product,
           preconditioner,
           opts.get("precision", default_opts.get<S>("precision")),
           opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-          (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0);
-      solver.apply(solution.backend(), writable_rhs.backend(), statistics);
-      if (!statistics.converged)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
+#if HAVE_MPI
+          (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
 #else // HAVE_MPI
-      typedef MatrixAdapter<typename MatrixType::BackendType,
-                            typename IstlDenseVector<S>::BackendType,
-                            typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
-      MatrixOperatorType matrix_operator(matrix_.backend());
-      typedef SeqILU0<typename MatrixType::BackendType,
-                      typename IstlDenseVector<S>::BackendType,
-                      typename IstlDenseVector<S>::BackendType> SmootherType;
-      typedef Dune::Amg::AMG<MatrixOperatorType, typename IstlDenseVector<S>::BackendType, SmootherType>
-          PreconditionerType;
-      Dune::SeqScalarProduct<typename IstlDenseVector<S>::BackendType> scalar_product;
-      typedef typename Dune::Amg::SmootherTraits<SmootherType>::Arguments SmootherArgs;
-      SmootherArgs smootherArgs;
-      smootherArgs.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
-      smootherArgs.relaxationFactor =
-          opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
+          opts.get("verbose", default_opts.get<int>("verbose"))
+#endif
+          );
 
-      Dune::Amg::Parameters params(
-          opts.get("preconditioner.max_level", default_opts.get<size_t>("preconditioner.max_level")),
-          opts.get("preconditioner.coarse_target", default_opts.get<size_t>("preconditioner.coarse_target")),
-          opts.get("preconditioner.min_coarse_rate", default_opts.get<S>("preconditioner.min_coarse_rate")),
-          opts.get("preconditioner.prolong_damp", default_opts.get<S>("preconditioner.prolong_damp")));
-      params.setDefaultValuesIsotropic(
-          opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
-      params.setDefaultValuesAnisotropic(opts.get("preconditioner.anisotropy_dim",
-                                                  default_opts.get<size_t>("preconditioner.anisotropy_dim"))); // <- dim
-      typedef Dune::Amg::CoarsenCriterion<Dune::Amg::SymmetricCriterion<typename MatrixType::BackendType,
-                                                                        Dune::Amg::FirstDiagonal>> AmgCriterion;
-      AmgCriterion amg_criterion(params);
-      amg_criterion.setDebugLevel(
-          opts.get("preconditioner.verbose", default_opts.get<size_t>("preconditioner.verbose")));
-      PreconditionerType preconditioner(matrix_operator, amg_criterion, smootherArgs);
-      typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
-      SolverType solver(matrix_operator,
-                        scalar_product,
-                        preconditioner,
-                        opts.get("precision", default_opts.get<S>("precision")),
-                        opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-                        opts.get("verbose", default_opts.get<size_t>("verbose")));
-      InverseOperatorResult stat;
-      solver.apply(solution.backend(), writable_rhs.backend(), stat);
-      if (!stat.converged)
+      // call the solver an do the actual work
+      InverseOperatorResult stats;
+      solver.apply(solution.backend(), writable_rhs.backend(), stats);
+      if (!stats.converged)
         DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
                               "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
                                   << "Those were the given options:\n\n"
                                   << opts);
-#endif // HAVE_MPI
 #if !HAVE_MPI
     } else if (type == "bicgstab.ilut") {
       typedef MatrixAdapter<typename MatrixType::BackendType,
