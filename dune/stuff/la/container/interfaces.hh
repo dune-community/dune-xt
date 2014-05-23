@@ -867,7 +867,7 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T>& vector)
   if (sz > 0) {
     out << vector[0];
     for (size_t ii = 1; ii < sz; ++ii)
-      out << ", " << vector[ii];
+      out << "\n " << vector[ii];
   } else
     out << " ";
   out << "]";
@@ -1074,12 +1074,12 @@ std::ostream& operator<<(std::ostream& out, const MatrixInterface<T>& matrix)
     for (size_t ii = 0; ii < rows; ++ii) {
       if (ii > 0)
         out << "\n ";
-      out << "[" << matrix.get(ii, 0);
+      out << "[" << matrix.get_entry(ii, 0);
       for (size_t jj = 1; jj < cols; ++jj)
-        out << ", " << matrix.get(ii, jj);
+        out << " " << matrix.get_entry(ii, jj);
       out << "]";
       if (rows > 1 && ii < (rows - 1))
-        out << ";";
+        out << ",";
     }
     out << "]";
   } else
