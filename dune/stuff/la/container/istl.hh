@@ -619,6 +619,39 @@ private:
 }; // class IstlRowMajorSparseMatrix
 
 
+template <class S>
+std::ostream& operator<<(std::ostream& out, const IstlRowMajorSparseMatrix<S>& matrix)
+{
+  out << "[";
+  const size_t rows = matrix.rows();
+  const size_t cols = matrix.cols();
+  if (rows > 0 && cols > 0) {
+    for (size_t ii = 0; ii < rows; ++ii) {
+      if (ii > 0)
+        out << "\n ";
+      out << "[";
+      if (matrix.backend().exists(ii, 0))
+        out << matrix.get_entry(ii, 0);
+      else
+        out << "0";
+      for (size_t jj = 1; jj < cols; ++jj) {
+        out << " ";
+        if (matrix.backend().exists(ii, jj))
+          out << matrix.get_entry(ii, jj);
+        else
+          out << "0";
+      }
+      out << "]";
+      if (rows > 1 && ii < (rows - 1))
+        out << ",";
+    }
+    out << "]";
+  } else
+    out << "[ ]]";
+  return out;
+} // ... operator<<(...)
+
+
 #else // HAVE_DUNE_ISTL
 
 
