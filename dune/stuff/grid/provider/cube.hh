@@ -14,7 +14,6 @@
 
 #include <boost/assign/list_of.hpp>
 
-
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
@@ -25,6 +24,7 @@
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/common/memory.hh>
+#include <dune/stuff/common/type_utils.hh>
 
 #include "default.hh"
 
@@ -213,15 +213,22 @@ private:
                                                                                                << " vs. "
                                                                                                << upper_right[dd]);
     }
+    std::shared_ptr<GridType> grd;
     switch (variant) {
       case 1:
-        return Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left, upper_right, num_elements);
+        grd = Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left, upper_right, num_elements);
         break;
       case 2:
       default:
-        return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lower_left, upper_right, num_elements);
+        grd = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lower_left, upper_right, num_elements);
         break;
     }
+    const std::string grid_type = Stuff::Common::Typename<GridType>::value();
+    if (grid_type == "Dune::ALUConformGrid<2, 2>"
+        || grid_type
+               == "Dune::ALUGrid<2, 2, (Dune::ALUGridElementType)0, (Dune::ALUGridRefinementType)0, Dune::No_Comm>")
+      grd->globalRefine(1);
+    return grd;
   } // ... create_grid(...)
 }; // class Cube
 
