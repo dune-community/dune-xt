@@ -3,8 +3,8 @@
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_STUFF_LA_SOLVER_STUFF_HH
-#define DUNE_STUFF_LA_SOLVER_STUFF_HH
+#ifndef DUNE_STUFF_LA_SOLVER_ISTL_HH
+#define DUNE_STUFF_LA_SOLVER_ISTL_HH
 
 #include <type_traits>
 #include <cmath>
@@ -83,8 +83,7 @@ public:
       iterative_options.set("preconditioner.coarse_target", "1000");
       iterative_options.set("preconditioner.min_coarse_rate", "1.2");
       iterative_options.set("preconditioner.prolong_damp", "1.6");
-      iterative_options.set("preconditioner.anisotropy_dim",
-                            "2"); // <- this should be the dimDomain if the discretizations!
+      iterative_options.set("preconditioner.anisotropy_dim", "2"); // <- this should be the dimDomain of the problem!
       iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
       iterative_options.set("preconditioner.verbose", "0");
 #if !HAVE_MPI
@@ -114,142 +113,148 @@ public:
    */
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts) const
   {
-    if (!opts.has_key("type"))
-      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
-                            "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
-    const auto type = opts.get<std::string>("type");
-    SolverUtils::check_given(type, options());
-    const Common::ConfigTree default_opts = options(type);
-    IstlDenseVector<S> writable_rhs       = rhs.copy();
-    // solve
-    if (type == "bicgstab.amg.ilu0") {
-      // define the matrix operator
-      typedef typename MatrixType::BackendType IstlMatrixType;
-      typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
+    try {
+      if (!opts.has_key("type"))
+        DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
+                              "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+      const auto type = opts.get<std::string>("type");
+      SolverUtils::check_given(type, options());
+      const Common::ConfigTree default_opts = options(type);
+      IstlDenseVector<S> writable_rhs       = rhs.copy();
+      // solve
+      if (type == "bicgstab.amg.ilu0") {
+        // define the matrix operator
+        typedef typename MatrixType::BackendType IstlMatrixType;
+        typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
 #if HAVE_MPI
-      typedef OverlappingSchwarzOperator<IstlMatrixType, IstlVectorType, IstlVectorType, CommunicatorType>
-          MatrixOperatorType;
-      MatrixOperatorType matrix_operator(matrix_.backend(), communicator_);
+        typedef OverlappingSchwarzOperator<IstlMatrixType, IstlVectorType, IstlVectorType, CommunicatorType>
+            MatrixOperatorType;
+        MatrixOperatorType matrix_operator(matrix_.backend(), communicator_);
 #else // HAVE_MPI
-      typedef MatrixAdapter<IstlMatrixType, IstlVectorType, IstlVectorType> MatrixOperatorType;
-      MatrixOperatorType matrix_operator(matrix_.backend());
+        typedef MatrixAdapter<IstlMatrixType, IstlVectorType, IstlVectorType> MatrixOperatorType;
+        MatrixOperatorType matrix_operator(matrix_.backend());
 #endif // HAVE_MPI
 
 // define the scalar product
 #if HAVE_MPI
-      OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
+        OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
 #else
-      Dune::SeqScalarProduct<typename IstlDenseVector<S>::BackendType> scalar_product;
+        Dune::SeqScalarProduct<typename IstlDenseVector<S>::BackendType> scalar_product;
 #endif
 
 // define ILU0 as the smoother for the AMG
 #if HAVE_MPI
-      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType;
-      typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType>
-          SmootherType;
+        typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType;
+        typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType>
+            SmootherType;
 #else // HAVE_MPI
-      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
+        typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
 #endif
-      typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
-      smoother_parameters.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
-      smoother_parameters.relaxationFactor =
-          opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
+        typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
+        smoother_parameters.iterations =
+            opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
+        smoother_parameters.relaxationFactor =
+            opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
 
-      // define the AMG as the preconditioner for the BiCGStab solver
-      Amg::Parameters amg_parameters(
-          opts.get("preconditioner.max_level", default_opts.get<size_t>("preconditioner.max_level")),
-          opts.get("preconditioner.coarse_target", default_opts.get<size_t>("preconditioner.coarse_target")),
-          opts.get("preconditioner.min_coarse_rate", default_opts.get<S>("preconditioner.min_coarse_rate")),
-          opts.get("preconditioner.prolong_damp", default_opts.get<S>("preconditioner.prolong_damp")));
-      amg_parameters.setDefaultValuesIsotropic(
-          opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
-      amg_parameters.setDefaultValuesAnisotropic(
-          opts.get("preconditioner.anisotropy_dim", default_opts.get<size_t>("preconditioner.anisotropy_dim")));
-      amg_parameters.setDebugLevel(
-          opts.get("preconditioner.verbose", default_opts.get<size_t>("preconditioner.verbose")));
-      Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(amg_parameters);
+        // define the AMG as the preconditioner for the BiCGStab solver
+        Amg::Parameters amg_parameters(
+            opts.get("preconditioner.max_level", default_opts.get<size_t>("preconditioner.max_level")),
+            opts.get("preconditioner.coarse_target", default_opts.get<size_t>("preconditioner.coarse_target")),
+            opts.get("preconditioner.min_coarse_rate", default_opts.get<S>("preconditioner.min_coarse_rate")),
+            opts.get("preconditioner.prolong_damp", default_opts.get<S>("preconditioner.prolong_damp")));
+        amg_parameters.setDefaultValuesIsotropic(
+            opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
+        amg_parameters.setDefaultValuesAnisotropic(
+            opts.get("preconditioner.anisotropy_dim", default_opts.get<size_t>("preconditioner.anisotropy_dim")));
+        amg_parameters.setDebugLevel(
+            opts.get("preconditioner.verbose", default_opts.get<size_t>("preconditioner.verbose")));
+        Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(
+            amg_parameters);
 #if HAVE_MPI
-      typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType, CommunicatorType> PreconditionerType;
-      PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters, communicator_);
+        typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType, CommunicatorType> PreconditionerType;
+        PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters, communicator_);
 #else // HAVE_MPI
-      typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType> PreconditionerType;
-      PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters);
+        typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType> PreconditionerType;
+        PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters);
 #endif // HAVE_MPI
 
-      // define the BiCGStab as the actual solver
-      BiCGSTABSolver<IstlVectorType> solver(
-          matrix_operator,
-          scalar_product,
-          preconditioner,
-          opts.get("precision", default_opts.get<S>("precision")),
-          opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+        // define the BiCGStab as the actual solver
+        BiCGSTABSolver<IstlVectorType> solver(
+            matrix_operator,
+            scalar_product,
+            preconditioner,
+            opts.get("precision", default_opts.get<S>("precision")),
+            opts.get("max_iter", default_opts.get<size_t>("max_iter")),
 #if HAVE_MPI
-          (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
+            (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
 #else // HAVE_MPI
-          opts.get("verbose", default_opts.get<int>("verbose"))
+            opts.get("verbose", default_opts.get<int>("verbose"))
 #endif
-          );
+            );
 
-      // call the solver an do the actual work
-      InverseOperatorResult stats;
-      solver.apply(solution.backend(), writable_rhs.backend(), stats);
-      if (!stats.converged)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
+        // call the solver an do the actual work
+        InverseOperatorResult stats;
+        solver.apply(solution.backend(), writable_rhs.backend(), stats);
+        if (!stats.converged)
+          DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                                "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                                    << "Those were the given options:\n\n"
+                                    << opts);
 #if !HAVE_MPI
-    } else if (type == "bicgstab.ilut") {
-      typedef MatrixAdapter<typename MatrixType::BackendType,
-                            typename IstlDenseVector<S>::BackendType,
-                            typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
-      MatrixOperatorType matrix_operator(matrix_.backend());
-      typedef SeqILUn<typename MatrixType::BackendType,
-                      typename IstlDenseVector<S>::BackendType,
-                      typename IstlDenseVector<S>::BackendType> PreconditionerType;
-      PreconditionerType preconditioner(
-          matrix_.backend(),
-          opts.get("preconditioner.iterations", default_opts.get<size_t>("preconditioner.iterations")),
-          opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
-      typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
-      SolverType solver(matrix_operator,
-                        preconditioner,
-                        opts.get("precision", default_opts.get<S>("precision")),
-                        opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-                        opts.get("verbose", default_opts.get<int>("verbose")));
-      InverseOperatorResult stat;
-      solver.apply(solution.backend(), writable_rhs.backend(), stat);
-      if (!stat.converged)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                              "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
+      } else if (type == "bicgstab.ilut") {
+        typedef MatrixAdapter<typename MatrixType::BackendType,
+                              typename IstlDenseVector<S>::BackendType,
+                              typename IstlDenseVector<S>::BackendType> MatrixOperatorType;
+        MatrixOperatorType matrix_operator(matrix_.backend());
+        typedef SeqILUn<typename MatrixType::BackendType,
+                        typename IstlDenseVector<S>::BackendType,
+                        typename IstlDenseVector<S>::BackendType> PreconditionerType;
+        PreconditionerType preconditioner(
+            matrix_.backend(),
+            opts.get("preconditioner.iterations", default_opts.get<size_t>("preconditioner.iterations")),
+            opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
+        typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
+        SolverType solver(matrix_operator,
+                          preconditioner,
+                          opts.get("precision", default_opts.get<S>("precision")),
+                          opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+                          opts.get("verbose", default_opts.get<int>("verbose")));
+        InverseOperatorResult stat;
+        solver.apply(solution.backend(), writable_rhs.backend(), stat);
+        if (!stat.converged)
+          DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                                "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                                    << "Those were the given options:\n\n"
+                                    << opts);
 #endif // !HAVE_MPI
-    } else
-      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
-                            "Given type '" << type << "' is not supported, although it was reported by options()!");
+      } else
+        DUNE_THROW_COLORFULLY(Exceptions::internal_error,
+                              "Given type '" << type << "' is not supported, although it was reported by options()!");
 #if !HAVE_MPI
-    // check (use writable_rhs as tmp)
-    const S post_check_solves_system_theshhold =
-        opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
-    if (post_check_solves_system_theshhold > 0) {
-      matrix_.mv(solution, writable_rhs);
-      writable_rhs -= rhs;
-      const S sup_norm = writable_rhs.sup_norm();
-      if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
-        DUNE_THROW_COLORFULLY(
-            Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
-            "The computed solution does not solve the system (although the dune-istl backend "
-                << "reported no error) and you requested checking (see options below)!\n"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
-                << "\n\n"
-                << "  (A * x - b).sup_norm() = "
-                << writable_rhs.sup_norm()
-                << "\n\n"
-                << "Those were the given options:\n\n"
-                << opts);
+      // check (use writable_rhs as tmp)
+      const S post_check_solves_system_theshhold =
+          opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
+      if (post_check_solves_system_theshhold > 0) {
+        matrix_.mv(solution, writable_rhs);
+        writable_rhs -= rhs;
+        const S sup_norm = writable_rhs.sup_norm();
+        if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
+          DUNE_THROW_COLORFULLY(
+              Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
+              "The computed solution does not solve the system (although the dune-istl backend "
+                  << "reported no error) and you requested checking (see options below)!\n"
+                  << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                  << "\n\n"
+                  << "  (A * x - b).sup_norm() = "
+                  << writable_rhs.sup_norm()
+                  << "\n\n"
+                  << "Those were the given options:\n\n"
+                  << opts);
+      }
+#endif // !HAVE_MPI
+    } catch (ISTLError& e) {
+      DUNE_THROW(Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());
     }
-#endif // !HAVE_MPI
   } // ... apply(...)
 
 private:
@@ -274,4 +279,4 @@ class Solver<IstlRowMajorSparseMatrix<S>>
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_SOLVER_STUFF_HH
+#endif // DUNE_STUFF_LA_SOLVER_ISTL_HH
