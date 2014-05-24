@@ -3,8 +3,8 @@
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_STUFF_GRID_PARTVIEW_HH
-#define DUNE_STUFF_GRID_PARTVIEW_HH
+#ifndef DUNE_STUFF_GRID_LAYERS_HH
+#define DUNE_STUFF_GRID_LAYERS_HH
 
 #include <memory>
 
@@ -269,4 +269,4 @@ struct LeafPartView
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_PARTVIEW_HH
+#endif // DUNE_STUFF_GRID_LAYERS_HH
