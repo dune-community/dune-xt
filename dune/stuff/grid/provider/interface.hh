@@ -18,7 +18,7 @@
 
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/grid/partview.hh>
+#include <dune/stuff/grid/layers.hh>
 #include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/grid/boundaryinfo.hh>
 
