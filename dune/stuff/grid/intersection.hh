@@ -12,6 +12,10 @@
 
 #include <dune/geometry/referenceelements.hh>
 
+#if HAVE_DUNE_GRID
+#include <dune/grid/common/gridview.hh>
+#endif
+
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/type_utils.hh>
@@ -20,6 +24,36 @@
 namespace Dune {
 namespace Stuff {
 namespace Grid {
+
+
+#if HAVE_DUNE_GRID
+
+
+template <class GridPartOrViewType>
+class Intersection
+{
+  template <class GridViewType, bool is_view>
+  struct Choose
+  {
+    typedef typename GridViewType::Intersection Type;
+  };
+
+  template <class GridPartType>
+  struct Choose<GridPartType, false>
+  {
+    typedef typename GridPartType::IntersectionType Type;
+  };
+
+  static const bool this_is_a_grid_view =
+      std::is_base_of<GridView<typename GridPartOrViewType::Traits>, GridPartOrViewType>::value;
+
+public:
+  typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
+}; // class Intersection
+
+
+#endif // HAVE_DUNE_GRID
+
 
 /**
   \brief      prints some basic information about a Dune::Intersection, namely the number of its corners and the
