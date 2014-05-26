@@ -9,6 +9,7 @@
 #if HAVE_DUNE_GRID
 #include <dune/grid/common/entity.hh>
 #include <dune/geometry/referenceelements.hh>
+#include <dune/grid/common/gridview.hh>
 #endif
 
 #include <dune/stuff/common/string.hh>
@@ -18,6 +19,35 @@
 namespace Dune {
 namespace Stuff {
 namespace Grid {
+
+#if HAVE_DUNE_GRID
+
+
+template <class GridPartOrViewType>
+class Entity
+{
+  template <class GridViewType, bool is_view>
+  struct Choose
+  {
+    typedef typename GridViewType::template Codim<0>::Entity Type;
+  };
+
+  template <class GridPartType>
+  struct Choose<GridPartType, false>
+  {
+    typedef typename GridPartType::template Codim<0>::EntityType Type;
+  };
+
+  static const bool this_is_a_grid_view =
+      std::is_base_of<GridView<typename GridPartOrViewType::Traits>, GridPartOrViewType>::value;
+
+public:
+  typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
+}; // class Entity
+
+
+#endif // HAVE_DUNE_GRID
+
 
 template <class EntityType>
 void printEntity(const EntityType& entity, const std::string name = Common::Typename<EntityType>::value(),
@@ -53,6 +83,7 @@ double DUNE_DEPRECATED_MSG("use entityDiameter instead")
   DUNE_THROW(Dune::NotImplemented, "geometryDiameter not implemented for dim 3");
 } // geometryDiameter
 
+
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 double entityDiameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
 {
@@ -68,7 +99,10 @@ double entityDiameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& e
   }
   return min_dist;
 } // geometryDiameter
+
+
 #endif // HAVE_DUNE_GRID
+
 
 #if DUNE_VERSION_NEWER(DUNE_GEOMETRY, 2, 3)
 #define REFERENCE_ELEMENTS ReferenceElements

@@ -8,10 +8,6 @@
 
 #include <memory>
 
-#if HAVE_DUNE_GRID
-#include <dune/grid/common/gridview.hh>
-#endif
-
 #if HAVE_DUNE_FEM
 #include <dune/fem/gridpart/leafgridpart.hh>
 #include <dune/fem/gridpart/levelgridpart.hh>
@@ -46,29 +42,6 @@ enum class ChooseLayer
 
 
 #if HAVE_DUNE_GRID
-
-
-template <class GridPartOrViewType>
-class Entity
-{
-  template <class GridViewType, bool is_view>
-  struct Choose
-  {
-    typedef typename GridViewType::template Codim<0>::Entity Type;
-  };
-
-  template <class GridPartType>
-  struct Choose<GridPartType, false>
-  {
-    typedef typename GridPartType::template Codim<0>::EntityType Type;
-  };
-
-  static const bool this_is_a_grid_view =
-      std::is_base_of<GridView<typename GridPartOrViewType::Traits>, GridPartOrViewType>::value;
-
-public:
-  typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
-};
 
 
 // forwards
