@@ -18,7 +18,7 @@ namespace Stuff {
 namespace LA {
 
 
-template <class ScalarType, ChooseBackend backend>
+template <class ScalarType, ChooseBackend backend = default_backend>
 struct Container;
 
 
