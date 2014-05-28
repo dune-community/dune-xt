@@ -10,7 +10,9 @@
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/gridpart/leafgridpart.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/fem/gridpart/levelgridpart.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_DUNE_FEM
 
 #if HAVE_DUNE_GRID_MULTISCALE
