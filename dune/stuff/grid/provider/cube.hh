@@ -53,8 +53,8 @@ struct ElementVariant<Dune::YaspGrid<dim>>
 };
 
 
-template <int dim>
-struct ElementVariant<Dune::SGrid<dim, dim>>
+template <int dimGrid, int dimWorld>
+struct ElementVariant<Dune::SGrid<dimGrid, dimWorld>>
 {
   static const int id = 1;
 };
@@ -63,8 +63,22 @@ struct ElementVariant<Dune::SGrid<dim, dim>>
 #if HAVE_ALUGRID
 
 
-template <int dim>
-struct ElementVariant<Dune::ALUCubeGrid<dim, dim>>
+template <int dimGrid, int dimWorld>
+struct ElementVariant<Dune::ALUCubeGrid<dimGrid, dimWorld>>
+{
+  static const int id = 1;
+};
+
+
+template <int dimGrid, int dimWorld>
+struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming>>
+{
+  static const int id = 1;
+};
+
+
+template <int dimGrid, int dimWorld>
+struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconforming>>
 {
   static const int id = 1;
 };
