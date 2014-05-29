@@ -262,11 +262,15 @@ public:
 
   virtual std::shared_ptr<GridType> grid() = 0;
 
+  using BaseType::layer;
+
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
   std::shared_ptr<typename BaseType::template Layer<layer_type, part_view_type>::Type> layer(const int level = 0)
   {
     return Grid::Layer<GridType, layer_type, part_view_type>::create(*(grid()), level);
   }
+
+  using BaseType::level;
 
   template <ChoosePartView type>
   std::shared_ptr<typename BaseType::template Level<type>::Type> level(const int level)
@@ -274,17 +278,23 @@ public:
     return LevelPartView<GridType, type>::create(*(grid()), level);
   }
 
+  using BaseType::level_view;
+
   std::shared_ptr<LevelGridViewType> level_view(const int level)
   {
     return this->template level<ChoosePartView::view>(level);
   }
 
 #if HAVE_DUNE_FEM
+  using BaseType::level_part;
+
   std::shared_ptr<LevelGridPartType> level_part(const int level)
   {
     return this->template level<ChoosePartView::part>(level);
   }
 #endif // HAVE_DUNE_FEM
+
+  using BaseType::leaf;
 
   template <ChoosePartView type>
   std::shared_ptr<typename BaseType::template Leaf<type>::Type> leaf()
@@ -292,12 +302,16 @@ public:
     return LeafPartView<GridType, type>::create(*(grid()));
   }
 
+  using BaseType::leaf_view;
+
   std::shared_ptr<LeafGridViewType> leaf_view()
   {
     return this->template leaf<ChoosePartView::view>();
   }
 
 #if HAVE_DUNE_FEM
+  using BaseType::leaf_part;
+
   std::shared_ptr<LeafGridPartType> leaf_part()
   {
     return this->template leaf<ChoosePartView::part>();
