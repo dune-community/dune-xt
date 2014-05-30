@@ -17,6 +17,7 @@
 #endif // HAVE_EIGEN
 
 #include <dune/common/typetraits.hh>
+#include <dune/common/densematrix.hh>
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
@@ -667,6 +668,24 @@ public:
     : backend_(new BackendType(other))
   {
   }
+
+  template <class M>
+  EigenDenseMatrix(const MatrixInterface<M>& other)
+    : backend_(new BackendType(other.rows(), other.cols()))
+  {
+    for (size_t ii = 0; ii < other.rows(); ++ii)
+      for (size_t jj = 0; jj < other.cols(); ++jj)
+        set_entry(ii, jj, other.get_entry(ii, jj));
+  } // EigenDenseMatrix(...)
+
+  template <class T>
+  EigenDenseMatrix(const DenseMatrix<T>& other)
+    : backend_(new BackendType(other.rows(), other.cols()))
+  {
+    for (size_t ii = 0; ii < other.rows(); ++ii)
+      for (size_t jj = 0; jj < other.cols(); ++jj)
+        set_entry(ii, jj, other[ii][jj]);
+  } // EigenDenseMatrix(...)
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
