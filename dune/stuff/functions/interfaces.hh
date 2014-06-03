@@ -371,6 +371,8 @@ std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E
   return out;
 } // ... operator<<(...)
 
+template <class OtherEntityImp, class GlobalFunctionImp>
+struct TransferredGlobalFunction;
 
 /**
  * base class for global matrix-valued valued functions that provides automatic local functions via
@@ -452,6 +454,19 @@ private:
     const typename EntityImp::Geometry geometry_;
     const ThisType& global_function_;
   }; // class Localfunction
+
+public:
+  template <class OtherEntityImp>
+  struct Transfer
+  {
+    typedef TransferredGlobalFunction<OtherEntityImp, ThisType> Type;
+  };
+
+  template <class OtherEntityImp>
+  typename Transfer<OtherEntityImp>::Type transfer() const
+  {
+    return typename Transfer<OtherEntityImp>::Type(*this);
+  }
 }; // class GlobalFunctionInterface
 
 
@@ -553,8 +568,48 @@ private:
     const typename EntityImp::Geometry geometry_;
     const ThisType& global_function_;
   }; // class Localfunction
+
+public:
+  template <class OtherEntityImp>
+  struct Transfer
+  {
+    typedef TransferredGlobalFunction<OtherEntityImp, ThisType> Type;
+  };
+
+  template <class OtherEntityImp>
+  typename Transfer<OtherEntityImp>::Type transfer() const
+  {
+    return typename Transfer<OtherEntityImp>::Type(*this);
+  }
 }; // class GlobalFunctionInterface< ..., 1 >
 
+template <class OtherEntityImp, class GlobalFunctionImp>
+struct TransferredGlobalFunction
+    : public GlobalFunctionInterface<OtherEntityImp, typename GlobalFunctionImp::DomainFieldType,
+                                     GlobalFunctionImp::dimDomain, typename GlobalFunctionImp::RangeFieldType,
+                                     GlobalFunctionImp::dimRange, GlobalFunctionImp::dimRangeCols>
+{
+
+  typedef GlobalFunctionInterface<OtherEntityImp, typename GlobalFunctionImp::DomainFieldType,
+                                  GlobalFunctionImp::dimDomain, typename GlobalFunctionImp::RangeFieldType,
+                                  GlobalFunctionImp::dimRange, GlobalFunctionImp::dimRangeCols> BaseType;
+  TransferredGlobalFunction(const GlobalFunctionImp& function)
+    : function_(function)
+  {
+  }
+
+  virtual size_t order() const
+  {
+    return function_.order();
+  }
+
+  virtual void evaluate(const typename BaseType::DomainType& x, typename BaseType::RangeType& ret) const
+  {
+    function_.evaluate(x, ret);
+  }
+
+  const GlobalFunctionImp& function_;
+};
 
 /**
  * \brief Interface for scalar and vector valued stationary function.
