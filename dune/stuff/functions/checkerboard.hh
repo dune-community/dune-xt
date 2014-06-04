@@ -64,13 +64,27 @@ class Checkerboard
       return 0;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
+    virtual void evaluate(const DomainType&
+#ifndef NDEBUG
+                              xx
+#else
+/*xx*/
+#endif
+                          ,
+                          RangeType& ret) const DS_OVERRIDE
     {
       assert(this->is_a_valid_point(xx));
       ret = value_;
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
+    virtual void jacobian(const DomainType&
+#ifndef NDEBUG
+                              xx
+#else
+/*xx*/
+#endif
+                          ,
+                          JacobianRangeType& ret) const DS_OVERRIDE
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
