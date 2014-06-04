@@ -74,8 +74,6 @@ public:
   template <class PointContainerType>
   EntityPointerVectorType operator()(const PointContainerType& points)
   {
-    const auto max_size = points.size();
-
     const IteratorType begin = gridview_.template begin<0>();
     const IteratorType end = gridview_.template end<0>();
     EntityPointerVectorType ret(points.size());
