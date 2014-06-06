@@ -11,14 +11,16 @@
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
-#include <dune/stuff/la/solver/istl_amg.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/la/container/istl.hh>
+#include <dune/stuff/la/solver/istl_amg.hh>
 
 #include "../solver.hh"
 
@@ -52,6 +54,8 @@ public:
     : matrix_(matrix)
 #if HAVE_MPI
     , communicator_(communicator)
+#else
+    , communicator_()
 #endif
   {
   }
@@ -123,9 +127,13 @@ public:
       IstlDenseVector<S> writable_rhs       = rhs.copy();
       // solve
       if (type == "bicgstab.amg.ilu0") {
-        // call the solver an do the actual work
-        AmgApplicator<S, CommunicatorType>(matrix_, communicator_).call(writable_rhs, solution, opts, default_opts);
-
+        auto result =
+            AmgApplicator<S, CommunicatorType>(matrix_, communicator_).call(writable_rhs, solution, opts, default_opts);
+        if (!result.converged)
+          DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                                "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                                    << "Those were the given options:\n\n"
+                                    << opts);
 #if !HAVE_MPI
       } else if (type == "bicgstab.ilut") {
         typedef MatrixAdapter<typename MatrixType::BackendType,
@@ -185,9 +193,7 @@ public:
 
 private:
   const MatrixType& matrix_;
-#if HAVE_MPI
   const CommunicatorType& communicator_;
-#endif
 }; // class Solver
 
 #else // HAVE_DUNE_ISTL

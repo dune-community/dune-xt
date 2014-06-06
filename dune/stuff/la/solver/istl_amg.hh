@@ -13,7 +13,9 @@
 #include <dune/istl/operators.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/istl/paamg/amg.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
@@ -21,13 +23,12 @@
 #include <dune/stuff/common/parallel/helper.hh>
 #include <dune/stuff/la/container/istl.hh>
 
-#include "../solver.hh"
-
 namespace Dune {
 namespace Stuff {
 namespace LA {
 
 #if HAVE_DUNE_ISTL
+
 
 //! the general, parallel case
 template <class S, class CommunicatorType>
@@ -44,8 +45,8 @@ public:
   {
   }
 
-  void call(IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts,
-            const Common::ConfigTree& default_opts)
+  InverseOperatorResult call(IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts,
+                             const Common::ConfigTree& default_opts)
   {
     // define the matrix operator
 
@@ -74,8 +75,7 @@ public:
         opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
     amg_parameters.setDefaultValuesAnisotropic(
         opts.get("preconditioner.anisotropy_dim", default_opts.get<size_t>("preconditioner.anisotropy_dim")));
-    amg_parameters.setDebugLevel(
-        opts.get("preconditioner.verbose", default_opts.get<size_t>("preconditioner.verbose")));
+    amg_parameters.setDebugLevel(opts.get("preconditioner.verbose", default_opts.get<int>("preconditioner.verbose")));
     Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(amg_parameters);
     typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType, CommunicatorType> PreconditionerType;
     PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters, communicator_);
@@ -96,17 +96,13 @@ public:
 
     InverseOperatorResult stats;
     solver.apply(solution.backend(), rhs.backend(), stats);
-    if (!stats.converged)
-      DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                            "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                << "Those were the given options:\n\n"
-                                << opts);
-  }
-
+    return stats;
+  } // ... call(...)
 protected:
   const MatrixType& matrix_;
   const CommunicatorType& communicator_;
 };
+
 
 //! specialization for our faux type \ref SequentialCommunication
 template <class S>
@@ -123,10 +119,9 @@ public:
   {
   }
 
-  void call(IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts,
-            const Common::ConfigTree& default_opts)
+  InverseOperatorResult call(IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts,
+                             const Common::ConfigTree& default_opts)
   {
-
     typedef MatrixAdapter<IstlMatrixType, IstlVectorType, IstlVectorType> MatrixOperatorType;
     MatrixOperatorType matrix_operator(matrix_.backend());
 
@@ -152,8 +147,7 @@ public:
         opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
     amg_parameters.setDefaultValuesAnisotropic(
         opts.get("preconditioner.anisotropy_dim", default_opts.get<size_t>("preconditioner.anisotropy_dim")));
-    amg_parameters.setDebugLevel(
-        opts.get("preconditioner.verbose", default_opts.get<size_t>("preconditioner.verbose")));
+    amg_parameters.setDebugLevel(opts.get("preconditioner.verbose", default_opts.get<int>("preconditioner.verbose")));
     Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(amg_parameters);
 
     typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType> PreconditionerType;
@@ -168,25 +162,24 @@ public:
                                           opts.get("verbose", default_opts.get<int>("verbose")));
     InverseOperatorResult stats;
     solver.apply(solution.backend(), rhs.backend(), stats);
-    if (!stats.converged)
-      DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                            "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                << "Those were the given options:\n\n"
-                                << opts);
-  }
+    return stats;
+  } // ... call(...)
 
 protected:
   const MatrixType& matrix_;
   const SequentialCommunication& communicator_;
 };
 
+
 #else // HAVE_DUNE_ISTL
+
 
 template <class S, class T>
 class AmgApplicator
 {
   static_assert(Dune::AlwaysFalse<S, T>::value, "You are missing dune-istl!");
 };
+
 
 #endif // HAVE_DUNE_ISTL
 
