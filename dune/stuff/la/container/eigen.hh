@@ -23,6 +23,7 @@
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/crtp.hh>
+#include <dune/stuff/common/float_cmp.hh>
 
 #include "interfaces.hh"
 #include "pattern.hh"
@@ -192,7 +193,8 @@ public:
     size_t max_index         = 0;
     const ScalarType minimum = backend_->minCoeff(&min_index);
     const ScalarType maximum = backend_->maxCoeff(&max_index);
-    if (std::abs(maximum) < std::abs(minimum) || (std::abs(maximum) == std::abs(minimum) && max_index > min_index)) {
+    if (std::abs(maximum) < std::abs(minimum)
+        || (Common::FloatCmp::eq(std::abs(maximum), std::abs(minimum)) && max_index > min_index)) {
       result.first  = min_index;
       result.second = std::abs(minimum);
     } else {
