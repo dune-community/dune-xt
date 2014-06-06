@@ -125,13 +125,6 @@ public:
     // get correct config
     const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::ConfigTree default_cfg = default_config();
-    // create
-    RangeType value;
-    try {
-      value = cfg.get("value", default_cfg.get<RangeType>("value"));
-    } catch (Stuff::Exceptions::configuration_error) {
-      value = RangeType(cfg.get("value", RangeFieldType(1)));
-    }
     return Common::make_unique<ThisType>(cfg.get("value", default_cfg.get<RangeType>("value")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
