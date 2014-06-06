@@ -40,13 +40,13 @@ public:
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
-    , communicator_provider_(new Common::ReferenceProviderByPointer<CommunicatorType>())
+    , communicator_provider_(new Common::ReferenceProviderByPointer<const CommunicatorType>())
   {
   }
 
   Solver(const MatrixType& matrix, const CommunicatorType& communicator)
     : matrix_(matrix)
-    , communicator_provider_(new Common::ReferenceProviderByReference<CommunicatorType>(communicator))
+    , communicator_provider_(new Common::ReferenceProviderByReference<const CommunicatorType>(communicator))
   {
   }
 
@@ -183,7 +183,7 @@ public:
 
 private:
   const MatrixType& matrix_;
-  const std::unique_ptr<Common::ReferenceProvider<CommunicatorType>> communicator_provider_;
+  const std::unique_ptr<Common::ReferenceProvider<const CommunicatorType>> communicator_provider_;
 }; // class Solver
 
 
