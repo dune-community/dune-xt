@@ -260,6 +260,8 @@ public:
   {
   }
 
+  using BaseType::grid;
+
   virtual std::shared_ptr<GridType> grid() = 0;
 
   using BaseType::layer;
