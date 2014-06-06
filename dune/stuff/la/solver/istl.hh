@@ -19,6 +19,7 @@
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/misc.hh>
 #include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/solver/istl_amg.hh>
 
@@ -37,26 +38,15 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUt
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
 
-#if !HAVE_MPI
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
+    , communicator_provider_(new Common::ReferenceProviderByPointer<CommunicatorType>())
   {
   }
-#endif // !HAVE_MPI
 
-  Solver(const MatrixType& matrix, const CommunicatorType&
-#if HAVE_MPI
-                                       communicator
-#else
-/*communicator*/
-#endif
-         )
+  Solver(const MatrixType& matrix, const CommunicatorType& communicator)
     : matrix_(matrix)
-#if HAVE_MPI
-    , communicator_(communicator)
-#else
-    , communicator_()
-#endif
+    , communicator_provider_(new Common::ReferenceProviderByReference<CommunicatorType>(communicator))
   {
   }
 
@@ -127,8 +117,8 @@ public:
       IstlDenseVector<S> writable_rhs       = rhs.copy();
       // solve
       if (type == "bicgstab.amg.ilu0") {
-        auto result =
-            AmgApplicator<S, CommunicatorType>(matrix_, communicator_).call(writable_rhs, solution, opts, default_opts);
+        auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_provider_->get())
+                          .call(writable_rhs, solution, opts, default_opts);
         if (!result.converged)
           DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
                                 "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
@@ -193,18 +183,22 @@ public:
 
 private:
   const MatrixType& matrix_;
-  const CommunicatorType& communicator_;
+  const std::unique_ptr<Common::ReferenceProvider<CommunicatorType>> communicator_provider_;
 }; // class Solver
+
 
 #else // HAVE_DUNE_ISTL
 
-template <class S>
-class Solver<IstlRowMajorSparseMatrix<S>>
+
+template <class S, class CommunicatorType>
+class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
 {
   static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
 };
 
+
 #endif // HAVE_DUNE_ISTL
+
 
 } // namespace LA
 } // namespace Stuff
