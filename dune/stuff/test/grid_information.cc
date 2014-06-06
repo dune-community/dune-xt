@@ -35,7 +35,7 @@ struct GridInfoTest : public ::testing::Test
 
   void check()
   {
-    const Dimensions<GridType> dim(*gridPtr);
+    const Dimensions<typename GridType::LeafGridView> dim(gridPtr->leafGridView());
     const auto gv      = gridPtr->leafView();
     const int entities = gv.size(0);
     EXPECT_DOUBLE_EQ(1.0 / double(entities), dim.entity_volume.min());
