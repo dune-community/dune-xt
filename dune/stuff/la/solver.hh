@@ -12,6 +12,7 @@
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parallel/helper.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -54,7 +55,7 @@ public:
 };
 
 
-template <class MatrixImp, class CommunicatorType = double>
+template <class MatrixImp, class CommunicatorType = SequentialCommunication>
 class Solver
 {
   static_assert(AlwaysFalse<MatrixImp>::value, "This is the unspecialized version of LA::Solver< ... >. Please include "
