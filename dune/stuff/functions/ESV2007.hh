@@ -13,6 +13,7 @@
 #include <dune/geometry/referenceelements.hh>
 
 #include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/debug.hh>
 
 #include "interfaces.hh"
 
@@ -93,27 +94,13 @@ class DUNE_DEPRECATED_MSG("Use ESV2007::Cutoff instead!") ESV2007Cutoff
       return 0;
     }
 
-    virtual void evaluate(const DomainType&
-#ifndef NDEBUG
-                              xx
-#else
-/*xx*/
-#endif
-                          ,
-                          RangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const DS_OVERRIDE DS_FINAL
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType&
-#ifndef NDEBUG
-                              xx
-#else
-/*xx*/
-#endif
-                          ,
-                          JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -485,27 +472,13 @@ class Cutoff
       return 0;
     }
 
-    virtual void evaluate(const DomainType&
-#ifndef NDEBUG
-                              xx
-#else
-/*xx*/
-#endif
-                          ,
-                          RangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const DS_OVERRIDE DS_FINAL
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType&
-#ifndef NDEBUG
-                              xx
-#else
-/*xx*/
-#endif
-                          ,
-                          JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
