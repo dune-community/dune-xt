@@ -14,6 +14,7 @@
 
 #include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/common/debug.hh>
+#include <dune/stuff/la/container/eigen.hh>
 
 #include "interfaces.hh"
 
@@ -400,19 +401,23 @@ private:
 }; // class Testcase1ExactSolution
 
 
-template <class DiffusionImp>
-class Cutoff
-    : public LocalizableFunctionInterface<typename DiffusionImp::EntityType, typename DiffusionImp::DomainFieldType,
-                                          DiffusionImp::dimDomain, typename DiffusionImp::RangeFieldType, 1, 1>
+template <class DiffusionFactorType, class DiffusionTensorType = void>
+class Cutoff;
+
+
+template <class DiffusionType>
+class Cutoff<DiffusionType, void>
+    : public LocalizableFunctionInterface<typename DiffusionType::EntityType, typename DiffusionType::DomainFieldType,
+                                          DiffusionType::dimDomain, typename DiffusionType::RangeFieldType, 1, 1>
 {
-  static_assert(std::is_base_of<Tags::LocalizableFunction, DiffusionImp>::value,
-                "DiffusionImp has to be tagged as a LocalizableFunction!");
-  typedef typename DiffusionImp::EntityType E_;
-  typedef typename DiffusionImp::DomainFieldType D_;
-  static const unsigned int d_ = DiffusionImp::dimDomain;
-  typedef typename DiffusionImp::RangeFieldType R_;
+  static_assert(std::is_base_of<Tags::LocalizableFunction, DiffusionType>::value,
+                "DiffusionType has to be tagged as a LocalizableFunction!");
+  typedef typename DiffusionType::EntityType E_;
+  typedef typename DiffusionType::DomainFieldType D_;
+  static const unsigned int d_ = DiffusionType::dimDomain;
+  typedef typename DiffusionType::RangeFieldType R_;
   typedef LocalizableFunctionInterface<E_, D_, d_, R_, 1> BaseType;
-  typedef Cutoff<DiffusionImp> ThisType;
+  typedef Cutoff<DiffusionType> ThisType;
 
   class Localfunction : public LocalfunctionInterface<E_, D_, d_, R_, 1, 1>
   {
@@ -452,12 +457,13 @@ class Cutoff
     }; // class Compute< ..., 1, 1 >
 
   public:
-    Localfunction(const EntityType& ent, const DiffusionImp& diffusion, const RangeFieldType poincare_constant)
+    Localfunction(const EntityType& ent, const DiffusionType& diffusion, const RangeFieldType poincare_constant)
       : BaseType(ent)
       , value_(0)
     {
       const RangeFieldType min_eigen_value =
-          Compute<DiffusionImp, DiffusionImp::dimRange, DiffusionImp::dimRangeCols>::min_eigenvalue_of(diffusion, ent);
+          Compute<DiffusionType, DiffusionType::dimRange, DiffusionType::dimRangeCols>::min_eigenvalue_of(diffusion,
+                                                                                                          ent);
       assert(min_eigen_value > 0.0);
       const DomainFieldType hh = compute_diameter_of_(ent);
       value_                   = (poincare_constant * hh * hh) / min_eigen_value;
@@ -520,7 +526,7 @@ public:
     return BaseType::static_id() + ".ESV2007.cutoff";
   }
 
-  Cutoff(const DiffusionImp& diffusion, const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
+  Cutoff(const DiffusionType& diffusion, const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
          const std::string nm = static_id())
     : diffusion_(diffusion)
     , poincare_constant_(poincare_constant)
@@ -553,7 +559,7 @@ public:
   }
 
 private:
-  const DiffusionImp& diffusion_;
+  const DiffusionType& diffusion_;
   const RangeFieldType poincare_constant_;
   std::string name_;
 }; // class Cutoff
