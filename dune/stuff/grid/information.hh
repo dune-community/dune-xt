@@ -9,6 +9,7 @@
 #include <ostream>
 #include <boost/format.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <dune/grid/common/gridview.hh>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/common/ranges.hh>
@@ -84,6 +85,8 @@ unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
 template <class GridViewType>
 struct Dimensions
 {
+  static_assert(std::is_base_of<GridView<typename GridViewType::Traits>, GridViewType>::value,
+                "GridViewType is no GridView");
   typedef typename GridViewType::Grid GridType;
   //! automatic running min/max
   typedef Dune::Stuff::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
