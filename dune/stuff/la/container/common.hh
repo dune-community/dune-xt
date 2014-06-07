@@ -14,6 +14,7 @@
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/dynmatrix.hh>
+#include <dune/common/densematrix.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/float_cmp.hh>
 #include <dune/common/typetraits.hh>
@@ -384,6 +385,15 @@ public:
     : backend_(new BackendType(other))
   {
   }
+
+  template <class T>
+  CommonDenseMatrix(const DenseMatrix<T>& other)
+    : backend_(new BackendType(other.rows(), other.cols()))
+  {
+    for (size_t ii = 0; ii < other.rows(); ++ii)
+      for (size_t jj = 0; jj < other.cols(); ++jj)
+        set_entry(ii, jj, other[ii][jj]);
+  } // CommonDenseMatrix(...)
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!

@@ -10,17 +10,18 @@
 #include <cmath>
 
 #if HAVE_DUNE_ISTL
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/istl/operators.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
-#include <dune/istl/paamg/amg.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/misc.hh>
 #include <dune/stuff/la/container/istl.hh>
+#include <dune/stuff/la/solver/istl_amg.hh>
 
 #include "../solver.hh"
 
@@ -37,24 +38,15 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUt
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
 
-#if !HAVE_MPI
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
+    , communicator_provider_(new Common::ReferenceProviderByPointer<const CommunicatorType>())
   {
   }
-#endif // !HAVE_MPI
 
-  Solver(const MatrixType& matrix, const CommunicatorType&
-#if HAVE_MPI
-                                       communicator
-#else
-/*communicator*/
-#endif
-         )
+  Solver(const MatrixType& matrix, const CommunicatorType& communicator)
     : matrix_(matrix)
-#if HAVE_MPI
-    , communicator_(communicator)
-#endif
+    , communicator_provider_(new Common::ReferenceProviderByReference<const CommunicatorType>(communicator))
   {
   }
 
@@ -125,79 +117,9 @@ public:
       IstlDenseVector<S> writable_rhs       = rhs.copy();
       // solve
       if (type == "bicgstab.amg.ilu0") {
-        // define the matrix operator
-        typedef typename MatrixType::BackendType IstlMatrixType;
-        typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
-#if HAVE_MPI
-        typedef OverlappingSchwarzOperator<IstlMatrixType, IstlVectorType, IstlVectorType, CommunicatorType>
-            MatrixOperatorType;
-        MatrixOperatorType matrix_operator(matrix_.backend(), communicator_);
-#else // HAVE_MPI
-        typedef MatrixAdapter<IstlMatrixType, IstlVectorType, IstlVectorType> MatrixOperatorType;
-        MatrixOperatorType matrix_operator(matrix_.backend());
-#endif // HAVE_MPI
-
-// define the scalar product
-#if HAVE_MPI
-        OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
-#else
-        Dune::SeqScalarProduct<typename IstlDenseVector<S>::BackendType> scalar_product;
-#endif
-
-// define ILU0 as the smoother for the AMG
-#if HAVE_MPI
-        typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType;
-        typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType>
-            SmootherType;
-#else // HAVE_MPI
-        typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
-#endif
-        typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
-        smoother_parameters.iterations =
-            opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
-        smoother_parameters.relaxationFactor =
-            opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
-
-        // define the AMG as the preconditioner for the BiCGStab solver
-        Amg::Parameters amg_parameters(
-            opts.get("preconditioner.max_level", default_opts.get<size_t>("preconditioner.max_level")),
-            opts.get("preconditioner.coarse_target", default_opts.get<size_t>("preconditioner.coarse_target")),
-            opts.get("preconditioner.min_coarse_rate", default_opts.get<S>("preconditioner.min_coarse_rate")),
-            opts.get("preconditioner.prolong_damp", default_opts.get<S>("preconditioner.prolong_damp")));
-        amg_parameters.setDefaultValuesIsotropic(
-            opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
-        amg_parameters.setDefaultValuesAnisotropic(
-            opts.get("preconditioner.anisotropy_dim", default_opts.get<size_t>("preconditioner.anisotropy_dim")));
-        amg_parameters.setDebugLevel(
-            opts.get("preconditioner.verbose", default_opts.get<size_t>("preconditioner.verbose")));
-        Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(
-            amg_parameters);
-#if HAVE_MPI
-        typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType, CommunicatorType> PreconditionerType;
-        PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters, communicator_);
-#else // HAVE_MPI
-        typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType> PreconditionerType;
-        PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters);
-#endif // HAVE_MPI
-
-        // define the BiCGStab as the actual solver
-        BiCGSTABSolver<IstlVectorType> solver(
-            matrix_operator,
-            scalar_product,
-            preconditioner,
-            opts.get("precision", default_opts.get<S>("precision")),
-            opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-#if HAVE_MPI
-            (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
-#else // HAVE_MPI
-            opts.get("verbose", default_opts.get<int>("verbose"))
-#endif
-            );
-
-        // call the solver an do the actual work
-        InverseOperatorResult stats;
-        solver.apply(solution.backend(), writable_rhs.backend(), stats);
-        if (!stats.converged)
+        auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_provider_->get())
+                          .call(writable_rhs, solution, opts, default_opts);
+        if (!result.converged)
           DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
                                 "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
                                     << "Those were the given options:\n\n"
@@ -261,21 +183,22 @@ public:
 
 private:
   const MatrixType& matrix_;
-#if HAVE_MPI
-  const CommunicatorType& communicator_;
-#endif
+  const std::unique_ptr<Common::ReferenceProvider<const CommunicatorType>> communicator_provider_;
 }; // class Solver
 
 
 #else // HAVE_DUNE_ISTL
 
-template <class S>
-class Solver<IstlRowMajorSparseMatrix<S>>
+
+template <class S, class CommunicatorType>
+class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
 {
   static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
 };
 
+
 #endif // HAVE_DUNE_ISTL
+
 
 } // namespace LA
 } // namespace Stuff
