@@ -35,7 +35,6 @@ class Constant
       for (size_t rr = 0; rr < r; ++rr) {
         if (rr > 0)
           str += "; ";
-        str += "[";
         for (size_t cc = 0; cc < rC; ++cc) {
           if (cc > 0)
             str += " ";
@@ -44,7 +43,6 @@ class Constant
           else
             str += "0";
         }
-        str += "]";
       }
       str += "]";
       return str;
@@ -72,14 +70,7 @@ class Constant
   {
     static std::string value_str()
     {
-      std::string str = "[";
-      for (size_t rr = 0; rr < r; ++rr) {
-        if (rr > 0)
-          str += " ";
-        str += "1";
-      }
-      str += "]";
-      return str;
+      return Get<R, 1, r>::value_str();
     }
   };
 
