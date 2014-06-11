@@ -15,6 +15,7 @@
 #include <limits>
 #include <iostream>
 #include <iterator>
+#include <type_traits>
 
 #include <dune/common/float_cmp.hh>
 
@@ -310,7 +311,8 @@ protected:
   {
     if (size < 0)
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
-    if (size > std::numeric_limits<size_t>::max())
+    typedef typename std::make_unsigned<SignedSizeType>::type UnsignedSizeType;
+    if (UnsignedSizeType(size) > std::numeric_limits<size_t>::max())
       DUNE_THROW_COLORFULLY(
           Exceptions::index_out_of_range,
           "Given size (" << size << ") is to large for size_t (max " << std::numeric_limits<size_t>::max() << ")!");
