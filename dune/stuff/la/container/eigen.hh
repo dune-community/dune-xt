@@ -916,34 +916,39 @@ public:
   typedef EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename BackendType::Index Index;
 
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
    */
   EigenRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern)
-    : backend_(new BackendType(rr, cc))
   {
+    assert(rr < std::numeric_limits<Index>::max() && cc < std::numeric_limits<Index>::max());
+    backend_ = std::make_shared<BackendType>(Index(rr), Index(cc));
     if (size_t(pattern.size()) != rr)
       DUNE_THROW_COLORFULLY(
           Exceptions::shapes_do_not_match,
           "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this (" << rows()
                                       << ")!");
     for (size_t row = 0; row < size_t(pattern.size()); ++row) {
-      backend_->startVec(row);
+      backend_->startVec(Index(row));
       const auto& columns = pattern.inner(row);
-      for (auto& column : columns)
-        backend_->insertBackByOuterInner(row, column);
+      for (auto& column : columns) {
+        assert(column < std::numeric_limits<Index>::max());
+        backend_->insertBackByOuterInner(Index(row), Index(column));
+      }
       // create diagonal entry (insertBackByOuterInner() can not handle empty rows)
       if (columns.size() == 0)
-        backend_->insertBackByOuterInner(row, row);
+        backend_->insertBackByOuterInner(Index(row), Index(row));
     }
     backend_->finalize();
     backend_->makeCompressed();
   }
 
   EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
-    : backend_(new BackendType(rr, cc))
   {
+    assert(rr < std::numeric_limits<Index>::max() && cc < std::numeric_limits<Index>::max());
+    backend_ = std::make_shared<BackendType>(Index(rr), Index(cc));
   }
 
   /// This constructor is needed for the python bindings.
@@ -954,9 +959,12 @@ public:
   }
 
   EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
+    : EigenRowMajorSparseMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
+                                MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc))
   {
+    //    assert(rr < std::numeric_limits<Index>::max() && rr > std::numeric_limits<Index>::min());
+    //    assert(cc < std::numeric_limits<Index>::max() && cc > std::numeric_limits<Index>::min());
+    //    backend_ = std::make_shared<BackendType>(Index(rr), Index(cc));
   }
 
   EigenRowMajorSparseMatrix(const ThisType& other)
@@ -1077,7 +1085,8 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend().coeffRef(ii, jj) += value;
+    assert(ii < std::numeric_limits<Index>::max && jj < std::numeric_limits<Index>::max);
+    backend().coeffRef(Index(ii), Index(jj)) += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
