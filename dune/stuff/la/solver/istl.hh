@@ -135,13 +135,13 @@ public:
                         typename IstlDenseVector<S>::BackendType> PreconditionerType;
         PreconditionerType preconditioner(
             matrix_.backend(),
-            opts.get("preconditioner.iterations", default_opts.get<size_t>("preconditioner.iterations")),
+            opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
             opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
         typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
         SolverType solver(matrix_operator,
                           preconditioner,
                           opts.get("precision", default_opts.get<S>("precision")),
-                          opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+                          opts.get("max_iter", default_opts.get<int>("max_iter")),
                           opts.get("verbose", default_opts.get<int>("verbose")));
         InverseOperatorResult stat;
         solver.apply(solution.backend(), writable_rhs.backend(), stat);
