@@ -45,8 +45,8 @@ template <class GridViewType>
 class EntityInlevelSearch : public EntitySearchBase<GridViewType>
 {
   typedef EntitySearchBase<GridViewType> BaseType;
-  typedef GenericReferenceElements<typename BaseType::LocalCoordinateType::value_type,
-                                   BaseType::LocalCoordinateType::dimension> RefElementType;
+  typedef ReferenceElements<typename BaseType::LocalCoordinateType::value_type,
+                            BaseType::LocalCoordinateType::dimension> RefElementType;
   typedef typename GridViewType::template Codim<0>::Iterator IteratorType;
 
 public:
