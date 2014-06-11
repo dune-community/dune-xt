@@ -332,7 +332,7 @@ public:
                                          ::Eigen::Lower,
                                          ::Eigen::DiagonalPreconditioner<S>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
@@ -341,7 +341,7 @@ public:
                                          ::Eigen::Upper,
                                          ::Eigen::DiagonalPreconditioner<double>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
@@ -350,7 +350,7 @@ public:
                                          ::Eigen::Lower,
                                          ::Eigen::IdentityPreconditioner> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
@@ -359,32 +359,32 @@ public:
                                          ::Eigen::Lower,
                                          ::Eigen::IdentityPreconditioner> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.ilut") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<S>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solver.preconditioner().setDroptol(
           opts.get("preconditioner.drop_tol", default_opts.get<S>("preconditioner.drop_tol")));
       solver.preconditioner().setFillfactor(
-          opts.get("preconditioner.fill_factor", default_opts.get<size_t>("preconditioner.fill_factor")));
+          opts.get("preconditioner.fill_factor", default_opts.get<int>("preconditioner.fill_factor")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.diagonal") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<S>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.identity") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
