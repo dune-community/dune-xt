@@ -19,7 +19,9 @@
 
 #include <dune/stuff/common/memory.hh>
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/stuff/common/disable_warnings.hh>
@@ -763,9 +765,12 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGri
 
 #include <dune/grid/alugrid.hh>
 
-typedef Dune::ALUSimplexGrid<2, 2>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType;
-typedef Dune::ALUSimplexGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType;
-typedef Dune::ALUCubeGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType;
+typedef Dune::ALUGrid<2, 2. Dune::simplex, Dune::nonconforming>::Codim<0>::Entity
+    DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType;
+typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity
+    DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType;
+typedef Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>::Codim<0>::Entity
+    DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType;
 
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType, 3)
