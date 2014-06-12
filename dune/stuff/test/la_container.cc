@@ -912,8 +912,9 @@ struct MatrixTest : public ::testing::Test
     if (result_mv_1 != vector_zeros || result_mv_2 != vector_zeros)
       DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1 << " vs " << result_mv_2 << " vs. " << vector_zeros);
     testmatrix_sparse.mv(testvector_5, result_mv_1);
-    if (result_mv_1[0] != ScalarType(1.25) || result_mv_1[1] != ScalarType(1.25) || result_mv_1[2] != ScalarType(1.75)
-        || result_mv_1[3] != ScalarType(0))
+    if (FloatCmp::ne(result_mv_1[0], ScalarType(1.25)) || FloatCmp::ne(result_mv_1[1], ScalarType(1.25))
+        || FloatCmp::ne(result_mv_1[2], ScalarType(1.75))
+        || FloatCmp::ne(result_mv_1[3], ScalarType(0)))
       DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1);
     testmatrix_2.mv(testvector_3, result_mv_1);
     result_mv_2 = vector_ones;
@@ -921,12 +922,14 @@ struct MatrixTest : public ::testing::Test
     if (result_mv_1 != result_mv_2)
       DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1 << " vs. " << result_mv_2);
     testmatrix_1.mv(testvector_1, result_mv_1);
-    if (result_mv_1[0] != ScalarType(5) || result_mv_1[1] != ScalarType(6) || result_mv_1[2] != ScalarType(7)
-        || result_mv_1[3] != ScalarType(8))
+    if (FloatCmp::ne(result_mv_1[0], ScalarType(5)) || FloatCmp::ne(result_mv_1[1], ScalarType(6))
+        || FloatCmp::ne(result_mv_1[2], ScalarType(7))
+        || FloatCmp::ne(result_mv_1[3], ScalarType(8)))
       DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1);
     testmatrix_sparse.mv(vector_ones, result_mv_1);
-    if (result_mv_1[0] != ScalarType(0.5) || result_mv_1[1] != ScalarType(2.5) || result_mv_1[2] != ScalarType(-0.5)
-        || result_mv_1[3] != ScalarType(0))
+    if (FloatCmp::ne(result_mv_1[0], ScalarType(0.5)) || FloatCmp::ne(result_mv_1[1], ScalarType(2.5))
+        || FloatCmp::ne(result_mv_1[2], ScalarType(-0.5))
+        || FloatCmp::ne(result_mv_1[3], ScalarType(0)))
       DUNE_THROW_COLORFULLY(Dune::Exception, result_mv_1);
     VectorImp a = vector_ones;
     matrix_zeros_dense.mv(vector_zeros, a);
