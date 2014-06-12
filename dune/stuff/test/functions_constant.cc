@@ -137,9 +137,9 @@ TYPED_TEST(ConstantFunctionYaspGridEntityTest, provides_required_methods)
 #define HAVE_ALUGRID 1
 #include <dune/grid/alugrid.hh>
 
-typedef Dune::ALUSimplexGrid<2, 2>::Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
-typedef Dune::ALUSimplexGrid<3, 3>::Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
-typedef Dune::ALUCubeGrid<3, 3>::Codim<0>::Entity DuneAluCubeGrid3dEntityType;
+typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
+typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
+typedef Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>::Codim<0>::Entity DuneAluCubeGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Functions::Constant<DuneAluSimplexGrid2dEntityType, double, 2, double, 1, 1>,
                        Dune::Stuff::Functions::Constant<DuneAluSimplexGrid2dEntityType, double, 2, double, 1, 2>,
