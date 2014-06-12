@@ -916,30 +916,31 @@ public:
   typedef EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
-  typedef typename BackendType::Index Index;
+  typedef typename BackendType::Index IndexType;
+  typedef typename std::make_unsigned<IndexType>::type UnsignedIndexType;
 
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
    */
   EigenRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern)
   {
-    assert(rr < std::numeric_limits<Index>::max() && cc < std::numeric_limits<Index>::max());
-    backend_ = std::make_shared<BackendType>(Index(rr), Index(cc));
+    assert(rr < std::numeric_limits<IndexType>::max() && cc < std::numeric_limits<IndexType>::max());
+    backend_ = std::make_shared<BackendType>(IndexType(rr), IndexType(cc));
     if (size_t(pattern.size()) != rr)
       DUNE_THROW_COLORFULLY(
           Exceptions::shapes_do_not_match,
           "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this (" << rows()
                                       << ")!");
     for (size_t row = 0; row < size_t(pattern.size()); ++row) {
-      backend_->startVec(Index(row));
+      backend_->startVec(IndexType(row));
       const auto& columns = pattern.inner(row);
       for (auto& column : columns) {
-        assert(column < std::numeric_limits<Index>::max());
-        backend_->insertBackByOuterInner(Index(row), Index(column));
+        assert(column < std::numeric_limits<IndexType>::max());
+        backend_->insertBackByOuterInner(IndexType(row), IndexType(column));
       }
       // create diagonal entry (insertBackByOuterInner() can not handle empty rows)
       if (columns.size() == 0)
-        backend_->insertBackByOuterInner(Index(row), Index(row));
+        backend_->insertBackByOuterInner(IndexType(row), IndexType(row));
     }
     backend_->finalize();
     backend_->makeCompressed();
@@ -947,8 +948,8 @@ public:
 
   EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
   {
-    assert(rr < std::numeric_limits<Index>::max() && cc < std::numeric_limits<Index>::max());
-    backend_ = std::make_shared<BackendType>(Index(rr), Index(cc));
+    assert(rr < std::numeric_limits<IndexType>::max() && cc < std::numeric_limits<IndexType>::max());
+    backend_ = std::make_shared<BackendType>(IndexType(rr), IndexType(cc));
   }
 
   /// This constructor is needed for the python bindings.
@@ -962,9 +963,9 @@ public:
     : EigenRowMajorSparseMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
                                 MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc))
   {
-    //    assert(rr < std::numeric_limits<Index>::max() && rr > std::numeric_limits<Index>::min());
-    //    assert(cc < std::numeric_limits<Index>::max() && cc > std::numeric_limits<Index>::min());
-    //    backend_ = std::make_shared<BackendType>(Index(rr), Index(cc));
+    //    assert(rr < std::numeric_limits<IndexType>::max() && rr > std::numeric_limits<IndexType>::min());
+    //    assert(cc < std::numeric_limits<IndexType>::max() && cc > std::numeric_limits<IndexType>::min());
+    //    backend_ = std::make_shared<BackendType>(IndexType(rr), IndexType(cc));
   }
 
   EigenRowMajorSparseMatrix(const ThisType& other)
@@ -1085,21 +1086,23 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    assert(ii < std::numeric_limits<Index>::max && jj < std::numeric_limits<Index>::max);
-    backend().coeffRef(Index(ii), Index(jj)) += value;
+    assert(ii < std::numeric_limits<IndexType>::max && jj < std::numeric_limits<IndexType>::max);
+    backend().coeffRef(IndexType(ii), IndexType(jj)) += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend().coeffRef(ii, jj) = value;
+    assert(ii < std::numeric_limits<IndexType>::max && jj < std::numeric_limits<IndexType>::max);
+    backend().coeffRef(IndexType(ii), IndexType(jj)) = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend_->coeff(ii, jj);
+    assert(ii < std::numeric_limits<IndexType>::max() && jj < std::numeric_limits<IndexType>::max());
+    return backend_->coeff(IndexType(ii), IndexType(jj));
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)
@@ -1107,7 +1110,8 @@ public:
     if (ii >= rows())
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend().row(ii) *= ScalarType(0);
+    assert(ii < std::numeric_limits<IndexType>::max());
+    backend().row(IndexType(ii)) *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
@@ -1116,11 +1120,13 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
-    for (size_t row = 0; row < backend_->outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
+    assert(jj < std::numeric_limits<IndexType>::max());
+    assert(backend_->outerSize() >= 0);
+    for (size_t row = 0; row < UnsignedIndexType(backend_->outerSize()); ++row) {
+      for (typename BackendType::InnerIterator row_it(*backend_, IndexType(row)); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
-          backend_->coeffRef(row, jj) = ScalarType(0);
+          backend_->coeffRef(IndexType(row), IndexType(jj)) = ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -1136,7 +1142,8 @@ public:
     if (!these_are_valid_indices(ii, ii))
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
-    backend().row(ii) *= ScalarType(0);
+    assert(ii < std::numeric_limits<IndexType>::max());
+    backend().row(IndexType(ii)) *= ScalarType(0);
     set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
 
@@ -1146,14 +1153,16 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
                             "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
-    for (size_t row = 0; row < backend_->outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
+    assert(jj < std::numeric_limits<IndexType>::max());
+    assert(backend_->outerSize() >= 0);
+    for (size_t row = 0; row < UnsignedIndexType(backend_->outerSize()); ++row) {
+      for (typename BackendType::InnerIterator row_it(*backend_, IndexType(row)); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
           if (col == row)
-            backend_->coeffRef(row, col) = ScalarType(1);
+            backend_->coeffRef(IndexType(row), IndexType(col)) = ScalarType(1);
           else
-            backend_->coeffRef(row, jj) = ScalarType(0);
+            backend_->coeffRef(IndexType(row), IndexType(jj)) = ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -1171,8 +1180,9 @@ private:
       return false;
     if (jj >= cols())
       return false;
-    for (size_t row = ii; row < backend_->outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
+    assert(backend_->outerSize() >= 0);
+    for (size_t row = ii; row < UnsignedIndexType(backend_->outerSize()); ++row) {
+      for (typename BackendType::InnerIterator row_it(*backend_, IndexType(row)); row_it; ++row_it) {
         const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
           return true;
