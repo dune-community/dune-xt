@@ -1078,7 +1078,7 @@ public:
     unit_col(col);
   }
 
-  inline void DUNE_DEPRECATED_MSG("Please use unit_col()!") clearRow(const size_t ii)
+  inline void DUNE_DEPRECATED_MSG("Please use clear_row()!") clearRow(const size_t ii)
   {
     clear_row(ii);
   }
