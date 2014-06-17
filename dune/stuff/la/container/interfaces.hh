@@ -939,6 +939,14 @@ public:
     CHECK_AND_CALL_CRTP(this->as_imp(*this).mv(xx, yy));
   }
 
+  template <class XX>
+  typename XX::derived_type operator*(const VectorInterface<XX>& xx) const
+  {
+    typename XX::derived_type yy(cols());
+    mv(xx.as_imp(xx), yy);
+    return yy;
+  }
+
   inline void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     CHECK_AND_CALL_CRTP(this->as_imp(*this).add_to_entry(ii, jj, value));
