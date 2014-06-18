@@ -474,6 +474,15 @@ public:
     return size();
   }
 
+  virtual ScalarType mean() const
+  {
+    ScalarType ret = 0.0;
+    for (const auto& element : *this)
+      ret += element;
+    ret /= size();
+    return ret;
+  }
+
   /**
    *  \brief  The maximum absolute value of the vector.
    *  \return A pair of the lowest index at which the maximum is attained and the absolute maximum value.
@@ -726,6 +735,34 @@ public:
   virtual derived_type operator-(const derived_type& other) const
   {
     return sub(other);
+  }
+
+  virtual derived_type& operator+=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element += scalar;
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type& operator-=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element -= scalar;
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type& operator/=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element /= scalar;
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type& operator*=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element *= scalar;
+    return this->as_imp(*this);
   }
 
   /**
