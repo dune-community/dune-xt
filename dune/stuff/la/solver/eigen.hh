@@ -452,13 +452,13 @@ public:
 //      if (solver.info() != ::Eigen::Success)
 //        return solver.info();
 #if HAVE_SUPERLU
-    } else if (type == "superlu") {
-      typedef ::Eigen::SuperLU<typename MatrixType::BackendType> SolverType;
-      SolverType solver;
-      solver.analyzePattern(matrix_.backend());
-      solver.factorize(matrix_.backend());
-      solution.backend() = solver.solve(rhs.backend());
-      info = solver.info();
+//    } else if (type == "superlu") {
+//      typedef ::Eigen::SuperLU< typename MatrixType::BackendType > SolverType;
+//      SolverType solver;
+//      solver.analyzePattern(matrix_.backend());
+//      solver.factorize(matrix_.backend());
+//      solution.backend() = solver.solve(rhs.backend());
+//      info = solver.info();
 #endif // HAVE_SUPERLU
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
