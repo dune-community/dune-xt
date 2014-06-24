@@ -16,13 +16,17 @@
 #include <string>
 
 #if HAVE_DUNE_FEM
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #if HAVE_DUNE_PDELAB
 #include <dune/typetree/nodetags.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/pdelab/common/function.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #include <dune/stuff/functions/interfaces.hh>

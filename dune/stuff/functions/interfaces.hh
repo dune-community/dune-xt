@@ -11,8 +11,10 @@
 #include <string>
 #include <ostream>
 
-#include <dune/common/fvector.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fmatrix.hh>
+#include <dune/common/fvector.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
@@ -32,8 +34,8 @@
 #if HAVE_DUNE_FEM
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/fem/function/common/function.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/fem/space/common/functionspace.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #if HAVE_DUNE_PDELAB
@@ -730,8 +732,10 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake2dE
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake3dEntityType, 3)
 
 #if HAVE_DUNE_GRID
-
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/sgrid.hh>
+#include <dune/stuff/common/disable_warnings.hh>
+
 
 typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid1dEntityType;
 typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid2dEntityType;
