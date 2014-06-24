@@ -7,6 +7,7 @@
 #define DUNE_STUFF_FUNCTION_FEMADAPTER
 
 #include <dune/stuff/functions/interfaces.hh>
+#include <dune/stuff/aliases.hh>
 
 #if HAVE_DUNE_FEM
 
