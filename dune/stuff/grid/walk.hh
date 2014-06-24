@@ -6,7 +6,9 @@
 #ifndef DUNE_STUFF_WALK_HH_INCLUDED
 #define DUNE_STUFF_WALK_HH_INCLUDED
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fvector.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/deprecated.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/math.hh>

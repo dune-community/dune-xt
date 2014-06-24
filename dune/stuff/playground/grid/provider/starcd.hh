@@ -24,13 +24,17 @@
 #include <dune/common/parametertree.hh>
 #include <dune/common/shared_ptr.hh>
 #include <dune/common/exceptions.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fvector.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/geometry/type.hh>
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/gridfactory.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/string.hh>

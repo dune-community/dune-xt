@@ -6,7 +6,9 @@
 #ifndef DUNE_STUFF_GRID_OUTPUT_PGF_HH
 #define DUNE_STUFF_GRID_OUTPUT_PGF_HH
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fvector.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/array.hh>
 #include <dune/stuff/grid/walk.hh>
 #include <dune/stuff/grid/walk_functors.hh>
