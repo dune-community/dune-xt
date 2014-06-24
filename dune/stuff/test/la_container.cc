@@ -10,7 +10,9 @@
 #include <type_traits>
 #include <memory>
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/float_cmp.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/la/container/interfaces.hh>
