@@ -227,7 +227,7 @@ public:
               "\\begin{tikzpicture}[scale=\\gridplotscale]\n";
     } else
       file << "\\begin{tikzpicture}\n";
-    GridWalk<typename GridType::LeafGridView> gridWalk(grid_.leafView());
+    GridWalk<typename GridType::LeafGridView> gridWalk(grid_.leafGridView());
     PgfEntityFunctorIntersections pgf(file);
     gridWalk(pgf, pgf);
 
@@ -258,7 +258,7 @@ public:
     grid_.globalRefine(refineLevel);
     for (int i = 0; i < refineLevel; ++i) {
       typedef typename GridType::LevelGridView ViewType;
-      const ViewType& view = grid_.levelView(i);
+      const ViewType& view = grid_.levelGridView(i);
       GridWalk<ViewType> gridWalk(view);
       PgfEntityFunctorIntersectionsWithShift pgf(file, texcolors_[std::min(i, int(texcolors_.size()))], i, true);
       gridWalk(pgf);
@@ -295,7 +295,7 @@ public:
     for (int i = 0; i < refineLevel; ++i) {
       typedef typename GridType::LevelGridView ViewType;
       {
-        const ViewType& view = grid_.levelView(i);
+        const ViewType& view = grid_.levelGridView(i);
         char buffer[80] = {'\0'};
         std::snprintf(buffer, 80, "\\subfloat[Level %d]{\n\\begin{tikzpicture}[scale=\\gridplotscale]\n", i);
         file << buffer;
@@ -304,7 +304,7 @@ public:
         gridWalk(thisLevel, thisLevel);
       }
 
-      GridWalk<typename GridType::LeafGridView> leafWalk(grid_.leafView());
+      GridWalk<typename GridType::LeafGridView> leafWalk(grid_.leafGridView());
       typedef typename GridType::LeafGridView::Traits::template Codim<0>::Entity EntityType;
       MinMaxCoordinateFunctor<EntityType> minMaxCoord;
       leafWalk(minMaxCoord);
