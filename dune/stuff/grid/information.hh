@@ -135,7 +135,7 @@ struct Dimensions
   Dimensions(const GridViewType& gridView)
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
-    GridWalk<GridViewType>(gridView).walkCodim0(f);
+    GridWalk<GridViewType>(gridView).operator()(f);
   }
 
   Dimensions(const EntityType& entity)
