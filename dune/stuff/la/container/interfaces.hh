@@ -478,6 +478,15 @@ public:
     return size();
   }
 
+  virtual ScalarType mean() const
+  {
+    ScalarType ret = 0.0;
+    for (const auto& element : *this)
+      ret += element;
+    ret /= size();
+    return ret;
+  }
+
   /**
    *  \brief  The maximum absolute value of the vector.
    *  \return A pair of the lowest index at which the maximum is attained and the absolute maximum value.
@@ -732,6 +741,34 @@ public:
     return sub(other);
   }
 
+  virtual derived_type& operator+=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element += scalar;
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type& operator-=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element -= scalar;
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type& operator/=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element /= scalar;
+    return this->as_imp(*this);
+  }
+
+  virtual derived_type& operator*=(const ScalarType& scalar)
+  {
+    for (auto& element : *this)
+      element *= scalar;
+    return this->as_imp(*this);
+  }
+
   /**
    *  \brief  Check vectors for equality (componentwise) using almost_equal()
    *  \param  other   A vector of same dimension to compare with.
@@ -943,6 +980,14 @@ public:
     CHECK_AND_CALL_CRTP(this->as_imp(*this).mv(xx, yy));
   }
 
+  template <class XX>
+  typename XX::derived_type operator*(const VectorInterface<XX>& xx) const
+  {
+    typename XX::derived_type yy(cols());
+    mv(xx.as_imp(xx), yy);
+    return yy;
+  }
+
   inline void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     CHECK_AND_CALL_CRTP(this->as_imp(*this).add_to_entry(ii, jj, value));
@@ -1082,7 +1127,7 @@ public:
     unit_col(col);
   }
 
-  inline void DUNE_DEPRECATED_MSG("Please use unit_col()!") clearRow(const size_t ii)
+  inline void DUNE_DEPRECATED_MSG("Please use clear_row()!") clearRow(const size_t ii)
   {
     clear_row(ii);
   }
