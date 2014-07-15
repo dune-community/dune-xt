@@ -151,7 +151,7 @@ public:
   static Common::ConfigTree default_config(const std::string sub_name = "")
   {
     Common::ConfigTree config("type", static_id());
-    config["dirichlet"] = "[1 2 3]";
+    config["default_to_dirichlet"] = "true";
     config["neumann"] = "[4]";
     if (sub_name.empty())
       return config;
@@ -329,18 +329,21 @@ public:
                                           const std::string sub_name = static_id())
   {
     const Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const auto dirichlet_ids     = cfg.get<std::vector<int>>("dirichlet", 0);
-    const auto neumann_ids       = cfg.get<std::vector<int>>("neumann", 0);
     std::map<std::string, std::set<int>> id_to_type_map;
-    id_to_type_map.insert(std::make_pair("dirichlet", std::set<int>(dirichlet_ids.begin(), dirichlet_ids.end())));
-    id_to_type_map.insert(std::make_pair("neumann", std::set<int>(neumann_ids.begin(), neumann_ids.end())));
-    return Common::make_unique<ThisType>(id_to_type_map);
+    for (const std::string& type : {"dirichlet", "neumann"})
+      if (cfg.has_key(type)) {
+        const auto ids = cfg.get<std::vector<int>>(type);
+        id_to_type_map.insert(std::make_pair(type, std::set<int>(ids.begin(), ids.end())));
+      }
+    return Common::make_unique<ThisType>(
+        id_to_type_map, cfg.get("default_to_dirichlet", default_config().get<bool>("default_to_dirichlet")));
   }
 
-  IdBased(const std::map<std::string, std::set<int>> id_to_type_map)
+  IdBased(const std::map<std::string, std::set<int>> id_to_type_map, const bool dirichlet_default = true)
     : id_to_type_map_(id_to_type_map)
-    , hasDirichlet_(id_to_type_map_.find("dirichlet") != id_to_type_map_.end())
-    , hasNeumann_(id_to_type_map_.find("neumann") != id_to_type_map_.end())
+    , dirichletDefault_(dirichlet_default)
+    , hasDirichlet_(id_to_type_map_.find("dirichlet") != id_to_type_map_.end() || dirichletDefault_)
+    , hasNeumann_(id_to_type_map_.find("neumann") != id_to_type_map_.end() || !dirichletDefault_)
   {
   }
 
@@ -369,11 +372,14 @@ public:
 #include <dune/stuff/common/disable_warnings.hh>
       const int boundaryId = intersection.boundaryId();
 #include <dune/stuff/common/reenable_warnings.hh>
-      // get set of dirichlet ids (has to be found, otherwise hasDirichlet_ would be false)
+      // get set of dirichlet ids
       const auto result = id_to_type_map_.find("dirichlet");
-      assert(result != id_to_type_map_.end());
-      const auto& idSet = result->second;
-      return (idSet.count(boundaryId) > 0);
+      if (result == id_to_type_map_.end())
+        return dirichletDefault_;
+      else {
+        const auto& idSet = result->second;
+        return (idSet.count(boundaryId) > 0) || dirichletDefault_;
+      }
     } else
       return false;
   } // bool dirichlet(const IntersectionType& intersection) const
@@ -385,17 +391,21 @@ public:
 #include <dune/stuff/common/disable_warnings.hh>
       const int boundaryId = intersection.boundaryId();
 #include <dune/stuff/common/reenable_warnings.hh>
-      // get set of neumann ids (has to be found, otherwise hasNeumann_ would be false)
+      // get set of neumann ids
       const auto result = id_to_type_map_.find("neumann");
-      assert(result != id_to_type_map_.end());
-      const auto& idSet = result->second;
-      return (idSet.count(boundaryId) > 0);
+      if (result == id_to_type_map_.end())
+        return !dirichletDefault_;
+      else {
+        const auto& idSet = result->second;
+        return (idSet.count(boundaryId) > 0) || !dirichletDefault_;
+      }
     } else
       return false;
   } // bool neumann(const IntersectionType& intersection) const
 
 private:
   std::map<std::string, std::set<int>> id_to_type_map_;
+  bool dirichletDefault_;
   bool hasDirichlet_;
   bool hasNeumann_;
 }; // class IdBased

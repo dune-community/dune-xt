@@ -38,7 +38,8 @@ enum class ChooseLayer
   leaf
 #if HAVE_DUNE_GRID_MULTISCALE
   ,
-  local
+  local,
+  local_oversampled
 #endif
 }; // enum class ChooseLayer
 
@@ -94,6 +95,13 @@ struct Layer<GridType, ChooseLayer::leaf, ChoosePartView::view>
 
 template <class GridType>
 struct Layer<GridType, ChooseLayer::local, ChoosePartView::view>
+{
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridViewType Type;
+};
+
+
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::view>
 {
   typedef typename grid::Multiscale::Default<GridType>::LocalGridViewType Type;
 };
@@ -184,6 +192,13 @@ struct Layer<GridType, ChooseLayer::leaf, ChoosePartView::part>
 
 template <class GridType>
 struct Layer<GridType, ChooseLayer::local, ChoosePartView::part>
+{
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridPartType Type;
+};
+
+
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::part>
 {
   typedef typename grid::Multiscale::Default<GridType>::LocalGridPartType Type;
 };
