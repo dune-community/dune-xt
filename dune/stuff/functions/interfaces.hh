@@ -42,7 +42,9 @@
 #endif
 
 #if HAVE_DUNE_GEOMETRY
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/quadraturerules.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 namespace Dune {
