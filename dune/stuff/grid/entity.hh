@@ -117,6 +117,13 @@ auto reference_element(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
   return REFERENCE_ELEMENTS<typename GridImp::ctype, worlddim>::general(entity.geometry().type());
 }
 
+template <int mydim, int cdim, class GridImp, template <int, int, class> class GeometryImp>
+auto reference_element(const Dune::Geometry<mydim, cdim, GridImp, GeometryImp>& geometry)
+    -> decltype(REFERENCE_ELEMENTS<typename GridImp::ctype, mydim>::general(geometry.type()))
+{
+  return REFERENCE_ELEMENTS<typename GridImp::ctype, mydim>::general(geometry.type());
+}
+
 #undef REFERENCE_ELEMENTS
 
 } // namespace Grid
