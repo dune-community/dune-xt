@@ -761,7 +761,7 @@ struct MatrixTest : public ::testing::Test
     PatternType pattern(dim);
     for (size_t ii = 0; ii < dim; ++ii) {
       for (size_t jj = 0; jj < dim; ++jj)
-        pattern.inner(ii).insert(jj);
+        pattern.inner(ii).push_back(jj);
     }
     MatrixImp d_by_size_and_pattern(dim, dim, pattern);
     size_t d_rows = d_by_size.rows();
@@ -841,13 +841,13 @@ struct MatrixTest : public ::testing::Test
     PatternType dense_pattern(dim);
     for (size_t ii = 0; ii < dim; ++ii) {
       for (size_t jj = 0; jj < dim; ++jj)
-        dense_pattern.inner(ii).insert(jj);
+        dense_pattern.inner(ii).push_back(jj);
     }
     PatternType sparse_pattern(dim);
-    sparse_pattern.inner(0).insert(2); //|-, -, x, -|
-    sparse_pattern.inner(1).insert(0); //|x, x, -, -|
-    sparse_pattern.inner(1).insert(1); //|-, -, -, x|
-    sparse_pattern.inner(2).insert(3); //|-, -, -, -|
+    sparse_pattern.inner(0).push_back(2); //|-, -, x, -|
+    sparse_pattern.inner(1).push_back(0); //|x, x, -, -|
+    sparse_pattern.inner(1).push_back(1); //|-, -, -, x|
+    sparse_pattern.inner(2).push_back(3); //|-, -, -, -|
 
     // create test matrizes
     MatrixImp matrix_zeros_dense(dim, dim, dense_pattern); // |0, 0, 0, 0|
