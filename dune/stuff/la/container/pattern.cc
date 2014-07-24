@@ -62,7 +62,7 @@ bool SparsityPatternDefault::operator!=(const SparsityPatternDefault& other) con
 
 void SparsityPatternDefault::insert(const size_t outer_index, const size_t inner_index)
 {
-  assert(ii < size() && "Wrong index requested!");
+  assert(outer_index < size() && "Wrong index requested!");
   if (std::find(vector_of_vectors_[outer_index].begin(), vector_of_vectors_[outer_index].end(), inner_index)
       == vector_of_vectors_[outer_index].end())
     vector_of_vectors_[outer_index].push_back(inner_index);
@@ -70,7 +70,7 @@ void SparsityPatternDefault::insert(const size_t outer_index, const size_t inner
 
 void SparsityPatternDefault::sort(const size_t outer_index)
 {
-  assert(ii < size() && "Wrong index requested!");
+  assert(outer_index < size() && "Wrong index requested!");
   std::sort(vector_of_vectors_[outer_index].begin(), vector_of_vectors_[outer_index].end());
 }
 
