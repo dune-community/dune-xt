@@ -24,6 +24,7 @@
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/memory.hh>
+#include <dune/stuff/grid/entity.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -49,8 +50,7 @@ template <class GridViewType>
 class EntityInlevelSearch : public EntitySearchBase<GridViewType>
 {
   typedef EntitySearchBase<GridViewType> BaseType;
-  typedef ReferenceElements<typename BaseType::LocalCoordinateType::value_type,
-                            BaseType::LocalCoordinateType::dimension> RefElementType;
+
   typedef typename GridViewType::template Codim<0>::Iterator IteratorType;
 
 public:
@@ -61,7 +61,7 @@ private:
   check_add(const typename BaseType::EntityType& entity, const typename BaseType::GlobalCoordinateType& point) const
   {
     const auto& geometry   = entity.geometry();
-    const auto& refElement = RefElementType::general(geometry.type());
+    const auto& refElement = DSG::reference_element(geometry);
     if (refElement.checkInside(geometry.local(point))) {
       return DSC::make_unique<typename BaseType::EntityType::EntityPointer>(entity);
     }
@@ -145,14 +145,12 @@ private:
   template <class QuadpointContainerType, class RangeType>
   EntityPointerVectorType process(const QuadpointContainerType& quad_points, const RangeType& range) const
   {
-    typedef GenericReferenceElements<typename BaseType::LocalCoordinateType::value_type,
-                                     BaseType::LocalCoordinateType::dimension> RefElementType;
     EntityPointerVectorType ret;
 
     for (const auto& my_ent : range) {
       const int my_level     = my_ent.level();
       const auto& geometry   = my_ent.geometry();
-      const auto& refElement = RefElementType::general(geometry.type());
+      const auto& refElement = DSG::reference_element(geometry);
       for (const auto& point : quad_points) {
         if (refElement.checkInside(geometry.local(point))) {
           // if I cannot descend further add this entity even if it's not my view

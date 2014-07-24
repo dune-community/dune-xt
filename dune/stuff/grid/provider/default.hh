@@ -31,18 +31,23 @@ public:
     return BaseType::static_id();
   }
 
+  ConstDefault(const GridType& grid)
+    : grid_(grid)
+  {
+  }
+
   ConstDefault(const GridType* grid_ptr)
-    : grid_(grid_ptr)
+    : grid_(*grid_ptr)
   {
   }
 
   ConstDefault(std::shared_ptr<const GridType> grid_ptr)
-    : grid_(grid_ptr)
+    : grid_(*grid_ptr)
   {
   }
 
   ConstDefault(std::unique_ptr<const GridType>&& grid_ptr)
-    : grid_(grid_ptr)
+    : grid_(*grid_ptr)
   {
   }
 
@@ -50,13 +55,13 @@ public:
   {
   }
 
-  virtual std::shared_ptr<const GridType> grid() const DS_OVERRIDE
+  virtual const GridType& grid() const DS_OVERRIDE
   {
     return grid_;
   }
 
 private:
-  std::shared_ptr<const GridType> grid_;
+  const GridType& grid_;
 }; // class ConstDefault
 
 
@@ -73,18 +78,23 @@ public:
     return BaseType::static_id();
   }
 
+  Default(GridType& grid)
+    : grid_(grid)
+  {
+  }
+
   Default(GridType* grid_ptr)
-    : grid_(grid_ptr)
+    : grid_(*grid_ptr)
   {
   }
 
   Default(std::shared_ptr<GridType> grid_ptr)
-    : grid_(grid_ptr)
+    : grid_(*grid_ptr)
   {
   }
 
   Default(std::unique_ptr<GridType>&& grid_ptr)
-    : grid_(grid_ptr)
+    : grid_(*grid_ptr)
   {
   }
 
@@ -92,18 +102,18 @@ public:
   {
   }
 
-  virtual std::shared_ptr<GridType> grid() DS_OVERRIDE
+  virtual GridType& grid() DS_OVERRIDE
   {
     return grid_;
   }
 
-  virtual std::shared_ptr<const GridType> grid() const DS_OVERRIDE
+  virtual const GridType& grid() const DS_OVERRIDE
   {
     return grid_;
   }
 
 private:
-  std::shared_ptr<GridType> grid_;
+  GridType& grid_;
 }; // class Default
 
 

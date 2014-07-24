@@ -10,11 +10,11 @@
 
 #include <memory>
 
-#include <dune/common/static_assert.hh>
+#include <type_traits>
 
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/sgrid.hh>
-#include <dune/stuff/common/disable_warnings.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/configtree.hh>
 
