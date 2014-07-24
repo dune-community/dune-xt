@@ -8,7 +8,7 @@
 
 #include <cmath>
 
-#include <dune/common/static_assert.hh>
+#include <type_traits>
 
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
