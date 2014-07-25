@@ -93,28 +93,28 @@ public:
   virtual const GridType& grid() const = 0;
 
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
-  std::shared_ptr<const typename Layer<layer_type, part_view_type>::Type> layer(const int level = 0) const
+  std::shared_ptr<const typename Layer<layer_type, part_view_type>::Type> layer(const int level_in = 0) const
   {
     GridType& non_const_grid = const_cast<GridType&>(grid());
-    return Grid::Layer<GridType, layer_type, part_view_type>::create(non_const_grid, level);
+    return Grid::Layer<GridType, layer_type, part_view_type>::create(non_const_grid, level_in);
   }
 
   template <ChoosePartView type>
-  std::shared_ptr<const typename Level<type>::Type> level(const int level) const
+  std::shared_ptr<const typename Level<type>::Type> level(const int level_in) const
   {
     GridType& non_const_grid = const_cast<GridType&>(grid());
-    return LevelPartView<GridType, type>::create(non_const_grid, level);
+    return LevelPartView<GridType, type>::create(non_const_grid, level_in);
   }
 
-  std::shared_ptr<const LevelGridViewType> level_view(const int level) const
+  std::shared_ptr<const LevelGridViewType> level_view(const int level_in) const
   {
-    return this->template level<ChoosePartView::view>(level);
+    return this->template level<ChoosePartView::view>(level_in);
   }
 
 #if HAVE_DUNE_FEM
-  std::shared_ptr<const LevelGridPartType> level_part(const int level) const
+  std::shared_ptr<const LevelGridPartType> level_part(const int level_in) const
   {
-    return this->template level<ChoosePartView::part>(level);
+    return this->template level<ChoosePartView::part>(level_in);
   }
 #endif // HAVE_DUNE_FEM
 
@@ -267,32 +267,32 @@ public:
   using BaseType::layer;
 
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
-  std::shared_ptr<typename BaseType::template Layer<layer_type, part_view_type>::Type> layer(const int level = 0)
+  std::shared_ptr<typename BaseType::template Layer<layer_type, part_view_type>::Type> layer(const int level_in = 0)
   {
-    return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level);
+    return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level_in);
   }
 
   using BaseType::level;
 
   template <ChoosePartView type>
-  std::shared_ptr<typename BaseType::template Level<type>::Type> level(const int level)
+  std::shared_ptr<typename BaseType::template Level<type>::Type> level(const int level_in)
   {
-    return LevelPartView<GridType, type>::create(grid(), level);
+    return LevelPartView<GridType, type>::create(grid(), level_in);
   }
 
   using BaseType::level_view;
 
-  std::shared_ptr<LevelGridViewType> level_view(const int level)
+  std::shared_ptr<LevelGridViewType> level_view(const int level_in)
   {
-    return this->template level<ChoosePartView::view>(level);
+    return this->template level<ChoosePartView::view>(level_in);
   }
 
 #if HAVE_DUNE_FEM
   using BaseType::level_part;
 
-  std::shared_ptr<LevelGridPartType> level_part(const int level)
+  std::shared_ptr<LevelGridPartType> level_part(const int level_in)
   {
-    return this->template level<ChoosePartView::part>(level);
+    return this->template level<ChoosePartView::part>(level_in);
   }
 #endif // HAVE_DUNE_FEM
 

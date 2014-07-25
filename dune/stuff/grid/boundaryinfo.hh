@@ -337,8 +337,8 @@ public:
         id_to_type_map, cfg.get("default_to_dirichlet", default_config().get<bool>("default_to_dirichlet")));
   }
 
-  IdBased(const std::map<std::string, std::set<int>> id_to_type_map, const bool dirichlet_default = true)
-    : id_to_type_map_(id_to_type_map)
+  IdBased(const std::map<std::string, std::set<int>> id_to_type_map_in, const bool dirichlet_default = true)
+    : id_to_type_map_(id_to_type_map_in)
     , dirichletDefault_(dirichlet_default)
     , hasDirichlet_(id_to_type_map_.find("dirichlet") != id_to_type_map_.end() || dirichletDefault_)
     , hasNeumann_(id_to_type_map_.find("neumann") != id_to_type_map_.end() || !dirichletDefault_)
@@ -739,8 +739,8 @@ public:
   typedef std::set<IdType> IdSetType;
   typedef std::map<std::string, IdSetType> IdSetMapType;
 
-  GridboundaryIdBased(const IdSetMapType boundaryInfoMap)
-    : boundaryInfoMap_(boundaryInfoMap)
+  GridboundaryIdBased(const IdSetMapType boundaryInfoMap_in)
+    : boundaryInfoMap_(boundaryInfoMap_in)
     , hasDirichlet_(boundaryInfoMap_.find("dirichlet") != boundaryInfoMap_.end())
     , hasNeumann_(boundaryInfoMap_.find("neumann") != boundaryInfoMap_.end())
   {
