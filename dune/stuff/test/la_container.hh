@@ -62,7 +62,7 @@ public:
   {
     Dune::Stuff::LA::SparsityPatternDefault pattern(size);
     for (size_t ii = 0; ii < size; ++ii)
-      pattern.insert(ii, ii);
+      pattern.inner(ii).push_back(ii);
     Dune::Stuff::LA::IstlRowMajorSparseMatrix<S> matrix(size, size, pattern);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
@@ -114,7 +114,7 @@ public:
   {
     Dune::Stuff::LA::SparsityPatternDefault pattern(size);
     for (size_t ii = 0; ii < size; ++ii)
-      pattern.insert(ii, ii);
+      pattern.inner(ii).insert(ii);
     Dune::Stuff::LA::EigenRowMajorSparseMatrix<S> matrix(size, size, pattern);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
