@@ -264,14 +264,14 @@ public:
 
   using BaseType::grid;
 
-  virtual std::shared_ptr<GridType> grid() = 0;
+  virtual GridType& grid() = 0;
 
   using BaseType::layer;
 
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
   std::shared_ptr<typename BaseType::template Layer<layer_type, part_view_type>::Type> layer(const int level = 0)
   {
-    return Grid::Layer<GridType, layer_type, part_view_type>::create(*(grid()), level);
+    return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level);
   }
 
   using BaseType::level;
@@ -279,7 +279,7 @@ public:
   template <ChoosePartView type>
   std::shared_ptr<typename BaseType::template Level<type>::Type> level(const int level)
   {
-    return LevelPartView<GridType, type>::create(*(grid()), level);
+    return LevelPartView<GridType, type>::create(grid(), level);
   }
 
   using BaseType::level_view;
@@ -303,7 +303,7 @@ public:
   template <ChoosePartView type>
   std::shared_ptr<typename BaseType::template Leaf<type>::Type> leaf()
   {
-    return LeafPartView<GridType, type>::create(*(grid()));
+    return LeafPartView<GridType, type>::create(grid());
   }
 
   using BaseType::leaf_view;

@@ -46,8 +46,8 @@ struct GridProviderBaseTest : public testing::Test
   static void fulfills_interface(GridProviderType& grid_provider)
   {
     using Stuff::Grid::ChoosePartView;
-    std::string static_id          = grid_provider.static_id();
-    std::shared_ptr<GridType> grid = grid_provider.grid();
+    std::string static_id = grid_provider.static_id();
+    const auto& grid = grid_provider.grid();
     std::shared_ptr<typename GridProviderType::template Leaf<ChoosePartView::view>::Type> leaf_view_auto =
         grid_provider.template leaf<ChoosePartView::view>();
     std::shared_ptr<typename GridProviderType::LeafGridViewType> leaf_view = grid_provider.leaf_view();
@@ -56,7 +56,7 @@ struct GridProviderBaseTest : public testing::Test
         grid_provider.template leaf<ChoosePartView::part>();
     std::shared_ptr<typename GridProviderType::LeafGridPartType> leaf_part = grid_provider.leaf_part();
 #endif // HAVE_DUNE_FEM
-    for (int level = 0; level <= grid->maxLevel(); ++level) {
+    for (int level = 0; level <= grid.maxLevel(); ++level) {
       std::shared_ptr<typename GridProviderType::template Level<ChoosePartView::view>::Type> level_view_auto =
           grid_provider.template level<ChoosePartView::view>(level);
       std::shared_ptr<typename GridProviderType::LevelGridViewType> level_view = grid_provider.level_view(level);

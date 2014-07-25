@@ -27,16 +27,16 @@ struct GridInfoTest : public ::testing::Test
   static const int griddim        = T::value;
   static const unsigned int level = 1;
   typedef Dune::SGrid<griddim, griddim> GridType;
-  std::shared_ptr<GridType> gridPtr;
+  const DSG::Providers::Cube<GridType> grid_prv;
   GridInfoTest()
-    : gridPtr(DSG::Providers::Cube<GridType>(0.f, 1.f, level).grid())
+    : grid_prv(0.f, 1.f, level)
   {
   }
 
   void check()
   {
-    const Dimensions<typename GridType::LeafGridView> dim(gridPtr->leafGridView());
-    const auto gv      = gridPtr->leafGridView();
+    const Dimensions<typename GridType::LeafGridView> dim(grid_prv.grid().leafGridView());
+    const auto gv      = grid_prv.grid().leafView();
     const int entities = gv.size(0);
     EXPECT_DOUBLE_EQ(1.0 / double(entities), dim.entity_volume.min());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.max());
@@ -58,7 +58,7 @@ struct GridInfoTest : public ::testing::Test
 
   void print(std::ostream& out)
   {
-    const auto& gv = gridPtr->leafGridView();
+    const auto& gv = grid_prv.grid().leafView();
     printInfo(gv, out);
   }
 };
