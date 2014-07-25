@@ -31,8 +31,8 @@ public:
     return BaseType::static_id();
   }
 
-  ConstDefault(const GridType& grid)
-    : grid_(grid)
+  ConstDefault(const GridType& grid_in)
+    : grid_(grid_in)
   {
   }
 
@@ -78,8 +78,8 @@ public:
     return BaseType::static_id();
   }
 
-  Default(GridType& grid)
-    : grid_(std::make_shared<GridType>(grid))
+  Default(GridType& grid_in)
+    : grid_(grid_in)
   {
   }
 
