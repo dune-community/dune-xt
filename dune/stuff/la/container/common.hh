@@ -8,6 +8,8 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_COMMON_HH
 #define DUNE_STUFF_LA_CONTAINER_COMMON_HH
 
+#include <config.h>
+
 #include <memory>
 #include <type_traits>
 
