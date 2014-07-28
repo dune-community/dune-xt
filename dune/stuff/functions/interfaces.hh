@@ -11,15 +11,19 @@
 #include <string>
 #include <ostream>
 
-#include <dune/common/fvector.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fmatrix.hh>
+#include <dune/common/fvector.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
 #include <dune/stuff/common/memory.hh>
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/stuff/common/disable_warnings.hh>
@@ -30,8 +34,8 @@
 #if HAVE_DUNE_FEM
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/fem/function/common/function.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/fem/space/common/functionspace.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #if HAVE_DUNE_PDELAB
@@ -640,11 +644,11 @@ struct TransferredGlobalFunction
 /**
  * \brief Interface for scalar and vector valued stationary function.
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class DUNE_DEPRECATED_MSG("Please derive your functions from GlobalFunctionInterface in the future!") FunctionInterface
 #if HAVE_DUNE_FEM
     : public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                 FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim>>
+                                 FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>>
 #endif // HAVE_DUNE_FEM
 {
 public:
@@ -657,8 +661,8 @@ public:
   typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
 #if HAVE_DUNE_FEM
   typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                       FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp,
-                                                         rangeDim>>::JacobianRangeType JacobianRangeType;
+                                       FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim,
+                                                         rangeDimCols>>::JacobianRangeType JacobianRangeType;
 #else
   typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
 #endif
@@ -754,8 +758,10 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake2dE
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake3dEntityType, 3)
 
 #if HAVE_DUNE_GRID
-
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/sgrid.hh>
+#include <dune/stuff/common/disable_warnings.hh>
+
 
 typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid1dEntityType;
 typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid2dEntityType;
@@ -789,9 +795,12 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGri
 
 #include <dune/grid/alugrid.hh>
 
-typedef Dune::ALUSimplexGrid<2, 2>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType;
-typedef Dune::ALUSimplexGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType;
-typedef Dune::ALUCubeGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType;
+typedef Dune::ALUGrid<2, 2. Dune::simplex, Dune::nonconforming>::Codim<0>::Entity
+    DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType;
+typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity
+    DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType;
+typedef Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>::Codim<0>::Entity
+    DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType;
 
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType, 3)

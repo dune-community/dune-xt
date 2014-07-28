@@ -11,7 +11,9 @@
 #include <sstream>
 #include <vector>
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fvector.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/exceptions.hh>
 

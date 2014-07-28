@@ -7,7 +7,9 @@
 #define DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
 
 #if HAVE_DUNE_GRID
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/io/file/vtk/function.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #include <dune/stuff/common/float_cmp.hh>

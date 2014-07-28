@@ -10,7 +10,9 @@
 
 #include <type_traits>
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/common/debug.hh>
