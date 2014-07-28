@@ -12,6 +12,7 @@
 #include <dune/common/array.hh>
 #include <dune/stuff/grid/walk.hh>
 #include <dune/stuff/grid/walk_functors.hh>
+#include <dune/stuff/common/fvector.hh>
 
 #include <ostream>
 #include <cstdio>

@@ -84,17 +84,17 @@ public:
   }
 
   Default(GridType* grid_ptr)
-    : grid_(std::make_shared<GridType>(*grid_ptr))
+    : grid_(*grid_ptr)
   {
   }
 
   Default(std::shared_ptr<GridType> grid_ptr)
-    : grid_(grid_ptr)
+    : grid_(*grid_ptr)
   {
   }
 
   Default(std::unique_ptr<GridType>&& grid_ptr)
-    : grid_(std::make_shared(*grid_ptr))
+    : grid_(*grid_ptr)
   {
   }
 
@@ -102,18 +102,18 @@ public:
   {
   }
 
-  virtual std::shared_ptr<GridType> grid() DS_OVERRIDE
+  virtual GridType& grid() DS_OVERRIDE
   {
     return grid_;
   }
 
   virtual const GridType& grid() const DS_OVERRIDE
   {
-    return *grid_;
+    return grid_;
   }
 
 private:
-  std::shared_ptr<GridType> grid_;
+  GridType& grid_;
 }; // class Default
 
 
