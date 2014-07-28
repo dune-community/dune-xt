@@ -15,8 +15,11 @@
 #include <limits>
 #include <iostream>
 #include <iterator>
+#include <type_traits>
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/float_cmp.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/type_utils.hh>
@@ -310,10 +313,11 @@ protected:
   {
     if (size < 0)
       DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
-    if (size > std::numeric_limits<size_t>::max())
+    typedef typename std::make_unsigned<SignedSizeType>::type UnsignedSizeType;
+    if (UnsignedSizeType(size) > std::numeric_limits<size_t>::max())
       DUNE_THROW_COLORFULLY(
           Exceptions::index_out_of_range,
-          "Given size (" << size << ") is to large for size_t (max " << std::numeric_limits<size_t>::max() << ")!");
+          "Given size (" << size << ") is too large for size_t (max " << std::numeric_limits<size_t>::max() << ")!");
     return size_t(size);
   } // ... ssize_t_is_valid(...)
 }; // class ContainerInterface

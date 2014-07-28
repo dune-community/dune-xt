@@ -15,8 +15,9 @@
 #include <dune/common/dynvector.hh>
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/densematrix.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/float_cmp.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
+
 #include <dune/common/typetraits.hh>
 
 #include "interfaces.hh"

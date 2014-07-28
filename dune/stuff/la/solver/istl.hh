@@ -66,9 +66,7 @@ public:
   {
     SolverUtils::check_given(type, options());
     Common::ConfigTree iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
-#if !HAVE_MPI
     iterative_options.set("post_check_solves_system", "1e-5");
-#endif
     if (type == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
@@ -135,13 +133,13 @@ public:
                         typename IstlDenseVector<S>::BackendType> PreconditionerType;
         PreconditionerType preconditioner(
             matrix_.backend(),
-            opts.get("preconditioner.iterations", default_opts.get<size_t>("preconditioner.iterations")),
+            opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
             opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
         typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
         SolverType solver(matrix_operator,
                           preconditioner,
                           opts.get("precision", default_opts.get<S>("precision")),
-                          opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+                          opts.get("max_iter", default_opts.get<int>("max_iter")),
                           opts.get("verbose", default_opts.get<int>("verbose")));
         InverseOperatorResult stat;
         solver.apply(solution.backend(), writable_rhs.backend(), stat);
@@ -154,15 +152,14 @@ public:
       } else
         DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                               "Given type '" << type << "' is not supported, although it was reported by options()!");
-#if !HAVE_MPI
       // check (use writable_rhs as tmp)
-      const S post_check_solves_system_theshhold =
+      const S post_check_solves_system_threshold =
           opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
-      if (post_check_solves_system_theshhold > 0) {
+      if (post_check_solves_system_threshold > 0) {
         matrix_.mv(solution, writable_rhs);
         writable_rhs -= rhs;
         const S sup_norm = writable_rhs.sup_norm();
-        if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
+        if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
           DUNE_THROW_COLORFULLY(
               Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
               "The computed solution does not solve the system (although the dune-istl backend "
@@ -175,7 +172,6 @@ public:
                   << "Those were the given options:\n\n"
                   << opts);
       }
-#endif // !HAVE_MPI
     } catch (ISTLError& e) {
       DUNE_THROW(Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());
     }

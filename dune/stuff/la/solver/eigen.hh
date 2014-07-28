@@ -148,13 +148,13 @@ public:
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
                             "Given type '" << type << "' is not supported, although it was reported by options()!");
     // check
-    const S post_check_solves_system_theshhold =
+    const S post_check_solves_system_threshold =
         opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
-    if (post_check_solves_system_theshhold > 0) {
+    if (post_check_solves_system_threshold > 0) {
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const S sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
+      if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
         DUNE_THROW_COLORFULLY(
             Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
             "The computed solution does not solve the system (although the eigen backend reported "
@@ -332,7 +332,7 @@ public:
                                          ::Eigen::Lower,
                                          ::Eigen::DiagonalPreconditioner<S>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
@@ -341,7 +341,7 @@ public:
                                          ::Eigen::Upper,
                                          ::Eigen::DiagonalPreconditioner<double>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
@@ -350,7 +350,7 @@ public:
                                          ::Eigen::Lower,
                                          ::Eigen::IdentityPreconditioner> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
@@ -359,32 +359,32 @@ public:
                                          ::Eigen::Lower,
                                          ::Eigen::IdentityPreconditioner> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.ilut") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<S>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solver.preconditioner().setDroptol(
           opts.get("preconditioner.drop_tol", default_opts.get<S>("preconditioner.drop_tol")));
       solver.preconditioner().setFillfactor(
-          opts.get("preconditioner.fill_factor", default_opts.get<size_t>("preconditioner.fill_factor")));
+          opts.get("preconditioner.fill_factor", default_opts.get<int>("preconditioner.fill_factor")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.diagonal") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<S>> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.identity") {
       typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> SolverType;
       SolverType solver(matrix_.backend());
-      solver.setMaxIterations(opts.get("max_iter", default_opts.get<std::size_t>("max_iter")));
+      solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<S>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
@@ -452,13 +452,13 @@ public:
 //      if (solver.info() != ::Eigen::Success)
 //        return solver.info();
 #if HAVE_SUPERLU
-    } else if (type == "superlu") {
-      typedef ::Eigen::SuperLU<typename MatrixType::BackendType> SolverType;
-      SolverType solver;
-      solver.analyzePattern(matrix_.backend());
-      solver.factorize(matrix_.backend());
-      solution.backend() = solver.solve(rhs.backend());
-      info = solver.info();
+//    } else if (type == "superlu") {
+//      typedef ::Eigen::SuperLU< typename MatrixType::BackendType > SolverType;
+//      SolverType solver;
+//      solver.analyzePattern(matrix_.backend());
+//      solver.factorize(matrix_.backend());
+//      solution.backend() = solver.solve(rhs.backend());
+//      info = solver.info();
 #endif // HAVE_SUPERLU
     } else
       DUNE_THROW_COLORFULLY(Exceptions::internal_error,
@@ -495,13 +495,13 @@ public:
                                   << "Please report this to the dune-stuff developers!");
     }
     // check
-    const S post_check_solves_system_theshhold =
+    const S post_check_solves_system_threshold =
         opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
-    if (post_check_solves_system_theshhold > 0) {
+    if (post_check_solves_system_threshold > 0) {
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const S sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_theshhold || std::isnan(sup_norm) || std::isinf(sup_norm))
+      if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
         DUNE_THROW_COLORFULLY(
             Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
             "The computed solution does not solve the system (although the eigen backend reported "
