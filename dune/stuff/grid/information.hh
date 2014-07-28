@@ -9,7 +9,9 @@
 #include <ostream>
 #include <boost/format.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/gridview.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/common/ranges.hh>
@@ -133,7 +135,7 @@ struct Dimensions
   Dimensions(const GridViewType& gridView)
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
-    GridWalk<GridViewType>(gridView).walkCodim0(f);
+    GridWalk<GridViewType>(gridView).operator()(f);
   }
 
   Dimensions(const EntityType& entity)

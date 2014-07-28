@@ -8,7 +8,9 @@
 #ifndef DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 #define DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #if HAVE_DUNE_SPGRID
 

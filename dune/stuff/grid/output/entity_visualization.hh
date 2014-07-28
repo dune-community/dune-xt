@@ -8,13 +8,15 @@
 #ifndef DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH
 #define DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH
 
-#include <dune/grid/io/file/dgfparser/dgfparser.hh>
 #include <dune/stuff/common/filesystem.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/geometry/genericgeometry/referenceelements.hh>
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/mcmgmapper.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
+#include <dune/grid/io/file/dgfparser/dgfparser.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 namespace Dune {
 namespace Stuff {

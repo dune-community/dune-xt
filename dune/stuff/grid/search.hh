@@ -11,11 +11,15 @@
 #include <boost/range/iterator_range.hpp>
 
 #if HAVE_DUNE_GEOMETRY
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 #else
 #include <dune/grid/common/genericreferenceelements.hh>
 #endif
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/gridview.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
