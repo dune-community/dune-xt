@@ -166,7 +166,7 @@ public:
   Cube(const DomainFieldType lower_left = default_config().get<DomainFieldType>("lower_left"),
        const DomainFieldType upper_right = default_config().get<DomainFieldType>("upper_right"),
        const unsigned int num_elements = default_config().get<std::vector<unsigned int>>("num_elements")[0])
-    : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements)))
+    : grid_ptr_(create_grid(DomainType(lower_left), DomainType(upper_right), parse_array(num_elements)))
   {
   }
 
@@ -228,7 +228,7 @@ private:
     return ret;
   } // ... parse_vector(...)
 
-  static std::shared_ptr<GridType> create_grid(const DomainType& lower_left, const DomainType& upper_right,
+  static std::shared_ptr<GridType> create_grid(DomainType lower_left, DomainType upper_right,
                                                const std::array<unsigned int, dimDomain>& num_elements)
   {
     static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
