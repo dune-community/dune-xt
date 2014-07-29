@@ -172,7 +172,7 @@ public:
 
   Cube(const std::vector<DomainFieldType>& lower_left, const std::vector<DomainFieldType>& upper_right,
        const std::vector<unsigned int> num_elements = default_config().get<std::vector<unsigned int>>("num_elements"))
-    : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements)))
+    : grid_ptr_(create_grid(parse_vector(lower_left), parse_vector(upper_right), parse_array(num_elements)))
   {
   }
 
