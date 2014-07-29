@@ -12,7 +12,6 @@
 #include <dune/common/array.hh>
 #include <dune/stuff/grid/walk.hh>
 #include <dune/stuff/grid/walk_functors.hh>
-#include <dune/stuff/common/fvector.hh>
 
 #include <ostream>
 #include <cstdio>
@@ -30,11 +29,11 @@ const TexColorArrayType texcolors_ = {{"black", "red", "blue", "green", "yellow"
 
 
 //! A means to ensure we have exactly 2 coords for tikz to draw, even in 1D
-struct PgfCoordWrapper : FieldVector<double, 2>
+struct PgfCoordWrapper : Dune::FieldVector<double, 2>
 {
   template <int wdim>
-  PgfCoordWrapper(const FieldVector<double, wdim>& vector)
-    : FieldVector<double, 2>(0.0)
+  PgfCoordWrapper(const Dune::FieldVector<double, wdim>& vector)
+    : Dune::FieldVector<double, 2>(0.0)
   {
     for (size_t i = 0; i < size_t(std::min(wdim, 2)); ++i)
       (*this)[i] = vector[i];
