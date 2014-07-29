@@ -36,7 +36,7 @@ struct GridInfoTest : public ::testing::Test
   void check()
   {
     const Dimensions<typename GridType::LeafGridView> dim(grid_prv.grid().leafGridView());
-    const auto gv      = grid_prv.grid().leafView();
+    const auto gv      = grid_prv.grid().leafGridView();
     const int entities = gv.size(0);
     EXPECT_DOUBLE_EQ(1.0 / double(entities), dim.entity_volume.min());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.max());
@@ -58,7 +58,7 @@ struct GridInfoTest : public ::testing::Test
 
   void print(std::ostream& out)
   {
-    const auto& gv = grid_prv.grid().leafView();
+    const auto& gv = grid_prv.grid().leafGridView();
     printInfo(gv, out);
   }
 };
