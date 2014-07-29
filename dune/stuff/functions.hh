@@ -181,7 +181,9 @@ public:
 } // namespace Dune
 
 
-#ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
+#if 0 // def DUNE_STUFF_FUNCTIONS_TO_LIB
+the whole  DUNE_STUFF_FUNCTIONS_TO_LIB stuff threw loads of errors, so I disabled it everywhere (Rene)
+
 #define DUNE_STUFF_FUNCTIONS_LIST_DIMRANGE(etype, ddim)                                                                \
   DUNE_STUFF_FUNCTIONS_LIST_DIMRANGECOLS(etype, ddim, 1)                                                               \
   DUNE_STUFF_FUNCTIONS_LIST_DIMRANGECOLS(etype, ddim, 2)                                                               \

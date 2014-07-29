@@ -721,7 +721,9 @@ public:
 #include "default.hh"
 #include "combined.hh"
 
-#ifdef DUNE_STUFF_FUNCTIONS_TO_LIB
+#if 0 // def DUNE_STUFF_FUNCTIONS_TO_LIB
+the whole  DUNE_STUFF_FUNCTIONS_TO_LIB stuff threw loads of errors, so I disabled it everywhere (Rene)
+
 #define DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(etype, ddim)                                                      \
   DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE(Dune::Stuff::LocalfunctionSetInterface, etype, ddim)                   \
   DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE(Dune::Stuff::LocalfunctionInterface, etype, ddim)                      \
@@ -749,9 +751,9 @@ public:
 
 #include <dune/stuff/grid/fakeentity.hh>
 
-typedef Dune::Stuff::Grid::FakeEntity<1> DuneStuffFunctionsInterfacesFake1dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<2> DuneStuffFunctionsInterfacesFake2dEntityType;
-typedef Dune::Stuff::Grid::FakeEntity<3> DuneStuffFunctionsInterfacesFake3dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity< 1 > DuneStuffFunctionsInterfacesFake1dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity< 2 > DuneStuffFunctionsInterfacesFake2dEntityType;
+typedef Dune::Stuff::Grid::FakeEntity< 3 > DuneStuffFunctionsInterfacesFake3dEntityType;
 
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake1dEntityType, 1)
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake2dEntityType, 2)
@@ -763,9 +765,9 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesFake3dE
 #include <dune/stuff/common/disable_warnings.hh>
 
 
-typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid1dEntityType;
-typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid2dEntityType;
-typedef Dune::SGrid<3, 3>::Codim<0>::Entity DuneStuffFunctionsInterfacesSGrid3dEntityType;
+typedef Dune::SGrid< 1, 1 >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesSGrid1dEntityType;
+typedef Dune::SGrid< 2, 2 >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesSGrid2dEntityType;
+typedef Dune::SGrid< 3, 3 >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesSGrid3dEntityType;
 
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesSGrid1dEntityType, 1)
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesSGrid2dEntityType, 2)
@@ -773,9 +775,9 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesSGrid3d
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef Dune::YaspGrid<1>::Codim<0>::Entity DuneStuffFunctionsInterfacesYaspGrid1dEntityType;
-typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneStuffFunctionsInterfacesYaspGrid2dEntityType;
-typedef Dune::YaspGrid<3>::Codim<0>::Entity DuneStuffFunctionsInterfacesYaspGrid3dEntityType;
+typedef Dune::YaspGrid< 1 >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesYaspGrid1dEntityType;
+typedef Dune::YaspGrid< 2 >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesYaspGrid2dEntityType;
+typedef Dune::YaspGrid< 3 >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesYaspGrid3dEntityType;
 
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGrid1dEntityType, 1)
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGrid2dEntityType, 2)
@@ -795,12 +797,9 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesYaspGri
 
 #include <dune/grid/alugrid.hh>
 
-typedef Dune::ALUGrid<2, 2. Dune::simplex, Dune::nonconforming>::Codim<0>::Entity
-    DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType;
-typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity
-    DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType;
-typedef Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>::Codim<0>::Entity
-    DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType;
+typedef Dune::ALUGrid< 2, 2. Dune::simplex, Dune::nonconforming >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType;
+typedef Dune::ALUGrid< 3, 3, Dune::simplex, Dune::nonconforming >::Codim< 0 >::Entity DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType;
+typedef Dune::ALUGrid< 3, 3, Dune::cube, Dune::nonconforming>::Codim< 0 >::Entity DuneStuffFunctionsInterfacesAluCubeGrid3dEntityType;
 
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
 DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluSimplexGrid3dEntityType, 3)
@@ -826,17 +825,17 @@ DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES(DuneStuffFunctionsInterfacesAluCube
 #undef DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_DIMRANGE
 #undef DUNE_STUFF_FUNCTIONS_INTERFACES_LIST_CLASSES
 
-extern template class Dune::Stuff::FunctionInterface<double, 1, double, 1>;
-extern template class Dune::Stuff::FunctionInterface<double, 1, double, 2>;
-extern template class Dune::Stuff::FunctionInterface<double, 1, double, 3>;
+extern template class Dune::Stuff::FunctionInterface< double, 1, double, 1 >;
+extern template class Dune::Stuff::FunctionInterface< double, 1, double, 2 >;
+extern template class Dune::Stuff::FunctionInterface< double, 1, double, 3 >;
 
-extern template class Dune::Stuff::FunctionInterface<double, 2, double, 1>;
-extern template class Dune::Stuff::FunctionInterface<double, 2, double, 2>;
-extern template class Dune::Stuff::FunctionInterface<double, 2, double, 3>;
+extern template class Dune::Stuff::FunctionInterface< double, 2, double, 1 >;
+extern template class Dune::Stuff::FunctionInterface< double, 2, double, 2 >;
+extern template class Dune::Stuff::FunctionInterface< double, 2, double, 3 >;
 
-extern template class Dune::Stuff::FunctionInterface<double, 3, double, 1>;
-extern template class Dune::Stuff::FunctionInterface<double, 3, double, 2>;
-extern template class Dune::Stuff::FunctionInterface<double, 3, double, 3>;
+extern template class Dune::Stuff::FunctionInterface< double, 3, double, 1 >;
+extern template class Dune::Stuff::FunctionInterface< double, 3, double, 2 >;
+extern template class Dune::Stuff::FunctionInterface< double, 3, double, 3 >;
 #endif // DUNE_STUFF_FUNCTIONS_TO_LIB
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
