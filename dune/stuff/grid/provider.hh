@@ -16,7 +16,7 @@
 #include <dune/grid/sgrid.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 
 #include "provider/interface.hh"
 #include "provider/cube.hh"
@@ -35,7 +35,7 @@ public:
 
 protected:
   template <class GridProviderType>
-  static std::unique_ptr<InterfaceType> call_create(const Common::ConfigTree& config)
+  static std::unique_ptr<InterfaceType> call_create(const Common::ConfigContainer& config)
   {
     if (config.empty())
       return GridProviderType::create();
@@ -50,7 +50,7 @@ public:
     return {Providers::Cube<GridType>::static_id()};
   } // ... available()
 
-  static Common::ConfigTree default_config(const std::string type, const std::string subname = "")
+  static Common::ConfigContainer default_config(const std::string type, const std::string subname = "")
   {
     namespace Providers = Stuff::Grid::Providers;
     if (type == Providers::Cube<GridType>::static_id())
@@ -61,7 +61,7 @@ public:
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
-                                               const Common::ConfigTree config = Common::ConfigTree())
+                                               const Common::ConfigContainer config = Common::ConfigContainer())
   {
     namespace Providers = Stuff::Grid::Providers;
     if (type == Providers::Cube<GridType>::static_id())
