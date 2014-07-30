@@ -69,7 +69,7 @@ struct SolverTest : public ::testing::Test
       DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Solver has no options!");
     for (auto opt : opts) {
       out << "solving with option '" << opt << "' and detailed options" << std::endl;
-      Common::ConfigTree detailed_opts = SolverType::options(opt);
+      Common::ConfigContainer detailed_opts = SolverType::options(opt);
       detailed_opts.report(out, "  ");
 
       // dynamic tests
