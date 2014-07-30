@@ -182,7 +182,10 @@ public:
 
   inline size_t size() const
   {
-    return backend_->dim();
+    // as long as we have scalar blocks of size 1 here,
+    // using backend's size would give a severe performance hit
+    // since that iterates over the entire vector summing up 1's
+    return backend_->N();
   }
 
   void add_to_entry(const size_t ii, const ScalarType& value)
