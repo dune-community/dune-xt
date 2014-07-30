@@ -14,7 +14,7 @@
 #include <dune/geometry/referenceelements.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/debug.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
@@ -212,26 +212,26 @@ public:
     return BaseType::static_id() + ".ESV2007.testcase1.force";
   }
 
-  static Common::ConfigTree default_config(const std::string sub_name = "")
+  static Common::ConfigContainer default_config(const std::string sub_name = "")
   {
-    Common::ConfigTree config;
+    Common::ConfigContainer config;
     config["integration_order"] = "3";
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigTree tmp;
+      Common::ConfigContainer tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigTree default_cfg = default_config();
+    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigContainer default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<size_t>("integration_order")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
@@ -320,26 +320,26 @@ public:
     return BaseType::static_id() + ".ESV2007.testcase1.exactsolution";
   }
 
-  static Common::ConfigTree default_config(const std::string sub_name = "")
+  static Common::ConfigContainer default_config(const std::string sub_name = "")
   {
-    Common::ConfigTree config;
+    Common::ConfigContainer config;
     config["integration_order"] = "3";
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigTree tmp;
+      Common::ConfigContainer tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigTree default_cfg = default_config();
+    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigContainer default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<size_t>("integration_order")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
