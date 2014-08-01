@@ -881,28 +881,6 @@ public:
    * \}
    */
 
-  /**
-   * \defgroup deprecated ´´These methods are provided for backwards compatibility only and will be removed soon!``
-   * \{
-   */
-  inline void DUNE_DEPRECATED_MSG("Please use add_to_entry()!") add(const size_t ii, const ScalarType& value)
-  {
-    add_to_entry(ii, value);
-  }
-
-  inline void DUNE_DEPRECATED_MSG("Please use set_entry()!") set(const size_t ii, const ScalarType& value)
-  {
-    set_entry(ii, value);
-  }
-
-  inline ScalarType DUNE_DEPRECATED_MSG("Please use get_entry()!") get(const size_t ii) const
-  {
-    return get_entry(ii);
-  }
-  /**
-   * \}
-   */
-
   iterator begin()
   {
     return iterator(*this);
@@ -1090,46 +1068,6 @@ public:
   inline void pb_unit_col(const size_t jj)
   {
     unit_col(this->assert_is_size_t_compatible_and_convert(jj));
-  }
-
-  /**
-   * \}
-   */
-
-  /**
-   * \defgroup deprecated ´´These methods are provided for backwards compatibility only and will be removed soon!``
-   * \{
-   */
-  inline void DUNE_DEPRECATED_MSG("Please use add_to_entry()!")
-      add(const size_t ii, const size_t jj, const ScalarType& value)
-  {
-    add_to_entry(ii, jj, value);
-  }
-
-  inline void DUNE_DEPRECATED_MSG("Please use set_entry()!")
-      set(const size_t ii, const size_t jj, const ScalarType& value)
-  {
-    set_entry(ii, jj, value);
-  }
-
-  inline ScalarType DUNE_DEPRECATED_MSG("Please use get_entry()!") get(const size_t ii, const size_t jj) const
-  {
-    return get_entry(ii, jj);
-  }
-
-  inline void DUNE_DEPRECATED_MSG("Please use unit_row()!") unitRow(const size_t row)
-  {
-    unit_row(row);
-  }
-
-  inline void DUNE_DEPRECATED_MSG("Please use unit_col()!") unitCol(const size_t col)
-  {
-    unit_col(col);
-  }
-
-  inline void DUNE_DEPRECATED_MSG("Please use clear_row()!") clearRow(const size_t ii)
-  {
-    clear_row(ii);
   }
 
   /**
