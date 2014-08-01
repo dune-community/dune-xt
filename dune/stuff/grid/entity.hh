@@ -64,28 +64,6 @@ void printEntity(const EntityType& entity, const std::string name = Common::Type
 
 
 #if HAVE_DUNE_GRID
-template <class GridImp, template <int, int, class> class EntityImp>
-double DUNE_DEPRECATED_MSG("use entityDiameter instead")
-    geometryDiameter(const Dune::Entity<0, 2, GridImp, EntityImp>& entity)
-{
-  const auto end = entity.ileafend();
-  double factor = 1.0;
-  for (auto it = entity.ileafbegin(); it != end; ++it) {
-    const auto& intersection = *it;
-    factor *= intersection.geometry().volume();
-  }
-  return factor / (2.0 * entity.geometry().volume());
-} // geometryDiameter
-
-
-template <class GridImp, template <int, int, class> class EntityImp>
-double DUNE_DEPRECATED_MSG("use entityDiameter instead")
-    geometryDiameter(const Dune::Entity<0, 3, GridImp, EntityImp>& /*entity*/)
-{
-  DUNE_THROW(Dune::NotImplemented, "geometryDiameter not implemented for dim 3");
-} // geometryDiameter
-
-
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 double entityDiameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
 {
