@@ -32,7 +32,7 @@
     void check() const                                                                                                 \
     {                                                                                                                  \
       for (const std::string& type : FunctionsProvider::available()) {                                                 \
-        const Dune::Stuff::Common::ConfigTree config = FunctionsProvider::default_config(type);                        \
+        const Dune::Stuff::Common::ConfigContainer config = FunctionsProvider::default_config(type);                   \
         try {                                                                                                          \
           const std::unique_ptr<InterfaceType> function = FunctionsProvider::create(type, config);                     \
         } catch (Dune::IOError&) {                                                                                     \

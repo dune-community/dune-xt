@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 
 #include "interfaces.hh"
 
@@ -96,26 +96,26 @@ public:
     return BaseType::static_id() + ".constant";
   }
 
-  static Common::ConfigTree default_config(const std::string sub_name = "")
+  static Common::ConfigContainer default_config(const std::string sub_name = "")
   {
-    Common::ConfigTree config;
+    Common::ConfigContainer config;
     config["value"] = Get<RangeFieldImp, rangeDim, rangeDimCols>::value_str();
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigTree tmp;
+      Common::ConfigContainer tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigTree default_cfg = default_config();
+    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigContainer default_cfg = default_config();
     return Common::make_unique<ThisType>(cfg.get("value", default_cfg.get<RangeType>("value")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)

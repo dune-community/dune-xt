@@ -15,7 +15,7 @@
 #include <dune/common/fvector.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/exceptions.hh>
 
 #include "expression/base.hh"
@@ -206,9 +206,9 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Common::ConfigTree default_config(const std::string sub_name = "")
+  static Common::ConfigContainer default_config(const std::string sub_name = "")
   {
-    Common::ConfigTree config;
+    Common::ConfigContainer config;
     config["variable"]   = "x";
     config["expression"] = "[x[0] sin(x[0]) exp(x[0])]";
     config["order"]      = "3";
@@ -216,18 +216,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigTree tmp;
+      Common::ConfigContainer tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigTree default_cfg = default_config();
+    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigContainer default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(cfg.get("variable", default_cfg.get<std::string>("variable")),
                                          cfg.get("expression", default_cfg.get<std::vector<std::string>>("expression")),

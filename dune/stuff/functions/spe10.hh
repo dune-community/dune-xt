@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
 
@@ -97,9 +97,9 @@ private:
   } // ... read_values_from_file(...)
 
 public:
-  static Common::ConfigTree default_config(const std::string sub_name = "")
+  static Common::ConfigContainer default_config(const std::string sub_name = "")
   {
-    Common::ConfigTree config;
+    Common::ConfigContainer config;
     config["filename"]    = "perm_case1.dat";
     config["lower_left"]  = "[0.0 0.0]";
     config["upper_right"] = "[762.0 15.24]";
@@ -109,18 +109,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigTree tmp;
+      Common::ConfigContainer tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigTree default_cfg = default_config();
+    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigContainer default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(
         cfg.get("filename", default_cfg.get<std::string>("filename")),
@@ -220,9 +220,9 @@ private:
   } // ... read_values_from_file(...)
 
 public:
-  static Common::ConfigTree default_config(const std::string sub_name = "")
+  static Common::ConfigContainer default_config(const std::string sub_name = "")
   {
-    Common::ConfigTree config;
+    Common::ConfigContainer config;
     config["filename"]    = "perm_case1.dat";
     config["lower_left"]  = "[0.0 0.0]";
     config["upper_right"] = "[762.0 15.24]";
@@ -232,18 +232,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigTree tmp;
+      Common::ConfigContainer tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigTree config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigTree cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigTree default_cfg = default_config();
+    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::ConfigContainer default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(
         cfg.get("filename", default_cfg.get<std::string>("filename")),
