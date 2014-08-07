@@ -95,20 +95,9 @@ public:
     }
   }
 
-  template <class Functor>
-  void walkCodim0(Functor& f) const DUNE_DEPRECATED_MSG("use operator()(Functor) instead ");
-
-
 private:
   const GridViewType& gridView_;
 };
-
-template <class V, int i>
-template <class Functor>
-void GridWalk<V, i>::walkCodim0(Functor& f) const
-{
-  this->operator()(f);
-}
 
 //!
 template <class ViewImp, int codim = 0>
