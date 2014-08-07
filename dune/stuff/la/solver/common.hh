@@ -13,7 +13,7 @@
 #include <cmath>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 
 #include <dune/stuff/la/container/common.hh>
 
@@ -45,10 +45,10 @@ public:
     return {"superlu"};
   }
 
-  static Common::ConfigTree options(const std::string& type)
+  static Common::ConfigContainer options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    return Common::ConfigTree({"type", "post_check_solves_system"}, {type, "1e-5"});
+    return Common::ConfigContainer({"type", "post_check_solves_system"}, {type, "1e-5"});
   } // ... options(...)
 
   void apply(const CommonDenseVector<S>& rhs, CommonDenseVector<S>& solution) const
@@ -61,14 +61,14 @@ public:
     apply(rhs, solution, options(type));
   }
 
-  void apply(const CommonDenseVector<S>& rhs, CommonDenseVector<S>& solution, const Common::ConfigTree& opts) const
+  void apply(const CommonDenseVector<S>& rhs, CommonDenseVector<S>& solution, const Common::ConfigContainer& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, options());
-    const Common::ConfigTree default_opts = options(type);
+    const Common::ConfigContainer default_opts = options(type);
     // solve
     try {
       matrix_.backend().solve(solution.backend(), rhs.backend());

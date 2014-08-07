@@ -5,8 +5,8 @@
 //
 // Contributors: Tobias Leibner
 
-#ifndef DUNE_STUFF_LA_CONTAINER_INTERFACE_HH
-#define DUNE_STUFF_LA_CONTAINER_INTERFACE_HH
+#ifndef DUNE_STUFF_LA_CONTAINER_INTERFACES_HH
+#define DUNE_STUFF_LA_CONTAINER_INTERFACES_HH
 
 #ifndef DUNE_STUFF_SSIZE_T
 #define DUNE_STUFF_SSIZE_T long int
@@ -93,7 +93,7 @@ class MatrixInterface
 };
 
 
-} // namespace Tagss
+} // namespace Tags
 namespace internal {
 
 
@@ -1108,4 +1108,4 @@ std::ostream& operator<<(std::ostream& out, const MatrixInterface<T>& matrix)
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_CONTAINER_INTERFACE_HH
+#endif // DUNE_STUFF_LA_CONTAINER_INTERFACES_HH

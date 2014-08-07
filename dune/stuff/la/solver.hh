@@ -11,7 +11,7 @@
 
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/parallel/helper.hh>
 
 namespace Dune {
@@ -82,7 +82,7 @@ public:
                               << "'!");
   }
 
-  static Common::ConfigTree options(const std::string& /*type*/)
+  static Common::ConfigContainer options(const std::string& /*type*/)
   {
     DUNE_THROW_COLORFULLY(NotImplemented,
                           "This is the unspecialized version of LA::Solver< ... >. "
@@ -116,7 +116,7 @@ public:
   }
 
   template <class RhsType, class SolutionType>
-  void apply(const RhsType& /*rhs*/, SolutionType& /*solution*/, const Common::ConfigTree& /*options*/) const
+  void apply(const RhsType& /*rhs*/, SolutionType& /*solution*/, const Common::ConfigContainer& /*options*/) const
   {
     DUNE_THROW_COLORFULLY(NotImplemented,
                           "This is the unspecialized version of LA::Solver< ... >. "

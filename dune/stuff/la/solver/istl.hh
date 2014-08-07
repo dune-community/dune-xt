@@ -18,7 +18,7 @@
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/common/misc.hh>
 #include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/solver/istl_amg.hh>
@@ -62,10 +62,10 @@ public:
     };
   } // ... options()
 
-  static Common::ConfigTree options(const std::string& type)
+  static Common::ConfigContainer options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    Common::ConfigTree iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
+    Common::ConfigContainer iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
     iterative_options.set("post_check_solves_system", "1e-5");
     if (type == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
@@ -103,7 +103,7 @@ public:
   /**
    *  \note does a copy of the rhs
    */
-  void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigTree& opts) const
+  void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::ConfigContainer& opts) const
   {
     try {
       if (!opts.has_key("type"))
@@ -111,8 +111,8 @@ public:
                               "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
       const auto type = opts.get<std::string>("type");
       SolverUtils::check_given(type, options());
-      const Common::ConfigTree default_opts = options(type);
-      IstlDenseVector<S> writable_rhs       = rhs.copy();
+      const Common::ConfigContainer default_opts = options(type);
+      IstlDenseVector<S> writable_rhs            = rhs.copy();
       // solve
       if (type == "bicgstab.amg.ilu0") {
         auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_provider_->get())
