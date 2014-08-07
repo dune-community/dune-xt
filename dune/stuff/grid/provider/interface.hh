@@ -23,7 +23,7 @@
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/grid/layers.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/grid/boundaryinfo.hh>
 
 namespace Dune {
@@ -154,7 +154,8 @@ public:
     vtkwriter.write(filename, VTK::appendedraw);
   } // ... visualize(...)
 
-  virtual void visualize(const Common::ConfigTree& boundary_info_cfg, const std::string filename = static_id()) const
+  virtual void visualize(const Common::ConfigContainer& boundary_info_cfg,
+                         const std::string filename = static_id()) const
   {
     // boundary info
     typedef Stuff::Grid::BoundaryInfoProvider<typename LeafGridViewType::Intersection> BoundaryInfoProvider;

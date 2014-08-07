@@ -22,7 +22,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/parameter/configcontainer.hh>
 #include <dune/stuff/grid/provider/interface.hh>
 #include <dune/stuff/grid/provider/cube.hh>
 
@@ -30,7 +30,7 @@ using namespace Dune;
 using namespace Dune::Stuff;
 
 //! \TODO enable embedded grids
-typedef testing::Types<SGrid<1, 1>, SGrid<2, 2>, SGrid<3, 3>, SGrid<4, 4>
+typedef testing::Types<SGrid<1, 1>, SGrid<2, 2>, SGrid<3, 3> //, SGrid<4,4>
                        //, SGrid<1,2>, SGrid<2,3>, SGrid<3,4>, SGrid<4,5>,
                        ,
                        Dune::YaspGrid<1>, Dune::YaspGrid<2>, Dune::YaspGrid<3>> GridTypes;

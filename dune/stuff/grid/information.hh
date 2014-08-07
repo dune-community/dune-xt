@@ -7,17 +7,23 @@
 #define DUNE_STUFF_GRID_INFORMATION_HH
 
 #include <ostream>
+
 #include <boost/format.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+
+#include <dune/common/unused.hh>
+
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/gridview.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
+
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/grid/walk.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/grid/entity.hh>
+
 
 namespace Dune {
 namespace Stuff {
@@ -75,7 +81,7 @@ unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
   unsigned int maxNeighbours = 0;
   for (const auto& entity : viewRange(gridView)) {
     unsigned int neighbours = 0;
-    for (const auto& i : intersectionRange(gridView, entity)) {
+    for (const auto& DUNE_UNUSED(i) : intersectionRange(gridView, entity)) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);
