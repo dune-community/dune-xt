@@ -641,6 +641,13 @@ struct TransferredGlobalFunction
   const GlobalFunctionImp& function_;
 };
 
+//! Utility to generate a complete Function Type from an existing one and a template
+template <class FunctionImp, template <class, class, int, class, int, int> class OutTemplate>
+struct FunctionTypeGenerator
+{
+  typedef OutTemplate<typename FunctionImp::EntityType, typename FunctionImp::DomainFieldType, FunctionImp::dimDomain,
+                      typename FunctionImp::RangeFieldType, FunctionImp::dimRange, FunctionImp::dimRangeCols> type;
+};
 
 } // namespace Stuff
 } // namespace Dune
