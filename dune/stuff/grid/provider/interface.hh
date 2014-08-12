@@ -23,7 +23,7 @@
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/grid/layers.hh>
-#include <dune/stuff/common/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/grid/boundaryinfo.hh>
 
 namespace Dune {

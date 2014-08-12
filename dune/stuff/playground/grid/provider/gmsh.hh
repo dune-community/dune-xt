@@ -31,7 +31,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/grid/io/file/gmshreader.hh>
 
-#include <dune/stuff/common/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 
 #include "interface.hh"
 

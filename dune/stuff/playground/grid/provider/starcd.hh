@@ -36,7 +36,7 @@
 #include <dune/grid/sgrid.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/logging.hh>
 #include <dune/stuff/grid/provider/interface.hh>

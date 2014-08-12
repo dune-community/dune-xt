@@ -25,7 +25,7 @@
 #endif
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
 
 #include "default.hh"
