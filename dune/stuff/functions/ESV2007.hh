@@ -14,7 +14,7 @@
 #include <dune/geometry/referenceelements.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configcontainer.hh>
 #include <dune/stuff/common/debug.hh>
 #include <dune/stuff/la/container/eigen.hh>
 

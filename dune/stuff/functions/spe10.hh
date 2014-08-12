@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configcontainer.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
 
