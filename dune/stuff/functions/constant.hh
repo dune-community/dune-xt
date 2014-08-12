@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include <dune/stuff/common/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 
 #include "interfaces.hh"
 

@@ -11,7 +11,7 @@
 #include <memory>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 
 #include "functions/interfaces.hh"
 #include "functions/checkerboard.hh"
