@@ -23,7 +23,7 @@
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/vector.hh>
 #include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configcontainer.hh>
 #include <dune/stuff/common/memory.hh>
 
 #if HAVE_DUNE_PDELAB

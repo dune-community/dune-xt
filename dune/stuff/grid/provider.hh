@@ -16,7 +16,7 @@
 #include <dune/grid/sgrid.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configcontainer.hh>
 
 #include "provider/interface.hh"
 #include "provider/cube.hh"
