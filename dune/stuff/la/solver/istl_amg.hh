@@ -19,7 +19,7 @@
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configcontainer.hh>
 #include <dune/stuff/common/parallel/helper.hh>
 #include <dune/stuff/la/container/istl.hh>
 

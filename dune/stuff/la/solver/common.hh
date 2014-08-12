@@ -13,7 +13,7 @@
 #include <cmath>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configcontainer.hh>
 
 #include <dune/stuff/la/container/common.hh>
 
