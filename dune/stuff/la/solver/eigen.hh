@@ -77,10 +77,10 @@ public:
             "lu.fullpiv"};
   } // ... options()
 
-  static Common::ConfigContainer options(const std::string& type)
+  static Common::Configuration options(const std::string& type)
   {
     SolverUtils::check_given(type, options());
-    Common::ConfigContainer default_options({"type", "post_check_solves_system"}, {type, "1e-5"});
+    Common::Configuration default_options({"type", "post_check_solves_system"}, {type, "1e-5"});
     // * for symmetric matrices
     if (type == "ldlt" || type == "llt") {
       default_options.set("pre_check_symmetry", "1e-8");
@@ -103,14 +103,14 @@ public:
 
   template <class T1, class T2>
   void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution,
-             const Common::ConfigContainer& opts) const
+             const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, options());
-    const Common::ConfigContainer default_opts = options(type);
+    const Common::Configuration default_opts = options(type);
     // check for symmetry (if solver needs it)
     if (type == "ldlt" || type == "llt") {
       const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
@@ -232,14 +232,14 @@ public:
     };
   } // ... options()
 
-  static Common::ConfigContainer options(const std::string& type)
+  static Common::Configuration options(const std::string& type)
   {
     // check
     SolverUtils::check_given(type, options());
     // default config
-    Common::ConfigContainer default_options({"type", "post_check_solves_system", "check_for_inf_nan"},
-                                            {type, "1e-5", "1"});
-    Common::ConfigContainer iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
+    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"},
+                                          {type, "1e-5", "1"});
+    Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += default_options;
     // direct solvers
     if (type == "lu.sparse" || type == "qr.sparse" || type == "lu.umfpack" || type == "spqr"
@@ -274,14 +274,14 @@ public:
 
   template <class T1, class T2>
   void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution,
-             const Common::ConfigContainer& opts) const
+             const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
                             "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, options());
-    const Common::ConfigContainer default_opts = options(type);
+    const Common::Configuration default_opts = options(type);
     // check for symmetry (if solver needs it)
     if (type.substr(0, 3) == "cg." || type == "ldlt.simplicial" || type == "llt.simplicial") {
       const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
