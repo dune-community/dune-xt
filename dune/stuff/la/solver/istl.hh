@@ -84,8 +84,8 @@ public:
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
 #endif // !HAVE_MPI
     } else
-      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
-                            "Given type '" << type << "' is not supported, although it was reported by options()!");
+      DUNE_THROW(Exceptions::internal_error,
+                 "Given type '" << type << "' is not supported, although it was reported by options()!");
     iterative_options.set("type", type);
     return iterative_options;
   } // ... options(...)
@@ -107,8 +107,8 @@ public:
   {
     try {
       if (!opts.has_key("type"))
-        DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
-                              "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+        DUNE_THROW(Exceptions::configuration_error,
+                   "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
       const auto type = opts.get<std::string>("type");
       SolverUtils::check_given(type, options());
       const Common::Configuration default_opts = options(type);
@@ -118,10 +118,10 @@ public:
         auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_provider_->get())
                           .call(writable_rhs, solution, opts, default_opts);
         if (!result.converged)
-          DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                                "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                    << "Those were the given options:\n\n"
-                                    << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                     "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
 #if !HAVE_MPI
       } else if (type == "bicgstab.ilut") {
         typedef MatrixAdapter<typename MatrixType::BackendType,
@@ -144,14 +144,14 @@ public:
         InverseOperatorResult stat;
         solver.apply(solution.backend(), writable_rhs.backend(), stat);
         if (!stat.converged)
-          DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                                "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                                    << "Those were the given options:\n\n"
-                                    << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                     "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
 #endif // !HAVE_MPI
       } else
-        DUNE_THROW_COLORFULLY(Exceptions::internal_error,
-                              "Given type '" << type << "' is not supported, although it was reported by options()!");
+        DUNE_THROW(Exceptions::internal_error,
+                   "Given type '" << type << "' is not supported, although it was reported by options()!");
       // check (use writable_rhs as tmp)
       const S post_check_solves_system_threshold =
           opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
@@ -160,17 +160,16 @@ public:
         writable_rhs -= rhs;
         const S sup_norm = writable_rhs.sup_norm();
         if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
-          DUNE_THROW_COLORFULLY(
-              Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
-              "The computed solution does not solve the system (although the dune-istl backend "
-                  << "reported no error) and you requested checking (see options below)!\n"
-                  << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
-                  << "\n\n"
-                  << "  (A * x - b).sup_norm() = "
-                  << writable_rhs.sup_norm()
-                  << "\n\n"
-                  << "Those were the given options:\n\n"
-                  << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
+                     "The computed solution does not solve the system (although the dune-istl backend "
+                         << "reported no error) and you requested checking (see options below)!\n"
+                         << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                         << "\n\n"
+                         << "  (A * x - b).sup_norm() = "
+                         << writable_rhs.sup_norm()
+                         << "\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       }
     } catch (ISTLError& e) {
       DUNE_THROW(Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());

@@ -59,14 +59,14 @@ struct SolverTest : public ::testing::Test
     const SolverType solver(matrix);
     solver.apply(rhs, solution);
     if (!solution.almost_equal(rhs))
-      DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Wrong solution!");
+      DUNE_THROW(Exceptions::results_are_not_as_expected, "Wrong solution!");
     solution.scal(0);
 
     // static tests
     typedef typename SolverType::MatrixType M;
     std::vector<std::string> opts = SolverType::options();
     if (opts.size() == 0)
-      DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Solver has no options!");
+      DUNE_THROW(Exceptions::results_are_not_as_expected, "Solver has no options!");
     for (auto opt : opts) {
       out << "solving with option '" << opt << "' and detailed options" << std::endl;
       Common::Configuration detailed_opts = SolverType::options(opt);
@@ -75,12 +75,12 @@ struct SolverTest : public ::testing::Test
       // dynamic tests
       solver.apply(rhs, solution, opt);
       if (!solution.almost_equal(rhs))
-        DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Wrong solution!");
+        DUNE_THROW(Exceptions::results_are_not_as_expected, "Wrong solution!");
       solution.scal(0);
 
       solver.apply(rhs, solution, detailed_opts);
       if (!solution.almost_equal(rhs))
-        DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Wrong solution!");
+        DUNE_THROW(Exceptions::results_are_not_as_expected, "Wrong solution!");
     }
   } // ... produces_correct_results(...)
 }; // struct SolverTest

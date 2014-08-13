@@ -106,8 +106,8 @@ public:
              const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
-                            "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+      DUNE_THROW(Exceptions::configuration_error,
+                 "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, options());
     const Common::Configuration default_opts = options(type);
@@ -119,15 +119,14 @@ public:
         // serialize difference to compute L^\infty error (no copy done here)
         const S error = std::max(std::abs(tmp.backend().minCoeff()), std::abs(tmp.backend().maxCoeff()));
         if (error > pre_check_symmetry_threshhold)
-          DUNE_THROW_COLORFULLY(
-              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-              "Given matrix is not symmetric and you requested checking (see options below)!\n"
-                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
-                  << "  (A - A').sup_norm() = "
-                  << error
-                  << "\n\n"
-                  << "Those were the given options:\n\n"
-                  << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+                     "Given matrix is not symmetric and you requested checking (see options below)!\n"
+                         << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
+                         << "  (A - A').sup_norm() = "
+                         << error
+                         << "\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       }
     }
     // solve
@@ -146,8 +145,8 @@ public:
     else if (type == "lu.partialpiv")
       solution.backend() = matrix_.backend().partialPivLu().solve(rhs.backend());
     else
-      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
-                            "Given type '" << type << "' is not supported, although it was reported by options()!");
+      DUNE_THROW(Exceptions::internal_error,
+                 "Given type '" << type << "' is not supported, although it was reported by options()!");
     // check
     const S post_check_solves_system_threshold =
         opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
@@ -156,17 +155,16 @@ public:
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const S sup_norm = tmp.sup_norm();
       if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
-        DUNE_THROW_COLORFULLY(
-            Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
-            "The computed solution does not solve the system (although the eigen backend reported "
-                << "'Success') and you requested checking (see options below)!\n"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
-                << "\n\n"
-                << "  (A * x - b).sup_norm() = "
-                << tmp.sup_norm()
-                << "\n\n"
-                << "Those were the given options:\n\n"
-                << opts);
+        DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
+                   "The computed solution does not solve the system (although the eigen backend reported "
+                       << "'Success') and you requested checking (see options below)!\n"
+                       << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                       << "\n\n"
+                       << "  (A * x - b).sup_norm() = "
+                       << tmp.sup_norm()
+                       << "\n\n"
+                       << "Those were the given options:\n\n"
+                       << opts);
     }
   } // ... apply(...)
 
@@ -277,8 +275,8 @@ public:
              const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
-                            "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+      DUNE_THROW(Exceptions::configuration_error,
+                 "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, options());
     const Common::Configuration default_opts = options(type);
@@ -291,15 +289,14 @@ public:
         // serialize difference to compute L^\infty error (no copy done here)
         EigenMappedDenseVector<S> differences(colmajor_copy.valuePtr(), colmajor_copy.nonZeros());
         if (differences.sup_norm() > pre_check_symmetry_threshhold)
-          DUNE_THROW_COLORFULLY(
-              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-              "Given matrix is not symmetric and you requested checking (see options below)!\n"
-                  << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
-                  << "  (A - A').sup_norm() = "
-                  << differences.sup_norm()
-                  << "\n\n"
-                  << "Those were the given options:\n\n"
-                  << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+                     "Given matrix is not symmetric and you requested checking (see options below)!\n"
+                         << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
+                         << "  (A - A').sup_norm() = "
+                         << differences.sup_norm()
+                         << "\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       }
     }
     // check for inf or nan
@@ -311,22 +308,20 @@ public:
       for (size_t ii = 0; ii < values.size(); ++ii) {
         const S& val = values[ii];
         if (std::isnan(val) || std::isinf(val))
-          DUNE_THROW_COLORFULLY(
-              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-              "Given matrix contains inf or nan and you requested checking (see options below)!\n"
-                  << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                  << "Those were the given options:\n\n"
-                  << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+                     "Given matrix contains inf or nan and you requested checking (see options below)!\n"
+                         << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       }
       for (size_t ii = 0; ii < rhs.size(); ++ii) {
         const S& val = rhs[ii];
         if (std::isnan(val) || std::isinf(val))
-          DUNE_THROW_COLORFULLY(
-              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-              "Given rhs contains inf or nan and you requested checking (see options below)!\n"
-                  << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                  << "Those were the given options:\n\n"
-                  << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+                     "Given rhs contains inf or nan and you requested checking (see options below)!\n"
+                         << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       }
     }
     ::Eigen::ComputationInfo info;
@@ -464,38 +459,35 @@ public:
 //      info = solver.info();
 #endif // HAVE_SUPERLU
     } else
-      DUNE_THROW_COLORFULLY(Exceptions::internal_error,
-                            "Given type '" << type << "' is not supported, although it was reported by options()!");
+      DUNE_THROW(Exceptions::internal_error,
+                 "Given type '" << type << "' is not supported, although it was reported by options()!");
     // handle eigens info
     if (info != ::Eigen::Success) {
       if (info == ::Eigen::NumericalIssue)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-                              "The eigen backend reported 'NumericalIssue'!\n"
-                                  << "=> see "
-                                     "http://eigen.tuxfamily.org/dox/"
-                                     "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
+        DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+                   "The eigen backend reported 'NumericalIssue'!\n"
+                       << "=> see http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b "
+                          "for eigens explanation\n"
+                       << "Those were the given options:\n\n"
+                       << opts);
       else if (info == ::Eigen::NoConvergence)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                              "The eigen backend reported 'NoConvergence'!\n"
-                                  << "=> see "
-                                     "http://eigen.tuxfamily.org/dox/"
-                                     "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
+        DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                   "The eigen backend reported 'NoConvergence'!\n"
+                       << "=> see http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b "
+                          "for eigens explanation\n"
+                       << "Those were the given options:\n\n"
+                       << opts);
       else if (info == ::Eigen::InvalidInput)
-        DUNE_THROW_COLORFULLY(Exceptions::linear_solver_failed_bc_it_was_not_set_up_correctly,
-                              "The eigen backend reported 'InvalidInput'!\n"
-                                  << "=> see "
-                                     "http://eigen.tuxfamily.org/dox/"
-                                     "group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b for eigens explanation\n"
-                                  << "Those were the given options:\n\n"
-                                  << opts);
+        DUNE_THROW(Exceptions::linear_solver_failed_bc_it_was_not_set_up_correctly,
+                   "The eigen backend reported 'InvalidInput'!\n"
+                       << "=> see http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b "
+                          "for eigens explanation\n"
+                       << "Those were the given options:\n\n"
+                       << opts);
       else
-        DUNE_THROW_COLORFULLY(Exceptions::internal_error,
-                              "The eigen backend reported an unknown status!\n"
-                                  << "Please report this to the dune-stuff developers!");
+        DUNE_THROW(Exceptions::internal_error,
+                   "The eigen backend reported an unknown status!\n"
+                       << "Please report this to the dune-stuff developers!");
     }
     // check
     const S post_check_solves_system_threshold =
@@ -505,29 +497,27 @@ public:
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const S sup_norm = tmp.sup_norm();
       if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
-        DUNE_THROW_COLORFULLY(
-            Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
-            "The computed solution does not solve the system (although the eigen backend reported "
-                << "'Success') and you requested checking (see options below)!\n"
-                << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
-                << "\n\n"
-                << "  (A * x - b).sup_norm() = "
-                << tmp.sup_norm()
-                << "\n\n"
-                << "Those were the given options:\n\n"
-                << opts);
+        DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
+                   "The computed solution does not solve the system (although the eigen backend reported "
+                       << "'Success') and you requested checking (see options below)!\n"
+                       << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+                       << "\n\n"
+                       << "  (A * x - b).sup_norm() = "
+                       << tmp.sup_norm()
+                       << "\n\n"
+                       << "Those were the given options:\n\n"
+                       << opts);
     }
     if (check_for_inf_nan)
       for (size_t ii = 0; ii < solution.size(); ++ii) {
         const S& val = solution[ii];
         if (std::isnan(val) || std::isinf(val))
-          DUNE_THROW_COLORFULLY(
-              Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-              "The computed solution contains inf or nan and you requested checking (see options "
-                  << "below)!\n"
-                  << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                  << "Those were the given options:\n\n"
-                  << opts);
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+                     "The computed solution contains inf or nan and you requested checking (see options "
+                         << "below)!\n"
+                         << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       }
   } // ... apply(...)
 
