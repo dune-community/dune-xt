@@ -215,7 +215,7 @@ public:
     if (subName.empty())
       return description;
     else {
-      Dune::Stuff::Common::ConfigContainer extendedDescription;
+      Dune::Stuff::Common::Configuration extendedDescription;
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
@@ -224,7 +224,7 @@ public:
   static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
   {
     // get correct _settings
-    Dune::Stuff::Common::ConfigContainer settings;
+    Dune::Stuff::Common::Configuration settings;
     if (_settings.hasSub(subName))
       settings = _settings.sub(subName);
     else
