@@ -223,7 +223,7 @@ private:
           if (boundaryInfo.neumann(*intersectionIt))
             data[index] = 1.0;
         } else
-          DUNE_THROW_COLORFULLY(Exceptions::internal_error, "Unknown type '" << type << "'!");
+          DUNE_THROW(Exceptions::internal_error, "Unknown type '" << type << "'!");
       }
     } // walk the grid
     return data;

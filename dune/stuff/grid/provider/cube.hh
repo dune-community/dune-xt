@@ -209,8 +209,8 @@ private:
   static std::array<unsigned int, dimDomain> parse_array(const std::vector<unsigned int>& in)
   {
     if (in.size() < dimDomain)
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
     std::array<unsigned int, dimDomain> ret;
     for (unsigned int ii = 0; ii < dimDomain; ++ii)
       ret[ii] = in[ii];
@@ -220,8 +220,8 @@ private:
   static DomainType parse_vector(const std::vector<DomainFieldType>& in)
   {
     if (in.size() < dimDomain)
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
     DomainType ret;
     for (unsigned int ii = 0; ii < dimDomain; ++ii)
       ret[ii] = in[ii];
@@ -234,10 +234,9 @@ private:
     static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
     for (unsigned int dd = 0; dd < dimDomain; ++dd) {
       if (!(lower_left[dd] < upper_right[dd]))
-        DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                              "lower_left has to be elementwise smaller than upper_right!\n\n" << lower_left[dd]
-                                                                                               << " vs. "
-                                                                                               << upper_right[dd]);
+        DUNE_THROW(Exceptions::wrong_input_given,
+                   "lower_left has to be elementwise smaller than upper_right!\n\n" << lower_left[dd] << " vs. "
+                                                                                    << upper_right[dd]);
     }
     switch (variant) {
       case 1:

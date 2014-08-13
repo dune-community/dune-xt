@@ -441,7 +441,7 @@ public:
     // get default
     const std::string default_type = cfg.get("default", default_cfg.get<std::string>("default"));
     if (default_type != "dirichlet" && default_type != "neumann")
-      DUNE_THROW_COLORFULLY(Exceptions::configuration_error, "Wrong default '" << default_type << "' given!");
+      DUNE_THROW(Exceptions::configuration_error, "Wrong default '" << default_type << "' given!");
     const bool default_to_dirichlet = default_type == "dirichlet";
     // get tolerance
     const DomainFieldType tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
@@ -469,8 +469,7 @@ public:
     // sanity check
     for (auto& dirichletNormal : dirichlet_normals_) {
       if (contains(dirichletNormal, neumann_normals_))
-        DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                              "Given normals are too close for given tolerance '" << tol << "'!");
+        DUNE_THROW(Exceptions::wrong_input_given, "Given normals are too close for given tolerance '" << tol << "'!");
     }
   } // NormalBased(...)
 
@@ -581,8 +580,8 @@ public:
     else if (type == BoundaryInfos::NormalBased<I>::static_id())
       return BoundaryInfos::NormalBased<I>::default_config(subname);
     else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
@@ -598,8 +597,8 @@ public:
     else if (type == BoundaryInfos::NormalBased<I>::static_id())
       return BoundaryInfos::NormalBased<I>::create(config);
     else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... create(...)
 }; // class BoundaryInfoProvider
 
