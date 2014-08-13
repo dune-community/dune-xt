@@ -12,8 +12,6 @@
 #include <vector>
 #include <array>
 
-#include <boost/assign/list_of.hpp>
-
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
