@@ -101,9 +101,9 @@ public:
     return BaseType::static_id() + ".checkerboard";
   }
 
-  static Common::ConfigContainer default_config(const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::ConfigContainer config;
+    Common::Configuration config;
     config["lower_left"]   = "[0.0 0.0 0.0]";
     config["upper_right"]  = "[1.0 1.0 1.0]";
     config["num_elements"] = "[2 2 2]";
@@ -112,18 +112,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigContainer tmp;
+      Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigContainer default_cfg = default_config();
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
     // calculate number of values and get values
     auto num_elements = cfg.get("num_elements", default_cfg.get<std::vector<size_t>>("num_elements"), dimDomain);
     size_t num_values = 1;

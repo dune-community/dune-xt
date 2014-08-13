@@ -206,9 +206,9 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Common::ConfigContainer default_config(const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::ConfigContainer config;
+    Common::Configuration config;
     config["variable"]   = "x";
     config["expression"] = "[x[0] sin(x[0]) exp(x[0])]";
     config["order"]      = "3";
@@ -216,18 +216,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigContainer tmp;
+      Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigContainer default_cfg = default_config();
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(cfg.get("variable", default_cfg.get<std::string>("variable")),
                                          cfg.get("expression", default_cfg.get<std::vector<std::string>>("expression")),

@@ -96,26 +96,26 @@ public:
     return BaseType::static_id() + ".constant";
   }
 
-  static Common::ConfigContainer default_config(const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::ConfigContainer config;
+    Common::Configuration config;
     config["value"] = Get<RangeFieldImp, rangeDim, rangeDimCols>::value_str();
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigContainer tmp;
+      Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigContainer default_cfg = default_config();
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
     return Common::make_unique<ThisType>(cfg.get("value", default_cfg.get<RangeType>("value")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
