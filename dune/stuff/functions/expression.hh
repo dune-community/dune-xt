@@ -93,9 +93,9 @@ class Expression
 
     virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const DS_OVERRIDE
     {
-      DUNE_THROW_COLORFULLY(NotImplemented,
-                            "If we decided on the JacobianRangeType of matrix valued functions we have to implement "
-                                << "gradients for this function!");
+      DUNE_THROW(NotImplemented,
+                 "Once we decided on the JacobianRangeType of matrix valued functions we have to implement "
+                     << "gradients for this function!");
     }
 
   private:
@@ -278,7 +278,7 @@ public:
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
   {
     if (gradients_.size() == 0)
-      DUNE_THROW_COLORFULLY(NotImplemented, "This function does not provide any gradients!");
+      DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
     assert(gradients_.size() == dimRange);
     for (size_t ii = 0; ii < dimRange; ++ii) {
       gradients_[ii]->evaluate(xx, ret[ii]);
