@@ -20,7 +20,6 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/vector.hh>
 #include <dune/stuff/common/float_cmp.hh>
