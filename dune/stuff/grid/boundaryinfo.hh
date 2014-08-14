@@ -1,5 +1,5 @@
 // This file is part of the dune-stuff project:
-//   https://users.dune-project.org/projects/dune-stuff/
+//   https://github.com/wwu-numerik/dune-stuff/
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //
@@ -20,7 +20,6 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/tree.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/vector.hh>
 #include <dune/stuff/common/float_cmp.hh>
