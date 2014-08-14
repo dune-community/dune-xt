@@ -1,5 +1,5 @@
 ﻿// This file is part of the dune-stuff project:
-//   https://users.dune-project.org/projects/dune-stuff/
+//   https://github.com/wwu-numerik/dune-stuff/
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
@@ -641,79 +641,13 @@ struct TransferredGlobalFunction
   const GlobalFunctionImp& function_;
 };
 
-/**
- * \brief Interface for scalar and vector valued stationary function.
- */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
-class DUNE_DEPRECATED_MSG("Please derive your functions from GlobalFunctionInterface in the future!") FunctionInterface
-#if HAVE_DUNE_FEM
-    : public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                 FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>>
-#endif // HAVE_DUNE_FEM
+//! Utility to generate a complete Function Type from an existing one and a template
+template <class FunctionImp, template <class, class, int, class, int, int> class OutTemplate>
+struct FunctionTypeGenerator
 {
-public:
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
-
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange = rangeDim;
-  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
-#if HAVE_DUNE_FEM
-  typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                       FunctionInterface<DomainFieldImp, domainDim, RangeFieldImp, rangeDim,
-                                                         rangeDimCols>>::JacobianRangeType JacobianRangeType;
-#else
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> JacobianRangeType;
-#endif
-
-  virtual ~FunctionInterface()
-  {
-  }
-
-  static std::string static_id()
-  {
-    return "dune.stuff.function";
-  }
-
-  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
-  /* @{ */
-  virtual std::string name() const
-  {
-    return "dune.stuff.function";
-  }
-
-  virtual int order() const
-  {
-    return -1;
-  }
-  /* @} */
-
-  /** \defgroup must This method has to be implemented.'' */
-  /* @{ */
-  virtual void evaluate(const DomainType& /*x*/, RangeType& /*ret*/) const = 0;
-  /* @} */
-
-  virtual RangeType evaluate(const DomainType& x) const
-  {
-    RangeType ret;
-    evaluate(x, ret);
-    return ret;
-  }
-
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
-  {
-    DUNE_THROW(Dune::NotImplemented, "You really have to implement this!");
-  }
-
-  virtual JacobianRangeType jacobian(const DomainType& x) const
-  {
-    JacobianRangeType ret;
-    jacobian(x, ret);
-    return ret;
-  }
-}; // class FunctionInterface
-
+  typedef OutTemplate<typename FunctionImp::EntityType, typename FunctionImp::DomainFieldType, FunctionImp::dimDomain,
+                      typename FunctionImp::RangeFieldType, FunctionImp::dimRange, FunctionImp::dimRangeCols> type;
+};
 
 } // namespace Stuff
 } // namespace Dune

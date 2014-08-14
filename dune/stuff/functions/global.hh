@@ -1,5 +1,5 @@
 // This file is part of the dune-stuff project:
-//   https://users.dune-project.org/projects/dune-stuff
+//   https://github.com/wwu-numerik/dune-stuff
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //
@@ -8,26 +8,7 @@
 #ifndef DUNE_STUFF_FUNCTION_GLOBAL_HH
 #define DUNE_STUFF_FUNCTION_GLOBAL_HH
 
-#warning This header is deprecated, use '#include <dune/stuff/functions/interfaces.hh>' and '#include <dune/stuff/functions/constant.hh>' instead!
-#include "interfaces.hh"
-#include "constant.hh"
-
-#include <memory>
-#include <string>
-
-#if HAVE_DUNE_FEM
-#include <dune/stuff/common/disable_warnings.hh>
-#include <dune/fem/function/common/function.hh>
-#include <dune/fem/space/common/functionspace.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-#endif
-
-#if HAVE_DUNE_PDELAB
-#include <dune/typetree/nodetags.hh>
-#include <dune/stuff/common/disable_warnings.hh>
-#include <dune/pdelab/common/function.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-#endif
+#include <functional>
 
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/common/memory.hh>
@@ -37,233 +18,51 @@ namespace Stuff {
 
 
 /**
- * base class for global matrix-valued valued functions that provides automatic local functions via
- * LocalizableFunctionInterface
+ * Global-valued function you can pass a lambda expression to that gets evaluated
+ * \example LambdaType lambda([](DomainType x) { return x;}, 1 );
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
-class DUNE_DEPRECATED_MSG("Use GlobalFunctionInterface instead!") GlobalFunction
-    : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+class GlobalLambdaFunction
+    : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
-  typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
-  typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-      LocalfunctionBaseType;
+
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
 
 public:
-  typedef typename LocalfunctionBaseType::DomainFieldType DomainFieldType;
-  static const unsigned int dimDomain = LocalfunctionBaseType::dimDomain;
-  typedef typename LocalfunctionBaseType::DomainType DomainType;
-
-  typedef typename LocalfunctionBaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange     = LocalfunctionBaseType::dimRange;
-  static const unsigned int dimRangeCols = LocalfunctionBaseType::dimRangeCols;
-  typedef typename LocalfunctionBaseType::RangeType RangeType;
-
-  typedef typename LocalfunctionBaseType::JacobianRangeType JacobianRangeType;
-
-  virtual ~GlobalFunction()
-  {
-  }
-
-  virtual std::string name() const
-  {
-    return "dune.stuff.function.global";
-  }
-
-  virtual ThisType* copy() const
-  {
-    DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
-  }
-
-  virtual size_t order() const = 0;
-
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const = 0;
-
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
-  {
-    DUNE_THROW(NotImplemented, "This does not make sense yet for matrix-valued functions!");
-  }
-
-  class Localfunction : public LocalfunctionBaseType
-  {
-  public:
-    Localfunction(const EntityImp& entity, const ThisType& global_function)
-      : LocalfunctionBaseType(entity)
-      , geometry_(entity.geometry())
-      , global_function_(global_function)
-    {
-    }
-
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const
-    {
-      const auto xx_global = geometry_.global(xx);
-      global_function_.evaluate(xx_global, ret);
-    }
-
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const
-    {
-      const auto xx_global = geometry_.global(xx);
-      global_function_.jacobian(xx_global, ret);
-    }
-
-    virtual size_t order() const
-    {
-      return global_function_.order();
-    }
-
-  private:
-    const typename EntityImp::Geometry geometry_;
-    const ThisType& global_function_;
-  };
-
-  virtual std::unique_ptr<LocalfunctionBaseType> local_function(const EntityImp& entity) const
-  {
-    return Common::make_unique<Localfunction>(entity, *this);
-  }
-}; // class GlobalFunction
-
-
-/**
- * base class for global valued functions that provides automatic local functions via LocalizableFunctionInterface
- */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
-class DUNE_DEPRECATED_MSG("Use GlobalFunctionInterface instead!")
-    GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-    : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-#if HAVE_DUNE_FEM
-      ,
-      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                 GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
-#endif // HAVE_DUNE_FEM
-#if HAVE_DUNE_PDELAB
-      ,
-      public TypeTree::LeafNode,
-      public PDELab::FunctionInterface<PDELab::FunctionTraits<DomainFieldImp, domainDim,
-                                                              FieldVector<DomainFieldImp, domainDim>, RangeFieldImp,
-                                                              rangeDim, FieldVector<RangeFieldImp, rangeDim>>,
-                                       GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
-#endif
-{
-  typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
-  typedef LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
-      LocalfunctionBaseType;
-
-public:
-  typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
-
-  typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeCols = 1;
-  typedef Dune::FieldVector<RangeFieldType, dimRange> RangeType;
-#if HAVE_DUNE_FEM
-  typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                       GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim,
-                                                      1>>::JacobianRangeType JacobianRangeType;
-#else
-  typedef typename LocalfunctionBaseType::JacobianRangeType JacobianRangeType;
-#endif
-
-  virtual ~GlobalFunction()
-  {
-  }
-
-  virtual std::string name() const
-  {
-    return "dune.stuff.function.global";
-  }
-
-  virtual ThisType* copy() const
-  {
-    DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
-  }
-
-  virtual size_t order() const = 0;
-
-  virtual void evaluate(const DomainType& x, RangeType& ret) const = 0;
-
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
-  {
-    DUNE_THROW(NotImplemented, "You have to imlement it if you intend to use it!");
-  }
-
-  class Localfunction : public LocalfunctionBaseType
-  {
-  public:
-    Localfunction(const EntityImp& entity, const ThisType& global_function)
-      : LocalfunctionBaseType(entity)
-      , geometry_(entity.geometry())
-      , global_function_(global_function)
-    {
-    }
-
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const
-    {
-      const auto xx_global = geometry_.global(xx);
-      global_function_.evaluate(xx_global, ret);
-    }
-
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const
-    {
-      const auto xx_global = geometry_.global(xx);
-      global_function_.jacobian(xx_global, ret);
-    }
-
-    virtual size_t order() const
-    {
-      return global_function_.order();
-    }
-
-  private:
-    const typename EntityImp::Geometry geometry_;
-    const ThisType& global_function_;
-  };
-
-  virtual std::unique_ptr<LocalfunctionBaseType> local_function(const EntityImp& entity) const
-  {
-    return Common::make_unique<Localfunction>(entity, *this);
-  }
-}; // class GlobalFunction< ..., 1 >
-
-
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
-class DUNE_DEPRECATED_MSG("Use Functions::Constant instead") GlobalConstantFunction
-    : public GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-{
-  typedef GlobalFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
-  typedef typename BaseType::RangeType RangeType;
   typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::JacobianRangeType JacobianRangeType;
+  typedef typename BaseType::RangeType RangeType;
+
+private:
+  typedef std::function<RangeType(DomainType)> LambdaType;
+
 
 public:
-  explicit GlobalConstantFunction(const RangeType& constant)
-    : constant_(constant)
+  GlobalLambdaFunction(LambdaType lambda, size_t order)
+    : lambda_(lambda)
+    , order_(order)
   {
   }
 
-  explicit GlobalConstantFunction(const RangeFieldImp& value)
-    : constant_(value)
+  virtual size_t order() const DS_OVERRIDE
   {
+    return order_;
   }
 
-  virtual size_t order() const DS_FINAL DS_OVERRIDE
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const
   {
-    return 0;
+    ret = lambda_(xx);
   }
 
-  virtual void evaluate(const DomainType& /*x*/, RangeType& ret) const DS_FINAL
+  virtual RangeType evaluate(const DomainType& xx) const
   {
-    ret = constant_;
-  }
-
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& ret) const DS_FINAL
-  {
-    ret *= 0.0;
+    return lambda_(xx);
   }
 
 private:
-  const RangeType constant_;
+  const LambdaType lambda_;
+  size_t order_;
 };
+
 
 } // namespace Stuff
 } // namespace Dune
