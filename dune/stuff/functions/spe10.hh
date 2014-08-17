@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
 
@@ -70,7 +70,7 @@ private:
 
   {
     if (!(max > min))
-      DUNE_THROW_COLORFULLY(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
+      DUNE_THROW(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
     const RangeFieldType scale = (max - min) / (maxValue - minValue);
     const RangeType shift      = min - scale * minValue;
     // read all the data from the file
@@ -87,19 +87,18 @@ private:
       }
       datafile.close();
       if (counter != entriesPerDim)
-        DUNE_THROW_COLORFULLY(Dune::IOError,
-                              "wrong number of entries in '" << filename << "' (are " << counter << ", should be "
-                                                             << entriesPerDim
-                                                             << ")!");
+        DUNE_THROW(Dune::IOError,
+                   "wrong number of entries in '" << filename << "' (are " << counter << ", should be " << entriesPerDim
+                                                  << ")!");
       return data;
     } else
-      DUNE_THROW_COLORFULLY(Dune::IOError, "could not open '" << filename << "'!");
+      DUNE_THROW(Dune::IOError, "could not open '" << filename << "'!");
   } // ... read_values_from_file(...)
 
 public:
-  static Common::ConfigContainer default_config(const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::ConfigContainer config;
+    Common::Configuration config;
     config["filename"]    = "perm_case1.dat";
     config["lower_left"]  = "[0.0 0.0]";
     config["upper_right"] = "[762.0 15.24]";
@@ -109,18 +108,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigContainer tmp;
+      Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigContainer default_cfg = default_config();
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(
         cfg.get("filename", default_cfg.get<std::string>("filename")),
@@ -190,7 +189,7 @@ private:
 
   {
     if (!(max > min))
-      DUNE_THROW_COLORFULLY(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
+      DUNE_THROW(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
     const RangeFieldType scale = (max - min) / (maxValue - minValue);
     const RangeFieldType shift = min - scale * minValue;
     // read all the data from the file
@@ -210,19 +209,18 @@ private:
       }
       datafile.close();
       if (counter != entriesPerDim)
-        DUNE_THROW_COLORFULLY(Dune::IOError,
-                              "wrong number of entries in '" << filename << "' (are " << counter << ", should be "
-                                                             << entriesPerDim
-                                                             << ")!");
+        DUNE_THROW(Dune::IOError,
+                   "wrong number of entries in '" << filename << "' (are " << counter << ", should be " << entriesPerDim
+                                                  << ")!");
       return data;
     } else
-      DUNE_THROW_COLORFULLY(Dune::IOError, "could not open '" << filename << "'!");
+      DUNE_THROW(Dune::IOError, "could not open '" << filename << "'!");
   } // ... read_values_from_file(...)
 
 public:
-  static Common::ConfigContainer default_config(const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::ConfigContainer config;
+    Common::Configuration config;
     config["filename"]    = "perm_case1.dat";
     config["lower_left"]  = "[0.0 0.0]";
     config["upper_right"] = "[762.0 15.24]";
@@ -232,18 +230,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigContainer tmp;
+      Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigContainer default_cfg = default_config();
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(
         cfg.get("filename", default_cfg.get<std::string>("filename")),
