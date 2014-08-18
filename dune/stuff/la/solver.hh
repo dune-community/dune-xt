@@ -11,7 +11,7 @@
 
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/parallel/helper.hh>
 
 namespace Dune {
@@ -46,10 +46,10 @@ public:
       std::stringstream ss;
       for (auto opt : opts)
         ss << opt << " ";
-      DUNE_THROW_COLORFULLY(Exceptions::configuration_error,
-                            "Given type '" << type << "' not supported (see below for a list of supported ones). "
-                                           << "Call options() first!\n"
-                                           << ss.str());
+      DUNE_THROW(Exceptions::configuration_error,
+                 "Given type '" << type << "' not supported (see below for a list of supported ones). "
+                                << "Call options() first!\n"
+                                << ss.str());
     }
   }
 };
@@ -66,29 +66,29 @@ public:
 
   Solver(const MatrixType& /*matrix*/)
   {
-    DUNE_THROW_COLORFULLY(NotImplemented,
-                          "This is the unspecialized version of LA::Solver< ... >. "
-                          "Please include the correct header for your matrix implementation '"
-                              << Common::Typename<MatrixType>::value()
-                              << "'!");
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
   }
 
   static std::vector<std::string> options()
   {
-    DUNE_THROW_COLORFULLY(NotImplemented,
-                          "This is the unspecialized version of LA::Solver< ... >. "
-                          "Please include the correct header for your matrix implementation '"
-                              << Common::Typename<MatrixType>::value()
-                              << "'!");
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
   }
 
-  static Common::ConfigContainer options(const std::string& /*type*/)
+  static Common::Configuration options(const std::string& /*type*/)
   {
-    DUNE_THROW_COLORFULLY(NotImplemented,
-                          "This is the unspecialized version of LA::Solver< ... >. "
-                          "Please include the correct header for your matrix implementation '"
-                              << Common::Typename<MatrixType>::value()
-                              << "'!");
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
   }
 
   /**
@@ -98,31 +98,31 @@ public:
   template <class RhsType, class SolutionType>
   void apply(const RhsType& /*rhs*/, SolutionType& /*solution*/) const
   {
-    DUNE_THROW_COLORFULLY(NotImplemented,
-                          "This is the unspecialized version of LA::Solver< ... >. "
-                          "Please include the correct header for your matrix implementation '"
-                              << Common::Typename<MatrixType>::value()
-                              << "'!");
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
   }
 
   template <class RhsType, class SolutionType>
   void apply(const RhsType& /*rhs*/, SolutionType& /*solution*/, const std::string& /*type*/) const
   {
-    DUNE_THROW_COLORFULLY(NotImplemented,
-                          "This is the unspecialized version of LA::Solver< ... >. "
-                          "Please include the correct header for your matrix implementation '"
-                              << Common::Typename<MatrixType>::value()
-                              << "'!");
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
   }
 
   template <class RhsType, class SolutionType>
-  void apply(const RhsType& /*rhs*/, SolutionType& /*solution*/, const Common::ConfigContainer& /*options*/) const
+  void apply(const RhsType& /*rhs*/, SolutionType& /*solution*/, const Common::Configuration& /*options*/) const
   {
-    DUNE_THROW_COLORFULLY(NotImplemented,
-                          "This is the unspecialized version of LA::Solver< ... >. "
-                          "Please include the correct header for your matrix implementation '"
-                              << Common::Typename<MatrixType>::value()
-                              << "'!");
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
   }
 }; // class Solver
 

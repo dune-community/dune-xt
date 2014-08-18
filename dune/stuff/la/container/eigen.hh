@@ -129,8 +129,8 @@ public:
   void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
   {
     if (xx.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -211,9 +211,8 @@ public:
                     const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
       if (!Dune::FloatCmp::eq<ScalarType>(get_entry(ii), other.get_entry(ii), epsilon))
         return false;
@@ -233,9 +232,8 @@ public:
   ScalarType dot(const EigenBaseVector<T, ScalarType>& other) const
   {
     if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     return backend_->transpose() * *(other.backend_);
   } // ... dot(...)
 
@@ -263,13 +261,11 @@ public:
   void add(const EigenBaseVector<T1, ScalarType>& other, EigenBaseVector<T2, ScalarType>& result) const
   {
     if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     if (result.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of result (" << result.size() << ") does not match the size of this (" << size()
-                                                   << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     result.backend() = *backend_ + *(other.backend_);
   } // ... add(...)
 
@@ -282,9 +278,8 @@ public:
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
     if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend() += *(other.backend_);
   } // ... iadd(...)
 
@@ -297,13 +292,11 @@ public:
   void sub(const EigenBaseVector<T1, ScalarType>& other, EigenBaseVector<T2, ScalarType>& result) const
   {
     if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     if (result.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of result (" << result.size() << ") does not match the size of this (" << size()
-                                                   << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     result.backend() = *backend_ - *(other.backend_);
   } // ... sub(...)
 
@@ -316,9 +309,8 @@ public:
   void isub(const EigenBaseVector<T, ScalarType>& other)
   {
     if (other.size() != size())
-      DUNE_THROW_COLORFULLY(Exceptions::shapes_do_not_match,
-                            "The size of other (" << other.size() << ") does not match the size of this (" << size()
-                                                  << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend() -= *(other.backend_);
   } // ... isub(...)
 
@@ -771,12 +763,12 @@ public:
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     if (!has_equal_shape(xx))
-      DUNE_THROW_COLORFULLY(
-          Exceptions::shapes_do_not_match,
-          "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this (" << rows()
-                              << "x"
-                              << cols()
-                              << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
+                                     << rows()
+                                     << "x"
+                                     << cols()
+                                     << ")!");
     const auto& xx_ref = *(xx.backend_);
     backend() += alpha * xx_ref;
   } // ... axpy(...)
@@ -834,8 +826,8 @@ public:
   void clear_row(const size_t ii)
   {
     if (ii >= rows())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
     for (size_t jj = 0; jj < cols(); ++jj)
       backend_->operator()(ii, jj) = ScalarType(0);
@@ -844,8 +836,8 @@ public:
   void clear_col(const size_t jj)
   {
     if (jj >= cols())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_->operator()(ii, jj) = ScalarType(0);
@@ -854,8 +846,8 @@ public:
   void unit_row(const size_t ii)
   {
     if (ii >= rows())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
     for (size_t jj = 0; jj < cols(); ++jj)
       backend_->operator()(ii, jj) = ScalarType(0);
@@ -865,8 +857,8 @@ public:
   void unit_col(const size_t jj)
   {
     if (jj >= cols())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_->operator()(ii, jj) = ScalarType(0);
@@ -927,10 +919,10 @@ public:
     backend_ = std::make_shared<BackendType>(assert_is_IndexType_compatible_and_convert(rr),
                                              assert_is_IndexType_compatible_and_convert(cc));
     if (size_t(pattern.size()) != rr)
-      DUNE_THROW_COLORFULLY(
-          Exceptions::shapes_do_not_match,
-          "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this (" << rows()
-                                      << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this ("
+                                             << rows()
+                                             << ")!");
     for (size_t row = 0; row < size_t(pattern.size()); ++row) {
       backend_->startVec(assert_is_IndexType_compatible_and_convert(row));
       const auto& columns = pattern.inner(row);
@@ -1044,12 +1036,12 @@ public:
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     if (!has_equal_shape(xx))
-      DUNE_THROW_COLORFULLY(
-          Exceptions::shapes_do_not_match,
-          "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this (" << rows()
-                              << "x"
-                              << cols()
-                              << ")!");
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
+                                     << rows()
+                                     << "x"
+                                     << cols()
+                                     << ")!");
     const auto& xx_ref = *(xx.backend_);
     backend() += alpha * xx_ref;
   } // ... axpy(...)
@@ -1108,16 +1100,16 @@ public:
   void clear_row(const size_t ii)
   {
     if (ii >= rows())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     backend().row(assert_is_IndexType_compatible_and_convert(ii)) *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
   {
     if (jj >= cols())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
     for (size_t row = 0; assert_is_IndexType_compatible_and_convert(row) < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, assert_is_IndexType_compatible_and_convert(row));
@@ -1137,11 +1129,11 @@ public:
   void unit_row(const size_t ii)
   {
     if (ii >= rows())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     if (!these_are_valid_indices(ii, ii))
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
     backend().row(assert_is_IndexType_compatible_and_convert(ii)) *= ScalarType(0);
     set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
@@ -1149,8 +1141,8 @@ public:
   void unit_col(const size_t jj)
   {
     if (jj >= rows())
-      DUNE_THROW_COLORFULLY(Exceptions::index_out_of_range,
-                            "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
     for (size_t row = 0; assert_is_IndexType_compatible_and_convert(row) < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, assert_is_IndexType_compatible_and_convert(row));
