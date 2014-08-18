@@ -177,7 +177,7 @@ protected:
 template <class S, class T>
 class AmgApplicator
 {
-  static_assert(Dune::AlwaysFalse<S, T>::value, "You are missing dune-istl!");
+  static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
 };
 
 
