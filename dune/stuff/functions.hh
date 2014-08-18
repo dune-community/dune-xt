@@ -11,7 +11,7 @@
 #include <memory>
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 
 #include "functions/interfaces.hh"
 #include "functions/checkerboard.hh"
@@ -36,7 +36,7 @@ public:
 
 protected:
   template <class FunctionType>
-  static std::unique_ptr<InterfaceType> call_create(const Common::ConfigContainer& config)
+  static std::unique_ptr<InterfaceType> call_create(const Common::Configuration& config)
   {
     if (config.empty())
       return FunctionType::create();
@@ -50,24 +50,23 @@ public:
     return {Functions::Constant<E, D, d, R, r, rC>::static_id()};
   } // ... available(...)
 
-  static Common::ConfigContainer default_config(const std::string type = available()[0],
-                                                const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string type = available()[0], const std::string sub_name = "")
   {
     if (type == Functions::Constant<E, D, d, R, r, rC>::static_id())
       return Functions::Constant<E, D, d, R, r, rC>::default_config(sub_name);
     else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "Requested type '" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "Requested type '" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string type = available()[0],
-                                               const Common::ConfigContainer config = Common::ConfigContainer())
+                                               const Common::Configuration config = Common::Configuration())
   {
     if (type == Functions::Constant<E, D, d, R, r, rC>::static_id())
       return call_create<Functions::Constant<E, D, d, R, r, rC>>(config);
     else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "Requested type '" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "Requested type '" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... create(...)
 }; // class FunctionsProviderBase
 
@@ -98,8 +97,7 @@ public:
     return base;
   } // ... available(...)
 
-  static Common::ConfigContainer default_config(const std::string type = available()[0],
-                                                const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string type = available()[0], const std::string sub_name = "")
   {
     if (type == Functions::Expression<E, D, d, R, r, rC>::static_id())
       return Functions::Expression<E, D, d, R, r, rC>::default_config(sub_name);
@@ -110,7 +108,7 @@ public:
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string type = available()[0],
-                                               const Common::ConfigContainer config = Common::ConfigContainer())
+                                               const Common::Configuration config = Common::Configuration())
   {
     if (type == Functions::Expression<E, D, d, R, r, rC>::static_id())
       return BaseType::template call_create<Functions::Expression<E, D, d, R, r, rC>>(config);
@@ -144,8 +142,7 @@ public:
     return base;
   } // ... available(...)
 
-  static Common::ConfigContainer default_config(const std::string type = available()[0],
-                                                const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string type = available()[0], const std::string sub_name = "")
   {
     if (type == Functions::Expression<E, D, d, R, r, rC>::static_id())
       return Functions::Expression<E, D, d, R, r, rC>::default_config(sub_name);
@@ -162,7 +159,7 @@ public:
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string type = available()[0],
-                                               const Common::ConfigContainer config = Common::ConfigContainer())
+                                               const Common::Configuration config = Common::Configuration())
   {
     if (type == Functions::Expression<E, D, d, R, r, rC>::static_id())
       return BaseType::template call_create<Functions::Expression<E, D, d, R, r, rC>>(config);
