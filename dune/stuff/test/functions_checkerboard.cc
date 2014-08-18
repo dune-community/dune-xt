@@ -188,10 +188,3 @@ TYPED_TEST(CheckerboardFunctionAluGridEntityTest, provides_required_methods)
 
 #endif // HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
 #endif // HAVE_DUNE_GRID
-
-
-int main(int argc, char** argv)
-{
-  test_init(argc, argv);
-  return RUN_ALL_TESTS();
-}
