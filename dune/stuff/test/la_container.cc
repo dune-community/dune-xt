@@ -1055,15 +1055,3 @@ TYPED_TEST(MatrixTest, produces_correct_results)
 {
   this->produces_correct_results();
 }
-
-int main(int argc, char** argv)
-{
-  try {
-    test_init(argc, argv);
-    return RUN_ALL_TESTS();
-  } catch (Dune::Exception& e) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("Dune reported error: ") << e << std::endl;
-  } catch (...) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("Unknown exception thrown!") << std::endl;
-  }
-}
