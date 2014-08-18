@@ -12,8 +12,6 @@
 #include <vector>
 #include <array>
 
-#include <boost/assign/list_of.hpp>
-
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
@@ -196,6 +194,16 @@ public:
   virtual const GridType& grid() const DS_OVERRIDE
   {
     return *grid_ptr_;
+  }
+
+  std::shared_ptr<GridType> grid_ptr()
+  {
+    return grid_ptr_;
+  }
+
+  std::shared_ptr<const GridType> grid_ptr() const
+  {
+    return grid_ptr_;
   }
 
 private:
