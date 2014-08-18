@@ -22,7 +22,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/grid/provider/interface.hh>
 #include <dune/stuff/grid/provider/cube.hh>
 

@@ -23,7 +23,7 @@
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/grid/layers.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/grid/boundaryinfo.hh>
 
 namespace Dune {
@@ -154,8 +154,7 @@ public:
     vtkwriter.write(filename, VTK::appendedraw);
   } // ... visualize(...)
 
-  virtual void visualize(const Common::ConfigContainer& boundary_info_cfg,
-                         const std::string filename = static_id()) const
+  virtual void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename = static_id()) const
   {
     // boundary info
     typedef Stuff::Grid::BoundaryInfoProvider<typename LeafGridViewType::Intersection> BoundaryInfoProvider;
@@ -224,7 +223,7 @@ private:
           if (boundaryInfo.neumann(*intersectionIt))
             data[index] = 1.0;
         } else
-          DUNE_THROW_COLORFULLY(Exceptions::internal_error, "Unknown type '" << type << "'!");
+          DUNE_THROW(Exceptions::internal_error, "Unknown type '" << type << "'!");
       }
     } // walk the grid
     return data;

@@ -16,7 +16,7 @@
 #include <dune/grid/sgrid.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 
 #include "provider/interface.hh"
 #include "provider/cube.hh"
@@ -35,7 +35,7 @@ public:
 
 protected:
   template <class GridProviderType>
-  static std::unique_ptr<InterfaceType> call_create(const Common::ConfigContainer& config)
+  static std::unique_ptr<InterfaceType> call_create(const Common::Configuration& config)
   {
     if (config.empty())
       return GridProviderType::create();
@@ -50,25 +50,25 @@ public:
     return {Providers::Cube<GridType>::static_id()};
   } // ... available()
 
-  static Common::ConfigContainer default_config(const std::string type, const std::string subname = "")
+  static Common::Configuration default_config(const std::string type, const std::string subname = "")
   {
     namespace Providers = Stuff::Grid::Providers;
     if (type == Providers::Cube<GridType>::static_id())
       return Providers::Cube<GridType>::default_config(subname);
     else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
-                                               const Common::ConfigContainer config = Common::ConfigContainer())
+                                               const Common::Configuration config = Common::Configuration())
   {
     namespace Providers = Stuff::Grid::Providers;
     if (type == Providers::Cube<GridType>::static_id())
       return call_create<Providers::Cube<GridType>>(config);
     else
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... create(...)
 }; // class GridProviders
 
