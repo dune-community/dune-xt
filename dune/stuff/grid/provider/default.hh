@@ -37,16 +37,19 @@ public:
   }
 
   ConstDefault(const GridType* grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
 
   ConstDefault(std::shared_ptr<const GridType> grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
 
   ConstDefault(std::unique_ptr<const GridType>&& grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
@@ -83,17 +86,19 @@ public:
   {
   }
 
-  Default(GridType* grid_ptr)
+  Default(GridType* grid_ptr) DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
 
   Default(std::shared_ptr<GridType> grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
 
   Default(std::unique_ptr<GridType>&& grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
