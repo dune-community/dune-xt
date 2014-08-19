@@ -1055,3 +1055,5 @@ TYPED_TEST(MatrixTest, produces_correct_results)
 {
   this->produces_correct_results();
 }
+
+#include <dune/stuff/test/test_main.cxx>
