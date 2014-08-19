@@ -106,3 +106,5 @@ TYPED_TEST(CubeProviderTest, fulfills_interface)
 }
 
 #endif // #if HAVE_DUNE_GRID
+
+#include <dune/stuff/test/test_main.cxx>
