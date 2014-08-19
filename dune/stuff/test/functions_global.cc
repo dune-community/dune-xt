@@ -194,8 +194,4 @@ TYPED_TEST(GlobalLambdaFunctionTestAluGridEntityTest, provides_required_methods)
 #endif // HAVE_DUNE_GRID
 
 
-int main(int argc, char** argv)
-{
-  test_init(argc, argv);
-  return RUN_ALL_TESTS();
-}
+#include <dune/stuff/test/test_main.cxx>
