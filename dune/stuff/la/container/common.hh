@@ -105,6 +105,8 @@ public:
   {
   }
 
+  using VectorInterfaceType::operator=;
+
   ThisType& operator=(const ThisType& other)
   {
     backend_ = other.backend_;
