@@ -183,3 +183,5 @@ TYPED_TEST(ConstantFunctionAluGridEntityTest, provides_required_methods)
 
 #endif // HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
 //#endif // HAVE_DUNE_GRID
+
+#include <dune/stuff/test/test_main.cxx>
