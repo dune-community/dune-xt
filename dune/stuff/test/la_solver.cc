@@ -59,28 +59,28 @@ struct SolverTest : public ::testing::Test
     const SolverType solver(matrix);
     solver.apply(rhs, solution);
     if (!solution.almost_equal(rhs))
-      DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Wrong solution!");
+      DUNE_THROW(Exceptions::results_are_not_as_expected, "Wrong solution!");
     solution.scal(0);
 
     // static tests
     typedef typename SolverType::MatrixType M;
     std::vector<std::string> opts = SolverType::options();
     if (opts.size() == 0)
-      DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Solver has no options!");
+      DUNE_THROW(Exceptions::results_are_not_as_expected, "Solver has no options!");
     for (auto opt : opts) {
       out << "solving with option '" << opt << "' and detailed options" << std::endl;
-      Common::ConfigContainer detailed_opts = SolverType::options(opt);
+      Common::Configuration detailed_opts = SolverType::options(opt);
       detailed_opts.report(out, "  ");
 
       // dynamic tests
       solver.apply(rhs, solution, opt);
       if (!solution.almost_equal(rhs))
-        DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Wrong solution!");
+        DUNE_THROW(Exceptions::results_are_not_as_expected, "Wrong solution!");
       solution.scal(0);
 
       solver.apply(rhs, solution, detailed_opts);
       if (!solution.almost_equal(rhs))
-        DUNE_THROW_COLORFULLY(Exceptions::results_are_not_as_expected, "Wrong solution!");
+        DUNE_THROW(Exceptions::results_are_not_as_expected, "Wrong solution!");
     }
   } // ... produces_correct_results(...)
 }; // struct SolverTest
@@ -91,20 +91,4 @@ TYPED_TEST(SolverTest, behaves_correctly)
   this->produces_correct_results();
 }
 
-
-int main(int argc, char** argv)
-{
-  try {
-    test_init(argc, argv);
-    return RUN_ALL_TESTS();
-  } catch (Dune::Exception& e) {
-    std::cerr << e.what() << std::endl;
-    std::abort();
-  } catch (std::exception& e) {
-    std::cerr << e.what() << std::endl;
-    std::abort();
-  } catch (...) {
-    std::cerr << "Unknown exception thrown!" << std::endl;
-    std::abort();
-  } // try
-}
+#include <dune/stuff/test/test_main.cxx>
