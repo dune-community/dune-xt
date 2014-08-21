@@ -31,7 +31,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/grid/io/file/gmshreader.hh>
 
-#include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/configuration.hh>
 
 #include "interface.hh"
 
@@ -89,7 +89,7 @@ public:
     if (subName.empty())
       return description;
     else {
-      Dune::Stuff::Common::ExtendedParameterTree extendedDescription;
+      Dune::Stuff::Common::Configuration extendedDescription;
       extendedDescription.add(description, subName);
       return extendedDescription;
     }
@@ -98,7 +98,7 @@ public:
   static ThisType* create(const Dune::ParameterTree& _settings, const std::string subName = id())
   {
     // get correct _settings
-    Dune::Stuff::Common::ExtendedParameterTree settings;
+    Dune::Stuff::Common::Configuration settings;
     if (_settings.hasSub(subName))
       settings = _settings.sub(subName);
     else

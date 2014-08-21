@@ -22,7 +22,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/grid/provider/interface.hh>
 #include <dune/stuff/grid/provider/cube.hh>
 
@@ -107,19 +107,4 @@ TYPED_TEST(CubeProviderTest, fulfills_interface)
 
 #endif // #if HAVE_DUNE_GRID
 
-int main(int argc, char** argv)
-{
-  try {
-    test_init(argc, argv);
-    return RUN_ALL_TESTS();
-  } catch (Dune::Exception& e) {
-    std::cerr << "Dune reported error:\n" << e.what() << std::endl;
-    std::abort();
-  } catch (std::exception& e) {
-    std::cerr << e.what() << std::endl;
-    std::abort();
-  } catch (...) {
-    std::cerr << "Unknown exception thrown!" << std::endl;
-    std::abort();
-  } // try
-}
+#include <dune/stuff/test/test_main.cxx>

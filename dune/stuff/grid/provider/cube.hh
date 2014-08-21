@@ -12,8 +12,6 @@
 #include <vector>
 #include <array>
 
-#include <boost/assign/list_of.hpp>
-
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
@@ -25,7 +23,7 @@
 #endif
 
 #include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
 
 #include "default.hh"
@@ -127,27 +125,27 @@ public:
     return BaseType::static_id() + ".cube";
   }
 
-  static Common::ConfigContainer default_config(const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::ConfigContainer config;
+    Common::Configuration config;
     config["lower_left"]   = "[0.0 0.0 0.0 0.0]";
     config["upper_right"]  = "[1.0 1.0 1.0 1.0]";
     config["num_elements"] = "[8 8 8 8]";
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigContainer tmp;
+      Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigContainer default_cfg = default_config();
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
     return Common::make_unique<ThisType>(
         cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
         cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
@@ -198,6 +196,16 @@ public:
     return *grid_ptr_;
   }
 
+  std::shared_ptr<GridType> grid_ptr()
+  {
+    return grid_ptr_;
+  }
+
+  std::shared_ptr<const GridType> grid_ptr() const
+  {
+    return grid_ptr_;
+  }
+
 private:
   static std::array<unsigned int, dimDomain> parse_array(const unsigned int in)
   {
@@ -209,8 +217,8 @@ private:
   static std::array<unsigned int, dimDomain> parse_array(const std::vector<unsigned int>& in)
   {
     if (in.size() < dimDomain)
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
     std::array<unsigned int, dimDomain> ret;
     for (unsigned int ii = 0; ii < dimDomain; ++ii)
       ret[ii] = in[ii];
@@ -220,8 +228,8 @@ private:
   static DomainType parse_vector(const std::vector<DomainFieldType>& in)
   {
     if (in.size() < dimDomain)
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                            "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
     DomainType ret;
     for (unsigned int ii = 0; ii < dimDomain; ++ii)
       ret[ii] = in[ii];
@@ -234,10 +242,9 @@ private:
     static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
     for (unsigned int dd = 0; dd < dimDomain; ++dd) {
       if (!(lower_left[dd] < upper_right[dd]))
-        DUNE_THROW_COLORFULLY(Exceptions::wrong_input_given,
-                              "lower_left has to be elementwise smaller than upper_right!\n\n" << lower_left[dd]
-                                                                                               << " vs. "
-                                                                                               << upper_right[dd]);
+        DUNE_THROW(Exceptions::wrong_input_given,
+                   "lower_left has to be elementwise smaller than upper_right!\n\n" << lower_left[dd] << " vs. "
+                                                                                    << upper_right[dd]);
     }
     switch (variant) {
       case 1:
