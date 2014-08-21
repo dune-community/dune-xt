@@ -160,32 +160,11 @@ struct LayerView<GridType, ChooseLayer::leaf>
 
 #if HAVE_DUNE_FEM
 
-/** dune-fem Leaf/LevelGridParts are a little funky in that their
- * GridViewType is entirely incompatible with the "real"
- * leaf/level gridview. To fix this we're injecting our own tiny
- * GridParts instead
- **/
 
 template <class GridType>
 struct Layer<GridType, ChooseLayer::level, ChoosePartView::part>
 {
-  typedef Dune::Fem::LevelGridPart<GridType> RealType;
-  struct Type : public RealType
-  {
-    typedef typename RealType::LevelGridView GridViewType;
-    explicit Type(GridType& g)
-      : RealType(g)
-    {
-    }
-    Type(GridType& g, const int l)
-      : RealType(g, l)
-    {
-    }
-    GridViewType gridView() const
-    {
-      return GridViewType(RealType::grid(), RealType::level());
-    }
-  };
+  typedef Dune::Fem::LevelGridPart<GridType> Type;
 
   static std::shared_ptr<Type> create(GridType& grid, const int level)
   {
@@ -199,19 +178,7 @@ struct Layer<GridType, ChooseLayer::level, ChoosePartView::part>
 template <class GridType>
 struct Layer<GridType, ChooseLayer::leaf, ChoosePartView::part>
 {
-  typedef Dune::Fem::LeafGridPart<GridType> RealType;
-  struct Type : public RealType
-  {
-    typedef typename RealType::LeafGridView GridViewType;
-    explicit Type(GridType& g)
-      : RealType(g)
-    {
-    }
-    GridViewType gridView() const
-    {
-      return RealType::grid().leafGridView();
-    }
-  };
+  typedef Dune::Fem::LeafGridPart<GridType> Type;
 
   static std::shared_ptr<Type> create(GridType& grid, const int /*level*/ = 0)
   {
