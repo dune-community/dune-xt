@@ -32,7 +32,7 @@
     void check() const                                                                                                 \
     {                                                                                                                  \
       for (const std::string& type : FunctionsProvider::available()) {                                                 \
-        const Dune::Stuff::Common::ConfigContainer config = FunctionsProvider::default_config(type);                   \
+        const Dune::Stuff::Common::Configuration config = FunctionsProvider::default_config(type);                     \
         try {                                                                                                          \
           const std::unique_ptr<InterfaceType> function = FunctionsProvider::create(type, config);                     \
         } catch (Dune::IOError&) {                                                                                     \
@@ -189,20 +189,4 @@ TYPED_TEST(FunctionsAluGridEntityTest, provides_required_methods)
 #endif // HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
 #endif // HAVE_DUNE_GRID
 
-
-int main(int argc, char** argv)
-{
-  try {
-    test_init(argc, argv);
-    return RUN_ALL_TESTS();
-  } catch (Dune::Exception& e) {
-    std::cerr << "Dune reported error:\n" << e.what() << std::endl;
-    std::abort();
-  } catch (std::exception& e) {
-    std::cerr << e.what() << std::endl;
-    std::abort();
-  } catch (...) {
-    std::cerr << "Unknown exception thrown!" << std::endl;
-    std::abort();
-  } // try
-}
+#include <dune/stuff/test/test_main.cxx>

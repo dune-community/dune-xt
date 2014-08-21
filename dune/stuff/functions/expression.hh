@@ -15,7 +15,7 @@
 #include <dune/common/fvector.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/parameter/configcontainer.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/exceptions.hh>
 
 #include "expression/base.hh"
@@ -93,9 +93,9 @@ class Expression
 
     virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const DS_OVERRIDE
     {
-      DUNE_THROW_COLORFULLY(NotImplemented,
-                            "If we decided on the JacobianRangeType of matrix valued functions we have to implement "
-                                << "gradients for this function!");
+      DUNE_THROW(NotImplemented,
+                 "Once we decided on the JacobianRangeType of matrix valued functions we have to implement "
+                     << "gradients for this function!");
     }
 
   private:
@@ -206,9 +206,9 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Common::ConfigContainer default_config(const std::string sub_name = "")
+  static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::ConfigContainer config;
+    Common::Configuration config;
     config["variable"]   = "x";
     config["expression"] = "[x[0] sin(x[0]) exp(x[0])]";
     config["order"]      = "3";
@@ -216,18 +216,18 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Common::ConfigContainer tmp;
+      Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr<ThisType> create(const Common::ConfigContainer config = default_config(),
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::ConfigContainer cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::ConfigContainer default_cfg = default_config();
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(cfg.get("variable", default_cfg.get<std::string>("variable")),
                                          cfg.get("expression", default_cfg.get<std::vector<std::string>>("expression")),
@@ -278,7 +278,7 @@ public:
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
   {
     if (gradients_.size() == 0)
-      DUNE_THROW_COLORFULLY(NotImplemented, "This function does not provide any gradients!");
+      DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
     assert(gradients_.size() == dimRange);
     for (size_t ii = 0; ii < dimRange; ++ii) {
       gradients_[ii]->evaluate(xx, ret[ii]);
