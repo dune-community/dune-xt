@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include <dune/stuff/common/memory.hh>
+
 #include "interface.hh"
 
 namespace Dune {
@@ -37,16 +39,19 @@ public:
   }
 
   ConstDefault(const GridType* grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
 
   ConstDefault(std::shared_ptr<const GridType> grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
 
   ConstDefault(std::unique_ptr<const GridType>&& grid_ptr)
+      DUNE_DEPRECATED_MSG("This ctor will be removed, it is misleading (18.08.2014)!")
     : grid_(*grid_ptr)
   {
   }
@@ -66,35 +71,39 @@ private:
 
 
 template <class GridImp>
-class Default : public ProviderInterface<GridImp>
+class Default : Common::StorageProvider<GridImp>, public ProviderInterface<GridImp>
 {
-  typedef ProviderInterface<GridImp> BaseType;
+  typedef Common::StorageProvider<GridImp> StorageProviderBaseType;
+  typedef ProviderInterface<GridImp> GridProviderBaseType;
 
 public:
-  using typename BaseType::GridType;
+  using typename GridProviderBaseType::GridType;
 
   static const std::string static_id()
   {
-    return BaseType::static_id();
+    return GridProviderBaseType::static_id();
   }
 
   Default(GridType& grid_in)
-    : grid_(grid_in)
+    : StorageProviderBaseType(grid_in)
   {
   }
 
+  /**
+   * \note Takes ownership of grid_ptr in the sense that you must not delete it manually!
+   */
   Default(GridType* grid_ptr)
-    : grid_(*grid_ptr)
+    : StorageProviderBaseType(grid_ptr)
   {
   }
 
   Default(std::shared_ptr<GridType> grid_ptr)
-    : grid_(*grid_ptr)
+    : StorageProviderBaseType(grid_ptr)
   {
   }
 
   Default(std::unique_ptr<GridType>&& grid_ptr)
-    : grid_(*grid_ptr)
+    : StorageProviderBaseType(grid_ptr)
   {
   }
 
@@ -104,16 +113,13 @@ public:
 
   virtual GridType& grid() DS_OVERRIDE
   {
-    return grid_;
+    return this->storage_access();
   }
 
   virtual const GridType& grid() const DS_OVERRIDE
   {
-    return grid_;
+    return this->storage_access();
   }
-
-private:
-  GridType& grid_;
 }; // class Default
 
 
