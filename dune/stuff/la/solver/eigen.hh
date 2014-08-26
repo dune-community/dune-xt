@@ -423,15 +423,15 @@ public:
       solver.factorize(colmajor_copy);
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
-#if HAVE_UMFPACK
-    } else if (type == "lu.umfpack") {
-      typedef ::Eigen::UmfPackLU<typename MatrixType::BackendType> SolverType;
-      SolverType solver;
-      solver.analyzePattern(matrix_.backend());
-      solver.factorize(matrix_.backend());
-      solution.backend() = solver.solve(rhs.backend());
-      info = solver.info();
-#endif // HAVE_UMFPACK
+      //#if HAVE_UMFPACK
+      //    } else if (type == "lu.umfpack") {
+      //      typedef ::Eigen::UmfPackLU< typename MatrixType::BackendType > SolverType;
+      //      SolverType solver;
+      //      solver.analyzePattern(matrix_.backend());
+      //      solver.factorize(matrix_.backend());
+      //      solution.backend() = solver.solve(rhs.backend());
+      //      info = solver.info();
+      //#endif // HAVE_UMFPACK
       //    } else if (type == "spqr") {
       //      ColMajorBackendType colmajor_copy(matrix_.backend());
       //      colmajor_copy.makeCompressed();
