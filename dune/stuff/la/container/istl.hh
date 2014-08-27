@@ -373,8 +373,8 @@ public:
     size_t row_index = 0;
     for (auto row = backend_->createbegin(); row != backend_->createend(); ++row) {
       assert(row_index < pattern.size());
-      const auto& cols = pattern.inner(row_index);
-      for (const auto& col : cols)
+      const auto& col_indices = pattern.inner(row_index);
+      for (const auto& col : col_indices)
         row.insert(col);
       ++row_index;
     }
