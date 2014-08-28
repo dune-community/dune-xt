@@ -4,7 +4,7 @@
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 // This one has to come first (includes the config.h)!
-#include <dune/stuff/test/test_common.hh>
+#include <dune/stuff/test/main.cxx>
 
 #include <tuple>
 
@@ -90,5 +90,3 @@ TYPED_TEST(SolverTest, behaves_correctly)
 {
   this->produces_correct_results();
 }
-
-#include <dune/stuff/test/test_main.cxx>
