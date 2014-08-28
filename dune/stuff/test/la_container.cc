@@ -5,7 +5,7 @@
 //
 // Contributors: Tobias Leibner
 
-#include <dune/stuff/test/main.cxx>
+#include "main.hxx"
 
 #include <type_traits>
 #include <memory>
