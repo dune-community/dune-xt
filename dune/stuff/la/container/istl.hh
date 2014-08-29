@@ -8,6 +8,8 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_ISTL_HH
 #define DUNE_STUFF_LA_CONTAINER_ISTL_HH
 
+#include <vector>
+#include <initializer_list>
 
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fmatrix.hh>
@@ -84,6 +86,23 @@ public:
   IstlDenseVector(const int ss, const ScalarType value = ScalarType(0))
     : IstlDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
   {
+  }
+
+  IstlDenseVector(const std::vector<ScalarType>& other)
+    : backend_(new BackendType(other.size()))
+  {
+    for (size_t ii = 0; ii < other.size(); ++ii)
+      backend_->operator[](ii)[0] = other[ii];
+  }
+
+  IstlDenseVector(const std::initializer_list<ScalarType>& other)
+    : backend_(new BackendType(other.size()))
+  {
+    size_t ii = 0;
+    for (auto element : other) {
+      backend_->operator[](ii)[0] = element;
+      ++ii;
+    }
   }
 
   IstlDenseVector(const ThisType& other)

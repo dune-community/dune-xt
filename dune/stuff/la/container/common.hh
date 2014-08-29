@@ -10,6 +10,8 @@
 
 #include <memory>
 #include <type_traits>
+#include <vector>
+#include <initializer_list>
 
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/dynvector.hh>
@@ -78,6 +80,23 @@ public:
   CommonDenseVector(const int ss, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value))
   {
+  }
+
+  CommonDenseVector(const std::vector<ScalarType>& other)
+    : backend_(new BackendType(other.size()))
+  {
+    for (size_t ii = 0; ii < other.size(); ++ii)
+      backend_->operator[](ii) = other[ii];
+  }
+
+  CommonDenseVector(const std::initializer_list<ScalarType>& other)
+    : backend_(new BackendType(other.size()))
+  {
+    size_t ii = 0;
+    for (auto element : other) {
+      backend_->operator[](ii) = element;
+      ++ii;
+    }
   }
 
   CommonDenseVector(const ThisType& other)
