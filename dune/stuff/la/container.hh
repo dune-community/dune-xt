@@ -6,7 +6,9 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_HH
 #define DUNE_STUFF_LA_CONTAINER_HH
 
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 #include "container/interfaces.hh"
 #include "container/common.hh"
