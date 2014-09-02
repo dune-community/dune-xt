@@ -19,6 +19,15 @@
 
 namespace Dune {
 namespace Stuff {
+namespace Exceptions {
+
+
+class spe10_data_file_missing : public Dune::IOError
+{
+};
+
+
+} // namespace Exceptions
 namespace Functions {
 
 
@@ -92,7 +101,7 @@ private:
                                                   << ")!");
       return data;
     } else
-      DUNE_THROW(Dune::IOError, "could not open '" << filename << "'!");
+      DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
   } // ... read_values_from_file(...)
 
 public:
@@ -214,7 +223,7 @@ private:
                                                   << ")!");
       return data;
     } else
-      DUNE_THROW(Dune::IOError, "could not open '" << filename << "'!");
+      DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
   } // ... read_values_from_file(...)
 
 public:
