@@ -12,6 +12,7 @@
 #define DUNE_STUFF_SSIZE_T long int
 #endif
 
+#include <cmath>
 #include <limits>
 #include <iostream>
 #include <iterator>
@@ -575,6 +576,16 @@ public:
   {
     return amax().second;
   }
+
+  virtual ScalarType standard_deviation() const
+  {
+    const ScalarType mu = mean();
+    ScalarType sigma = 0.0;
+    for (const auto& x_i : *this)
+      sigma += std::pow(x_i - mu, 2);
+    sigma /= size();
+    return std::sqrt(sigma);
+  } // ... standard_deviation(...)
 
   /**
    *  \brief  Adds two vectors.

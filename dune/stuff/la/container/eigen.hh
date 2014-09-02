@@ -8,6 +8,8 @@
 
 #include <memory>
 #include <type_traits>
+#include <vector>
+#include <initializer_list>
 
 #if HAVE_EIGEN
 #include <dune/stuff/common/disable_warnings.hh>
@@ -397,6 +399,23 @@ public:
     }
   }
 
+  EigenDenseVector(const std::vector<ScalarType>& other)
+  {
+    this->backend_ = std::make_shared<BackendType>(other.size());
+    for (size_t ii = 0; ii < other.size(); ++ii)
+      this->backend_->operator[](ii) = other[ii];
+  }
+
+  EigenDenseVector(const std::initializer_list<ScalarType>& other)
+  {
+    this->backend_ = std::make_shared<BackendType>(other.size());
+    size_t ii = 0;
+    for (auto element : other) {
+      this->backend_->operator[](ii) = element;
+      ++ii;
+    }
+  }
+
   EigenDenseVector(const BackendType& other)
   {
     this->backend_ = std::make_shared<BackendType>(other);
@@ -520,6 +539,22 @@ public:
     }
   }
 
+  EigenMappedDenseVector(const std::vector<ScalarType>& other)
+  {
+    this->backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
+    for (size_t ii = 0; ii < other.size(); ++ii)
+      this->backend_->operator[](ii) = other[ii];
+  }
+
+  EigenMappedDenseVector(const std::initializer_list<ScalarType>& other)
+  {
+    this->backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
+    size_t ii = 0;
+    for (auto element : other) {
+      this->backend_->operator[](ii) = element;
+      ++ii;
+    }
+  }
 
   /**
    *  \brief  This constructor does not do a deep copy.
