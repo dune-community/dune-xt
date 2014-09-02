@@ -3,7 +3,7 @@
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include "test_common.hh"
+#include "main.hxx"
 
 #if HAVE_DUNE_GRID
 
@@ -42,5 +42,3 @@ TEST(PgfOutput, Sgrid)
 }
 
 #endif //#if HAVE_DUNE_GRID
-
-#include <dune/stuff/test/test_main.cxx>
