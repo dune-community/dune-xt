@@ -45,20 +45,33 @@ namespace Functions {
 
 // forwards, include is below
 #if HAVE_DUNE_GRID
+
+
 template <class GridViewType, int dimRange, int dimRangeCols = 1>
 class VisualizationAdapter;
+
+
 #endif // HAVE_DUNE_GRID
+
 
 template <class MinuendType, class SubtrahendType>
 class Difference;
-}
 
+
+template <class LeftSummandType, class RightSummandType>
+class Sum;
+
+
+} // namespace Functions
 namespace Tags {
+
 
 class LocalizableFunction
 {
 };
-}
+
+
+} // namespace Tags
 
 
 /**
@@ -308,6 +321,7 @@ public:
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
   typedef Functions::Difference<ThisType, ThisType> DifferenceType;
+  typedef Functions::Sum<ThisType, ThisType> SumType;
 
   virtual ~LocalizableFunctionInterface()
   {
@@ -343,6 +357,11 @@ public:
   DifferenceType operator-(const ThisType& other) const
   {
     return DifferenceType(*this, other);
+  }
+
+  SumType operator+(const ThisType& other) const
+  {
+    return SumType(*this, other);
   }
 
 #if HAVE_DUNE_GRID
@@ -388,8 +407,10 @@ std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E
   return out;
 } // ... operator<<(...)
 
+
 template <class OtherEntityImp, class GlobalFunctionImp>
 struct TransferredGlobalFunction;
+
 
 /**
  * base class for global matrix-valued valued functions that provides automatic local functions via
