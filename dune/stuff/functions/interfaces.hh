@@ -14,42 +14,30 @@
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
-#include <dune/stuff/common/memory.hh>
-
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
+#include <dune/geometry/quadraturerules.hh>
 
 #if HAVE_DUNE_GRID
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/io/file/vtk.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #if HAVE_DUNE_FEM
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-#endif
+#endif // HAVE_DUNE_FEM
 
 #if HAVE_DUNE_PDELAB
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/typetree/nodetags.hh>
 #include <dune/pdelab/common/function.hh>
+#endif // HAVE_DUNE_PDELAB
 #include <dune/stuff/common/reenable_warnings.hh>
-#endif
 
-#if HAVE_DUNE_GEOMETRY
-#include <dune/stuff/common/disable_warnings.hh>
-#include <dune/geometry/quadraturerules.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-#endif
+#include <dune/stuff/common/memory.hh>
+
 
 namespace Dune {
 namespace Stuff {
