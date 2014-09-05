@@ -57,7 +57,7 @@ namespace Functions {
 
 // forwards, include is below
 #if HAVE_DUNE_GRID
-template <class GridViewType, int dimRange>
+template <class GridViewType, int dimRange, int dimRangeCols = 1>
 class VisualizationAdapter;
 #endif // HAVE_DUNE_GRID
 
@@ -370,7 +370,8 @@ public:
   {
     if (filename.empty())
       DUNE_THROW(RangeError, "Empty filename given!");
-    auto adapter = std::make_shared<Stuff::Functions::VisualizationAdapter<GridViewType, dimRange>>(*this);
+    auto adapter =
+        std::make_shared<Stuff::Functions::VisualizationAdapter<GridViewType, dimRange, dimRangeCols>>(*this);
     if (subsampling) {
       SubsamplingVTKWriter<GridViewType> vtk_writer(grid_view, VTK::nonconforming);
       vtk_writer.addVertexData(adapter);
