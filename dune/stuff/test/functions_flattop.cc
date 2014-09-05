@@ -22,7 +22,7 @@
 
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/grid/provider/cube.hh>
-#include <dune/stuff/playground/functions/flattop.hh>
+#include <dune/stuff/functions/flattop.hh>
 
 #include "function.hh"
 
