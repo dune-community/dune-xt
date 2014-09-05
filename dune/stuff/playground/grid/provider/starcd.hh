@@ -154,7 +154,7 @@ public:
       // Erase zeros at the beginning of the line
       items2.erase(std::remove(items2.begin(), items2.end(), 0), items2.end());
 
-      if ((!items1[0] == items2[0]) || (!numberOfElements == items2[0]))
+      if (!(items1[0] == items2[0]) || !(numberOfElements == items2[0]))
         DUNE_THROW(Dune::IOError, "Elementindices do not correspond!");
 
       if (items2.size() == numberOfVerticesCube + 1) // cube
@@ -181,7 +181,7 @@ public:
       }
     } // while loop
 
-    if (!numberOfElements == (numberOfCubes + numberOfPrisms))
+    if (!(numberOfElements == (numberOfCubes + numberOfPrisms)))
       DUNE_THROW(Dune::IOError,
                  "Number of Elements (" << numberOfElements << ") is not equal to number of cubes (" << numberOfCubes
                                         << ") and number of prisms ("
