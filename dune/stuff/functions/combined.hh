@@ -64,6 +64,14 @@ private:
       static const unsigned int rC = rC_in;
     };
 
+    template <int r_in, int rC_in, bool anything>
+    class Dimension<r_in, r_in, rC_in, rC_in, Combination::sum, anything>
+    {
+    public:
+      static const unsigned int r  = r_in;
+      static const unsigned int rC = rC_in;
+    };
+
   public:
     static const unsigned int r  = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::r;
     static const unsigned int rC = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::rC;
