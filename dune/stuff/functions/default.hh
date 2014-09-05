@@ -20,9 +20,10 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 #if HAVE_DUNE_GRID
-template <class GridViewType, int dimRange>
+
+
+template <class GridViewType, int dimRange, int dimRangeCols>
 class VisualizationAdapter : public VTKFunction<GridViewType>
 {
 public:
@@ -32,7 +33,8 @@ public:
   static const unsigned int dimDomain = GridViewType::dimension;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
 
-  typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, double, dimRange> FunctionType;
+  typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, double, dimRange, dimRangeCols>
+      FunctionType;
 
   VisualizationAdapter(const FunctionType& function, const std::string nm = "")
     : function_(function)
@@ -41,12 +43,44 @@ public:
   {
   }
 
-  virtual int ncomps() const DS_OVERRIDE
+private:
+  template <int r, int rC, bool anything = true>
+  class Call
   {
-    return dimRange;
+  public:
+    static int ncomps()
+    {
+      return 1;
+    }
+
+    static double evaluate(const int& /*comp*/, const typename FunctionType::RangeType& val)
+    {
+      return val.frobenius_norm();
+    }
+  }; // class Call
+
+  template <int r, bool anything>
+  class Call<r, 1, anything>
+  {
+  public:
+    static int ncomps()
+    {
+      return r;
+    }
+
+    static double evaluate(const int& comp, const typename FunctionType::RangeType& val)
+    {
+      return val[comp];
+    }
+  }; // class Call< ..., 1, ... >
+
+public:
+  virtual int ncomps() const /*DS_OVERRIDE DS_FINAL*/
+  {
+    return Call<dimRange, dimRangeCols>::ncomps();
   }
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const /*DS_OVERRIDE DS_FINAL*/
   {
     if (name_.empty())
       return function_.name();
@@ -54,20 +88,22 @@ public:
       return name_;
   }
 
-  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const DS_OVERRIDE
+  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const /*DS_OVERRIDE DS_FINAL*/
   {
     assert(comp >= 0);
     assert(comp < dimRange);
     const auto local_func = function_.local_function(en);
     local_func->evaluate(xx, tmp_value_);
-    return tmp_value_[comp];
+    return Call<dimRange, dimRangeCols>::evaluate(comp, tmp_value_);
   }
 
 private:
   const FunctionType& function_;
-  mutable FieldVector<double, dimRange> tmp_value_;
+  mutable typename FunctionType::RangeType tmp_value_;
   const std::string name_;
 }; // class VisualizationAdapter
+
+
 #endif // HAVE_DUNE_GRID
 
 
