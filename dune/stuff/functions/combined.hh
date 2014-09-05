@@ -22,7 +22,8 @@ namespace internal {
 
 enum class Combination
 {
-  difference
+  difference,
+  sum
 }; // enum class Combination
 
 
@@ -115,6 +116,37 @@ private:
       ret -= tmp_ret;
     } // ... jacobian(...)
   }; // class Call< ..., difference >
+
+  template <bool anything>
+  class Call<Combination::sum, anything>
+  {
+  public:
+    static std::string type()
+    {
+      return "sum";
+    }
+
+    static size_t order(const size_t left_order, const size_t right_order)
+    {
+      return std::max(left_order, right_order);
+    }
+
+    static void evaluate(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
+                         const DomainType& xx, RangeType& ret, RangeType& tmp_ret)
+    {
+      left_local.evaluate(xx, ret);
+      right_local.evaluate(xx, tmp_ret);
+      ret += tmp_ret;
+    } // ... evaluate(...)
+
+    static void jacobian(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
+                         const DomainType& xx, JacobianRangeType& ret, JacobianRangeType& tmp_ret)
+    {
+      left_local.jacobian(xx, ret);
+      right_local.jacobian(xx, tmp_ret);
+      ret += tmp_ret;
+    } // ... jacobian(...)
+  }; // class Call< ..., sum >
 
 public:
   static std::string type()
@@ -287,6 +319,20 @@ public:
   {
   }
 }; // class Difference
+
+
+template <class LeftSummandType, class RightSummandType>
+class Sum : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>
+{
+  typedef internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum> BaseType;
+
+public:
+  template <class... Args>
+  Sum(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {
+  }
+}; // class Sum
 
 
 } // namespace Functions
