@@ -14,41 +14,30 @@
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
 
-#include <dune/stuff/common/memory.hh>
-
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
+#include <dune/geometry/quadraturerules.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk.hh>
-#include <dune/stuff/common/filesystem.hh>
 #endif
 
 #if HAVE_DUNE_FEM
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-#endif
+#endif // HAVE_DUNE_FEM
 
 #if HAVE_DUNE_PDELAB
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/typetree/nodetags.hh>
 #include <dune/pdelab/common/function.hh>
+#endif // HAVE_DUNE_PDELAB
 #include <dune/stuff/common/reenable_warnings.hh>
-#endif
 
-#if HAVE_DUNE_GEOMETRY
-#include <dune/stuff/common/disable_warnings.hh>
-#include <dune/geometry/quadraturerules.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-#endif
+#include <dune/stuff/common/memory.hh>
+
 
 namespace Dune {
 namespace Stuff {
@@ -56,20 +45,33 @@ namespace Functions {
 
 // forwards, include is below
 #if HAVE_DUNE_GRID
+
+
 template <class GridViewType, int dimRange, int dimRangeCols = 1>
 class VisualizationAdapter;
+
+
 #endif // HAVE_DUNE_GRID
+
 
 template <class MinuendType, class SubtrahendType>
 class Difference;
-}
 
+
+template <class LeftSummandType, class RightSummandType>
+class Sum;
+
+
+} // namespace Functions
 namespace Tags {
+
 
 class LocalizableFunction
 {
 };
-}
+
+
+} // namespace Tags
 
 
 /**
@@ -266,9 +268,8 @@ public:
     return ret;
   }
 
-#if HAVE_DUNE_GEOMETRY
   //! evaluate at N quadrature points into vector of size >= N
-  void evaluate(const Dune::QuadratureRule<DomainFieldImp, domainDim>& quadrature, std::vector<RangeType>& ret)
+  void evaluate(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature, std::vector<RangeType>& ret)
   {
     assert(ret.size() >= quadrature.size());
     std::size_t i = 0;
@@ -277,14 +278,13 @@ public:
   }
 
   //! jacobian at N quadrature points into vector of size >= N
-  void jacobian(const Dune::QuadratureRule<DomainFieldImp, domainDim>& quadrature, std::vector<JacobianRangeType>& ret)
+  void jacobian(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature, std::vector<JacobianRangeType>& ret)
   {
     assert(ret.size() >= quadrature.size());
     std::size_t i = 0;
     for (const auto& point : quadrature)
       jacobian(point.position(), ret[i++]);
   }
-#endif
   /* @} */
 }; // class LocalfunctionInterface
 
@@ -321,6 +321,7 @@ public:
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
   typedef Functions::Difference<ThisType, ThisType> DifferenceType;
+  typedef Functions::Sum<ThisType, ThisType> SumType;
 
   virtual ~LocalizableFunctionInterface()
   {
@@ -337,7 +338,7 @@ public:
    **/
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
 
-  virtual ThisType* copy() const = 0;
+  virtual ThisType* DUNE_DEPRECATED_MSG("Will be removed, does not work (05.09.2014)!") copy() const = 0;
   /* @} */
 
   /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
@@ -356,6 +357,11 @@ public:
   DifferenceType operator-(const ThisType& other) const
   {
     return DifferenceType(*this, other);
+  }
+
+  SumType operator+(const ThisType& other) const
+  {
+    return SumType(*this, other);
   }
 
 #if HAVE_DUNE_GRID
@@ -401,8 +407,10 @@ std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E
   return out;
 } // ... operator<<(...)
 
+
 template <class OtherEntityImp, class GlobalFunctionImp>
 struct TransferredGlobalFunction;
+
 
 /**
  * base class for global matrix-valued valued functions that provides automatic local functions via
@@ -433,7 +441,7 @@ public:
   {
   }
 
-  virtual ThisType* copy() const
+  virtual ThisType* DUNE_DEPRECATED_MSG("Will be removed, does not work (05.09.2014)!") copy() const
   {
     DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
   }
@@ -547,7 +555,7 @@ public:
   {
   }
 
-  virtual ThisType* copy() const
+  virtual ThisType* DUNE_DEPRECATED_MSG("Will be removed, does not work (05.09.2014)!") copy() const
   {
     DUNE_THROW(NotImplemented, "not needed, no meaningful default implementation possible -> exception");
   }
