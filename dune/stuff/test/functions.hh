@@ -51,10 +51,14 @@ protected:
     static_assert(std::is_same<RangeType, typename InterfaceType::RangeType>::value, "");
     static_assert(std::is_same<JacobianRangeType, typename InterfaceType::JacobianRangeType>::value, "");
     // required static methods
-    std::string static_id                    = FunctionImp::static_id();
+    std::string static_id = FunctionImp::static_id();
+  } // ... static_interface_check(...)
+
+  static void static_create_check()
+  {
     Stuff::Common::Configuration default_cfg = FunctionImp::default_config();
     std::unique_ptr<FunctionImp> func        = FunctionImp::create(default_cfg);
-  } // ... static_interface_check(...)
+  } // ... static_create_check(...)
 
   template <class GridType>
   void dynamic_interface_check(const FunctionImp& func, GridType& grid) const
