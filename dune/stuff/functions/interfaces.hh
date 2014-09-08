@@ -23,6 +23,7 @@
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk.hh>
+#include <dune/stuff/common/filesystem.hh>
 #endif
 
 #if HAVE_DUNE_FEM
@@ -370,22 +371,19 @@ public:
    *        see in the visualization is a refinement of the actual grid!
    */
   template <class GridViewType>
-  void visualize(const GridViewType& grid_view, const std::string filename, const bool subsampling = true,
+  void visualize(const GridViewType& grid_view, const std::string path, const bool subsampling = true,
                  const VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
-    if (filename.empty())
-      DUNE_THROW(RangeError, "Empty filename given!");
-    auto adapter =
-        std::make_shared<Stuff::Functions::VisualizationAdapter<GridViewType, dimRange, dimRangeCols>>(*this);
-    if (subsampling) {
-      SubsamplingVTKWriter<GridViewType> vtk_writer(grid_view, VTK::nonconforming);
-      vtk_writer.addVertexData(adapter);
-      vtk_writer.write(filename, vtk_output_type);
-    } else {
-      VTKWriter<GridViewType> vtk_writer(grid_view, VTK::nonconforming);
-      vtk_writer.addVertexData(adapter);
-      vtk_writer.write(filename, vtk_output_type);
-    }
+    if (path.empty())
+      DUNE_THROW(RangeError, "Empty path given!");
+    const auto directory = DSC::directoryOnly(path);
+    const auto filename  = DSC::filenameOnly(path);
+    auto adapter = std::make_shared<Functions::VisualizationAdapter<GridViewType, dimRange, dimRangeCols>>(*this);
+    std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
+        subsampling ? DSC::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
+                    : DSC::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
+    vtk_writer->addVertexData(adapter);
+    vtk_writer->pwrite(filename, directory, "", vtk_output_type);
   } // ... visualize(...)
 #endif // HAVE_DUNE_GRID
 
