@@ -17,6 +17,7 @@
 #include <dune/common/dynvector.hh>
 #include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
+#include <dune/common/parallel/mpihelper.hh>
 
 #include <dune/geometry/referenceelements.hh>
 #include <dune/geometry/quadraturerules.hh>
@@ -38,6 +39,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/memory.hh>
+#include <dune/stuff/common/exceptions.hh>
 
 
 namespace Dune {
@@ -383,7 +385,10 @@ public:
         subsampling ? DSC::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
                     : DSC::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
     vtk_writer->addVertexData(adapter);
-    vtk_writer->pwrite(filename, directory, "", vtk_output_type);
+    if (MPIHelper::getCollectiveCommunication().size() == 1)
+      vtk_writer->write(path, vtk_output_type);
+    else
+      vtk_writer->pwrite(filename, directory, "", vtk_output_type);
   } // ... visualize(...)
 #endif // HAVE_DUNE_GRID
 
