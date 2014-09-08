@@ -257,6 +257,7 @@ public:
     , right_(Common::make_unique<RightStorageType>(right))
     , name_(nm.empty()
                 ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '" + right.name()
+                      + "'"
                 : nm)
   {
   }
@@ -266,7 +267,8 @@ public:
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
     , name_(nm.empty()
-                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '" + right.name()
+                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->storage_access().name()
+                      + "' and '" + right_->storage_access().name() + "'"
                 : nm)
   {
   }
@@ -281,6 +283,8 @@ public:
   Combined(const ThisType& other) = delete;
 
   ThisType& operator=(const ThisType& other) = delete;
+
+  ThisType& operator=(ThisType&& other) = delete;
 
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const /*DS_OVERRIDE DS_FINAL*/
   {
@@ -297,7 +301,7 @@ public:
   virtual std::string type() const DS_OVERRIDE DS_FINAL
   {
     return SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->storage_access().type() + "' and '"
-           + right_->storage_access().type();
+           + right_->storage_access().type() + "'";
   } // ... type(...)
 
   virtual std::string name() const DS_OVERRIDE DS_FINAL
