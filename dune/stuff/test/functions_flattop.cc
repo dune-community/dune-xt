@@ -24,7 +24,7 @@
 #include <dune/stuff/grid/provider/cube.hh>
 #include <dune/stuff/functions/flattop.hh>
 
-#include "function.hh"
+#include "functions.hh"
 
 #if HAVE_DUNE_GRID
 
