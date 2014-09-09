@@ -385,6 +385,7 @@ public:
         subsampling ? DSC::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
                     : DSC::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
     vtk_writer->addVertexData(adapter);
+    DSC::testCreateDirectory(directory);
     if (MPIHelper::getCollectiveCommunication().size() == 1)
       vtk_writer->write(path, vtk_output_type);
     else
