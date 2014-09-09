@@ -139,11 +139,17 @@ public:
         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  Spe10Model1(const std::string& filename, std::vector<DomainFieldType>&& lowerLeft,
-              std::vector<DomainFieldType>&& upperRight, const RangeFieldType min = minValue,
+  Spe10Model1(const std::string& filename, const std::vector<DomainFieldType>& lowerLeft,
+              const std::vector<DomainFieldType>& upperRight, const RangeFieldType min = minValue,
               const RangeFieldType max = maxValue, const std::string nm = static_id())
-    : BaseType(std::move(lowerLeft), std::move(upperRight), {numXelements, numZelements},
-               read_values_from_file(filename, min, max), nm)
+    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
+  {
+  }
+
+  Spe10Model1(const std::string& filename, const DomainType& lowerLeft, const DomainType& upperRight,
+              const RangeFieldType min = minValue, const RangeFieldType max = maxValue,
+              const std::string nm = static_id())
+    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
   {
   }
 
@@ -261,11 +267,17 @@ public:
         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  Spe10Model1(const std::string& filename, std::vector<DomainFieldType>&& lowerLeft,
-              std::vector<DomainFieldType>&& upperRight, const RangeFieldType min = minValue,
+  Spe10Model1(const std::string& filename, const std::vector<DomainFieldType>& lowerLeft,
+              const std::vector<DomainFieldType>& upperRight, const RangeFieldType min = minValue,
               const RangeFieldType max = maxValue, const std::string nm = static_id())
-    : BaseType(std::move(lowerLeft), std::move(upperRight), {numXelements, numZelements},
-               read_values_from_file(filename, min, max), nm)
+    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
+  {
+  }
+
+  Spe10Model1(const std::string& filename, const DomainType& lowerLeft, const DomainType& upperRight,
+              const RangeFieldType min = minValue, const RangeFieldType max = maxValue,
+              const std::string nm = static_id())
+    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
   {
   }
 
