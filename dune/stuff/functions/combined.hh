@@ -23,7 +23,8 @@ namespace internal {
 enum class Combination
 {
   difference,
-  sum
+  sum,
+  product
 }; // enum class Combination
 
 
@@ -66,6 +67,14 @@ private:
 
     template <int r_in, int rC_in, bool anything>
     class Dimension<r_in, r_in, rC_in, rC_in, Combination::sum, anything>
+    {
+    public:
+      static const unsigned int r  = r_in;
+      static const unsigned int rC = rC_in;
+    };
+
+    template <int r_in, int rC_in, bool anything>
+    class Dimension<1, r_in, 1, rC_in, Combination::product, anything>
     {
     public:
       static const unsigned int r  = r_in;
@@ -155,6 +164,36 @@ private:
       ret += tmp_ret;
     } // ... jacobian(...)
   }; // class Call< ..., sum >
+
+  // left only scalar atm
+  template <bool anything>
+  class Call<Combination::product, anything>
+  {
+  public:
+    static std::string type()
+    {
+      return "product";
+    }
+
+    static size_t order(const size_t left_order, const size_t right_order)
+    {
+      return left_order + right_order;
+    }
+
+    static void evaluate(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
+                         const DomainType& xx, RangeType& ret, RangeType& /*tmp_ret*/)
+    {
+      auto left_value = left_local.evaluate(xx);
+      right_local.evaluate(xx, ret);
+      ret *= left_value;
+    } // ... evaluate(...)
+
+    static void jacobian(const LeftLocalfunctionType& /*left_local*/, const RightLocalfunctionType& /*right_local*/,
+                         const DomainType& /*xx*/, JacobianRangeType& /*ret*/, JacobianRangeType& /*tmp_ret*/)
+    {
+      DUNE_THROW(NotImplemented, "If you need this, implement it!");
+    }
+  }; // class Call< ..., product >
 
 public:
   static std::string type()
@@ -345,6 +384,20 @@ public:
   {
   }
 }; // class Sum
+
+
+template <class LeftSummandType, class RightSummandType>
+class Product : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>
+{
+  typedef internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product> BaseType;
+
+public:
+  template <class... Args>
+  Product(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {
+  }
+}; // class Product
 
 
 } // namespace Functions
