@@ -7,6 +7,7 @@
 #define DUNE_STUFF_FUNCTIONS_COMBINED_HH
 
 #include <type_traits>
+#include <memory>
 
 #include <dune/common/typetraits.hh>
 
@@ -398,6 +399,45 @@ public:
   {
   }
 }; // class Product
+
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<Difference<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
+{
+  return std::make_shared<Difference<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<Difference<T1, T2>> make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+{
+  return std::make_shared<Difference<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<Sum<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
+{
+  return std::make_shared<Sum<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<Sum<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+{
+  return std::make_shared<Sum<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<Product<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
+{
+  return std::make_shared<Product<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<Product<T1, T2>> make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+{
+  return std::make_shared<Product<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
 
 
 } // namespace Functions
