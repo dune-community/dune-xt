@@ -138,7 +138,7 @@ public:
     base.push_back(Functions::Checkerboard<E, D, d, R, r, rC>::static_id());
     base.push_back(Functions::ESV2007::Testcase1Force<E, D, d, R, r, rC>::static_id());
     base.push_back(Functions::ESV2007::Testcase1ExactSolution<E, D, d, R, r, rC>::static_id());
-    base.push_back(Functions::Spe10Model1<E, D, d, R, r, rC>::static_id());
+    base.push_back(Functions::Spe10::Model1<E, D, d, R, r, rC>::static_id());
     return base;
   } // ... available(...)
 
@@ -152,8 +152,8 @@ public:
       return Functions::ESV2007::Testcase1Force<E, D, d, R, r, rC>::default_config(sub_name);
     else if (type == Functions::ESV2007::Testcase1ExactSolution<E, D, d, R, r, rC>::static_id())
       return Functions::ESV2007::Testcase1ExactSolution<E, D, d, R, r, rC>::default_config(sub_name);
-    else if (type == Functions::Spe10Model1<E, D, d, R, r, rC>::static_id())
-      return Functions::Spe10Model1<E, D, d, R, r, rC>::default_config(sub_name);
+    else if (type == Functions::Spe10::Model1<E, D, d, R, r, rC>::static_id())
+      return Functions::Spe10::Model1<E, D, d, R, r, rC>::default_config(sub_name);
     else
       return BaseType::default_config(type, sub_name);
   } // ... default_config(...)
@@ -169,8 +169,8 @@ public:
       return BaseType::template call_create<Functions::ESV2007::Testcase1Force<E, D, d, R, r, rC>>(config);
     else if (type == Functions::ESV2007::Testcase1ExactSolution<E, D, d, R, r, rC>::static_id())
       return BaseType::template call_create<Functions::ESV2007::Testcase1ExactSolution<E, D, d, R, r, rC>>(config);
-    else if (type == Functions::Spe10Model1<E, D, d, R, r, rC>::static_id())
-      return BaseType::template call_create<Functions::Spe10Model1<E, D, d, R, r, rC>>(config);
+    else if (type == Functions::Spe10::Model1<E, D, d, R, r, rC>::static_id())
+      return BaseType::template call_create<Functions::Spe10::Model1<E, D, d, R, r, rC>>(config);
     else
       return BaseType::create(type, config);
   } // ... create(...)
