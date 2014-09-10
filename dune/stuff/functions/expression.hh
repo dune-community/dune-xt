@@ -192,14 +192,14 @@ public:
 
   typedef typename BaseType::DomainFieldType DomainFieldType;
   static const unsigned int dimDomain = BaseType::dimDomain;
-  typedef typename LocalfunctionType::DomainType DomainType;
+  typedef typename BaseType::DomainType DomainType;
 
   typedef typename BaseType::RangeFieldType RangeFieldType;
   static const unsigned int dimRange     = BaseType::dimRange;
   static const unsigned int dimRangeCols = BaseType::dimRangeCols;
-  typedef typename LocalfunctionType::RangeType RangeType;
+  typedef typename BaseType::RangeType RangeType;
 
-  typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
+  typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
   static std::string static_id()
   {
