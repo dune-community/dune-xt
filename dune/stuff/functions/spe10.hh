@@ -64,16 +64,18 @@ public:
 
   static std::string static_id()
   {
-    return BaseType::static_id() + ".spe10.model1";
-  }
+    return LocalizableFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>::static_id()
+           + ".spe10.model1";
+  } // ... static_id(...)
 
-private:
+public:
   static const size_t numXelements;
   static const size_t numYelements;
   static const size_t numZelements;
   static const RangeFieldType minValue;
   static const RangeFieldType maxValue;
 
+private:
   static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
                                                       const RangeFieldType& max)
 
@@ -189,16 +191,18 @@ public:
 
   static std::string static_id()
   {
-    return BaseType::static_id() + ".spe10.model1";
-  }
+    return LocalizableFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>::static_id()
+           + ".spe10.model1";
+  } // ... static_id(...)
 
-private:
+public:
   static const size_t numXelements;
   static const size_t numYelements;
   static const size_t numZelements;
   static const RangeFieldType minValue;
   static const RangeFieldType maxValue;
 
+private:
   static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
                                                       const RangeFieldType& max)
 
@@ -211,7 +215,7 @@ private:
     std::ifstream datafile(filename);
     if (datafile.is_open()) {
       static const size_t entriesPerDim = numXelements * numYelements * numZelements;
-      // create storage (there should be exactly 6000 values in the file, but we onyl read the first 2000)
+      // create storage (there should be exactly 6000 values in the file, but we only read the first 2000)
       RangeType unit_matrix(0.0);
       for (size_t dd = 0; dd < dimDomain; ++dd)
         unit_matrix[dd][dd] = 1.0;
