@@ -13,6 +13,8 @@
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/common/fvector.hh>
+#include <dune/common/static_assert.hh>
 
 #include "checkerboard.hh"
 
@@ -29,306 +31,193 @@ class spe10_data_file_missing : public Dune::IOError
 
 } // namespace Exceptions
 namespace Functions {
+namespace Spe10 {
+namespace internal {
+
+
+static const std::string model1_filename = "perm_case1.dat";
+static const size_t model1_x_elements    = 100;
+static const size_t model1_y_elements    = 1;
+static const size_t model1_z_elements    = 20;
+static const double model_1_length_x     = 762.0;
+static const double model_1_length_y     = 7.62;
+static const double model_1_length_z     = 15.24;
+static const double model1_min_value     = 0.001;
+static const double model1_max_value     = 998.915;
+
+
+template <class EntityImp, class DomainFieldImp, class RangeFieldImp, int r, int rC>
+class Model1Base : public Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC>
+{
+  typedef Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC> BaseType;
+
+public:
+  typedef typename BaseType::EntityType EntityType;
+  typedef typename BaseType::LocalfunctionType LocalfunctionType;
+
+  typedef typename BaseType::DomainFieldType DomainFieldType;
+  static const int dimDomain = BaseType::dimDomain;
+  typedef typename BaseType::DomainType DomainType;
+
+  typedef typename BaseType::RangeFieldType RangeFieldType;
+  static const int dimRange = BaseType::dimRange;
+  typedef typename BaseType::RangeType RangeType;
+
+  static std::string static_id()
+  {
+    return LocalizableFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>::static_id()
+           + ".spe10.model1";
+  } // ... static_id(...)
+
+private:
+  static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
+                                                      const RangeFieldType& max, const RangeType& unit_range)
+
+  {
+    if (!(max > min))
+      DUNE_THROW(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
+    const RangeFieldType scale = (max - min) / (internal::model1_max_value - internal::model1_min_value);
+    const RangeFieldType shift = min - scale * internal::model1_min_value;
+    // read all the data from the file
+    std::ifstream datafile(filename);
+    if (datafile.is_open()) {
+      static const size_t entriesPerDim = model1_x_elements * model1_y_elements * model1_z_elements;
+      // create storage (there should be exactly 6000 values in the file, but we onyl read the first 2000)
+      std::vector<RangeType> data(entriesPerDim, unit_range);
+      double tmp     = 0;
+      size_t counter = 0;
+      while (datafile >> tmp && counter < entriesPerDim)
+        data[counter++] *= (tmp * scale) + shift;
+      datafile.close();
+      if (counter != entriesPerDim)
+        DUNE_THROW(Dune::IOError,
+                   "wrong number of entries in '" << filename << "' (are " << counter << ", should be " << entriesPerDim
+                                                  << ")!");
+      return data;
+    } else
+      DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
+  } // ... read_values_from_file(...)
+
+public:
+  static Common::Configuration default_config(const std::string sub_name = "")
+  {
+    Common::Configuration config;
+    config["filename"]   = internal::model1_filename;
+    config["lower_left"] = "[0.0 0.0]";
+    config["upper_right"] =
+        "[" + Common::toString(internal::model_1_length_x) + " " + Common::toString(internal::model_1_length_z) + "]";
+    config.set("min_value", internal::model1_min_value);
+    config.set("max_value", internal::model1_max_value);
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
+    else {
+      Common::Configuration tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  template <class DerivedType>
+  static std::unique_ptr<DerivedType> create_derived(const Common::Configuration config, const std::string sub_name)
+  {
+    // get correct config
+    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration default_cfg = default_config();
+    // create
+    return Common::make_unique<DerivedType>(cfg.get("filename", default_cfg.get<std::string>("filename")),
+                                            cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
+                                            cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
+                                            cfg.get("min_value", default_cfg.get<RangeFieldType>("min_value")),
+                                            cfg.get("max_value", default_cfg.get<RangeFieldType>("max_value")),
+                                            cfg.get("name", default_cfg.get<std::string>("name")));
+  } // ... create(...)
+
+  Model1Base(const std::string& filename, const DomainType& lowerLeft, const DomainType& upperRight,
+             const RangeFieldType min, const RangeFieldType max, const std::string nm, const RangeType& unit_range)
+    : BaseType(lowerLeft, upperRight, {model1_x_elements, model1_z_elements},
+               read_values_from_file(filename, min, max, unit_range), nm)
+  {
+  }
+
+  virtual std::string type() const DS_OVERRIDE
+  {
+    return BaseType::static_id() + ".spe10.model1";
+  }
+}; // class Model1Base
+
+
+} // namespace internal
 
 
 // default, to allow for specialization
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
-class Spe10Model1
+class Model1
 {
-public:
-  Spe10Model1() = delete;
-}; // class FunctionSpe10Model1
+  static_assert(AlwaysFalse<EntityImp>::value, "Not available for these dimensions!");
+};
 
 
 /**
- *  \note For dimRange 1 we only read the Kx values from the file.
+ * We read only the Kx values from file and scale the unit matrix atm.
  */
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
-class Spe10Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
-    : public Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
+template <class EntityImp, class DomainFieldImp, class RangeFieldImp, int r>
+class Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r>
+    : public internal::Model1Base<EntityImp, DomainFieldImp, RangeFieldImp, r, r>
 {
-  typedef Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1> BaseType;
-  typedef Spe10Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1> ThisType;
+  typedef internal::Model1Base<EntityImp, DomainFieldImp, RangeFieldImp, r, r> BaseType;
+  typedef Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r> ThisType;
 
 public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::LocalfunctionType LocalfunctionType;
+  using typename BaseType::DomainFieldType;
+  using BaseType::dimDomain;
+  using typename BaseType::RangeFieldType;
+  using typename BaseType::RangeType;
 
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const int dimDomain = BaseType::dimDomain;
-  typedef typename BaseType::DomainType DomainType;
-
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const int dimRange = BaseType::dimRange;
-  typedef typename BaseType::RangeType RangeType;
-
-  static std::string static_id()
+  static std::unique_ptr<ThisType> create(const Common::Configuration config = BaseType::default_config(),
+                                          const std::string sub_name = BaseType::static_id())
   {
-    return LocalizableFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>::static_id()
-           + ".spe10.model1";
-  } // ... static_id(...)
-
-public:
-  static const size_t numXelements;
-  static const size_t numYelements;
-  static const size_t numZelements;
-  static const RangeFieldType minValue;
-  static const RangeFieldType maxValue;
-
-private:
-  static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
-                                                      const RangeFieldType& max)
-
-  {
-    if (!(max > min))
-      DUNE_THROW(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
-    const RangeFieldType scale = (max - min) / (maxValue - minValue);
-    const RangeType shift      = min - scale * minValue;
-    // read all the data from the file
-    std::ifstream datafile(filename);
-    if (datafile.is_open()) {
-      static const size_t entriesPerDim = numXelements * numYelements * numZelements;
-      // create storage (there should be exactly 6000 values in the file, but we onyl read the first 2000)
-      std::vector<RangeType> data(entriesPerDim, RangeFieldType(0));
-      double tmp     = 0;
-      size_t counter = 0;
-      while (datafile >> tmp && counter < entriesPerDim) {
-        data[counter] = (tmp * scale) + shift;
-        ++counter;
-      }
-      datafile.close();
-      if (counter != entriesPerDim)
-        DUNE_THROW(Dune::IOError,
-                   "wrong number of entries in '" << filename << "' (are " << counter << ", should be " << entriesPerDim
-                                                  << ")!");
-      return data;
-    } else
-      DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
-  } // ... read_values_from_file(...)
-
-public:
-  static Common::Configuration default_config(const std::string sub_name = "")
-  {
-    Common::Configuration config;
-    config["filename"]    = "perm_case1.dat";
-    config["lower_left"]  = "[0.0 0.0]";
-    config["upper_right"] = "[762.0 15.24]";
-    config["min_value"]   = "0.001";
-    config["max_value"]   = "998.915";
-    config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
-  {
-    // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    // create
-    return Common::make_unique<ThisType>(
-        cfg.get("filename", default_cfg.get<std::string>("filename")),
-        cfg.get("lower_left", default_cfg.get<std::vector<DomainFieldType>>("lower_left"), dimDomain),
-        cfg.get("upper_right", default_cfg.get<std::vector<DomainFieldType>>("upper_right"), dimDomain),
-        cfg.get("min_val", minValue),
-        cfg.get("max_val", maxValue),
-        cfg.get("name", default_cfg.get<std::string>("name")));
+    return BaseType::template create_derived<ThisType>(config, sub_name);
   } // ... create(...)
 
-  Spe10Model1(const std::string& filename, const std::vector<DomainFieldType>& lowerLeft,
-              const std::vector<DomainFieldType>& upperRight, const RangeFieldType min = minValue,
-              const RangeFieldType max = maxValue, const std::string nm = static_id())
-    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
+  Model1(const std::string& filename, const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
+         const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
+         const RangeFieldType min = internal::model1_min_value, const RangeFieldType max = internal::model1_max_value,
+         const std::string nm = BaseType::static_id())
+    : BaseType(filename, lower_left, upper_right, min, max, nm, unit_matrix())
   {
   }
-
-  Spe10Model1(const std::string& filename, const DomainType& lowerLeft, const DomainType& upperRight,
-              const RangeFieldType min = minValue, const RangeFieldType max = maxValue,
-              const std::string nm = static_id())
-    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
-  {
-  }
-
-  virtual std::string type() const DS_OVERRIDE
-  {
-    return BaseType::static_id() + ".spe10.model1";
-  }
-
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
-}; // class Spe10Model1< ..., 2, ..., 1, 1 >
-
-
-/**
- * We read only the Kx values from file and scale the unit matrix. Thus we should be the same as the scalar variant.
- */
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
-class Spe10Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, 2, 2>
-    : public Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, 2, 2>
-{
-  typedef Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, 2, 2> BaseType;
-  typedef Spe10Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, 2, 2> ThisType;
-
-public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::LocalfunctionType LocalfunctionType;
-
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const int dimDomain = BaseType::dimDomain;
-  typedef typename BaseType::DomainType DomainType;
-
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const int dimRange = BaseType::dimRange;
-  typedef typename BaseType::RangeType RangeType;
-
-  static std::string static_id()
-  {
-    return LocalizableFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>::static_id()
-           + ".spe10.model1";
-  } // ... static_id(...)
-
-public:
-  static const size_t numXelements;
-  static const size_t numYelements;
-  static const size_t numZelements;
-  static const RangeFieldType minValue;
-  static const RangeFieldType maxValue;
 
 private:
-  static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
-                                                      const RangeFieldType& max)
-
+  template <int d, bool anything = true>
+  struct Call
   {
-    if (!(max > min))
-      DUNE_THROW(Dune::RangeError, "max (is " << max << ") has to be larger than min (is " << min << ")!");
-    const RangeFieldType scale = (max - min) / (maxValue - minValue);
-    const RangeFieldType shift = min - scale * minValue;
-    // read all the data from the file
-    std::ifstream datafile(filename);
-    if (datafile.is_open()) {
-      static const size_t entriesPerDim = numXelements * numYelements * numZelements;
-      // create storage (there should be exactly 6000 values in the file, but we only read the first 2000)
-      RangeType unit_matrix(0.0);
-      for (size_t dd = 0; dd < dimDomain; ++dd)
-        unit_matrix[dd][dd] = 1.0;
-      std::vector<RangeType> data(entriesPerDim, unit_matrix);
-      double tmp     = 0;
-      size_t counter = 0;
-      while (datafile >> tmp && counter < entriesPerDim) {
-        data[counter] *= (tmp * scale) + shift;
-        ++counter;
-      }
-      datafile.close();
-      if (counter != entriesPerDim)
-        DUNE_THROW(Dune::IOError,
-                   "wrong number of entries in '" << filename << "' (are " << counter << ", should be " << entriesPerDim
-                                                  << ")!");
-      return data;
-    } else
-      DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
-  } // ... read_values_from_file(...)
-
-public:
-  static Common::Configuration default_config(const std::string sub_name = "")
-  {
-    Common::Configuration config;
-    config["filename"]    = "perm_case1.dat";
-    config["lower_left"]  = "[0.0 0.0]";
-    config["upper_right"] = "[762.0 15.24]";
-    config["min_value"]   = "0.001";
-    config["max_value"]   = "998.915";
-    config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
+    static RangeType unit_matrix()
+    {
+      RangeType ret(0.0);
+      for (size_t rr = 0; rr < r; ++rr)
+        ret[rr][rr] = 1.0;
+      return ret;
     }
-  } // ... default_config(...)
+  };
 
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
+  template <bool anything>
+  struct Call<1, anything>
   {
-    // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    // create
-    return Common::make_unique<ThisType>(
-        cfg.get("filename", default_cfg.get<std::string>("filename")),
-        cfg.get("lower_left", default_cfg.get<std::vector<DomainFieldType>>("lower_left"), dimDomain),
-        cfg.get("upper_right", default_cfg.get<std::vector<DomainFieldType>>("upper_right"), dimDomain),
-        cfg.get("min_val", minValue),
-        cfg.get("max_val", maxValue),
-        cfg.get("name", default_cfg.get<std::string>("name")));
-  } // ... create(...)
+    static RangeType unit_matrix()
+    {
+      return RangeType(1);
+    }
+  };
 
-  Spe10Model1(const std::string& filename, const std::vector<DomainFieldType>& lowerLeft,
-              const std::vector<DomainFieldType>& upperRight, const RangeFieldType min = minValue,
-              const RangeFieldType max = maxValue, const std::string nm = static_id())
-    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
+  static RangeType unit_matrix()
   {
+    return Call<r>::unit_matrix();
   }
-
-  Spe10Model1(const std::string& filename, const DomainType& lowerLeft, const DomainType& upperRight,
-              const RangeFieldType min = minValue, const RangeFieldType max = maxValue,
-              const std::string nm = static_id())
-    : BaseType(lowerLeft, upperRight, {numXelements, numZelements}, read_values_from_file(filename, min, max), nm)
-  {
-  }
-
-  virtual std::string type() const DS_OVERRIDE
-  {
-    return BaseType::static_id() + ".spe10.model1";
-  }
-
-  virtual ThisType* copy() const DS_OVERRIDE
-  {
-    return new ThisType(*this);
-  }
-}; // class Spe10Model1< ..., 2, ..., 1, 1 >
+}; // class Model1< ..., 2, ..., r, r >
 
 
-template <class E, class D, class R>
-const size_t Spe10Model1<E, D, 2, R, 1, 1>::numXelements = 100;
-
-template <class E, class D, class R>
-const size_t Spe10Model1<E, D, 2, R, 1, 1>::numYelements = 1;
-
-template <class E, class D, class R>
-const size_t Spe10Model1<E, D, 2, R, 1, 1>::numZelements = 20;
-
-template <class E, class D, class R>
-const typename Spe10Model1<E, D, 2, R, 1, 1>::RangeFieldType Spe10Model1<E, D, 2, R, 1, 1>::minValue = 0.001;
-
-template <class E, class D, class R>
-const typename Spe10Model1<E, D, 2, R, 1, 1>::RangeFieldType Spe10Model1<E, D, 2, R, 1, 1>::maxValue = 998.915;
-
-
-template <class E, class D, class R>
-const size_t Spe10Model1<E, D, 2, R, 2, 2>::numXelements = 100;
-
-template <class E, class D, class R>
-const size_t Spe10Model1<E, D, 2, R, 2, 2>::numYelements = 1;
-
-template <class E, class D, class R>
-const size_t Spe10Model1<E, D, 2, R, 2, 2>::numZelements = 20;
-
-template <class E, class D, class R>
-const typename Spe10Model1<E, D, 2, R, 2, 2>::RangeFieldType Spe10Model1<E, D, 2, R, 2, 2>::minValue = 0.001;
-
-template <class E, class D, class R>
-const typename Spe10Model1<E, D, 2, R, 2, 2>::RangeFieldType Spe10Model1<E, D, 2, R, 2, 2>::maxValue = 998.915;
-
-
+} // namespace Spe10
 } // namespace Functions
 } // namespace Stuff
 } // namespace Dune
