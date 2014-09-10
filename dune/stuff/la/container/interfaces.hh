@@ -46,20 +46,20 @@ enum class ChooseBackend
 
 
 static constexpr ChooseBackend default_backend =
-#if HAVE_DUNE_ISTL
-    ChooseBackend::istl_sparse;
-#elif HAVE_EIGEN
+#if HAVE_EIGEN
     ChooseBackend::eigen_sparse;
+#elif HAVE_DUNE_ISTL
+    ChooseBackend::istl_sparse;
 #else
     ChooseBackend::common_dense;
 #endif
 
 
 static constexpr ChooseBackend default_sparse_backend =
-#if HAVE_DUNE_ISTL
-    ChooseBackend::istl_sparse;
-#elif HAVE_EIGEN
+#if HAVE_EIGEN
     ChooseBackend::eigen_sparse;
+#elif HAVE_DUNE_ISTL
+    ChooseBackend::istl_sparse;
 #else
     ChooseBackend::common_dense;
 #error "There is no sparse LA backend available!"
