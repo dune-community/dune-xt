@@ -136,7 +136,7 @@ private:
     if (vals.size() > 0) {
       ret += vals[0];
       for (size_t ii = 1; ii < vals.size(); ++ii)
-        ret += ", " + vals[ii];
+        ret += "\n   " + vals[ii];
     }
     return ret;
   } // ... available_as_str(...)
@@ -183,9 +183,21 @@ public:
       return call_default_config<IndicatorType>(sub_name);
     else if (call_compare<Spe10Model1Type>(type))
       return call_default_config<Spe10Model1Type>(sub_name);
+    else if (available().empty())
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "There is no " << InterfaceType::static_id() << " available for dimensions " << int(d) << " -> "
+                                << int(r)
+                                << " x "
+                                << int(rC)
+                                << "!");
     else
       DUNE_THROW(Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of:\n  " << available_as_str());
+                 "Requested type '" << type << "' is not one of those avaible for dimensions " << int(d) << " -> "
+                                    << int(r)
+                                    << " x "
+                                    << int(rC)
+                                    << ":\n"
+                                    << available_as_str());
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const std::string type = available()[0],
@@ -207,9 +219,21 @@ public:
       return call_create<IndicatorType>(cfg);
     else if (call_compare<Spe10Model1Type>(type))
       return call_create<Spe10Model1Type>(cfg);
+    else if (available().empty())
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "There is no " << InterfaceType::static_id() << " available for dimensions " << int(d) << " -> "
+                                << int(r)
+                                << " x "
+                                << int(rC)
+                                << "!");
     else
       DUNE_THROW(Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of:\n  " << available_as_str());
+                 "Requested type '" << type << "' is not one of those avaible for dimensions " << int(d) << " -> "
+                                    << int(r)
+                                    << " x "
+                                    << int(rC)
+                                    << ":\n"
+                                    << available_as_str());
   } // ... create(...)
 }; // class FunctionsProvider
 
