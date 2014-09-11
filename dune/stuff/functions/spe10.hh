@@ -63,6 +63,8 @@ public:
   static const int dimRange = BaseType::dimRange;
   typedef typename BaseType::RangeType RangeType;
 
+  static const bool available = true;
+
   static std::string static_id()
   {
     return LocalizableFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>::static_id()
@@ -151,10 +153,13 @@ public:
 
 
 // default, to allow for specialization
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
-class Model1
+template <class E, class D, int d, class R, int r, int rC = 1>
+class Model1 : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
-  static_assert(AlwaysFalse<EntityImp>::value, "Not available for these dimensions!");
+  Model1()
+  {
+    static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
+  }
 };
 
 

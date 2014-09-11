@@ -91,6 +91,8 @@ public:
 
   using typename BaseType::LocalfunctionType;
 
+  static const bool available = true;
+
   static std::string static_id()
   {
     return BaseType::static_id() + ".constant";

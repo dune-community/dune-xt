@@ -323,6 +323,8 @@ public:
   typedef typename LocalfunctionType::RangeType RangeType;
   typedef typename LocalfunctionType::JacobianRangeType JacobianRangeType;
 
+  static const bool available = false;
+
   typedef Functions::Difference<ThisType, ThisType> DifferenceType;
   typedef Functions::Sum<ThisType, ThisType> SumType;
 
