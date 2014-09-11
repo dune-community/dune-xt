@@ -23,6 +23,8 @@
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/grid/provider/cube.hh>
 #include <dune/stuff/functions/flattop.hh>
+#include <dune/stuff/common/string.hh>
+#include <dune/stuff/common/fvector.hh>
 
 #include "functions.hh"
 
@@ -57,13 +59,7 @@ protected:
 
   static std::shared_ptr<GridType> create_grid()
   {
-    return Stuff::Grid::Providers::Cube<GridType>(0.0, 3.0, 12).grid_ptr();
-  }
-
-  template <class... Args>
-  static std::unique_ptr<FunctionType> create(Args&&... args)
-  {
-    return std::unique_ptr<FunctionType>(new FunctionType(std::forward<Args>(args)...));
+    return Stuff::Grid::Providers::Cube<GridType>(0, 3, 12).grid_ptr();
   }
 
   template <class P, class V, class L, class R, class D, class E>
@@ -72,7 +68,7 @@ protected:
     if (Common::FloatCmp::lt(point, left - delta) || Common::FloatCmp::gt(point, right + delta)) {
       // outside
       EXPECT_EQ(0.0, value) << point;
-    } else if (Common::FloatCmp::ge(point, left) && Common::FloatCmp::le(point, right)) {
+    } else if (Common::FloatCmp::ge(point, left + delta) && Common::FloatCmp::le(point, right - delta)) {
       // inside
       EXPECT_EQ(top_value, value) << point;
     } else {
@@ -102,24 +98,24 @@ TYPED_TEST(FlatTopFunctionTest, static_create_check)
 }
 TYPED_TEST(FlatTopFunctionTest, dynamic_interface_check)
 {
-  this->dynamic_interface_check(*(this->create()), *(this->create_grid()));
+  this->dynamic_interface_check(*(TestFixture::FunctionType::create()), *(this->create_grid()));
 }
 TYPED_TEST(FlatTopFunctionTest, copy_check)
 {
-  this->copy_check(*(this->create()));
+  this->copy_check(*(TestFixture::FunctionType::create()));
 }
 TYPED_TEST(FlatTopFunctionTest, evaluate_check)
 {
   auto grid_ptr = this->create_grid();
-  typedef FieldVector<double, TypeParam::value> DomainType;
-  const DomainType left(1.0);
-  const DomainType right(2.0);
-  const DomainType delta(0.25);
-  const double value = 1.75;
-  auto func          = this->create(left, right, delta, value, "bar");
-  //  func->visualize(grid_ptr->leafGridView(), "foo");
+  typedef DSC::FieldVector<double, TypeParam::value> DomainType;
+  const DomainType left(1);
+  const DomainType right(2);
+  const DomainType delta(1e-6);
+  const double value = 20;
+  typename TestFixture::FunctionType func(left, right, delta, value, "bar");
+  func.visualize(grid_ptr->leafGridView(), "dim_" + DSC::toString(int(TypeParam::value)));
   for (const auto& entity : Stuff::Common::viewRange(grid_ptr->leafGridView())) {
-    const auto local_func  = func->local_function(entity);
+    const auto local_func  = func.local_function(entity);
     const auto& quadrature = QuadratureRules<double, TypeParam::value>::rule(
         entity.type(), boost::numeric_cast<int>(local_func->order() + 2));
     for (const auto& element : quadrature) {
