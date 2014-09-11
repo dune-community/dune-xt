@@ -27,15 +27,15 @@
     static const unsigned int r  = ConstantFunctionType::dimRange;                                                     \
     static const unsigned int rC = ConstantFunctionType::dimRangeCols;                                                 \
     typedef Dune::Stuff::FunctionsProvider<E, D, d, R, r, rC> FunctionsProvider;                                       \
-    typedef Dune::Stuff::LocalizableFunctionInterface<E, D, d, R, r, rC> InterfaceType;                                \
+    typedef typename FunctionsProvider::InterfaceType InterfaceType;                                                   \
                                                                                                                        \
     void check() const                                                                                                 \
     {                                                                                                                  \
-      for (const std::string& type : FunctionsProvider::available()) {                                                 \
+      for (const auto& type : FunctionsProvider::available()) {                                                        \
         const Dune::Stuff::Common::Configuration config = FunctionsProvider::default_config(type);                     \
         try {                                                                                                          \
           const std::unique_ptr<InterfaceType> function = FunctionsProvider::create(type, config);                     \
-        } catch (Dune::IOError&) {                                                                                     \
+        } catch (Dune::Stuff::Exceptions::spe10_data_file_missing&) {                                                  \
         }                                                                                                              \
       }                                                                                                                \
     }                                                                                                                  \
@@ -131,15 +131,7 @@ TYPED_TEST(FunctionsYaspGridEntityTest, provides_required_methods)
   this->check();
 }
 
-#if HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
-#undef HAVE_GRIDTYPE
-#undef WORLDDIM
-#undef GRIDDIM
-#undef GRIDTYPE
-#undef ENABLE_ALUGRID
-#undef HAVE_ALUGRID
-#define ENABLE_ALUGRID 1
-#define HAVE_ALUGRID 1
+#if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 
 typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
@@ -186,5 +178,5 @@ TYPED_TEST(FunctionsAluGridEntityTest, provides_required_methods)
   this->check();
 }
 
-#endif // HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
+#endif // HAVE_ALUGRID
 #endif // HAVE_DUNE_GRID
