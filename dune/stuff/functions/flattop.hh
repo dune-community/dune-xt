@@ -10,6 +10,7 @@
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
+#include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/functions/interfaces.hh>
 
 namespace Dune {
@@ -38,10 +39,11 @@ class FlatTop<E, D, d, R, 1, 1> : public GlobalFunctionInterface<E, D, d, R, 1, 
 
 public:
   typedef typename BaseType::EntityType EntityType;
+  typedef typename BaseType::DomainFieldType DomainFieldType;
+  static const unsigned int dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
   typedef typename BaseType::RangeType RangeType;
   typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimDomain = BaseType::dimDomain;
 
   static std::string static_id()
   {
@@ -78,10 +80,8 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  FlatTop(const DomainType& lower_left = default_config().get<DomainType>("lower_left"),
-          const DomainType& upper_right    = default_config().get<DomainType>("upper_right"),
-          const DomainType& boundary_layer = default_config().get<DomainType>("boundary_layer"),
-          const RangeType& value           = default_config().get<RangeType>("value"),
+  FlatTop(const DomainType& lower_left, const DomainType& upper_right, const DomainType& boundary_layer,
+          const RangeType& value = default_config().get<RangeType>("value"),
           const std::string name = default_config().get<std::string>("name"))
     : lower_left_(lower_left)
     , upper_right_(upper_right)
@@ -89,15 +89,20 @@ public:
     , value_(value)
     , name_(name)
   {
-    for (size_t dd = 0; dd < dimDomain; ++dd) {
-      if (!(upper_right_[dd] > lower_left_[dd]))
-        DUNE_THROW(
-            Exceptions::wrong_input_given,
-            "lower_left_[" << dd << "] = " << lower_left_[dd] << ", upper_right_[" << dd << "] = " << upper_right_);
-      if (!(boundary_layer_[dd] > 0))
-        DUNE_THROW(Exceptions::wrong_input_given, "boundary_layer_[" << dd << "] = " << boundary_layer_[dd]);
-    }
-  } // ... FlatTop(...)
+    check_input();
+  }
+
+  FlatTop(const DomainType& lower_left, const DomainType& upper_right, const DomainFieldType& boundary_layer,
+          const RangeType& value = default_config().get<RangeType>("value"),
+          const std::string name = default_config().get<std::string>("name"))
+    : lower_left_(lower_left)
+    , upper_right_(upper_right)
+    , boundary_layer_(boundary_layer)
+    , value_(value)
+    , name_(name)
+  {
+    check_input();
+  }
 
   FlatTop(const ThisType& other)
     : lower_left_(other.lower_left_)
@@ -147,15 +152,15 @@ public:
         // outside
         ret[0] = 0.0;
         break;
-      } else if (point < left) {
+      } else if (point < left + delta) {
         // left boundary layer
-        ret[0] *= phi_left((point - left) / delta);
-      } else if (point < right) {
+        ret[0] *= phi_left((point - (left + delta)) / (2.0 * delta));
+      } else if (point < right - delta) {
         // inside
         // do nothing (keep value)
       } else if (point < right + delta) {
         // right boundary layer
-        ret[0] *= phi_right((point - right) / delta);
+        ret[0] *= phi_right((point - (right - delta)) / (2.0 * delta));
       } else {
         // outside
         ret[0] = 0.0;
@@ -165,6 +170,15 @@ public:
   } // ... evaluate(...)
 
 private:
+  void check_input() const
+  {
+    if (!(Common::FloatCmp::gt(upper_right_, lower_left_)))
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "lower_left_ = [" << lower_left_ << "], upper_right_ = [" << upper_right_ << "]");
+    if (!(Common::FloatCmp::gt(boundary_layer_, DomainType(0))))
+      DUNE_THROW(Exceptions::wrong_input_given, "boundary_layer_ = [" << boundary_layer_ << "]");
+  } // .. check_input(...)
+
   RangeFieldType phi_left(const RangeFieldType& point) const
   {
     assert(!(point < -1.0));
