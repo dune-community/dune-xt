@@ -126,16 +126,10 @@ TYPED_TEST(ConstantFunctionYaspGridEntityTest, provides_required_methods)
   this->check();
 }
 
-#if HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
-#undef HAVE_GRIDTYPE
-#undef WORLDDIM
-#undef GRIDDIM
-#undef GRIDTYPE
-#undef ENABLE_ALUGRID
-#undef HAVE_ALUGRID
-#define ENABLE_ALUGRID 1
-#define HAVE_ALUGRID 1
+#if HAVE_ALUGRID
+#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/alugrid.hh>
+#include <dune/stuff/common/reenable_warnings.hh>
 
 typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
 typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity DuneAluSimplexGrid3dEntityType;
@@ -181,5 +175,5 @@ TYPED_TEST(ConstantFunctionAluGridEntityTest, provides_required_methods)
   this->check();
 }
 
-#endif // HAVE_ALUGRID_SERIAL || HAVE_ALUGRID_PARALLEL
+#endif // HAVE_ALUGRID
 //#endif // HAVE_DUNE_GRID
