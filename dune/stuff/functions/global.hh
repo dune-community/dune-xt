@@ -25,7 +25,6 @@ template <class EntityImp, class DomainFieldImp, int domainDim, class RangeField
 class GlobalLambdaFunction
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
-
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
 
 public:
@@ -35,7 +34,6 @@ public:
 private:
   typedef std::function<RangeType(DomainType)> LambdaType;
 
-
 public:
   GlobalLambdaFunction(LambdaType lambda, size_t order)
     : lambda_(lambda)
@@ -43,24 +41,24 @@ public:
   {
   }
 
-  virtual size_t order() const DS_OVERRIDE
+  virtual size_t order() const DS_OVERRIDE DS_FINAL
   {
     return order_;
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE DS_FINAL
   {
     ret = lambda_(xx);
   }
 
-  virtual RangeType evaluate(const DomainType& xx) const
+  virtual RangeType evaluate(const DomainType& xx) const DS_OVERRIDE DS_FINAL
   {
     return lambda_(xx);
   }
 
 private:
   const LambdaType lambda_;
-  size_t order_;
+  const size_t order_;
 };
 
 
