@@ -461,6 +461,20 @@ public:
     DUNE_THROW(NotImplemented, "This does not make sense yet for matrix-valued functions!");
   }
 
+  virtual RangeType evaluate(const DomainType& xx) const
+  {
+    RangeType ret;
+    evaluate(xx, ret);
+    return ret;
+  }
+
+  virtual JacobianRangeType jacobian(const DomainType& xx) const
+  {
+    JacobianRangeType ret;
+    jacobian(xx, ret);
+    return ret;
+  }
+
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const DS_OVERRIDE DS_FINAL
   {
     return Common::make_unique<Localfunction>(entity, *this);
@@ -573,6 +587,20 @@ public:
   virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
   {
     DUNE_THROW(NotImplemented, "You have to imlement it if you intend to use it!");
+  }
+
+  virtual RangeType evaluate(const DomainType& xx) const
+  {
+    RangeType ret;
+    evaluate(xx, ret);
+    return ret;
+  }
+
+  virtual JacobianRangeType jacobian(const DomainType& xx) const
+  {
+    JacobianRangeType ret;
+    jacobian(xx, ret);
+    return ret;
   }
 
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const DS_OVERRIDE DS_FINAL
