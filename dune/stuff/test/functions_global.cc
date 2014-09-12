@@ -16,24 +16,24 @@
 // we need this nasty code generation because the testing::Types< ... > only accepts 50 arguments
 // and all combinations of functions and entities and dimensions and fieldtypes would be way too much
 #define TEST_STRUCT_GENERATOR(ftype, etype)                                                                            \
-  template <class LocalizableFunctionType>                                                                             \
+  template <class GlobalFunctionType>                                                                                  \
   struct ftype##etype##Test : public ::testing::Test                                                                   \
   {                                                                                                                    \
-    typedef typename LocalizableFunctionType::EntityType EntityType;                                                   \
-    typedef typename LocalizableFunctionType::LocalfunctionType LocalfunctionType;                                     \
-    typedef typename LocalizableFunctionType::DomainFieldType DomainFieldType;                                         \
-    static const unsigned int dimDomain = LocalizableFunctionType::dimDomain;                                          \
-    typedef typename LocalizableFunctionType::DomainType DomainType;                                                   \
-    typedef typename LocalizableFunctionType::RangeFieldType RangeFieldType;                                           \
-    static const unsigned int dimRange     = LocalizableFunctionType::dimRange;                                        \
-    static const unsigned int dimRangeCols = LocalizableFunctionType::dimRangeCols;                                    \
-    typedef typename LocalizableFunctionType::RangeType RangeType;                                                     \
-    typedef typename LocalizableFunctionType::JacobianRangeType JacobianRangeType;                                     \
+    typedef typename GlobalFunctionType::EntityType EntityType;                                                        \
+    typedef typename GlobalFunctionType::LocalfunctionType LocalfunctionType;                                          \
+    typedef typename GlobalFunctionType::DomainFieldType DomainFieldType;                                              \
+    static const unsigned int dimDomain = GlobalFunctionType::dimDomain;                                               \
+    typedef typename GlobalFunctionType::DomainType DomainType;                                                        \
+    typedef typename GlobalFunctionType::RangeFieldType RangeFieldType;                                                \
+    static const unsigned int dimRange     = GlobalFunctionType::dimRange;                                             \
+    static const unsigned int dimRangeCols = GlobalFunctionType::dimRangeCols;                                         \
+    typedef typename GlobalFunctionType::RangeType RangeType;                                                          \
+    typedef typename GlobalFunctionType::JacobianRangeType JacobianRangeType;                                          \
                                                                                                                        \
     void check() const                                                                                                 \
     {                                                                                                                  \
-      const LocalizableFunctionType zero([](DomainType /*x*/) { return RangeType(0); }, 0);                            \
-      const LocalizableFunctionType one([](DomainType /*x*/) { return RangeType(1); }, 0);                             \
+      const GlobalFunctionType zero([](DomainType /*x*/) { return RangeType(0); }, 0);                                 \
+      const GlobalFunctionType one([](DomainType /*x*/) { return RangeType(1); }, 0);                                  \
       const auto diff = zero - one;                                                                                    \
       const auto xx = DomainType(666);                                                                                 \
       EXPECT_EQ(zero.evaluate(xx), RangeType(0));                                                                      \
