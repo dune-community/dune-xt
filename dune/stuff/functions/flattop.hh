@@ -11,6 +11,7 @@
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/float_cmp.hh>
+#include <dune/stuff/common/fvector.hh>
 #include <dune/stuff/functions/interfaces.hh>
 
 namespace Dune {
@@ -45,8 +46,12 @@ public:
   typedef typename BaseType::DomainFieldType DomainFieldType;
   static const unsigned int dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeType RangeType;
   typedef typename BaseType::RangeFieldType RangeFieldType;
+  static const unsigned int dimRange = BaseType::dimRange;
+  typedef typename BaseType::RangeType RangeType;
+
+  typedef Common::FieldVector<DomainFieldType, dimDomain> StuffDomainType;
+  typedef Common::FieldVector<RangeFieldType, dimRange> StuffRangeType;
 
   static const bool available = true;
 
@@ -85,20 +90,8 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  FlatTop(const DomainType& lower_left, const DomainType& upper_right, const DomainType& boundary_layer,
-          const RangeType& value = default_config().get<RangeType>("value"),
-          const std::string name = default_config().get<std::string>("name"))
-    : lower_left_(lower_left)
-    , upper_right_(upper_right)
-    , boundary_layer_(boundary_layer)
-    , value_(value)
-    , name_(name)
-  {
-    check_input();
-  }
-
-  FlatTop(const DomainType& lower_left, const DomainType& upper_right, const DomainFieldType& boundary_layer,
-          const RangeType& value = default_config().get<RangeType>("value"),
+  FlatTop(const StuffDomainType& lower_left, const StuffDomainType& upper_right, const StuffDomainType& boundary_layer,
+          const StuffRangeType& value = default_config().get<StuffRangeType>("value"),
           const std::string name = default_config().get<std::string>("name"))
     : lower_left_(lower_left)
     , upper_right_(upper_right)
@@ -179,9 +172,28 @@ private:
   {
     if (!(Common::FloatCmp::gt(upper_right_, lower_left_)))
       DUNE_THROW(Exceptions::wrong_input_given,
-                 "lower_left_ = [" << lower_left_ << "], upper_right_ = [" << upper_right_ << "]");
-    if (!(Common::FloatCmp::gt(boundary_layer_, DomainType(0))))
-      DUNE_THROW(Exceptions::wrong_input_given, "boundary_layer_ = [" << boundary_layer_ << "]");
+                 "upper_right has to be greater than lower_left!\n"
+                     << "lower_left = ["
+                     << lower_left_
+                     << "]\n"
+                     << "upper_right = ["
+                     << upper_right_
+                     << "]");
+    if (!(Common::FloatCmp::gt(boundary_layer_, StuffDomainType(0))))
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "boundary_layer has to be strictly positive!\n"
+                     << "boundary_layer = ["
+                     << boundary_layer_
+                     << "]");
+    if (Common::FloatCmp::gt(boundary_layer_ * 2.0, upper_right_ - lower_left_))
+      DUNE_THROW(Exceptions::wrong_input_given,
+                 "boundary_layer has to be thin enough!\n"
+                 "2*boundary_layer = ["
+                     << boundary_layer_ * 2.0
+                     << "]\n"
+                     << "upper_right - lower_left = ["
+                     << upper_right_ - lower_left_
+                     << "]");
   } // .. check_input(...)
 
   RangeFieldType phi_left(const RangeFieldType& point) const
@@ -198,10 +210,10 @@ private:
     return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);
   } // ... phi_right(...)
 
-  const DomainType lower_left_;
-  const DomainType upper_right_;
-  const DomainType boundary_layer_;
-  const RangeType value_;
+  const StuffDomainType lower_left_;
+  const StuffDomainType upper_right_;
+  const StuffDomainType boundary_layer_;
+  const StuffRangeType value_;
   const std::string name_;
 }; // class FlatTop< ..., 1, 1 >
 
