@@ -198,16 +198,22 @@ private:
 
   RangeFieldType phi_left(const RangeFieldType& point) const
   {
-    assert(!(point < -1.0));
-    assert(!(point > 0.0));
-    return std::pow(1.0 + point, 2) * (1.0 - 2.0 * point);
+    if (point < -1.0)
+      return 0.0;
+    else if (point > 0.0)
+      return 1.0;
+    else
+      return std::pow(1.0 + point, 2) * (1.0 - 2.0 * point);
   } // ... phi_left(...)
 
   RangeFieldType phi_right(const RangeFieldType& point) const
   {
-    assert(!(point < 0.0));
-    assert(!(point > 1.0));
-    return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);
+    if (point < 0.0)
+      return 1.0;
+    else if (point > 1.0)
+      return 0.0;
+    else
+      return std::pow(1.0 - point, 2) * (1.0 + 2.0 * point);
   } // ... phi_right(...)
 
   const StuffDomainType lower_left_;
