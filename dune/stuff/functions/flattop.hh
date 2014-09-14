@@ -117,26 +117,25 @@ public:
   {
   }
 
-  virtual ThisType* copy() const /*DS_OVERRIDE DS_FINAL*/
+  virtual ThisType* copy() const DS_OVERRIDE DS_FINAL
   {
     return new ThisType(*this);
   }
 
-  virtual std::string type() const /*DS_OVERRIDE DS_FINAL*/
+  virtual std::string type() const DS_OVERRIDE DS_FINAL
   {
     return BaseType::static_id() + ".flattop";
   }
 
-  virtual std::string name() const /*DS_OVERRIDE DS_FINAL*/
+  virtual std::string name() const DS_OVERRIDE DS_FINAL
   {
     return name_;
   }
 
   virtual size_t order() const
   {
-    // could be 3 but I am to lazy
-    return 4;
-  } // ... order(...)
+    return 3 * dimDomain;
+  }
 
   virtual void evaluate(const DomainType& xx, RangeType& ret) const
   {
