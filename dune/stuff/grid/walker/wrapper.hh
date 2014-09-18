@@ -17,12 +17,15 @@ namespace internal {
 template <class GridViewType>
 class Codim0Object : public Functor::Codim0<GridViewType>
 {
-  typedef typename GridViewType::template Codim<0>::Entity EntityType;
+  typedef Functor::Codim0<GridViewType> BaseType;
 
 public:
+  typedef typename BaseType::EntityType EntityType;
+
   ~Codim0Object()
   {
   }
+
   virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const = 0;
 };
 
