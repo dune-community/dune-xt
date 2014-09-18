@@ -21,6 +21,7 @@
 #include <dune/stuff/grid/intersection.hh>
 
 #include "walker/functors.hh"
+#include "walker/apply-on.hh"
 #include "walker/wrapper.hh"
 
 namespace Dune {
