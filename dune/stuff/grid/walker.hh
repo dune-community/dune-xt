@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <functional>
 
-#if 1 // HAVE_TBB
+#if HAVE_TBB
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
 #include <tbb/tbb_stddef.h>
@@ -182,7 +182,7 @@ public:
   } // ... walk(...)
 
 protected:
-#if 1 // HAVE_TBB
+#if HAVE_TBB
   template <class PartioningType, class WalkerType>
   struct Body
   {
