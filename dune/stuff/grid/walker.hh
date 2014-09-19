@@ -239,7 +239,13 @@ protected:
   template <class EntityRange>
   void walk_range(const EntityRange& entity_range)
   {
+#ifdef __INTEL_COMPILER
+    const auto it_end = entity_range.end();
+    for (auto it = entity_range.begin(); it != it_end; ++it) {
+      const EntityType& entity = *it;
+#else
     for (const EntityType& entity : entity_range) {
+#endif
       // apply codim0 functors
       apply_local(entity);
 
