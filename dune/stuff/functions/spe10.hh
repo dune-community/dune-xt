@@ -14,7 +14,7 @@
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/fvector.hh>
-#include <dune/common/static_assert.hh>
+#include <dune/stuff/common/type_utils.hh>
 
 #include "checkerboard.hh"
 
