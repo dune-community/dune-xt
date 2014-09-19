@@ -6,7 +6,7 @@
 #ifndef DUNE_STUFF_FUNCTIONS_FLATTOP_HH
 #define DUNE_STUFF_FUNCTIONS_FLATTOP_HH
 
-#include <dune/common/static_assert.hh>
+#include <type_traits>
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
