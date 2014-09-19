@@ -8,13 +8,13 @@
 
 #include <iostream>
 #include <memory>
-#include <type_traits>
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/color.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/fvector.hh>
+#include <dune/common/static_assert.hh>
 
 #include "checkerboard.hh"
 
