@@ -114,7 +114,7 @@ TYPED_TEST(FlatTopFunctionTest, evaluate_check)
   const double value = 20;
   typename TestFixture::FunctionType func(left, right, delta, value, "bar");
   func.visualize(grid_ptr->leafGridView(), "dim_" + DSC::toString(int(TypeParam::value)));
-  for (const auto& entity : Stuff::Common::viewRange(grid_ptr->leafGridView())) {
+  for (const auto& entity : Stuff::Common::entityRange(grid_ptr->leafGridView())) {
     const auto local_func  = func.local_function(entity);
     const auto& quadrature = QuadratureRules<double, TypeParam::value>::rule(
         entity.type(), boost::numeric_cast<int>(local_func->order() + 2));

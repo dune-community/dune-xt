@@ -63,7 +63,7 @@ protected:
   template <class GridType>
   void dynamic_interface_check(const FunctionImp& func, GridType& grid) const
   {
-    for (const auto& entity : Common::viewRange(grid.leafGridView()))
+    for (const auto& entity : Common::entityRange(grid.leafGridView()))
       std::unique_ptr<LocalfunctionType> local_func = func.local_function(entity);
     std::string tp                                  = func.type();
     std::string nm                                  = func.name();
