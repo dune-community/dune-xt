@@ -170,7 +170,7 @@ public:
 
     // only do something, if we have to
     if ((codim0_functors_.size() + codim1_functors_.size()) > 0) {
-      walk_range(DSC::viewRange(grid_view_));
+      walk_range(DSC::entityRange(grid_view_));
     } // only do something, if we have to
 
     // finalize functors

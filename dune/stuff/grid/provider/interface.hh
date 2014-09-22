@@ -212,7 +212,7 @@ private:
   {
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
-    for (const auto& entity : DSC::viewRange(gridView)) {
+    for (const auto& entity : DSC::entityRange(gridView)) {
       const auto& index = gridView.indexSet().index(entity);
       data[index] = 0.0;
       for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
@@ -232,7 +232,7 @@ private:
   std::vector<double> generateEntityVisualization(const LeafGridViewType& gridView) const
   {
     std::vector<double> data(gridView.indexSet().size(0));
-    for (const auto& entity : DSC::viewRange(gridView)) {
+    for (const auto& entity : DSC::entityRange(gridView)) {
       const auto& index = gridView.indexSet().index(entity);
       data[index]       = double(index);
     } // walk the grid

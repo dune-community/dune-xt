@@ -137,7 +137,7 @@ public:
   EntityPointerVectorType operator()(const PointContainerType& points) const
   {
     auto level = std::min(gridview_.grid().maxLevel(), start_level_);
-    auto range = DSC::viewRange(gridview_.grid().levelView(level));
+    auto range = DSC::entityRange(gridview_.grid().levelView(level));
     return process(points, range);
   }
 

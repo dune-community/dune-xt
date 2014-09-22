@@ -46,7 +46,7 @@ struct Statistics
     , numberOfBoundaryIntersections(0)
     , maxGridWidth(0)
   {
-    for (const auto& entity : viewRange(gridView)) {
+    for (const auto& entity : entityRange(gridView)) {
       for (const auto& intIt : intersectionRange(gridView, entity)) {
         ++numberOfIntersections;
         maxGridWidth = std::max(intIt.geometry().volume(), maxGridWidth);
@@ -79,7 +79,7 @@ template <class GridViewType>
 unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
 {
   unsigned int maxNeighbours = 0;
-  for (const auto& entity : viewRange(gridView)) {
+  for (const auto& entity : entityRange(gridView)) {
     unsigned int neighbours = 0;
     for (const auto& DUNE_UNUSED(i) : intersectionRange(gridView, entity)) {
       ++neighbours;
