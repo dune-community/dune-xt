@@ -1016,6 +1016,16 @@ public:
    * \}
    */
 
+  ScalarType sup_norm() const
+  {
+    ScalarType ret = 0;
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (size_t jj = 0; jj < cols(); ++jj)
+        ret = std::max(ret, std::abs(get_entry(ii, jj)));
+    return ret;
+  }
+
+
   /**
    * \defgroup python_bindings ´´These methods are necesarry for the python bindings. They are provided by the
    * interface!``
