@@ -96,7 +96,7 @@ public:
                new ApplyOn::AllIntersections<GridViewType>())
   {
     if (&other == this)
-      DUNE_THROW(Stuff::Exceptions::internal_error, "Do not add a Walker to itself!");
+      DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
     codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
     codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
   } // ... add(...)
@@ -105,7 +105,7 @@ public:
            const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
   {
     if (&other == this)
-      DUNE_THROW(Stuff::Exceptions::internal_error, "Do not add a Walker to itself!");
+      DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
     codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
     codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
   } // ... add(...)
@@ -181,8 +181,9 @@ public:
       clear();
   } // ... walk(...)
 
-protected:
 #if HAVE_TBB
+
+protected:
   template <class PartioningType, class WalkerType>
   struct Body
   {
@@ -191,6 +192,7 @@ protected:
       , partitioning_(partitioning)
     {
     }
+
     Body(Body& other, tbb::split /*split*/)
       : walker_(other.walker_)
       , partitioning_(other.partitioning_)
@@ -203,6 +205,7 @@ protected:
       for (std::size_t p = range.begin(); p != range.end(); ++p)
         walker_.walk_range(partitioning_.partition(p));
     }
+
     void join(Body& /*other*/)
     {
     }
@@ -221,10 +224,9 @@ public:
     // only do something, if we have to
     if ((codim0_functors_.size() + codim1_functors_.size()) > 0) {
       tbb::blocked_range<std::size_t> range(0, partitioning.partitions());
-
       Body<PartioningType, ThisType> body(*this, partitioning);
       tbb::parallel_reduce(range, body);
-    } // only do something, if we have to
+    }
 
     // finalize functors
     finalize();
@@ -233,7 +235,8 @@ public:
     if (clear_stack)
       clear();
   } // ... tbb_walk(...)
-#endif
+
+#endif // HAVE_TBB
 
 protected:
   template <class EntityRange>
@@ -268,7 +271,7 @@ protected:
         } // walk the intersections
       } // only walk the intersections, if there are codim1 functors present
     }
-  }
+  } // ... walk_range(...)
 
   const GridViewType& grid_view_;
   std::vector<std::unique_ptr<internal::Codim0Object<GridViewType>>> codim0_functors_;

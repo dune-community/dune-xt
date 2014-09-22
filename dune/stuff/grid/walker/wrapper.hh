@@ -85,6 +85,7 @@ public:
   ~Codim1Object()
   {
   }
+
   virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const = 0;
 };
 
