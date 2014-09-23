@@ -213,14 +213,14 @@ public:
 
   inline BackendType& backend()
   {
-    CHECK_CRTP(this->as_imp(*this).backend());
-    return this->as_imp(*this).backend();
+    CHECK_CRTP(this->as_imp().backend());
+    return this->as_imp().backend();
   }
 
   inline const BackendType& backend() const
   {
-    CHECK_CRTP(this->as_imp(*this).backend());
-    return this->as_imp(*this).backend();
+    CHECK_CRTP(this->as_imp().backend());
+    return this->as_imp().backend();
   }
 }; // class ProvidesBackend
 
@@ -250,8 +250,8 @@ public:
    */
   inline derived_type copy() const
   {
-    CHECK_CRTP(this->as_imp(*this).copy());
-    return this->as_imp(*this).copy();
+    CHECK_CRTP(this->as_imp().copy());
+    return this->as_imp().copy();
   }
 
   /**
@@ -260,7 +260,7 @@ public:
    */
   inline void scal(const ScalarType& alpha)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).scal(alpha));
+    CHECK_AND_CALL_CRTP(this->as_imp().scal(alpha));
   }
 
   /**
@@ -270,7 +270,7 @@ public:
    */
   inline void axpy(const ScalarType& alpha, const derived_type& xx)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).axpy(alpha, xx));
+    CHECK_AND_CALL_CRTP(this->as_imp().axpy(alpha, xx));
   }
 
   /**
@@ -279,8 +279,8 @@ public:
    */
   inline bool has_equal_shape(const derived_type& other) const
   {
-    CHECK_CRTP(this->as_imp(*this).has_equal_shape(other));
-    return this->as_imp(*this).has_equal_shape(other);
+    CHECK_CRTP(this->as_imp().has_equal_shape(other));
+    return this->as_imp().has_equal_shape(other);
   }
 
   /**
@@ -332,8 +332,8 @@ public:
 
   inline std::shared_ptr<const ContainerType> container() const
   {
-    CHECK_CRTP(this->as_imp(*this).container());
-    return this->as_imp(*this).container();
+    CHECK_CRTP(this->as_imp().container());
+    return this->as_imp().container();
   }
 }; // class ProvidesConstContainer
 
@@ -350,8 +350,8 @@ public:
 
   inline std::shared_ptr<ContainerType> container()
   {
-    CHECK_CRTP(this->as_imp(*this).container());
-    return this->as_imp(*this).container();
+    CHECK_CRTP(this->as_imp().container());
+    return this->as_imp().container();
   }
 }; // class ProvidesContainer
 
@@ -364,8 +364,8 @@ public:
 
   inline ScalarType* data()
   {
-    CHECK_CRTP(this->as_imp(*this).data());
-    return this->as_imp(*this).data();
+    CHECK_CRTP(this->as_imp().data());
+    return this->as_imp().data();
   }
 }; // class ProvidesDataAccess
 
@@ -396,8 +396,8 @@ public:
    */
   inline size_t size() const
   {
-    CHECK_CRTP(this->as_imp(*this).size());
-    return this->as_imp(*this).size();
+    CHECK_CRTP(this->as_imp().size());
+    return this->as_imp().size();
   } // ... size(...)
 
   /**
@@ -405,7 +405,7 @@ public:
    */
   inline void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).add_to_entry(ii, value));
+    CHECK_AND_CALL_CRTP(this->as_imp().add_to_entry(ii, value));
   }
 
   /**
@@ -413,7 +413,7 @@ public:
    */
   inline void set_entry(const size_t ii, const ScalarType& value)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).set_entry(ii, value));
+    CHECK_AND_CALL_CRTP(this->as_imp().set_entry(ii, value));
   }
 
   /**
@@ -421,20 +421,20 @@ public:
    */
   inline ScalarType get_entry(const size_t ii) const
   {
-    CHECK_CRTP(this->as_imp(*this).get_entry(ii));
-    return this->as_imp(*this).get_entry(ii);
+    CHECK_CRTP(this->as_imp().get_entry(ii));
+    return this->as_imp().get_entry(ii);
   } // ... get_entry(...)
 
   inline ScalarType& get_entry_ref(const size_t ii)
   {
-    CHECK_CRTP(this->as_imp(*this).get_entry_ref(ii));
-    return this->as_imp(*this).get_entry_ref(ii);
+    CHECK_CRTP(this->as_imp().get_entry_ref(ii));
+    return this->as_imp().get_entry_ref(ii);
   } // ... get_entry_ref(...)
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
   {
-    CHECK_CRTP(this->as_imp(*this).get_entry_ref(ii));
-    return this->as_imp(*this).get_entry_ref(ii);
+    CHECK_CRTP(this->as_imp().get_entry_ref(ii));
+    return this->as_imp().get_entry_ref(ii);
   } // ... get_entry_ref(...)
 
   /**
@@ -952,20 +952,20 @@ public:
 
   inline size_t rows() const
   {
-    CHECK_CRTP(this->as_imp(*this).rows());
-    return this->as_imp(*this).rows();
+    CHECK_CRTP(this->as_imp().rows());
+    return this->as_imp().rows();
   }
 
   inline size_t cols() const
   {
-    CHECK_CRTP(this->as_imp(*this).cols());
-    return this->as_imp(*this).cols();
+    CHECK_CRTP(this->as_imp().cols());
+    return this->as_imp().cols();
   }
 
   template <class XX, class YY>
   inline void mv(const XX& xx, YY& yy) const
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).mv(xx, yy));
+    CHECK_AND_CALL_CRTP(this->as_imp().mv(xx, yy));
   }
 
   template <class XX>
@@ -978,38 +978,38 @@ public:
 
   inline void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).add_to_entry(ii, jj, value));
+    CHECK_AND_CALL_CRTP(this->as_imp().add_to_entry(ii, jj, value));
   }
 
   inline void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).set_entry(ii, jj, value));
+    CHECK_AND_CALL_CRTP(this->as_imp().set_entry(ii, jj, value));
   }
 
   inline ScalarType get_entry(const size_t ii, const size_t jj) const
   {
-    CHECK_CRTP(this->as_imp(*this).get_entry(ii, jj));
-    return this->as_imp(*this).get_entry(ii, jj);
+    CHECK_CRTP(this->as_imp().get_entry(ii, jj));
+    return this->as_imp().get_entry(ii, jj);
   }
 
   inline void clear_row(const size_t ii)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).clear_row(ii));
+    CHECK_AND_CALL_CRTP(this->as_imp().clear_row(ii));
   }
 
   inline void clear_col(const size_t jj)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).clear_col(jj));
+    CHECK_AND_CALL_CRTP(this->as_imp().clear_col(jj));
   }
 
   inline void unit_row(const size_t ii)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).unit_row(ii));
+    CHECK_AND_CALL_CRTP(this->as_imp().unit_row(ii));
   }
 
   inline void unit_col(const size_t jj)
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).unit_col(jj));
+    CHECK_AND_CALL_CRTP(this->as_imp().unit_col(jj));
   }
 
   /**
