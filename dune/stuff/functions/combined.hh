@@ -326,11 +326,12 @@ public:
 
   ThisType& operator=(ThisType&& other) = delete;
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const /*DS_OVERRIDE DS_FINAL*/
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE DS_FINAL
   {
     typedef CombinedLocalFunction<LeftType, RightType, comb> RealLocalFunctionType;
-    return std::unique_ptr<RealLocalFunctionType>(
-        new RealLocalFunctionType(left_->storage_access(), right_->storage_access(), entity));
+    assert(left_);
+    assert(right_);
+    return DSC::make_unique<RealLocalFunctionType>(left_->storage_access(), right_->storage_access(), entity);
   } // ... local_function(...)
 
   virtual ThisType* copy() const
