@@ -84,7 +84,14 @@ public:
 private:
   void ensure_uniqueness() const
   {
-    CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp(*this).ensure_uniqueness());
+/** the CHECK_AND_CALL_CRTP macro fails here because we have two different CrtpInterface<...> base
+ * classes that both provide a mutex, with no way to disambiguate between them
+CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
+**/
+#ifndef NDEBUG
+#warning "no crtp check"
+#endif
+    VectorInterfaceType::as_imp().ensure_uniqueness();
   }
 
 public:
