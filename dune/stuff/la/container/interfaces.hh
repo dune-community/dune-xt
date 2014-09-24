@@ -225,6 +225,22 @@ public:
 }; // class ProvidesBackend
 
 
+/**
+ * \brief Interface for all containers (vectors and matrices).
+ *
+ * \note  All derived classes are supposed to implement copy-on-write. This can be achieved by internally holding a
+ *        shared_prt to the appropriate backend and by passing this shared_prt around on copy, move or assingment. Any
+ *        class method that writes to the backend or exposes a reference to the backend is then required to make a deep
+ *        copy of the backend, if it is not the sole owner of this resource. This can for instance be achieved by
+ *        calling a private method:
+\code
+  inline void ensure_uniqueness() const
+  {
+    if (!backend_.unique())
+      backend_ = std::make_shared< BackendType >(*backend_);
+  }
+\endcode
+ */
 template <class Traits>
 class ContainerInterface : public Tags::ContainerInterface, public CRTPInterface<ContainerInterface<Traits>, Traits>
 {

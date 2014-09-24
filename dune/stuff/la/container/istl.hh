@@ -336,6 +336,9 @@ public:
    */
 
 private:
+  /**
+   * \see ContainerInterface
+   */
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
@@ -626,6 +629,9 @@ private:
     return backend_->exists(ii, jj);
   } // ... these_are_valid_indices(...)
 
+  /**
+   * \see ContainerInterface
+   */
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
