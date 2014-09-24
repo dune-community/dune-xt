@@ -99,10 +99,7 @@ public:
     }
   }
 
-  CommonDenseVector(const ThisType& other)
-    : backend_(other.backend_)
-  {
-  }
+  CommonDenseVector(const ThisType& other) = default;
 
   CommonDenseVector(const BackendType& other)
     : backend_(new BackendType(other))

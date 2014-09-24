@@ -699,10 +699,7 @@ public:
     backend_->setZero();
   }
 
-  EigenDenseMatrix(const ThisType& other)
-    : backend_(other.backend_)
-  {
-  }
+  EigenDenseMatrix(const ThisType& other) = default;
 
   EigenDenseMatrix(const BackendType& other)
     : backend_(new BackendType(other))
