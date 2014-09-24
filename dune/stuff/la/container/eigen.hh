@@ -186,7 +186,7 @@ protected:
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
   {
-    return (*backend_)(ii);
+    return backend()[ii];
   }
   /**
    * \}
