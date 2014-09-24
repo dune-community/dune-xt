@@ -75,12 +75,12 @@ private:
   }; // class Call< ..., 1, ... >
 
 public:
-  virtual int ncomps() const /*DS_OVERRIDE DS_FINAL*/
+  virtual int ncomps() const DS_OVERRIDE DS_FINAL
   {
     return Call<dimRange, dimRangeCols>::ncomps();
   }
 
-  virtual std::string name() const /*DS_OVERRIDE DS_FINAL*/
+  virtual std::string name() const DS_OVERRIDE DS_FINAL
   {
     if (name_.empty())
       return function_.name();
@@ -88,7 +88,7 @@ public:
       return name_;
   }
 
-  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const /*DS_OVERRIDE DS_FINAL*/
+  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const DS_OVERRIDE DS_FINAL
   {
     assert(comp >= 0);
     assert(comp < dimRange);
