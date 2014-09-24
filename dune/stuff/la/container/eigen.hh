@@ -82,8 +82,10 @@ public:
   typedef typename Traits::derived_type VectorImpType;
 
 private:
-  //! disambiguation necessary since it exeists in multiple bases
+//! disambiguation necessary since it exeists in multiple bases
+#ifndef NDEBUG
   using VectorInterfaceType::crtp_mutex_;
+#endif
 
   /**
    * \see ContainerInterface
