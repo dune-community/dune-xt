@@ -40,13 +40,13 @@ public:
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
-    , communicator_provider_(new CommunicatorType())
+    , communicator_(new CommunicatorType())
   {
   }
 
   Solver(const MatrixType& matrix, const CommunicatorType& communicator)
     : matrix_(matrix)
-    , communicator_provider_(communicator)
+    , communicator_(communicator)
   {
   }
 
@@ -115,7 +115,7 @@ public:
       IstlDenseVector<S> writable_rhs          = rhs.copy();
       // solve
       if (type == "bicgstab.amg.ilu0") {
-        auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_provider_->get())
+        auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.storage_access())
                           .call(writable_rhs, solution, opts, default_opts);
         if (!result.converged)
           DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
@@ -178,7 +178,7 @@ public:
 
 private:
   const MatrixType& matrix_;
-  const std::unique_ptr<Common::StorageProvider<const CommunicatorType>> communicator_provider_;
+  const Common::ConstStorageProvider<CommunicatorType> communicator_;
 }; // class Solver
 
 
