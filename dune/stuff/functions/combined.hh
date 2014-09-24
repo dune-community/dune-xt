@@ -367,12 +367,7 @@ public:
   {
   }
 
-  Combined(ThisType&& source)
-    : left_(std::move(source.left_))
-    , right_(std::move(source.right_))
-    , name_(source.name_)
-  {
-  }
+  Combined(ThisType&& source) = default;
 
   Combined(const ThisType& other) = delete;
 

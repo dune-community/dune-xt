@@ -173,14 +173,7 @@ public:
                  "values too small (is " << values_->size() << ", should be " << totalSubdomains << ")");
   } // Checkerboard(...)
 
-  Checkerboard(const ThisType& other)
-    : lowerLeft_(other.lowerLeft_)
-    , upperRight_(other.upperRight_)
-    , numElements_(other.numElements_)
-    , values_(other.values_)
-    , name_(other.name_)
-  {
-  }
+  Checkerboard(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
 

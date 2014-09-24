@@ -138,12 +138,7 @@ public:
   {
   }
 
-  Expression(const ThisType& other)
-    : function_(other.function_)
-    , order_(other.order_)
-    , name_(other.name_)
-  {
-  }
+  Expression(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other)
   {

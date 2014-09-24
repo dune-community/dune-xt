@@ -134,11 +134,7 @@ public:
   {
   }
 
-  Constant(const ThisType& other)
-    : constant_(other.constant_)
-    , name_(other.name_)
-  {
-  }
+  Constant(const ThisType& other) = default;
 
   virtual std::string type() const DS_OVERRIDE DS_FINAL
   {

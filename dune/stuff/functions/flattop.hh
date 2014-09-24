@@ -102,14 +102,7 @@ public:
     check_input();
   }
 
-  FlatTop(const ThisType& other)
-    : lower_left_(other.lower_left_)
-    , upper_right_(other.upper_right_)
-    , boundary_layer_(other.boundary_layer_)
-    , value_(other.value_)
-    , name_(other.name_)
-  {
-  }
+  FlatTop(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
 
