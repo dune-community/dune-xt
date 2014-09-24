@@ -82,18 +82,15 @@ public:
   typedef typename Traits::derived_type VectorImpType;
 
 private:
+  //! disambiguation necessary since it exeists in multiple bases
+  using VectorInterfaceType::crtp_mutex_;
+
   /**
    * \see ContainerInterface
    */
   void ensure_uniqueness() const
   {
-/** the CHECK_AND_CALL_CRTP macro fails here because we have two different CrtpInterface<...> base
- * classes that both provide a mutex, with no way to disambiguate between them
-CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
-**/
-#ifndef NDEBUG
-#warning "no crtp check"
-#endif
+    CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
     VectorInterfaceType::as_imp().ensure_uniqueness();
   }
 
@@ -458,9 +455,6 @@ public:
   using BaseType::backend;
 
 private:
-  /**
-   * \see ContainerInterface
-   */
   inline void ensure_uniqueness() const
   {
     if (!this->backend_.unique())
@@ -614,9 +608,6 @@ public:
   using BaseType::backend;
 
 private:
-  /**
-   * \see ContainerInterface
-   */
   inline void ensure_uniqueness() const
   {
     if (!this->backend_.unique()) {
@@ -921,9 +912,6 @@ public:
    */
 
 private:
-  /**
-   * \see ContainerInterface
-   */
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
@@ -1250,9 +1238,6 @@ private:
     return IndexType(size);
   } // ... assert_is_IndexType_compatible_and_convert(...)
 
-  /**
-   * \see ContainerInterface
-   */
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
