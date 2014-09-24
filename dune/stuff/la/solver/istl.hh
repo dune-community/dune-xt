@@ -19,7 +19,7 @@
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/misc.hh>
+#include <dune/stuff/common/memory.hh>
 #include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/solver/istl_amg.hh>
 
@@ -40,13 +40,13 @@ public:
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
-    , communicator_provider_(new Common::ReferenceProviderByPointer<const CommunicatorType>())
+    , communicator_provider_(new CommunicatorType())
   {
   }
 
   Solver(const MatrixType& matrix, const CommunicatorType& communicator)
     : matrix_(matrix)
-    , communicator_provider_(new Common::ReferenceProviderByReference<const CommunicatorType>(communicator))
+    , communicator_provider_(communicator)
   {
   }
 
@@ -178,7 +178,7 @@ public:
 
 private:
   const MatrixType& matrix_;
-  const std::unique_ptr<Common::ReferenceProvider<const CommunicatorType>> communicator_provider_;
+  const std::unique_ptr<Common::StorageProvider<const CommunicatorType>> communicator_provider_;
 }; // class Solver
 
 
