@@ -29,6 +29,11 @@ enum class Combination
 }; // enum class Combination
 
 
+/**
+ * \brief Helper class defining types of combined functions, if available.
+ *
+ * \note Most likely you do not want to use this class directly, but Combined.
+ */
 template <class LeftType, class RightType, Combination comb>
 class SelectCombined
 {
@@ -221,6 +226,11 @@ public:
 }; // class SelectCombined
 
 
+/**
+ * \brief Generic combined local function.
+ *
+ * \note Most likely you do not want to use this class directly, but Combined.
+ */
 template <class LeftType, class RightType, Combination type>
 class CombinedLocalFunction
     : public LocalfunctionInterface<
@@ -273,6 +283,50 @@ private:
 }; // class CombinedLocalFunction
 
 
+/**
+ * \brief Generic combined function.
+ *
+ *        This class combines two given functions of type LeftType and RightType using the given combination
+ *        Combination. This class (and any derived class, like Difference, Sum or Product) can be used in two was:
+ *        - You can pass references of the left and right operand to this class. This is done for instance when calling
+ *          operator+, operator- or operator* on any function deriving from LocalizableFunctionInterface:
+\code
+typedef Functions::Constant< ..., double, 2, double 1 > ConstantType;
+ConstantType one(1);
+ConstantType two(2);
+// the following code
+auto difference = one - two;
+// is equivalent to
+Difference< ConstantType, ConstantType > difference(one, two);
+// and
+internal::Combined< ConstantType, ConstantType, Combination::difference > difference(one, tow);
+\endcode
+ *          In this situation you are responsible to ensure that the arguments given are valid throughout the lifetime
+ *          of this class. The following will lead to a segfault:
+\code
+typedef Functions::Constant< ..., double, 2, double 1 > ConstantType;
+
+Difference< ConstantType, ConstantType > stupid_difference()
+{
+  ConstantType one(1);
+  ConstantType two(2);
+  return one - two;
+}
+\endcode
+ *        - You can pass shared_ptr of the left and right operands to this class. In this case the following is valid:
+\code
+typedef Functions::Constant< ..., double, 2, double 1 > ConstantType;
+
+Difference< ConstantType, ConstantType > stupid_difference()
+{
+  auto one = std::make_shared< ConstantType >(1);
+  auto two = std::make_shared< ConstantType >(2);
+  return Difference< ConstantType, ConstantType >(one, two)
+}
+\endcode
+ *
+ * \note  Most likely you do not want to use this class diretly, but one of Difference, Sum or Product.
+ */
 template <class LeftType, class RightType, Combination comb>
 class Combined
     : public LocalizableFunctionInterface<
@@ -360,6 +414,11 @@ private:
 } // namespace internal
 
 
+/**
+ * \brief Function representing the difference between two functions.
+ *
+ * \see internal::Combined
+ */
 template <class MinuendType, class SubtrahendType>
 class Difference : public internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference>
 {
@@ -374,6 +433,11 @@ public:
 }; // class Difference
 
 
+/**
+ * \brief Function representing the sum of two functions.
+ *
+ * \see internal::Combined
+ */
 template <class LeftSummandType, class RightSummandType>
 class Sum : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>
 {
@@ -388,6 +452,11 @@ public:
 }; // class Sum
 
 
+/**
+ * \brief Function representing the product of two functions.
+ *
+ * \see internal::Combined
+ */
 template <class LeftSummandType, class RightSummandType>
 class Product : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>
 {
