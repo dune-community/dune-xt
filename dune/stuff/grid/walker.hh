@@ -17,6 +17,12 @@
 #include <tbb/tbb_stddef.h>
 #endif
 
+#include <dune/grid/common/gridview.hh>
+
+#if HAVE_DUNE_FEM
+#include <dune/fem/gridpart/common/gridpart.hh>
+#endif
+
 #include <dune/stuff/grid/entity.hh>
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/common/parallel/threadmanager.hh>
@@ -33,6 +39,9 @@ namespace Grid {
 template <class GridViewImp>
 class Walker : public Functor::Codim0And1<GridViewImp>
 {
+  static_assert(std::is_base_of<Dune::GridView<typename GridViewImp::Traits>, GridViewImp>::value
+                    || std::is_base_of<Dune::Fem::GridPartInterface<typename GridViewImp::Traits>, GridViewImp>::value,
+                "GridViewImp has to be derived from either Dune::GridView or Dune::Fem::GridPartInterface!");
   typedef Walker<GridViewImp> ThisType;
 
 public:
