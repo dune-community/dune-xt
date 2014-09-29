@@ -17,6 +17,44 @@
 namespace Dune {
 namespace Stuff {
 namespace Functions {
+namespace internal {
+
+
+template <class K, int dim>
+struct UnitMatrix
+{
+  typedef FieldMatrix<K, dim, dim> type;
+
+  static type value()
+  {
+    type ret(0);
+    for (size_t dd = 0; dd < dim; ++dd)
+      ret[dd][dd] = 1;
+    return ret;
+  }
+}; // struct UnitMatrix
+
+
+template <class K>
+struct UnitMatrix<K, 1>
+{
+  typedef FieldVector<K, 1> type;
+
+  static type value()
+  {
+    return type(1);
+  }
+}; // struct UnitMatrix
+
+
+template <class K, int dim>
+typename UnitMatrix<K, dim>::type unit_matrix()
+{
+  return UnitMatrix<K, dim>::value();
+}
+
+
+} // namespace internal
 
 
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
