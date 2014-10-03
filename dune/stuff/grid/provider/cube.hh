@@ -229,17 +229,6 @@ private:
     return ret;
   } // ... parse_array(...)
 
-  static DomainType parse_vector(const std::vector<DomainFieldType>& in)
-  {
-    if (in.size() < dimDomain)
-      DUNE_THROW(Exceptions::wrong_input_given,
-                 "Given vector is too short: should be " << dimDomain << ", is " << in.size() << "!");
-    DomainType ret;
-    for (unsigned int ii = 0; ii < dimDomain; ++ii)
-      ret[ii] = in[ii];
-    return ret;
-  } // ... parse_vector(...)
-
   static std::shared_ptr<GridType> create_grid(DomainType lower_left, DomainType upper_right,
                                                const std::array<unsigned int, dimDomain>& num_elements,
                                                const size_t num_refinements)
