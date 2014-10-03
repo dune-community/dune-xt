@@ -23,7 +23,7 @@
 #endif
 #include <dune/stuff/common/reenable_warnings.hh>
 
-
+#include <dune/stuff/common/fvector.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
@@ -174,14 +174,16 @@ public:
   {
   }
 
-  Cube(const DomainType& lower_left, const DomainType& upper_right,
+  Cube(const DSC::FieldVector<DomainFieldType, dimDomain>& lower_left,
+       const DSC::FieldVector<DomainFieldType, dimDomain>& upper_right,
        const unsigned int num_elements = default_config().get<std::vector<unsigned int>>("num_elements")[0],
        const size_t num_refinements = default_config().get<size_t>("num_refinements"))
     : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements), num_refinements))
   {
   }
 
-  Cube(const DomainType& lower_left, const DomainType& upper_right,
+  Cube(const DSC::FieldVector<DomainFieldType, dimDomain>& lower_left,
+       const DSC::FieldVector<DomainFieldType, dimDomain>& upper_right,
        const std::vector<unsigned int> num_elements = default_config().get<std::vector<unsigned int>>("num_elements"),
        const size_t num_refinements = default_config().get<size_t>("num_refinements"))
     : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements), num_refinements))
