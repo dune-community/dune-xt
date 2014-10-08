@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <vector>
 #include <initializer_list>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/dynvector.hh>
@@ -73,12 +74,12 @@ public:
 
   /// This constructor is needed for the python bindings.
   CommonDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
   {
   }
 
   CommonDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
   {
   }
 
@@ -373,21 +374,18 @@ public:
   /// This constructor is needed for the python bindings.
   CommonDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
                     const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
   {
   }
 
   CommonDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
   {
   }
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   CommonDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), ScalarType(0)))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), ScalarType(0)))
   {
   }
 
