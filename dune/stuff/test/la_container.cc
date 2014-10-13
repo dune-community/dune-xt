@@ -80,7 +80,7 @@ struct ContainerTest : public ::testing::Test
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
     // * of the container as the interface
-    typedef typename Stuff::LA::ContainerInterface<Traits> InterfaceType;
+    typedef typename Stuff::LA::ContainerInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
     static_assert(std::is_same<ContainerImp, I_derived_type>::value, "derived_type has to be the correct Type!");
@@ -130,7 +130,7 @@ struct VectorTest : public ::testing::Test
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
     // * of the vector as the interface
-    typedef typename Stuff::LA::VectorInterface<Traits> InterfaceType;
+    typedef typename Stuff::LA::VectorInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
     static_assert(std::is_same<VectorImp, I_derived_type>::value, "derived_type has to be the correct Type!");
@@ -657,7 +657,7 @@ struct MatrixTest : public ::testing::Test
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
     // * of the matrix as the interface
-    typedef typename Stuff::LA::MatrixInterface<Traits> InterfaceType;
+    typedef typename Stuff::LA::MatrixInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
     static_assert(std::is_same<MatrixImp, I_derived_type>::value, "derived_type has to be the correct Type!");
