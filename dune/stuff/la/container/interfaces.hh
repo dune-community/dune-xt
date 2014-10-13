@@ -35,7 +35,7 @@ namespace LA {
 
 
 // forward
-template <class Traits>
+template <class Traits, class ScalarImp>
 class VectorInterface;
 
 
@@ -101,13 +101,13 @@ class MatrixInterface
 namespace internal {
 
 
-template <class Traits>
+template <class Traits, class ScalarImp>
 class VectorInputIterator : public std::iterator<std::input_iterator_tag, typename Traits::ScalarType>
 {
-  typedef VectorInputIterator<Traits> ThisType;
+  typedef VectorInputIterator<Traits, ScalarImp> ThisType;
 
 public:
-  typedef VectorInterface<Traits> VectorType;
+  typedef VectorInterface<Traits, ScalarImp> VectorType;
   typedef typename VectorType::ScalarType ScalarType;
 
 private:
@@ -164,16 +164,17 @@ protected:
 }; // class VectorInputIterator
 
 
-template <class Traits>
-class VectorOutputIterator : public VectorInputIterator<Traits>,
+template <class Traits, class ScalarImp>
+class VectorOutputIterator : public VectorInputIterator<Traits, ScalarImp>,
                              public std::iterator<std::output_iterator_tag, typename Traits::ScalarType>
 {
-  typedef VectorInputIterator<Traits> BaseType;
-  typedef VectorOutputIterator<Traits> ThisType;
+  typedef VectorInputIterator<Traits, ScalarImp> BaseType;
+  typedef VectorOutputIterator<Traits, ScalarImp> ThisType;
 
 public:
-  typedef VectorInterface<Traits> VectorType;
+  typedef VectorInterface<Traits, ScalarImp> VectorType;
   typedef typename VectorType::ScalarType ScalarType;
+  static_assert(std::is_same<ScalarImp, ScalarType>::value, "");
 
 private:
   struct Holder
@@ -244,13 +245,16 @@ public:
   }
 \endcode
  */
-template <class Traits>
-class ContainerInterface : public Tags::ContainerInterface, public CRTPInterface<ContainerInterface<Traits>, Traits>
+template <class Traits, class ScalarImp>
+class ContainerInterface : public Tags::ContainerInterface,
+                           public CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
 {
-  typedef CRTPInterface<ContainerInterface<Traits>, Traits> CRTP;
+  typedef CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits> CRTP;
 
 public:
-  typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::ScalarType TraitsScalarType;
+  typedef ScalarImp ScalarType;
+  static_assert(std::is_same<ScalarType, TraitsScalarType>::value, "");
 
   using typename CRTP::derived_type;
 
@@ -390,15 +394,17 @@ public:
 }; // class ProvidesDataAccess
 
 
-template <class Traits>
-class VectorInterface : public ContainerInterface<Traits>, public Tags::VectorInterface
+template <class Traits, class ScalarImp>
+class VectorInterface : public ContainerInterface<Traits, ScalarImp>, public Tags::VectorInterface
 {
 public:
   typedef typename Traits::derived_type derived_type;
-  typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::ScalarType TraitsScalarType;
+  typedef ScalarImp ScalarType;
+  static_assert(std::is_same<ScalarType, TraitsScalarType>::value, "");
 
-  typedef internal::VectorInputIterator<Traits> const_iterator;
-  typedef internal::VectorOutputIterator<Traits> iterator;
+  typedef internal::VectorInputIterator<Traits, ScalarType> const_iterator;
+  typedef internal::VectorOutputIterator<Traits, ScalarType> iterator;
 
   virtual ~VectorInterface()
   {
@@ -958,13 +964,13 @@ public:
   }
 
 private:
-  template <class T>
-  friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T>& /*vector*/);
+  template <class T, class S>
+  friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
 }; // class VectorInterface
 
 
-template <class T>
-std::ostream& operator<<(std::ostream& out, const VectorInterface<T>& vector)
+template <class T, class S>
+std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
 {
   out << "[";
   const size_t sz = vector.size();
@@ -979,12 +985,14 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T>& vector)
 } // ... operator<<(...)
 
 
-template <class Traits>
-class MatrixInterface : public ContainerInterface<Traits>, public Tags::MatrixInterface
+template <class Traits, class ScalarImp>
+class MatrixInterface : public ContainerInterface<Traits, ScalarImp>, public Tags::MatrixInterface
 {
 public:
   typedef typename Traits::derived_type derived_type;
-  typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::ScalarType TraitsScalarType;
+  typedef ScalarImp ScalarType;
+  static_assert(std::is_same<ScalarType, TraitsScalarType>::value, "");
 
   virtual ~MatrixInterface()
   {
@@ -1015,7 +1023,7 @@ public:
   }
 
   template <class XX>
-  typename XX::derived_type operator*(const VectorInterface<XX>& xx) const
+  typename XX::derived_type operator*(const VectorInterface<XX, ScalarType>& xx) const
   {
     typename XX::derived_type yy(cols());
     mv(xx.as_imp(xx), yy);
@@ -1141,13 +1149,13 @@ public:
    */
 
 private:
-  template <class T>
-  friend std::ostream& operator<<(std::ostream& /*out*/, const MatrixInterface<T>& /*matrix*/);
+  template <class T, class S>
+  friend std::ostream& operator<<(std::ostream& /*out*/, const MatrixInterface<T, S>& /*matrix*/);
 }; // class MatrixInterface
 
 
-template <class T>
-std::ostream& operator<<(std::ostream& out, const MatrixInterface<T>& matrix)
+template <class T, class S>
+std::ostream& operator<<(std::ostream& out, const MatrixInterface<T, S>& matrix)
 {
   out << "[";
   const size_t rows = matrix.rows();
