@@ -7,6 +7,7 @@
 #define DUNE_STUFF_GRID_WALKER_WRAPPER_HH
 
 #include "functors.hh"
+#include "apply-on.hh"
 
 namespace Dune {
 namespace Stuff {
