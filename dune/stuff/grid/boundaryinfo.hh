@@ -421,7 +421,9 @@ public:
 
   typedef typename IntersectionType::ctype DomainFieldType;
   static const unsigned int dimDomain = IntersectionType::dimension;
+  static const unsigned int dimWorld  = IntersectionType::dimensionworld;
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
+  typedef Dune::FieldVector<DomainFieldType, dimWorld> WorldType;
 
   static const std::string static_id()
   {
@@ -446,15 +448,15 @@ public:
     // get tolerance
     const DomainFieldType tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
     // get dirichlet and neumann
-    std::vector<DomainType> dirichlets = getVectors(cfg, "dirichlet");
-    std::vector<DomainType> neumanns   = getVectors(cfg, "neumann");
+    std::vector<WorldType> dirichlets = getVectors(cfg, "dirichlet");
+    std::vector<WorldType> neumanns   = getVectors(cfg, "neumann");
     // return
     return Common::make_unique<ThisType>(default_to_dirichlet, dirichlets, neumanns, tol);
   } // ... create(...)
 
   NormalBased(const bool default_to_dirichlet = true,
-              const std::vector<DomainType> dirichlet_normals = std::vector<DomainType>(),
-              const std::vector<DomainType> neumann_normals   = std::vector<DomainType>(),
+              const std::vector<WorldType> dirichlet_normals = std::vector<WorldType>(),
+              const std::vector<WorldType> neumann_normals   = std::vector<WorldType>(),
               const DomainFieldType tol = 1e-10)
     : default_to_dirichlet_(default_to_dirichlet)
     , dirichlet_normals_(dirichlet_normals)
@@ -490,7 +492,7 @@ public:
   virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
   {
     if (intersection.boundary()) {
-      const DomainType outerNormal = intersection.centerUnitOuterNormal();
+      const WorldType outerNormal = intersection.centerUnitOuterNormal();
       if (contains(outerNormal, dirichlet_normals_))
         return true;
       else if (contains(outerNormal, neumann_normals_))
@@ -504,7 +506,7 @@ public:
   virtual bool neumann(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
   {
     if (intersection.boundary()) {
-      const DomainType outerNormal = intersection.centerUnitOuterNormal();
+      const WorldType outerNormal = intersection.centerUnitOuterNormal();
       if (contains(outerNormal, neumann_normals_))
         return true;
       else if (contains(outerNormal, dirichlet_normals_))
@@ -516,26 +518,26 @@ public:
   } // ... neumann(...)
 
 private:
-  static std::vector<DomainType> getVectors(const Common::Configuration& config, const std::string key)
+  static std::vector<WorldType> getVectors(const Common::Configuration& config, const std::string key)
   {
-    std::vector<DomainType> ret;
+    std::vector<WorldType> ret;
     if (config.has_sub(key)) {
       bool found           = true;
       unsigned int counter = 0;
       while (found) {
         const std::string localKey = key + "." + Dune::Stuff::Common::toString(counter);
         if (config.has_key(localKey))
-          ret.push_back(config.get<DomainType>(localKey, dimDomain));
+          ret.push_back(config.get<WorldType>(localKey, dimWorld));
         else
           found = false;
         ++counter;
       }
     } else if (config.has_key(key))
-      ret.push_back(config.get<DomainType>(key, dimDomain));
+      ret.push_back(config.get<WorldType>(key, dimWorld));
     return ret;
   } // ... getVectors(...)
 
-  bool contains(const DomainType& normal, const std::vector<DomainType>& vectors) const
+  bool contains(const WorldType& normal, const std::vector<WorldType>& vectors) const
   {
     for (auto& vector : vectors)
       if (Dune::Stuff::Common::FloatCmp::eq(normal, vector, tol_))
@@ -544,8 +546,8 @@ private:
   }
 
   const bool default_to_dirichlet_;
-  std::vector<DomainType> dirichlet_normals_;
-  std::vector<DomainType> neumann_normals_;
+  std::vector<WorldType> dirichlet_normals_;
+  std::vector<WorldType> neumann_normals_;
   const DomainFieldType tol_;
 }; // class NormalBased
 

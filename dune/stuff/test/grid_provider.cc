@@ -29,11 +29,8 @@
 using namespace Dune;
 using namespace Dune::Stuff;
 
-//! \TODO enable embedded grids
-typedef testing::Types<SGrid<1, 1>, SGrid<2, 2>, SGrid<3, 3> //, SGrid<4,4>
-                       //, SGrid<1,2>, SGrid<2,3>, SGrid<3,4>, SGrid<4,5>,
-                       ,
-                       Dune::YaspGrid<1>, Dune::YaspGrid<2>, Dune::YaspGrid<3>> GridTypes;
+typedef testing::Types<SGrid<1, 1>, SGrid<2, 2>, SGrid<3, 3>, SGrid<4, 4>, SGrid<1, 2>, SGrid<2, 3>, SGrid<3, 4>,
+                       SGrid<4, 5>, Dune::YaspGrid<1>, Dune::YaspGrid<2>, Dune::YaspGrid<3>> GridTypes;
 
 template <class GridType>
 struct GridProviderBaseTest : public testing::Test
@@ -68,10 +65,12 @@ struct GridProviderBaseTest : public testing::Test
           grid_provider.template level<ChoosePartView::part>(level);
       std::shared_ptr<typename GridProviderType::LevelGridPartType> level_part = grid_provider.level_part(level);
 #endif // HAVE_DUNE_FEM
-      grid_provider.visualize();
+      //! TODO: visualization for grid with dim > 3 ??
+      if (GridType::dimension <= 3)
+        grid_provider.visualize();
     }
   } // ... fulfills_interface()
-}; // struct GridProviderTest
+}; // struct GridProviderBaseTest
 
 
 template <class GridType>
