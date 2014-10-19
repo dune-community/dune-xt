@@ -419,7 +419,7 @@ std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E
 
 
 template <class OtherEntityImp, class GlobalFunctionImp>
-struct TransferredGlobalFunction;
+class TransferredGlobalFunction;
 
 
 /**
