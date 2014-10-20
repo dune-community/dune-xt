@@ -8,17 +8,21 @@
 #ifndef DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 #define DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 
+#include <dune/common/unused.hh>
+
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
+
+#if HAVE_DUNE_SPGRID
+#include <dune/grid/spgrid.hh>
+#include <dune/stuff/aliases.hh>
+#endif // HAVE_DUNE_SPGRID
 
 
 namespace Dune {
 
 #if HAVE_DUNE_SPGRID
-
-#include <dune/grid/spgrid.hh>
-#include <dune/stuff/aliases.hh>
 
 /** \brief Specialization of the StructuredGridFactory for SPGrid
  *
@@ -132,9 +136,9 @@ public:
    *  \note Simplices are not supported in SGrid, so this functions
    *        unconditionally throws a GridError.
    */
-  static shared_ptr<GridType> createSimplexGrid(const FieldVector<ctype, dim>& lowerLeft,
-                                                const FieldVector<ctype, dim>& upperRight,
-                                                const array<unsigned int, dim>& elements)
+  static shared_ptr<GridType> createSimplexGrid(const FieldVector<ctype, dim>& DUNE_UNUSED(lowerLeft),
+                                                const FieldVector<ctype, dim>& DUNE_UNUSED(upperRight),
+                                                const array<unsigned int, dim>& DUNE_UNUSED(elements))
   {
     DUNE_THROW(GridError,
                className<StructuredGridFactory>() << "::createSimplexGrid(): Simplices are not supported "
