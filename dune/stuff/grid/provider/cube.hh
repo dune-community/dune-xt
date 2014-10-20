@@ -15,7 +15,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/stuff/common/disable_warnings.hh>
-#include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
@@ -27,6 +26,7 @@
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
+#include <dune/stuff/grid/structuredgridfactory.hh>
 
 #include "default.hh"
 
