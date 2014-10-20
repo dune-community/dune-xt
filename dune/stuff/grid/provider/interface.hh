@@ -95,45 +95,45 @@ public:
   virtual const GridType& grid() const = 0;
 
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
-  std::shared_ptr<const typename Layer<layer_type, part_view_type>::Type> layer(const int level_in = 0) const
+  typename Layer<layer_type, part_view_type>::Type layer(const int level_in = 0) const
   {
     GridType& non_const_grid = const_cast<GridType&>(grid());
     return Grid::Layer<GridType, layer_type, part_view_type>::create(non_const_grid, level_in);
   }
 
   template <ChoosePartView type>
-  std::shared_ptr<const typename Level<type>::Type> level(const int level_in) const
+  typename Level<type>::Type level(const int level_in) const
   {
     GridType& non_const_grid = const_cast<GridType&>(grid());
     return LevelPartView<GridType, type>::create(non_const_grid, level_in);
   }
 
-  std::shared_ptr<const LevelGridViewType> level_view(const int level_in) const
+  LevelGridViewType level_view(const int level_in) const
   {
     return this->template level<ChoosePartView::view>(level_in);
   }
 
 #if HAVE_DUNE_FEM
-  std::shared_ptr<const LevelGridPartType> level_part(const int level_in) const
+  LevelGridPartType level_part(const int level_in) const
   {
     return this->template level<ChoosePartView::part>(level_in);
   }
 #endif // HAVE_DUNE_FEM
 
   template <ChoosePartView type>
-  std::shared_ptr<const typename Leaf<type>::Type> leaf() const
+  typename Leaf<type>::Type leaf() const
   {
     GridType& non_const_grid = const_cast<GridType&>(grid());
     return LeafPartView<GridType, type>::create(non_const_grid);
   }
 
-  std::shared_ptr<const LeafGridViewType> leaf_view() const
+  LeafGridViewType leaf_view() const
   {
     return this->template leaf<ChoosePartView::view>();
   }
 
 #if HAVE_DUNE_FEM
-  std::shared_ptr<const LeafGridPartType> leaf_part() const
+  LeafGridPartType leaf_part() const
   {
     return this->template leaf<ChoosePartView::part>();
   }
@@ -143,12 +143,12 @@ public:
   {
     // vtk writer
     auto grid_view = leaf_view();
-    Dune::VTKWriter<LeafGridViewType> vtkwriter(*grid_view);
+    Dune::VTKWriter<LeafGridViewType> vtkwriter(grid_view);
     // codim 0 entity id
-    std::vector<double> entityId = generateEntityVisualization(*grid_view);
+    std::vector<double> entityId = generateEntityVisualization(grid_view);
     vtkwriter.addCellData(entityId, "entity_id");
     // boundary id
-    std::vector<double> boundaryId = generateBoundaryIdVisualization(*grid_view);
+    std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
     vtkwriter.addCellData(boundaryId, "boundary_id");
     // write
     vtkwriter.write(filename, VTK::appendedraw);
@@ -162,18 +162,18 @@ public:
         BoundaryInfoProvider::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
     // vtk writer
     auto grid_view = leaf_view();
-    Dune::VTKWriter<LeafGridViewType> vtkwriter(*grid_view);
+    Dune::VTKWriter<LeafGridViewType> vtkwriter(grid_view);
     // codim 0 entity id
-    std::vector<double> entityId = generateEntityVisualization(*grid_view);
+    std::vector<double> entityId = generateEntityVisualization(grid_view);
     vtkwriter.addCellData(entityId, "entityId");
     // boundary id
-    std::vector<double> boundaryId = generateBoundaryIdVisualization(*grid_view);
+    std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
     vtkwriter.addCellData(boundaryId, "boundaryId");
     // dirichlet values
-    std::vector<double> dirichlet = generateBoundaryVisualization(*grid_view, *boundary_info_ptr, "dirichlet");
+    std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
     vtkwriter.addCellData(dirichlet, "isDirichletBoundary");
     // neumann values
-    std::vector<double> neumann = generateBoundaryVisualization(*grid_view, *boundary_info_ptr, "neumann");
+    std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
     vtkwriter.addCellData(neumann, "isNeumannBoundary");
     // write
     vtkwriter.write(filename, VTK::appendedraw);
@@ -269,7 +269,7 @@ public:
   using BaseType::layer;
 
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
-  std::shared_ptr<typename BaseType::template Layer<layer_type, part_view_type>::Type> layer(const int level_in = 0)
+  typename BaseType::template Layer<layer_type, part_view_type>::Type layer(const int level_in = 0)
   {
     return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level_in);
   }
@@ -277,14 +277,14 @@ public:
   using BaseType::level;
 
   template <ChoosePartView type>
-  std::shared_ptr<typename BaseType::template Level<type>::Type> level(const int level_in)
+  typename BaseType::template Level<type>::Type level(const int level_in)
   {
     return LevelPartView<GridType, type>::create(grid(), level_in);
   }
 
   using BaseType::level_view;
 
-  std::shared_ptr<LevelGridViewType> level_view(const int level_in)
+  LevelGridViewType level_view(const int level_in)
   {
     return this->template level<ChoosePartView::view>(level_in);
   }
@@ -292,7 +292,7 @@ public:
 #if HAVE_DUNE_FEM
   using BaseType::level_part;
 
-  std::shared_ptr<LevelGridPartType> level_part(const int level_in)
+  LevelGridPartType level_part(const int level_in)
   {
     return this->template level<ChoosePartView::part>(level_in);
   }
@@ -301,14 +301,14 @@ public:
   using BaseType::leaf;
 
   template <ChoosePartView type>
-  std::shared_ptr<typename BaseType::template Leaf<type>::Type> leaf()
+  typename BaseType::template Leaf<type>::Type leaf()
   {
     return LeafPartView<GridType, type>::create(grid());
   }
 
   using BaseType::leaf_view;
 
-  std::shared_ptr<LeafGridViewType> leaf_view()
+  LeafGridViewType leaf_view()
   {
     return this->template leaf<ChoosePartView::view>();
   }
@@ -316,7 +316,7 @@ public:
 #if HAVE_DUNE_FEM
   using BaseType::leaf_part;
 
-  std::shared_ptr<LeafGridPartType> leaf_part()
+  LeafGridPartType leaf_part()
   {
     return this->template leaf<ChoosePartView::part>();
   }
