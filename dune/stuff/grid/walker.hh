@@ -19,6 +19,7 @@
 
 #include <dune/stuff/grid/entity.hh>
 #include <dune/stuff/grid/intersection.hh>
+#include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/parallel/threadmanager.hh>
 
 #include "walker/functors.hh"
@@ -40,7 +41,7 @@ public:
   typedef typename Stuff::Grid::Entity<GridViewType>::Type EntityType;
   typedef typename Stuff::Grid::Intersection<GridViewType>::Type IntersectionType;
 
-  Walker(const GridViewType& grd_vw)
+  Walker(GridViewType grd_vw)
     : grid_view_(grd_vw)
   {
   }
@@ -276,7 +277,7 @@ protected:
     }
   } // ... walk_range(...)
 
-  const GridViewType& grid_view_;
+  const GridViewType grid_view_;
   std::vector<std::unique_ptr<internal::Codim0Object<GridViewType>>> codim0_functors_;
   std::vector<std::unique_ptr<internal::Codim1Object<GridViewType>>> codim1_functors_;
 }; // class Walker
