@@ -106,7 +106,7 @@ class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits
                          public ProvidesDataAccess<internal::EigenDenseVectorTraits<ScalarImp>>
 {
   typedef EigenDenseVector<ScalarImp> ThisType;
-  typedef VectorInterface<internal::EigenDenseVectorTraits<ScalarImp>> VectorInterfaceType;
+  typedef VectorInterface<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
   typedef EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>> BaseType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
@@ -220,7 +220,7 @@ class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDense
                                public ProvidesBackend<internal::EigenMappedDenseVectorTraits<ScalarImp>>
 {
   typedef EigenMappedDenseVector<ScalarImp> ThisType;
-  typedef VectorInterface<internal::EigenMappedDenseVectorTraits<ScalarImp>> VectorInterfaceType;
+  typedef VectorInterface<internal::EigenMappedDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
   typedef EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>> BaseType;
   static_assert(std::is_same<ScalarImp, double>::value, "Undefined behaviour for non-double data!");
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
@@ -354,13 +354,12 @@ private:
 
 
 template <class ScalarImp = double>
-class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>>,
-                         public EigenMatrixInterfaceDynamic,
+class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp>,
                          public ProvidesBackend<internal::EigenDenseMatrixTraits<ScalarImp>>,
                          public ProvidesDataAccess<internal::EigenDenseMatrixTraits<ScalarImp>>
 {
   typedef EigenDenseMatrix<ScalarImp> ThisType;
-  typedef MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>> MatrixInterfaceType;
+  typedef MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
@@ -421,7 +420,7 @@ public:
   }
 
   template <class M>
-  EigenDenseMatrix(const MatrixInterface<M>& other)
+  EigenDenseMatrix(const MatrixInterface<M, ScalarType>& other)
     : backend_(new BackendType(other.rows(), other.cols()))
   {
     for (size_t ii = 0; ii < other.rows(); ++ii)

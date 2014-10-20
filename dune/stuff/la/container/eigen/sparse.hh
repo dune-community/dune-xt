@@ -66,12 +66,12 @@ public:
  * \brief A sparse matrix implementation of the MatrixInterface with row major memory layout.
  */
 template <class ScalarImp = double>
-class EigenRowMajorSparseMatrix : public MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>>,
-                                  public EigenMatrixInterfaceDynamic,
-                                  public ProvidesBackend<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>>
+class EigenRowMajorSparseMatrix
+    : public MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>,
+      public ProvidesBackend<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>>
 {
   typedef EigenRowMajorSparseMatrix<ScalarImp> ThisType;
-  typedef MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>> MatrixInterfaceType;
+  typedef MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
