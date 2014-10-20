@@ -205,7 +205,7 @@ public:
     return grid_ptr_;
   }
 
-  std::shared_ptr<const GridType> grid_ptr() const
+  const std::shared_ptr<const GridType>& grid_ptr() const
   {
     return grid_ptr_;
   }
