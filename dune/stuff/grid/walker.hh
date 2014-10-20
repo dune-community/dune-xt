@@ -20,6 +20,7 @@
 #include <dune/stuff/grid/entity.hh>
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/common/parallel/threadmanager.hh>
+#include <dune/stuff/common/ranges.hh>
 
 #include "walker/functors.hh"
 #include "walker/apply-on.hh"
