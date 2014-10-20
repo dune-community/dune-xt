@@ -48,22 +48,22 @@ struct GridProviderBaseTest : public testing::Test
     using Stuff::Grid::ChoosePartView;
     std::string static_id = grid_provider.static_id();
     const auto& grid = grid_provider.grid();
-    std::shared_ptr<typename GridProviderType::template Leaf<ChoosePartView::view>::Type> leaf_view_auto =
+    typename GridProviderType::template Leaf<ChoosePartView::view>::Type DUNE_UNUSED(leaf_view_auto) =
         grid_provider.template leaf<ChoosePartView::view>();
-    std::shared_ptr<typename GridProviderType::LeafGridViewType> leaf_view = grid_provider.leaf_view();
+    typename GridProviderType::LeafGridViewType DUNE_UNUSED(leaf_view) = grid_provider.leaf_view();
 #if HAVE_DUNE_FEM
-    std::shared_ptr<typename GridProviderType::template Leaf<ChoosePartView::part>::Type> leaf_part_auto =
+    typename GridProviderType::template Leaf<ChoosePartView::part>::Type DUNE_UNUSED(leaf_part_auto) =
         grid_provider.template leaf<ChoosePartView::part>();
-    std::shared_ptr<typename GridProviderType::LeafGridPartType> leaf_part = grid_provider.leaf_part();
+    typename GridProviderType::LeafGridPartType leaf_part = grid_provider.leaf_part();
 #endif // HAVE_DUNE_FEM
     for (int level = 0; level <= grid.maxLevel(); ++level) {
-      std::shared_ptr<typename GridProviderType::template Level<ChoosePartView::view>::Type> level_view_auto =
+      typename GridProviderType::template Level<ChoosePartView::view>::Type DUNE_UNUSED(level_view_auto) =
           grid_provider.template level<ChoosePartView::view>(level);
-      std::shared_ptr<typename GridProviderType::LevelGridViewType> level_view = grid_provider.level_view(level);
+      typename GridProviderType::LevelGridViewType DUNE_UNUSED(level_view) = grid_provider.level_view(level);
 #if HAVE_DUNE_FEM
-      std::shared_ptr<typename GridProviderType::template Level<ChoosePartView::part>::Type> level_part_auto =
+      typename GridProviderType::template Level<ChoosePartView::part>::Type DUNE_UNUSED(level_part_auto) =
           grid_provider.template level<ChoosePartView::part>(level);
-      std::shared_ptr<typename GridProviderType::LevelGridPartType> level_part = grid_provider.level_part(level);
+      typename GridProviderType::LevelGridPartType DUNE_UNUSED(level_part) = grid_provider.level_part(level);
 #endif // HAVE_DUNE_FEM
       //! TODO: visualization for grid with dim > 3 ??
       if (GridType::dimension <= 3)
