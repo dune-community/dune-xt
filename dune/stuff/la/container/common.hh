@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <vector>
 #include <initializer_list>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/dynvector.hh>
@@ -53,11 +54,11 @@ public:
  *  \brief A dense vector implementation of VectorInterface using the Dune::DynamicVector.
  */
 template <class ScalarImp = double>
-class CommonDenseVector : public VectorInterface<CommonDenseVectorTraits<ScalarImp>>,
+class CommonDenseVector : public VectorInterface<CommonDenseVectorTraits<ScalarImp>, ScalarImp>,
                           public ProvidesBackend<CommonDenseVectorTraits<ScalarImp>>
 {
   typedef CommonDenseVector<ScalarImp> ThisType;
-  typedef VectorInterface<CommonDenseVectorTraits<ScalarImp>> VectorInterfaceType;
+  typedef VectorInterface<CommonDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
@@ -73,12 +74,12 @@ public:
 
   /// This constructor is needed for the python bindings.
   CommonDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
   {
   }
 
   CommonDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
   {
   }
 
@@ -331,7 +332,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  friend class VectorInterface<CommonDenseVectorTraits<ScalarType>>;
+  friend class VectorInterface<CommonDenseVectorTraits<ScalarType>, ScalarType>;
   friend class CommonDenseMatrix<ScalarType>;
 
   mutable std::shared_ptr<BackendType> backend_;
@@ -352,11 +353,11 @@ public:
  *  \brief  A dense matrix implementation of MatrixInterface using the dune-common.
  */
 template <class ScalarImp = double>
-class CommonDenseMatrix : public MatrixInterface<CommonDenseMatrixTraits<ScalarImp>>,
+class CommonDenseMatrix : public MatrixInterface<CommonDenseMatrixTraits<ScalarImp>, ScalarImp>,
                           public ProvidesBackend<CommonDenseMatrixTraits<ScalarImp>>
 {
   typedef CommonDenseMatrix<ScalarImp> ThisType;
-  typedef MatrixInterface<CommonDenseMatrixTraits<ScalarImp>> MatrixInterfaceType;
+  typedef MatrixInterface<CommonDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
@@ -373,21 +374,18 @@ public:
   /// This constructor is needed for the python bindings.
   CommonDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
                     const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
   {
   }
 
   CommonDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), value))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
   {
   }
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   CommonDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc), ScalarType(0)))
+    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), ScalarType(0)))
   {
   }
 
@@ -508,8 +506,8 @@ public:
     return backend_->cols();
   }
 
-  inline void mv(const VectorInterface<CommonDenseVectorTraits<ScalarType>>& xx,
-                 VectorInterface<CommonDenseVectorTraits<ScalarType>>& yy) const
+  inline void mv(const VectorInterface<CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
+                 VectorInterface<CommonDenseVectorTraits<ScalarType>, ScalarType>& yy) const
   {
     mv(static_cast<const typename CommonDenseVectorTraits<ScalarType>::derived_type&>(xx),
        static_cast<typename CommonDenseVectorTraits<ScalarType>::derived_type&>(yy));
