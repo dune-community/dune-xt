@@ -816,22 +816,23 @@ struct MatrixTest : public ::testing::Test
     EXPECT_TRUE(result_mv_1 == vector_zeros && result_mv_2 == vector_zeros) << result_mv_1 << " vs " << result_mv_2
                                                                             << " vs. " << vector_zeros;
     testmatrix_sparse.mv(testvector_5, result_mv_1);
-    EXPECT_TRUE(result_mv_1[0] == ScalarType(1.25) && result_mv_1[1] == ScalarType(1.25)
-                && result_mv_1[2] == ScalarType(1.75)
-                && result_mv_1[3] == ScalarType(0))
+    EXPECT_TRUE(FloatCmp::eq(result_mv_1[0], ScalarType(1.25)) && FloatCmp::eq(result_mv_1[1], ScalarType(1.25))
+                && FloatCmp::eq(result_mv_1[2], ScalarType(1.75))
+                && FloatCmp::eq(result_mv_1[3], ScalarType(0)))
         << result_mv_1;
     testmatrix_2.mv(testvector_3, result_mv_1);
     result_mv_2 = vector_ones;
     result_mv_2.scal(ScalarType(3));
     EXPECT_EQ(result_mv_1, result_mv_2);
     testmatrix_1.mv(testvector_1, result_mv_1);
-    EXPECT_TRUE(result_mv_1[0] == ScalarType(5) && result_mv_1[1] == ScalarType(6) && result_mv_1[2] == ScalarType(7)
-                && result_mv_1[3] == ScalarType(8))
+    EXPECT_TRUE(FloatCmp::eq(result_mv_1[0], ScalarType(5)) && FloatCmp::eq(result_mv_1[1], ScalarType(6))
+                && FloatCmp::eq(result_mv_1[2], ScalarType(7))
+                && FloatCmp::eq(result_mv_1[3], ScalarType(8)))
         << result_mv_1;
     testmatrix_sparse.mv(vector_ones, result_mv_1);
-    EXPECT_TRUE(result_mv_1[0] == ScalarType(0.5) && result_mv_1[1] == ScalarType(2.5)
-                && result_mv_1[2] == ScalarType(-0.5)
-                && result_mv_1[3] == ScalarType(0))
+    EXPECT_TRUE(FloatCmp::eq(result_mv_1[0], ScalarType(0.5)) && FloatCmp::eq(result_mv_1[1], ScalarType(2.5))
+                && FloatCmp::eq(result_mv_1[2], ScalarType(-0.5))
+                && FloatCmp::eq(result_mv_1[3], ScalarType(0)))
         << result_mv_1;
     VectorImp a = vector_ones;
     matrix_zeros_dense.mv(vector_zeros, a);
