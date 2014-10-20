@@ -48,9 +48,7 @@ class MatrixInterface : public ContainerInterface<Traits, ScalarImp>, public Tag
 {
 public:
   typedef typename Traits::derived_type derived_type;
-  typedef typename Traits::ScalarType TraitsScalarType;
   typedef ScalarImp ScalarType;
-  static_assert(std::is_same<ScalarType, TraitsScalarType>::value, "");
 
   virtual ~MatrixInterface()
   {

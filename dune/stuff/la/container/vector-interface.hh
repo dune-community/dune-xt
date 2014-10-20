@@ -8,10 +8,6 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_VECTOR_INTERFACE_HH
 #define DUNE_STUFF_LA_CONTAINER_VECTOR_INTERFACE_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-#define DUNE_STUFF_SSIZE_T long int
-#endif
-
 #include <cmath>
 #include <limits>
 #include <iostream>
@@ -55,9 +51,7 @@ class VectorInterface : public ContainerInterface<Traits, ScalarImp>, public Tag
 {
 public:
   typedef typename Traits::derived_type derived_type;
-  typedef typename Traits::ScalarType TraitsScalarType;
   typedef ScalarImp ScalarType;
-  static_assert(std::is_same<ScalarType, TraitsScalarType>::value, "");
 
   typedef internal::VectorInputIterator<Traits, ScalarType> const_iterator;
   typedef internal::VectorOutputIterator<Traits, ScalarType> iterator;

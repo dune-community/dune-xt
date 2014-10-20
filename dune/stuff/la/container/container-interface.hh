@@ -8,6 +8,10 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_CONTAINER_INTERFACE_HH
 #define DUNE_STUFF_LA_CONTAINER_CONTAINER_INTERFACE_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+#define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <cmath>
 #include <limits>
 #include <type_traits>
@@ -117,11 +121,10 @@ class ContainerInterface : public Tags::ContainerInterface,
                            public CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
 {
   typedef CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits> CRTP;
+  static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value, "");
 
 public:
-  typedef typename Traits::ScalarType TraitsScalarType;
   typedef ScalarImp ScalarType;
-  static_assert(std::is_same<ScalarType, TraitsScalarType>::value, "");
 
   using typename CRTP::derived_type;
 
