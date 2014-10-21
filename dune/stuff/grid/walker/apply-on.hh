@@ -209,7 +209,7 @@ public:
   typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  DirichletIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit DirichletIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
   {
   }
@@ -233,7 +233,7 @@ public:
   typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  NeumannIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit NeumannIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
   {
   }

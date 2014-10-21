@@ -42,7 +42,7 @@ public:
   typedef typename Stuff::Grid::Entity<GridViewType>::Type EntityType;
   typedef typename Stuff::Grid::Intersection<GridViewType>::Type IntersectionType;
 
-  Walker(GridViewType grd_vw)
+  explicit Walker(GridViewType grd_vw)
     : grid_view_(grd_vw)
   {
   }

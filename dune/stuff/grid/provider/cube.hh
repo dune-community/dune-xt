@@ -165,10 +165,10 @@ public:
    *  \param[in]  num_elements (optional)
    *              Number of elements.
    **/
-  Cube(const DomainFieldType lower_left = default_config().get<DomainFieldType>("lower_left"),
-       const DomainFieldType upper_right = default_config().get<DomainFieldType>("upper_right"),
-       const unsigned int num_elements   = default_config().get<std::vector<unsigned int>>("num_elements")[0],
-       const size_t num_refinements = default_config().get<size_t>("num_refinements"))
+  explicit Cube(const DomainFieldType lower_left = default_config().get<DomainFieldType>("lower_left"),
+                const DomainFieldType upper_right = default_config().get<DomainFieldType>("upper_right"),
+                const unsigned int num_elements   = default_config().get<std::vector<unsigned int>>("num_elements")[0],
+                const size_t num_refinements = default_config().get<size_t>("num_refinements"))
     : grid_ptr_(
           create_grid(DomainType(lower_left), DomainType(upper_right), parse_array(num_elements), num_refinements))
   {
