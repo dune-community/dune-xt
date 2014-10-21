@@ -84,9 +84,9 @@ public:
    *  \note Simplices are not supported in SGrid, so this functions
    *        unconditionally throws a GridError.
    */
-  static shared_ptr<GridType> createSimplexGrid(const FieldVector<ctype, dimworld>& lowerLeft,
-                                                const FieldVector<ctype, dimworld>& upperRight,
-                                                const array<unsigned int, dim>& elements)
+  static shared_ptr<GridType> createSimplexGrid(const FieldVector<ctype, dimworld>& /*lowerLeft*/,
+                                                const FieldVector<ctype, dimworld>& /*upperRight*/,
+                                                const array<unsigned int, dim>& /*elements*/)
   {
     DUNE_THROW(GridError,
                className<StructuredGridFactory>() << "::createSimplexGrid(): Simplices are not supported "
