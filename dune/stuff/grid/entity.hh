@@ -6,10 +6,11 @@
 #ifndef DUNE_STUFF_GRID_ENTITY_HH
 #define DUNE_STUFF_GRID_ENTITY_HH
 
+#include <dune/geometry/referenceelements.hh>
+
 #if HAVE_DUNE_GRID
 #include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/entity.hh>
-#include <dune/geometry/referenceelements.hh>
 #include <dune/grid/common/gridview.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 #endif
