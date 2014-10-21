@@ -45,6 +45,7 @@ template <class ImpTraits, class ScalarImp = double>
 class EigenBaseVector : public VectorInterface<ImpTraits, ScalarImp>, public ProvidesBackend<ImpTraits>
 {
   typedef VectorInterface<ImpTraits, ScalarImp> VectorInterfaceType;
+  typedef EigenBaseVector<ImpTraits, ScalarImp> ThisType;
 
 public:
   typedef ImpTraits Traits;
@@ -53,10 +54,13 @@ public:
   typedef typename Traits::derived_type VectorImpType;
 
 private:
-//! disambiguation necessary since it exeists in multiple bases
 #ifndef NDEBUG
+  //! disambiguation necessary since it exists in multiple bases
   using VectorInterfaceType::crtp_mutex_;
 #endif
+
+  //! disambiguation necessary since it exists in multiple bases
+  using VectorInterfaceType::as_imp;
 
   /**
    * \see ContainerInterface
@@ -68,10 +72,19 @@ private:
   }
 
 public:
-  VectorImpType& operator=(const VectorImpType& other)
+  VectorImpType& operator=(const ThisType& other)
   {
-    backend_ = other.backend_;
-    return *this;
+    if (this != &other)
+      backend_ = other.backend_;
+    return this->as_imp();
+  } // ... operator=(...)
+
+  VectorImpType& operator=(const ScalarType& value)
+  {
+    ensure_uniqueness();
+    for (auto& element : *this)
+      element = value;
+    return this->as_imp();
   } // ... operator=(...)
 
   /**

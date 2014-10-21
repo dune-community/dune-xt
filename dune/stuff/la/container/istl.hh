@@ -125,8 +125,6 @@ public:
   {
   }
 
-  using VectorInterfaceType::operator=;
-
   ThisType& operator=(const ThisType& other)
   {
     backend_ = other.backend_;
@@ -146,6 +144,14 @@ public:
    * \defgroup backend ´´These methods are required by the ProvidesBackend interface.``
    * \{
    */
+
+  ThisType& operator=(const ScalarType& value)
+  {
+    ensure_uniqueness();
+    for (auto& element : *this)
+      element = value;
+    return *this;
+  } // ... operator=(...)
 
   BackendType& backend()
   {

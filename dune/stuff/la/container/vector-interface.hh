@@ -355,13 +355,6 @@ public:
       set_entry(ii, get_entry(ii) - other.get_entry(ii));
   } // ... isub(...)
 
-  virtual derived_type& operator=(const ScalarType& value)
-  {
-    for (auto& element : *this)
-      element = value;
-    return this->as_imp(*this);
-  }
-
   /**
    *  \brief  Multiplies every component of this by a scalar.
    *  \param  alpha The scalar.
