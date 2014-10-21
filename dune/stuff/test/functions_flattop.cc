@@ -13,12 +13,11 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/stuff/common/disable_warnings.hh>
 #if HAVE_DUNE_GRID
 #include <dune/grid/sgrid.hh>
 #endif
+
 #include <dune/geometry/quadraturerules.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/grid/provider/cube.hh>

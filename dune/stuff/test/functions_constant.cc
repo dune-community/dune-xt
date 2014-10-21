@@ -40,9 +40,7 @@
 
 #if HAVE_DUNE_GRID
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/sgrid.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 
 typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneSGrid1dEntityType;
 typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneSGrid2dEntityType;
@@ -127,9 +125,7 @@ TYPED_TEST(ConstantFunctionYaspGridEntityTest, provides_required_methods)
 }
 
 #if HAVE_ALUGRID
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/alugrid.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 
 typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity DuneAluSimplexGrid2dEntityType;
 typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>::Codim<0>::Entity DuneAluSimplexGrid3dEntityType;

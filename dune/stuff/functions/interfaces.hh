@@ -12,7 +12,6 @@
 #include <ostream>
 #include <type_traits>
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
@@ -31,13 +30,12 @@
 #if HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
 #include <dune/fem/space/common/functionspace.hh>
-#endif // HAVE_DUNE_FEM
+#endif
 
 #if HAVE_DUNE_PDELAB
 #include <dune/typetree/nodetags.hh>
 #include <dune/pdelab/common/function.hh>
-#endif // HAVE_DUNE_PDELAB
-#include <dune/stuff/common/reenable_warnings.hh>
+#endif
 
 #include <dune/stuff/common/memory.hh>
 #include <dune/stuff/common/exceptions.hh>

@@ -41,9 +41,7 @@
 
 #if HAVE_DUNE_GRID
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/sgrid.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 
 typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneSGrid1dEntityType;
 typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneSGrid2dEntityType;
