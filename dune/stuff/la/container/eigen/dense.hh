@@ -116,7 +116,7 @@ public:
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::BackendType BackendType;
 
-  EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
+  explicit EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
   {
     this->backend_ = std::make_shared<BackendType>(ss);
     if (FloatCmp::eq(value, ScalarType(0)))
@@ -128,7 +128,7 @@ public:
   }
 
   /// This constructor is needed for the python bindings.
-  EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
+  explicit EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
   {
     this->backend_ = std::make_shared<BackendType>(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss));
     if (FloatCmp::eq(value, ScalarType(0)))
@@ -139,7 +139,7 @@ public:
     }
   }
 
-  EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
+  explicit EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
     this->backend_ = std::make_shared<BackendType>(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss));
     if (FloatCmp::eq(value, ScalarType(0)))
@@ -150,14 +150,14 @@ public:
     }
   }
 
-  EigenDenseVector(const std::vector<ScalarType>& other)
+  explicit EigenDenseVector(const std::vector<ScalarType>& other)
   {
     this->backend_ = std::make_shared<BackendType>(other.size());
     for (size_t ii = 0; ii < other.size(); ++ii)
       this->backend_->operator[](ii) = other[ii];
   }
 
-  EigenDenseVector(const std::initializer_list<ScalarType>& other)
+  explicit EigenDenseVector(const std::initializer_list<ScalarType>& other)
   {
     this->backend_ = std::make_shared<BackendType>(other.size());
     size_t ii = 0;
@@ -167,7 +167,7 @@ public:
     }
   }
 
-  EigenDenseVector(const BackendType& other)
+  explicit EigenDenseVector(const BackendType& other)
   {
     this->backend_ = std::make_shared<BackendType>(other);
   }
@@ -175,12 +175,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  EigenDenseVector(BackendType* backend_ptr)
+  explicit EigenDenseVector(BackendType* backend_ptr)
   {
     this->backend_ = std::shared_ptr<BackendType>(backend_ptr);
   }
 
-  EigenDenseVector(std::shared_ptr<BackendType> backend_ptr)
+  explicit EigenDenseVector(std::shared_ptr<BackendType> backend_ptr)
   {
     this->backend_ = backend_ptr;
   }
@@ -242,7 +242,7 @@ public:
   /**
    *  \brief  This constructor allows to create an instance of this type just like any other vector.
    */
-  EigenMappedDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
+  explicit EigenMappedDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
   {
     this->backend_ = std::make_shared<BackendType>(new ScalarType[ss], ss);
     if (FloatCmp::eq(value, ScalarType(0)))
@@ -254,7 +254,7 @@ public:
   }
 
   /// This constructor is needed for the python bindings.
-  EigenMappedDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
+  explicit EigenMappedDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
   {
     const size_t ss_size_t = VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss);
     this->backend_ = std::make_shared<BackendType>(new ScalarType[ss_size_t], ss_size_t);
@@ -266,7 +266,7 @@ public:
     }
   }
 
-  EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
+  explicit EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
     const size_t ss_size_t = VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss);
     this->backend_ = std::make_shared<BackendType>(new ScalarType[ss_size_t], ss_size_t);
@@ -278,14 +278,14 @@ public:
     }
   }
 
-  EigenMappedDenseVector(const std::vector<ScalarType>& other)
+  explicit EigenMappedDenseVector(const std::vector<ScalarType>& other)
   {
     this->backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     for (size_t ii = 0; ii < other.size(); ++ii)
       this->backend_->operator[](ii) = other[ii];
   }
 
-  EigenMappedDenseVector(const std::initializer_list<ScalarType>& other)
+  explicit EigenMappedDenseVector(const std::initializer_list<ScalarType>& other)
   {
     this->backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     size_t ii = 0;
@@ -306,7 +306,7 @@ public:
   /**
    * \brief This constructor does a deep copy.
    */
-  EigenMappedDenseVector(const BackendType& other)
+  explicit EigenMappedDenseVector(const BackendType& other)
   {
     this->backend_          = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     this->backend_->operator=(other);
@@ -315,12 +315,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  EigenMappedDenseVector(BackendType* backend_ptr)
+  explicit EigenMappedDenseVector(BackendType* backend_ptr)
   {
     this->backend_ = std::shared_ptr<BackendType>(backend_ptr);
   }
 
-  EigenMappedDenseVector(std::shared_ptr<BackendType> backend_ptr)
+  explicit EigenMappedDenseVector(std::shared_ptr<BackendType> backend_ptr)
   {
     this->backend_ = backend_ptr;
   }
@@ -368,7 +368,7 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
 
-  EigenDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
+  explicit EigenDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(rr, cc))
   {
     if (FloatCmp::eq(value, ScalarType(0)))
@@ -380,7 +380,8 @@ public:
   }
 
   /// This constructor is needed for the python bindings.
-  EigenDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0, const ScalarType value = ScalarType(0))
+  explicit EigenDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
+                            const ScalarType value = ScalarType(0))
     : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
                                MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
@@ -392,7 +393,7 @@ public:
     }
   }
 
-  EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
+  explicit EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
                                MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
@@ -414,7 +415,7 @@ public:
 
   EigenDenseMatrix(const ThisType& other) = default;
 
-  EigenDenseMatrix(const BackendType& other)
+  explicit EigenDenseMatrix(const BackendType& other)
     : backend_(new BackendType(other))
   {
   }
@@ -440,12 +441,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  EigenDenseMatrix(BackendType* backend_ptr)
+  explicit EigenDenseMatrix(BackendType* backend_ptr)
     : backend_(backend_ptr)
   {
   }
 
-  EigenDenseMatrix(std::shared_ptr<BackendType> backend_ptr)
+  explicit EigenDenseMatrix(std::shared_ptr<BackendType> backend_ptr)
     : backend_(backend_ptr)
   {
   }

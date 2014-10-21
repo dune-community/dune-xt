@@ -67,30 +67,30 @@ public:
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::BackendType BackendType;
 
-  CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
+  explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(ss, value))
   {
   }
 
   /// This constructor is needed for the python bindings.
-  CommonDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
+  explicit CommonDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
   {
   }
 
-  CommonDenseVector(const int ss, const ScalarType value = ScalarType(0))
+  explicit CommonDenseVector(const int ss, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
   {
   }
 
-  CommonDenseVector(const std::vector<ScalarType>& other)
+  explicit CommonDenseVector(const std::vector<ScalarType>& other)
     : backend_(new BackendType(other.size()))
   {
     for (size_t ii = 0; ii < other.size(); ++ii)
       backend_->operator[](ii) = other[ii];
   }
 
-  CommonDenseVector(const std::initializer_list<ScalarType>& other)
+  explicit CommonDenseVector(const std::initializer_list<ScalarType>& other)
     : backend_(new BackendType(other.size()))
   {
     size_t ii = 0;
@@ -102,7 +102,7 @@ public:
 
   CommonDenseVector(const ThisType& other) = default;
 
-  CommonDenseVector(const BackendType& other)
+  explicit CommonDenseVector(const BackendType& other)
     : backend_(new BackendType(other))
   {
   }
@@ -110,12 +110,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  CommonDenseVector(BackendType* backend_ptr)
+  explicit CommonDenseVector(BackendType* backend_ptr)
     : backend_(backend_ptr)
   {
   }
 
-  CommonDenseVector(std::shared_ptr<BackendType> backend_ptr)
+  explicit CommonDenseVector(std::shared_ptr<BackendType> backend_ptr)
     : backend_(backend_ptr)
   {
   }
@@ -366,19 +366,19 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
 
-  CommonDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
+  explicit CommonDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(rr, cc, value))
   {
   }
 
   /// This constructor is needed for the python bindings.
-  CommonDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
-                    const ScalarType value = ScalarType(0))
+  explicit CommonDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
+                             const ScalarType value = ScalarType(0))
     : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
   {
   }
 
-  CommonDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
+  explicit CommonDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
   {
   }
@@ -394,7 +394,7 @@ public:
   {
   }
 
-  CommonDenseMatrix(const BackendType& other)
+  explicit CommonDenseMatrix(const BackendType& other)
     : backend_(new BackendType(other))
   {
   }
@@ -411,12 +411,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  CommonDenseMatrix(BackendType* backend_ptr)
+  explicit CommonDenseMatrix(BackendType* backend_ptr)
     : backend_(backend_ptr)
   {
   }
 
-  CommonDenseMatrix(std::shared_ptr<BackendType> backend_ptr)
+  explicit CommonDenseMatrix(std::shared_ptr<BackendType> backend_ptr)
     : backend_(backend_ptr)
   {
   }

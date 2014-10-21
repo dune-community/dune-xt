@@ -24,7 +24,7 @@ public:
   typedef BaseType::value_type InnerType;
   typedef typename BaseType::const_iterator ConstOuterIteratorType;
 
-  SparsityPatternDefault(const size_t _size = 0);
+  explicit SparsityPatternDefault(const size_t _size = 0);
 
   size_t size() const;
 

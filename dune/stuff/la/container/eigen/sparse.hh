@@ -108,20 +108,20 @@ public:
     backend_->makeCompressed();
   }
 
-  EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
+  explicit EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
   {
     backend_ = std::make_shared<BackendType>(assert_is_IndexType_compatible_and_convert(rr),
                                              assert_is_IndexType_compatible_and_convert(cc));
   }
 
   /// This constructor is needed for the python bindings.
-  EigenRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
+  explicit EigenRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
     : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
                                MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
   {
   }
 
-  EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
+  explicit EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
     : EigenRowMajorSparseMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
                                 MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc))
   {
@@ -134,7 +134,7 @@ public:
   {
   }
 
-  EigenRowMajorSparseMatrix(const BackendType& other)
+  explicit EigenRowMajorSparseMatrix(const BackendType& other)
     : backend_(new BackendType(other))
   {
   }
@@ -142,12 +142,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  EigenRowMajorSparseMatrix(BackendType* backend_ptr)
+  explicit EigenRowMajorSparseMatrix(BackendType* backend_ptr)
     : backend_(backend_ptr)
   {
   }
 
-  EigenRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr)
+  explicit EigenRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr)
     : backend_(backend_ptr)
   {
   }

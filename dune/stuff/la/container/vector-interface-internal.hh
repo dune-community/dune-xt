@@ -41,7 +41,7 @@ public:
 private:
   struct ConstHolder
   {
-    ConstHolder(const VectorType& vec)
+    explicit ConstHolder(const VectorType& vec)
       : element(vec)
     {
     }
@@ -50,7 +50,7 @@ private:
   };
 
 public:
-  VectorInputIterator(const VectorType& vec, const bool end = false)
+  explicit VectorInputIterator(const VectorType& vec, const bool end = false)
     : const_holder_(std::make_shared<ConstHolder>(vec))
     , position_(0)
     , end_(end)
@@ -107,7 +107,7 @@ public:
 private:
   struct Holder
   {
-    Holder(VectorType& vec)
+    explicit Holder(VectorType& vec)
       : element(vec)
     {
     }
@@ -116,7 +116,7 @@ private:
   };
 
 public:
-  VectorOutputIterator(VectorType& vec, const bool end = false)
+  explicit VectorOutputIterator(VectorType& vec, const bool end = false)
     : BaseType(vec, end)
     , holder_(std::make_shared<Holder>(vec))
   {

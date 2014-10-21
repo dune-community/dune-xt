@@ -70,32 +70,32 @@ public:
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::BackendType BackendType;
 
-  IstlDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
+  explicit IstlDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(ss))
   {
     backend_->operator=(value);
   }
 
   /// This constructor is needed for the python bindings.
-  IstlDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
+  explicit IstlDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
     : IstlDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
   {
   }
 
   /// This constructor is needed because marking the above one as explicit had no effect.
-  IstlDenseVector(const int ss, const ScalarType value = ScalarType(0))
+  explicit IstlDenseVector(const int ss, const ScalarType value = ScalarType(0))
     : IstlDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
   {
   }
 
-  IstlDenseVector(const std::vector<ScalarType>& other)
+  explicit IstlDenseVector(const std::vector<ScalarType>& other)
     : backend_(new BackendType(other.size()))
   {
     for (size_t ii = 0; ii < other.size(); ++ii)
       backend_->operator[](ii)[0] = other[ii];
   }
 
-  IstlDenseVector(const std::initializer_list<ScalarType>& other)
+  explicit IstlDenseVector(const std::initializer_list<ScalarType>& other)
     : backend_(new BackendType(other.size()))
   {
     size_t ii = 0;
@@ -107,7 +107,7 @@ public:
 
   IstlDenseVector(const ThisType& other) = default;
 
-  IstlDenseVector(const BackendType& other)
+  explicit IstlDenseVector(const BackendType& other)
     : backend_(new BackendType(other))
   {
   }
@@ -115,12 +115,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  IstlDenseVector(BackendType* backend_ptr)
+  explicit IstlDenseVector(BackendType* backend_ptr)
     : backend_(backend_ptr)
   {
   }
 
-  IstlDenseVector(std::shared_ptr<BackendType> backend_ptr)
+  explicit IstlDenseVector(std::shared_ptr<BackendType> backend_ptr)
     : backend_(backend_ptr)
   {
   }
@@ -400,20 +400,20 @@ public:
     backend_->operator*=(ScalarType(0));
   }
 
-  IstlRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
+  explicit IstlRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
     : backend_(new BackendType(rr, cc, BackendType::row_wise))
   {
   }
 
   /// This constructor is needed for the python bindings.
-  IstlRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
+  explicit IstlRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
     : backend_(new BackendType(this->assert_is_size_t_compatible_and_convert(rr),
                                this->assert_is_size_t_compatible_and_convert(cc), BackendType::row_wise))
   {
   }
 
   /// This constructor is needed because marking the above one as explicit had no effect.
-  IstlRowMajorSparseMatrix(const int rr, const int cc = 0)
+  explicit IstlRowMajorSparseMatrix(const int rr, const int cc = 0)
     : backend_(new BackendType(this->assert_is_size_t_compatible_and_convert(rr),
                                this->assert_is_size_t_compatible_and_convert(cc), BackendType::row_wise))
   {
@@ -421,7 +421,7 @@ public:
 
   IstlRowMajorSparseMatrix(const ThisType& other) = default;
 
-  IstlRowMajorSparseMatrix(const BackendType& other)
+  explicit IstlRowMajorSparseMatrix(const BackendType& other)
     : backend_(new BackendType(other))
   {
   }
@@ -429,12 +429,12 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  IstlRowMajorSparseMatrix(BackendType* backend_ptr)
+  explicit IstlRowMajorSparseMatrix(BackendType* backend_ptr)
     : backend_(backend_ptr)
   {
   }
 
-  IstlRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr)
+  explicit IstlRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr)
     : backend_(backend_ptr)
   {
   }
