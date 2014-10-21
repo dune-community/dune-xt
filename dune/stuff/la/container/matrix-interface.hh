@@ -43,7 +43,7 @@ class MatrixInterface
 } // namespace Tags
 
 
-template <class Traits, class ScalarImp>
+template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class MatrixInterface : public ContainerInterface<Traits, ScalarImp>, public Tags::MatrixInterface
 {
 public:

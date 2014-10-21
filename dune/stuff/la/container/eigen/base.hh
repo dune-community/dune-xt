@@ -22,29 +22,29 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-namespace internal {
 
 
-// forwards
-template <class Traits, class ScalarImp>
-class EigenBaseVector;
+template <class ScalarImp>
+class EigenDenseMatrix;
 
-class EigenVectorInterfaceDynamic
-{
-};
+template <class ScalarType>
+class EigenRowMajorSparseMatrix;
+
 
 #if HAVE_EIGEN
+
+
+template <class Traits, class ScalarImp>
+class EigenBaseVector;
 
 
 /**
  *  \brief Base class for all eigen implementations of VectorInterface.
  */
 template <class ImpTraits, class ScalarImp = double>
-class EigenBaseVector : public VectorInterface<ImpTraits>,
-                        public EigenVectorInterfaceDynamic,
-                        public ProvidesBackend<ImpTraits>
+class EigenBaseVector : public VectorInterface<ImpTraits, ScalarImp>, public ProvidesBackend<ImpTraits>
 {
-  typedef VectorInterface<ImpTraits> VectorInterfaceType;
+  typedef VectorInterface<ImpTraits, ScalarImp> VectorInterfaceType;
 
 public:
   typedef ImpTraits Traits;
@@ -305,7 +305,7 @@ public:
    */
 
 private:
-  friend class VectorInterface<Traits>;
+  friend class VectorInterface<Traits, ScalarType>;
   friend class EigenDenseMatrix<ScalarType>;
   friend class EigenRowMajorSparseMatrix<ScalarType>;
 
@@ -326,7 +326,6 @@ class EigenBaseVector
 
 #endif // HAVE_EIGEN
 
-} // namespace internal
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune

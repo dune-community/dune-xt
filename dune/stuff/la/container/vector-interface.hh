@@ -46,7 +46,7 @@ class VectorInterface
 } // namespace Tags
 
 
-template <class Traits, class ScalarImp>
+template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class VectorInterface : public ContainerInterface<Traits, ScalarImp>, public Tags::VectorInterface
 {
 public:
