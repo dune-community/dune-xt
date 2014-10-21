@@ -12,16 +12,13 @@
 #include <type_traits>
 #include <vector>
 #include <initializer_list>
+
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/float_cmp.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-
-#include <dune/common/typetraits.hh>
 
 #include "interfaces.hh"
 #include "pattern.hh"

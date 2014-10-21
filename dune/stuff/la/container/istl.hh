@@ -11,18 +11,14 @@
 #include <vector>
 #include <initializer_list>
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/typetraits.hh>
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/bvector.hh>
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/istl/bcrsmatrix.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
-#endif // HAVE_DUNE_ISTL
+#endif
 
 #include "interfaces.hh"
 #include "pattern.hh"

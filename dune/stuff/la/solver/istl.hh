@@ -11,10 +11,8 @@
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
