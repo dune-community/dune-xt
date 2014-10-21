@@ -3,10 +3,6 @@
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_STUFF_TEST_MAIN_CATCH_EXCEPTIONS
-#define DUNE_STUFF_TEST_MAIN_CATCH_EXCEPTIONS 1
-#endif
-
 #include "main.hxx"
 
 #include <memory>
