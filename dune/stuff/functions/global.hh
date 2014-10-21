@@ -35,9 +35,9 @@ private:
   typedef std::function<RangeType(DomainType)> LambdaType;
 
 public:
-  GlobalLambdaFunction(LambdaType lambda, size_t order)
+  GlobalLambdaFunction(LambdaType lambda, size_t order_in)
     : lambda_(lambda)
-    , order_(order)
+    , order_(order_in)
   {
   }
 
