@@ -170,7 +170,7 @@ public:
    * \defgroup vector_overrides ´´These methods override default implementations from VectorInterface.``
    * \{
    */
-  virtual std::pair<size_t, ScalarType> amax() const DS_OVERRIDE DS_FINAL
+  virtual std::pair<size_t, ScalarType> amax() const override final
   {
     auto result              = std::make_pair(size_t(0), ScalarType(0));
     size_t min_index         = 0;
@@ -201,9 +201,9 @@ public:
     return true;
   } // ... almost_equal(...)
 
-  virtual bool almost_equal(const VectorImpType& other,
-                            const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
-      DS_OVERRIDE DS_FINAL
+  virtual bool
+  almost_equal(const VectorImpType& other,
+               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     return this->template almost_equal<Traits>(other, epsilon);
   }
@@ -219,22 +219,22 @@ public:
     return backend_->transpose() * *(other.backend_);
   } // ... dot(...)
 
-  virtual ScalarType dot(const VectorImpType& other) const DS_OVERRIDE DS_FINAL
+  virtual ScalarType dot(const VectorImpType& other) const override final
   {
     return this->template dot<Traits>(other);
   }
 
-  virtual ScalarType l1_norm() const DS_OVERRIDE DS_FINAL
+  virtual ScalarType l1_norm() const override final
   {
     return backend_->template lpNorm<1>();
   }
 
-  virtual ScalarType l2_norm() const DS_OVERRIDE DS_FINAL
+  virtual ScalarType l2_norm() const override final
   {
     return backend_->template lpNorm<2>();
   }
 
-  virtual ScalarType sup_norm() const DS_OVERRIDE DS_FINAL
+  virtual ScalarType sup_norm() const override final
   {
     return backend_->template lpNorm<::Eigen::Infinity>();
   }
@@ -251,7 +251,7 @@ public:
     result.backend() = *backend_ + *(other.backend_);
   } // ... add(...)
 
-  virtual void add(const VectorImpType& other, VectorImpType& result) const DS_OVERRIDE DS_FINAL
+  virtual void add(const VectorImpType& other, VectorImpType& result) const override final
   {
     return this->template add<Traits, Traits>(other, result);
   }
@@ -265,7 +265,7 @@ public:
     backend() += *(other.backend_);
   } // ... iadd(...)
 
-  virtual void iadd(const VectorImpType& other) DS_OVERRIDE DS_FINAL
+  virtual void iadd(const VectorImpType& other) override final
   {
     return this->template iadd<Traits>(other);
   }
@@ -282,7 +282,7 @@ public:
     result.backend() = *backend_ - *(other.backend_);
   } // ... sub(...)
 
-  virtual void sub(const VectorImpType& other, VectorImpType& result) const DS_OVERRIDE DS_FINAL
+  virtual void sub(const VectorImpType& other, VectorImpType& result) const override final
   {
     return this->template sub<Traits, Traits>(other, result);
   }
@@ -296,7 +296,7 @@ public:
     backend() -= *(other.backend_);
   } // ... isub(...)
 
-  virtual void isub(const VectorImpType& other) DS_OVERRIDE DS_FINAL
+  virtual void isub(const VectorImpType& other) override final
   {
     this->template isub<Traits>(other);
   }
