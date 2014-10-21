@@ -9,10 +9,8 @@
 #include <dune/geometry/referenceelements.hh>
 
 #if HAVE_DUNE_GRID
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/entity.hh>
 #include <dune/grid/common/gridview.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #include <dune/stuff/common/string.hh>

@@ -10,13 +10,11 @@
 
 #include <dune/common/unused.hh>
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 
 #if HAVE_DUNE_SPGRID
 #include <dune/grid/spgrid.hh>
-#endif // HAVE_DUNE_SPGRID
+#endif
 
 #include <dune/stuff/aliases.hh>
 

@@ -8,18 +8,12 @@
 #ifndef DUNE_STUFF_GRID_INTERSECTION_HH
 #define DUNE_STUFF_GRID_INTERSECTION_HH
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fvector.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/geometry/referenceelements.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 
 #if HAVE_DUNE_GRID
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/common/gridview.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #endif
 
 #include <dune/stuff/common/string.hh>

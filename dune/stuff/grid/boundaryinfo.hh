@@ -15,9 +15,12 @@
 #include <memory>
 
 #include <dune/common/exceptions.hh>
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/common/fvector.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
+
+#if HAVE_DUNE_PDELAB
+#include <dune/typetree/leafnode.hh>
+#include <dune/pdelab/common/geometrywrapper.hh>
+#endif
 
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/color.hh>
@@ -25,11 +28,6 @@
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
-
-#if HAVE_DUNE_PDELAB
-#include <dune/typetree/leafnode.hh>
-#include <dune/pdelab/common/geometrywrapper.hh>
-#endif
 
 namespace Dune {
 namespace Stuff {

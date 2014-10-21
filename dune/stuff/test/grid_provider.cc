@@ -17,9 +17,7 @@
 #include <dune/common/parametertree.hh>
 #include <dune/common/timer.hh>
 
-#include <dune/stuff/common/disable_warnings.hh>
 #include <dune/grid/sgrid.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/grid/yaspgrid.hh>
 
 #include <dune/stuff/common/configuration.hh>

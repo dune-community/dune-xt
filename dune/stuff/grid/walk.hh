@@ -6,19 +6,20 @@
 #ifndef DUNE_STUFF_GRID_WALK_HH
 #define DUNE_STUFF_GRID_WALK_HH
 
-#include <dune/stuff/common/disable_warnings.hh>
+#include <vector>
+
+#include <boost/format.hpp>
+
 #include <dune/common/fvector.hh>
-#include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/deprecated.hh>
+
+#include <dune/grid/common/geometry.hh>
+
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/common/misc.hh>
 #include <dune/stuff/common/ranges.hh>
-#include <dune/grid/common/geometry.hh>
 #include <dune/stuff/aliases.hh>
-
-#include <vector>
-#include <boost/format.hpp>
 
 namespace Dune {
 namespace Stuff {
