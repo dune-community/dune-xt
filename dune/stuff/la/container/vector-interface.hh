@@ -448,6 +448,13 @@ public:
     return this->as_imp(*this);
   }
 
+  /** \todo icc says: warning: function "Dune::Stuff::LA::ContainerInterface<Traits,
+  ScalarImp>::operator*=(Dune::Stuff::LA::ContainerInterface<Traits, ScalarImp>::ScalarType) [with
+  Traits=Dune::Stuff::LA::CommonDenseVectorTraits<double>, ScalarImp=double]" is hidden by
+            "Dune::Stuff::LA::VectorInterface<Traits, ScalarImp>::operator*= [with
+  Traits=Dune::Stuff::LA::CommonDenseVectorTraits<double>, ScalarImp=double]" -- virtual function override intended?
+            virtual derived_type& operator*=(const ScalarType& scalar)
+  **/
   virtual derived_type& operator*=(const ScalarType& scalar)
   {
     for (auto& element : *this)
