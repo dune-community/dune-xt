@@ -23,7 +23,7 @@ class Codim0Object : public Functor::Codim0<GridViewType>
 public:
   typedef typename BaseType::EntityType EntityType;
 
-  ~Codim0Object()
+  virtual ~Codim0Object()
   {
   }
 
@@ -83,7 +83,7 @@ class Codim1Object : public Functor::Codim1<GridViewType>
 public:
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  ~Codim1Object()
+  virtual ~Codim1Object()
   {
   }
 
