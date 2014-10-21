@@ -6,6 +6,8 @@
 #ifndef DUNE_STUFF_GRID_SEARCH_HH
 #define DUNE_STUFF_GRID_SEARCH_HH
 
+#if HAVE_DUNE_GRID
+
 #include <vector>
 
 #include <boost/range/iterator_range.hpp>
@@ -174,5 +176,7 @@ private:
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_SEARCH_HH
