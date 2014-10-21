@@ -174,27 +174,27 @@ public:
 
   Constant(const ThisType& other) = default;
 
-  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  virtual std::string type() const override final
   {
     return BaseType::static_id() + ".constant";
   }
 
-  virtual size_t order() const DS_OVERRIDE DS_FINAL
+  virtual size_t order() const override final
   {
     return 0;
   }
 
-  virtual void evaluate(const DomainType& /*x*/, RangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void evaluate(const DomainType& /*x*/, RangeType& ret) const override final
   {
     ret = constant_;
   }
 
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& ret) const override final
   {
     ret *= 0.0;
   }
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     return name_;
   }

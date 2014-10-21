@@ -65,17 +65,17 @@ class FemAdapter
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const DS_OVERRIDE
+    virtual size_t order() const override
     {
       return wrapped_localfunction_.order();
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
     {
       wrapped_localfunction_.evaluate(xx, ret);
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
     {
       wrapped_localfunction_.jacobian(xx, ret);
     }
@@ -110,17 +110,17 @@ public:
     return BaseType::static_id() + ".femadapter";
   }
 
-  virtual ThisType* copy() const DS_OVERRIDE
+  virtual ThisType* copy() const override
   {
     return new ThisType(*this);
   }
 
-  virtual std::string type() const DS_OVERRIDE
+  virtual std::string type() const override
   {
     return BaseType::static_id() + ".femadapter";
   }
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const override
   {
     return df_.name();
   }

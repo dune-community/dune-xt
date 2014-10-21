@@ -260,17 +260,17 @@ public:
   {
   }
 
-  virtual size_t order() const DS_OVERRIDE DS_FINAL
+  virtual size_t order() const override final
   {
     return Select::order(left_local_->order(), right_local_->order());
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
   {
     Select::evaluate(*left_local_, *right_local_, xx, ret, tmp_range_);
   }
 
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
   {
     Select::jacobian(*left_local_, *right_local_, xx, ret, tmp_jacobian_);
   }
@@ -375,7 +375,7 @@ public:
 
   ThisType& operator=(ThisType&& other) = delete;
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE DS_FINAL
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
   {
     typedef CombinedLocalFunction<LeftType, RightType, comb> RealLocalFunctionType;
     assert(left_);
@@ -388,13 +388,13 @@ public:
     DUNE_THROW(NotImplemented, "Are you kidding me?");
   }
 
-  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  virtual std::string type() const override final
   {
     return SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->storage_access().type() + "' and '"
            + right_->storage_access().type() + "'";
   } // ... type(...)
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     return name_;
   }

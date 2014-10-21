@@ -110,17 +110,17 @@ public:
   {
   }
 
-  virtual ThisType* copy() const DS_OVERRIDE DS_FINAL
+  virtual ThisType* copy() const override final
   {
     return new ThisType(*this);
   }
 
-  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  virtual std::string type() const override final
   {
     return BaseType::static_id() + ".flattop";
   }
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     return name_;
   }

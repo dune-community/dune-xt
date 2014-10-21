@@ -75,12 +75,12 @@ class Expression
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const DS_OVERRIDE
+    virtual size_t order() const override
     {
       return order_;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
     {
       function_->evaluate(this->entity().geometry().global(xx), tmp_vector_);
       for (size_t ii = 0; ii < dimRange; ++ii) {
@@ -91,7 +91,7 @@ class Expression
       }
     } // ... evaluate(...)
 
-    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const DS_OVERRIDE
+    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const override
     {
       DUNE_THROW(NotImplemented,
                  "Once we decided on the JacobianRangeType of matrix valued functions we have to implement "
@@ -150,17 +150,17 @@ public:
     return *this;
   }
 
-  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  virtual std::string type() const override final
   {
     return BaseType::static_id() + ".expression";
   }
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const override
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
   {
     return std::unique_ptr<Localfunction>(new Localfunction(entity, function_, order_));
   }
@@ -252,27 +252,27 @@ public:
     build_gradients(variable, gradient_expressions);
   }
 
-  virtual ThisType* copy() const DS_OVERRIDE
+  virtual ThisType* copy() const override
   {
     return new ThisType(*this);
   }
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const override
   {
     return name_;
   }
 
-  virtual size_t order() const DS_OVERRIDE
+  virtual size_t order() const override
   {
     return order_;
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const override
   {
     function_->evaluate(xx, ret);
   }
 
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
+  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
   {
     if (gradients_.size() == 0)
       DUNE_THROW(NotImplemented, "This function does not provide any gradients!");

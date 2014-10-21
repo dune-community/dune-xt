@@ -61,18 +61,18 @@ class Checkerboard
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const DS_OVERRIDE
+    virtual size_t order() const override
     {
       return 0;
     }
 
-    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const DS_OVERRIDE
+    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
       ret = value_;
     }
 
-    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const DS_OVERRIDE
+    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -179,22 +179,22 @@ public:
 
   ThisType& operator=(ThisType&& source) = delete;
 
-  virtual ThisType* copy() const DS_OVERRIDE
+  virtual ThisType* copy() const override
   {
     return new ThisType(*this);
   }
 
-  virtual std::string type() const DS_OVERRIDE
+  virtual std::string type() const override
   {
     return BaseType::static_id() + ".checkerboard";
   }
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const override
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
   {
     // decide on the subdomain the center of the entity belongs to
     const auto center = entity.geometry().center();

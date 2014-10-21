@@ -75,12 +75,12 @@ private:
   }; // class Call< ..., 1, ... >
 
 public:
-  virtual int ncomps() const DS_OVERRIDE DS_FINAL
+  virtual int ncomps() const override final
   {
     return Call<dimRange, dimRangeCols>::ncomps();
   }
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     if (name_.empty())
       return function_.name();
@@ -88,7 +88,7 @@ public:
       return name_;
   }
 
-  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const DS_OVERRIDE DS_FINAL
+  virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const override final
   {
     assert(comp >= 0);
     assert(comp < dimRange);
@@ -161,14 +161,14 @@ private:
 
 //  virtual ~LocalDifferentiableFunctionDefault() {}
 
-//  virtual const EntityType& entity() const DS_OVERRIDE
+//  virtual const EntityType& entity() const override
 //  {
 //    return entity_;
 //  }
 
 //  virtual void evaluate(const DomainType& /*xx*/, RangeType& /*ret*/) const = 0;
 
-//  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
+//  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
 //  {
 //    assert(this->is_a_valid_point(xx));
 //    // clear

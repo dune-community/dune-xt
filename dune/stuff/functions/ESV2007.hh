@@ -92,18 +92,18 @@ class DUNE_DEPRECATED_MSG("Use ESV2007::Cutoff instead!") ESV2007Cutoff
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const DS_OVERRIDE DS_FINAL
+    virtual size_t order() const override final
     {
       return 0;
     }
 
-    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -157,17 +157,17 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  virtual ThisType* copy() const DS_OVERRIDE DS_FINAL
+  virtual ThisType* copy() const override final
   {
     return new ThisType(*this);
   }
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE DS_FINAL
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
   {
     return std::unique_ptr<Localfunction>(new Localfunction(entity, diffusion_, poincare_constant_));
   }
@@ -248,22 +248,22 @@ public:
 
   ThisType& operator=(const ThisType& /*other*/) = delete;
 
-  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  virtual std::string type() const override final
   {
     return BaseType::static_id() + ".ESV2007.testcase1.force";
   }
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     return name_;
   }
 
-  virtual ThisType* copy() const DS_OVERRIDE DS_FINAL
+  virtual ThisType* copy() const override final
   {
     return new ThisType(*this);
   }
 
-  virtual size_t order() const DS_OVERRIDE DS_FINAL
+  virtual size_t order() const override final
   {
     return order_;
   }
@@ -271,7 +271,7 @@ public:
   /**
    * \brief "0.5 * pi * pi * cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
   {
     ret[0] = M_PI_2l * M_PIl * cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]);
   }
@@ -280,7 +280,7 @@ public:
    * \brief ["-0.25 * pi * pi * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.25 * pi * pi * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
   {
     const DomainFieldType pre   = -0.25 * M_PIl * M_PIl * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
@@ -361,22 +361,22 @@ public:
 
   ThisType& operator=(const ThisType& /*other*/) = delete;
 
-  virtual std::string type() const DS_OVERRIDE DS_FINAL
+  virtual std::string type() const override final
   {
     return BaseType::static_id() + ".ESV2007.testcase1.exactsolution";
   }
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     return name_;
   }
 
-  virtual ThisType* copy() const DS_OVERRIDE DS_FINAL
+  virtual ThisType* copy() const override final
   {
     return new ThisType(*this);
   }
 
-  virtual size_t order() const DS_OVERRIDE DS_FINAL
+  virtual size_t order() const override final
   {
     return order_;
   }
@@ -384,7 +384,7 @@ public:
   /**
    * \brief "cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
   {
     ret[0] = cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]);
   }
@@ -393,7 +393,7 @@ public:
    * \brief ["-0.5 * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.5 * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
   {
     const DomainFieldType pre   = -0.5 * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
@@ -480,18 +480,18 @@ class Cutoff<DiffusionType, void>
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const DS_OVERRIDE DS_FINAL
+    virtual size_t order() const override final
     {
       return 0;
     }
 
-    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -545,17 +545,17 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  virtual ThisType* copy() const DS_OVERRIDE DS_FINAL
+  virtual ThisType* copy() const override final
   {
     return new ThisType(*this);
   }
 
-  virtual std::string name() const DS_OVERRIDE DS_FINAL
+  virtual std::string name() const override final
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const DS_OVERRIDE DS_FINAL
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
   {
     return std::unique_ptr<Localfunction>(new Localfunction(entity, diffusion_, poincare_constant_));
   }

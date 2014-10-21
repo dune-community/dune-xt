@@ -41,17 +41,17 @@ public:
   {
   }
 
-  virtual size_t order() const DS_OVERRIDE DS_FINAL
+  virtual size_t order() const override final
   {
     return order_;
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE DS_FINAL
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
   {
     ret = lambda_(xx);
   }
 
-  virtual RangeType evaluate(const DomainType& xx) const DS_OVERRIDE DS_FINAL
+  virtual RangeType evaluate(const DomainType& xx) const override final
   {
     return lambda_(xx);
   }

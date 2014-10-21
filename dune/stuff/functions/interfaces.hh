@@ -236,18 +236,18 @@ public:
    * \defgroup providedbase ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
    * @{
    **/
-  virtual size_t size() const DS_FINAL
+  virtual size_t size() const final
   {
     return 1;
   }
 
-  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const DS_FINAL
+  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const final
   {
     assert(ret.size() >= 1);
     evaluate(xx, ret[0]);
   }
 
-  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const DS_FINAL
+  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const final
   {
     assert(ret.size() >= 1);
     jacobian(xx, ret[0]);
@@ -479,7 +479,7 @@ public:
     return ret;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const DS_OVERRIDE DS_FINAL
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const override final
   {
     return Common::make_unique<Localfunction>(entity, *this);
   }
@@ -495,19 +495,19 @@ private:
     {
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
     {
       const auto xx_global = geometry_.global(xx);
       global_function_.evaluate(xx_global, ret);
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
     {
       const auto xx_global = geometry_.global(xx);
       global_function_.jacobian(xx_global, ret);
     }
 
-    virtual size_t order() const DS_OVERRIDE DS_FINAL
+    virtual size_t order() const override final
     {
       return global_function_.order();
     }
@@ -607,7 +607,7 @@ public:
     return ret;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const DS_OVERRIDE DS_FINAL
+  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const override final
   {
     return Common::make_unique<Localfunction>(entity, *this);
   }
@@ -623,19 +623,19 @@ private:
     {
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
     {
       const auto xx_global = geometry_.global(xx);
       global_function_.evaluate(xx_global, ret);
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE DS_FINAL
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
     {
       const auto xx_global = geometry_.global(xx);
       global_function_.jacobian(xx_global, ret);
     }
 
-    virtual size_t order() const DS_OVERRIDE DS_FINAL
+    virtual size_t order() const override final
     {
       return global_function_.order();
     }
