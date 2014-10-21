@@ -49,22 +49,22 @@ public:
   {
   }
 
-  virtual void prepare() DS_OVERRIDE DS_FINAL
+  virtual void prepare() override final
   {
     wrapped_functor_.prepare();
   }
 
-  virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const DS_OVERRIDE DS_FINAL
+  virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const override final
   {
     return where_->apply_on(grid_view, entity);
   }
 
-  virtual void apply_local(const EntityType& entity) DS_OVERRIDE DS_FINAL
+  virtual void apply_local(const EntityType& entity) override final
   {
     wrapped_functor_.apply_local(entity);
   }
 
-  virtual void finalize() DS_OVERRIDE DS_FINAL
+  virtual void finalize() override final
   {
     wrapped_functor_.finalize();
   }
@@ -106,23 +106,23 @@ public:
   {
   }
 
-  virtual void prepare() DS_OVERRIDE DS_FINAL
+  virtual void prepare() override final
   {
     wrapped_functor_.prepare();
   }
 
-  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
   {
     return where_->apply_on(grid_view, intersection);
   }
 
   virtual void apply_local(const IntersectionType& intersection, const EntityType& inside_entity,
-                           const EntityType& outside_entity) DS_OVERRIDE DS_FINAL
+                           const EntityType& outside_entity) override final
   {
     wrapped_functor_.apply_local(intersection, inside_entity, outside_entity);
   }
 
-  virtual void finalize() DS_OVERRIDE DS_FINAL
+  virtual void finalize() override final
   {
     wrapped_functor_.finalize();
   }
@@ -158,33 +158,33 @@ public:
   {
   }
 
-  virtual void prepare() DS_OVERRIDE DS_FINAL
+  virtual void prepare() override final
   {
     grid_walker_.prepare();
   }
 
-  virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const DS_OVERRIDE DS_FINAL
+  virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const override final
   {
     return which_entities_->apply_on(grid_view, entity) && grid_walker_.apply_on(entity);
   }
 
-  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
   {
     return which_intersections_->apply_on(grid_view, intersection) && grid_walker_.apply_on(intersection);
   }
 
-  virtual void apply_local(const EntityType& entity) DS_OVERRIDE DS_FINAL
+  virtual void apply_local(const EntityType& entity) override final
   {
     grid_walker_.apply_local(entity);
   }
 
   virtual void apply_local(const IntersectionType& intersection, const EntityType& inside_entity,
-                           const EntityType& outside_entity) DS_OVERRIDE DS_FINAL
+                           const EntityType& outside_entity) override final
   {
     grid_walker_.apply_local(intersection, inside_entity, outside_entity);
   }
 
-  virtual void finalize() DS_OVERRIDE DS_FINAL
+  virtual void finalize() override final
   {
     grid_walker_.finalize();
   }
@@ -215,12 +215,12 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const DS_OVERRIDE DS_FINAL
+  virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const override final
   {
     return where_->apply_on(grid_view, entity);
   }
 
-  virtual void apply_local(const EntityType& entity) DS_OVERRIDE DS_FINAL
+  virtual void apply_local(const EntityType& entity) override final
   {
     lambda_(entity);
   }

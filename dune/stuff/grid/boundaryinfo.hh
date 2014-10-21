@@ -228,22 +228,22 @@ public:
   {
   }
 
-  virtual bool has_dirichlet() const DS_OVERRIDE DS_FINAL
+  virtual bool has_dirichlet() const override final
   {
     return true;
   }
 
-  virtual bool has_neumann() const DS_OVERRIDE DS_FINAL
+  virtual bool has_neumann() const override final
   {
     return false;
   }
 
-  virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool dirichlet(const IntersectionType& intersection) const override final
   {
     return intersection.boundary();
   }
 
-  virtual bool neumann(const IntersectionType& /*intersection*/) const DS_OVERRIDE DS_FINAL
+  virtual bool neumann(const IntersectionType& /*intersection*/) const override final
   {
     return false;
   }
@@ -283,22 +283,22 @@ public:
   {
   }
 
-  virtual bool has_dirichlet() const DS_OVERRIDE DS_FINAL
+  virtual bool has_dirichlet() const override final
   {
     return false;
   }
 
-  virtual bool has_neumann() const DS_OVERRIDE DS_FINAL
+  virtual bool has_neumann() const override final
   {
     return true;
   }
 
-  virtual bool dirichlet(const IntersectionType& /*intersection*/) const DS_OVERRIDE DS_FINAL
+  virtual bool dirichlet(const IntersectionType& /*intersection*/) const override final
   {
     return false;
   }
 
-  virtual bool neumann(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool neumann(const IntersectionType& intersection) const override final
   {
     return intersection.boundary();
   }
@@ -355,17 +355,17 @@ public:
     return id_to_type_map_;
   }
 
-  virtual bool has_dirichlet() const DS_OVERRIDE DS_FINAL
+  virtual bool has_dirichlet() const override final
   {
     return hasDirichlet_;
   }
 
-  virtual bool has_neumann() const DS_OVERRIDE DS_FINAL
+  virtual bool has_neumann() const override final
   {
     return hasNeumann_;
   }
 
-  virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool dirichlet(const IntersectionType& intersection) const override final
   {
     if (hasDirichlet_ && intersection.boundary()) {
 #include <dune/stuff/common/disable_warnings.hh>
@@ -383,7 +383,7 @@ public:
       return false;
   } // bool dirichlet(const IntersectionType& intersection) const
 
-  virtual bool neumann(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool neumann(const IntersectionType& intersection) const override final
   {
     if (hasNeumann_ && intersection.boundary()) {
 // get boundary id
@@ -479,17 +479,17 @@ public:
   {
   }
 
-  virtual bool has_dirichlet() const DS_OVERRIDE DS_FINAL
+  virtual bool has_dirichlet() const override final
   {
     return default_to_dirichlet_ || (dirichlet_normals_.size() > 0);
   }
 
-  virtual bool has_neumann() const DS_OVERRIDE DS_FINAL
+  virtual bool has_neumann() const override final
   {
     return !default_to_dirichlet_ || (neumann_normals_.size() > 0);
   }
 
-  virtual bool dirichlet(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool dirichlet(const IntersectionType& intersection) const override final
   {
     if (intersection.boundary()) {
       const WorldType outerNormal = intersection.centerUnitOuterNormal();
@@ -503,7 +503,7 @@ public:
     return false;
   } // ... dirichlet(...)
 
-  virtual bool neumann(const IntersectionType& intersection) const DS_OVERRIDE DS_FINAL
+  virtual bool neumann(const IntersectionType& intersection) const override final
   {
     if (intersection.boundary()) {
       const WorldType outerNormal = intersection.centerUnitOuterNormal();

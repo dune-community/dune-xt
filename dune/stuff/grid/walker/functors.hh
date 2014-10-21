@@ -112,7 +112,7 @@ public:
   }
 
   virtual void apply_local(const IntersectionType& intersection, const EntityType& /*inside_entity*/,
-                           const EntityType& /*outside_entity*/) DS_OVERRIDE
+                           const EntityType& /*outside_entity*/) override
   {
     if (boundary_info_.dirichlet(intersection))
       ++found_;
