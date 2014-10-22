@@ -60,7 +60,7 @@ class GridWalk
   typedef Dune::GridView<typename GridViewImp::Traits> GridViewType;
 
 public:
-  GridWalk(const GridViewType& gp)
+  GridWalk(GridViewType gp)
     : gridView_(gp)
   {
   }
@@ -97,7 +97,7 @@ public:
   }
 
 private:
-  const GridViewType& gridView_;
+  const GridViewType gridView_;
 };
 
 //!
