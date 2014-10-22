@@ -202,7 +202,7 @@ protected:
     {
     }
 
-    void operator()(const tbb::blocked_range<std::size_t>& range)
+    void operator()(const tbb::blocked_range<std::size_t>& range) const
     {
       // for all partitions in tbb-range
       for (std::size_t p = range.begin(); p != range.end(); ++p) {
