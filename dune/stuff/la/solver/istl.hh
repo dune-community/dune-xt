@@ -48,7 +48,7 @@ public:
   {
   }
 
-  static std::vector<std::string> options()
+  static std::vector<std::string> types()
   {
     return
     {
@@ -58,14 +58,15 @@ public:
           "bicgstab.ilut"
 #endif
     };
-  } // ... options()
+  } // ... types()
 
-  static Common::Configuration options(const std::string& type)
+  static Common::Configuration options(const std::string type = "")
   {
-    SolverUtils::check_given(type, options());
+    const std::string tp = !type.empty() ? type : types()[0];
+    SolverUtils::check_given(tp, types());
     Common::Configuration iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
     iterative_options.set("post_check_solves_system", "1e-5");
-    if (type == "bicgstab.amg.ilu0") {
+    if (tp == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
       iterative_options.set("smoother.verbose", "0");
@@ -77,20 +78,20 @@ public:
       iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
       iterative_options.set("preconditioner.verbose", "0");
 #if !HAVE_MPI
-    } else if (type == "bicgstab.ilut") {
+    } else if (tp == "bicgstab.ilut") {
       iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
 #endif // !HAVE_MPI
     } else
       DUNE_THROW(Exceptions::internal_error,
-                 "Given type '" << type << "' is not supported, although it was reported by options()!");
-    iterative_options.set("type", type);
+                 "Given type '" << tp << "' is not supported, although it was reported by types()!");
+    iterative_options.set("type", tp);
     return iterative_options;
   } // ... options(...)
 
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution) const
   {
-    apply(rhs, solution, options()[0]);
+    apply(rhs, solution, types()[0]);
   }
 
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const std::string& type) const
@@ -108,7 +109,7 @@ public:
         DUNE_THROW(Exceptions::configuration_error,
                    "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
       const auto type = opts.get<std::string>("type");
-      SolverUtils::check_given(type, options());
+      SolverUtils::check_given(type, types());
       const Common::Configuration default_opts = options(type);
       IstlDenseVector<S> writable_rhs          = rhs.copy();
       // solve
@@ -149,7 +150,7 @@ public:
 #endif // !HAVE_MPI
       } else
         DUNE_THROW(Exceptions::internal_error,
-                   "Given type '" << type << "' is not supported, although it was reported by options()!");
+                   "Given type '" << type << "' is not supported, although it was reported by types()!");
       // check (use writable_rhs as tmp)
       const S post_check_solves_system_threshold =
           opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));

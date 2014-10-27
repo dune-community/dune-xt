@@ -73,7 +73,7 @@ public:
                    << "'!");
   }
 
-  static std::vector<std::string> options()
+  static std::vector<std::string> types()
   {
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
@@ -82,7 +82,7 @@ public:
                    << "'!");
   }
 
-  static Common::Configuration options(const std::string& /*type*/)
+  static Common::Configuration options(const std::string /*type*/ = "")
   {
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
