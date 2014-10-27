@@ -26,6 +26,8 @@
 #include "dune/stuff/la/container/interfaces.hh"
 #include "dune/stuff/la/container/pattern.hh"
 
+#include "base.hh"
+
 namespace Dune {
 namespace Stuff {
 namespace LA {
