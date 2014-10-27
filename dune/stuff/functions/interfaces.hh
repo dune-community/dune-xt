@@ -64,6 +64,10 @@ template <class LeftSummandType, class RightSummandType>
 class Sum;
 
 
+template <class FunctionImp>
+class Divergence;
+
+
 } // namespace Functions
 namespace Tags {
 
@@ -326,6 +330,7 @@ public:
 
   typedef Functions::Difference<ThisType, ThisType> DifferenceType;
   typedef Functions::Sum<ThisType, ThisType> SumType;
+  typedef Functions::Divergence<ThisType> DivergenceType;
 
   virtual ~LocalizableFunctionInterface()
   {
@@ -369,6 +374,11 @@ public:
   SumType operator+(const ThisType& other) const
   {
     return SumType(*this, other);
+  }
+
+  DivergenceType divergence() const
+  {
+    return DivergenceType(*this);
   }
 
 #if HAVE_DUNE_GRID
@@ -740,5 +750,6 @@ struct is_localizable_function : public std::integral_constant<bool, internal::I
 
 #include "default.hh"
 #include "combined.hh"
+#include "derived.hh"
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
