@@ -166,7 +166,7 @@ public:
       functor->finalize();
   } // ... finalize()
 
-  void walk(const bool clear_stack = true)
+  void walk()
   {
     // prepare functors
     prepare();
@@ -178,10 +178,6 @@ public:
 
     // finalize functors
     finalize();
-
-    // clear the stack of functors
-    if (clear_stack)
-      clear();
   } // ... walk(...)
 
 #if HAVE_TBB
@@ -221,7 +217,7 @@ protected:
 
 public:
   template <class PartioningType>
-  void tbb_walk(PartioningType& partitioning, const bool clear_stack = true)
+  void walk(PartioningType& partitioning)
   {
     // prepare functors
     prepare();
@@ -235,10 +231,6 @@ public:
 
     // finalize functors
     finalize();
-
-    // clear the stack of functors
-    if (clear_stack)
-      clear();
   } // ... tbb_walk(...)
 
 #endif // HAVE_TBB
