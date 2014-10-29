@@ -11,7 +11,9 @@
 #include <type_traits>
 #include <functional>
 
-#if HAVE_TBB
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) //&& HAVE_TBB //EXADUNE
+#include <dune/grid/utility/partitioning/ranged.hh>
+#include <dune/stuff/common/parallel/threadmanager.hh>
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
 #include <tbb/tbb_stddef.h>
@@ -166,8 +168,18 @@ public:
       functor->finalize();
   } // ... finalize()
 
-  void walk()
+  void walk(const bool use_tbb = false)
   {
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
+    if (use_tbb) {
+      const auto num_partitions = ThreadManager::current_threads();
+      RangedPartitioning<GridViewType, 0> partitioning(grid_view_, num_partitions);
+      this->walk(partitioning);
+      return;
+    }
+#else
+    const auto DUNE_UNUSED(no_warning_for_use_tbb) = use_tbb;
+#endif
     // prepare functors
     prepare();
 
