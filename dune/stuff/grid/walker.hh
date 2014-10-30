@@ -11,9 +11,12 @@
 #include <type_traits>
 #include <functional>
 
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) //&& HAVE_TBB //EXADUNE
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
 #include <dune/grid/utility/partitioning/ranged.hh>
 #include <dune/stuff/common/parallel/threadmanager.hh>
+#endif
+
+#if HAVE_TBB
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
 #include <tbb/tbb_stddef.h>
