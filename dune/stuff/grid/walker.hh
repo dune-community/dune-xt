@@ -175,7 +175,7 @@ public:
   {
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
     if (use_tbb) {
-      const auto num_partitions = threadManager().current_threads();
+      const auto num_partitions = DSC_CONFIG_GET("threading.partition_factor", 1u) * threadManager().current_threads();
       RangedPartitioning<GridViewType, 0> partitioning(grid_view_, num_partitions);
       this->walk(partitioning);
       return;
