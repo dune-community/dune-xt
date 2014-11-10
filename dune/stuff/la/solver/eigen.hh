@@ -79,7 +79,7 @@ public:
   {
     const std::string tp = !type.empty() ? type : types()[0];
     SolverUtils::check_given(tp, types());
-    Common::Configuration default_options({"type", "post_check_solves_system"}, {tp, "1e-5"});
+    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"}, {tp, "1e-5", "1"});
     // * for symmetric matrices
     if (tp == "ldlt" || tp == "llt") {
       default_options.set("pre_check_symmetry", "1e-8");
@@ -110,6 +110,36 @@ public:
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
+    // check for inf or nan
+    const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
+    if (check_for_inf_nan) {
+      for (size_t ii = 0; ii < matrix_.rows(); ++ii) {
+        for (size_t jj = 0; jj < matrix_.cols(); ++jj) {
+          const S& val = matrix_.backend()(ii, jj);
+          if (std::isnan(val) || std::isinf(val)) {
+            std::stringstream msg;
+            msg << "Given matrix contains inf or nan and you requested checking (see options below)!\n"
+                << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                << "Those were the given options:\n\n" << opts;
+            if (rhs.size() <= internal::max_size_to_print)
+              msg << "\nThis was the given matrix:\n\n" << matrix_ << "\n";
+            DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
+          }
+        }
+      }
+      for (size_t ii = 0; ii < rhs.size(); ++ii) {
+        const S& val = rhs[ii];
+        if (std::isnan(val) || std::isinf(val)) {
+          std::stringstream msg;
+          msg << "Given rhs contains inf or nan and you requested checking (see options below)!\n"
+              << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+              << "Those were the given options:\n\n" << opts;
+          if (rhs.size() <= internal::max_size_to_print)
+            msg << "\nThis was the given right hand side:\n\n" << rhs << "\n";
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
+        }
+      }
+    }
     // check for symmetry (if solver needs it)
     if (type == "ldlt" || type == "llt") {
       const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
@@ -149,6 +179,21 @@ public:
       DUNE_THROW(Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by types()!");
     // check
+    if (check_for_inf_nan)
+      for (size_t ii = 0; ii < solution.size(); ++ii) {
+        const S& val = solution[ii];
+        if (std::isnan(val) || std::isinf(val)) {
+          std::stringstream msg;
+          msg << "The computed solution contains inf or nan and you requested checking (see options "
+              << "below)!\n"
+              << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+              << "Those were the given options:\n\n" << opts;
+          if (rhs.size() <= internal::max_size_to_print)
+            msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\nThis was the given right hand side b:\n\n"
+                << rhs << "\nThis is the computed solution:\n\n" << solution << "\n";
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
+        }
+      }
     const S post_check_solves_system_threshold =
         opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
     if (post_check_solves_system_threshold > 0) {
