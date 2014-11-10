@@ -117,15 +117,17 @@ public:
         const MatrixType tmp(matrix_.backend() - matrix_.backend().transpose());
         // serialize difference to compute L^\infty error (no copy done here)
         const S error = std::max(std::abs(tmp.backend().minCoeff()), std::abs(tmp.backend().maxCoeff()));
-        if (error > pre_check_symmetry_threshhold)
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-                     "Given matrix is not symmetric and you requested checking (see options below)!\n"
-                         << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
-                         << "  (A - A').sup_norm() = "
-                         << error
-                         << "\n\n"
-                         << "Those were the given options:\n\n"
-                         << opts);
+        if (error > pre_check_symmetry_threshhold) {
+          std::stringstream msg;
+          msg << "Given matrix is not symmetric and you requested checking (see options below)!\n"
+              << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
+              << "  (A - A').sup_norm() = " << error << "\n\n"
+              << "Those were the given options:\n\n" << opts;
+          if (rhs.size() <= internal::max_size_to_print)
+            msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\nThis was the given right hand side b:\n\n"
+                << rhs << "\n";
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements, msg.str());
+        }
       }
     }
     // solve
@@ -153,17 +155,19 @@ public:
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const S sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
-        DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
-                   "The computed solution does not solve the system (although the eigen backend reported "
-                       << "'Success') and you requested checking (see options below)!\n"
-                       << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
-                       << "\n\n"
-                       << "  (A * x - b).sup_norm() = "
-                       << tmp.sup_norm()
-                       << "\n\n"
-                       << "Those were the given options:\n\n"
-                       << opts);
+      if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm)) {
+        std::stringstream msg;
+        msg << "The computed solution does not solve the system (although the eigen backend reported "
+            << "'Success') and you requested checking (see options below)!\n"
+            << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
+            << "\n\n"
+            << "  (A * x - b).sup_norm() = " << tmp.sup_norm() << "\n\n"
+            << "Those were the given options:\n\n" << opts;
+        if (rhs.size() <= internal::max_size_to_print)
+          msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\nThis was the given right hand side b:\n\n" << rhs
+              << "\n";
+        DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system, msg.str());
+      }
     }
   } // ... apply(...)
 
