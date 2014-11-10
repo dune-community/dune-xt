@@ -154,9 +154,8 @@ public:
               << "  (A - A').sup_norm() = " << error << "\n\n"
               << "Those were the given options:\n\n" << opts;
           if (rhs.size() <= internal::max_size_to_print)
-            msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\nThis was the given right hand side b:\n\n"
-                << rhs << "\n";
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements, msg.str());
+            msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\n";
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
         }
       }
     }
@@ -210,7 +209,7 @@ public:
             << "Those were the given options:\n\n" << opts;
         if (rhs.size() <= internal::max_size_to_print)
           msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\nThis was the given right hand side b:\n\n" << rhs
-              << "\n";
+              << "\nThis is the computed solution:\n\n" << solution << "\n";
         DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system, msg.str());
       }
     }
@@ -328,25 +327,6 @@ public:
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
-    // check for symmetry (if solver needs it)
-    if (type.substr(0, 3) == "cg." || type == "ldlt.simplicial" || type == "llt.simplicial") {
-      const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
-      if (pre_check_symmetry_threshhold > 0) {
-        ColMajorBackendType colmajor_copy(matrix_.backend());
-        colmajor_copy -= matrix_.backend().transpose();
-        // serialize difference to compute L^\infty error (no copy done here)
-        EigenMappedDenseVector<S> differences(colmajor_copy.valuePtr(), colmajor_copy.nonZeros());
-        if (differences.sup_norm() > pre_check_symmetry_threshhold)
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-                     "Given matrix is not symmetric and you requested checking (see options below)!\n"
-                         << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
-                         << "  (A - A').sup_norm() = "
-                         << differences.sup_norm()
-                         << "\n\n"
-                         << "Those were the given options:\n\n"
-                         << opts);
-      }
-    }
     // check for inf or nan
     const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
     if (check_for_inf_nan) {
@@ -356,7 +336,7 @@ public:
       for (size_t ii = 0; ii < values.size(); ++ii) {
         const S& val = values[ii];
         if (std::isnan(val) || std::isinf(val))
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "Given matrix contains inf or nan and you requested checking (see options below)!\n"
                          << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
                          << "Those were the given options:\n\n"
@@ -365,9 +345,28 @@ public:
       for (size_t ii = 0; ii < rhs.size(); ++ii) {
         const S& val = rhs[ii];
         if (std::isnan(val) || std::isinf(val))
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "Given rhs contains inf or nan and you requested checking (see options below)!\n"
                          << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
+      }
+    }
+    // check for symmetry (if solver needs it)
+    if (type.substr(0, 3) == "cg." || type == "ldlt.simplicial" || type == "llt.simplicial") {
+      const S pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<S>("pre_check_symmetry"));
+      if (pre_check_symmetry_threshhold > 0) {
+        ColMajorBackendType colmajor_copy(matrix_.backend());
+        colmajor_copy -= matrix_.backend().transpose();
+        // serialize difference to compute L^\infty error (no copy done here)
+        EigenMappedDenseVector<S> differences(colmajor_copy.valuePtr(), colmajor_copy.nonZeros());
+        if (differences.sup_norm() > pre_check_symmetry_threshhold)
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
+                     "Given matrix is not symmetric and you requested checking (see options below)!\n"
+                         << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
+                         << "  (A - A').sup_norm() = "
+                         << differences.sup_norm()
+                         << "\n\n"
                          << "Those were the given options:\n\n"
                          << opts);
       }
@@ -512,7 +511,7 @@ public:
     // handle eigens info
     if (info != ::Eigen::Success) {
       if (info == ::Eigen::NumericalIssue)
-        DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+        DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                    "The eigen backend reported 'NumericalIssue'!\n"
                        << "=> see http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b "
                           "for eigens explanation\n"
@@ -538,6 +537,17 @@ public:
                        << "Please report this to the dune-stuff developers!");
     }
     // check
+    if (check_for_inf_nan)
+      for (size_t ii = 0; ii < solution.size(); ++ii) {
+        const S& val = solution[ii];
+        if (std::isnan(val) || std::isinf(val))
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
+                     "The computed solution contains inf or nan and you requested checking (see options "
+                         << "below)!\n"
+                         << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
+      }
     const S post_check_solves_system_threshold =
         opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
     if (post_check_solves_system_threshold > 0) {
@@ -556,17 +566,6 @@ public:
                        << "Those were the given options:\n\n"
                        << opts);
     }
-    if (check_for_inf_nan)
-      for (size_t ii = 0; ii < solution.size(); ++ii) {
-        const S& val = solution[ii];
-        if (std::isnan(val) || std::isinf(val))
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
-                     "The computed solution contains inf or nan and you requested checking (see options "
-                         << "below)!\n"
-                         << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                         << "Those were the given options:\n\n"
-                         << opts);
-      }
   } // ... apply(...)
 
 private:
