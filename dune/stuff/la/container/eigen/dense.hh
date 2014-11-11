@@ -621,6 +621,18 @@ public:
     backend_->operator()(jj, jj) = ScalarType(1);
   } // ... unit_col(...)
 
+  bool valid() const
+  {
+    for (size_t ii = 0; ii < rows(); ++ii) {
+      for (size_t jj = 0; jj < cols(); ++jj) {
+        const auto& entry = backend_->operator()(ii, jj);
+        if (std::isnan(entry) || std::isinf(entry))
+          return false;
+      }
+    }
+    return true;
+  } // ... valid(...)
+
   /**
    * \}
    */
