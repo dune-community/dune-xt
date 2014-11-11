@@ -87,25 +87,33 @@ public:
   {
     backend_ = std::make_shared<BackendType>(assert_is_IndexType_compatible_and_convert(rr),
                                              assert_is_IndexType_compatible_and_convert(cc));
-    if (size_t(pattern.size()) != rr)
-      DUNE_THROW(Exceptions::shapes_do_not_match,
-                 "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this ("
-                                             << rows()
-                                             << ")!");
-    for (size_t row = 0; row < size_t(pattern.size()); ++row) {
-      backend_->startVec(assert_is_IndexType_compatible_and_convert(row));
-      const auto& columns = pattern.inner(row);
-      for (auto& column : columns) {
-        backend_->insertBackByOuterInner(assert_is_IndexType_compatible_and_convert(row),
-                                         assert_is_IndexType_compatible_and_convert(column));
+    if (rr > 0 && cc > 0) {
+      if (size_t(pattern.size()) != rr)
+        DUNE_THROW(Exceptions::shapes_do_not_match,
+                   "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this ("
+                                               << rr
+                                               << ")!");
+      for (size_t row = 0; row < size_t(pattern.size()); ++row) {
+        backend_->startVec(assert_is_IndexType_compatible_and_convert(row));
+        const auto& columns = pattern.inner(row);
+        for (auto& column : columns) {
+#ifndef NDEBUG
+          if (column >= cc)
+            DUNE_THROW(Exceptions::shapes_do_not_match,
+                       "The size of row " << row << " of the pattern does not match the number of columns of this ("
+                                          << cc
+                                          << ")!");
+#endif // NDEBUG
+          backend_->insertBackByOuterInner(assert_is_IndexType_compatible_and_convert(row),
+                                           assert_is_IndexType_compatible_and_convert(column));
+        }
+        // create entry (insertBackByOuterInner() can not handle empty rows)
+        if (columns.size() == 0)
+          backend_->insertBackByOuterInner(assert_is_IndexType_compatible_and_convert(row), 0);
       }
-      // create diagonal entry (insertBackByOuterInner() can not handle empty rows)
-      if (columns.size() == 0)
-        backend_->insertBackByOuterInner(assert_is_IndexType_compatible_and_convert(row),
-                                         assert_is_IndexType_compatible_and_convert(row));
+      backend_->finalize();
+      backend_->makeCompressed();
     }
-    backend_->finalize();
-    backend_->makeCompressed();
   }
 
   explicit EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
