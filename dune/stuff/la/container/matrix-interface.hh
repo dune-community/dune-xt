@@ -123,6 +123,16 @@ public:
   }
 
   /**
+   * \brief  Checks entries for inf or nan.
+   * \return false if any entry is inf or nan, else true
+   */
+  inline bool valid() const
+  {
+    CHECK_CRTP(this->as_imp().valid());
+    return this->as_imp().valid();
+  }
+
+  /**
    * \}
    */
 
