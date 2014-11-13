@@ -122,7 +122,7 @@ struct Dimensions
     {
       const auto& geo = ent.geometry();
       entity_volume_(geo.volume());
-      entity_width_(entityDiameter(ent));
+      entity_width_(entity_diameter(ent));
       for (int i = 0; i < geo.corners(); ++i) {
         const auto& corner(geo.corner(i));
         for (size_t k = 0; k < GridType::dimensionworld; ++k)
