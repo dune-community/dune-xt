@@ -12,6 +12,7 @@
 #include <limits>
 #include <iostream>
 #include <type_traits>
+#include <vector>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -595,6 +596,14 @@ public:
   const_iterator end() const
   {
     return const_iterator(*this, true);
+  }
+
+  operator std::vector<ScalarType>() const
+  {
+    std::vector<ScalarType> ret(dim());
+    for (size_t ii = 0; ii < dim(); ++ii)
+      ret[ii] = this->operator[](ii);
+    return ret;
   }
 
 private:
