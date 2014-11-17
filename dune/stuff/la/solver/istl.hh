@@ -50,14 +50,7 @@ public:
 
   static std::vector<std::string> options()
   {
-    return
-    {
-      "bicgstab.amg.ilu0"
-#if !HAVE_MPI
-          ,
-          "bicgstab.ilut"
-#endif
-    };
+    return {"bicgstab.amg.ilu0", "bicgstab.ilut"};
   } // ... options()
 
   static Common::Configuration options(const std::string& type)
@@ -76,11 +69,9 @@ public:
       iterative_options.set("preconditioner.anisotropy_dim", "2"); // <- this should be the dimDomain of the problem!
       iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
       iterative_options.set("preconditioner.verbose", "0");
-#if !HAVE_MPI
     } else if (type == "bicgstab.ilut") {
       iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
-#endif // !HAVE_MPI
     } else
       DUNE_THROW(Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by options()!");
@@ -120,7 +111,6 @@ public:
                      "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
                          << "Those were the given options:\n\n"
                          << opts);
-#if !HAVE_MPI
       } else if (type == "bicgstab.ilut") {
         typedef MatrixAdapter<typename MatrixType::BackendType,
                               typename IstlDenseVector<S>::BackendType,
@@ -140,13 +130,15 @@ public:
                           opts.get("max_iter", default_opts.get<int>("max_iter")),
                           opts.get("verbose", default_opts.get<int>("verbose")));
         InverseOperatorResult stat;
+#if HAVE_MPI
+        DSC_LOG_DEBUG << "using serial bicgstab.ilut\n";
+#endif
         solver.apply(solution.backend(), writable_rhs.backend(), stat);
         if (!stat.converged)
           DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
                      "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
                          << "Those were the given options:\n\n"
                          << opts);
-#endif // !HAVE_MPI
       } else
         DUNE_THROW(Exceptions::internal_error,
                    "Given type '" << type << "' is not supported, although it was reported by options()!");
