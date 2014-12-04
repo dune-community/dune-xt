@@ -37,8 +37,8 @@
 #include <dune/pdelab/common/function.hh>
 #endif
 
-#include <dune/stuff/common/memory.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/memory.hh>
 
 
 namespace Dune {
