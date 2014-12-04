@@ -145,7 +145,6 @@ public:
     return ret;
   }
 
-
   /**
    * \defgroup python_bindings ´´These methods are necesarry for the python bindings. They are provided by the
    * interface!``
