@@ -169,6 +169,20 @@ private:
 }; // class EntityHierarchicSearch
 
 
+template <class GV>
+EntityInlevelSearch<GV> make_entity_in_level_search(const GV& grid_view)
+{
+  return EntityInlevelSearch<GV>(grid_view);
+}
+
+
+template <class GV>
+EntityHierarchicSearch<GV> make_entity_hierarchic_search(const GV& grid_view)
+{
+  return EntityHierarchicSearch<GV>(grid_view);
+}
+
+
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune
