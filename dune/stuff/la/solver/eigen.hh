@@ -29,12 +29,6 @@
 //#   endif
 #endif // HAVE_EIGEN
 
-//#if HAVE_FASP
-// extern "C" {
-//# include "fasp_functs.h"
-//}
-//#endif // HAVE_FASP
-
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/la/container/eigen.hh>
