@@ -74,7 +74,7 @@ public:
     try {
       matrix_.backend().solve(solution.backend(), rhs.backend());
     } catch (FMatrixError&) {
-      DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+      DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                  "The dune-common backend reported 'FMatrixError'!\n"
                      << "Those were the given options:\n\n"
                      << opts);
