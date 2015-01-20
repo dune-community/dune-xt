@@ -74,7 +74,7 @@ public:
     amg_parameters.setDefaultValuesAnisotropic(
         opts.get("preconditioner.anisotropy_dim", default_opts.get<size_t>("preconditioner.anisotropy_dim")));
     amg_parameters.setDebugLevel(opts.get("preconditioner.verbose", default_opts.get<int>("preconditioner.verbose")));
-    Amg::CoarsenCriterion<Amg::SymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(amg_parameters);
+    Amg::CoarsenCriterion<Amg::UnSymmetricCriterion<IstlMatrixType, Amg::FirstDiagonal>> amg_criterion(amg_parameters);
     typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType, CommunicatorType> PreconditionerType;
     PreconditionerType preconditioner(matrix_operator, amg_criterion, smoother_parameters, communicator_);
 
