@@ -30,7 +30,7 @@ namespace Grid {
 
 
 template <class GridImp>
-class ConstProviderInterface
+class ProviderInterface
 {
 public:
   typedef GridImp GridType;
@@ -84,58 +84,56 @@ public:
     return "stuff.grid.provider";
   }
 
-  virtual ~ConstProviderInterface()
+  virtual ~ProviderInterface()
   {
   }
 
+  virtual GridType& grid() = 0;
   virtual const GridType& grid() const = 0;
 
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
-  typename Layer<layer_type, part_view_type>::Type layer(const int level_in = 0) const
+  typename Layer<layer_type, part_view_type>::Type layer(const int level_in = 0)
   {
-    GridType& non_const_grid = const_cast<GridType&>(grid());
-    return Grid::Layer<GridType, layer_type, part_view_type>::create(non_const_grid, level_in);
+    return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level_in);
   }
 
   template <ChoosePartView type>
-  typename Level<type>::Type level(const int level_in) const
+  typename Level<type>::Type level(const int level_in)
   {
-    GridType& non_const_grid = const_cast<GridType&>(grid());
-    return LevelPartView<GridType, type>::create(non_const_grid, level_in);
+    return LevelPartView<GridType, type>::create(grid(), level_in);
   }
 
-  LevelGridViewType level_view(const int level_in) const
+  LevelGridViewType level_view(const int level_in)
   {
     return this->template level<ChoosePartView::view>(level_in);
   }
 
 #if HAVE_DUNE_FEM
-  LevelGridPartType level_part(const int level_in) const
+  LevelGridPartType level_part(const int level_in)
   {
     return this->template level<ChoosePartView::part>(level_in);
   }
 #endif // HAVE_DUNE_FEM
 
   template <ChoosePartView type>
-  typename Leaf<type>::Type leaf() const
+  typename Leaf<type>::Type leaf()
   {
-    GridType& non_const_grid = const_cast<GridType&>(grid());
-    return LeafPartView<GridType, type>::create(non_const_grid);
+    return LeafPartView<GridType, type>::create(grid());
   }
 
-  LeafGridViewType leaf_view() const
+  LeafGridViewType leaf_view()
   {
     return this->template leaf<ChoosePartView::view>();
   }
 
 #if HAVE_DUNE_FEM
-  LeafGridPartType leaf_part() const
+  LeafGridPartType leaf_part()
   {
     return this->template leaf<ChoosePartView::part>();
   }
 #endif // HAVE_DUNE_FEM
 
-  virtual void visualize(const std::string filename = static_id()) const
+  virtual void visualize(const std::string filename = static_id())
   {
     // vtk writer
     auto grid_view = leaf_view();
@@ -150,7 +148,7 @@ public:
     vtkwriter.write(filename, VTK::appendedraw);
   } // ... visualize(...)
 
-  virtual void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename = static_id()) const
+  virtual void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename = static_id())
   {
     // boundary info
     typedef Stuff::Grid::BoundaryInfoProvider<typename LeafGridViewType::Intersection> BoundaryInfoProvider;
@@ -237,99 +235,7 @@ private:
 }; // class ConstProviderInterface
 
 
-template <class GridImp>
-class ProviderInterface : public ConstProviderInterface<GridImp>
-{
-  typedef ConstProviderInterface<GridImp> BaseType;
-
-public:
-  using typename BaseType::GridType;
-  using typename BaseType::LevelGridViewType;
-  using typename BaseType::LevelGridPartType;
-  using typename BaseType::LeafGridViewType;
-  using typename BaseType::LeafGridPartType;
-
-  static const std::string static_id()
-  {
-    return BaseType::static_id();
-  }
-
-  virtual ~ProviderInterface()
-  {
-  }
-
-  using BaseType::grid;
-
-  virtual GridType& grid() = 0;
-
-  using BaseType::layer;
-
-  template <ChooseLayer layer_type, ChoosePartView part_view_type>
-  typename BaseType::template Layer<layer_type, part_view_type>::Type layer(const int level_in = 0)
-  {
-    return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level_in);
-  }
-
-  using BaseType::level;
-
-  template <ChoosePartView type>
-  typename BaseType::template Level<type>::Type level(const int level_in)
-  {
-    return LevelPartView<GridType, type>::create(grid(), level_in);
-  }
-
-  using BaseType::level_view;
-
-  LevelGridViewType level_view(const int level_in)
-  {
-    return this->template level<ChoosePartView::view>(level_in);
-  }
-
-#if HAVE_DUNE_FEM
-  using BaseType::level_part;
-
-  LevelGridPartType level_part(const int level_in)
-  {
-    return this->template level<ChoosePartView::part>(level_in);
-  }
-#endif // HAVE_DUNE_FEM
-
-  using BaseType::leaf;
-
-  template <ChoosePartView type>
-  typename BaseType::template Leaf<type>::Type leaf()
-  {
-    return LeafPartView<GridType, type>::create(grid());
-  }
-
-  using BaseType::leaf_view;
-
-  LeafGridViewType leaf_view()
-  {
-    return this->template leaf<ChoosePartView::view>();
-  }
-
-#if HAVE_DUNE_FEM
-  using BaseType::leaf_part;
-
-  LeafGridPartType leaf_part()
-  {
-    return this->template leaf<ChoosePartView::part>();
-  }
-
-#endif // HAVE_DUNE_FEM
-}; // class ProviderInterface
-
-
 #else // HAVE_DUNE_GRID
-
-
-template <class GridImp>
-class ConstProviderInterface
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
 
 template <class GridImp>
 class ProviderInterface

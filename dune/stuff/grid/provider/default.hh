@@ -19,39 +19,6 @@ namespace Providers {
 
 #if HAVE_DUNE_GRID
 
-
-template <class GridImp>
-class ConstDefault : public ConstProviderInterface<GridImp>
-{
-  typedef ConstProviderInterface<GridImp> BaseType;
-
-public:
-  using typename BaseType::GridType;
-
-  static const std::string static_id()
-  {
-    return BaseType::static_id();
-  }
-
-  explicit ConstDefault(const GridType& grid_in)
-    : grid_(grid_in)
-  {
-  }
-
-  virtual ~ConstDefault()
-  {
-  }
-
-  virtual const GridType& grid() const override
-  {
-    return grid_;
-  }
-
-private:
-  const GridType& grid_;
-}; // class ConstDefault
-
-
 template <class GridImp>
 class Default : Common::StorageProvider<GridImp>, public ProviderInterface<GridImp>
 {
@@ -106,14 +73,6 @@ public:
 
 
 #else // HAVE_DUNE_GRID
-
-
-template <class GridImp>
-class ConstDefault
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
 
 template <class GridImp>
 class Default

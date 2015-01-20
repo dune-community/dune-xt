@@ -11,6 +11,11 @@
 #include <type_traits>
 #include <functional>
 
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
+#include <dune/grid/utility/partitioning/ranged.hh>
+#include <dune/stuff/common/parallel/threadmanager.hh>
+#endif
+
 #if HAVE_TBB
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
@@ -166,8 +171,18 @@ public:
       functor->finalize();
   } // ... finalize()
 
-  void walk(const bool clear_stack = true)
+  void walk(const bool use_tbb = false)
   {
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
+    if (use_tbb) {
+      const auto num_partitions = DSC_CONFIG_GET("threading.partition_factor", 1u) * threadManager().current_threads();
+      RangedPartitioning<GridViewType, 0> partitioning(grid_view_, num_partitions);
+      this->walk(partitioning);
+      return;
+    }
+#else
+    const auto DUNE_UNUSED(no_warning_for_use_tbb) = use_tbb;
+#endif
     // prepare functors
     prepare();
 
@@ -178,10 +193,7 @@ public:
 
     // finalize functors
     finalize();
-
-    // clear the stack of functors
-    if (clear_stack)
-      clear();
+    clear();
   } // ... walk(...)
 
 #if HAVE_TBB
@@ -221,7 +233,7 @@ protected:
 
 public:
   template <class PartioningType>
-  void tbb_walk(PartioningType& partitioning, const bool clear_stack = true)
+  void walk(PartioningType& partitioning)
   {
     // prepare functors
     prepare();
@@ -235,10 +247,7 @@ public:
 
     // finalize functors
     finalize();
-
-    // clear the stack of functors
-    if (clear_stack)
-      clear();
+    clear();
   } // ... tbb_walk(...)
 
 #endif // HAVE_TBB

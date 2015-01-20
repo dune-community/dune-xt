@@ -27,8 +27,8 @@ template <class T>
 struct GridWalkerTest : public ::testing::Test
 {
   static const int griddim        = T::value;
-  static const unsigned int level = 1;
-  typedef Dune::SGrid<griddim, griddim> GridType;
+  static const unsigned int level = 4;
+  typedef Dune::YaspGrid<griddim> GridType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename GridType::template Codim<0>::Entity EntityType;
   const DSG::Providers::Cube<GridType> grid_prv;
@@ -41,19 +41,27 @@ struct GridWalkerTest : public ::testing::Test
   {
     const auto gv = grid_prv.grid().leafGridView();
     Walker<GridViewType> walker(gv);
-    size_t count = 0;
+    const auto correct_size = gv.size(0);
+    atomic<size_t> count(0);
     auto counter = [&](const EntityType&) { count++; };
     walker.add(counter);
-    walker.walk(false);
-    EXPECT_EQ(count, gv.size(0));
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
-    count                 = 0;
-    const auto& index_set = gv.grid().leafIndexSet();
-    IndexSetPartitioner<GridViewType> partitioner(index_set);
-    Dune::SeedListPartitioning<GridType, 0> partitioning(gv, partitioner);
-    walker.tbb_walk(partitioning);
-    EXPECT_EQ(count, gv.size(0));
+    auto test1 = [&] { walker.walk(false); };
+    auto test2 = [&] { walker.walk(true); };
+    list<function<void()>> tests({test1, test2});
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
+    auto test3 = [&] {
+      IndexSetPartitioner<GridViewType> partitioner(gv.grid().leafIndexSet());
+      Dune::SeedListPartitioning<GridType, 0> partitioning(gv, partitioner);
+      walker.walk(partitioning);
+    };
+    tests.push_back(test3);
 #endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) && HAVE_TBB
+
+    for (const auto& test : tests) {
+      count = 0;
+      test();
+      EXPECT_EQ(count, correct_size);
+    }
   }
 };
 
