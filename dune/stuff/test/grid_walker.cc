@@ -61,7 +61,7 @@ struct GridWalkerTest : public ::testing::Test
       walker.walk(partitioning);
     };
     tests.push_back(test3);
-#endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) && HAVE_TBB
+#endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) // EXADUNE
 
     for (const auto& test : tests) {
       count = 0;
@@ -77,4 +77,4 @@ TYPED_TEST(GridWalkerTest, Misc)
   this->check();
 }
 
-#endif // #if HAVE_DUNE_GRID
+#endif // HAVE_DUNE_GRID
