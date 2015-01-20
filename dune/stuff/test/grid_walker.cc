@@ -77,4 +77,9 @@ TYPED_TEST(GridWalkerTest, Misc)
   this->check();
 }
 
+
+#else // HAVE_DUNE_GRID
+
+TEST(DISABLED_GridWalkerTest, Misc){};
+
 #endif // HAVE_DUNE_GRID
