@@ -13,7 +13,6 @@
 #include <dune/istl/operators.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
-#include <dune/istl/superlu.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
@@ -53,10 +52,7 @@ public:
   {
     return
     {
-#if !HAVE_MPI && HAVE_SUPERLU
-      "superlu",
-#endif
-          "bicgstab.amg.ilu0"
+      "bicgstab.amg.ilu0"
 #if !HAVE_MPI
           ,
           "bicgstab.ilut"
@@ -68,9 +64,8 @@ public:
   {
     const std::string tp = !type.empty() ? type : types()[0];
     SolverUtils::check_given(tp, types());
-    Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp, "1e-5", "0"});
-    Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
-    iterative_options += general_opts;
+    Common::Configuration iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
+    iterative_options.set("post_check_solves_system", "1e-5");
     if (tp == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
@@ -82,20 +77,16 @@ public:
       iterative_options.set("preconditioner.anisotropy_dim", "2"); // <- this should be the dimDomain of the problem!
       iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
       iterative_options.set("preconditioner.verbose", "0");
-      return iterative_options;
 #if !HAVE_MPI
     } else if (tp == "bicgstab.ilut") {
       iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
-      return iterative_options;
-#if HAVE_SUPERLU
-    } else if (tp == "superlu") {
-      return general_opts;
-#endif // HAVE_SUPERLU
 #endif // !HAVE_MPI
     } else
       DUNE_THROW(Exceptions::internal_error,
                  "Given type '" << tp << "' is not supported, although it was reported by types()!");
+    iterative_options.set("type", tp);
+    return iterative_options;
   } // ... options(...)
 
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution) const
@@ -156,18 +147,6 @@ public:
                      "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
                          << "Those were the given options:\n\n"
                          << opts);
-#if HAVE_SUPERLU
-      } else if (type == "superlu") {
-        SuperLU<typename MatrixType::BackendType> solver(matrix_.backend(),
-                                                         opts.get("verbose", default_opts.get<int>("verbose")));
-        InverseOperatorResult stat;
-        solver.apply(solution.backend(), writable_rhs.backend(), stat);
-        if (!stat.converged)
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
-                     "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
-                         << "Those were the given options:\n\n"
-                         << opts);
-#endif // HAVE_SUPERLU
 #endif // !HAVE_MPI
       } else
         DUNE_THROW(Exceptions::internal_error,
@@ -186,7 +165,7 @@ public:
                          << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
                          << "\n\n"
                          << "  (A * x - b).sup_norm() = "
-                         << sup_norm
+                         << writable_rhs.sup_norm()
                          << "\n\n"
                          << "Those were the given options:\n\n"
                          << opts);
