@@ -63,20 +63,20 @@ struct SolverTest : public ::testing::Test
 
     // static tests
     typedef typename SolverType::MatrixType M;
-    std::vector<std::string> opts = SolverType::options();
-    if (opts.size() == 0)
-      DUNE_THROW(Exceptions::results_are_not_as_expected, "Solver has no options!");
-    for (auto opt : opts) {
-      out << "solving with option '" << opt << "' and detailed options" << std::endl;
-      Common::Configuration detailed_opts = SolverType::options(opt);
-      detailed_opts.report(out, "  ");
+    std::vector<std::string> types = SolverType::types();
+    if (types.size() == 0)
+      DUNE_THROW(Exceptions::results_are_not_as_expected, "Solver has no types!");
+    for (auto type : types) {
+      out << "solving with type '" << type << "' and options" << std::endl;
+      Common::Configuration options = SolverType::options(type);
+      options.report(out, "  ");
 
       // dynamic tests
-      solver.apply(rhs, solution, opt);
+      solver.apply(rhs, solution, type);
       EXPECT_TRUE(solution.almost_equal(rhs));
       solution.scal(0);
 
-      solver.apply(rhs, solution, detailed_opts);
+      solver.apply(rhs, solution, options);
       EXPECT_TRUE(solution.almost_equal(rhs));
     }
   } // ... produces_correct_results(...)
