@@ -30,8 +30,10 @@ namespace Grid {
 
 
 template <class GridImp>
-class ProviderInterface
+class ConstProviderInterface
 {
+  static_assert(GridImp::dimension > 0, "Dimension should be positive!");
+
 public:
   typedef GridImp GridType;
   static const unsigned int dimDomain = GridImp::dimension;
@@ -84,57 +86,64 @@ public:
     return "stuff.grid.provider";
   }
 
-  virtual ~ProviderInterface()
+  virtual ~ConstProviderInterface()
   {
   }
 
-  virtual GridType& grid() = 0;
   virtual const GridType& grid() const = 0;
 
   template <ChooseLayer layer_type, ChoosePartView part_view_type>
-  typename Layer<layer_type, part_view_type>::Type layer(const int level_in = 0)
+  typename Layer<layer_type, part_view_type>::Type layer(const int level_in = 0) const
   {
     return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level_in);
   }
 
   template <ChoosePartView type>
-  typename Level<type>::Type level(const int level_in)
+  typename Level<type>::Type level(const int level_in) const
   {
     return LevelPartView<GridType, type>::create(grid(), level_in);
   }
 
-  LevelGridViewType level_view(const int level_in)
+  LevelGridViewType level_view(const int level_in) const
   {
     return this->template level<ChoosePartView::view>(level_in);
   }
 
-#if HAVE_DUNE_FEM
-  LevelGridPartType level_part(const int level_in)
-  {
-    return this->template level<ChoosePartView::part>(level_in);
-  }
-#endif // HAVE_DUNE_FEM
-
   template <ChoosePartView type>
-  typename Leaf<type>::Type leaf()
+  typename Leaf<type>::Type leaf() const
   {
     return LeafPartView<GridType, type>::create(grid());
   }
 
-  LeafGridViewType leaf_view()
+  LeafGridViewType leaf_view() const
   {
     return this->template leaf<ChoosePartView::view>();
   }
 
-#if HAVE_DUNE_FEM
-  LeafGridPartType leaf_part()
+  virtual void visualize(const std::string filename = static_id(),
+                         const Common::Configuration& boundary_info_cfg = Common::Configuration()) const
   {
-    return this->template leaf<ChoosePartView::part>();
-  }
-#endif // HAVE_DUNE_FEM
+    if (boundary_info_cfg.empty())
+      visualize_plain(filename);
+    else
+      visualize_with_boundary(boundary_info_cfg, filename);
+  } // ... visualize(...)
 
-  virtual void visualize(const std::string filename = static_id())
+  virtual void visualize(const Common::Configuration& boundary_info_cfg) const
   {
+    visualize_with_boundary(boundary_info_cfg, static_id());
+  }
+
+  virtual void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename) const
+  {
+    visualize_with_boundary(boundary_info_cfg, filename);
+  }
+
+private:
+  virtual void visualize_plain(const std::string filename) const
+  {
+    if (GridType::dimension > 3) // give us a call if you have any idea!
+      DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // vtk writer
     auto grid_view = leaf_view();
     Dune::VTKWriter<LeafGridViewType> vtkwriter(grid_view);
@@ -146,10 +155,12 @@ public:
     vtkwriter.addCellData(boundaryId, "boundary_id");
     // write
     vtkwriter.write(filename, VTK::appendedraw);
-  } // ... visualize(...)
+  } // ... visualize_plain(...)
 
-  virtual void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename = static_id())
+  virtual void visualize_with_boundary(const Common::Configuration& boundary_info_cfg, const std::string filename) const
   {
+    if (GridType::dimension > 3) // give us a call if you have any idea!
+      DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
     typedef Stuff::Grid::BoundaryInfoProvider<typename LeafGridViewType::Intersection> BoundaryInfoProvider;
     auto boundary_info_ptr =
@@ -171,9 +182,8 @@ public:
     vtkwriter.addCellData(neumann, "isNeumannBoundary");
     // write
     vtkwriter.write(filename, VTK::appendedraw);
-  } // ... visualize(...)
+  } // ... visualize_with_boundary(...)
 
-private:
   std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
   {
     std::vector<double> data(gridView.indexSet().size(0));
@@ -235,7 +245,84 @@ private:
 }; // class ConstProviderInterface
 
 
+template <class GridImp>
+class ProviderInterface : public ConstProviderInterface<GridImp>
+{
+  typedef ConstProviderInterface<GridImp> BaseType;
+
+public:
+  using typename BaseType::GridType;
+  using typename BaseType::LevelGridViewType;
+  using typename BaseType::LevelGridPartType;
+  using typename BaseType::LeafGridViewType;
+  using typename BaseType::LeafGridPartType;
+
+  static const std::string static_id()
+  {
+    return BaseType::static_id();
+  }
+
+  virtual ~ProviderInterface()
+  {
+  }
+
+  using BaseType::grid;
+
+  virtual GridType& grid() = 0;
+
+  using BaseType::layer;
+
+  template <ChooseLayer layer_type, ChoosePartView part_view_type>
+  typename BaseType::template Layer<layer_type, part_view_type>::Type layer(const int level_in = 0)
+  {
+    return Grid::Layer<GridType, layer_type, part_view_type>::create(grid(), level_in);
+  }
+
+  using BaseType::level;
+
+  template <ChoosePartView type>
+  typename BaseType::template Level<type>::Type level(const int level_in)
+  {
+    return LevelPartView<GridType, type>::create(grid(), level_in);
+  }
+
+#if HAVE_DUNE_FEM
+
+  LevelGridPartType level_part(const int level_in)
+  {
+    return this->template level<ChoosePartView::part>(level_in);
+  }
+
+#endif // HAVE_DUNE_FEM
+
+  using BaseType::leaf;
+
+  template <ChoosePartView type>
+  typename BaseType::template Leaf<type>::Type leaf()
+  {
+    return LeafPartView<GridType, type>::create(grid());
+  }
+
+#if HAVE_DUNE_FEM
+
+  LeafGridPartType leaf_part()
+  {
+    return this->template leaf<ChoosePartView::part>();
+  }
+
+#endif // HAVE_DUNE_FEM
+}; // class ProviderInterface
+
+
 #else // HAVE_DUNE_GRID
+
+
+template <class GridImp>
+class ConstProviderInterface
+{
+  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
+};
+
 
 template <class GridImp>
 class ProviderInterface
