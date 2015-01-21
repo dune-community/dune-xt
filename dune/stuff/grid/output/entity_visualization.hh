@@ -41,7 +41,7 @@ struct ElementVisualization
   static void elementdata(const Grid& grid, const F& f)
   {
     // get grid view on leaf part
-    const auto gridView = grid.leafView();
+    const auto gridView = grid.leafGridView();
 
     // make a mapper for codim 0 entities in the leaf grid
     Dune::LeafMultipleCodimMultipleGeomTypeMapper<Grid, P0Layout> mapper(grid);
@@ -130,7 +130,7 @@ struct ElementVisualization
       double ret(0.0);
       int numberOfBoundarySegments(0);
       bool isOnBoundary   = false;
-      const auto leafview = grid_.leafView();
+      const auto leafview = grid_.leafGridView();
       for (const auto& intersection : DSC::intersectionRange(leafview, entity)) {
         if (!intersection.neighbor() && intersection.boundary()) {
           isOnBoundary = true;
