@@ -44,18 +44,24 @@ struct GridWalkerTest : public ::testing::Test
     const auto correct_size = gv.size(0);
     atomic<size_t> count(0);
     auto counter = [&](const EntityType&) { count++; };
-    walker.add(counter);
-    auto test1 = [&] { walker.walk(false); };
-    auto test2 = [&] { walker.walk(true); };
+    auto test1 = [&] {
+      walker.add(counter);
+      walker.walk(false);
+    };
+    auto test2 = [&] {
+      walker.add(counter);
+      walker.walk(true);
+    };
     list<function<void()>> tests({test1, test2});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
     auto test3 = [&] {
       IndexSetPartitioner<GridViewType> partitioner(gv.grid().leafIndexSet());
       Dune::SeedListPartitioning<GridType, 0> partitioning(gv, partitioner);
+      walker.add(counter);
       walker.walk(partitioning);
     };
     tests.push_back(test3);
-#endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) && HAVE_TBB
+#endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) // EXADUNE
 
     for (const auto& test : tests) {
       count = 0;
@@ -71,4 +77,9 @@ TYPED_TEST(GridWalkerTest, Misc)
   this->check();
 }
 
-#endif // #if HAVE_DUNE_GRID
+
+#else // HAVE_DUNE_GRID
+
+TEST(DISABLED_GridWalkerTest, Misc){};
+
+#endif // HAVE_DUNE_GRID
