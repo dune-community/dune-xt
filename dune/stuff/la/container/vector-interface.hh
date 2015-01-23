@@ -638,6 +638,28 @@ struct is_vector<V, false> : public std::false_type
 };
 
 
+namespace internal {
+
+
+template <class VectorImp>
+struct VectorAbstractionBase
+{
+  static const bool is_vector = LA::is_vector<VectorImp>::value;
+
+  typedef typename std::conditional<is_vector, VectorImp, void>::type VectorType;
+  typedef typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type ScalarType;
+  typedef ScalarType S;
+
+  static typename std::enable_if<is_vector, VectorType>::type create(const size_t sz, const ScalarType& val)
+  {
+    return VectorType(sz, val);
+  }
+}; // struct VectorAbstractionBase
+
+
+} // namespace internal
+
+
 template <class T, class S>
 std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
 {
