@@ -615,6 +615,17 @@ private:
 
 
 } // namespace LA
+namespace Common {
+
+
+template <class T>
+struct VectorAbstraction<LA::CommonDenseVector<T>>
+    : public LA::internal::VectorAbstractionBase<LA::CommonDenseVector<T>>
+{
+};
+
+
+} // namespace Common
 } // namespace Stuff
 } // namespace Dune
 
