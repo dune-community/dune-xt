@@ -11,20 +11,19 @@
 #include <cmath>
 #include <limits>
 #include <iostream>
-#include <type_traits>
 #include <vector>
 
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/common/float_cmp.hh>
 
-#include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/type_utils.hh>
+#include <dune/stuff/common/vector.hh>
 
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
-
 
 namespace Dune {
 namespace Stuff {
