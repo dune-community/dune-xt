@@ -15,10 +15,9 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/common/float_cmp.hh>
-
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/vector.hh>
 
@@ -186,20 +185,18 @@ public:
    *  \param  other   A vector of same dimension to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::FloatCmp
+   *  \see    Dune::Stuff::Common::FloatCmp
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual bool almost_equal(const derived_type& other,
-                            const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  virtual bool
+  almost_equal(const derived_type& other,
+               const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     if (other.size() != size())
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    for (size_t ii = 0; ii < size(); ++ii)
-      if (!Dune::FloatCmp::eq<ScalarType>(get_entry(ii), other.get_entry(ii), epsilon))
-        return false;
-    return true;
-  } // ... almost_equal(...)
+    return Stuff::Common::FloatCmp::eq(this->as_imp(), other, epsilon);
+  }
 
   /**
    *  \brief  Computes the scalar products between two vectors.
