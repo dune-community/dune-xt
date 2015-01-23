@@ -14,6 +14,7 @@
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
 #include <dune/istl/umfpack.hh>
+#include <dune/istl/superlu.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/stuff/common/exceptions.hh>
@@ -49,24 +50,29 @@ public:
   {
   }
 
-  static std::vector<std::string> options()
+  static std::vector<std::string> types()
   {
     return
     {
-      "bicgstab.amg.ilu0", "bicgstab.ilut"
+#if !HAVE_MPI && HAVE_SUPERLU
+      "superlu",
+#endif
+          "bicgstab.amg.ilu0", "bicgstab.ilut"
 #if HAVE_UMFPACK
           ,
           "umfpack"
 #endif
     };
-  } // ... options()
+  } // ... types()
 
-  static Common::Configuration options(const std::string& type)
+  static Common::Configuration options(const std::string type = "")
   {
-    SolverUtils::check_given(type, options());
-    Common::Configuration iterative_options({"max_iter", "precision", "verbose"}, {"10000", "1e-10", "0"});
-    iterative_options.set("post_check_solves_system", "1e-5");
-    if (type == "bicgstab.amg.ilu0") {
+    const std::string tp = !type.empty() ? type : types()[0];
+    SolverUtils::check_given(tp, types());
+    Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp, "1e-5", "0"});
+    Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
+    iterative_options += general_opts;
+    if (tp == "bicgstab.amg.ilu0") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
       iterative_options.set("smoother.verbose", "0");
@@ -77,23 +83,28 @@ public:
       iterative_options.set("preconditioner.anisotropy_dim", "2"); // <- this should be the dimDomain of the problem!
       iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
       iterative_options.set("preconditioner.verbose", "0");
-    } else if (type == "bicgstab.ilut") {
+      return iterative_options;
+    } else if (tp == "bicgstab.ilut") {
       iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
+      return iterative_options;
 #if HAVE_UMFPACK
-    } else if (type == "umfpack") {
-      iterative_options = Common::Configuration({"post_check_solves_system", "verbose"}, {"1e-5", "0"});
+    } else if (tp == "umfpack") {
+      return general_opts;
 #endif
+#if !HAVE_MPI && HAVE_SUPERLU
+    } else if (tp == "superlu") {
+      return general_opts;
+#endif // !HAVE_MPI && HAVE_SUPERLU
     } else
       DUNE_THROW(Exceptions::internal_error,
-                 "Given type '" << type << "' is not supported, although it was reported by options()!");
-    iterative_options.set("type", type);
-    return iterative_options;
+                 "Given type '" << tp << "' is not supported, although it was reported by types()!");
+    return Common::Configuration();
   } // ... options(...)
 
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution) const
   {
-    apply(rhs, solution, options()[0]);
+    apply(rhs, solution, types()[0]);
   }
 
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const std::string& type) const
@@ -111,7 +122,7 @@ public:
         DUNE_THROW(Exceptions::configuration_error,
                    "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
       const auto type = opts.get<std::string>("type");
-      SolverUtils::check_given(type, options());
+      SolverUtils::check_given(type, types());
       const Common::Configuration default_opts = options(type);
       IstlDenseVector<S> writable_rhs          = rhs.copy();
       // solve
@@ -157,10 +168,22 @@ public:
                                                          opts.get("verbose", default_opts.get<int>("verbose")));
         InverseOperatorResult stat;
         solver.apply(solution.backend(), writable_rhs.backend(), stat);
-#endif
+#endif // HAVE_UMFPACK
+#if !HAVE_MPI && HAVE_SUPERLU
+      } else if (type == "superlu") {
+        SuperLU<typename MatrixType::BackendType> solver(matrix_.backend(),
+                                                         opts.get("verbose", default_opts.get<int>("verbose")));
+        InverseOperatorResult stat;
+        solver.apply(solution.backend(), writable_rhs.backend(), stat);
+        if (!stat.converged)
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                     "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
+#endif // !HAVE_MPI && HAVE_SUPERLU
       } else
         DUNE_THROW(Exceptions::internal_error,
-                   "Given type '" << type << "' is not supported, although it was reported by options()!");
+                   "Given type '" << type << "' is not supported, although it was reported by types()!");
       // check (use writable_rhs as tmp)
       const S post_check_solves_system_threshold =
           opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
@@ -175,7 +198,7 @@ public:
                          << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
                          << "\n\n"
                          << "  (A * x - b).sup_norm() = "
-                         << writable_rhs.sup_norm()
+                         << sup_norm
                          << "\n\n"
                          << "Those were the given options:\n\n"
                          << opts);

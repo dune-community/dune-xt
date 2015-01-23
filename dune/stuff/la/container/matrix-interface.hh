@@ -123,6 +123,16 @@ public:
   }
 
   /**
+   * \brief  Checks entries for inf or nan.
+   * \return false if any entry is inf or nan, else true
+   */
+  inline bool valid() const
+  {
+    CHECK_CRTP(this->as_imp().valid());
+    return this->as_imp().valid();
+  }
+
+  /**
    * \}
    */
 
@@ -134,7 +144,6 @@ public:
         ret = std::max(ret, std::abs(get_entry(ii, jj)));
     return ret;
   }
-
 
   /**
    * \defgroup python_bindings ´´These methods are necesarry for the python bindings. They are provided by the

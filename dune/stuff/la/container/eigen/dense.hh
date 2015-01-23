@@ -621,6 +621,18 @@ public:
     backend_->operator()(jj, jj) = ScalarType(1);
   } // ... unit_col(...)
 
+  bool valid() const
+  {
+    for (size_t ii = 0; ii < rows(); ++ii) {
+      for (size_t jj = 0; jj < cols(); ++jj) {
+        const auto& entry = backend_->operator()(ii, jj);
+        if (std::isnan(entry) || std::isinf(entry))
+          return false;
+      }
+    }
+    return true;
+  } // ... valid(...)
+
   /**
    * \}
    */
@@ -661,6 +673,26 @@ class EigenDenseMatrix
 #endif // HAVE_EIGEN
 
 } // namespace LA
+namespace Common {
+
+#if HAVE_EIGEN
+
+
+template <class T>
+struct VectorAbstraction<LA::EigenDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::EigenDenseVector<T>>
+{
+};
+
+template <class T>
+struct VectorAbstraction<LA::EigenMappedDenseVector<T>>
+    : public LA::internal::VectorAbstractionBase<LA::EigenMappedDenseVector<T>>
+{
+};
+
+
+#endif // HAVE_EIGEN
+
+} // namespace Common
 } // namespace Stuff
 } // namespace Dune
 

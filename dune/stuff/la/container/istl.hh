@@ -611,6 +611,21 @@ public:
     }
     set_entry(jj, jj, ScalarType(1));
   } // ... unit_col(...)
+
+  bool valid() const
+  {
+    for (size_t ii = 0; ii < rows(); ++ii) {
+      const auto& row_vec = backend_->operator[](ii);
+      for (size_t jj = 0; jj < cols(); ++jj)
+        if (backend_->exists(ii, jj)) {
+          const auto& entry = row_vec[jj][0];
+          if (std::isnan(entry) || std::isinf(entry))
+            return false;
+        }
+    }
+    return true;
+  } // ... valid(...)
+
   /**
    * \}
    */
@@ -690,6 +705,20 @@ class IstlRowMajorSparseMatrix
 #endif // HAVE_DUNE_ISTL
 
 } // namespace LA
+namespace Common {
+
+#if HAVE_DUNE_ISTL
+
+
+template <class T>
+struct VectorAbstraction<LA::IstlDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::IstlDenseVector<T>>
+{
+};
+
+
+#endif // HAVE_DUNE_ISTL
+
+} // namespace Common
 } // namespace Stuff
 } // namespace Dune
 

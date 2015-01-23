@@ -26,6 +26,8 @@
 #include "dune/stuff/la/container/interfaces.hh"
 #include "dune/stuff/la/container/pattern.hh"
 
+#include "dense.hh"
+
 namespace Dune {
 namespace Stuff {
 namespace LA {
@@ -339,6 +341,14 @@ public:
       }
     }
   } // ... unit_col(...)
+
+  bool valid() const
+  {
+    // serialize matrix (no copy done here)
+    auto& non_const_ref = const_cast<BackendType&>(*backend_);
+    return EigenMappedDenseVector<ScalarType>(non_const_ref.valuePtr(), non_const_ref.nonZeros()).valid();
+  } // ... valid(...)
+
   /**
    * \}
    */

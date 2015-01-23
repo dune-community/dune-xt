@@ -40,20 +40,21 @@ public:
   {
   }
 
-  static std::vector<std::string> options()
+  static std::vector<std::string> types()
   {
     return {"superlu"};
   }
 
-  static Common::Configuration options(const std::string& type)
+  static Common::Configuration options(const std::string type = "")
   {
-    SolverUtils::check_given(type, options());
-    return Common::Configuration({"type", "post_check_solves_system"}, {type, "1e-5"});
+    const std::string tp = !type.empty() ? type : types()[0];
+    SolverUtils::check_given(tp, types());
+    return Common::Configuration({"type", "post_check_solves_system"}, {tp, "1e-5"});
   } // ... options(...)
 
   void apply(const CommonDenseVector<S>& rhs, CommonDenseVector<S>& solution) const
   {
-    apply(rhs, solution, options()[0]);
+    apply(rhs, solution, types()[0]);
   }
 
   void apply(const CommonDenseVector<S>& rhs, CommonDenseVector<S>& solution, const std::string& type) const
@@ -67,13 +68,13 @@ public:
       DUNE_THROW(Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
-    SolverUtils::check_given(type, options());
+    SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
     // solve
     try {
       matrix_.backend().solve(solution.backend(), rhs.backend());
     } catch (FMatrixError&) {
-      DUNE_THROW(Exceptions::linear_solver_failed_bc_matrix_did_not_fulfill_requirements,
+      DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                  "The dune-common backend reported 'FMatrixError'!\n"
                      << "Those were the given options:\n\n"
                      << opts);

@@ -11,19 +11,18 @@
 #include <cmath>
 #include <limits>
 #include <iostream>
-#include <type_traits>
+#include <vector>
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/common/float_cmp.hh>
-
-#include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/float_cmp.hh>
+#include <dune/stuff/common/type_utils.hh>
+#include <dune/stuff/common/vector.hh>
 
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
-
 
 namespace Dune {
 namespace Stuff {
@@ -171,7 +170,7 @@ public:
   {
     auto result = std::make_pair(size_t(0), ScalarType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
-      const auto value = std::abs(get_entry(ii));
+      const auto value = std::abs(get_entry_ref(ii));
       if (value > result.second) {
         result.first  = ii;
         result.second = value;
@@ -186,20 +185,18 @@ public:
    *  \param  other   A vector of same dimension to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::FloatCmp
+   *  \see    Dune::Stuff::Common::FloatCmp
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual bool almost_equal(const derived_type& other,
-                            const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  virtual bool
+  almost_equal(const derived_type& other,
+               const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     if (other.size() != size())
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    for (size_t ii = 0; ii < size(); ++ii)
-      if (!Dune::FloatCmp::eq<ScalarType>(get_entry(ii), other.get_entry(ii), epsilon))
-        return false;
-    return true;
-  } // ... almost_equal(...)
+    return Stuff::Common::FloatCmp::eq(this->as_imp(), other, epsilon);
+  }
 
   /**
    *  \brief  Computes the scalar products between two vectors.
@@ -214,7 +211,7 @@ public:
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += get_entry(ii) * other.get_entry(ii);
+      result += get_entry_ref(ii) * other.get_entry_ref(ii);
     return result;
   } // ... dot(...)
 
@@ -227,7 +224,7 @@ public:
   {
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += std::abs(get_entry(ii));
+      result += std::abs(get_entry_ref(ii));
     return result;
   } // ... l1_norm(...)
 
@@ -277,7 +274,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      result.set_entry(ii, get_entry(ii) + other.get_entry(ii));
+      result.set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
   } // ... add(...)
 
   /**
@@ -305,7 +302,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, get_entry(ii) + other.get_entry(ii));
+      set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
   } // ... iadd(...)
 
   /**
@@ -323,7 +320,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      result.set_entry(ii, get_entry(ii) - other.get_entry(ii));
+      result.set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
   } // ... sub(...)
 
   /**
@@ -350,7 +347,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, get_entry(ii) - other.get_entry(ii));
+      set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
   } // ... isub(...)
 
   /**
@@ -597,10 +594,67 @@ public:
     return const_iterator(*this, true);
   }
 
+  operator std::vector<ScalarType>() const
+  {
+    std::vector<ScalarType> ret(dim());
+    for (size_t ii = 0; ii < dim(); ++ii)
+      ret[ii] = this->operator[](ii);
+    return ret;
+  }
+
 private:
   template <class T, class S>
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
 }; // class VectorInterface
+
+
+namespace internal {
+
+
+template <class V>
+struct is_vector_helper
+{
+  DSC_has_typedef_initialize_once(Traits) DSC_has_typedef_initialize_once(ScalarType)
+
+      static const bool is_candidate = DSC_has_typedef(Traits)<V>::value && DSC_has_typedef(ScalarType)<V>::value;
+}; // class is_vector_helper
+
+
+} // namespace internal
+
+
+template <class V, bool candidate = internal::is_vector_helper<V>::is_candidate>
+struct is_vector : public std::is_base_of<VectorInterface<typename V::Traits, typename V::ScalarType>, V>
+{
+};
+
+
+template <class V>
+struct is_vector<V, false> : public std::false_type
+{
+};
+
+
+namespace internal {
+
+
+template <class VectorImp>
+struct VectorAbstractionBase
+{
+  static const bool is_vector = LA::is_vector<VectorImp>::value;
+
+  typedef typename std::conditional<is_vector, VectorImp, void>::type VectorType;
+  typedef typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type ScalarType;
+  typedef ScalarType S;
+
+  static typename std::enable_if<is_vector, VectorType>::type create(const size_t sz, const ScalarType& val)
+  {
+    return VectorType(sz, val);
+  }
+}; // struct VectorAbstractionBase
+
+
+} // namespace internal
 
 
 template <class T, class S>
