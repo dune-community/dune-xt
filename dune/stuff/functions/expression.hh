@@ -268,6 +268,40 @@ public:
   virtual void evaluate(const DomainType& xx, RangeType& ret) const override
   {
     function_->evaluate(xx, ret);
+#ifndef NDEBUG
+#ifndef DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+    bool failure = false;
+    std::string type;
+    if (std::isnan(ret[0])) {
+      failure = true;
+      type = "NaN";
+    } else if (std::isinf(ret[0])) {
+      failure = true;
+      type = "inf";
+    } else if (std::abs(ret[0]) > (0.9 * std::numeric_limits<double>::max())) {
+      failure = true;
+      type    = "an unlikely value";
+    }
+    if (failure)
+      DUNE_THROW(Stuff::Exceptions::internal_error,
+                 "evaluating this function yielded "
+                     << type
+                     << "!\n"
+                     << "The variable of this function is:     "
+                     << function_->variable()
+                     << "\n"
+                     << "The expression of this functional is: "
+                     << function_->expression().at(0)
+                     << "\n"
+                     << "You tried to evaluate it with:   xx = "
+                     << xx
+                     << "\n"
+                     << "The result was:                       "
+                     << ret
+                     << "\n\n"
+                     << "You can disable this check by defining DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
+#endif // DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#endif // NDEBUG
   }
 
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override

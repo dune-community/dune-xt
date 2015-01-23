@@ -37,8 +37,8 @@
 #include <dune/pdelab/common/function.hh>
 #endif
 
-#include <dune/stuff/common/memory.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/memory.hh>
 
 
 namespace Dune {
@@ -62,6 +62,10 @@ class Difference;
 
 template <class LeftSummandType, class RightSummandType>
 class Sum;
+
+
+template <class FunctionImp>
+class Divergence;
 
 
 } // namespace Functions
@@ -326,6 +330,7 @@ public:
 
   typedef Functions::Difference<ThisType, ThisType> DifferenceType;
   typedef Functions::Sum<ThisType, ThisType> SumType;
+  typedef Functions::Divergence<ThisType> DivergenceType;
 
   virtual ~LocalizableFunctionInterface()
   {
@@ -369,6 +374,11 @@ public:
   SumType operator+(const ThisType& other) const
   {
     return SumType(*this, other);
+  }
+
+  DivergenceType divergence() const
+  {
+    return DivergenceType(*this);
   }
 
 #if HAVE_DUNE_GRID
@@ -480,6 +490,16 @@ public:
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const override final
   {
     return Common::make_unique<Localfunction>(entity, *this);
+  }
+
+  virtual std::string type() const override
+  {
+    return "stuff.globalfunction";
+  }
+
+  virtual std::string name() const override
+  {
+    return "stuff.globalfunction";
   }
 
 private:
@@ -608,6 +628,16 @@ public:
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const override final
   {
     return Common::make_unique<Localfunction>(entity, *this);
+  }
+
+  virtual std::string type() const override
+  {
+    return "stuff.globalfunction";
+  }
+
+  virtual std::string name() const override
+  {
+    return "stuff.globalfunction";
   }
 
 private:
@@ -740,5 +770,6 @@ struct is_localizable_function : public std::integral_constant<bool, internal::I
 
 #include "default.hh"
 #include "combined.hh"
+#include "derived.hh"
 
 #endif // DUNE_STUFF_FUNCTION_INTERFACE_HH

@@ -35,9 +35,10 @@ private:
   typedef std::function<RangeType(DomainType)> LambdaType;
 
 public:
-  GlobalLambdaFunction(LambdaType lambda, size_t order_in)
+  GlobalLambdaFunction(LambdaType lambda, const size_t order_in, const std::string nm = "stuff.globallambdafunction")
     : lambda_(lambda)
     , order_(order_in)
+    , name_(nm)
   {
   }
 
@@ -56,9 +57,20 @@ public:
     return lambda_(xx);
   }
 
+  virtual std::string type() const override
+  {
+    return "stuff.globallambdafunction";
+  }
+
+  virtual std::string name() const override
+  {
+    return name_;
+  }
+
 private:
   const LambdaType lambda_;
   const size_t order_;
+  const std::string name_;
 };
 
 
