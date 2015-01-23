@@ -171,7 +171,7 @@ public:
   {
     auto result = std::make_pair(size_t(0), ScalarType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
-      const auto value = std::abs(get_entry(ii));
+      const auto value = std::abs(get_entry_ref(ii));
       if (value > result.second) {
         result.first  = ii;
         result.second = value;
@@ -214,7 +214,7 @@ public:
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += get_entry(ii) * other.get_entry(ii);
+      result += get_entry_ref(ii) * other.get_entry_ref(ii);
     return result;
   } // ... dot(...)
 
@@ -227,7 +227,7 @@ public:
   {
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += std::abs(get_entry(ii));
+      result += std::abs(get_entry_ref(ii));
     return result;
   } // ... l1_norm(...)
 
@@ -277,7 +277,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      result.set_entry(ii, get_entry(ii) + other.get_entry(ii));
+      result.set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
   } // ... add(...)
 
   /**
@@ -305,7 +305,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, get_entry(ii) + other.get_entry(ii));
+      set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
   } // ... iadd(...)
 
   /**
@@ -323,7 +323,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      result.set_entry(ii, get_entry(ii) - other.get_entry(ii));
+      result.set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
   } // ... sub(...)
 
   /**
@@ -350,7 +350,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, get_entry(ii) - other.get_entry(ii));
+      set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
   } // ... isub(...)
 
   /**
