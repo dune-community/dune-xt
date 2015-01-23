@@ -705,6 +705,20 @@ class IstlRowMajorSparseMatrix
 #endif // HAVE_DUNE_ISTL
 
 } // namespace LA
+namespace Common {
+
+#if HAVE_DUNE_ISTL
+
+
+template <class T>
+struct VectorAbstraction<LA::IstlDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::IstlDenseVector<T>>
+{
+};
+
+
+#endif // HAVE_DUNE_ISTL
+
+} // namespace Common
 } // namespace Stuff
 } // namespace Dune
 
