@@ -74,7 +74,7 @@ struct MinMaxCoordinateFunctor
   void operator()(const EntityType& ent, const int)
   {
     const typename EntityType::Geometry& geo = ent.geometry();
-    for (int i = 0; i < geo.corners(); ++i) {
+    for (decltype(geo.corners()) i = 0; i < geo.corners(); ++i) {
       for (int k = 0; k < int(EntityGeometryType::coorddimension); ++k) {
         minima_[k] = std::min(minima_[k], geo.corner(i)[k]);
         maxima_[k] = std::max(maxima_[k], geo.corner(i)[k]);
