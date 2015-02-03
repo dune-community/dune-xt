@@ -75,7 +75,7 @@ public:
   {
     static_assert(codim == 0, "walking intersections is only possible for codim 0 entities");
     for (const auto& entity : DSC::entityRange(gridView_)) {
-      const int entityIndex = gridView_.indexSet().index(entity);
+      const auto entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
       for (const auto& intersection : DSC::intersectionRange(gridView_, entity)) {
         intersectionFunctor(entity, intersection);
@@ -91,7 +91,7 @@ public:
   {
     static_assert(codim <= GridViewType::dimension, "codim too high to walk");
     for (const auto& entity : DSC::entityRange(gridView_)) {
-      const int entityIndex = gridView_.indexSet().index(entity);
+      const auto entityIndex = gridView_.indexSet().index(entity);
       entityFunctor(entity, entityIndex);
     }
   }
