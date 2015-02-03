@@ -71,7 +71,7 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
 {
   out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
   const auto& geometry = intersection.geometry();
-  for (int ii = 0; ii < geometry.corners(); ++ii)
+  for (decltype(geometry.corners()) ii = 0; ii < geometry.corners(); ++ii)
     Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
 } // ... printIntersection(...)
 
