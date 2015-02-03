@@ -165,7 +165,7 @@ struct ElementVisualization
 
       DomainType baryCenter(0.0);
 
-      for (int corner = 0; corner < geometry.corners(); ++corner) {
+      for (decltype(geometry.corners()) corner = 0; corner < geometry.corners(); ++corner) {
         baryCenter += geometry.corner(corner);
       }
       baryCenter /= geometry.corners();
@@ -197,7 +197,7 @@ struct ElementVisualization
       if (vol < 0) {
         std::cout << std::setiosflags(std::ios::fixed) << std::setprecision(6) << std::setw(8);
         // std::cout.showpoint();
-        for (int i = 0; i < geo.corners(); ++i) {
+        for (decltype(geo.corners()) i = 0; i < geo.corners(); ++i) {
           std::cout << geo.corner(i) << "\t\t";
         }
         std::cout << std::endl;
