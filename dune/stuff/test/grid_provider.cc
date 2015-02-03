@@ -174,14 +174,25 @@ TYPED_TEST(CubeGridProvider, fulfills_const_interface)
 {
   this->const_interface();
 }
-TYPED_TEST(CubeGridProvider, fulfills_non_const_interface)
-{
-  this->non_const_interface();
-}
 TYPED_TEST(CubeGridProvider, is_visualizable)
 {
   this->visualize();
 }
+
+#if HAVE_DUNE_FEM
+
+TYPED_TEST(CubeGridProvider, fulfills_non_const_interface)
+{
+  this->non_const_interface();
+}
+
+#else // HAVE_DUNE_FEM
+
+TEST(DISABLED_CubeGridProvider, fulfills_non_const_interface)
+{
+}
+
+#endif
 
 
 #else // HAVE_DUNE_GRID
@@ -190,9 +201,6 @@ TEST(DISABLED_CubeGridProvider, is_default_creatable)
 {
 }
 TEST(DISABLED_CubeGridProvider, fulfills_const_interface)
-{
-}
-TEST(DISABLED_CubeGridProvider, fulfills_non_const_interface)
 {
 }
 TEST(DISABLED_CubeGridProvider, is_visualizable)
