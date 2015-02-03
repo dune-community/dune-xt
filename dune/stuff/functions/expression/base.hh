@@ -150,7 +150,7 @@ public:
     else {
       stream << "[ " << expression()[0] << std::endl;
       const std::string whitespace = Dune::Stuff::Common::whitespaceify(tmp + "[ ");
-      for (unsigned int i = 1; i < expression().size() - 1; ++i)
+      for (size_t i = 1; i < expression().size() - 1; ++i)
         stream << _prefix << whitespace << expression()[i] << std::endl;
       stream << _prefix << whitespace << expression()[expression().size() - 1] << " ]" << std::endl;
     }
@@ -215,7 +215,7 @@ private:
   std::string variable_;
   std::vector<std::string> variables_;
   std::vector<std::string> expressions_;
-  unsigned int actualDimRange_;
+  size_t actualDimRange_;
   mutable DomainFieldType* arg_[dimDomain];
   RVar* var_arg_[dimDomain];
   RVar* vararray_[dimDomain];
