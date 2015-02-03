@@ -43,7 +43,7 @@ struct GridInfoTest : public ::testing::Test
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.average());
     EXPECT_DOUBLE_EQ(1.0, dim.volumeRelation());
     const auto& dl = dim.coord_limits;
-    for (int i : valueRange(griddim)) {
+    for (auto i : valueRange(griddim)) {
       EXPECT_DOUBLE_EQ(dl[i].max(), 1.0);
       EXPECT_DOUBLE_EQ(dl[i].min(), 0.0);
       EXPECT_DOUBLE_EQ(dl[i].average(), 0.5);
