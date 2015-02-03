@@ -8,6 +8,7 @@
 
 #include "walk.hh"
 
+#include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/grid/information.hh>
 
 namespace Dune {
@@ -74,7 +75,7 @@ struct MinMaxCoordinateFunctor
   void operator()(const EntityType& ent, const int)
   {
     const typename EntityType::Geometry& geo = ent.geometry();
-    for (decltype(geo.corners()) i = 0; i < geo.corners(); ++i) {
+    for (auto i : DSC::valueRange(geo.corners())) {
       for (int k = 0; k < int(EntityGeometryType::coorddimension); ++k) {
         minima_[k] = std::min(minima_[k], geo.corner(i)[k]);
         maxima_[k] = std::max(maxima_[k], geo.corner(i)[k]);
