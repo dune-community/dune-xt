@@ -146,7 +146,7 @@ private:
     EntityPointerVectorType ret;
 
     for (const auto& my_ent : range) {
-      const int my_level     = my_ent.level();
+      const auto my_level    = my_ent.level();
       const auto& geometry   = my_ent.geometry();
       const auto& refElement = DSG::reference_element(geometry);
       for (const auto& point : quad_points) {
