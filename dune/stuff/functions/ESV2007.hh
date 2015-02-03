@@ -14,6 +14,7 @@
 
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/debug.hh>
+#include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
 #include "interfaces.hh"
@@ -499,9 +500,9 @@ class Cutoff<DiffusionType, void>
     static DomainFieldType compute_diameter_of_(const EntityType& ent)
     {
       DomainFieldType ret(0);
-      for (decltype(ent.template count<dimDomain>()) cc = 0; cc < ent.template count<dimDomain>(); ++cc) {
+      for (auto cc : DSC::valueRange(ent.template count<dimDomain>())) {
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
-        for (decltype(ent.template count<dimDomain>()) dd = cc + 1; dd < ent.template count<dimDomain>(); ++dd) {
+        for (auto dd : DSC::valueRange(cc + 1, ent.template count<dimDomain>())) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
           const auto diff         = vertex - other_vertex;
           ret                     = std::max(ret, diff.two_norm());
