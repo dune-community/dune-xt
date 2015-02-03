@@ -94,7 +94,7 @@ public:
       DUNE_THROW(Dune::IOError, "File " << vertexFileName << " is too short!");
 
     // read the vertices
-    int numberOfVertices = 0;
+    size_t numberOfVertices = 0;
     Dune::FieldVector<double, dim> position;
 
     out << "Reading " << vertexFileName << " ...   " << std::flush;
