@@ -81,7 +81,7 @@ class LocalizableFunction
 
 
 /**
- *  \brief  Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
+ *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionSetInterface
