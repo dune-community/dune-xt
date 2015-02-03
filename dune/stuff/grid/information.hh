@@ -74,18 +74,18 @@ void printInfo(const GridViewType& gridView, std::ostream& out)
 * \attention Not optimal, does a whole grid walk!
 **/
 template <class GridViewType>
-unsigned int maxNumberOfNeighbors(const GridViewType& gridView)
+size_t maxNumberOfNeighbors(const GridViewType& gridView)
 {
-  unsigned int maxNeighbours = 0;
+  size_t maxNeighbours = 0;
   for (const auto& entity : entityRange(gridView)) {
-    unsigned int neighbours = 0;
+    size_t neighbours = 0;
     for (const auto& DUNE_UNUSED(i) : intersectionRange(gridView, entity)) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);
   }
   return maxNeighbours;
-} // unsigned int maxNumberOfNeighbors(const GridPartType& gridPart)
+} // size_t maxNumberOfNeighbors(const GridPartType& gridPart)
 
 //! Provide min/max coordinates for all space dimensions of a GridView
 template <class GridViewType>
