@@ -105,7 +105,7 @@ public:
     if (ret.size() != dimRange)
       ret = Dune::DynamicVector<RangeFieldType>(dimRange);
     // copy arg
-    for (int ii = 0; ii < std::min(domainDim, int(arg.size())); ++ii)
+    for (size_t ii = 0; ii < std::min(domainDim, arg.size()); ++ii)
       *(arg_[ii]) = arg[ii];
     // copy ret
     for (typename Dune::DynamicVector<RangeFieldType>::size_type ii = 0; ii < dimRange; ++ii)
@@ -133,7 +133,7 @@ public:
   {
     assert(arg.size() > 0);
     // copy arg
-    for (int ii = 0; ii < std::min(size_t(dimDomain), size_t(arg.size())); ++ii)
+    for (size_t ii = 0; ii < std::min(dimDomain, arg.size()); ++ii)
       *(arg_[ii]) = arg[ii];
     // copy ret
     for (size_t ii = 0; ii < dimRange; ++ii)
