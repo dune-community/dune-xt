@@ -20,6 +20,7 @@
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/print.hh>
+#include <dune/stuff/common/ranges.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -71,7 +72,7 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
 {
   out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
   const auto& geometry = intersection.geometry();
-  for (decltype(geometry.corners()) ii = 0; ii < geometry.corners(); ++ii)
+  for (auto ii : DSC::valueRange(geometry.corners()))
     Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
 } // ... printIntersection(...)
 
