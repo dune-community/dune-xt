@@ -55,12 +55,8 @@ public:
   typedef typename BaseType::EntityType EntityType;
   typedef typename BaseType::LocalfunctionType LocalfunctionType;
 
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const int dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
-
   typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const int dimRange = BaseType::dimRange;
   typedef typename BaseType::RangeType RangeType;
 
   static const bool available = true;
