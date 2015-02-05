@@ -88,12 +88,12 @@ public:
 
   /// This constructor is needed for the python bindings.
   explicit CommonDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
+    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(ss), value))
   {
   }
 
   explicit CommonDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(boost::numeric_cast<size_t>(ss), value))
+    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(ss), value))
   {
   }
 
@@ -364,18 +364,20 @@ public:
   /// This constructor is needed for the python bindings.
   explicit CommonDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
                              const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
+    : backend_(
+          new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc), value))
   {
   }
 
   explicit CommonDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), value))
+    : backend_(
+          new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc), value))
   {
   }
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   CommonDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
-    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc), ScalarType(0)))
+    : backend_(new BackendType(rr, cc, ScalarType(0)))
   {
   }
 
