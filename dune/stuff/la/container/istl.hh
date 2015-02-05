@@ -38,6 +38,10 @@ class IstlRowMajorSparseMatrix;
 
 #if HAVE_DUNE_ISTL
 
+
+namespace internal {
+
+
 /**
  * \brief Traits for IstlDenseVector.
  */
@@ -52,19 +56,35 @@ public:
 
 
 /**
+ * \brief Traits for IstlRowMajorSparseMatrix.
+ */
+template <class ScalarImp>
+class IstlRowMajorSparseMatrixTraits
+{
+public:
+  typedef ScalarImp ScalarType;
+  typedef IstlRowMajorSparseMatrix<ScalarType> derived_type;
+  typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
+}; // class RowMajorSparseMatrixTraits
+
+
+} // namespace internal
+
+
+/**
  *  \brief A dense vector implementation of VectorInterface using the Dune::BlockVector from dune-istl.
  */
 template <class ScalarImp = double>
-class IstlDenseVector : public VectorInterface<IstlDenseVectorTraits<ScalarImp>, ScalarImp>,
-                        public ProvidesBackend<IstlDenseVectorTraits<ScalarImp>>
+class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp>,
+                        public ProvidesBackend<internal::IstlDenseVectorTraits<ScalarImp>>
 {
   typedef IstlDenseVector<ScalarImp> ThisType;
-  typedef VectorInterface<IstlDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
+  typedef VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
-  typedef IstlDenseVectorTraits<ScalarImp> Traits;
+  typedef internal::IstlDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::BackendType BackendType;
 
@@ -329,7 +349,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  friend class VectorInterface<IstlDenseVectorTraits<ScalarType>, ScalarType>;
+  friend class VectorInterface<internal::IstlDenseVectorTraits<ScalarType>, ScalarType>;
   friend class IstlRowMajorSparseMatrix<ScalarType>;
 
   mutable std::shared_ptr<BackendType> backend_;
@@ -337,31 +357,18 @@ private:
 
 
 /**
- * \brief Traits for IstlRowMajorSparseMatrix.
- */
-template <class ScalarImp = double>
-class IstlRowMajorSparseMatrixTraits
-{
-public:
-  typedef ScalarImp ScalarType;
-  typedef IstlRowMajorSparseMatrix<ScalarType> derived_type;
-  typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
-}; // class RowMajorSparseMatrixTraits
-
-/**
  * \brief A sparse matrix implementation of the MatrixInterface using the Dune::BCRSMatrix from dune-istl.
  */
 template <class ScalarImp = double>
-class IstlRowMajorSparseMatrix : public MatrixInterface<IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>,
-                                 public ProvidesBackend<IstlRowMajorSparseMatrixTraits<ScalarImp>>
+class IstlRowMajorSparseMatrix : public MatrixInterface<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>,
+                                 public ProvidesBackend<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>>
 {
   typedef IstlRowMajorSparseMatrix<ScalarImp> ThisType;
-  //  typedef MatrixInterface< IstlRowMajorSparseMatrixTraits< ScalarImp > > MatrixInterface;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
-  typedef IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
+  typedef internal::IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
 

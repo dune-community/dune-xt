@@ -37,6 +37,9 @@ template <class ScalarImp>
 class CommonDenseMatrix;
 
 
+namespace internal {
+
+
 /// Traits for CommonDenseVector
 template <class ScalarImp = double>
 class CommonDenseVectorTraits
@@ -48,20 +51,33 @@ public:
 };
 
 
+template <class ScalarImp = double>
+class CommonDenseMatrixTraits
+{
+public:
+  typedef ScalarImp ScalarType;
+  typedef CommonDenseMatrix<ScalarType> derived_type;
+  typedef Dune::DynamicMatrix<ScalarType> BackendType;
+};
+
+
+} // namespace internal
+
+
 /**
  *  \brief A dense vector implementation of VectorInterface using the Dune::DynamicVector.
  */
 template <class ScalarImp = double>
-class CommonDenseVector : public VectorInterface<CommonDenseVectorTraits<ScalarImp>, ScalarImp>,
-                          public ProvidesBackend<CommonDenseVectorTraits<ScalarImp>>
+class CommonDenseVector : public VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp>,
+                          public ProvidesBackend<internal::CommonDenseVectorTraits<ScalarImp>>
 {
   typedef CommonDenseVector<ScalarImp> ThisType;
-  typedef VectorInterface<CommonDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
+  typedef VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
-  typedef CommonDenseVectorTraits<ScalarImp> Traits;
+  typedef internal::CommonDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::BackendType BackendType;
 
@@ -316,37 +332,27 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  friend class VectorInterface<CommonDenseVectorTraits<ScalarType>, ScalarType>;
+  friend class VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>;
   friend class CommonDenseMatrix<ScalarType>;
 
   mutable std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseVector
 
 
-template <class ScalarImp = double>
-class CommonDenseMatrixTraits
-{
-public:
-  typedef ScalarImp ScalarType;
-  typedef CommonDenseMatrix<ScalarType> derived_type;
-  typedef Dune::DynamicMatrix<ScalarType> BackendType;
-};
-
-
 /**
  *  \brief  A dense matrix implementation of MatrixInterface using the Dune::DynamicMatrix.
  */
 template <class ScalarImp = double>
-class CommonDenseMatrix : public MatrixInterface<CommonDenseMatrixTraits<ScalarImp>, ScalarImp>,
-                          public ProvidesBackend<CommonDenseMatrixTraits<ScalarImp>>
+class CommonDenseMatrix : public MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp>,
+                          public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp>>
 {
   typedef CommonDenseMatrix<ScalarImp> ThisType;
-  typedef MatrixInterface<CommonDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
+  typedef MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
-  typedef CommonDenseMatrixTraits<ScalarImp> Traits;
+  typedef internal::CommonDenseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
 
@@ -480,8 +486,8 @@ public:
     return backend_->cols();
   }
 
-  inline void mv(const VectorInterface<CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
-                 VectorInterface<CommonDenseVectorTraits<ScalarType>, ScalarType>& yy) const
+  inline void mv(const VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
+                 VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& yy) const
   {
     mv(static_cast<const typename CommonDenseVectorTraits<ScalarType>::derived_type&>(xx),
        static_cast<typename CommonDenseVectorTraits<ScalarType>::derived_type&>(yy));
