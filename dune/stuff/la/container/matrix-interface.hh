@@ -8,10 +8,6 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_MATRIX_INTERFACE_HH
 #define DUNE_STUFF_LA_CONTAINER_MATRIX_INTERFACE_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-#define DUNE_STUFF_SSIZE_T long int
-#endif
-
 #include <cmath>
 #include <limits>
 #include <iostream>
