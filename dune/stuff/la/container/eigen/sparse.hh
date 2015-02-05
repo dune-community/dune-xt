@@ -10,6 +10,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <dune/stuff/common/disable_warnings.hh>
 #if HAVE_EIGEN
 #include <Eigen/SparseCore>
@@ -82,13 +84,17 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
 
+private:
+  typedef typename BackendType::Index EIGEN_size_t;
+
+public:
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
    */
   EigenRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern)
   {
-    backend_ = std::make_shared<BackendType>(assert_is_IndexType_compatible_and_convert(rr),
-                                             assert_is_IndexType_compatible_and_convert(cc));
+    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(rr),
+                                             internal::boost_numeric_cast<EIGEN_size_t>(cc));
     if (rr > 0 && cc > 0) {
       if (size_t(pattern.size()) != rr)
         DUNE_THROW(Exceptions::shapes_do_not_match,
@@ -96,7 +102,7 @@ public:
                                                << rr
                                                << ")!");
       for (size_t row = 0; row < size_t(pattern.size()); ++row) {
-        backend_->startVec(assert_is_IndexType_compatible_and_convert(row));
+        backend_->startVec(internal::boost_numeric_cast<EIGEN_size_t>(row));
         const auto& columns = pattern.inner(row);
         for (auto& column : columns) {
 #ifndef NDEBUG
@@ -106,12 +112,12 @@ public:
                                           << cc
                                           << ")!");
 #endif // NDEBUG
-          backend_->insertBackByOuterInner(assert_is_IndexType_compatible_and_convert(row),
-                                           assert_is_IndexType_compatible_and_convert(column));
+          backend_->insertBackByOuterInner(internal::boost_numeric_cast<EIGEN_size_t>(row),
+                                           internal::boost_numeric_cast<EIGEN_size_t>(column));
         }
         // create entry (insertBackByOuterInner() can not handle empty rows)
         if (columns.size() == 0)
-          backend_->insertBackByOuterInner(assert_is_IndexType_compatible_and_convert(row), 0);
+          backend_->insertBackByOuterInner(internal::boost_numeric_cast<EIGEN_size_t>(row), 0);
       }
       backend_->finalize();
       backend_->makeCompressed();
@@ -120,20 +126,19 @@ public:
 
   explicit EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
   {
-    backend_ = std::make_shared<BackendType>(assert_is_IndexType_compatible_and_convert(rr),
-                                             assert_is_IndexType_compatible_and_convert(cc));
+    backend_ = std::make_shared<BackendType>(rr, cc);
   }
 
   /// This constructor is needed for the python bindings.
   explicit EigenRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
-    : backend_(new BackendType(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                               MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc)))
+    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
+                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
   {
   }
 
   explicit EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : EigenRowMajorSparseMatrix(MatrixInterfaceType::assert_is_size_t_compatible_and_convert(rr),
-                                MatrixInterfaceType::assert_is_size_t_compatible_and_convert(cc))
+    : EigenRowMajorSparseMatrix(internal::boost_numeric_cast<EIGEN_size_t>(rr),
+                                internal::boost_numeric_cast<EIGEN_size_t>(cc))
   {
   }
 
@@ -245,14 +250,14 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend().coeffRef(assert_is_IndexType_compatible_and_convert(ii),
-                       assert_is_IndexType_compatible_and_convert(jj)) += value;
+    backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
+                       internal::boost_numeric_cast<EIGEN_size_t>(jj)) += value;
   }
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend().coeffRef(assert_is_IndexType_compatible_and_convert(ii), assert_is_IndexType_compatible_and_convert(jj)) =
+    backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii), internal::boost_numeric_cast<EIGEN_size_t>(jj)) =
         value;
   }
 
@@ -260,8 +265,8 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend_->coeff(assert_is_IndexType_compatible_and_convert(ii),
-                           assert_is_IndexType_compatible_and_convert(jj));
+    return backend_->coeff(internal::boost_numeric_cast<EIGEN_size_t>(ii),
+                           internal::boost_numeric_cast<EIGEN_size_t>(jj));
   }
 
   void clear_row(const size_t ii)
@@ -269,7 +274,7 @@ public:
     if (ii >= rows())
       DUNE_THROW(Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend().row(assert_is_IndexType_compatible_and_convert(ii)) *= ScalarType(0);
+    backend().row(internal::boost_numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
   }
 
   void clear_col(const size_t jj)
@@ -278,14 +283,14 @@ public:
       DUNE_THROW(Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
-    for (size_t row = 0; assert_is_IndexType_compatible_and_convert(row) < backend_->outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(*backend_, assert_is_IndexType_compatible_and_convert(row));
+    for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend_->outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(*backend_, internal::boost_numeric_cast<EIGEN_size_t>(row));
            row_it;
            ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
-          backend_->coeffRef(assert_is_IndexType_compatible_and_convert(row),
-                             assert_is_IndexType_compatible_and_convert(jj)) = ScalarType(0);
+          backend_->coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(row),
+                             internal::boost_numeric_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -304,7 +309,7 @@ public:
     if (!these_are_valid_indices(ii, ii))
       DUNE_THROW(Exceptions::index_out_of_range,
                  "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
-    backend().row(assert_is_IndexType_compatible_and_convert(ii)) *= ScalarType(0);
+    backend().row(internal::boost_numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
     set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
 
@@ -317,18 +322,18 @@ public:
       DUNE_THROW(Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
-    for (size_t row = 0; assert_is_IndexType_compatible_and_convert(row) < backend_->outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(*backend_, assert_is_IndexType_compatible_and_convert(row));
+    for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend_->outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(*backend_, internal::boost_numeric_cast<EIGEN_size_t>(row));
            row_it;
            ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
           if (col == row)
-            backend_->coeffRef(assert_is_IndexType_compatible_and_convert(row),
-                               assert_is_IndexType_compatible_and_convert(col)) = ScalarType(1);
+            backend_->coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(row),
+                               internal::boost_numeric_cast<EIGEN_size_t>(col)) = ScalarType(1);
           else
-            backend_->coeffRef(assert_is_IndexType_compatible_and_convert(row),
-                               assert_is_IndexType_compatible_and_convert(jj)) = ScalarType(0);
+            backend_->coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(row),
+                               internal::boost_numeric_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -354,8 +359,8 @@ private:
       return false;
     if (jj >= cols())
       return false;
-    for (size_t row = ii; assert_is_IndexType_compatible_and_convert(row) < backend_->outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(*backend_, assert_is_IndexType_compatible_and_convert(row));
+    for (size_t row = ii; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend_->outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(*backend_, internal::boost_numeric_cast<EIGEN_size_t>(row));
            row_it;
            ++row_it) {
         const size_t col = row_it.col();
@@ -367,13 +372,6 @@ private:
     }
     return false;
   } // ... these_are_valid_indices(...)
-
-  template <class SizeType>
-  static inline IndexType assert_is_IndexType_compatible_and_convert(const SizeType& size)
-  {
-    assert(size < std::numeric_limits<IndexType>::max());
-    return IndexType(size);
-  } // ... assert_is_IndexType_compatible_and_convert(...)
 
   inline void ensure_uniqueness() const
   {

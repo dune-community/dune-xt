@@ -130,7 +130,7 @@ public:
   /// This constructor is needed for the python bindings.
   explicit EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
   {
-    this->backend_ = std::make_shared<BackendType>(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss));
+    this->backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<size_t>(ss));
     if (FloatCmp::eq(value, ScalarType(0)))
       this->backend_->setZero();
     else {
@@ -141,7 +141,7 @@ public:
 
   explicit EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
-    this->backend_ = std::make_shared<BackendType>(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss));
+    this->backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<size_t>(ss));
     if (FloatCmp::eq(value, ScalarType(0)))
       this->backend_->setZero();
     else {
@@ -255,7 +255,7 @@ public:
   /// This constructor is needed for the python bindings.
   explicit EigenMappedDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
   {
-    const size_t ss_size_t = VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss);
+    const auto ss_size_t = internal::boost_numeric_cast<size_t>(ss);
     this->backend_ = std::make_shared<BackendType>(new ScalarType[ss_size_t], ss_size_t);
     if (FloatCmp::eq(value, ScalarType(0)))
       this->backend_->setZero();
@@ -267,7 +267,7 @@ public:
 
   explicit EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
-    const size_t ss_size_t = VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss);
+    const auto ss_size_t = internal::boost_numeric_cast<size_t>(ss);
     this->backend_ = std::make_shared<BackendType>(new ScalarType[ss_size_t], ss_size_t);
     if (FloatCmp::eq(value, ScalarType(0)))
       this->backend_->setZero();
@@ -386,7 +386,7 @@ public:
   /// This constructor is needed for the python bindings.
   explicit EigenDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
                             const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc)))
+    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc)))
   {
     if (FloatCmp::eq(value, ScalarType(0)))
       backend_->setZero();
@@ -397,7 +397,7 @@ public:
   } // EigenDenseMatrix(...)
 
   explicit EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc)))
+    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc)))
   {
     if (FloatCmp::eq(value, ScalarType(0)))
       backend_->setZero();
@@ -409,7 +409,7 @@ public:
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   EigenDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
-    : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc)))
+    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc)))
   {
     backend_->setZero();
   }
