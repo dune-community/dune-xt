@@ -13,11 +13,11 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#if HAVE_EIGEN
 #include <dune/stuff/common/disable_warnings.hh>
+#if HAVE_EIGEN
 #include <Eigen/Core>
+#endif
 #include <dune/stuff/common/reenable_warnings.hh>
-#endif // HAVE_EIGEN
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/densematrix.hh>
