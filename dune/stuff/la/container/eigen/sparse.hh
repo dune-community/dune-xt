@@ -295,6 +295,9 @@ public:
 
   void unit_row(const size_t ii)
   {
+    if (ii >= cols())
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
     if (ii >= rows())
       DUNE_THROW(Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
@@ -307,9 +310,12 @@ public:
 
   void unit_col(const size_t jj)
   {
-    if (jj >= rows())
+    if (jj >= cols())
       DUNE_THROW(Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
+    if (jj >= rows())
+      DUNE_THROW(Exceptions::index_out_of_range,
+                 "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
     for (size_t row = 0; assert_is_IndexType_compatible_and_convert(row) < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, assert_is_IndexType_compatible_and_convert(row));
