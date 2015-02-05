@@ -190,6 +190,32 @@ public:
 }; // class ContainerInterface
 
 
+namespace internal {
+
+
+template <class C>
+struct is_container_helper
+{
+  DSC_has_typedef_initialize_once(Traits) DSC_has_typedef_initialize_once(ScalarType)
+
+      static const bool is_candidate = DSC_has_typedef(Traits)<C>::value && DSC_has_typedef(ScalarType)<C>::value;
+}; // class is_container_helper
+
+
+} // namespace internal
+
+
+template <class C, bool candidate = internal::is_container_helper<C>::is_candidate>
+struct is_container : public std::is_base_of<ContainerInterface<typename C::Traits, typename C::ScalarType>, C>
+{
+};
+
+
+template <class C>
+struct is_container<C, false> : public std::false_type
+{
+};
+
 protected:
 template <class SignedSizeType>
 static size_t DUNE_DEPRECATED_MSG("Use boost::numeric_cast instead (24.09.2014)!")
