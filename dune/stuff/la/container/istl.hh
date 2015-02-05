@@ -508,12 +508,6 @@ public:
     return backend_->M();
   }
 
-  template <class SourceType, class RangeType>
-  inline void mv(const SourceType& /*xx*/, RangeType& /*yy*/) const
-  {
-    static_assert(Dune::AlwaysFalse<SourceType>::value, "Not available for this combination of xx and yy!");
-  }
-
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
     backend_->mv(*(xx.backend_), yy.backend());
