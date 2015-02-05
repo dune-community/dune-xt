@@ -59,9 +59,6 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::derived_type VectorImpType;
 
-  //! disambiguation necessary since it exists in multiple bases
-  using VectorInterfaceType::as_imp;
-
   VectorImpType& operator=(const ThisType& other)
   {
     if (this != &other)
@@ -296,6 +293,9 @@ public:
   }
 
   /// \{
+
+  //! disambiguation necessary since it exists in multiple bases
+  using VectorInterfaceType::as_imp;
 
 private:
   /**
