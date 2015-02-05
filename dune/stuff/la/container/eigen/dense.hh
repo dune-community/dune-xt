@@ -206,8 +206,7 @@ private:
  *  \brief  A dense vector implementation of VectorInterface using the eigen backend which wrappes a raw array.
  */
 template <class ScalarImp = double>
-class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>>,
-                               public ProvidesBackend<internal::EigenMappedDenseVectorTraits<ScalarImp>>
+class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>>
 {
   typedef EigenMappedDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::EigenMappedDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
