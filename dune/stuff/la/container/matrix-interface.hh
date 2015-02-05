@@ -145,60 +145,63 @@ public:
 
   inline DUNE_STUFF_SSIZE_T pb_rows() const
   {
-    if (!(rows() <= std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()))
-      DUNE_THROW(Exceptions::index_out_of_range,
-                 "The number of rows of this (" << rows() << ") do not fit into DUNE_STUFF_SSIZE_T (max "
-                                                << std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()
-                                                << ")!");
-    return (DUNE_STUFF_SSIZE_T)(rows());
+    try {
+      return boost::numeric_cast<DUNE_STUFF_SSIZE_T>(rows());
+    } catch (boost::bad_numeric_cast& ee) {
+      DUNE_THROW(Exceptions::external_error,
+                 "There was an error in boost converting '" << rows() << "' to '"
+                                                            << Common::Typename<ScalarType>::value()
+                                                            << "': "
+                                                            << ee.what());
+    }
   } // ... pb_rows(...)
 
   inline DUNE_STUFF_SSIZE_T pb_cols() const
   {
-    if (!(cols() <= std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()))
-      DUNE_THROW(Exceptions::index_out_of_range,
-                 "The number of columns of this (" << cols() << ") do not fit into DUNE_STUFF_SSIZE_T (max "
-                                                   << std::numeric_limits<DUNE_STUFF_SSIZE_T>::max()
-                                                   << ")!");
-    return (DUNE_STUFF_SSIZE_T)(cols());
+    try {
+      return boost::numeric_cast<DUNE_STUFF_SSIZE_T>(cols());
+    } catch (boost::bad_numeric_cast& ee) {
+      DUNE_THROW(Exceptions::external_error,
+                 "There was an error in boost converting '" << cols() << "' to '"
+                                                            << Common::Typename<ScalarType>::value()
+                                                            << "': "
+                                                            << ee.what());
+    }
   } // ... pb_cols(...)
 
   inline void pb_add_to_entry(const DUNE_STUFF_SSIZE_T ii, const DUNE_STUFF_SSIZE_T jj, const ScalarType& value)
   {
-    add_to_entry(
-        this->assert_is_size_t_compatible_and_convert(ii), this->assert_is_size_t_compatible_and_convert(jj), value);
-  } // ... pb_add_to_entry(...)
+    add_to_entry(boost::numeric_cast<size_t>(ii), boost::numeric_cast<size_t>(jj), value);
+  }
 
   inline void pb_set_entry(const DUNE_STUFF_SSIZE_T ii, const DUNE_STUFF_SSIZE_T jj, const ScalarType& value)
   {
-    set_entry(
-        this->assert_is_size_t_compatible_and_convert(ii), this->assert_is_size_t_compatible_and_convert(jj), value);
-  } // ... pb_set_entry(...)
+    set_entry(boost::numeric_cast<size_t>(ii), boost::numeric_cast<size_t>(jj), value);
+  }
 
   inline ScalarType pb_get_entry(const DUNE_STUFF_SSIZE_T ii, const DUNE_STUFF_SSIZE_T jj) const
   {
-    return get_entry(this->assert_is_size_t_compatible_and_convert(ii),
-                     this->assert_is_size_t_compatible_and_convert(jj));
-  } // ... pb_get_entry(...)
-
-  inline void pb_clear_row(const size_t ii)
-  {
-    clear_row(this->assert_is_size_t_compatible_and_convert(ii));
+    return get_entry(boost::numeric_cast<size_t>(ii), boost::numeric_cast<size_t>(jj));
   }
 
-  inline void pb_clear_col(const size_t jj)
+  inline void pb_clear_row(const DUNE_STUFF_SSIZE_T ii)
   {
-    clear_col(this->assert_is_size_t_compatible_and_convert(jj));
+    clear_row(boost::numeric_cast<size_t>(ii));
   }
 
-  inline void pb_unit_row(const size_t ii)
+  inline void pb_clear_col(const DUNE_STUFF_SSIZE_T jj)
   {
-    unit_row(this->assert_is_size_t_compatible_and_convert(ii));
+    clear_col(boost::numeric_cast<size_t>(jj));
   }
 
-  inline void pb_unit_col(const size_t jj)
+  inline void pb_unit_row(const DUNE_STUFF_SSIZE_T ii)
   {
-    unit_col(this->assert_is_size_t_compatible_and_convert(jj));
+    unit_row(boost::numeric_cast<size_t>(ii));
+  }
+
+  inline void pb_unit_col(const DUNE_STUFF_SSIZE_T jj)
+  {
+    unit_col(boost::numeric_cast<size_t>(jj));
   }
 
   /// \}
