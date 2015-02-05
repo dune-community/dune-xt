@@ -194,6 +194,24 @@ public:
   } // ... almost_equal(...)
 
   /**
+   *  \brief  Check vectors for equality (variant for arbitrary derived combinations).
+   *          Equality of two vectors is defined as in Dune::FloatCmp componentwise.
+   *  \param  other   A vector of same dimension to compare with.
+   *  \param  epsilon See Dune::FloatCmp.
+   *  \return Truth value of the comparison.
+   *  \see    Dune::Stuff::Common::FloatCmp
+   */
+  template <class T>
+  bool almost_equal(const VectorInterface<T>& other,
+                    const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    if (other.size() != size())
+      DUNE_THROW(Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    return Stuff::Common::FloatCmp::eq(this->as_imp(), other.as_imp(), epsilon);
+  } // ... almost_equal(...)
+
+  /**
    *  \brief  Computes the scalar products between two vectors.
    *  \param  other The second factor.
    *  \return The scalar product.
