@@ -59,25 +59,9 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::derived_type VectorImpType;
 
-private:
-#ifndef NDEBUG
-  //! disambiguation necessary since it exists in multiple bases
-  using VectorInterfaceType::crtp_mutex_;
-#endif
-
   //! disambiguation necessary since it exists in multiple bases
   using VectorInterfaceType::as_imp;
 
-  /**
-   * \see ContainerInterface
-   */
-  void ensure_uniqueness() const
-  {
-    CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
-    VectorInterfaceType::as_imp().ensure_uniqueness();
-  }
-
-public:
   VectorImpType& operator=(const ThisType& other)
   {
     if (this != &other)
@@ -93,29 +77,25 @@ public:
     return this->as_imp();
   } // ... operator=(...)
 
-  /**
-   * \defgroup backend ´´These methods are required by the ProvidesBackend interface.``
-   * \{
-   */
+  /// \name Required by the ProvidesBackend interface.
+  /// \{
+
   BackendType& backend()
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
+  }
 
   const BackendType& backend() const
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
-  /**
-   * \}
-   */
+  }
 
-  /**
-   * \defgroup container ´´These methods are required by ContainerInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by ContainerInterface.
+  /// \{
+
   VectorImpType copy() const
   {
     return VectorImpType(*backend_);
@@ -139,14 +119,11 @@ public:
   {
     return size() == other.size();
   }
-  /**
-   * \}
-   */
 
-  /**
-   * \defgroup vector_required ´´These methods are required by VectorInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by VectorInterface.
+  /// \{
+
   inline size_t size() const
   {
     return backend_->size();
@@ -156,19 +133,19 @@ public:
   {
     assert(ii < size());
     backend()(ii) += value;
-  } // ... add_to_entry(...)
+  }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
     backend()(ii) = value;
-  } // ... set_entry(...)
+  }
 
   ScalarType get_entry(const size_t ii) const
   {
     assert(ii < size());
     return backend_->operator[](ii);
-  } // ... get_entry(...)
+  }
 
 protected:
   inline ScalarType& get_entry_ref(const size_t ii)
@@ -180,15 +157,13 @@ protected:
   {
     return backend()[ii];
   }
-  /**
-   * \}
-   */
+
+  /// \}
 
 public:
-  /**
-   * \defgroup vector_overrides ´´These methods override default implementations from VectorInterface.``
-   * \{
-   */
+  /// \name These methods override default implementations from VectorInterface.
+  /// \{
+
   virtual std::pair<size_t, ScalarType> amax() const override final
   {
     auto result              = std::make_pair(size_t(0), ScalarType(0));
@@ -319,11 +294,24 @@ public:
   {
     this->template isub<Traits>(other);
   }
-  /**
-   * \}
-   */
+
+  /// \{
 
 private:
+  /**
+   * \see ContainerInterface
+   */
+  void ensure_uniqueness() const
+  {
+    CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
+    VectorInterfaceType::as_imp().ensure_uniqueness();
+  }
+
+#ifndef NDEBUG
+  //! disambiguation necessary since it exists in multiple bases
+  using VectorInterfaceType::crtp_mutex_;
+#endif
+
   friend class VectorInterface<Traits, ScalarType>;
   friend class EigenDenseMatrix<ScalarType>;
   friend class EigenRowMajorSparseMatrix<ScalarType>;

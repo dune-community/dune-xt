@@ -66,7 +66,7 @@ void SparsityPatternDefault::insert(const size_t outer_index, const size_t inner
   if (std::find(vector_of_vectors_[outer_index].begin(), vector_of_vectors_[outer_index].end(), inner_index)
       == vector_of_vectors_[outer_index].end())
     vector_of_vectors_[outer_index].push_back(inner_index);
-}
+} // ... insert(...)
 
 void SparsityPatternDefault::sort(const size_t outer_index)
 {

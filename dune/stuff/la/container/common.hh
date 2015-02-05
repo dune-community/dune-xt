@@ -96,7 +96,7 @@ public:
       backend_->operator[](ii) = element;
       ++ii;
     }
-  }
+  } // CommonDenseVector(...)
 
   CommonDenseVector(const ThisType& other) = default;
 
@@ -122,7 +122,7 @@ public:
   {
     backend_ = other.backend_;
     return *this;
-  } // ... operator=(...)
+  }
 
   ThisType& operator=(const ScalarType& value)
   {
@@ -139,12 +139,10 @@ public:
   {
     backend_ = std::make_shared<BackendType>(other);
     return *this;
-  } // ... operator=(...)
+  }
 
-  /**
-   * \defgroup backend ´´These methods are required by the ProvidesBackend interface.``
-   * \{
-   */
+  /// \name Required by the ProvidesBackend interface.
+  /// \{
 
   BackendType& backend()
   {
@@ -157,14 +155,10 @@ public:
     ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
-  /**
-   * \}
-   */
 
-  /**
-   * \defgroup container ´´These methods are required by ContainerInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by ContainerInterface.
+  /// \{
 
   ThisType copy() const
   {
@@ -192,14 +186,10 @@ public:
   {
     return size() == other.size();
   }
-  /**
-   * \}
-   */
 
-  /**
-   * \defgroup vector_required ´´These methods are required by VectorInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by VectorInterface.
+  /// \{
 
   inline size_t size() const
   {
@@ -238,14 +228,9 @@ private:
   }
 
 public:
-  /**
-   * \}
-   */
-
-  /**
-   * \defgroup vector_overrides ´´These methods override default implementations from VectorInterface.``
-   * \{
-   */
+  /// \}
+  /// \name These methods override default implementations from VectorInterface.
+  /// \{
 
   virtual ScalarType dot(const ThisType& other) const override final
   {
@@ -312,19 +297,14 @@ public:
     backend() -= *(other.backend_);
   } // ... isub(...)
 
-  /**
-   * \}
-   */
+  /// \}
+  /// \name Imported from VectorInterface.
+  /// \{
 
-  /**
-   * \defgroup vector_defaults ´´These methods are imported from VectorInterface.``
-   * \{
-   */
   using VectorInterfaceType::add;
   using VectorInterfaceType::sub;
-  /**
-   * \}
-   */
+
+  /// \}
 
 private:
   /**
@@ -354,7 +334,7 @@ public:
 
 
 /**
- *  \brief  A dense matrix implementation of MatrixInterface using the dune-common.
+ *  \brief  A dense matrix implementation of MatrixInterface using the Dune::DynamicMatrix.
  */
 template <class ScalarImp = double>
 class CommonDenseMatrix : public MatrixInterface<CommonDenseMatrixTraits<ScalarImp>, ScalarImp>,
@@ -429,7 +409,7 @@ public:
   {
     backend_ = other.backend_;
     return *this;
-  } // ... operator=(...)
+  }
 
   /**
    *  \note Does a deep copy.
@@ -438,32 +418,26 @@ public:
   {
     backend_ = std::make_shared<BackendType>(other);
     return *this;
-  } // ... operator=(...)
+  }
 
-  /**
-   * \defgroup backend ´´These methods are required by the ProvidesBackend interface.``
-   * \{
-   */
+  /// \name Required by the ProvidesBackend interface.
+  /// \{
 
   BackendType& backend()
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
+  }
 
   const BackendType& backend() const
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
-  /**
-   * \}
-   */
+  }
 
-  /**
-   * \defgroup container ´´These methods are required by ContainerInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by ContainerInterface.
+  /// \{
 
   ThisType copy() const
   {
@@ -473,7 +447,7 @@ public:
   void scal(const ScalarType& alpha)
   {
     backend() *= alpha;
-  } // ... scal(...)
+  }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
@@ -491,14 +465,10 @@ public:
   {
     return (rows() == other.rows()) && (cols() == other.cols());
   }
-  /**
-   * \}
-   */
 
-  /**
-   * \defgroup matrix_required ´´These methods are required by MatrixInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by MatrixInterface.
+  /// \{
 
   inline size_t rows() const
   {
@@ -596,9 +566,7 @@ public:
     return true;
   } // ... valid(...)
 
-  /**
-   * \}
-   */
+  /// \}
 
 private:
   /**

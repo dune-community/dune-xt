@@ -125,7 +125,7 @@ public:
       this->backend_->setOnes();
       this->backend_->operator*=(value);
     }
-  }
+  } // EigenDenseVector(...)
 
   /// This constructor is needed for the python bindings.
   explicit EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
@@ -137,7 +137,7 @@ public:
       this->backend_->setOnes();
       this->backend_->operator*=(value);
     }
-  }
+  } // EigenDenseVector(...)
 
   explicit EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
@@ -148,7 +148,7 @@ public:
       this->backend_->setOnes();
       this->backend_->operator*=(value);
     }
-  }
+  } // EigenDenseVector(...)
 
   explicit EigenDenseVector(const std::vector<ScalarType>& other)
   {
@@ -165,7 +165,7 @@ public:
       this->backend_->operator[](ii) = element;
       ++ii;
     }
-  }
+  } // EigenDenseVector(...)
 
   explicit EigenDenseVector(const BackendType& other)
   {
@@ -209,9 +209,6 @@ private:
 
   friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>>;
 }; // class EigenDenseVector
-/**
- *  \brief  A dense metrix implementation of MatrixInterface using the eigen backend.
- */
 
 
 /**
@@ -253,7 +250,7 @@ public:
       this->backend_->setOnes();
       this->backend_->operator*=(value);
     }
-  }
+  } // EigenMappedDenseVector(...)
 
   /// This constructor is needed for the python bindings.
   explicit EigenMappedDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
@@ -266,7 +263,7 @@ public:
       this->backend_->setOnes();
       this->backend_->operator*=(value);
     }
-  }
+  } // EigenMappedDenseVector(...)
 
   explicit EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
@@ -278,7 +275,7 @@ public:
       this->backend_->setOnes();
       this->backend_->operator*=(value);
     }
-  }
+  } // EigenMappedDenseVector(...)
 
   explicit EigenMappedDenseVector(const std::vector<ScalarType>& other)
   {
@@ -295,7 +292,7 @@ public:
       this->backend_->operator[](ii) = element;
       ++ii;
     }
-  }
+  } // EigenMappedDenseVector(...)
 
   /**
    *  \brief  This constructor does not do a deep copy.
@@ -357,6 +354,9 @@ private:
 }; // class EigenMappedDenseVector
 
 
+/**
+ *  \brief  A dense matrix implementation of MatrixInterface using the eigen backend.
+ */
 template <class ScalarImp = double>
 class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp>,
                          public ProvidesBackend<internal::EigenDenseMatrixTraits<ScalarImp>>,
@@ -381,7 +381,7 @@ public:
       backend_->setOnes();
       backend_->operator*=(value);
     }
-  }
+  } // EigenDenseMatrix(...)
 
   /// This constructor is needed for the python bindings.
   explicit EigenDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
@@ -394,7 +394,7 @@ public:
       backend_->setOnes();
       backend_->operator*=(value);
     }
-  }
+  } // EigenDenseMatrix(...)
 
   explicit EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(boost::numeric_cast<size_t>(rr), boost::numeric_cast<size_t>(cc)))
@@ -405,7 +405,7 @@ public:
       backend_->setOnes();
       backend_->operator*=(value);
     }
-  }
+  } // EigenDenseMatrix(...)
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   EigenDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
@@ -428,7 +428,7 @@ public:
     for (size_t ii = 0; ii < other.rows(); ++ii)
       for (size_t jj = 0; jj < other.cols(); ++jj)
         set_entry(ii, jj, other.get_entry(ii, jj));
-  } // EigenDenseMatrix(...)
+  }
 
   template <class T>
   EigenDenseMatrix(const DenseMatrix<T>& other)
@@ -437,7 +437,7 @@ public:
     for (size_t ii = 0; ii < other.rows(); ++ii)
       for (size_t jj = 0; jj < other.cols(); ++jj)
         set_entry(ii, jj, other[ii][jj]);
-  } // EigenDenseMatrix(...)
+  }
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
@@ -456,7 +456,7 @@ public:
   {
     backend_ = other.backend_;
     return *this;
-  } // ... operator=(...)
+  }
 
   /**
    *  \note Does a deep copy.
@@ -465,46 +465,35 @@ public:
   {
     backend_ = std::make_shared<BackendType>(other);
     return *this;
-  } // ... operator=(...)
+  }
 
-  /**
-   * \defgroup backend ´´These methods are required by the ProvidesBackend interface.``
-   * \{
-   */
+  /// \name Required by the ProvidesBackend interface.
+  /// \{
 
   BackendType& backend()
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
+  }
 
   const BackendType& backend() const
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
-  /**
-   * \}
-   */
+  }
 
-  /**
-   * \defgroup data ´´These methods are required by the ProvidesDataAccess interface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by the ProvidesDataAccess interface.
+  /// \{
 
   ScalarType* data()
   {
     return backend_->data();
   }
 
-  /**
-   * \}
-   */
-
-  /**
-   * \defgroup container ´´These methods are required by ContainerInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by ContainerInterface.
+  /// \{
 
   ThisType copy() const
   {
@@ -514,7 +503,7 @@ public:
   void scal(const ScalarType& alpha)
   {
     backend() *= alpha;
-  } // ... scal(...)
+  }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
@@ -533,14 +522,10 @@ public:
   {
     return (rows() == other.rows()) && (cols() == other.cols());
   }
-  /**
-   * \}
-   */
 
-  /**
-   * \defgroup matrix_required ´´These methods are required by MatrixInterface.``
-   * \{
-   */
+  /// \}
+  /// \name Required by MatrixInterface.
+  /// \{
 
   inline size_t rows() const
   {

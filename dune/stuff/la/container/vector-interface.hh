@@ -57,11 +57,8 @@ public:
   {
   }
 
-  /**
-   * \defgroup haveto ´´These methods have to be implemented by a derived class in addition to the ones required by
-   * ContainerInterface!``
-   * \{
-   */
+  /// \name Have to be implemented by a derived class in addition to the ones required by ContainerInterface!
+  /// \{
 
   /**
    * \brief   The size of the vector.
@@ -71,7 +68,7 @@ public:
   {
     CHECK_CRTP(this->as_imp().size());
     return this->as_imp().size();
-  } // ... size(...)
+  }
 
   /**
    * \brief Add a scalar to the iith entry.
@@ -96,29 +93,24 @@ public:
   {
     CHECK_CRTP(this->as_imp().get_entry(ii));
     return this->as_imp().get_entry(ii);
-  } // ... get_entry(...)
+  }
 
   inline ScalarType& get_entry_ref(const size_t ii)
   {
     CHECK_CRTP(this->as_imp().get_entry_ref(ii));
     return this->as_imp().get_entry_ref(ii);
-  } // ... get_entry_ref(...)
+  }
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
   {
     CHECK_CRTP(this->as_imp().get_entry_ref(ii));
     return this->as_imp().get_entry_ref(ii);
-  } // ... get_entry_ref(...)
+  }
 
-  /**
-   * \}
-   */
-
-  /**
-   * \defgroup provided ´´These methods are provided by the interface for convenience! Those marked as virtual may be
-   * implemented more efficiently in a derived class!``
-   * \{
-   */
+  /// \}
+  /// \name Provided by the interface for convenience!
+  /// \note Those marked as virtual may be implemented more efficiently in a derived class!
+  /// \{
 
   virtual bool valid() const
   {
@@ -127,16 +119,19 @@ public:
         return false;
     }
     return true;
-  }
+  } // ... valid()
 
   /**
-   * \brief Get reference to the iith entry.
+   * \brief Get writable reference to the iith entry.
    */
   inline ScalarType& operator[](const size_t ii)
   {
     return get_entry_ref(ii);
   }
 
+  /**
+   * \brief Get read-only reference to the iith entry.
+   */
   inline const ScalarType& operator[](const size_t ii) const
   {
     return get_entry_ref(ii);
@@ -159,7 +154,7 @@ public:
       ret += element;
     ret /= size();
     return ret;
-  }
+  } // ... mean()
 
   /**
    *  \brief  The maximum absolute value of the vector.
@@ -196,7 +191,7 @@ public:
       DUNE_THROW(Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     return Stuff::Common::FloatCmp::eq(this->as_imp(), other, epsilon);
-  }
+  } // ... almost_equal(...)
 
   /**
    *  \brief  Computes the scalar products between two vectors.
@@ -456,15 +451,10 @@ public:
   {
     return !(this->operator==(other));
   }
-  /**
-   * \}
-   */
 
-  /**
-   * \defgroup python_bindings ´´These methods are necesarry for the python bindings. They are provided by the
-   * interface!``
-   * \{
-   */
+  /// \}
+  /// \name Necesarry for the python bindings.
+  /// \{
 
   /**
    * \brief Variant of dim() needed for the python bindings.
@@ -570,9 +560,8 @@ public:
     }
     return values;
   } // components(...)
-  /**
-   * \}
-   */
+
+  /// \}
 
   iterator begin()
   {

@@ -13,8 +13,8 @@
 #include <type_traits>
 
 #include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/type_utils.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -128,10 +128,8 @@ public:
   {
   }
 
-  /**
-   * \defgroup haveto ´´These methods have to be implemented by a derived class!``
-   * \{
-   */
+  /// \name Have to be implemented by a derived class!
+  /// \{
 
   /**
    * \brief   Creates a (deep) copy of the underlying resource
@@ -172,15 +170,11 @@ public:
     return this->as_imp().has_equal_shape(other);
   }
 
-  /**
-   * \}
-   */
+  /// \}
+  /// \name Are provided by the interface for convenience!
+  /// \note Those marked as virtual may be implemented more efficiently in a derived class!
+  /// \{
 
-  /**
-   * \defgroup provided ´´These methods are provided by the interface for convenience! Those marked as virtual may be
-   * implemented more efficiently in a derived class!``
-   * \{
-   */
 
   static std::string type_this()
   {
@@ -192,25 +186,24 @@ public:
     scal(alpha);
     return this->as_imp(*this);
   }
+  /// \}
+}; // class ContainerInterface
 
-  /**
-   * \}
-   */
 
 protected:
-  template <class SignedSizeType>
-  static size_t DUNE_DEPRECATED_MSG("Use boost::numeric_cast instead (24.09.2014)!")
-      assert_is_size_t_compatible_and_convert(const SignedSizeType& size)
-  {
-    if (size < 0)
-      DUNE_THROW(Exceptions::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
-    typedef typename std::make_unsigned<SignedSizeType>::type UnsignedSizeType;
-    if (UnsignedSizeType(size) > std::numeric_limits<size_t>::max())
-      DUNE_THROW(Exceptions::index_out_of_range,
-                 "Given size (" << size << ") is too large for size_t (max " << std::numeric_limits<size_t>::max()
-                                << ")!");
-    return size_t(size);
-  } // ... ssize_t_is_valid(...)
+template <class SignedSizeType>
+static size_t DUNE_DEPRECATED_MSG("Use boost::numeric_cast instead (24.09.2014)!")
+    assert_is_size_t_compatible_and_convert(const SignedSizeType& size)
+{
+  if (size < 0)
+    DUNE_THROW(Exceptions::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
+  typedef typename std::make_unsigned<SignedSizeType>::type UnsignedSizeType;
+  if (UnsignedSizeType(size) > std::numeric_limits<size_t>::max())
+    DUNE_THROW(Exceptions::index_out_of_range,
+               "Given size (" << size << ") is too large for size_t (max " << std::numeric_limits<size_t>::max()
+                              << ")!");
+  return size_t(size);
+} // ... ssize_t_is_valid(...)
 }; // class ContainerInterface
 
 
