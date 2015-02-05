@@ -180,28 +180,6 @@ public:
   } // ... amax(...)
 
   template <class T>
-  bool almost_equal(const EigenBaseVector<T, ScalarType>& other,
-                    const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
-  {
-    if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    for (size_t ii = 0; ii < size(); ++ii)
-      if (!Dune::FloatCmp::eq<ScalarType>(get_entry(ii), other.get_entry(ii), epsilon))
-        return false;
-    return true;
-  } // ... almost_equal(...)
-
-  virtual bool
-  almost_equal(const VectorImpType& other,
-               const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
-  {
-    return this->template almost_equal<Traits>(other, epsilon);
-  }
-
-  using VectorInterfaceType::almost_equal;
-
-  template <class T>
   ScalarType dot(const EigenBaseVector<T, ScalarType>& other) const
   {
     if (other.size() != size())
