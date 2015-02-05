@@ -11,6 +11,8 @@
 #include <vector>
 #include <initializer_list>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/typetraits.hh>
@@ -96,13 +98,13 @@ public:
 
   /// This constructor is needed for the python bindings.
   explicit IstlDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : IstlDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
+    : IstlDenseVector(internal::boost_numeric_cast<size_t>(ss), value)
   {
   }
 
   /// This constructor is needed because marking the above one as explicit had no effect.
   explicit IstlDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : IstlDenseVector(VectorInterfaceType::assert_is_size_t_compatible_and_convert(ss), value)
+    : IstlDenseVector(internal::boost_numeric_cast<size_t>(ss), value)
   {
   }
 
@@ -401,15 +403,15 @@ public:
 
   /// This constructor is needed for the python bindings.
   explicit IstlRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
-    : backend_(new BackendType(this->assert_is_size_t_compatible_and_convert(rr),
-                               this->assert_is_size_t_compatible_and_convert(cc), BackendType::row_wise))
+    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc),
+                               BackendType::row_wise))
   {
   }
 
   /// This constructor is needed for the python bindings.
   explicit IstlRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : backend_(new BackendType(this->assert_is_size_t_compatible_and_convert(rr),
-                               this->assert_is_size_t_compatible_and_convert(cc), BackendType::row_wise))
+    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc),
+                               BackendType::row_wise))
   {
   }
 
