@@ -130,7 +130,7 @@ public:
     return yy;
   }
 
-  ScalarType sup_norm() const
+  virtual ScalarType sup_norm() const
   {
     ScalarType ret = 0;
     for (size_t ii = 0; ii < rows(); ++ii)
