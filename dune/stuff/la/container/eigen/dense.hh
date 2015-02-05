@@ -25,7 +25,6 @@
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/float_cmp.hh>
 
 #include "dune/stuff/la/container/interfaces.hh"
 #include "dune/stuff/la/container/pattern.hh"
@@ -116,60 +115,50 @@ public:
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::BackendType BackendType;
 
+private:
+  typedef typename BackendType::Index EIGEN_size_t;
+
+public:
   explicit EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
   {
-    this->backend_ = std::make_shared<BackendType>(ss);
-    if (FloatCmp::eq(value, ScalarType(0)))
-      this->backend_->setZero();
-    else {
-      this->backend_->setOnes();
-      this->backend_->operator*=(value);
-    }
-  } // EigenDenseVector(...)
+    backend_ = std::make_shared<BackendType>(ss);
+    backend_->setOnes();
+    backend_->operator*=(value);
+  }
 
   /// This constructor is needed for the python bindings.
   explicit EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
   {
-    this->backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<size_t>(ss));
-    if (FloatCmp::eq(value, ScalarType(0)))
-      this->backend_->setZero();
-    else {
-      this->backend_->setOnes();
-      this->backend_->operator*=(value);
-    }
-  } // EigenDenseVector(...)
+    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(ss));
+    backend_->setOnes();
+    backend_->operator*=(value);
+  }
 
   explicit EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
-    this->backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<size_t>(ss));
-    if (FloatCmp::eq(value, ScalarType(0)))
-      this->backend_->setZero();
-    else {
-      this->backend_->setOnes();
-      this->backend_->operator*=(value);
-    }
-  } // EigenDenseVector(...)
+    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(ss));
+    backend_->setOnes();
+    backend_->operator*=(value);
+  }
 
   explicit EigenDenseVector(const std::vector<ScalarType>& other)
   {
-    this->backend_ = std::make_shared<BackendType>(other.size());
+    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
     for (size_t ii = 0; ii < other.size(); ++ii)
-      this->backend_->operator[](ii) = other[ii];
+      backend_->operator[](ii) = other[ii];
   }
 
   explicit EigenDenseVector(const std::initializer_list<ScalarType>& other)
   {
-    this->backend_ = std::make_shared<BackendType>(other.size());
+    backend_  = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
     size_t ii = 0;
-    for (auto element : other) {
-      this->backend_->operator[](ii) = element;
-      ++ii;
-    }
-  } // EigenDenseVector(...)
+    for (auto element : other)
+      backend_->operator[](ii++) = element;
+  }
 
   explicit EigenDenseVector(const BackendType& other)
   {
-    this->backend_ = std::make_shared<BackendType>(other);
+    backend_ = std::make_shared<BackendType>(other);
   }
 
   /**
@@ -177,12 +166,12 @@ public:
    */
   explicit EigenDenseVector(BackendType* backend_ptr)
   {
-    this->backend_ = std::shared_ptr<BackendType>(backend_ptr);
+    backend_ = std::shared_ptr<BackendType>(backend_ptr);
   }
 
   explicit EigenDenseVector(std::shared_ptr<BackendType> backend_ptr)
   {
-    this->backend_ = backend_ptr;
+    backend_ = backend_ptr;
   }
 
   using BaseType::operator=;
@@ -192,7 +181,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    this->backend_ = std::make_shared<BackendType>(other);
+    backend_ = std::make_shared<BackendType>(other);
     return *this;
   } // ... operator=(...)
 
@@ -201,10 +190,12 @@ public:
   using BaseType::backend;
 
 private:
+  using BaseType::backend_;
+
   inline void ensure_uniqueness() const
   {
-    if (!this->backend_.unique())
-      this->backend_ = std::make_shared<BackendType>(*(this->backend_));
+    if (!backend_.unique())
+      backend_ = std::make_shared<BackendType>(*(backend_));
   } // ... ensure_uniqueness(...)
 
   friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>>;
@@ -230,12 +221,16 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
 
+private:
+  typedef typename BackendType::Index EIGEN_size_t;
+
+public:
   /**
    *  \brief  This is the constructor of interest which wrappes a raw array.
    */
   EigenMappedDenseVector(ScalarType* data, size_t data_size)
   {
-    this->backend_ = std::make_shared<BackendType>(data, data_size);
+    backend_ = std::make_shared<BackendType>(data, internal::boost_numeric_cast<EIGEN_size_t>(data_size));
   }
 
   /**
@@ -243,63 +238,49 @@ public:
    */
   explicit EigenMappedDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
   {
-    this->backend_ = std::make_shared<BackendType>(new ScalarType[ss], ss);
-    if (FloatCmp::eq(value, ScalarType(0)))
-      this->backend_->setZero();
-    else {
-      this->backend_->setOnes();
-      this->backend_->operator*=(value);
-    }
-  } // EigenMappedDenseVector(...)
+    backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
+    backend_->setOnes();
+    backend_->operator*=(value);
+  }
 
   /// This constructor is needed for the python bindings.
   explicit EigenMappedDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
   {
-    const auto ss_size_t = internal::boost_numeric_cast<size_t>(ss);
-    this->backend_ = std::make_shared<BackendType>(new ScalarType[ss_size_t], ss_size_t);
-    if (FloatCmp::eq(value, ScalarType(0)))
-      this->backend_->setZero();
-    else {
-      this->backend_->setOnes();
-      this->backend_->operator*=(value);
-    }
-  } // EigenMappedDenseVector(...)
+    backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
+    backend_->setOnes();
+    backend_->operator*=(value);
+  }
 
   explicit EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
-    const auto ss_size_t = internal::boost_numeric_cast<size_t>(ss);
-    this->backend_ = std::make_shared<BackendType>(new ScalarType[ss_size_t], ss_size_t);
-    if (FloatCmp::eq(value, ScalarType(0)))
-      this->backend_->setZero();
-    else {
-      this->backend_->setOnes();
-      this->backend_->operator*=(value);
-    }
-  } // EigenMappedDenseVector(...)
+    backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
+    backend_->setOnes();
+    backend_->operator*=(value);
+  }
 
   explicit EigenMappedDenseVector(const std::vector<ScalarType>& other)
   {
-    this->backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
+    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
+                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
     for (size_t ii = 0; ii < other.size(); ++ii)
-      this->backend_->operator[](ii) = other[ii];
+      backend_->operator[](ii) = other[ii];
   }
 
   explicit EigenMappedDenseVector(const std::initializer_list<ScalarType>& other)
   {
-    this->backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
+    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
+                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
     size_t ii = 0;
-    for (auto element : other) {
-      this->backend_->operator[](ii) = element;
-      ++ii;
-    }
-  } // EigenMappedDenseVector(...)
+    for (auto element : other)
+      backend_->operator[](ii++) = element;
+  }
 
   /**
    *  \brief  This constructor does not do a deep copy.
    */
   EigenMappedDenseVector(const ThisType& other)
   {
-    this->backend_ = other.backend_;
+    backend_ = other.backend_;
   }
 
   /**
@@ -307,8 +288,9 @@ public:
    */
   explicit EigenMappedDenseVector(const BackendType& other)
   {
-    this->backend_          = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
-    this->backend_->operator=(other);
+    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
+                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_->operator=(other);
   }
 
   /**
@@ -316,12 +298,12 @@ public:
    */
   explicit EigenMappedDenseVector(BackendType* backend_ptr)
   {
-    this->backend_ = std::shared_ptr<BackendType>(backend_ptr);
+    backend_ = std::shared_ptr<BackendType>(backend_ptr);
   }
 
   explicit EigenMappedDenseVector(std::shared_ptr<BackendType> backend_ptr)
   {
-    this->backend_ = backend_ptr;
+    backend_ = backend_ptr;
   }
 
   using BaseType::operator=;
@@ -331,8 +313,8 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    this->backend_          = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
-    this->backend_->operator=(other);
+    backend_          = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
+    backend_->operator=(other);
     return *this;
   }
 
@@ -341,12 +323,14 @@ public:
   using BaseType::backend;
 
 private:
+  using BaseType::backend_;
+
   inline void ensure_uniqueness() const
   {
-    if (!this->backend_.unique()) {
-      auto new_backend     = std::make_shared<BackendType>(new ScalarType[this->backend_->size()], this->backend_->size());
-      new_backend->operator=(*(this->backend_));
-      this->backend_       = new_backend;
+    if (!backend_.unique()) {
+      auto new_backend     = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
+      new_backend->operator=(*(backend_));
+      backend_             = new_backend;
     }
   } // ... ensure_uniqueness(...)
 
@@ -372,44 +356,39 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
 
+private:
+  typedef typename BackendType::Index EIGEN_size_t;
+
+public:
   explicit EigenDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(rr, cc))
   {
-    if (FloatCmp::eq(value, ScalarType(0)))
-      backend_->setZero();
-    else {
-      backend_->setOnes();
-      backend_->operator*=(value);
-    }
-  } // EigenDenseMatrix(...)
+    this->backend_->setOnes();
+    this->backend_->operator*=(value);
+  }
 
   /// This constructor is needed for the python bindings.
   explicit EigenDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
                             const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc)))
+    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
+                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
   {
-    if (FloatCmp::eq(value, ScalarType(0)))
-      backend_->setZero();
-    else {
-      backend_->setOnes();
-      backend_->operator*=(value);
-    }
-  } // EigenDenseMatrix(...)
+    this->backend_->setOnes();
+    this->backend_->operator*=(value);
+  }
 
   explicit EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc)))
+    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
+                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
   {
-    if (FloatCmp::eq(value, ScalarType(0)))
-      backend_->setZero();
-    else {
-      backend_->setOnes();
-      backend_->operator*=(value);
-    }
-  } // EigenDenseMatrix(...)
+    this->backend_->setOnes();
+    this->backend_->operator*=(value);
+  }
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   EigenDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
-    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc)))
+    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
+                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
   {
     backend_->setZero();
   }
