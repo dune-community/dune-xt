@@ -489,8 +489,7 @@ public:
   inline void mv(const VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
                  VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& yy) const
   {
-    mv(static_cast<const typename CommonDenseVectorTraits<ScalarType>::derived_type&>(xx),
-       static_cast<typename CommonDenseVectorTraits<ScalarType>::derived_type&>(yy));
+    mv(xx.as_imp(), yy.as_imp());
   }
 
   inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
