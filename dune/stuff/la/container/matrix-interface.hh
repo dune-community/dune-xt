@@ -233,6 +233,33 @@ std::ostream& operator<<(std::ostream& out, const MatrixInterface<T, S>& matrix)
 } // ... operator<<(...)
 
 
+namespace internal {
+
+
+template <class M>
+struct is_matrix_helper
+{
+  DSC_has_typedef_initialize_once(Traits) DSC_has_typedef_initialize_once(ScalarType)
+
+      static const bool is_candidate = DSC_has_typedef(Traits)<M>::value && DSC_has_typedef(ScalarType)<M>::value;
+}; // class is_matrix_helper
+
+
+} // namespace internal
+
+
+template <class M, bool candidate = internal::is_matrix_helper<M>::is_candidate>
+struct is_matrix : public std::is_base_of<MatrixInterface<typename M::Traits, typename M::ScalarType>, M>
+{
+};
+
+
+template <class M>
+struct is_matrix<M, false> : public std::false_type
+{
+};
+
+
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
