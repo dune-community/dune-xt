@@ -12,6 +12,8 @@
 #include <limits>
 #include <type_traits>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/type_utils.hh>
@@ -74,6 +76,28 @@ class ProvidesDataAccess
 
 
 } // namespace Tags
+namespace internal {
+
+
+/**
+ * \brief Tries a boost::numeric_cast and throws an Exceptions::wrong_input_given on failure.
+ *
+ *        This can be used in the ctor initializer list.
+ */
+template <class Out, class In>
+static Out boost_numeric_cast(const In& in)
+{
+  try {
+    return boost::numeric_cast<Out>(in);
+  } catch (boost::bad_numeric_cast& ee) {
+    DUNE_THROW(Exceptions::wrong_input_given,
+               "There was an error in boost converting '" << in << "' to '" << Common::Typename<Out>::value() << "': "
+                                                          << ee.what());
+  }
+} // ... boost_numeric_cast(...)
+
+
+} // namespace internal
 
 
 template <class Traits>
@@ -215,22 +239,6 @@ template <class C>
 struct is_container<C, false> : public std::false_type
 {
 };
-
-protected:
-template <class SignedSizeType>
-static size_t DUNE_DEPRECATED_MSG("Use boost::numeric_cast instead (24.09.2014)!")
-    assert_is_size_t_compatible_and_convert(const SignedSizeType& size)
-{
-  if (size < 0)
-    DUNE_THROW(Exceptions::index_out_of_range, "Given size (" << size << ") has to be non-negative!");
-  typedef typename std::make_unsigned<SignedSizeType>::type UnsignedSizeType;
-  if (UnsignedSizeType(size) > std::numeric_limits<size_t>::max())
-    DUNE_THROW(Exceptions::index_out_of_range,
-               "Given size (" << size << ") is too large for size_t (max " << std::numeric_limits<size_t>::max()
-                              << ")!");
-  return size_t(size);
-} // ... ssize_t_is_valid(...)
-}; // class ContainerInterface
 
 
 template <class Traits>
