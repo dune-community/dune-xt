@@ -654,7 +654,8 @@ struct VectorAbstractionBase
   typedef typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type ScalarType;
   typedef ScalarType S;
 
-  static typename std::enable_if<is_vector, VectorType>::type create(const size_t sz, const ScalarType& val)
+  static typename std::enable_if<is_vector, VectorType>::type create(const size_t sz,
+                                                                     const ScalarType& val = ScalarType(0))
   {
     return VectorType(sz, val);
   }
