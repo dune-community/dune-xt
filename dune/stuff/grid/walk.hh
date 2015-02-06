@@ -54,7 +54,7 @@ const GridWalkDummyFunctor gridWalkDummyFunctor;
  *  \tparam GridViewImp any \ref GridView interface compliant type
  *  \tparam codim determines the codim of the Entities that are iterated on
  **/
-template <class GridViewImp, int codim = 0>
+template <class GridViewImp, size_t codim = 0>
 class GridWalk
 {
   typedef Dune::GridView<typename GridViewImp::Traits> GridViewType;
@@ -101,7 +101,7 @@ private:
 };
 
 //!
-template <class ViewImp, int codim = 0>
+template <class ViewImp, size_t codim = 0>
 GridWalk<Dune::GridView<ViewImp>, codim> make_gridwalk(const Dune::GridView<ViewImp>& view)
 {
   return GridWalk<Dune::GridView<ViewImp>, codim>(view);

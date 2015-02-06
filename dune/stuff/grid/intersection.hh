@@ -82,7 +82,7 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
 * @param[in] globalPoint A Dune::FieldVector with the global coordinates of the point
 * @return Returns true if the point lies on the intersection, false otherwise.
 */
-template <class IntersectionType, class FieldType, int dim>
+template <class IntersectionType, class FieldType, size_t dim>
 bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, dim>& globalPoint)
 {
   // map global coordinates to local coordinates of the intersection

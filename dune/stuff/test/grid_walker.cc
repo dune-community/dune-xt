@@ -26,8 +26,8 @@ typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
 template <class T>
 struct GridWalkerTest : public ::testing::Test
 {
-  static const int griddim        = T::value;
-  static const unsigned int level = 4;
+  static const size_t griddim = T::value;
+  static const size_t level   = 4;
   typedef Dune::YaspGrid<griddim> GridType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename GridType::template Codim<0>::Entity EntityType;

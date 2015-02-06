@@ -50,7 +50,7 @@ public:
   typedef GridProviderGmsh<GridType> ThisType;
 
   //! Dimension of the provided grid.
-  static const unsigned int dim = BaseType::dim;
+  static const size_t dim = BaseType::dim;
 
   //! Type of the grids coordinates.
   typedef typename BaseType::CoordinateType CoordinateType;

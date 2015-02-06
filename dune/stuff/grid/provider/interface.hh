@@ -36,7 +36,7 @@ class ConstProviderInterface
 
 public:
   typedef GridImp GridType;
-  static const unsigned int dimDomain = GridImp::dimension;
+  static const size_t dimDomain = GridImp::dimension;
   typedef typename GridType::ctype DomainFieldType;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef typename GridType::template Codim<0>::Entity EntityType;

@@ -418,8 +418,8 @@ public:
   typedef typename BaseType::IntersectionType IntersectionType;
 
   typedef typename IntersectionType::ctype DomainFieldType;
-  static const unsigned int dimDomain = IntersectionType::dimension;
-  static const unsigned int dimWorld  = IntersectionType::dimensionworld;
+  static const size_t dimDomain = IntersectionType::dimension;
+  static const size_t dimWorld  = IntersectionType::dimensionworld;
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef Dune::FieldVector<DomainFieldType, dimWorld> WorldType;
 
