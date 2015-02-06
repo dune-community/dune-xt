@@ -109,9 +109,9 @@ class DUNE_DEPRECATED_MSG("Use ESV2007::Cutoff instead!") ESV2007Cutoff
     static DomainFieldType compute_diameter_of_(const EntityType& ent)
     {
       DomainFieldType ret(0);
-      for (int cc = 0; cc < ent.template count<dimDomain>(); ++cc) {
+      for (auto cc : DSC::valueRange(ent.template count<dimDomain>())) {
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
-        for (int dd = cc + 1; dd < ent.template count<dimDomain>(); ++dd) {
+        for (auto dd : DSC::valueRange(ent.template count<dimDomain>())) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
           const auto diff         = vertex - other_vertex;
           ret                     = std::max(ret, diff.two_norm());
