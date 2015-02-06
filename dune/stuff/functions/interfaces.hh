@@ -416,9 +416,8 @@ private:
 }; // class LocalizableFunctionInterface
 
 
-std::ostream& operator<<(std::ostream& out,
-                         const LocalizableFunctionInterface<E, D, d, R, r, rC>&
-                             function) template <class E, class D, size_t d, class R, size_t r, size_t rC>
+template <class E, class D, size_t d, class R, size_t r, size_t rC>
+std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E, D, d, R, r, rC>& function)
 {
   function.report(out);
   return out;
