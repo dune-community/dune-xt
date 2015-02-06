@@ -396,6 +396,21 @@ class EigenRowMajorSparseMatrix
 #endif // HAVE_EIGEN
 
 } // namespace LA
+namespace Common {
+
+#if HAVE_EIGEN
+
+
+template <class T>
+struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
+    : public LA::internal::MatrixAbstractionBase<LA::EigenRowMajorSparseMatrix<T>>
+{
+};
+
+
+#endif // HAVE_EIGEN
+
+} // namespace Common
 } // namespace Stuff
 } // namespace Dune
 

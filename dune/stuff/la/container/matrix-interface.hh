@@ -13,9 +13,10 @@
 #include <iostream>
 #include <type_traits>
 
-#include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/matrix.hh>
+#include <dune/stuff/common/type_utils.hh>
 
 #include "container-interface.hh"
 #include "vector-interface.hh"
@@ -263,6 +264,47 @@ struct is_matrix<M, false> : public std::false_type
 };
 
 
+namespace internal {
+
+
+template <class MatrixImp>
+struct MatrixAbstractionBase
+{
+  static const bool is_matrix = LA::is_matrix<MatrixImp>::value;
+
+  typedef typename std::conditional<is_matrix, MatrixImp, void>::type MatrixType;
+  typedef typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type ScalarType;
+  typedef ScalarType S;
+
+  static typename std::enable_if<is_matrix, MatrixType>::type create(const size_t rows, const size_t cols,
+                                                                     const ScalarType& val = ScalarType(0))
+  {
+    return MatrixType(rows, cols, val);
+  }
+
+  static size_t rows(const MatrixType& mat)
+  {
+    return mat.rows();
+  }
+
+  static size_t cols(const MatrixType& mat)
+  {
+    return mat.cols();
+  }
+
+  static void set_entry(MatrixType& mat, const size_t row, const size_t col, const ScalarType& val)
+  {
+    mat.set_entry(row, col, val);
+  }
+
+  static ScalarType get_entry(const MatrixType& mat, const size_t row, const size_t col)
+  {
+    return mat.get_entry(row, col);
+  }
+}; // struct MatrixAbstractionBase
+
+
+} // namespace internal
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
