@@ -191,10 +191,10 @@ private:
     for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
          it != gridView.template end<0>();
          ++it) {
-      const auto& entity           = *it;
-      const auto& index            = gridView.indexSet().index(entity);
-      data[index]                  = 0.0;
-      int numberOfBoundarySegments = 0;
+      const auto& entity              = *it;
+      const auto& index               = gridView.indexSet().index(entity);
+      data[index]                     = 0.0;
+      size_t numberOfBoundarySegments = 0;
       bool isOnBoundary = false;
       for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
         if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
