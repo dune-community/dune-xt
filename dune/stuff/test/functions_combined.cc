@@ -33,10 +33,10 @@ class DifferenceFunctionType
 {
   typedef typename G::template Codim<0>::Entity E;
   typedef typename G::ctype D;
-  static const unsigned int d = G::dimension;
+  static const size_t d = G::dimension;
   typedef double R;
-  static const unsigned int r  = 1;
-  static const unsigned int rC = 1;
+  static const size_t r  = 1;
+  static const size_t rC = 1;
 
 public:
   typedef Functions::Constant<E, D, d, R, r, rC> ConstantFunctionType;

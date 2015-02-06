@@ -22,10 +22,10 @@
   {                                                                                                                    \
     typedef typename ConstantFunctionType::EntityType E;                                                               \
     typedef typename ConstantFunctionType::DomainFieldType D;                                                          \
-    static const unsigned int d = ConstantFunctionType::dimDomain;                                                     \
+    static const size_t d = ConstantFunctionType::dimDomain;                                                           \
     typedef typename ConstantFunctionType::RangeFieldType R;                                                           \
-    static const unsigned int r  = ConstantFunctionType::dimRange;                                                     \
-    static const unsigned int rC = ConstantFunctionType::dimRangeCols;                                                 \
+    static const size_t r  = ConstantFunctionType::dimRange;                                                           \
+    static const size_t rC = ConstantFunctionType::dimRangeCols;                                                       \
     typedef Dune::Stuff::FunctionsProvider<E, D, d, R, r, rC> FunctionsProvider;                                       \
     typedef typename FunctionsProvider::InterfaceType InterfaceType;                                                   \
                                                                                                                        \

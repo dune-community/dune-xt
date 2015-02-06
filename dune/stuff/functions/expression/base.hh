@@ -29,17 +29,17 @@ namespace Functions {
  *  \brief base class that makes a function out of the stuff from mathexpr.hh
  *  \attention  Most surely you do not want to use this class directly, but Functions::Expression!
  */
-template <class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+template <class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
 class MathExpressionBase
 {
 public:
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
 
   typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
+  static const size_t dimDomain = domainDim;
 
   typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange = rangeDim;
+  static const size_t dimRange = rangeDim;
 
   MathExpressionBase(const std::string _variable, const std::string _expression)
   {

@@ -46,7 +46,7 @@ static const double model1_min_value     = 0.001;
 static const double model1_max_value     = 998.915;
 
 
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp, int r, int rC>
+template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r, size_t rC>
 class Model1Base : public Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC>
 {
   typedef Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC> BaseType;
@@ -149,7 +149,7 @@ public:
 
 
 // default, to allow for specialization
-template <class E, class D, int d, class R, int r, int rC = 1>
+template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Model1 : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
   Model1()
@@ -162,7 +162,7 @@ class Model1 : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 /**
  * We read only the Kx values from file and scale the unit matrix atm.
  */
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp, int r>
+template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r>
 class Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r>
     : public internal::Model1Base<EntityImp, DomainFieldImp, RangeFieldImp, r, r>
 {
@@ -190,7 +190,7 @@ public:
   }
 
 private:
-  template <int d, bool anything = true>
+  template <size_t d, bool anything = true>
   struct Call
   {
     static RangeType unit_matrix()

@@ -25,7 +25,7 @@ namespace Functions {
  *           http://dx.doi.org/10.1016/j.cam.2013.09.033
  *           Subsection 2.1.1
  */
-template <class E, class D, int d, class R, int r, int rC = 1>
+template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class FlatTop : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
   FlatTop()
@@ -35,7 +35,7 @@ class FlatTop : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 };
 
 
-template <class E, class D, int d, class R>
+template <class E, class D, size_t d, class R>
 class FlatTop<E, D, d, R, 1, 1> : public GlobalFunctionInterface<E, D, d, R, 1, 1>
 {
   typedef GlobalFunctionInterface<E, D, d, R, 1, 1> BaseType;
@@ -44,10 +44,10 @@ class FlatTop<E, D, d, R, 1, 1> : public GlobalFunctionInterface<E, D, d, R, 1, 
 public:
   typedef typename BaseType::EntityType EntityType;
   typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const unsigned int dimDomain = BaseType::dimDomain;
+  static const size_t dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
   typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange = BaseType::dimRange;
+  static const size_t dimRange = BaseType::dimRange;
   typedef typename BaseType::RangeType RangeType;
 
   typedef Common::FieldVector<DomainFieldType, dimDomain> StuffDomainType;

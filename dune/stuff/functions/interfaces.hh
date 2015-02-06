@@ -49,7 +49,7 @@ namespace Functions {
 #if HAVE_DUNE_GRID
 
 
-template <class GridViewType, int dimRange, int dimRangeCols = 1>
+template <class GridViewType, size_t dimRange, size_t dimRangeCols = 1>
 class VisualizationAdapter;
 
 
@@ -83,30 +83,31 @@ class LocalizableFunction
 /**
  *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+          size_t rangeDimCols = 1>
 class LocalfunctionSetInterface
 {
   static_assert(EntityImp::dimension == domainDim, "Dimensions do not match!");
 
-  template <class RangeFieldType, int dimRange, int dimRangeCols>
+  template <class RangeFieldType, size_t dimRange, size_t dimRangeCols>
   struct RangeTypeSelector
   {
     typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> type;
   };
 
-  template <class RangeFieldType, int dimRange>
+  template <class RangeFieldType, size_t dimRange>
   struct RangeTypeSelector<RangeFieldType, dimRange, 1>
   {
     typedef Dune::FieldVector<RangeFieldType, dimRange> type;
   };
 
-  template <int dimDomain, class RangeFieldType, int dimRange, int dimRangeCols>
+  template <size_t dimDomain, class RangeFieldType, size_t dimRange, size_t dimRangeCols>
   struct JacobianRangeTypeSelector
   {
     typedef double type;
   };
 
-  template <int dimDomain, class RangeFieldType, int dimRange>
+  template <size_t dimDomain, class RangeFieldType, size_t dimRange>
   struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
   {
     typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> type;
@@ -116,12 +117,12 @@ public:
   typedef EntityImp EntityType;
 
   typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
+  static const size_t dimDomain = domainDim;
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeCols = rangeDimCols;
+  static const size_t dimRange     = rangeDim;
+  static const size_t dimRangeCols = rangeDimCols;
   typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::type RangeType;
   typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::type JacobianRangeType;
 
@@ -195,7 +196,8 @@ protected:
 /**
  *  \brief  Interface for functions, which can be evaluated locally on one Entity.
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+          size_t rangeDimCols = 1>
 class LocalfunctionInterface
     : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
@@ -206,7 +208,7 @@ public:
   typedef EntityImp EntityType;
 
   typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const unsigned int dimDomain = BaseType::dimDomain;
+  static const size_t dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
   typedef typename BaseType::RangeType RangeType;
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
@@ -298,7 +300,8 @@ class IsLocalizableFunction
 /**
  * \brief Interface for functions which provide a LocalfunctionInterface for an entity.
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+          size_t rangeDimCols = 1>
 class LocalizableFunctionInterface : public IsLocalizableFunction, public Tags::LocalizableFunction
 {
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -308,11 +311,11 @@ public:
   typedef EntityImp EntityType;
 
   typedef DomainFieldImp DomainFieldType;
-  static const unsigned int dimDomain = domainDim;
+  static const size_t dimDomain = domainDim;
 
   typedef RangeFieldImp RangeFieldType;
-  static const unsigned int dimRange     = rangeDim;
-  static const unsigned int dimRangeCols = rangeDimCols;
+  static const size_t dimRange     = rangeDim;
+  static const size_t dimRangeCols = rangeDimCols;
 
   typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
       LocalfunctionType;
@@ -413,8 +416,9 @@ private:
 }; // class LocalizableFunctionInterface
 
 
-template <class E, class D, int d, class R, int r, int rC>
-std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E, D, d, R, r, rC>& function)
+std::ostream& operator<<(std::ostream& out,
+                         const LocalizableFunctionInterface<E, D, d, R, r, rC>&
+                             function) template <class E, class D, size_t d, class R, size_t r, size_t rC>
 {
   function.report(out);
   return out;
@@ -429,7 +433,8 @@ class TransferredGlobalFunction;
  * base class for global matrix-valued valued functions that provides automatic local functions via
  * LocalizableFunctionInterface
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+          size_t rangeDimCols = 1>
 class GlobalFunctionInterface
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
@@ -700,7 +705,7 @@ private:
 
 
 //! Utility to generate a complete Function Type from an existing one and a template
-template <class FunctionImp, template <class, class, int, class, int, int> class OutTemplate>
+template <class FunctionImp, template <class, class, size_t, class, size_t, size_t> class OutTemplate>
 struct FunctionTypeGenerator
 {
   typedef OutTemplate<typename FunctionImp::EntityType, typename FunctionImp::DomainFieldType, FunctionImp::dimDomain,

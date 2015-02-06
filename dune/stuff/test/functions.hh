@@ -26,10 +26,10 @@ protected:
   // required types and static members
   typedef typename FunctionImp::EntityType EntityType;
   typedef typename FunctionImp::DomainFieldType DomainFieldType;
-  static const unsigned int dimDomain = FunctionImp::dimDomain;
+  static const size_t dimDomain = FunctionImp::dimDomain;
   typedef typename FunctionImp::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange     = FunctionImp::dimRange;
-  static const unsigned int dimRangeCols = FunctionImp::dimRangeCols;
+  static const size_t dimRange     = FunctionImp::dimRange;
+  static const size_t dimRangeCols = FunctionImp::dimRangeCols;
   typedef typename FunctionImp::LocalfunctionType LocalfunctionType;
   typedef typename FunctionImp::DomainType DomainType;
   typedef typename FunctionImp::RangeType RangeType;

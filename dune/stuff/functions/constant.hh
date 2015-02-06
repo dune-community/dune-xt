@@ -57,14 +57,15 @@ typename UnitMatrix<K, dim>::type unit_matrix()
 } // namespace internal
 
 
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+          size_t rangeDimCols = 1>
 class Constant
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
   typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
 
-  template <class R, int r, int rC>
+  template <class R, size_t r, size_t rC>
   struct Get
   {
     static std::string value_str()

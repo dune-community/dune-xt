@@ -33,7 +33,7 @@ class DUNE_DEPRECATED_MSG("Use ESV2007::Cutoff instead!") ESV2007Cutoff
                 "DiffusionImp has to be tagged as a LocalizableFunction!");
   typedef typename DiffusionImp::EntityType E_;
   typedef typename DiffusionImp::DomainFieldType D_;
-  static const unsigned int d_ = DiffusionImp::dimDomain;
+  static const size_t d_ = DiffusionImp::dimDomain;
   typedef typename DiffusionImp::RangeFieldType R_;
   typedef LocalizableFunctionInterface<E_, D_, d_, R_, 1> BaseType;
   typedef ESV2007Cutoff<DiffusionImp> ThisType;
@@ -46,7 +46,7 @@ class DUNE_DEPRECATED_MSG("Use ESV2007::Cutoff instead!") ESV2007Cutoff
     typedef typename BaseType::EntityType EntityType;
 
     typedef typename BaseType::DomainFieldType DomainFieldType;
-    static const unsigned int dimDomain = BaseType::dimDomain;
+    static const size_t dimDomain = BaseType::dimDomain;
     typedef typename BaseType::DomainType DomainType;
 
     typedef typename BaseType::RangeFieldType RangeFieldType;
@@ -54,7 +54,7 @@ class DUNE_DEPRECATED_MSG("Use ESV2007::Cutoff instead!") ESV2007Cutoff
     typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
   private:
-    template <class D, int r, int rR>
+    template <class D, size_t r, size_t rR>
     struct Compute
     {
       static_assert(AlwaysFalse<D>::value, "Not implemented for these dimensions!");
@@ -170,7 +170,7 @@ private:
 namespace ESV2007 {
 
 
-template <class E, class D, int d, class R, int r, int rC = 1>
+template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Testcase1Force : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
   Testcase1Force()
@@ -283,7 +283,7 @@ private:
 }; // class Testcase1Force
 
 
-template <class E, class D, int d, class R, int r, int rC = 1>
+template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Testcase1ExactSolution : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
   Testcase1ExactSolution()
@@ -409,7 +409,7 @@ class Cutoff<DiffusionType, void>
                 "DiffusionType has to be tagged as a LocalizableFunction!");
   typedef typename DiffusionType::EntityType E_;
   typedef typename DiffusionType::DomainFieldType D_;
-  static const unsigned int d_ = DiffusionType::dimDomain;
+  static const size_t d_ = DiffusionType::dimDomain;
   typedef typename DiffusionType::RangeFieldType R_;
   typedef LocalizableFunctionInterface<E_, D_, d_, R_, 1> BaseType;
   typedef Cutoff<DiffusionType> ThisType;
@@ -422,12 +422,12 @@ class Cutoff<DiffusionType, void>
     typedef typename BaseType::EntityType EntityType;
 
     typedef typename BaseType::DomainFieldType DomainFieldType;
-    static const unsigned int dimDomain = BaseType::dimDomain;
+    static const size_t dimDomain = BaseType::dimDomain;
     typedef typename BaseType::DomainType DomainType;
 
     typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const unsigned int dimRange     = BaseType::dimRange;
-    static const unsigned int dimRangeCols = BaseType::dimRangeCols;
+    static const size_t dimRange     = BaseType::dimRange;
+    static const size_t dimRangeCols = BaseType::dimRangeCols;
     typedef typename BaseType::RangeType RangeType;
 
     typedef typename BaseType::JacobianRangeType JacobianRangeType;

@@ -45,7 +45,7 @@ class SelectCombined
 public:
   typedef typename LeftType::EntityType E;
   typedef typename LeftType::DomainFieldType D;
-  static const unsigned int d = LeftType::dimDomain;
+  static const size_t d = LeftType::dimDomain;
   typedef typename LeftType::RangeFieldType R;
 
 private:
@@ -57,44 +57,44 @@ private:
   template <class L, class R>
   class Choose
   {
-    template <int rL, int rR, int rCL, int rcR, Combination cc, bool anything = true>
+    template <size_t rL, size_t rR, size_t rCL, size_t rcR, Combination cc, bool anything = true>
     class Dimension
     {
       static_assert(!anything, "No combination for these dimensions available!");
     };
 
-    template <int r_in, int rC_in, bool anything>
+    template <size_t r_in, size_t rC_in, bool anything>
     class Dimension<r_in, r_in, rC_in, rC_in, Combination::difference, anything>
     {
     public:
-      static const unsigned int r  = r_in;
-      static const unsigned int rC = rC_in;
+      static const size_t r  = r_in;
+      static const size_t rC = rC_in;
     };
 
-    template <int r_in, int rC_in, bool anything>
+    template <size_t r_in, size_t rC_in, bool anything>
     class Dimension<r_in, r_in, rC_in, rC_in, Combination::sum, anything>
     {
     public:
-      static const unsigned int r  = r_in;
-      static const unsigned int rC = rC_in;
+      static const size_t r  = r_in;
+      static const size_t rC = rC_in;
     };
 
-    template <int r_in, int rC_in, bool anything>
+    template <size_t r_in, size_t rC_in, bool anything>
     class Dimension<1, r_in, 1, rC_in, Combination::product, anything>
     {
     public:
-      static const unsigned int r  = r_in;
-      static const unsigned int rC = rC_in;
+      static const size_t r  = r_in;
+      static const size_t rC = rC_in;
     };
 
   public:
-    static const unsigned int r  = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::r;
-    static const unsigned int rC = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::rC;
+    static const size_t r  = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::r;
+    static const size_t rC = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::rC;
   }; // class Choose
 
 public:
-  static const unsigned int r  = Choose<LeftType, RightType>::r;
-  static const unsigned int rC = Choose<LeftType, RightType>::rC;
+  static const size_t r  = Choose<LeftType, RightType>::r;
+  static const size_t rC = Choose<LeftType, RightType>::rC;
 
   typedef typename LeftType::LocalfunctionType LeftLocalfunctionType;
   typedef typename RightType::LocalfunctionType RightLocalfunctionType;

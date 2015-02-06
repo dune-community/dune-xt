@@ -30,7 +30,7 @@ namespace Stuff {
  * \note If you want to add a new function FooBar, do the following: provide a definition that is available for all
  *       template arguments, like:
 \code
-template< class E, class D, int d, class R, int r, int rC = 1 >
+template< class E, class D, size_t d, class R, size_t r, size_t rC = 1 >
 class FooBar
   : public LocalizableFunctionInterface< E, D, d, R, r, rC >
 {
@@ -44,7 +44,7 @@ static const bool available = true;
  *       This is all you have to do when implementing the function. In addition you have to add the appropriate include
  *       in this file (of course) and the appropriate type below (just like the rest, should be obvious).
  */
-template <class E, class D, int d, class R, int r, int rC = 1>
+template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class FunctionsProvider
 {
 public:
@@ -185,17 +185,17 @@ public:
       return call_default_config<Spe10Model1Type>(sub_name);
     else if (available().empty())
       DUNE_THROW(Exceptions::wrong_input_given,
-                 "There is no " << InterfaceType::static_id() << " available for dimensions " << int(d) << " -> "
-                                << int(r)
+                 "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(d) << " -> "
+                                << size_t(r)
                                 << " x "
-                                << int(rC)
+                                << size_t(rC)
                                 << "!");
     else
       DUNE_THROW(Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of those avaible for dimensions " << int(d) << " -> "
-                                    << int(r)
+                 "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(d) << " -> "
+                                    << size_t(r)
                                     << " x "
-                                    << int(rC)
+                                    << size_t(rC)
                                     << ":\n"
                                     << available_as_str());
   } // ... default_config(...)
@@ -221,17 +221,17 @@ public:
       return call_create<Spe10Model1Type>(cfg);
     else if (available().empty())
       DUNE_THROW(Exceptions::wrong_input_given,
-                 "There is no " << InterfaceType::static_id() << " available for dimensions " << int(d) << " -> "
-                                << int(r)
+                 "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(d) << " -> "
+                                << size_t(r)
                                 << " x "
-                                << int(rC)
+                                << size_t(rC)
                                 << "!");
     else
       DUNE_THROW(Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of those avaible for dimensions " << int(d) << " -> "
-                                    << int(r)
+                 "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(d) << " -> "
+                                    << size_t(r)
                                     << " x "
-                                    << int(rC)
+                                    << size_t(rC)
                                     << ":\n"
                                     << available_as_str());
   } // ... create(...)

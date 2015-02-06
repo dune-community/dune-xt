@@ -22,11 +22,11 @@
     typedef typename GlobalFunctionType::EntityType EntityType;                                                        \
     typedef typename GlobalFunctionType::LocalfunctionType LocalfunctionType;                                          \
     typedef typename GlobalFunctionType::DomainFieldType DomainFieldType;                                              \
-    static const unsigned int dimDomain = GlobalFunctionType::dimDomain;                                               \
+    static const size_t dimDomain = GlobalFunctionType::dimDomain;                                                     \
     typedef typename GlobalFunctionType::DomainType DomainType;                                                        \
     typedef typename GlobalFunctionType::RangeFieldType RangeFieldType;                                                \
-    static const unsigned int dimRange     = GlobalFunctionType::dimRange;                                             \
-    static const unsigned int dimRangeCols = GlobalFunctionType::dimRangeCols;                                         \
+    static const size_t dimRange     = GlobalFunctionType::dimRange;                                                   \
+    static const size_t dimRangeCols = GlobalFunctionType::dimRangeCols;                                               \
     typedef typename GlobalFunctionType::RangeType RangeType;                                                          \
     typedef typename GlobalFunctionType::JacobianRangeType JacobianRangeType;                                          \
                                                                                                                        \

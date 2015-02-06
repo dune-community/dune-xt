@@ -22,11 +22,11 @@
     typedef typename LocalizableFunctionType::EntityType EntityType;                                                   \
     typedef typename LocalizableFunctionType::LocalfunctionType LocalfunctionType;                                     \
     typedef typename LocalizableFunctionType::DomainFieldType DomainFieldType;                                         \
-    static const unsigned int dimDomain = LocalizableFunctionType::dimDomain;                                          \
+    static const size_t dimDomain = LocalizableFunctionType::dimDomain;                                                \
     typedef typename LocalizableFunctionType::DomainType DomainType;                                                   \
     typedef typename LocalizableFunctionType::RangeFieldType RangeFieldType;                                           \
-    static const unsigned int dimRange     = LocalizableFunctionType::dimRange;                                        \
-    static const unsigned int dimRangeCols = LocalizableFunctionType::dimRangeCols;                                    \
+    static const size_t dimRange     = LocalizableFunctionType::dimRange;                                              \
+    static const size_t dimRangeCols = LocalizableFunctionType::dimRangeCols;                                          \
     typedef typename LocalizableFunctionType::RangeType RangeType;                                                     \
     typedef typename LocalizableFunctionType::JacobianRangeType JacobianRangeType;                                     \
                                                                                                                        \

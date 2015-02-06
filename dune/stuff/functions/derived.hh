@@ -38,35 +38,35 @@ class SelectDerived
 public:
   typedef typename FunctionType::EntityType E;
   typedef typename FunctionType::DomainFieldType D;
-  static const unsigned int d = FunctionType::dimDomain;
+  static const size_t d = FunctionType::dimDomain;
   typedef typename FunctionType::RangeFieldType R;
 
 private:
   template <class F>
   class Choose
   {
-    template <int d, int r, int rC, Derivative der, bool anything = true>
+    template <size_t d, size_t r, size_t rC, Derivative der, bool anything = true>
     class Dimension
     {
       static_assert(!anything, "No derivative for these dimensions available!");
     };
 
-    template <int d, bool anything>
+    template <size_t d, bool anything>
     class Dimension<d, d, 1, Derivative::divergence, anything>
     {
     public:
-      static const unsigned int r  = 1;
-      static const unsigned int rC = 1;
+      static const size_t r  = 1;
+      static const size_t rC = 1;
     };
 
   public:
-    static const unsigned int r  = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::r;
-    static const unsigned int rC = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::rC;
+    static const size_t r  = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::r;
+    static const size_t rC = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::rC;
   }; // class SelectDerived
 
 public:
-  static const unsigned int r  = Choose<FunctionType>::r;
-  static const unsigned int rC = Choose<FunctionType>::rC;
+  static const size_t r  = Choose<FunctionType>::r;
+  static const size_t rC = Choose<FunctionType>::rC;
 
   typedef typename FunctionType::LocalfunctionType FunctionLocalfunctionType;
   typedef typename LocalfunctionInterface<E, D, d, R, r, rC>::DomainType DomainType;

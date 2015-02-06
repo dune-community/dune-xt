@@ -23,7 +23,8 @@ namespace Stuff {
 namespace Functions {
 
 
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+          size_t rangeDimCols = 1>
 class Checkerboard
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
@@ -81,7 +82,7 @@ public:
   typedef typename BaseType::LocalfunctionType LocalfunctionType;
 
   typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const int dimDomain = BaseType::dimDomain;
+  static const size_t dimDomain = BaseType::dimDomain;
 
   typedef typename BaseType::RangeFieldType RangeFieldType;
   typedef typename BaseType::RangeType RangeType;

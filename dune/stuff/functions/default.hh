@@ -21,14 +21,14 @@ namespace Functions {
 #if HAVE_DUNE_GRID
 
 
-template <class GridViewType, int dimRange, int dimRangeCols>
+template <class GridViewType, size_t dimRange, size_t dimRangeCols>
 class VisualizationAdapter : public VTKFunction<GridViewType>
 {
 public:
   typedef typename GridViewType::template Codim<0>::Entity EntityType;
 
   typedef typename GridViewType::ctype DomainFieldType;
-  static const unsigned int dimDomain = GridViewType::dimension;
+  static const size_t dimDomain = GridViewType::dimension;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, double, dimRange, dimRangeCols>
@@ -42,7 +42,7 @@ public:
   }
 
 private:
-  template <int r, int rC, bool anything = true>
+  template <size_t r, size_t rC, bool anything = true>
   class Call
   {
   public:
@@ -57,7 +57,7 @@ private:
     }
   }; // class Call
 
-  template <int r, bool anything>
+  template <size_t r, bool anything>
   class Call<r, 1, anything>
   {
   public:

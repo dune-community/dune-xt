@@ -30,7 +30,8 @@ namespace Functions {
  *  \attention  If you add the create() and default_config() method, do not forget to enable the matrix valued
  *              versions in test/function_expression.cc
  */
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+          size_t rangeDimCols = 1>
 class Expression
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
@@ -51,8 +52,8 @@ class Expression
 
     typedef typename BaseType::DomainType DomainType;
     typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const unsigned int dimRange     = BaseType::dimRange;
-    static const unsigned int dimRangeCols = BaseType::dimRangeCols;
+    static const size_t dimRange     = BaseType::dimRange;
+    static const size_t dimRangeCols = BaseType::dimRangeCols;
     typedef typename BaseType::RangeType RangeType;
 
     typedef typename BaseType::JacobianRangeType JacobianRangeType;
@@ -158,7 +159,7 @@ private:
 }; // class Expression
 
 
-template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim>
+template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
 class Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim>
 {
@@ -171,10 +172,10 @@ public:
   typedef typename BaseType::EntityType EntityType;
   typedef typename BaseType::LocalfunctionType LocalfunctionType;
 
-  static const unsigned int dimDomain = BaseType::dimDomain;
+  static const size_t dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
 
-  static const unsigned int dimRange = BaseType::dimRange;
+  static const size_t dimRange = BaseType::dimRange;
   typedef typename BaseType::RangeType RangeType;
 
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
