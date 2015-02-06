@@ -81,7 +81,7 @@ class LocalizableFunction
 
 
 /**
- *  \brief  Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
+ *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  */
 template <class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1>
 class LocalfunctionSetInterface
@@ -208,12 +208,7 @@ public:
   typedef typename BaseType::DomainFieldType DomainFieldType;
   static const unsigned int dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
-
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange     = BaseType::dimRange;
-  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
-
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
   LocalfunctionInterface(const EntityType& ent)
@@ -444,15 +439,8 @@ class GlobalFunctionInterface
 
 public:
   typedef typename BaseType::LocalfunctionType LocalfunctionType;
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const unsigned int dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
-
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange     = BaseType::dimRange;
-  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
-
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
   virtual ~GlobalFunctionInterface()
@@ -576,15 +564,8 @@ class GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldIm
 
 public:
   typedef typename BaseType::LocalfunctionType LocalfunctionType;
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const unsigned int dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
-
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const unsigned int dimRange     = BaseType::dimRange;
-  static const unsigned int dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
-
 #if HAVE_DUNE_FEM
   typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
                                        GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp,
@@ -730,37 +711,35 @@ struct FunctionTypeGenerator
 namespace internal {
 
 
-template <class LF>
-class IsLocalizableFunctionHelper
+template <class F>
+struct is_localizable_function_helper
 {
-  static const bool tagged = std::is_base_of<Tags::LocalizableFunction, LF>::value;
+  DSC_has_typedef_initialize_once(EntityType) DSC_has_typedef_initialize_once(DomainFieldType)
+      DSC_has_typedef_initialize_once(RangeFieldType) DSC_has_static_member_initialize_once(dimDomain)
+          DSC_has_static_member_initialize_once(dimRange) DSC_has_static_member_initialize_once(dimRangeCols)
 
-  template <class F, bool anything = false>
-  struct Choose : public std::false_type
-  {
-  };
-
-  // If you get an error here you have manually derived from Tags::LocalizableFunction but not from
-  // LocalizableFunctionInterface, which is beyond reason!
-  template <class F>
-  struct Choose<F, true>
-      : public std::is_base_of<LocalizableFunctionInterface<typename F::EntityType, typename F::DomainFieldType,
-                                                            F::dimDomain, typename F::RangeFieldType, F::dimRange,
-                                                            F::dimRangeCols>,
-                               F>
-  {
-  };
-
-public:
-  static const bool value = Choose<LF, tagged>::value;
-}; // class IsLocalizableFunctionHelper
+              static const
+      bool is_candidate = DSC_has_typedef(EntityType)<F>::value && DSC_has_typedef(DomainFieldType)<F>::value
+                          && DSC_has_typedef(RangeFieldType)<F>::value && DSC_has_static_member(dimDomain)<F>::value
+                          && DSC_has_static_member(dimRange)<F>::value && DSC_has_static_member(dimRangeCols)<F>::value;
+}; // class is_localizable_function_helper
 
 
 } // namespace internal
 
 
-template <class LF>
-struct is_localizable_function : public std::integral_constant<bool, internal::IsLocalizableFunctionHelper<LF>::value>
+template <class F, bool candidate = internal::is_localizable_function_helper<F>::is_candidate>
+struct is_localizable_function
+    : public std::is_base_of<LocalizableFunctionInterface<typename F::EntityType, typename F::DomainFieldType,
+                                                          F::dimDomain, typename F::RangeFieldType, F::dimRange,
+                                                          F::dimRangeCols>,
+                             F>
+{
+};
+
+
+template <class F>
+struct is_localizable_function<F, false> : public std::false_type
 {
 };
 

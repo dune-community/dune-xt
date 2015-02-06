@@ -157,17 +157,6 @@ public:
   } // void report(const std::string, std::ostream&, const std::string&) const
 
 private:
-  //  void evaluate(const Dune::DynamicVector< DomainFieldType >& arg, RangeFieldType& ret) const
-  //  {
-  //    assert(dimRange == 1 && "I'm only here to be used by Functions::Parametric::Coefficient, which has dimrange ==
-  //    1");
-  //    // copy arg
-  //    for (int ii = 0; ii < std::min(domainDim, int(arg.size())); ++ii)
-  //      *(arg_[ii]) = arg[ii];
-  //    // copy ret
-  //    ret = op_[0]->Val();
-  //  }
-
   void setup(const std::string& _variable, const std::vector<std::string>& _expression)
   {
     static_assert((dimDomain > 0), "Really?");
