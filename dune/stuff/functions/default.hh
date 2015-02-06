@@ -6,6 +6,8 @@
 #ifndef DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
 #define DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/function.hh>
 #endif
@@ -89,7 +91,7 @@ public:
   virtual double evaluate(int comp, const EntityType& en, const DomainType& xx) const override final
   {
     assert(comp >= 0);
-    assert(comp < dimRange);
+    assert(comp < boost::numeric_cast<int>(dimRange));
     const auto local_func = function_.local_function(en);
     local_func->evaluate(xx, tmp_value_);
     return Call<dimRange, dimRangeCols>::evaluate(comp, tmp_value_);
