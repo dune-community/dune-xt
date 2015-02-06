@@ -24,7 +24,7 @@ typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
 template <class T>
 struct GridInfoTest : public ::testing::Test
 {
-  static const int griddim        = T::value;
+  static const size_t griddim     = T::value;
   static const unsigned int level = 1;
   typedef Dune::SGrid<griddim, griddim> GridType;
   const DSG::Providers::Cube<GridType> grid_prv;
@@ -36,8 +36,8 @@ struct GridInfoTest : public ::testing::Test
   void check()
   {
     const Dimensions<typename GridType::LeafGridView> dim(grid_prv.grid().leafGridView());
-    const auto gv      = grid_prv.grid().leafGridView();
-    const int entities = gv.size(0);
+    const auto gv       = grid_prv.grid().leafGridView();
+    const auto entities = gv.size(0);
     EXPECT_DOUBLE_EQ(1.0 / double(entities), dim.entity_volume.min());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.max());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.average());
@@ -49,7 +49,7 @@ struct GridInfoTest : public ::testing::Test
       EXPECT_DOUBLE_EQ(dl[i].average(), 0.5);
     }
     const Statistics st(gv);
-    const int line = std::pow(2, level);
+    const auto line = std::pow(2, level);
     EXPECT_EQ(line * (griddim), st.numberOfBoundaryIntersections);
     EXPECT_EQ(entities * (2 * griddim), st.numberOfIntersections);
     EXPECT_EQ(st.numberOfIntersections - st.numberOfBoundaryIntersections, st.numberOfInnerIntersections);

@@ -19,12 +19,12 @@ using namespace Dune::Stuff::Grid;
  **/
 TEST(PgfOutput, Sgrid)
 {
-  const int dim = 2;
+  const size_t dim = 2;
   typedef Dune::SGrid<dim, dim> GridType;
   int n[dim];
   double h[dim];
 
-  for (int i = 0; i < dim; ++i) {
+  for (size_t i = 0; i < dim; ++i) {
     n[i] = 2;
     h[i] = 1.0;
   }
