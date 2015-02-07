@@ -272,22 +272,33 @@ struct MatrixAbstractionBase
 {
   static const bool is_matrix = LA::is_matrix<MatrixImp>::value;
 
+  static const bool has_static_size = false;
+
+  static const size_t static_rows = std::numeric_limits<size_t>::max();
+
+  static const size_t static_cols = std::numeric_limits<size_t>::max();
+
   typedef typename std::conditional<is_matrix, MatrixImp, void>::type MatrixType;
   typedef typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type ScalarType;
   typedef ScalarType S;
 
-  static typename std::enable_if<is_matrix, MatrixType>::type create(const size_t rows, const size_t cols,
-                                                                     const ScalarType& val = ScalarType(0))
+  static inline typename std::enable_if<is_matrix, MatrixType>::type create(const size_t rows, const size_t cols)
+  {
+    return MatrixType(rows, cols);
+  }
+
+  static inline typename std::enable_if<is_matrix, MatrixType>::type create(const size_t rows, const size_t cols,
+                                                                            const ScalarType& val)
   {
     return MatrixType(rows, cols, val);
   }
 
-  static size_t rows(const MatrixType& mat)
+  static inline typename std::enable_if<is_matrix, size_t>::type rows(const MatrixType& mat)
   {
     return mat.rows();
   }
 
-  static size_t cols(const MatrixType& mat)
+  static inline typename std::enable_if<is_matrix, size_t>::type cols(const MatrixType& mat)
   {
     return mat.cols();
   }
@@ -297,7 +308,8 @@ struct MatrixAbstractionBase
     mat.set_entry(row, col, val);
   }
 
-  static ScalarType get_entry(const MatrixType& mat, const size_t row, const size_t col)
+  static inline typename std::enable_if<is_matrix, ScalarType>::type get_entry(const MatrixType& mat, const size_t row,
+                                                                               const size_t col)
   {
     return mat.get_entry(row, col);
   }
