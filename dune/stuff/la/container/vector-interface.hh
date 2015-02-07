@@ -650,12 +650,20 @@ struct VectorAbstractionBase
 {
   static const bool is_vector = LA::is_vector<VectorImp>::value;
 
+  static const bool has_static_size = false;
+
+  static const size_t static_size = std::numeric_limits<size_t>::max();
+
   typedef typename std::conditional<is_vector, VectorImp, void>::type VectorType;
   typedef typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type ScalarType;
   typedef ScalarType S;
 
-  static typename std::enable_if<is_vector, VectorType>::type create(const size_t sz,
-                                                                     const ScalarType& val = ScalarType(0))
+  static inline typename std::enable_if<is_vector, VectorType>::type create(const size_t sz)
+  {
+    return VectorType(sz);
+  }
+
+  static inline typename std::enable_if<is_vector, VectorType>::type create(const size_t sz, const ScalarType& val)
   {
     return VectorType(sz, val);
   }
