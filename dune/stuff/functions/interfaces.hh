@@ -567,9 +567,15 @@ class GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldIm
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
 
 public:
-  typedef typename BaseType::LocalfunctionType LocalfunctionType;
-  typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeType RangeType;
+  using typename BaseType::DomainFieldType;
+  using BaseType::dimDomain;
+  using typename BaseType::DomainType;
+  using typename BaseType::RangeFieldType;
+  using BaseType::dimRange;
+  using BaseType::dimRangeCols;
+  using typename BaseType::RangeType;
+  using typename BaseType::LocalfunctionType;
+  using typename BaseType::EntityType;
 #if HAVE_DUNE_FEM
   typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
                                        GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp,
