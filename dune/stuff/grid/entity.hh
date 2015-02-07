@@ -98,14 +98,14 @@ double DUNE_DEPRECATED_MSG(
 #define REFERENCE_ELEMENTS GenericReferenceElements
 #endif
 
-template <size_t codim, size_t worlddim, class GridImp, template <int, int, class> class EntityImp>
+template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 auto reference_element(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
     -> decltype(REFERENCE_ELEMENTS<typename GridImp::ctype, worlddim>::general(entity.geometry().type()))
 {
   return REFERENCE_ELEMENTS<typename GridImp::ctype, worlddim>::general(entity.geometry().type());
 }
 
-template <size_t mydim, size_t cdim, class GridImp, template <int, int, class> class GeometryImp>
+template <int mydim, int cdim, class GridImp, template <int, int, class> class GeometryImp>
 auto reference_element(const Dune::Geometry<mydim, cdim, GridImp, GeometryImp>& geometry)
     -> decltype(REFERENCE_ELEMENTS<typename GridImp::ctype, mydim>::general(geometry.type()))
 {
