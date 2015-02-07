@@ -37,6 +37,7 @@
 #include <dune/pdelab/common/function.hh>
 #endif
 
+#include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/memory.hh>
 
