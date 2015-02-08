@@ -42,45 +42,45 @@ struct ElementVariant;
 template <typename GridType>
 struct ElementVariant
 {
-  static const size_t id = 2;
+  static const int id = 2;
 };
 
 
-template <size_t dim>
+template <int dim>
 struct ElementVariant<Dune::YaspGrid<dim>>
 {
-  static const size_t id = 1;
+  static const int id = 1;
 };
 
 
-template <size_t dimGrid, size_t dimWorld>
+template <int dimGrid, int dimWorld>
 struct ElementVariant<Dune::SGrid<dimGrid, dimWorld>>
 {
-  static const size_t id = 1;
+  static const int id = 1;
 };
 
 
 #if HAVE_ALUGRID
 
 
-template <size_t dimGrid, size_t dimWorld>
+template <int dimGrid, int dimWorld>
 struct ElementVariant<Dune::ALUCubeGrid<dimGrid, dimWorld>>
 {
-  static const size_t id = 1;
+  static const int id = 1;
 };
 
 
-template <size_t dimGrid, size_t dimWorld>
+template <int dimGrid, int dimWorld>
 struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming>>
 {
-  static const size_t id = 1;
+  static const int id = 1;
 };
 
 
-template <size_t dimGrid, size_t dimWorld>
+template <int dimGrid, int dimWorld>
 struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconforming>>
 {
-  static const size_t id = 1;
+  static const int id = 1;
 };
 
 
@@ -108,7 +108,7 @@ struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconf
  *          <ul><li>\c 1: cubes
  *          <li>2: simplices</ul>
  **/
-template <typename GridImp, size_t variant = internal::ElementVariant<GridImp>::id>
+template <typename GridImp, int variant = internal::ElementVariant<GridImp>::id>
 class Cube : public ProviderInterface<GridImp>
 {
   typedef ProviderInterface<GridImp> BaseType;
@@ -259,7 +259,7 @@ private:
 #else // HAVE_DUNE_GRID
 
 
-template <typename GridImp, size_t variant = 1>
+template <typename GridImp, int variant = 1>
 class Cube
 {
   static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
