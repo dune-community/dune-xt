@@ -88,7 +88,7 @@ class Constant
     }
   };
 
-  template <class R, int rC>
+  template <class R, size_t rC>
   struct Get<R, 1, rC>
   {
     static std::string value_str()
@@ -104,7 +104,7 @@ class Constant
     }
   };
 
-  template <class R, int r>
+  template <class R, size_t r>
   struct Get<R, r, 1>
   {
     static std::string value_str()
@@ -141,6 +141,7 @@ public:
     Common::Configuration config;
     config["value"] = Get<RangeFieldImp, rangeDim, rangeDimCols>::value_str();
     config["name"] = static_id();
+    config.report();
     if (sub_name.empty())
       return config;
     else {
