@@ -137,8 +137,8 @@ public:
   }
 
   explicit EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : EigenRowMajorSparseMatrix(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                                internal::boost_numeric_cast<EIGEN_size_t>(cc))
+    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
+                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
   {
   }
 
