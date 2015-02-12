@@ -14,17 +14,19 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
+#if HAVE_DUNE_GRID
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
+#endif
+#include <dune/stuff/grid/structuredgridfactory.hh>
 #endif
 
 #include <dune/stuff/common/fvector.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
-#include <dune/stuff/grid/structuredgridfactory.hh>
 
 #include "default.hh"
 
