@@ -6,7 +6,7 @@
 #ifndef DUNE_STUFF_WALK_FUNCTORS_HH
 #define DUNE_STUFF_WALK_FUNCTORS_HH
 
-#include "walk.hh"
+#include "walker.hh"
 
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/grid/information.hh>
@@ -16,20 +16,21 @@ namespace Stuff {
 namespace Grid {
 
 //! GridWalk functor that refines all entitites above given volume
-template <class GridType>
-struct MaximumEntityVolumeRefineFunctor
+template <class GridViewType>
+struct MaximumEntityVolumeRefineFunctor : public Functor::Codim0<GridViewType>
 {
+  typedef Functor::Codim0<GridViewType> BaseType;
+  typedef typename GridViewType::GridType GridType;
   MaximumEntityVolumeRefineFunctor(GridType& grid, double volume, double factor)
     : threshold_volume_(volume * factor)
     , grid_(grid)
   {
   }
 
-  template <class Entity>
-  void operator()(const Entity& ent, const int /*ent_idx*/)
+  virtual void apply_local(const typename BaseType::EntityType& ent)
   {
-    const double volume = ent.geometry().volume();
 
+    const double volume = ent.geometry().volume();
     if (volume > threshold_volume_)
       grid_.mark(1, ent);
   }
@@ -47,10 +48,12 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
   const double unrefined_min_volume = unrefined_dimensions.entity_volume.min();
   typedef typename GridType::LeafGridView View;
   View view = grid.leafView();
-  MaximumEntityVolumeRefineFunctor<GridType> f(grid, unrefined_min_volume, size_factor);
+  MaximumEntityVolumeRefineFunctor<View> f(grid, unrefined_min_volume, size_factor);
   while (true) {
     grid.preAdapt();
-    GridWalk<View>(view).walkCodim0(f);
+    Walker<View> gw(view);
+    gw.add(f);
+    gw.walk();
     if (!grid.adapt())
       break;
     grid.postAdapt();
@@ -60,10 +63,11 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
 
 /** \brief Functor for a \ref GridWalk calculating minima and maxima of entities' coordinates
  **/
-template <class EntityType>
-struct MinMaxCoordinateFunctor
+template <class GridViewType>
+struct MinMaxCoordinateFunctor : public Functor::Codim0<GridViewType>
 {
-  typedef typename EntityType::Geometry EntityGeometryType;
+  typedef Functor::Codim0<GridViewType> BaseType;
+  typedef typename BaseType::EntityType::Geometry EntityGeometryType;
   typedef typename EntityGeometryType::ctype ctype;
   typedef FieldVector<ctype, EntityGeometryType::coorddimension> VectorType;
   MinMaxCoordinateFunctor()
@@ -72,9 +76,9 @@ struct MinMaxCoordinateFunctor
   {
   }
 
-  void operator()(const EntityType& ent, const int)
+  virtual void apply_local(const typename BaseType::EntityType& ent)
   {
-    const typename EntityType::Geometry& geo = ent.geometry();
+    const auto& geo = ent.geometry();
     for (auto i : DSC::valueRange(geo.corners())) {
       for (auto k : valueRange(EntityGeometryType::coorddimension)) {
         minima_[k] = std::min(minima_[k], geo.corner(i)[k]);

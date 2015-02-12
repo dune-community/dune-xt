@@ -18,7 +18,7 @@
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/grid/walk.hh>
+#include <dune/stuff/grid/walker.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/grid/entity.hh>
 
@@ -139,7 +139,9 @@ struct Dimensions
   Dimensions(const GridViewType& gridView)
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
-    GridWalk<GridViewType>(gridView).operator()(f);
+    Walker<GridViewType> gw(gridView);
+    gw.add(f);
+    gw.walk();
   }
 
   Dimensions(const EntityType& entity)

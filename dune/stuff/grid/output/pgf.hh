@@ -14,7 +14,7 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/array.hh>
 
-#include <dune/stuff/grid/walk.hh>
+#include <dune/stuff/grid/walker.hh>
 #include <dune/stuff/grid/walk_functors.hh>
 
 namespace Dune {
@@ -88,8 +88,11 @@ private:
  *  A functor to be used in a \ref GridWalk
  *  \see Pgf
  **/
-class PgfEntityFunctorIntersections
+template <class GridViewType>
+class PgfEntityFunctorIntersections : public Functor::Codim0And1<GridViewType>
 {
+  typedef Functor::Codim0And1<GridViewType> BaseType;
+
 public:
   PgfEntityFunctorIntersections(std::ostream& file, const std::string color = "black",
                                 const bool printEntityIndex = false)
@@ -99,14 +102,17 @@ public:
   {
   }
 
-  template <class EntityType>
-  void operator()(const EntityType& ent, int ent_idx)
+  virtual void apply_local(const typename BaseType::EntityType& entity)
   {
-    maybePrintEntityIndex(ent, ent_idx);
+    assert(false);
+    // mapper -> ent_id ??
+    auto ent_idx = 0;
+    maybePrintEntityIndex(entity, ent_idx);
   }
 
-  template <class EntityType, class IntersectionType>
-  void operator()(const EntityType& /*ent*/, const IntersectionType& intersection)
+  virtual void apply_local(const typename BaseType::IntersectionType& intersection,
+                           const typename BaseType::EntityType& /*inside_entity*/,
+                           const typename BaseType::EntityType& /*outside_entity*/)
   {
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
@@ -123,8 +129,7 @@ public:
     file_.flush();
   }
 
-  template <class Entity>
-  void maybePrintEntityIndex(const Entity& entity, const int idx)
+  void maybePrintEntityIndex(const typename BaseType::EntityType& entity, const int idx)
   {
     if (!printEntityIndex_)
       return;
@@ -149,26 +154,24 @@ protected:
  *
  *  A functor to be used in a \ref GridWalk
  **/
-class PgfEntityFunctorIntersectionsWithShift : public PgfEntityFunctorIntersections
+template <class GridViewType>
+class PgfEntityFunctorIntersectionsWithShift : public PgfEntityFunctorIntersections<GridViewType>
 {
+  typedef PgfEntityFunctorIntersections<GridViewType> BaseType;
+
 public:
   PgfEntityFunctorIntersectionsWithShift(std::ostream& file, const std::string color = "black", const int level = 0,
                                          bool printEntityIndex = false)
-    : PgfEntityFunctorIntersections(file, color, printEntityIndex)
+    : BaseType(file, color, printEntityIndex)
     , level_(level)
   {
   }
 
-  template <class Entity>
-  void operator()(const Entity& ent, const int ent_idx)
+  virtual void apply_local(const typename BaseType::IntersectionType& intersection,
+                           const typename BaseType::EntityType& inside_entity,
+                           const typename BaseType::EntityType& /*outside_entity*/)
   {
-    maybePrintEntityIndex(ent, ent_idx);
-  }
-
-  template <class EntityType, class IntersectionType>
-  void operator()(const EntityType& ent, const IntersectionType& intersection)
-  {
-    const PgfCoordWrapper center(ent.geometry().center());
+    const PgfCoordWrapper center(inside_entity.geometry().center());
     const float fac = 0.16 * level_;
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
@@ -182,13 +185,13 @@ public:
     std::snprintf(buffer,
                   150,
                   "\\draw[draw=%s,line width=\\gridlinewidth pt,line cap=round] (%f,%f)--(%f,%f);\n",
-                  color_.c_str(),
+                  this->color_.c_str(),
                   a[0],
                   a[1],
                   b[0],
                   b[1]);
-    file_ << buffer;
-    file_.flush();
+    this->file_ << buffer;
+    this->file_.flush();
   }
 
 private:
@@ -221,9 +224,10 @@ public:
               "\\begin{tikzpicture}[scale=\\gridplotscale]\n";
     } else
       file << "\\begin{tikzpicture}\n";
-    GridWalk<typename GridType::LeafGridView> gridWalk(grid_.leafGridView());
-    PgfEntityFunctorIntersections pgf(file);
-    gridWalk(pgf, pgf);
+    Walker<typename GridType::LeafGridView> gridWalk(grid_.leafGridView());
+    PgfEntityFunctorIntersections<typename GridType::LeafGridView> pgf(file);
+    gridWalk.add(pgf);
+    gridWalk.walk();
 
     file << "\\end{tikzpicture}\n";
     if (!includable)
@@ -253,9 +257,11 @@ public:
     for (int i = 0; i < refineLevel; ++i) {
       typedef typename GridType::LevelGridView ViewType;
       const ViewType& view = grid_.levelGridView(i);
-      GridWalk<ViewType> gridWalk(view);
-      PgfEntityFunctorIntersectionsWithShift pgf(file, texcolors_[std::min(i, int(texcolors_.size()))], i, true);
-      gridWalk(pgf);
+      Walker<ViewType> gridWalk(view);
+      PgfEntityFunctorIntersectionsWithShift<ViewType> pgf(
+          file, texcolors_[std::min(i, int(texcolors_.size()))], i, true);
+      gridWalk.add(pgf);
+      gridWalk.walk();
       file << "%%%%%%%%%%%%%%%" << view.size(0) << "%%%%%%%%%%%%%%%%\n";
     }
 
@@ -293,15 +299,17 @@ public:
         char buffer[80] = {'\0'};
         std::snprintf(buffer, 80, "\\subfloat[Level %d]{\n\\begin{tikzpicture}[scale=\\gridplotscale]\n", i);
         file << buffer;
-        GridWalk<ViewType> gridWalk(view);
-        PgfEntityFunctorIntersections thisLevel(file, "black", true);
-        gridWalk(thisLevel, thisLevel);
+        Walker<ViewType> gridWalk(view);
+        PgfEntityFunctorIntersections<ViewType> thisLevel(file, "black", true);
+        gridWalk.add(thisLevel);
+        gridWalk.walk();
       }
-
-      GridWalk<typename GridType::LeafGridView> leafWalk(grid_.leafGridView());
-      typedef typename GridType::LeafGridView::Traits::template Codim<0>::Entity EntityType;
-      MinMaxCoordinateFunctor<EntityType> minMaxCoord;
-      leafWalk(minMaxCoord);
+      typedef typename GridType::LeafGridView LeafView;
+      Walker<LeafView> leafWalk(grid_.leafGridView());
+      typedef typename LeafView::Traits::template Codim<0>::Entity EntityType;
+      MinMaxCoordinateFunctor<LeafView> minMaxCoord;
+      leafWalk.add(minMaxCoord);
+      leafWalk.walk();
 
       switch (GridType::dimensionworld) {
         case 1: {
