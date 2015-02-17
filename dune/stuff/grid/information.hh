@@ -147,7 +147,7 @@ struct Dimensions
   Dimensions(const EntityType& entity)
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
-    f(entity, 0);
+    f.apply_local(entity);
   }
 };
 
