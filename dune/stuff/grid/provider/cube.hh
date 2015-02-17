@@ -47,7 +47,7 @@ struct ElementVariant
   static const int id = 2;
 };
 
-
+#if HAVE_DUNE_GRID
 template <int dim>
 struct ElementVariant<Dune::YaspGrid<dim>>
 {
@@ -60,7 +60,7 @@ struct ElementVariant<Dune::SGrid<dimGrid, dimWorld>>
 {
   static const int id = 1;
 };
-
+#endif // HAVE_DUNE_GRID
 
 #if HAVE_ALUGRID
 
