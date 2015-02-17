@@ -129,22 +129,21 @@ TYPED_TEST(FlatTopFunctionTest, evaluate_check)
 
 #else // HAVE_DUNE_GRID
 
-#if DS_COMPILE_DISABLED_TESTS
-TYPED_TEST(DISABLED_FlatTopFunctionTest, static_interface_check)
+// no-compile placeholders to mark disabled tests in test-binary output
+TEST(DISABLED_FlatTopFunctionTest, static_interface_check)
 {
 }
-TYPED_TEST(DISABLED_FlatTopFunctionTest, static_create_check)
+TEST(DISABLED_FlatTopFunctionTest, static_create_check)
 {
 }
-TYPED_TEST(DISABLED_FlatTopFunctionTest, dynamic_interface_check)
+TEST(DISABLED_FlatTopFunctionTest, dynamic_interface_check)
 {
 }
-TYPED_TEST(DISABLED_FlatTopFunctionTest, copy_check)
+TEST(DISABLED_FlatTopFunctionTest, copy_check)
 {
 }
-TYPED_TEST(DISABLED_FlatTopFunctionTest, evaluate_check)
+TEST(DISABLED_FlatTopFunctionTest, evaluate_check)
 {
 }
-#endif
 
 #endif // HAVE_DUNE_GRID
