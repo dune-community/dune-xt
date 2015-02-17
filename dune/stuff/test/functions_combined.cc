@@ -99,7 +99,7 @@ TYPED_TEST(DifferenceFunctionTest, evaluate_check)
 
 #else // HAVE_DUNE_GRID
 
-
+#if DS_COMPILE_DISABLED_TESTS
 TYPED_TEST(DISABLED_FlatTopFunctionTest, static_interface_check)
 {
 }
@@ -109,6 +109,6 @@ TYPED_TEST(DISABLED_DifferenceFunctionTest, dynamic_interface_check)
 TYPED_TEST(DISABLED_DifferenceFunctionTest, evaluate_check)
 {
 }
-
+#endif
 
 #endif // HAVE_DUNE_GRID
