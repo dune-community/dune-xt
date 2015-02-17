@@ -28,12 +28,12 @@ namespace Dune {
  *  StructuredGridFactory just like the unstructured Grids. Limitations:
  *  \li SPGrid does not support simplices
  */
-template <class ct, size_t dim, SPRefinementStrategy strategy, class Comm>
+template <class ct, int dim, SPRefinementStrategy strategy, class Comm>
 class StructuredGridFactory<SPGrid<ct, dim, strategy, Comm>>
 {
   typedef SPGrid<ct, dim, strategy, Comm> GridType;
   typedef typename GridType::ctype ctype;
-  static const size_t dimworld = GridType::dimensionworld;
+  static const int dimworld = GridType::dimensionworld;
 
 public:
   /** \brief Create a structured cube grid
