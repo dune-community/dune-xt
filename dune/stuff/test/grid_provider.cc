@@ -42,7 +42,8 @@ protected:
   typedef typename GridProviderType::GridType GridType;
 
 private:
-  typedef Stuff::Grid::ConstProviderInterface<GridType> InterfaceType;
+  typedef Stuff::Grid::ConstProviderInterface<GridType> ConstInterfaceType;
+  typedef Stuff::Grid::ProviderInterface<GridType> InterfaceType;
 
   static_assert(std::is_base_of<InterfaceType, GridProviderType>::value,
                 "GridProviderType has to be derived from Stuff::Grid::ConstProviderInterface!");
@@ -91,8 +92,21 @@ public:
   static void const_interface()
   {
     const auto grid_provider = create();
+#if defined(__INTEL_COMPILER)
+    /**
+     * ICC is actually correct and standard compliant in rejecting the #else branch here:
+     * 7.3.3 The using declaration [namespace.udecl]
+     * 14/ If a function declaration in namespace scope or block scope has the same name and
+     * the same parameter types as a function introduced by a using-declaration, and the
+     * declarations do not declare the same function, the program is ill-formed.
+     *
+     * This is just a temporary workaround to have tests build on all compilers again
+     **/
+    check_const_interface<ConstInterfaceType>(*grid_provider);
+#else
     check_const_interface<GridProviderType>(*grid_provider);
     check_const_interface<InterfaceType>(*grid_provider);
+#endif
   } // ... const_interface()
 
 private:
