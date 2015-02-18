@@ -6,6 +6,9 @@
 #ifndef DUNE_STUFF_WALK_FUNCTORS_HH
 #define DUNE_STUFF_WALK_FUNCTORS_HH
 
+// nothing here will compile w/o grid present
+#if HAVE_DUNE_GRID
+
 #include "walker.hh"
 
 #include <dune/stuff/common/ranges.hh>
@@ -94,5 +97,6 @@ struct MinMaxCoordinateFunctor : public Functor::Codim0<GridViewType>
 } // namespace Stud
 } // namespace Dune
 
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_WALK_FUNCTORS_HH

@@ -6,6 +6,9 @@
 #ifndef DUNE_STUFF_GRID_OUTPUT_PGF_HH
 #define DUNE_STUFF_GRID_OUTPUT_PGF_HH
 
+// nothing here will compile w/o grid present
+#if HAVE_DUNE_GRID
+
 #include <ostream>
 #include <cstdio>
 #include <limits>
@@ -364,5 +367,7 @@ private:
 } // namespace Stuff
 } // namespace Grid
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_GRID_IO_LATEX_PGF_HH

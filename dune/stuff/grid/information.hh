@@ -13,7 +13,9 @@
 
 #include <dune/common/unused.hh>
 
+#if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
+#endif
 
 #include <dune/stuff/common/math.hh>
 #include <dune/stuff/grid/intersection.hh>
@@ -87,6 +89,8 @@ size_t maxNumberOfNeighbors(const GridViewType& gridView)
   }
   return maxNeighbours;
 } // size_t maxNumberOfNeighbors(const GridPartType& gridPart)
+
+#if HAVE_DUNE_GRID
 
 //! Provide min/max coordinates for all space dimensions of a GridView
 template <class GridViewType>
@@ -169,9 +173,13 @@ Dimensions<GridViewType> dimensions(const typename GridViewType::Grid::template 
   return Dimensions<GridViewType>(entity);
 }
 
+#endif // HAVE_DUNE_GRID
+
 } // namespace Grid
 } // end of namespace Stuff
 } // namespace Dune
+
+#if HAVE_DUNE_GRID
 
 template <class T>
 inline std::ostream& operator<<(std::ostream& s, const DSG::Dimensions<T>& d)
@@ -184,5 +192,8 @@ inline std::ostream& operator<<(std::ostream& s, const DSG::Dimensions<T>& d)
            % d.entity_volume.average() % d.entity_volume.max() % d.volumeRelation();
   s << std::endl;
   return s;
-} // <<
+}
+
+#endif // HAVE_DUNE_GRID
+
 #endif // DUNE_STUFF_GRID_INFORMATION_HH

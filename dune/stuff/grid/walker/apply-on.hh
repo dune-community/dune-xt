@@ -6,6 +6,9 @@
 #ifndef DUNE_STUFF_GRID_WALKER_APPLY_ON_HH
 #define DUNE_STUFF_GRID_WALKER_APPLY_ON_HH
 
+// nothing here will compile w/o grid present
+#if HAVE_DUNE_GRID
+
 #include <dune/stuff/grid/entity.hh>
 #include <dune/stuff/grid/intersection.hh>
 #include <dune/stuff/grid/boundaryinfo.hh>
@@ -252,5 +255,7 @@ private:
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_WALKER_APPLY_ON_HH

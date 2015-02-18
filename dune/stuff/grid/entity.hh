@@ -89,8 +89,6 @@ double DUNE_DEPRECATED_MSG(
   return entity_diameter(entity);
 } // entityDiameter
 
-#endif // HAVE_DUNE_GRID
-
 
 #if DUNE_VERSION_NEWER(DUNE_GEOMETRY, 2, 3)
 #define REFERENCE_ELEMENTS ReferenceElements
@@ -113,6 +111,8 @@ auto reference_element(const Dune::Geometry<mydim, cdim, GridImp, GeometryImp>& 
 }
 
 #undef REFERENCE_ELEMENTS
+
+#endif // HAVE_DUNE_GRID
 
 } // namespace Grid
 } // namespace Stuff

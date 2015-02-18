@@ -6,6 +6,9 @@
 #ifndef DUNE_STUFF_GRID_WALKER_HH
 #define DUNE_STUFF_GRID_WALKER_HH
 
+// nothing here will compile w/o grid present
+#if HAVE_DUNE_GRID
+
 #include <vector>
 #include <memory>
 #include <type_traits>
@@ -297,5 +300,7 @@ protected:
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_WALKER_HH
