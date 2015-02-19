@@ -19,6 +19,7 @@
 #include <dune/stuff/common/memory.hh>
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/grid/search.hh>
+#include <dune/stuff/grid/walker/apply-on.hh>
 
 #include <dune/stuff/common/string.hh>
 
@@ -335,17 +336,17 @@ public:
   {
     const auto& it_end        = real_grid_view_.template end<0>();
     const IndexSet& index_set = real_grid_view_.indexSet();
-    size_t entitycount        = 0;
-    size_t step               = 1000;
-    size_t numsteps           = 1;
+    //    size_t entitycount = 0;
+    //    size_t step = 1000;
+    //    size_t numsteps = 1;
     CoordinateType periodic_neighbor_coords;
     std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
     for (auto it = real_grid_view_.template begin<0>(); it != it_end; ++it) {
-      ++entitycount;
-      if (entitycount == numsteps * step) {
-        std::cout << numsteps * step << " Entities done..." << std::endl;
-        ++numsteps;
-      }
+      //      ++entitycount;
+      //      if (entitycount == numsteps*step) {
+      //        std::cout << numsteps*step << " Entities done..." << std::endl;
+      //        ++numsteps;
+      //      }
       intersection_neighbor_map.clear();
       const auto& entity   = *it;
       const auto& i_it_end = real_grid_view_.iend(entity);
@@ -374,7 +375,8 @@ public:
           assert(num_boundary_coords = 1);
           if (is_periodic) {
             EntityPointerType periodic_neighbor =
-                *(Dune::Stuff::Grid::EntityInlevelSearch<RealGridViewType>(real_grid_view_)
+                *(Dune::Stuff::Grid::EntityInlevelSearch<RealGridViewType>(
+                      real_grid_view_, new ApplyOn::BoundaryEntities<RealGridViewType>)
                       .
                       operator()(std::vector<CoordinateType>(1, periodic_neighbor_coords))[0]);
             intersection_neighbor_map.insert(

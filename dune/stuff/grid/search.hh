@@ -23,6 +23,7 @@
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/memory.hh>
 #include <dune/stuff/grid/entity.hh>
+#include <dune/stuff/grid/walker/apply-on.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -67,8 +68,10 @@ private:
   }
 
 public:
-  EntityInlevelSearch(const GridViewType& gridview)
+  EntityInlevelSearch(const GridViewType& gridview, const ApplyOn::WhichEntity<GridViewType>* which_entities =
+                                                        new ApplyOn::AllEntities<GridViewType>())
     : gridview_(gridview)
+    , which_entities_(which_entities)
     , it_last_(gridview_.template begin<0>())
   {
   }
@@ -85,7 +88,7 @@ public:
       bool it_reset = true;
       typename EntityPointerVectorType::value_type tmp_ptr(nullptr);
       for (; it_current != end; ++it_current) {
-        if ((tmp_ptr = check_add(*it_current, point))) {
+        if ((which_entities_->apply_on(gridview_, *it_current)) && (tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
           tmp_ptr    = nullptr;
           it_reset   = false;
@@ -96,7 +99,7 @@ public:
       if (!it_reset)
         continue;
       for (it_current = begin; it_current != it_last_; ++it_current) {
-        if ((tmp_ptr = check_add(*it_current, point))) {
+        if ((which_entities_->apply_on(gridview_, *it_current)) && (tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
           tmp_ptr    = nullptr;
           it_reset   = false;
@@ -110,6 +113,7 @@ public:
 
 private:
   const GridViewType gridview_;
+  const std::unique_ptr<const ApplyOn::WhichEntity<GridViewType>> which_entities_;
   IteratorType it_last_;
 }; // class EntityInlevelSearch
 
