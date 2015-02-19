@@ -117,23 +117,23 @@ struct PeriodicViewTestCube : public testing::Test
             const auto outside = *(intersection.outside());
             // find corresponding intersection in outside
             const auto index_in_outside                             = intersection.indexInOutside();
-            const PeriodicIntersectionType* intersection_in_outside = periodic_grid_view.ibegin(outside).operator->();
+            PeriodicIntersectionType intersection_in_outside        = *(periodic_grid_view.ibegin(outside).operator->());
             const PeriodicIntersectionIteratorType i_it_outside_end = periodic_grid_view.iend(outside);
             for (PeriodicIntersectionIteratorType i_it_outside = periodic_grid_view.ibegin(outside);
                  i_it_outside != i_it_outside_end;
                  ++i_it_outside) {
               const PeriodicIntersectionType* outside_intersection = i_it_outside.operator->();
               if (outside_intersection->indexInInside() == index_in_outside) {
-                intersection_in_outside = outside_intersection;
+                intersection_in_outside = *outside_intersection;
               }
             }
             // check outside_intersection coords
             const auto coords_in_outside   = intersection.geometryInOutside().center();
-            const auto coords_in_outside_2 = intersection_in_outside->geometryInInside().center();
+            const auto coords_in_outside_2 = intersection_in_outside.geometryInInside().center();
             EXPECT_TRUE(Dune::Stuff::Common::FloatCmp::eq(coords_in_outside, coords_in_outside_2));
             // check global intersection coords in periodic case
             const auto global_intersection_coords         = intersection.geometry().center();
-            const auto global_outside_intersection_coords = (*intersection_in_outside).geometry().center();
+            const auto global_outside_intersection_coords = intersection_in_outside.geometry().center();
             size_t coord_difference_count                 = 0;
             size_t differing_coordinate;
             for (size_t ii = 0; ii < dimDomain; ++ii) {
