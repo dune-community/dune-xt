@@ -10,6 +10,9 @@
 
 #include <dune/geometry/genericgeometry/referenceelements.hh>
 
+// largest scope guarded for headercheck with grid missing
+#if HAVE_DUNE_GRID
+
 #include <dune/grid/common/mcmgmapper.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/io/file/dgfparser/dgfparser.hh>
@@ -230,5 +233,7 @@ struct ElementVisualization
 } // namespace Stuff
 } // namespace Grid
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH

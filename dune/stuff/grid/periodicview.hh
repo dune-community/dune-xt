@@ -33,6 +33,7 @@ class PeriodicIntersection : public RealGridViewImp::Intersection
   typedef PeriodicIntersection<RealGridViewType> ThisType;
   typedef typename RealGridViewType::Intersection BaseType;
 
+public:
   typedef typename BaseType::LocalGeometry LocalGeometry;
   typedef typename BaseType::Geometry::GlobalCoordinate GlobalCoordinate;
   typedef typename BaseType::EntityPointer EntityPointer;
@@ -72,14 +73,15 @@ public:
 
   bool boundary() const
   {
-    if (periodic_) {
+    if (periodic_)
       return false;
-    } else {
-      if (BaseType::boundary()) {
-        std::cout << "Komisch " << BaseType::geometry().center() << std::endl;
-      }
+    else
       return BaseType::boundary();
-    }
+  }
+
+  bool is_periodic() const
+  {
+    return periodic_;
   }
 
   EntityPointer outside() const
@@ -173,23 +175,23 @@ public:
   // methods that differ from BaseType
   const Intersection& operator*() const
   {
-    return current_intersection_;
+    return *(new Intersection(
+        BaseType::equals(real_grid_view_.iend(entity_)) ? *real_grid_view_.ibegin(entity_) : BaseType::operator*(),
+        real_grid_view_,
+        periodic_directions_));
   }
 
   const Intersection* operator->() const
   {
-    return &current_intersection_;
+    return new Intersection(
+        BaseType::equals(real_grid_view_.iend(entity_)) ? *real_grid_view_.ibegin(entity_) : BaseType::operator*(),
+        real_grid_view_,
+        periodic_directions_);
   }
 
   ThisType& operator++()
   {
     BaseType::operator++();
-    current_intersection_ = Intersection(
-        BaseType::equals(real_grid_view_.iend(entity_)) ? *real_grid_view_.ibegin(entity_) : BaseType::operator*(),
-        real_grid_view_,
-        intersection_map_.at(
-            (BaseType::equals(real_grid_view_.iend(entity_)) ? *real_grid_view_.ibegin(entity_) : BaseType::operator*())
-                .indexInInside()));
     return *this;
   }
 
@@ -205,11 +207,10 @@ public:
 
   bool equals(const PeriodicIntersectionIterator& rhs) const
   {
-    return BaseType::equals(BaseType(rhs)) /*&& (current_intersection_ == rhs.current_intersection_)*/;
+    return BaseType::equals(BaseType(rhs));
   }
 
 private:
-  Intersection current_intersection_;
   const RealGridViewType& real_grid_view_;
   const EntityType& entity_;
   const std::map<IntersectionIndexType, std::tuple<bool, EntityPointerType, const RealIntersectionType*>>&

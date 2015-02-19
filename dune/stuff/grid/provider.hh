@@ -12,8 +12,6 @@
 
 #include <type_traits>
 
-#include <dune/grid/sgrid.hh>
-
 #include <dune/stuff/common/configuration.hh>
 
 #include "provider/interface.hh"

@@ -27,17 +27,16 @@ struct GridInfoTest : public ::testing::Test
   static const size_t griddim     = T::value;
   static const unsigned int level = 1;
   typedef Dune::SGrid<griddim, griddim> GridType;
+  typedef Dimensions<typename GridType::LeafGridView> DimensionsType;
+
   const DSG::Providers::Cube<GridType> grid_prv;
   GridInfoTest()
     : grid_prv(0.f, 1.f, level)
   {
   }
 
-  void check()
+  void check_dimensions(const DimensionsType& dim, const size_t entities)
   {
-    const Dimensions<typename GridType::LeafGridView> dim(grid_prv.grid().leafGridView());
-    const auto gv       = grid_prv.grid().leafGridView();
-    const auto entities = gv.size(0);
     EXPECT_DOUBLE_EQ(1.0 / double(entities), dim.entity_volume.min());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.max());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.average());
@@ -48,6 +47,15 @@ struct GridInfoTest : public ::testing::Test
       EXPECT_DOUBLE_EQ(dl[i].min(), 0.0);
       EXPECT_DOUBLE_EQ(dl[i].average(), 0.5);
     }
+  }
+
+  void check()
+  {
+    const auto gv       = grid_prv.grid().leafGridView();
+    const auto entities = gv.size(0);
+    check_dimensions(DimensionsType(grid_prv.grid().leafGridView()), entities);
+    const auto& first_entity = *(grid_prv.grid().leafGridView().template begin<0>());
+    check_dimensions(DimensionsType(first_entity), 1u);
     const Statistics st(gv);
     const auto line = std::pow(2, level);
     EXPECT_EQ(line * (griddim), st.numberOfBoundaryIntersections);

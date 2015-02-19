@@ -333,7 +333,7 @@ public:
         id_to_type_map.insert(std::make_pair(type, std::set<int>(ids.begin(), ids.end())));
       }
     return Common::make_unique<ThisType>(
-        id_to_type_map, cfg.get("default_to_dirichlet", default_config().get<bool>("default_to_dirichlet")));
+        id_to_type_map, cfg.get("default_to_dirichlet", default_config().template get<bool>("default_to_dirichlet")));
   }
 
   IdBased(const std::map<std::string, std::set<int>> id_to_type_map_in, const bool dirichlet_default = true)

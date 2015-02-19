@@ -8,6 +8,9 @@
 #ifndef DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 #define DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 
+// nothing here will compile w/o grid present
+#if HAVE_DUNE_GRID
+
 #include <dune/common/unused.hh>
 
 #include <dune/grid/utility/structuredgridfactory.hh>
@@ -28,12 +31,12 @@ namespace Dune {
  *  StructuredGridFactory just like the unstructured Grids. Limitations:
  *  \li SPGrid does not support simplices
  */
-template <class ct, size_t dim, SPRefinementStrategy strategy, class Comm>
+template <class ct, int dim, SPRefinementStrategy strategy, class Comm>
 class StructuredGridFactory<SPGrid<ct, dim, strategy, Comm>>
 {
   typedef SPGrid<ct, dim, strategy, Comm> GridType;
   typedef typename GridType::ctype ctype;
-  static const size_t dimworld = GridType::dimensionworld;
+  static const int dimworld = GridType::dimensionworld;
 
 public:
   /** \brief Create a structured cube grid
@@ -145,5 +148,7 @@ public:
 };
 
 } // namespace Dune
+
+#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
