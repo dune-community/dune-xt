@@ -40,7 +40,7 @@
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/memory.hh>
-
+#include <dune/stuff/common/type_utils.hh>
 
 namespace Dune {
 namespace Stuff {
