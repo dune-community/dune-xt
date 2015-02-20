@@ -78,7 +78,7 @@ public:
       return BaseType::boundary();
   }
 
-  bool is_periodic() const
+  bool periodic() const
   {
     return periodic_;
   }
@@ -336,7 +336,7 @@ public:
     const auto& it_end        = real_grid_view_.template end<0>();
     const IndexSet& index_set = real_grid_view_.indexSet();
     size_t entitycount        = 0;
-    size_t step               = 1000;
+    size_t step               = 100;
     size_t numsteps           = 1;
     CoordinateType periodic_neighbor_coords;
     std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
@@ -357,14 +357,12 @@ public:
           periodic_neighbor_coords   = intersection.geometry().center();
           size_t num_boundary_coords = 0;
           for (std::size_t ii = 0; ii < dimDomain; ++ii) {
-            if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 0.0)) {
-              if (periodic_directions_[ii]) {
+            if (periodic_directions_[ii]) {
+              if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 0.0)) {
                 is_periodic                  = true;
                 periodic_neighbor_coords[ii] = 1.0;
                 ++num_boundary_coords;
-              }
-            } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 1.0)) {
-              if (periodic_directions_[ii]) {
+              } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 1.0)) {
                 is_periodic                  = true;
                 periodic_neighbor_coords[ii] = 0.0;
                 ++num_boundary_coords;
