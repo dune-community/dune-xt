@@ -20,11 +20,10 @@
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/grid/search.hh>
 
-#include <dune/stuff/common/string.hh>
-
 namespace Dune {
 namespace Stuff {
 namespace Grid {
+
 
 template <class RealGridViewImp>
 class PeriodicIntersection : public RealGridViewImp::Intersection
@@ -40,7 +39,6 @@ public:
   typedef typename RealGridViewType::IntersectionIterator RealIntersectionIteratorType;
   static const size_t dimDomain = RealGridViewType::dimension;
 
-public:
   //! \brief Constructor from real intersection
   PeriodicIntersection(const BaseType& real_intersection, const RealGridViewType& real_grid_view,
                        const std::pair<bool, EntityPointer>& periodic_pair)
@@ -112,12 +110,13 @@ public:
   }
 
 private:
+  // tries to find intersection in outside (works only if periodic_ == true)
   const BaseType find_intersection_in_outside() const
   {
-    //    std::cout << "I was called!" << std::endl;
     BaseType outside_intersection(*(real_grid_view_->ibegin(*outside_)));
     const GlobalCoordinate coords                       = this->geometry().center();
     const RealIntersectionIteratorType outside_i_it_end = real_grid_view_->iend(*outside());
+    // walk over outside intersections and find an intersection on the boundary that differs only in one coordinate
     for (RealIntersectionIteratorType outside_i_it = real_grid_view_->ibegin(*outside());
          outside_i_it != outside_i_it_end;
          ++outside_i_it) {
@@ -257,7 +256,6 @@ private:
   const bool has_boundary_intersections_;
   mutable Intersection current_intersection_;
   const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map_;
-
 }; // ... class PeriodicIntersectionIterator ...
 
 // forward
@@ -274,15 +272,12 @@ public:
   typedef typename RealGridViewType::Grid Grid;
   typedef typename RealGridViewType::IndexSet IndexSet;
   typedef typename RealGridViewType::CollectiveCommunication CollectiveCommunication;
-
   typedef typename RealGridViewType::Traits RealGridViewTraits;
 
   template <int cd>
   struct Codim
   {
-    // TODO: replace this at least for cd == 1 later?
     typedef typename RealGridViewTraits::template Codim<cd>::Iterator Iterator;
-
     typedef typename RealGridViewTraits::template Codim<cd>::EntityPointer EntityPointer;
     typedef typename RealGridViewTraits::template Codim<cd>::Entity Entity;
     typedef typename RealGridViewTraits::template Codim<cd>::Geometry Geometry;
@@ -334,9 +329,8 @@ public:
   typedef typename RealIntersectionType::GlobalCoordinate CoordinateType;
   typedef PeriodicIntersection<RealGridViewType> Intersection;
   typedef typename RealGridViewType::CollectiveCommunication CollectiveCommunication;
-  static const size_t dimDomain = RealGridViewType::dimension;
-
   typedef typename Grid::template Codim<0>::EntityPointer EntityPointerType;
+  static const size_t dimDomain = RealGridViewType::dimension;
 
   template <int cd>
   struct Codim : public Traits::template Codim<cd>
@@ -387,12 +381,11 @@ public:
             }
             assert(num_boundary_coords = 1);
             if (is_periodic) {
-              EntityPointerType periodic_neighbor =
-                  *(Dune::Stuff::Grid::EntityInlevelSearch<RealGridViewType>(real_grid_view_)
+              EntityPointerType outside =
+                  *(EntityInlevelSearch<RealGridViewType>(real_grid_view_)
                         .
                         operator()(std::vector<CoordinateType>(1, periodic_neighbor_coords))[0]);
-              intersection_neighbor_map.insert(
-                  std::make_pair(index_in_inside, std::make_pair(is_periodic, periodic_neighbor)));
+              intersection_neighbor_map.insert(std::make_pair(index_in_inside, std::make_pair(is_periodic, outside)));
             } else {
               intersection_neighbor_map.insert(
                   std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(entity))));
@@ -435,7 +428,7 @@ public:
   }
 
   template <int cd>
-  typename Codim<cd>::Iterator begin() const // TODO: change at least for cd == 1 to PeriodicIterator
+  typename Codim<cd>::Iterator begin() const
   {
     return real_grid_view_.template begin<cd>();
   }
