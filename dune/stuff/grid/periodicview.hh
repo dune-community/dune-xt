@@ -167,16 +167,19 @@ public:
       BaseType& real_intersection_iterator, const RealGridViewType& real_grid_view, const EntityType& entity,
       const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map)
     : BaseType(real_intersection_iterator)
+    , real_grid_view_(real_grid_view)
+    , entity_(entity)
+    , has_boundary_intersections_(entity_.hasBoundaryIntersections())
     , current_intersection_(
           (real_intersection_iterator == real_grid_view.iend(entity)) ? *real_grid_view.ibegin(entity) : BaseType::
                                                                                                          operator*(),
-          real_grid_view, intersection_map.at((real_intersection_iterator == real_grid_view.iend(entity))
-                                                  ? *real_grid_view.ibegin(entity)
-                                                  : BaseType::
-                                                    operator*())
-                              .indexInInside)
-    , real_grid_view_(real_grid_view)
-    , entity_(entity)
+          real_grid_view, has_boundary_intersections_
+                              ? intersection_map.at(((real_intersection_iterator == real_grid_view.iend(entity))
+                                                         ? *real_grid_view.ibegin(entity)
+                                                         : BaseType::
+                                                           operator*())
+                                                        .indexInInside())
+                              : std::make_pair(bool(false), EntityPointerType(entity_)))
     , intersection_map_(intersection_map)
   {
   }
@@ -186,16 +189,19 @@ public:
       BaseType real_intersection_iterator, const RealGridViewType& real_grid_view, const EntityType& entity,
       const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map)
     : BaseType(real_intersection_iterator)
+    , real_grid_view_(real_grid_view)
+    , entity_(entity)
+    , has_boundary_intersections_(entity_.hasBoundaryIntersections())
     , current_intersection_(
           (real_intersection_iterator == real_grid_view.iend(entity)) ? *real_grid_view.ibegin(entity) : BaseType::
                                                                                                          operator*(),
-          real_grid_view, intersection_map.at(((real_intersection_iterator == real_grid_view.iend(entity))
-                                                   ? *real_grid_view.ibegin(entity)
-                                                   : BaseType::
-                                                     operator*())
-                                                  .indexInInside()))
-    , real_grid_view_(real_grid_view)
-    , entity_(entity)
+          real_grid_view, has_boundary_intersections_
+                              ? intersection_map.at(((real_intersection_iterator == real_grid_view.iend(entity))
+                                                         ? *real_grid_view.ibegin(entity)
+                                                         : BaseType::
+                                                           operator*())
+                                                        .indexInInside())
+                              : std::make_pair(bool(false), EntityPointerType(entity_)))
     , intersection_map_(intersection_map)
   {
   }
@@ -204,15 +210,23 @@ public:
   // methods that differ from BaseType
   const Intersection& operator*() const
   {
-    current_intersection_ = Intersection(
-        BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
+    if (has_boundary_intersections_)
+      current_intersection_ = Intersection(
+          BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
+    else
+      current_intersection_ =
+          Intersection(BaseType::operator*(), real_grid_view_, std::make_pair(bool(false), EntityPointerType(entity_)));
     return current_intersection_;
   }
 
   const Intersection* operator->() const
   {
-    current_intersection_ = Intersection(
-        BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
+    if (has_boundary_intersections_)
+      current_intersection_ = Intersection(
+          BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
+    else
+      current_intersection_ =
+          Intersection(BaseType::operator*(), real_grid_view_, std::make_pair(bool(false), EntityPointerType(entity_)));
     return &current_intersection_;
   }
 
@@ -238,9 +252,10 @@ public:
   }
 
 private:
-  mutable Intersection current_intersection_;
   const RealGridViewType& real_grid_view_;
   const EntityType& entity_;
+  const bool has_boundary_intersections_;
+  mutable Intersection current_intersection_;
   const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map_;
 
 }; // ... class PeriodicIntersectionIterator ...
@@ -335,58 +350,60 @@ public:
   {
     const auto& it_end        = real_grid_view_.template end<0>();
     const IndexSet& index_set = real_grid_view_.indexSet();
-    size_t entitycount        = 0;
-    size_t step               = 100;
-    size_t numsteps           = 1;
+    //    size_t entitycount = 0;
+    //    size_t step = 100;
+    //    size_t numsteps = 1;
     CoordinateType periodic_neighbor_coords;
     std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
     for (auto it = real_grid_view_.template begin<0>(); it != it_end; ++it) {
-      ++entitycount;
-      if (entitycount == numsteps * step) {
-        std::cout << numsteps * step << " Entities done..." << std::endl;
-        ++numsteps;
-      }
+      //      ++entitycount;
+      //      if (entitycount == numsteps*step) {
+      //        std::cout << numsteps*step << " Entities done..." << std::endl;
+      //        ++numsteps;
+      //      }
       intersection_neighbor_map.clear();
-      const auto& entity   = *it;
-      const auto& i_it_end = real_grid_view_.iend(entity);
-      for (auto i_it = real_grid_view_.ibegin(entity); i_it != i_it_end; ++i_it) {
-        const RealIntersectionType& intersection    = *i_it;
-        const IntersectionIndexType index_in_inside = intersection.indexInInside();
-        bool is_periodic = false;
-        if (intersection.boundary()) {
-          periodic_neighbor_coords   = intersection.geometry().center();
-          size_t num_boundary_coords = 0;
-          for (std::size_t ii = 0; ii < dimDomain; ++ii) {
-            if (periodic_directions_[ii]) {
-              if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 0.0)) {
-                is_periodic                  = true;
-                periodic_neighbor_coords[ii] = 1.0;
-                ++num_boundary_coords;
-              } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 1.0)) {
-                is_periodic                  = true;
-                periodic_neighbor_coords[ii] = 0.0;
-                ++num_boundary_coords;
+      const auto& entity = *it;
+      if (entity.hasBoundaryIntersections()) {
+        const auto& i_it_end = real_grid_view_.iend(entity);
+        for (auto i_it = real_grid_view_.ibegin(entity); i_it != i_it_end; ++i_it) {
+          const RealIntersectionType& intersection    = *i_it;
+          const IntersectionIndexType index_in_inside = intersection.indexInInside();
+          bool is_periodic = false;
+          if (intersection.boundary()) {
+            periodic_neighbor_coords   = intersection.geometry().center();
+            size_t num_boundary_coords = 0;
+            for (std::size_t ii = 0; ii < dimDomain; ++ii) {
+              if (periodic_directions_[ii]) {
+                if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 0.0)) {
+                  is_periodic                  = true;
+                  periodic_neighbor_coords[ii] = 1.0;
+                  ++num_boundary_coords;
+                } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 1.0)) {
+                  is_periodic                  = true;
+                  periodic_neighbor_coords[ii] = 0.0;
+                  ++num_boundary_coords;
+                }
               }
             }
-          }
-          assert(num_boundary_coords = 1);
-          if (is_periodic) {
-            EntityPointerType periodic_neighbor =
-                *(Dune::Stuff::Grid::EntityInlevelSearch<RealGridViewType>(real_grid_view_)
-                      .
-                      operator()(std::vector<CoordinateType>(1, periodic_neighbor_coords))[0]);
-            intersection_neighbor_map.insert(
-                std::make_pair(index_in_inside, std::make_pair(is_periodic, periodic_neighbor)));
+            assert(num_boundary_coords = 1);
+            if (is_periodic) {
+              EntityPointerType periodic_neighbor =
+                  *(Dune::Stuff::Grid::EntityInlevelSearch<RealGridViewType>(real_grid_view_)
+                        .
+                        operator()(std::vector<CoordinateType>(1, periodic_neighbor_coords))[0]);
+              intersection_neighbor_map.insert(
+                  std::make_pair(index_in_inside, std::make_pair(is_periodic, periodic_neighbor)));
+            } else {
+              intersection_neighbor_map.insert(
+                  std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(entity))));
+            }
           } else {
             intersection_neighbor_map.insert(
-                std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(entity))));
+                std::make_pair(index_in_inside, std::make_pair(bool(false), EntityPointerType(entity))));
           }
-        } else {
-          intersection_neighbor_map.insert(
-              std::make_pair(index_in_inside, std::make_pair(bool(false), EntityPointerType(entity))));
         }
+        entity_to_intersection_map_map_.insert(std::make_pair(index_set.index(entity), intersection_neighbor_map));
       }
-      entity_to_intersection_map_map_.insert(std::make_pair(index_set.index(entity), intersection_neighbor_map));
     }
   }
 
@@ -466,18 +483,30 @@ public:
   // ... except for the intersection iterators
   IntersectionIterator ibegin(const typename Codim<0>::Entity& entity) const
   {
-    return IntersectionIterator(real_grid_view_.ibegin(entity),
-                                real_grid_view_,
-                                entity,
-                                entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity)));
+    if (entity.hasBoundaryIntersections())
+      return IntersectionIterator(real_grid_view_.ibegin(entity),
+                                  real_grid_view_,
+                                  entity,
+                                  entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity)));
+    else
+      return IntersectionIterator(real_grid_view_.ibegin(entity),
+                                  real_grid_view_,
+                                  entity,
+                                  std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
   }
 
   IntersectionIterator iend(const typename Codim<0>::Entity& entity) const
   {
-    return IntersectionIterator(real_grid_view_.iend(entity),
-                                real_grid_view_,
-                                entity,
-                                entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity)));
+    if (entity.hasBoundaryIntersections())
+      return IntersectionIterator(real_grid_view_.iend(entity),
+                                  real_grid_view_,
+                                  entity,
+                                  entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity)));
+    else
+      return IntersectionIterator(real_grid_view_.iend(entity),
+                                  real_grid_view_,
+                                  entity,
+                                  std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
   }
 
 private:
