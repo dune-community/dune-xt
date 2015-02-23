@@ -62,18 +62,12 @@ public:
   // methods that differ from BaseType
   bool neighbor() const
   {
-    if (periodic_)
-      return true;
-    else
-      return BaseType::neighbor();
+    return periodic_ ? true : BaseType::neighbor();
   }
 
   bool boundary() const
   {
-    if (periodic_)
-      return false;
-    else
-      return BaseType::boundary();
+    return periodic_ ? false : BaseType::boundary();
   }
 
   bool periodic() const
@@ -83,10 +77,7 @@ public:
 
   EntityPointer outside() const
   {
-    if (periodic_)
-      return outside_;
-    else
-      return BaseType::outside();
+    return periodic_ ? outside_ : BaseType::outside();
   }
 
   LocalGeometry geometryInOutside() const
@@ -209,23 +200,22 @@ public:
   // methods that differ from BaseType
   const Intersection& operator*() const
   {
-    if (has_boundary_intersections_)
-      current_intersection_ = Intersection(
-          BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
-    else
-      current_intersection_ =
-          Intersection(BaseType::operator*(), real_grid_view_, std::make_pair(bool(false), EntityPointerType(entity_)));
+    std::cout << entity_.geometry().center() << " vs  " << current_intersection_.geometry().center() << std::endl;
+    current_intersection_ =
+        Intersection(BaseType::operator*(),
+                     real_grid_view_,
+                     has_boundary_intersections_ ? intersection_map_.at((BaseType::operator*()).indexInInside())
+                                                 : std::make_pair(bool(false), EntityPointerType(entity_)));
     return current_intersection_;
   }
 
   const Intersection* operator->() const
   {
-    if (has_boundary_intersections_)
-      current_intersection_ = Intersection(
-          BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
-    else
-      current_intersection_ =
-          Intersection(BaseType::operator*(), real_grid_view_, std::make_pair(bool(false), EntityPointerType(entity_)));
+    current_intersection_ =
+        Intersection(BaseType::operator*(),
+                     real_grid_view_,
+                     has_boundary_intersections_ ? intersection_map_.at((BaseType::operator*()).indexInInside())
+                                                 : std::make_pair(bool(false), EntityPointerType(entity_)));
     return &current_intersection_;
   }
 
@@ -358,7 +348,7 @@ public:
       intersection_neighbor_map.clear();
       const auto& entity = *it;
       if (entity.hasBoundaryIntersections()) {
-        const auto& i_it_end = real_grid_view_.iend(entity);
+        const auto i_it_end = real_grid_view_.iend(entity);
         for (auto i_it = real_grid_view_.ibegin(entity); i_it != i_it_end; ++i_it) {
           const RealIntersectionType& intersection    = *i_it;
           const IntersectionIndexType index_in_inside = intersection.indexInInside();
@@ -476,30 +466,22 @@ public:
   // ... except for the intersection iterators
   IntersectionIterator ibegin(const typename Codim<0>::Entity& entity) const
   {
-    if (entity.hasBoundaryIntersections())
-      return IntersectionIterator(real_grid_view_.ibegin(entity),
-                                  real_grid_view_,
-                                  entity,
-                                  entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity)));
-    else
-      return IntersectionIterator(real_grid_view_.ibegin(entity),
-                                  real_grid_view_,
-                                  entity,
-                                  std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
+    return IntersectionIterator(real_grid_view_.ibegin(entity),
+                                real_grid_view_,
+                                entity,
+                                entity.hasBoundaryIntersections()
+                                    ? entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity))
+                                    : std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
   }
 
   IntersectionIterator iend(const typename Codim<0>::Entity& entity) const
   {
-    if (entity.hasBoundaryIntersections())
-      return IntersectionIterator(real_grid_view_.iend(entity),
-                                  real_grid_view_,
-                                  entity,
-                                  entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity)));
-    else
-      return IntersectionIterator(real_grid_view_.iend(entity),
-                                  real_grid_view_,
-                                  entity,
-                                  std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
+    return IntersectionIterator(real_grid_view_.iend(entity),
+                                real_grid_view_,
+                                entity,
+                                entity.hasBoundaryIntersections()
+                                    ? entity_to_intersection_map_map_.at(real_grid_view_.indexSet().index(entity))
+                                    : std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
   }
 
 private:
