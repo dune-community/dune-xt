@@ -202,6 +202,29 @@ public:
   }
 }; // class BoundaryIntersections
 
+template <class GridViewImp>
+class FilteredIntersections : public WhichIntersection<GridViewImp>
+{
+  typedef WhichIntersection<GridViewImp> BaseType;
+
+public:
+  typedef typename BaseType::GridViewType GridViewType;
+  typedef typename BaseType::IntersectionType IntersectionType;
+  typedef std::function<bool(const GridViewType&, const IntersectionType&)> FilterType;
+
+  FilteredIntersections(FilterType filter)
+    : filter_(filter)
+  {
+  }
+
+  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
+  {
+    return filter_(grid_view, intersection);
+  }
+
+private:
+  const FilterType filter_;
+}; // class BoundaryIntersections
 
 template <class GridViewImp>
 class DirichletIntersections : public WhichIntersection<GridViewImp>
