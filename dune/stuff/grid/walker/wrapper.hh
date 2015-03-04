@@ -233,6 +233,38 @@ private:
   std::unique_ptr<const ApplyOn::WhichEntity<GridViewType>> where_;
 }; // class Codim0LambdaWrapper
 
+template <class GridViewType>
+class Codim1LambdaWrapper : public Codim1Object<GridViewType>
+{
+  typedef Codim1Object<GridViewType> BaseType;
+
+public:
+  typedef typename BaseType::EntityType EntityType;
+  typedef typename BaseType::IntersectionType IntersectionType;
+  typedef std::function<void(const IntersectionType&, const EntityType&, const EntityType&)> LambdaType;
+
+  Codim1LambdaWrapper(LambdaType lambda, const ApplyOn::WhichIntersection<GridViewType>* where)
+    : lambda_(lambda)
+    , where_(where)
+  {
+  }
+
+  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
+  {
+    return where_->apply_on(grid_view, intersection);
+  }
+
+  virtual void apply_local(const IntersectionType& intersection, const EntityType& inside_entity,
+                           const EntityType& outside_entity) override final
+  {
+    lambda_(intersection, inside_entity, outside_entity);
+  }
+
+private:
+  LambdaType lambda_;
+  std::unique_ptr<const ApplyOn::WhichIntersection<GridViewType>> where_;
+}; // class Codim1FunctorWrapper
+
 
 } // namespace internal
 } // namespace Grid
