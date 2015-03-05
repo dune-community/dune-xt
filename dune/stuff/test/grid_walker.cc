@@ -30,14 +30,15 @@ struct GridWalkerTest : public ::testing::Test
   static const size_t level   = 4;
   typedef Dune::YaspGrid<griddim> GridType;
   typedef typename GridType::LeafGridView GridViewType;
-  typedef typename GridType::template Codim<0>::Entity EntityType;
+  typedef typename DSG::Entity<GridViewType>::Type EntityType;
+  typedef typename DSG::Intersection<GridViewType>::Type IntersectionType;
   const DSG::Providers::Cube<GridType> grid_prv;
   GridWalkerTest()
     : grid_prv(0.f, 1.f, level)
   {
   }
 
-  void check()
+  void check_count()
   {
     const auto gv = grid_prv.grid().leafGridView();
     Walker<GridViewType> walker(gv);
@@ -69,12 +70,31 @@ struct GridWalkerTest : public ::testing::Test
       EXPECT_EQ(count, correct_size);
     }
   }
+
+  void check_apply_on()
+  {
+    const auto gv = grid_prv.grid().leafGridView();
+    Walker<GridViewType> walker(gv);
+
+    size_t filter_count = 0, all_count = 0;
+    auto boundaries = [=](const GridViewType&, const IntersectionType& inter) { return inter.boundary(); };
+    auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
+    auto all_counter    = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
+
+    auto on_filter_boundaries = new DSG::ApplyOn::FilteredIntersections<GridViewType>(boundaries);
+    auto on_all_boundaries = new DSG::ApplyOn::BoundaryIntersections<GridViewType>();
+    walker.add(filter_counter, on_filter_boundaries);
+    walker.add(all_counter, on_all_boundaries);
+    walker.walk();
+    EXPECT_EQ(filter_count, all_count);
+  }
 };
 
 TYPED_TEST_CASE(GridWalkerTest, GridDims);
 TYPED_TEST(GridWalkerTest, Misc)
 {
-  this->check();
+  this->check_count();
+  this->check_apply_on();
 }
 
 

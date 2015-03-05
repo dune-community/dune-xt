@@ -68,6 +68,12 @@ public:
     codim0_functors_.emplace_back(new internal::Codim0LambdaWrapper<GridViewType>(lambda, where));
   }
 
+  void add(std::function<void(const IntersectionType&, const EntityType&, const EntityType&)> lambda,
+           const ApplyOn::WhichIntersection<GridViewType>* where = new ApplyOn::AllIntersections<GridViewType>())
+  {
+    codim1_functors_.emplace_back(new internal::Codim1LambdaWrapper<GridViewType>(lambda, where));
+  }
+
   void add(Functor::Codim0<GridViewType>& functor,
            const ApplyOn::WhichEntity<GridViewType>* where = new ApplyOn::AllEntities<GridViewType>())
   {
