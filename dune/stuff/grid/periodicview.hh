@@ -134,6 +134,7 @@ protected:
   const RealGridViewType& real_grid_view_;
 }; // ... class PeriodicIntersection ...
 
+
 template <class RealGridViewImp>
 class PeriodicIntersectionIterator : public RealGridViewImp::IntersectionIterator
 {
@@ -296,17 +297,9 @@ public:
   {
     const auto it_end         = real_grid_view_.template end<0>();
     const IndexSet& index_set = real_grid_view_.indexSet();
-    //    size_t entitycount = 0;
-    //    size_t step = 100;
-    //    size_t numsteps = 1;
     CoordinateType periodic_neighbor_coords;
     std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
     for (auto it = real_grid_view_.template begin<0>(); it != it_end; ++it) {
-      //      ++entitycount;
-      //      if (entitycount == numsteps*step) {
-      //        std::cout << numsteps*step << " Entities done..." << std::endl;
-      //        ++numsteps;
-      //      }
       intersection_neighbor_map.clear();
       const auto& entity = *it;
       if (entity.hasBoundaryIntersections()) {
@@ -333,10 +326,6 @@ public:
             }
             assert(num_boundary_coords = 1);
             if (is_periodic) {
-              //              EntityPointerType outside = *(EntityInlevelSearch< RealGridViewType
-              //              >(real_grid_view_).operator()(
-              //                                              std::vector< CoordinateType >(1,
-              //                                              periodic_neighbor_coords))[0]);
               std::vector<std::unique_ptr<EntityPointerType>> outside_vector =
                   EntityInlevelSearch<RealGridViewType>(real_grid_view_)
                       .
@@ -491,7 +480,8 @@ public:
     , BaseType(ConstStorProv::access())
   {
   }
-}; // ... class PeriodicGridView ...
+}; // class PeriodicGridView
+
 
 } // namespace Grid
 } // namespace Stuff
