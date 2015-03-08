@@ -15,6 +15,7 @@
 
 #include <dune/grid/common/gridview.hh>
 
+#include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/memory.hh>
 #include <dune/stuff/common/float_cmp.hh>
@@ -45,18 +46,8 @@ public:
     : BaseType(real_intersection)
     , periodic_(periodic_pair.first)
     , outside_(periodic_pair.second)
-    , real_grid_view_(&real_grid_view)
+    , real_grid_view_(real_grid_view)
   {
-  }
-
-  //! \brief Copy operator from existing PeriodicIntersection
-  const ThisType operator=(ThisType other)
-  {
-    real            = other.real;
-    periodic_       = other.periodic_;
-    outside_        = other.outside_;
-    real_grid_view_ = other.real_grid_view_;
-    return *this;
   }
 
   // methods that differ from BaseType
@@ -92,8 +83,8 @@ public:
   LocalGeometry geometryInOutside() const
   {
     if (periodic_) {
-      const BaseType outside_intersection = find_intersection_in_outside();
-      return outside_intersection.geometryInInside();
+      const RealIntersectionIteratorType outside_intersection_it = find_intersection_in_outside();
+      return outside_intersection_it->geometryInInside();
     } else {
       return BaseType::geometryInOutside();
     }
@@ -102,8 +93,8 @@ public:
   int indexInOutside() const
   {
     if (periodic_) {
-      const BaseType outside_intersection = find_intersection_in_outside();
-      return outside_intersection.indexInInside();
+      const RealIntersectionIteratorType outside_intersection_it = find_intersection_in_outside();
+      return outside_intersection_it->indexInInside();
     } else {
       return BaseType::indexInOutside();
     }
@@ -111,15 +102,13 @@ public:
 
 private:
   // tries to find intersection in outside (works only if periodic_ == true)
-  const BaseType find_intersection_in_outside() const
+  const RealIntersectionIteratorType find_intersection_in_outside() const
   {
-    BaseType outside_intersection(*(real_grid_view_->ibegin(*outside_)));
     const GlobalCoordinate coords                       = this->geometry().center();
-    const RealIntersectionIteratorType outside_i_it_end = real_grid_view_->iend(*outside());
+    RealIntersectionIteratorType outside_i_it           = real_grid_view_.ibegin(*outside());
+    const RealIntersectionIteratorType outside_i_it_end = real_grid_view_.iend(*outside());
     // walk over outside intersections and find an intersection on the boundary that differs only in one coordinate
-    for (RealIntersectionIteratorType outside_i_it = real_grid_view_->ibegin(*outside());
-         outside_i_it != outside_i_it_end;
-         ++outside_i_it) {
+    for (; outside_i_it != outside_i_it_end; ++outside_i_it) {
       const BaseType& curr_outside_intersection = *outside_i_it;
       if (curr_outside_intersection.boundary()) {
         const GlobalCoordinate curr_outside_intersection_coords = curr_outside_intersection.geometry().center();
@@ -130,20 +119,19 @@ private:
           }
         }
         if (coord_difference_count == size_t(1)) {
-          outside_intersection = curr_outside_intersection;
-          return outside_intersection;
+          return outside_i_it;
         }
       }
     }
-    DUNE_THROW(Dune::InvalidStateException, "This should not happen");
-    return BaseType(*this);
+    DUNE_THROW(Dune::InvalidStateException, "Could not find outside intersection!");
+    return real_grid_view_.ibegin(*outside());
   }
 
 protected:
   using BaseType::real;
   bool periodic_;
   EntityPointer outside_;
-  const RealGridViewType* real_grid_view_;
+  const RealGridViewType& real_grid_view_;
 }; // ... class PeriodicIntersection ...
 
 template <class RealGridViewImp>
@@ -161,29 +149,7 @@ public:
   typedef typename RealGridViewType::template Codim<0>::Entity EntityType;
   static const size_t dimDomain = RealGridViewType::dimension;
 
-  /** Copy Constructor from real intersection iterator */
-  PeriodicIntersectionIterator(
-      BaseType& real_intersection_iterator, const RealGridViewType& real_grid_view, const EntityType& entity,
-      const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map)
-    : BaseType(real_intersection_iterator)
-    , real_grid_view_(real_grid_view)
-    , entity_(entity)
-    , has_boundary_intersections_(entity_.hasBoundaryIntersections())
-    , current_intersection_(
-          (real_intersection_iterator == real_grid_view.iend(entity)) ? *real_grid_view.ibegin(entity) : BaseType::
-                                                                                                         operator*(),
-          real_grid_view, has_boundary_intersections_
-                              ? intersection_map.at(((real_intersection_iterator == real_grid_view.iend(entity))
-                                                         ? *real_grid_view.ibegin(entity)
-                                                         : BaseType::
-                                                           operator*())
-                                                        .indexInInside())
-                              : std::make_pair(bool(false), EntityPointerType(entity_)))
-    , intersection_map_(intersection_map)
-  {
-  }
-
-  /** Copy Constructor from real intersection iterator, pass by value */
+  /** Copy Constructor from real intersection iterator*/
   PeriodicIntersectionIterator(
       BaseType real_intersection_iterator, const RealGridViewType& real_grid_view, const EntityType& entity,
       const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map)
@@ -191,42 +157,22 @@ public:
     , real_grid_view_(real_grid_view)
     , entity_(entity)
     , has_boundary_intersections_(entity_.hasBoundaryIntersections())
-    , current_intersection_(
-          (real_intersection_iterator == real_grid_view.iend(entity)) ? *real_grid_view.ibegin(entity) : BaseType::
-                                                                                                         operator*(),
-          real_grid_view, has_boundary_intersections_
-                              ? intersection_map.at(((real_intersection_iterator == real_grid_view.iend(entity))
-                                                         ? *real_grid_view.ibegin(entity)
-                                                         : BaseType::
-                                                           operator*())
-                                                        .indexInInside())
-                              : std::make_pair(bool(false), EntityPointerType(entity_)))
     , intersection_map_(intersection_map)
+    , current_intersection_(create_current_intersection_safely())
   {
   }
-
 
   // methods that differ from BaseType
   const Intersection& operator*() const
   {
-    if (has_boundary_intersections_)
-      current_intersection_ = Intersection(
-          BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
-    else
-      current_intersection_ =
-          Intersection(BaseType::operator*(), real_grid_view_, std::make_pair(bool(false), EntityPointerType(entity_)));
-    return current_intersection_;
+    current_intersection_ = create_current_intersection();
+    return *current_intersection_;
   }
 
   const Intersection* operator->() const
   {
-    if (has_boundary_intersections_)
-      current_intersection_ = Intersection(
-          BaseType::operator*(), real_grid_view_, intersection_map_.at((BaseType::operator*()).indexInInside()));
-    else
-      current_intersection_ =
-          Intersection(BaseType::operator*(), real_grid_view_, std::make_pair(bool(false), EntityPointerType(entity_)));
-    return &current_intersection_;
+    current_intersection_ = create_current_intersection();
+    return &(*current_intersection_);
   }
 
   ThisType& operator++()
@@ -235,27 +181,33 @@ public:
     return *this;
   }
 
-  bool operator==(const PeriodicIntersectionIterator& rhs) const
-  {
-    return rhs.equals(*this);
-  }
-
-  bool operator!=(const PeriodicIntersectionIterator& rhs) const
-  {
-    return !rhs.equals(*this);
-  }
-
-  bool equals(const PeriodicIntersectionIterator& rhs) const
-  {
-    return BaseType::equals(BaseType(rhs));
-  }
-
 private:
+  std::unique_ptr<Intersection> create_current_intersection() const
+  {
+    return DSC::make_unique<Intersection>(BaseType::operator*(),
+                                          real_grid_view_,
+                                          has_boundary_intersections_
+                                              ? intersection_map_.at((BaseType::operator*()).indexInInside())
+                                              : std::make_pair(bool(false), EntityPointerType(entity_)));
+  }
+
+  std::unique_ptr<Intersection> create_current_intersection_safely() const
+  {
+    return std::make_unique<Intersection>(
+        *this == real_grid_view_.iend(entity_) ? *real_grid_view_.ibegin(entity_) : BaseType::operator*(),
+        real_grid_view_,
+        has_boundary_intersections_
+            ? intersection_map_.at(
+                  (*this == real_grid_view_.iend(entity_) ? *real_grid_view_.ibegin(entity_) : BaseType::operator*())
+                      .indexInInside())
+            : std::make_pair(bool(false), EntityPointerType(entity_)));
+  }
+
   const RealGridViewType& real_grid_view_;
   const EntityType& entity_;
   const bool has_boundary_intersections_;
-  mutable Intersection current_intersection_;
   const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map_;
+  mutable std::unique_ptr<Intersection> current_intersection_;
 }; // ... class PeriodicIntersectionIterator ...
 
 // forward
@@ -342,7 +294,7 @@ public:
     : real_grid_view_(real_grid_view)
     , periodic_directions_(periodic_directions)
   {
-    const auto& it_end        = real_grid_view_.template end<0>();
+    const auto it_end         = real_grid_view_.template end<0>();
     const IndexSet& index_set = real_grid_view_.indexSet();
     //    size_t entitycount = 0;
     //    size_t step = 100;
@@ -358,7 +310,7 @@ public:
       intersection_neighbor_map.clear();
       const auto& entity = *it;
       if (entity.hasBoundaryIntersections()) {
-        const auto& i_it_end = real_grid_view_.iend(entity);
+        const auto i_it_end = real_grid_view_.iend(entity);
         for (auto i_it = real_grid_view_.ibegin(entity); i_it != i_it_end; ++i_it) {
           const RealIntersectionType& intersection    = *i_it;
           const IntersectionIndexType index_in_inside = intersection.indexInInside();
@@ -381,11 +333,18 @@ public:
             }
             assert(num_boundary_coords = 1);
             if (is_periodic) {
-              EntityPointerType outside =
-                  *(EntityInlevelSearch<RealGridViewType>(real_grid_view_)
-                        .
-                        operator()(std::vector<CoordinateType>(1, periodic_neighbor_coords))[0]);
-              intersection_neighbor_map.insert(std::make_pair(index_in_inside, std::make_pair(is_periodic, outside)));
+              //              EntityPointerType outside = *(EntityInlevelSearch< RealGridViewType
+              //              >(real_grid_view_).operator()(
+              //                                              std::vector< CoordinateType >(1,
+              //                                              periodic_neighbor_coords))[0]);
+              std::vector<std::unique_ptr<EntityPointerType>> outside_vector =
+                  EntityInlevelSearch<RealGridViewType>(real_grid_view_)
+                      .
+                      operator()(std::vector<CoordinateType>(1, periodic_neighbor_coords));
+              std::unique_ptr<EntityPointerType> outside_ptr_ptr = std::move(outside_vector.at(0));
+              const auto& outside_entity = *(*outside_ptr_ptr);
+              intersection_neighbor_map.insert(
+                  std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(outside_entity))));
             } else {
               intersection_neighbor_map.insert(
                   std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(entity))));
