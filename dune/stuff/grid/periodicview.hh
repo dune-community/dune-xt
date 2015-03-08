@@ -193,7 +193,7 @@ private:
 
   std::unique_ptr<Intersection> create_current_intersection_safely() const
   {
-    return std::make_unique<Intersection>(
+    return DSC::make_unique<Intersection>(
         *this == real_grid_view_.iend(entity_) ? *real_grid_view_.ibegin(entity_) : BaseType::operator*(),
         real_grid_view_,
         has_boundary_intersections_
