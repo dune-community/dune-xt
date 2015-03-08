@@ -48,6 +48,7 @@ struct PeriodicViewTestCube : public testing::Test
   typedef
       typename Dune::Stuff::Grid::template PeriodicIntersectionIterator<GridViewType> PeriodicIntersectionIteratorType;
   typedef typename Dune::Stuff::Grid::template PeriodicIntersection<GridViewType> PeriodicIntersectionType;
+  typedef typename PeriodicIntersectionType::EntityPointer EntityPointerType;
   typedef typename GridViewType::CollectiveCommunication CollectiveCommunication;
   static const size_t dimDomain = GridViewType::dimension;
 
@@ -114,19 +115,18 @@ struct PeriodicViewTestCube : public testing::Test
           const PeriodicIntersectionType& intersection = *i_it;
           if (intersection.neighbor()) {
             ++neighbor_count;
-            const auto outside = *(intersection.outside());
+            const EntityPointerType outside = intersection.outside();
             // find corresponding intersection in outside
             const auto index_in_outside                             = intersection.indexInOutside();
-            PeriodicIntersectionType intersection_in_outside        = *(periodic_grid_view.ibegin(outside).operator->());
-            const PeriodicIntersectionIteratorType i_it_outside_end = periodic_grid_view.iend(outside);
-            for (PeriodicIntersectionIteratorType i_it_outside = periodic_grid_view.ibegin(outside);
-                 i_it_outside != i_it_outside_end;
-                 ++i_it_outside) {
+            PeriodicIntersectionIteratorType i_it_outside           = periodic_grid_view.ibegin(*outside);
+            const PeriodicIntersectionIteratorType i_it_outside_end = periodic_grid_view.iend(*outside);
+            for (; i_it_outside != i_it_outside_end; ++i_it_outside) {
               const PeriodicIntersectionType* outside_intersection = i_it_outside.operator->();
               if (outside_intersection->indexInInside() == index_in_outside) {
-                intersection_in_outside = *outside_intersection;
+                break;
               }
             }
+            const PeriodicIntersectionType& intersection_in_outside = *i_it_outside;
             // check outside_intersection coords
             const auto coords_in_outside   = intersection.geometryInOutside().center();
             const auto coords_in_outside_2 = intersection_in_outside.geometryInInside().center();
