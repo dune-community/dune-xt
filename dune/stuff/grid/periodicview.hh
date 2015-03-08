@@ -24,6 +24,12 @@
 namespace Dune {
 namespace Stuff {
 namespace Grid {
+namespace internal {
+
+
+// forward
+template <class RealGridViewImp>
+class PeriodicGridViewImp;
 
 
 template <class RealGridViewImp>
@@ -211,9 +217,6 @@ private:
   mutable std::unique_ptr<Intersection> current_intersection_;
 }; // ... class PeriodicIntersectionIterator ...
 
-// forward
-template <class RealGridViewImp>
-class PeriodicGridViewImp;
 
 template <class RealGridViewImp>
 class PeriodicGridViewTraits
@@ -457,20 +460,25 @@ private:
   const std::bitset<dimDomain> periodic_directions_;
 }; // ... class PeriodicGridViewImp ...
 
+
+} // namespace internal
+
+
 template <class RealGridViewImp>
-class PeriodicGridView : Dune::Stuff::Common::ConstStorageProvider<PeriodicGridViewImp<RealGridViewImp>>,
-                         public Dune::GridView<PeriodicGridViewTraits<RealGridViewImp>>
+class PeriodicGridView : Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>>,
+                         public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp>>
 {
   typedef RealGridViewImp RealGridViewType;
-  typedef typename Dune::GridView<PeriodicGridViewTraits<RealGridViewType>> BaseType;
-  typedef typename Dune::Stuff::Common::ConstStorageProvider<PeriodicGridViewImp<RealGridViewImp>> ConstStorProv;
+  typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType>> BaseType;
+  typedef
+      typename Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>> ConstStorProv;
 
 public:
   static const size_t dimension = RealGridViewType::dimension;
 
   PeriodicGridView(const RealGridViewType& real_grid_view,
                    const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
-    : ConstStorProv(new PeriodicGridViewImp<RealGridViewType>(real_grid_view, periodic_directions))
+    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType>(real_grid_view, periodic_directions))
     , BaseType(ConstStorProv::access())
   {
   }
