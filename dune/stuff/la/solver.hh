@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-#include <dune/common/deprecated.hh>
-
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/configuration.hh>
