@@ -16,7 +16,6 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/version.hh>
-#include <dune/common/deprecated.hh>
 #include <dune/common/parallel/mpihelper.hh>
 
 #include <dune/geometry/referenceelements.hh>
