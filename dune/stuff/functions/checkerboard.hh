@@ -169,11 +169,6 @@ public:
 
   ThisType& operator=(ThisType&& source) = delete;
 
-  virtual ThisType* copy() const override
-  {
-    return new ThisType(*this);
-  }
-
   virtual std::string type() const override
   {
     return BaseType::static_id() + ".checkerboard";

@@ -236,11 +236,6 @@ public:
     build_gradients(variable, gradient_expressions);
   }
 
-  virtual ThisType* copy() const override
-  {
-    return new ThisType(*this);
-  }
-
   virtual std::string name() const override
   {
     return name_;

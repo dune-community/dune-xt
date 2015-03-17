@@ -71,10 +71,6 @@ protected:
     std::string nm = func.name();
   } // ... dynamic_interface_check(...)
 
-  void copy_check(const FunctionImp& func) const
-  {
-    std::unique_ptr<InterfaceType> cp(func.copy());
-  }
 }; // class FunctionTest
 
 
