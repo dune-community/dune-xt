@@ -59,7 +59,8 @@ void printEntity(const EntityType& entity, const std::string name = Common::Type
     out << prefix << name << ":\n";
   const auto& geometry = entity.geometry();
   for (auto ii : DSC::valueRange(geometry.corners()))
-    Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
+    out << prefix + "  "
+        << "corner " + Common::toString(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... printEntity(...)
 
 
