@@ -24,11 +24,6 @@ namespace Exceptions {
 class linear_solver_failed_bc_data_did_not_fulfill_requirements : public linear_solver_failed
 {
 };
-class DUNE_DEPRECATED_MSG("Use linear_solver_failed_bc_data_did_not_fulfill_requirements instead (10.11.2014)!")
-    linear_solver_failed_bc_matrix_did_not_fulfill_requirements
-    : public linear_solver_failed_bc_data_did_not_fulfill_requirements
-{
-};
 class linear_solver_failed_bc_it_did_not_converge : public linear_solver_failed
 {
 };
