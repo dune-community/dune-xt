@@ -110,11 +110,6 @@ public:
   {
   }
 
-  virtual ThisType* copy() const override final
-  {
-    return new ThisType(*this);
-  }
-
   virtual std::string type() const override final
   {
     return BaseType::static_id() + ".flattop";
