@@ -9,6 +9,7 @@
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
+#include "walker/functors.hh"
 #include "walker.hh"
 
 #include <dune/stuff/common/ranges.hh>

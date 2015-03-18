@@ -59,7 +59,8 @@ void printEntity(const EntityType& entity, const std::string name = Common::Type
     out << prefix << name << ":\n";
   const auto& geometry = entity.geometry();
   for (auto ii : DSC::valueRange(geometry.corners()))
-    Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
+    out << prefix + "  "
+        << "corner " + Common::toString(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... printEntity(...)
 
 
@@ -80,15 +81,6 @@ double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
   }
   return max_dist;
 } // entity_diameter
-
-template <size_t codim, size_t worlddim, class GridImp, template <int, int, class> class EntityImp>
-double DUNE_DEPRECATED_MSG(
-    "use entity_diameter instead, but: changed meaning from min conerdistance to max corner distance")
-    entityDiameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
-{
-  return entity_diameter(entity);
-} // entityDiameter
-
 
 #if DUNE_VERSION_NEWER(DUNE_GEOMETRY, 2, 3)
 #define REFERENCE_ELEMENTS ReferenceElements

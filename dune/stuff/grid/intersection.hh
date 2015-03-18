@@ -73,7 +73,8 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
   out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
   const auto& geometry = intersection.geometry();
   for (auto ii : DSC::valueRange(geometry.corners()))
-    Common::print(geometry.corner(ii), "corner " + Common::toString(ii), out, prefix + "  ");
+    out << prefix + "  "
+        << "corner " + Common::toString(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... printIntersection(...)
 
 /** Check whether a spatial point lies on an intersection.
