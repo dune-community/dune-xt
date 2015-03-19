@@ -21,6 +21,7 @@
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/grid/search.hh>
+#include <dune/stuff/grid/information.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -277,6 +278,7 @@ class PeriodicGridViewImp
 
 public:
   typedef typename RealGridViewType::Grid Grid;
+  typedef typename Grid::ctype CoordinateFieldType;
   typedef typename RealGridViewType::IndexSet IndexSet;
   typedef typename Dune::GeometryType GeometryType;
   typedef PeriodicIntersectionIterator<RealGridViewType> IntersectionIterator;
@@ -302,6 +304,8 @@ public:
     EntityInlevelSearch<RealGridViewType> entity_search(real_grid_view_);
     const IndexSet& index_set = real_grid_view_.indexSet();
     CoordinateType periodic_neighbor_coords;
+    Dune::Stuff::Grid::Dimensions<RealGridViewType> dimensions(real_grid_view_);
+    const double dx = dimensions.entity_width.min();
     std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
     for (const auto& entity : DSC::entityRange(real_grid_view_)) {
       intersection_neighbor_map.clear();
@@ -318,11 +322,11 @@ public:
               if (periodic_directions_[ii]) {
                 if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 0.0)) {
                   is_periodic                  = true;
-                  periodic_neighbor_coords[ii] = 1.0;
+                  periodic_neighbor_coords[ii] = 1.0 - 1.0 / 16.0 * dx;
                   ++num_boundary_coords;
                 } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 1.0)) {
                   is_periodic                  = true;
-                  periodic_neighbor_coords[ii] = 0.0;
+                  periodic_neighbor_coords[ii] = 0.0 + 1.0 / 16.0 * dx;
                   ++num_boundary_coords;
                 }
               }
