@@ -29,6 +29,17 @@ namespace Grid {
 namespace internal {
 
 
+/** \brief Intersection for PeriodicGridView
+ *
+ * PeriodicIntersection is derived from the Intersection of the underlying GridView. On the inside of the grid or if
+ * periodic_ is false, the PeriodicIntersection will behave exactly like its BaseType. If periodic_ is true, the
+ * PeriodicIntersection will return boundary() == false even if it actually is on the boundary. In this case, outside(),
+ * geometryInOutside() and indexInOutside() are well-defined and give the information from the periodically adjacent
+ * entity. To be able to differentiate between PeriodicIntersections on the boundary and PeriodicIntersections inside
+ * the grid, the method 'bool periodic()' has been added.
+ *
+ * \see PeriodicGridView
+ */
 template <class RealGridViewImp>
 class PeriodicIntersection : public RealGridViewImp::Intersection
 {
@@ -136,7 +147,14 @@ protected:
   std::unique_ptr<DSC::ConstStorageProvider<RealGridViewType>> real_grid_view_;
 }; // ... class PeriodicIntersection ...
 
-
+/** \brief IntersectionIterator for PeriodicGridView
+ *
+ * PeriodicIntersectionIterator is derived from the IntersectionIterator of the underlying GridView and behaves exactly
+ * like the underlying IntersectionIterator except that it returns a PeriodicIntersection in its operator* and
+ * operator-> methods.
+ *
+ * \see PeriodicGridView
+ */
 template <class RealGridViewImp>
 class PeriodicIntersectionIterator : public RealGridViewImp::IntersectionIterator
 {
@@ -152,7 +170,6 @@ public:
   typedef typename RealGridViewType::template Codim<0>::Entity EntityType;
   static const size_t dimDomain = RealGridViewType::dimension;
 
-  /** Copy Constructor from real intersection iterator*/
   PeriodicIntersectionIterator(
       BaseType real_intersection_iterator, const RealGridViewType& real_grid_view, const EntityType& entity,
       const std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>& intersection_map)
@@ -218,6 +235,7 @@ template <class RealGridViewImp>
 class PeriodicGridViewImp;
 
 
+//! Traits for PeriodicGridView
 template <class RealGridViewImp>
 class PeriodicGridViewTraits
 {
@@ -267,6 +285,9 @@ public:
 }; // ... class PeriodicGridViewTraits ...
 
 
+/** \brief Actual Implementation of PeriodicGridView
+ *  \see PeriodicGridView
+*/
 template <class RealGridViewImp>
 class PeriodicGridViewImp : public RealGridViewImp
 {
@@ -291,7 +312,6 @@ public:
   {
   };
 
-  /** Constructor from real grid view */
   PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
     : BaseType(real_grid_view)
     , periodic_directions_(periodic_directions)
@@ -376,7 +396,32 @@ private:
 
 } // namespace internal
 
+/** \brief GridView that takes an arbitrary Dune::GridView and adds periodic boundaries
+ *
+ * PeriodicGridView is templated by and derived from an arbitrary Dune::GridView. All methods are forwarded to the
+ * underlying GridView except for the ibegin and iend methods. These methods return a PeriodicIntersectionIterator
+ * which again behaves like the underlying IntersectionIterator except that it returns a PeriodicIntersection in its
+ * operator*. The PeriodicIntersection again behaves like an Intersection of the underlying GridView, but may return
+ * boundary() == false and an outside() entity even if it is on the boundary. The outside() entity is the entity
+ * adjacent to the intersection if it is identified with the intersection on the other side of the grid.
+ * In the constructor, PeriodicGridViewImp will build a map mapping boundary entity indices to a map mapping local
+ * intersection indices to a std::pair containing the information whether this intersection shall be periodic and the
+ * outside entity. This may take quite long as finding the outside entity requires a grid walk for each periodic
+ * intersection.
+ * By default, all coordinate directions will be made periodic. By supplying a std::bitset< dimension > you can decide
+ * for each direction whether it should be periodic (1 means periodic, 0 means 'behave like underlying GridView in that
+ * direction').
 
+   \note
+      -  Currently, PeriodicGridView will only work with GridViews on the unit hypercube
+      -  Only cube and regular simplex grids have been tested so far. Other grids may not work properly. This is due to
+      the heuristics for finding the periodic neighbor entity: Given an intersection on the boundary that shall be
+      periodic, the coordinates intersection.geometry().center() are moved to the other side of the grid and then
+      supplied to Dune::Stuff::Grid::EntityInLevelSearch. As the coordinates are on the boundary of the wanted entity,
+      this search will fail for some grids. Thus, the coordinates are moved a little to the inside of the grid before
+      searching for the entity. The moved coordinates will be inside the wanted entity for cube and usual simplex grids
+      but this is not guaranteed for arbitrary grids.
+ */
 template <class RealGridViewImp>
 class PeriodicGridView : Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>>,
                          public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp>>
