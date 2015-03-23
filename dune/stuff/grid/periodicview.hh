@@ -270,21 +270,21 @@ public:
 template <class RealGridViewImp>
 class PeriodicGridViewImp : public RealGridViewImp
 {
-  typedef RealGridViewImp RealGridViewType;
-  typedef PeriodicGridViewImp<RealGridViewType> ThisType;
-  typedef PeriodicGridViewTraits<RealGridViewType> Traits;
+  typedef RealGridViewImp BaseType;
+  typedef PeriodicGridViewImp<BaseType> ThisType;
+  typedef PeriodicGridViewTraits<BaseType> Traits;
 
 public:
-  typedef typename RealGridViewType::Grid Grid;
-  typedef typename RealGridViewType::IndexSet IndexSet;
-  typedef PeriodicIntersectionIterator<RealGridViewType> IntersectionIterator;
+  typedef typename BaseType::Grid Grid;
+  typedef typename BaseType::IndexSet IndexSet;
+  typedef PeriodicIntersectionIterator<BaseType> IntersectionIterator;
   typedef typename IntersectionIterator::RealIntersectionType RealIntersectionType;
-  typedef typename RealGridViewType::IndexSet::IndexType EntityIndexType;
+  typedef typename BaseType::IndexSet::IndexType EntityIndexType;
   typedef int IntersectionIndexType;
   typedef typename RealIntersectionType::GlobalCoordinate CoordinateType;
-  typedef PeriodicIntersection<RealGridViewType> Intersection;
+  typedef PeriodicIntersection<BaseType> Intersection;
   typedef typename Grid::template Codim<0>::EntityPointer EntityPointerType;
-  static const size_t dimDomain = RealGridViewType::dimension;
+  static const size_t dimDomain = BaseType::dimension;
 
   template <int cd>
   struct Codim : public Traits::template Codim<cd>
@@ -292,19 +292,18 @@ public:
   };
 
   /** Constructor from real grid view */
-  PeriodicGridViewImp(const RealGridViewType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
-    : RealGridViewType(real_grid_view)
+  PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
+    : BaseType(real_grid_view)
     , periodic_directions_(periodic_directions)
   {
-    EntityInlevelSearch<RealGridViewType> entity_search(real_grid_view);
-    const IndexSet& index_set = real_grid_view.indexSet();
+    EntityInlevelSearch<BaseType> entity_search(*this);
     CoordinateType periodic_neighbor_coords;
     std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
-    for (const auto& entity : DSC::entityRange(real_grid_view)) {
+    for (const auto& entity : DSC::entityRange(*this)) {
       if (entity.hasBoundaryIntersections()) {
         intersection_neighbor_map.clear();
-        const auto i_it_end = real_grid_view.iend(entity);
-        for (auto i_it = real_grid_view.ibegin(entity); i_it != i_it_end; ++i_it) {
+        const auto i_it_end = BaseType::iend(entity);
+        for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
           const RealIntersectionType& intersection    = *i_it;
           const IntersectionIndexType index_in_inside = intersection.indexInInside();
           bool is_periodic = false;
@@ -340,7 +339,8 @@ public:
                 std::make_pair(index_in_inside, std::make_pair(bool(false), EntityPointerType(entity))));
           }
         }
-        entity_to_intersection_map_map_.insert(std::make_pair(index_set.index(entity), intersection_neighbor_map));
+        entity_to_intersection_map_map_.insert(
+            std::make_pair(this->indexSet().index(entity), intersection_neighbor_map));
       }
     }
   }
@@ -348,12 +348,10 @@ public:
   IntersectionIterator ibegin(const typename Codim<0>::Entity& entity) const
   {
     if (entity.hasBoundaryIntersections())
-      return IntersectionIterator(RealGridViewType::ibegin(entity),
-                                  *this,
-                                  entity,
-                                  entity_to_intersection_map_map_.at(this->indexSet().index(entity)));
+      return IntersectionIterator(
+          BaseType::ibegin(entity), *this, entity, entity_to_intersection_map_map_.at(this->indexSet().index(entity)));
     else
-      return IntersectionIterator(RealGridViewType::ibegin(entity),
+      return IntersectionIterator(BaseType::ibegin(entity),
                                   *this,
                                   entity,
                                   std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
@@ -362,15 +360,11 @@ public:
   IntersectionIterator iend(const typename Codim<0>::Entity& entity) const
   {
     if (entity.hasBoundaryIntersections())
-      return IntersectionIterator(RealGridViewType::iend(entity),
-                                  *this,
-                                  entity,
-                                  entity_to_intersection_map_map_.at(this->indexSet().index(entity)));
+      return IntersectionIterator(
+          BaseType::iend(entity), *this, entity, entity_to_intersection_map_map_.at(this->indexSet().index(entity)));
     else
-      return IntersectionIterator(RealGridViewType::iend(entity),
-                                  *this,
-                                  entity,
-                                  std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
+      return IntersectionIterator(
+          BaseType::iend(entity), *this, entity, std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>>());
   }
 
 private:
