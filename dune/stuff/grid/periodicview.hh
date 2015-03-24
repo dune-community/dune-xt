@@ -347,6 +347,8 @@ public:
             if (is_periodic) {
               const auto outside_ptr_ptrs = entity_search(std::vector<CoordinateType>(1, periodic_neighbor_coords));
               const auto& outside_ptr_ptr = outside_ptr_ptrs.at(0);
+              if (outside_ptr_ptr == nullptr)
+                DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
               const auto& outside_entity = *outside_ptr_ptr;
               intersection_neighbor_map.insert(
                   std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(outside_entity))));
