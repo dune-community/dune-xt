@@ -287,13 +287,10 @@ TYPED_TEST(PeriodicViewTestSimplex, checksimplex)
 
 #else // HAVE_DUNE_GRID
 
-TEST(DISABLED_CubeGridProvider, is_default_creatable)
+TEST(DISABLED_PeriodicViewTestCube, checkcube)
 {
 }
-TEST(DISABLED_CubeGridProvider, fulfills_const_interface)
-{
-}
-TEST(DISABLED_CubeGridProvider, is_visualizable)
+TEST(DISABLED_PeriodicViewTestSimplex, checksimplex)
 {
 }
 
