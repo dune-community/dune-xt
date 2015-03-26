@@ -33,10 +33,9 @@ namespace internal {
  *
  * PeriodicIntersection is derived from the Intersection of the underlying GridView. On the inside of the grid or if
  * periodic_ is false, the PeriodicIntersection will behave exactly like its BaseType. If periodic_ is true, the
- * PeriodicIntersection will return boundary() == false even if it actually is on the boundary. In this case, outside(),
+ * PeriodicIntersection will return neighbor == true even if it actually is on the boundary. In this case, outside(),
  * geometryInOutside() and indexInOutside() are well-defined and give the information from the periodically adjacent
- * entity. To be able to differentiate between PeriodicIntersections on the boundary and PeriodicIntersections inside
- * the grid, the method 'bool periodic()' has been added.
+ * entity.
  *
  * \see PeriodicGridView
  */
@@ -71,19 +70,6 @@ public:
       return true;
     else
       return BaseType::neighbor();
-  }
-
-  bool boundary() const
-  {
-    if (periodic_)
-      return false;
-    else
-      return BaseType::boundary();
-  }
-
-  bool periodic() const
-  {
-    return periodic_;
   }
 
   EntityPointer outside() const
