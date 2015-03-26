@@ -213,10 +213,7 @@ public:
     return Common::make_unique<ThisType>(cfg.get("variable", default_cfg.get<std::string>("variable")),
                                          cfg.get("expression", default_cfg.get<std::vector<std::string>>("expression")),
                                          cfg.get("order", default_cfg.get<size_t>("order")),
-                                         cfg.get("name", default_cfg.get<std::string>("name")),
-                                         cfg.has_key("gradient")
-                                             ? cfg.get<std::vector<std::vector<std::string>>>("gradient")
-                                             : std::vector<std::vector<std::string>>());
+                                         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
   Expression(const std::string variable, const std::string expression,
