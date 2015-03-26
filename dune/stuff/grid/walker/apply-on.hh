@@ -202,6 +202,32 @@ public:
   }
 }; // class BoundaryIntersections
 
+
+/**
+ *  \brief Selects each periodic intersection.
+ *
+ *  To decide if this in an periodic intersection,
+\code
+intersection.neighbor() && intersection.boundary()
+\endcode
+ *  is used.
+ */
+template <class GridViewImp>
+class PeriodicIntersections : public WhichIntersection<GridViewImp>
+{
+  typedef WhichIntersection<GridViewImp> BaseType;
+
+public:
+  typedef typename BaseType::GridViewType GridViewType;
+  typedef typename BaseType::IntersectionType IntersectionType;
+
+  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  {
+    return intersection.neighbor() && intersection.boundary();
+  }
+}; // class PeriodicIntersections
+
+
 template <class GridViewImp>
 class FilteredIntersections : public WhichIntersection<GridViewImp>
 {
