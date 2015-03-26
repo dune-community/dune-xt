@@ -62,10 +62,10 @@ public:
    *  \param elements   Number of elements in each coordinate direction
    *  \param overlap    Size of overlap in each coordinate direction
    */
-  static std::shared_ptr<GridType> createCubeGrid(const FieldVector<ctype, dimworld>& lowerLeft,
-                                                  const FieldVector<ctype, dimworld>& upperRight,
-                                                  const array<unsigned int, dim>& elements,
-                                                  const array<unsigned int, dim>& overlap)
+  static std::shared_ptr<GridType>
+  createCubeGrid(const FieldVector<ctype, dimworld>& lowerLeft, const FieldVector<ctype, dimworld>& upperRight,
+                 const array<unsigned int, dim>& elements, const array<unsigned int, dim>& overlap,
+                 Dune::MPIHelper::MPICommunicator communicator = Dune::MPIHelper::getCommunicator())
   {
     Dune::array<int, dim> cells;
     Dune::array<int, dim> over;
@@ -73,7 +73,7 @@ public:
       cells[i] = elements[i];
       over[i]  = overlap[i];
     }
-    return std::make_shared<GridType>(lowerLeft, upperRight, cells, over);
+    return std::make_shared<GridType>(lowerLeft, upperRight, cells, over, communicator);
   }
 
   /** \brief Create a structured simplex grid
