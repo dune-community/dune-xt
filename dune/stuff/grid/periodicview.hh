@@ -13,7 +13,9 @@
 #include <utility>
 #include <vector>
 
+#if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
+#endif
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -25,6 +27,11 @@
 namespace Dune {
 namespace Stuff {
 namespace Grid {
+
+
+#if HAVE_DUNE_GRID
+
+
 namespace internal {
 
 
@@ -431,6 +438,18 @@ public:
   }
 }; // class PeriodicGridView
 
+
+#else // HAVE_DUNE_GRID
+
+
+template <class RealGridViewImp>
+class PeriodicGridView
+{
+  static_assert(AlwaysFalse<RealGridViewImp>::value, "You are missing dune-grid!");
+};
+
+
+#endif // HAVE_DUNE_GRID
 
 } // namespace Grid
 } // namespace Stuff
