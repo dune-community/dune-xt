@@ -288,7 +288,7 @@ public:
   typedef typename IntersectionIterator::RealIntersectionType RealIntersectionType;
   typedef typename BaseType::IndexSet::IndexType EntityIndexType;
   typedef int IntersectionIndexType;
-  typedef typename RealIntersectionType::GlobalCoordinate CoordinateType;
+  typedef typename RealIntersectionType::GlobalCoordinate DomainType;
   typedef PeriodicIntersection<BaseType> Intersection;
   typedef typename Grid::template Codim<0>::EntityPointer EntityPointerType;
   typedef std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> IntersectionMapType;
@@ -299,13 +299,33 @@ public:
   {
   };
 
-  PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
+  PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions,
+                      const bool auto_detect_period, DomainType lower_left, DomainType upper_right)
     : BaseType(real_grid_view)
     , empty_intersection_map_(IntersectionMapType())
     , periodic_directions_(periodic_directions)
   {
+    if (auto_detect_period) {
+      auto entity_it = BaseType::template begin<0>();
+      lower_left     = entity_it->geometry().center();
+      upper_right = lower_left;
+      for (const auto& entity : DSC::entityRange(*this)) {
+        const auto i_it_end = BaseType::iend(entity);
+        for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
+          const RealIntersectionType& intersection = *i_it;
+          const auto intersection_coords = intersection.geometry().center();
+          for (std::size_t ii = 0; ii < dimDomain; ++ii) {
+            if (intersection_coords[ii] > upper_right[ii])
+              upper_right[ii] = intersection_coords[ii];
+            if (intersection_coords[ii] < lower_left[ii])
+              lower_left[ii] = intersection_coords[ii];
+          }
+        }
+      }
+    }
+
     EntityInlevelSearch<BaseType> entity_search(*this);
-    CoordinateType periodic_neighbor_coords;
+    DomainType periodic_neighbor_coords;
     std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
     for (const auto& entity : DSC::entityRange(*this)) {
       if (entity.hasBoundaryIntersections()) {
@@ -320,26 +340,28 @@ public:
             size_t num_boundary_coords = 0;
             for (std::size_t ii = 0; ii < dimDomain; ++ii) {
               if (periodic_directions_[ii]) {
-                if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 0.0)) {
-                  is_periodic                  = true;
-                  periodic_neighbor_coords[ii] = 1.0 - 1.0 / 100.0 * entity.geometry().center()[ii];
+                if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], lower_left[ii])) {
+                  is_periodic = true;
+                  periodic_neighbor_coords[ii] =
+                      upper_right[ii] - 1.0 / 100.0 * (entity.geometry().center()[ii] - lower_left[ii]);
                   ++num_boundary_coords;
-                } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], 1.0)) {
-                  is_periodic                  = true;
-                  periodic_neighbor_coords[ii] = 1.0 / 100.0 * (1.0 - entity.geometry().center()[ii]);
+                } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], upper_right[ii])) {
+                  is_periodic = true;
+                  periodic_neighbor_coords[ii] =
+                      lower_left[ii] + 1.0 / 100.0 * (upper_right[ii] - entity.geometry().center()[ii]);
                   ++num_boundary_coords;
                 }
               }
             }
             assert(num_boundary_coords = 1);
             if (is_periodic) {
-              const auto outside_ptr_ptrs = entity_search(std::vector<CoordinateType>(1, periodic_neighbor_coords));
+              const auto outside_ptr_ptrs = entity_search(std::vector<DomainType>(1, periodic_neighbor_coords));
               const auto& outside_ptr_ptr = outside_ptr_ptrs.at(0);
               if (outside_ptr_ptr == nullptr)
                 DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
-              const auto& outside_entity = *outside_ptr_ptr;
+              const EntityPointerType& outside_ptr = *outside_ptr_ptr;
               intersection_neighbor_map.insert(
-                  std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(outside_entity))));
+                  std::make_pair(index_in_inside, std::make_pair(is_periodic, outside_ptr)));
             } else {
               intersection_neighbor_map.insert(
                   std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(entity))));
@@ -420,13 +442,17 @@ class PeriodicGridView : Dune::Stuff::Common::ConstStorageProvider<internal::Per
   typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType>> BaseType;
   typedef
       typename Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>> ConstStorProv;
+  typedef typename RealGridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
 
 public:
   static const size_t dimension = RealGridViewType::dimension;
 
   PeriodicGridView(const RealGridViewType& real_grid_view,
-                   const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
-    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType>(real_grid_view, periodic_directions))
+                   const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set(),
+                   const bool auto_detect_period = false, DomainType lower_left = DomainType(0.0),
+                   DomainType upper_right = DomainType(1.0))
+    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType>(real_grid_view, periodic_directions,
+                                                                        auto_detect_period, lower_left, upper_right))
     , BaseType(ConstStorProv::access())
   {
   }
