@@ -203,6 +203,22 @@ public:
 }; // class BoundaryIntersections
 
 
+template <class GridViewImp>
+class NonPeriodicBoundaryIntersections : public WhichIntersection<GridViewImp>
+{
+  typedef WhichIntersection<GridViewImp> BaseType;
+
+public:
+  typedef typename BaseType::GridViewType GridViewType;
+  typedef typename BaseType::IntersectionType IntersectionType;
+
+  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  {
+    return intersection.boundary() && !intersection.neighbor();
+  }
+}; // class BoundaryIntersections
+
+
 /**
  *  \brief Selects each periodic intersection.
  *
