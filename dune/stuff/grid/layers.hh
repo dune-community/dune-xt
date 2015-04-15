@@ -343,7 +343,7 @@ struct Layer<GridType, ChooseLayer::level, ChoosePartView::view>
 
   static Type create(const GridType& grid, const int level)
   {
-    return LeafPartView<GridType, ChoosePartView::view>::create(grid, level);
+    return LevelPartView<GridType, ChoosePartView::view>::create(grid, level);
   }
 }; // struct Layer< ..., level, view >
 
