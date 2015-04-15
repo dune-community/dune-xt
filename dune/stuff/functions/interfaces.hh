@@ -84,10 +84,11 @@ class VisualizationAdapter;
 template <class MinuendType, class SubtrahendType>
 class Difference;
 
-
 template <class LeftSummandType, class RightSummandType>
 class Sum;
 
+template <class LeftSummandType, class RightSummandType>
+class Product;
 
 template <class FunctionImp>
 class Divergence;
@@ -397,6 +398,13 @@ public:
   SumType operator+(const ThisType& other) const
   {
     return SumType(*this, other);
+  }
+
+  template <class OtherType>
+  typename std::enable_if<is_localizable_function<OtherType>::value, Functions::Product<ThisType, OtherType>>::type
+  operator*(const OtherType& other) const
+  {
+    return Functions::Product<ThisType, OtherType>(*this, other);
   }
 
   DivergenceType divergence() const
