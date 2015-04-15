@@ -44,9 +44,33 @@
 
 namespace Dune {
 namespace Stuff {
+namespace internal {
+
+
+template <class F>
+struct is_localizable_function_helper
+{
+  DSC_has_typedef_initialize_once(EntityType) DSC_has_typedef_initialize_once(DomainFieldType)
+      DSC_has_typedef_initialize_once(RangeFieldType) DSC_has_static_member_initialize_once(dimDomain)
+          DSC_has_static_member_initialize_once(dimRange) DSC_has_static_member_initialize_once(dimRangeCols)
+
+              static const
+      bool is_candidate = DSC_has_typedef(EntityType)<F>::value && DSC_has_typedef(DomainFieldType)<F>::value
+                          && DSC_has_typedef(RangeFieldType)<F>::value && DSC_has_static_member(dimDomain)<F>::value
+                          && DSC_has_static_member(dimRange)<F>::value && DSC_has_static_member(dimRangeCols)<F>::value;
+}; // class is_localizable_function_helper
+
+
+} // namespace internal
+
+
+// forwards, includes are below
+template <class F, bool candidate = internal::is_localizable_function_helper<F>::is_candidate>
+struct is_localizable_function;
+
+
 namespace Functions {
 
-// forwards, include is below
 #if HAVE_DUNE_GRID
 
 
@@ -719,28 +743,8 @@ struct FunctionTypeGenerator
 };
 
 
-namespace internal {
-
-
 template <class F>
-struct is_localizable_function_helper
-{
-  DSC_has_typedef_initialize_once(EntityType) DSC_has_typedef_initialize_once(DomainFieldType)
-      DSC_has_typedef_initialize_once(RangeFieldType) DSC_has_static_member_initialize_once(dimDomain)
-          DSC_has_static_member_initialize_once(dimRange) DSC_has_static_member_initialize_once(dimRangeCols)
-
-              static const
-      bool is_candidate = DSC_has_typedef(EntityType)<F>::value && DSC_has_typedef(DomainFieldType)<F>::value
-                          && DSC_has_typedef(RangeFieldType)<F>::value && DSC_has_static_member(dimDomain)<F>::value
-                          && DSC_has_static_member(dimRange)<F>::value && DSC_has_static_member(dimRangeCols)<F>::value;
-}; // class is_localizable_function_helper
-
-
-} // namespace internal
-
-
-template <class F, bool candidate = internal::is_localizable_function_helper<F>::is_candidate>
-struct is_localizable_function
+struct is_localizable_function<F, true>
     : public std::is_base_of<LocalizableFunctionInterface<typename F::EntityType, typename F::DomainFieldType,
                                                           F::dimDomain, typename F::RangeFieldType, F::dimRange,
                                                           F::dimRangeCols>,
