@@ -112,6 +112,12 @@ public:
   /// \note Those marked as virtual may be implemented more efficiently in a derived class!
   /// \{
 
+  virtual void set_all(const ScalarType& val)
+  {
+    for (auto& element : *this)
+      element = val;
+  }
+
   virtual bool valid() const
   {
     for (const auto& val : *this) {
