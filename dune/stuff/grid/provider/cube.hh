@@ -34,6 +34,27 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 namespace Providers {
+namespace Configs {
+
+
+static Common::Configuration Cube_default(const std::string sub_name = "")
+{
+  Common::Configuration config;
+  config["lower_left"]      = "[0 0 0 0]";
+  config["upper_right"]     = "[1 1 1 1]";
+  config["num_elements"]    = "[8 8 8 8]";
+  config["num_refinements"] = "0";
+  if (sub_name.empty())
+    return config;
+  else {
+    Common::Configuration tmp;
+    tmp.add(config, sub_name);
+    return tmp;
+  }
+} // ... Cube_default(...)
+
+
+} // namespace Configs
 namespace internal {
 
 
@@ -129,19 +150,8 @@ public:
 
   static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::Configuration config;
-    config["lower_left"]      = "[0.0 0.0 0.0 0.0]";
-    config["upper_right"]     = "[1.0 1.0 1.0 1.0]";
-    config["num_elements"]    = "[8 8 8 8]";
-    config["num_refinements"] = "0";
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
+    return Configs::Cube_default(sub_name);
+  }
 
   static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
