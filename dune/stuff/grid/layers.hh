@@ -348,34 +348,34 @@ struct Layer<GridType, ChooseLayer::level, ChoosePartView::view>
 }; // struct Layer< ..., level, view >
 
 
-#if 0 // HAVE_DUNE_GRID_MULTISCALE
+#if HAVE_DUNE_GRID_MULTISCALE
 
 
-template< class GridType >
-struct Layer< GridType, ChooseLayer::local, ChoosePartView::view >
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local, ChoosePartView::view>
 {
-  typedef typename grid::Multiscale::Default< GridType >::LocalGridViewType Type;
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridViewType Type;
 };
 
 
-template< class GridType >
-struct Layer< GridType, ChooseLayer::local_oversampled, ChoosePartView::view >
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::view>
 {
-  typedef typename grid::Multiscale::Default< GridType >::LocalGridViewType Type;
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridViewType Type;
 };
 
 
-template< class GridType >
-struct Layer< GridType, ChooseLayer::local, ChoosePartView::part >
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local, ChoosePartView::part>
 {
-  typedef typename grid::Multiscale::Default< GridType >::LocalGridPartType Type;
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridPartType Type;
 };
 
 
-template< class GridType >
-struct Layer< GridType, ChooseLayer::local_oversampled, ChoosePartView::part >
+template <class GridType>
+struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::part>
 {
-  typedef typename grid::Multiscale::Default< GridType >::LocalGridPartType Type;
+  typedef typename grid::Multiscale::Default<GridType>::LocalGridPartType Type;
 };
 
 
