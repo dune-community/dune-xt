@@ -93,8 +93,8 @@ struct PeriodicViewTestCube : public testing::Test
         EXPECT_EQ(codim0_size, int(8 * 8 * 8));
       if (dimDomain == 3 && is_simplex)
         EXPECT_EQ(codim0_size, int(6 * 8 * 8 * 8));
-      EXPECT_EQ(periodic_grid_view.size(Dune::cube), grid_view.size(Dune::cube));
-      EXPECT_EQ(periodic_grid_view.size(Dune::simplex), grid_view.size(Dune::simplex));
+      EXPECT_EQ(periodic_grid_view.size(Dune::GeometryType::cube), grid_view.size(Dune::GeometryType::cube));
+      EXPECT_EQ(periodic_grid_view.size(Dune::GeometryType::simplex), grid_view.size(Dune::GeometryType::simplex));
       EXPECT_EQ(periodic_grid_view.overlapSize(0), grid_view.overlapSize(0));
       EXPECT_EQ(periodic_grid_view.overlapSize(1), grid_view.overlapSize(1));
       EXPECT_EQ(periodic_grid_view.ghostSize(0), grid_view.ghostSize(0));
