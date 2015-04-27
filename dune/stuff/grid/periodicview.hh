@@ -299,27 +299,24 @@ public:
   {
   };
 
-  PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions,
-                      const bool auto_detect_period, DomainType lower_left, DomainType upper_right)
+  PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
     : BaseType(real_grid_view)
     , empty_intersection_map_(IntersectionMapType())
     , periodic_directions_(periodic_directions)
   {
-    if (auto_detect_period) {
-      auto entity_it = BaseType::template begin<0>();
-      lower_left     = entity_it->geometry().center();
-      upper_right = lower_left;
-      for (const auto& entity : DSC::entityRange(*this)) {
-        const auto i_it_end = BaseType::iend(entity);
-        for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
-          const RealIntersectionType& intersection = *i_it;
-          const auto intersection_coords = intersection.geometry().center();
-          for (std::size_t ii = 0; ii < dimDomain; ++ii) {
-            if (intersection_coords[ii] > upper_right[ii])
-              upper_right[ii] = intersection_coords[ii];
-            if (intersection_coords[ii] < lower_left[ii])
-              lower_left[ii] = intersection_coords[ii];
-          }
+    auto entity_it         = BaseType::template begin<0>();
+    DomainType lower_left  = entity_it->geometry().center();
+    DomainType upper_right = lower_left;
+    for (const auto& entity : DSC::entityRange(*this)) {
+      const auto i_it_end = BaseType::iend(entity);
+      for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
+        const RealIntersectionType& intersection = *i_it;
+        const auto intersection_coords = intersection.geometry().center();
+        for (std::size_t ii = 0; ii < dimDomain; ++ii) {
+          if (intersection_coords[ii] > upper_right[ii])
+            upper_right[ii] = intersection_coords[ii];
+          if (intersection_coords[ii] < lower_left[ii])
+            lower_left[ii] = intersection_coords[ii];
         }
       }
     }
@@ -448,11 +445,8 @@ public:
   static const size_t dimension = RealGridViewType::dimension;
 
   PeriodicGridView(const RealGridViewType& real_grid_view,
-                   const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set(),
-                   const bool auto_detect_period = true, DomainType lower_left = DomainType(0.0),
-                   DomainType upper_right = DomainType(1.0))
-    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType>(real_grid_view, periodic_directions,
-                                                                        auto_detect_period, lower_left, upper_right))
+                   const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
+    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType>(real_grid_view, periodic_directions))
     , BaseType(ConstStorProv::access())
   {
   }
