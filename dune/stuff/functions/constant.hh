@@ -141,7 +141,6 @@ public:
     Common::Configuration config;
     config["value"] = Get<RangeFieldImp, rangeDim, rangeDimCols>::value_str();
     config["name"] = static_id();
-    config.report();
     if (sub_name.empty())
       return config;
     else {
