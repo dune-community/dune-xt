@@ -37,7 +37,6 @@
       config["expression"] = "[2*x[0] 2*x[1] 2*x[2]]";                                                                 \
       config["gradient"] = "[2 0 0; 0 2 0; 0 0 2]";                                                                    \
       const std::unique_ptr<const LocalizableFunctionType> function2(LocalizableFunctionType::create(config));         \
-      const LocalizableFunctionType function3("x", {"x[0]", "x[0]", "x[0]"});                                          \
     }                                                                                                                  \
   };
 // TEST_STRUCT_GENERATOR
