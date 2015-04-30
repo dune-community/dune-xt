@@ -209,11 +209,26 @@ public:
     // get correct config
     const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
+    // get gradient
+    std::vector<std::vector<std::string>> gradient_as_vectors;
+    if (cfg.has_key("gradient")) {
+      // get gradient as FieldMatrix
+      typedef typename Dune::FieldMatrix<std::string, dimRange, dimDomain> JacobianMatrixType;
+      const JacobianMatrixType gradient_as_matrix = cfg.get<JacobianMatrixType>("gradient");
+      // convert FieldMatrix to std::vector< std::vector < std::string > >
+      for (size_t rr = 0; rr < dimRange; ++rr) {
+        std::vector<std::string> gradient_expression;
+        for (size_t cc = 0; cc < dimDomain; ++cc)
+          gradient_expression.emplace_back(gradient_as_matrix[rr][cc]);
+        gradient_as_vectors.emplace_back(gradient_expression);
+      }
+    }
     // create
     return Common::make_unique<ThisType>(cfg.get("variable", default_cfg.get<std::string>("variable")),
                                          cfg.get("expression", default_cfg.get<std::vector<std::string>>("expression")),
                                          cfg.get("order", default_cfg.get<size_t>("order")),
-                                         cfg.get("name", default_cfg.get<std::string>("name")));
+                                         cfg.get("name", default_cfg.get<std::string>("name")),
+                                         gradient_as_vectors);
   } // ... create(...)
 
   Expression(const std::string variable, const std::string expression,
@@ -283,7 +298,7 @@ public:
                      << "You can disable this check by defining DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
 #endif // DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
-  }
+  } // ... evaluate(...)
 
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
   {
@@ -294,6 +309,7 @@ public:
       gradients_[ii]->evaluate(xx, ret[ii]);
     }
   } // ... jacobian(...)
+
 private:
   void build_gradients(const std::string variable, const std::vector<std::vector<std::string>>& gradient_expressions)
   {
