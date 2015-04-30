@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <dune/stuff/common/configuration.hh>
+#include <dune/stuff/functions/constant.hh>
 
 #include "interfaces.hh"
 
@@ -30,68 +31,11 @@ class Linear
 
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
-class Linear<EntityImp, DomainFieldType, domainDim, RangeFieldImp, rangeDim, 1>
+class Linear<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 {
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
   typedef Linear<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
-
-  template <class R, size_t r, size_t rC>
-  struct Get
-  {
-    static std::string value_str()
-    {
-      std::string str = "[";
-      for (size_t rr = 0; rr < r; ++rr) {
-        if (rr > 0)
-          str += "; ";
-        for (size_t cc = 0; cc < rC; ++cc) {
-          if (cc > 0)
-            str += " ";
-          if (cc == rr)
-            str += "1";
-          else
-            str += "0";
-        }
-      }
-      str += "]";
-      return str;
-    }
-  };
-
-  template <class R, size_t rC>
-  struct Get<R, 1, rC>
-  {
-    static std::string value_str()
-    {
-      std::string str = "[";
-      for (size_t cc = 0; cc < rC; ++cc) {
-        if (cc > 0)
-          str += " ";
-        str += "0";
-      }
-      str += "]";
-      return str;
-    }
-  };
-
-  template <class R, size_t r>
-  struct Get<R, r, 1>
-  {
-    static std::string value_str()
-    {
-      return Get<R, 1, r>::value_str();
-    }
-  };
-
-  template <class R>
-  struct Get<R, 1, 1>
-  {
-    static std::string value_str()
-    {
-      return "1";
-    }
-  };
 
 public:
   typedef typename BaseType::DomainType DomainType;
@@ -111,8 +55,8 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["matrix"] = Get<RangeFieldImp, rangeDim, domainDim>::value_str();
-    config["vector"] = Get<RangeFieldImp, rangeDim, 1>::value_str();
+    config["matrix"] = internal::Get<RangeFieldImp, rangeDim, domainDim>::value_str();
+    config["vector"] = internal::Get<RangeFieldImp, rangeDim, 1>::value_str();
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
