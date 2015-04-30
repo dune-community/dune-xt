@@ -216,8 +216,6 @@ public:
       typedef typename Dune::FieldMatrix<std::string, dimRange, dimDomain> JacobianMatrixType;
       const JacobianMatrixType gradient_as_matrix = cfg.get<JacobianMatrixType>("gradient");
       // convert FieldMatrix to std::vector< std::vector < std::string > >
-      assert(gradient_as_matrix.rows >= dimRange);
-      assert(gradient_as_matrix.cols >= dimDomain);
       for (size_t rr = 0; rr < dimRange; ++rr) {
         std::vector<std::string> gradient_expression;
         for (size_t cc = 0; cc < dimDomain; ++cc)
