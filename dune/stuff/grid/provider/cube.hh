@@ -20,6 +20,9 @@
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
+#if HAVE_DUNE_SPGRID
+#include <dune/grid/spgrid.hh>
+#endif
 #include <dune/stuff/grid/structuredgridfactory.hh>
 #endif
 
@@ -78,6 +81,12 @@ struct ElementVariant<Dune::YaspGrid<dim>>
 
 template <int dimGrid, int dimWorld>
 struct ElementVariant<Dune::SGrid<dimGrid, dimWorld>>
+{
+  static const int id = 1;
+};
+
+template <class ct, int dim, SPRefinementStrategy strategy, class Comm>
+struct ElementVariant<Dune::SPGrid<ct, dim, strategy, Comm>>
 {
   static const int id = 1;
 };
