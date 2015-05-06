@@ -217,6 +217,9 @@ private:
   }
 }; // class Model1< ..., 2, ..., r, r >
 
+/**
+ * Grid is currently mandated to have LL (0,0,0) to UR (365.76, 670.56, 51.816) corners
+ */
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
 class Model2 : public Stuff::GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>
 {
