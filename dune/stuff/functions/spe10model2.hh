@@ -15,6 +15,7 @@
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/common/fvector.hh>
 #include <dune/stuff/common/type_utils.hh>
+#include <dune/stuff/functions/global.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -22,7 +23,8 @@ namespace Functions {
 namespace Spe10 {
 
 /**
- * Grid is currently mandated to have LL (0,0,0) to UR (365.76, 670.56, 51.816) corners
+ * Grid originally had LL (0,0,0) to UR (365.76, 670.56, 51.816) corners
+ *
  */
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
 class Model2 : public Stuff::GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>
@@ -33,14 +35,19 @@ class Model2 : public Stuff::GlobalFunctionInterface<EntityImp, DomainFieldImp, 
   typedef Stuff::GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC> BaseType;
 
 public:
-  Model2(std::string data_filename = "perm_case2a.dat")
-    : deltas_{{6.096, 3.048, 0.6096}}
+  Model2(std::string data_filename = "perm_case2a.dat",
+         DSC::FieldVector<double, dim_domain> upper_right = default_upper_right)
+    : deltas_{{upper_right[0] / num_elements[0], upper_right[1] / num_elements[1], upper_right[2] / num_elements[2]}}
     , permeability_(nullptr)
     , permMatrix_(0.0)
     , filename_(data_filename)
   {
     readPermeability();
   }
+
+  static const DSC::FieldVector<double, dim_domain> default_upper_right;
+  // unsigned int mandated by CubeGrid provider
+  static const DSC::FieldVector<unsigned int, dim_domain> num_elements;
 
   virtual ~Model2()
   {
@@ -62,13 +69,17 @@ public:
                       << "dune-multiscale/dune/multiscale/problems/spe10_permeability.dat!\n";
       DUNE_THROW(IOError, "Data file for Groundwaterflow permeability could not be opened!");
     }
+
     // 3 is the maximum space dimension
     for (size_t dim = 0; dim < dim_domain; ++dim)
-      permIntervalls_[dim] = std::floor(x[dim] / deltas_[dim]);
+      permIntervalls_[dim] = std::min(unsigned(std::floor(x[dim] / deltas_[dim])), num_elements[dim] - 1);
 
-    const int offset = permIntervalls_[0] + permIntervalls_[1] * 60 + permIntervalls_[2] * 220 * 60;
-    for (size_t dim = 0; dim < dim_domain; ++dim)
-      diffusion[dim][dim] = permeability_[offset + dim * 1122000];
+    const int offset = permIntervalls_[0] + permIntervalls_[1] * num_elements[0]
+                       + permIntervalls_[2] * num_elements[1] * num_elements[0];
+    for (size_t dim = 0; dim < dim_domain; ++dim) {
+      const auto idx      = offset + dim * 1122000;
+      diffusion[dim][dim] = permeability_[idx];
+    }
   }
 
   virtual size_t order() const
@@ -102,6 +113,12 @@ private:
   const std::string filename_;
 };
 
+template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
+const DSC::FieldVector<unsigned int, dim_domain>
+    Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::num_elements{{60, 220, 85}};
+template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
+const DSC::FieldVector<double, dim_domain>
+    Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::default_upper_right{{7.059, 12.941, 1}};
 } // namespace Spe10
 } // namespace Functions
 } // namespace Stuff
