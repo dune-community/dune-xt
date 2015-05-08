@@ -118,7 +118,7 @@ const DSC::FieldVector<unsigned int, dim_domain>
     Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::num_elements{{60, 220, 85}};
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
 const DSC::FieldVector<double, dim_domain>
-    Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::default_upper_right{{7.059, 12.941, 1}};
+    Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::default_upper_right{{1, 3.667, 1.417}};
 } // namespace Spe10
 } // namespace Functions
 } // namespace Stuff
