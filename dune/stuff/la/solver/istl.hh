@@ -126,9 +126,9 @@ public:
       const Common::Configuration default_opts = options(type);
       IstlDenseVector<S> writable_rhs          = rhs.copy();
       // solve
-      if (type == "bicgstab.amg.ilu0") {
+      if (type.substr(0, 13) == "bicgstab.amg.") {
         auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.storage_access())
-                          .call(writable_rhs, solution, opts, default_opts);
+                          .call(writable_rhs, solution, opts, default_opts, type.substr(13));
         if (!result.converged)
           DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
                      "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
