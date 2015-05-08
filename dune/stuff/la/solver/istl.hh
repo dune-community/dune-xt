@@ -57,7 +57,7 @@ public:
 #if !HAVE_MPI && HAVE_SUPERLU
       "superlu",
 #endif
-          "bicgstab.amg.ilu0", "bicgstab.ilut"
+          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut"
 #if HAVE_UMFPACK
           ,
           "umfpack"
@@ -72,7 +72,7 @@ public:
     Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp, "1e-5", "0"});
     Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += general_opts;
-    if (tp == "bicgstab.amg.ilu0") {
+    if (tp.substr(0, 13) == "bicgstab.amg.") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
       iterative_options.set("smoother.verbose", "0");
