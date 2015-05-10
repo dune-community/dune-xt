@@ -116,7 +116,8 @@ public:
 
   CommonDenseVector(const ThisType& other) = default;
 
-  explicit CommonDenseVector(const BackendType& other)
+  explicit CommonDenseVector(const BackendType& other, const bool /*prune*/ = false,
+                             const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
     : backend_(new BackendType(other))
   {
   }
@@ -386,9 +387,16 @@ public:
   {
   }
 
-  explicit CommonDenseMatrix(const BackendType& other)
-    : backend_(new BackendType(other))
+  /**
+   * \note If prune == true, this implementation is not optimal!
+   */
+  explicit CommonDenseMatrix(const BackendType& other, const bool prune = false,
+                             const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
+    if (prune)
+      backend_ = ThisType(other).pruned(eps).backend_;
+    else
+      backend_ = std::make_shared<BackendType>(other);
   }
 
   template <class T>
