@@ -353,6 +353,30 @@ public:
     return backend_->nonZeros();
   }
 
+  virtual SparsityPatternDefault
+  pattern(const bool prune = false,
+          const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  {
+    SparsityPatternDefault ret(rows());
+    if (prune) {
+      for (EIGEN_size_t row = 0; row < backend_->outerSize(); ++row) {
+        for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
+          const size_t col = row_it.col();
+          const auto val = backend_->coeff(row, col);
+          if (Common::FloatCmp::ne(val, ScalarType(0), eps))
+            ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(col));
+        }
+      }
+    } else {
+      for (EIGEN_size_t row = 0; row < backend_->outerSize(); ++row) {
+        for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it)
+          ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(row_it.col()));
+      }
+    }
+    ret.sort();
+    return ret;
+  } // ... pattern(...)
+
   /// \}
 
 private:

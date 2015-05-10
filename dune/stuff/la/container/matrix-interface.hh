@@ -15,10 +15,12 @@
 
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/matrix.hh>
 #include <dune/stuff/common/type_utils.hh>
 
 #include "container-interface.hh"
+#include "pattern.hh"
 #include "vector-interface.hh"
 
 namespace Dune {
@@ -152,6 +154,32 @@ public:
   {
     return rows() * cols();
   }
+
+  /**
+   * \brief Computes the sparsity pattern of the matrix.
+   *
+   * This is mainly useful for sparse matrices and returns a full pattern for dense matrices
+   *
+   * \param prune If true, treats all entries smaller than eps as zero and does not include these indices in the
+   * returned pattern
+   */
+  virtual SparsityPatternDefault
+  pattern(const bool prune = false, const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    SparsityPatternDefault ret(rows());
+    if (prune) {
+      for (size_t ii = 0; ii < rows(); ++ii)
+        for (size_t jj = 0; jj < cols(); ++jj)
+          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(get_entry(ii, jj), ScalarType(0), eps))
+            ret.insert(ii, jj);
+    } else {
+      for (size_t ii = 0; ii < rows(); ++ii)
+        for (size_t jj = 0; jj < cols(); ++jj)
+          ret.insert(ii, jj);
+    }
+    ret.sort();
+    return ret;
+  } // ... pattern(...)
 
   /// \}
   /// \name Necesarry for the python bindings.

@@ -619,6 +619,30 @@ public:
     return backend_->nonzeroes();
   }
 
+  virtual SparsityPatternDefault
+  pattern(const bool prune = false,
+          const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  {
+    SparsityPatternDefault ret(rows());
+    if (prune) {
+      return pruned_pattern_from_backend(*backend_, eps);
+    } else {
+      for (size_t ii = 0; ii < rows(); ++ii) {
+        for (size_t jj = 0; jj < cols(); ++jj)
+          if (backend_->exists(ii, jj))
+            ret.insert(ii, jj);
+      }
+    }
+    ret.sort();
+    return ret;
+  } // ... pattern(...)
+
+  virtual ThisType
+  pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  {
+    return ThisType(*backend_, true, eps);
+  }
+
   /// \}
 
 private:
