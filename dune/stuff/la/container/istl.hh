@@ -22,6 +22,8 @@
 #include <dune/istl/bcrsmatrix.hh>
 #endif
 
+#include <dune/stuff/common/float_cmp.hh>
+
 #include "interfaces.hh"
 #include "pattern.hh"
 
@@ -127,7 +129,8 @@ public:
 
   IstlDenseVector(const ThisType& other) = default;
 
-  explicit IstlDenseVector(const BackendType& other)
+  explicit IstlDenseVector(const BackendType& other, const bool /*prune*/ = false,
+                           const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
     : backend_(new BackendType(other))
   {
   }
@@ -377,24 +380,15 @@ public:
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
    */
-  IstlRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern)
-    : backend_(new BackendType(rr, cc, BackendType::row_wise))
+  IstlRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
   {
-    if (size_t(pattern.size()) != rr)
+    if (patt.size() != rr)
       DUNE_THROW(Exceptions::shapes_do_not_match,
-                 "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this ("
-                                             << rows()
+                 "The size of the pattern (" << patt.size() << ") does not match the number of rows of this (" << rows()
                                              << ")!");
-    size_t row_index = 0;
-    for (auto row = backend_->createbegin(); row != backend_->createend(); ++row) {
-      assert(row_index < pattern.size());
-      const auto& col_indices = pattern.inner(row_index);
-      for (const auto& col : col_indices)
-        row.insert(col);
-      ++row_index;
-    }
+    build_sparse_matrix(rr, cc, patt);
     backend_->operator*=(ScalarType(0));
-  } // IstlRowMajorSparseMatrix(...)
+  } // ... IstlRowMajorSparseMatrix(...)
 
   explicit IstlRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
     : backend_(new BackendType(rr, cc, BackendType::row_wise))
@@ -417,10 +411,21 @@ public:
 
   IstlRowMajorSparseMatrix(const ThisType& other) = default;
 
-  explicit IstlRowMajorSparseMatrix(const BackendType& other)
-    : backend_(new BackendType(other))
+  explicit IstlRowMajorSparseMatrix(const BackendType& mat, const bool prune = false,
+                                    const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
-  }
+    if (prune) {
+      auto pruned_pattern = pruned_pattern_from_backend(mat, eps);
+      build_sparse_matrix(mat.N(), mat.M(), pruned_pattern);
+      for (size_t ii = 0; ii < pruned_pattern.size(); ++ii) {
+        const auto& mat_row = mat[ii];
+        auto& backend_row = backend_->operator[](ii);
+        for (const auto& jj : pruned_pattern.inner(ii))
+          backend_row[jj][0][0] = mat_row[jj][0][0];
+      }
+    } else
+      backend_ = std::shared_ptr<BackendType>(new BackendType(mat));
+  } // IstlRowMajorSparseMatrix(...)
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
@@ -646,6 +651,33 @@ public:
   /// \}
 
 private:
+  void build_sparse_matrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
+  {
+    backend_ = std::make_shared<BackendType>(rr, cc, BackendType::row_wise);
+    for (auto row = backend_->createbegin(); row != backend_->createend(); ++row) {
+      assert(row.index() < patt.size());
+      const auto& col_indices = patt.inner(row.index());
+      for (const auto& col : col_indices)
+        row.insert(col);
+    }
+  } // ... build_sparse_matrix(...)
+
+  SparsityPatternDefault
+  pruned_pattern_from_backend(const BackendType& mat,
+                              const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    SparsityPatternDefault ret(mat.N());
+    for (size_t ii = 0; ii < mat.N(); ++ii) {
+      const auto& row = mat[ii];
+      for (size_t jj = 0; jj < mat.M(); ++jj)
+        if (mat.exists(ii, jj)
+            && Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(row[jj][0][0], ScalarType(0), eps))
+          ret.insert(ii, jj);
+    }
+    ret.sort();
+    return ret;
+  } // ... pruned_pattern_from_backend(...)
+
   bool these_are_valid_indices(const size_t ii, const size_t jj) const
   {
     if (ii >= rows())
