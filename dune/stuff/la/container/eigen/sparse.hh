@@ -348,6 +348,11 @@ public:
     return EigenMappedDenseVector<ScalarType>(non_const_ref.valuePtr(), non_const_ref.nonZeros()).valid();
   }
 
+  virtual size_t non_zeros() const override final
+  {
+    return backend_->nonZeros();
+  }
+
   /// \}
 
 private:

@@ -610,6 +610,15 @@ public:
     return true;
   } // ... valid(...)
 
+  /**
+   * \attention Use and interprete with care, since the Dune::BCRSMatrix is known to report strange things here,
+   * depending on its state!
+   */
+  virtual size_t non_zeros() const override final
+  {
+    return backend_->nonzeroes();
+  }
+
   /// \}
 
 private:

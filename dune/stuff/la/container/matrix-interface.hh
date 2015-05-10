@@ -140,6 +140,19 @@ public:
     return ret;
   } // ... sup_norm(...)
 
+  /**
+   * \brief Returns the number of entries in the sparsity pattern of the matrix.
+   *
+   * This is mainly useful for sparse matrices and returns rows() times cols() for dense matrices.
+   *
+   * \note Some implementations do not report the correct number here, so use and interpret only if you know what you
+   * are doing!
+   */
+  virtual size_t non_zeros() const
+  {
+    return rows() * cols();
+  }
+
   /// \}
   /// \name Necesarry for the python bindings.
   /// \{
@@ -204,6 +217,19 @@ public:
   {
     unit_col(boost::numeric_cast<size_t>(jj));
   }
+
+  DUNE_STUFF_SSIZE_T pb_non_zeros() const
+  {
+    try {
+      return boost::numeric_cast<DUNE_STUFF_SSIZE_T>(non_zeros());
+    } catch (boost::bad_numeric_cast& ee) {
+      DUNE_THROW(Exceptions::external_error,
+                 "There was an error in boost converting '" << non_zeros() << "' to '"
+                                                            << Common::Typename<ScalarType>::value()
+                                                            << "': "
+                                                            << ee.what());
+    }
+  } // ... pb_non_zeros(...)
 
   /// \}
 
