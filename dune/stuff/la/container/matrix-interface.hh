@@ -181,6 +181,25 @@ public:
     return ret;
   } // ... pattern(...)
 
+  /**
+   * \brief Returns a pruned variant of this matrix.
+   *
+   * This is mainly useful for sparse matrices and returns a matrix that should be very close to this matrix, except for
+   * very small values, which are set to zero and the entries of which are removed from the sparsity pattern.
+   *
+   * \sa    pattern
+   * \param eps Is forwarded to pattern(true, eps)
+   */
+  virtual derived_type pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    auto pruned_pattern = pattern(true, eps);
+    derived_type ret(rows(), cols(), pruned_pattern);
+    for (size_t ii = 0; ii < pruned_pattern.size(); ++ii)
+      for (const size_t& jj : pruned_pattern.inner(ii))
+        ret.set_entry(ii, jj, get_entry(ii, jj));
+    return ret;
+  } // ... pruned(...)
+
   /// \}
   /// \name Necesarry for the python bindings.
   /// \{
