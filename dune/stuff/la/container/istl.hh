@@ -633,9 +633,10 @@ public:
       return pruned_pattern_from_backend(*backend_, eps);
     } else {
       for (size_t ii = 0; ii < rows(); ++ii) {
-        for (size_t jj = 0; jj < cols(); ++jj)
-          if (backend_->exists(ii, jj))
-            ret.insert(ii, jj);
+        const auto& row   = backend_->operator[](ii);
+        const auto it_end = row.end();
+        for (auto it = row.begin(); it != it_end; ++it)
+          ret.insert(ii, it.index());
       }
     }
     ret.sort();
@@ -668,11 +669,11 @@ private:
   {
     SparsityPatternDefault ret(mat.N());
     for (size_t ii = 0; ii < mat.N(); ++ii) {
-      const auto& row = mat[ii];
-      for (size_t jj = 0; jj < mat.M(); ++jj)
-        if (mat.exists(ii, jj)
-            && Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(row[jj][0][0], ScalarType(0), eps))
-          ret.insert(ii, jj);
+      const auto& row   = mat[ii];
+      const auto it_end = row.end();
+      for (auto it = row.begin(); it != it_end; ++it)
+        if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(it->operator[](0)[0], ScalarType(0), eps))
+          ret.insert(ii, it.index());
     }
     ret.sort();
     return ret;
