@@ -62,7 +62,8 @@ template <class ScalarImp = double>
 class EigenDenseVectorTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
   typedef EigenDenseVector<ScalarType> derived_type;
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, 1> BackendType;
 }; // class EigenDenseVectorTraits
@@ -77,7 +78,8 @@ class EigenMappedDenseVectorTraits
   typedef typename ::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, 1> PlainBackendType;
 
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
   typedef EigenMappedDenseVector<ScalarType> derived_type;
   typedef Eigen::Map<PlainBackendType> BackendType;
 }; // class EigenMappedDenseVectorTraits
@@ -104,18 +106,19 @@ public:
  *  \brief A dense vector implementation of VectorInterface using the eigen backend.
  */
 template <class ScalarImp = double>
-class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>>,
+class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp>,
                          public ProvidesDataAccess<internal::EigenDenseVectorTraits<ScalarImp>>
 {
   typedef EigenDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
-  typedef EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>> BaseType;
+  typedef EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> BaseType;
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::EigenDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealScalarType RealScalarType;
   typedef typename Traits::BackendType BackendType;
 
 private:
@@ -201,7 +204,7 @@ private:
       backend_ = std::make_shared<BackendType>(*(backend_));
   } // ... ensure_uniqueness(...)
 
-  friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>>;
+  friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenDenseVector
 
 
@@ -209,11 +212,11 @@ private:
  *  \brief  A dense vector implementation of VectorInterface using the eigen backend which wrappes a raw array.
  */
 template <class ScalarImp = double>
-class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>>
+class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>, ScalarImp>
 {
   typedef EigenMappedDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::EigenMappedDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
-  typedef EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>> BaseType;
+  typedef EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>, ScalarImp> BaseType;
   static_assert(std::is_same<ScalarImp, double>::value, "Undefined behaviour for non-double data!");
   static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
                 "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
@@ -222,6 +225,7 @@ public:
   typedef internal::EigenMappedDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealScalarType RealScalarType;
 
 private:
   typedef typename BackendType::Index EIGEN_size_t;
@@ -336,7 +340,7 @@ private:
     }
   } // ... ensure_uniqueness(...)
 
-  friend class EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarType>>;
+  friend class EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenMappedDenseVector
 
 

@@ -9,6 +9,7 @@
 #include <memory>
 #include <type_traits>
 #include <vector>
+#include <complex>
 
 #include <dune/stuff/common/disable_warnings.hh>
 #if HAVE_EIGEN
@@ -17,6 +18,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/common/typetraits.hh>
+#include <dune/common/ftraits.hh>
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -56,6 +58,7 @@ class EigenBaseVector : public VectorInterface<ImpTraits, ScalarImp>, public Pro
 public:
   typedef ImpTraits Traits;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealScalarType RealScalarType;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::derived_type VectorImpType;
 
@@ -161,20 +164,19 @@ public:
   /// \name These methods override default implementations from VectorInterface.
   /// \{
 
-  virtual std::pair<size_t, ScalarType> amax() const override final
+  virtual std::pair<size_t, RealScalarType> amax() const override final
   {
-    auto result              = std::make_pair(size_t(0), ScalarType(0));
-    size_t min_index         = 0;
-    size_t max_index         = 0;
-    const ScalarType minimum = backend_->minCoeff(&min_index);
-    const ScalarType maximum = backend_->maxCoeff(&max_index);
-    if (std::abs(maximum) < std::abs(minimum)
-        || (Common::FloatCmp::eq(std::abs(maximum), std::abs(minimum)) && max_index > min_index)) {
+    auto result                  = std::make_pair(size_t(0), RealScalarType(0));
+    size_t min_index             = 0;
+    size_t max_index             = 0;
+    const RealScalarType minimum = (backend_->cwiseAbs()).minCoeff(&min_index);
+    const RealScalarType maximum = (backend_->cwiseAbs()).maxCoeff(&max_index);
+    if (maximum < minimum || (Common::FloatCmp::eq(maximum, minimum) && max_index > min_index)) {
       result.first  = min_index;
-      result.second = std::abs(minimum);
+      result.second = minimum;
     } else {
       result.first  = max_index;
-      result.second = std::abs(maximum);
+      result.second = maximum;
     }
     return result;
   } // ... amax(...)
@@ -193,17 +195,17 @@ public:
     return this->template dot<Traits>(other);
   }
 
-  virtual ScalarType l1_norm() const override final
+  virtual RealScalarType l1_norm() const override final
   {
     return backend_->template lpNorm<1>();
   }
 
-  virtual ScalarType l2_norm() const override final
+  virtual RealScalarType l2_norm() const override final
   {
     return backend_->template lpNorm<2>();
   }
 
-  virtual ScalarType sup_norm() const override final
+  virtual RealScalarType sup_norm() const override final
   {
     return backend_->template lpNorm<::Eigen::Infinity>();
   }

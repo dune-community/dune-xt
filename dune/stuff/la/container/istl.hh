@@ -53,7 +53,8 @@ template <class ScalarImp>
 class IstlDenseVectorTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
   typedef IstlDenseVector<ScalarImp> derived_type;
   typedef BlockVector<FieldVector<ScalarType, 1>> BackendType;
 }; // class IstlDenseVectorTraits
@@ -91,6 +92,7 @@ class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<S
 public:
   typedef internal::IstlDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealScalarType RealScalarType;
   typedef typename Traits::BackendType BackendType;
 
   explicit IstlDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
@@ -267,17 +269,17 @@ public:
     return backend_->dot(*(other.backend_));
   } // ... dot(...)
 
-  virtual ScalarType l1_norm() const override final
+  virtual RealScalarType l1_norm() const override final
   {
     return backend_->one_norm();
   }
 
-  virtual ScalarType l2_norm() const override final
+  virtual RealScalarType l2_norm() const override final
   {
     return backend_->two_norm();
   }
 
-  virtual ScalarType sup_norm() const override final
+  virtual RealScalarType sup_norm() const override final
   {
     return backend_->infinity_norm();
   }
