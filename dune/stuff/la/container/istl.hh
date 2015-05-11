@@ -10,12 +10,14 @@
 
 #include <vector>
 #include <initializer_list>
+#include <complex>
 
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/common/ftraits.hh>
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/bvector.hh>
@@ -64,7 +66,8 @@ template <class ScalarImp>
 class IstlRowMajorSparseMatrixTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
   typedef IstlRowMajorSparseMatrix<ScalarType> derived_type;
   typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
 }; // class RowMajorSparseMatrixTraits
@@ -373,6 +376,7 @@ public:
   typedef internal::IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealScalarType RealScalarType;
 
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
@@ -603,7 +607,7 @@ public:
       for (size_t jj = 0; jj < cols(); ++jj)
         if (backend_->exists(ii, jj)) {
           const auto& entry = row_vec[jj][0];
-          if (std::isnan(entry) || std::isinf(entry))
+          if (std::isnan(entry.two_norm()) || std::isinf(entry.two_norm()))
             return false;
         }
     }

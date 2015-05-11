@@ -9,6 +9,7 @@
 #include <memory>
 #include <type_traits>
 #include <vector>
+#include <complex>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -19,6 +20,7 @@
 #include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/common/typetraits.hh>
+#include <dune/common/ftraits.hh>
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -57,7 +59,8 @@ template <class ScalarImp = double>
 class EigenRowMajorSparseMatrixTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
   typedef EigenRowMajorSparseMatrix<ScalarType> derived_type;
   typedef typename ::Eigen::SparseMatrix<ScalarType, ::Eigen::RowMajor> BackendType;
 }; // class RowMajorSparseMatrixTraits
@@ -83,6 +86,7 @@ public:
   typedef internal::EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealScalarType RealScalarType;
 
 private:
   typedef typename BackendType::Index EIGEN_size_t;

@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <vector>
 #include <initializer_list>
+#include <complex>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -21,6 +22,7 @@
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/densematrix.hh>
+#include <dune/common/ftraits.hh>
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -88,7 +90,8 @@ template <class ScalarImp = double>
 class EigenDenseMatrixTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
   typedef EigenDenseMatrix<ScalarType> derived_type;
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
 }; // class EigenDenseMatrixTraits
@@ -354,6 +357,7 @@ public:
   typedef internal::EigenDenseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealScalarType RealScalarType;
 
 private:
   typedef typename BackendType::Index EIGEN_size_t;
@@ -595,7 +599,7 @@ public:
     for (size_t ii = 0; ii < rows(); ++ii) {
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = backend_->operator()(ii, jj);
-        if (std::isnan(entry) || std::isinf(entry))
+        if (std::isnan(std::real(entry)) || std::isnan(std::imag(entry)) || std::isinf(std::abs(entry)))
           return false;
       }
     }

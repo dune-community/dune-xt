@@ -13,6 +13,8 @@
 #include <iostream>
 #include <type_traits>
 
+#include <dune/common/ftraits.hh>
+
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/matrix.hh>
@@ -45,7 +47,8 @@ class MatrixInterface : public ContainerInterface<Traits, ScalarImp>, public Tag
 {
 public:
   typedef typename Traits::derived_type derived_type;
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
 
   virtual ~MatrixInterface()
   {
@@ -131,9 +134,9 @@ public:
     return yy;
   }
 
-  virtual ScalarType sup_norm() const
+  virtual RealScalarType sup_norm() const
   {
-    ScalarType ret = 0;
+    RealScalarType ret = 0;
     for (size_t ii = 0; ii < rows(); ++ii)
       for (size_t jj = 0; jj < cols(); ++jj)
         ret = std::max(ret, std::abs(get_entry(ii, jj)));
