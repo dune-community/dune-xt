@@ -662,13 +662,14 @@ private:
   void build_sparse_matrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
   {
     DUNE_STUFF_PROFILE_SCOPE(static_id() + ".build");
-    backend_ = std::make_shared<BackendType>(rr, cc, BackendType::row_wise);
-    for (auto row = backend_->createbegin(); row != backend_->createend(); ++row) {
-      assert(row.index() < patt.size());
-      const auto& col_indices = patt.inner(row.index());
-      for (const auto& col : col_indices)
-        row.insert(col);
-    }
+    backend_ = std::make_shared<BackendType>(rr, cc, BackendType::random);
+    for (size_t ii = 0; ii < patt.size(); ++ii)
+      backend_->setrowsize(ii, patt.inner(ii).size());
+    backend_->endrowsizes();
+    for (size_t ii = 0; ii < patt.size(); ++ii)
+      for (const auto& jj : patt.inner(ii))
+        backend_->addindex(ii, jj);
+    backend_->endindices();
   } // ... build_sparse_matrix(...)
 
   SparsityPatternDefault
