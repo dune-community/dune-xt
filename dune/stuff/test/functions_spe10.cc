@@ -11,6 +11,7 @@
 
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/functions/spe10.hh>
+#include <dune/stuff/functions/spe10model2.hh>
 
 // we need this nasty code generation because the testing::Types< ... > only accepts 50 arguments
 // and all combinations of functions and entities and dimensions and fieldtypes would be way too much
