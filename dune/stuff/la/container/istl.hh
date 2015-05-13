@@ -54,7 +54,7 @@ class IstlDenseVectorTraits
 {
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef IstlDenseVector<ScalarImp> derived_type;
   typedef BlockVector<FieldVector<ScalarType, 1>> BackendType;
 }; // class IstlDenseVectorTraits
@@ -68,7 +68,7 @@ class IstlRowMajorSparseMatrixTraits
 {
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef IstlRowMajorSparseMatrix<ScalarType> derived_type;
   typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
 }; // class RowMajorSparseMatrixTraits
@@ -92,7 +92,7 @@ class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<S
 public:
   typedef internal::IstlDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealScalarType RealScalarType;
+  typedef typename Traits::RealType RealType;
   typedef typename Traits::BackendType BackendType;
 
   explicit IstlDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
@@ -269,17 +269,17 @@ public:
     return backend_->dot(*(other.backend_));
   } // ... dot(...)
 
-  virtual RealScalarType l1_norm() const override final
+  virtual RealType l1_norm() const override final
   {
     return backend_->one_norm();
   }
 
-  virtual RealScalarType l2_norm() const override final
+  virtual RealType l2_norm() const override final
   {
     return backend_->two_norm();
   }
 
-  virtual RealScalarType sup_norm() const override final
+  virtual RealType sup_norm() const override final
   {
     return backend_->infinity_norm();
   }
@@ -378,7 +378,7 @@ public:
   typedef internal::IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealScalarType RealScalarType;
+  typedef typename Traits::RealType RealType;
 
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.

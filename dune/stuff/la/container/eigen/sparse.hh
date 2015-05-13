@@ -60,7 +60,7 @@ class EigenRowMajorSparseMatrixTraits
 {
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef EigenRowMajorSparseMatrix<ScalarType> derived_type;
   typedef typename ::Eigen::SparseMatrix<ScalarType, ::Eigen::RowMajor> BackendType;
 }; // class RowMajorSparseMatrixTraits
@@ -86,7 +86,7 @@ public:
   typedef internal::EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealScalarType RealScalarType;
+  typedef typename Traits::RealType RealType;
 
 private:
   typedef typename BackendType::Index EIGEN_size_t;
