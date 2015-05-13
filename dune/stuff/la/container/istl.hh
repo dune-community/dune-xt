@@ -424,10 +424,13 @@ public:
       auto pruned_pattern = pruned_pattern_from_backend(mat, eps);
       build_sparse_matrix(mat.N(), mat.M(), pruned_pattern);
       for (size_t ii = 0; ii < pruned_pattern.size(); ++ii) {
-        const auto& mat_row = mat[ii];
-        auto& backend_row = backend_->operator[](ii);
-        for (const auto& jj : pruned_pattern.inner(ii))
-          backend_row[jj][0][0] = mat_row[jj][0][0];
+        const auto& row_indices = pruned_pattern.inner(ii);
+        if (row_indices.size() > 0) {
+          const auto& mat_row = mat[ii];
+          auto& backend_row = backend_->operator[](ii);
+          for (const auto& jj : row_indices)
+            backend_row[jj][0][0] = mat_row[jj][0][0];
+        }
       }
     } else
       backend_ = std::shared_ptr<BackendType>(new BackendType(mat));
@@ -640,10 +643,12 @@ public:
       return pruned_pattern_from_backend(*backend_, eps);
     } else {
       for (size_t ii = 0; ii < rows(); ++ii) {
-        const auto& row   = backend_->operator[](ii);
-        const auto it_end = row.end();
-        for (auto it = row.begin(); it != it_end; ++it)
-          ret.insert(ii, it.index());
+        if (backend_->getrowsize(ii) > 0) {
+          const auto& row   = backend_->operator[](ii);
+          const auto it_end = row.end();
+          for (auto it = row.begin(); it != it_end; ++it)
+            ret.insert(ii, it.index());
+        }
       }
     }
     ret.sort();
@@ -678,11 +683,13 @@ private:
   {
     SparsityPatternDefault ret(mat.N());
     for (size_t ii = 0; ii < mat.N(); ++ii) {
-      const auto& row   = mat[ii];
-      const auto it_end = row.end();
-      for (auto it = row.begin(); it != it_end; ++it)
-        if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(it->operator[](0)[0], ScalarType(0), eps))
-          ret.insert(ii, it.index());
+      if (mat.getrowsize(ii) > 0) {
+        const auto& row   = mat[ii];
+        const auto it_end = row.end();
+        for (auto it = row.begin(); it != it_end; ++it)
+          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(it->operator[](0)[0], ScalarType(0), eps))
+            ret.insert(ii, it.index());
+      }
     }
     ret.sort();
     return ret;
