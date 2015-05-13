@@ -609,7 +609,7 @@ public:
       for (size_t jj = 0; jj < cols(); ++jj)
         if (backend_->exists(ii, jj)) {
           const auto& entry = row_vec[jj][0];
-          if (std::isnan(entry.two_norm()) || std::isinf(entry.two_norm()))
+          if (std::isnan(std::real(entry[0])) || std::isnan(std::imag(entry[0])) || std::isinf(std::abs(entry[0])))
             return false;
         }
     }
