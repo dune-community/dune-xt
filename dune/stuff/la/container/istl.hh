@@ -81,7 +81,8 @@ public:
  */
 template <class ScalarImp = double>
 class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp>,
-                        public ProvidesBackend<internal::IstlDenseVectorTraits<ScalarImp>>
+                        public ProvidesBackend<internal::IstlDenseVectorTraits<ScalarImp>>,
+                        public ProvidesDataAccess<internal::IstlDenseVectorTraits<ScalarImp>>
 {
   typedef IstlDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
@@ -185,6 +186,15 @@ public:
   {
     ensure_uniqueness();
     return *backend_;
+  }
+
+  /// \}
+  /// \name Required by ProvidesDataAccess.
+  /// \{
+
+  ScalarType* data()
+  {
+    return &(backend()[0][0]);
   }
 
   /// \}
