@@ -190,6 +190,16 @@ public:
   using VectorInterfaceType::sub;
   using BaseType::backend;
 
+  /// \name Required by ProvidesDataAccess.
+  /// \{
+
+  ScalarType* data()
+  {
+    return backend().data();
+  }
+
+  /// \}
+
 private:
   using BaseType::backend_;
 
