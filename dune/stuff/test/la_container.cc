@@ -7,12 +7,12 @@
 
 #include "main.hxx"
 
-#include <type_traits>
+#include <complex>
 #include <memory>
-
-#include <dune/common/float_cmp.hh>
+#include <type_traits>
 
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/la/container/common.hh>
 #include <dune/stuff/la/container/eigen.hh>
@@ -25,41 +25,73 @@ using namespace Dune;
 
 static const size_t dim = 4;
 
-typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>
+
+#define EXPECT_DOUBLE_OR_COMPLEX_EQ(expected, actual)                                                                  \
+  {                                                                                                                    \
+    EXPECT_DOUBLE_EQ(expected, std::real(actual));                                                                     \
+    EXPECT_DOUBLE_EQ(0, std::imag(actual));                                                                            \
+  }
+
+typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>,
+                       Dune::Stuff::LA::CommonDenseVector<std::complex<double>>
 #if HAVE_EIGEN
                        ,
-                       Dune::Stuff::LA::EigenDenseVector<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>
+                       Dune::Stuff::LA::EigenDenseVector<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>,
+                       Dune::Stuff::LA::EigenDenseVector<std::complex<double>>
+//                      , Dune::Stuff::LA::EigenMappedDenseVector< std::complex< double > >
 #endif
 #if HAVE_DUNE_ISTL
                        ,
-                       Dune::Stuff::LA::IstlDenseVector<double>
+                       Dune::Stuff::LA::IstlDenseVector<double>, Dune::Stuff::LA::IstlDenseVector<std::complex<double>>
 #endif
                        > VectorTypes;
 
 typedef testing::
-    Types<std::pair<Dune::Stuff::LA::CommonDenseMatrix<double>, Dune::Stuff::LA::CommonDenseVector<double>>
+    Types<std::pair<Dune::Stuff::LA::CommonDenseMatrix<double>, Dune::Stuff::LA::CommonDenseVector<double>>,
+          std::pair<Dune::Stuff::LA::CommonDenseMatrix<std::complex<double>>,
+                    Dune::Stuff::LA::CommonDenseVector<std::complex<double>>>
 #if HAVE_EIGEN
           ,
           std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>,
           std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>,
                     Dune::Stuff::LA::EigenMappedDenseVector<double>>,
           std::pair<Dune::Stuff::LA::EigenDenseMatrix<double>, Dune::Stuff::LA::EigenDenseVector<double>>,
-          std::pair<Dune::Stuff::LA::EigenDenseMatrix<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>>
+          std::pair<Dune::Stuff::LA::EigenDenseMatrix<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>>,
+          std::pair<Dune::Stuff::LA::EigenRowMajorSparseMatrix<std::complex<double>>,
+                    Dune::Stuff::LA::EigenDenseVector<std::complex<double>>>
+          //                      , std::pair< Dune::Stuff::LA::EigenRowMajorSparseMatrix< std::complex< double > >
+          //                                 , Dune::Stuff::LA::EigenMappedDenseVector< std::complex< double > > >
+          ,
+          std::pair<Dune::Stuff::LA::EigenDenseMatrix<std::complex<double>>,
+                    Dune::Stuff::LA::EigenDenseVector<std::complex<double>>>
+//                      , std::pair< Dune::Stuff::LA::EigenDenseMatrix< std::complex< double > >
+//                                 , Dune::Stuff::LA::EigenMappedDenseVector< std::complex< double > > >
 #endif
 #if HAVE_DUNE_ISTL
           ,
-          std::pair<Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>, Dune::Stuff::LA::IstlDenseVector<double>>
+          std::pair<Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>, Dune::Stuff::LA::IstlDenseVector<double>>,
+          std::pair<Dune::Stuff::LA::IstlRowMajorSparseMatrix<std::complex<double>>,
+                    Dune::Stuff::LA::IstlDenseVector<std::complex<double>>>
 #endif
           > MatrixVectorCombinations;
 
-typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>, Dune::Stuff::LA::CommonDenseMatrix<double>
+typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>, Dune::Stuff::LA::CommonDenseMatrix<double>,
+                       Dune::Stuff::LA::CommonDenseVector<std::complex<double>>,
+                       Dune::Stuff::LA::CommonDenseMatrix<std::complex<double>>
 #if HAVE_EIGEN
                        ,
-                       Dune::Stuff::LA::EigenDenseVector<double>, Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>
+                       Dune::Stuff::LA::EigenDenseVector<double>, Dune::Stuff::LA::EigenMappedDenseVector<double>,
+                       Dune::Stuff::LA::EigenRowMajorSparseMatrix<double>,
+                       Dune::Stuff::LA::EigenDenseVector<std::complex<double>>
+                       //                      , Dune::Stuff::LA::EigenMappedDenseVector< std::complex< double > >
+                       ,
+                       Dune::Stuff::LA::EigenRowMajorSparseMatrix<std::complex<double>>
 #endif
 #if HAVE_DUNE_ISTL
                        ,
-                       Dune::Stuff::LA::IstlDenseVector<double>, Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>
+                       Dune::Stuff::LA::IstlDenseVector<double>, Dune::Stuff::LA::IstlRowMajorSparseMatrix<double>,
+                       Dune::Stuff::LA::IstlDenseVector<std::complex<double>>,
+                       Dune::Stuff::LA::IstlRowMajorSparseMatrix<std::complex<double>>
 #endif
                        > ContainerTypes;
 
@@ -75,18 +107,23 @@ struct ContainerTest : public ::testing::Test
     typedef typename Traits::derived_type T_derived_type;
     static_assert(std::is_same<ContainerImp, T_derived_type>::value, "derived_type has to be the correct Type!");
     typedef typename Traits::ScalarType T_ScalarType;
+    typedef typename Traits::RealType T_RealType;
     // * of the container as itself (aka the derived type)
     typedef typename ContainerImp::ScalarType D_ScalarType;
+    typedef typename ContainerImp::RealType D_RealType;
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the container as the interface
     typedef typename Stuff::LA::ContainerInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
+    typedef typename InterfaceType::RealType I_RealType;
     static_assert(std::is_same<ContainerImp, I_derived_type>::value, "derived_type has to be the correct Type!");
     static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
-
+    static_assert(std::is_same<T_RealType, I_RealType>::value,
+                  "ScalarType of derived_type has to be the correct Type!");
 
     // dynamic tests
     // * of the container as itself (aka the derived type)
@@ -125,17 +162,22 @@ struct VectorTest : public ::testing::Test
     typedef typename Traits::derived_type T_derived_type;
     static_assert(std::is_same<VectorImp, T_derived_type>::value, "derived_type has to be the correct Type!");
     typedef typename Traits::ScalarType T_ScalarType;
+    typedef typename Traits::RealType T_RealType;
     // * of the vector as itself (aka the derived type)
     typedef typename VectorImp::ScalarType D_ScalarType;
+    typedef typename VectorImp::RealType D_RealType;
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the vector as the interface
     typedef typename Stuff::LA::VectorInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
+    typedef typename InterfaceType::RealType I_RealType;
     static_assert(std::is_same<VectorImp, I_derived_type>::value, "derived_type has to be the correct Type!");
     static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_RealType, I_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // dynamic tests
     // * of the vector as itself (aka the derived type)
     VectorImp d_by_size(dim);
@@ -146,9 +188,9 @@ struct VectorTest : public ::testing::Test
       d_by_size_and_value.set_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
       d_by_size_and_value.add_to_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
       EXPECT_FALSE(
-          Dune::FloatCmp::ne(d_by_size_and_value.get_entry(ii), D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(1)))
+          DSC::FloatCmp::ne(d_by_size_and_value.get_entry(ii), D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(1)))
           << d_by_size_and_value.get_entry(ii);
-      EXPECT_FALSE(Dune::FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value[ii]))
+      EXPECT_FALSE(DSC::FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value[ii]))
           << d_by_size_and_value[ii];
     }
     size_t d_dim = d_by_size.dim();
@@ -157,17 +199,17 @@ struct VectorTest : public ::testing::Test
     d_by_size_and_value.scal(D_ScalarType(0));
     EXPECT_TRUE(d_by_size_and_value.almost_equal(d_by_size));
     D_ScalarType d_dot = d_by_size.dot(d_by_size_and_value);
-    EXPECT_DOUBLE_EQ(D_ScalarType(0), d_dot);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_dot);
     D_ScalarType d_l1_norm = d_by_size.l1_norm();
-    EXPECT_DOUBLE_EQ(D_ScalarType(0), d_l1_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_l1_norm);
     D_ScalarType d_l2_norm = d_by_size.l2_norm();
-    EXPECT_DOUBLE_EQ(D_ScalarType(0), d_l2_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_l2_norm);
     D_ScalarType d_sup_norm = d_by_size.sup_norm();
-    EXPECT_DOUBLE_EQ(D_ScalarType(0), d_sup_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_sup_norm);
     VectorImp d_ones(dim, D_ScalarType(1));
     std::pair<size_t, D_ScalarType> d_amax = d_ones.amax();
     EXPECT_EQ(0, d_amax.first);
-    EXPECT_DOUBLE_EQ(D_ScalarType(1), d_amax.second);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(1), d_amax.second);
     d_ones.add(d_by_size, d_by_size_and_value);
     EXPECT_TRUE(d_by_size_and_value.almost_equal(d_ones));
     VectorImp d_added = d_ones.add(d_by_size);
@@ -190,17 +232,17 @@ struct VectorTest : public ::testing::Test
     i_by_size_and_value.scal(I_ScalarType(0));
     EXPECT_TRUE(i_by_size_and_value.almost_equal(d_by_size_2));
     I_ScalarType i_dot = i_by_size.dot(d_by_size_and_value_2);
-    EXPECT_DOUBLE_EQ(I_ScalarType(0), i_dot);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(0), i_dot);
     I_ScalarType i_l1_norm = i_by_size.l1_norm();
-    EXPECT_DOUBLE_EQ(I_ScalarType(0), i_l1_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(0), i_l1_norm);
     I_ScalarType i_l2_norm = i_by_size.l2_norm();
-    EXPECT_DOUBLE_EQ(I_ScalarType(0), i_l2_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(0), i_l2_norm);
     I_ScalarType i_sup_norm = i_by_size.sup_norm();
-    EXPECT_DOUBLE_EQ(I_ScalarType(0), i_sup_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(0), i_sup_norm);
     VectorImp i_ones(dim, I_ScalarType(1));
     std::pair<size_t, I_ScalarType> i_amax = i_ones.amax();
     EXPECT_EQ(0, i_amax.first);
-    EXPECT_DOUBLE_EQ(I_ScalarType(1), i_amax.second);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(I_RealType(1), i_amax.second);
     i_ones.add(d_by_size_2, d_by_size_and_value_2);
     EXPECT_TRUE(i_by_size_and_value.almost_equal(i_ones));
     VectorImp i_added = i_ones.add(d_by_size_2);
@@ -218,6 +260,7 @@ struct VectorTest : public ::testing::Test
   void produces_correct_results() const
   {
     typedef typename VectorImp::ScalarType ScalarType;
+    typedef typename VectorImp::RealType RealType;
 
     // create test vectors
     VectorImp zeros(dim); // [0, 0, 0, 0]
@@ -252,121 +295,121 @@ struct VectorTest : public ::testing::Test
     testvector_5[3] = ScalarType(-3.5);
 
     // test amax()
-    std::pair<size_t, ScalarType> amax = zeros.amax();
+    std::pair<size_t, RealType> amax = zeros.amax();
     EXPECT_EQ(0, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(0), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(0), amax.second);
     amax = ones.amax();
     EXPECT_EQ(0, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(1), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(1), amax.second);
     amax = countingup.amax();
     EXPECT_EQ(3, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(3), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(3), amax.second);
     amax = testvector_1.amax();
     EXPECT_EQ(1, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(2), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(2), amax.second);
     amax = testvector_2.amax();
     EXPECT_EQ(1, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(2), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(2), amax.second);
     amax = testvector_3.amax();
     EXPECT_EQ(0, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(1), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(1), amax.second);
     amax = testvector_4.amax();
     EXPECT_EQ(1, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(3), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(3), amax.second);
     amax = testvector_5.amax();
     EXPECT_EQ(3, amax.first);
-    EXPECT_DOUBLE_EQ(ScalarType(3.5), amax.second);
+    EXPECT_DOUBLE_EQ(RealType(3.5), amax.second);
 
     // test l1_norm()
-    ScalarType l1_norm = zeros.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(0), l1_norm);
+    RealType l1_norm = zeros.l1_norm();
+    EXPECT_DOUBLE_EQ(RealType(0), l1_norm);
     l1_norm = ones.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(4), l1_norm);
+    EXPECT_DOUBLE_EQ(RealType(4), l1_norm);
     l1_norm = countingup.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(6), l1_norm);
+    EXPECT_DOUBLE_EQ(RealType(6), l1_norm);
     l1_norm = testvector_1.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(5), l1_norm);
+    EXPECT_DOUBLE_EQ(RealType(5), l1_norm);
     l1_norm = testvector_2.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(5), l1_norm);
+    EXPECT_DOUBLE_EQ(RealType(5), l1_norm);
     l1_norm = testvector_3.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(4), l1_norm);
+    EXPECT_DOUBLE_EQ(RealType(4), l1_norm);
     l1_norm = testvector_4.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(5), l1_norm);
+    EXPECT_DOUBLE_EQ(RealType(5), l1_norm);
     l1_norm = testvector_5.l1_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(7.25), l1_norm);
+    EXPECT_DOUBLE_EQ(RealType(7.25), l1_norm);
 
     // test l2_norm()
-    ScalarType l2_norm = zeros.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(0), l2_norm);
+    RealType l2_norm = zeros.l2_norm();
+    EXPECT_DOUBLE_EQ(RealType(0), l2_norm);
     l2_norm = ones.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(2), l2_norm);
+    EXPECT_DOUBLE_EQ(RealType(2), l2_norm);
     l2_norm = countingup.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(std::sqrt(14)), l2_norm);
+    EXPECT_DOUBLE_EQ(RealType(std::sqrt(14)), l2_norm);
     l2_norm = testvector_1.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(3), l2_norm);
+    EXPECT_DOUBLE_EQ(RealType(3), l2_norm);
     l2_norm = testvector_2.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(3), l2_norm);
+    EXPECT_DOUBLE_EQ(RealType(3), l2_norm);
     l2_norm = testvector_3.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(2), l2_norm);
+    EXPECT_DOUBLE_EQ(RealType(2), l2_norm);
     l2_norm = testvector_4.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(std::sqrt(13)), l2_norm);
+    EXPECT_DOUBLE_EQ(RealType(std::sqrt(13)), l2_norm);
     l2_norm = testvector_5.l2_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(std::sqrt(20.0625)), l2_norm);
+    EXPECT_DOUBLE_EQ(RealType(std::sqrt(20.0625)), l2_norm);
 
     // test sup_norm()
-    ScalarType sup_norm = zeros.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(0), sup_norm);
+    RealType sup_norm = zeros.sup_norm();
+    EXPECT_DOUBLE_EQ(RealType(0), sup_norm);
     sup_norm = ones.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(1), sup_norm);
+    EXPECT_DOUBLE_EQ(RealType(1), sup_norm);
     sup_norm = countingup.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(3), sup_norm);
+    EXPECT_DOUBLE_EQ(RealType(3), sup_norm);
     sup_norm = testvector_1.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(2), sup_norm);
+    EXPECT_DOUBLE_EQ(RealType(2), sup_norm);
     sup_norm = testvector_2.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(2), sup_norm);
+    EXPECT_DOUBLE_EQ(RealType(2), sup_norm);
     sup_norm = testvector_3.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(1), sup_norm);
+    EXPECT_DOUBLE_EQ(RealType(1), sup_norm);
     sup_norm = testvector_4.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(3), sup_norm);
+    EXPECT_DOUBLE_EQ(RealType(3), sup_norm);
     sup_norm = testvector_5.sup_norm();
-    EXPECT_DOUBLE_EQ(ScalarType(3.5), sup_norm);
+    EXPECT_DOUBLE_EQ(RealType(3.5), sup_norm);
 
     // test dot(), operator*
     ScalarType dot            = ones.dot(zeros);
     ScalarType dot_operator   = ones * zeros;
     ScalarType dot2           = zeros.dot(ones);
     ScalarType dot_operator_2 = zeros * ones;
-    EXPECT_TRUE(Dune::FloatCmp::eq(dot, ScalarType(0)) && Dune::FloatCmp::eq(dot, dot2)
-                && Dune::FloatCmp::eq(dot_operator, dot_operator_2)
-                && Dune::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
+                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
+                && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
     dot          = ones.dot(ones);
     dot_operator = ones * ones;
-    EXPECT_TRUE(Dune::FloatCmp::eq(dot, ScalarType(4)) && Dune::FloatCmp::eq(dot_operator, ScalarType(4)))
+    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(4)) && DSC::FloatCmp::eq(dot_operator, ScalarType(4)))
         << "These should equal 4: " << dot << ", " << dot_operator;
     dot            = ones.dot(testvector_3);
     dot_operator   = ones * testvector_3;
     dot2           = testvector_3.dot(ones);
     dot_operator_2 = testvector_3 * ones;
-    EXPECT_TRUE(Dune::FloatCmp::eq(dot, ScalarType(0)) && Dune::FloatCmp::eq(dot, dot2)
-                && Dune::FloatCmp::eq(dot_operator, dot_operator_2)
-                && Dune::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
+                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
+                && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
     dot            = countingup.dot(testvector_5);
     dot_operator   = countingup * testvector_5;
     dot2           = testvector_5.dot(countingup);
     dot_operator_2 = testvector_5 * countingup;
-    EXPECT_TRUE(Dune::FloatCmp::eq(dot, ScalarType(-5.5)) && Dune::FloatCmp::eq(dot, dot2)
-                && Dune::FloatCmp::eq(dot_operator, dot_operator_2)
-                && Dune::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(-5.5)) && DSC::FloatCmp::eq(dot, dot2)
+                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
+                && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal -5.5: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
     dot            = testvector_3.dot(testvector_5);
     dot_operator   = testvector_3 * testvector_5;
     dot2           = testvector_5.dot(testvector_3);
     dot_operator_2 = testvector_5 * testvector_3;
-    EXPECT_TRUE(Dune::FloatCmp::eq(dot, ScalarType(-7.25)) && Dune::FloatCmp::eq(dot, dot2)
-                && Dune::FloatCmp::eq(dot_operator, dot_operator_2)
-                && Dune::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(-7.25)) && DSC::FloatCmp::eq(dot, dot2)
+                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
+                && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal -7.25: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
 
     // test operator==
@@ -410,37 +453,37 @@ struct VectorTest : public ::testing::Test
     scaled_by_operator = testvector_1;
     scaled_by_operator *= ScalarType(2);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(2) * testvector_1[ii], scaled[ii]);
-      EXPECT_DOUBLE_EQ(ScalarType(2) * testvector_1[ii], scaled_by_operator[ii]);
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2) * testvector_1[ii], scaled[ii]));
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2) * testvector_1[ii], scaled_by_operator[ii]));
     }
     scaled = testvector_3;
     scaled.scal(ScalarType(-2));
     scaled_by_operator = testvector_3;
     scaled_by_operator *= ScalarType(-2);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(-2) * testvector_3[ii], scaled[ii]);
-      EXPECT_DOUBLE_EQ(ScalarType(-2) * testvector_3[ii], scaled_by_operator[ii]);
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-2) * testvector_3[ii], scaled[ii]));
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-2) * testvector_3[ii], scaled_by_operator[ii]));
     }
     scaled = countingup;
     scaled.scal(ScalarType(2.2));
     scaled_by_operator = countingup;
     scaled_by_operator *= ScalarType(2.2);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(2.2) * countingup[ii], scaled[ii]);
-      EXPECT_DOUBLE_EQ(ScalarType(2.2) * countingup[ii], scaled_by_operator[ii]);
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2.2) * countingup[ii], scaled[ii]));
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2.2) * countingup[ii], scaled_by_operator[ii]));
     }
     scaled = testvector_5;
     scaled.scal(ScalarType(-3.75));
     scaled_by_operator = testvector_5;
     scaled_by_operator *= ScalarType(-3.75);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(-3.75) * testvector_5[ii], scaled[ii]);
-      EXPECT_DOUBLE_EQ(ScalarType(-3.75) * testvector_5[ii], scaled_by_operator[ii]);
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-3.75) * testvector_5[ii], scaled[ii]));
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-3.75) * testvector_5[ii], scaled_by_operator[ii]));
     }
     VectorImp a = ones;
     a.scal(ScalarType(0));
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
 
     // test operator+, operator+=, add, iadd
@@ -500,17 +543,17 @@ struct VectorTest : public ::testing::Test
     a = ones;
     a += testvector_3;
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     a.iadd(testvector_3);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     ones.add(testvector_3, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
 
     // test operator-, operator-=, sub, isub
@@ -570,17 +613,17 @@ struct VectorTest : public ::testing::Test
     a = ones;
     a -= testvector_3;
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     a.isub(testvector_3);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     ones.sub(testvector_3, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
 
     // test operator= for scalars
@@ -617,7 +660,7 @@ struct VectorTest : public ::testing::Test
     a = ones;
     a.axpy(ScalarType(2), testvector_3);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
   } // void produces_correct_results() const
 }; // struct VectorTest
@@ -649,17 +692,22 @@ struct MatrixTest : public ::testing::Test
     typedef typename Traits::derived_type T_derived_type;
     static_assert(std::is_same<MatrixImp, T_derived_type>::value, "derived_type has to be the correct Type!");
     typedef typename Traits::ScalarType T_ScalarType;
+    typedef typename Traits::RealType T_RealType;
     // * of the matrix as itself (aka the derived type)
     typedef typename MatrixImp::ScalarType D_ScalarType;
+    typedef typename MatrixImp::RealType D_RealType;
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the matrix as the interface
     typedef typename Stuff::LA::MatrixInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
+    typedef typename InterfaceType::RealType I_RealType;
     static_assert(std::is_same<MatrixImp, I_derived_type>::value, "derived_type has to be the correct Type!");
     static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
+    static_assert(std::is_same<T_RealType, I_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // dynamic tests
     // * of the matrix as itself (aka the derived type)
     MatrixImp d_by_size(dim, dim);
@@ -684,42 +732,41 @@ struct MatrixTest : public ::testing::Test
     EXPECT_EQ(zeros, result);
     for (size_t ii = 0; ii < d_rows; ++ii) {
       d_by_size_and_pattern.unit_row(ii);
-      EXPECT_DOUBLE_EQ(D_ScalarType(1), d_by_size_and_pattern.get_entry(ii, ii));
+      EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(1), d_by_size_and_pattern.get_entry(ii, ii));
       for (size_t jj = 0; jj < ii; ++jj) {
-        EXPECT_DOUBLE_EQ(D_ScalarType(0), d_by_size_and_pattern.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_by_size_and_pattern.get_entry(ii, jj));
       }
       for (size_t jj = ii + 1; jj < d_cols; ++jj) {
-        EXPECT_DOUBLE_EQ(D_ScalarType(0), d_by_size_and_pattern.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_by_size_and_pattern.get_entry(ii, jj));
       }
     }
     for (size_t ii = 0; ii < d_rows; ++ii) {
       d_by_size_and_pattern.clear_row(ii);
       for (size_t jj = 0; jj < d_cols; ++jj) {
-        EXPECT_DOUBLE_EQ(D_ScalarType(0), d_by_size_and_pattern.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_by_size_and_pattern.get_entry(ii, jj));
       }
     }
     for (size_t jj = 0; jj < d_cols; ++jj) {
       d_by_size_and_pattern.unit_col(jj);
-      EXPECT_DOUBLE_EQ(D_ScalarType(1), d_by_size_and_pattern.get_entry(jj, jj));
+      EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(1), d_by_size_and_pattern.get_entry(jj, jj));
       for (size_t ii = 0; ii < jj; ++ii) {
-        EXPECT_DOUBLE_EQ(D_ScalarType(0), d_by_size_and_pattern.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_by_size_and_pattern.get_entry(ii, jj));
       }
       for (size_t ii = jj + 1; ii < d_rows; ++ii) {
-        EXPECT_DOUBLE_EQ(D_ScalarType(0), d_by_size_and_pattern.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_by_size_and_pattern.get_entry(ii, jj));
       }
     }
     for (size_t jj = 0; jj < d_cols; ++jj) {
       d_by_size_and_pattern.clear_col(jj);
       for (size_t ii = 0; ii < d_rows; ++ii) {
-        EXPECT_DOUBLE_EQ(D_ScalarType(0), d_by_size_and_pattern.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_by_size_and_pattern.get_entry(ii, jj));
       }
     }
     for (size_t ii = 0; ii < d_rows; ++ii) {
       for (size_t jj = 0; jj < d_cols; ++jj) {
-        d_by_size_and_pattern.set_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
-        d_by_size_and_pattern.add_to_entry(ii, jj, D_ScalarType(0.5) + D_ScalarType(ii) + D_ScalarType(jj));
-        EXPECT_DOUBLE_EQ(D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(2) * D_ScalarType(jj) + D_ScalarType(1),
-                         d_by_size_and_pattern.get_entry(ii, jj));
+        d_by_size_and_pattern.set_entry(ii, jj, D_ScalarType(0.5 + ii + jj));
+        d_by_size_and_pattern.add_to_entry(ii, jj, D_ScalarType(0.5 + ii + jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(2 * ii + 2 * jj + 1), d_by_size_and_pattern.get_entry(ii, jj));
       }
     }
   } // void fulfills_interface() const
@@ -727,6 +774,7 @@ struct MatrixTest : public ::testing::Test
   void produces_correct_results() const
   {
     typedef typename MatrixImp::ScalarType ScalarType;
+    typedef typename MatrixImp::RealType RealType;
 
     // create test patterns
     PatternType dense_pattern(dim);
@@ -803,28 +851,28 @@ struct MatrixTest : public ::testing::Test
     EXPECT_EQ(vector_zeros, result_mv_1);
     EXPECT_EQ(vector_zeros, result_mv_2);
     testmatrix_sparse.mv(testvector_5, result_mv_1);
-    EXPECT_DOUBLE_EQ(ScalarType(1.25), result_mv_1[0]);
-    EXPECT_DOUBLE_EQ(ScalarType(1.25), result_mv_1[1]);
-    EXPECT_DOUBLE_EQ(ScalarType(1.75), result_mv_1[2]);
-    EXPECT_DOUBLE_EQ(ScalarType(0), result_mv_1[3]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.25), result_mv_1[0]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.25), result_mv_1[1]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.75), result_mv_1[2]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), result_mv_1[3]);
     testmatrix_2.mv(testvector_3, result_mv_1);
     result_mv_2 = vector_ones;
     result_mv_2.scal(ScalarType(3));
     EXPECT_EQ(result_mv_1, result_mv_2);
     testmatrix_1.mv(testvector_1, result_mv_1);
-    EXPECT_DOUBLE_EQ(ScalarType(5), result_mv_1[0]);
-    EXPECT_DOUBLE_EQ(ScalarType(6), result_mv_1[1]);
-    EXPECT_DOUBLE_EQ(ScalarType(7), result_mv_1[2]);
-    EXPECT_DOUBLE_EQ(ScalarType(8), result_mv_1[3]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(5), result_mv_1[0]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(6), result_mv_1[1]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(7), result_mv_1[2]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(8), result_mv_1[3]);
     testmatrix_sparse.mv(vector_ones, result_mv_1);
-    EXPECT_DOUBLE_EQ(ScalarType(0.5), result_mv_1[0]);
-    EXPECT_DOUBLE_EQ(ScalarType(2.5), result_mv_1[1]);
-    EXPECT_DOUBLE_EQ(ScalarType(-0.5), result_mv_1[2]);
-    EXPECT_DOUBLE_EQ(ScalarType(0), result_mv_1[3]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), result_mv_1[0]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2.5), result_mv_1[1]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(-0.5), result_mv_1[2]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), result_mv_1[3]);
     VectorImp a = vector_ones;
     matrix_zeros_dense.mv(vector_zeros, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_DOUBLE_EQ(ScalarType(1), vector_ones[ii]) << "check copy-on-write";
+      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), vector_ones[ii])) << "check copy-on-write";
     }
 
     // test scal, operator*
@@ -836,8 +884,8 @@ struct MatrixTest : public ::testing::Test
     scaled_by_operator *= ScalarType(1);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(0), scaled.get_entry(ii, jj));
-        EXPECT_DOUBLE_EQ(ScalarType(0), scaled_by_operator.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), scaled.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), scaled_by_operator.get_entry(ii, jj));
       }
     }
     scaled             = matrix_zeros_sparse;
@@ -846,8 +894,8 @@ struct MatrixTest : public ::testing::Test
     scaled_by_operator *= ScalarType(1);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(0), scaled.get_entry(ii, jj));
-        EXPECT_DOUBLE_EQ(ScalarType(0), scaled_by_operator.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), scaled.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), scaled_by_operator.get_entry(ii, jj));
       }
     }
     scaled             = matrix_ones;
@@ -856,8 +904,8 @@ struct MatrixTest : public ::testing::Test
     scaled_by_operator *= ScalarType(0.5);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(0.5), scaled.get_entry(ii, jj));
-        EXPECT_DOUBLE_EQ(ScalarType(0.5), scaled_by_operator.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), scaled.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), scaled_by_operator.get_entry(ii, jj));
       }
     }
     scaled             = testmatrix_sparse;
@@ -866,8 +914,10 @@ struct MatrixTest : public ::testing::Test
     scaled_by_operator *= ScalarType(-1.25);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25), scaled.get_entry(ii, jj));
-        EXPECT_DOUBLE_EQ(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25), scaled_by_operator.get_entry(ii, jj));
+        EXPECT_TRUE(
+            DSC::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25), scaled.get_entry(ii, jj)));
+        EXPECT_TRUE(DSC::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25),
+                                      scaled_by_operator.get_entry(ii, jj)));
       }
     }
     scaled             = testmatrix_1;
@@ -876,15 +926,16 @@ struct MatrixTest : public ::testing::Test
     scaled_by_operator *= ScalarType(10);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled.get_entry(ii, jj));
-        EXPECT_DOUBLE_EQ(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled_by_operator.get_entry(ii, jj));
+        EXPECT_TRUE(DSC::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled.get_entry(ii, jj)));
+        EXPECT_TRUE(
+            DSC::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled_by_operator.get_entry(ii, jj)));
       }
     }
     MatrixImp b = matrix_ones;
     b.scal(ScalarType(0));
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(1), matrix_ones.get_entry(ii, jj)) << "check copy-on-write";
+        EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), matrix_ones.get_entry(ii, jj))) << "check copy-on-write";
       }
     }
 
@@ -893,36 +944,37 @@ struct MatrixTest : public ::testing::Test
     result_axpy.axpy(ScalarType(1.5), matrix_ones);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(1.5), result_axpy.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.5), result_axpy.get_entry(ii, jj));
       }
     }
     result_axpy = matrix_zeros_sparse;
     result_axpy.axpy(ScalarType(-1.5), matrix_zeros_sparse);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(0), result_axpy.get_entry(ii, jj));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), result_axpy.get_entry(ii, jj));
       }
     }
     result_axpy = testmatrix_sparse;
     result_axpy.axpy(ScalarType(-0.5), testmatrix_sparse);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(0.5) * testmatrix_sparse.get_entry(ii, jj), result_axpy.get_entry(ii, jj));
+        EXPECT_TRUE(
+            DSC::FloatCmp::eq(ScalarType(0.5) * testmatrix_sparse.get_entry(ii, jj), result_axpy.get_entry(ii, jj)));
       }
     }
     result_axpy = testmatrix_1;
     result_axpy.axpy(ScalarType(2), testmatrix_2);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj),
-                         result_axpy.get_entry(ii, jj));
+        EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj),
+                                      result_axpy.get_entry(ii, jj)));
       }
     }
     b = matrix_zeros_dense;
     b.axpy(ScalarType(1), matrix_ones);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_DOUBLE_EQ(ScalarType(0), matrix_zeros_dense.get_entry(ii, jj)) << "check copy-on-write";
+        EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(0), matrix_zeros_dense.get_entry(ii, jj))) << "check copy-on-write";
       }
     }
   } // void produces_correct_results() const
