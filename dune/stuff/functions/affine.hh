@@ -19,6 +19,9 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
+/**
+ * \brief Simple affine function of the form f(x) = A*x + b
+ */
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
 class Affine
