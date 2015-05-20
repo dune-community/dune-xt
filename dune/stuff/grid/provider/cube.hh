@@ -272,7 +272,11 @@ private:
         grd_ptr = DSG::StructuredGridFactory<GridType>::createSimplexGrid(lower_left, upper_right, num_elements);
         break;
     }
+    grd_ptr->loadBalance();
+    grd_ptr->preAdapt();
     grd_ptr->globalRefine(boost::numeric_cast<int>(num_refinements));
+    grd_ptr->postAdapt();
+    grd_ptr->loadBalance();
     return grd_ptr;
   } // ... create_grid(...)
 
