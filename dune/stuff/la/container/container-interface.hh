@@ -145,6 +145,7 @@ class ContainerInterface : public Tags::ContainerInterface,
 
 public:
   typedef ScalarImp ScalarType;
+  typedef typename Traits::RealType RealType;
 
   using typename CRTP::derived_type;
 
