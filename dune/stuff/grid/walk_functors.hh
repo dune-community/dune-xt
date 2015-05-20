@@ -84,7 +84,7 @@ struct MinMaxCoordinateFunctor : public Functor::Codim0<GridViewType>
   {
     const auto& geo = ent.geometry();
     for (auto i : DSC::valueRange(geo.corners())) {
-      for (auto k : valueRange(EntityGeometryType::coorddimension)) {
+      for (auto k : DSC::valueRange(EntityGeometryType::coorddimension)) {
         minima_[k] = std::min(minima_[k], geo.corner(i)[k]);
         maxima_[k] = std::max(maxima_[k], geo.corner(i)[k]);
       }
