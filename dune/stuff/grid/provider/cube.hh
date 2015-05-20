@@ -105,15 +105,15 @@ struct ElementVariant<Dune::ALUCubeGrid<dimGrid, dimWorld>>
 };
 
 
-template <int dimGrid, int dimWorld>
-struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming>>
+template <int dimGrid, int dimWorld, class MpiCommImp>
+struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming, MpiCommImp>>
 {
   static const int id = 1;
 };
 
 
-template <int dimGrid, int dimWorld>
-struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconforming>>
+template <int dimGrid, int dimWorld, class MpiCommImp>
+struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconforming, MpiCommImp>>
 {
   static const int id = 1;
 };
@@ -265,11 +265,11 @@ private:
     std::shared_ptr<GridType> grd_ptr(nullptr);
     switch (variant) {
       case 1:
-        grd_ptr = Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left, upper_right, num_elements);
+        grd_ptr = DSG::StructuredGridFactory<GridType>::createCubeGrid(lower_left, upper_right, num_elements);
         break;
       case 2:
       default:
-        grd_ptr = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lower_left, upper_right, num_elements);
+        grd_ptr = DSG::StructuredGridFactory<GridType>::createSimplexGrid(lower_left, upper_right, num_elements);
         break;
     }
     grd_ptr->globalRefine(boost::numeric_cast<int>(num_refinements));
