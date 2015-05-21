@@ -24,16 +24,6 @@
 namespace Dune {
 namespace Stuff {
 namespace Functions {
-namespace internal {
-
-
-template <size_t rangeDimCols>
-struct ChooseVariant
-{
-};
-
-
-} // namespace internal
 
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
