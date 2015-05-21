@@ -129,7 +129,7 @@ class LocalfunctionSetInterface
   template <size_t dimDomain, class RangeFieldType, size_t dimRange, size_t dimRangeCols>
   struct JacobianRangeTypeSelector
   {
-    typedef double type;
+    typedef Dune::FieldVector<Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain>, dimRangeCols> type;
   };
 
   template <size_t dimDomain, class RangeFieldType, size_t dimRange>
