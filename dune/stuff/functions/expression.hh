@@ -124,11 +124,12 @@ public:
     const std::vector<std::string> expression_row(dimRangeCols, expression);
     const ExpressionStringVectorType expressions(dimRange, expression_row);
     // create associated gradient vector
-    GradientStringVectorType gradient_expressions(dimRangeCols);
-    assert(gradient.size() >= dimDomain);
-    const ExpressionStringVectorType gradient_row(dimRange, gradient);
-    for (size_t cc = 0; cc < dimRangeCols; ++cc) {
-      gradient_expressions[cc] = gradient_row;
+    GradientStringVectorType gradient_expressions;
+    if (gradient.size() > 0) {
+      const std::vector<std::vector<std::string>> gradient_row(dimRange, gradient);
+      for (size_t cc = 0; cc < dimRangeCols; ++cc) {
+        gradient_expressions.emplace_back(gradient_row);
+      }
     }
     // build function and gradient
     build_function(variable, expressions);
@@ -286,7 +287,7 @@ private:
         assert(gradient_expressions[cc].size() >= dimRange);
         for (size_t rr = 0; rr < dimRange; ++rr) {
           const auto& gradient_expression = gradient_expressions[cc][rr];
-          assert(gradient_expressions[cc][rr].size() >= dimDomain);
+          assert(gradient_expression.size() >= dimDomain);
           gradients_[cc].emplace_back(new MathExpressionGradientType(variable, gradient_expression));
         }
       }
