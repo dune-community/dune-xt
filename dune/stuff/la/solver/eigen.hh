@@ -328,50 +328,50 @@ public:
     const Common::Configuration default_opts = options(type);
     // check for inf or nan
     const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
-    // check for inf or nan not possible with this implementation
-    if (check_for_inf_nan)
-      DUNE_THROW(NotImplemented, "check_for inf_nan not implemeted for non-double data");
-    /*if (check_for_inf_nan) {
-      // serialize matrix (no copy done here)
-      MatrixType& non_const_ref = const_cast< MatrixType& >(matrix_);
-      const EigenMappedDenseVector< S > values(non_const_ref.backend().valuePtr(), non_const_ref.backend().nonZeros());
-      for (size_t ii = 0; ii < values.size(); ++ii) {
-        const S& val = values[ii];
-        if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val)))
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
-                     "Given matrix contains inf or nan and you requested checking (see options below)!\n"
-                     << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                     << "Those were the given options:\n\n"
-                     << opts);
+    if (check_for_inf_nan) {
+      // iterates over the non-zero entries of matrix_.backend() and checks them
+      typedef typename MatrixType::BackendType::InnerIterator InnerIterator;
+      for (int ii = 0; ii < matrix_.backend().outerSize(); ++ii) {
+        for (InnerIterator it(matrix_.backend(), ii); it; ++it) {
+          if (std::isnan(std::real(it.value())) || std::isnan(std::imag(it.value()))
+              || std::isinf(std::abs(it.value())))
+            DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
+                       "Given matrix contains inf or nan and you requested checking (see options below)!\n"
+                           << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                           << "Those were the given options:\n\n"
+                           << opts);
+        }
       }
       for (size_t ii = 0; ii < rhs.size(); ++ii) {
         const S& val = rhs[ii];
         if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val)))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "Given rhs contains inf or nan and you requested checking (see options below)!\n"
-                     << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                     << "Those were the given options:\n\n"
-                     << opts);
+                         << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       }
-    }*/
-    // check for symmetry (if solver needs it) not possible atm
+    }
+    // check for symmetry (if solver needs it)
     if (type.substr(0, 3) == "cg." || type == "ldlt.simplicial" || type == "llt.simplicial") {
       const R pre_check_symmetry_threshhold = opts.get("pre_check_symmetry", default_opts.get<R>("pre_check_symmetry"));
-      if (pre_check_symmetry_threshhold > 0)
-        DUNE_THROW(NotImplemented, "Matrices with non-double data cannot be checked fo symmetry at the moment!");
-      /*if (pre_check_symmetry_threshhold > 0) {
+      if (pre_check_symmetry_threshhold > 0) {
         ColMajorBackendType colmajor_copy(matrix_.backend());
         colmajor_copy -= matrix_.backend().adjoint();
-        // serialize difference to compute L^\infty error (no copy done here)
-        EigenMappedDenseVector< S > differences(colmajor_copy.valuePtr(), colmajor_copy.nonZeros());
-        if (differences.sup_norm() > pre_check_symmetry_threshhold)
-          DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
-                     "Given matrix is not symmetric and you requested checking (see options below)!\n"
-                     << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
-                     << "  (A - A').sup_norm() = " << differences.sup_norm() << "\n\n"
-                     << "Those were the given options:\n\n"
-                     << opts);
-      } */
+        // iterates over non-zero entries as above
+        typedef typename ColMajorBackendType::InnerIterator InnerIterator;
+        for (int ii = 0; ii < colmajor_copy.outerSize(); ++ii) {
+          for (InnerIterator it(colmajor_copy, ii); it; ++it) {
+            if (std::max(std::abs(std::real(it.value())), std::abs(std::imag(it.value())))
+                > pre_check_symmetry_threshhold)
+              DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
+                         "Given matrix is not symmetric and you requested checking (see options below)!\n"
+                             << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
+                             << "Those were the given options:\n\n"
+                             << opts);
+          }
+        }
+      }
     }
     ::Eigen::ComputationInfo info;
     if (type == "cg.diagonal.lower") {
@@ -539,17 +539,17 @@ public:
                        << "Please report this to the dune-stuff developers!");
     }
     // check
-    /*if (check_for_inf_nan)
+    if (check_for_inf_nan)
       for (size_t ii = 0; ii < solution.size(); ++ii) {
         const S& val = solution[ii];
         if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val)))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "The computed solution contains inf or nan and you requested checking (see options "
-                     << "below)!\n"
-                     << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                     << "Those were the given options:\n\n"
-                     << opts);
-      }*/
+                         << "below)!\n"
+                         << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
+      }
     const R post_check_solves_system_threshold =
         opts.get("post_check_solves_system", default_opts.get<R>("post_check_solves_system"));
     if (post_check_solves_system_threshold > 0) {
