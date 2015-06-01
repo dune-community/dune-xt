@@ -233,7 +233,10 @@ public:
   typedef EigenRowMajorSparseMatrix<S> MatrixType;
   typedef typename MatrixType::RealType R;
 
+private:
+  typedef typename MatrixType::BackendType::Index EIGEN_size_t;
 
+public:
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
   {
@@ -331,7 +334,7 @@ public:
     if (check_for_inf_nan) {
       // iterates over the non-zero entries of matrix_.backend() and checks them
       typedef typename MatrixType::BackendType::InnerIterator InnerIterator;
-      for (int ii = 0; ii < matrix_.backend().outerSize(); ++ii) {
+      for (EIGEN_size_t ii = 0; ii < matrix_.backend().outerSize(); ++ii) {
         for (InnerIterator it(matrix_.backend(), ii); it; ++it) {
           if (std::isnan(std::real(it.value())) || std::isnan(std::imag(it.value()))
               || std::isinf(std::abs(it.value())))
@@ -360,7 +363,7 @@ public:
         colmajor_copy -= matrix_.backend().adjoint();
         // iterates over non-zero entries as above
         typedef typename ColMajorBackendType::InnerIterator InnerIterator;
-        for (int ii = 0; ii < colmajor_copy.outerSize(); ++ii) {
+        for (EIGEN_size_t ii = 0; ii < colmajor_copy.outerSize(); ++ii) {
           for (InnerIterator it(colmajor_copy, ii); it; ++it) {
             if (std::max(std::abs(std::real(it.value())), std::abs(std::imag(it.value())))
                 > pre_check_symmetry_threshhold)
