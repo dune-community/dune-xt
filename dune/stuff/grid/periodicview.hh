@@ -323,7 +323,7 @@ public:
 
     EntityInlevelSearch<BaseType> entity_search(*this);
     DomainType periodic_neighbor_coords;
-    std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
+    IntersectionMapType intersection_neighbor_map;
     for (const auto& entity : DSC::entityRange(*this)) {
       if (entity.hasBoundaryIntersections()) {
         intersection_neighbor_map.clear();
@@ -452,7 +452,7 @@ public:
   }
 
   PeriodicGridView(const PeriodicGridView& other)
-    : ConstStorProv(other.access())
+    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType>(other.access()))
     , BaseType(ConstStorProv::access())
   {
   }
