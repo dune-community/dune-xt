@@ -84,7 +84,7 @@ public:
       get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
     } catch (Exceptions::conversion_error) {
       // if dimRangeCols == 1 and we could not get expression as FieldVector, get it as FieldMatrix with one col
-      if (dimRangeCols == 1) {
+      if (dimRangeCols == 1) { // the 2 in ChooseVariant is here on purpose, anything > 1 will suffice
         get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<2>());
       } else { // if dimRangeCols > 1 do the same again (to throw exception without catching it)
         get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
