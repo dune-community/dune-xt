@@ -347,9 +347,15 @@ public:
 
   bool valid() const
   {
-    // serialize matrix (no copy done here)
-    auto& non_const_ref = const_cast<BackendType&>(*backend_);
-    return EigenMappedDenseVector<ScalarType>(non_const_ref.valuePtr(), non_const_ref.nonZeros()).valid();
+    // iterate over non-zero entries
+    typedef typename BackendType::InnerIterator InnerIterator;
+    for (EIGEN_size_t ii = 0; ii < backend_->outerSize(); ++ii) {
+      for (InnerIterator it(*backend_, ii); it; ++it) {
+        if (std::isnan(std::real(it.value())) || std::isnan(std::imag(it.value())) || std::isinf(std::abs(it.value())))
+          return false;
+      }
+    }
+    return true;
   }
 
   /// \}
