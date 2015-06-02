@@ -120,12 +120,12 @@ public:
     return name_;
   }
 
-  virtual size_t order() const
+  virtual size_t order() const override
   {
     return 3 * dimDomain;
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const override
   {
     ret = value_;
     for (size_t dd = 0; dd < dimDomain; ++dd) {

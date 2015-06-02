@@ -70,10 +70,22 @@ class Checkerboard
     virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
-      ret *= RangeFieldType(0);
+      jacobian_helper(ret, internal::ChooseVariant<rangeDimCols>());
     }
 
   private:
+    template <size_t rC>
+    void jacobian_helper(JacobianRangeType& ret, internal::ChooseVariant<rC>) const
+    {
+      for (auto& col_jacobian : ret) {
+        col_jacobian *= RangeFieldType(0);
+      }
+    }
+
+    void jacobian_helper(JacobianRangeType& ret, internal::ChooseVariant<1>) const
+    {
+      ret *= RangeFieldType(0);
+    }
     const RangeType value_;
   }; // class Localfunction
 
