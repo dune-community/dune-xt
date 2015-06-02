@@ -23,6 +23,8 @@
 #include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/solver/istl_amg.hh>
 
+#include <dune/common/version.hh>
+
 #include "../solver.hh"
 
 namespace Dune {
@@ -37,6 +39,11 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUt
 {
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
+  typedef typename MatrixType::RealType R;
+
+#if !DUNE_VERSION_NEWER(DUNE_ISTL, 2, 4)
+  static_assert(!std::is_same<S, std::complex<R>>::value, "the dune-istl solver does not work with complex yet!");
+#endif
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
@@ -145,11 +152,11 @@ public:
         PreconditionerType preconditioner(
             matrix_.backend(),
             opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
-            opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
+            opts.get("preconditioner.relaxation_factor", default_opts.get<R>("preconditioner.relaxation_factor")));
         typedef BiCGSTABSolver<typename IstlDenseVector<S>::BackendType> SolverType;
         SolverType solver(matrix_operator,
                           preconditioner,
-                          opts.get("precision", default_opts.get<S>("precision")),
+                          opts.get("precision", default_opts.get<R>("precision")),
                           opts.get("max_iter", default_opts.get<int>("max_iter")),
                           opts.get("verbose", default_opts.get<int>("verbose")));
         InverseOperatorResult stat;
@@ -185,12 +192,12 @@ public:
         DUNE_THROW(Exceptions::internal_error,
                    "Given type '" << type << "' is not supported, although it was reported by types()!");
       // check (use writable_rhs as tmp)
-      const S post_check_solves_system_threshold =
-          opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
+      const R post_check_solves_system_threshold =
+          opts.get("post_check_solves_system", default_opts.get<R>("post_check_solves_system"));
       if (post_check_solves_system_threshold > 0) {
         matrix_.mv(solution, writable_rhs);
         writable_rhs -= rhs;
-        const S sup_norm = writable_rhs.sup_norm();
+        const R sup_norm = writable_rhs.sup_norm();
         if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
                      "The computed solution does not solve the system (although the dune-istl backend "

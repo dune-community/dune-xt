@@ -29,6 +29,7 @@ class Solver<CommonDenseMatrix<S>, CommunicatorType> : protected SolverUtils
 {
 public:
   typedef CommonDenseMatrix<S> MatrixType;
+  typedef typename MatrixType::RealType R;
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
@@ -80,13 +81,13 @@ public:
                      << opts);
     }
     // check
-    const S post_check_solves_system_threshold =
-        opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
+    const R post_check_solves_system_threshold =
+        opts.get("post_check_solves_system", default_opts.get<R>("post_check_solves_system"));
     if (post_check_solves_system_threshold > 0) {
       auto tmp = rhs.copy();
       matrix_.mv(solution, tmp);
       tmp -= rhs;
-      const S sup_norm = tmp.sup_norm();
+      const R sup_norm = tmp.sup_norm();
       if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
         DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
                    "The computed solution does not solve the system (although the dune-common backend "

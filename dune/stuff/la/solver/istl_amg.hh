@@ -33,6 +33,7 @@ template <class S, class CommunicatorType>
 class AmgApplicator
 {
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
+  typedef typename MatrixType::RealType R;
   typedef typename MatrixType::BackendType IstlMatrixType;
   typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
 
@@ -61,14 +62,14 @@ public:
     typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
     smoother_parameters.iterations = opts.get("smoother.iterations", default_opts.get<size_t>("smoother.iterations"));
     smoother_parameters.relaxationFactor =
-        opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
+        opts.get("smoother.relaxation_factor", default_opts.get<R>("smoother.relaxation_factor"));
 
     // define the AMG as the preconditioner for the BiCGStab solver
     Amg::Parameters amg_parameters(
         opts.get("preconditioner.max_level", default_opts.get<size_t>("preconditioner.max_level")),
         opts.get("preconditioner.coarse_target", default_opts.get<size_t>("preconditioner.coarse_target")),
-        opts.get("preconditioner.min_coarse_rate", default_opts.get<S>("preconditioner.min_coarse_rate")),
-        opts.get("preconditioner.prolong_damp", default_opts.get<S>("preconditioner.prolong_damp")));
+        opts.get("preconditioner.min_coarse_rate", default_opts.get<R>("preconditioner.min_coarse_rate")),
+        opts.get("preconditioner.prolong_damp", default_opts.get<R>("preconditioner.prolong_damp")));
     amg_parameters.setDefaultValuesIsotropic(
         opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
     amg_parameters.setDefaultValuesAnisotropic(
@@ -83,7 +84,7 @@ public:
         matrix_operator,
         scalar_product,
         preconditioner,
-        opts.get("precision", default_opts.get<S>("precision")),
+        opts.get("precision", default_opts.get<R>("precision")),
         opts.get("max_iter", default_opts.get<size_t>("max_iter")),
 #if HAVE_MPI
         (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
@@ -107,6 +108,7 @@ template <class S>
 class AmgApplicator<S, SequentialCommunication>
 {
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
+  typedef typename MatrixType::RealType R;
   typedef typename MatrixType::BackendType IstlMatrixType;
   typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
 
@@ -133,14 +135,14 @@ public:
     typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
     smoother_parameters.iterations = opts.get("smoother.iterations", default_opts.get<int>("smoother.iterations"));
     smoother_parameters.relaxationFactor =
-        opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
+        opts.get("smoother.relaxation_factor", default_opts.get<R>("smoother.relaxation_factor"));
 
     // define the AMG as the preconditioner for the BiCGStab solver
     Amg::Parameters amg_parameters(
         opts.get("preconditioner.max_level", default_opts.get<int>("preconditioner.max_level")),
         opts.get("preconditioner.coarse_target", default_opts.get<int>("preconditioner.coarse_target")),
-        opts.get("preconditioner.min_coarse_rate", default_opts.get<S>("preconditioner.min_coarse_rate")),
-        opts.get("preconditioner.prolong_damp", default_opts.get<S>("preconditioner.prolong_damp")));
+        opts.get("preconditioner.min_coarse_rate", default_opts.get<R>("preconditioner.min_coarse_rate")),
+        opts.get("preconditioner.prolong_damp", default_opts.get<R>("preconditioner.prolong_damp")));
     amg_parameters.setDefaultValuesIsotropic(
         opts.get("preconditioner.isotropy_dim", default_opts.get<size_t>("preconditioner.isotropy_dim")));
     amg_parameters.setDefaultValuesAnisotropic(
@@ -155,7 +157,7 @@ public:
     BiCGSTABSolver<IstlVectorType> solver(matrix_operator,
                                           scalar_product,
                                           preconditioner,
-                                          opts.get("precision", default_opts.get<S>("precision")),
+                                          opts.get("precision", default_opts.get<R>("precision")),
                                           opts.get("max_iter", default_opts.get<int>("max_iter")),
                                           opts.get("verbose", default_opts.get<int>("verbose")));
     InverseOperatorResult stats;
