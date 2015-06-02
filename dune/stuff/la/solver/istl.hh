@@ -23,6 +23,8 @@
 #include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/solver/istl_amg.hh>
 
+#include <dune/common/version.hh>
+
 #include "../solver.hh"
 
 namespace Dune {
@@ -39,8 +41,9 @@ public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
   typedef typename MatrixType::RealType R;
 
-  // remove this as soon as the next release of dune-istl has resolved the bugs concerning the use of complex
+#if !DUNE_VERSION_NEWER(DUNE_ISTL, 2, 4)
   static_assert(!std::is_same<S, std::complex<R>>::value, "the dune-istl solver does not work with complex yet!");
+#endif
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
