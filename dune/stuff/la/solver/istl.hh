@@ -57,7 +57,7 @@ public:
 #if !HAVE_MPI && HAVE_SUPERLU
       "superlu",
 #endif
-          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut"
+          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab"
 #if HAVE_UMFPACK
           ,
           "umfpack"
@@ -163,6 +163,14 @@ public:
                          << "Those were the given options:\n\n"
                          << opts);
 #if HAVE_UMFPACK
+      } else if (type == "bicgstab") {
+        auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.storage_access())
+                          .call(writable_rhs, solution, opts, default_opts, "");
+        if (!result.converged)
+          DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
+                     "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
+                         << "Those were the given options:\n\n"
+                         << opts);
       } else if (type == "umfpack") {
         UMFPack<typename MatrixType::BackendType> solver(matrix_.backend(),
                                                          opts.get("verbose", default_opts.get<int>("verbose")));

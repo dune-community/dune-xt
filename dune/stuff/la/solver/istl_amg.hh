@@ -28,6 +28,40 @@ namespace LA {
 #if HAVE_DUNE_ISTL
 
 
+template <class O, int c>
+class IdentityPreconditioner : public Dune::Preconditioner<typename O::domain_type, typename O::range_type>
+{
+public:
+  //! \brief The domain type of the preconditioner.
+  typedef typename O::domain_type domain_type;
+  //! \brief The range type of the preconditioner.
+  typedef typename O::range_type range_type;
+  //! \brief The field type of the preconditioner.
+  typedef typename range_type::field_type field_type;
+  typedef O InverseOperator;
+
+  // define the category
+  enum
+  {
+    //! \brief The category the preconditioner is part of.
+    category = c
+  };
+
+
+  void pre(domain_type&, range_type&)
+  {
+  }
+
+  void apply(domain_type& v, const range_type& d)
+  {
+    v = d;
+  }
+
+  void post(domain_type&)
+  {
+  }
+};
+
 //! the general, parallel case
 template <class S, class CommunicatorType>
 class AmgApplicator
@@ -111,6 +145,29 @@ public:
       typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType_SSOR, CommunicatorType> PreconditionerType_SSOR;
       PreconditionerType_SSOR preconditioner(matrix_operator, amg_criterion, smoother_parameters_ILU, communicator_);
 
+      // define the BiCGStab as the actual solver
+      BiCGSTABSolver<IstlVectorType> solver(
+          matrix_operator,
+          scalar_product,
+          preconditioner,
+          opts.get("precision", default_opts.get<S>("precision")),
+          opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+#if HAVE_MPI
+          (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
+#else // HAVE_MPI
+          opts.get("verbose", default_opts.get<int>("verbose"))
+#endif
+          );
+
+      InverseOperatorResult stats;
+      solver.apply(solution.backend(), rhs.backend(), stats);
+      return stats;
+    } else if (smoother_type == "") {
+
+      typedef IdentityPreconditioner<MatrixOperatorType, Dune::SolverCategory::overlapping> SequentialPreconditioner;
+      SequentialPreconditioner seq_preconditioner;
+      BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialPreconditioner> preconditioner(
+          seq_preconditioner, communicator_);
       // define the BiCGStab as the actual solver
       BiCGSTABSolver<IstlVectorType> solver(
           matrix_operator,
