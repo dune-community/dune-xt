@@ -72,7 +72,7 @@ public:
     Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp, "1e-5", "0"});
     Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += general_opts;
-    if (tp.substr(0, 13) == "bicgstab.amg.") {
+    if (tp.substr(0, 13) == "bicgstab.amg." || tp == "bicgstab") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
       iterative_options.set("smoother.verbose", "0");
@@ -164,8 +164,8 @@ public:
                          << opts);
 
       } else if (type == "bicgstab") {
-        auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.storage_access())
-                          .call(writable_rhs, solution, opts, default_opts, "");
+        const auto result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.storage_access())
+                                .call(writable_rhs, solution, opts, default_opts, "");
         if (!result.converged)
           DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
                      "The dune-istl backend reported 'InverseOperatorResult.converged == false'!\n"
