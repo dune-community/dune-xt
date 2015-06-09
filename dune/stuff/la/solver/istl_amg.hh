@@ -162,29 +162,6 @@ public:
       InverseOperatorResult stats;
       solver.apply(solution.backend(), rhs.backend(), stats);
       return stats;
-    } else if (smoother_type == "") {
-
-      typedef IdentityPreconditioner<MatrixOperatorType, Dune::SolverCategory::overlapping> SequentialPreconditioner;
-      SequentialPreconditioner seq_preconditioner;
-      BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialPreconditioner> preconditioner(
-          seq_preconditioner, communicator_);
-      // define the BiCGStab as the actual solver
-      BiCGSTABSolver<IstlVectorType> solver(
-          matrix_operator,
-          scalar_product,
-          preconditioner,
-          opts.get("precision", default_opts.get<S>("precision")),
-          opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-#if HAVE_MPI
-          (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
-#else // HAVE_MPI
-          opts.get("verbose", default_opts.get<int>("verbose"))
-#endif
-          );
-
-      InverseOperatorResult stats;
-      solver.apply(solution.backend(), rhs.backend(), stats);
-      return stats;
     } else
       DUNE_THROW(Exceptions::wrong_input_given, "Unknown smoother requested: " << smoother_type);
   } // ... call(...)
