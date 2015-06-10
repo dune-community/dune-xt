@@ -114,7 +114,8 @@ public:
 #if !HAVE_MPI && HAVE_SUPERLU
       "superlu",
 #endif
-          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab"
+          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor"
+//           , "bicgstab"
 #if HAVE_UMFPACK
           ,
           "umfpack"
@@ -141,7 +142,7 @@ public:
       iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
       iterative_options.set("preconditioner.verbose", "0");
       return iterative_options;
-    } else if (tp == "bicgstab.ilut") {
+    } else if (tp == "bicgstab.ilut" || tp == "bicgstab.ssor") {
       iterative_options.set("preconditioner.iterations", "2");
       iterative_options.set("preconditioner.relaxation_factor", "1.0");
       return iterative_options;
@@ -218,6 +219,21 @@ public:
                               opts.get("max_iter", default_opts.get<int>("max_iter")),
                               verbosity(opts, default_opts));
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
+      } else if (type == "bicgstab.ssor") {
+        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.storage_access());
+        typedef SeqSSOR<typename MatrixType::BackendType, IstlVectorType, IstlVectorType> SequentialPreconditionerType;
+        SequentialPreconditionerType seq_preconditioner(
+            matrix_.backend(),
+            opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
+            opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
+        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.storage_access());
+        BiCgSolverType solver(matrix_operator,
+                              scalar_product,
+                              preconditioner,
+                              opts.get("precision", default_opts.get<S>("precision")),
+                              opts.get("max_iter", default_opts.get<int>("max_iter")),
+                              verbosity(opts, default_opts));
+        solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
 //      }
 //      else if (type == "bicgstab")  {
 //        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.storage_access());
@@ -261,6 +277,7 @@ public:
           opts.get("post_check_solves_system", default_opts.get<S>("post_check_solves_system"));
       if (post_check_solves_system_threshold > 0) {
         matrix_.mv(solution, writable_rhs);
+        communicator_.storage_access().copyOwnerToAll(writable_rhs.backend(), writable_rhs.backend());
         writable_rhs -= rhs;
         const S sup_norm = writable_rhs.sup_norm();
         if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
