@@ -28,15 +28,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-template <template <class> class VectorImp, class Space>
-typename Space::RangeFieldType communicated_dot(const VectorImp<typename Space::RangeFieldType>& vector,
-                                                const VectorImp<typename Space::RangeFieldType>& source,
-                                                const Space& space)
-{
-  return vector.dot(source);
-}
-
-
 /**
  *  \brief  Contains tags mostly needed for python bindings.
  */
