@@ -73,6 +73,19 @@ typename Space::RangeFieldType communicated_dot(const VectorImp<typename Space::
   return MPIHelper::getCollectiveCommunication().sum(result);
 }
 
+template <class Space>
+void ensure_parallel_dof_consistency(Dune::Stuff::LA::IstlDenseVector<typename Space::RangeFieldType>& vector,
+                                     const Space& space)
+{
+  space.communicator().copyOwnerToAll(vector.backend(), vector.backend());
+}
+
+template <template <class> class VectorImp, class Space>
+void ensure_parallel_dof_consistency(VectorImp<typename Space::RangeFieldType>& /*vector*/, const Space& /*space*/)
+{
+  DSC_LOG_DEBUG_0 << "parallel dof consistency can only be ensured for ISTL vectors atm\n";
+}
+
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
