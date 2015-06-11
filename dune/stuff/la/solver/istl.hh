@@ -114,8 +114,7 @@ public:
 #if !HAVE_MPI && HAVE_SUPERLU
       "superlu",
 #endif
-          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor"
-//           , "bicgstab"
+          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor", "bicgstab"
 #if HAVE_UMFPACK
           ,
           "umfpack"
