@@ -105,6 +105,7 @@ public:
 
   typedef typename BaseType::RangeFieldType RangeFieldType;
   typedef typename BaseType::RangeType RangeType;
+  typedef Ellipsoid<dimDomain, DomainFieldType> EllipsoidType;
 
   static const bool available = true;
 
@@ -116,10 +117,8 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["lower_left"]   = "[0.0 0.0 0.0]";
-    config["upper_right"]  = "[1.0 1.0 1.0]";
-    config["num_elements"] = "[2 2 2]";
-    config["values"]       = "[1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0]";
+    config["lower_left"]  = "[0.0 0.0 0.0]";
+    config["upper_right"] = "[1.0 1.0 1.0]";
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
@@ -136,25 +135,7 @@ public:
     // get correct config
     const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
-    // calculate number of values and get values
-    auto num_elements =
-        cfg.get("num_elements", default_cfg.get<Common::FieldVector<size_t, dimDomain>>("num_elements"), dimDomain);
-    size_t num_values = 1;
-    for (size_t ii = 0; ii < num_elements.size(); ++ii)
-      num_values *= num_elements[ii];
-    std::vector<RangeType> values(num_values);
-    auto values_rf = cfg.get("values", default_cfg.get<std::vector<RangeFieldType>>("values"), num_values);
-    for (size_t ii = 0; ii < values_rf.size(); ++ii)
-      values[ii] = RangeType(values_rf[ii]);
-    // create
-    return Common::make_unique<ThisType>(
-        cfg.get(
-            "lower_left", default_cfg.get<Common::FieldVector<DomainFieldType, dimDomain>>("lower_left"), dimDomain),
-        cfg.get(
-            "upper_right", default_cfg.get<Common::FieldVector<DomainFieldType, dimDomain>>("upper_right"), dimDomain),
-        std::move(num_elements),
-        std::move(values),
-        cfg.get("name", default_cfg.get<std::string>("name")));
+    DUNE_THROW(NotImplemented, "");
   } // ... create(...)
 
   RandomEllipsoidsFunction(const Common::FieldVector<DomainFieldType, dimDomain>& lowerLeft,
@@ -165,30 +146,50 @@ public:
     , name_(nm)
     , ellipsoid_cfg_(ellipsoid_cfg)
   {
-    //    randomblock_config["ellipsoids.count"] = "200";
-    //    randomblock_config["ellipsoids.min_radius"] = "0.01";
-    //    randomblock_config["ellipsoids.max_radius"] = "0.03";
     //    randomblock_config["ellipsoids.seed"] = "0";
     //    randomblock_config["ellipsoids.children"] = "3";
     //    randomblock_config["ellipsoids.recursion_depth"] = "4";
     //    randomblock_config["ellipsoids.recursion_scale"] = "0.5";
     //    config.add(randomblock_config, "diffusion_factor");
     typedef unsigned long CT;
-    const CT level_0_count = ellipsoid_cfg.get("ellipsoids.count", 200);
+    const CT level_0_count = ellipsoid_cfg.get("ellipsoids.count", 10);
     const CT max_depth     = ellipsoid_cfg.get("ellipsoids.recursion_depth", 1);
     const CT children      = ellipsoid_cfg.get<CT>("ellipsoids.children", 3u, DSC::ValidateGreater<CT>(0));
     const CT total_count = level_0_count * std::pow(children, max_depth);
-    ellipsoids_.resize(total_count);
-    const auto seed = DomainFieldType(0);
+    ellipsoids_.resize(level_0_count);
+    ellipsoids_.reserve(total_count);
+    const auto seed = DomainFieldType(ellipsoid_cfg.get("ellipsoids.seed", 0));
     DSC::DefaultRNG<DomainFieldType> center_rng(
         *std::max(lowerLeft.begin(), lowerLeft.end()), *std::min(upperRight.begin(), upperRight.end()), seed);
     DSC::DefaultRNG<DomainFieldType> radii_rng(
-        ellipsoid_cfg.get("ellipsoids.min_radii", 0.01), ellipsoid_cfg.get("ellipsoids.max_radii", 0.04), seed);
-    for (auto ii : DSC::valueRange(0, total_count, total_count / level_0_count)) {
-      std::fill(ellipsoids_[ii].center.begin(), ellipsoids_[ii].center.end(), center_rng);
-      std::fill(ellipsoids_[ii].radii.begin(), ellipsoids_[ii].radii.end(), radii_rng);
+        ellipsoid_cfg.get("ellipsoids.min_radius", 0.01), ellipsoid_cfg.get("ellipsoids.max_radius", 0.04), seed);
+    DSC::DefaultRNG<DomainFieldType> dist_rng(-ellipsoid_cfg.get("ellipsoids.max_radius", 0.04) / 2.,
+                                              ellipsoid_cfg.get("ellipsoids.max_radius", 0.04) / 2.,
+                                              seed);
+
+    const auto parent_range = DSC::valueRange(0ul, level_0_count);
+    for (auto ii : parent_range) {
+      std::generate(ellipsoids_[ii].center.begin(), ellipsoids_[ii].center.end(), center_rng);
+      std::generate(ellipsoids_[ii].radii.begin(), ellipsoids_[ii].radii.end(), radii_rng);
     }
-    for (auto current_depth : DSC::valueRange(1, max_depth + 1)) {
+
+    std::function<void(CT, const EllipsoidType&)> recurse_add = [&](CT current_level, const EllipsoidType& parent) {
+      if (current_level > max_depth)
+        return;
+      for (auto child_no : DSC::valueRange(children)) {
+        EllipsoidType child = parent;
+        auto displacement = [&](DomainFieldType& coord) {
+          coord += dist_rng() * std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
+        };
+        std::for_each(child.center.begin(), child.center.end(), displacement);
+        std::generate(child.radii.begin(), child.radii.end(), radii_rng);
+        ellipsoids_.push_back(child);
+        recurse_add(current_level + 1, child);
+      }
+    };
+
+    for (auto ii : parent_range) {
+      recurse_add(0, ellipsoids_[ii]);
     }
   }
 
@@ -239,7 +240,7 @@ private:
   const Common::FieldVector<DomainFieldType, dimDomain> upperRight_;
   std::string name_;
   const Stuff::Common::Configuration ellipsoid_cfg_;
-  std::vector<Ellipsoid> ellipsoids_;
+  std::vector<EllipsoidType> ellipsoids_;
 }; // class RandomEllipsoidsFunction
 
 
