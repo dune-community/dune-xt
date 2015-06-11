@@ -234,22 +234,20 @@ public:
                               opts.get("max_iter", default_opts.get<int>("max_iter")),
                               verbosity(opts, default_opts));
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
-//      }
-//      else if (type == "bicgstab")  {
-//        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.storage_access());
-//        typedef IdentityPreconditioner<MatrixOperatorType, Dune::SolverCategory::overlapping>
-//        SequentialPreconditioner;
-//        SequentialPreconditioner seq_preconditioner;
-//        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.storage_access());
-//        // define the BiCGStab as the actual solver
-//        BiCgSolverType solver(matrix_operator,
-//                                                scalar_product,
-//                                                preconditioner,
-//                                                opts.get("precision", default_opts.get< S >("precision")),
-//                                                opts.get("max_iter", default_opts.get< size_t >("max_iter")),
-//                                                verbosity(opts, default_opts)
-//                                                );
-//        solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
+      } else if (type == "bicgstab") {
+        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.storage_access());
+        constexpr auto cat   = decltype(matrix_operator)::category;
+        typedef IdentityPreconditioner<MatrixOperatorType, cat> SequentialPreconditioner;
+        SequentialPreconditioner seq_preconditioner;
+        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.storage_access());
+        // define the BiCGStab as the actual solver
+        BiCgSolverType solver(matrix_operator,
+                              scalar_product,
+                              preconditioner,
+                              opts.get("precision", default_opts.get<S>("precision")),
+                              opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+                              verbosity(opts, default_opts));
+        solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
 #if HAVE_UMFPACK
       } else if (type == "umfpack") {
         UMFPack<typename MatrixType::BackendType> solver(matrix_.backend(),
