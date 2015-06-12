@@ -26,10 +26,11 @@ namespace Functions {
 template <size_t dim, class CoordType = double>
 struct Ellipsoid
 {
-  DSC::FieldVector<CoordType, dim> center;
-  DSC::FieldVector<CoordType, dim> radii;
+  typedef DSC::FieldVector<CoordType, dim> ctype;
+  ctype center;
+  ctype radii;
 
-  bool contains(DSC::FieldVector<CoordType, dim> point) const
+  bool contains(ctype point) const
   {
     const auto shifted = point - center;
     double sum = 0;
@@ -39,6 +40,10 @@ struct Ellipsoid
     }
     return DSC::FloatCmp::le(sum, 1.);
   }
+  bool intersects_cube(ctype ll, ctype ur) const
+  {
+    DUNE_THROW(NotImplemented, "");
+  }
 };
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
@@ -46,11 +51,22 @@ template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFi
 class RandomEllipsoidsFunction
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
+protected:
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       BaseType;
   typedef RandomEllipsoidsFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       ThisType;
 
+public:
+  typedef typename BaseType::EntityType EntityType;
+  typedef typename BaseType::LocalfunctionType LocalfunctionType;
+
+  typedef typename BaseType::DomainFieldType DomainFieldType;
+  static const size_t dimDomain = BaseType::dimDomain;
+
+  typedef typename BaseType::RangeFieldType RangeFieldType;
+  typedef typename BaseType::RangeType RangeType;
+  typedef Ellipsoid<dimDomain, DomainFieldType> EllipsoidType;
   class Localfunction
       : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
   {
@@ -65,9 +81,10 @@ class RandomEllipsoidsFunction
     typedef typename BaseType::RangeType RangeType;
     typedef typename BaseType::JacobianRangeType JacobianRangeType;
 
-    Localfunction(const EntityType& ent, const RangeType value)
+    Localfunction(const EntityType& ent, const RangeType value, std::vector<EllipsoidType>&& local_ellipsoids)
       : BaseType(ent)
       , value_(value)
+      , local_ellipsoids_(local_ellipsoids)
     {
     }
 
@@ -80,10 +97,16 @@ class RandomEllipsoidsFunction
       return 0;
     }
 
-    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const override
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
-      ret = value_;
+      for (const auto& ellipsoid : local_ellipsoids_) {
+        if (ellipsoid.contains(xx)) {
+          ret = value_;
+          return;
+        }
+      }
+      ret = 0;
     }
 
     virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override
@@ -94,19 +117,10 @@ class RandomEllipsoidsFunction
 
   private:
     const RangeType value_;
+    const std::vector<EllipsoidType> local_ellipsoids_;
   }; // class Localfunction
 
 public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::LocalfunctionType LocalfunctionType;
-
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const size_t dimDomain = BaseType::dimDomain;
-
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  typedef typename BaseType::RangeType RangeType;
-  typedef Ellipsoid<dimDomain, DomainFieldType> EllipsoidType;
-
   static const bool available = true;
 
   static std::string static_id()
@@ -214,25 +228,15 @@ public:
     constexpr auto local_value = DomainFieldType(1);
     // decide on the subdomain the center of the entity belongs to
     const auto center = entity.geometry().center();
-    //    std::vector< size_t > whichPartition(dimDomain, 0);
-    //    const auto& ll = lowerLeft_;
-    //    const auto& ur = upperRight_;
-    //    const auto& ne = numElements_;
-    //    for (size_t dd = 0; dd < dimDomain; ++dd) {
-    //      // for points that are on upperRight_[d], this selects one partition too much
-    //      // so we need to cap this
-    //      whichPartition[dd] = std::min(size_t(std::floor(ne[dd]*((center[dd] - ll[dd])/(ur[dd] - ll[dd])))),
-    //                                    ne[dd] - 1);
-    //    }
-    //    size_t subdomain = 0;
-    //    if (dimDomain == 1)
-    //      subdomain = whichPartition[0];
-    //    else if (dimDomain == 2)
-    //      subdomain = whichPartition[0] + whichPartition[1]*ne[0];
-    //    else
-    //      subdomain = whichPartition[0] + whichPartition[1]*ne[0] + whichPartition[2]*ne[1]*ne[0];
-    //    // return the component that belongs to the subdomain
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, local_value));
+    bool in_ellipsoid = false;
+    std::vector<EllipsoidType> local_ellipsoids;
+    for (const auto& ellipsoid : ellipsoids_) {
+      typename EllipsoidType::ctype ll, ur;
+      if (ellipsoid.intersects_cube(ll, ur)) {
+        local_ellipsoids.push_back(ellipsoid);
+      }
+    }
+    return std::unique_ptr<Localfunction>(new Localfunction(entity, local_value, std::move(local_ellipsoids)));
   } // ... local_function(...)
 
 private:
