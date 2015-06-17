@@ -237,13 +237,13 @@ public:
                          << function_->variable()
                          << "\n"
                          << "The expression of this functional is: "
-                         << function_->expression().at(0)
+                         << function_->expression().at(rr * dimRangeCols + cc)
                          << "\n"
                          << "You tried to evaluate it with:   xx = "
                          << xx
                          << "\n"
                          << "The result was:                       "
-                         << ret
+                         << tmp_row_[cc]
                          << "\n\n"
                          << "You can disable this check by defining DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
       }
