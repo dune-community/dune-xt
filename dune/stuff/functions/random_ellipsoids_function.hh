@@ -43,6 +43,7 @@ struct Ellipsoid
   }
   bool intersects_cube(DomainType ll, DomainType ur) const
   {
+    DUNE_THROW(NotImplemented, "");
   }
 };
 
@@ -83,10 +84,11 @@ public:
 
     Localfunction(const EntityType& ent, const RangeType value, std::vector<EllipsoidType>&& local_ellipsoids)
       : BaseType(ent)
+      , geometry_(ent.geometry())
       , value_(value)
       , local_ellipsoids_(local_ellipsoids)
     {
-      DSC_LOG_DEBUG_0 << "create local Ellips with " << local_ellipsoids_.size() << " instances\n";
+      //      DSC_LOG_DEBUG_0 << "create local LF Ellips with " << local_ellipsoids_.size() << " instances\n";
     }
 
     Localfunction(const Localfunction& /*other*/) = delete;
@@ -95,15 +97,17 @@ public:
 
     virtual size_t order() const override
     {
-      return 0;
+      return 8;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+    virtual void evaluate(const DomainType& xx_local, RangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
+      const auto xx_global = geometry_.global(xx_local);
       for (const auto& ellipsoid : local_ellipsoids_) {
-        if (ellipsoid.contains(xx)) {
+        if (ellipsoid.contains(xx_global)) {
           ret = value_;
+          //          DSC_LOG_DEBUG_0 << "ell  INSIDE " << ellipsoid.center << " with xx " << xx_global << "\n";
           return;
         }
       }
@@ -117,6 +121,7 @@ public:
     }
 
   private:
+    const typename EntityImp::Geometry geometry_;
     const RangeType value_;
     const std::vector<EllipsoidType> local_ellipsoids_;
   }; // class Localfunction
@@ -161,26 +166,22 @@ public:
     , name_(nm)
     , ellipsoid_cfg_(ellipsoid_cfg)
   {
-    //    randomblock_config["ellipsoids.seed"] = "0";
-    //    randomblock_config["ellipsoids.children"] = "3";
-    //    randomblock_config["ellipsoids.recursion_depth"] = "4";
-    //    randomblock_config["ellipsoids.recursion_scale"] = "0.5";
-    //    config.add(randomblock_config, "diffusion_factor");
-    typedef unsigned long CT;
-    const CT level_0_count = ellipsoid_cfg.get("ellipsoids.count", 10);
-    const CT max_depth     = ellipsoid_cfg.get("ellipsoids.recursion_depth", 1);
-    const CT children      = ellipsoid_cfg.get<CT>("ellipsoids.children", 3u); //, DSC::ValidateLess<CT>(0));
-    const CT total_count = level_0_count * std::pow(children, max_depth);
+    typedef unsigned long UL;
+    const UL level_0_count = ellipsoid_cfg.get("ellipsoids.count", 10);
+    const UL max_depth     = ellipsoid_cfg.get("ellipsoids.recursion_depth", 1);
+    const UL children      = ellipsoid_cfg.get<UL>("ellipsoids.children", 3u); //, DSC::ValidateLess<UL>(0));
+    const UL total_count = level_0_count + level_0_count * std::pow(children, max_depth + 1);
     ellipsoids_.resize(level_0_count);
     ellipsoids_.reserve(total_count);
-    const auto seed = DomainFieldType(ellipsoid_cfg.get("ellipsoids.seed", 0));
-    DSC::DefaultRNG<DomainFieldType> center_rng(
-        *std::max(lowerLeft.begin(), lowerLeft.end()), *std::min(upperRight.begin(), upperRight.end()), seed);
-    DSC::DefaultRNG<DomainFieldType> radii_rng(
-        ellipsoid_cfg.get("ellipsoids.min_radius", 0.01), ellipsoid_cfg.get("ellipsoids.max_radius", 0.04), seed);
-    DSC::DefaultRNG<DomainFieldType> dist_rng(-ellipsoid_cfg.get("ellipsoids.max_radius", 0.04) / 2.,
-                                              ellipsoid_cfg.get("ellipsoids.max_radius", 0.04) / 2.,
-                                              seed);
+    const auto seed               = DomainFieldType(ellipsoid_cfg.get("ellipsoids.seed", 0));
+    const auto min_radius         = ellipsoid_cfg.get("ellipsoids.min_radius", 0.01);
+    const auto max_radius         = ellipsoid_cfg.get("ellipsoids.max_radius", 0.02);
+    const auto child_displacement = ellipsoid_cfg.get("ellipsoids.max_child_displacement", max_radius);
+    typedef DSC::DefaultRNG<DomainFieldType> RNG;
+    RNG center_rng(0, 1, seed);
+    RNG radii_rng(min_radius, max_radius, seed);
+    RNG dist_rng(min_radius, child_displacement, seed);
+    RNG sign_rng(-1, 1, seed);
 
     const auto parent_range = DSC::valueRange(0ul, level_0_count);
     for (auto ii : parent_range) {
@@ -189,16 +190,19 @@ public:
       std::generate(ellipsoids_[ii].radii.begin(), ellipsoids_[ii].radii.end(), [&radii_rng]() { return radii_rng(); });
     }
 
-    std::function<void(CT, const EllipsoidType&)> recurse_add = [&](CT current_level, const EllipsoidType& parent) {
+    std::function<void(UL, const EllipsoidType&)> recurse_add = [&](UL current_level, const EllipsoidType& parent) {
       if (current_level > max_depth)
         return;
-      for (auto child_no : DSC::valueRange(children)) {
+      for (const auto unused_counter : DSC::valueRange(children)) {
         EllipsoidType child = parent;
-        auto displace = [&](DomainFieldType& coord) {
-          coord += dist_rng() * std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
+        const double scale  = std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
+        const auto displace = [&](DomainFieldType& coord) {
+          const auto disp   = dist_rng() * DSC::sign(sign_rng());
+          coord += disp;
+          DSC_LOG_DEBUG_0 << disp << ";";
         };
         std::for_each(child.center.begin(), child.center.end(), displace);
-        std::generate(child.radii.begin(), child.radii.end(), radii_rng);
+        std::generate(child.radii.begin(), child.radii.end(), [&radii_rng, scale]() { return radii_rng() * scale; });
         ellipsoids_.push_back(child);
         recurse_add(current_level + 1, child);
       }
@@ -208,6 +212,7 @@ public:
       recurse_add(0, ellipsoids_[ii]);
     }
     DSC_LOG_DEBUG_0 << "generated " << ellipsoids_.size() << " of " << total_count << "\n";
+    to_file(*DSC::make_ofstream("ellipsoids.txt"));
   }
 
   RandomEllipsoidsFunction(const ThisType& other) = default;
@@ -226,7 +231,19 @@ public:
     return name_;
   }
 
+  void to_file(std::ostream& out) const
+  {
+    boost::format line("%d|%g;%g|%g;%g\n");
+    size_t id = 0;
+    for (const auto& ellipsoid : ellipsoids_) {
+      const auto str =
+          (line % id % ellipsoid.center[0] % ellipsoid.center[1] % ellipsoid.radii[0] % ellipsoid.radii[1]).str();
+      out << str;
+    }
+    out.flush();
+  }
 
+private:
   std::tuple<typename EllipsoidType::DomainType, typename EllipsoidType::DomainType>
   bounding_box(const EntityType& entity) const
   {
@@ -247,16 +264,16 @@ public:
     }
   }
 
+public:
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
   {
-    constexpr auto local_value = DomainFieldType(1);
+    const auto local_value = DomainFieldType(ellipsoid_cfg_.get("ellipsoids.local_value", 1.));
     // decide on the subdomain the center of the entity belongs to
     const auto max_radius = ellipsoid_cfg_.get("ellipsoids.max_radius", 0.04);
     typename EllipsoidType::DomainType ll, ur;
     std::tie(ll, ur) = bounding_box(entity);
-    std::for_each(ll.begin(), ll.end(), [&max_radius](DomainFieldType& cc) { cc -= 1.1 * max_radius; });
-    std::for_each(ur.begin(), ur.end(), [&max_radius](DomainFieldType& cc) { cc += 1.1 * max_radius; });
-    DSC_LOG_DEBUG_0 << "LL " << ll << " UR " << ur << "\n";
+    std::for_each(ll.begin(), ll.end(), [&max_radius](DomainFieldType& lc) { lc -= 1.1 * max_radius; });
+    std::for_each(ur.begin(), ur.end(), [&max_radius](DomainFieldType& uc) { uc += 1.1 * max_radius; });
     std::vector<EllipsoidType> local_ellipsoids;
     for (const auto& ellipsoid : ellipsoids_) {
       bool inside = true;
@@ -266,18 +283,16 @@ public:
       }
       if (inside) {
         local_ellipsoids.push_back(ellipsoid);
-        DSC_LOG_DEBUG_0 << "ell  INSIDE " << ellipsoid.center << " with Radii " << ellipsoid.radii << "\n";
-      } else {
-        DSC_LOG_DEBUG_0 << "ell outside " << ellipsoid.center << " with Radii " << ellipsoid.radii << "\n";
       }
     }
-    return std::unique_ptr<Localfunction>(new Localfunction(entity, local_value, std::move(local_ellipsoids)));
+    std::vector<EllipsoidType> tmp = ellipsoids_;
+    return std::unique_ptr<Localfunction>(new Localfunction(entity, local_value, std::move(tmp)));
   } // ... local_function(...)
 
 private:
   const Common::FieldVector<DomainFieldType, dimDomain> lowerLeft_;
   const Common::FieldVector<DomainFieldType, dimDomain> upperRight_;
-  std::string name_;
+  const std::string name_;
   const Stuff::Common::Configuration ellipsoid_cfg_;
   std::vector<EllipsoidType> ellipsoids_;
 }; // class RandomEllipsoidsFunction
