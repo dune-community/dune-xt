@@ -150,9 +150,11 @@ private:
     // codim 0 entity id
     std::vector<double> entityId = generateEntityVisualization(grid_view);
     vtkwriter.addCellData(entityId, "entity_id");
+#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
     // boundary id
     std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
     vtkwriter.addCellData(boundaryId, "boundary_id");
+#endif
     // write
     vtkwriter.write(filename, VTK::appendedraw);
   } // ... visualize_plain(...)
@@ -171,9 +173,11 @@ private:
     // codim 0 entity id
     std::vector<double> entityId = generateEntityVisualization(grid_view);
     vtkwriter.addCellData(entityId, "entityId");
+#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
     // boundary id
     std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
     vtkwriter.addCellData(boundaryId, "boundaryId");
+#endif
     // dirichlet values
     std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
     vtkwriter.addCellData(dirichlet, "isDirichletBoundary");
@@ -186,6 +190,7 @@ private:
 
   std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
   {
+#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
     for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
@@ -208,6 +213,8 @@ private:
       }
     } // walk the grid
     return data;
+#endif
+    DUNE_THROW(InvalidStateException, "Experimental Grid Extensions missing");
   } // std::vector< double > generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
 
   template <class BoundaryInfoType>
