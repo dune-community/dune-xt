@@ -152,7 +152,8 @@ public:
   }
 
   explicit EigenRowMajorSparseMatrix(const BackendType& mat, const bool prune = false,
-                                     const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
+                                     const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                         Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
     if (prune) {
       // we do this here instead of using pattern(true), since we can build the triplets along the way which is more
@@ -381,9 +382,9 @@ public:
     return backend_->nonZeros();
   }
 
-  virtual SparsityPatternDefault
-  pattern(const bool prune = false,
-          const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  virtual SparsityPatternDefault pattern(const bool prune = false,
+                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
+                                             eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     SparsityPatternDefault ret(rows());
     if (prune) {
@@ -405,8 +406,8 @@ public:
     return ret;
   } // ... pattern(...)
 
-  virtual ThisType
-  pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
+                              eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     return ThisType(*backend_, true, eps);
   }
