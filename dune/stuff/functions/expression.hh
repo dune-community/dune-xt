@@ -218,10 +218,10 @@ public:
     for (size_t rr = 0; rr < dimRange; ++rr) {
       tmp_row_ = ret[rr];
       for (size_t cc = 0; cc < dimRangeCols; ++cc) {
-        if (std::isnan(tmp_row_[cc])) {
+        if (DSC::isnan(tmp_row_[cc])) {
           failure = true;
           type = "NaN";
-        } else if (std::isinf(tmp_row_[cc])) {
+        } else if (DSC::isinf(tmp_row_[cc])) {
           failure = true;
           type = "inf";
         } else if (std::abs(tmp_row_[cc]) > (0.9 * std::numeric_limits<double>::max())) {
