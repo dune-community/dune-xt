@@ -11,6 +11,8 @@
 #include "container/eigen.hh"
 #include "container/istl.hh"
 
+#include <dune/stuff/common/logging.hh>
+
 namespace Dune {
 namespace Stuff {
 namespace LA {

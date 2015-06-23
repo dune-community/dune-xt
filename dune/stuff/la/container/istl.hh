@@ -26,6 +26,7 @@
 
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/profiler.hh>
+#include <dune/stuff/common/math.hh>
 
 #include "interfaces.hh"
 #include "pattern.hh"
@@ -633,7 +634,7 @@ public:
       for (size_t jj = 0; jj < cols(); ++jj)
         if (backend_->exists(ii, jj)) {
           const auto& entry = row_vec[jj][0];
-          if (DSC::isnan(std::real(entry[0])) || DSC::isnan(std::imag(entry[0])) || DSC::isinf(std::abs(entry[0])))
+          if (Common::isnan(entry[0]) || Common::isinf(entry[0]))
             return false;
         }
     }
