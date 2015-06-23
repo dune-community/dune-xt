@@ -102,7 +102,7 @@ public:
 
     virtual void evaluate(const DomainType& xx_local, RangeType& ret) const override
     {
-      assert(this->is_a_valid_point(xx));
+      assert(this->is_a_valid_point(xx_local));
       const auto xx_global = geometry_.global(xx_local);
       for (const auto& ellipsoid : local_ellipsoids_) {
         if (ellipsoid.contains(xx_global)) {
