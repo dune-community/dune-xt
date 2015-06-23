@@ -603,7 +603,7 @@ public:
     for (size_t ii = 0; ii < rows(); ++ii) {
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = backend_->operator()(ii, jj);
-        if (std::isnan(std::real(entry)) || std::isnan(std::imag(entry)) || std::isinf(std::abs(entry)))
+        if (Common::isnan(entry) || Common::isinf(entry))
           return false;
       }
     }

@@ -23,6 +23,7 @@
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/vector.hh>
+#include <dune/stuff/common/math.hh>
 
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
@@ -125,7 +126,7 @@ public:
   virtual bool valid() const
   {
     for (const auto& val : *this) {
-      if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val)))
+      if (Common::isnan(val) || Common::isinf(val))
         return false;
     }
     return true;

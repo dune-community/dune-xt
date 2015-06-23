@@ -88,7 +88,7 @@ public:
       matrix_.mv(solution, tmp);
       tmp -= rhs;
       const R sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
+      if (sup_norm > post_check_solves_system_threshold || DSC::isnan(sup_norm) || DSC::isinf(sup_norm))
         DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
                    "The computed solution does not solve the system (although the dune-common backend "
                        << "reported no error) and you requested checking (see options below)! "

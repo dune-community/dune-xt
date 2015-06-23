@@ -114,7 +114,7 @@ public:
       for (size_t ii = 0; ii < matrix_.rows(); ++ii) {
         for (size_t jj = 0; jj < matrix_.cols(); ++jj) {
           const S& val = matrix_.backend()(ii, jj);
-          if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val))) {
+          if (Common::isnan(val) || Common::isinf(val)) {
             std::stringstream msg;
             msg << "Given matrix contains inf or nan and you requested checking (see options below)!\n"
                 << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
@@ -127,7 +127,7 @@ public:
       }
       for (size_t ii = 0; ii < rhs.size(); ++ii) {
         const S& val = rhs[ii];
-        if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val))) {
+        if (Common::isnan(val) || Common::isinf(val)) {
           std::stringstream msg;
           msg << "Given rhs contains inf or nan and you requested checking (see options below)!\n"
               << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
@@ -179,7 +179,7 @@ public:
     if (check_for_inf_nan)
       for (size_t ii = 0; ii < solution.size(); ++ii) {
         const S& val = solution[ii];
-        if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val))) {
+        if (Common::isnan(val) || Common::isinf(val)) {
           std::stringstream msg;
           msg << "The computed solution contains inf or nan and you requested checking (see options "
               << "below)!\n"
@@ -197,7 +197,7 @@ public:
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const R sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm)) {
+      if (sup_norm > post_check_solves_system_threshold || DSC::isnan(sup_norm) || DSC::isinf(sup_norm)) {
         std::stringstream msg;
         msg << "The computed solution does not solve the system (although the eigen backend reported "
             << "'Success') and you requested checking (see options below)!\n"
@@ -336,8 +336,8 @@ public:
       typedef typename MatrixType::BackendType::InnerIterator InnerIterator;
       for (EIGEN_size_t ii = 0; ii < matrix_.backend().outerSize(); ++ii) {
         for (InnerIterator it(matrix_.backend(), ii); it; ++it) {
-          if (std::isnan(std::real(it.value())) || std::isnan(std::imag(it.value()))
-              || std::isinf(std::abs(it.value())))
+          if (DSC::isnan(std::real(it.value())) || DSC::isnan(std::imag(it.value()))
+              || DSC::isinf(std::abs(it.value())))
             DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                        "Given matrix contains inf or nan and you requested checking (see options below)!\n"
                            << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
@@ -347,7 +347,7 @@ public:
       }
       for (size_t ii = 0; ii < rhs.size(); ++ii) {
         const S& val = rhs[ii];
-        if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val)))
+        if (Common::isnan(val) || Common::isinf(val))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "Given rhs contains inf or nan and you requested checking (see options below)!\n"
                          << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
@@ -545,7 +545,7 @@ public:
     if (check_for_inf_nan)
       for (size_t ii = 0; ii < solution.size(); ++ii) {
         const S& val = solution[ii];
-        if (std::isnan(std::real(val)) || std::isnan(std::imag(val)) || std::isinf(std::abs(val)))
+        if (Common::isnan(val) || Common::isinf(val))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "The computed solution contains inf or nan and you requested checking (see options "
                          << "below)!\n"
@@ -559,7 +559,7 @@ public:
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const R sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_threshold || std::isnan(sup_norm) || std::isinf(sup_norm))
+      if (sup_norm > post_check_solves_system_threshold || DSC::isnan(sup_norm) || DSC::isinf(sup_norm))
         DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
                    "The computed solution does not solve the system (although the eigen backend reported "
                        << "'Success') and you requested checking (see options below)!\n"

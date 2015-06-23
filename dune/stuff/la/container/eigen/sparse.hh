@@ -351,7 +351,7 @@ public:
     typedef typename BackendType::InnerIterator InnerIterator;
     for (EIGEN_size_t ii = 0; ii < backend_->outerSize(); ++ii) {
       for (InnerIterator it(*backend_, ii); it; ++it) {
-        if (std::isnan(std::real(it.value())) || std::isnan(std::imag(it.value())) || std::isinf(std::abs(it.value())))
+        if (DSC::isnan(std::real(it.value())) || DSC::isnan(std::imag(it.value())) || DSC::isinf(std::abs(it.value())))
           return false;
       }
     }

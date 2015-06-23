@@ -578,7 +578,7 @@ public:
       const auto& row_vec = backend_->operator[](ii);
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = row_vec[jj];
-        if (std::isnan(std::real(entry)) || std::isnan(std::imag(entry)) || std::isinf(std::abs(entry)))
+        if (Common::isnan(entry) || Common::isinf(entry))
           return false;
       }
     }
