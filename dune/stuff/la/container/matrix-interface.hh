@@ -17,10 +17,12 @@
 
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/matrix.hh>
 #include <dune/stuff/common/type_utils.hh>
 
 #include "container-interface.hh"
+#include "pattern.hh"
 #include "vector-interface.hh"
 
 namespace Dune {
@@ -143,6 +145,64 @@ public:
     return ret;
   } // ... sup_norm(...)
 
+  /**
+   * \brief Returns the number of entries in the sparsity pattern of the matrix.
+   *
+   * This is mainly useful for sparse matrices and returns rows() times cols() for dense matrices.
+   *
+   * \note Some implementations do not report the correct number here, so use and interpret only if you know what you
+   * are doing!
+   */
+  virtual size_t non_zeros() const
+  {
+    return rows() * cols();
+  }
+
+  /**
+   * \brief Computes the sparsity pattern of the matrix.
+   *
+   * This is mainly useful for sparse matrices and returns a full pattern for dense matrices
+   *
+   * \param prune If true, treats all entries smaller than eps as zero and does not include these indices in the
+   * returned pattern
+   */
+  virtual SparsityPatternDefault
+  pattern(const bool prune = false, const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    SparsityPatternDefault ret(rows());
+    if (prune) {
+      for (size_t ii = 0; ii < rows(); ++ii)
+        for (size_t jj = 0; jj < cols(); ++jj)
+          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(get_entry(ii, jj), ScalarType(0), eps))
+            ret.insert(ii, jj);
+    } else {
+      for (size_t ii = 0; ii < rows(); ++ii)
+        for (size_t jj = 0; jj < cols(); ++jj)
+          ret.insert(ii, jj);
+    }
+    ret.sort();
+    return ret;
+  } // ... pattern(...)
+
+  /**
+   * \brief Returns a pruned variant of this matrix.
+   *
+   * This is mainly useful for sparse matrices and returns a matrix that should be very close to this matrix, except for
+   * very small values, which are set to zero and the entries of which are removed from the sparsity pattern.
+   *
+   * \sa    pattern
+   * \param eps Is forwarded to pattern(true, eps)
+   */
+  virtual derived_type pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    auto pruned_pattern = pattern(true, eps);
+    derived_type ret(rows(), cols(), pruned_pattern);
+    for (size_t ii = 0; ii < pruned_pattern.size(); ++ii)
+      for (const size_t& jj : pruned_pattern.inner(ii))
+        ret.set_entry(ii, jj, get_entry(ii, jj));
+    return ret;
+  } // ... pruned(...)
+
   /// \}
   /// \name Necesarry for the python bindings.
   /// \{
@@ -207,6 +267,19 @@ public:
   {
     unit_col(boost::numeric_cast<size_t>(jj));
   }
+
+  DUNE_STUFF_SSIZE_T pb_non_zeros() const
+  {
+    try {
+      return boost::numeric_cast<DUNE_STUFF_SSIZE_T>(non_zeros());
+    } catch (boost::bad_numeric_cast& ee) {
+      DUNE_THROW(Exceptions::external_error,
+                 "There was an error in boost converting '" << non_zeros() << "' to '"
+                                                            << Common::Typename<ScalarType>::value()
+                                                            << "': "
+                                                            << ee.what());
+    }
+  } // ... pb_non_zeros(...)
 
   /// \}
 

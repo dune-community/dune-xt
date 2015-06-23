@@ -151,10 +151,28 @@ public:
   {
   }
 
-  explicit EigenRowMajorSparseMatrix(const BackendType& other)
-    : backend_(new BackendType(other))
+  explicit EigenRowMajorSparseMatrix(const BackendType& mat, const bool prune = false,
+                                     const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
-  }
+    if (prune) {
+      // we do this here instead of using pattern(true), since we can build the triplets along the way which is more
+      // efficient
+      typedef ::Eigen::Triplet<ScalarType> TripletType;
+      std::vector<TripletType> triplets;
+      triplets.reserve(mat.nonZeros());
+      for (EIGEN_size_t row = 0; row < mat.outerSize(); ++row) {
+        for (typename BackendType::InnerIterator row_it(mat, row); row_it; ++row_it) {
+          const size_t col = row_it.col();
+          const auto val = mat.coeff(row, col);
+          if (Stuff::Common::FloatCmp::ne<Stuff::Common::FloatCmp::Style::absolute>(val, ScalarType(0), eps))
+            triplets.emplace_back(row, col, val);
+        }
+      }
+      backend_ = std::make_shared<BackendType>(mat.rows(), mat.cols());
+      backend_->setFromTriplets(triplets.begin(), triplets.end());
+    } else
+      backend_ = std::make_shared<BackendType>(mat);
+  } // EigenRowMajorSparseMatrix(...)
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
@@ -358,11 +376,44 @@ public:
     return true;
   }
 
+  virtual size_t non_zeros() const override final
+  {
+    return backend_->nonZeros();
+  }
+
+  virtual SparsityPatternDefault
+  pattern(const bool prune = false,
+          const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  {
+    SparsityPatternDefault ret(rows());
+    if (prune) {
+      for (EIGEN_size_t row = 0; row < backend_->outerSize(); ++row) {
+        for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
+          const size_t col = row_it.col();
+          const auto val = backend_->coeff(row, col);
+          if (Common::FloatCmp::ne(val, ScalarType(0), eps))
+            ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(col));
+        }
+      }
+    } else {
+      for (EIGEN_size_t row = 0; row < backend_->outerSize(); ++row) {
+        for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it)
+          ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(row_it.col()));
+      }
+    }
+    ret.sort();
+    return ret;
+  } // ... pattern(...)
+
+  virtual ThisType
+  pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  {
+    return ThisType(*backend_, true, eps);
+  }
+
   /// \}
 
 private:
-  typedef typename BackendType::Index IndexType;
-
   bool these_are_valid_indices(const size_t ii, const size_t jj) const
   {
     if (ii >= rows())

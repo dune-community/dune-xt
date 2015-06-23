@@ -32,7 +32,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 /**
  *  \brief  Contains tags mostly needed for python bindings.
  */
