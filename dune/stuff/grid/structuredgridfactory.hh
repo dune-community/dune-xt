@@ -20,6 +20,7 @@
 #endif
 
 #include <dune/stuff/aliases.hh>
+#include <dune/stuff/common/ranges.hh>
 
 namespace Dune {
 
@@ -147,6 +148,87 @@ public:
   }
 };
 
+namespace Stuff {
+namespace Grid {
+
+template <class GridType>
+static Dune::array<unsigned int, GridType::dimension> default_overlap()
+{
+  Dune::array<unsigned int, GridType::dimension> olvp;
+  olvp.fill(1u);
+  return olvp;
+}
+
+//! general case just forwards to Dune core implementation
+template <class GridType>
+class StructuredGridFactory : public Dune::StructuredGridFactory<GridType>
+{
+  typedef typename GridType::ctype ctype;
+
+public:
+  static std::shared_ptr<GridType>
+  createCubeGrid(const Dune::FieldVector<ctype, GridType::dimension>& lowerLeft,
+                 const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
+                 const Dune::array<unsigned int, GridType::dimension>& elements,
+                 Dune::array<unsigned int, GridType::dimension> /*overlap*/ = default_overlap<GridType>(),
+                 Dune::MPIHelper::MPICommunicator /*communicator*/          = Dune::MPIHelper::getCommunicator())
+  {
+    return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
+  }
+};
+
+#if HAVE_DUNE_SPGRID
+template <class ct, int dim, Dune::SPRefinementStrategy strategy, class Comm>
+class StructuredGridFactory<Dune::SPGrid<ct, dim, strategy, Comm>>
+    : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, strategy, Comm>>
+{
+  typedef Dune::SPGrid<ct, dim, strategy, Comm> GridType;
+  typedef typename GridType::ctype ctype;
+
+public:
+  static std::shared_ptr<GridType>
+  createCubeGrid(const Dune::FieldVector<ctype, dim>& lowerLeft, const Dune::FieldVector<ctype, dim>& upperRight,
+                 const Dune::array<unsigned int, dim>& elements,
+                 Dune::array<unsigned int, dim> overlap        = default_overlap<GridType>(),
+                 Dune::MPIHelper::MPICommunicator communicator = Dune::MPIHelper::getCommunicator())
+  {
+    return Dune::StructuredGridFactory<GridType>::createCubeGrid(
+        lowerLeft, upperRight, elements, overlap, communicator);
+  }
+};
+
+#endif
+
+template <int dim>
+class StructuredGridFactory<Dune::YaspGrid<dim>> : public Dune::StructuredGridFactory<Dune::YaspGrid<dim>>
+{
+  typedef Dune::YaspGrid<dim> GridType;
+  typedef typename GridType::ctype ctype;
+
+public:
+  //! creates a non-periodic Yasp grid
+  static std::shared_ptr<GridType>
+  createCubeGrid(const Dune::FieldVector<ctype, dim>& lowerLeft, const Dune::FieldVector<ctype, dim>& upperRight,
+                 const Dune::array<unsigned int, dim>& elements_in,
+                 Dune::array<unsigned int, dim> overlap        = default_overlap<GridType>(),
+                 Dune::MPIHelper::MPICommunicator communicator = Dune::MPIHelper::getCommunicator())
+  {
+    const auto no_periodic_direction = std::bitset<dim>();
+    if (DSC::FloatCmp::ne(lowerLeft, Dune::FieldVector<ctype, GridType::dimensionworld>(0.0)))
+      DUNE_THROW(Dune::InvalidStateException, "YaspGrid + Origin != 0.0 is still a no-go");
+    Dune::array<int, dim> elements;
+    std::copy(elements_in.begin(), elements_in.end(), elements.begin());
+    auto overlap_check = overlap;
+    overlap_check.fill(overlap[0]);
+    for (auto i : DSC::valueRange(1, dim))
+      if (overlap[i] != overlap[0])
+        DUNE_THROW(Dune::InvalidStateException, "YaspGrid only supports uniform overlap");
+    return std::make_shared<GridType>(communicator, upperRight, elements, no_periodic_direction, overlap[0]);
+  }
+};
+
+} // namespace Grid
+} // end of namespace Stuff
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID
