@@ -10,17 +10,23 @@
 
 #include <vector>
 #include <initializer_list>
+#include <complex>
 
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/common/ftraits.hh>
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/bvector.hh>
 #include <dune/istl/bcrsmatrix.hh>
 #endif
+
+#include <dune/stuff/common/float_cmp.hh>
+#include <dune/stuff/common/profiler.hh>
+#include <dune/stuff/common/math.hh>
 
 #include "interfaces.hh"
 #include "pattern.hh"
@@ -29,14 +35,12 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 // forward
 template <class ScalarImp>
 class IstlDenseVector;
 
 template <class ScalarImp>
 class IstlRowMajorSparseMatrix;
-
 
 #if HAVE_DUNE_ISTL
 
@@ -51,7 +55,8 @@ template <class ScalarImp>
 class IstlDenseVectorTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef IstlDenseVector<ScalarImp> derived_type;
   typedef BlockVector<FieldVector<ScalarType, 1>> BackendType;
 }; // class IstlDenseVectorTraits
@@ -64,7 +69,8 @@ template <class ScalarImp>
 class IstlRowMajorSparseMatrixTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef IstlRowMajorSparseMatrix<ScalarType> derived_type;
   typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
 }; // class RowMajorSparseMatrixTraits
@@ -78,7 +84,8 @@ public:
  */
 template <class ScalarImp = double>
 class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp>,
-                        public ProvidesBackend<internal::IstlDenseVectorTraits<ScalarImp>>
+                        public ProvidesBackend<internal::IstlDenseVectorTraits<ScalarImp>>,
+                        public ProvidesDataAccess<internal::IstlDenseVectorTraits<ScalarImp>>
 {
   typedef IstlDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
@@ -88,6 +95,7 @@ class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<S
 public:
   typedef internal::IstlDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealType RealType;
   typedef typename Traits::BackendType BackendType;
 
   explicit IstlDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
@@ -127,7 +135,8 @@ public:
 
   IstlDenseVector(const ThisType& other) = default;
 
-  explicit IstlDenseVector(const BackendType& other)
+  explicit IstlDenseVector(const BackendType& other, const bool /*prune*/ = false,
+                           const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
     : backend_(new BackendType(other))
   {
   }
@@ -181,6 +190,15 @@ public:
   {
     ensure_uniqueness();
     return *backend_;
+  }
+
+  /// \}
+  /// \name Required by ProvidesDataAccess.
+  /// \{
+
+  ScalarType* data()
+  {
+    return &(backend()[0][0]);
   }
 
   /// \}
@@ -264,17 +282,17 @@ public:
     return backend_->dot(*(other.backend_));
   } // ... dot(...)
 
-  virtual ScalarType l1_norm() const override final
+  virtual RealType l1_norm() const override final
   {
     return backend_->one_norm();
   }
 
-  virtual ScalarType l2_norm() const override final
+  virtual RealType l2_norm() const override final
   {
     return backend_->two_norm();
   }
 
-  virtual ScalarType sup_norm() const override final
+  virtual RealType sup_norm() const override final
   {
     return backend_->infinity_norm();
   }
@@ -373,28 +391,25 @@ public:
   typedef internal::IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealType RealType;
+
+  static std::string static_id()
+  {
+    return "stuff.la.container.istl.istlrowmajorsparsematrix";
+  }
 
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
    */
-  IstlRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern)
-    : backend_(new BackendType(rr, cc, BackendType::row_wise))
+  IstlRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
   {
-    if (size_t(pattern.size()) != rr)
+    if (patt.size() != rr)
       DUNE_THROW(Exceptions::shapes_do_not_match,
-                 "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this ("
-                                             << rows()
+                 "The size of the pattern (" << patt.size() << ") does not match the number of rows of this (" << rows()
                                              << ")!");
-    size_t row_index = 0;
-    for (auto row = backend_->createbegin(); row != backend_->createend(); ++row) {
-      assert(row_index < pattern.size());
-      const auto& col_indices = pattern.inner(row_index);
-      for (const auto& col : col_indices)
-        row.insert(col);
-      ++row_index;
-    }
+    build_sparse_matrix(rr, cc, patt);
     backend_->operator*=(ScalarType(0));
-  } // IstlRowMajorSparseMatrix(...)
+  } // ... IstlRowMajorSparseMatrix(...)
 
   explicit IstlRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
     : backend_(new BackendType(rr, cc, BackendType::row_wise))
@@ -417,10 +432,25 @@ public:
 
   IstlRowMajorSparseMatrix(const ThisType& other) = default;
 
-  explicit IstlRowMajorSparseMatrix(const BackendType& other)
-    : backend_(new BackendType(other))
+  explicit IstlRowMajorSparseMatrix(const BackendType& mat, const bool prune = false,
+                                    const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                        Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
-  }
+    if (prune) {
+      auto pruned_pattern = pruned_pattern_from_backend(mat, eps);
+      build_sparse_matrix(mat.N(), mat.M(), pruned_pattern);
+      for (size_t ii = 0; ii < pruned_pattern.size(); ++ii) {
+        const auto& row_indices = pruned_pattern.inner(ii);
+        if (row_indices.size() > 0) {
+          const auto& mat_row = mat[ii];
+          auto& backend_row = backend_->operator[](ii);
+          for (const auto& jj : row_indices)
+            backend_row[jj][0][0] = mat_row[jj][0][0];
+        }
+      }
+    } else
+      backend_ = std::shared_ptr<BackendType>(new BackendType(mat));
+  } // IstlRowMajorSparseMatrix(...)
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
@@ -512,6 +542,7 @@ public:
 
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".mv");
     backend_->mv(*(xx.backend_), yy.backend());
   }
 
@@ -603,16 +634,85 @@ public:
       for (size_t jj = 0; jj < cols(); ++jj)
         if (backend_->exists(ii, jj)) {
           const auto& entry = row_vec[jj][0];
-          if (std::isnan(entry) || std::isinf(entry))
+          if (Common::isnan(entry[0]) || Common::isinf(entry[0]))
             return false;
         }
     }
     return true;
   } // ... valid(...)
 
+  /**
+   * \attention Use and interprete with care, since the Dune::BCRSMatrix is known to report strange things here,
+   * depending on its state!
+   */
+  virtual size_t non_zeros() const override final
+  {
+    return backend_->nonzeroes();
+  }
+
+  virtual SparsityPatternDefault
+  pattern(const bool prune = false,
+          const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
+              eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  {
+    SparsityPatternDefault ret(rows());
+    if (prune) {
+      return pruned_pattern_from_backend(*backend_, eps);
+    } else {
+      for (size_t ii = 0; ii < rows(); ++ii) {
+        if (backend_->getrowsize(ii) > 0) {
+          const auto& row   = backend_->operator[](ii);
+          const auto it_end = row.end();
+          for (auto it = row.begin(); it != it_end; ++it)
+            ret.insert(ii, it.index());
+        }
+      }
+    }
+    ret.sort();
+    return ret;
+  } // ... pattern(...)
+
+  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
+                              eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  {
+    return ThisType(*backend_, true, eps);
+  }
+
   /// \}
 
 private:
+  void build_sparse_matrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
+  {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".build");
+    backend_ = std::make_shared<BackendType>(rr, cc, BackendType::random);
+    for (size_t ii = 0; ii < patt.size(); ++ii)
+      backend_->setrowsize(ii, patt.inner(ii).size());
+    backend_->endrowsizes();
+    for (size_t ii = 0; ii < patt.size(); ++ii)
+      for (const auto& jj : patt.inner(ii))
+        backend_->addindex(ii, jj);
+    backend_->endindices();
+  } // ... build_sparse_matrix(...)
+
+  SparsityPatternDefault
+  pruned_pattern_from_backend(const BackendType& mat,
+                              const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                  Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    SparsityPatternDefault ret(mat.N());
+    for (size_t ii = 0; ii < mat.N(); ++ii) {
+      if (mat.getrowsize(ii) > 0) {
+        const auto& row   = mat[ii];
+        const auto it_end = row.end();
+        for (auto it = row.begin(); it != it_end; ++it)
+          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(it->operator[](0)[0], ScalarType(0), eps))
+            ret.insert(ii, it.index());
+      }
+    }
+    ret.sort();
+    return ret;
+  } // ... pruned_pattern_from_backend(...)
+
   bool these_are_valid_indices(const size_t ii, const size_t jj) const
   {
     if (ii >= rows())

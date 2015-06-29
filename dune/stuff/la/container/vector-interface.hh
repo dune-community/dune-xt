@@ -12,14 +12,18 @@
 #include <limits>
 #include <iostream>
 #include <vector>
+#include <complex>
 
 #include <boost/numeric/conversion/cast.hpp>
+
+#include <dune/common/ftraits.hh>
 
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/vector.hh>
+#include <dune/stuff/common/math.hh>
 
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
@@ -27,7 +31,6 @@
 namespace Dune {
 namespace Stuff {
 namespace LA {
-
 
 /**
  *  \brief  Contains tags mostly needed for python bindings.
@@ -48,7 +51,8 @@ class VectorInterface : public ContainerInterface<Traits, ScalarImp>, public Tag
 {
 public:
   typedef typename Traits::derived_type derived_type;
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
 
   typedef internal::VectorInputIterator<Traits, ScalarType> const_iterator;
   typedef internal::VectorOutputIterator<Traits, ScalarType> iterator;
@@ -121,7 +125,7 @@ public:
   virtual bool valid() const
   {
     for (const auto& val : *this) {
-      if (std::isnan(val) || std::isinf(val))
+      if (Common::isnan(val) || Common::isinf(val))
         return false;
     }
     return true;
@@ -167,9 +171,9 @@ public:
    *  \return A pair of the lowest index at which the maximum is attained and the absolute maximum value.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual std::pair<size_t, ScalarType> amax() const
+  virtual std::pair<size_t, RealType> amax() const
   {
-    auto result = std::make_pair(size_t(0), ScalarType(0));
+    auto result = std::make_pair(size_t(0), RealType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
       const auto value = std::abs(get_entry_ref(ii));
       if (value > result.second) {
@@ -189,9 +193,8 @@ public:
    *  \see    Dune::Stuff::Common::FloatCmp
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual bool
-  almost_equal(const derived_type& other,
-               const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  virtual bool almost_equal(const derived_type& other,
+                            const RealType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<RealType>::value()) const
   {
     if (other.size() != size())
       DUNE_THROW(Exceptions::shapes_do_not_match,
@@ -209,7 +212,7 @@ public:
    */
   template <class T>
   bool almost_equal(const VectorInterface<T>& other,
-                    const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+                    const RealType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<RealType>::value()) const
   {
     if (other.size() != size())
       DUNE_THROW(Exceptions::shapes_do_not_match,
@@ -230,7 +233,7 @@ public:
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += get_entry_ref(ii) * other.get_entry_ref(ii);
+      result += std::conj(get_entry_ref(ii)) * other.get_entry_ref(ii);
     return result;
   } // ... dot(...)
 
@@ -239,9 +242,9 @@ public:
    *  \return The l1-norm of the vector.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual ScalarType l1_norm() const
+  virtual RealType l1_norm() const
   {
-    ScalarType result = 0;
+    RealType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
       result += std::abs(get_entry_ref(ii));
     return result;
@@ -252,9 +255,10 @@ public:
    *  \return The l2-norm of the vector.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual ScalarType l2_norm() const
+  virtual RealType l2_norm() const
   {
-    return std::sqrt(dot(this->as_imp(*this)));
+    return std::sqrt(std::abs(dot(this->as_imp(*this)))); // std::abs is only needed for the right return type:
+    // v.dot(v) should always be a ScalarType with zero imaginary part
   }
 
   /**
@@ -262,7 +266,7 @@ public:
    *  \return The l-infintiy-norm of the vector.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual ScalarType sup_norm() const
+  virtual RealType sup_norm() const
   {
     return amax().second;
   }
@@ -549,15 +553,15 @@ public:
    * \brief Variant of amax() needed for the python bindings.
    * \see   amax()
    */
-  std::vector<ScalarType> pb_amax() const
+  std::vector<RealType> pb_amax() const
   {
     const auto max = amax();
     try {
-      return {boost::numeric_cast<ScalarType>(max.first), max.second};
+      return {boost::numeric_cast<RealType>(max.first), max.second};
     } catch (boost::bad_numeric_cast& ee) {
       DUNE_THROW(Exceptions::external_error,
                  "There was an error in boost converting '" << max.first << "' to '"
-                                                            << Common::Typename<ScalarType>::value()
+                                                            << Common::Typename<RealType>::value()
                                                             << "': "
                                                             << ee.what());
     }
@@ -662,7 +666,9 @@ struct VectorAbstractionBase
 
   typedef typename std::conditional<is_vector, VectorImp, void>::type VectorType;
   typedef typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type ScalarType;
+  typedef typename std::conditional<is_vector, typename VectorImp::RealType, void>::type RealType;
   typedef ScalarType S;
+  typedef RealType R;
 
   static inline typename std::enable_if<is_vector, VectorType>::type create(const size_t sz)
   {

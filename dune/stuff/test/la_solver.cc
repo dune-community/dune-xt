@@ -22,21 +22,27 @@ std::ostream& out = DSC_LOG.devnull();
 using namespace Dune::Stuff;
 using namespace Dune::Stuff::LA;
 
-typedef testing::Types<std::tuple<CommonDenseMatrix<double>, CommonDenseVector<double>, CommonDenseVector<double>>
+typedef testing::
+    Types<std::tuple<CommonDenseMatrix<double>, CommonDenseVector<double>, CommonDenseVector<double>>,
+          std::tuple<CommonDenseMatrix<std::complex<double>>, CommonDenseVector<std::complex<double>>,
+                     CommonDenseVector<std::complex<double>>>
 #if HAVE_EIGEN
-                       ,
-                       std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>,
-                       std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenMappedDenseVector<double>>,
-                       std::tuple<EigenDenseMatrix<double>, EigenMappedDenseVector<double>, EigenDenseVector<double>>,
-                       std::tuple<EigenDenseMatrix<double>, EigenMappedDenseVector<double>,
-                                  EigenMappedDenseVector<double>>,
-                       std::tuple<EigenRowMajorSparseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>
+          ,
+          std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>,
+          std::tuple<EigenDenseMatrix<std::complex<double>>, EigenDenseVector<std::complex<double>>,
+                     EigenDenseVector<std::complex<double>>>,
+          std::tuple<EigenDenseMatrix<double>, EigenDenseVector<double>, EigenMappedDenseVector<double>>,
+          std::tuple<EigenDenseMatrix<double>, EigenMappedDenseVector<double>, EigenDenseVector<double>>,
+          std::tuple<EigenDenseMatrix<double>, EigenMappedDenseVector<double>, EigenMappedDenseVector<double>>,
+          std::tuple<EigenRowMajorSparseMatrix<double>, EigenDenseVector<double>, EigenDenseVector<double>>,
+          std::tuple<EigenRowMajorSparseMatrix<std::complex<double>>, EigenDenseVector<std::complex<double>>,
+                     EigenDenseVector<std::complex<double>>>
 #endif // HAVE_EIGEN
 #if HAVE_DUNE_ISTL
-                       ,
-                       std::tuple<IstlRowMajorSparseMatrix<double>, IstlDenseVector<double>, IstlDenseVector<double>>
+          ,
+          std::tuple<IstlRowMajorSparseMatrix<double>, IstlDenseVector<double>, IstlDenseVector<double>>
 #endif
-                       > MatrixVectorCombinations;
+          > MatrixVectorCombinations;
 
 template <class MatrixVectorCombination>
 struct SolverTest : public ::testing::Test

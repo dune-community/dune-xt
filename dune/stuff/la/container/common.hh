@@ -13,6 +13,7 @@
 #include <memory>
 #include <type_traits>
 #include <vector>
+#include <complex>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -20,6 +21,7 @@
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/float_cmp.hh>
+#include <dune/common/ftraits.hh>
 
 #include "interfaces.hh"
 #include "pattern.hh"
@@ -45,7 +47,8 @@ template <class ScalarImp = double>
 class CommonDenseVectorTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonDenseVector<ScalarType> derived_type;
   typedef Dune::DynamicVector<ScalarType> BackendType;
 };
@@ -55,7 +58,8 @@ template <class ScalarImp = double>
 class CommonDenseMatrixTraits
 {
 public:
-  typedef ScalarImp ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonDenseMatrix<ScalarType> derived_type;
   typedef Dune::DynamicMatrix<ScalarType> BackendType;
 };
@@ -69,7 +73,8 @@ public:
  */
 template <class ScalarImp = double>
 class CommonDenseVector : public VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp>,
-                          public ProvidesBackend<internal::CommonDenseVectorTraits<ScalarImp>>
+                          public ProvidesBackend<internal::CommonDenseVectorTraits<ScalarImp>>,
+                          public ProvidesDataAccess<internal::CommonDenseVectorTraits<ScalarImp>>
 {
   typedef CommonDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
@@ -79,6 +84,7 @@ class CommonDenseVector : public VectorInterface<internal::CommonDenseVectorTrai
 public:
   typedef internal::CommonDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealType RealType;
   typedef typename Traits::BackendType BackendType;
 
   explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
@@ -116,7 +122,8 @@ public:
 
   CommonDenseVector(const ThisType& other) = default;
 
-  explicit CommonDenseVector(const BackendType& other)
+  explicit CommonDenseVector(const BackendType& other, const bool /*prune*/ = false,
+                             const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
     : backend_(new BackendType(other))
   {
   }
@@ -171,6 +178,15 @@ public:
     ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
+
+  /// \}
+  /// \name Required by ProvidesDataAccess.
+  /// \{
+
+  ScalarType* data()
+  {
+    return &(backend()[0]);
+  }
 
   /// \}
   /// \name Required by ContainerInterface.
@@ -256,17 +272,17 @@ public:
     return backend_->operator*(*(other.backend_));
   } // ... dot(...)
 
-  virtual ScalarType l1_norm() const override final
+  virtual RealType l1_norm() const override final
   {
     return backend_->one_norm();
   }
 
-  virtual ScalarType l2_norm() const override final
+  virtual RealType l2_norm() const override final
   {
     return backend_->two_norm();
   }
 
-  virtual ScalarType sup_norm() const override final
+  virtual RealType sup_norm() const override final
   {
     return backend_->infinity_norm();
   }
@@ -355,6 +371,7 @@ public:
   typedef internal::CommonDenseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealType RealType;
 
   explicit CommonDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(rr, cc, value))
@@ -386,9 +403,17 @@ public:
   {
   }
 
-  explicit CommonDenseMatrix(const BackendType& other)
-    : backend_(new BackendType(other))
+  /**
+   * \note If prune == true, this implementation is not optimal!
+   */
+  explicit CommonDenseMatrix(const BackendType& other, const bool prune = false,
+                             const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                 Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
+    if (prune)
+      backend_ = ThisType(other).pruned(eps).backend_;
+    else
+      backend_ = std::make_shared<BackendType>(other);
   }
 
   template <class T>
@@ -572,7 +597,7 @@ public:
       const auto& row_vec = backend_->operator[](ii);
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = row_vec[jj];
-        if (std::isnan(entry) || std::isinf(entry))
+        if (Common::isnan(entry) || Common::isinf(entry))
           return false;
       }
     }
