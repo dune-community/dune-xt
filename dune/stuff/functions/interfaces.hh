@@ -69,6 +69,19 @@ struct is_localizable_function;
 
 
 namespace Functions {
+namespace internal {
+
+
+// additional argument for member functions to differentiate between dimRangeCols = 1 and dimRangeCols > 1 by
+// overloading
+template <size_t rangeDimCols>
+struct ChooseVariant
+{
+};
+
+
+} // namespace internal
+
 
 #if HAVE_DUNE_GRID
 
@@ -129,7 +142,7 @@ class LocalfunctionSetInterface
   template <size_t dimDomain, class RangeFieldType, size_t dimRange, size_t dimRangeCols>
   struct JacobianRangeTypeSelector
   {
-    typedef double type;
+    typedef Dune::FieldVector<Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain>, dimRangeCols> type;
   };
 
   template <size_t dimDomain, class RangeFieldType, size_t dimRange>
