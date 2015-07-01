@@ -209,7 +209,7 @@ public:
   virtual derived_type& operator*=(const ScalarType& alpha)
   {
     scal(alpha);
-    return this->as_imp(*this);
+    return this->as_imp();
   }
   /// \}
 }; // class ContainerInterface

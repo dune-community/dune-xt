@@ -92,6 +92,7 @@ public:
 
   /**
    * \brief Get the iith entry.
+   * \todo  Default implement using get_entry_ref!
    */
   inline ScalarType get_entry(const size_t ii) const
   {
