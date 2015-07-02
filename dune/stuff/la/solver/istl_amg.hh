@@ -101,7 +101,7 @@ public:
         opts.get("smoother.relaxation_factor", default_opts.get<S>("smoother.relaxation_factor"));
     // SSOR as the smoother for the amg
     typedef SeqSSOR<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType_SSOR;
-    typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType_ILU>
+    typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType_SSOR>
         SmootherType_SSOR;
     typename Amg::SmootherTraits<SmootherType_SSOR>::Arguments smoother_parameters_SSOR;
     smoother_parameters_SSOR.iterations =
