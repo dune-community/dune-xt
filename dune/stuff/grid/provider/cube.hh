@@ -196,8 +196,8 @@ public:
                 const size_t num_refinements = default_config().get<size_t>("num_refinements"),
                 const std::array<unsigned int, dimDomain> overlap =
                     DSC::make_array<unsigned int, dimDomain>(default_config().get<unsigned int>("overlap")))
-    : grid_ptr_(
-          create_grid(DomainType(lower_left), DomainType(upper_right), parse_array(num_elements), num_refinements))
+    : grid_ptr_(create_grid(DomainType(lower_left), DomainType(upper_right), parse_array(num_elements), num_refinements,
+                            overlap))
   {
   }
 
@@ -207,7 +207,7 @@ public:
        const size_t num_refinements = default_config().get<size_t>("num_refinements"),
        const std::array<unsigned int, dimDomain> overlap =
            DSC::make_array<unsigned int, dimDomain>(default_config().get<unsigned int>("overlap")))
-    : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements), num_refinements))
+    : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements), num_refinements, overlap))
   {
   }
 
@@ -217,7 +217,7 @@ public:
        const size_t num_refinements = default_config().get<size_t>("num_refinements"),
        const std::array<unsigned int, dimDomain> overlap =
            DSC::make_array<unsigned int, dimDomain>(default_config().get<unsigned int>("overlap")))
-    : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements), num_refinements))
+    : grid_ptr_(create_grid(lower_left, upper_right, parse_array(num_elements), num_refinements, overlap))
   {
   }
 
