@@ -54,6 +54,64 @@ typename UnitMatrix<K, dim>::type unit_matrix()
 }
 
 
+template <class R, size_t r, size_t rC>
+struct Get
+{
+  static std::string value_str()
+  {
+    std::string str = "[";
+    for (size_t rr = 0; rr < r; ++rr) {
+      if (rr > 0)
+        str += "; ";
+      for (size_t cc = 0; cc < rC; ++cc) {
+        if (cc > 0)
+          str += " ";
+        if (cc == rr)
+          str += "1";
+        else
+          str += "0";
+      }
+    }
+    str += "]";
+    return str;
+  }
+};
+
+template <class R, size_t rC>
+struct Get<R, 1, rC>
+{
+  static std::string value_str()
+  {
+    std::string str = "[";
+    for (size_t cc = 0; cc < rC; ++cc) {
+      if (cc > 0)
+        str += " ";
+      str += "1";
+    }
+    str += "]";
+    return str;
+  }
+};
+
+template <class R, size_t r>
+struct Get<R, r, 1>
+{
+  static std::string value_str()
+  {
+    return Get<R, 1, r>::value_str();
+  }
+};
+
+template <class R>
+struct Get<R, 1, 1>
+{
+  static std::string value_str()
+  {
+    return "1";
+  }
+};
+
+
 } // namespace internal
 
 
@@ -64,63 +122,6 @@ class Constant
 {
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
   typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
-
-  template <class R, size_t r, size_t rC>
-  struct Get
-  {
-    static std::string value_str()
-    {
-      std::string str = "[";
-      for (size_t rr = 0; rr < r; ++rr) {
-        if (rr > 0)
-          str += "; ";
-        for (size_t cc = 0; cc < rC; ++cc) {
-          if (cc > 0)
-            str += " ";
-          if (cc == rr)
-            str += "1";
-          else
-            str += "0";
-        }
-      }
-      str += "]";
-      return str;
-    }
-  };
-
-  template <class R, size_t rC>
-  struct Get<R, 1, rC>
-  {
-    static std::string value_str()
-    {
-      std::string str = "[";
-      for (size_t cc = 0; cc < rC; ++cc) {
-        if (cc > 0)
-          str += " ";
-        str += "1";
-      }
-      str += "]";
-      return str;
-    }
-  };
-
-  template <class R, size_t r>
-  struct Get<R, r, 1>
-  {
-    static std::string value_str()
-    {
-      return Get<R, 1, r>::value_str();
-    }
-  };
-
-  template <class R>
-  struct Get<R, 1, 1>
-  {
-    static std::string value_str()
-    {
-      return "1";
-    }
-  };
 
 public:
   typedef typename BaseType::DomainType DomainType;
@@ -139,7 +140,7 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["value"] = Get<RangeFieldImp, rangeDim, rangeDimCols>::value_str();
+    config["value"] = internal::Get<RangeFieldImp, rangeDim, rangeDimCols>::value_str();
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
