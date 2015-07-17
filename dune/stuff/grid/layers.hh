@@ -7,6 +7,7 @@
 #define DUNE_STUFF_GRID_LAYERS_HH
 
 #include <memory>
+#include <cassert>
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/gridpart/leafgridpart.hh>
