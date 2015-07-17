@@ -51,6 +51,7 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
   virtual ~MatrixInterface()
   {
@@ -171,10 +172,11 @@ public:
                                              eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     SparsityPatternDefault ret(rows());
+    const ScalarType zero(0);
     if (prune) {
       for (size_t ii = 0; ii < rows(); ++ii)
         for (size_t jj = 0; jj < cols(); ++jj)
-          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(get_entry(ii, jj), ScalarType(0), eps))
+          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(get_entry(ii, jj), zero, eps))
             ret.insert(ii, jj);
     } else {
       for (size_t ii = 0; ii < rows(); ++ii)
@@ -197,7 +199,7 @@ public:
   virtual derived_type pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
                                   eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
-    auto pruned_pattern = pattern(true, eps);
+    const auto pruned_pattern = pattern(true, eps);
     derived_type ret(rows(), cols(), pruned_pattern);
     for (size_t ii = 0; ii < pruned_pattern.size(); ++ii)
       for (const size_t& jj : pruned_pattern.inner(ii))

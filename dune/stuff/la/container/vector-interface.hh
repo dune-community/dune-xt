@@ -57,6 +57,8 @@ public:
   typedef internal::VectorInputIterator<Traits, ScalarType> const_iterator;
   typedef internal::VectorOutputIterator<Traits, ScalarType> iterator;
 
+  static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
+
   virtual ~VectorInterface()
   {
   }
@@ -194,8 +196,9 @@ public:
    *  \see    Dune::Stuff::Common::FloatCmp
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual bool almost_equal(const derived_type& other,
-                            const RealType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<RealType>::value()) const
+  virtual bool
+  almost_equal(const derived_type& other,
+               const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     if (other.size() != size())
       DUNE_THROW(Exceptions::shapes_do_not_match,
@@ -213,7 +216,7 @@ public:
    */
   template <class T>
   bool almost_equal(const VectorInterface<T>& other,
-                    const RealType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<RealType>::value()) const
+                    const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     if (other.size() != size())
       DUNE_THROW(Exceptions::shapes_do_not_match,

@@ -159,13 +159,14 @@ public:
       // we do this here instead of using pattern(true), since we can build the triplets along the way which is more
       // efficient
       typedef ::Eigen::Triplet<ScalarType> TripletType;
+      const ScalarType zero(0);
       std::vector<TripletType> triplets;
       triplets.reserve(mat.nonZeros());
       for (EIGEN_size_t row = 0; row < mat.outerSize(); ++row) {
         for (typename BackendType::InnerIterator row_it(mat, row); row_it; ++row_it) {
           const size_t col = row_it.col();
           const auto val = mat.coeff(row, col);
-          if (Stuff::Common::FloatCmp::ne<Stuff::Common::FloatCmp::Style::absolute>(val, ScalarType(0), eps))
+          if (Stuff::Common::FloatCmp::ne<Stuff::Common::FloatCmp::Style::absolute>(val, zero, eps))
             triplets.emplace_back(row, col, val);
         }
       }
@@ -382,17 +383,18 @@ public:
     return backend_->nonZeros();
   }
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
-                                             eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  virtual SparsityPatternDefault
+  pattern(const bool prune = false,
+          const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
     SparsityPatternDefault ret(rows());
+    const auto zero = typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type(0);
     if (prune) {
       for (EIGEN_size_t row = 0; row < backend_->outerSize(); ++row) {
         for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
           const size_t col = row_it.col();
           const auto val = backend_->coeff(row, col);
-          if (Common::FloatCmp::ne(val, ScalarType(0), eps))
+          if (Common::FloatCmp::ne(val, zero, eps))
             ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(col));
         }
       }
@@ -406,8 +408,8 @@ public:
     return ret;
   } // ... pattern(...)
 
-  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
-                              eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  virtual ThisType
+  pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     return ThisType(*backend_, true, eps);
   }

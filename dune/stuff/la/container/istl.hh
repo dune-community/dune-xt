@@ -437,7 +437,7 @@ public:
                                         Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
     if (prune) {
-      auto pruned_pattern = pruned_pattern_from_backend(mat, eps);
+      const auto pruned_pattern = pruned_pattern_from_backend(mat, eps);
       build_sparse_matrix(mat.N(), mat.M(), pruned_pattern);
       for (size_t ii = 0; ii < pruned_pattern.size(); ++ii) {
         const auto& row_indices = pruned_pattern.inner(ii);
@@ -704,9 +704,11 @@ private:
       if (mat.getrowsize(ii) > 0) {
         const auto& row   = mat[ii];
         const auto it_end = row.end();
-        for (auto it = row.begin(); it != it_end; ++it)
-          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(it->operator[](0)[0], ScalarType(0), eps))
+        for (auto it = row.begin(); it != it_end; ++it) {
+          const auto val = it->operator[](0)[0];
+          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(val, decltype(val)(0), eps))
             ret.insert(ii, it.index());
+        }
       }
     }
     ret.sort();
