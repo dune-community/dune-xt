@@ -21,6 +21,7 @@
 
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/common/float_cmp.hh>
 
 namespace Dune {
 
