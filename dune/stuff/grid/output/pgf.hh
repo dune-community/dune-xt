@@ -310,7 +310,6 @@ public:
       }
       typedef typename GridType::LeafGridView LeafView;
       Walker<LeafView> leafWalk(grid_.leafGridView());
-      typedef typename LeafView::Traits::template Codim<0>::Entity EntityType;
       MinMaxCoordinateFunctor<LeafView> minMaxCoord;
       leafWalk.add(minMaxCoord);
       leafWalk.walk();

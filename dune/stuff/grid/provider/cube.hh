@@ -40,7 +40,7 @@ namespace Providers {
 namespace Configs {
 
 
-static Common::Configuration Cube_default(const std::string sub_name = "")
+static inline Common::Configuration Cube_default(const std::string sub_name = "")
 {
   Common::Configuration config;
   config["lower_left"]      = "[0 0 0 0]";
