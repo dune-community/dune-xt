@@ -192,7 +192,7 @@ public:
       return;
     }
 #else
-    const auto DUNE_UNUSED(no_warning_for_use_tbb) = use_tbb;
+    const auto DSC_UNUSED(no_warning_for_use_tbb) = use_tbb;
 #endif
     // prepare functors
     prepare();
