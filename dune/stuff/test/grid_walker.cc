@@ -53,15 +53,16 @@ struct GridWalkerTest : public ::testing::Test
       walker.add(counter);
       walker.walk(true);
     };
-    list<function<void()>> tests({test1, test2});
+    auto test3 = [&] { walker.add(counter).walk(true); };
+    list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
-    auto test3 = [&] {
+    auto test0 = [&] {
       IndexSetPartitioner<GridViewType> partitioner(gv.grid().leafIndexSet());
       Dune::SeedListPartitioning<GridType, 0> partitioning(gv, partitioner);
       walker.add(counter);
       walker.walk(partitioning);
     };
-    tests.push_back(test3);
+    tests.push_back(test0);
 #endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) // EXADUNE
 
     for (const auto& test : tests) {
