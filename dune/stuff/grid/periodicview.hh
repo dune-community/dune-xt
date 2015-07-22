@@ -304,6 +304,7 @@ public:
     , empty_intersection_map_(IntersectionMapType())
     , periodic_directions_(periodic_directions)
   {
+    // find lower left and upper right corner of the grid
     auto entity_it         = BaseType::template begin<0>();
     DomainType lower_left  = entity_it->geometry().center();
     DomainType upper_right = lower_left;
@@ -321,6 +322,10 @@ public:
       }
     }
 
+    // walk the grid and create a map that maps each entity(index) on the boundary to a map that maps every
+    // local intersection index to a std::pair< bool, EntityPointerType >, where the bool component of the pair
+    // indicates whether the intersection is on a periodic boundary and the second component points to the periodic
+    // neighbor entity if it is. If the first component is false, the EntityPointer is not meant to be used.
     EntityInlevelSearch<BaseType> entity_search(*this);
     DomainType periodic_neighbor_coords;
     IntersectionMapType intersection_neighbor_map;
