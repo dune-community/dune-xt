@@ -17,9 +17,9 @@
 #include "functions/checkerboard.hh"
 #include "functions/constant.hh"
 #include "functions/expression.hh"
-#include "functions/flattop.hh"
 #include "functions/ESV2007.hh"
-#include "playground/functions/indicator.hh"
+#include "functions/flattop.hh"
+#include "functions/indicator.hh"
 #include "functions/spe10.hh"
 
 namespace Dune {
