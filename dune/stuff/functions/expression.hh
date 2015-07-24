@@ -16,6 +16,7 @@
 
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/parallel/threadstorage.hh>
 
 #include "expression/base.hh"
 #include "interfaces.hh"
@@ -216,15 +217,15 @@ public:
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < dimRange; ++rr) {
-      tmp_row_ = ret[rr];
+      *tmp_row_ = ret[rr];
       for (size_t cc = 0; cc < dimRangeCols; ++cc) {
-        if (DSC::isnan(tmp_row_[cc])) {
+        if (DSC::isnan(tmp_row_->operator[](cc))) {
           failure    = true;
           error_type = "NaN";
-        } else if (DSC::isinf(tmp_row_[cc])) {
+        } else if (DSC::isinf(tmp_row_->operator[](cc))) {
           failure    = true;
           error_type = "inf";
-        } else if (std::abs(tmp_row_[cc]) > (0.9 * std::numeric_limits<double>::max())) {
+        } else if (std::abs(tmp_row_->operator[](cc)) > (0.9 * std::numeric_limits<double>::max())) {
           failure    = true;
           error_type = "an unlikely value";
         }
@@ -243,7 +244,7 @@ public:
                          << xx
                          << "\n"
                          << "The result was:                       "
-                         << tmp_row_[cc]
+                         << tmp_row_->operator[](cc)
                          << "\n\n"
                          << "You can disable this check by defining DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
       }
@@ -297,11 +298,11 @@ private:
   template <size_t rC>
   void evaluate_helper(const DomainType& xx, RangeType& ret, internal::ChooseVariant<rC>) const
   {
-    function_->evaluate(xx, tmp_vector_);
+    function_->evaluate(xx, *tmp_vector_);
     for (size_t rr = 0; rr < dimRange; ++rr) {
       auto& retRow = ret[rr];
       for (size_t cc = 0; cc < dimRangeCols; ++cc)
-        retRow[cc] = tmp_vector_[rr * dimRangeCols + cc];
+        retRow[cc] = (*tmp_vector_)[rr * dimRangeCols + cc];
     }
   } // ... evaluate_helper(...)
 
@@ -380,11 +381,10 @@ private:
   } // ... get_gradient(...)
 
   std::shared_ptr<const MathExpressionFunctionType> function_;
-  size_t order_;
-  std::string name_;
-  mutable FieldVector<RangeFieldType, dimRange * dimRangeCols> tmp_vector_;
-  mutable FieldVector<RangeFieldType, dimRangeCols> tmp_row_;
-  mutable FieldVector<RangeFieldType, dimDomain> tmp_gradient_row_;
+  const size_t order_;
+  const std::string name_;
+  mutable typename DS::PerThreadValue<FieldVector<RangeFieldType, dimRange * dimRangeCols>> tmp_vector_;
+  mutable typename DS::PerThreadValue<FieldVector<RangeFieldType, dimRangeCols>> tmp_row_;
   std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
 }; // class Expression
 
