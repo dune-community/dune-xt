@@ -381,8 +381,8 @@ private:
   } // ... get_gradient(...)
 
   std::shared_ptr<const MathExpressionFunctionType> function_;
-  const size_t order_;
-  const std::string name_;
+  size_t order_;
+  std::string name_;
   mutable typename DS::PerThreadValue<FieldVector<RangeFieldType, dimRange * dimRangeCols>> tmp_vector_;
   mutable typename DS::PerThreadValue<FieldVector<RangeFieldType, dimRangeCols>> tmp_row_;
   std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
