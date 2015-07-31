@@ -87,8 +87,8 @@ struct ElementVariant<Dune::SGrid<dimGrid, dimWorld>>
 };
 
 #if HAVE_DUNE_SPGRID
-template <class ct, int dim, SPRefinementStrategy strategy, class Comm>
-struct ElementVariant<Dune::SPGrid<ct, dim, strategy, Comm>>
+template <class ct, int dim, template <int> class Refinement, class Comm>
+struct ElementVariant<Dune::SPGrid<ct, dim, Refinement, Comm>>
 {
   static const int id = 1;
 };

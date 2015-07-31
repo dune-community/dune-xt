@@ -13,6 +13,7 @@
 
 #include <dune/common/unused.hh>
 
+#include <dune/grid/sgrid.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 
 #if HAVE_DUNE_SPGRID
@@ -33,10 +34,10 @@ namespace Dune {
  *  StructuredGridFactory just like the unstructured Grids. Limitations:
  *  \li SPGrid does not support simplices
  */
-template <class ct, int dim, SPRefinementStrategy strategy, class Comm>
-class StructuredGridFactory<SPGrid<ct, dim, strategy, Comm>>
+template <class ct, int dim, template <int> class Refinement, class Comm>
+class StructuredGridFactory<SPGrid<ct, dim, Refinement, Comm>>
 {
-  typedef SPGrid<ct, dim, strategy, Comm> GridType;
+  typedef SPGrid<ct, dim, Refinement, Comm> GridType;
   typedef typename GridType::ctype ctype;
   static const int dimworld = GridType::dimensionworld;
 
@@ -179,11 +180,11 @@ public:
 };
 
 #if HAVE_DUNE_SPGRID
-template <class ct, int dim, Dune::SPRefinementStrategy strategy, class Comm>
-class StructuredGridFactory<Dune::SPGrid<ct, dim, strategy, Comm>>
-    : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, strategy, Comm>>
+template <class ct, int dim, template <int> class Refinement, class Comm>
+class StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
+    : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
 {
-  typedef Dune::SPGrid<ct, dim, strategy, Comm> GridType;
+  typedef Dune::SPGrid<ct, dim, Refinement, Comm> GridType;
   typedef typename GridType::ctype ctype;
 
 public:
