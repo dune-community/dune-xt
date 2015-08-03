@@ -41,49 +41,6 @@
 
 #if HAVE_DUNE_GRID
 
-#include <dune/grid/sgrid.hh>
-
-typedef Dune::SGrid<1, 1>::Codim<0>::Entity DuneSGrid1dEntityType;
-typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneSGrid2dEntityType;
-typedef Dune::SGrid<3, 3>::Codim<0>::Entity DuneSGrid3dEntityType;
-
-typedef testing::Types<Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 1, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 1, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 1, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 2, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 2, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 2, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 3, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 3, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid1dEntityType, double, 1, double, 3, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 1, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 1, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 1, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 2, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 2, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 2, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 3, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 3, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid2dEntityType, double, 2, double, 3, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 1, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 1, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 1, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 2, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 2, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 2, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 3, 1>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 3, 2>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, double, 3, 3>,
-                       Dune::Stuff::Functions::Checkerboard<DuneSGrid3dEntityType, double, 3, std::complex<double>, 3,
-                                                            3>> CheckerboardFunctionSGridEntityTypes;
-
-TEST_STRUCT_GENERATOR(CheckerboardFunction, SGridEntity)
-TYPED_TEST_CASE(CheckerboardFunctionSGridEntityTest, CheckerboardFunctionSGridEntityTypes);
-TYPED_TEST(CheckerboardFunctionSGridEntityTest, provides_required_methods)
-{
-  this->check();
-}
-
 #include <dune/grid/yaspgrid.hh>
 
 typedef Dune::YaspGrid<1>::Codim<0>::Entity DuneYaspGrid1dEntityType;

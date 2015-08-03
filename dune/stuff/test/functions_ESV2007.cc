@@ -41,21 +41,6 @@
 
 #if HAVE_DUNE_GRID
 
-#include <dune/grid/sgrid.hh>
-
-typedef Dune::SGrid<2, 2>::Codim<0>::Entity DuneSGrid2dEntityType;
-
-typedef testing::Types<Dune::Stuff::Functions::ESV2007::Testcase1Force<DuneSGrid2dEntityType, double, 2, double, 1, 1>,
-                       Dune::Stuff::Functions::ESV2007::Testcase1ExactSolution<DuneSGrid2dEntityType, double, 2, double,
-                                                                               1, 1>> ESV2007FunctionSGridEntityTypes;
-
-TEST_STRUCT_GENERATOR(CheckerboardFunction, SGridEntity)
-TYPED_TEST_CASE(CheckerboardFunctionSGridEntityTest, ESV2007FunctionSGridEntityTypes);
-TYPED_TEST(CheckerboardFunctionSGridEntityTest, provides_required_methods)
-{
-  this->check();
-}
-
 #include <dune/grid/yaspgrid.hh>
 
 typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneYaspGrid2dEntityType;

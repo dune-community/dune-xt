@@ -14,7 +14,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #if HAVE_DUNE_GRID
-#include <dune/grid/sgrid.hh>
+#include <dune/grid/yaspgrid.hh>
 #endif
 
 #include <dune/geometry/quadraturerules.hh>
@@ -49,11 +49,10 @@ public:
 
 
 template <class DimDomain>
-class FlatTopFunctionTest
-    : public FunctionTest<typename FlatTopFunctionType<SGrid<DimDomain::value, DimDomain::value>>::value>
+class FlatTopFunctionTest : public FunctionTest<typename FlatTopFunctionType<YaspGrid<DimDomain::value>>::value>
 {
 protected:
-  typedef SGrid<DimDomain::value, DimDomain::value> GridType;
+  typedef YaspGrid<DimDomain::value> GridType;
   typedef typename FlatTopFunctionType<GridType>::value FunctionType;
 
   static std::shared_ptr<GridType> create_grid()

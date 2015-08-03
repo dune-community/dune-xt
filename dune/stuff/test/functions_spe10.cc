@@ -40,7 +40,7 @@
 
 #if HAVE_DUNE_GRID
 
-//# include <dune/grid/sgrid.hh>
+//# include <dune/grid/yaspgrid.hh>
 
 // typedef Dune::SGrid< 1, 1 >::Codim< 0 >::Entity DuneSGrid1dEntityType;
 // typedef Dune::SGrid< 2, 2 >::Codim< 0 >::Entity DuneSGrid2dEntityType;
