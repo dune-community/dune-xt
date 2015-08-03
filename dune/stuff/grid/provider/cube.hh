@@ -15,7 +15,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #if HAVE_DUNE_GRID
-#include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -75,13 +74,6 @@ struct ElementVariant
 #if HAVE_DUNE_GRID
 template <int dim>
 struct ElementVariant<Dune::YaspGrid<dim>>
-{
-  static const int id = 1;
-};
-
-
-template <int dimGrid, int dimWorld>
-struct ElementVariant<Dune::SGrid<dimGrid, dimWorld>>
 {
   static const int id = 1;
 };
