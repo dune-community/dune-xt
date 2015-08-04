@@ -43,7 +43,7 @@
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneYaspGrid2dEntityType;
+typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>::Codim<0>::Entity DuneYaspGrid2dEntityType;
 
 typedef testing::
     Types<Dune::Stuff::Functions::ESV2007::Testcase1Force<DuneYaspGrid2dEntityType, double, 2, double, 1, 1>,

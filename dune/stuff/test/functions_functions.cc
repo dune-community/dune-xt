@@ -47,9 +47,9 @@
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef Dune::YaspGrid<1>::Codim<0>::Entity DuneYaspGrid1dEntityType;
-typedef Dune::YaspGrid<2>::Codim<0>::Entity DuneYaspGrid2dEntityType;
-typedef Dune::YaspGrid<3>::Codim<0>::Entity DuneYaspGrid3dEntityType;
+typedef Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>::Codim<0>::Entity DuneYaspGrid1dEntityType;
+typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>::Codim<0>::Entity DuneYaspGrid2dEntityType;
+typedef Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>>::Codim<0>::Entity DuneYaspGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Functions::Constant<DuneYaspGrid1dEntityType, double, 1, double, 1, 1>,
                        Dune::Stuff::Functions::Constant<DuneYaspGrid1dEntityType, double, 1, double, 1, 2>,

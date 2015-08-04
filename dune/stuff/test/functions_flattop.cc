@@ -49,10 +49,13 @@ public:
 
 
 template <class DimDomain>
-class FlatTopFunctionTest : public FunctionTest<typename FlatTopFunctionType<YaspGrid<DimDomain::value>>::value>
+class FlatTopFunctionTest
+    : public FunctionTest<
+          typename FlatTopFunctionType<YaspGrid<DimDomain::value,
+                                                EquidistantOffsetCoordinates<double, DimDomain::value>>>::value>
 {
 protected:
-  typedef YaspGrid<DimDomain::value> GridType;
+  typedef YaspGrid<DimDomain::value, EquidistantOffsetCoordinates<double, DimDomain::value>> GridType;
   typedef typename FlatTopFunctionType<GridType>::value FunctionType;
 
   static std::shared_ptr<GridType> create_grid()

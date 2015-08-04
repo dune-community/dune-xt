@@ -83,7 +83,7 @@
 
 #include <dune/grid/yaspgrid.hh>
 
-typedef Dune::YaspGrid<3>::Codim<0>::Entity DuneYaspGrid3dEntityType;
+typedef Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>>::Codim<0>::Entity DuneYaspGrid3dEntityType;
 
 typedef testing::Types<Dune::Stuff::Functions::Spe10::Model2<DuneYaspGrid3dEntityType, double, 3, double, 3, 3>>
     Spe10Model2FunctionYaspGridEntityTypes;
