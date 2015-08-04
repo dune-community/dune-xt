@@ -28,7 +28,7 @@ struct GridWalkerTest : public ::testing::Test
 {
   static const size_t griddim = T::value;
   static const size_t level   = 4;
-  typedef Dune::YaspGrid<griddim> GridType;
+  typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename DSG::Entity<GridViewType>::Type EntityType;
   typedef typename DSG::Intersection<GridViewType>::Type IntersectionType;

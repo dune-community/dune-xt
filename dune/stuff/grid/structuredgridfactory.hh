@@ -8,6 +8,8 @@
 #ifndef DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 #define DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 
+#include <memory>
+
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
@@ -153,10 +155,11 @@ public:
 
 #endif
 
-template <int dim>
-class StructuredGridFactory<Dune::YaspGrid<dim>> : public Dune::StructuredGridFactory<Dune::YaspGrid<dim>>
+template <int dim, class Coords>
+class StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
+    : public Dune::StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
 {
-  typedef Dune::YaspGrid<dim> GridType;
+  typedef Dune::YaspGrid<dim, Coords> GridType;
   typedef typename GridType::ctype ctype;
 
 public:
@@ -168,16 +171,14 @@ public:
                  Dune::MPIHelper::MPICommunicator communicator = Dune::MPIHelper::getCommunicator())
   {
     const auto no_periodic_direction = std::bitset<dim>();
-    if (DSC::FloatCmp::ne(lowerLeft, Dune::FieldVector<ctype, GridType::dimensionworld>(0.0)))
-      DUNE_THROW(Dune::InvalidStateException, "YaspGrid + Origin != 0.0 is still a no-go");
-    Dune::array<int, dim> elements;
+    std::array<int, dim> elements;
     std::copy(elements_in.begin(), elements_in.end(), elements.begin());
     auto overlap_check = overlap;
     overlap_check.fill(overlap[0]);
     for (auto i : DSC::valueRange(1, dim))
       if (overlap[i] != overlap[0])
         DUNE_THROW(Dune::InvalidStateException, "YaspGrid only supports uniform overlap");
-    return std::make_shared<GridType>(communicator, upperRight, elements, no_periodic_direction, overlap[0]);
+    return std::make_shared<GridType>(lowerLeft, upperRight, elements, no_periodic_direction, overlap[0], communicator);
   }
 };
 

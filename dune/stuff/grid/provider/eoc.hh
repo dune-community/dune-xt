@@ -7,7 +7,9 @@
 #define DUNE_STUFF_GRID_PROVIDER_EOC_HH
 
 #if HAVE_DUNE_GRID
+#define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1
 #include <dune/grid/io/file/dgfparser.hh>
+#undef DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING
 #endif
 
 #include "default.hh"

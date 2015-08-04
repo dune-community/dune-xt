@@ -77,6 +77,11 @@ struct ElementVariant<Dune::YaspGrid<dim>>
 {
   static const int id = 1;
 };
+template <int dim, class Coords>
+struct ElementVariant<Dune::YaspGrid<dim, Coords>>
+{
+  static const int id = 1;
+};
 
 #if HAVE_DUNE_SPGRID
 template <class ct, int dim, template <int> class Refinement, class Comm>

@@ -23,7 +23,9 @@
 using namespace Dune;
 using namespace Stuff;
 
-#define YASPGRIDS YaspGrid<1>, YaspGrid<2>, YaspGrid<3>
+#define YASPGRIDS                                                                                                      \
+  YaspGrid<1, EquidistantOffsetCoordinates<double, 1>>, YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,          \
+      YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>
 
 #if HAVE_ALUGRID
 #define ALUCUBEGRIDS ALUGrid<2, 2, cube, nonconforming>, ALUGrid<3, 3, cube, nonconforming>
@@ -272,19 +274,8 @@ struct PeriodicViewTestYaspCube : public testing::Test
     this->check(hr_partially_periodic_grid_view, hyperrectangle_grid_view, is_simplex, 4);
     this->check(hr_fully_periodic_grid_view, hyperrectangle_grid_view, is_simplex, 5);
   } // void checks_for_all_grids(...)
-}; // ... struct PeriodicViewTestYaspCube ...
 
-template <class GridImp>
-struct PeriodicViewTestALUCube : public PeriodicViewTestYaspCube<GridImp>
-{
-  typedef PeriodicViewTestYaspCube<GridImp> BaseType;
-  typedef typename BaseType::GridProviderType GridProviderType;
-  typedef typename BaseType::GridType GridType;
-  typedef typename BaseType::GridViewType GridViewType;
-  typedef typename BaseType::PeriodicGridViewType PeriodicGridViewType;
-  static const size_t dimDomain = BaseType::dimDomain;
-
-  void additional_checks_for_alu(const bool is_simplex)
+  void non_trivial_origin_checks(const bool is_simplex)
   {
     // create grid on hyperrectangle with lower_left != 0 (not possible for YaspGrid)
     DSC::Configuration grid_config             = GridProviderType::default_config();
@@ -308,6 +299,19 @@ struct PeriodicViewTestALUCube : public PeriodicViewTestYaspCube<GridImp>
     this->check(partially_periodic_grid_view, grid_view, is_simplex, 7);
     this->check(fully_periodic_grid_view, grid_view, is_simplex, 8);
   } // void additional_checks_for_alu(...)
+}; // ... struct PeriodicViewTestYaspCube ...
+
+template <class GridImp>
+struct PeriodicViewTestALUCube : public PeriodicViewTestYaspCube<GridImp>
+{
+  typedef PeriodicViewTestYaspCube<GridImp> BaseType;
+  typedef typename BaseType::GridProviderType GridProviderType;
+  typedef typename BaseType::GridType GridType;
+  typedef typename BaseType::GridViewType GridViewType;
+  typedef typename BaseType::PeriodicGridViewType PeriodicGridViewType;
+  static const size_t dimDomain = BaseType::dimDomain;
+
+
 }; // ... struct PeriodicViewTestALUCube ...
 
 template <class GridImp>
@@ -321,6 +325,7 @@ TYPED_TEST_CASE(PeriodicViewTestYaspCube, YaspCubeGridTypes);
 TYPED_TEST(PeriodicViewTestYaspCube, check_yaspcube)
 {
   this->checks_for_all_grids(false);
+  this->non_trivial_origin_checks(false);
 }
 
 #if HAVE_ALUGRID
@@ -333,14 +338,14 @@ TYPED_TEST_CASE(PeriodicViewTestALUCube, ALUCubeGridTypes);
 TYPED_TEST(PeriodicViewTestALUCube, check_alucube)
 {
   this->checks_for_all_grids(false);
-  this->additional_checks_for_alu(false);
+  this->non_trivial_origin_checks(false);
 }
 
 TYPED_TEST_CASE(PeriodicViewTestALUSimplex, ALUSimplexGridTypes);
 TYPED_TEST(PeriodicViewTestALUSimplex, check_alusimplex)
 {
   this->checks_for_all_grids(true);
-  this->additional_checks_for_alu(true);
+  this->non_trivial_origin_checks(true);
 }
 
 #else // HAVE_ALUGRID

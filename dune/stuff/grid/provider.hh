@@ -23,7 +23,7 @@ namespace Stuff {
 #if HAVE_DUNE_GRID
 
 
-template <class GridType = Dune::SGrid<2, 2>>
+template <class GridType = Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>
 class GridProviders
 {
 public:
