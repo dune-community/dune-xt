@@ -6,6 +6,7 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_EOC_HH
 #define DUNE_STUFF_GRID_PROVIDER_EOC_HH
 
+// silence sgrid deprecation warning temporarily
 #if HAVE_DUNE_GRID
 #define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1
 #include <dune/grid/io/file/dgfparser.hh>
