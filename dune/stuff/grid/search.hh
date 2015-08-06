@@ -40,7 +40,7 @@ public:
   typedef typename ViewTraits::template Codim<0>::Entity EntityType;
   typedef typename EntityType::Geometry::LocalCoordinate LocalCoordinateType;
   typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
-  typedef std::vector<std::unique_ptr<typename EntityType::EntityPointer>> EntityPointerVectorType;
+  typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
 }; // class EntitySearchBase
 
 
@@ -52,16 +52,16 @@ class EntityInlevelSearch : public EntitySearchBase<GridViewType>
   typedef typename GridViewType::template Codim<0>::Iterator IteratorType;
 
 public:
-  typedef typename BaseType::EntityPointerVectorType EntityPointerVectorType;
+  typedef typename BaseType::EntityVectorType EntityVectorType;
 
 private:
-  inline typename EntityPointerVectorType::value_type
-  check_add(const typename BaseType::EntityType& entity, const typename BaseType::GlobalCoordinateType& point) const
+  inline typename EntityVectorType::value_type check_add(const typename BaseType::EntityType& entity,
+                                                         const typename BaseType::GlobalCoordinateType& point) const
   {
     const auto& geometry   = entity.geometry();
     const auto& refElement = DSG::reference_element(geometry);
     if (refElement.checkInside(geometry.local(point))) {
-      return DSC::make_unique<typename BaseType::EntityType::EntityPointer>(entity);
+      return DSC::make_unique<typename BaseType::EntityType>(entity);
     }
     return nullptr;
   }
@@ -74,16 +74,16 @@ public:
   }
 
   template <class PointContainerType>
-  EntityPointerVectorType operator()(const PointContainerType& points)
+  EntityVectorType operator()(const PointContainerType& points)
   {
     const IteratorType begin = gridview_.template begin<0>();
     const IteratorType end = gridview_.template end<0>();
-    EntityPointerVectorType ret(points.size());
-    typename EntityPointerVectorType::size_type idx(0);
+    EntityVectorType ret(points.size());
+    typename EntityVectorType::size_type idx(0);
     for (const auto& point : points) {
       IteratorType it_current = it_last_;
       bool it_reset = true;
-      typename EntityPointerVectorType::value_type tmp_ptr(nullptr);
+      typename EntityVectorType::value_type tmp_ptr(nullptr);
       for (; it_current != end; ++it_current) {
         if ((tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
@@ -129,10 +129,10 @@ public:
   {
   }
 
-  typedef typename BaseType::EntityPointerVectorType EntityPointerVectorType;
+  typedef typename BaseType::EntityVectorType EntityVectorType;
 
   template <class PointContainerType>
-  EntityPointerVectorType operator()(const PointContainerType& points) const
+  EntityVectorType operator()(const PointContainerType& points) const
   {
     auto level = std::min(gridview_.grid().maxLevel(), start_level_);
     auto range = DSC::entityRange(gridview_.grid().levelView(level));
@@ -141,9 +141,9 @@ public:
 
 private:
   template <class QuadpointContainerType, class RangeType>
-  EntityPointerVectorType process(const QuadpointContainerType& quad_points, const RangeType& range) const
+  EntityVectorType process(const QuadpointContainerType& quad_points, const RangeType& range) const
   {
-    EntityPointerVectorType ret;
+    EntityVectorType ret;
 
     for (const auto& my_ent : range) {
       const auto my_level    = my_ent.level();

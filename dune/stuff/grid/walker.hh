@@ -295,8 +295,7 @@ protected:
 
           // apply codim1 functors
           if (intersection.neighbor()) {
-            const auto neighbor_ptr = intersection.outside();
-            const auto& neighbor = *neighbor_ptr;
+            const auto neighbor = intersection.outside();
             apply_local(intersection, entity, neighbor);
           } else
             apply_local(intersection, entity, entity);
