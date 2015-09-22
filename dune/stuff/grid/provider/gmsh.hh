@@ -55,8 +55,15 @@ public:
     if (std::is_same<ALUGrid<2, 2, simplex, conforming>, GridType>::value
         || std::is_same<ALUGrid<2, 2, simplex, nonconforming>, GridType>::value)
       filename = "gmsh_2d_simplices.msh";
-    return Common::Configuration("filename", filename);
-  }
+    Common::Configuration config("filename", filename);
+    if (sub_name.empty())
+      return config;
+    else {
+      Common::Configuration tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
 
   static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
