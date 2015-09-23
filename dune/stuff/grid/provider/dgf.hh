@@ -3,8 +3,8 @@
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_STUFF_GRID_PROVIDER_GMSH_HH
-#define DUNE_STUFF_GRID_PROVIDER_GMSH_HH
+#ifndef DUNE_STUFF_GRID_PROVIDER_DGF_HH
+#define DUNE_STUFF_GRID_PROVIDER_DGF_HH
 
 #if HAVE_DUNE_GRID
 
@@ -119,4 +119,4 @@ private:
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_PROVIDER_GMSH_HH
+#endif // DUNE_STUFF_GRID_PROVIDER_DGF_HH
