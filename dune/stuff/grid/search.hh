@@ -28,7 +28,6 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
-
 template <class GridViewType>
 class EntitySearchBase
 {
@@ -42,7 +41,6 @@ public:
   typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
   typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
 }; // class EntitySearchBase
-
 
 template <class GridViewType>
 class EntityInlevelSearch : public EntitySearchBase<GridViewType>
@@ -113,7 +111,6 @@ private:
   IteratorType it_last_;
 }; // class EntityInlevelSearch
 
-
 template <class GridViewType>
 class EntityHierarchicSearch : public EntitySearchBase<GridViewType>
 {
@@ -168,20 +165,17 @@ private:
   }
 }; // class EntityHierarchicSearch
 
-
 template <class GV>
 EntityInlevelSearch<GV> make_entity_in_level_search(const GV& grid_view)
 {
   return EntityInlevelSearch<GV>(grid_view);
 }
 
-
 template <class GV>
 EntityHierarchicSearch<GV> make_entity_hierarchic_search(const GV& grid_view)
 {
   return EntityHierarchicSearch<GV>(grid_view);
 }
-
 
 } // namespace Grid
 } // namespace Stuff

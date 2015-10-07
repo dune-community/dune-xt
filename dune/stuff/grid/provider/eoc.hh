@@ -22,7 +22,6 @@ namespace Providers {
 
 #if HAVE_DUNE_GRID
 
-
 /**
  *  The purpose of this class is to behave like a Stuff::Grid::ProviderInterface and at the same time to provide a
  *  means to obtain the real grid level corresponding to a refinement level.
@@ -99,16 +98,13 @@ private:
   int reference_level_;
 }; // class EOC
 
-
 #else // HAVE_DUNE_GRID
-
 
 template <class GridImp>
 class EOC
 {
   static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
 };
-
 
 #endif // HAVE_DUNE_GRID
 

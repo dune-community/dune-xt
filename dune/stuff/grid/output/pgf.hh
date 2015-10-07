@@ -29,7 +29,6 @@ namespace {
 const TexColorArrayType texcolors_ = {{"black", "red", "blue", "green", "yellow", "cyan", "magenta"}};
 }
 
-
 //! A means to ensure we have exactly 2 coords for tikz to draw, even in 1D
 struct PgfCoordWrapper : Dune::FieldVector<double, 2>
 {

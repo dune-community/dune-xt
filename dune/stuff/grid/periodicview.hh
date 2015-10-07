@@ -28,12 +28,9 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
-
 #if HAVE_DUNE_GRID
 
-
 namespace internal {
-
 
 /** \brief Intersection for PeriodicGridView
  *
@@ -216,11 +213,9 @@ private:
   mutable std::unique_ptr<Intersection> current_intersection_;
 }; // ... class PeriodicIntersectionIterator ...
 
-
 // forward
 template <class RealGridViewImp>
 class PeriodicGridViewImp;
-
 
 //! Traits for PeriodicGridView
 template <class RealGridViewImp>
@@ -270,7 +265,6 @@ public:
   typedef PeriodicIntersection<RealGridViewType> Intersection;
   typedef PeriodicIntersectionIterator<RealGridViewType> IntersectionIterator;
 }; // ... class PeriodicGridViewTraits ...
-
 
 /** \brief Actual Implementation of PeriodicGridView
  *  \see PeriodicGridView
@@ -401,9 +395,7 @@ private:
   const std::bitset<dimDomain> periodic_directions_;
 }; // ... class PeriodicGridViewImp ...
 
-
 } // namespace internal
-
 
 /** \brief GridView that takes an arbitrary Dune::GridView and adds periodic boundaries
  *
@@ -458,16 +450,13 @@ public:
   }
 }; // class PeriodicGridView
 
-
 #else // HAVE_DUNE_GRID
-
 
 template <class RealGridViewImp>
 class PeriodicGridView
 {
   static_assert(AlwaysFalse<RealGridViewImp>::value, "You are missing dune-grid!");
 };
-
 
 #endif // HAVE_DUNE_GRID
 

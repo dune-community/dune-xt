@@ -71,7 +71,6 @@ public:
   }
 }; // class Default
 
-
 #else // HAVE_DUNE_GRID
 
 template <class GridImp>
@@ -79,7 +78,6 @@ class Default
 {
   static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
 };
-
 
 #endif // HAVE_DUNE_GRID
 

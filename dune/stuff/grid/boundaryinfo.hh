@@ -34,15 +34,12 @@ namespace Stuff {
 namespace Grid {
 namespace internal {
 
-
 inline static std::string boundary_info_static_id()
 {
   return "stuff.grid.boundaryinfo";
 }
 
-
 } // namespace internal
-
 
 template <class IntersectionImp>
 class BoundaryInfoInterface
@@ -97,9 +94,7 @@ public:
 #endif // HAVE_DUNE_PDELAB
 }; // class BoundaryInfoInterface
 
-
 namespace BoundaryInfoConfigs {
-
 
 class AllDirichlet
 {
@@ -117,7 +112,6 @@ public:
       return Common::Configuration(sub_name + ".type", static_id());
   }
 }; // class AllDirichlet
-
 
 class AllNeumann
 {
@@ -188,12 +182,9 @@ public:
   } // ... default_config(...)
 }; // class NormalBased
 
-
 } // namespace BoundaryInfoConfigs
 
-
 namespace BoundaryInfos {
-
 
 template <class IntersectionImp>
 class AllDirichlet : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
@@ -248,7 +239,6 @@ public:
     return false;
   }
 }; // class AllDirichlet
-
 
 template <class IntersectionImp>
 class AllNeumann : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
@@ -552,9 +542,7 @@ private:
   const DomainFieldType tol_;
 }; // class NormalBased
 
-
 } // namespace BoundaryInfos
-
 
 template <class I>
 class BoundaryInfoProvider
@@ -620,9 +608,7 @@ public:
   } // ... create(...)
 }; // class BoundaryInfoProvider
 
-
 } // namespace Grid
-
 
 } // namespace Stuff
 } // namespace Dune

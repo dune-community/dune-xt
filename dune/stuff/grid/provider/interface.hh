@@ -28,7 +28,6 @@ namespace Grid {
 
 #if HAVE_DUNE_GRID
 
-
 template <class GridImp>
 class ConstProviderInterface
 {
@@ -221,7 +220,6 @@ private:
   }
 #endif
 
-
   template <class BoundaryInfoType>
   std::vector<double> generateBoundaryVisualization(const LeafGridViewType& gridView,
                                                     const BoundaryInfoType& boundaryInfo, const std::string type) const
@@ -255,7 +253,6 @@ private:
     return data;
   } // ... generateEntityVisualization(...)
 }; // class ConstProviderInterface
-
 
 template <class GridImp>
 class ProviderInterface : public ConstProviderInterface<GridImp>
@@ -328,9 +325,7 @@ public:
 #endif // HAVE_DUNE_FEM
 }; // class ProviderInterface
 
-
 #else // HAVE_DUNE_GRID
-
 
 template <class GridImp>
 class ConstProviderInterface
@@ -338,13 +333,11 @@ class ConstProviderInterface
   static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
 };
 
-
 template <class GridImp>
 class ProviderInterface
 {
   static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
 };
-
 
 #endif // HAVE_DUNE_GRID
 

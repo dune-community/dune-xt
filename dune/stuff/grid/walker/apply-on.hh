@@ -18,7 +18,6 @@ namespace Stuff {
 namespace Grid {
 namespace ApplyOn {
 
-
 /**
  *  \brief Interface for functors to tell on which entity to apply.
  *
@@ -44,7 +43,6 @@ public:
   virtual bool apply_on(const GridViewType& /*grid_view*/, const EntityType& /*entity*/) const = 0;
 }; // class WhichEntity
 
-
 /**
  *  \brief Selects all entities.
  */
@@ -63,7 +61,6 @@ public:
   }
 }; // class AllEntities
 
-
 /**
  *  \brief Selects entities which have a boundary intersection.
  */
@@ -81,7 +78,6 @@ public:
     return entity.hasBoundaryIntersections();
   }
 }; // class BoundaryEntities
-
 
 /**
  *  \brief Interface for functors to tell on which intersection to apply.
@@ -108,7 +104,6 @@ public:
   virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& /*intersection*/) const = 0;
 }; // class WhichIntersection< GridViewImp >
 
-
 /**
  *  \brief Selects all intersections.
  */
@@ -127,7 +122,6 @@ public:
     return true;
   }
 }; // class AllIntersections
-
 
 /**
  *  \brief Selects each inner intersection.
@@ -152,7 +146,6 @@ public:
     return intersection.neighbor() && !intersection.boundary();
   }
 }; // class InnerIntersections
-
 
 /**
  *  \brief Selects each inner intersection only once.
@@ -186,7 +179,6 @@ public:
   }
 }; // class InnerIntersections
 
-
 template <class GridViewImp>
 class BoundaryIntersections : public WhichIntersection<GridViewImp>
 {
@@ -202,7 +194,6 @@ public:
   }
 }; // class BoundaryIntersections
 
-
 template <class GridViewImp>
 class NonPeriodicBoundaryIntersections : public WhichIntersection<GridViewImp>
 {
@@ -217,7 +208,6 @@ public:
     return intersection.boundary() && !intersection.neighbor();
   }
 }; // class BoundaryIntersections
-
 
 /**
  *  \brief Selects each periodic intersection.
@@ -242,7 +232,6 @@ public:
     return intersection.neighbor() && intersection.boundary();
   }
 }; // class PeriodicIntersections
-
 
 template <class GridViewImp>
 class FilteredIntersections : public WhichIntersection<GridViewImp>
@@ -291,7 +280,6 @@ private:
   const BoundaryInfoInterface<IntersectionType>& boundary_info_;
 }; // class DirichletIntersections
 
-
 template <class GridViewImp>
 class NeumannIntersections : public WhichIntersection<GridViewImp>
 {
@@ -314,7 +302,6 @@ public:
 private:
   const BoundaryInfoInterface<IntersectionType>& boundary_info_;
 }; // class NeumannIntersections
-
 
 } // namespace ApplyOn
 } // namespace Grid
