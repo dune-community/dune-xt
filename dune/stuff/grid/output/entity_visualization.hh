@@ -64,7 +64,6 @@ struct ElementVisualization
     vtkwriter.pwrite(f.filename(), f.dir(), piecefilesFolderName, Dune::VTK::appendedraw);
   }
 
-
   class FunctorBase
   {
   public:
@@ -231,7 +230,6 @@ struct ElementVisualization
     elementdata(grid, volumeFunctor);
   }
 };
-
 
 } // namespace Stuff
 } // namespace Grid

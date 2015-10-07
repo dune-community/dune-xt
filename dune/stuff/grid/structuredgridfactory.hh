@@ -100,9 +100,7 @@ public:
   }
 };
 
-
 #endif // HAVE_DUNE_SPGRID
-
 
 namespace Stuff {
 namespace Grid {

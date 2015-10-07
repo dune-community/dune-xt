@@ -17,7 +17,6 @@ namespace Stuff {
 namespace Grid {
 namespace internal {
 
-
 template <class GridViewType>
 class Codim0Object : public Functor::Codim0<GridViewType>
 {
@@ -32,7 +31,6 @@ public:
 
   virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const = 0;
 };
-
 
 template <class GridViewType, class Codim0FunctorType>
 class Codim0FunctorWrapper : public Codim0Object<GridViewType>
@@ -77,7 +75,6 @@ private:
   std::unique_ptr<const ApplyOn::WhichEntity<GridViewType>> where_;
 }; // class Codim0FunctorWrapper
 
-
 template <class GridViewType>
 class Codim1Object : public Functor::Codim1<GridViewType>
 {
@@ -92,7 +89,6 @@ public:
 
   virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const = 0;
 };
-
 
 template <class GridViewType, class Codim1FunctorType>
 class Codim1FunctorWrapper : public Codim1Object<GridViewType>
@@ -134,7 +130,6 @@ private:
   Codim1FunctorType& wrapped_functor_;
   std::unique_ptr<const ApplyOn::WhichIntersection<GridViewType>> where_;
 }; // class Codim1FunctorWrapper
-
 
 template <class GridViewType, class WalkerType>
 class WalkerWrapper : public Codim0Object<GridViewType>, public Codim1Object<GridViewType>
@@ -197,7 +192,6 @@ private:
   std::unique_ptr<const ApplyOn::WhichEntity<GridViewType>> which_entities_;
   std::unique_ptr<const ApplyOn::WhichIntersection<GridViewType>> which_intersections_;
 }; // class WalkerWrapper
-
 
 template <class GridViewType>
 class Codim0LambdaWrapper : public Codim0Object<GridViewType>
@@ -264,7 +258,6 @@ private:
   LambdaType lambda_;
   std::unique_ptr<const ApplyOn::WhichIntersection<GridViewType>> where_;
 }; // class Codim1FunctorWrapper
-
 
 } // namespace internal
 } // namespace Grid

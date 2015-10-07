@@ -41,7 +41,6 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
-
 template <class GridViewImp>
 class Walker : public Functor::Codim0And1<GridViewImp>
 {

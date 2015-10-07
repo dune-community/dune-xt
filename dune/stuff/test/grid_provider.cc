@@ -19,7 +19,6 @@
 using namespace Dune;
 using namespace Stuff;
 
-
 #define YASPGRIDS                                                                                                      \
   YaspGrid<1, EquidistantOffsetCoordinates<double, 1>>, YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,          \
       YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, YaspGrid<4, EquidistantOffsetCoordinates<double, 4>>
@@ -33,7 +32,6 @@ using namespace Stuff;
       ALUGrid<2, 2, simplex, conforming> /*, ALUGrid< 2, 3, simplex, conforming >     <- same here */                  \
       , ALUGrid<3, 3, simplex, conforming>
 #endif // HAVE_ALUGRID
-
 
 template <class GridProviderType>
 class ConstGridProviderBase : public testing::Test
@@ -132,7 +130,6 @@ public:
 
 }; // class ConstGridProviderBase
 
-
 template <class GridProviderType>
 class GridProviderBase : public ConstGridProviderBase<GridProviderType>
 {
@@ -165,12 +162,10 @@ public:
 
 }; // class GridProviderBase
 
-
 template <class GridType>
 struct CubeGridProvider : public GridProviderBase<Stuff::Grid::Providers::Cube<GridType>>
 {
 };
-
 
 typedef testing::Types<YASPGRIDS
 #if HAVE_ALUGRID
@@ -207,7 +202,6 @@ TEST(DISABLED_CubeGridProvider, fulfills_non_const_interface)
 }
 
 #endif
-
 
 #else // HAVE_DUNE_GRID
 

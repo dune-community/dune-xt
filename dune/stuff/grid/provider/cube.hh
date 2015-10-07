@@ -38,7 +38,6 @@ namespace Grid {
 namespace Providers {
 namespace Configs {
 
-
 static inline Common::Configuration Cube_default(const std::string sub_name = "")
 {
   Common::Configuration config;
@@ -56,14 +55,11 @@ static inline Common::Configuration Cube_default(const std::string sub_name = ""
   }
 } // ... Cube_default(...)
 
-
 } // namespace Configs
 namespace internal {
 
-
 template <typename GridType>
 struct ElementVariant;
-
 
 template <typename GridType>
 struct ElementVariant
@@ -95,13 +91,11 @@ struct ElementVariant<Dune::SPGrid<ct, dim, Refinement, Comm>>
 
 #if HAVE_ALUGRID
 
-
 template <int dimGrid, int dimWorld>
 struct ElementVariant<Dune::ALUCubeGrid<dimGrid, dimWorld>>
 {
   static const int id = 1;
 };
-
 
 template <int dimGrid, int dimWorld, class MpiCommImp>
 struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming, MpiCommImp>>
@@ -109,20 +103,17 @@ struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conform
   static const int id = 1;
 };
 
-
 template <int dimGrid, int dimWorld, class MpiCommImp>
 struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconforming, MpiCommImp>>
 {
   static const int id = 1;
 };
 
-
 #endif // HAVE_ALUGRID
 
 } // namespace internal
 
 #if HAVE_DUNE_GRID
-
 
 /**
  *  \brief  Creates a grid of a cube in various dimensions.
@@ -292,16 +283,13 @@ private:
   std::shared_ptr<GridType> grid_ptr_;
 }; // class Cube
 
-
 #else // HAVE_DUNE_GRID
-
 
 template <typename GridImp, int variant = 1>
 class Cube
 {
   static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
 };
-
 
 #endif // HAVE_DUNE_GRID
 

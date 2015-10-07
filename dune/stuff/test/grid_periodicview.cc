@@ -33,7 +33,6 @@ using namespace Stuff;
 #define ALUSIMPLEXGRIDS ALUGrid<2, 2, simplex, conforming>, ALUGrid<3, 3, simplex, conforming>
 #endif // HAVE_ALUGRID
 
-
 template <class GridImp>
 struct PeriodicViewTestYaspCube : public testing::Test
 {
@@ -310,7 +309,6 @@ struct PeriodicViewTestALUCube : public PeriodicViewTestYaspCube<GridImp>
   typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::PeriodicGridViewType PeriodicGridViewType;
   static const size_t dimDomain = BaseType::dimDomain;
-
 
 }; // ... struct PeriodicViewTestALUCube ...
 
