@@ -237,7 +237,7 @@ public:
                          << function_->variable()
                          << "\n"
                          << "The expression of this functional is: "
-                         << expression().at(rr * dimRangeCols + cc)
+                         << function_->expression().at(rr * dimRangeCols + cc)
                          << "\n"
                          << "You tried to evaluate it with:   xx = "
                          << xx
