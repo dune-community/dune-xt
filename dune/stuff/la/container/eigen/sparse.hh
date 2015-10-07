@@ -36,7 +36,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 // forwards
 template <class ScalarType>
 class EigenRowMajorSparseMatrix;
@@ -45,12 +44,9 @@ class EigenMatrixInterfaceDynamic
 {
 };
 
-
 #if HAVE_EIGEN
 
-
 namespace internal {
-
 
 /**
  * \brief Traits for EigenRowMajorSparseMatrix.
@@ -65,9 +61,7 @@ public:
   typedef typename ::Eigen::SparseMatrix<ScalarType, ::Eigen::RowMajor> BackendType;
 }; // class RowMajorSparseMatrixTraits
 
-
 } // namespace internal
-
 
 /**
  * \brief A sparse matrix implementation of the MatrixInterface with row major memory layout.
@@ -446,16 +440,13 @@ private:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class EigenRowMajorSparseMatrix
 
-
 #else // HAVE_EIGEN
-
 
 template <class ScalarImp>
 class EigenRowMajorSparseMatrix
 {
   static_assert(AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
 };
-
 
 #endif // HAVE_EIGEN
 
@@ -464,13 +455,11 @@ namespace Common {
 
 #if HAVE_EIGEN
 
-
 template <class T>
 struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::EigenRowMajorSparseMatrix<T>>
 {
 };
-
 
 #endif // HAVE_EIGEN
 

@@ -22,7 +22,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 enum class ChooseBackend
 {
   common_dense,
@@ -30,7 +29,6 @@ enum class ChooseBackend
   eigen_dense,
   eigen_sparse
 }; // enum class ChooseBackend
-
 
 static constexpr ChooseBackend default_backend =
 #if HAVE_EIGEN
@@ -40,7 +38,6 @@ static constexpr ChooseBackend default_backend =
 #else
     ChooseBackend::common_dense;
 #endif
-
 
 static constexpr ChooseBackend default_sparse_backend =
 #if HAVE_EIGEN
@@ -52,7 +49,6 @@ static constexpr ChooseBackend default_sparse_backend =
 #error "There is no sparse LA backend available!"
 #endif
 
-
 static constexpr ChooseBackend default_dense_backend =
 #if HAVE_EIGEN
     ChooseBackend::eigen_dense;
@@ -60,12 +56,10 @@ static constexpr ChooseBackend default_dense_backend =
     ChooseBackend::common_dense;
 #endif
 
-
 /**
  *  \brief  Contains tags mostly needed for python bindings.
  */
 namespace Tags {
-
 
 class ContainerInterface
 {
@@ -74,10 +68,8 @@ class ProvidesDataAccess
 {
 };
 
-
 } // namespace Tags
 namespace internal {
-
 
 /**
  * \brief Tries a boost::numeric_cast and throws an Exceptions::wrong_input_given on failure.
@@ -96,9 +88,7 @@ static Out boost_numeric_cast(const In& in)
   }
 } // ... boost_numeric_cast(...)
 
-
 } // namespace internal
-
 
 template <class Traits>
 class ProvidesBackend : public CRTPInterface<ProvidesBackend<Traits>, Traits>
@@ -118,7 +108,6 @@ public:
     return this->as_imp().backend();
   }
 }; // class ProvidesBackend
-
 
 /**
  * \brief Interface for all containers (vectors and matrices).
@@ -200,7 +189,6 @@ public:
   /// \note Those marked as virtual may be implemented more efficiently in a derived class!
   /// \{
 
-
   static std::string type_this()
   {
     return Common::Typename<derived_type>::value();
@@ -214,9 +202,7 @@ public:
   /// \}
 }; // class ContainerInterface
 
-
 namespace internal {
-
 
 template <class C>
 struct is_container_helper
@@ -226,21 +212,17 @@ struct is_container_helper
       static const bool is_candidate = DSC_has_typedef(Traits)<C>::value && DSC_has_typedef(ScalarType)<C>::value;
 }; // class is_container_helper
 
-
 } // namespace internal
-
 
 template <class C, bool candidate = internal::is_container_helper<C>::is_candidate>
 struct is_container : public std::is_base_of<ContainerInterface<typename C::Traits, typename C::ScalarType>, C>
 {
 };
 
-
 template <class C>
 struct is_container<C, false> : public std::false_type
 {
 };
-
 
 template <class Traits>
 class ProvidesConstContainer : public CRTPInterface<ProvidesConstContainer<Traits>, Traits>
@@ -254,7 +236,6 @@ public:
     return this->as_imp().container();
   }
 }; // class ProvidesConstContainer
-
 
 template <class Traits>
 class ProvidesContainer : public ProvidesConstContainer<Traits>
@@ -273,7 +254,6 @@ public:
   }
 }; // class ProvidesContainer
 
-
 template <class Traits>
 class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>, public Tags::ProvidesDataAccess
 {
@@ -286,7 +266,6 @@ public:
     return this->as_imp().data();
   }
 }; // class ProvidesDataAccess
-
 
 } // namespace LA
 } // namespace Stuff

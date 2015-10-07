@@ -37,14 +37,11 @@ namespace LA {
  */
 namespace Tags {
 
-
 class VectorInterface
 {
 };
 
-
 } // namespace Tags
-
 
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class VectorInterface : public ContainerInterface<Traits, ScalarImp>, public Tags::VectorInterface
@@ -628,9 +625,7 @@ private:
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
 }; // class VectorInterface
 
-
 namespace internal {
-
 
 template <class V>
 struct is_vector_helper
@@ -640,24 +635,19 @@ struct is_vector_helper
       static const bool is_candidate = DSC_has_typedef(Traits)<V>::value && DSC_has_typedef(ScalarType)<V>::value;
 }; // class is_vector_helper
 
-
 } // namespace internal
-
 
 template <class V, bool candidate = internal::is_vector_helper<V>::is_candidate>
 struct is_vector : public std::is_base_of<VectorInterface<typename V::Traits, typename V::ScalarType>, V>
 {
 };
 
-
 template <class V>
 struct is_vector<V, false> : public std::false_type
 {
 };
 
-
 namespace internal {
-
 
 template <class VectorImp>
 struct VectorAbstractionBase
@@ -685,9 +675,7 @@ struct VectorAbstractionBase
   }
 }; // struct VectorAbstractionBase
 
-
 } // namespace internal
-
 
 template <class T, class S>
 std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
@@ -703,7 +691,6 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
   out << "]";
   return out;
 } // ... operator<<(...)
-
 
 } // namespace LA
 } // namespace Stuff

@@ -18,7 +18,6 @@ namespace Dune {
 namespace Stuff {
 namespace Exceptions {
 
-
 class linear_solver_failed_bc_data_did_not_fulfill_requirements : public linear_solver_failed
 {
 };
@@ -32,17 +31,13 @@ class linear_solver_failed_bc_the_solution_does_not_solve_the_system : public li
 {
 };
 
-
 } // namespace Exceptions
 namespace LA {
 namespace internal {
 
-
 static const constexpr size_t max_size_to_print = 5;
 
-
 } // namespace internal
-
 
 class SolverUtils
 {
@@ -60,7 +55,6 @@ public:
     }
   }
 };
-
 
 template <class MatrixImp, class CommunicatorType = SequentialCommunication>
 class Solver
@@ -132,7 +126,6 @@ public:
                    << "'!");
   }
 }; // class Solver
-
 
 } // namespace LA
 } // namespace Stuff

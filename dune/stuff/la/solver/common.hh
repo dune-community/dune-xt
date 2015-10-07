@@ -23,7 +23,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 template <class S, class CommunicatorType>
 class Solver<CommonDenseMatrix<S>, CommunicatorType> : protected SolverUtils
 {
@@ -105,7 +104,6 @@ public:
 private:
   const MatrixType& matrix_;
 }; // class Solver< CommonDenseMatrix< ... > >
-
 
 } // namespace LA
 } // namespace Stuff
