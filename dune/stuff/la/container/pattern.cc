@@ -4,11 +4,11 @@
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 #include "config.h"
+#include "pattern.hh"
 
 #include <cassert>
 #include <algorithm>
 
-#include "pattern.hh"
 
 namespace Dune {
 namespace Stuff {

@@ -68,7 +68,6 @@ struct SolverTest : public ::testing::Test
     solution.scal(0);
 
     // static tests
-    typedef typename SolverType::MatrixType M;
     std::vector<std::string> types = SolverType::types();
     if (types.size() == 0)
       DUNE_THROW(Exceptions::results_are_not_as_expected, "Solver has no types!");

@@ -95,19 +95,19 @@ public:
   /**
    * \brief This is the constructor of interest which creates a sparse matrix.
    */
-  EigenRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern)
+  EigenRowMajorSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& pattern_in)
   {
     backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(rr),
                                              internal::boost_numeric_cast<EIGEN_size_t>(cc));
     if (rr > 0 && cc > 0) {
-      if (size_t(pattern.size()) != rr)
+      if (size_t(pattern_in.size()) != rr)
         DUNE_THROW(Exceptions::shapes_do_not_match,
-                   "The size of the pattern (" << pattern.size() << ") does not match the number of rows of this ("
+                   "The size of the pattern (" << pattern_in.size() << ") does not match the number of rows of this ("
                                                << rr
                                                << ")!");
-      for (size_t row = 0; row < size_t(pattern.size()); ++row) {
+      for (size_t row = 0; row < size_t(pattern_in.size()); ++row) {
         backend_->startVec(internal::boost_numeric_cast<EIGEN_size_t>(row));
-        const auto& columns = pattern.inner(row);
+        const auto& columns = pattern_in.inner(row);
         for (auto& column : columns) {
 #ifndef NDEBUG
           if (column >= cc)
