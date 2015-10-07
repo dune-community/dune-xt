@@ -191,7 +191,7 @@ public:
 
   void walk(const bool use_tbb = false)
   {
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     if (use_tbb) {
       const auto num_partitions = DSC_CONFIG_GET("threading.partition_factor", 1u) * threadManager().current_threads();
       RangedPartitioning<GridViewType, 0> partitioning(grid_view_, num_partitions);
