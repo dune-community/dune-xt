@@ -8,6 +8,8 @@
 #ifndef DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH
 #define DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH
 
+#include <boost/io/ios_state.hpp>
+
 #include <dune/geometry/genericgeometry/referenceelements.hh>
 
 // largest scope guarded for headercheck with grid missing
@@ -198,12 +200,13 @@ struct ElementVisualization
       const typename Entity::Geometry& geo = ent.geometry();
       double vol = geo.volume();
       if (vol < 0) {
-        std::cout << std::setiosflags(std::ios::fixed) << std::setprecision(6) << std::setw(8);
+        boost::io::ios_all_saver guard(DSC_LOG_ERROR);
+        DSC_LOG_ERROR << std::setiosflags(std::ios::fixed) << std::setprecision(6) << std::setw(8);
         // std::cout.showpoint();
         for (auto i : DSC::valueRange(geo.corners())) {
-          std::cout << geo.corner(i) << "\t\t";
+          DSC_LOG_ERROR << geo.corner(i) << "\t\t";
         }
-        std::cout << std::endl;
+        DSC_LOG_ERROR << std::endl;
       }
       return vol;
     }

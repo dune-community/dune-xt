@@ -62,71 +62,79 @@ public:
     return grid_view_;
   }
 
-  void add(std::function<void(const EntityType&)> lambda,
-           const ApplyOn::WhichEntity<GridViewType>* where = new ApplyOn::AllEntities<GridViewType>())
+  ThisType& add(std::function<void(const EntityType&)> lambda,
+                const ApplyOn::WhichEntity<GridViewType>* where = new ApplyOn::AllEntities<GridViewType>())
   {
     codim0_functors_.emplace_back(new internal::Codim0LambdaWrapper<GridViewType>(lambda, where));
+    return *this;
   }
 
-  void add(std::function<void(const IntersectionType&, const EntityType&, const EntityType&)> lambda,
-           const ApplyOn::WhichIntersection<GridViewType>* where = new ApplyOn::AllIntersections<GridViewType>())
+  ThisType& add(std::function<void(const IntersectionType&, const EntityType&, const EntityType&)> lambda,
+                const ApplyOn::WhichIntersection<GridViewType>* where = new ApplyOn::AllIntersections<GridViewType>())
   {
     codim1_functors_.emplace_back(new internal::Codim1LambdaWrapper<GridViewType>(lambda, where));
+    return *this;
   }
 
-  void add(Functor::Codim0<GridViewType>& functor,
-           const ApplyOn::WhichEntity<GridViewType>* where = new ApplyOn::AllEntities<GridViewType>())
+  ThisType& add(Functor::Codim0<GridViewType>& functor,
+                const ApplyOn::WhichEntity<GridViewType>* where = new ApplyOn::AllEntities<GridViewType>())
   {
     codim0_functors_.emplace_back(
         new internal::Codim0FunctorWrapper<GridViewType, Functor::Codim0<GridViewType>>(functor, where));
+    return *this;
   }
 
-  void add(Functor::Codim1<GridViewType>& functor,
-           const ApplyOn::WhichIntersection<GridViewType>* where = new ApplyOn::AllIntersections<GridViewType>())
+  ThisType& add(Functor::Codim1<GridViewType>& functor,
+                const ApplyOn::WhichIntersection<GridViewType>* where = new ApplyOn::AllIntersections<GridViewType>())
   {
     codim1_functors_.emplace_back(
         new internal::Codim1FunctorWrapper<GridViewType, Functor::Codim1<GridViewType>>(functor, where));
+    return *this;
   }
 
-  void add(Functor::Codim0And1<GridViewType>& functor,
-           const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>(),
-           const ApplyOn::WhichIntersection<GridViewType>* which_intersections =
-               new ApplyOn::AllIntersections<GridViewType>())
+  ThisType& add(Functor::Codim0And1<GridViewType>& functor,
+                const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>(),
+                const ApplyOn::WhichIntersection<GridViewType>* which_intersections =
+                    new ApplyOn::AllIntersections<GridViewType>())
   {
     codim0_functors_.emplace_back(
         new internal::Codim0FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(functor, which_entities));
     codim1_functors_.emplace_back(new internal::Codim1FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(
         functor, which_intersections));
+    return *this;
   }
 
-  void add(Functor::Codim0And1<GridViewType>& functor,
-           const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
-           const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
+  ThisType& add(Functor::Codim0And1<GridViewType>& functor,
+                const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
+                const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
   {
     codim0_functors_.emplace_back(
         new internal::Codim0FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(functor, which_entities));
     codim1_functors_.emplace_back(new internal::Codim1FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(
         functor, which_intersections));
+    return *this;
   }
 
-  void add(ThisType& other,
-           const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>(),
-           const ApplyOn::WhichIntersection<GridViewType>* which_intersections =
-               new ApplyOn::AllIntersections<GridViewType>())
+  ThisType& add(ThisType& other,
+                const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>(),
+                const ApplyOn::WhichIntersection<GridViewType>* which_intersections =
+                    new ApplyOn::AllIntersections<GridViewType>())
   {
     if (&other == this)
       DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
     codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
     codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
+    return *this;
   } // ... add(...)
 
-  void add(ThisType& other, const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
-           const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
+  ThisType& add(ThisType& other, const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
+                const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
   {
     if (&other == this)
       DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
     codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
     codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
+    return *this;
   } // ... add(...)
 
   void clear()
@@ -192,7 +200,7 @@ public:
       return;
     }
 #else
-    const auto DUNE_UNUSED(no_warning_for_use_tbb) = use_tbb;
+    const auto DSC_UNUSED(no_warning_for_use_tbb) = use_tbb;
 #endif
     // prepare functors
     prepare();
@@ -287,8 +295,7 @@ protected:
 
           // apply codim1 functors
           if (intersection.neighbor()) {
-            const auto neighbor_ptr = intersection.outside();
-            const auto& neighbor = *neighbor_ptr;
+            const auto neighbor = intersection.outside();
             apply_local(intersection, entity, neighbor);
           } else
             apply_local(intersection, entity, entity);

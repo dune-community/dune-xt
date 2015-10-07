@@ -28,7 +28,7 @@ struct GridWalkerTest : public ::testing::Test
 {
   static const size_t griddim = T::value;
   static const size_t level   = 4;
-  typedef Dune::YaspGrid<griddim> GridType;
+  typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename DSG::Entity<GridViewType>::Type EntityType;
   typedef typename DSG::Intersection<GridViewType>::Type IntersectionType;
@@ -53,15 +53,18 @@ struct GridWalkerTest : public ::testing::Test
       walker.add(counter);
       walker.walk(true);
     };
-    list<function<void()>> tests({test1, test2});
+    auto test3 = [&] { walker.add(counter).walk(true); };
+    list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
-    auto test3 = [&] {
-      IndexSetPartitioner<GridViewType> partitioner(gv.grid().leafIndexSet());
+    auto test0        = [&] {
+      const auto& set = gv.grid().leafIndexSet();
+      IndexSetPartitioner<GridViewType> partitioner(set);
+      EXPECT_EQ(set.size(0), partitioner.partitions());
       Dune::SeedListPartitioning<GridType, 0> partitioning(gv, partitioner);
       walker.add(counter);
       walker.walk(partitioning);
     };
-    tests.push_back(test3);
+    tests.push_back(test0);
 #endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) // EXADUNE
 
     for (const auto& test : tests) {

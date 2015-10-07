@@ -188,9 +188,9 @@ private:
     vtkwriter.write(filename, VTK::appendedraw);
   } // ... visualize_with_boundary(...)
 
+#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
   std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
   {
-#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
     for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
@@ -213,9 +213,14 @@ private:
       }
     } // walk the grid
     return data;
-#endif
+  }
+#else
+  std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& /*gridView*/) const
+  {
     DUNE_THROW(InvalidStateException, "Experimental Grid Extensions missing");
-  } // std::vector< double > generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
+  }
+#endif
+
 
   template <class BoundaryInfoType>
   std::vector<double> generateBoundaryVisualization(const LeafGridViewType& gridView,

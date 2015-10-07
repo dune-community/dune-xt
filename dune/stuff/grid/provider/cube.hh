@@ -15,7 +15,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #if HAVE_DUNE_GRID
-#include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -40,7 +39,7 @@ namespace Providers {
 namespace Configs {
 
 
-static Common::Configuration Cube_default(const std::string sub_name = "")
+static inline Common::Configuration Cube_default(const std::string sub_name = "")
 {
   Common::Configuration config;
   config["lower_left"]      = "[0 0 0 0]";
@@ -78,17 +77,15 @@ struct ElementVariant<Dune::YaspGrid<dim>>
 {
   static const int id = 1;
 };
-
-
-template <int dimGrid, int dimWorld>
-struct ElementVariant<Dune::SGrid<dimGrid, dimWorld>>
+template <int dim, class Coords>
+struct ElementVariant<Dune::YaspGrid<dim, Coords>>
 {
   static const int id = 1;
 };
 
 #if HAVE_DUNE_SPGRID
-template <class ct, int dim, SPRefinementStrategy strategy, class Comm>
-struct ElementVariant<Dune::SPGrid<ct, dim, strategy, Comm>>
+template <class ct, int dim, template <int> class Refinement, class Comm>
+struct ElementVariant<Dune::SPGrid<ct, dim, Refinement, Comm>>
 {
   static const int id = 1;
 };

@@ -8,11 +8,14 @@
 #ifndef DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 #define DUNE_STUFF_GRID_STRUCTURED_GRID_FACTORY_HH
 
+#include <memory>
+
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
 #include <dune/common/unused.hh>
 
+#include <dune/grid/yaspgrid.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 
 #if HAVE_DUNE_SPGRID
@@ -33,10 +36,10 @@ namespace Dune {
  *  StructuredGridFactory just like the unstructured Grids. Limitations:
  *  \li SPGrid does not support simplices
  */
-template <class ct, int dim, SPRefinementStrategy strategy, class Comm>
-class StructuredGridFactory<SPGrid<ct, dim, strategy, Comm>>
+template <class ct, int dim, template <int> class Refinement, class Comm>
+class StructuredGridFactory<SPGrid<ct, dim, Refinement, Comm>>
 {
-  typedef SPGrid<ct, dim, strategy, Comm> GridType;
+  typedef SPGrid<ct, dim, Refinement, Comm> GridType;
   typedef typename GridType::ctype ctype;
   static const int dimworld = GridType::dimensionworld;
 
@@ -101,54 +104,6 @@ public:
 #endif // HAVE_DUNE_SPGRID
 
 
-/** \brief Specialization of the StructuredGridFactory for SGrid< dim, dimWorld >
- *
- *  This allows a SGrid to be constructed using the
- *  StructuredGridFactory just like the unstructured Grids. Limitations:
- *  \li SGrid does not support simplices
- */
-template <int dim, int dimworld>
-class StructuredGridFactory<SGrid<dim, dimworld>>
-{
-  typedef SGrid<dim, dimworld> GridType;
-  typedef typename GridType::ctype ctype;
-
-public:
-  /** \brief Create a structured cube grid
-   *
-   *  \param lowerLeft  Lower left corner of the grid
-   *  \param upperRight Upper right corner of the grid
-   *  \param elements   Number of elements in each coordinate direction
-   */
-  static shared_ptr<GridType> createCubeGrid(const FieldVector<ctype, dim>& lowerLeft,
-                                             const FieldVector<ctype, dim>& upperRight,
-                                             const array<unsigned int, dim>& elements)
-  {
-    FieldVector<int, dim> elements_;
-    std::copy(elements.begin(), elements.end(), elements_.begin());
-
-    return shared_ptr<GridType>(new GridType(elements_, lowerLeft, upperRight));
-  }
-
-  /** \brief Create a structured simplex grid
-   *
-   *  \param lowerLeft  Lower left corner of the grid
-   *  \param upperRight Upper right corner of the grid
-   *  \param elements   Number of elements in each coordinate direction
-   *
-   *  \note Simplices are not supported in SGrid, so this functions
-   *        unconditionally throws a GridError.
-   */
-  static shared_ptr<GridType> createSimplexGrid(const FieldVector<ctype, dim>& /*lowerLeft*/,
-                                                const FieldVector<ctype, dim>& /*upperRight*/,
-                                                const array<unsigned int, dim>& /*elements*/)
-  {
-    DUNE_THROW(GridError,
-               className<StructuredGridFactory>() << "::createSimplexGrid(): Simplices are not supported "
-                                                     "by SGrid.");
-  }
-};
-
 namespace Stuff {
 namespace Grid {
 
@@ -179,11 +134,11 @@ public:
 };
 
 #if HAVE_DUNE_SPGRID
-template <class ct, int dim, Dune::SPRefinementStrategy strategy, class Comm>
-class StructuredGridFactory<Dune::SPGrid<ct, dim, strategy, Comm>>
-    : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, strategy, Comm>>
+template <class ct, int dim, template <int> class Refinement, class Comm>
+class StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
+    : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
 {
-  typedef Dune::SPGrid<ct, dim, strategy, Comm> GridType;
+  typedef Dune::SPGrid<ct, dim, Refinement, Comm> GridType;
   typedef typename GridType::ctype ctype;
 
 public:
@@ -200,10 +155,11 @@ public:
 
 #endif
 
-template <int dim>
-class StructuredGridFactory<Dune::YaspGrid<dim>> : public Dune::StructuredGridFactory<Dune::YaspGrid<dim>>
+template <int dim, class Coords>
+class StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
+    : public Dune::StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
 {
-  typedef Dune::YaspGrid<dim> GridType;
+  typedef Dune::YaspGrid<dim, Coords> GridType;
   typedef typename GridType::ctype ctype;
 
 public:
@@ -215,16 +171,14 @@ public:
                  Dune::MPIHelper::MPICommunicator communicator = Dune::MPIHelper::getCommunicator())
   {
     const auto no_periodic_direction = std::bitset<dim>();
-    if (DSC::FloatCmp::ne(lowerLeft, Dune::FieldVector<ctype, GridType::dimensionworld>(0.0)))
-      DUNE_THROW(Dune::InvalidStateException, "YaspGrid + Origin != 0.0 is still a no-go");
-    Dune::array<int, dim> elements;
+    std::array<int, dim> elements;
     std::copy(elements_in.begin(), elements_in.end(), elements.begin());
     auto overlap_check = overlap;
     overlap_check.fill(overlap[0]);
     for (auto i : DSC::valueRange(1, dim))
       if (overlap[i] != overlap[0])
         DUNE_THROW(Dune::InvalidStateException, "YaspGrid only supports uniform overlap");
-    return std::make_shared<GridType>(communicator, upperRight, elements, no_periodic_direction, overlap[0]);
+    return std::make_shared<GridType>(lowerLeft, upperRight, elements, no_periodic_direction, overlap[0], communicator);
   }
 };
 
