@@ -32,7 +32,6 @@ class Affine
   }
 };
 
-
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
 class Affine<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
@@ -122,7 +121,6 @@ private:
   const RangeType b_;
   const std::string name_;
 };
-
 
 } // namespace Functions
 } // namespace Stuff

@@ -18,7 +18,6 @@
 namespace Dune {
 namespace Stuff {
 
-
 template <class FunctionImp>
 class FunctionTest : public ::testing::Test
 {
@@ -72,7 +71,6 @@ protected:
   } // ... dynamic_interface_check(...)
 
 }; // class FunctionTest
-
 
 } // namespace Stuff
 } // namespace Dune

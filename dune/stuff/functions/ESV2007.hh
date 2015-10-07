@@ -28,7 +28,6 @@ namespace Stuff {
 namespace Functions {
 namespace ESV2007 {
 
-
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Testcase1Force : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
@@ -37,7 +36,6 @@ class Testcase1Force : public LocalizableFunctionInterface<E, D, d, R, r, rC>
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
-
 
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
 class Testcase1Force<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
@@ -136,7 +134,6 @@ private:
   const std::string name_;
 }; // class Testcase1Force
 
-
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Testcase1ExactSolution : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
@@ -145,7 +142,6 @@ class Testcase1ExactSolution : public LocalizableFunctionInterface<E, D, d, R, r
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
-
 
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
 class Testcase1ExactSolution<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
@@ -244,10 +240,8 @@ private:
   const std::string name_;
 }; // class Testcase1ExactSolution
 
-
 template <class DiffusionFactorType, class DiffusionTensorType = void>
 class Cutoff;
-
 
 template <class DiffusionType>
 class Cutoff<DiffusionType, void>
@@ -389,7 +383,6 @@ private:
   const RangeFieldType poincare_constant_;
   std::string name_;
 }; // class Cutoff
-
 
 template <class DiffusionFactorType, class DiffusionTensorType>
 class Cutoff
@@ -613,7 +606,6 @@ private:
   const RangeFieldType poincare_constant_;
   std::string name_;
 }; // class Cutoff
-
 
 } // namespace ESV2007
 } // namespace Functions

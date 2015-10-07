@@ -16,7 +16,6 @@
 namespace Dune {
 namespace Stuff {
 
-
 /**
  * Global-valued function you can pass a lambda expression to that gets evaluated
  * \example LambdaType lambda([](DomainType x) { return x;}, 1 );
@@ -73,7 +72,6 @@ private:
   const size_t order_;
   const std::string name_;
 };
-
 
 } // namespace Stuff
 } // namespace Dune

@@ -297,7 +297,6 @@ private:
   std::vector<EllipsoidType> ellipsoids_;
 }; // class RandomEllipsoidsFunction
 
-
 } // namespace Functions
 } // namespace Stuff
 } // namespace Dune

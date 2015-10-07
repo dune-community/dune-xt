@@ -22,7 +22,6 @@ namespace Functions {
 
 #if HAVE_DUNE_GRID
 
-
 template <class GridViewType, size_t dimRange, size_t dimRangeCols>
 class VisualizationAdapter : public VTKFunction<GridViewType>
 {
@@ -102,7 +101,6 @@ private:
   mutable typename FunctionType::RangeType tmp_value_;
   const std::string name_;
 }; // class VisualizationAdapter
-
 
 #endif // HAVE_DUNE_GRID
 

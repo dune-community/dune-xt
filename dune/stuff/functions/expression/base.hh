@@ -24,7 +24,6 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 /**
  *  \brief base class that makes a function out of the stuff from mathexpr.hh
  *  \attention  Most surely you do not want to use this class directly, but Functions::Expression!
@@ -219,7 +218,6 @@ private:
   ROperation* op_[dimRange];
   mutable std::mutex mutex_;
 }; // class MathExpressionBase
-
 
 } // namespace Functions
 } // namespace Stuff

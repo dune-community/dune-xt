@@ -26,7 +26,6 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
 class Expression
@@ -238,7 +237,7 @@ public:
                          << function_->variable()
                          << "\n"
                          << "The expression of this functional is: "
-                         << function_->expression().at(rr * dimRangeCols + cc)
+                         << expression().at(rr * dimRangeCols + cc)
                          << "\n"
                          << "You tried to evaluate it with:   xx = "
                          << xx
@@ -387,7 +386,6 @@ private:
   mutable typename DS::PerThreadValue<FieldVector<RangeFieldType, dimRangeCols>> tmp_row_;
   std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
 }; // class Expression
-
 
 } // namespace Functions
 } // namespace Stuff

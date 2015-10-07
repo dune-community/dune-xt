@@ -27,7 +27,6 @@
 using namespace Dune;
 using namespace Stuff;
 
-
 template <class G>
 class DifferenceFunctionType
 {
@@ -42,7 +41,6 @@ public:
   typedef Functions::Constant<E, D, d, R, r, rC> ConstantFunctionType;
   typedef Functions::Difference<ConstantFunctionType, ConstantFunctionType> value;
 }; // struct DifferenceFunctionType
-
 
 template <class DimDomain>
 class DifferenceFunctionTest
@@ -69,7 +67,6 @@ protected:
     return std::unique_ptr<FunctionType>(new FunctionType(left, right));
   } // ... create(...)
 }; // class DifferenceFunctionTest
-
 
 typedef testing::Types<Int<1>, Int<2>, Int<3>> DimDomains;
 
@@ -98,7 +95,6 @@ TYPED_TEST(DifferenceFunctionTest, evaluate_check)
     }
   }
 } // DifferenceFunctionTest, evaluate_check
-
 
 #else // HAVE_DUNE_GRID
 

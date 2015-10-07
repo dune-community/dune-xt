@@ -20,14 +20,12 @@ namespace Stuff {
 namespace Functions {
 namespace internal {
 
-
 enum class Combination
 {
   difference,
   sum,
   product
 }; // enum class Combination
-
 
 /**
  * \brief Helper class defining types of combined functions, if available.
@@ -225,7 +223,6 @@ public:
   }
 }; // class SelectCombined
 
-
 /**
  * \brief Generic combined local function.
  *
@@ -281,7 +278,6 @@ private:
   mutable RangeType tmp_range_;
   mutable JacobianRangeType tmp_jacobian_;
 }; // class CombinedLocalFunction
-
 
 /**
  * \brief Generic combined function.
@@ -405,9 +401,7 @@ private:
   const std::string name_;
 }; // class Combined
 
-
 } // namespace internal
-
 
 /**
  * \brief Function representing the difference between two functions.
@@ -427,7 +421,6 @@ public:
   }
 }; // class Difference
 
-
 /**
  * \brief Function representing the sum of two functions.
  *
@@ -445,7 +438,6 @@ public:
   {
   }
 }; // class Sum
-
 
 /**
  * \brief Function representing the product of two functions.
@@ -465,7 +457,6 @@ public:
   }
 }; // class Product
 
-
 template <class T1, class T2, class... Args>
 std::shared_ptr<Difference<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
 {
@@ -477,7 +468,6 @@ std::shared_ptr<Difference<T1, T2>> make_difference(std::shared_ptr<T1> left, st
 {
   return std::make_shared<Difference<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
-
 
 template <class T1, class T2, class... Args>
 std::shared_ptr<Sum<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
@@ -491,7 +481,6 @@ std::shared_ptr<Sum<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<
   return std::make_shared<Sum<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
-
 template <class T1, class T2, class... Args>
 std::shared_ptr<Product<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
 {
@@ -503,7 +492,6 @@ std::shared_ptr<Product<T1, T2>> make_product(std::shared_ptr<T1> left, std::sha
 {
   return std::make_shared<Product<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
-
 
 } // namespace Functions
 } // namespace Stuff
