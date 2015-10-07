@@ -158,7 +158,7 @@ public:
       triplets.reserve(mat.nonZeros());
       for (EIGEN_size_t row = 0; row < mat.outerSize(); ++row) {
         for (typename BackendType::InnerIterator row_it(mat, row); row_it; ++row_it) {
-          const size_t col = row_it.col();
+          const EIGEN_size_t col = row_it.col();
           const auto val = mat.coeff(row, col);
           if (Stuff::Common::FloatCmp::ne<Stuff::Common::FloatCmp::Style::absolute>(val, zero, eps))
             triplets.emplace_back(row, col, val);
@@ -386,7 +386,7 @@ public:
     if (prune) {
       for (EIGEN_size_t row = 0; row < backend_->outerSize(); ++row) {
         for (typename BackendType::InnerIterator row_it(*backend_, row); row_it; ++row_it) {
-          const size_t col = row_it.col();
+          const EIGEN_size_t col = row_it.col();
           const auto val = backend_->coeff(row, col);
           if (Common::FloatCmp::ne(val, zero, eps))
             ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(col));
