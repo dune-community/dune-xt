@@ -50,14 +50,14 @@ class PeriodicIntersection : public RealGridViewImp::Intersection
   typedef typename RealGridViewType::Intersection BaseType;
 
 public:
-  typedef typename BaseType::LocalGeometry LocalGeometry;
-  typedef typename BaseType::EntityPointer EntityPointer;
+  using typename BaseType::LocalGeometry;
+  typedef typename BaseType::Entity EntityType;
   typedef typename RealGridViewType::IntersectionIterator RealIntersectionIteratorType;
   static const size_t dimDomain = RealGridViewType::dimension;
 
   //! \brief Constructor from real intersection
   PeriodicIntersection(const BaseType& real_intersection, const RealGridViewType& real_grid_view,
-                       const std::pair<bool, EntityPointer>& periodic_pair)
+                       const std::pair<bool, EntityType>& periodic_pair)
     : BaseType(real_intersection)
     , periodic_(periodic_pair.first)
     , outside_(periodic_pair.second)
@@ -74,7 +74,7 @@ public:
       return BaseType::neighbor();
   } // bool neighbor() const
 
-  EntityPointer outside() const
+  EntityType outside() const
   {
     if (periodic_)
       return outside_;
@@ -85,8 +85,7 @@ public:
   LocalGeometry geometryInOutside() const
   {
     if (periodic_) {
-      const RealIntersectionIteratorType outside_intersection_it = find_intersection_in_outside();
-      return outside_intersection_it->geometryInInside();
+      return find_intersection_in_outside().geometryInInside();
     } else {
       return BaseType::geometryInOutside();
     }
@@ -95,8 +94,7 @@ public:
   int indexInOutside() const
   {
     if (periodic_) {
-      const RealIntersectionIteratorType outside_intersection_it = find_intersection_in_outside();
-      return outside_intersection_it->indexInInside();
+      return find_intersection_in_outside().indexInInside();
     } else {
       return BaseType::indexInOutside();
     }
@@ -104,11 +102,11 @@ public:
 
 private:
   // tries to find intersection in outside (works only if periodic_ == true)
-  RealIntersectionIteratorType find_intersection_in_outside() const
+  BaseType find_intersection_in_outside() const
   {
     const auto coords                                   = this->geometry().center();
-    RealIntersectionIteratorType outside_i_it           = real_grid_view_->access().ibegin(*outside());
-    const RealIntersectionIteratorType outside_i_it_end = real_grid_view_->access().iend(*outside());
+    RealIntersectionIteratorType outside_i_it           = real_grid_view_->access().ibegin(outside_);
+    const RealIntersectionIteratorType outside_i_it_end = real_grid_view_->access().iend(outside_);
     // walk over outside intersections and find an intersection on the boundary that differs only in one coordinate
     for (; outside_i_it != outside_i_it_end; ++outside_i_it) {
       const BaseType& curr_outside_intersection = *outside_i_it;
@@ -121,17 +119,17 @@ private:
           }
         }
         if (coord_difference_count == size_t(1)) {
-          return outside_i_it;
+          return *outside_i_it;
         }
       }
     }
     DUNE_THROW(Dune::InvalidStateException, "Could not find outside intersection!");
-    return real_grid_view_->access().ibegin(*outside());
+    return *(real_grid_view_->access().ibegin(outside_));
   } // ... find_intersection_in_outside() const
 
 protected:
   bool periodic_;
-  EntityPointer outside_;
+  EntityType outside_;
   std::unique_ptr<DSC::ConstStorageProvider<RealGridViewType>> real_grid_view_;
 }; // ... class PeriodicIntersection ...
 
@@ -152,10 +150,9 @@ class PeriodicIntersectionIterator : public RealGridViewImp::IntersectionIterato
 public:
   typedef typename BaseType::Intersection RealIntersectionType;
   typedef int IntersectionIndexType;
-  typedef typename RealIntersectionType::EntityPointer EntityPointerType;
   typedef PeriodicIntersection<RealGridViewType> Intersection;
   typedef typename RealGridViewType::template Codim<0>::Entity EntityType;
-  typedef std::pair<bool, EntityPointerType> PeriodicPairType;
+  typedef std::pair<bool, EntityType> PeriodicPairType;
   static const size_t dimDomain = RealGridViewType::dimension;
 
   PeriodicIntersectionIterator(BaseType real_intersection_iterator, const RealGridViewType& real_grid_view,
@@ -166,7 +163,7 @@ public:
     , entity_(entity)
     , has_boundary_intersections_(entity_.hasBoundaryIntersections())
     , intersection_map_(intersection_map)
-    , nonperiodic_pair_(std::make_pair(bool(false), EntityPointerType(entity_)))
+    , nonperiodic_pair_(std::make_pair(bool(false), EntityType(entity_)))
     , current_intersection_(create_current_intersection_safely())
   {
   }
@@ -278,14 +275,14 @@ class PeriodicGridViewImp : public RealGridViewImp
 public:
   typedef typename BaseType::Grid Grid;
   typedef typename BaseType::IndexSet IndexSet;
+  typedef typename BaseType::template Codim<0>::Entity EntityType;
   typedef PeriodicIntersectionIterator<BaseType> IntersectionIterator;
   typedef typename IntersectionIterator::RealIntersectionType RealIntersectionType;
   typedef typename BaseType::IndexSet::IndexType EntityIndexType;
   typedef int IntersectionIndexType;
   typedef typename RealIntersectionType::GlobalCoordinate DomainType;
   typedef PeriodicIntersection<BaseType> Intersection;
-  typedef typename Grid::template Codim<0>::EntityPointer EntityPointerType;
-  typedef std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> IntersectionMapType;
+  typedef std::map<IntersectionIndexType, std::pair<bool, EntityType>> IntersectionMapType;
   static const size_t dimDomain = BaseType::dimension;
 
   template <int cd>
@@ -298,6 +295,7 @@ public:
     , empty_intersection_map_(IntersectionMapType())
     , periodic_directions_(periodic_directions)
   {
+    // find lower left and upper right corner of the grid
     auto entity_it         = BaseType::template begin<0>();
     DomainType lower_left  = entity_it->geometry().center();
     DomainType upper_right = lower_left;
@@ -315,9 +313,13 @@ public:
       }
     }
 
+    // walk the grid and create a map that maps each entity(index) on the boundary to a map that maps every
+    // local intersection index to a std::pair< bool, EntityType >, where the bool component of the pair
+    // indicates whether the intersection is on a periodic boundary and the second component is the periodic neighbor
+    // entity if the first component is true. If the first component is false, the Entity is not meant to be used.
     EntityInlevelSearch<BaseType> entity_search(*this);
     DomainType periodic_neighbor_coords;
-    std::map<IntersectionIndexType, std::pair<bool, EntityPointerType>> intersection_neighbor_map;
+    IntersectionMapType intersection_neighbor_map;
     for (const auto& entity : DSC::entityRange(*this)) {
       if (entity.hasBoundaryIntersections()) {
         intersection_neighbor_map.clear();
@@ -346,20 +348,19 @@ public:
             }
             assert(num_boundary_coords = 1);
             if (is_periodic) {
-              const auto outside_ptr_ptrs = entity_search(std::vector<DomainType>(1, periodic_neighbor_coords));
-              const auto& outside_ptr_ptr = outside_ptr_ptrs.at(0);
-              if (outside_ptr_ptr == nullptr)
+              const auto outside_ptrs = entity_search(std::vector<DomainType>(1, periodic_neighbor_coords));
+              const auto& outside_ptr = outside_ptrs.at(0);
+              if (outside_ptr == nullptr)
                 DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
-              const EntityPointerType& outside_ptr = *outside_ptr_ptr;
               intersection_neighbor_map.insert(
-                  std::make_pair(index_in_inside, std::make_pair(is_periodic, outside_ptr)));
+                  std::make_pair(index_in_inside, std::make_pair(is_periodic, *outside_ptr)));
             } else {
               intersection_neighbor_map.insert(
-                  std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityPointerType(entity))));
+                  std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityType(entity))));
             }
           } else {
             intersection_neighbor_map.insert(
-                std::make_pair(index_in_inside, std::make_pair(bool(false), EntityPointerType(entity))));
+                std::make_pair(index_in_inside, std::make_pair(bool(false), EntityType(entity))));
           }
         }
         entity_to_intersection_map_map_.insert(
@@ -444,7 +445,7 @@ public:
   }
 
   PeriodicGridView(const PeriodicGridView& other)
-    : ConstStorProv(other.access())
+    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType>(other.access()))
     , BaseType(ConstStorProv::access())
   {
   }

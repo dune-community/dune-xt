@@ -100,11 +100,11 @@ struct PeriodicViewTestYaspCube : public testing::Test
         const PeriodicIntersectionType& intersection = *i_it;
         if (intersection.neighbor()) {
           ++neighbor_count;
-          const EntityPointerType outside = intersection.outside();
+          const EntityType outside = intersection.outside();
           // find corresponding intersection in outside
           const auto index_in_outside                             = intersection.indexInOutside();
-          PeriodicIntersectionIteratorType i_it_outside           = periodic_grid_view.ibegin(*outside);
-          const PeriodicIntersectionIteratorType i_it_outside_end = periodic_grid_view.iend(*outside);
+          PeriodicIntersectionIteratorType i_it_outside           = periodic_grid_view.ibegin(outside);
+          const PeriodicIntersectionIteratorType i_it_outside_end = periodic_grid_view.iend(outside);
           for (; i_it_outside != i_it_outside_end; ++i_it_outside) {
             const PeriodicIntersectionType* outside_intersection = i_it_outside.operator->();
             if (outside_intersection->indexInInside() == index_in_outside) {
