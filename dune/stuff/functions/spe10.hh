@@ -18,22 +18,18 @@
 
 #include "checkerboard.hh"
 
-
 namespace Dune {
 namespace Stuff {
 namespace Exceptions {
-
 
 class spe10_data_file_missing : public Dune::IOError
 {
 };
 
-
 } // namespace Exceptions
 namespace Functions {
 namespace Spe10 {
 namespace internal {
-
 
 static const std::string model1_filename = "perm_case1.dat";
 static const size_t model1_x_elements    = 100;
@@ -44,7 +40,6 @@ static const double model_1_length_y     = 7.62;
 static const double model_1_length_z     = 15.24;
 static const double model1_min_value     = 0.001;
 static const double model1_max_value     = 998.915;
-
 
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r, size_t rC>
 class Model1Base : public Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC>
@@ -144,9 +139,7 @@ public:
   }
 }; // class Model1Base
 
-
 } // namespace internal
-
 
 // default, to allow for specialization
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
@@ -157,7 +150,6 @@ class Model1 : public LocalizableFunctionInterface<E, D, d, R, r, rC>
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
-
 
 /**
  * We read only the Kx values from file and scale the unit matrix atm.
@@ -216,7 +208,6 @@ private:
     return Call<r>::unit_matrix();
   }
 }; // class Model1< ..., 2, ..., r, r >
-
 
 } // namespace Spe10
 } // namespace Functions

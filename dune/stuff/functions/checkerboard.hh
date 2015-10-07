@@ -22,7 +22,6 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
 class Checkerboard
@@ -223,7 +222,6 @@ private:
   std::shared_ptr<const std::vector<RangeType>> values_;
   std::string name_;
 }; // class Checkerboard
-
 
 } // namespace Functions
 } // namespace Stuff

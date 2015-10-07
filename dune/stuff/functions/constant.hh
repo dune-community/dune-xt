@@ -19,7 +19,6 @@ namespace Stuff {
 namespace Functions {
 namespace internal {
 
-
 template <class K, int dim>
 struct UnitMatrix
 {
@@ -34,7 +33,6 @@ struct UnitMatrix
   }
 }; // struct UnitMatrix
 
-
 template <class K>
 struct UnitMatrix<K, 1>
 {
@@ -46,13 +44,11 @@ struct UnitMatrix<K, 1>
   }
 }; // struct UnitMatrix
 
-
 template <class K, int dim>
 typename UnitMatrix<K, dim>::type unit_matrix()
 {
   return UnitMatrix<K, dim>::value();
 }
-
 
 template <class R, size_t r, size_t rC>
 struct Get
@@ -111,9 +107,7 @@ struct Get<R, 1, 1>
   }
 };
 
-
 } // namespace internal
-
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
@@ -216,7 +210,6 @@ private:
   const RangeType constant_;
   const std::string name_;
 };
-
 
 } // namespace Functions
 } // namespace Stuff

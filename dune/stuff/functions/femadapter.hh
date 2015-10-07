@@ -16,7 +16,6 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 template <class DiscreteFunctionType>
 class FemAdapter
     : public LocalizableFunctionInterface<
@@ -116,7 +115,6 @@ public:
 private:
   const DiscreteFunctionType& df_;
 }; // class Checkerboard
-
 
 } // namespace Functions
 } // namespace Stuff

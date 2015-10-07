@@ -18,7 +18,6 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 /**
  * Based on: Brenner, S. C. and Davis, C. B. and Sung, L.-y.
  *           A partition of unity method for the displacement obstacle problem of clamped Kirchhoff plates
@@ -33,7 +32,6 @@ class FlatTop : public LocalizableFunctionInterface<E, D, d, R, r, rC>
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
-
 
 template <class E, class D, size_t d, class R>
 class FlatTop<E, D, d, R, 1, 1> : public GlobalFunctionInterface<E, D, d, R, 1, 1>
@@ -209,7 +207,6 @@ private:
   const StuffRangeType value_;
   const std::string name_;
 }; // class FlatTop< ..., 1, 1 >
-
 
 } // namespace Functions
 } // namespace Stuff

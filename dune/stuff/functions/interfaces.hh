@@ -45,7 +45,6 @@ namespace Dune {
 namespace Stuff {
 namespace internal {
 
-
 template <class F>
 struct is_localizable_function_helper
 {
@@ -59,18 +58,14 @@ struct is_localizable_function_helper
                           && DSC_has_static_member(dimRange)<F>::value && DSC_has_static_member(dimRangeCols)<F>::value;
 }; // class is_localizable_function_helper
 
-
 } // namespace internal
-
 
 // forwards, includes are below
 template <class F, bool candidate = internal::is_localizable_function_helper<F>::is_candidate>
 struct is_localizable_function;
 
-
 namespace Functions {
 namespace internal {
-
 
 // additional argument for member functions to differentiate between dimRangeCols = 1 and dimRangeCols > 1 by
 // overloading
@@ -79,19 +74,14 @@ struct ChooseVariant
 {
 };
 
-
 } // namespace internal
 
-
 #if HAVE_DUNE_GRID
-
 
 template <class GridViewType, size_t dimRange, size_t dimRangeCols = 1>
 class VisualizationAdapter;
 
-
 #endif // HAVE_DUNE_GRID
-
 
 template <class MinuendType, class SubtrahendType>
 class Difference;
@@ -105,18 +95,14 @@ class Product;
 template <class FunctionImp>
 class Divergence;
 
-
 } // namespace Functions
 namespace Tags {
-
 
 class LocalizableFunction
 {
 };
 
-
 } // namespace Tags
-
 
 /**
  *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
@@ -230,7 +216,6 @@ protected:
   const EntityType& entity_;
 }; // class LocalfunctionSetInterface
 
-
 /**
  *  \brief  Interface for functions, which can be evaluated locally on one Entity.
  */
@@ -329,11 +314,9 @@ public:
   /* @} */
 }; // class LocalfunctionInterface
 
-
 class IsLocalizableFunction
 {
 };
-
 
 /**
  * \brief Interface for functions which provide a LocalfunctionInterface for an entity.
@@ -455,7 +438,6 @@ private:
   friend std::ostream& operator<<(std::ostream& /*out*/, const ThisType& /*function*/);
 }; // class LocalizableFunctionInterface
 
-
 template <class E, class D, size_t d, class R, size_t r, size_t rC>
 std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E, D, d, R, r, rC>& function)
 {
@@ -463,10 +445,8 @@ std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E
   return out;
 } // ... operator<<(...)
 
-
 template <class OtherEntityImp, class GlobalFunctionImp>
 class TransferredGlobalFunction;
-
 
 /**
  * base class for global matrix-valued valued functions that provides automatic local functions via
@@ -579,7 +559,6 @@ public:
     return typename Transfer<OtherEntityImp>::Type(*this);
   }
 }; // class GlobalFunctionInterface
-
 
 /**
  * base class for global valued functions that provides automatic local functions via LocalizableFunctionInterface
@@ -742,7 +721,6 @@ private:
   const GlobalFunctionImp& function_;
 }; // class TransferredGlobalFunction
 
-
 //! Utility to generate a complete Function Type from an existing one and a template
 template <class FunctionImp, template <class, class, size_t, class, size_t, size_t> class OutTemplate>
 struct FunctionTypeGenerator
@@ -750,7 +728,6 @@ struct FunctionTypeGenerator
   typedef OutTemplate<typename FunctionImp::EntityType, typename FunctionImp::DomainFieldType, FunctionImp::dimDomain,
                       typename FunctionImp::RangeFieldType, FunctionImp::dimRange, FunctionImp::dimRangeCols> type;
 };
-
 
 template <class F>
 struct is_localizable_function<F, true>
@@ -761,12 +738,10 @@ struct is_localizable_function<F, true>
 {
 };
 
-
 template <class F>
 struct is_localizable_function<F, false> : public std::false_type
 {
 };
-
 
 } // namespace Stuff
 } // namespace Dune

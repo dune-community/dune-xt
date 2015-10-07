@@ -23,7 +23,6 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Indicator : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
@@ -32,7 +31,6 @@ class Indicator : public LocalizableFunctionInterface<E, D, d, R, r, rC>
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
-
 
 template <class E, class D, size_t d, class R>
 class Indicator<E, D, d, R, 1> : public LocalizableFunctionInterface<E, D, d, R, 1>
@@ -184,7 +182,6 @@ private:
   const std::vector<std::tuple<DomainType, DomainType, R>> values_;
   const std::string name_;
 }; // class Indicator
-
 
 } // namespace Functions
 } // namespace Stuff
