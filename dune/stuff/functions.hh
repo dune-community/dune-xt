@@ -25,7 +25,6 @@
 namespace Dune {
 namespace Stuff {
 
-
 /**
  * \note If you want to add a new function FooBar, do the following: provide a definition that is available for all
  *       template arguments, like:
@@ -237,9 +236,7 @@ public:
   } // ... create(...)
 }; // class FunctionsProvider
 
-
 } // namespace Stuff
 } // namespace Dune
-
 
 #endif // DUNE_STUFF_FUNCTIONS_HH

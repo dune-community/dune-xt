@@ -12,7 +12,6 @@
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/functions/global.hh>
 
-
 // we need this nasty code generation because the testing::Types< ... > only accepts 50 arguments
 // and all combinations of functions and entities and dimensions and fieldtypes would be way too much
 #define TEST_STRUCT_GENERATOR(ftype, etype)                                                                            \
@@ -41,7 +40,6 @@
     }                                                                                                                  \
   };
 // TEST_STRUCT_GENERATOR
-
 
 #if HAVE_DUNE_GRID
 

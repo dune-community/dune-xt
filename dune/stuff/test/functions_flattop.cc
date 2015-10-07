@@ -32,7 +32,6 @@
 using namespace Dune;
 using namespace Stuff;
 
-
 template <class G>
 class FlatTopFunctionType
 {
@@ -46,7 +45,6 @@ class FlatTopFunctionType
 public:
   typedef Functions::FlatTop<E, D, d, R, r, rC> value;
 }; // struct FlatTopFunctionType
-
 
 template <class DimDomain>
 class FlatTopFunctionTest
@@ -85,7 +83,6 @@ protected:
   } // ... check(...)
 }; // class FlatTopFunctionTest
 
-
 typedef testing::Types<Int<1>, Int<2>, Int<3>> DimDomains;
 
 TYPED_TEST_CASE(FlatTopFunctionTest, DimDomains);
@@ -123,7 +120,6 @@ TYPED_TEST(FlatTopFunctionTest, evaluate_check)
     }
   }
 }
-
 
 #else // HAVE_DUNE_GRID
 

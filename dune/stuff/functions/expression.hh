@@ -25,7 +25,6 @@ namespace Dune {
 namespace Stuff {
 namespace Functions {
 
-
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
 class Expression
@@ -387,7 +386,6 @@ private:
   mutable FieldVector<RangeFieldType, dimDomain> tmp_gradient_row_;
   std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
 }; // class Expression
-
 
 } // namespace Functions
 } // namespace Stuff

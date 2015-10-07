@@ -23,12 +23,10 @@ namespace Stuff {
 namespace Functions {
 namespace internal {
 
-
 enum class Derivative
 {
   divergence
 };
-
 
 template <class FunctionType, Derivative derivative>
 class SelectDerived
@@ -132,7 +130,6 @@ public:
   }
 }; // class SelectDerived
 
-
 template <class FunctionType, Derivative derivative>
 class DerivedLocalFunction
     : public LocalfunctionInterface<
@@ -177,7 +174,6 @@ public:
 private:
   const std::unique_ptr<const typename FunctionType::LocalfunctionType> func_local_;
 }; // class DerivedLocalFunction
-
 
 template <class FunctionType, Derivative derivative>
 class Derived
@@ -244,9 +240,7 @@ private:
   const std::string name_;
 }; // class Derived
 
-
 } // namespace internal
-
 
 template <class FunctionType>
 class Divergence : public internal::Derived<FunctionType, internal::Derivative::divergence>
@@ -261,7 +255,6 @@ public:
   }
 }; // class Divergence
 
-
 template <class T, class... Args>
 std::shared_ptr<Divergence<T>> make_divergence(const T& func, Args&&... args)
 {
@@ -273,7 +266,6 @@ std::shared_ptr<Divergence<T>> make_divergence(std::shared_ptr<T> func, Args&&..
 {
   return std::make_shared<Divergence<T>>(func, std::forward<Args>(args)...);
 }
-
 
 } // namespace Functions
 } // namespace Stuff

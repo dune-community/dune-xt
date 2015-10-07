@@ -37,7 +37,6 @@
   };
 // TEST_STRUCT_GENERATOR
 
-
 #if HAVE_DUNE_GRID
 
 //# include <dune/grid/yaspgrid.hh>
