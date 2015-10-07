@@ -30,7 +30,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 // forwards
 template <class ScalarImp>
 class CommonDenseVector;
@@ -38,9 +37,7 @@ class CommonDenseVector;
 template <class ScalarImp>
 class CommonDenseMatrix;
 
-
 namespace internal {
-
 
 /// Traits for CommonDenseVector
 template <class ScalarImp = double>
@@ -53,7 +50,6 @@ public:
   typedef Dune::DynamicVector<ScalarType> BackendType;
 };
 
-
 template <class ScalarImp = double>
 class CommonDenseMatrixTraits
 {
@@ -64,9 +60,7 @@ public:
   typedef Dune::DynamicMatrix<ScalarType> BackendType;
 };
 
-
 } // namespace internal
-
 
 /**
  *  \brief A dense vector implementation of VectorInterface using the Dune::DynamicVector.
@@ -354,7 +348,6 @@ private:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseVector
 
-
 /**
  *  \brief  A dense matrix implementation of MatrixInterface using the Dune::DynamicMatrix.
  */
@@ -619,10 +612,8 @@ private:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseMatrix
 
-
 } // namespace LA
 namespace Common {
-
 
 template <class T>
 struct VectorAbstraction<LA::CommonDenseVector<T>>
@@ -630,13 +621,11 @@ struct VectorAbstraction<LA::CommonDenseVector<T>>
 {
 };
 
-
 template <class T>
 struct MatrixAbstraction<LA::CommonDenseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T>>
 {
 };
-
 
 } // namespace Common
 } // namespace Stuff

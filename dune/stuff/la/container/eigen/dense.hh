@@ -37,7 +37,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 // forwards
 template <class ScalarImp>
 class EigenDenseVector;
@@ -48,12 +47,9 @@ class EigenMappedDenseVector;
 template <class ScalarImp>
 class EigenDenseMatrix;
 
-
 #if HAVE_EIGEN
 
-
 namespace internal {
-
 
 /**
  *  \brief Traits for EigenDenseVector.
@@ -67,7 +63,6 @@ public:
   typedef EigenDenseVector<ScalarType> derived_type;
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, 1> BackendType;
 }; // class EigenDenseVectorTraits
-
 
 /**
  *  \brief Traits for EigenMappedDenseVector.
@@ -84,7 +79,6 @@ public:
   typedef Eigen::Map<PlainBackendType> BackendType;
 }; // class EigenMappedDenseVectorTraits
 
-
 /**
  *  \brief Traits for EigenDenseMatrix.
  */
@@ -98,9 +92,7 @@ public:
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
 }; // class EigenDenseMatrixTraits
 
-
 } // namespace internal
-
 
 /**
  *  \brief A dense vector implementation of VectorInterface using the eigen backend.
@@ -217,7 +209,6 @@ private:
 
   friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenDenseVector
-
 
 /**
  *  \brief  A dense vector implementation of VectorInterface using the eigen backend which wrappes a raw array.
@@ -354,7 +345,6 @@ private:
 
   friend class EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenMappedDenseVector
-
 
 /**
  *  \brief  A dense matrix implementation of MatrixInterface using the eigen backend.
@@ -644,9 +634,7 @@ private:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class EigenDenseMatrix
 
-
 #else // HAVE_EIGEN
-
 
 template <class ScalarImp>
 class EigenDenseVector
@@ -666,14 +654,12 @@ class EigenDenseMatrix
   static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
 };
 
-
 #endif // HAVE_EIGEN
 
 } // namespace LA
 namespace Common {
 
 #if HAVE_EIGEN
-
 
 template <class T>
 struct VectorAbstraction<LA::EigenDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::EigenDenseVector<T>>
@@ -686,12 +672,10 @@ struct VectorAbstraction<LA::EigenMappedDenseVector<T>>
 {
 };
 
-
 template <class T>
 struct MatrixAbstraction<LA::EigenDenseMatrix<T>> : public LA::internal::MatrixAbstractionBase<LA::EigenDenseMatrix<T>>
 {
 };
-
 
 #endif // HAVE_EIGEN
 

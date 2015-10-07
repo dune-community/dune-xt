@@ -8,10 +8,8 @@
 #ifndef DUNE_STUFF_LA_CONTAINER_INTERFACES_HH
 #define DUNE_STUFF_LA_CONTAINER_INTERFACES_HH
 
-
 #include "container-interface.hh"
 #include "vector-interface.hh"
 #include "matrix-interface.hh"
-
 
 #endif // DUNE_STUFF_LA_CONTAINER_INTERFACES_HH

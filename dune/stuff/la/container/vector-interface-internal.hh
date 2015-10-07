@@ -15,19 +15,15 @@
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/exceptions.hh>
 
-
 namespace Dune {
 namespace Stuff {
 namespace LA {
-
 
 // forward
 template <class Traits, class ScalarImp>
 class VectorInterface;
 
-
 namespace internal {
-
 
 template <class Traits, class ScalarImp>
 class VectorInputIterator : public std::iterator<std::input_iterator_tag, typename Traits::ScalarType>
@@ -91,7 +87,6 @@ protected:
   bool end_;
 }; // class VectorInputIterator
 
-
 template <class Traits, class ScalarImp>
 class VectorOutputIterator : public VectorInputIterator<Traits, ScalarImp>,
                              public std::iterator<std::output_iterator_tag, typename Traits::ScalarType>
@@ -133,7 +128,6 @@ public:
 private:
   std::shared_ptr<Holder> holder_;
 }; // class VectorOutputIterator
-
 
 } // namespace internal
 } // namespace LA

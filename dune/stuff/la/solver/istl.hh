@@ -90,7 +90,6 @@ struct IstlSolverTraits<S, SequentialCommunication>
   }
 };
 
-
 template <class S, class CommunicatorType>
 class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUtils
 {
@@ -306,9 +305,7 @@ private:
   const Common::ConstStorageProvider<CommunicatorType> communicator_;
 }; // class Solver
 
-
 #else // HAVE_DUNE_ISTL
-
 
 template <class S, class CommunicatorType>
 class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
@@ -316,9 +313,7 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
   static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
 };
 
-
 #endif // HAVE_DUNE_ISTL
-
 
 } // namespace LA
 } // namespace Stuff

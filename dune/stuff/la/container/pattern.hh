@@ -14,7 +14,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 class SparsityPatternDefault
 {
 private:
@@ -49,7 +48,6 @@ public:
 private:
   BaseType vector_of_vectors_;
 }; // class SparsityPatternDefault
-
 
 } // namespace LA
 } // namespace Stuff

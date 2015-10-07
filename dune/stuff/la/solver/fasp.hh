@@ -21,7 +21,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 template <class ElementImp>
 class AmgSolver<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>, Dune::Stuff::LA::EigenDenseVector<ElementImp>>
     : public SolverInterface<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>,

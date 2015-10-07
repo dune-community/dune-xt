@@ -9,11 +9,9 @@
 #include <cassert>
 #include <algorithm>
 
-
 namespace Dune {
 namespace Stuff {
 namespace LA {
-
 
 // ================================
 // ==== SparsityPatternDefault ====
@@ -79,7 +77,6 @@ void SparsityPatternDefault::sort()
   for (auto& inner_vector : vector_of_vectors_)
     std::sort(inner_vector.begin(), inner_vector.end());
 }
-
 
 } // namespace LA
 } // namespace Stuff

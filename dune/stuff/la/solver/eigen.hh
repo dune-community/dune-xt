@@ -42,7 +42,6 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 #if HAVE_EIGEN
 
 template <class S, class CommunicatorType>
@@ -84,7 +83,6 @@ public:
     }
     return default_options;
   } // ... options(...)
-
 
   template <class T1, class T2>
   void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution) const
@@ -216,7 +214,6 @@ public:
 private:
   const MatrixType& matrix_;
 }; // class Solver
-
 
 /**
  *  \note lu.sparse will copy the matrix to column major
@@ -577,9 +574,7 @@ private:
   const MatrixType& matrix_;
 }; // class Solver
 
-
 #else // HAVE_EIGEN
-
 
 template <class S>
 class Solver<EigenDenseMatrix<S>>
@@ -592,7 +587,6 @@ class Solver<EigenRowMajorSparseMatrix<S>>
 {
   static_assert(Dune::AlwaysFalse<S>::value, "You are missing Eigen!");
 };
-
 
 #endif // HAVE_EIGEN
 

@@ -29,20 +29,16 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 /**
  * \brief Contains tags mostly needed for python bindings.
  */
 namespace Tags {
 
-
 class MatrixInterface
 {
 };
 
-
 } // namespace Tags
-
 
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class MatrixInterface : public ContainerInterface<Traits, ScalarImp>, public Tags::MatrixInterface
@@ -292,7 +288,6 @@ private:
   friend std::ostream& operator<<(std::ostream& /*out*/, const MatrixInterface<T, S>& /*matrix*/);
 }; // class MatrixInterface
 
-
 template <class T, class S>
 std::ostream& operator<<(std::ostream& out, const MatrixInterface<T, S>& matrix)
 {
@@ -316,9 +311,7 @@ std::ostream& operator<<(std::ostream& out, const MatrixInterface<T, S>& matrix)
   return out;
 } // ... operator<<(...)
 
-
 namespace internal {
-
 
 template <class M>
 struct is_matrix_helper
@@ -328,24 +321,19 @@ struct is_matrix_helper
       static const bool is_candidate = DSC_has_typedef(Traits)<M>::value && DSC_has_typedef(ScalarType)<M>::value;
 }; // class is_matrix_helper
 
-
 } // namespace internal
-
 
 template <class M, bool candidate = internal::is_matrix_helper<M>::is_candidate>
 struct is_matrix : public std::is_base_of<MatrixInterface<typename M::Traits, typename M::ScalarType>, M>
 {
 };
 
-
 template <class M>
 struct is_matrix<M, false> : public std::false_type
 {
 };
 
-
 namespace internal {
-
 
 template <class MatrixImp>
 struct MatrixAbstractionBase
@@ -394,7 +382,6 @@ struct MatrixAbstractionBase
     return mat.get_entry(row, col);
   }
 }; // struct MatrixAbstractionBase
-
 
 } // namespace internal
 } // namespace LA
