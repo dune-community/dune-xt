@@ -10,7 +10,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #if HAVE_DUNE_GRID
-#include <dune/grid/sgrid.hh>
+#include <dune/grid/yaspgrid.hh>
 #endif
 
 #include <dune/geometry/quadraturerules.hh>
@@ -46,10 +46,12 @@ public:
 
 template <class DimDomain>
 class DifferenceFunctionTest
-    : public FunctionTest<typename DifferenceFunctionType<SGrid<DimDomain::value, DimDomain::value>>::value>
+    : public FunctionTest<
+          typename DifferenceFunctionType<YaspGrid<DimDomain::value,
+                                                   EquidistantOffsetCoordinates<double, DimDomain::value>>>::value>
 {
 protected:
-  typedef SGrid<DimDomain::value, DimDomain::value> GridType;
+  typedef YaspGrid<DimDomain::value, EquidistantOffsetCoordinates<double, DimDomain::value>> GridType;
   typedef typename DifferenceFunctionType<GridType>::value FunctionType;
 
   static std::shared_ptr<GridType> create_grid()
@@ -59,8 +61,9 @@ protected:
 
   static std::unique_ptr<FunctionType> create(const double ll, const double rr)
   {
-    typedef typename DifferenceFunctionType<SGrid<DimDomain::value, DimDomain::value>>::ConstantFunctionType
-        ConstantFunctionType;
+    typedef typename DifferenceFunctionType<YaspGrid<DimDomain::value,
+                                                     EquidistantOffsetCoordinates<double, DimDomain::value>>>::
+        ConstantFunctionType ConstantFunctionType;
     auto left  = std::make_shared<ConstantFunctionType>(ll);
     auto right = std::make_shared<ConstantFunctionType>(rr);
     return std::unique_ptr<FunctionType>(new FunctionType(left, right));

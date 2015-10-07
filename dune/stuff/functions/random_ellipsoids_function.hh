@@ -41,7 +41,7 @@ struct Ellipsoid
     }
     return DSC::FloatCmp::le(sum, 1.);
   }
-  bool intersects_cube(DomainType ll, DomainType ur) const
+  bool intersects_cube(DomainType /*ll*/, DomainType /*ur*/) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -197,7 +197,7 @@ public:
         EllipsoidType child = parent;
         const double scale  = std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
         const auto displace = [&](DomainFieldType& coord) {
-          const auto disp   = dist_rng() * DSC::sign(sign_rng());
+          const auto disp   = dist_rng() * DSC::signum(sign_rng());
           coord += disp;
           DSC_LOG_DEBUG_0 << disp << ";";
         };
