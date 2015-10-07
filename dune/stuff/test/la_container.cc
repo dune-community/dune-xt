@@ -25,7 +25,6 @@ using namespace Dune;
 
 static const size_t dim = 4;
 
-
 #define EXPECT_DOUBLE_OR_COMPLEX_EQ(expected, actual)                                                                  \
   {                                                                                                                    \
     EXPECT_DOUBLE_EQ(expected, std::real(actual));                                                                     \
@@ -95,7 +94,6 @@ typedef testing::Types<Dune::Stuff::LA::CommonDenseVector<double>, Dune::Stuff::
 #endif
                        > ContainerTypes;
 
-
 template <class ContainerImp>
 struct ContainerTest : public ::testing::Test
 {
@@ -143,13 +141,11 @@ struct ContainerTest : public ::testing::Test
   } // void fulfills_interface() const
 }; // struct ContainerTest
 
-
 TYPED_TEST_CASE(ContainerTest, ContainerTypes);
 TYPED_TEST(ContainerTest, fulfills_interface)
 {
   this->fulfills_interface();
 }
-
 
 template <class VectorImp>
 struct VectorTest : public ::testing::Test
@@ -664,7 +660,6 @@ struct VectorTest : public ::testing::Test
     }
   } // void produces_correct_results() const
 }; // struct VectorTest
-
 
 TYPED_TEST_CASE(VectorTest, VectorTypes);
 TYPED_TEST(VectorTest, fulfills_interface)

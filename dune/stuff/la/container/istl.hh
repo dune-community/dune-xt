@@ -44,9 +44,7 @@ class IstlRowMajorSparseMatrix;
 
 #if HAVE_DUNE_ISTL
 
-
 namespace internal {
-
 
 /**
  * \brief Traits for IstlDenseVector.
@@ -61,7 +59,6 @@ public:
   typedef BlockVector<FieldVector<ScalarType, 1>> BackendType;
 }; // class IstlDenseVectorTraits
 
-
 /**
  * \brief Traits for IstlRowMajorSparseMatrix.
  */
@@ -75,9 +72,7 @@ public:
   typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
 }; // class RowMajorSparseMatrixTraits
 
-
 } // namespace internal
-
 
 /**
  *  \brief A dense vector implementation of VectorInterface using the Dune::BlockVector from dune-istl.
@@ -374,7 +369,6 @@ private:
 
   mutable std::shared_ptr<BackendType> backend_;
 }; // class IstlDenseVector
-
 
 /**
  * \brief A sparse matrix implementation of the MatrixInterface using the Dune::BCRSMatrix from dune-istl.
@@ -736,7 +730,6 @@ private:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class IstlRowMajorSparseMatrix
 
-
 template <class S>
 std::ostream& operator<<(std::ostream& out, const IstlRowMajorSparseMatrix<S>& matrix)
 {
@@ -769,9 +762,7 @@ std::ostream& operator<<(std::ostream& out, const IstlRowMajorSparseMatrix<S>& m
   return out;
 } // ... operator<<(...)
 
-
 #else // HAVE_DUNE_ISTL
-
 
 template <class ScalarImp>
 class IstlDenseVector
@@ -785,7 +776,6 @@ class IstlRowMajorSparseMatrix
   static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing dune-istl!");
 };
 
-
 #endif // HAVE_DUNE_ISTL
 
 } // namespace LA
@@ -793,19 +783,16 @@ namespace Common {
 
 #if HAVE_DUNE_ISTL
 
-
 template <class T>
 struct VectorAbstraction<LA::IstlDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::IstlDenseVector<T>>
 {
 };
-
 
 template <class T>
 struct MatrixAbstraction<LA::IstlRowMajorSparseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>
 {
 };
-
 
 #endif // HAVE_DUNE_ISTL
 

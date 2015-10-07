@@ -18,7 +18,6 @@ public:
   }
 };
 
-
 template <class S>
 class ContainerFactory<Dune::Stuff::LA::CommonDenseVector<S>>
 {
@@ -41,7 +40,6 @@ public:
     return matrix;
   }
 };
-
 
 #if HAVE_DUNE_ISTL
 template <class S>
@@ -70,7 +68,6 @@ public:
   }
 };
 #endif // HAVE_DUNE_ISTL
-
 
 #if HAVE_EIGEN
 template <class S>

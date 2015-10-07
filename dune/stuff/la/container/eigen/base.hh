@@ -31,20 +31,16 @@ namespace Dune {
 namespace Stuff {
 namespace LA {
 
-
 template <class ScalarImp>
 class EigenDenseMatrix;
 
 template <class ScalarType>
 class EigenRowMajorSparseMatrix;
 
-
 #if HAVE_EIGEN
-
 
 template <class Traits, class ScalarImp>
 class EigenBaseVector;
-
 
 /**
  *  \brief Base class for all eigen implementations of VectorInterface.
@@ -300,16 +296,13 @@ protected:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class EigenBaseVector
 
-
 #else // HAVE_EIGEN
-
 
 template <class Traits, class ScalarImp>
 class EigenBaseVector
 {
   static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing Eigen!");
 };
-
 
 #endif // HAVE_EIGEN
 

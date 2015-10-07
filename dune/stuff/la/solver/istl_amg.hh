@@ -27,7 +27,6 @@ namespace LA {
 
 #if HAVE_DUNE_ISTL
 
-
 template <class O, int c>
 class IdentityPreconditioner : public Dune::Preconditioner<typename O::domain_type, typename O::range_type>
 {
@@ -46,7 +45,6 @@ public:
     //! \brief The category the preconditioner is part of.
     category = c
   };
-
 
   void pre(domain_type&, range_type&)
   {
@@ -171,7 +169,6 @@ protected:
   const CommunicatorType& communicator_;
 };
 
-
 //! specialization for our faux type \ref SequentialCommunication
 template <class S>
 class AmgApplicator<S, SequentialCommunication>
@@ -255,9 +252,7 @@ protected:
   const SequentialCommunication& communicator_;
 };
 
-
 #else // HAVE_DUNE_ISTL
-
 
 template <class S, class T>
 class AmgApplicator
@@ -265,12 +260,10 @@ class AmgApplicator
   static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
 };
 
-
 #endif // HAVE_DUNE_ISTL
 
 } // namespace LA
 } // namespace Stuff
 } // namespace Dune
-
 
 #endif // DUNE_STUFF_LA_SOLVER_ISTL_AMG_HH
