@@ -18,7 +18,6 @@ namespace Stuff {
 namespace Grid {
 namespace Functor {
 
-
 template <class GridViewImp>
 class Codim0
 {
@@ -40,7 +39,6 @@ public:
   {
   }
 }; // class Codim0
-
 
 template <class GridViewImp>
 class Codim1
@@ -65,7 +63,6 @@ public:
   {
   }
 }; // class Codim1
-
 
 template <class GridViewImp>
 class Codim0And1
@@ -92,7 +89,6 @@ public:
   {
   }
 }; // class Codim0And1
-
 
 template <class GridViewImp>
 class DirichletDetector : public Codim1<GridViewImp>
@@ -130,7 +126,6 @@ private:
   const BoundaryInfoInterface<IntersectionType>& boundary_info_;
   size_t found_;
 }; // class DirichletDetector
-
 
 } // namespace Functor
 } // namespace Grid

@@ -25,7 +25,6 @@ namespace Grid {
 
 #if HAVE_DUNE_GRID
 
-
 template <class GridPartOrViewType>
 class Entity
 {
@@ -48,9 +47,7 @@ public:
   typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
 }; // class Entity
 
-
 #endif // HAVE_DUNE_GRID
-
 
 template <class EntityType>
 void printEntity(const EntityType& entity, const std::string name = Common::Typename<EntityType>::value(),
@@ -63,7 +60,6 @@ void printEntity(const EntityType& entity, const std::string name = Common::Type
     out << prefix + "  "
         << "corner " + Common::toString(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... printEntity(...)
-
 
 #if HAVE_DUNE_GRID
 

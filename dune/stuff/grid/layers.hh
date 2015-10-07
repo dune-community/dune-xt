@@ -20,18 +20,15 @@
 
 #include <dune/stuff/common/type_utils.hh>
 
-
 namespace Dune {
 namespace Stuff {
 namespace Grid {
-
 
 enum class ChoosePartView
 {
   view,
   part
 }; // enum class ChoosePartView
-
 
 enum class ChooseLayer
 {
@@ -44,9 +41,7 @@ enum class ChooseLayer
 #endif
 }; // enum class ChooseLayer
 
-
 #if HAVE_DUNE_GRID
-
 
 // forwards
 template <class GridType, ChooseLayer layer, ChoosePartView part_view>
@@ -64,7 +59,6 @@ struct LayerView;
 template <class GridType, ChooseLayer type>
 struct LayerPart;
 
-
 // specializations of LeafPartView
 
 /**
@@ -80,7 +74,6 @@ struct LeafPartView<GridType, ChoosePartView::view>
     return grid.leafGridView();
   }
 }; // struct LeafPartView< ..., view >
-
 
 #if HAVE_DUNE_FEM
 
@@ -113,7 +106,6 @@ struct LeafPartView<GridType, ChoosePartView::part>
 };
 
 #endif // HAVE_DUNE_FEM
-
 
 // specializations of LevelPartView
 
@@ -156,7 +148,6 @@ struct LevelPartView<GridType, ChoosePartView::part>
     return Type(grid, level);
   }
 }; // struct LevelPartView< ..., part >
-
 
 // specializations of LayerPart
 
@@ -222,7 +213,6 @@ struct LayerPart<GridType, ChooseLayer::level>
 
 #endif // HAVE_DUNE_FEM
 
-
 // specializations of LayerView
 
 /**
@@ -252,7 +242,6 @@ struct LayerView<GridType, ChooseLayer::level>
     return LevelPartView<GridType, ChoosePartView::view>::create(grid, level);
   }
 }; // struct LayerView< ..., level >
-
 
 // specializatins of Layer
 
@@ -348,9 +337,7 @@ struct Layer<GridType, ChooseLayer::level, ChoosePartView::view>
   }
 }; // struct Layer< ..., level, view >
 
-
 #if HAVE_DUNE_GRID_MULTISCALE
-
 
 template <class GridType>
 struct Layer<GridType, ChooseLayer::local, ChoosePartView::view>
@@ -358,13 +345,11 @@ struct Layer<GridType, ChooseLayer::local, ChoosePartView::view>
   typedef typename grid::Multiscale::Default<GridType>::LocalGridViewType Type;
 };
 
-
 template <class GridType>
 struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::view>
 {
   typedef typename grid::Multiscale::Default<GridType>::LocalGridViewType Type;
 };
-
 
 template <class GridType>
 struct Layer<GridType, ChooseLayer::local, ChoosePartView::part>
@@ -372,17 +357,14 @@ struct Layer<GridType, ChooseLayer::local, ChoosePartView::part>
   typedef typename grid::Multiscale::Default<GridType>::LocalGridPartType Type;
 };
 
-
 template <class GridType>
 struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::part>
 {
   typedef typename grid::Multiscale::Default<GridType>::LocalGridPartType Type;
 };
 
-
 #endif // HAVE_DUNE_GRID_MULTISCALE
 #else // HAVE_DUNE_GRID
-
 
 template <class GridType, ChooseLayer layer, ChoosePartView type>
 struct Layer
@@ -390,20 +372,17 @@ struct Layer
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
 };
 
-
 template <class GridType, ChoosePartView type>
 struct LevelPartView
 {
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
 };
 
-
 template <class GridType, ChoosePartView type>
 struct LeafPartView
 {
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
 };
-
 
 #endif // HAVE_DUNE_GRID
 

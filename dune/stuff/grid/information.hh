@@ -25,7 +25,6 @@
 #include <dune/stuff/grid/entity.hh>
 #include <dune/stuff/grid/walker/functors.hh>
 
-
 namespace Dune {
 namespace Stuff {
 namespace Grid {

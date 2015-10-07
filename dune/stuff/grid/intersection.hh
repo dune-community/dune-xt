@@ -26,9 +26,7 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
-
 #if HAVE_DUNE_GRID
-
 
 template <class GridPartOrViewType>
 class Intersection
@@ -52,9 +50,7 @@ public:
   typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
 }; // class Intersection
 
-
 #endif // HAVE_DUNE_GRID
-
 
 /**
   \brief      prints some basic information about a Dune::Intersection, namely the number of its corners and the

@@ -22,7 +22,6 @@ namespace Stuff {
 
 #if HAVE_DUNE_GRID
 
-
 template <class GridType = Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>
 class GridProviders
 {
@@ -73,16 +72,13 @@ public:
   } // ... create(...)
 }; // class GridProviders
 
-
 #else // HAVE_DUNE_GRID
-
 
 template <class GridType>
 class GridProviders
 {
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
 };
-
 
 #endif // HAVE_DUNE_GRID
 
