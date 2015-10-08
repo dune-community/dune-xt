@@ -250,7 +250,7 @@ public:
                               scalar_product,
                               preconditioner,
                               opts.get("precision", default_opts.get<S>("precision")),
-                              opts.get("max_iter", default_opts.get<size_t>("max_iter")),
+                              opts.get("max_iter", default_opts.get<int>("max_iter")),
                               verbosity(opts, default_opts));
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
 #if HAVE_UMFPACK
