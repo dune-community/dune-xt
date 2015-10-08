@@ -65,7 +65,7 @@ struct GridWalkerTest : public ::testing::Test
       walker.walk(partitioning);
     };
     tests.push_back(test0);
-#endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) // EXADUNE
+#endif // DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB
 
     for (const auto& test : tests) {
       count = 0;

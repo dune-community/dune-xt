@@ -16,16 +16,16 @@
 
 #include <dune/common/version.hh>
 
+#if HAVE_TBB
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
 #include <dune/grid/utility/partitioning/ranged.hh>
 #include <dune/stuff/common/parallel/threadmanager.hh>
-#endif
+#endif // DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9)
 
-#if HAVE_TBB
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
 #include <tbb/tbb_stddef.h>
-#endif
+#endif // HAVE_TBB
 
 #include <dune/stuff/grid/entity.hh>
 #include <dune/stuff/grid/intersection.hh>
