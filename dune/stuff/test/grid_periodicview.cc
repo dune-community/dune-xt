@@ -64,8 +64,8 @@ struct PeriodicViewTestYaspCube : public testing::Test
       lower_left = DSC::fromString<DomainType>("[-0.5 0.5 0.7 -1.3]");
 
     // check interface
-    const GridType& DUNE_UNUSED(test_grid) = periodic_grid_view.grid();
-    const IndexSet& DUNE_UNUSED(test_indexSet) = periodic_grid_view.indexSet();
+    const GridType& DSC_UNUSED(test_grid) = periodic_grid_view.grid();
+    const IndexSet& DSC_UNUSED(test_indexSet) = periodic_grid_view.indexSet();
     const int codim0_size = periodic_grid_view.size(0);
     EXPECT_EQ(codim0_size, grid_view.size(0));
     if (dimDomain == 1)
@@ -84,7 +84,7 @@ struct PeriodicViewTestYaspCube : public testing::Test
     EXPECT_EQ(periodic_grid_view.overlapSize(1), grid_view.overlapSize(1));
     EXPECT_EQ(periodic_grid_view.ghostSize(0), grid_view.ghostSize(0));
     EXPECT_EQ(periodic_grid_view.ghostSize(1), grid_view.ghostSize(1));
-    const CollectiveCommunication& DUNE_UNUSED(test_comm) = periodic_grid_view.comm();
+    const CollectiveCommunication& DSC_UNUSED(test_comm) = periodic_grid_view.comm();
 
     size_t neighbor_count = 0;
     size_t boundary_count = 0;
