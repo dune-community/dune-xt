@@ -55,7 +55,7 @@ struct GridWalkerTest : public ::testing::Test
     };
     auto test3 = [&] { walker.add(counter).walk(true); };
     list<function<void()>> tests({test1, test2, test3});
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     auto test0        = [&] {
       const auto& set = gv.grid().leafIndexSet();
       IndexSetPartitioner<GridViewType> partitioner(set);
@@ -65,7 +65,7 @@ struct GridWalkerTest : public ::testing::Test
       walker.walk(partitioning);
     };
     tests.push_back(test0);
-#endif // DUNE_VERSION_NEWER(DUNE_COMMON,3,9) // EXADUNE
+#endif // DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB
 
     for (const auto& test : tests) {
       count = 0;
