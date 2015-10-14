@@ -22,6 +22,7 @@
 #include <dune/stuff/common/filesystem.hh>
 #include <dune/stuff/aliases.hh>
 #include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/common/logging.hh>
 
 namespace Dune {
 namespace Stuff {
