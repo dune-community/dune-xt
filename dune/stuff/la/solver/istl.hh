@@ -97,10 +97,6 @@ public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
   typedef typename MatrixType::RealType R;
 
-#if !DUNE_VERSION_NEWER(DUNE_ISTL, 2, 4)
-  static_assert(!std::is_same<S, std::complex<R>>::value, "the dune-istl solver does not work with complex yet!");
-#endif
-
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
     , communicator_(new CommunicatorType())
