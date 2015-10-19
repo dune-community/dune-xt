@@ -100,14 +100,12 @@ public:
 
   virtual std::unique_ptr<Grid::ConstProviderInterface<GridType>> copy() const override final
   {
-    DUNE_THROW(NotImplemented, "");
-    return nullptr;
+    return DSC::make_unique<ThisType>(*this);
   }
 
   virtual std::unique_ptr<Grid::ProviderInterface<GridType>> copy() override final
   {
-    DUNE_THROW(NotImplemented, "");
-    return nullptr;
+    return DSC::make_unique<ThisType>(*this);
   }
 
 private:
