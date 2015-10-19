@@ -6,10 +6,9 @@
 #ifndef DUNE_STUFF_GRID_PROVIDER_DGF_HH
 #define DUNE_STUFF_GRID_PROVIDER_DGF_HH
 
-#if HAVE_DUNE_GRID
-
 #include <memory>
 
+#if HAVE_DUNE_GRID
 #include <dune/grid/io/file/dgfparser/gridptr.hh> // How convenient that GridPtr requires DGFGridFactory but
 #include <dune/grid/io/file/dgfparser/dgfgridfactory.hh> // does not include it!
 #include <dune/grid/io/file/dgfparser/dgfoned.hh>
@@ -18,6 +17,7 @@
 #if HAVE_ALUGRID
 #include <dune/grid/io/file/dgfparser/dgfalu.hh>
 #endif
+#endif // HAVE_DUNE_GRID
 
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/string.hh>
@@ -27,6 +27,8 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 namespace Providers {
+
+#if HAVE_DUNE_GRID
 
 template <class GridImp>
 class DGF : public Grid::ProviderInterface<GridImp>
@@ -112,11 +114,19 @@ private:
   std::shared_ptr<GridType> grid_;
 }; // class DGF
 
+#else // HAVE_DUNE_GRID
+
+template <class GridImp>
+class DGF
+{
+  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
+};
+
+#endif // HAVE_DUNE_GRID
+
 } // namespace Providers
 } // namespace Grid
 } // namespace Stuff
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_STUFF_GRID_PROVIDER_DGF_HH
