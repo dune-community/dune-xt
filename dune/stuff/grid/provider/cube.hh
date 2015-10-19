@@ -178,8 +178,8 @@ public:
    *  \param[in]  num_elements (optional)
    *              Number of elements.
    **/
-  explicit Cube(const DomainFieldType lower_left = default_config().get<DomainFieldType>("lower_left"),
-                const DomainFieldType upper_right = default_config().get<DomainFieldType>("upper_right"),
+  explicit Cube(const DomainFieldType lower_left = default_config().get<DomainType>("lower_left")[0],
+                const DomainFieldType upper_right = default_config().get<DomainType>("upper_right")[0],
                 const unsigned int num_elements   = default_config().get<std::vector<unsigned int>>("num_elements")[0],
                 const size_t num_refinements = default_config().get<size_t>("num_refinements"),
                 const std::array<unsigned int, dimDomain> overlap =
