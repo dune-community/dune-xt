@@ -3,21 +3,18 @@
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include "main.hxx"
-
 #if HAVE_DUNE_GRID
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
 #include <dune/grid/yaspgrid.hh>
-#include <dune/grid/yaspgrid.hh>
 
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/grid/provider/interface.hh>
-#include <dune/stuff/grid/provider/cube.hh>
 
-using namespace Dune;
-using namespace Stuff;
+#define SGRIDS                                                                                                         \
+  Dune::SGrid<1, 1>, Dune::SGrid<2, 2>, Dune::SGrid<3, 3>, Dune::SGrid<4, 4>, Dune::SGrid<1, 2>, Dune::SGrid<2, 3>,    \
+      Dune::SGrid<3, 4>, Dune::SGrid<4, 5>
 
 #define YASPGRIDS                                                                                                      \
   YaspGrid<1, EquidistantOffsetCoordinates<double, 1>>, YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,          \
@@ -25,12 +22,15 @@ using namespace Stuff;
 
 #if HAVE_ALUGRID
 #define ALUGRIDS                                                                                                       \
-  ALUGrid<2, 2, cube, nonconforming> /*, ALUGrid< 2, 3, cube, nonconforming >     <- provider does not work */         \
-      , ALUGrid<3, 3, cube, nonconforming>,                                                                            \
-      ALUGrid<2, 2, simplex, nonconforming> /*, ALUGrid< 2, 3, simplex, nonconforming >  <- same here */               \
-      , ALUGrid<3, 3, simplex, nonconforming>,                                                                         \
-      ALUGrid<2, 2, simplex, conforming> /*, ALUGrid< 2, 3, simplex, conforming >     <- same here */                  \
-      , ALUGrid<3, 3, simplex, conforming>
+  Dune::ALUGrid<2, 2, Dune::cube, Dune::nonconforming> /*, Dune::ALUGrid< 2, 3, Dune::cube, Dune::nonconforming >      \
+                                                          <- provider does not work */                                 \
+      , Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>,                                                          \
+      Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming> /*, Dune::ALUGrid< 2, 3, Dune::simplex,                  \
+                                                                 Dune::nonconforming > <- same here */                 \
+      , Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>,                                                       \
+      Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> /*, Dune::ALUGrid< 2, 3, Dune::simplex, Dune::conforming >  \
+                                                              <- same here */                                          \
+      , Dune::ALUGrid<3, 3, Dune::simplex, Dune::conforming>
 #endif // HAVE_ALUGRID
 
 template <class GridProviderType>
@@ -40,11 +40,11 @@ protected:
   typedef typename GridProviderType::GridType GridType;
 
 private:
-  typedef Stuff::Grid::ConstProviderInterface<GridType> ConstInterfaceType;
-  typedef Stuff::Grid::ProviderInterface<GridType> InterfaceType;
+  typedef Dune::Stuff::Grid::ConstProviderInterface<GridType> ConstInterfaceType;
+  typedef Dune::Stuff::Grid::ProviderInterface<GridType> InterfaceType;
 
   static_assert(std::is_base_of<InterfaceType, GridProviderType>::value,
-                "GridProviderType has to be derived from Stuff::Grid::ConstProviderInterface!");
+                "GridProviderType has to be derived from Dune::Stuff::Grid::ConstProviderInterface!");
 
 protected:
   static std::unique_ptr<GridProviderType> create()
@@ -71,8 +71,8 @@ private:
   template <class GPT>
   static void check_const_interface(const GPT& grid_provider)
   {
-    using Stuff::Grid::ChooseLayer;
-    using Stuff::Grid::ChoosePartView;
+    using Dune::Stuff::Grid::ChooseLayer;
+    using Dune::Stuff::Grid::ChoosePartView;
     const auto& grid_i = grid_provider.grid();
     auto DUNE_UNUSED(leaf_grid_view_1) = grid_provider.leaf_view();
     auto DUNE_UNUSED(leaf_grid_view_2) = grid_provider.template leaf<ChoosePartView::view>();
@@ -111,11 +111,11 @@ private:
   template <class GPT>
   static void check_visualize(const GPT& grid_provider)
   {
-    auto type_str = Stuff::Common::Typename<GPT>::value();
+    auto type_str = Dune::Stuff::Common::Typename<GPT>::value();
     grid_provider.visualize();
     grid_provider.visualize(type_str + "_a");
-    grid_provider.visualize(Stuff::Grid::BoundaryInfoConfigs::AllDirichlet::default_config());
-    grid_provider.visualize(Stuff::Grid::BoundaryInfoConfigs::AllDirichlet::default_config(), type_str + "_b");
+    grid_provider.visualize(Dune::Stuff::Grid::BoundaryInfoConfigs::AllDirichlet::default_config());
+    grid_provider.visualize(Dune::Stuff::Grid::BoundaryInfoConfigs::AllDirichlet::default_config(), type_str + "_b");
   } // ... check_visualize(...)
 
 public:
@@ -135,14 +135,14 @@ class GridProviderBase : public ConstGridProviderBase<GridProviderType>
 {
   typedef ConstGridProviderBase<GridProviderType> BaseType;
   typedef typename BaseType::GridType GridType;
-  typedef Stuff::Grid::ProviderInterface<GridType> InterfaceType;
+  typedef Dune::Stuff::Grid::ProviderInterface<GridType> InterfaceType;
 
 private:
   template <class GPT>
   static void check_non_const_interface(GPT& grid_provider)
   {
-    using Stuff::Grid::ChooseLayer;
-    using Stuff::Grid::ChoosePartView;
+    using Dune::Stuff::Grid::ChooseLayer;
+    using Dune::Stuff::Grid::ChoosePartView;
     auto& grid_i = grid_provider.grid();
     auto DUNE_UNUSED(leaf_grid_part_1) = grid_provider.template leaf<ChoosePartView::part>();
     auto DUNE_UNUSED(leaf_grid_part_2) = grid_provider.leaf_part();
@@ -161,58 +161,5 @@ public:
   } // ... non_const_interface()
 
 }; // class GridProviderBase
-
-template <class GridType>
-struct CubeGridProvider : public GridProviderBase<Stuff::Grid::Providers::Cube<GridType>>
-{
-};
-
-typedef testing::Types<YASPGRIDS
-#if HAVE_ALUGRID
-                       ,
-                       ALUGRIDS
-#endif
-                       > GridTypes;
-
-TYPED_TEST_CASE(CubeGridProvider, GridTypes);
-TYPED_TEST(CubeGridProvider, is_default_creatable)
-{
-  this->is_default_creatable();
-}
-TYPED_TEST(CubeGridProvider, fulfills_const_interface)
-{
-  this->const_interface();
-}
-TYPED_TEST(CubeGridProvider, is_visualizable)
-{
-  this->visualize();
-}
-
-#if HAVE_DUNE_FEM
-
-TYPED_TEST(CubeGridProvider, fulfills_non_const_interface)
-{
-  this->non_const_interface();
-}
-
-#else // HAVE_DUNE_FEM
-
-TEST(DISABLED_CubeGridProvider, fulfills_non_const_interface)
-{
-}
-
-#endif
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_CubeGridProvider, is_default_creatable)
-{
-}
-TEST(DISABLED_CubeGridProvider, fulfills_const_interface)
-{
-}
-TEST(DISABLED_CubeGridProvider, is_visualizable)
-{
-}
 
 #endif // HAVE_DUNE_GRID
