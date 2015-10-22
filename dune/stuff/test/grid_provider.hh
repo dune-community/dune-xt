@@ -17,8 +17,10 @@
       Dune::SGrid<3, 4>, Dune::SGrid<4, 5>
 
 #define YASPGRIDS                                                                                                      \
-  YaspGrid<1, EquidistantOffsetCoordinates<double, 1>>, YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,          \
-      YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, YaspGrid<4, EquidistantOffsetCoordinates<double, 4>>
+  Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>,                                                    \
+      Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>,                                                \
+      Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>>,                                                \
+      Dune::YaspGrid<4, Dune::EquidistantOffsetCoordinates<double, 4>>
 
 #if HAVE_ALUGRID
 #define ALUGRIDS                                                                                                       \

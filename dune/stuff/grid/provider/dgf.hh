@@ -98,16 +98,6 @@ public:
     return grid_;
   }
 
-  virtual std::unique_ptr<Grid::ConstProviderInterface<GridType>> copy() const override final
-  {
-    return DSC::make_unique<ThisType>(*this);
-  }
-
-  virtual std::unique_ptr<Grid::ProviderInterface<GridType>> copy() override final
-  {
-    return DSC::make_unique<ThisType>(*this);
-  }
-
 private:
   std::shared_ptr<GridType> grid_;
 }; // class DGF
