@@ -15,6 +15,9 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
+#define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1
+#include <dune/grid/sgrid.hh>
+#undef DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALBERTAGRID
 #include <dune/grid/albertagrid.hh>
@@ -72,8 +75,8 @@ struct ElementVariant
   static const int id = 2;
 };
 
-template <int dim>
-struct ElementVariant<Dune::YaspGrid<dim>>
+template <int dd, int dw>
+struct ElementVariant<Dune::SGrid<dd, dw>>
 {
   static const int id = 1;
 };
