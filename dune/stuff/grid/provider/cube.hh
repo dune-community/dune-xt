@@ -16,6 +16,9 @@
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
+#if HAVE_ALBERTAGRID
+#include <dune/grid/alugrid.hh>
+#endif
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
@@ -273,9 +276,15 @@ private:
         break;
     }
     grd_ptr->loadBalance();
-    grd_ptr->preAdapt();
+#if HAVE_ALBERTAGRID
+    if (!std::is_same<GridType, AlbertaGrid<dimDomain, dimDomain>>::value)
+#endif
+      grd_ptr->preAdapt();
     grd_ptr->globalRefine(boost::numeric_cast<int>(num_refinements));
-    grd_ptr->postAdapt();
+#if HAVE_ALBERTAGRID
+    if (!std::is_same<GridType, AlbertaGrid<dimDomain, dimDomain>>::value)
+#endif
+      grd_ptr->postAdapt();
     grd_ptr->loadBalance();
     return grd_ptr;
   } // ... create_grid(...)
