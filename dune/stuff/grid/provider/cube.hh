@@ -19,6 +19,9 @@
 #if HAVE_ALBERTAGRID
 #include <dune/grid/albertagrid.hh>
 #endif
+#if HAVE_DUNE_ALUGRID
+#include <dune/alugrid/grid.hh>
+#endif
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
@@ -92,13 +95,7 @@ struct ElementVariant<Dune::SPGrid<ct, dim, Refinement, Comm>>
 
 #endif // HAVE_DUNE_GRID
 
-#if HAVE_ALUGRID
-
-template <int dimGrid, int dimWorld>
-struct ElementVariant<Dune::ALUCubeGrid<dimGrid, dimWorld>>
-{
-  static const int id = 1;
-};
+#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
 template <int dimGrid, int dimWorld, class MpiCommImp>
 struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming, MpiCommImp>>
@@ -112,7 +109,7 @@ struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconf
   static const int id = 1;
 };
 
-#endif // HAVE_ALUGRID
+#endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
 } // namespace internal
 
