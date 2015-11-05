@@ -17,7 +17,7 @@
 #if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALBERTAGRID
-#include <dune/grid/alugrid.hh>
+#include <dune/grid/albertagrid.hh>
 #endif
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
