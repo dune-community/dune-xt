@@ -6,6 +6,7 @@
 #ifndef DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
 #define DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
 
+#if HAVE_DUNE_GRID
 #include <memory>
 #include <sstream>
 #include <type_traits>
@@ -14,7 +15,6 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALBERTAGRID
 #include <dune/grid/albertagrid.hh>
@@ -29,7 +29,6 @@
 #include <dune/grid/spgrid.hh>
 #endif
 #include <dune/stuff/grid/structuredgridfactory.hh>
-#endif
 
 #include <dune/stuff/common/fvector.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -73,12 +72,12 @@ struct ElementVariant
   static const int id = 2;
 };
 
-#if HAVE_DUNE_GRID
 template <int dim>
 struct ElementVariant<Dune::YaspGrid<dim>>
 {
   static const int id = 1;
 };
+
 template <int dim, class Coords>
 struct ElementVariant<Dune::YaspGrid<dim, Coords>>
 {
@@ -92,8 +91,6 @@ struct ElementVariant<Dune::SPGrid<ct, dim, Refinement, Comm>>
   static const int id = 1;
 };
 #endif
-
-#endif // HAVE_DUNE_GRID
 
 #if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
@@ -112,8 +109,6 @@ struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconf
 #endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
 } // namespace internal
-
-#if HAVE_DUNE_GRID
 
 /**
  *  \brief  Creates a grid of a cube in various dimensions.
