@@ -203,8 +203,7 @@ public:
   }
 
   Cube(const DSC::FieldVector<DomainFieldType, dimDomain>& lower_left,
-       const DSC::FieldVector<DomainFieldType, dimDomain>& upper_right,
-       const std::vector<unsigned int> num_elements = default_config().get<std::vector<unsigned int>>("num_elements"),
+       const DSC::FieldVector<DomainFieldType, dimDomain>& upper_right, const std::vector<unsigned int> num_elements,
        const size_t num_refinements = default_config().get<size_t>("num_refinements"),
        const std::array<unsigned int, dimDomain> overlap =
            DSC::make_array<unsigned int, dimDomain>(default_config().get<unsigned int>("overlap")))
