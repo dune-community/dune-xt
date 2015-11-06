@@ -91,8 +91,8 @@ contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D
   assert(geometry.corners() == 2);
   const auto corner_0 = geometry.corner(0);
   const auto corner_1 = geometry.corner(1);
-  // A line is given by $y = a*x + b$. Searching for a and b fails for certain intersections (for instance those
-  // parallel to the y axis. So in order to check if the point is on the line between the corners we consider the
+  // A line is given by $y = a*x + b$. Computing a and b fails for certain intersections (for instance those
+  // parallel to the y axis). So in order to check if the point is on the line between the corners we consider the
   // vectors pointing from the point to each corner. If those are not orthogonal to the intersections normal, the point
   // cannot lie on the line between the two corners.
   const auto normal = intersection.centerUnitOuterNormal();
@@ -106,7 +106,7 @@ contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D
   if (DSC::FloatCmp::lt(global_point[1], std::min(corner_0[1], corner_1[1]), tolerance)
       || DSC::FloatCmp::gt(global_point[1], std::max(corner_0[1], corner_1[1]), tolerance))
     return false;
-  // At this point we cannot reject the assumtion that the point lies on the line between the two corners.
+  // At this point we cannot reject the assumption that the point lies on the line between the two corners.
   return true;
 } // ... contains(...)
 
