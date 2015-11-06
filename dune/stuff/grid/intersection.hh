@@ -16,11 +16,11 @@
 #include <dune/grid/common/gridview.hh>
 #endif
 
-#include <dune/stuff/common/string.hh>
 #include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/common/print.hh>
 #include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/common/string.hh>
+#include <dune/stuff/common/type_utils.hh>
 
 namespace Dune {
 namespace Stuff {
@@ -69,8 +69,8 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
   out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
   const auto& geometry = intersection.geometry();
   for (auto ii : DSC::valueRange(geometry.corners()))
-    out << prefix + "  "
-        << "corner " + Common::toString(ii) << " = " << geometry.corner(ii) << "\n";
+    out << prefix << "  corner " + Common::toString(ii) << " = " << geometry.corner(ii)
+        << " (local: " << geometry.local(geometry.corner(ii)) << ")\n";
 } // ... printIntersection(...)
 
 /** Check whether a spatial point lies on an intersection.
@@ -79,7 +79,7 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
 * @param[in] globalPoint A Dune::FieldVector with the global coordinates of the point
 * @return Returns true if the point lies on the intersection, false otherwise.
 */
-template <class IntersectionType, class FieldType, size_t dim>
+template <class IntersectionType, class FieldType, int dim>
 bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, dim>& globalPoint)
 {
   // map global coordinates to local coordinates of the intersection
