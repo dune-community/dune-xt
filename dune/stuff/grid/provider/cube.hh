@@ -6,6 +6,7 @@
 #ifndef DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
 #define DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
 
+#if HAVE_DUNE_GRID
 #include <memory>
 #include <sstream>
 #include <type_traits>
@@ -14,8 +15,16 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#if HAVE_DUNE_GRID
+#define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1
+#include <dune/grid/sgrid.hh>
+#undef DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING
 #include <dune/grid/yaspgrid.hh>
+#if HAVE_ALBERTAGRID
+#include <dune/grid/albertagrid.hh>
+#endif
+#if HAVE_DUNE_ALUGRID
+#include <dune/alugrid/grid.hh>
+#endif
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
@@ -23,7 +32,6 @@
 #include <dune/grid/spgrid.hh>
 #endif
 #include <dune/stuff/grid/structuredgridfactory.hh>
-#endif
 
 #include <dune/stuff/common/fvector.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -67,12 +75,12 @@ struct ElementVariant
   static const int id = 2;
 };
 
-#if HAVE_DUNE_GRID
-template <int dim>
-struct ElementVariant<Dune::YaspGrid<dim>>
+template <int dd, int dw>
+struct ElementVariant<Dune::SGrid<dd, dw>>
 {
   static const int id = 1;
 };
+
 template <int dim, class Coords>
 struct ElementVariant<Dune::YaspGrid<dim, Coords>>
 {
@@ -87,15 +95,7 @@ struct ElementVariant<Dune::SPGrid<ct, dim, Refinement, Comm>>
 };
 #endif
 
-#endif // HAVE_DUNE_GRID
-
-#if HAVE_ALUGRID
-
-template <int dimGrid, int dimWorld>
-struct ElementVariant<Dune::ALUCubeGrid<dimGrid, dimWorld>>
-{
-  static const int id = 1;
-};
+#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
 template <int dimGrid, int dimWorld, class MpiCommImp>
 struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::conforming, MpiCommImp>>
@@ -109,11 +109,9 @@ struct ElementVariant<Dune::ALUGrid<dimGrid, dimWorld, Dune::cube, Dune::nonconf
   static const int id = 1;
 };
 
-#endif // HAVE_ALUGRID
+#endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
 } // namespace internal
-
-#if HAVE_DUNE_GRID
 
 /**
  *  \brief  Creates a grid of a cube in various dimensions.
@@ -200,8 +198,7 @@ public:
   }
 
   Cube(const DSC::FieldVector<DomainFieldType, dimDomain>& lower_left,
-       const DSC::FieldVector<DomainFieldType, dimDomain>& upper_right,
-       const std::vector<unsigned int> num_elements = default_config().get<std::vector<unsigned int>>("num_elements"),
+       const DSC::FieldVector<DomainFieldType, dimDomain>& upper_right, const std::vector<unsigned int> num_elements,
        const size_t num_refinements = default_config().get<size_t>("num_refinements"),
        const std::array<unsigned int, dimDomain> overlap =
            DSC::make_array<unsigned int, dimDomain>(default_config().get<unsigned int>("overlap")))
@@ -273,9 +270,15 @@ private:
         break;
     }
     grd_ptr->loadBalance();
-    grd_ptr->preAdapt();
+#if HAVE_ALBERTAGRID
+    if (!std::is_same<GridType, AlbertaGrid<dimDomain, dimDomain>>::value)
+#endif
+      grd_ptr->preAdapt();
     grd_ptr->globalRefine(boost::numeric_cast<int>(num_refinements));
-    grd_ptr->postAdapt();
+#if HAVE_ALBERTAGRID
+    if (!std::is_same<GridType, AlbertaGrid<dimDomain, dimDomain>>::value)
+#endif
+      grd_ptr->postAdapt();
     grd_ptr->loadBalance();
     return grd_ptr;
   } // ... create_grid(...)
