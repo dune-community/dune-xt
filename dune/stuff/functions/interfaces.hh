@@ -602,6 +602,10 @@ public:
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 #endif
 
+  static_assert(std::is_same<typename LocalfunctionType::RangeType, RangeType>::value, "RangeType mismatch");
+  static_assert(std::is_same<typename LocalfunctionType::DomainType, DomainType>::value, "DomainType mismatch");
+  static_assert(std::is_same<Dune::FieldVector<DomainFieldImp, domainDim>, DomainType>::value, "DomainType mismatch");
+
   virtual ~GlobalFunctionInterface()
   {
   }
