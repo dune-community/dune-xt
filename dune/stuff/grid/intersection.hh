@@ -8,6 +8,7 @@
 #ifndef DUNE_STUFF_GRID_INTERSECTION_HH
 #define DUNE_STUFF_GRID_INTERSECTION_HH
 
+#include <dune/common/deprecated.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/geometry/referenceelements.hh>
@@ -117,7 +118,8 @@ contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D
 * @return Returns true if the point lies on the intersection, false otherwise.
 */
 template <class IntersectionType, class FieldType, int dim>
-bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, dim>& globalPoint)
+bool DUNE_DEPRECATED_MSG("This method does not produce correct results, use contains() instead!")
+    intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, dim>& globalPoint)
 {
   // map global coordinates to local coordinates of the intersection
   const auto& intersectionGeometry = intersection.geometry();
@@ -132,6 +134,13 @@ bool intersectionContains(const IntersectionType& intersection, const Dune::Fiel
   // check whether reference element contains the local coordinates
   return refElement.checkInside(localPoint);
 } // end function intersectionContains
+
+template <class IntersectionType, class FieldType>
+bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, 2>& globalPoint)
+{
+  return contains(intersection, globalPoint);
+}
+
 
 } // end namespace Grid
 } // end of namespace Stuff
