@@ -17,6 +17,7 @@
 #endif
 
 #include <dune/stuff/aliases.hh>
+#include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/print.hh>
 #include <dune/stuff/common/ranges.hh>
 #include <dune/stuff/common/string.hh>
@@ -72,6 +73,42 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
     out << prefix << "  corner " + Common::toString(ii) << " = " << geometry.corner(ii)
         << " (local: " << geometry.local(geometry.corner(ii)) << ")\n";
 } // ... printIntersection(...)
+
+
+/**
+ * \brief Checks if intersection contains the given global_point.
+ *
+ *        Returns true, if global_point lies on the line between the corners of intersection.
+ */
+template <class G, class I, class D>
+typename std::enable_if<Dune::Intersection<G, I>::dimension == 2, bool>::type
+contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D, 2>& global_point,
+         const D& tolerance = DSC::FloatCmp::DefaultEpsilon<D>::value())
+{
+  const auto& geometry = intersection.geometry();
+  // get the global coordinates of the intersections corners
+  assert(geometry.corners() == 2);
+  const auto corner_0 = geometry.corner(0);
+  const auto corner_1 = geometry.corner(1);
+  // A line is given by $y = a*x + b$. Searching for a and b fails for certain intersections (for instance those
+  // parallel to the y axis. So in order to check if the point is on the line between the corners we consider the
+  // vectors pointing from the point to each corner. If those are not orthogonal to the intersections normal, the point
+  // cannot lie on the line between the two corners.
+  const auto normal = intersection.centerUnitOuterNormal();
+  for (auto vector : {corner_0 - global_point, corner_1 - global_point})
+    if (vector * normal > tolerance)
+      return false;
+  // Now that we know the point is on the line, check if it is outside the bounding box of the two corners.
+  if (DSC::FloatCmp::lt(global_point[0], std::min(corner_0[0], corner_1[0]), tolerance)
+      || DSC::FloatCmp::gt(global_point[0], std::max(corner_0[0], corner_1[0]), tolerance))
+    return false;
+  if (DSC::FloatCmp::lt(global_point[1], std::min(corner_0[1], corner_1[1]), tolerance)
+      || DSC::FloatCmp::gt(global_point[1], std::max(corner_0[1], corner_1[1]), tolerance))
+    return false;
+  // At this point we cannot reject the assumtion that the point lies on the line between the two corners.
+  return true;
+} // ... contains(...)
+
 
 /** Check whether a spatial point lies on an intersection.
 *
