@@ -19,7 +19,7 @@
 #include <dune/grid/sgrid.hh>
 #undef DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING
 #include <dune/grid/yaspgrid.hh>
-#if HAVE_ALBERTAGRID
+#if HAVE_ALBERTA
 #include <dune/grid/albertagrid.hh>
 #endif
 #if HAVE_DUNE_ALUGRID
@@ -274,12 +274,12 @@ private:
         break;
     }
     grd_ptr->loadBalance();
-#if HAVE_ALBERTAGRID
+#if HAVE_ALBERTA
     if (!std::is_same<GridType, AlbertaGrid<dimDomain, dimDomain>>::value)
 #endif
       grd_ptr->preAdapt();
     grd_ptr->globalRefine(boost::numeric_cast<int>(num_refinements));
-#if HAVE_ALBERTAGRID
+#if HAVE_ALBERTA
     if (!std::is_same<GridType, AlbertaGrid<dimDomain, dimDomain>>::value)
 #endif
       grd_ptr->postAdapt();
