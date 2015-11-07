@@ -39,10 +39,17 @@ struct is_grid_view_helper
 
 } // namespace internal
 
+#if HAVE_DUNE_GRID
 template <class G, bool candidate = internal::is_grid_view_helper<G>::is_candidate>
 struct is_grid_view : public std::is_base_of<Dune::GridView<typename G::Traits>, G>
 {
 };
+#else
+template <class G, bool candidate>
+struct is_grid_view : public std::false_type
+{
+};
+#endif
 
 template <class G>
 struct is_grid_view<G, false> : public std::false_type
