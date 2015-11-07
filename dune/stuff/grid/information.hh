@@ -29,6 +29,8 @@ namespace Dune {
 namespace Stuff {
 namespace Grid {
 
+#if HAVE_DUNE_GRID
+
 struct Statistics
 {
   size_t numberOfEntities;
@@ -87,7 +89,6 @@ size_t maxNumberOfNeighbors(const GridViewType& gridView)
   return maxNeighbours;
 } // size_t maxNumberOfNeighbors(const GridPartType& gridPart)
 
-#if HAVE_DUNE_GRID
 
 //! Provide min/max coordinates for all space dimensions of a GridView
 template <class GridViewType>

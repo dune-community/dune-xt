@@ -75,7 +75,7 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
         << " (local: " << geometry.local(geometry.corner(ii)) << ")\n";
 } // ... printIntersection(...)
 
-
+#if HAVE_DUNE_GRID
 /**
  * \brief Checks if intersection contains the given global_point.
  *
@@ -109,7 +109,7 @@ contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D
   // At this point we cannot reject the assumption that the point lies on the line between the two corners.
   return true;
 } // ... contains(...)
-
+#endif
 
 /** Check whether a spatial point lies on an intersection.
 *
