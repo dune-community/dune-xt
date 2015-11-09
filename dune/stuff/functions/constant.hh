@@ -124,6 +124,10 @@ public:
 
   using typename BaseType::LocalfunctionType;
 
+  static_assert(std::is_same<typename LocalfunctionType::RangeType, RangeType>::value, "RangeType mismatch");
+  static_assert(std::is_same<typename LocalfunctionType::DomainType, DomainType>::value, "DomainType mismatch");
+  static_assert(std::is_same<Dune::FieldVector<DomainFieldImp, domainDim>, DomainType>::value, "RangeType mismatch");
+
   static const bool available = true;
 
   static std::string static_id()
