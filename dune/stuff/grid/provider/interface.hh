@@ -143,19 +143,21 @@ private:
   {
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
-    // vtk writer
-    auto grid_view = leaf_view();
-    Dune::VTKWriter<LeafGridViewType> vtkwriter(grid_view);
-    // codim 0 entity id
-    std::vector<double> entityId = generateEntityVisualization(grid_view);
-    vtkwriter.addCellData(entityId, "entity_id");
+    for (auto level : DSC::valueRange(grid().maxLevel() + 1)) {
+      auto grid_view = level_view(level);
+      // vtk writer
+      Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
+      // codim 0 entity id
+      std::vector<double> entityId = generateEntityVisualization(grid_view);
+      vtkwriter.addCellData(entityId, "entity_id__level_" + DSC::toString(level));
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
-    // boundary id
-    std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-    vtkwriter.addCellData(boundaryId, "boundary_id");
+      // boundary id
+      std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
+      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + DSC::toString(level));
 #endif
-    // write
-    vtkwriter.write(filename, VTK::appendedraw);
+      // write
+      vtkwriter.write(filename + "__level_" + DSC::toString(level), VTK::appendedraw);
+    }
   } // ... visualize_plain(...)
 
   virtual void visualize_with_boundary(const Common::Configuration& boundary_info_cfg, const std::string filename) const
@@ -163,44 +165,46 @@ private:
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
-    typedef Stuff::Grid::BoundaryInfoProvider<typename LeafGridViewType::Intersection> BoundaryInfoProvider;
+    typedef Stuff::Grid::BoundaryInfoProvider<typename LevelGridViewType::Intersection> BoundaryInfoProvider;
     auto boundary_info_ptr =
         BoundaryInfoProvider::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
-    // vtk writer
-    auto grid_view = leaf_view();
-    Dune::VTKWriter<LeafGridViewType> vtkwriter(grid_view);
-    // codim 0 entity id
-    std::vector<double> entityId = generateEntityVisualization(grid_view);
-    vtkwriter.addCellData(entityId, "entityId");
+    for (auto level : DSC::valueRange(grid().maxLevel() + 1)) {
+      auto grid_view = level_view(level);
+      // vtk writer
+      Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
+      // codim 0 entity id
+      std::vector<double> entityId = generateEntityVisualization(grid_view);
+      vtkwriter.addCellData(entityId, "entity_id__level_" + DSC::toString(level));
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
-    // boundary id
-    std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-    vtkwriter.addCellData(boundaryId, "boundaryId");
+      // boundary id
+      std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
+      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + DSC::toString(level));
 #endif
-    // dirichlet values
-    std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
-    vtkwriter.addCellData(dirichlet, "isDirichletBoundary");
-    // neumann values
-    std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
-    vtkwriter.addCellData(neumann, "isNeumannBoundary");
-    // write
-    vtkwriter.write(filename, VTK::appendedraw);
+      // dirichlet values
+      std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
+      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + DSC::toString(level));
+      // neumann values
+      std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
+      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + DSC::toString(level));
+      // write
+      vtkwriter.write(filename + "__level_" + DSC::toString(level), VTK::appendedraw);
+    }
   } // ... visualize_with_boundary(...)
 
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
-  std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& gridView) const
+  std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
   {
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
-    for (typename LeafGridViewType::template Codim<0>::Iterator it = gridView.template begin<0>();
-         it != gridView.template end<0>();
-         ++it) {
+    const auto it_end = gridView.template end<0>();
+    for (auto it = gridView.template begin<0>(); it != it_end; ++it) {
       const auto& entity              = *it;
       const auto& index               = gridView.indexSet().index(entity);
       data[index]                     = 0.0;
       size_t numberOfBoundarySegments = 0;
-      bool isOnBoundary = false;
-      for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
+      bool isOnBoundary               = false;
+      const auto intersectionItEnd = gridView.iend(entity);
+      for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != intersectionItEnd; ++intersectionIt) {
         if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
           isOnBoundary = true;
           numberOfBoundarySegments += 1;
@@ -214,14 +218,14 @@ private:
     return data;
   }
 #else
-  std::vector<double> generateBoundaryIdVisualization(const LeafGridViewType& /*gridView*/) const
+  std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& /*gridView*/) const
   {
     DUNE_THROW(InvalidStateException, "Experimental Grid Extensions missing");
   }
 #endif
 
   template <class BoundaryInfoType>
-  std::vector<double> generateBoundaryVisualization(const LeafGridViewType& gridView,
+  std::vector<double> generateBoundaryVisualization(const LevelGridViewType& gridView,
                                                     const BoundaryInfoType& boundaryInfo, const std::string type) const
   {
     std::vector<double> data(gridView.indexSet().size(0));
@@ -243,7 +247,7 @@ private:
     return data;
   } // std::vector< double > generateBoundaryVisualization(...) const
 
-  std::vector<double> generateEntityVisualization(const LeafGridViewType& gridView) const
+  std::vector<double> generateEntityVisualization(const LevelGridViewType& gridView) const
   {
     std::vector<double> data(gridView.indexSet().size(0));
     for (const auto& entity : DSC::entityRange(gridView)) {
