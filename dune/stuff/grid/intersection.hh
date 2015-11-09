@@ -141,7 +141,6 @@ bool intersectionContains(const IntersectionType& intersection, const Dune::Fiel
   return contains(intersection, globalPoint);
 }
 
-
 } // end namespace Grid
 } // end of namespace Stuff
 } // end namespace Dune
