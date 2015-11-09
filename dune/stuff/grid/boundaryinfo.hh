@@ -69,7 +69,11 @@ public:
     return internal::boundary_info_static_id();
   }
 
-  virtual ~BoundaryInfoInterface() = default;
+  /** \note throw spec here and in derived classes are only there to work around icc-mic bug
+   **/
+  virtual ~BoundaryInfoInterface() throw()
+  {
+  }
 
   virtual bool has_dirichlet() const
   {
@@ -250,7 +254,7 @@ public:
   {
   }
 
-  virtual ~AllDirichlet()
+  virtual ~AllDirichlet() throw()
   {
   }
 
@@ -304,9 +308,7 @@ public:
   {
   }
 
-  virtual ~AllNeumann()
-  {
-  }
+  virtual ~AllNeumann() = default;
 
   virtual bool has_dirichlet() const override final
   {
@@ -372,9 +374,7 @@ public:
   {
   }
 
-  virtual ~IdBased()
-  {
-  }
+  virtual ~IdBased() = default;
 
   const std::map<std::string, std::set<int>>& id_to_type_map() const
   {
@@ -501,7 +501,7 @@ public:
     }
   } // NormalBased(...)
 
-  virtual ~NormalBased()
+  virtual ~NormalBased() throw()
   {
   }
 
