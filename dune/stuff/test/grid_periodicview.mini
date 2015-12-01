@@ -1,0 +1,10 @@
+__name = grid_periodicview
+__exec_suffix = 1d, 2d, 3d | expand 1
+
+dim = 1, 2, 3 | expand 1
+
+grids = YaspGrid<{dim}, EquidistantOffsetCoordinates<double, {dim}>> 
+
+[__static]
+TESTGRIDTYPE = {grids}
+IS_SIMPLEX = false
