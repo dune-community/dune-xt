@@ -1,10 +1,19 @@
 __name = grid_periodicview
-__exec_suffix = 1d, 2d, 3d | expand 1
+__exec_suffix = yasp_{dim}d, alu_{geometry}_{dim}d | expand grid
 
-dim = 1, 2, 3 | expand 1
+dim = 1, 2, 3 | expand
+geometry = cube, simplex | expand 2
+geometry_is_simplex = false, true | expand 2
+refinement = nonconforming, conforming | expand 2
 
-grids = YaspGrid<{dim}, EquidistantOffsetCoordinates<double, {dim}>> 
+grid_yasp = YaspGrid<{dim},EquidistantOffsetCoordinates<double,{dim}>>
+grid_alu = ALUGrid<{dim},{dim},{geometry},{refinement}>
+grid = {grid_yasp}, {grid_alu}  | expand grid
+'{grid}' == 'ALUGrid<1,1,{geometry},{refinement}>' | exclude
+
 
 [__static]
-TESTGRIDTYPE = {grids}
-IS_SIMPLEX = false
+TESTGRIDTYPE = {grid}
+IS_SIMPLEX = false, {geometry_is_simplex} | expand grid
+
+1, HAVE_DUNE_ALUGRID | expand grid | cmake_guard

@@ -8,9 +8,10 @@
 #include "main.hxx"
 
 #if HAVE_DUNE_GRID
-#if HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
-#endif
+#if HAVE_DUNE_ALUGRID
+#include <dune/alugrid/common/declaration.hh>
+#include <dune/alugrid/3d/alugrid.hh>
+#endif // HAVE_DUNE_ALUGRID
 #include <dune/grid/yaspgrid.hh>
 
 #include <dune/stuff/common/configuration.hh>
@@ -23,12 +24,6 @@
 using namespace Dune;
 using namespace Stuff;
 
-
-#if HAVE_DUNE_ALUGRID
-#define ALUCUBEGRIDS ALUGrid<2, 2, cube, nonconforming>, ALUGrid<3, 3, cube, nonconforming>
-
-#define ALUSIMPLEXGRIDS ALUGrid<2, 2, simplex, conforming>, ALUGrid<3, 3, simplex, conforming>
-#endif // HAVE_DUNE_ALUGRID
 
 struct PeriodicViewTest : public testing::Test
 {
@@ -70,17 +65,17 @@ struct PeriodicViewTest : public testing::Test
     const GridType& DSC_UNUSED(test_grid) = periodic_grid_view.grid();
     const IndexSet& DSC_UNUSED(test_indexSet) = periodic_grid_view.indexSet();
     const int codim0_size = periodic_grid_view.size(0);
-    EXPECT_EQ(codim0_size, grid_view.size(0));
+    EXPECT_EQ(grid_view.size(0), codim0_size);
     if (is_cube)
-      EXPECT_EQ(codim0_size, std::pow(int(8), dimDomain));
+      EXPECT_EQ(std::pow(int(8), dimDomain), codim0_size);
     if (IS_SIMPLEX)
-      EXPECT_EQ(codim0_size, std::pow(int(8), dimDomain) * factorial(dimDomain));
-    EXPECT_EQ(periodic_grid_view.size(Dune::GeometryType::cube), grid_view.size(Dune::GeometryType::cube));
-    EXPECT_EQ(periodic_grid_view.size(Dune::GeometryType::simplex), grid_view.size(Dune::GeometryType::simplex));
-    EXPECT_EQ(periodic_grid_view.overlapSize(0), grid_view.overlapSize(0));
-    EXPECT_EQ(periodic_grid_view.overlapSize(1), grid_view.overlapSize(1));
-    EXPECT_EQ(periodic_grid_view.ghostSize(0), grid_view.ghostSize(0));
-    EXPECT_EQ(periodic_grid_view.ghostSize(1), grid_view.ghostSize(1));
+      EXPECT_EQ(std::pow(int(8), dimDomain) * factorial(dimDomain), codim0_size);
+    EXPECT_EQ(grid_view.size(Dune::GeometryType::cube), periodic_grid_view.size(Dune::GeometryType::cube));
+    EXPECT_EQ(grid_view.size(Dune::GeometryType::simplex), periodic_grid_view.size(Dune::GeometryType::simplex));
+    EXPECT_EQ(grid_view.overlapSize(0), periodic_grid_view.overlapSize(0));
+    EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
+    EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));
+    EXPECT_EQ(grid_view.ghostSize(1), periodic_grid_view.ghostSize(1));
     const CollectiveCommunication& DSC_UNUSED(test_comm) = periodic_grid_view.comm();
 
     size_t neighbor_count = 0;
