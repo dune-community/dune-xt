@@ -16,4 +16,4 @@ grid = {grid_yasp}, {grid_alu}  | expand grid
 TESTGRIDTYPE = {grid}
 IS_SIMPLEX = false, {geometry_is_simplex} | expand grid
 
-1, HAVE_DUNE_ALUGRID | expand grid | cmake_guard
+1, dune-alugrid_FOUND | expand grid | cmake_guard
