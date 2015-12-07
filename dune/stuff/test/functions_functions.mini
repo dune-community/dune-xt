@@ -1,5 +1,5 @@
 __name = grid_periodicview
-__exec_suffix = yasp_d{dimDomain}_r{dimRange}_rC{dimRangeCols}, alu_{geometry_short}_d{dimDomain}_r{dimRange}_rC{dimRangeCols} | expand grid
+__exec_suffix = yasp_d{dimDomain}_r{dimRange}_rc{dimRangeCols}, alu_{geometry_short}_d{dimDomain}_r{dimRange}_rC{dimRangeCols} | expand grid
 
 dimDomain = 1, 2, 3 | expand
 dimRange = 1, 2, 3 | expand
@@ -16,4 +16,4 @@ entity_type = Dune::{grid}::Codim<0>::Entity
 [__static]
 TESTFUNCTIONTYPE = Dune::Stuff::Functions::Constant<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>
 
-1, HAVE_ALUGRID | expand grid | cmake_guard
+1, ALUGRID_FOUND | expand grid | cmake_guard
