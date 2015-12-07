@@ -8,10 +8,9 @@
 #include "main.hxx"
 
 #if HAVE_DUNE_GRID
-#if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/common/declaration.hh>
-#include <dune/alugrid/3d/alugrid.hh>
-#endif // HAVE_DUNE_ALUGRID
+#if HAVE_ALUGRID
+#include <dune/grid/alugrid.hh>
+#endif
 #include <dune/grid/yaspgrid.hh>
 
 #include <dune/stuff/common/configuration.hh>
