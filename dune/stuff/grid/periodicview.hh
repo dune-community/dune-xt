@@ -79,7 +79,7 @@ public:
     if (periodic_)
       return outside_;
     else
-      return BaseType::outside();
+      return EntityType(BaseType::outside());
   } // ... outside() const
 
   LocalGeometry geometryInOutside() const
