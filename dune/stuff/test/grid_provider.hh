@@ -42,6 +42,8 @@
 
 #endif // HAVE_ALUGRID
 
+#include "gtest/gtest.h"
+
 template <class GridProviderType>
 class ConstGridProviderBase : public testing::Test
 {
