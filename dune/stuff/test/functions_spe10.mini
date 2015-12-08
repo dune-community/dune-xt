@@ -1,0 +1,10 @@
+include functions_functions.mini
+
+__name = functions_spe10
+
+dimDomain = 3
+dimRange = 3
+dimRangeCols = 3
+
+[__static]
+TESTFUNCTIONTYPE = Dune::Stuff::Functions::Spe10::Model2<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

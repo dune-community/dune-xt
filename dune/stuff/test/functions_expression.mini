@@ -1,0 +1,6 @@
+include functions_functions.mini
+
+__name = functions_expression
+
+[__static]
+TESTFUNCTIONTYPE = Dune::Stuff::Functions::Expression<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>
