@@ -1,16 +1,7 @@
 __name = grid_periodicview
-__exec_suffix = yasp_{dim}d, alu_{geometry}_{dim}d | expand grid
+__exec_suffix = yasp_{dimDomain}d, alu_{geometry_short}_{refinement_short}_{dimDomain}d | expand grid
 
-dim = 1, 2, 3 | expand
-geometry = cube, simplex | expand 2
-geometry_is_simplex = false, true | expand 2
-refinement = nonconforming, conforming | expand 2
-
-grid_yasp = YaspGrid<{dim},EquidistantOffsetCoordinates<double,{dim}>>
-grid_alu = ALUGrid<{dim},{dim},{geometry},{refinement}>
-grid = {grid_yasp}, {grid_alu}  | expand grid
-'{grid}' == 'ALUGrid<1,1,{geometry},{refinement}>' | exclude
-
+include grids.mini
 
 [__static]
 TESTGRIDTYPE = {grid}
