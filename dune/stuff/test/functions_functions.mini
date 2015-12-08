@@ -1,19 +1,10 @@
-__name = grid_periodicview
-__exec_suffix = yasp_d{dimDomain}_r{dimRange}_rc{dimRangeCols}, alu_{geometry_short}_d{dimDomain}_r{dimRange}_rC{dimRangeCols} | expand grid
+__name = functions_functions
+__exec_suffix = yasp_d{dimDomain}_r{dimRange}_rc{dimRangeCols}, alu_{geometry_short}_{refinement_short}_d{dimDomain}_r{dimRange}_rC{dimRangeCols} | expand grid
 
-dimDomain = 1, 2, 3 | expand
 dimRange = 1, 2, 3 | expand
 dimRangeCols = 1, 2, 3 | expand
-geometry = Dune::cube, Dune::simplex | expand 2
-geometry_short = cube, simplex | expand 2
 
-grid_yasp = YaspGrid<{dimDomain},Dune::EquidistantOffsetCoordinates<double,{dimDomain}>>
-grid_alu = ALUGrid<{dimDomain},{dimDomain},{geometry},Dune::nonconforming>
-grid = {grid_yasp}, {grid_alu}  | expand grid
-'{grid}' == 'ALUGrid<1,1,{geometry},Dune::nonconforming>' | exclude
-entity_type = Dune::{grid}::Codim<0>::Entity
+include grids.mini
 
 [__static]
 TESTFUNCTIONTYPE = Dune::Stuff::Functions::Constant<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>
-
-1, ALUGRID_FOUND | expand grid | cmake_guard

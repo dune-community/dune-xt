@@ -1,0 +1,6 @@
+include functions_functions.mini
+
+__name = functions_global
+
+[__static]
+TESTFUNCTIONTYPE = Dune::Stuff::GlobalLambdaFunction<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

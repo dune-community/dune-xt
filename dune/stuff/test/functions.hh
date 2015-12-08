@@ -23,6 +23,7 @@ class FunctionTest : public ::testing::Test
 {
 protected:
   // required types and static members
+  typedef FunctionImp FunctionType;
   typedef typename FunctionImp::EntityType EntityType;
   typedef typename FunctionImp::DomainFieldType DomainFieldType;
   static const size_t dimDomain = FunctionImp::dimDomain;

@@ -1,0 +1,6 @@
+include functions_functions.mini
+
+__name = functions_constant
+
+[__static]
+TESTFUNCTIONTYPE = Dune::Stuff::Functions::Constant<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

@@ -4,6 +4,7 @@
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 #include "main.hxx"
+#include "functions.hh"
 
 #include <memory>
 
@@ -20,19 +21,13 @@
 
 /* we just take the constant function as a container for the types we need */
 /* since this one always exists for all combinations */
-struct FunctionsTest : public ::testing::Test
+struct FunctionsTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
 {
-  typedef typename TESTFUNCTIONTYPE ConstantFunctionType;
-  typedef typename ConstantFunctionType::EntityType E;
-  typedef typename ConstantFunctionType::DomainFieldType D;
-  static const size_t d = ConstantFunctionType::dimDomain;
-  typedef typename ConstantFunctionType::RangeFieldType R;
-  static const size_t r  = ConstantFunctionType::dimRange;
-  static const size_t rC = ConstantFunctionType::dimRangeCols;
-  typedef Dune::Stuff::FunctionsProvider<E, D, d, R, r, rC> FunctionsProvider;
+  typedef Dune::Stuff::FunctionsProvider<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+      FunctionsProvider;
   typedef typename FunctionsProvider::InterfaceType InterfaceType;
 
-  void check() const
+  virtual void check() const
   {
     for (const auto& type : FunctionsProvider::available()) {
       const Dune::Stuff::Common::Configuration config = FunctionsProvider::default_config(type);

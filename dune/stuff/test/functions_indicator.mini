@@ -1,0 +1,10 @@
+__name = functions_indicator
+__exec_suffix = yasp_d{dimDomain}_r{dimRange}_rc{dimRangeCols}, alu_{geometry_short}_{refinement_short}_d{dimDomain}_r{dimRange}_rC{dimRangeCols} | expand grid
+
+dimRange = 1
+dimRangeCols = 1
+
+include grids.mini
+
+[__static]
+TESTFUNCTIONTYPE = Dune::Stuff::Functions::Indicator<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

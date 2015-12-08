@@ -4,6 +4,7 @@
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 #include "main.hxx"
+#include "functions.hh"
 
 #include <memory>
 
@@ -18,26 +19,11 @@
 #include <dune/grid/alugrid.hh>
 #endif // HAVE_ALUGRID
 
-// we need this nasty code generation because the testing::Types< ... > only accepts 50 arguments
-// and all combinations of functions and entities and dimensions and fieldtypes would be way too much
-struct ConstantFunctionTest : public ::testing::Test
+struct ConstantFunctionTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
 {
-  typedef typename TESTFUNCTIONTYPE LocalizableFunctionType;
-  typedef typename LocalizableFunctionType::EntityType EntityType;
-  typedef typename LocalizableFunctionType::LocalfunctionType LocalfunctionType;
-  typedef typename LocalizableFunctionType::DomainFieldType DomainFieldType;
-  static const size_t dimDomain = LocalizableFunctionType::dimDomain;
-  typedef typename LocalizableFunctionType::DomainType DomainType;
-  typedef typename LocalizableFunctionType::RangeFieldType RangeFieldType;
-  static const size_t dimRange     = LocalizableFunctionType::dimRange;
-  static const size_t dimRangeCols = LocalizableFunctionType::dimRangeCols;
-  typedef typename LocalizableFunctionType::RangeType RangeType;
-  typedef typename LocalizableFunctionType::JacobianRangeType JacobianRangeType;
-
-  void check() const
+  virtual void check() const
   {
-    const std::unique_ptr<const LocalizableFunctionType> function(
-        LocalizableFunctionType::create(LocalizableFunctionType::default_config()));
+    const std::unique_ptr<const FunctionType> function(FunctionType::create(FunctionType::default_config()));
   }
 };
 
