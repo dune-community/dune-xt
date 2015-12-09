@@ -47,20 +47,30 @@ struct PeriodicViewTest : public testing::Test
     return n > 0 ? n * factorial(n - 1) : 1;
   }
 
-  static void check(const PeriodicGridViewType periodic_grid_view, const GridViewType& grid_view, const size_t variant)
+  static void check()
   {
-    const bool is_simplex = DSC::fromString<bool>(DSC_CONFIG["test_grid_periodicview.is_simplex"]);
-    std::cout << is_simplex << std::endl;
-    const bool is_cube = !is_simplex;
-    DomainType lower_left(0);
-    DomainType upper_right(1);
-    if (variant >= 3)
-      upper_right = DSC::fromString<DomainType>("[2.0 3.0 1.0 4.0]");
-    if (variant >= 6)
-      lower_left = DSC::fromString<DomainType>("[-0.5 0.5 0.7 -1.3]");
+    // create grid and get gridview
+    DSC::Configuration grid_config             = DSC_CONFIG.sub("test_grid_periodicview");
+    GridProviderType grid_provider             = *(GridProviderType::create(grid_config));
+    const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
+    const GridViewType grid_view               = grid->leafGridView();
 
-    const int is_nonperiodic        = variant == 0 || variant == 3 || variant == 6 ? 1 : 0;
-    const int is_partially_periodic = variant == 1 || variant == 4 || variant == 7 ? 1 : 0;
+    // check whether grid is periodic
+    const bool is_nonperiodic        = grid_config["periodic"] == "no";
+    const bool is_partially_periodic = grid_config["periodic"] == "partial";
+
+    // create periodic grid_view
+    std::bitset<dimDomain> periodic_directions;
+    if (is_partially_periodic)
+      periodic_directions[0] = 1;
+    else if (!is_nonperiodic)
+      periodic_directions.set();
+    const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
+
+    const bool is_simplex        = DSC::fromString<bool>(grid_config["is_simplex"]);
+    const bool is_cube           = !is_simplex;
+    const DomainType lower_left  = DSC::fromString<DomainType>(grid_config["lower_left"]);
+    const DomainType upper_right = DSC::fromString<DomainType>(grid_config["upper_right"]);
 
     // check interface
     const GridType& DSC_UNUSED(test_grid) = periodic_grid_view.grid();
@@ -148,7 +158,9 @@ struct PeriodicViewTest : public testing::Test
     // on each face, there are 8**(dimDomain-1) intersections. For a simplex grid in 3 dimensions, there are twice as
     // much.
     size_t num_intersections_on_face = std::pow(8, dimDomain - 1);
-    if (is_simplex && dimDomain == 3)
+    // use dimDomain from config here to avoid "code will never be executed" warning
+    assert(dimDomain == DSC::fromString<int>(grid_config["dimDomain"]));
+    if (is_simplex && DSC::fromString<int>(grid_config["dimDomain"]) == 3)
       num_intersections_on_face *= 2;
     // In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
     // two
@@ -167,74 +179,11 @@ struct PeriodicViewTest : public testing::Test
     const size_t num_entities = grid_view.size(0);
     EXPECT_EQ(num_entities * num_intersections_per_entity - expected_num_boundary_intersections, neighbor_count);
   } // void check(...)
-
-  static void checks_for_all_grids()
-  {
-    // create grid on unit hypercube
-    GridProviderType grid_provider             = *(GridProviderType::create());
-    const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
-    const GridViewType grid_view               = grid->leafGridView();
-
-    // create grid on hyperrectangle
-    DSC::Configuration grid_config                            = GridProviderType::default_config();
-    grid_config["lower_left"]                                 = "[0.0 0.0 0.0 0.0]";
-    grid_config["upper_right"]                                = "[2.0 3.0 1.0 4.0]";
-    GridProviderType hyperrectangle_grid_provider             = *(GridProviderType::create(grid_config));
-    const std::shared_ptr<const GridType> hyperrectangle_grid = hyperrectangle_grid_provider.grid_ptr();
-    const GridViewType hyperrectangle_grid_view               = hyperrectangle_grid->leafGridView();
-
-    std::bitset<dimDomain> periodic_directions;
-    // create PeriodicGridViews that actually are not periodic
-    const PeriodicGridViewType non_periodic_grid_view(grid_view, periodic_directions);
-    const PeriodicGridViewType hr_non_periodic_grid_view(hyperrectangle_grid_view, periodic_directions);
-    // create PeriodicGridViews that are periodic only in x-direction
-    periodic_directions[0] = 1;
-    const PeriodicGridViewType partially_periodic_grid_view(grid_view, periodic_directions);
-    const PeriodicGridViewType hr_partially_periodic_grid_view(hyperrectangle_grid_view, periodic_directions);
-    // create PeriodicGridViews that are periodic in all directions
-    periodic_directions.set();
-    const PeriodicGridViewType fully_periodic_grid_view(grid_view, periodic_directions);
-    const PeriodicGridViewType hr_fully_periodic_grid_view(hyperrectangle_grid_view, periodic_directions);
-
-    // check
-    check(non_periodic_grid_view, grid_view, 0);
-    check(partially_periodic_grid_view, grid_view, 1);
-    check(fully_periodic_grid_view, grid_view, 2);
-    check(hr_non_periodic_grid_view, hyperrectangle_grid_view, 3);
-    check(hr_partially_periodic_grid_view, hyperrectangle_grid_view, 4);
-    check(hr_fully_periodic_grid_view, hyperrectangle_grid_view, 5);
-  } // void checks_for_all_grids()
-
-  static void non_trivial_origin_checks()
-  {
-    // create grid on hyperrectangle with lower_left != 0 (not possible for YaspGrid)
-    DSC::Configuration grid_config             = GridProviderType::default_config();
-    grid_config["lower_left"]                  = "[-0.5 0.5 0.7 -1.3]";
-    grid_config["upper_right"]                 = "[2.0 3.0 1.0 4.0]";
-    GridProviderType grid_provider             = *(GridProviderType::create(grid_config));
-    const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
-    const GridViewType grid_view               = grid->leafGridView();
-
-    std::bitset<dimDomain> periodic_directions;
-    // create PeriodicGridViewType that actually is not periodic
-    const PeriodicGridViewType non_periodic_grid_view(grid_view, periodic_directions);
-    // create PeriodicGridViewType that is periodic only in x-direction
-    periodic_directions[0] = 1;
-    const PeriodicGridViewType partially_periodic_grid_view(grid_view, periodic_directions);
-    // create PeriodicGridViewType that is periodic in all directions
-    periodic_directions.set();
-    const PeriodicGridViewType fully_periodic_grid_view(grid_view, periodic_directions);
-
-    check(non_periodic_grid_view, grid_view, 6);
-    check(partially_periodic_grid_view, grid_view, 7);
-    check(fully_periodic_grid_view, grid_view, 8);
-  } // void non_trivial_origin_checks()
 };
 
 TEST_F(PeriodicViewTest, check_all)
 {
-  this->checks_for_all_grids();
-  this->non_trivial_origin_checks();
+  this->check();
 }
 
 #else // HAVE_DUNE_GRID
