@@ -1,5 +1,5 @@
 __name = grid_periodicview
-__exec_suffix = yasp_{dimDomain}d, alu_{geometry}_{refinement}_{dimDomain}d | expand grid
+__exec_suffix = yasp_{dimDomain}d, alu_{__local.geometry}_{__local.refinement}_{dimDomain}d | expand grid
 
 include grids.mini
 
