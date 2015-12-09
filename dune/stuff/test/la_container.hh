@@ -6,6 +6,16 @@
 #ifndef DUNE_STUFF_TEST_LA_CONTAINER_HH
 #define DUNE_STUFF_TEST_LA_CONTAINER_HH
 
+#include <complex>
+#include <memory>
+#include <type_traits>
+
+#include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/float_cmp.hh>
+#include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/container/common.hh>
+#include <dune/stuff/la/container/eigen.hh>
+#include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/container.hh>
 
 template <class ContainerImp>
@@ -119,5 +129,11 @@ public:
   }
 };
 #endif // HAVE_EIGEN
+
+#define EXPECT_DOUBLE_OR_COMPLEX_EQ(expected, actual)                                                                  \
+  {                                                                                                                    \
+    EXPECT_DOUBLE_EQ(expected, std::real(actual));                                                                     \
+    EXPECT_DOUBLE_EQ(0, std::imag(actual));                                                                            \
+  }
 
 #endif // DUNE_STUFF_TEST_LA_CONTAINER_HH
