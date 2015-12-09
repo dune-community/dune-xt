@@ -4,4 +4,4 @@ __exec_suffix = {vector}_{fieldtype_short}
 include vectors.mini
 
 [__static]
-TESTVECTORTYPE = Dune::Stuff::LA::{vector}<fieldtype>
+TESTVECTORTYPE = Dune::Stuff::LA::{vector}<{fieldtype}>
