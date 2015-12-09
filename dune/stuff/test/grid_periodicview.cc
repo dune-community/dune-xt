@@ -49,7 +49,9 @@ struct PeriodicViewTest : public testing::Test
 
   static void check(const PeriodicGridViewType periodic_grid_view, const GridViewType& grid_view, const size_t variant)
   {
-    const bool is_cube = !IS_SIMPLEX;
+    const bool is_simplex = DSC::fromString<bool>(DSC_CONFIG["test_grid_periodicview.is_simplex"]);
+    std::cout << is_simplex << std::endl;
+    const bool is_cube = !is_simplex;
     DomainType lower_left(0);
     DomainType upper_right(1);
     if (variant >= 3)
@@ -67,7 +69,7 @@ struct PeriodicViewTest : public testing::Test
     EXPECT_EQ(grid_view.size(0), codim0_size);
     if (is_cube)
       EXPECT_EQ(std::pow(int(8), dimDomain), codim0_size);
-    if (IS_SIMPLEX)
+    if (is_simplex)
       EXPECT_EQ(std::pow(int(8), dimDomain) * factorial(dimDomain), codim0_size);
     EXPECT_EQ(grid_view.size(Dune::GeometryType::cube), periodic_grid_view.size(Dune::GeometryType::cube));
     EXPECT_EQ(grid_view.size(Dune::GeometryType::simplex), periodic_grid_view.size(Dune::GeometryType::simplex));
@@ -146,7 +148,7 @@ struct PeriodicViewTest : public testing::Test
     // on each face, there are 8**(dimDomain-1) intersections. For a simplex grid in 3 dimensions, there are twice as
     // much.
     size_t num_intersections_on_face = std::pow(8, dimDomain - 1);
-    if (IS_SIMPLEX && dimDomain == 3)
+    if (is_simplex && dimDomain == 3)
       num_intersections_on_face *= 2;
     // In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
     // two
