@@ -23,8 +23,7 @@ struct IndicatorFunctionTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
 {
   void check() const
   {
-    const std::unique_ptr<const LocalizableFunctionType> function(
-        LocalizableFunctionType::create(LocalizableFunctionType::default_config()));
+    const std::unique_ptr<const FunctionType> function(FunctionType::create(FunctionType::default_config()));
   }
 };
 
