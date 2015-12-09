@@ -12,36 +12,6 @@
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/grid/provider/interface.hh>
 
-#define SGRIDS /* clang-format off */                                                                                  \
-    Dune::SGrid<1, 1>                                                                                                  \
-  , Dune::SGrid<2, 2>                                                                                                  \
-  , Dune::SGrid<3, 3>                                                                                                  \
-  , Dune::SGrid<4, 4>                                                                                                  \
-/*, Dune::SGrid<1, 2> <- grid provider do not work for these combinations, bc. of the visualization with */            \
-/*, Dune::SGrid<2, 3>    boundary info, bc. of function based boundary info bc. of global function interface */        \
-/*, Dune::SGrid<3, 4> */                                                                                               \
-/*, Dune::SGrid<4, 5> */  /*clang-format on */
-
-#define YASPGRIDS /* clang-format off */                                                                               \
-    Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>                                                   \
-  , Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>                                                   \
-  , Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>>                                                   \
-  , Dune::YaspGrid<4, Dune::EquidistantOffsetCoordinates<double, 4>> /* clang-format on */
-
-#if HAVE_ALUGRID
-#define ALUGRIDS /* clang-format off */                                                                                \
-    Dune::ALUGrid<2, 2, Dune::cube, Dune::nonconforming>                                                               \
-  , Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>                                                               \
-  , Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>                                                            \
-  , Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>                                                            \
-  , Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>                                                               \
-  , Dune::ALUGrid<3, 3, Dune::simplex, Dune::conforming>                                                               \
-/*, Dune::ALUGrid<2, 3, Dune::cube, Dune::nonconforming> same reasons as above */                                      \
-/*, Dune::ALUGrid<2, 3, Dune::simplex, Dune::nonconforming> */                                                         \
-/*, Dune::ALUGrid<2, 3, Dune::simplex, Dune::conforming> */ /* clang-format on */
-
-#endif // HAVE_ALUGRID
-
 #include "gtest/gtest.h"
 
 template <class GridProviderType>
