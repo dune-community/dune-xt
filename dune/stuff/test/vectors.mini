@@ -1,9 +1,9 @@
 fieldtype = double, std::complex<double> | expand field
 fieldtype_short = double, complex | expand field
 
-vector_common = CommonDenseVector
-vector_eigen = EigenDenseVector, EigenMappedDenseVector | expand
-vector_istl = IstlDenseVector
-vector = {vector_common}, {vector_eigen}, {vector_istl} | expand types
+__local.vector_common = CommonDenseVector
+__local.vector_eigen = EigenDenseVector, EigenMappedDenseVector | expand
+__local.vector_istl = IstlDenseVector
+vector = {__local.vector_common}, {__local.vector_eigen}, {__local.vector_istl} | expand types
 
 1, EIGEN_FOUND, dune-istl_FOUND | expand types | cmake_guard
