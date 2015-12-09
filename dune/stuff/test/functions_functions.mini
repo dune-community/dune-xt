@@ -1,5 +1,5 @@
 __name = functions_functions
-__exec_suffix = yasp_d{dimDomain}_r{dimRange}_rc{dimRangeCols}, alu_{geometry}_{refinement}_d{dimDomain}_r{dimRange}_rc{dimRangeCols} | expand grid
+__exec_suffix = yasp_d{dimDomain}_r{dimRange}_rc{dimRangeCols}, alu_{__local.geometry}_{__local.refinement}_d{dimDomain}_r{dimRange}_rc{dimRangeCols} | expand grid
 
 dimRange = 1, 2, 3 | expand
 dimRangeCols = 1, 2, 3 | expand
