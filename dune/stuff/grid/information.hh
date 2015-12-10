@@ -89,7 +89,6 @@ size_t maxNumberOfNeighbors(const GridViewType& gridView)
   return maxNeighbours;
 } // size_t maxNumberOfNeighbors(const GridPartType& gridPart)
 
-
 //! Provide min/max coordinates for all space dimensions of a GridView
 template <class GridViewType>
 struct Dimensions
