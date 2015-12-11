@@ -125,12 +125,21 @@ private:
     using Dune::Stuff::Grid::ChooseLayer;
     using Dune::Stuff::Grid::ChoosePartView;
     auto& grid_i = grid_provider.grid();
+#if HAVE_DUNE_FEM
     auto DUNE_UNUSED(leaf_grid_part_1) = grid_provider.template leaf<ChoosePartView::part>();
     auto DUNE_UNUSED(leaf_grid_part_2) = grid_provider.leaf_part();
     for (int level = 0; level <= grid_i.maxLevel(); ++level) {
       auto DUNE_UNUSED(level_grid_part_1) = grid_provider.template level<ChoosePartView::part>(level);
       auto DUNE_UNUSED(level_grid_part_2) = grid_provider.level_part(level);
     }
+#else // HAVE_DUNE_FEM
+    auto DUNE_UNUSED(leaf_grid_view_1) = grid_provider.template leaf<ChoosePartView::view>();
+    auto DUNE_UNUSED(leaf_grid_view_2) = grid_provider.leaf_view();
+    for (int level = 0; level <= grid_i.maxLevel(); ++level) {
+      auto DUNE_UNUSED(level_grid_view_1) = grid_provider.template level<ChoosePartView::view>(level);
+      auto DUNE_UNUSED(level_grid_view_2) = grid_provider.level_view(level);
+    }
+#endif
   } // ... check_non_const_interface()
 
 public:
