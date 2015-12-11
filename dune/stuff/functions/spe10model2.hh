@@ -1,7 +1,9 @@
 // This file is part of the dune-stuff project:
-//   https://github.com/wwu-numerik/dune-stuff/
-// Copyright holders: Rene Milk, Felix Schindler
+//   https://github.com/wwu-numerik/dune-stuff
+// The copyright lies with the authors of this file (see below).
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// Authors:
+//   Rene Milk (2015)
 
 #ifndef DUNE_STUFF_FUNCTIONS_SPE10MODEL2_HH
 #define DUNE_STUFF_FUNCTIONS_SPE10MODEL2_HH
