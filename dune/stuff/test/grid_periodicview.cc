@@ -1,9 +1,11 @@
 // This file is part of the dune-stuff project:
 //   https://github.com/wwu-numerik/dune-stuff
-// Copyright holders: Rene Milk, Felix Schindler
+// The copyright lies with the authors of this file (see below).
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-//
-// Contributors: Tobias Leibner
+// Authors:
+//   Felix Schindler (2015)
+//   Rene Milk       (2015)
+//   Tobias Leibner  (2015)
 
 #include "main.hxx"
 
