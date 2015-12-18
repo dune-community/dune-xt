@@ -23,12 +23,9 @@ using namespace Dune::Stuff::Common;
 using namespace Dune::Stuff::Grid;
 using namespace std;
 
-typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
-
-template <class T>
 struct GridInfoTest : public ::testing::Test
 {
-  static const size_t griddim     = T::value;
+  static const size_t griddim     = TESTGRIDDIM;
   static const unsigned int level = 1;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef Dimensions<typename GridType::LeafGridView> DimensionsType;
@@ -75,8 +72,7 @@ struct GridInfoTest : public ::testing::Test
   }
 };
 
-TYPED_TEST_CASE(GridInfoTest, GridDims);
-TYPED_TEST(GridInfoTest, Misc)
+TEST_F(GridInfoTest, Misc)
 {
   this->check();
   this->print(dev_null);
