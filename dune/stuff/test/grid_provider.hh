@@ -7,6 +7,9 @@
 //   Rene Milk       (2012 - 2015)
 //   Tobias Leibner  (2014)
 
+#ifndef DUNE_STUFF_TEST_GRID_PROVIDER_HH
+#define DUNE_STUFF_TEST_GRID_PROVIDER_HH
+
 #if HAVE_DUNE_GRID
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -157,3 +160,4 @@ public:
 }; // class GridProviderBase
 
 #endif // HAVE_DUNE_GRID
+#endif // DUNE_STUFF_TEST_GRID_PROVIDER_HH
