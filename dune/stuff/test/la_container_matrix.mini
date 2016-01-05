@@ -1,0 +1,13 @@
+__name = la_container_matrix
+__exec_suffix = {matrix}_{vector}_{fieldtype_short}
+
+include vectors.mini
+
+include matrices.mini
+
+[__static]
+TESTMATRIXTYPE = Dune::Stuff::LA::{matrix}<{fieldtype}>
+TESTVECTORTYPE = Dune::Stuff::LA::{vector}<{fieldtype}>
+
+
+
