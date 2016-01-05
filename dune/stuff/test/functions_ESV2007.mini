@@ -1,0 +1,16 @@
+__name = functions_ESV2007
+__exec_suffix = yasp_{testcase_short}, alu_{testcase_short} | expand grid
+
+grid1 = Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>
+grid2 = Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>
+grid = {grid1}, {grid2} | expand grid
+entity_type = {grid}::Codim<0>::Entity
+
+testcase1 = Dune::Stuff::Functions::ESV2007::Testcase1Force<{entity_type}, double, 2, double, 1, 1>
+testcase2 = Dune::Stuff::Functions::ESV2007::Testcase1ExactSolution<{entity_type}, double, 2, double, 1, 1>
+testcase_short = force, exact | expand testcase
+
+[__static]
+TESTFUNCTIONTYPE = {testcase1}, {testcase2} | expand testcase
+
+1, ALUGRID_FOUND | expand grid | cmake_guard

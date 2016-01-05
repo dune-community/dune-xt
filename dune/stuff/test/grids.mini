@@ -1,0 +1,18 @@
+dimDomain = 1, 2, 3 | expand
+
+__local.geometry = cube, simplex | expand 2
+__local.geometry_is_simplex = false, true | expand 2
+__local.refinement = nonconforming, conforming | expand
+__local.grid_yasp = Dune::YaspGrid<{dimDomain},Dune::EquidistantOffsetCoordinates<double,{dimDomain}>>
+__local.grid_alu = Dune::ALUGrid<{dimDomain},{dimDomain},Dune::{__local.geometry},Dune::{__local.refinement}>
+
+grid = {__local.grid_yasp}, {__local.grid_alu}  | expand grid
+
+'{grid}' == 'Dune::ALUGrid<1,1,Dune::{__local.geometry},Dune::{__local.refinement}>' | exclude
+'{grid}' == 'Dune::ALUGrid<{dimDomain},{dimDomain},Dune::cube,Dune::conforming>' | exclude
+
+entity_type = {grid}::Codim<0>::Entity
+
+1, ALUGRID_FOUND | expand grid | cmake_guard
+
+
