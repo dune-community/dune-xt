@@ -7,6 +7,9 @@
 //   Rene Milk       (2012 - 2015)
 //   Tobias Leibner  (2014)
 
+#ifndef DUNE_STUFF_TEST_GRID_PROVIDER_HH
+#define DUNE_STUFF_TEST_GRID_PROVIDER_HH
+
 #if HAVE_DUNE_GRID
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -15,36 +18,6 @@
 
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/grid/provider/interface.hh>
-
-#define SGRIDS /* clang-format off */                                                                                  \
-    Dune::SGrid<1, 1>                                                                                                  \
-  , Dune::SGrid<2, 2>                                                                                                  \
-  , Dune::SGrid<3, 3>                                                                                                  \
-  , Dune::SGrid<4, 4>                                                                                                  \
-/*, Dune::SGrid<1, 2> <- grid provider do not work for these combinations, bc. of the visualization with */            \
-/*, Dune::SGrid<2, 3>    boundary info, bc. of function based boundary info bc. of global function interface */        \
-/*, Dune::SGrid<3, 4> */                                                                                               \
-/*, Dune::SGrid<4, 5> */  /*clang-format on */
-
-#define YASPGRIDS /* clang-format off */                                                                               \
-    Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>                                                   \
-  , Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>                                                   \
-  , Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>>                                                   \
-  , Dune::YaspGrid<4, Dune::EquidistantOffsetCoordinates<double, 4>> /* clang-format on */
-
-#if HAVE_ALUGRID
-#define ALUGRIDS /* clang-format off */                                                                                \
-    Dune::ALUGrid<2, 2, Dune::cube, Dune::nonconforming>                                                               \
-  , Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming>                                                               \
-  , Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>                                                            \
-  , Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming>                                                            \
-  , Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>                                                               \
-  , Dune::ALUGrid<3, 3, Dune::simplex, Dune::conforming>                                                               \
-/*, Dune::ALUGrid<2, 3, Dune::cube, Dune::nonconforming> same reasons as above */                                      \
-/*, Dune::ALUGrid<2, 3, Dune::simplex, Dune::nonconforming> */                                                         \
-/*, Dune::ALUGrid<2, 3, Dune::simplex, Dune::conforming> */ /* clang-format on */
-
-#endif // HAVE_ALUGRID
 
 #include "gtest/gtest.h"
 
@@ -159,12 +132,21 @@ private:
     using Dune::Stuff::Grid::ChooseLayer;
     using Dune::Stuff::Grid::ChoosePartView;
     auto& grid_i = grid_provider.grid();
+#if HAVE_DUNE_FEM
     auto DUNE_UNUSED(leaf_grid_part_1) = grid_provider.template leaf<ChoosePartView::part>();
     auto DUNE_UNUSED(leaf_grid_part_2) = grid_provider.leaf_part();
     for (int level = 0; level <= grid_i.maxLevel(); ++level) {
       auto DUNE_UNUSED(level_grid_part_1) = grid_provider.template level<ChoosePartView::part>(level);
       auto DUNE_UNUSED(level_grid_part_2) = grid_provider.level_part(level);
     }
+#else // HAVE_DUNE_FEM
+    auto DUNE_UNUSED(leaf_grid_view_1) = grid_provider.template leaf<ChoosePartView::view>();
+    auto DUNE_UNUSED(leaf_grid_view_2) = grid_provider.leaf_view();
+    for (int level = 0; level <= grid_i.maxLevel(); ++level) {
+      auto DUNE_UNUSED(level_grid_view_1) = grid_provider.template level<ChoosePartView::view>(level);
+      auto DUNE_UNUSED(level_grid_view_2) = grid_provider.level_view(level);
+    }
+#endif
   } // ... check_non_const_interface()
 
 public:
@@ -178,3 +160,4 @@ public:
 }; // class GridProviderBase
 
 #endif // HAVE_DUNE_GRID
+#endif // DUNE_STUFF_TEST_GRID_PROVIDER_HH

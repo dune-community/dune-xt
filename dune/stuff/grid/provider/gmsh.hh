@@ -18,7 +18,9 @@
 #include <type_traits>
 
 #include <dune/grid/utility/structuredgridfactory.hh>
+#if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
+#endif // HAVE_ALUGRID
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 #include <dune/grid/io/file/gmshreader.hh>
@@ -56,9 +58,11 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     std::string filename = "g.msh";
+#if HAVE_ALUGRID
     if (std::is_same<ALUGrid<2, 2, simplex, conforming>, GridType>::value
         || std::is_same<ALUGrid<2, 2, simplex, nonconforming>, GridType>::value)
       filename = "gmsh_2d_simplices.msh";
+#endif // HAVE_ALUGRID
     Common::Configuration config("filename", filename);
     if (sub_name.empty())
       return config;

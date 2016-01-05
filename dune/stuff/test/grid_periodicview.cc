@@ -25,20 +25,10 @@
 using namespace Dune;
 using namespace Stuff;
 
-#define YASPGRIDS                                                                                                      \
-  YaspGrid<1, EquidistantOffsetCoordinates<double, 1>>, YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,          \
-      YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>
 
-#if HAVE_ALUGRID
-#define ALUCUBEGRIDS ALUGrid<2, 2, cube, nonconforming>, ALUGrid<3, 3, cube, nonconforming>
-
-#define ALUSIMPLEXGRIDS ALUGrid<2, 2, simplex, conforming>, ALUGrid<3, 3, simplex, conforming>
-#endif // HAVE_ALUGRID
-
-template <class GridImp>
-struct PeriodicViewTestYaspCube : public testing::Test
+struct PeriodicViewTest : public testing::Test
 {
-  typedef GridImp GridType;
+  typedef TESTGRIDTYPE GridType;
   typedef typename GridType::ctype ctype;
   typedef typename GridType::template Codim<0>::Geometry GeometryType;
   typedef Dune::Stuff::Grid::Providers::template Cube<GridType> GridProviderType;
@@ -54,38 +44,51 @@ struct PeriodicViewTestYaspCube : public testing::Test
   typedef typename GridViewType::CollectiveCommunication CollectiveCommunication;
   static const size_t dimDomain = GridViewType::dimension;
 
-  void check(const PeriodicGridViewType periodic_grid_view, const GridViewType& grid_view, const bool is_simplex,
-             const size_t variant)
+  static constexpr int factorial(int n)
   {
-    const bool is_cube = !is_simplex;
-    DomainType lower_left(0);
-    DomainType upper_right(1);
-    if (variant >= 3)
-      upper_right = DSC::fromString<DomainType>("[2.0 3.0 1.0 4.0]");
-    if (variant >= 6)
-      lower_left = DSC::fromString<DomainType>("[-0.5 0.5 0.7 -1.3]");
+    return n > 0 ? n * factorial(n - 1) : 1;
+  }
+
+  static void check()
+  {
+    // create grid and get gridview
+    DSC::Configuration grid_config             = DSC_CONFIG.sub("test_grid_periodicview");
+    GridProviderType grid_provider             = *(GridProviderType::create(grid_config));
+    const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
+    const GridViewType grid_view               = grid->leafGridView();
+
+    // check whether grid is periodic
+    const bool is_nonperiodic        = grid_config["periodic"] == "no";
+    const bool is_partially_periodic = grid_config["periodic"] == "partial";
+
+    // create periodic grid_view
+    std::bitset<dimDomain> periodic_directions;
+    if (is_partially_periodic)
+      periodic_directions[0] = 1;
+    else if (!is_nonperiodic)
+      periodic_directions.set();
+    const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
+
+    const bool is_simplex        = DSC::fromString<bool>(grid_config["is_simplex"]);
+    const bool is_cube           = !is_simplex;
+    const DomainType lower_left  = DSC::fromString<DomainType>(grid_config["lower_left"]);
+    const DomainType upper_right = DSC::fromString<DomainType>(grid_config["upper_right"]);
 
     // check interface
     const GridType& DSC_UNUSED(test_grid) = periodic_grid_view.grid();
     const IndexSet& DSC_UNUSED(test_indexSet) = periodic_grid_view.indexSet();
     const int codim0_size = periodic_grid_view.size(0);
-    EXPECT_EQ(codim0_size, grid_view.size(0));
-    if (dimDomain == 1)
-      EXPECT_EQ(codim0_size, int(8));
-    if (dimDomain == 2 && is_cube)
-      EXPECT_EQ(codim0_size, int(8 * 8));
-    if (dimDomain == 2 && is_simplex)
-      EXPECT_EQ(codim0_size, int(2 * 8 * 8));
-    if (dimDomain == 3 && is_cube)
-      EXPECT_EQ(codim0_size, int(8 * 8 * 8));
-    if (dimDomain == 3 && is_simplex)
-      EXPECT_EQ(codim0_size, int(6 * 8 * 8 * 8));
-    EXPECT_EQ(periodic_grid_view.size(Dune::GeometryType::cube), grid_view.size(Dune::GeometryType::cube));
-    EXPECT_EQ(periodic_grid_view.size(Dune::GeometryType::simplex), grid_view.size(Dune::GeometryType::simplex));
-    EXPECT_EQ(periodic_grid_view.overlapSize(0), grid_view.overlapSize(0));
-    EXPECT_EQ(periodic_grid_view.overlapSize(1), grid_view.overlapSize(1));
-    EXPECT_EQ(periodic_grid_view.ghostSize(0), grid_view.ghostSize(0));
-    EXPECT_EQ(periodic_grid_view.ghostSize(1), grid_view.ghostSize(1));
+    EXPECT_EQ(grid_view.size(0), codim0_size);
+    if (is_cube)
+      EXPECT_EQ(std::pow(int(8), dimDomain), codim0_size);
+    if (is_simplex)
+      EXPECT_EQ(std::pow(int(8), dimDomain) * factorial(dimDomain), codim0_size);
+    EXPECT_EQ(grid_view.size(Dune::GeometryType::cube), periodic_grid_view.size(Dune::GeometryType::cube));
+    EXPECT_EQ(grid_view.size(Dune::GeometryType::simplex), periodic_grid_view.size(Dune::GeometryType::simplex));
+    EXPECT_EQ(grid_view.overlapSize(0), periodic_grid_view.overlapSize(0));
+    EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
+    EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));
+    EXPECT_EQ(grid_view.ghostSize(1), periodic_grid_view.ghostSize(1));
     const CollectiveCommunication& DSC_UNUSED(test_comm) = periodic_grid_view.comm();
 
     size_t neighbor_count = 0;
@@ -142,7 +145,7 @@ struct PeriodicViewTestYaspCube : public testing::Test
                             && Dune::Stuff::Common::FloatCmp::eq(global_intersection_coords[differing_coordinate],
                                                                  lower_left[differing_coordinate])));
             ++periodic_count;
-            if (variant == 1 || variant == 4 || variant == 7)
+            if (is_partially_periodic)
               EXPECT_EQ(size_t(0), differing_coordinate);
           }
         }
@@ -152,215 +155,42 @@ struct PeriodicViewTestYaspCube : public testing::Test
       }
     }
 
-    if (dimDomain == 1) {
-      if (variant == 0 || variant == 3 || variant == 6) {
-        EXPECT_EQ(size_t(2 * 7), neighbor_count);
-        EXPECT_EQ(size_t(2), boundary_count);
-        EXPECT_EQ(size_t(0), periodic_count);
-      }
-      if (variant == 1 || variant == 4 || variant == 7) {
-        EXPECT_EQ(size_t(2 * 7 + 2), neighbor_count);
-        EXPECT_EQ(size_t(0), boundary_count);
-        EXPECT_EQ(size_t(2), periodic_count);
-      }
-      if (variant == 2 || variant == 5 || variant == 8) {
-        EXPECT_EQ(size_t(2 * 7 + 2), neighbor_count);
-        EXPECT_EQ(size_t(0), boundary_count);
-        EXPECT_EQ(size_t(2), periodic_count);
-      }
-    }
-    if (dimDomain == 2 && is_cube) {
-      if (variant == 0 || variant == 3 || variant == 6) {
-        EXPECT_EQ(size_t(2 * 2 * 8 * 7), neighbor_count);
-        EXPECT_EQ(size_t(2 * 8 * 2), boundary_count);
-        EXPECT_EQ(size_t(0), periodic_count);
-      }
-      if (variant == 1 || variant == 4 || variant == 7) {
-        EXPECT_EQ(size_t(2 * 2 * 8 * 7 + 2 * 8), neighbor_count);
-        EXPECT_EQ(size_t(2 * 8 * 2 - 2 * 8), boundary_count);
-        EXPECT_EQ(size_t(2 * 8), periodic_count);
-      }
-      if (variant == 2 || variant == 5 || variant == 8) {
-        EXPECT_EQ(size_t(2 * 2 * 8 * 7 + 2 * 8 * 2), neighbor_count);
-        EXPECT_EQ(size_t(0), boundary_count);
-        EXPECT_EQ(size_t(2 * 8 * 2), periodic_count);
-      }
-    }
-    if (dimDomain == 2 && is_simplex) {
-      if (variant == 0 || variant == 3 || variant == 6) {
-        EXPECT_EQ(size_t(2 * 2 * 8 * 7 + 2 * 64), neighbor_count);
-        EXPECT_EQ(size_t(2 * 8 * 2), boundary_count);
-        EXPECT_EQ(size_t(0), periodic_count);
-      }
-      if (variant == 1 || variant == 4 || variant == 7) {
-        EXPECT_EQ(size_t(2 * 2 * 8 * 7 + 2 * 8 + 2 * 64), neighbor_count);
-        EXPECT_EQ(size_t(2 * 8 * 2 - 2 * 8), boundary_count);
-        EXPECT_EQ(size_t(2 * 8), periodic_count);
-      }
-      if (variant == 2 || variant == 5 || variant == 8) {
-        EXPECT_EQ(size_t(2 * 2 * 8 * 7 + 2 * 8 * 2 + 2 * 64), neighbor_count);
-        EXPECT_EQ(size_t(0), boundary_count);
-        EXPECT_EQ(size_t(2 * 8 * 2), periodic_count);
-      }
-    }
-    if (dimDomain == 3 && is_cube) {
-      if (variant == 0 || variant == 3 || variant == 6) {
-        EXPECT_EQ(size_t(2 * 3 * 7 * 64), neighbor_count);
-        EXPECT_EQ(size_t(6 * 64), boundary_count);
-        EXPECT_EQ(size_t(0), periodic_count);
-      }
-      if (variant == 1 || variant == 4 || variant == 7) {
-        EXPECT_EQ(size_t(2 * 3 * 7 * 64 + 2 * 64), neighbor_count);
-        EXPECT_EQ(size_t(6 * 64 - 2 * 64), boundary_count);
-        EXPECT_EQ(size_t(2 * 64), periodic_count);
-      }
-      if (variant == 2 || variant == 5 || variant == 8) {
-        EXPECT_EQ(size_t(2 * 3 * 7 * 64 + 6 * 64), neighbor_count);
-        EXPECT_EQ(size_t(0), boundary_count);
-        EXPECT_EQ(size_t(6 * 64), periodic_count);
-      }
-    }
-    if (dimDomain == 3 && is_simplex) {
-      if (variant == 0 || variant == 3 || variant == 6) {
-        EXPECT_EQ(size_t(2 * 2 * 3 * 7 * 64 + 2 * 6 * 8 * 8 * 8), neighbor_count);
-        EXPECT_EQ(size_t(2 * 6 * 64), boundary_count);
-        EXPECT_EQ(size_t(0), periodic_count);
-      }
-      if (variant == 1 || variant == 4 || variant == 7) {
-        EXPECT_EQ(size_t(2 * 2 * 3 * 7 * 64 + 2 * 2 * 64 + 2 * 6 * 8 * 8 * 8), neighbor_count);
-        EXPECT_EQ(size_t(2 * 6 * 64 - 2 * 2 * 64), boundary_count);
-        EXPECT_EQ(size_t(2 * 2 * 64), periodic_count);
-      }
-      if (variant == 2 || variant == 5 || variant == 8) {
-        EXPECT_EQ(size_t(2 * 2 * 3 * 7 * 64 + 2 * 6 * 64 + 2 * 6 * 8 * 8 * 8), neighbor_count);
-        EXPECT_EQ(size_t(0), boundary_count);
-        EXPECT_EQ(size_t(2 * 6 * 64), periodic_count);
-      }
-    }
+    // the cube/rectangle grid has 2*dimDomain faces
+    const size_t num_faces = 2 * dimDomain;
+    // on each face, there are 8**(dimDomain-1) intersections. For a simplex grid in 3 dimensions, there are twice as
+    // much.
+    size_t num_intersections_on_face = std::pow(8, dimDomain - 1);
+    // use dimDomain from config here to avoid "code will never be executed" warning
+    assert(dimDomain == DSC::fromString<int>(grid_config["dimDomain"]));
+    if (is_simplex && DSC::fromString<int>(grid_config["dimDomain"]) == 3)
+      num_intersections_on_face *= 2;
+    // In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
+    // two
+    // faces are periodic. In a nonperiodic grid, no intersections are periodic.
+    size_t num_periodic_faces = is_partially_periodic ? 2 : num_faces;
+    if (is_nonperiodic)
+      num_periodic_faces *= 0;
+    const size_t expected_num_periodic_intersections = num_periodic_faces * num_intersections_on_face;
+    EXPECT_EQ(expected_num_periodic_intersections, periodic_count);
+    // The boundary count should be the number of interfaces on the boundary without the periodic interfaces
+    const size_t expected_num_boundary_intersections =
+        num_faces * num_intersections_on_face - expected_num_periodic_intersections;
+    EXPECT_EQ(expected_num_boundary_intersections, boundary_count);
+    // neighbor_count should equal the number of intersections without intersections on non-periodic boundaries
+    const size_t num_intersections_per_entity = is_cube ? 2 * dimDomain : dimDomain + 1;
+    const size_t num_entities = grid_view.size(0);
+    EXPECT_EQ(num_entities * num_intersections_per_entity - expected_num_boundary_intersections, neighbor_count);
   } // void check(...)
-
-  void checks_for_all_grids(const bool is_simplex)
-  {
-    // create grid on unit hypercube
-    GridProviderType grid_provider             = *(GridProviderType::create());
-    const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
-    const GridViewType grid_view               = grid->leafGridView();
-
-    // create grid on hyperrectangle
-    DSC::Configuration grid_config                            = GridProviderType::default_config();
-    grid_config["lower_left"]                                 = "[0.0 0.0 0.0 0.0]";
-    grid_config["upper_right"]                                = "[2.0 3.0 1.0 4.0]";
-    GridProviderType hyperrectangle_grid_provider             = *(GridProviderType::create(grid_config));
-    const std::shared_ptr<const GridType> hyperrectangle_grid = hyperrectangle_grid_provider.grid_ptr();
-    const GridViewType hyperrectangle_grid_view               = hyperrectangle_grid->leafGridView();
-
-    std::bitset<dimDomain> periodic_directions;
-    // create PeriodicGridViews that actually are not periodic
-    const PeriodicGridViewType non_periodic_grid_view(grid_view, periodic_directions);
-    const PeriodicGridViewType hr_non_periodic_grid_view(hyperrectangle_grid_view, periodic_directions);
-    // create PeriodicGridViews that are periodic only in x-direction
-    periodic_directions[0] = 1;
-    const PeriodicGridViewType partially_periodic_grid_view(grid_view, periodic_directions);
-    const PeriodicGridViewType hr_partially_periodic_grid_view(hyperrectangle_grid_view, periodic_directions);
-    // create PeriodicGridViews that are periodic in all directions
-    periodic_directions.set();
-    const PeriodicGridViewType fully_periodic_grid_view(grid_view, periodic_directions);
-    const PeriodicGridViewType hr_fully_periodic_grid_view(hyperrectangle_grid_view, periodic_directions);
-
-    // check
-    this->check(non_periodic_grid_view, grid_view, is_simplex, 0);
-    this->check(partially_periodic_grid_view, grid_view, is_simplex, 1);
-    this->check(fully_periodic_grid_view, grid_view, is_simplex, 2);
-    this->check(hr_non_periodic_grid_view, hyperrectangle_grid_view, is_simplex, 3);
-    this->check(hr_partially_periodic_grid_view, hyperrectangle_grid_view, is_simplex, 4);
-    this->check(hr_fully_periodic_grid_view, hyperrectangle_grid_view, is_simplex, 5);
-  } // void checks_for_all_grids(...)
-
-  void non_trivial_origin_checks(const bool is_simplex)
-  {
-    // create grid on hyperrectangle with lower_left != 0 (not possible for YaspGrid)
-    DSC::Configuration grid_config             = GridProviderType::default_config();
-    grid_config["lower_left"]                  = "[-0.5 0.5 0.7 -1.3]";
-    grid_config["upper_right"]                 = "[2.0 3.0 1.0 4.0]";
-    GridProviderType grid_provider             = *(GridProviderType::create(grid_config));
-    const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
-    const GridViewType grid_view               = grid->leafGridView();
-
-    std::bitset<dimDomain> periodic_directions;
-    // create PeriodicGridViewType that actually is not periodic
-    const PeriodicGridViewType non_periodic_grid_view(grid_view, periodic_directions);
-    // create PeriodicGridViewType that is periodic only in x-direction
-    periodic_directions[0] = 1;
-    const PeriodicGridViewType partially_periodic_grid_view(grid_view, periodic_directions);
-    // create PeriodicGridViewType that is periodic in all directions
-    periodic_directions.set();
-    const PeriodicGridViewType fully_periodic_grid_view(grid_view, periodic_directions);
-
-    this->check(non_periodic_grid_view, grid_view, is_simplex, 6);
-    this->check(partially_periodic_grid_view, grid_view, is_simplex, 7);
-    this->check(fully_periodic_grid_view, grid_view, is_simplex, 8);
-  } // void additional_checks_for_alu(...)
-}; // ... struct PeriodicViewTestYaspCube ...
-
-template <class GridImp>
-struct PeriodicViewTestALUCube : public PeriodicViewTestYaspCube<GridImp>
-{
-  typedef PeriodicViewTestYaspCube<GridImp> BaseType;
-  typedef typename BaseType::GridProviderType GridProviderType;
-  typedef typename BaseType::GridType GridType;
-  typedef typename BaseType::GridViewType GridViewType;
-  typedef typename BaseType::PeriodicGridViewType PeriodicGridViewType;
-  static const size_t dimDomain = BaseType::dimDomain;
-
-}; // ... struct PeriodicViewTestALUCube ...
-
-template <class GridImp>
-struct PeriodicViewTestALUSimplex : public PeriodicViewTestALUCube<GridImp>
-{
 };
 
-typedef testing::Types<YASPGRIDS> YaspCubeGridTypes;
-
-TYPED_TEST_CASE(PeriodicViewTestYaspCube, YaspCubeGridTypes);
-TYPED_TEST(PeriodicViewTestYaspCube, check_yaspcube)
+TEST_F(PeriodicViewTest, check_all)
 {
-  this->checks_for_all_grids(false);
-  this->non_trivial_origin_checks(false);
+  this->check();
 }
 
-#if HAVE_ALUGRID
-
-typedef testing::Types<ALUCUBEGRIDS> ALUCubeGridTypes;
-
-typedef testing::Types<ALUSIMPLEXGRIDS> ALUSimplexGridTypes;
-
-TYPED_TEST_CASE(PeriodicViewTestALUCube, ALUCubeGridTypes);
-TYPED_TEST(PeriodicViewTestALUCube, check_alucube)
-{
-  this->checks_for_all_grids(false);
-  this->non_trivial_origin_checks(false);
-}
-
-TYPED_TEST_CASE(PeriodicViewTestALUSimplex, ALUSimplexGridTypes);
-TYPED_TEST(PeriodicViewTestALUSimplex, check_alusimplex)
-{
-  this->checks_for_all_grids(true);
-  this->non_trivial_origin_checks(true);
-}
-
-#else // HAVE_ALUGRID
-
-TEST(DISABLED_PeriodicViewTestALUCube, check_alucube)
-{
-}
-TEST(DISABLED_PeriodicViewTestALUSimplex, check_alusimplex)
-{
-}
-
-#endif // HAVE_ALUGRID
 #else // HAVE_DUNE_GRID
 
-TEST(DISABLED_PeriodicViewTestYaspCube, check_yaspcube)
+TEST(DISABLED_PeriodicViewTest, check_all)
 {
 }
 
