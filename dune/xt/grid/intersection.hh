@@ -9,8 +9,8 @@
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_INTERSECTION_HH
-#define DUNE_STUFF_GRID_INTERSECTION_HH
+#ifndef DUNE_XT_GRID_INTERSECTION_HH
+#define DUNE_XT_GRID_INTERSECTION_HH
 
 #include <dune/common/deprecated.hh>
 #include <dune/common/fvector.hh>
@@ -149,4 +149,4 @@ bool intersectionContains(const IntersectionType& intersection, const Dune::Fiel
 } // end of namespace Stuff
 } // end namespace Dune
 
-#endif // DUNE_STUFF_GRID_INTERSECTION_HH
+#endif // DUNE_XT_GRID_INTERSECTION_HH

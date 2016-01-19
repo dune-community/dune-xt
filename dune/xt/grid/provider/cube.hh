@@ -10,8 +10,8 @@
 //   Rene Milk        (2012 - 2015)
 //   Tobias Leibner   (2014)
 
-#ifndef DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
-#define DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
+#ifndef DUNE_XT_GRID_PROVIDER_CUBE_HH
+#define DUNE_XT_GRID_PROVIDER_CUBE_HH
 
 #include <memory>
 #include <sstream>
@@ -299,4 +299,4 @@ class Cube
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRIDS_PROVIDER_CUBE_HH
+#endif // DUNE_XT_GRID_PROVIDER_CUBE_HH

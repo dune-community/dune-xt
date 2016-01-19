@@ -7,8 +7,8 @@
 //   Rene Milk       (2015)
 //   Tobias Leibner  (2015)
 
-#ifndef DUNE_STUFF_GRID_PERIODICVIEW_HH
-#define DUNE_STUFF_GRID_PERIODICVIEW_HH
+#ifndef DUNE_XT_GRID_PERIODICVIEW_HH
+#define DUNE_XT_GRID_PERIODICVIEW_HH
 
 #include <bitset>
 #include <map>
@@ -467,4 +467,4 @@ class PeriodicGridView
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_PERIODICVIEW_HH
+#endif // DUNE_XT_GRID_PERIODICVIEW_HH

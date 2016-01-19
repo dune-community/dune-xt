@@ -8,8 +8,8 @@
 //   Sven Kaulmann   (2014)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_PROVIDER_DEFAULT_HH
-#define DUNE_STUFF_GRID_PROVIDER_DEFAULT_HH
+#ifndef DUNE_XT_GRID_PROVIDER_DEFAULT_HH
+#define DUNE_XT_GRID_PROVIDER_DEFAULT_HH
 
 #include <memory>
 
@@ -91,4 +91,4 @@ class Default
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_PROVIDER_DEFAULT_HH
+#endif // DUNE_XT_GRID_PROVIDER_DEFAULT_HH

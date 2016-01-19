@@ -8,8 +8,8 @@
 //   Sven Kaulmann   (2013 - 2014)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_BOUNDARYINFO_HH
-#define DUNE_STUFF_GRID_BOUNDARYINFO_HH
+#ifndef DUNE_XT_GRID_BOUNDARYINFO_HH
+#define DUNE_XT_GRID_BOUNDARYINFO_HH
 
 #include <map>
 #include <set>
@@ -801,4 +801,4 @@ public:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_BOUNDARYINFO_HH
+#endif // DUNE_XT_GRID_BOUNDARYINFO_HH

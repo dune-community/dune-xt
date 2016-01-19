@@ -8,8 +8,8 @@
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH
-#define DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH
+#ifndef DUNE_XT_GRID_OUTPUT_ENTITY_VISUALIZATION_HH
+#define DUNE_XT_GRID_OUTPUT_ENTITY_VISUALIZATION_HH
 
 #include <boost/io/ios_state.hpp>
 
@@ -241,4 +241,4 @@ struct ElementVisualization
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_ENTITY_VISUALIZATION_HH
+#endif // DUNE_XT_GRID_OUTPUT_ENTITY_VISUALIZATION_HH

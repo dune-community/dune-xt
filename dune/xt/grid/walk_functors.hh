@@ -6,8 +6,8 @@
 //   Felix Schindler (2012, 2014 - 2015)
 //   Rene Milk       (2012, 2015)
 
-#ifndef DUNE_STUFF_WALK_FUNCTORS_HH
-#define DUNE_STUFF_WALK_FUNCTORS_HH
+#ifndef DUNE_XT_WALK_FUNCTORS_HH
+#define DUNE_XT_WALK_FUNCTORS_HH
 
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
@@ -103,4 +103,4 @@ struct MinMaxCoordinateFunctor : public Functor::Codim0<GridViewType>
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_WALK_FUNCTORS_HH
+#endif // DUNE_XT_WALK_FUNCTORS_HH

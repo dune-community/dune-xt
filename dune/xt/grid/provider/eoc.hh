@@ -6,8 +6,8 @@
 //   Felix Schindler (2015)
 //   Rene Milk       (2015)
 
-#ifndef DUNE_STUFF_GRID_PROVIDER_EOC_HH
-#define DUNE_STUFF_GRID_PROVIDER_EOC_HH
+#ifndef DUNE_XT_GRID_PROVIDER_EOC_HH
+#define DUNE_XT_GRID_PROVIDER_EOC_HH
 
 // silence sgrid deprecation warning temporarily
 #if HAVE_DUNE_GRID
@@ -116,4 +116,4 @@ class EOC
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_PROVIDER_EOC_HH
+#endif // DUNE_XT_GRID_PROVIDER_EOC_HH

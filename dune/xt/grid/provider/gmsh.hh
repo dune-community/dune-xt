@@ -9,8 +9,8 @@
 //   Rene Milk       (2012 - 2013, 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_PROVIDER_GMSH_HH
-#define DUNE_STUFF_GRID_PROVIDER_GMSH_HH
+#ifndef DUNE_XT_GRID_PROVIDER_GMSH_HH
+#define DUNE_XT_GRID_PROVIDER_GMSH_HH
 
 #if HAVE_DUNE_GRID
 
@@ -125,4 +125,4 @@ private:
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_PROVIDER_GMSH_HH
+#endif // DUNE_XT_GRID_PROVIDER_GMSH_HH

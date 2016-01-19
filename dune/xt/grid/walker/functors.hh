@@ -6,8 +6,8 @@
 //   Felix Schindler (2014)
 //   Rene Milk       (2014 - 2015)
 
-#ifndef DUNE_STUFF_GRID_WALKER_FUNCTORS_HH
-#define DUNE_STUFF_GRID_WALKER_FUNCTORS_HH
+#ifndef DUNE_XT_GRID_WALKER_FUNCTORS_HH
+#define DUNE_XT_GRID_WALKER_FUNCTORS_HH
 
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
@@ -137,4 +137,4 @@ private:
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_WALKER_FUNCTORS_HH
+#endif // DUNE_XT_GRID_WALKER_FUNCTORS_HH

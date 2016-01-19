@@ -7,8 +7,8 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_WALKER_WRAPPER_HH
-#define DUNE_STUFF_GRID_WALKER_WRAPPER_HH
+#ifndef DUNE_XT_GRID_WALKER_WRAPPER_HH
+#define DUNE_XT_GRID_WALKER_WRAPPER_HH
 
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
@@ -270,4 +270,4 @@ private:
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_WALKER_WRAPPER_HH
+#endif // DUNE_XT_GRID_WALKER_WRAPPER_HH

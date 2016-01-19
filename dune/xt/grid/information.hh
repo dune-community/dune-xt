@@ -8,8 +8,8 @@
 //   Sven Kaulmann   (2014)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_INFORMATION_HH
-#define DUNE_STUFF_GRID_INFORMATION_HH
+#ifndef DUNE_XT_GRID_INFORMATION_HH
+#define DUNE_XT_GRID_INFORMATION_HH
 
 #include <ostream>
 
@@ -198,4 +198,4 @@ inline std::ostream& operator<<(std::ostream& s, const DSG::Dimensions<T>& d)
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_INFORMATION_HH
+#endif // DUNE_XT_GRID_INFORMATION_HH

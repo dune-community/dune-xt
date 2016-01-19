@@ -8,8 +8,8 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_PROVIDER_HH
-#define DUNE_STUFF_GRID_PROVIDER_HH
+#ifndef DUNE_XT_GRID_PROVIDER_HH
+#define DUNE_XT_GRID_PROVIDER_HH
 
 #include <memory>
 
@@ -88,4 +88,4 @@ class GridProviders
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_PROVIDER_HH
+#endif // DUNE_XT_GRID_PROVIDER_HH

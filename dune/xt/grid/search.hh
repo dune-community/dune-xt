@@ -7,8 +7,8 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_STUFF_GRID_SEARCH_HH
-#define DUNE_STUFF_GRID_SEARCH_HH
+#ifndef DUNE_XT_GRID_SEARCH_HH
+#define DUNE_XT_GRID_SEARCH_HH
 
 #if HAVE_DUNE_GRID
 
@@ -187,4 +187,4 @@ EntityHierarchicSearch<GV> make_entity_hierarchic_search(const GV& grid_view)
 
 #endif // HAVE_DUNE_GRID
 
-#endif // DUNE_STUFF_GRID_SEARCH_HH
+#endif // DUNE_XT_GRID_SEARCH_HH

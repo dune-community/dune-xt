@@ -10,8 +10,8 @@
 //   Sven Kaulmann   (2014)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
-#define DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
+#ifndef DUNE_XT_GRID_PROVIDER_INTERFACE_HH
+#define DUNE_XT_GRID_PROVIDER_INTERFACE_HH
 
 #include <memory>
 
@@ -354,4 +354,4 @@ class ProviderInterface
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_PROVIDER_INTERFACE_HH
+#endif // DUNE_XT_GRID_PROVIDER_INTERFACE_HH

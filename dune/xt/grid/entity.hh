@@ -8,8 +8,8 @@
 //   Sven Kaulmann   (2014)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_GRID_ENTITY_HH
-#define DUNE_STUFF_GRID_ENTITY_HH
+#ifndef DUNE_XT_GRID_ENTITY_HH
+#define DUNE_XT_GRID_ENTITY_HH
 
 #include <dune/geometry/referenceelements.hh>
 
@@ -112,4 +112,4 @@ auto reference_element(const Dune::Geometry<mydim, cdim, GridImp, GeometryImp>& 
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_GRID_ENTITY_HH
+#endif // DUNE_XT_GRID_ENTITY_HH
