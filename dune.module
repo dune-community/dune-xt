@@ -1,0 +1,5 @@
+Module: dune-xt-functions
+Version: 2.4.1
+Maintainer: dune-xt-dev@listserv.uni-muenster.de
+Depends: dune-common (>= 2.4) dune-testtools (>= 2.4) dune-geometry (>= 2.4) dune-grid (>= 2.4) dune-xt-common (>=2.4) dune-xt-grid (>= 2.4)
+Suggests: dune-fem dune-pdelab dune-xt-la (>= 2.4)
