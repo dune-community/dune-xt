@@ -1,0 +1,4 @@
+Module: dune-xt-grid
+Version: 2.4.1
+Maintainer: dune-xt-dev@listserv.uni-muenster.de
+Depends: dune-common (>= 2.4) dune-testtools (>= 2.4) dune-geometry (>= 2.4) dune-grid (>= 2.4) dune-xt-common (>=2.4)
