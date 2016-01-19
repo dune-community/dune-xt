@@ -25,25 +25,26 @@
 #include <dune/pdelab/common/geometrywrapper.hh>
 #endif
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/color.hh>
-#include <dune/stuff/common/fvector.hh>
-#include <dune/stuff/common/vector.hh>
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/memory.hh>
-#include <dune/stuff/common/timedlogging.hh>
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/functions.hh>
+#include <dune/xt/common/color.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/memory.hh>
+#include <dune/xt/common/timedlogging.hh>
+#include <dune/xt/common/vector.hh>
+
+#include <dune/xt/functions.hh>
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace internal {
 
 inline static std::string boundary_info_static_id()
 {
-  return "stuff.grid.boundaryinfo";
+  return "grid.boundaryinfo";
 }
 
 } // namespace internal
@@ -229,9 +230,9 @@ public:
 namespace BoundaryInfos {
 
 template <class IntersectionImp>
-class AllDirichlet : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+class AllDirichlet : public XT::Grid::BoundaryInfoInterface<IntersectionImp>
 {
-  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef XT::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
   typedef AllDirichlet<IntersectionImp> ThisType;
 
 public:
@@ -283,9 +284,9 @@ public:
 }; // class AllDirichlet
 
 template <class IntersectionImp>
-class AllNeumann : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+class AllNeumann : public XT::Grid::BoundaryInfoInterface<IntersectionImp>
 {
-  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef XT::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
   typedef AllNeumann<IntersectionImp> ThisType;
 
 public:
@@ -337,9 +338,9 @@ public:
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
 
 template <class IntersectionImp>
-class IdBased : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+class IdBased : public XT::Grid::BoundaryInfoInterface<IntersectionImp>
 {
-  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef XT::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
   typedef IdBased<IntersectionImp> ThisType;
 
 public:
@@ -397,9 +398,9 @@ public:
   virtual bool dirichlet(const IntersectionType& intersection) const override final
   {
     if (hasDirichlet_ && intersection.boundary()) {
-#include <dune/stuff/common/disable_warnings.hh>
+#include <dune/xt/common/disable_warnings.hh>
       const int boundaryId = intersection.boundaryId();
-#include <dune/stuff/common/reenable_warnings.hh>
+#include <dune/xt/common/reenable_warnings.hh>
       // get set of dirichlet ids
       const auto result = id_to_type_map_.find("dirichlet");
       if (result == id_to_type_map_.end())
@@ -416,9 +417,9 @@ public:
   {
     if (hasNeumann_ && intersection.boundary()) {
 // get boundary id
-#include <dune/stuff/common/disable_warnings.hh>
+#include <dune/xt/common/disable_warnings.hh>
       const int boundaryId = intersection.boundaryId();
-#include <dune/stuff/common/reenable_warnings.hh>
+#include <dune/xt/common/reenable_warnings.hh>
       // get set of neumann ids
       const auto result = id_to_type_map_.find("neumann");
       if (result == id_to_type_map_.end())
@@ -441,9 +442,9 @@ private:
 #endif // #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
 
 template <class IntersectionImp>
-class NormalBased : public Stuff::Grid::BoundaryInfoInterface<IntersectionImp>
+class NormalBased : public XT::Grid::BoundaryInfoInterface<IntersectionImp>
 {
-  typedef Stuff::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
+  typedef XT::Grid::BoundaryInfoInterface<IntersectionImp> BaseType;
   typedef NormalBased<IntersectionImp> ThisType;
 
 public:
@@ -472,7 +473,7 @@ public:
     // get default
     const std::string default_type = cfg.get("default", default_cfg.get<std::string>("default"));
     if (default_type != "dirichlet" && default_type != "neumann")
-      DUNE_THROW(Exceptions::configuration_error, "Wrong default '" << default_type << "' given!");
+      DUNE_THROW(Common::Exceptions::configuration_error, "Wrong default '" << default_type << "' given!");
     const bool default_to_dirichlet = default_type == "dirichlet";
     // get tolerance
     const DomainFieldType tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
@@ -500,7 +501,8 @@ public:
     // sanity check
     for (auto& dirichletNormal : dirichlet_normals_) {
       if (contains(dirichletNormal, neumann_normals_))
-        DUNE_THROW(Exceptions::wrong_input_given, "Given normals are too close for given tolerance '" << tol << "'!");
+        DUNE_THROW(Common::Exceptions::wrong_input_given,
+                   "Given normals are too close for given tolerance '" << tol << "'!");
     }
   } // NormalBased(...)
 
@@ -554,7 +556,7 @@ private:
       bool found     = true;
       size_t counter = 0;
       while (found) {
-        const std::string localKey = key + "." + Dune::Stuff::Common::toString(counter);
+        const std::string localKey = key + "." + Dune::XT::Common::to_string(counter);
         if (config.has_key(localKey))
           ret.push_back(config.get<WorldType>(localKey, dimWorld));
         else
@@ -569,7 +571,7 @@ private:
   bool contains(const WorldType& normal, const std::vector<WorldType>& vectors) const
   {
     for (auto& vector : vectors)
-      if (Dune::Stuff::Common::FloatCmp::eq(normal, vector, tol_))
+      if (Dune::XT::Common::FloatCmp::eq(normal, vector, tol_))
         return true;
     return false;
   }
@@ -618,8 +620,8 @@ private:
     else {
       Common::Configuration sub_cfg = cfg.has_sub(id) ? cfg.sub(id) : default_cfg.sub(id);
       size_t counter = 0;
-      while (sub_cfg.has_key(Common::toString(counter))) {
-        value_range.push_back(sub_cfg.get<Common::FieldVector<double, 2>>(Common::toString(counter)));
+      while (sub_cfg.has_key(Common::to_string(counter))) {
+        value_range.push_back(sub_cfg.get<Common::FieldVector<double, 2>>(Common::to_string(counter)));
         ++counter;
       }
     }
@@ -736,7 +738,7 @@ public:
 
   static std::vector<std::string> available()
   {
-    using namespace Stuff::Grid::BoundaryInfos;
+    using namespace XT::Grid::BoundaryInfos;
     return
     {
       BoundaryInfos::AllDirichlet<I>::static_id(), BoundaryInfos::AllNeumann<I>::static_id()
@@ -751,7 +753,7 @@ public:
 
   static Common::Configuration default_config(const std::string type, const std::string subname = "")
   {
-    using namespace Stuff::Grid::BoundaryInfos;
+    using namespace XT::Grid::BoundaryInfos;
     if (type == BoundaryInfos::AllDirichlet<I>::static_id())
       return BoundaryInfos::AllDirichlet<I>::default_config(subname);
     else if (type == BoundaryInfos::AllNeumann<I>::static_id())
@@ -765,7 +767,7 @@ public:
     else if (type == BoundaryInfos::FunctionBased<I>::static_id())
       return BoundaryInfos::FunctionBased<I>::default_config(subname);
     else
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... default_config(...)
 
@@ -777,7 +779,7 @@ public:
   static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
                                                const Common::Configuration config = default_config(available()[0]))
   {
-    using namespace Stuff::Grid::BoundaryInfos;
+    using namespace XT::Grid::BoundaryInfos;
     if (type == BoundaryInfos::AllDirichlet<I>::static_id())
       return BoundaryInfos::AllDirichlet<I>::create(config);
     else if (type == BoundaryInfos::AllNeumann<I>::static_id())
@@ -791,14 +793,14 @@ public:
     else if (type == BoundaryInfos::FunctionBased<I>::static_id())
       return BoundaryInfos::FunctionBased<I>::create(config);
     else
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... create(...)
 }; // class BoundaryInfoProvider
 
 } // namespace Grid
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_HH

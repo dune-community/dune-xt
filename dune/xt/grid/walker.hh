@@ -13,17 +13,17 @@
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
-#include <vector>
+#include <functional>
 #include <memory>
 #include <type_traits>
-#include <functional>
+#include <vector>
 
 #include <dune/common/version.hh>
 
 #if HAVE_TBB
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
 #include <dune/grid/utility/partitioning/ranged.hh>
-#include <dune/stuff/common/parallel/threadmanager.hh>
+#include <dune/xt/common/parallel/threadmanager.hh>
 #endif // DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9)
 
 #include <tbb/blocked_range.h>
@@ -31,23 +31,24 @@
 #include <tbb/tbb_stddef.h>
 #endif // HAVE_TBB
 
-#include <dune/stuff/grid/entity.hh>
-#include <dune/stuff/grid/intersection.hh>
-#include <dune/stuff/grid/layers.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/parallel/threadmanager.hh>
-#include <dune/stuff/common/ranges.hh>
+#include <dune/xt/common/parallel/threadmanager.hh>
+#include <dune/xt/common/ranges.hh>
+#include <dune/xt/common/unused.hh>
 
-#include "walker/functors.hh"
+#include <dune/xt/grid/entity.hh>
+#include <dune/xt/grid/intersection.hh>
+#include <dune/xt/grid/layers.hh>
+
 #include "walker/apply-on.hh"
+#include "walker/functors.hh"
 #include "walker/wrapper.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace internal {
 
-template <class GPV, bool is_grd_vw = DSG::is_grid_view<GPV>::value>
+template <class GPV, bool is_grd_vw = is_grid_view<GPV>::value>
 struct GridPartViewHolder
 {
   typedef GPV type;
@@ -94,8 +95,8 @@ class Walker : internal::GridPartViewHolder<GridViewImp>, public Functor::Codim0
 
 public:
   typedef GridViewImp GridViewType;
-  typedef typename Stuff::Grid::Entity<GridViewType>::Type EntityType;
-  typedef typename Stuff::Grid::Intersection<GridViewType>::Type IntersectionType;
+  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  typedef typename XT::Grid::Intersection<GridViewType>::Type IntersectionType;
 
   explicit Walker(GridViewType grd_vw)
     : internal::GridPartViewHolder<GridViewImp>(grd_vw)
@@ -166,7 +167,7 @@ public:
                     new ApplyOn::AllIntersections<GridViewType>())
   {
     if (&other == this)
-      DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
+      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
     codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
     codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
     return *this;
@@ -176,7 +177,7 @@ public:
                 const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
   {
     if (&other == this)
-      DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
+      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not add a Walker to itself!");
     codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
     codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
     return *this;
@@ -246,7 +247,7 @@ public:
       return;
     }
 #else
-    const auto DSC_UNUSED(no_warning_for_use_tbb) = use_tbb;
+    const auto DXTC_UNUSED(no_warning_for_use_tbb) = use_tbb;
 #endif
     // prepare functors
     prepare();
@@ -356,7 +357,7 @@ protected:
 }; // class Walker
 
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID

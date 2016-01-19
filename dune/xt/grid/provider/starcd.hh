@@ -13,32 +13,33 @@
 
 #if HAVE_DUNE_GRID
 
-#include <iostream>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 #include <memory>
+#include <sstream>
 #include <type_traits>
 
 #include <boost/assign/list_of.hpp>
 
-#include <dune/common/shared_ptr.hh>
 #include <dune/common/exceptions.hh>
-#include <dune/common/parametertree.hh>
 #include <dune/common/fvector.hh>
+#include <dune/common/parametertree.hh>
+#include <dune/common/shared_ptr.hh>
 
 #include <dune/geometry/type.hh>
 
 #include <dune/grid/common/gridfactory.hh>
-#include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/sgrid.hh>
+#include <dune/grid/utility/structuredgridfactory.hh>
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/logging.hh>
-#include <dune/stuff/grid/provider/interface.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/logging.hh>
+#include <dune/xt/common/string.hh>
+
+#include <dune/xt/grid/provider/interface.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 
 /**
  * \brief   StarCD grid provider
@@ -83,7 +84,7 @@ public:
 
   GridProviderStarCD(const std::string& filename)
   {
-    std::ostream& out = Dune::Stuff::Common::Logger().devnull();
+    std::ostream& out = Dune::XT::Common::Logger().devnull();
 
     // set up the grid factory
     GridFactory<GridType> factory;
@@ -106,7 +107,7 @@ public:
     out << "Reading " << vertexFileName << " ...   " << std::flush;
     while (std::getline(vertexFile, line)) {
       numberOfVertices++;
-      const std::vector<double> items = Dune::Stuff::Common::tokenize<double>(line, " ");
+      const std::vector<double> items = Dune::XT::Common::tokenize<double>(line, " ");
       if (items.size() != dimDomain + 1)
         DUNE_THROW(Dune::IOError, "Error: " << items.size() << " = items.size() != dim + 1 = " << dimDomain + 1 << "!");
       for (size_t ii = 0; ii < dimDomain; ++ii)
@@ -144,8 +145,8 @@ public:
                                                        << "!");
       numberOfElements++;
 
-      const auto items1 = Dune::Stuff::Common::tokenize<int>(firstLine, " ");
-      auto items2       = Dune::Stuff::Common::tokenize<int>(secondLine, " ");
+      const auto items1 = Dune::XT::Common::tokenize<int>(firstLine, " ");
+      auto items2       = Dune::XT::Common::tokenize<int>(secondLine, " ");
 
       // Erase zeros at the beginning of the line
       items2.erase(std::remove(items2.begin(), items2.end(), 0), items2.end());
@@ -231,7 +232,7 @@ private:
   std::shared_ptr<GridType> grid_;
 }; // class GridProviderStarCD
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID

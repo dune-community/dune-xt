@@ -15,25 +15,26 @@
 #include <memory>
 
 #if HAVE_DUNE_GRID
-#include <dune/grid/io/file/dgfparser/gridptr.hh> // How convenient that GridPtr requires DGFGridFactory but
-#include <dune/grid/io/file/dgfparser/dgfgridfactory.hh> // does not include it!
-#include <dune/grid/io/file/dgfparser/dgfoned.hh>
-#include <dune/grid/io/file/dgfparser/dgfs.hh>
-#include <dune/grid/io/file/dgfparser/dgfyasp.hh>
-#if HAVE_ALUGRID
-#include <dune/grid/io/file/dgfparser/dgfalu.hh>
-#endif
 #if HAVE_DUNE_ALUGRID
 #include <dune/alugrid/dgf.hh>
 #endif
+#if HAVE_ALUGRID
+#include <dune/grid/io/file/dgfparser/dgfalu.hh>
+#endif
+#include <dune/grid/io/file/dgfparser/dgfgridfactory.hh> // How convenient that GridPtr requires DGFGridFactory but ...
+#include <dune/grid/io/file/dgfparser/dgfoned.hh>
+#include <dune/grid/io/file/dgfparser/dgfs.hh>
+#include <dune/grid/io/file/dgfparser/dgfyasp.hh>
+#include <dune/grid/io/file/dgfparser/gridptr.hh> // ... does not include it!
 #endif // HAVE_DUNE_GRID
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/grid/provider/interface.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/string.hh>
+
+#include <dune/xt/grid/provider/interface.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace Providers {
 
@@ -56,7 +57,7 @@ public:
 
   static Common::Configuration default_config(const std::string sub_name = "")
   { // size_t(...) required, else linker error with clang
-    Common::Configuration config("filename", "dgf_" + Common::toString(size_t(dimDomain)) + "d_interval.dgf");
+    Common::Configuration config("filename", "dgf_" + Common::to_string(size_t(dimDomain)) + "d_interval.dgf");
     if (sub_name.empty())
       return config;
     else {
@@ -123,7 +124,7 @@ class DGF
 
 } // namespace Providers
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_PROVIDER_DGF_HH

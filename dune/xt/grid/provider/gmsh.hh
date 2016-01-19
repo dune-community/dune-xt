@@ -17,20 +17,21 @@
 #include <memory>
 #include <type_traits>
 
-#include <dune/grid/utility/structuredgridfactory.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif // HAVE_ALUGRID
-#include <dune/grid/sgrid.hh>
-#include <dune/grid/yaspgrid.hh>
 #include <dune/grid/io/file/gmshreader.hh>
+#include <dune/grid/sgrid.hh>
+#include <dune/grid/utility/structuredgridfactory.hh>
+#include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/grid/provider/interface.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+
+#include <dune/xt/grid/provider/interface.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace Providers {
 
@@ -120,7 +121,7 @@ private:
 
 } // namespace Providers
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID

@@ -14,19 +14,19 @@
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
-#include <ostream>
+#include <array>
 #include <cstdio>
 #include <limits>
-#include <array>
+#include <ostream>
 
-#include <dune/common/fvector.hh>
 #include <dune/common/array.hh>
+#include <dune/common/fvector.hh>
 
-#include <dune/stuff/grid/walker.hh>
-#include <dune/stuff/grid/walk_functors.hh>
+#include <dune/xt/grid/walk_functors.hh>
+#include <dune/xt/grid/walker.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 typedef std::array<std::string, 7> TexColorArrayType;
@@ -367,7 +367,7 @@ private:
   GridType& grid_;
 };
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Grid
 } // namespace Dune
 

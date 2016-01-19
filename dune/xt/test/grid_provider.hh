@@ -16,10 +16,10 @@
 #endif
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/common/type_utils.hh>
-#include <dune/stuff/grid/provider/interface.hh>
+#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/grid/provider/interface.hh>
 
-#include "gtest/gtest.h"
+#include <dune/xt/test/gtest/gtest.h>
 
 template <class GridProviderType>
 class ConstGridProviderBase : public testing::Test
@@ -28,11 +28,11 @@ protected:
   typedef typename GridProviderType::GridType GridType;
 
 private:
-  typedef Dune::Stuff::Grid::ConstProviderInterface<GridType> ConstInterfaceType;
-  typedef Dune::Stuff::Grid::ProviderInterface<GridType> InterfaceType;
+  typedef Dune::XT::Grid::ConstProviderInterface<GridType> ConstInterfaceType;
+  typedef Dune::XT::Grid::ProviderInterface<GridType> InterfaceType;
 
   static_assert(std::is_base_of<InterfaceType, GridProviderType>::value,
-                "GridProviderType has to be derived from Dune::Stuff::Grid::ConstProviderInterface!");
+                "GridProviderType has to be derived from Dune::XT::Grid::ConstProviderInterface!");
 
 protected:
   static std::unique_ptr<GridProviderType> create()
@@ -59,8 +59,8 @@ private:
   template <class GPT>
   static void check_const_interface(const GPT& grid_provider)
   {
-    using Dune::Stuff::Grid::ChooseLayer;
-    using Dune::Stuff::Grid::ChoosePartView;
+    using Dune::XT::Grid::ChooseLayer;
+    using Dune::XT::Grid::ChoosePartView;
     const auto& grid_i = grid_provider.grid();
     auto DUNE_UNUSED(leaf_grid_view_1) = grid_provider.leaf_view();
     auto DUNE_UNUSED(leaf_grid_view_2) = grid_provider.template leaf<ChoosePartView::view>();
@@ -99,11 +99,11 @@ private:
   template <class GPT>
   static void check_visualize(const GPT& grid_provider)
   {
-    auto type_str = Dune::Stuff::Common::Typename<GPT>::value();
+    auto type_str = Dune::XT::Common::Typename<GPT>::value();
     grid_provider.visualize();
     grid_provider.visualize(type_str + "_a");
-    grid_provider.visualize(Dune::Stuff::Grid::BoundaryInfoConfigs::AllDirichlet::default_config());
-    grid_provider.visualize(Dune::Stuff::Grid::BoundaryInfoConfigs::AllDirichlet::default_config(), type_str + "_b");
+    grid_provider.visualize(Dune::XT::Grid::BoundaryInfoConfigs::AllDirichlet::default_config());
+    grid_provider.visualize(Dune::XT::Grid::BoundaryInfoConfigs::AllDirichlet::default_config(), type_str + "_b");
   } // ... check_visualize(...)
 
 public:
@@ -123,14 +123,14 @@ class GridProviderBase : public ConstGridProviderBase<GridProviderType>
 {
   typedef ConstGridProviderBase<GridProviderType> BaseType;
   typedef typename BaseType::GridType GridType;
-  typedef Dune::Stuff::Grid::ProviderInterface<GridType> InterfaceType;
+  typedef Dune::XT::Grid::ProviderInterface<GridType> InterfaceType;
 
 private:
   template <class GPT>
   static void check_non_const_interface(GPT& grid_provider)
   {
-    using Dune::Stuff::Grid::ChooseLayer;
-    using Dune::Stuff::Grid::ChoosePartView;
+    using Dune::XT::Grid::ChooseLayer;
+    using Dune::XT::Grid::ChoosePartView;
     auto& grid_i = grid_provider.grid();
 #if HAVE_DUNE_FEM
     auto DUNE_UNUSED(leaf_grid_part_1) = grid_provider.template leaf<ChoosePartView::part>();

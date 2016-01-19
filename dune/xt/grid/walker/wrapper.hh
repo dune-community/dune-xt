@@ -13,11 +13,11 @@
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
-#include "functors.hh"
 #include "apply-on.hh"
+#include "functors.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace internal {
 
@@ -265,7 +265,7 @@ private:
 
 } // namespace internal
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID

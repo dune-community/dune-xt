@@ -3,17 +3,17 @@
 // Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 
-#include <dune/stuff/grid/provider/cube.hh>
-#include <dune/stuff/grid/provider/dgf.hh>
-#include <dune/stuff/grid/provider/gmsh.hh>
+#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/provider/dgf.hh>
+#include <dune/xt/grid/provider/gmsh.hh>
 
 #include "grid_provider.hh"
 
 #if HAVE_DUNE_GRID
 
-struct TestGridProvider : public GridProviderBase<Dune::Stuff::Grid::Providers::TESTGRIDPROVIDERTYPE<TESTGRIDTYPE>>
+struct TestGridProvider : public GridProviderBase<Dune::XT::Grid::Providers::TESTGRIDPROVIDERTYPE<TESTGRIDTYPE>>
 {
 };
 

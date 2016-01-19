@@ -10,8 +10,8 @@
 #ifndef DUNE_XT_GRID_LAYERS_HH
 #define DUNE_XT_GRID_LAYERS_HH
 
-#include <memory>
 #include <cassert>
+#include <memory>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
@@ -26,19 +26,19 @@
 #include <dune/grid/multiscale/default.hh>
 #endif
 
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/type_utils.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace internal {
 
 template <class G>
 struct is_grid_view_helper
 {
-  DSC_has_typedef_initialize_once(Traits)
+  DXTC_has_typedef_initialize_once(Traits)
 
-      static const bool is_candidate = DSC_has_typedef(Traits)<G>::value;
+      static const bool is_candidate = DXTC_has_typedef(Traits)<G>::value;
 }; // class is_grid_view_helper
 
 } // namespace internal
@@ -423,7 +423,7 @@ struct LeafPartView
 #endif // HAVE_DUNE_GRID
 
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_LAYERS_HH

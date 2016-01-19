@@ -19,14 +19,14 @@
 #include "default.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace Providers {
 
 #if HAVE_DUNE_GRID
 
 /**
- *  The purpose of this class is to behave like a Stuff::Grid::ProviderInterface and at the same time to provide a
+ *  The purpose of this class is to behave like a XT::Grid::ProviderInterface and at the same time to provide a
  *  means to obtain the real grid level corresponding to a refinement level.
  */
 template <class GridImp>
@@ -113,7 +113,7 @@ class EOC
 
 } // namespace Providers
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_PROVIDER_EOC_HH

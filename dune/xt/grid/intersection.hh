@@ -18,18 +18,18 @@
 #include <dune/geometry/referenceelements.hh>
 
 #if HAVE_DUNE_GRID
+#include <dune/grid/common/intersection.hh>
 #include <dune/grid/common/gridview.hh>
 #endif
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/common/print.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/print.hh>
+#include <dune/xt/common/ranges.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/type_utils.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 #if HAVE_DUNE_GRID
@@ -74,8 +74,8 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
 {
   out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
   const auto& geometry = intersection.geometry();
-  for (auto ii : DSC::valueRange(geometry.corners()))
-    out << prefix << "  corner " + Common::toString(ii) << " = " << geometry.corner(ii)
+  for (auto ii : Common::value_range(geometry.corners()))
+    out << prefix << "  corner " + Common::to_string(ii) << " = " << geometry.corner(ii)
         << " (local: " << geometry.local(geometry.corner(ii)) << ")\n";
 } // ... printIntersection(...)
 
@@ -88,7 +88,7 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
 template <class G, class I, class D>
 typename std::enable_if<Dune::Intersection<G, I>::dimension == 2, bool>::type
 contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D, 2>& global_point,
-         const D& tolerance = DSC::FloatCmp::DefaultEpsilon<D>::value())
+         const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
 {
   const auto& geometry = intersection.geometry();
   // get the global coordinates of the intersections corners
@@ -104,11 +104,11 @@ contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D
     if (vector * normal > tolerance)
       return false;
   // Now that we know the point is on the line, check if it is outside the bounding box of the two corners.
-  if (DSC::FloatCmp::lt(global_point[0], std::min(corner_0[0], corner_1[0]), tolerance)
-      || DSC::FloatCmp::gt(global_point[0], std::max(corner_0[0], corner_1[0]), tolerance))
+  if (Common::FloatCmp::lt(global_point[0], std::min(corner_0[0], corner_1[0]), tolerance)
+      || Common::FloatCmp::gt(global_point[0], std::max(corner_0[0], corner_1[0]), tolerance))
     return false;
-  if (DSC::FloatCmp::lt(global_point[1], std::min(corner_0[1], corner_1[1]), tolerance)
-      || DSC::FloatCmp::gt(global_point[1], std::max(corner_0[1], corner_1[1]), tolerance))
+  if (Common::FloatCmp::lt(global_point[1], std::min(corner_0[1], corner_1[1]), tolerance)
+      || Common::FloatCmp::gt(global_point[1], std::max(corner_0[1], corner_1[1]), tolerance))
     return false;
   // At this point we cannot reject the assumption that the point lies on the line between the two corners.
   return true;
@@ -145,8 +145,8 @@ bool intersectionContains(const IntersectionType& intersection, const Dune::Fiel
   return contains(intersection, globalPoint);
 }
 
-} // end namespace Grid
-} // end of namespace Stuff
-} // end namespace Dune
+} // namespace Grid
+} // namespace XT
+} // namespace Dune
 
 #endif // DUNE_XT_GRID_INTERSECTION_HH

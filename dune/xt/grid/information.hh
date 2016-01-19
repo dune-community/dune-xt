@@ -22,16 +22,16 @@
 #include <dune/grid/common/gridview.hh>
 #endif
 
-#include <dune/stuff/common/math.hh>
-#include <dune/stuff/grid/intersection.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/grid/walker.hh>
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/grid/entity.hh>
-#include <dune/stuff/grid/walker/functors.hh>
+#include <dune/xt/common/math.hh>
+#include <dune/xt/common/ranges.hh>
+
+#include <dune/xt/grid/entity.hh>
+#include <dune/xt/grid/intersection.hh>
+#include <dune/xt/grid/walker.hh>
+#include <dune/xt/grid/walker/functors.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 #if HAVE_DUNE_GRID
@@ -102,7 +102,7 @@ struct Dimensions
                 "GridViewType is no GridView");
   typedef typename GridViewType::Grid GridType;
   //! automatic running min/max
-  typedef Dune::Stuff::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
+  typedef Dune::XT::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
   typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
   typedef typename GridType::template Codim<0>::Entity EntityType;
   CoordLimitsType coord_limits;
@@ -129,7 +129,7 @@ struct Dimensions
       const auto& geo = ent.geometry();
       entity_volume_(geo.volume());
       entity_width_(entity_diameter(ent));
-      for (auto i : DSC::valueRange(geo.corners())) {
+      for (auto i : Common::value_range(geo.corners())) {
         const auto& corner(geo.corner(i));
         for (size_t k = 0; k < GridType::dimensionworld; ++k)
           coord_limits_[k](corner[k]);
@@ -178,13 +178,13 @@ Dimensions<GridViewType> dimensions(const typename GridViewType::Grid::template 
 #endif // HAVE_DUNE_GRID
 
 } // namespace Grid
-} // end of namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #if HAVE_DUNE_GRID
 
 template <class T>
-inline std::ostream& operator<<(std::ostream& s, const DSG::Dimensions<T>& d)
+inline std::ostream& operator<<(std::ostream& s, const Dune::XT::Grid::Dimensions<T>& d)
 {
   for (size_t k = 0; k < T::dimensionworld; ++k) {
     const auto& mma = d.coord_limits[k];

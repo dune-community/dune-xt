@@ -18,16 +18,15 @@
 
 #include <dune/common/unused.hh>
 
-#include <dune/grid/yaspgrid.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
+#include <dune/grid/yaspgrid.hh>
 
 #if HAVE_DUNE_SPGRID
 #include <dune/grid/spgrid.hh>
 #endif
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/float_cmp.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/ranges.hh>
 
 namespace Dune {
 
@@ -58,7 +57,7 @@ public:
                                                   const array<unsigned int, dim>& elements)
   {
     Dune::array<int, dim> cells;
-    for (const auto i : DSC::valueRange(dim))
+    for (const auto i : Common::value_range(dim))
       cells[i] = elements[i];
     return std::make_shared<GridType>(lowerLeft, upperRight, cells);
   }
@@ -77,7 +76,7 @@ public:
   {
     Dune::array<int, dim> cells;
     Dune::array<int, dim> over;
-    for (const auto i : DSC::valueRange(dim)) {
+    for (const auto i : Common::value_range(dim)) {
       cells[i] = elements[i];
       over[i]  = overlap[i];
     }
@@ -105,7 +104,7 @@ public:
 
 #endif // HAVE_DUNE_SPGRID
 
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 template <class GridType>
@@ -176,7 +175,7 @@ public:
     std::copy(elements_in.begin(), elements_in.end(), elements.begin());
     auto overlap_check = overlap;
     overlap_check.fill(overlap[0]);
-    for (auto i : DSC::valueRange(1, dim))
+    for (auto i : Common::value_range(1, dim))
       if (overlap[i] != overlap[0])
         DUNE_THROW(Dune::InvalidStateException, "YaspGrid only supports uniform overlap");
     return std::make_shared<GridType>(lowerLeft, upperRight, elements, no_periodic_direction, overlap[0], communicator);
@@ -184,7 +183,7 @@ public:
 };
 
 } // namespace Grid
-} // end of namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID

@@ -23,13 +23,13 @@
 #endif
 #include <dune/grid/common/gridview.hh>
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/memory.hh>
-#include <dune/stuff/grid/entity.hh>
+#include <dune/xt/common/memory.hh>
+#include <dune/xt/common/ranges.hh>
+
+#include <dune/xt/grid/entity.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 template <class GridViewType>
@@ -61,9 +61,9 @@ private:
                                                          const typename BaseType::GlobalCoordinateType& point) const
   {
     const auto& geometry   = entity.geometry();
-    const auto& refElement = DSG::reference_element(geometry);
+    const auto& refElement = reference_element(geometry);
     if (refElement.checkInside(geometry.local(point))) {
-      return DSC::make_unique<typename BaseType::EntityType>(entity);
+      return Common::make_unique<typename BaseType::EntityType>(entity);
     }
     return nullptr;
   }
@@ -149,7 +149,7 @@ private:
     for (const auto& my_ent : range) {
       const auto my_level    = my_ent.level();
       const auto& geometry   = my_ent.geometry();
-      const auto& refElement = DSG::reference_element(geometry);
+      const auto& refElement = reference_element(geometry);
       for (const auto& point : quad_points) {
         if (refElement.checkInside(geometry.local(point))) {
           // if I cannot descend further add this entity even if it's not my view
@@ -182,7 +182,7 @@ EntityHierarchicSearch<GV> make_entity_hierarchic_search(const GV& grid_view)
 }
 
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID

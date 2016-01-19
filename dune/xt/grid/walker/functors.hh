@@ -12,12 +12,12 @@
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
-#include <dune/stuff/grid/entity.hh>
-#include <dune/stuff/grid/intersection.hh>
-#include <dune/stuff/grid/boundaryinfo.hh>
+#include <dune/xt/grid/boundaryinfo.hh>
+#include <dune/xt/grid/entity.hh>
+#include <dune/xt/grid/intersection.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace Functor {
 
@@ -26,7 +26,7 @@ class Codim0
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename Stuff::Grid::Entity<GridViewType>::Type EntityType;
+  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
 
   virtual ~Codim0()
   {
@@ -48,8 +48,8 @@ class Codim1
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename Stuff::Grid::Entity<GridViewType>::Type EntityType;
-  typedef typename Stuff::Grid::Intersection<GridViewType>::Type IntersectionType;
+  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  typedef typename XT::Grid::Intersection<GridViewType>::Type IntersectionType;
 
   virtual ~Codim1()
   {
@@ -72,8 +72,8 @@ class Codim0And1
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename Stuff::Grid::Entity<GridViewType>::Type EntityType;
-  typedef typename Stuff::Grid::Intersection<GridViewType>::Type IntersectionType;
+  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  typedef typename XT::Grid::Intersection<GridViewType>::Type IntersectionType;
 
   virtual ~Codim0And1()
   {
@@ -132,7 +132,7 @@ private:
 
 } // namespace Functor
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_DUNE_GRID

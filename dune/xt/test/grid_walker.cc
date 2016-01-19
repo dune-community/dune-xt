@@ -7,22 +7,23 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2015)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 
 #if HAVE_DUNE_GRID
-
-#include <dune/stuff/grid/walker.hh>
-#include <dune/stuff/grid/provider/cube.hh>
-#include <dune/stuff/common/parallel/partitioner.hh>
-#include <dune/stuff/common/logstreams.hh>
 
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
 #include <dune/grid/utility/partitioning/seedlist.hh>
 #endif
 
-using namespace Dune::Stuff;
-using namespace Dune::Stuff::Common;
-using namespace Dune::Stuff::Grid;
+#include <dune/xt/common/logstreams.hh>
+#include <dune/xt/common/parallel/partitioner.hh>
+
+#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/walker.hh>
+
+
+using namespace Dune::XT::Common;
+using namespace Dune::XT::Grid;
 using namespace std;
 
 typedef testing::Types<Int<1>, Int<2>, Int<3>> GridDims;
@@ -34,9 +35,9 @@ struct GridWalkerTest : public ::testing::Test
   static const size_t level   = 4;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridViewType;
-  typedef typename DSG::Entity<GridViewType>::Type EntityType;
-  typedef typename DSG::Intersection<GridViewType>::Type IntersectionType;
-  const DSG::Providers::Cube<GridType> grid_prv;
+  typedef typename Entity<GridViewType>::Type EntityType;
+  typedef typename Intersection<GridViewType>::Type IntersectionType;
+  const Providers::Cube<GridType> grid_prv;
   GridWalkerTest()
     : grid_prv(0.f, 1.f, level)
   {
@@ -88,8 +89,8 @@ struct GridWalkerTest : public ::testing::Test
     auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
     auto all_counter    = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
 
-    auto on_filter_boundaries = new DSG::ApplyOn::FilteredIntersections<GridViewType>(boundaries);
-    auto on_all_boundaries = new DSG::ApplyOn::BoundaryIntersections<GridViewType>();
+    auto on_filter_boundaries = new ApplyOn::FilteredIntersections<GridViewType>(boundaries);
+    auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridViewType>();
     walker.add(filter_counter, on_filter_boundaries);
     walker.add(all_counter, on_all_boundaries);
     walker.walk();

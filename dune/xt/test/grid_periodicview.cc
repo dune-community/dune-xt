@@ -7,7 +7,7 @@
 //   Rene Milk       (2015)
 //   Tobias Leibner  (2015)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 
 #if HAVE_DUNE_GRID
 #if HAVE_ALUGRID
@@ -15,15 +15,16 @@
 #endif
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/type_utils.hh>
-#include <dune/stuff/grid/periodicview.hh>
-#include <dune/stuff/grid/provider/interface.hh>
-#include <dune/stuff/grid/provider/cube.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/type_utils.hh>
 
-using namespace Dune;
-using namespace Stuff;
+#include <dune/xt/grid/periodicview.hh>
+#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/provider/interface.hh>
+
+using namespace Dune::XT;
+using namespace Dune::XT::Common;
 
 
 struct PeriodicViewTest : public testing::Test
@@ -31,15 +32,16 @@ struct PeriodicViewTest : public testing::Test
   typedef TESTGRIDTYPE GridType;
   typedef typename GridType::ctype ctype;
   typedef typename GridType::template Codim<0>::Geometry GeometryType;
-  typedef Dune::Stuff::Grid::Providers::template Cube<GridType> GridProviderType;
+  typedef Dune::XT::Grid::Providers::template Cube<GridType> GridProviderType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename GridViewType::IndexSet IndexSet;
   typedef typename GridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
-  typedef typename Dune::Stuff::Grid::template PeriodicGridView<GridViewType> PeriodicGridViewType;
+  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType> PeriodicGridViewType;
   typedef typename PeriodicGridViewType::template Codim<0>::Entity EntityType;
   typedef typename PeriodicGridViewType::template Codim<0>::Iterator EntityIteratorType;
-  typedef typename DSG::internal::template PeriodicIntersectionIterator<GridViewType> PeriodicIntersectionIteratorType;
-  typedef typename DSG::internal::template PeriodicIntersection<GridViewType> PeriodicIntersectionType;
+  typedef typename Dune::XT::Grid::internal::template PeriodicIntersectionIterator<GridViewType>
+      PeriodicIntersectionIteratorType;
+  typedef typename Dune::XT::Grid::internal::template PeriodicIntersection<GridViewType> PeriodicIntersectionType;
   typedef typename PeriodicIntersectionType::EntityPointer EntityPointerType;
   typedef typename GridViewType::CollectiveCommunication CollectiveCommunication;
   static const size_t dimDomain = GridViewType::dimension;
@@ -52,7 +54,7 @@ struct PeriodicViewTest : public testing::Test
   static void check()
   {
     // create grid and get gridview
-    DSC::Configuration grid_config             = DSC_CONFIG.sub("test_grid_periodicview");
+    Configuration grid_config                  = DXTC_CONFIG.sub("test_grid_periodicview");
     GridProviderType grid_provider             = *(GridProviderType::create(grid_config));
     const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
     const GridViewType grid_view               = grid->leafGridView();
@@ -69,14 +71,14 @@ struct PeriodicViewTest : public testing::Test
       periodic_directions.set();
     const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
 
-    const bool is_simplex        = DSC::fromString<bool>(grid_config["is_simplex"]);
+    const bool is_simplex        = Common::from_string<bool>(grid_config["is_simplex"]);
     const bool is_cube           = !is_simplex;
-    const DomainType lower_left  = DSC::fromString<DomainType>(grid_config["lower_left"]);
-    const DomainType upper_right = DSC::fromString<DomainType>(grid_config["upper_right"]);
+    const DomainType lower_left  = Common::from_string<DomainType>(grid_config["lower_left"]);
+    const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
 
     // check interface
-    const GridType& DSC_UNUSED(test_grid) = periodic_grid_view.grid();
-    const IndexSet& DSC_UNUSED(test_indexSet) = periodic_grid_view.indexSet();
+    const GridType& DXTC_UNUSED(test_grid) = periodic_grid_view.grid();
+    const IndexSet& DXTC_UNUSED(test_indexSet) = periodic_grid_view.indexSet();
     const int codim0_size = periodic_grid_view.size(0);
     EXPECT_EQ(grid_view.size(0), codim0_size);
     if (is_cube)
@@ -89,7 +91,7 @@ struct PeriodicViewTest : public testing::Test
     EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
     EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));
     EXPECT_EQ(grid_view.ghostSize(1), periodic_grid_view.ghostSize(1));
-    const CollectiveCommunication& DSC_UNUSED(test_comm) = periodic_grid_view.comm();
+    const CollectiveCommunication& DXTC_UNUSED(test_comm) = periodic_grid_view.comm();
 
     size_t neighbor_count = 0;
     size_t boundary_count = 0;
@@ -120,15 +122,15 @@ struct PeriodicViewTest : public testing::Test
           // check outside_intersection coords
           const auto coords_in_outside   = intersection.geometryInOutside().center();
           const auto coords_in_outside_2 = intersection_in_outside.geometryInInside().center();
-          EXPECT_TRUE(Dune::Stuff::Common::FloatCmp::eq(coords_in_outside, coords_in_outside_2));
+          EXPECT_TRUE(Dune::XT::Common::FloatCmp::eq(coords_in_outside, coords_in_outside_2));
           // check global intersection coords in periodic case
           const auto global_intersection_coords         = intersection.geometry().center();
           const auto global_outside_intersection_coords = intersection_in_outside.geometry().center();
           size_t coord_difference_count                 = 0;
           size_t differing_coordinate;
           for (size_t ii = 0; ii < dimDomain; ++ii) {
-            if (Dune::Stuff::Common::FloatCmp::ne(global_outside_intersection_coords[ii],
-                                                  global_intersection_coords[ii])) {
+            if (Dune::XT::Common::FloatCmp::ne(global_outside_intersection_coords[ii],
+                                               global_intersection_coords[ii])) {
               ++coord_difference_count;
               differing_coordinate = ii;
             }
@@ -136,14 +138,14 @@ struct PeriodicViewTest : public testing::Test
           if (intersection.boundary() && intersection.neighbor()) {
             EXPECT_TRUE(intersection_in_outside.boundary() && intersection_in_outside.neighbor());
             EXPECT_EQ(size_t(1), coord_difference_count);
-            EXPECT_TRUE((Dune::Stuff::Common::FloatCmp::eq(global_outside_intersection_coords[differing_coordinate],
-                                                           lower_left[differing_coordinate])
-                         && Dune::Stuff::Common::FloatCmp::eq(global_intersection_coords[differing_coordinate],
-                                                              upper_right[differing_coordinate]))
-                        || (Dune::Stuff::Common::FloatCmp::eq(global_outside_intersection_coords[differing_coordinate],
-                                                              upper_right[differing_coordinate])
-                            && Dune::Stuff::Common::FloatCmp::eq(global_intersection_coords[differing_coordinate],
-                                                                 lower_left[differing_coordinate])));
+            EXPECT_TRUE((Dune::XT::Common::FloatCmp::eq(global_outside_intersection_coords[differing_coordinate],
+                                                        lower_left[differing_coordinate])
+                         && Dune::XT::Common::FloatCmp::eq(global_intersection_coords[differing_coordinate],
+                                                           upper_right[differing_coordinate]))
+                        || (Dune::XT::Common::FloatCmp::eq(global_outside_intersection_coords[differing_coordinate],
+                                                           upper_right[differing_coordinate])
+                            && Dune::XT::Common::FloatCmp::eq(global_intersection_coords[differing_coordinate],
+                                                              lower_left[differing_coordinate])));
             ++periodic_count;
             if (is_partially_periodic)
               EXPECT_EQ(size_t(0), differing_coordinate);
@@ -161,8 +163,8 @@ struct PeriodicViewTest : public testing::Test
     // much.
     size_t num_intersections_on_face = std::pow(8, dimDomain - 1);
     // use dimDomain from config here to avoid "code will never be executed" warning
-    assert(dimDomain == DSC::fromString<int>(grid_config["dimDomain"]));
-    if (is_simplex && DSC::fromString<int>(grid_config["dimDomain"]) == 3)
+    assert(dimDomain == Common::from_string<int>(grid_config["dimDomain"]));
+    if (is_simplex && Common::from_string<int>(grid_config["dimDomain"]) == 3)
       num_intersections_on_face *= 2;
     // In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
     // two

@@ -19,15 +19,14 @@
 #include <dune/grid/common/gridview.hh>
 #endif
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/memory.hh>
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/grid/search.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/memory.hh>
+#include <dune/xt/common/ranges.hh>
+#include <dune/xt/grid/search.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 #if HAVE_DUNE_GRID
@@ -63,7 +62,7 @@ public:
     : BaseType(real_intersection)
     , periodic_(periodic_pair.first)
     , outside_(periodic_pair.second)
-    , real_grid_view_(new DSC::ConstStorageProvider<RealGridViewType>(real_grid_view))
+    , real_grid_view_(new Common::ConstStorageProvider<RealGridViewType>(real_grid_view))
   {
   }
 
@@ -116,7 +115,7 @@ private:
         const auto curr_outside_intersection_coords = curr_outside_intersection.geometry().center();
         size_t coord_difference_count = 0;
         for (size_t ii = 0; ii < dimDomain; ++ii) {
-          if (Dune::Stuff::Common::FloatCmp::ne(curr_outside_intersection_coords[ii], coords[ii])) {
+          if (Dune::XT::Common::FloatCmp::ne(curr_outside_intersection_coords[ii], coords[ii])) {
             ++coord_difference_count;
           }
         }
@@ -132,7 +131,7 @@ private:
 protected:
   bool periodic_;
   EntityType outside_;
-  std::unique_ptr<DSC::ConstStorageProvider<RealGridViewType>> real_grid_view_;
+  std::unique_ptr<Common::ConstStorageProvider<RealGridViewType>> real_grid_view_;
 }; // ... class PeriodicIntersection ...
 
 /** \brief IntersectionIterator for PeriodicGridView
@@ -186,22 +185,22 @@ public:
 private:
   std::unique_ptr<Intersection> create_current_intersection() const
   {
-    return DSC::make_unique<Intersection>(BaseType::operator*(),
-                                          real_grid_view_,
-                                          has_boundary_intersections_
-                                              ? intersection_map_.at((BaseType::operator*()).indexInInside())
-                                              : (const PeriodicPairType&)nonperiodic_pair_);
+    return Common::make_unique<Intersection>(BaseType::operator*(),
+                                             real_grid_view_,
+                                             has_boundary_intersections_
+                                                 ? intersection_map_.at((BaseType::operator*()).indexInInside())
+                                                 : (const PeriodicPairType&)nonperiodic_pair_);
   } // ... create_current_intersection() const
 
   std::unique_ptr<Intersection> create_current_intersection_safely() const
   {
     const bool is_iend                            = (*this == real_grid_view_.iend(entity_));
     const RealIntersectionType& real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
-    return DSC::make_unique<Intersection>(real_intersection,
-                                          real_grid_view_,
-                                          has_boundary_intersections_
-                                              ? intersection_map_.at(real_intersection.indexInInside())
-                                              : (const PeriodicPairType&)nonperiodic_pair_);
+    return Common::make_unique<Intersection>(real_intersection,
+                                             real_grid_view_,
+                                             has_boundary_intersections_
+                                                 ? intersection_map_.at(real_intersection.indexInInside())
+                                                 : (const PeriodicPairType&)nonperiodic_pair_);
   } // ... create_current_intersection_safely() const
 
   const RealGridViewType& real_grid_view_;
@@ -335,12 +334,12 @@ public:
             size_t num_boundary_coords = 0;
             for (std::size_t ii = 0; ii < dimDomain; ++ii) {
               if (periodic_directions_[ii]) {
-                if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], lower_left[ii])) {
+                if (Dune::XT::Common::FloatCmp::eq(periodic_neighbor_coords[ii], lower_left[ii])) {
                   is_periodic = true;
                   periodic_neighbor_coords[ii] =
                       upper_right[ii] - 1.0 / 100.0 * (entity.geometry().center()[ii] - lower_left[ii]);
                   ++num_boundary_coords;
-                } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], upper_right[ii])) {
+                } else if (Dune::XT::Common::FloatCmp::eq(periodic_neighbor_coords[ii], upper_right[ii])) {
                   is_periodic = true;
                   periodic_neighbor_coords[ii] =
                       lower_left[ii] + 1.0 / 100.0 * (upper_right[ii] - entity.geometry().center()[ii]);
@@ -421,19 +420,18 @@ private:
       -  Only cube and regular simplex grids have been tested so far. Other grids may not work properly. This is due to
       the heuristics for finding the periodic neighbor entity: Given an intersection on the boundary that shall be
       periodic, the coordinates intersection.geometry().center() are moved to the other side of the grid and then
-      supplied to Dune::Stuff::Grid::EntityInLevelSearch. As the coordinates are on the boundary of the wanted entity,
+      supplied to Dune::XT::Grid::EntityInLevelSearch. As the coordinates are on the boundary of the wanted entity,
       this search will fail for some grids. Thus, the coordinates are moved a little to the inside of the grid before
       searching for the entity. The moved coordinates will be inside the wanted entity for cube and usual simplex grids
       but this is not guaranteed for arbitrary grids.
  */
 template <class RealGridViewImp>
-class PeriodicGridView : Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>>,
+class PeriodicGridView : Dune::XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>>,
                          public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp>>
 {
   typedef RealGridViewImp RealGridViewType;
   typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType>> BaseType;
-  typedef
-      typename Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>> ConstStorProv;
+  typedef typename Dune::XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp>> ConstStorProv;
   typedef typename RealGridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
 
 public:
@@ -464,7 +462,7 @@ class PeriodicGridView
 #endif // HAVE_DUNE_GRID
 
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_PERIODICVIEW_HH

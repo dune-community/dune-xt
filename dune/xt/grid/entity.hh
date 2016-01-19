@@ -18,14 +18,13 @@
 #include <dune/grid/common/gridview.hh>
 #endif
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/print.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/print.hh>
+#include <dune/xt/common/ranges.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/type_utils.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 #if HAVE_DUNE_GRID
@@ -61,9 +60,9 @@ void printEntity(const EntityType& entity, const std::string name = Common::Type
   if (!name.empty())
     out << prefix << name << ":\n";
   const auto& geometry = entity.geometry();
-  for (auto ii : DSC::valueRange(geometry.corners()))
+  for (auto ii : Common::value_range(geometry.corners()))
     out << prefix + "  "
-        << "corner " + Common::toString(ii) << " = " << geometry.corner(ii) << "\n";
+        << "corner " + Common::to_string(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... printEntity(...)
 
 #if HAVE_DUNE_GRID
@@ -73,9 +72,9 @@ double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
 {
   auto max_dist        = std::numeric_limits<typename GridImp::ctype>::min();
   const auto& geometry = entity.geometry();
-  for (auto i : DSC::valueRange(geometry.corners())) {
+  for (auto i : Common::value_range(geometry.corners())) {
     const auto xi = geometry.corner(i);
-    for (auto j : DSC::valueRange(i + 1, geometry.corners())) {
+    for (auto j : Common::value_range(i + 1, geometry.corners())) {
       auto xj = geometry.corner(j);
       xj -= xi;
       max_dist = std::max(max_dist, xj.two_norm());
@@ -109,7 +108,7 @@ auto reference_element(const Dune::Geometry<mydim, cdim, GridImp, GeometryImp>& 
 #endif // HAVE_DUNE_GRID
 
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_ENTITY_HH

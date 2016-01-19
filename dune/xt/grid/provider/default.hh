@@ -13,12 +13,12 @@
 
 #include <memory>
 
-#include <dune/stuff/common/memory.hh>
+#include <dune/xt/common/memory.hh>
 
 #include "interface.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 namespace Providers {
 
@@ -88,7 +88,7 @@ class Default
 
 } // namespace Providers
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_PROVIDER_DEFAULT_HH

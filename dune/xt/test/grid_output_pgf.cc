@@ -7,7 +7,7 @@
 //   Rene Milk       (2012 - 2015)
 //   Tobias Leibner  (2014)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 
 #if HAVE_DUNE_GRID
 
@@ -15,9 +15,9 @@
 
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/stuff/grid/output/pgf.hh>
+#include <dune/xt/grid/output/pgf.hh>
 
-using namespace Dune::Stuff::Grid;
+using namespace Dune::XT::Grid;
 
 /** output files are compiled in test-compile-pgfoutput.sh target
  **/

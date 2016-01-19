@@ -21,14 +21,15 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #endif
 
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/grid/layers.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/grid/boundaryinfo.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/ranges.hh>
+
+#include <dune/xt/grid/boundaryinfo.hh>
+#include <dune/xt/grid/layers.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 #if HAVE_DUNE_GRID
@@ -87,7 +88,7 @@ public:
 
   static const std::string static_id()
   {
-    return "stuff.grid.provider";
+    return "grid.provider";
   }
 
   virtual ~ConstProviderInterface()
@@ -148,20 +149,20 @@ private:
   {
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
-    for (auto level : DSC::valueRange(grid().maxLevel() + 1)) {
+    for (auto level : Common::value_range(grid().maxLevel() + 1)) {
       auto grid_view = level_view(level);
       // vtk writer
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + DSC::toString(level));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(level));
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + DSC::toString(level));
+      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(level));
 #endif
       // write
-      vtkwriter.write(filename + "__level_" + DSC::toString(level), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::to_string(level), VTK::appendedraw);
     }
   } // ... visualize_plain(...)
 
@@ -170,29 +171,29 @@ private:
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
-    typedef Stuff::Grid::BoundaryInfoProvider<typename LevelGridViewType::Intersection> BoundaryInfoProvider;
+    typedef XT::Grid::BoundaryInfoProvider<typename LevelGridViewType::Intersection> BoundaryInfoProvider;
     auto boundary_info_ptr =
         BoundaryInfoProvider::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
-    for (auto level : DSC::valueRange(grid().maxLevel() + 1)) {
+    for (auto level : Common::value_range(grid().maxLevel() + 1)) {
       auto grid_view = level_view(level);
       // vtk writer
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + DSC::toString(level));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(level));
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + DSC::toString(level));
+      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(level));
 #endif
       // dirichlet values
       std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
-      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + DSC::toString(level));
+      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(level));
       // neumann values
       std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
-      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + DSC::toString(level));
+      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::to_string(level));
       // write
-      vtkwriter.write(filename + "__level_" + DSC::toString(level), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::to_string(level), VTK::appendedraw);
     }
   } // ... visualize_with_boundary(...)
 
@@ -246,7 +247,7 @@ private:
           if (boundaryInfo.neumann(*intersectionIt))
             data[index] = 1.0;
         } else
-          DUNE_THROW(Exceptions::internal_error, "Unknown type '" << type << "'!");
+          DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type << "'!");
       }
     } // walk the grid
     return data;
@@ -351,7 +352,7 @@ class ProviderInterface
 #endif // HAVE_DUNE_GRID
 
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_PROVIDER_INTERFACE_HH

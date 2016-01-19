@@ -12,14 +12,15 @@
 // nothing here will compile w/o grid present
 #if HAVE_DUNE_GRID
 
-#include "walker/functors.hh"
-#include "walker.hh"
+#include <dune/xt/common/ranges.hh>
 
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/grid/information.hh>
+#include <dune/xt/grid/information.hh>
+
+#include "walker.hh"
+#include "walker/functors.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 //! GridWalk functor that refines all entitites above given volume
@@ -50,8 +51,8 @@ struct MaximumEntityVolumeRefineFunctor : public Functor::Codim0<GridViewType>
 template <class GridType>
 void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
 {
-  namespace DSG = Dune::Stuff::Grid;
-  const typename DSG::Dimensions<GridType> unrefined_dimensions(grid);
+  using namespace Dune::XT;
+  const typename Grid::Dimensions<GridType> unrefined_dimensions(grid);
   const double unrefined_min_volume = unrefined_dimensions.entity_volume.min();
   typedef typename GridType::LeafGridView View;
   View view = grid.leafView();
@@ -64,7 +65,7 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
     if (!grid.adapt())
       break;
     grid.postAdapt();
-    std::cout << DSG::Dimensions<GridType>()(grid);
+    std::cout << Grid::Dimensions<GridType>()(grid);
   }
 } // EnforceMaximumEntityVolume
 
@@ -86,8 +87,8 @@ struct MinMaxCoordinateFunctor : public Functor::Codim0<GridViewType>
   virtual void apply_local(const typename BaseType::EntityType& ent)
   {
     const auto& geo = ent.geometry();
-    for (auto i : DSC::valueRange(geo.corners())) {
-      for (auto k : DSC::valueRange(EntityGeometryType::coorddimension)) {
+    for (auto i : Common::value_range(geo.corners())) {
+      for (auto k : Common::value_range(EntityGeometryType::coorddimension)) {
         minima_[k] = std::min(minima_[k], geo.corner(i)[k]);
         maxima_[k] = std::max(maxima_[k], geo.corner(i)[k]);
       }

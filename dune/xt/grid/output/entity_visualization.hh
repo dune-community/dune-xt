@@ -19,16 +19,15 @@
 #if HAVE_DUNE_GRID
 
 #include <dune/grid/common/mcmgmapper.hh>
-#include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/io/file/dgfparser/dgfparser.hh>
+#include <dune/grid/io/file/vtk/vtkwriter.hh>
 
-#include <dune/stuff/common/filesystem.hh>
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/logging.hh>
+#include <dune/xt/common/filesystem.hh>
+#include <dune/xt/common/logging.hh>
+#include <dune/xt/common/ranges.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Grid {
 
 struct ElementVisualization
@@ -64,7 +63,7 @@ struct ElementVisualization
     vtkwriter.addCellData(values, "data");
     const std::string piecefilesFolderName = "piecefiles";
     const std::string piecefilesPath = f.dir() + "/" + piecefilesFolderName + "/";
-    DSC::testCreateDirectory(piecefilesPath);
+    Common::test_create_directory(piecefilesPath);
     vtkwriter.pwrite(f.filename(), f.dir(), piecefilesFolderName, Dune::VTK::appendedraw);
   }
 
@@ -173,7 +172,7 @@ struct ElementVisualization
 
       DomainType baryCenter(0.0);
 
-      for (auto corner : DSC::valueRange(geometry.corners())) {
+      for (auto corner : Common::value_range(geometry.corners())) {
         baryCenter += geometry.corner(corner);
       }
       baryCenter /= geometry.corners();
@@ -203,13 +202,13 @@ struct ElementVisualization
       const typename Entity::Geometry& geo = ent.geometry();
       double vol = geo.volume();
       if (vol < 0) {
-        boost::io::ios_all_saver guard(DSC_LOG_ERROR);
-        DSC_LOG_ERROR << std::setiosflags(std::ios::fixed) << std::setprecision(6) << std::setw(8);
+        boost::io::ios_all_saver guard(DXTC_LOG_ERROR);
+        DXTC_LOG_ERROR << std::setiosflags(std::ios::fixed) << std::setprecision(6) << std::setw(8);
         // std::cout.showpoint();
-        for (auto i : DSC::valueRange(geo.corners())) {
-          DSC_LOG_ERROR << geo.corner(i) << "\t\t";
+        for (auto i : Common::value_range(geo.corners())) {
+          DXTC_LOG_ERROR << geo.corner(i) << "\t\t";
         }
-        DSC_LOG_ERROR << std::endl;
+        DXTC_LOG_ERROR << std::endl;
       }
       return vol;
     }
@@ -235,7 +234,7 @@ struct ElementVisualization
   }
 };
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Grid
 } // namespace Dune
 
