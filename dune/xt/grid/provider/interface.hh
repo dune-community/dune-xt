@@ -19,6 +19,7 @@
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
+#include <dune/grid/common/rangegenerators.hh>
 #endif
 
 #include <dune/xt/common/configuration.hh>
@@ -236,7 +237,7 @@ private:
   {
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
-    for (const auto& entity : DSC::entityRange(gridView)) {
+    for (auto&& entity : elements(gridView)) {
       const auto& index = gridView.indexSet().index(entity);
       data[index] = 0.0;
       for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
@@ -256,7 +257,7 @@ private:
   std::vector<double> generateEntityVisualization(const LevelGridViewType& gridView) const
   {
     std::vector<double> data(gridView.indexSet().size(0));
-    for (const auto& entity : DSC::entityRange(gridView)) {
+    for (auto&& entity : elements(gridView)) {
       const auto& index = gridView.indexSet().index(entity);
       data[index]       = double(index);
     } // walk the grid

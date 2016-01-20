@@ -19,6 +19,7 @@
 #if HAVE_DUNE_GRID
 
 #include <dune/grid/common/mcmgmapper.hh>
+#include <dune/grid/common/rangegenerators.hh>
 #include <dune/grid/io/file/dgfparser/dgfparser.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 
@@ -55,7 +56,7 @@ struct ElementVisualization
     Dune::LeafMultipleCodimMultipleGeomTypeMapper<Grid, P0Layout> mapper(grid);
 
     std::vector<double> values(mapper.size());
-    for (const auto& entity : DSC::entityRange(gridView)) {
+    for (auto&& entity : elements(gridView)) {
       values[mapper.map(entity)] = f(entity);
     }
 
@@ -138,7 +139,7 @@ struct ElementVisualization
       int numberOfBoundarySegments(0);
       bool isOnBoundary   = false;
       const auto leafview = grid_.leafGridView();
-      for (const auto& intersection : DSC::intersectionRange(leafview, entity)) {
+      for (auto&& intersection : intersections(leafview, entity)) {
         if (!intersection.neighbor() && intersection.boundary()) {
           isOnBoundary = true;
           numberOfBoundarySegments += 1;

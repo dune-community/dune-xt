@@ -20,6 +20,7 @@
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
+#include <dune/grid/common/rangegenerators.hh>
 #endif
 
 #include <dune/xt/common/math.hh>
@@ -51,8 +52,8 @@ struct Statistics
     , numberOfBoundaryIntersections(0)
     , maxGridWidth(0)
   {
-    for (const auto& entity : DSC::entityRange(gridView)) {
-      for (const auto& intIt : DSC::intersectionRange(gridView, entity)) {
+    for (auto&& entity : elements(gridView)) {
+      for (auto&& intIt : intersections(gridView, entity)) {
         ++numberOfIntersections;
         maxGridWidth = std::max(intIt.geometry().volume(), maxGridWidth);
         // if we are inside the grid
@@ -84,9 +85,9 @@ template <class GridViewType>
 size_t maxNumberOfNeighbors(const GridViewType& gridView)
 {
   size_t maxNeighbours = 0;
-  for (const auto& entity : DSC::entityRange(gridView)) {
+  for (auto&& entity : elements(gridView)) {
     size_t neighbours = 0;
-    for (const auto& DSC_UNUSED(i) : DSC::intersectionRange(gridView, entity)) {
+    for (auto&& DXTC_UNUSED(i) : intersections(gridView, entity)) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);

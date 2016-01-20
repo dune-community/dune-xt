@@ -31,6 +31,8 @@
 #include <tbb/tbb_stddef.h>
 #endif // HAVE_TBB
 
+#include <dune/grid/common/rangegenerators.hh>
+
 #include <dune/xt/common/parallel/threadmanager.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
@@ -254,7 +256,7 @@ public:
 
     // only do something, if we have to
     if ((codim0_functors_.size() + codim1_functors_.size()) > 0) {
-      walk_range(DSC::entityRange(this->grid_view_));
+      walk_range(elements(this->grid_view_));
     } // only do something, if we have to
 
     // finalize functors

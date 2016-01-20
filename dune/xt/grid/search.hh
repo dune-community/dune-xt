@@ -22,6 +22,7 @@
 #include <dune/grid/common/genericreferenceelements.hh>
 #endif
 #include <dune/grid/common/gridview.hh>
+#include <dune/grid/common/rangegenerators.hh>
 
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/ranges.hh>
@@ -136,7 +137,7 @@ public:
   EntityVectorType operator()(const PointContainerType& points) const
   {
     auto level = std::min(gridview_.grid().maxLevel(), start_level_);
-    auto range = DSC::entityRange(gridview_.grid().levelView(level));
+    auto range = elements(gridview_.grid().levelView(level));
     return process(points, range);
   }
 

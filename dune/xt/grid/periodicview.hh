@@ -17,6 +17,7 @@
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
+#include <dune/grid/common/rangegenerators.hh>
 #endif
 
 #include <dune/xt/common/exceptions.hh>
@@ -300,7 +301,7 @@ public:
     auto entity_it         = BaseType::template begin<0>();
     DomainType lower_left  = entity_it->geometry().center();
     DomainType upper_right = lower_left;
-    for (const auto& entity : DSC::entityRange(*this)) {
+    for (auto&& entity : elements(*this)) {
       const auto i_it_end = BaseType::iend(entity);
       for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
         const RealIntersectionType& intersection = *i_it;
@@ -321,7 +322,7 @@ public:
     EntityInlevelSearch<BaseType> entity_search(*this);
     DomainType periodic_neighbor_coords;
     IntersectionMapType intersection_neighbor_map;
-    for (const auto& entity : DSC::entityRange(*this)) {
+    for (auto&& entity : elements(*this)) {
       if (entity.hasBoundaryIntersections()) {
         intersection_neighbor_map.clear();
         const auto i_it_end = BaseType::iend(entity);
