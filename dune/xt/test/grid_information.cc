@@ -41,7 +41,7 @@ struct GridInfoTest : public ::testing::Test
     EXPECT_DOUBLE_EQ(1.0 / double(entities), dim.entity_volume.min());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.max());
     EXPECT_DOUBLE_EQ(dim.entity_volume.min(), dim.entity_volume.average());
-    EXPECT_DOUBLE_EQ(1.0, dim.volumeRelation());
+    EXPECT_DOUBLE_EQ(1.0, dim.volume_relation());
     const auto& dl = dim.coord_limits;
     for (auto i : value_range(griddim)) {
       EXPECT_DOUBLE_EQ(dl[i].max(), 1.0);
@@ -62,13 +62,13 @@ struct GridInfoTest : public ::testing::Test
     EXPECT_EQ(line * (griddim), st.numberOfBoundaryIntersections);
     EXPECT_EQ(entities * (2 * griddim), st.numberOfIntersections);
     EXPECT_EQ(st.numberOfIntersections - st.numberOfBoundaryIntersections, st.numberOfInnerIntersections);
-    EXPECT_EQ(griddim * 2, maxNumberOfNeighbors(gv));
+    EXPECT_EQ(griddim * 2, max_number_of_neighbors(gv));
   }
 
   void print(std::ostream& out)
   {
     const auto& gv = grid_prv.grid().leafGridView();
-    printInfo(gv, out);
+    print_info(gv, out);
   }
 };
 

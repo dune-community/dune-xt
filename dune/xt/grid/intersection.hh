@@ -65,15 +65,15 @@ public:
               std::ostream, into which the information is printed
   **/
 template <class IntersectionType>
-void printIntersection(const IntersectionType& intersection, std::ostream& out = std::cout,
-                       const std::string prefix = "")
+void print_intersection(const IntersectionType& intersection, std::ostream& out = std::cout,
+                        const std::string prefix = "")
 {
   out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
   const auto& geometry = intersection.geometry();
   for (auto ii : Common::value_range(geometry.corners()))
     out << prefix << "  corner " + Common::to_string(ii) << " = " << geometry.corner(ii)
         << " (local: " << geometry.local(geometry.corner(ii)) << ")\n";
-} // ... printIntersection(...)
+} // ... print_intersection(...)
 
 
 /**

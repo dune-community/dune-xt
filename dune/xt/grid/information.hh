@@ -65,7 +65,7 @@ struct Statistics
 /** \brief grid statistic output to given stream
    */
 template <class GridViewType>
-void printInfo(const GridViewType& gridView, std::ostream& out)
+void print_info(const GridViewType& gridView, std::ostream& out)
 {
   const Statistics st(gridView);
   out << "found " << st.numberOfEntities << " entities," << std::endl;
@@ -73,13 +73,13 @@ void printInfo(const GridViewType& gridView, std::ostream& out)
   out << "      " << st.numberOfInnerIntersections << " intersections inside and" << std::endl;
   out << "      " << st.numberOfBoundaryIntersections << " intersections on the boundary." << std::endl;
   out << "      maxGridWidth is " << st.maxGridWidth << std::endl;
-} // printGridInformation
+} // ... print_info(...)
 
 /**
 * \attention Not optimal, does a whole grid walk!
 **/
 template <class GridViewType>
-size_t maxNumberOfNeighbors(const GridViewType& gridView)
+size_t max_number_of_neighbors(const GridViewType& gridView)
 {
   size_t maxNeighbours = 0;
   for (auto&& entity : elements(gridView)) {
@@ -90,7 +90,7 @@ size_t maxNumberOfNeighbors(const GridViewType& gridView)
     maxNeighbours = std::max(maxNeighbours, neighbours);
   }
   return maxNeighbours;
-} // size_t maxNumberOfNeighbors(const GridPartType& gridPart)
+} // ... max_number_of_neighbors(...)
 
 //! Provide min/max coordinates for all space dimensions of a GridView
 template <class GridViewType>
@@ -135,7 +135,7 @@ struct Dimensions
     } // ()
   };
 
-  double volumeRelation() const
+  double volume_relation() const
   {
     return entity_volume.min() != 0.0 ? entity_volume.max() / entity_volume.min() : -1;
   }
@@ -187,7 +187,7 @@ inline std::ostream& operator<<(std::ostream& s, const Dune::XT::Grid::Dimension
     s << boost::format("x%d\tmin: %e\tavg: %e\tmax: %e\n") % k % mma.min() % mma.average() % mma.max();
   }
   s << boost::format("Entity vol min: %e\tavg: %e\tmax: %e\tQout: %e") % d.entity_volume.min()
-           % d.entity_volume.average() % d.entity_volume.max() % d.volumeRelation();
+           % d.entity_volume.average() % d.entity_volume.max() % d.volume_relation();
   s << std::endl;
   return s;
 }

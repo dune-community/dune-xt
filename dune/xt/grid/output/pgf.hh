@@ -99,10 +99,10 @@ class PgfEntityFunctorIntersections : public Functor::Codim0And1<GridViewType>
 
 public:
   PgfEntityFunctorIntersections(const GridViewType& grid_view, std::ostream& file, const std::string color = "black",
-                                const bool printEntityIndex = false)
+                                const bool print_entityIndex = false)
     : file_(file)
     , color_(color)
-    , printEntityIndex_(printEntityIndex)
+    , print_entityIndex_(print_entityIndex)
     , grid_view_(grid_view)
   {
   }
@@ -134,7 +134,7 @@ public:
 
   void maybePrintEntityIndex(const typename BaseType::EntityType& entity, const int idx)
   {
-    if (!printEntityIndex_)
+    if (!print_entityIndex_)
       return;
     PgfCoordWrapper center(entity.geometry().center());
     char buffer[50] = {'\0'};
@@ -145,7 +145,7 @@ public:
 protected:
   std::ostream& file_;
   const std::string color_;
-  const bool printEntityIndex_;
+  const bool print_entityIndex_;
   const GridViewType& grid_view_;
 };
 
@@ -166,8 +166,8 @@ class PgfEntityFunctorIntersectionsWithShift : public PgfEntityFunctorIntersecti
 public:
   PgfEntityFunctorIntersectionsWithShift(const GridViewType& grid_view, std::ostream& file,
                                          const std::string color = "black", const int level = 0,
-                                         bool printEntityIndex = false)
-    : BaseType(grid_view, file, color, printEntityIndex)
+                                         bool print_entityIndex = false)
+    : BaseType(grid_view, file, color, print_entityIndex)
     , level_(level)
   {
   }

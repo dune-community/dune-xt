@@ -50,8 +50,8 @@ public:
 
 
 template <class EntityType>
-void printEntity(const EntityType& entity, const std::string name = Common::Typename<EntityType>::value(),
-                 std::ostream& out = std::cout, const std::string prefix = "")
+void print_entity(const EntityType& entity, const std::string name = Common::Typename<EntityType>::value(),
+                  std::ostream& out = std::cout, const std::string prefix = "")
 {
   if (!name.empty())
     out << prefix << name << ":\n";
@@ -59,7 +59,7 @@ void printEntity(const EntityType& entity, const std::string name = Common::Type
   for (auto ii : Common::value_range(geometry.corners()))
     out << prefix + "  "
         << "corner " + Common::to_string(ii) << " = " << geometry.corner(ii) << "\n";
-} // ... printEntity(...)
+} // ... print_entity(...)
 
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
