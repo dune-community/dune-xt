@@ -13,6 +13,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #if HAVE_DUNE_GRID
+#include <dune/grid/common/rangegenerators.hh>
 #include <dune/grid/yaspgrid.hh>
 #endif
 
@@ -87,7 +88,7 @@ TYPED_TEST(DifferenceFunctionTest, evaluate_check)
   auto grid_ptr = this->create_grid();
   auto func     = this->create(1.0, 2.0);
   //  func->visualize(grid_ptr->leafGridView(), "foo");
-  for (const auto& entity : Stuff::Common::entityRange(grid_ptr->leafGridView())) {
+  for (auto&& entity : elements(grid_ptr->leafGridView())) {
     const auto local_func  = func->local_function(entity);
     const auto& quadrature = QuadratureRules<double, TypeParam::value>::rule(
         entity.type(), boost::numeric_cast<int>(local_func->order() + 2));

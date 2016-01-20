@@ -13,6 +13,8 @@
 #include <type_traits>
 #include <memory>
 
+#include <dune/grid/common/rangegenerators.hh>
+
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/test/gtest/gtest.h>
@@ -67,7 +69,7 @@ protected:
   void dynamic_interface_check(const FunctionImp& func, GridType& grid) const
   {
 #if HAVE_DUNE_GRID
-    for (const auto& entity : Common::entityRange(grid.leafGridView()))
+    for (auto&& entity : elements(grid.leafGridView()))
       std::unique_ptr<LocalfunctionType> local_func = func.local_function(entity);
 #endif
     std::string tp = func.type();
