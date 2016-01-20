@@ -34,9 +34,6 @@
 #include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/common/vector.hh>
 
-#include <dune/xt/functions.hh>
-#include <dune/xt/functions/interfaces.hh>
-
 namespace Dune {
 namespace XT {
 namespace Grid {
@@ -197,37 +194,10 @@ public:
   } // ... default_config(...)
 }; // class NormalBased
 
-class FunctionBased
-{
-public:
-  static const std::string static_id()
-  {
-    return internal::boundary_info_static_id() + ".functionbased";
-  }
-
-  static Common::Configuration default_config(const std::string sub_name = "")
-  {
-    Common::Configuration config("type", static_id());
-    config["default"]                       = "dirichlet";
-    config["dirichlet.function.type"]       = "stuff.function.constant";
-    config["dirichlet.function.expression"] = "1";
-    config["dirichlet.value_range.1"]       = "[0 0.1]";
-    config["neumann.function.type"]         = "stuff.function.constant";
-    config["neumann.function.expression"]   = "1";
-    config["neumann.value_range.1"] = "[0 0.1]";
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-}; // class FunctionBased
 
 } // namespace BoundaryInfoConfigs
-
 namespace BoundaryInfos {
+
 
 template <class IntersectionImp>
 class AllDirichlet : public XT::Grid::BoundaryInfoInterface<IntersectionImp>
@@ -582,151 +552,6 @@ private:
   const DomainFieldType tol_;
 }; // class NormalBased
 
-template <class IntersectionImp>
-class FunctionBased : public BoundaryInfoInterface<IntersectionImp>
-{
-  typedef BoundaryInfoInterface<IntersectionImp> BaseType;
-  typedef FunctionBased<IntersectionImp> ThisType;
-
-public:
-  using typename BaseType::IntersectionType;
-  using typename BaseType::DomainFieldType;
-  using typename BaseType::DomainType;
-  using BaseType::dimDomain;
-
-private:
-  typedef typename IntersectionType::Entity EntityType;
-  typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, double, 1> FunctionType;
-
-public:
-  static const std::string static_id()
-  {
-    return BoundaryInfoConfigs::FunctionBased::static_id();
-  }
-
-  static Common::Configuration default_config(const std::string sub_name = "")
-  {
-    return BoundaryInfoConfigs::FunctionBased::default_config(sub_name);
-  }
-
-private:
-  static std::vector<Common::FieldVector<double, 2>>
-  get_value_range(const Common::Configuration& cfg, const Common::Configuration& default_cfg, const std::string& id)
-  {
-    auto logger = Common::TimedLogger().get("stuff.grid.boundaryinfo.get_value_range");
-    std::vector<Common::FieldVector<double, 2>> value_range;
-    if (cfg.has_key(id) && !cfg.has_sub(id))
-      value_range.push_back(cfg.get<Common::FieldVector<double, 2>>(id));
-    else {
-      Common::Configuration sub_cfg = cfg.has_sub(id) ? cfg.sub(id) : default_cfg.sub(id);
-      size_t counter = 0;
-      while (sub_cfg.has_key(Common::to_string(counter))) {
-        value_range.push_back(sub_cfg.get<Common::FieldVector<double, 2>>(Common::to_string(counter)));
-        ++counter;
-      }
-    }
-    logger.debug() << "found " << value_range.size() << " value ranges for id '" << id << "'" << std::endl;
-    return value_range;
-  } // ... get_value_range(...)
-
-public:
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
-  {
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    // get default
-    const std::string default_type = cfg.get("default", default_cfg.get<std::string>("default"));
-    if (default_type != "dirichlet" && default_type != "neumann")
-      DUNE_THROW(Exceptions::configuration_error, "Wrong default '" << default_type << "' given!");
-    const bool default_to_dirichlet = default_type == "dirichlet";
-    // create
-    typedef FunctionsProvider<EntityType, DomainFieldType, dimDomain, double, 1> FunctionProviderType;
-    return Common::make_unique<ThisType>(
-        default_to_dirichlet,
-        FunctionProviderType::create(cfg.has_sub("dirichlet.function") ? cfg.sub("dirichlet.function")
-                                                                       : default_cfg.sub("dirichlet.function")),
-        FunctionProviderType::create(cfg.has_sub("dirichlet.function") ? cfg.sub("dirichlet.function")
-                                                                       : default_cfg.sub("dirichlet.function")),
-        get_value_range(cfg, default_cfg, "dirichlet.value_range"),
-        get_value_range(cfg, default_cfg, "neumann.value_range"));
-  } // ... create(...)
-
-  FunctionBased(const bool default_is_dirichlet, std::shared_ptr<const FunctionType> dirichlet_function,
-                std::shared_ptr<const FunctionType> neumann_function,
-                const std::vector<Common::FieldVector<double, 2>>& dirichlet_value_range,
-                const std::vector<Common::FieldVector<double, 2>>& neumann_value_range)
-    : default_is_dirichlet_(default_is_dirichlet)
-    , dirichlet_function_(dirichlet_function)
-    , neumann_function_(neumann_function)
-    , dirichlet_value_range_(dirichlet_value_range)
-    , neumann_value_range_(neumann_value_range)
-  {
-  }
-
-  virtual ~FunctionBased() throw()
-  {
-  }
-
-  virtual bool dirichlet(const IntersectionType& intersection) const override final
-  {
-    if (!intersection.boundary())
-      return false;
-    const auto entity_ptr = intersection.inside();
-    const auto& entity    = *entity_ptr;
-    const auto xx_global  = intersection.geometry().center();
-    const auto xx_entity  = entity.geometry().local(xx_global);
-    auto logger = Common::TimedLogger().get("stuff.grid.boundaryinfo.dirichlet");
-    logger.debug() << "xx_global = " << xx_global << std::endl;
-    logger.debug() << "xx_entity = " << xx_entity << std::endl;
-    const auto local_dirichlet_function = dirichlet_function_->local_function(entity);
-    const auto local_neumann_function = neumann_function_->local_function(entity);
-    for (const auto& value_range : dirichlet_value_range_)
-      if (matches(*local_dirichlet_function, value_range, xx_entity))
-        return true;
-    for (const auto& value_range : neumann_value_range_)
-      if (matches(*local_neumann_function, value_range, xx_entity))
-        return false;
-    return default_is_dirichlet_;
-  } // ... dirichlet(...)
-
-  virtual bool neumann(const IntersectionType& intersection) const override final
-  {
-    if (!intersection.boundary())
-      return false;
-    const auto entity_ptr               = intersection.inside();
-    const auto& entity                  = *entity_ptr;
-    const auto xx_global                = intersection.geometry().center();
-    const auto xx_entity                = entity.geometry().local(xx_global);
-    const auto local_dirichlet_function = dirichlet_function_->local_function(entity);
-    const auto local_neumann_function = neumann_function_->local_function(entity);
-    for (const auto& value_range : neumann_value_range_)
-      if (matches(*local_neumann_function, value_range, xx_entity))
-        return true;
-    for (const auto& value_range : dirichlet_value_range_)
-      if (matches(*local_dirichlet_function, value_range, xx_entity))
-        return false;
-    return !default_is_dirichlet_;
-  } // ... neumann(...)
-
-private:
-  bool matches(const typename FunctionType::LocalfunctionType& local_function,
-               const Common::FieldVector<double, 2>& value_range, const DomainType& xx) const
-  {
-    auto logger      = Common::TimedLogger().get("stuff.grid.boundaryinfo.matches");
-    const auto value = local_function.evaluate(xx)[0];
-    bool does = Common::FloatCmp::ge(value, value_range[0]) && Common::FloatCmp::le(value, value_range[1]);
-    logger.debug() << "value = " << value << std::endl;
-    logger.debug() << "match: " << does << std::endl;
-    return does;
-  }
-
-  const bool default_is_dirichlet_;
-  const std::shared_ptr<const FunctionType> dirichlet_function_;
-  const std::shared_ptr<const FunctionType> neumann_function_;
-  const std::vector<Common::FieldVector<double, 2>> dirichlet_value_range_;
-  const std::vector<Common::FieldVector<double, 2>> neumann_value_range_;
-}; // class FunctionBased
 
 } // namespace BoundaryInfos
 
@@ -746,8 +571,6 @@ public:
                                                        ,
           BoundaryInfos::IdBased<I>::static_id()
 #endif
-              ,
-          BoundaryInfos::NormalBased<I>::static_id(), BoundaryInfos::FunctionBased<I>::static_id()
     };
   } // ... available(...)
 
@@ -764,8 +587,6 @@ public:
 #endif
     else if (type == BoundaryInfos::NormalBased<I>::static_id())
       return BoundaryInfos::NormalBased<I>::default_config(subname);
-    else if (type == BoundaryInfos::FunctionBased<I>::static_id())
-      return BoundaryInfos::FunctionBased<I>::default_config(subname);
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
@@ -790,8 +611,6 @@ public:
 #endif
     else if (type == BoundaryInfos::NormalBased<I>::static_id())
       return BoundaryInfos::NormalBased<I>::create(config);
-    else if (type == BoundaryInfos::FunctionBased<I>::static_id())
-      return BoundaryInfos::FunctionBased<I>::create(config);
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
