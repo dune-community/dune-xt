@@ -1,10 +1,10 @@
-// This file is part of the dune-stuff project:
-//   https://github.com/wwu-numerik/dune-stuff
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 // Authors:
 //   Andreas Buhr    (2014)
-//   Felix Schindler (2013 - 2015)
+//   Felix Schindler (2013 - 2016)
 //   Rene Milk       (2012 - 2013, 2015)
 //   Tobias Leibner  (2014)
 

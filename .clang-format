@@ -1,3 +1,11 @@
+# This file is part of the dune-xt-grid project:
+#   https://github.com/dune-community/dune-xt-grid
+# The copyright lies with the authors of this file (see below).
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+# Authors:
+#   Felix Schindler (2016)
+#   Rene Milk       (2011)
+#
 # http://llvm.org/releases/3.7.0/tools/clang/docs/ClangFormatStyleOptions.html
 AlignAfterOpenBracket: true
 AlignConsecutiveAssignments: true
