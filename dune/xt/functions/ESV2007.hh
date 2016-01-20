@@ -23,7 +23,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/debug.hh>
 #include <dune/xt/common/ranges.hh>
-#include <dune/xt/la/container/eigen.hh>
+//#include <dune/xt/la/container/eigen.hh>
 
 #include "interfaces.hh"
 
@@ -477,29 +477,31 @@ class Cutoff
     {
       static RangeFieldType min_eigenvalue_of(const DT& diffusion_tensor, const EntityType& ent)
       {
-#if !HAVE_EIGEN
-        static_assert(AlwaysFalse<DT>::value, "You are missing eigen!");
-#else
-        const auto local_diffusion_tensor = diffusion_tensor.local_function(ent);
-        assert(local_diffusion_tensor->order() == 0);
-        const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(ent.type());
-        const Stuff::LA::EigenDenseMatrix<RangeFieldType> tensor =
-            local_diffusion_tensor->evaluate(reference_element.position(0, 0));
-        ::Eigen::EigenSolver<typename Stuff::LA::EigenDenseMatrix<RangeFieldType>::BackendType> eigen_solver(
-            tensor.backend());
-        assert(eigen_solver.info() == ::Eigen::Success);
-        const auto eigenvalues = eigen_solver.eigenvalues(); // <- this should be an Eigen vector of std::complex
+        //#if !HAVE_EIGEN
+        //        static_assert(AlwaysFalse<DT>::value, "You are missing eigen!");
+        //#else
+        //        const auto local_diffusion_tensor = diffusion_tensor.local_function(ent);
+        //        assert(local_diffusion_tensor->order() == 0);
+        //        const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(ent.type());
+        //        const LA::EigenDenseMatrix<RangeFieldType> tensor =
+        //            local_diffusion_tensor->evaluate(reference_element.position(0, 0));
+        //        ::Eigen::EigenSolver<typename LA::EigenDenseMatrix<RangeFieldType>::BackendType> eigen_solver(
+        //            tensor.backend());
+        DUNE_THROW(NotImplemented, "missing LA");
+        //        assert(eigen_solver.info() == ::Eigen::Success);
+        //        const auto eigenvalues = eigen_solver.eigenvalues(); // <- this should be an Eigen vector of
+        //        std::complex
         RangeFieldType min_ev = std::numeric_limits<RangeFieldType>::max();
-        for (size_t ii = 0; ii < boost::numeric_cast<size_t>(eigenvalues.size()); ++ii) {
-          // assert this is real
-          assert(std::abs(eigenvalues[ii].imag()) < 1e-15);
-          // assert that this eigenvalue is positive
-          const RangeFieldType eigenvalue = eigenvalues[ii].real();
-          assert(eigenvalue > 1e-15);
-          min_ev = std::min(min_ev, eigenvalue);
-        }
+        //        for (size_t ii = 0; ii < boost::numeric_cast<size_t>(eigenvalues.size()); ++ii) {
+        //          // assert this is real
+        //          assert(std::abs(eigenvalues[ii].imag()) < 1e-15);
+        //          // assert that this eigenvalue is positive
+        //          const RangeFieldType eigenvalue = eigenvalues[ii].real();
+        //          assert(eigenvalue > 1e-15);
+        //          min_ev = std::min(min_ev, eigenvalue);
+        //        }
         return min_ev;
-#endif // HAVE_EIGEN
+        //#endif  // HAVE_EIGEN
       } // ... min_eigenvalue_of_(...)
     }; // class Compute< ..., d, d >
 
