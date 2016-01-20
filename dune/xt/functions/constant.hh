@@ -13,12 +13,12 @@
 
 #include <memory>
 
-#include <dune/stuff/common/configuration.hh>
+#include <dune/xt/common/configuration.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 namespace internal {
 
@@ -219,7 +219,7 @@ private:
 };
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_CONSTANT_HH

@@ -1,16 +1,16 @@
-// This file is part of the dune-stuff project:
-//   https://github.com/wwu-numerik/dune-stuff
+// This file is part of the dune-xt-functions project:
+//   https://github.com/dune-community/dune-xt-functions
 // The copyright lies with the authors of this file (see below).
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 // Authors:
 //   Felix Schindler (2014 - 2015)
 //   Rene Milk       (2015)
 
-#ifndef DUNE_STUFF_TEST_MAIN_CATCH_EXCEPTIONS
-#define DUNE_STUFF_TEST_MAIN_CATCH_EXCEPTIONS 1
+#ifndef DUNE_XT_COMMON_TEST_MAIN_CATCH_EXCEPTIONS
+#define DUNE_XT_COMMON_TEST_MAIN_CATCH_EXCEPTIONS 1
 #endif
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 
 #include <memory>
 
@@ -22,18 +22,18 @@
 
 #include <dune/geometry/quadraturerules.hh>
 
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/grid/provider/cube.hh>
-#include <dune/stuff/functions/flattop.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/fvector.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/functions/flattop.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/fvector.hh>
 
 #include "functions.hh"
 
 #if HAVE_DUNE_GRID
 
 using namespace Dune;
-using namespace Stuff;
+using namespace Dune::XT;
 
 template <class G>
 class FlatTopFunctionType
@@ -61,7 +61,7 @@ protected:
 
   static std::shared_ptr<GridType> create_grid()
   {
-    return Stuff::Grid::Providers::Cube<GridType>(0, 3, 12).grid_ptr();
+    return XT::Grid::Providers::Cube<GridType>(0, 3, 12).grid_ptr();
   }
 
   template <class P, class V, class L, class R, class D, class E>
@@ -104,13 +104,13 @@ TYPED_TEST(FlatTopFunctionTest, dynamic_interface_check)
 TYPED_TEST(FlatTopFunctionTest, evaluate_check)
 {
   auto grid_ptr = this->create_grid();
-  typedef DSC::FieldVector<double, TypeParam::value> DomainType;
+  typedef FieldVector<double, TypeParam::value> DomainType;
   const DomainType left(1);
   const DomainType right(2);
   const DomainType delta(1e-6);
   const double value = 20;
   typename TestFixture::FunctionType func(left, right, delta, value, "bar");
-  func.visualize(grid_ptr->leafGridView(), "dim_" + DSC::toString(int(TypeParam::value)));
+  func.visualize(grid_ptr->leafGridView(), "dim_" + Common::to_string(int(TypeParam::value)));
   for (const auto& entity : Stuff::Common::entityRange(grid_ptr->leafGridView())) {
     const auto local_func  = func.local_function(entity);
     const auto& quadrature = QuadratureRules<double, TypeParam::value>::rule(

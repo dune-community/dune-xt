@@ -7,15 +7,15 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014)
 
-#include "main.hxx"
-#include "functions.hh"
+#include <dune/xt/test/main.hxx>
+
 
 #include <memory>
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/functions/constant.hh>
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/constant.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
@@ -23,7 +23,12 @@
 #include <dune/grid/alugrid.hh>
 #endif // HAVE_ALUGRID
 
-struct ConstantFunctionTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
+#include "functions.hh"
+
+using namespace Dune;
+using namespace Dune::XT;
+
+struct ConstantFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   virtual void check() const
   {

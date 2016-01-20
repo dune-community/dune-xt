@@ -7,15 +7,15 @@
 //   Rene Milk       (2010, 2012 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 #include "functions.hh"
 
 #include <memory>
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/functions/expression.hh>
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/expression.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
@@ -23,11 +23,14 @@
 #include <dune/grid/alugrid.hh>
 #endif // HAVE_ALUGRID
 
-struct ExpressionFunctionTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
+using namespace Dune;
+using namespace Dune::XT;
+
+struct ExpressionFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   virtual void check() const
   {
-    Dune::Stuff::Common::Configuration config = FunctionType::default_config();
+    Common::Configuration config = FunctionType::default_config();
     const std::unique_ptr<const FunctionType> function(FunctionType::create(config));
     config["expression"] = "[2*x[0] 3*x[0] 4*x[0]; 1 sin(x[0]) 0; cos(x[0]) x[0] 0]";
     config["gradient"]   = "[2 0 0; 0 0 0; -sin(x[0]) 0 0]";

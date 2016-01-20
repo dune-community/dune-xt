@@ -13,13 +13,13 @@
 #include <type_traits>
 #include <memory>
 
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/test/gtest/gtest.h>
-#include <dune/stuff/functions/interfaces.hh>
+#include <dune/xt/common/ranges.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/test/gtest/gtest.h>
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 
 template <class FunctionImp>
 class FunctionTest : public ::testing::Test
@@ -59,8 +59,8 @@ protected:
 
   static void static_create_check()
   {
-    Stuff::Common::Configuration default_cfg = FunctionImp::default_config();
-    std::unique_ptr<FunctionImp> func        = FunctionImp::create(default_cfg);
+    Common::Configuration default_cfg = FunctionImp::default_config();
+    std::unique_ptr<FunctionImp> func = FunctionImp::create(default_cfg);
   } // ... static_create_check(...)
 
   template <class GridType>
@@ -76,7 +76,7 @@ protected:
 
 }; // class FunctionTest
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_TEST_FUNCTIONS_HH

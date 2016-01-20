@@ -13,17 +13,17 @@
 #include <iostream>
 #include <memory>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/color.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/fvector.hh>
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/color.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/type_utils.hh>
 
-#include "checkerboard.hh"
+#include "../checkerboard.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Exceptions {
 
 class spe10_data_file_missing : public Dune::IOError
@@ -102,7 +102,7 @@ public:
     config["filename"]   = internal::model1_filename;
     config["lower_left"] = "[0.0 0.0]";
     config["upper_right"] =
-        "[" + Common::toString(internal::model_1_length_x) + " " + Common::toString(internal::model_1_length_z) + "]";
+        "[" + Common::to_string(internal::model_1_length_x) + " " + Common::to_string(internal::model_1_length_z) + "]";
     config.set("min_value", internal::model1_min_value);
     config.set("max_value", internal::model1_max_value);
     config["name"] = static_id();
@@ -215,7 +215,7 @@ private:
 
 } // namespace Spe10
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_SPE10_HH

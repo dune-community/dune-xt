@@ -17,22 +17,21 @@
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/debug.hh>
-#include <dune/stuff/common/fvector.hh>
-#include <dune/stuff/common/random.hh>
-#include <dune/stuff/grid/information.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/debug.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/random.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 template <size_t dim, class CoordType = double>
 struct Ellipsoid
 {
-  typedef DSC::FieldVector<CoordType, dim> DomainType;
+  typedef FieldVector<CoordType, dim> DomainType;
   DomainType center;
   DomainType radii;
 
@@ -40,11 +39,11 @@ struct Ellipsoid
   {
     const auto shifted = point - center;
     double sum = 0;
-    for (auto ii : DSC::valueRange(dim)) {
+    for (auto ii : Common::value_range(dim)) {
       const auto pii = shifted[ii];
       sum += std::pow(pii, 2) / std::pow(radii[ii], 2);
     }
-    return DSC::FloatCmp::le(sum, 1.);
+    return FloatCmp::le(sum, 1.);
   }
   bool intersects_cube(DomainType /*ll*/, DomainType /*ur*/) const
   {
@@ -93,7 +92,7 @@ public:
       , value_(value)
       , local_ellipsoids_(local_ellipsoids)
     {
-      //      DSC_LOG_DEBUG_0 << "create local LF Ellips with " << local_ellipsoids_.size() << " instances\n";
+      //      DXTC_LOG_DEBUG_0 << "create local LF Ellips with " << local_ellipsoids_.size() << " instances\n";
     }
 
     Localfunction(const Localfunction& /*other*/) = delete;
@@ -112,14 +111,14 @@ public:
       for (const auto& ellipsoid : local_ellipsoids_) {
         if (ellipsoid.contains(xx_global)) {
           ret = value_;
-          //          DSC_LOG_DEBUG_0 << "ell  INSIDE " << ellipsoid.center << " with xx " << xx_global << "\n";
+          //          DXTC_LOG_DEBUG_0 << "ell  INSIDE " << ellipsoid.center << " with xx " << xx_global << "\n";
           return;
         }
       }
       ret = 0;
     }
 
-    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override
+    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -165,7 +164,7 @@ public:
 
   RandomEllipsoidsFunction(const Common::FieldVector<DomainFieldType, dimDomain>& lowerLeft,
                            const Common::FieldVector<DomainFieldType, dimDomain>& upperRight,
-                           const Stuff::Common::Configuration& ellipsoid_cfg, const std::string nm = static_id())
+                           const Common::Configuration& ellipsoid_cfg, const std::string nm = static_id())
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
     , name_(nm)
@@ -174,7 +173,7 @@ public:
     typedef unsigned long UL;
     const UL level_0_count = ellipsoid_cfg.get("ellipsoids.count", 10);
     const UL max_depth     = ellipsoid_cfg.get("ellipsoids.recursion_depth", 1);
-    const UL children      = ellipsoid_cfg.get<UL>("ellipsoids.children", 3u); //, DSC::ValidateLess<UL>(0));
+    const UL children      = ellipsoid_cfg.get<UL>("ellipsoids.children", 3u); //, ValidateLess<UL>(0));
     const UL total_count = level_0_count + level_0_count * std::pow(children, max_depth + 1);
     ellipsoids_.resize(level_0_count);
     ellipsoids_.reserve(total_count);
@@ -182,13 +181,13 @@ public:
     const auto min_radius         = ellipsoid_cfg.get("ellipsoids.min_radius", 0.01);
     const auto max_radius         = ellipsoid_cfg.get("ellipsoids.max_radius", 0.02);
     const auto child_displacement = ellipsoid_cfg.get("ellipsoids.max_child_displacement", max_radius);
-    typedef DSC::DefaultRNG<DomainFieldType> RNG;
+    typedef Common::DefaultRNG<DomainFieldType> RNG;
     RNG center_rng(0, 1, seed);
     RNG radii_rng(min_radius, max_radius, seed);
     RNG dist_rng(min_radius, child_displacement, seed);
     RNG sign_rng(-1, 1, seed);
 
-    const auto parent_range = DSC::valueRange(0ul, level_0_count);
+    const auto parent_range = Common::value_range(0ul, level_0_count);
     for (auto ii : parent_range) {
       std::generate(
           ellipsoids_[ii].center.begin(), ellipsoids_[ii].center.end(), [&center_rng]() { return center_rng(); });
@@ -198,13 +197,13 @@ public:
     std::function<void(UL, const EllipsoidType&)> recurse_add = [&](UL current_level, const EllipsoidType& parent) {
       if (current_level > max_depth)
         return;
-      for (const auto unused_counter : DSC::valueRange(children)) {
+      for (const auto unused_counter : Common::value_range(children)) {
         EllipsoidType child = parent;
         const double scale  = std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
         const auto displace = [&](DomainFieldType& coord) {
-          const auto disp   = dist_rng() * DSC::signum(sign_rng());
+          const auto disp   = dist_rng() * signum(sign_rng());
           coord += disp;
-          DSC_LOG_DEBUG_0 << disp << ";";
+          DXTC_LOG_DEBUG_0 << disp << ";";
         };
         std::for_each(child.center.begin(), child.center.end(), displace);
         std::generate(child.radii.begin(), child.radii.end(), [&radii_rng, scale]() { return radii_rng() * scale; });
@@ -216,8 +215,8 @@ public:
     for (auto ii : parent_range) {
       recurse_add(0, ellipsoids_[ii]);
     }
-    DSC_LOG_DEBUG_0 << "generated " << ellipsoids_.size() << " of " << total_count << "\n";
-    to_file(*DSC::make_ofstream("ellipsoids.txt"));
+    DXTC_LOG_DEBUG_0 << "generated " << ellipsoids_.size() << " of " << total_count << "\n";
+    to_file(*Common::make_ofstream("ellipsoids.txt"));
   }
 
   RandomEllipsoidsFunction(const ThisType& other) = default;
@@ -253,15 +252,15 @@ private:
   bounding_box(const EntityType& entity) const
   {
     typename EllipsoidType::DomainType ll, ur;
-    typedef Dune::Stuff::Common::MinMaxAvg<DomainFieldType> MinMaxAvgType;
+    typedef Common::MinMaxAvg<DomainFieldType> MinMaxAvgType;
     std::array<MinMaxAvgType, dimDomain> coord_limits;
     const auto& geo = entity.geometry();
-    for (auto i : DSC::valueRange(geo.corners())) {
+    for (auto i : Common::value_range(geo.corners())) {
       const auto& corner(geo.corner(i));
       for (size_t k = 0; k < dimDomain; ++k)
         coord_limits[k](corner[k]);
     }
-    for (auto ii : DSC::valueRange(dimDomain)) {
+    for (auto ii : Common::value_range(dimDomain)) {
       ll[ii] = coord_limits[ii].min();
       ur[ii] = coord_limits[ii].max();
 
@@ -282,9 +281,9 @@ public:
     std::vector<EllipsoidType> local_ellipsoids;
     for (const auto& ellipsoid : ellipsoids_) {
       bool inside = true;
-      for (auto ii : DSC::valueRange(dimDomain)) {
-        inside = inside && DSC::FloatCmp::ge(ellipsoid.center[ii], ll[ii]);
-        inside = inside && DSC::FloatCmp::le(ellipsoid.center[ii], ur[ii]);
+      for (auto ii : Common::value_range(dimDomain)) {
+        inside = inside && FloatCmp::ge(ellipsoid.center[ii], ll[ii]);
+        inside = inside && FloatCmp::le(ellipsoid.center[ii], ur[ii]);
       }
       if (inside) {
         local_ellipsoids.push_back(ellipsoid);
@@ -298,12 +297,12 @@ private:
   const Common::FieldVector<DomainFieldType, dimDomain> lowerLeft_;
   const Common::FieldVector<DomainFieldType, dimDomain> upperRight_;
   const std::string name_;
-  const Stuff::Common::Configuration ellipsoid_cfg_;
+  const Common::Configuration ellipsoid_cfg_;
   std::vector<EllipsoidType> ellipsoids_;
 }; // class RandomEllipsoidsFunction
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH

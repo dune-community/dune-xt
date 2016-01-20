@@ -11,16 +11,16 @@
 #include <iostream>
 #include <memory>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/color.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/fvector.hh>
-#include <dune/stuff/common/type_utils.hh>
-#include <dune/stuff/functions/global.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/color.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/functions/global.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 namespace Spe10 {
 
@@ -29,16 +29,16 @@ namespace Spe10 {
  *
  */
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
-class Model2 : public Stuff::GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>
+class Model2 : public GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>
 {
   static_assert(r == rC, "");
   static_assert(dim_domain == rC, "");
   static_assert(dim_domain == 3, "");
-  typedef Stuff::GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC> BaseType;
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC> BaseType;
 
 public:
   Model2(std::string data_filename = "perm_case2a.dat",
-         DSC::FieldVector<double, dim_domain> upper_right = default_upper_right)
+         Common::FieldVector<double, dim_domain> upper_right = default_upper_right)
     : deltas_{{upper_right[0] / num_elements[0], upper_right[1] / num_elements[1], upper_right[2] / num_elements[2]}}
     , permeability_(nullptr)
     , permMatrix_(0.0)
@@ -47,9 +47,9 @@ public:
     readPermeability();
   }
 
-  static const DSC::FieldVector<double, dim_domain> default_upper_right;
+  static const Common::FieldVector<double, dim_domain> default_upper_right;
   // unsigned int mandated by CubeGrid provider
-  static const DSC::FieldVector<unsigned int, dim_domain> num_elements;
+  static const Common::FieldVector<unsigned int, dim_domain> num_elements;
 
   virtual ~Model2()
   {
@@ -63,12 +63,12 @@ public:
   {
 
     if (!permeability_) {
-      DSC_LOG_ERROR_0 << "The SPE10-permeability data file could not be opened. This file does\n"
-                      << "not come with the dune-multiscale repository due to file size. To download it\n"
-                      << "execute\n"
-                      << "wget http://www.spe.org/web/csp/datasets/por_perm_case2a.zip\n"
-                      << "unzip the file and move the file 'spe_perm.dat' to\n"
-                      << "dune-multiscale/dune/multiscale/problems/spe10_permeability.dat!\n";
+      DXTC_LOG_ERROR_0 << "The SPE10-permeability data file could not be opened. This file does\n"
+                       << "not come with the dune-multiscale repository due to file size. To download it\n"
+                       << "execute\n"
+                       << "wget http://www.spe.org/web/csp/datasets/por_perm_case2a.zip\n"
+                       << "unzip the file and move the file 'spe_perm.dat' to\n"
+                       << "dune-multiscale/dune/multiscale/problems/spe10_permeability.dat!\n";
       DUNE_THROW(IOError, "Data file for Groundwaterflow permeability could not be opened!");
     }
 
@@ -116,14 +116,14 @@ private:
 };
 
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
-const DSC::FieldVector<unsigned int, dim_domain>
+const Common::FieldVector<unsigned int, dim_domain>
     Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::num_elements{{60, 220, 85}};
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
-const DSC::FieldVector<double, dim_domain>
+const Common::FieldVector<double, dim_domain>
     Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::default_upper_right{{1, 3.667, 1.417}};
 } // namespace Spe10
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_SPE10MODEL2_HH

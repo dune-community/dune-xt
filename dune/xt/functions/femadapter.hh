@@ -10,14 +10,13 @@
 #ifndef DUNE_XT_FUNCTIONS_FEMADAPTER
 #define DUNE_XT_FUNCTIONS_FEMADAPTER
 
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/common/memory.hh>
-#include <dune/stuff/aliases.hh>
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/common/memory.hh>
 
 #if HAVE_DUNE_FEM
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 template <class DiscreteFunctionType>
@@ -113,7 +112,7 @@ public:
   //! this intentionally hides
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const
   {
-    return DSC::make_unique<Localfunction>(df_, entity);
+    return Common::make_unique<Localfunction>(df_, entity);
   } // ... local_function(...)
 
 private:
@@ -121,7 +120,7 @@ private:
 }; // class Checkerboard
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // if HAVE_DUNE_FEM

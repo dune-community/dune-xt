@@ -16,13 +16,13 @@
 
 #include <dune/common/typetraits.hh>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/memory.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/memory.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 namespace internal {
 
@@ -220,7 +220,7 @@ public:
   {
     typedef DerivedLocalFunction<FunctionType, derivative> RealLocalFunctionType;
     assert(func_);
-    return DSC::make_unique<RealLocalFunctionType>(func_->storage_access(), entity);
+    return Common::make_unique<RealLocalFunctionType>(func_->storage_access(), entity);
   } // ... local_function(...)
 
   virtual ThisType* copy() const
@@ -271,7 +271,7 @@ std::shared_ptr<Divergence<T>> make_divergence(std::shared_ptr<T> func, Args&&..
 }
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_DERIVED_HH

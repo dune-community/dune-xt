@@ -16,12 +16,12 @@
 #include <dune/grid/io/file/vtk/function.hh>
 #endif
 
-#include <dune/stuff/common/float_cmp.hh>
+#include <dune/xt/common/float_cmp.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 #if HAVE_DUNE_GRID
@@ -109,7 +109,7 @@ private:
 #endif // HAVE_DUNE_GRID
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_VISUALIZATION_HH

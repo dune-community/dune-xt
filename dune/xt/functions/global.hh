@@ -13,11 +13,11 @@
 
 #include <functional>
 
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/common/memory.hh>
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/common/memory.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 
 /**
  * Global-valued function you can pass a lambda expression to that gets evaluated
@@ -38,7 +38,7 @@ private:
   typedef std::function<RangeType(DomainType)> LambdaType;
 
 public:
-  GlobalLambdaFunction(LambdaType lambda, const size_t order_in, const std::string nm = "stuff.globallambdafunction")
+  GlobalLambdaFunction(LambdaType lambda, const size_t order_in, const std::string nm = "globallambdafunction")
     : lambda_(lambda)
     , order_(order_in)
     , name_(nm)
@@ -62,7 +62,7 @@ public:
 
   virtual std::string type() const override
   {
-    return "stuff.globallambdafunction";
+    return "globallambdafunction";
   }
 
   virtual std::string name() const override
@@ -76,7 +76,7 @@ private:
   const std::string name_;
 };
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_GLOBAL_HH

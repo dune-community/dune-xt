@@ -14,8 +14,8 @@
 #include <vector>
 #include <memory>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
 
 #include "functions/interfaces.hh"
 #include "functions/checkerboard.hh"
@@ -24,10 +24,10 @@
 #include "functions/ESV2007.hh"
 #include "functions/flattop.hh"
 #include "functions/indicator.hh"
-#include "functions/spe10.hh"
+#include "functions/spe10/model1.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 
 /**
  * \note If you want to add a new function FooBar, do the following: provide a definition that is available for all
@@ -69,13 +69,13 @@ private:
 
     static Common::Configuration default_config(const std::string /*sub_name*/)
     {
-      DUNE_THROW(Stuff::Exceptions::internal_error, "This should not happen!");
+      DUNE_THROW(Common::Exceptions::internal_error, "This should not happen!");
       return Common::Configuration(0);
     }
 
     static std::unique_ptr<FunctionType> create(const Common::Configuration& /*cfg*/)
     {
-      DUNE_THROW(Stuff::Exceptions::internal_error, "This should not happen!");
+      DUNE_THROW(Common::Exceptions::internal_error, "This should not happen!");
       return std::unique_ptr<FunctionType>(nullptr);
     }
   }; // struct Call
@@ -187,14 +187,14 @@ public:
     else if (call_compare<Spe10Model1Type>(type))
       return call_default_config<Spe10Model1Type>(sub_name);
     else if (available().empty())
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(d) << " -> "
                                 << size_t(r)
                                 << " x "
                                 << size_t(rC)
                                 << "!");
     else
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(d) << " -> "
                                     << size_t(r)
                                     << " x "
@@ -223,14 +223,14 @@ public:
     else if (call_compare<Spe10Model1Type>(type))
       return call_create<Spe10Model1Type>(cfg);
     else if (available().empty())
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(d) << " -> "
                                 << size_t(r)
                                 << " x "
                                 << size_t(rC)
                                 << "!");
     else
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(d) << " -> "
                                     << size_t(r)
                                     << " x "
@@ -242,12 +242,12 @@ public:
   static std::unique_ptr<InterfaceType> create(const Common::Configuration& cfg)
   {
     if (!cfg.has_key("type"))
-      DUNE_THROW(Exceptions::wrong_input_given, "Missing 'type' in given cfg (see below)!\n\n" << cfg);
+      DUNE_THROW(Common::Exceptions::wrong_input_given, "Missing 'type' in given cfg (see below)!\n\n" << cfg);
     return create(cfg.get<std::string>("type"), cfg);
   }
 }; // class FunctionsProvider
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_HH

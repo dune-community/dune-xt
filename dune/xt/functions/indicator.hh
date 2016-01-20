@@ -13,17 +13,17 @@
 #include <vector>
 #include <utility>
 
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/type_utils.hh>
 
-#include <dune/stuff/common/fvector.hh>
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/memory.hh>
-#include <dune/stuff/common/configuration.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/memory.hh>
+#include <dune/xt/common/configuration.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
@@ -124,8 +124,8 @@ public:
     DomainType tmp_lower;
     DomainType tmp_upper;
     size_t cc = 0;
-    while (cfg.has_sub(DSC::toString(cc))) {
-      const Stuff::Common::Configuration local_cfg = cfg.sub(DSC::toString(cc));
+    while (cfg.has_sub(Common::to_string(cc))) {
+      const Common::Configuration local_cfg = cfg.sub(Common::to_string(cc));
       if (local_cfg.has_key("domain") && local_cfg.has_key("value")) {
         auto domains = local_cfg.get<FieldMatrix<DomainFieldType, d, 2>>("domain");
         for (size_t dd = 0; dd < d; ++dd) {
@@ -187,7 +187,7 @@ private:
 }; // class Indicator
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_INDICATOR_HH

@@ -6,15 +6,15 @@
 //   Felix Schindler (2015)
 //   Rene Milk       (2015)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 #include "functions.hh"
 
 #include <memory>
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/functions/ESV2007.hh>
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/ESV2007.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
@@ -22,7 +22,10 @@
 #include <dune/grid/alugrid.hh>
 #endif // HAVE_ALUGRID
 
-struct ESV2007FunctionTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
+using namespace Dune;
+using namespace Dune::XT;
+
+struct ESV2007FunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   virtual void check() const
   {

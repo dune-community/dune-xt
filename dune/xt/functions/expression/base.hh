@@ -14,22 +14,23 @@
 
 #include <sstream>
 #include <vector>
+#include <mutex>
 
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/common/string.hh>
-#include <dune/stuff/common/color.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/color.hh>
 
 #include "mathexpr.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 /**
- *  \brief base class that makes a function out of the stuff from mathexpr.hh
+ *  \brief base class that makes a function out of the from mathexpr.hh
  *  \attention  Most surely you do not want to use this class directly, but Functions::Expression!
  */
 template <class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
@@ -147,7 +148,7 @@ public:
       ret[ii] = op_[ii]->Val();
   }
 
-  void report(const std::string _name = "dune.stuff.function.mathexpressionbase", std::ostream& stream = std::cout,
+  void report(const std::string _name = "function.mathexpressionbase", std::ostream& stream = std::cout,
               const std::string& _prefix = "") const
   {
     const std::string tmp = _name + "(" + variable() + ") = ";
@@ -156,7 +157,7 @@ public:
       stream << expression()[0] << std::endl;
     else {
       stream << "[ " << expression()[0] << std::endl;
-      const std::string whitespace = Dune::Stuff::Common::whitespaceify(tmp + "[ ");
+      const std::string whitespace = Common::whitespaceify(tmp + "[ ");
       for (size_t i = 1; i < expression().size() - 1; ++i)
         stream << _prefix << whitespace << expression()[i] << std::endl;
       stream << _prefix << whitespace << expression()[expression().size() - 1] << " ]" << std::endl;
@@ -171,8 +172,7 @@ private:
     // set expressions
     if (_expression.size() < dimRange)
       DUNE_THROW(Dune::InvalidStateException,
-                 "\n" << Dune::Stuff::Common::colorStringRed("ERROR:") << " '_expression' too short (is "
-                      << _expression.size()
+                 "\n" << Common::color_string_red("ERROR:") << " '_expression' too short (is " << _expression.size()
                       << ", should be "
                       << dimRange
                       << ")!");
@@ -220,7 +220,7 @@ private:
 }; // class MathExpressionBase
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH

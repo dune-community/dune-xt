@@ -17,16 +17,16 @@
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/parallel/threadstorage.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/parallel/threadstorage.hh>
 
 #include "expression/base.hh"
 #include "interfaces.hh"
 #include "default.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
@@ -85,7 +85,7 @@ public:
     // try to get expression as FieldVector (if dimRangeCols == 1) or as FieldMatrix (else)
     try {
       get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
-    } catch (Exceptions::conversion_error) {
+    } catch (Common::Exceptions::conversion_error) {
       // if dimRangeCols == 1 and we could not get expression as FieldVector, get it as FieldMatrix with one col
       if (dimRangeCols == 1) { // the 2 in ChooseVariant is here on purpose, anything > 1 will suffice
         get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<2>());
@@ -215,16 +215,16 @@ public:
   {
     evaluate_helper(xx, ret, internal::ChooseVariant<dimRangeCols>());
 #ifndef NDEBUG
-#ifndef DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < dimRange; ++rr) {
       *tmp_row_ = ret[rr];
       for (size_t cc = 0; cc < dimRangeCols; ++cc) {
-        if (DSC::isnan(tmp_row_->operator[](cc))) {
+        if (isnan(tmp_row_->operator[](cc))) {
           failure    = true;
           error_type = "NaN";
-        } else if (DSC::isinf(tmp_row_->operator[](cc))) {
+        } else if (isinf(tmp_row_->operator[](cc))) {
           failure    = true;
           error_type = "inf";
         } else if (std::abs(tmp_row_->operator[](cc)) > (0.9 * std::numeric_limits<double>::max())) {
@@ -232,7 +232,7 @@ public:
           error_type = "an unlikely value";
         }
         if (failure)
-          DUNE_THROW(Stuff::Exceptions::internal_error,
+          DUNE_THROW(Common::Exceptions::internal_error,
                      "evaluating this function yielded "
                          << error_type
                          << "!\n"
@@ -248,10 +248,10 @@ public:
                          << "The result was:                       "
                          << tmp_row_->operator[](cc)
                          << "\n\n"
-                         << "You can disable this check by defining DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
+                         << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
       }
     }
-#endif // DUNE_STUFF_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
   } // ... evaluate(...)
 
@@ -365,7 +365,7 @@ private:
     // create vector of gradient keys
     std::vector<std::string> gradient_keys(1, first_gradient_key);
     for (size_t cc = 1; cc < dimRangeCols; ++cc)
-      gradient_keys.emplace_back("gradient." + DSC::toString(cc));
+      gradient_keys.emplace_back("gradient." + Common::to_string(cc));
     // get gradient as FieldMatrix for every key
     for (std::string key : gradient_keys) {
       ExpressionStringVectorType gradient_as_vectors_component;
@@ -385,13 +385,13 @@ private:
   std::shared_ptr<const MathExpressionFunctionType> function_;
   size_t order_;
   std::string name_;
-  mutable typename DS::PerThreadValue<FieldVector<RangeFieldType, dimRange * dimRangeCols>> tmp_vector_;
-  mutable typename DS::PerThreadValue<FieldVector<RangeFieldType, dimRangeCols>> tmp_row_;
+  mutable typename Common::PerThreadValue<FieldVector<RangeFieldType, dimRange * dimRangeCols>> tmp_vector_;
+  mutable typename Common::PerThreadValue<FieldVector<RangeFieldType, dimRangeCols>> tmp_row_;
   std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
 }; // class Expression
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_HH

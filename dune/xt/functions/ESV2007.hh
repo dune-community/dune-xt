@@ -20,15 +20,15 @@
 
 #include <dune/geometry/referenceelements.hh>
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/debug.hh>
-#include <dune/stuff/common/ranges.hh>
-#include <dune/stuff/la/container/eigen.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/debug.hh>
+#include <dune/xt/common/ranges.hh>
+#include <dune/xt/la/container/eigen.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 namespace ESV2007 {
 
@@ -320,13 +320,13 @@ class Cutoff<DiffusionType, void>
       return 0;
     }
 
-    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const override final
+    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx), RangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override final
+    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -336,9 +336,9 @@ class Cutoff<DiffusionType, void>
     static DomainFieldType compute_diameter_of_(const EntityType& ent)
     {
       DomainFieldType ret(0);
-      for (auto cc : DSC::valueRange(ent.template count<dimDomain>())) {
+      for (auto cc : Common::value_range(ent.template count<dimDomain>())) {
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
-        for (auto dd : DSC::valueRange(cc + 1, ent.template count<dimDomain>())) {
+        for (auto dd : Common::value_range(cc + 1, ent.template count<dimDomain>())) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
           const auto diff         = vertex - other_vertex;
           ret                     = std::max(ret, diff.two_norm());
@@ -532,13 +532,13 @@ class Cutoff
       return 0;
     }
 
-    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const override final
+    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx), RangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override final
+    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -548,9 +548,9 @@ class Cutoff
     static DomainFieldType compute_diameter_of_(const EntityType& ent)
     {
       DomainFieldType ret(0);
-      for (auto cc : DSC::valueRange(ent.template count<dimDomain>())) {
+      for (auto cc : Common::value_range(ent.template count<dimDomain>())) {
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
-        for (auto dd : DSC::valueRange(cc + 1, ent.template count<dimDomain>())) {
+        for (auto dd : Common::value_range(cc + 1, ent.template count<dimDomain>())) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
           const auto diff         = vertex - other_vertex;
           ret                     = std::max(ret, diff.two_norm());
@@ -613,7 +613,7 @@ private:
 
 } // namespace ESV2007
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_ESV2007_HH

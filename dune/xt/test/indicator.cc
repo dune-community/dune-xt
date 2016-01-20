@@ -6,15 +6,15 @@
 //   Felix Schindler (2015)
 //   Rene Milk       (2015)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 #include "functions.hh"
 
 #include <memory>
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/functions/indicator.hh>
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/indicator.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
@@ -22,7 +22,10 @@
 #include <dune/grid/alugrid.hh>
 #endif // HAVE_ALUGRID
 
-struct IndicatorFunctionTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
+using namespace Dune;
+using namespace Dune::XT;
+
+struct IndicatorFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   void check() const
   {

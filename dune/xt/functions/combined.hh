@@ -15,12 +15,12 @@
 
 #include <dune/common/typetraits.hh>
 
-#include <dune/stuff/common/memory.hh>
+#include <dune/xt/common/memory.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 namespace internal {
 
@@ -380,7 +380,7 @@ public:
     typedef CombinedLocalFunction<LeftType, RightType, comb> RealLocalFunctionType;
     assert(left_);
     assert(right_);
-    return DSC::make_unique<RealLocalFunctionType>(left_->storage_access(), right_->storage_access(), entity);
+    return Common::make_unique<RealLocalFunctionType>(left_->storage_access(), right_->storage_access(), entity);
   } // ... local_function(...)
 
   virtual ThisType* copy() const
@@ -498,7 +498,7 @@ std::shared_ptr<Product<T1, T2>> make_product(std::shared_ptr<T1> left, std::sha
 }
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_COMBINED_HH

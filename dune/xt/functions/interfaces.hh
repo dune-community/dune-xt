@@ -28,7 +28,7 @@
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk.hh>
-#include <dune/stuff/common/filesystem.hh>
+#include <dune/xt/common/filesystem.hh>
 #endif
 
 #if HAVE_DUNE_FEM
@@ -41,26 +41,26 @@
 #include <dune/pdelab/common/function.hh>
 #endif
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/memory.hh>
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/memory.hh>
+#include <dune/xt/common/type_utils.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace internal {
 
 template <class F>
 struct is_localizable_function_helper
 {
-  DSC_has_typedef_initialize_once(EntityType) DSC_has_typedef_initialize_once(DomainFieldType)
-      DSC_has_typedef_initialize_once(RangeFieldType) DSC_has_static_member_initialize_once(dimDomain)
-          DSC_has_static_member_initialize_once(dimRange) DSC_has_static_member_initialize_once(dimRangeCols)
+  DXTC_has_typedef_initialize_once(EntityType) DXTC_has_typedef_initialize_once(DomainFieldType)
+      DXTC_has_typedef_initialize_once(RangeFieldType) DXTC_has_static_member_initialize_once(dimDomain)
+          DXTC_has_static_member_initialize_once(dimRange) DXTC_has_static_member_initialize_once(dimRangeCols)
 
               static const
-      bool is_candidate = DSC_has_typedef(EntityType)<F>::value && DSC_has_typedef(DomainFieldType)<F>::value
-                          && DSC_has_typedef(RangeFieldType)<F>::value && DSC_has_static_member(dimDomain)<F>::value
-                          && DSC_has_static_member(dimRange)<F>::value && DSC_has_static_member(dimRangeCols)<F>::value;
+      bool is_candidate = DXTC_has_typedef(EntityType)<F>::value && DXTC_has_typedef(DomainFieldType)<F>::value
+                          && DXTC_has_typedef(RangeFieldType)<F>::value && DXTC_has_static_member(dimDomain)<F>::value
+                          && DXTC_has_static_member(dimRange)<F>::value
+                          && DXTC_has_static_member(dimRangeCols)<F>::value;
 }; // class is_localizable_function_helper
 
 } // namespace internal
@@ -362,7 +362,7 @@ public:
 
   static std::string static_id()
   {
-    return "stuff.function";
+    return "function";
   }
 
   /**
@@ -376,12 +376,12 @@ public:
   /* @{ */
   virtual std::string type() const
   {
-    return "stuff.function";
+    return "function";
   }
 
   virtual std::string name() const
   {
-    return "stuff.function";
+    return "function";
   }
   /* @} */
 
@@ -418,14 +418,14 @@ public:
   {
     if (path.empty())
       DUNE_THROW(RangeError, "Empty path given!");
-    const auto directory = DSC::directoryOnly(path);
-    const auto filename  = DSC::filenameOnly(path);
+    const auto directory = Common::directory_only(path);
+    const auto filename  = Common::filename_only(path);
     auto adapter = std::make_shared<Functions::VisualizationAdapter<GridViewType, dimRange, dimRangeCols>>(*this);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
-        subsampling ? DSC::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
-                    : DSC::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
+        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
+                    : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
     vtk_writer->addVertexData(adapter);
-    DSC::testCreateDirectory(directory);
+    Common::test_create_directory(directory);
     if (MPIHelper::getCollectiveCommunication().size() == 1)
       vtk_writer->write(path, vtk_output_type);
     else
@@ -506,12 +506,12 @@ public:
 
   virtual std::string type() const override
   {
-    return "stuff.globalfunction";
+    return "globalfunction";
   }
 
   virtual std::string name() const override
   {
-    return "stuff.globalfunction";
+    return "globalfunction";
   }
 
 private:
@@ -645,12 +645,12 @@ public:
 
   virtual std::string type() const override
   {
-    return "stuff.globalfunction";
+    return "globalfunction";
   }
 
   virtual std::string name() const override
   {
-    return "stuff.globalfunction";
+    return "globalfunction";
   }
 
 private:
@@ -752,7 +752,7 @@ struct is_localizable_function<F, false> : public std::false_type
 {
 };
 
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #include "default.hh"

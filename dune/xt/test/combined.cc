@@ -6,7 +6,7 @@
 //   Felix Schindler (2014 - 2015)
 //   Rene Milk       (2015)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 
 #include <memory>
 
@@ -18,17 +18,17 @@
 
 #include <dune/geometry/quadraturerules.hh>
 
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/grid/provider/cube.hh>
-#include <dune/stuff/functions/constant.hh>
-#include <dune/stuff/functions/combined.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/functions/constant.hh>
+#include <dune/xt/functions/combined.hh>
 
 #include "functions.hh"
 
 #if HAVE_DUNE_GRID
 
 using namespace Dune;
-using namespace Stuff;
+using namespace Dune::XT;
 
 template <class G>
 class DifferenceFunctionType
@@ -57,7 +57,7 @@ protected:
 
   static std::shared_ptr<GridType> create_grid()
   {
-    return Stuff::Grid::Providers::Cube<GridType>(0.0, 1.0, 4).grid_ptr();
+    return XT::Grid::Providers::Cube<GridType>(0.0, 1.0, 4).grid_ptr();
   }
 
   static std::unique_ptr<FunctionType> create(const double ll, const double rr)

@@ -17,14 +17,14 @@
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/debug.hh>
-#include <dune/stuff/common/fvector.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/debug.hh>
+#include <dune/xt/common/fvector.hh>
 
 #include "interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
@@ -65,13 +65,13 @@ class Checkerboard
       return 0;
     }
 
-    virtual void evaluate(const DomainType& UNUSED_UNLESS_DEBUG(xx), RangeType& ret) const override
+    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx), RangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
       ret = value_;
     }
 
-    virtual void jacobian(const DomainType& UNUSED_UNLESS_DEBUG(xx), JacobianRangeType& ret) const override
+    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
       jacobian_helper(ret, internal::ChooseVariant<rangeDimCols>());
@@ -229,7 +229,7 @@ private:
 }; // class Checkerboard
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_HH

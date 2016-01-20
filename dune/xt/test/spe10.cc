@@ -5,16 +5,16 @@
 // Authors:
 //   Rene Milk (2015)
 
-#include "main.hxx"
+#include <dune/xt/test/main.hxx>
 #include "functions.hh"
 
 #include <memory>
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/stuff/functions/interfaces.hh>
-#include <dune/stuff/functions/spe10.hh>
-#include <dune/stuff/functions/spe10model2.hh>
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/spe10/model1.hh>
+#include <dune/xt/functions/spe10/model2.hh>
 
 #if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
@@ -22,7 +22,10 @@
 #include <dune/grid/alugrid.hh>
 #endif // HAVE_ALUGRID
 
-struct Spe10Model2FunctionTest : public DS::FunctionTest<TESTFUNCTIONTYPE>
+using namespace Dune;
+using namespace Dune::XT;
+
+struct Spe10Model2FunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   void check() const
   {

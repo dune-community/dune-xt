@@ -10,16 +10,16 @@
 #ifndef DUNE_XT_FUNCTIONS_FLATTOP_HH
 #define DUNE_XT_FUNCTIONS_FLATTOP_HH
 
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/type_utils.hh>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/common/fvector.hh>
-#include <dune/stuff/functions/interfaces.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace Functions {
 
 /**
@@ -160,7 +160,7 @@ private:
   void check_input() const
   {
     if (!(Common::FloatCmp::gt(upper_right_, lower_left_)))
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "upper_right has to be greater than lower_left!\n"
                      << "lower_left = ["
                      << lower_left_
@@ -169,13 +169,13 @@ private:
                      << upper_right_
                      << "]");
     if (!(Common::FloatCmp::gt(boundary_layer_, StuffDomainType(0))))
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "boundary_layer has to be strictly positive!\n"
                      << "boundary_layer = ["
                      << boundary_layer_
                      << "]");
     if (Common::FloatCmp::gt(boundary_layer_ * 2.0, upper_right_ - lower_left_))
-      DUNE_THROW(Exceptions::wrong_input_given,
+      DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "boundary_layer has to be thin enough!\n"
                  "2*boundary_layer = ["
                      << boundary_layer_ * 2.0
@@ -213,7 +213,7 @@ private:
 }; // class FlatTop< ..., 1, 1 >
 
 } // namespace Functions
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_FUNCTIONS_FLATTOP_HH
