@@ -7,8 +7,8 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
-#define DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
+#ifndef DUNE_XT_FUNCTIONS_VISUALIZATION_HH
+#define DUNE_XT_FUNCTIONS_VISUALIZATION_HH
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -112,4 +112,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_VISUALIZATION_HH
+#endif // DUNE_XT_FUNCTIONS_VISUALIZATION_HH

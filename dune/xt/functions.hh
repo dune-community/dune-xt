@@ -7,8 +7,8 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_FUNCTIONS_HH
-#define DUNE_STUFF_FUNCTIONS_HH
+#ifndef DUNE_XT_FUNCTIONS_HH
+#define DUNE_XT_FUNCTIONS_HH
 
 #include <string>
 #include <vector>
@@ -250,4 +250,4 @@ public:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_HH
+#endif // DUNE_XT_FUNCTIONS_HH

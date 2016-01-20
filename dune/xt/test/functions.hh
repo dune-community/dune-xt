@@ -6,8 +6,8 @@
 //   Felix Schindler (2014 - 2015)
 //   Rene Milk       (2015)
 
-#ifndef DUNE_STUFF_TEST_FUNCTION_HH
-#define DUNE_STUFF_TEST_FUNCTION_HH
+#ifndef DUNE_XT_TEST_FUNCTIONS_HH
+#define DUNE_XT_TEST_FUNCTIONS_HH
 
 #include <string>
 #include <type_traits>
@@ -79,4 +79,4 @@ protected:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_TEST_FUNCTION_HH
+#endif // DUNE_XT_TEST_FUNCTIONS_HH

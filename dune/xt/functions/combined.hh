@@ -7,8 +7,8 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_FUNCTIONS_COMBINED_HH
-#define DUNE_STUFF_FUNCTIONS_COMBINED_HH
+#ifndef DUNE_XT_FUNCTIONS_COMBINED_HH
+#define DUNE_XT_FUNCTIONS_COMBINED_HH
 
 #include <type_traits>
 #include <memory>
@@ -501,4 +501,4 @@ std::shared_ptr<Product<T1, T2>> make_product(std::shared_ptr<T1> left, std::sha
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_COMBINED_HH
+#endif // DUNE_XT_FUNCTIONS_COMBINED_HH

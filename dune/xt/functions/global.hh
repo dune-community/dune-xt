@@ -8,8 +8,8 @@
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_FUNCTION_GLOBAL_HH
-#define DUNE_STUFF_FUNCTION_GLOBAL_HH
+#ifndef DUNE_XT_FUNCTIONS_GLOBAL_HH
+#define DUNE_XT_FUNCTIONS_GLOBAL_HH
 
 #include <functional>
 
@@ -79,4 +79,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTION_GLOBAL_HH
+#endif // DUNE_XT_FUNCTIONS_GLOBAL_HH

@@ -8,8 +8,8 @@
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_STUFF_FUNCTION_INTERFACE_HH
-#define DUNE_STUFF_FUNCTION_INTERFACE_HH
+#ifndef DUNE_XT_FUNCTIONS_INTERFACE_HH
+#define DUNE_XT_FUNCTIONS_INTERFACE_HH
 
 #include <vector>
 #include <memory>
@@ -203,17 +203,17 @@ public:
 
 protected:
   bool is_a_valid_point(const DomainType&
-#ifndef DUNE_STUFF_FUNCTIONS_DISABLE_CHECKS
+#ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
                             xx
 #else
 /*xx*/
 #endif
                         ) const
   {
-#ifndef DUNE_STUFF_FUNCTIONS_DISABLE_CHECKS
+#ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
     const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
     return reference_element.checkInside(xx);
-#else // DUNE_STUFF_FUNCTIONS_DISABLE_CHECKS
+#else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
     return true;
 #endif
   }
@@ -759,4 +759,4 @@ struct is_localizable_function<F, false> : public std::false_type
 #include "combined.hh"
 #include "derived.hh"
 
-#endif // DUNE_STUFF_FUNCTION_INTERFACE_HH
+#endif // DUNE_XT_FUNCTIONS_INTERFACE_HH

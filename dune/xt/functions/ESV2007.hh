@@ -7,8 +7,8 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_STUFF_FUNCTIONS_ESV2007_HH
-#define DUNE_STUFF_FUNCTIONS_ESV2007_HH
+#ifndef DUNE_XT_FUNCTIONS_ESV2007_HH
+#define DUNE_XT_FUNCTIONS_ESV2007_HH
 
 #include <cmath>
 
@@ -616,4 +616,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_ESV2007_HH
+#endif // DUNE_XT_FUNCTIONS_ESV2007_HH

@@ -9,8 +9,8 @@
 //   Rene Milk       (2013, 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_STUFF_FUNCTION_EXPRESSION_BASE_HH
-#define DUNE_STUFF_FUNCTION_EXPRESSION_BASE_HH
+#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH
+#define DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH
 
 #include <sstream>
 #include <vector>
@@ -223,4 +223,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTION_EXPRESSION_BASE_HH
+#endif // DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH

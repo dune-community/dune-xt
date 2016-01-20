@@ -7,8 +7,8 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2015)
 
-#ifndef DUNE_STUFF_FUNCTIONS_FLATTOP_HH
-#define DUNE_STUFF_FUNCTIONS_FLATTOP_HH
+#ifndef DUNE_XT_FUNCTIONS_FLATTOP_HH
+#define DUNE_XT_FUNCTIONS_FLATTOP_HH
 
 #include <dune/stuff/common/type_utils.hh>
 
@@ -216,4 +216,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_FLATTOP_HH
+#endif // DUNE_XT_FUNCTIONS_FLATTOP_HH

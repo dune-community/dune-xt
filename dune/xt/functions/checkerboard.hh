@@ -8,8 +8,8 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
-#define DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
+#ifndef DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
+#define DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
 
 #include <vector>
 #include <cmath>
@@ -232,4 +232,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTION_CHECKERBOARD_HH
+#endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_HH

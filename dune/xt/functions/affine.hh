@@ -8,8 +8,8 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_STUFF_FUNCTIONS_AFFINE_HH
-#define DUNE_STUFF_FUNCTIONS_AFFINE_HH
+#ifndef DUNE_XT_FUNCTIONS_AFFINE_HH
+#define DUNE_XT_FUNCTIONS_AFFINE_HH
 
 #include <memory>
 
@@ -129,4 +129,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_AFFINE_HH
+#endif // DUNE_XT_FUNCTIONS_AFFINE_HH

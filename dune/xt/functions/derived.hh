@@ -6,8 +6,8 @@
 //   Felix Schindler (2014 - 2015)
 //   Rene Milk       (2015)
 
-#ifndef DUNE_STUFF_FUNCTIONS_DERIVED_HH
-#define DUNE_STUFF_FUNCTIONS_DERIVED_HH
+#ifndef DUNE_XT_FUNCTIONS_DERIVED_HH
+#define DUNE_XT_FUNCTIONS_DERIVED_HH
 
 #include <type_traits>
 #include <memory>
@@ -274,4 +274,4 @@ std::shared_ptr<Divergence<T>> make_divergence(std::shared_ptr<T> func, Args&&..
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_DERIVED_HH
+#endif // DUNE_XT_FUNCTIONS_DERIVED_HH

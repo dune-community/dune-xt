@@ -7,8 +7,8 @@
 //   Rene Milk       (2011 - 2012, 2014 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_FUNCTION_FEMADAPTER
-#define DUNE_STUFF_FUNCTION_FEMADAPTER
+#ifndef DUNE_XT_FUNCTIONS_FEMADAPTER
+#define DUNE_XT_FUNCTIONS_FEMADAPTER
 
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/common/memory.hh>
@@ -126,4 +126,4 @@ private:
 
 #endif // if HAVE_DUNE_FEM
 
-#endif // DUNE_STUFF_FUNCTION_FEMADAPTER
+#endif // DUNE_XT_FUNCTIONS_FEMADAPTER

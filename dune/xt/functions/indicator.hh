@@ -6,8 +6,8 @@
 //   Felix Schindler (2015)
 //   Rene Milk       (2015)
 
-#ifndef DUNE_STUFF_FUNCTIONS_INDICATOR_HH
-#define DUNE_STUFF_FUNCTIONS_INDICATOR_HH
+#ifndef DUNE_XT_FUNCTIONS_INDICATOR_HH
+#define DUNE_XT_FUNCTIONS_INDICATOR_HH
 
 #include <memory>
 #include <vector>
@@ -190,4 +190,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_INDICATOR_HH
+#endif // DUNE_XT_FUNCTIONS_INDICATOR_HH

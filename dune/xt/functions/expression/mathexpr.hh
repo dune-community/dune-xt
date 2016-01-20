@@ -21,8 +21,8 @@ This software comes with absolutely no warranty.
 
 // clang-format off
 
-#ifndef DUNE_STUFF_FUNCTION_NONPARAMETRIC_EXPRESSION_MATHEXPRESSION_HH
-#define DUNE_STUFF_FUNCTION_NONPARAMETRIC_EXPRESSION_MATHEXPRESSION_HH
+#ifndef DUNE_XT_FUNCTIONS_NONPARAMETRIC_EXPRESSION_MATHEXPRESSION_HH
+#define DUNE_XT_FUNCTIONS_NONPARAMETRIC_EXPRESSION_MATHEXPRESSION_HH
 
 #include<string.h>
 #include<stdio.h>
@@ -159,6 +159,6 @@ signed char EqStr(const char*s,const char*s2);
 signed char CompStr(const char*s,int n,const char*s2);
 char* DelStr(const char*s,int n);
 
-#endif // DUNE_STUFF_FUNCTION_NONPARAMETRIC_EXPRESSION_MATHEXPRESSION_HH
+#endif // DUNE_XT_FUNCTIONS_NONPARAMETRIC_EXPRESSION_MATHEXPRESSION_HH
 
 // clang-format on

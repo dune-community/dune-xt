@@ -5,8 +5,8 @@
 // Authors:
 //   Rene Milk (2015)
 
-#ifndef DUNE_STUFF_FUNCTIONS_SPE10MODEL2_HH
-#define DUNE_STUFF_FUNCTIONS_SPE10MODEL2_HH
+#ifndef DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
+#define DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
 
 #include <iostream>
 #include <memory>
@@ -126,4 +126,4 @@ const DSC::FieldVector<double, dim_domain>
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_FUNCTIONS_SPE10MODEL2_HH
+#endif // DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
