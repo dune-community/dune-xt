@@ -1,0 +1,9 @@
+DGF
+INTERVAL
+0 # left boundary
+1 # right boundary
+2 # number of elements
+#
+BOUNDARYDOMAIN
+default 1
+#
