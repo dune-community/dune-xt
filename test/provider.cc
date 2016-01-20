@@ -7,13 +7,13 @@
 //   Rene Milk       (2012 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#include <dune/xt/test/main.hxx>
+#include <dune/xt/common/test/main.hxx>
 
 #include <dune/xt/grid/provider/cube.hh>
 #include <dune/xt/grid/provider/dgf.hh>
 #include <dune/xt/grid/provider/gmsh.hh>
 
-#include "grid_provider.hh"
+#include <dune/xt/grid/test/provider.hh>
 
 
 struct TestGridProvider : public GridProviderBase<Dune::XT::Grid::Providers::TESTGRIDPROVIDERTYPE<TESTGRIDTYPE>>

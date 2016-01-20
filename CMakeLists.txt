@@ -44,6 +44,7 @@ set_source_files_properties(${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1)
 
 add_subdirectory(dune)
 add_subdirectory(doc)
+add_subdirectory(test)
 
 # enable headercheck
 add_definitions("-DENABLE_HEADERCHECK=1")

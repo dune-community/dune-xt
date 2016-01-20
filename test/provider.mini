@@ -1,4 +1,4 @@
-__name = grid_provider
+__name = provider
 __exec_suffix = {gridprovider}_yasp_{dimDomain}d, {gridprovider}_alu_{__local.geometry}_{__local.refinement}_{dimDomain}d | expand grid
 
 include grids.mini

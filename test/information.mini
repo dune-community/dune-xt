@@ -1,4 +1,4 @@
-__name = grid_information
+__name = information
 __exec_suffix = {dimDomain}d
 
 dimDomain = 1, 2, 3 | expand

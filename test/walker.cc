@@ -7,7 +7,7 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2015)
 
-#include <dune/xt/test/main.hxx>
+#include <dune/xt/common/test/main.hxx>
 
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
 #include <dune/grid/utility/partitioning/seedlist.hh>

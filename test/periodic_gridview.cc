@@ -7,7 +7,7 @@
 //   Rene Milk       (2015)
 //   Tobias Leibner  (2015)
 
-#include <dune/xt/test/main.hxx>
+#include <dune/xt/common/test/main.hxx>
 
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -18,7 +18,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_utils.hh>
 
-#include <dune/xt/grid/periodicview.hh>
+#include <dune/xt/grid/periodic_gridview.hh>
 #include <dune/xt/grid/provider/cube.hh>
 #include <dune/xt/grid/provider/interface.hh>
 
