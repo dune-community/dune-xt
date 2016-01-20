@@ -11,9 +11,6 @@
 #ifndef DUNE_XT_GRID_OUTPUT_PGF_HH
 #define DUNE_XT_GRID_OUTPUT_PGF_HH
 
-// nothing here will compile w/o grid present
-#if HAVE_DUNE_GRID
-
 #include <array>
 #include <cstdio>
 #include <limits>
@@ -370,7 +367,5 @@ private:
 } // namespace XT
 } // namespace Grid
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_OUTPUT_PGF_HH

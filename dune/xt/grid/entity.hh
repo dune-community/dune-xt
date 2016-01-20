@@ -13,10 +13,8 @@
 
 #include <dune/geometry/referenceelements.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/common/entity.hh>
 #include <dune/grid/common/gridview.hh>
-#endif
 
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/ranges.hh>
@@ -27,7 +25,6 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-#if HAVE_DUNE_GRID
 
 template <class GridPartOrViewType>
 class Entity
@@ -51,7 +48,6 @@ public:
   typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
 }; // class Entity
 
-#endif // HAVE_DUNE_GRID
 
 template <class EntityType>
 void printEntity(const EntityType& entity, const std::string name = Common::Typename<EntityType>::value(),
@@ -65,7 +61,6 @@ void printEntity(const EntityType& entity, const std::string name = Common::Type
         << "corner " + Common::to_string(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... printEntity(...)
 
-#if HAVE_DUNE_GRID
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
@@ -83,29 +78,21 @@ double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
   return max_dist;
 } // entity_diameter
 
-#if DUNE_VERSION_NEWER(DUNE_GEOMETRY, 2, 3)
-#define REFERENCE_ELEMENTS ReferenceElements
-#else
-#define REFERENCE_ELEMENTS GenericReferenceElements
-#endif
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 auto reference_element(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
-    -> decltype(REFERENCE_ELEMENTS<typename GridImp::ctype, worlddim>::general(entity.geometry().type()))
+    -> decltype(ReferenceElements<typename GridImp::ctype, worlddim>::general(entity.geometry().type()))
 {
-  return REFERENCE_ELEMENTS<typename GridImp::ctype, worlddim>::general(entity.geometry().type());
+  return ReferenceElements<typename GridImp::ctype, worlddim>::general(entity.geometry().type());
 }
 
 template <int mydim, int cdim, class GridImp, template <int, int, class> class GeometryImp>
 auto reference_element(const Dune::Geometry<mydim, cdim, GridImp, GeometryImp>& geometry)
-    -> decltype(REFERENCE_ELEMENTS<typename GridImp::ctype, mydim>::general(geometry.type()))
+    -> decltype(ReferenceElements<typename GridImp::ctype, mydim>::general(geometry.type()))
 {
-  return REFERENCE_ELEMENTS<typename GridImp::ctype, mydim>::general(geometry.type());
+  return ReferenceElements<typename GridImp::ctype, mydim>::general(geometry.type());
 }
 
-#undef REFERENCE_ELEMENTS
-
-#endif // HAVE_DUNE_GRID
 
 } // namespace Grid
 } // namespace XT

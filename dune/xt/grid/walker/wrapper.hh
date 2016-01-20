@@ -10,9 +10,6 @@
 #ifndef DUNE_XT_GRID_WALKER_WRAPPER_HH
 #define DUNE_XT_GRID_WALKER_WRAPPER_HH
 
-// nothing here will compile w/o grid present
-#if HAVE_DUNE_GRID
-
 #include "apply-on.hh"
 #include "functors.hh"
 
@@ -267,7 +264,5 @@ private:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_WALKER_WRAPPER_HH

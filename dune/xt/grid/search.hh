@@ -10,17 +10,12 @@
 #ifndef DUNE_XT_GRID_SEARCH_HH
 #define DUNE_XT_GRID_SEARCH_HH
 
-#if HAVE_DUNE_GRID
-
 #include <vector>
 
 #include <boost/range/iterator_range.hpp>
 
-#if HAVE_DUNE_GEOMETRY
 #include <dune/geometry/referenceelements.hh>
-#else
-#include <dune/grid/common/genericreferenceelements.hh>
-#endif
+
 #include <dune/grid/common/gridview.hh>
 #include <dune/grid/common/rangegenerators.hh>
 
@@ -185,7 +180,5 @@ EntityHierarchicSearch<GV> make_entity_hierarchic_search(const GV& grid_view)
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_SEARCH_HH

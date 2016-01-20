@@ -9,12 +9,9 @@
 #ifndef DUNE_XT_GRID_PROVIDER_EOC_HH
 #define DUNE_XT_GRID_PROVIDER_EOC_HH
 
-// silence sgrid deprecation warning temporarily
-#if HAVE_DUNE_GRID
-#define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1
+#define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1 // silence sgrid deprecation warning temporarily
 #include <dune/grid/io/file/dgfparser.hh>
 #undef DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING
-#endif
 
 #include "default.hh"
 
@@ -23,7 +20,6 @@ namespace XT {
 namespace Grid {
 namespace Providers {
 
-#if HAVE_DUNE_GRID
 
 /**
  *  The purpose of this class is to behave like a XT::Grid::ProviderInterface and at the same time to provide a
@@ -101,15 +97,6 @@ private:
   int reference_level_;
 }; // class EOC
 
-#else // HAVE_DUNE_GRID
-
-template <class GridImp>
-class EOC
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
-#endif // HAVE_DUNE_GRID
 
 } // namespace Providers
 } // namespace Grid

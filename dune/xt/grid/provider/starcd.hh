@@ -11,8 +11,6 @@
 #ifndef DUNE_XT_GRID_PROVIDER_STARCD_HH
 #define DUNE_XT_GRID_PROVIDER_STARCD_HH
 
-#if HAVE_DUNE_GRID
-
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -234,7 +232,5 @@ private:
 
 } // namespace XT
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_PROVIDER_STARCD_HH

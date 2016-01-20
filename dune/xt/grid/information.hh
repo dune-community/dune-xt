@@ -18,10 +18,8 @@
 
 #include <dune/common/unused.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
 #include <dune/grid/common/rangegenerators.hh>
-#endif
 
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/ranges.hh>
@@ -35,7 +33,6 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-#if HAVE_DUNE_GRID
 
 struct Statistics
 {
@@ -176,13 +173,11 @@ Dimensions<GridViewType> dimensions(const typename GridViewType::Grid::template 
   return Dimensions<GridViewType>(entity);
 }
 
-#endif // HAVE_DUNE_GRID
 
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
 
-#if HAVE_DUNE_GRID
 
 template <class T>
 inline std::ostream& operator<<(std::ostream& s, const Dune::XT::Grid::Dimensions<T>& d)
@@ -197,6 +192,5 @@ inline std::ostream& operator<<(std::ostream& s, const Dune::XT::Grid::Dimension
   return s;
 }
 
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_INFORMATION_HH

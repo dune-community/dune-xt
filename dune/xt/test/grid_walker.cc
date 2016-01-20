@@ -9,8 +9,6 @@
 
 #include <dune/xt/test/main.hxx>
 
-#if HAVE_DUNE_GRID
-
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
 #include <dune/grid/utility/partitioning/seedlist.hh>
 #endif
@@ -104,9 +102,3 @@ TYPED_TEST(GridWalkerTest, Misc)
   this->check_count();
   this->check_apply_on();
 }
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_GridWalkerTest, Misc){};
-
-#endif // HAVE_DUNE_GRID

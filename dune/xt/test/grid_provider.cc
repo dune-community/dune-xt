@@ -11,7 +11,6 @@
 
 #include "grid_provider.hh"
 
-#if HAVE_DUNE_GRID
 
 struct TestGridProvider : public GridProviderBase<Dune::XT::Grid::Providers::TESTGRIDPROVIDERTYPE<TESTGRIDTYPE>>
 {
@@ -33,17 +32,3 @@ TEST_F(TestGridProvider, fulfills_non_const_interface)
 {
   this->non_const_interface();
 }
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_TestGridProvider, is_default_creatable)
-{
-}
-TEST(DISABLED_TestGridProvider, fulfills_const_interface)
-{
-}
-TEST(DISABLED_TestGridProvider, is_visualizable)
-{
-}
-
-#endif // HAVE_DUNE_GRID

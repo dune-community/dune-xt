@@ -10,7 +10,6 @@
 #ifndef DUNE_XT_TEST_GRID_PROVIDER_HH
 #define DUNE_XT_TEST_GRID_PROVIDER_HH
 
-#if HAVE_DUNE_GRID
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
@@ -159,5 +158,4 @@ public:
 
 }; // class GridProviderBase
 
-#endif // HAVE_DUNE_GRID
 #endif // DUNE_XT_TEST_GRID_PROVIDER_HH

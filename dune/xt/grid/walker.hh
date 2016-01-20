@@ -10,9 +10,6 @@
 #ifndef DUNE_XT_GRID_WALKER_HH
 #define DUNE_XT_GRID_WALKER_HH
 
-// nothing here will compile w/o grid present
-#if HAVE_DUNE_GRID
-
 #include <functional>
 #include <memory>
 #include <type_traits>
@@ -361,7 +358,5 @@ protected:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_WALKER_HH

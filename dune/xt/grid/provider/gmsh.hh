@@ -12,18 +12,17 @@
 #ifndef DUNE_XT_GRID_PROVIDER_GMSH_HH
 #define DUNE_XT_GRID_PROVIDER_GMSH_HH
 
-#if HAVE_DUNE_GRID
-
 #include <memory>
 #include <type_traits>
 
-#if HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
-#endif // HAVE_ALUGRID
 #include <dune/grid/io/file/gmshreader.hh>
 #include <dune/grid/sgrid.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/yaspgrid.hh>
+
+#if HAVE_ALUGRID
+#include <dune/grid/alugrid.hh>
+#endif
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -123,7 +122,5 @@ private:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_PROVIDER_GMSH_HH

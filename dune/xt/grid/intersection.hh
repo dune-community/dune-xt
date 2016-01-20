@@ -17,10 +17,8 @@
 
 #include <dune/geometry/referenceelements.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/common/intersection.hh>
 #include <dune/grid/common/gridview.hh>
-#endif
 
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/print.hh>
@@ -32,7 +30,6 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-#if HAVE_DUNE_GRID
 
 template <class GridPartOrViewType>
 class Intersection
@@ -56,7 +53,6 @@ public:
   typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
 }; // class Intersection
 
-#endif // HAVE_DUNE_GRID
 
 /**
   \brief      prints some basic information about a Dune::Intersection, namely the number of its corners and the
@@ -79,7 +75,7 @@ void printIntersection(const IntersectionType& intersection, std::ostream& out =
         << " (local: " << geometry.local(geometry.corner(ii)) << ")\n";
 } // ... printIntersection(...)
 
-#if HAVE_DUNE_GRID
+
 /**
  * \brief Checks if intersection contains the given global_point.
  *
@@ -113,37 +109,7 @@ contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D
   // At this point we cannot reject the assumption that the point lies on the line between the two corners.
   return true;
 } // ... contains(...)
-#endif
 
-/** Check whether a spatial point lies on an intersection.
-*
-* @param[in] intersection The intersection
-* @param[in] globalPoint A Dune::FieldVector with the global coordinates of the point
-* @return Returns true if the point lies on the intersection, false otherwise.
-*/
-template <class IntersectionType, class FieldType, int dim>
-bool DUNE_DEPRECATED_MSG("This method does not produce correct results, use contains() instead!")
-    intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, dim>& globalPoint)
-{
-  // map global coordinates to local coordinates of the intersection
-  const auto& intersectionGeometry = intersection.geometry();
-  const auto& localPoint           = intersectionGeometry.local(globalPoint);
-
-// get codim 1 reference element
-#if DUNE_VERSION_NEWER(DUNE_GEOMETRY, 2, 3)
-  const auto& refElement = ReferenceElements<FieldType, dim - 1>::general(intersectionGeometry.type());
-#else
-  const auto& refElement = GenericReferenceElements<FieldType, dim - 1>::general(intersectionGeometry.type());
-#endif
-  // check whether reference element contains the local coordinates
-  return refElement.checkInside(localPoint);
-} // end function intersectionContains
-
-template <class IntersectionType, class FieldType>
-bool intersectionContains(const IntersectionType& intersection, const Dune::FieldVector<FieldType, 2>& globalPoint)
-{
-  return contains(intersection, globalPoint);
-}
 
 } // namespace Grid
 } // namespace XT

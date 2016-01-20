@@ -14,10 +14,6 @@
 
 #include <memory>
 
-#if HAVE_DUNE_GRID
-#if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/dgf.hh>
-#endif
 #if HAVE_ALUGRID
 #include <dune/grid/io/file/dgfparser/dgfalu.hh>
 #endif
@@ -26,7 +22,10 @@
 #include <dune/grid/io/file/dgfparser/dgfs.hh>
 #include <dune/grid/io/file/dgfparser/dgfyasp.hh>
 #include <dune/grid/io/file/dgfparser/gridptr.hh> // ... does not include it!
-#endif // HAVE_DUNE_GRID
+
+#if HAVE_DUNE_ALUGRID
+#include <dune/alugrid/dgf.hh>
+#endif
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/string.hh>
@@ -38,7 +37,6 @@ namespace XT {
 namespace Grid {
 namespace Providers {
 
-#if HAVE_DUNE_GRID
 
 template <class GridImp>
 class DGF : public Grid::ProviderInterface<GridImp>
@@ -112,15 +110,6 @@ private:
   std::shared_ptr<GridType> grid_;
 }; // class DGF
 
-#else // HAVE_DUNE_GRID
-
-template <class GridImp>
-class DGF
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
-#endif // HAVE_DUNE_GRID
 
 } // namespace Providers
 } // namespace Grid

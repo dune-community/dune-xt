@@ -22,7 +22,6 @@ namespace XT {
 namespace Grid {
 namespace Providers {
 
-#if HAVE_DUNE_GRID
 
 template <class GridImp>
 class Default : Common::StorageProvider<GridImp>, public ProviderInterface<GridImp>
@@ -76,15 +75,6 @@ public:
   }
 }; // class Default
 
-#else // HAVE_DUNE_GRID
-
-template <class GridImp>
-class Default
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
-#endif // HAVE_DUNE_GRID
 
 } // namespace Providers
 } // namespace Grid

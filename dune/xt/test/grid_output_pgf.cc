@@ -9,8 +9,6 @@
 
 #include <dune/xt/test/main.hxx>
 
-#if HAVE_DUNE_GRID
-
 #include <fstream>
 
 #include <dune/grid/yaspgrid.hh>
@@ -43,5 +41,3 @@ TEST(PgfOutput, Sgrid)
   std::ofstream fileA("pgfoutput_leaf.tex");
   output.leaf(fileA, includable);
 }
-
-#endif //#if HAVE_DUNE_GRID

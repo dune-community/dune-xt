@@ -17,10 +17,8 @@
 
 #include <dune/common/fvector.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/common/rangegenerators.hh>
-#endif
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -33,7 +31,6 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-#if HAVE_DUNE_GRID
 
 template <class GridImp>
 class ConstProviderInterface
@@ -336,21 +333,6 @@ public:
 #endif // HAVE_DUNE_FEM
 }; // class ProviderInterface
 
-#else // HAVE_DUNE_GRID
-
-template <class GridImp>
-class ConstProviderInterface
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
-template <class GridImp>
-class ProviderInterface
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
-#endif // HAVE_DUNE_GRID
 
 } // namespace Grid
 } // namespace XT

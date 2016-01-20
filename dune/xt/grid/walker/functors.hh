@@ -9,9 +9,6 @@
 #ifndef DUNE_XT_GRID_WALKER_FUNCTORS_HH
 #define DUNE_XT_GRID_WALKER_FUNCTORS_HH
 
-// nothing here will compile w/o grid present
-#if HAVE_DUNE_GRID
-
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
@@ -134,7 +131,5 @@ private:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
-
-#endif // HAVE_DUNE_GRID
 
 #endif // DUNE_XT_GRID_WALKER_FUNCTORS_HH

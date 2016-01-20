@@ -9,7 +9,6 @@
 
 #include <dune/xt/test/main.hxx>
 
-#if HAVE_DUNE_GRID
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
@@ -189,11 +188,3 @@ TEST_F(PeriodicViewTest, check_all)
 {
   this->check();
 }
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_PeriodicViewTest, check_all)
-{
-}
-
-#endif // HAVE_DUNE_GRID

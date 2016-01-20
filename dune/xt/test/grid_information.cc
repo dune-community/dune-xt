@@ -9,8 +9,6 @@
 
 #include <dune/xt/test/main.hxx>
 
-#if HAVE_DUNE_GRID
-
 #include <dune/common/shared_ptr.hh>
 
 #include <dune/xt/common/logstreams.hh>
@@ -79,5 +77,3 @@ TEST_F(GridInfoTest, Misc)
   this->check();
   this->print(dev_null);
 }
-
-#endif // #if HAVE_DUNE_GRID

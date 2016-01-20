@@ -21,32 +21,33 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#if HAVE_DUNE_GRID // clang-format off
-# define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1
+#if HAVE_ALBERTA // clang-format off
+# include <dune/xt/common/disable_warnings.hh>
+#   include <dune/grid/albertagrid.hh>
+# include <dune/xt/common/reenable_warnings.hh>
+#if HAVE_ALUGRID
+# include <dune/grid/alugrid.hh>
+#endif
+#endif
+#define DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING 1
 # include <dune/grid/sgrid.hh>
-# undef DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING
-# include <dune/grid/yaspgrid.hh>
-# if HAVE_ALBERTA
-#   include <dune/xt/common/disable_warnings.hh>
-#     include <dune/grid/albertagrid.hh>
-#   include <dune/xt/common/reenable_warnings.hh>
-# endif
-# if HAVE_DUNE_ALUGRID
-#   include <dune/alugrid/grid.hh>
-# endif
-# if HAVE_ALUGRID
-#   include <dune/grid/alugrid.hh>
-# endif
-# if HAVE_DUNE_SPGRID
-#   include <dune/grid/spgrid.hh>
-# endif
-# include <dune/xt/grid/structuredgridfactory.hh>
-#endif // HAVE_DUNE_GRID // clang-format on
+#undef DUNE_AVOID_SGRID_DEPRE_WARNING_BECAUSE_I_KNOW_WHAT_IM_DOING
+#include <dune/grid/yaspgrid.hh>
+
+#if HAVE_DUNE_ALUGRID
+# include <dune/alugrid/grid.hh>
+#endif
+
+#if HAVE_DUNE_SPGRID
+# include <dune/grid/spgrid.hh>
+#endif // clang-format on
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/memory.hh>
+
+#include <dune/xt/grid/structuredgridfactory.hh>
 
 #include "default.hh"
 
@@ -55,7 +56,6 @@ namespace XT {
 namespace Grid {
 namespace Providers {
 
-#if HAVE_DUNE_GRID
 
 namespace Configs {
 
@@ -155,7 +155,10 @@ public:
   using typename BaseType::DomainFieldType;
   using typename BaseType::DomainType;
 
-  static const std::string static_id() { return BaseType::static_id() + ".cube"; }
+  static const std::string static_id()
+  {
+    return BaseType::static_id() + ".cube";
+  }
 
   static Common::Configuration default_config(const std::string sub_name = "")
   {
@@ -216,13 +219,25 @@ public:
   {
   }
 
-  virtual GridType& grid() override { return *grid_ptr_; }
+  virtual GridType& grid() override
+  {
+    return *grid_ptr_;
+  }
 
-  virtual const GridType& grid() const override { return *grid_ptr_; }
+  virtual const GridType& grid() const override
+  {
+    return *grid_ptr_;
+  }
 
-  std::shared_ptr<GridType> grid_ptr() { return grid_ptr_; }
+  std::shared_ptr<GridType> grid_ptr()
+  {
+    return grid_ptr_;
+  }
 
-  const std::shared_ptr<const GridType>& grid_ptr() const { return grid_ptr_; }
+  const std::shared_ptr<const GridType>& grid_ptr() const
+  {
+    return grid_ptr_;
+  }
 
 private:
   static std::array<unsigned int, dimDomain> parse_array(const unsigned int in)
@@ -245,10 +260,10 @@ private:
 
   /// TODO simplex grid overlap
   static std::shared_ptr<GridType>
-      create_grid(DomainType lower_left, DomainType upper_right,
-                  const std::array<unsigned int, dimDomain>& num_elements, const size_t num_refinements,
-                  const std::array<unsigned int, dimDomain> overlap =
-                      Common::make_array<unsigned int, dimDomain>(default_config().get<size_t>("overlap")))
+  create_grid(DomainType lower_left, DomainType upper_right, const std::array<unsigned int, dimDomain>& num_elements,
+              const size_t num_refinements,
+              const std::array<unsigned int, dimDomain> overlap =
+                  Common::make_array<unsigned int, dimDomain>(default_config().get<size_t>("overlap")))
   {
     static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
     for (size_t dd = 0; dd < dimDomain; ++dd) {
@@ -284,15 +299,6 @@ private:
   std::shared_ptr<GridType> grid_ptr_;
 }; // class Cube
 
-#else // HAVE_DUNE_GRID
-
-template <typename GridImp, int variant = 1>
-class Cube
-{
-  static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-grid!");
-};
-
-#endif // HAVE_DUNE_GRID
 
 } // namespace Providers
 } // namespace Grid

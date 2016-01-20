@@ -13,9 +13,7 @@
 #include <cassert>
 #include <memory>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
-#endif
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/gridpart/leafgridpart.hh>
@@ -43,17 +41,10 @@ struct is_grid_view_helper
 
 } // namespace internal
 
-#if HAVE_DUNE_GRID
 template <class G, bool candidate = internal::is_grid_view_helper<G>::is_candidate>
 struct is_grid_view : public std::is_base_of<Dune::GridView<typename G::Traits>, G>
 {
 };
-#else
-template <class G, bool candidate>
-struct is_grid_view : public std::false_type
-{
-};
-#endif
 
 template <class G>
 struct is_grid_view<G, false> : public std::false_type
@@ -77,7 +68,6 @@ enum class ChooseLayer
 #endif
 }; // enum class ChooseLayer
 
-#if HAVE_DUNE_GRID
 
 // forwards
 template <class GridType, ChooseLayer layer, ChoosePartView part_view>
@@ -400,7 +390,6 @@ struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::part>
 };
 
 #endif // HAVE_DUNE_GRID_MULTISCALE
-#else // HAVE_DUNE_GRID
 
 template <class GridType, ChooseLayer layer, ChoosePartView type>
 struct Layer
@@ -420,7 +409,6 @@ struct LeafPartView
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
 };
 
-#endif // HAVE_DUNE_GRID
 
 } // namespace Grid
 } // namespace XT
