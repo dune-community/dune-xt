@@ -28,7 +28,7 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-template <class GridViewType>
+template <class GridViewType, int codim = 0>
 class EntitySearchBase
 {
   typedef typename GridViewType::Traits ViewTraits;
@@ -36,18 +36,46 @@ class EntitySearchBase
                 "GridViewType has to be derived from GridView!");
 
 public:
-  typedef typename ViewTraits::template Codim<0>::Entity EntityType;
+  typedef typename ViewTraits::template Codim<codim>::Entity EntityType;
   typedef typename EntityType::Geometry::LocalCoordinate LocalCoordinateType;
   typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
   typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
 }; // class EntitySearchBase
 
-template <class GridViewType>
+template<int codim>
+struct CheckInside
+{
+    template< class GeometryType, class GlobalCoordinateType>
+    static bool check(const GeometryType& geometry, const GlobalCoordinateType& point)
+    {
+        if (codim == point.size()) {
+            return Common::FloatCmp::eq(geometry.center(),point);
+        } else {
+            if (Common::FloatCmp::ne(geometry.global(geometry.local(point)), point))
+                return false;
+            const auto& refElement = reference_element(geometry);
+            return refElement.checkInside(geometry.local(point));
+        }
+    }
+};
+
+template<>
+struct CheckInside<0>
+{
+    template< class GeometryType, class GlobalCoordinateType>
+    static bool check(const GeometryType& geometry, const GlobalCoordinateType& point)
+    {
+        const auto& refElement = reference_element(geometry);
+        return refElement.checkInside(geometry.local(point));
+    }
+};
+
+template <class GridViewType, int codim = 0>
 class EntityInlevelSearch : public EntitySearchBase<GridViewType>
 {
-  typedef EntitySearchBase<GridViewType> BaseType;
+  typedef EntitySearchBase<GridViewType,codim> BaseType;
 
-  typedef typename GridViewType::template Codim<0>::Iterator IteratorType;
+  typedef typename GridViewType::template Codim<codim>::Iterator IteratorType;
 
 public:
   typedef typename BaseType::EntityVectorType EntityVectorType;
@@ -56,9 +84,8 @@ private:
   inline typename EntityVectorType::value_type check_add(const typename BaseType::EntityType& entity,
                                                          const typename BaseType::GlobalCoordinateType& point) const
   {
-    const auto& geometry   = entity.geometry();
-    const auto& refElement = reference_element(geometry);
-    if (refElement.checkInside(geometry.local(point))) {
+    const auto& geometry = entity.geometry();
+    if (CheckInside<codim>::check(geometry, point)) {
       return Common::make_unique<typename BaseType::EntityType>(entity);
     }
     return nullptr;
@@ -67,15 +94,15 @@ private:
 public:
   EntityInlevelSearch(const GridViewType& gridview)
     : gridview_(gridview)
-    , it_last_(gridview_.template begin<0>())
+    , it_last_(gridview_.template begin<codim>())
   {
   }
 
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points)
   {
-    const IteratorType begin = gridview_.template begin<0>();
-    const IteratorType end = gridview_.template end<0>();
+    const IteratorType begin = gridview_.template begin<codim>();
+    const IteratorType end = gridview_.template end<codim>();
     EntityVectorType ret(points.size());
     typename EntityVectorType::size_type idx(0);
     for (const auto& point : points) {
