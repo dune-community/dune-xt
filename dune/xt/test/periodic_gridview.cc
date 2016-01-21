@@ -7,7 +7,7 @@
 //   Rene Milk       (2015)
 //   Tobias Leibner  (2015)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
