@@ -4,7 +4,7 @@
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 // Authors:
 //   Andreas Buhr    (2014)
-//   Felix Schindler (2013 - 2015)
+//   Felix Schindler (2013 - 2016)
 //   Kirsten Weber   (2013)
 //   Rene Milk       (2013, 2015)
 //   Tobias Leibner  (2014 - 2015)

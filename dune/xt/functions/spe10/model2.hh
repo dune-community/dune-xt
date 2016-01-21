@@ -3,7 +3,8 @@
 // The copyright lies with the authors of this file (see below).
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 // Authors:
-//   Rene Milk (2015)
+//   Felix Schindler (2016)
+//   Rene Milk       (2015)
 
 #ifndef DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
 #define DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
