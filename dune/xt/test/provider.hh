@@ -18,7 +18,7 @@
 #include <dune/xt/common/type_utils.hh>
 #include <dune/xt/grid/provider/interface.hh>
 
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/gtest/gtest.h>
 
 template <class GridProviderType>
 class ConstGridProviderBase : public testing::Test

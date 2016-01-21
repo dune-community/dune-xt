@@ -13,7 +13,7 @@
 #include <dune/xt/grid/provider/dgf.hh>
 #include <dune/xt/grid/provider/gmsh.hh>
 
-#include <dune/xt/grid/test/provider.hh>
+#include "provider.hh"
 
 
 struct TestGridProvider : public GridProviderBase<Dune::XT::Grid::Providers::TESTGRIDPROVIDERTYPE<TESTGRIDTYPE>>
