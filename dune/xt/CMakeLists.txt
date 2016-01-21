@@ -6,3 +6,4 @@
 #   Felix Schindler (2016)
 
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
+add_subdirectory(test EXCLUDE_FROM_ALL )
