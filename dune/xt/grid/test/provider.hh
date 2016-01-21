@@ -15,7 +15,7 @@
 #endif
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/provider/interface.hh>
 
 #include <dune/xt/common/test/gtest/gtest.h>

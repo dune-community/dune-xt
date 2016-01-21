@@ -24,7 +24,7 @@
 #include <dune/grid/multiscale/default.hh>
 #endif
 
-#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
 namespace XT {
@@ -34,9 +34,9 @@ namespace internal {
 template <class G>
 struct is_grid_view_helper
 {
-  DXTC_has_typedef_initialize_once(Traits)
+  DXTC_has_typedef_initialize_once(Traits);
 
-      static const bool is_candidate = DXTC_has_typedef(Traits)<G>::value;
+  static const bool is_candidate = DXTC_has_typedef(Traits)<G>::value;
 }; // class is_grid_view_helper
 
 } // namespace internal

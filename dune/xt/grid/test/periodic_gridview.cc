@@ -16,7 +16,7 @@
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/string.hh>
-#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/periodic_gridview.hh>
 #include <dune/xt/grid/provider/cube.hh>

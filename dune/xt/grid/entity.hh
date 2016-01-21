@@ -19,7 +19,7 @@
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/string.hh>
-#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
 namespace XT {
