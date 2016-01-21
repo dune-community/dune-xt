@@ -11,23 +11,22 @@
 #ifndef DUNE_XT_FUNCTIONS_INTERFACE_HH
 #define DUNE_XT_FUNCTIONS_INTERFACE_HH
 
-#include <vector>
 #include <memory>
-#include <string>
 #include <ostream>
+#include <string>
 #include <type_traits>
+#include <vector>
 
+#include <dune/common/dynvector.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
-#include <dune/common/dynvector.hh>
-#include <dune/common/version.hh>
 #include <dune/common/parallel/mpihelper.hh>
+#include <dune/common/version.hh>
 
-#include <dune/geometry/referenceelements.hh>
 #include <dune/geometry/quadraturerules.hh>
+#include <dune/geometry/referenceelements.hh>
 
 #include <dune/grid/io/file/vtk.hh>
-#include <dune/xt/common/filesystem.hh>
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
@@ -35,11 +34,13 @@
 #endif
 
 #if HAVE_DUNE_PDELAB
-#include <dune/typetree/nodetags.hh>
 #include <dune/pdelab/common/function.hh>
+
+#include <dune/typetree/nodetags.hh>
 #endif
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_utils.hh>
 
@@ -749,8 +750,8 @@ struct is_localizable_function<F, false> : public std::false_type
 } // namespace XT
 } // namespace Dune
 
-#include "default.hh"
 #include "combined.hh"
+#include "default.hh"
 #include "derived.hh"
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACE_HH

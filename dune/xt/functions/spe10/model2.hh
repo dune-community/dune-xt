@@ -11,12 +11,13 @@
 #include <iostream>
 #include <memory>
 
-#include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/color.hh>
-#include <dune/xt/common/string.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_utils.hh>
+
 #include <dune/xt/functions/global.hh>
 
 namespace Dune {

@@ -14,6 +14,7 @@
 #include <memory>
 
 #include <dune/xt/common/configuration.hh>
+
 #include <dune/xt/functions/constant.hh>
 
 #include "interfaces.hh"

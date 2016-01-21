@@ -16,16 +16,18 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <dune/geometry/quadraturerules.hh>
+
 #include <dune/grid/common/rangegenerators.hh>
 #include <dune/grid/yaspgrid.hh>
 
-#include <dune/geometry/quadraturerules.hh>
-
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/grid/provider/cube.hh>
-#include <dune/xt/functions/flattop.hh>
-#include <dune/xt/common/string.hh>
 #include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/string.hh>
+
+#include <dune/xt/grid/provider/cube.hh>
+
+#include <dune/xt/functions/flattop.hh>
 
 #include "functions.hh"
 

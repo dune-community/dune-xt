@@ -10,8 +10,8 @@
 #ifndef DUNE_XT_FUNCTIONS_COMBINED_HH
 #define DUNE_XT_FUNCTIONS_COMBINED_HH
 
-#include <type_traits>
 #include <memory>
+#include <type_traits>
 
 #include <dune/common/typetraits.hh>
 

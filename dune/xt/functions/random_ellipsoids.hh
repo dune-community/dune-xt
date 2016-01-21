@@ -11,14 +11,13 @@
 #ifndef DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
 #define DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
 
-#include <vector>
 #include <cmath>
 #include <memory>
-
-#include <dune/common/exceptions.hh>
+#include <vector>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/debug.hh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/random.hh>
 

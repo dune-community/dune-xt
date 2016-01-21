@@ -10,15 +10,14 @@
 #define DUNE_XT_FUNCTIONS_INDICATOR_HH
 
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
-#include <dune/xt/common/type_utils.hh>
-
-#include <dune/xt/common/fvector.hh>
-#include <dune/xt/common/string.hh>
-#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/memory.hh>
+#include <dune/xt/common/string.hh>
+#include <dune/xt/common/type_utils.hh>
 
 #include "interfaces.hh"
 

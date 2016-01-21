@@ -13,8 +13,9 @@
 
 #include <functional>
 
-#include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/common/memory.hh>
+
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

@@ -9,15 +9,16 @@
 #ifndef DUNE_XT_TEST_FUNCTIONS_HH
 #define DUNE_XT_TEST_FUNCTIONS_HH
 
+#include <memory>
 #include <string>
 #include <type_traits>
-#include <memory>
 
 #include <dune/grid/common/rangegenerators.hh>
 
-#include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/ranges.hh>
 #include <dune/xt/test/gtest/gtest.h>
+
 #include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {

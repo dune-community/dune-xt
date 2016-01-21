@@ -9,18 +9,17 @@
 
 #include <dune/xt/test/main.hxx>
 
-
 #include <memory>
 
-#include <dune/common/exceptions.hh>
-
-#include <dune/xt/functions/interfaces.hh>
-#include <dune/xt/functions/constant.hh>
-
-#include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
-#endif // HAVE_ALUGRID
+#endif
+#include <dune/grid/yaspgrid.hh>
+
+#include <dune/xt/common/exceptions.hh>
+
+#include <dune/xt/functions/constant.hh>
+#include <dune/xt/functions/interfaces.hh>
 
 #include "functions.hh"
 

@@ -12,16 +12,16 @@
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH
 
+#include <mutex>
 #include <sstream>
 #include <vector>
-#include <mutex>
 
-#include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
 #include <dune/common/exceptions.hh>
+#include <dune/common/fvector.hh>
 
-#include <dune/xt/common/string.hh>
 #include <dune/xt/common/color.hh>
+#include <dune/xt/common/string.hh>
 
 #include "mathexpr.hh"
 

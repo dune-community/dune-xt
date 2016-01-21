@@ -7,19 +7,20 @@
 //   Rene Milk       (2015)
 
 #include <dune/xt/test/main.hxx>
-#include "functions.hh"
 
 #include <memory>
 
-#include <dune/common/exceptions.hh>
-
-#include <dune/xt/functions/interfaces.hh>
-#include <dune/xt/functions/ESV2007.hh>
-
-#include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
-#endif // HAVE_ALUGRID
+#endif
+#include <dune/grid/yaspgrid.hh>
+
+#include <dune/xt/common/exceptions.hh>
+
+#include <dune/xt/functions/ESV2007.hh>
+#include <dune/xt/functions/interfaces.hh>
+
+#include "functions.hh"
 
 using namespace Dune;
 using namespace Dune::XT;

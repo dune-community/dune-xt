@@ -9,8 +9,8 @@
 #ifndef DUNE_XT_FUNCTIONS_DERIVED_HH
 #define DUNE_XT_FUNCTIONS_DERIVED_HH
 
-#include <type_traits>
 #include <memory>
+#include <type_traits>
 
 #include <boost/numeric/conversion/cast.hpp>
 

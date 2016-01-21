@@ -8,19 +8,20 @@
 //   Tobias Leibner  (2014)
 
 #include <dune/xt/test/main.hxx>
-#include "functions.hh"
 
 #include <memory>
 
-#include <dune/common/exceptions.hh>
+#if HAVE_ALUGRID
+#include <dune/grid/alugrid.hh>
+#endif
+#include <dune/grid/yaspgrid.hh>
+
+#include <dune/xt/common/exceptions.hh>
 
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/checkerboard.hh>
 
-#include <dune/grid/yaspgrid.hh>
-#if HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
-#endif // HAVE_ALUGRID
+#include "functions.hh"
 
 using namespace Dune;
 using namespace Dune::XT;

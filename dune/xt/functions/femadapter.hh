@@ -10,8 +10,9 @@
 #ifndef DUNE_XT_FUNCTIONS_FEMADAPTER
 #define DUNE_XT_FUNCTIONS_FEMADAPTER
 
-#include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/common/memory.hh>
+
+#include <dune/xt/functions/interfaces.hh>
 
 #if HAVE_DUNE_FEM
 

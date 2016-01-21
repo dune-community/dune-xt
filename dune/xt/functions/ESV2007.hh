@@ -11,7 +11,6 @@
 #define DUNE_XT_FUNCTIONS_ESV2007_HH
 
 #include <cmath>
-
 #include <type_traits>
 
 #if HAVE_EIGEN

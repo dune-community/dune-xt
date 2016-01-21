@@ -11,8 +11,8 @@
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_HH
 
-#include <vector>
 #include <limits>
+#include <vector>
 
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
@@ -21,9 +21,9 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 
+#include "default.hh"
 #include "expression/base.hh"
 #include "interfaces.hh"
-#include "default.hh"
 
 namespace Dune {
 namespace XT {
