@@ -1,30 +1,33 @@
-// This file is part of the dune-xt-grid project:
-//   https://github.com/dune-community/dune-xt-grid
-// The copyright lies with the authors of this file (see below).
+// This file is part of the dune-stuff project:
+//   https://github.com/wwu-numerik/dune-stuff/
+// Copyright holders: Rene Milk, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-// Authors:
-//   Felix Schindler (2015 - 2016)
-//   Rene Milk       (2015)
-//   Tobias Leibner  (2015)
+//
+// Contributors: Tobias Leibner
 
-#ifndef DUNE_XT_GRID_PERIODICVIEW_HH
-#define DUNE_XT_GRID_PERIODICVIEW_HH
+#ifndef DUNE_STUFF_GRID_PERIODICVIEW_HH
+#define DUNE_STUFF_GRID_PERIODICVIEW_HH
+
+#include<config.h>
 
 #include <bitset>
 #include <map>
 #include <utility>
 #include <vector>
 
+#if HAVE_DUNE_GRID
 #include <dune/grid/common/gridview.hh>
-#include <dune/grid/common/rangegenerators.hh>
+#endif
 
-#include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/common/memory.hh>
-#include <dune/xt/grid/search.hh>
+#include <dune/stuff/aliases.hh>
+#include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/memory.hh>
+#include <dune/stuff/common/float_cmp.hh>
+#include <dune/stuff/common/ranges.hh>
+#include <dune/stuff/grid/search.hh>
 
 namespace Dune {
-namespace XT {
+namespace Stuff {
 namespace Grid {
 
 #if HAVE_DUNE_GRID
@@ -177,7 +180,7 @@ public:
     : BaseType(real_intersection)
     , periodic_(periodic_pair.first)
     , outside_(periodic_pair.second)
-    , real_grid_view_(new Common::ConstStorageProvider<RealGridViewType>(real_grid_view))
+    , real_grid_view_(new DSC::ConstStorageProvider<RealGridViewType>(real_grid_view))
   {
   }
 
@@ -195,7 +198,7 @@ public:
     if (periodic_)
       return outside_;
     else
-      return EntityType(BaseType::outside());
+      return BaseType::outside();
   } // ... outside() const
 
   LocalGeometry geometryInOutside() const
@@ -230,7 +233,7 @@ private:
         const auto curr_outside_intersection_coords = curr_outside_intersection.geometry().center();
         size_t coord_difference_count = 0;
         for (size_t ii = 0; ii < dimDomain; ++ii) {
-          if (Dune::XT::Common::FloatCmp::ne(curr_outside_intersection_coords[ii], coords[ii])) {
+          if (Dune::Stuff::Common::FloatCmp::ne(curr_outside_intersection_coords[ii], coords[ii])) {
             ++coord_difference_count;
           }
         }
@@ -246,7 +249,7 @@ private:
 protected:
   bool periodic_;
   EntityType outside_;
-  std::unique_ptr<Common::ConstStorageProvider<RealGridViewType>> real_grid_view_;
+  std::unique_ptr<DSC::ConstStorageProvider<RealGridViewType>> real_grid_view_;
 }; // ... class PeriodicIntersection ...
 
 /** \brief IntersectionIterator for PeriodicGridView
@@ -300,22 +303,22 @@ public:
 private:
   std::unique_ptr<Intersection> create_current_intersection() const
   {
-    return Common::make_unique<Intersection>(BaseType::operator*(),
-                                             real_grid_view_,
-                                             has_boundary_intersections_
-                                                 ? intersection_map_.at((BaseType::operator*()).indexInInside())
-                                                 : (const PeriodicPairType&)nonperiodic_pair_);
+    return DSC::make_unique<Intersection>(BaseType::operator*(),
+                                          real_grid_view_,
+                                          has_boundary_intersections_
+                                              ? intersection_map_.at((BaseType::operator*()).indexInInside())
+                                              : (const PeriodicPairType&)nonperiodic_pair_);
   } // ... create_current_intersection() const
 
   std::unique_ptr<Intersection> create_current_intersection_safely() const
   {
     const bool is_iend                            = (*this == real_grid_view_.iend(entity_));
     const RealIntersectionType& real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
-    return Common::make_unique<Intersection>(real_intersection,
-                                             real_grid_view_,
-                                             has_boundary_intersections_
-                                                 ? intersection_map_.at(real_intersection.indexInInside())
-                                                 : (const PeriodicPairType&)nonperiodic_pair_);
+    return DSC::make_unique<Intersection>(real_intersection,
+                                          real_grid_view_,
+                                          has_boundary_intersections_
+                                              ? intersection_map_.at(real_intersection.indexInInside())
+                                              : (const PeriodicPairType&)nonperiodic_pair_);
   } // ... create_current_intersection_safely() const
 
   const RealGridViewType& real_grid_view_;
@@ -527,7 +530,7 @@ private:
           std::size_t upper_right_coords = 0;
           for (std::size_t ii = 0; ii < dimDomain; ++ii) {
               if (periodic_directions[ii]) {
-                  if (XT::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
+                  if (Dune::Stuff::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
                       ++upper_right_coords;
                       periodic_coords[ii] = lower_left[ii];
                   }
@@ -641,7 +644,7 @@ public:
       auto entity_it         = BaseType::template begin<0>();
       DomainType lower_left  = entity_it->geometry().center();
       DomainType upper_right = lower_left;
-      for (const auto& entity : Dune::elements(*this)) {
+      for (const auto& entity : DSC::entityRange(*this)) {
           if (entity.hasBoundaryIntersections()) {
               const auto i_it_end = BaseType::iend(entity);
               for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
@@ -671,7 +674,7 @@ public:
       // index of the corresponding coordinate in the periodic_neighbor_coords_vector.
       std::map< IndexType, std::map< IntersectionIndexType, size_t > > entity_to_intersection_to_vector_index_map;
       std::map< IntersectionIndexType, size_t > intersection_to_vector_index_map;
-      for (const auto& entity : Dune::elements(*this)) {
+      for (const auto& entity : DSC::entityRange(*this)) {
           // count entities per geometry type for the PeriodicIndexSet
           const auto geometry_type = entity.type();
           if (type_counts.count(geometry_type))
@@ -691,12 +694,12 @@ public:
                       size_t num_boundary_coords = 0;
                       for (std::size_t ii = 0; ii < dimDomain; ++ii) {
                           if (periodic_directions_[ii]) {
-                              if (XT::Common::FloatCmp::eq(periodic_neighbor_coords[ii], lower_left[ii])) {
+                              if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], lower_left[ii])) {
                                   is_periodic = true;
                                   periodic_neighbor_coords[ii] =
                                           upper_right[ii] - 1.0 / 100.0 * (entity.geometry().center()[ii] - lower_left[ii]);
                                   ++num_boundary_coords;
-                              } else if (XT::Common::FloatCmp::eq(periodic_neighbor_coords[ii], upper_right[ii])) {
+                              } else if (Dune::Stuff::Common::FloatCmp::eq(periodic_neighbor_coords[ii], upper_right[ii])) {
                                   is_periodic = true;
                                   periodic_neighbor_coords[ii] =
                                           lower_left[ii] + 1.0 / 100.0 * (upper_right[ii] - entity.geometry().center()[ii]);
@@ -748,12 +751,12 @@ public:
 
   int size (int codim) const
   {
-      return index_set_->size(codim);
+      return index_set_.size(codim);
   }
 
   int size (const Dune::GeometryType &type) const
   {
-      return index_set_->size(type);
+      return index_set_.size(type);
   }
 
   template<int cd>
@@ -858,19 +861,19 @@ private:
       -  Only cube and regular simplex grids have been tested so far. Other grids may not work properly. This is due to
       the heuristics for finding the periodic neighbor entity: Given an intersection on the boundary that shall be
       periodic, the coordinates intersection.geometry().center() are moved to the other side of the grid and then
-      supplied to Dune::XT::Grid::EntityInLevelSearch. As the coordinates are on the boundary of the wanted entity,
+      supplied to Dune::Stuff::Grid::EntityInLevelSearch. As the coordinates are on the boundary of the wanted entity,
       this search will fail for some grids. Thus, the coordinates are moved a little to the inside of the grid before
       searching for the entity. The moved coordinates will be inside the wanted entity for cube and usual simplex grids
       but this is not guaranteed for arbitrary grids.
  */
 template <class RealGridViewImp, bool periodic_codim_iterator = true, bool use_less_memory = false>
-class PeriodicGridView : XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, periodic_codim_iterator, use_less_memory>>,
+class PeriodicGridView : Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, periodic_codim_iterator, use_less_memory>>,
                          public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp, periodic_codim_iterator, use_less_memory>>
 {
   typedef RealGridViewImp RealGridViewType;
   typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType, periodic_codim_iterator, use_less_memory>> BaseType;
   typedef
-      typename XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, periodic_codim_iterator, use_less_memory>> ConstStorProv;
+      typename Dune::Stuff::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, periodic_codim_iterator, use_less_memory>> ConstStorProv;
   typedef typename RealGridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
 
 public:
@@ -900,9 +903,8 @@ class PeriodicGridView
 
 #endif // HAVE_DUNE_GRID
 
-
 } // namespace Grid
-} // namespace XT
+} // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_PERIODICVIEW_HH
+#endif // DUNE_STUFF_GRID_PERIODICVIEW_HH
