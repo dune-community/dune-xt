@@ -7,7 +7,7 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#include <dune/xt/test/main.hxx>
+#include <dune/xt/common/test/main.hxx>
 
 #include <memory>
 
