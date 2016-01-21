@@ -16,7 +16,6 @@
 #include <dune/xt/functions/spe10/model1.hh>
 #include <dune/xt/functions/spe10/model2.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -38,11 +37,3 @@ TEST_F(Spe10Model2FunctionTest, provides_required_methods)
 {
   this->check();
 }
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_Spe10Model2FunctionTest, provides_required_methods)
-{
-}
-
-#endif // HAVE_DUNE_GRID

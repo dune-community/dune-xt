@@ -26,10 +26,8 @@
 #include <dune/geometry/referenceelements.hh>
 #include <dune/geometry/quadraturerules.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk.hh>
 #include <dune/xt/common/filesystem.hh>
-#endif
 
 #if HAVE_DUNE_FEM
 #include <dune/fem/function/common/function.hh>
@@ -81,12 +79,10 @@ struct ChooseVariant
 
 } // namespace internal
 
-#if HAVE_DUNE_GRID
 
 template <class GridViewType, size_t dimRange, size_t dimRangeCols = 1>
 class VisualizationAdapter;
 
-#endif // HAVE_DUNE_GRID
 
 template <class MinuendType, class SubtrahendType>
 class Difference;
@@ -407,7 +403,6 @@ public:
     return DivergenceType(*this);
   }
 
-#if HAVE_DUNE_GRID
   /**
    * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default. This means that the grid you
    *        see in the visualization is a refinement of the actual grid!
@@ -431,7 +426,6 @@ public:
     else
       vtk_writer->pwrite(filename, directory, "", vtk_output_type);
   } // ... visualize(...)
-#endif // HAVE_DUNE_GRID
 
   virtual void report(std::ostream& out, const std::string prefix = "") const
   {

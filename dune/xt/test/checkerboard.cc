@@ -17,7 +17,6 @@
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/checkerboard.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -38,11 +37,3 @@ TEST_F(CheckerboardFunctionTest, provides_required_methods)
 {
   this->check();
 }
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_CheckerboardFunctionTest, provides_required_methods)
-{
-}
-
-#endif // HAVE_DUNE_GRID

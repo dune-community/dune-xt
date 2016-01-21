@@ -16,7 +16,6 @@
 
 #include <dune/xt/functions.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -44,17 +43,3 @@ struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
     }
   }
 };
-
-
-TEST_F(FunctionsTest, provides_required_methods)
-{
-  this->check();
-}
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_FunctionsTest, provides_required_methods)
-{
-}
-
-#endif // HAVE_DUNE_GRID

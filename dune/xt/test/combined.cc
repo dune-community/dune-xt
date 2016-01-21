@@ -12,10 +12,8 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/common/rangegenerators.hh>
 #include <dune/grid/yaspgrid.hh>
-#endif
 
 #include <dune/geometry/quadraturerules.hh>
 
@@ -25,8 +23,6 @@
 #include <dune/xt/functions/combined.hh>
 
 #include "functions.hh"
-
-#if HAVE_DUNE_GRID
 
 using namespace Dune;
 using namespace Dune::XT;
@@ -99,18 +95,3 @@ TYPED_TEST(DifferenceFunctionTest, evaluate_check)
     }
   }
 } // DifferenceFunctionTest, evaluate_check
-
-#else // HAVE_DUNE_GRID
-
-// no-compile placeholders to mark disabled tests in test-binary output
-TEST(DISABLED_FlatTopFunctionTest, static_interface_check)
-{
-}
-TEST(DISABLED_DifferenceFunctionTest, dynamic_interface_check)
-{
-}
-TEST(DISABLED_DifferenceFunctionTest, evaluate_check)
-{
-}
-
-#endif // HAVE_DUNE_GRID

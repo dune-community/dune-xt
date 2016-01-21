@@ -12,9 +12,7 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/io/file/vtk/function.hh>
-#endif
 
 #include <dune/xt/common/float_cmp.hh>
 
@@ -24,7 +22,6 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
-#if HAVE_DUNE_GRID
 
 template <class GridViewType, size_t dimRange, size_t dimRangeCols>
 class VisualizationAdapter : public VTKFunction<GridViewType>
@@ -106,7 +103,6 @@ private:
   const std::string name_;
 }; // class VisualizationAdapter
 
-#endif // HAVE_DUNE_GRID
 
 } // namespace Functions
 } // namespace XT

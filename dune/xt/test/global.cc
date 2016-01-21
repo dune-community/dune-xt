@@ -17,7 +17,6 @@
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/global.hh>
 
-#if HAVE_DUNE_GRID
 #include <dune/grid/yaspgrid.hh>
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
@@ -38,16 +37,3 @@ struct GlobalLambdaFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
     EXPECT_EQ(one.evaluate(xx), RangeType(1));
   }
 };
-
-TEST_F(GlobalLambdaFunctionTest, provides_required_methods)
-{
-  this->check();
-}
-
-#else // HAVE_DUNE_GRID
-
-TEST(DISABLED_GlobalLambdaFunctionTest, provides_required_methods)
-{
-}
-
-#endif // HAVE_DUNE_GRID
