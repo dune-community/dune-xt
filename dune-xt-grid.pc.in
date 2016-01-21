@@ -15,7 +15,7 @@ DEPENDENCIES=@REQUIRES@
 
 Name: @PACKAGE_NAME@
 Version: @VERSION@
-Description: dune-xt-grid module
+Description: DUNE eXTensions (grid)
 URL: https://github.com/dune-community/dune-xt-grid
 Requires: dune-common dune-testtools dune-geometry dune-grid dune-xt-common
 Libs: -L${libdir}
