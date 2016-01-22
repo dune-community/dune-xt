@@ -391,24 +391,6 @@ struct Layer<GridType, ChooseLayer::local_oversampled, ChoosePartView::part>
 
 #endif // HAVE_DUNE_GRID_MULTISCALE
 
-template <class GridType, ChooseLayer layer, ChoosePartView type>
-struct Layer
-{
-  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
-};
-
-template <class GridType, ChoosePartView type>
-struct LevelPartView
-{
-  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
-};
-
-template <class GridType, ChoosePartView type>
-struct LeafPartView
-{
-  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-grid!");
-};
-
 
 } // namespace Grid
 } // namespace XT
