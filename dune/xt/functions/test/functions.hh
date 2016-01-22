@@ -18,7 +18,7 @@
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/ranges.hh>
-#include <dune/xt/test/gtest/gtest.h>
+#include <dune/xt/common/test/gtest/gtest.h>
 
 #include <dune/xt/functions/interfaces.hh>
 
