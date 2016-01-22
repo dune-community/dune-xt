@@ -8,23 +8,24 @@
 //   Tobias Leibner  (2014)
 
 // This one has to come first (includes the config.h)!
-#include "main.hxx"
+#include <dune/xt/common/test/main.hxx>
 
 #include <tuple>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/logging.hh>
-#include <dune/stuff/la/container.hh>
-#include <dune/stuff/la/solver.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/logging.hh>
+#include <dune/xt/la/container.hh>
+#include <dune/xt/la/solver.hh>
 
-#include "la_container.hh"
+#include "container.hh"
 
 // toggle output
 // std::ostream& out = std::cout;
-std::ostream& out = DSC_LOG.devnull();
+std::ostream& out = DXTC_LOG.devnull();
 
-using namespace Dune::Stuff;
-using namespace Dune::Stuff::LA;
+using namespace Dune;
+using namespace Dune::XT;
+using namespace Dune::XT::LA;
 
 struct SolverTest : public ::testing::Test
 {
@@ -51,7 +52,7 @@ struct SolverTest : public ::testing::Test
     // static tests
     std::vector<std::string> types = SolverType::types();
     if (types.size() == 0)
-      DUNE_THROW(Exceptions::results_are_not_as_expected, "Solver has no types!");
+      DUNE_THROW(Common::Exceptions::results_are_not_as_expected, "Solver has no types!");
     for (auto type : types) {
       out << "solving with type '" << type << "' and options" << std::endl;
       Common::Configuration options = SolverType::options(type);

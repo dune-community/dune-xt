@@ -13,7 +13,7 @@
 #include <algorithm>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 // ================================
@@ -82,5 +82,5 @@ void SparsityPatternDefault::sort()
 }
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune

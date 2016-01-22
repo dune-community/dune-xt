@@ -16,12 +16,12 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 enum class ChooseBackend
@@ -84,7 +84,7 @@ static Out boost_numeric_cast(const In& in)
   try {
     return boost::numeric_cast<Out>(in);
   } catch (boost::bad_numeric_cast& ee) {
-    DUNE_THROW(Exceptions::wrong_input_given,
+    DUNE_THROW(Common::Exceptions::wrong_input_given,
                "There was an error in boost converting '" << in << "' to '" << Common::Typename<Out>::value() << "': "
                                                           << ee.what());
   }
@@ -209,9 +209,10 @@ namespace internal {
 template <class C>
 struct is_container_helper
 {
-  DSC_has_typedef_initialize_once(Traits) DSC_has_typedef_initialize_once(ScalarType)
+  DXTC_has_typedef_initialize_once(Traits);
+  DXTC_has_typedef_initialize_once(ScalarType);
 
-      static const bool is_candidate = DSC_has_typedef(Traits)<C>::value && DSC_has_typedef(ScalarType)<C>::value;
+  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(ScalarType)<C>::value;
 }; // class is_container_helper
 
 } // namespace internal
@@ -270,7 +271,7 @@ public:
 }; // class ProvidesDataAccess
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // #ifndef DUNE_XT_LA_CONTAINER_CONTAINER_INTERFACE_HH

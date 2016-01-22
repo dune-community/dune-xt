@@ -18,18 +18,18 @@
 
 #include <dune/common/ftraits.hh>
 
-#include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/common/matrix.hh>
-#include <dune/stuff/common/type_utils.hh>
+#include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/type_traits.hh>
 
 #include "container-interface.hh"
 #include "pattern.hh"
 #include "vector-interface.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 /**
@@ -239,9 +239,10 @@ namespace internal {
 template <class M>
 struct is_matrix_helper
 {
-  DSC_has_typedef_initialize_once(Traits) DSC_has_typedef_initialize_once(ScalarType)
+  DXTC_has_typedef_initialize_once(Traits);
+  DXTC_has_typedef_initialize_once(ScalarType);
 
-      static const bool is_candidate = DSC_has_typedef(Traits)<M>::value && DSC_has_typedef(ScalarType)<M>::value;
+  static const bool is_candidate = DXTC_has_typedef(Traits)<M>::value && DXTC_has_typedef(ScalarType)<M>::value;
 }; // class is_matrix_helper
 
 } // namespace internal
@@ -308,7 +309,7 @@ struct MatrixAbstractionBase
 
 } // namespace internal
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_HH

@@ -18,7 +18,7 @@
 #include <cmath>
 #include <complex>
 
-#include <dune/stuff/common/disable_warnings.hh>
+#include <dune/xt/common/disable_warnings.hh>
 #if HAVE_EIGEN
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
@@ -35,16 +35,16 @@
 //#     include <Eigen/SuperLUSupport>
 //#   endif
 #endif // HAVE_EIGEN
-#include <dune/stuff/common/reenable_warnings.hh>
+#include <dune/xt/common/reenable_warnings.hh>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/la/container/eigen.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/la/container/eigen.hh>
 
 #include "../solver.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 #if HAVE_EIGEN
@@ -106,7 +106,7 @@ public:
              const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW(Exceptions::configuration_error,
+      DUNE_THROW(Common::Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
@@ -176,7 +176,7 @@ public:
     else if (type == "lu.partialpiv")
       solution.backend() = matrix_.backend().partialPivLu().solve(rhs.backend());
     else
-      DUNE_THROW(Exceptions::internal_error,
+      DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by types()!");
     // check
     if (check_for_inf_nan)
@@ -200,7 +200,7 @@ public:
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const R sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_threshold || DSC::isnan(sup_norm) || DSC::isinf(sup_norm)) {
+      if (sup_norm > post_check_solves_system_threshold || Common::isnan(sup_norm) || Common::isinf(sup_norm)) {
         std::stringstream msg;
         msg << "The computed solution does not solve the system (although the eigen backend reported "
             << "'Success') and you requested checking (see options below)!\n"
@@ -326,7 +326,7 @@ public:
              const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW(Exceptions::configuration_error,
+      DUNE_THROW(Common::Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
@@ -338,8 +338,8 @@ public:
       typedef typename MatrixType::BackendType::InnerIterator InnerIterator;
       for (EIGEN_size_t ii = 0; ii < matrix_.backend().outerSize(); ++ii) {
         for (InnerIterator it(matrix_.backend(), ii); it; ++it) {
-          if (DSC::isnan(std::real(it.value())) || DSC::isnan(std::imag(it.value()))
-              || DSC::isinf(std::abs(it.value())))
+          if (Common::isnan(std::real(it.value())) || Common::isnan(std::imag(it.value()))
+              || Common::isinf(std::abs(it.value())))
             DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                        "Given matrix contains inf or nan and you requested checking (see options below)!\n"
                            << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
@@ -513,7 +513,7 @@ public:
       //      info = solver.info();
       //#endif // HAVE_SUPERLU
     } else
-      DUNE_THROW(Exceptions::internal_error,
+      DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by types()!");
     // handle eigens info
     if (info != ::Eigen::Success) {
@@ -539,9 +539,9 @@ public:
                        << "Those were the given options:\n\n"
                        << opts);
       else
-        DUNE_THROW(Exceptions::internal_error,
+        DUNE_THROW(Common::Exceptions::internal_error,
                    "The eigen backend reported an unknown status!\n"
-                       << "Please report this to the dune-stuff developers!");
+                       << "Please report this to the dune-xt developers!");
     }
     // check
     if (check_for_inf_nan)
@@ -561,7 +561,7 @@ public:
       auto tmp = rhs.copy();
       tmp.backend() = matrix_.backend() * solution.backend() - rhs.backend();
       const R sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_threshold || DSC::isnan(sup_norm) || DSC::isinf(sup_norm))
+      if (sup_norm > post_check_solves_system_threshold || Common::isnan(sup_norm) || Common::isinf(sup_norm))
         DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
                    "The computed solution does not solve the system (although the eigen backend reported "
                        << "'Success') and you requested checking (see options below)!\n"
@@ -596,7 +596,7 @@ class Solver<EigenRowMajorSparseMatrix<S>>
 #endif // HAVE_EIGEN
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_SOLVER_EIGEN_HH

@@ -15,7 +15,7 @@
 #include <set>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 class SparsityPatternDefault
@@ -54,7 +54,7 @@ private:
 }; // class SparsityPatternDefault
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_CONTAINER_PATTERN_HH

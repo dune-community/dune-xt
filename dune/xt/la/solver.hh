@@ -13,30 +13,30 @@
 #include <string>
 #include <vector>
 
-#include <dune/stuff/common/type_utils.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/parallel/helper.hh>
+#include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/parallel/helper.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
+namespace LA {
 namespace Exceptions {
 
-class linear_solver_failed_bc_data_did_not_fulfill_requirements : public linear_solver_failed
+class linear_solver_failed_bc_data_did_not_fulfill_requirements : public Common::Exceptions::linear_solver_failed
 {
 };
-class linear_solver_failed_bc_it_did_not_converge : public linear_solver_failed
+class linear_solver_failed_bc_it_did_not_converge : public Common::Exceptions::linear_solver_failed
 {
 };
-class linear_solver_failed_bc_it_was_not_set_up_correctly : public linear_solver_failed
+class linear_solver_failed_bc_it_was_not_set_up_correctly : public Common::Exceptions::linear_solver_failed
 {
 };
-class linear_solver_failed_bc_the_solution_does_not_solve_the_system : public linear_solver_failed
+class linear_solver_failed_bc_the_solution_does_not_solve_the_system : public Common::Exceptions::linear_solver_failed
 {
 };
 
 } // namespace Exceptions
-namespace LA {
 namespace internal {
 
 static const constexpr size_t max_size_to_print = 5;
@@ -52,7 +52,7 @@ public:
       std::stringstream ss;
       for (auto opt : opts)
         ss << opt << " ";
-      DUNE_THROW(Exceptions::configuration_error,
+      DUNE_THROW(Common::Exceptions::configuration_error,
                  "Given type '" << type << "' not supported (see below for a list of supported ones). "
                                 << "Call options() first!\n"
                                 << ss.str());
@@ -132,7 +132,7 @@ public:
 }; // class Solver
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #include "solver/common.hh"

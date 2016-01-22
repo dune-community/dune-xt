@@ -16,22 +16,22 @@ extern "C" {
 #include "fasp_functs.h"
 }
 
-#include <dune/stuff/la/container/eigen.hh>
+#include <dune/xt/la/container/eigen.hh>
 
 #include "interface.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 template <class ElementImp>
-class AmgSolver<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>, Dune::Stuff::LA::EigenDenseVector<ElementImp>>
-    : public SolverInterface<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>,
-                             Dune::Stuff::LA::EigenDenseVector<ElementImp>>
+class AmgSolver<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>, Dune::XT::LA::EigenDenseVector<ElementImp>>
+    : public SolverInterface<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>,
+                             Dune::XT::LA::EigenDenseVector<ElementImp>>
 {
 public:
-  typedef SolverInterface<Dune::Stuff::LA::EigenRowMajorSparseMatrix<ElementImp>,
-                          Dune::Stuff::LA::EigenDenseVector<ElementImp>> BaseType;
+  typedef SolverInterface<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>,
+                          Dune::XT::LA::EigenDenseVector<ElementImp>> BaseType;
 
   typedef typename BaseType::MatrixType MatrixType;
   typedef typename BaseType::VectorType VectorType;
@@ -360,7 +360,7 @@ private:
 }; // class AmgSolver
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // HAVE_EIGEN

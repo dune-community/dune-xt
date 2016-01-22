@@ -5,11 +5,12 @@
 //
 // Contributors: Tobias Leibner
 
-#include "main.hxx"
+#include <dune/xt/common/test/main.hxx>
 
 #include "la_container.hh"
 
 using namespace Dune;
+using namespace Dune::XT;
 
 static const size_t dim = 4;
 
@@ -33,7 +34,7 @@ struct VectorTest : public ::testing::Test
                   "ScalarType of derived_type has to be the correct Type!");
     static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the vector as the interface
-    typedef typename Stuff::LA::VectorInterface<Traits, D_ScalarType> InterfaceType;
+    typedef typename XT::LA::VectorInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
     typedef typename InterfaceType::RealType I_RealType;
@@ -53,7 +54,7 @@ struct VectorTest : public ::testing::Test
       EXPECT_FALSE(
           DSC::FloatCmp::ne(d_by_size_and_value.get_entry(ii), D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(1)))
           << d_by_size_and_value.get_entry(ii);
-      EXPECT_FALSE(DSC::FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value[ii]))
+      EXPECT_FALSE(Common::FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value[ii]))
           << d_by_size_and_value[ii];
     }
     size_t d_dim = d_by_size.dim();
@@ -242,19 +243,19 @@ struct VectorTest : public ::testing::Test
     ScalarType dot_operator   = ones * zeros;
     ScalarType dot2           = zeros.dot(ones);
     ScalarType dot_operator_2 = zeros * ones;
-    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
                 && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
                 && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
     dot          = ones.dot(ones);
     dot_operator = ones * ones;
-    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(4)) && DSC::FloatCmp::eq(dot_operator, ScalarType(4)))
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(4)) && DSC::FloatCmp::eq(dot_operator, ScalarType(4)))
         << "These should equal 4: " << dot << ", " << dot_operator;
     dot            = ones.dot(testvector_3);
     dot_operator   = ones * testvector_3;
     dot2           = testvector_3.dot(ones);
     dot_operator_2 = testvector_3 * ones;
-    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
                 && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
                 && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
@@ -262,7 +263,7 @@ struct VectorTest : public ::testing::Test
     dot_operator   = countingup * testvector_5;
     dot2           = testvector_5.dot(countingup);
     dot_operator_2 = testvector_5 * countingup;
-    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(-5.5)) && DSC::FloatCmp::eq(dot, dot2)
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-5.5)) && DSC::FloatCmp::eq(dot, dot2)
                 && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
                 && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal -5.5: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
@@ -270,7 +271,7 @@ struct VectorTest : public ::testing::Test
     dot_operator   = testvector_3 * testvector_5;
     dot2           = testvector_5.dot(testvector_3);
     dot_operator_2 = testvector_5 * testvector_3;
-    EXPECT_TRUE(DSC::FloatCmp::eq(dot, ScalarType(-7.25)) && DSC::FloatCmp::eq(dot, dot2)
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-7.25)) && DSC::FloatCmp::eq(dot, dot2)
                 && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
                 && DSC::FloatCmp::eq(dot, dot_operator))
         << "These should all equal -7.25: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
@@ -316,37 +317,37 @@ struct VectorTest : public ::testing::Test
     scaled_by_operator = testvector_1;
     scaled_by_operator *= ScalarType(2);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2) * testvector_1[ii], scaled[ii]));
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2) * testvector_1[ii], scaled_by_operator[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(2) * testvector_1[ii], scaled[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(2) * testvector_1[ii], scaled_by_operator[ii]));
     }
     scaled = testvector_3;
     scaled.scal(ScalarType(-2));
     scaled_by_operator = testvector_3;
     scaled_by_operator *= ScalarType(-2);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-2) * testvector_3[ii], scaled[ii]));
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-2) * testvector_3[ii], scaled_by_operator[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(-2) * testvector_3[ii], scaled[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(-2) * testvector_3[ii], scaled_by_operator[ii]));
     }
     scaled = countingup;
     scaled.scal(ScalarType(2.2));
     scaled_by_operator = countingup;
     scaled_by_operator *= ScalarType(2.2);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2.2) * countingup[ii], scaled[ii]));
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2.2) * countingup[ii], scaled_by_operator[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(2.2) * countingup[ii], scaled[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(2.2) * countingup[ii], scaled_by_operator[ii]));
     }
     scaled = testvector_5;
     scaled.scal(ScalarType(-3.75));
     scaled_by_operator = testvector_5;
     scaled_by_operator *= ScalarType(-3.75);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-3.75) * testvector_5[ii], scaled[ii]));
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(-3.75) * testvector_5[ii], scaled_by_operator[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(-3.75) * testvector_5[ii], scaled[ii]));
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(-3.75) * testvector_5[ii], scaled_by_operator[ii]));
     }
     VectorImp a = ones;
     a.scal(ScalarType(0));
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
 
     // test operator+, operator+=, add, iadd
@@ -406,17 +407,17 @@ struct VectorTest : public ::testing::Test
     a = ones;
     a += testvector_3;
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     a.iadd(testvector_3);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     ones.add(testvector_3, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
 
     // test operator-, operator-=, sub, isub
@@ -476,17 +477,17 @@ struct VectorTest : public ::testing::Test
     a = ones;
     a -= testvector_3;
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     a.isub(testvector_3);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
     a = ones;
     ones.sub(testvector_3, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
 
     // test operator= for scalars
@@ -523,7 +524,7 @@ struct VectorTest : public ::testing::Test
     a = ones;
     a.axpy(ScalarType(2), testvector_3);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), ones[ii])) << "check copy-on-write";
     }
   } // void produces_correct_results() const
 }; // struct VectorTest

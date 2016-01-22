@@ -14,13 +14,13 @@
 #include <memory>
 #include <type_traits>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/la/container/interfaces.hh>
-#include <dune/stuff/la/container/common.hh>
-#include <dune/stuff/la/container/eigen.hh>
-#include <dune/stuff/la/container/istl.hh>
-#include <dune/stuff/la/container.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/la/container/interfaces.hh>
+#include <dune/xt/la/container/common.hh>
+#include <dune/xt/la/container/eigen.hh>
+#include <dune/xt/la/container/istl.hh>
+#include <dune/xt/la/container.hh>
 
 template <class ContainerImp>
 class ContainerFactory
@@ -33,22 +33,22 @@ public:
 };
 
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::CommonDenseVector<S>>
+class ContainerFactory<Dune::XT::LA::CommonDenseVector<S>>
 {
 public:
-  static Dune::Stuff::LA::CommonDenseVector<S> create(const size_t size)
+  static Dune::XT::LA::CommonDenseVector<S> create(const size_t size)
   {
-    return Dune::Stuff::LA::CommonDenseVector<S>(size, S(1));
+    return Dune::XT::LA::CommonDenseVector<S>(size, S(1));
   }
 };
 
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::CommonDenseMatrix<S>>
+class ContainerFactory<Dune::XT::LA::CommonDenseMatrix<S>>
 {
 public:
-  static Dune::Stuff::LA::CommonDenseMatrix<S> create(const size_t size)
+  static Dune::XT::LA::CommonDenseMatrix<S> create(const size_t size)
   {
-    Dune::Stuff::LA::CommonDenseMatrix<S> matrix(size, size);
+    Dune::XT::LA::CommonDenseMatrix<S> matrix(size, size);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
     return matrix;
@@ -57,25 +57,25 @@ public:
 
 #if HAVE_DUNE_ISTL
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::IstlDenseVector<S>>
+class ContainerFactory<Dune::XT::LA::IstlDenseVector<S>>
 {
 public:
-  static Dune::Stuff::LA::IstlDenseVector<S> create(const size_t size)
+  static Dune::XT::LA::IstlDenseVector<S> create(const size_t size)
   {
-    return Dune::Stuff::LA::IstlDenseVector<S>(size, S(1));
+    return Dune::XT::LA::IstlDenseVector<S>(size, S(1));
   }
 };
 
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::IstlRowMajorSparseMatrix<S>>
+class ContainerFactory<Dune::XT::LA::IstlRowMajorSparseMatrix<S>>
 {
 public:
-  static Dune::Stuff::LA::IstlRowMajorSparseMatrix<S> create(const size_t size)
+  static Dune::XT::LA::IstlRowMajorSparseMatrix<S> create(const size_t size)
   {
-    Dune::Stuff::LA::SparsityPatternDefault pattern(size);
+    Dune::XT::LA::SparsityPatternDefault pattern(size);
     for (size_t ii = 0; ii < size; ++ii)
       pattern.inner(ii).push_back(ii);
-    Dune::Stuff::LA::IstlRowMajorSparseMatrix<S> matrix(size, size, pattern);
+    Dune::XT::LA::IstlRowMajorSparseMatrix<S> matrix(size, size, pattern);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
     return matrix;
@@ -85,32 +85,32 @@ public:
 
 #if HAVE_EIGEN
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::EigenDenseVector<S>>
+class ContainerFactory<Dune::XT::LA::EigenDenseVector<S>>
 {
 public:
-  static Dune::Stuff::LA::EigenDenseVector<S> create(const size_t size)
+  static Dune::XT::LA::EigenDenseVector<S> create(const size_t size)
   {
-    return Dune::Stuff::LA::EigenDenseVector<S>(size, S(1));
+    return Dune::XT::LA::EigenDenseVector<S>(size, S(1));
   }
 };
 
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::EigenMappedDenseVector<S>>
+class ContainerFactory<Dune::XT::LA::EigenMappedDenseVector<S>>
 {
 public:
-  static Dune::Stuff::LA::EigenMappedDenseVector<S> create(const size_t size)
+  static Dune::XT::LA::EigenMappedDenseVector<S> create(const size_t size)
   {
-    return Dune::Stuff::LA::EigenMappedDenseVector<S>(size, S(1));
+    return Dune::XT::LA::EigenMappedDenseVector<S>(size, S(1));
   }
 };
 
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::EigenDenseMatrix<S>>
+class ContainerFactory<Dune::XT::LA::EigenDenseMatrix<S>>
 {
 public:
-  static Dune::Stuff::LA::EigenDenseMatrix<S> create(const size_t size)
+  static Dune::XT::LA::EigenDenseMatrix<S> create(const size_t size)
   {
-    Dune::Stuff::LA::EigenDenseMatrix<S> matrix(size, size);
+    Dune::XT::LA::EigenDenseMatrix<S> matrix(size, size);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
     return matrix;
@@ -118,15 +118,15 @@ public:
 };
 
 template <class S>
-class ContainerFactory<Dune::Stuff::LA::EigenRowMajorSparseMatrix<S>>
+class ContainerFactory<Dune::XT::LA::EigenRowMajorSparseMatrix<S>>
 {
 public:
-  static Dune::Stuff::LA::EigenRowMajorSparseMatrix<S> create(const size_t size)
+  static Dune::XT::LA::EigenRowMajorSparseMatrix<S> create(const size_t size)
   {
-    Dune::Stuff::LA::SparsityPatternDefault pattern(size);
+    Dune::XT::LA::SparsityPatternDefault pattern(size);
     for (size_t ii = 0; ii < size; ++ii)
       pattern.inner(ii).push_back(ii);
-    Dune::Stuff::LA::EigenRowMajorSparseMatrix<S> matrix(size, size, pattern);
+    Dune::XT::LA::EigenRowMajorSparseMatrix<S> matrix(size, size, pattern);
     for (size_t ii = 0; ii < size; ++ii)
       matrix.unit_row(ii);
     return matrix;

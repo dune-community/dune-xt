@@ -16,24 +16,23 @@
 #include <vector>
 #include <complex>
 
-#include <dune/stuff/common/disable_warnings.hh>
+#include <dune/xt/common/disable_warnings.hh>
 #if HAVE_EIGEN
 #include <Eigen/Core>
 #endif
-#include <dune/stuff/common/reenable_warnings.hh>
+#include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/float_cmp.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/float_cmp.hh>
 
-#include "dune/stuff/la/container/interfaces.hh"
+#include "dune/xt/la/container/interfaces.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 template <class ScalarImp>
@@ -111,7 +110,7 @@ public:
   void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
   {
     if (xx.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
     backend() += alpha * xx.backend();
   } // ... axpy(...)
@@ -186,7 +185,7 @@ public:
   ScalarType dot(const EigenBaseVector<T, ScalarType>& other) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     return backend_->transpose() * *(other.backend_);
   } // ... dot(...)
@@ -215,10 +214,10 @@ public:
   void add(const EigenBaseVector<T1, ScalarType>& other, EigenBaseVector<T2, ScalarType>& result) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     if (result.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     result.backend() = *backend_ + *(other.backend_);
   } // ... add(...)
@@ -232,7 +231,7 @@ public:
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend() += *(other.backend_);
   } // ... iadd(...)
@@ -246,10 +245,10 @@ public:
   void sub(const EigenBaseVector<T1, ScalarType>& other, EigenBaseVector<T2, ScalarType>& result) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     if (result.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     result.backend() = *backend_ - *(other.backend_);
   } // ... sub(...)
@@ -263,7 +262,7 @@ public:
   void isub(const EigenBaseVector<T, ScalarType>& other)
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend() -= *(other.backend_);
   } // ... isub(...)
@@ -312,7 +311,7 @@ class EigenBaseVector
 #endif // HAVE_EIGEN
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_CONTAINER_EIGEN_BASE_HH

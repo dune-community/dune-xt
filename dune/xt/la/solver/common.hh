@@ -17,15 +17,15 @@
 #include <sstream>
 #include <cmath>
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
 
-#include <dune/stuff/la/container/common.hh>
+#include <dune/xt/la/container/common.hh>
 
 #include "../solver.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 template <class S, class CommunicatorType>
@@ -70,7 +70,7 @@ public:
   void apply(const CommonDenseVector<S>& rhs, CommonDenseVector<S>& solution, const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
-      DUNE_THROW(Exceptions::configuration_error,
+      DUNE_THROW(Common::Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
@@ -92,7 +92,7 @@ public:
       matrix_.mv(solution, tmp);
       tmp -= rhs;
       const R sup_norm = tmp.sup_norm();
-      if (sup_norm > post_check_solves_system_threshold || DSC::isnan(sup_norm) || DSC::isinf(sup_norm))
+      if (sup_norm > post_check_solves_system_threshold || Common::isnan(sup_norm) || Common::isinf(sup_norm))
         DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
                    "The computed solution does not solve the system (although the dune-common backend "
                        << "reported no error) and you requested checking (see options below)! "
@@ -111,7 +111,7 @@ private:
 }; // class Solver< CommonDenseMatrix< ... > >
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_SOLVER_COMMON_HH

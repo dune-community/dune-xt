@@ -14,10 +14,10 @@
 #include "container/eigen.hh"
 #include "container/istl.hh"
 
-#include <dune/stuff/common/logging.hh>
+#include <dune/xt/common/logging.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 template <class ScalarType, ChooseBackend backend = default_backend>
@@ -86,7 +86,7 @@ void ensure_parallel_dof_consistency(VectorImp<typename Space::RangeFieldType>& 
 }
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_CONTAINER_HH

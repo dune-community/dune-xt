@@ -5,11 +5,12 @@
 //
 // Contributors: Tobias Leibner
 
-#include "main.hxx"
+#include <dune/xt/common/test/main.hxx>
 
 #include "la_container.hh"
 
 using namespace Dune;
+using namespace Dune::XT;
 
 static const size_t dim = 4;
 
@@ -17,7 +18,7 @@ struct MatrixTest : public ::testing::Test
 {
   typedef TESTMATRIXTYPE MatrixImp;
   typedef TESTVECTORTYPE VectorImp;
-  typedef typename Dune::Stuff::LA::SparsityPatternDefault PatternType;
+  typedef typename Dune::XT::LA::SparsityPatternDefault PatternType;
 
   void fulfills_interface() const
   {
@@ -35,7 +36,7 @@ struct MatrixTest : public ::testing::Test
                   "ScalarType of derived_type has to be the correct Type!");
     static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the matrix as the interface
-    typedef typename Stuff::LA::MatrixInterface<Traits, D_ScalarType> InterfaceType;
+    typedef typename XT::LA::MatrixInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
     typedef typename InterfaceType::RealType I_RealType;
@@ -207,7 +208,7 @@ struct MatrixTest : public ::testing::Test
     VectorImp a = vector_ones;
     matrix_zeros_dense.mv(vector_zeros, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), vector_ones[ii])) << "check copy-on-write";
+      EXPECT_TRUECommon::FloatCmp::eq(ScalarType(1), vector_ones[ii])) << "check copy-on-write";
     }
 
     // test scal, operator*
@@ -251,7 +252,7 @@ struct MatrixTest : public ::testing::Test
       for (size_t jj = 0; jj < cols; ++jj) {
         EXPECT_TRUE(
             DSC::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25), scaled.get_entry(ii, jj)));
-        EXPECT_TRUE(DSC::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25),
+        EXPECT_TRUECommon::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25),
                                       scaled_by_operator.get_entry(ii, jj)));
       }
     }
@@ -261,7 +262,7 @@ struct MatrixTest : public ::testing::Test
     scaled_by_operator *= ScalarType(10);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUE(DSC::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled.get_entry(ii, jj)));
+        EXPECT_TRUECommon::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled.get_entry(ii, jj)));
         EXPECT_TRUE(
             DSC::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled_by_operator.get_entry(ii, jj)));
       }
@@ -270,7 +271,7 @@ struct MatrixTest : public ::testing::Test
     b.scal(ScalarType(0));
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(1), matrix_ones.get_entry(ii, jj))) << "check copy-on-write";
+        EXPECT_TRUECommon::FloatCmp::eq(ScalarType(1), matrix_ones.get_entry(ii, jj))) << "check copy-on-write";
       }
     }
 
@@ -301,7 +302,7 @@ struct MatrixTest : public ::testing::Test
     result_axpy.axpy(ScalarType(2), testmatrix_2);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj),
+        EXPECT_TRUECommon::FloatCmp::eq(ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj),
                                       result_axpy.get_entry(ii, jj)));
       }
     }
@@ -309,7 +310,7 @@ struct MatrixTest : public ::testing::Test
     b.axpy(ScalarType(1), matrix_ones);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUE(DSC::FloatCmp::eq(ScalarType(0), matrix_zeros_dense.get_entry(ii, jj))) << "check copy-on-write";
+        EXPECT_TRUECommon::FloatCmp::eq(ScalarType(0), matrix_zeros_dense.get_entry(ii, jj))) << "check copy-on-write";
       }
     }
   } // void produces_correct_results() const

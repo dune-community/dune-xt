@@ -13,12 +13,12 @@
 #include <iterator>
 #include <type_traits>
 
-#include <dune/stuff/common/type_utils.hh>
-#include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/exceptions.hh>
+#include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/exceptions.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 // forward
@@ -77,7 +77,7 @@ public:
   const ScalarType& operator*() const
   {
     if (end_)
-      DUNE_THROW(Exceptions::you_are_using_this_wrong, "This is the end!");
+      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "This is the end!");
     return const_holder_->element[position_];
   }
 
@@ -123,7 +123,7 @@ public:
   ScalarType& operator*()
   {
     if (this->end_)
-      DUNE_THROW(Exceptions::you_are_using_this_wrong, "This is the end!");
+      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "This is the end!");
     return holder_->element[this->position_];
   } // ... operator*()
 
@@ -133,7 +133,7 @@ private:
 
 } // namespace internal
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_INTERNAL_HH

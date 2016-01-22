@@ -19,18 +19,18 @@
 
 #include <dune/common/ftraits.hh>
 
-#include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/float_cmp.hh>
-#include <dune/stuff/common/type_utils.hh>
-#include <dune/stuff/common/vector.hh>
-#include <dune/stuff/common/math.hh>
+#include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/vector.hh>
+#include <dune/xt/common/math.hh>
 
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 /**
@@ -191,17 +191,16 @@ public:
    *  \param  other   A vector of same dimension to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::Stuff::Common::FloatCmp
+   *  \see    Dune::XT::Common::FloatCmp
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
-  virtual bool
-  almost_equal(const derived_type& other,
-               const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  virtual bool almost_equal(const derived_type& other,
+                            const ScalarType epsilon = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return Stuff::Common::FloatCmp::eq(this->as_imp(), other, epsilon);
+    return Common::FloatCmp::eq(this->as_imp(), other, epsilon);
   } // ... almost_equal(...)
 
   /**
@@ -210,16 +209,16 @@ public:
    *  \param  other   A vector of same dimension to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::Stuff::Common::FloatCmp
+   *  \see    Dune::XT::Common::FloatCmp
    */
   template <class T>
   bool almost_equal(const VectorInterface<T>& other,
-                    const ScalarType epsilon = Stuff::Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+                    const ScalarType epsilon = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return Stuff::Common::FloatCmp::eq(this->as_imp(), other.as_imp(), epsilon);
+    return Common::FloatCmp::eq(this->as_imp(), other.as_imp(), epsilon);
   } // ... almost_equal(...)
 
   /**
@@ -231,7 +230,7 @@ public:
   virtual ScalarType dot(const derived_type& other) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
@@ -293,10 +292,10 @@ public:
   virtual void add(const derived_type& other, derived_type& result) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     if (result.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
       result.set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
@@ -324,7 +323,7 @@ public:
   virtual void iadd(const derived_type& other)
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
       set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
@@ -339,10 +338,10 @@ public:
   virtual void sub(const derived_type& other, derived_type& result) const
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     if (result.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
       result.set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
@@ -369,7 +368,7 @@ public:
   virtual void isub(const derived_type& other)
   {
     if (other.size() != size())
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
       set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
@@ -520,9 +519,10 @@ namespace internal {
 template <class V>
 struct is_vector_helper
 {
-  DSC_has_typedef_initialize_once(Traits) DSC_has_typedef_initialize_once(ScalarType)
+  DXTC_has_typedef_initialize_once(Traits);
+  DXTC_has_typedef_initialize_once(ScalarType);
 
-      static const bool is_candidate = DSC_has_typedef(Traits)<V>::value && DSC_has_typedef(ScalarType)<V>::value;
+  static const bool is_candidate = DXTC_has_typedef(Traits)<V>::value && DXTC_has_typedef(ScalarType)<V>::value;
 }; // class is_vector_helper
 
 } // namespace internal
@@ -583,7 +583,7 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
 } // ... operator<<(...)
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_HH

@@ -21,13 +21,13 @@
 #include <dune/istl/preconditioners.hh>
 #endif // HAVE_DUNE_ISTL
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/parallel/helper.hh>
-#include <dune/stuff/la/container/istl.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/parallel/helper.hh>
+#include <dune/xt/la/container/istl.hh>
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 #if HAVE_DUNE_ISTL
@@ -167,7 +167,7 @@ public:
       solver.apply(solution.backend(), rhs.backend(), stats);
       return stats;
     } else
-      DUNE_THROW(Exceptions::wrong_input_given, "Unknown smoother requested: " << smoother_type);
+      DUNE_THROW(Common::Exceptions::wrong_input_given, "Unknown smoother requested: " << smoother_type);
   } // ... call(...)
 protected:
   const MatrixType& matrix_;
@@ -247,7 +247,7 @@ public:
                                             opts.get("verbose", default_opts.get<int>("verbose")));
       solver.apply(solution.backend(), rhs.backend(), stats);
     } else {
-      DUNE_THROW(Exceptions::wrong_input_given, "Unknown smoother requested: " << smoother_type);
+      DUNE_THROW(Common::Exceptions::wrong_input_given, "Unknown smoother requested: " << smoother_type);
     }
     return stats;
   } // ... call(...)
@@ -268,7 +268,7 @@ class AmgApplicator
 #endif // HAVE_DUNE_ISTL
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_SOLVER_ISTL_AMG_HH

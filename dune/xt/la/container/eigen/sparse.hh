@@ -18,27 +18,27 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/stuff/common/disable_warnings.hh>
+#include <dune/xt/common/disable_warnings.hh>
 #if HAVE_EIGEN
 #include <Eigen/SparseCore>
 #endif
-#include <dune/stuff/common/reenable_warnings.hh>
+#include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
 
-#include <dune/stuff/aliases.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/float_cmp.hh>
+#include <dune/xt/common/math.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/float_cmp.hh>
 
-#include "dune/stuff/la/container/interfaces.hh"
-#include "dune/stuff/la/container/pattern.hh"
+#include "dune/xt/la/container/interfaces.hh"
+#include "dune/xt/la/container/pattern.hh"
 
 #include "dense.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 // forwards
@@ -98,7 +98,7 @@ public:
                                              internal::boost_numeric_cast<EIGEN_size_t>(cc));
     if (rr > 0 && cc > 0) {
       if (size_t(pattern_in.size()) != rr)
-        DUNE_THROW(Exceptions::shapes_do_not_match,
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of the pattern (" << pattern_in.size() << ") does not match the number of rows of this ("
                                                << rr
                                                << ")!");
@@ -108,7 +108,7 @@ public:
         for (auto& column : columns) {
 #ifndef NDEBUG
           if (column >= cc)
-            DUNE_THROW(Exceptions::shapes_do_not_match,
+            DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                        "The size of row " << row << " of the pattern does not match the number of columns of this ("
                                           << cc
                                           << ")!");
@@ -150,7 +150,7 @@ public:
         for (typename BackendType::InnerIterator row_it(mat, row); row_it; ++row_it) {
           const EIGEN_size_t col = row_it.col();
           const auto val = mat.coeff(row, col);
-          if (Stuff::Common::FloatCmp::ne<Stuff::Common::FloatCmp::Style::absolute>(val, zero, eps))
+          if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(val, zero, eps))
             triplets.emplace_back(row, col, val);
         }
       }
@@ -220,7 +220,7 @@ public:
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     if (!has_equal_shape(xx))
-      DUNE_THROW(Exceptions::shapes_do_not_match,
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows()
                                      << "x"
@@ -280,7 +280,7 @@ public:
   void clear_row(const size_t ii)
   {
     if (ii >= rows())
-      DUNE_THROW(Exceptions::index_out_of_range,
+      DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     backend().row(internal::boost_numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
   }
@@ -288,7 +288,7 @@ public:
   void clear_col(const size_t jj)
   {
     if (jj >= cols())
-      DUNE_THROW(Exceptions::index_out_of_range,
+      DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
     for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend_->outerSize(); ++row) {
@@ -309,13 +309,13 @@ public:
   void unit_row(const size_t ii)
   {
     if (ii >= cols())
-      DUNE_THROW(Exceptions::index_out_of_range,
+      DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
     if (ii >= rows())
-      DUNE_THROW(Exceptions::index_out_of_range,
+      DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     if (!these_are_valid_indices(ii, ii))
-      DUNE_THROW(Exceptions::index_out_of_range,
+      DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
     backend().row(internal::boost_numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
     set_entry(ii, ii, ScalarType(1));
@@ -324,10 +324,10 @@ public:
   void unit_col(const size_t jj)
   {
     if (jj >= cols())
-      DUNE_THROW(Exceptions::index_out_of_range,
+      DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     if (jj >= rows())
-      DUNE_THROW(Exceptions::index_out_of_range,
+      DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
     for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend_->outerSize(); ++row) {
@@ -355,7 +355,7 @@ public:
     typedef typename BackendType::InnerIterator InnerIterator;
     for (EIGEN_size_t ii = 0; ii < backend_->outerSize(); ++ii) {
       for (InnerIterator it(*backend_, ii); it; ++it) {
-        if (DSC::isnan(std::real(it.value())) || DSC::isnan(std::imag(it.value())) || DSC::isinf(std::abs(it.value())))
+        if (Common::isnan(it.value()) || Common::isinf(it.value()))
           return false;
       }
     }
@@ -454,7 +454,7 @@ struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
 #endif // HAVE_EIGEN
 
 } // namespace Common
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_CONTAINER_EIGEN_SPARSE_HH

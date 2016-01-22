@@ -22,18 +22,17 @@
 #include <dune/istl/superlu.hh>
 #endif // HAVE_DUNE_ISTL
 
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/configuration.hh>
-#include <dune/stuff/common/memory.hh>
-#include <dune/stuff/la/container/istl.hh>
-#include <dune/stuff/la/solver/istl_amg.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/memory.hh>
 
-#include <dune/common/version.hh>
+#include <dune/xt/la/container/istl.hh>
 
+#include "istl/amg.hh"
 #include "../solver.hh"
 
 namespace Dune {
-namespace Stuff {
+namespace XT {
 namespace LA {
 
 #if HAVE_DUNE_ISTL
@@ -161,7 +160,7 @@ public:
       return general_opts;
 #endif // !HAVE_MPI && HAVE_SUPERLU
     } else
-      DUNE_THROW(Exceptions::internal_error, "Given solver type '" << tp << "' has no default options");
+      DUNE_THROW(Common::Exceptions::internal_error, "Given solver type '" << tp << "' has no default options");
     return Common::Configuration();
   } // ... options(...)
 
@@ -200,7 +199,7 @@ public:
 
     try {
       if (!opts.has_key("type"))
-        DUNE_THROW(Exceptions::configuration_error,
+        DUNE_THROW(Common::Exceptions::configuration_error,
                    "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
       const auto type = opts.get<std::string>("type");
       SolverUtils::check_given(type, types());
@@ -268,7 +267,7 @@ public:
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
 #endif // !HAVE_MPI && HAVE_SUPERLU
       } else
-        DUNE_THROW(Exceptions::internal_error,
+        DUNE_THROW(Common::Exceptions::internal_error,
                    "Given type '" << type << "' is not supported, although it was reported by types()!");
       if (!solver_result.converged)
         DUNE_THROW(Exceptions::linear_solver_failed_bc_it_did_not_converge,
@@ -284,7 +283,7 @@ public:
         communicator_.storage_access().copyOwnerToAll(writable_rhs.backend(), writable_rhs.backend());
         writable_rhs -= rhs;
         const R sup_norm = writable_rhs.sup_norm();
-        if (sup_norm > post_check_solves_system_threshold || DSC::isnan(sup_norm) || DSC::isinf(sup_norm))
+        if (sup_norm > post_check_solves_system_threshold || Common::isnan(sup_norm) || Common::isinf(sup_norm))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
                      "The computed solution does not solve the system (although the dune-istl backend "
                          << "reported no error) and you requested checking (see options below)!\n"
@@ -297,7 +296,7 @@ public:
                          << opts);
       }
     } catch (ISTLError& e) {
-      DUNE_THROW(Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());
+      DUNE_THROW(Common::Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());
     }
   } // ... apply(...)
 
@@ -317,7 +316,7 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
 #endif // HAVE_DUNE_ISTL
 
 } // namespace LA
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_LA_SOLVER_ISTL_HH

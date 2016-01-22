@@ -7,11 +7,12 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#include "main.hxx"
+#include <dune/xt/common/test/main.hxx>
 
 #include "la_container.hh"
 
 using namespace Dune;
+using namespace Dune::XT;
 
 static const size_t dim = 4;
 
@@ -34,7 +35,7 @@ struct ContainerTest : public ::testing::Test
                   "ScalarType of derived_type has to be the correct Type!");
     static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the container as the interface
-    typedef typename Stuff::LA::ContainerInterface<Traits, D_ScalarType> InterfaceType;
+    typedef typename XT::LA::ContainerInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
     typedef typename InterfaceType::RealType I_RealType;
