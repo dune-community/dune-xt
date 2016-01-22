@@ -16,8 +16,6 @@
 #include <initializer_list>
 #include <complex>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/typetraits.hh>
@@ -88,8 +86,6 @@ class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<S
 {
   typedef IstlDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::IstlDenseVectorTraits<ScalarImp> Traits;
@@ -101,18 +97,6 @@ public:
     : backend_(new BackendType(ss))
   {
     backend_->operator=(value);
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit IstlDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : IstlDenseVector(internal::boost_numeric_cast<size_t>(ss), value)
-  {
-  }
-
-  /// This constructor is needed because marking the above one as explicit had no effect.
-  explicit IstlDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : IstlDenseVector(internal::boost_numeric_cast<size_t>(ss), value)
-  {
   }
 
   explicit IstlDenseVector(const std::vector<ScalarType>& other)
@@ -382,8 +366,6 @@ class IstlRowMajorSparseMatrix : public MatrixInterface<internal::IstlRowMajorSp
                                  public ProvidesBackend<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>>
 {
   typedef IstlRowMajorSparseMatrix<ScalarImp> ThisType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
@@ -411,20 +393,6 @@ public:
 
   explicit IstlRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
     : backend_(new BackendType(rr, cc, BackendType::row_wise))
-  {
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit IstlRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
-    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc),
-                               BackendType::row_wise))
-  {
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit IstlRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc),
-                               BackendType::row_wise))
   {
   }
 

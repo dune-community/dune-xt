@@ -18,8 +18,6 @@
 #include <vector>
 #include <complex>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <dune/common/dynvector.hh>
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/densematrix.hh>
@@ -75,8 +73,6 @@ class CommonDenseVector : public VectorInterface<internal::CommonDenseVectorTrai
 {
   typedef CommonDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::CommonDenseVectorTraits<ScalarImp> Traits;
@@ -86,17 +82,6 @@ public:
 
   explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(ss, value))
-  {
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit CommonDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(ss), value))
-  {
-  }
-
-  explicit CommonDenseVector(const int ss, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(internal::boost_numeric_cast<size_t>(ss), value))
   {
   }
 
@@ -360,8 +345,6 @@ class CommonDenseMatrix : public MatrixInterface<internal::CommonDenseMatrixTrai
 {
   typedef CommonDenseMatrix<ScalarImp> ThisType;
   typedef MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::CommonDenseMatrixTraits<ScalarImp> Traits;
@@ -371,20 +354,6 @@ public:
 
   explicit CommonDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(rr, cc, value))
-  {
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit CommonDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
-                             const ScalarType value = ScalarType(0))
-    : backend_(
-          new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc), value))
-  {
-  }
-
-  explicit CommonDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : backend_(
-          new BackendType(internal::boost_numeric_cast<size_t>(rr), internal::boost_numeric_cast<size_t>(cc), value))
   {
   }
 

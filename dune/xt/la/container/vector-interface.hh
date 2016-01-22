@@ -17,8 +17,6 @@
 #include <vector>
 #include <complex>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <dune/common/ftraits.hh>
 
 #include <dune/stuff/common/crtp.hh>
@@ -483,117 +481,6 @@ public:
   {
     return !(this->operator==(other));
   }
-
-  /// \}
-  /// \name Necesarry for the python bindings.
-  /// \{
-
-  /**
-   * \brief Variant of dim() needed for the python bindings.
-   * \see   dim()
-   */
-  inline DUNE_STUFF_SSIZE_T pb_dim() const
-  {
-    try {
-      return boost::numeric_cast<DUNE_STUFF_SSIZE_T>(dim());
-    } catch (boost::bad_numeric_cast& ee) {
-      DUNE_THROW(Exceptions::external_error,
-                 "There was an error in boost converting '" << dim() << "' to '"
-                                                            << Common::Typename<ScalarType>::value()
-                                                            << "': "
-                                                            << ee.what());
-    }
-  } // ... pb_dim(...)
-
-  /**
-   * \brief Variant of add_to_entry() needed for the python bindings.
-   * \see   add_to_entry()
-   */
-  inline void pb_add_to_entry(const DUNE_STUFF_SSIZE_T ii, const ScalarType& value)
-  {
-    try {
-      add_to_entry(boost::numeric_cast<size_t>(ii), value);
-    } catch (boost::bad_numeric_cast& ee) {
-      DUNE_THROW(Exceptions::external_error,
-                 "There was an error in boost converting '" << ii << "' to '" << Common::Typename<size_t>::value()
-                                                            << "': "
-                                                            << ee.what());
-    }
-  } // ... pb_add_to_entry(...)
-
-  /**
-   * \brief Variant of set_entry() needed for the python bindings.
-   * \see   set_entry()
-   */
-  inline void pb_set_entry(const DUNE_STUFF_SSIZE_T ii, const ScalarType& value)
-  {
-    try {
-      set_entry(boost::numeric_cast<size_t>(ii), value);
-    } catch (boost::bad_numeric_cast& ee) {
-      DUNE_THROW(Exceptions::external_error,
-                 "There was an error in boost converting '" << ii << "' to '" << Common::Typename<size_t>::value()
-                                                            << "': "
-                                                            << ee.what());
-    }
-  } // ... pb_set_entry(...)
-
-  /**
-   * \brief Variant of get_entry() needed for the python bindings.
-   * \see   get_entry()
-   */
-  inline ScalarType pb_get_entry(const DUNE_STUFF_SSIZE_T ii)
-  {
-    try {
-      return get_entry(boost::numeric_cast<size_t>(ii));
-    } catch (boost::bad_numeric_cast& ee) {
-      DUNE_THROW(Exceptions::external_error,
-                 "There was an error in boost converting '" << ii << "' to '" << Common::Typename<size_t>::value()
-                                                            << "': "
-                                                            << ee.what());
-    }
-  } // ... pb_get_entry(...)
-
-  /**
-   * \brief Variant of amax() needed for the python bindings.
-   * \see   amax()
-   */
-  std::vector<RealType> pb_amax() const
-  {
-    const auto max = amax();
-    try {
-      return {boost::numeric_cast<RealType>(max.first), max.second};
-    } catch (boost::bad_numeric_cast& ee) {
-      DUNE_THROW(Exceptions::external_error,
-                 "There was an error in boost converting '" << max.first << "' to '"
-                                                            << Common::Typename<RealType>::value()
-                                                            << "': "
-                                                            << ee.what());
-    }
-  } // ... pb_amax(...)
-
-  std::vector<ScalarType> components(const std::vector<DUNE_STUFF_SSIZE_T>& component_indices) const
-  {
-    if (component_indices.size() > dim())
-      DUNE_THROW(Exceptions::index_out_of_range,
-                 "size of component_indices (" << component_indices.size() << ") is larger than the dim of this ("
-                                               << dim()
-                                               << ")!");
-    std::vector<ScalarType> values(component_indices.size(), ScalarType(0));
-    try {
-      for (size_t ii = 0; ii < component_indices.size(); ++ii) {
-        const size_t component = boost::numeric_cast<size_t>(component_indices[ii]);
-        if (component >= dim())
-          DUNE_THROW(Exceptions::index_out_of_range,
-                     "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
-        values[ii] = get_entry(component);
-      }
-    } catch (boost::bad_numeric_cast& ee) {
-      DUNE_THROW(Exceptions::external_error, "There was an error in boost during a numeric_cast: " << ee.what());
-    }
-    return values;
-  } // components(...)
-
-  /// \}
 
   iterator begin()
   {

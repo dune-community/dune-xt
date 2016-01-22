@@ -78,8 +78,6 @@ class EigenRowMajorSparseMatrix
 {
   typedef EigenRowMajorSparseMatrix<ScalarImp> ThisType;
   typedef MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
@@ -130,19 +128,6 @@ public:
   explicit EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0)
   {
     backend_ = std::make_shared<BackendType>(rr, cc);
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit EigenRowMajorSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
-    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
-  {
-  }
-
-  explicit EigenRowMajorSparseMatrix(const int rr, const int cc = 0)
-    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
-  {
   }
 
   EigenRowMajorSparseMatrix(const ThisType& other)

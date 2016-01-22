@@ -109,8 +109,6 @@ class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits
   typedef EigenDenseVector<ScalarImp> ThisType;
   typedef VectorInterface<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
   typedef EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> BaseType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::EigenDenseVectorTraits<ScalarImp> Traits;
@@ -125,21 +123,6 @@ public:
   explicit EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
   {
     backend_ = std::make_shared<BackendType>(ss);
-    backend_->setOnes();
-    backend_->operator*=(value);
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit EigenDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-  {
-    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(ss));
-    backend_->setOnes();
-    backend_->operator*=(value);
-  }
-
-  explicit EigenDenseVector(const int ss, const ScalarType value = ScalarType(0))
-  {
-    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(ss));
     backend_->setOnes();
     backend_->operator*=(value);
   }
@@ -225,8 +208,6 @@ class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDense
   typedef VectorInterface<internal::EigenMappedDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
   typedef EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarImp>, ScalarImp> BaseType;
   static_assert(std::is_same<ScalarImp, double>::value, "Undefined behaviour for non-double data!");
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::EigenMappedDenseVectorTraits<ScalarImp> Traits;
@@ -250,21 +231,6 @@ public:
    *  \brief  This constructor allows to create an instance of this type just like any other vector.
    */
   explicit EigenMappedDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
-  {
-    backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
-    backend_->setOnes();
-    backend_->operator*=(value);
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit EigenMappedDenseVector(const DUNE_STUFF_SSIZE_T ss, const ScalarType value = ScalarType(0))
-  {
-    backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
-    backend_->setOnes();
-    backend_->operator*=(value);
-  }
-
-  explicit EigenMappedDenseVector(const int ss, const ScalarType value = ScalarType(0))
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
     backend_->setOnes();
@@ -361,8 +327,6 @@ class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits
 {
   typedef EigenDenseMatrix<ScalarImp> ThisType;
   typedef MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::EigenDenseMatrixTraits<ScalarImp> Traits;
@@ -376,24 +340,6 @@ private:
 public:
   explicit EigenDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
     : backend_(new BackendType(rr, cc))
-  {
-    this->backend_->setOnes();
-    this->backend_->operator*=(value);
-  }
-
-  /// This constructor is needed for the python bindings.
-  explicit EigenDenseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0,
-                            const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
-  {
-    this->backend_->setOnes();
-    this->backend_->operator*=(value);
-  }
-
-  explicit EigenDenseMatrix(const int rr, const int cc = 0, const ScalarType value = ScalarType(0))
-    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
   {
     this->backend_->setOnes();
     this->backend_->operator*=(value);
