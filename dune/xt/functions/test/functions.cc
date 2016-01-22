@@ -30,15 +30,15 @@ using namespace Dune::XT;
 struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   typedef FunctionsProvider<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
-      FunctionsProvider;
-  typedef typename FunctionsProvider::InterfaceType InterfaceType;
+      FunctionsProviderType;
+  typedef typename FunctionsProviderType::InterfaceType InterfaceType;
 
   virtual void check() const
   {
-    for (const auto& type : FunctionsProvider::available()) {
-      const Common::Configuration config = FunctionsProvider::default_config(type);
+    for (const auto& type : FunctionsProviderType::available()) {
+      const Common::Configuration config = FunctionsProviderType::default_config(type);
       try {
-        const std::unique_ptr<InterfaceType> function = FunctionsProvider::create(type, config);
+        const std::unique_ptr<InterfaceType> function = FunctionsProviderType::create(type, config);
       } catch (Exceptions::spe10_data_file_missing&) {
       }
     }
