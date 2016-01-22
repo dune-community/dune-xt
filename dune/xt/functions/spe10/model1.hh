@@ -18,7 +18,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/string.hh>
-#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/common/type_traits.hh>
 
 #include "../checkerboard.hh"
 

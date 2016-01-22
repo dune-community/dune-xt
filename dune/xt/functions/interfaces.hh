@@ -42,7 +42,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
-#include <dune/xt/common/type_utils.hh>
+#include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
 namespace XT {
@@ -51,15 +51,17 @@ namespace internal {
 template <class F>
 struct is_localizable_function_helper
 {
-  DXTC_has_typedef_initialize_once(EntityType) DXTC_has_typedef_initialize_once(DomainFieldType)
-      DXTC_has_typedef_initialize_once(RangeFieldType) DXTC_has_static_member_initialize_once(dimDomain)
-          DXTC_has_static_member_initialize_once(dimRange) DXTC_has_static_member_initialize_once(dimRangeCols)
+  DXTC_has_typedef_initialize_once(EntityType);
+  DXTC_has_typedef_initialize_once(DomainFieldType);
+  DXTC_has_typedef_initialize_once(RangeFieldType);
+  DXTC_has_static_member_initialize_once(dimDomain);
+  DXTC_has_static_member_initialize_once(dimRange);
+  DXTC_has_static_member_initialize_once(dimRangeCols);
 
-              static const
-      bool is_candidate = DXTC_has_typedef(EntityType)<F>::value && DXTC_has_typedef(DomainFieldType)<F>::value
-                          && DXTC_has_typedef(RangeFieldType)<F>::value && DXTC_has_static_member(dimDomain)<F>::value
-                          && DXTC_has_static_member(dimRange)<F>::value
-                          && DXTC_has_static_member(dimRangeCols)<F>::value;
+  static const bool is_candidate =
+      DXTC_has_typedef(EntityType)<F>::value && DXTC_has_typedef(DomainFieldType)<F>::value
+      && DXTC_has_typedef(RangeFieldType)<F>::value && DXTC_has_static_member(dimDomain)<F>::value
+      && DXTC_has_static_member(dimRange)<F>::value && DXTC_has_static_member(dimRangeCols)<F>::value;
 }; // class is_localizable_function_helper
 
 } // namespace internal
