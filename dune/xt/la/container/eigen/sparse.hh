@@ -8,8 +8,8 @@
 //   Rene Milk        (2014 - 2015)
 //   Tobias Leibner   (2014 - 2015)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_EIGEN_SPARSE_HH
-#define DUNE_STUFF_LA_CONTAINER_EIGEN_SPARSE_HH
+#ifndef DUNE_XT_LA_CONTAINER_EIGEN_SPARSE_HH
+#define DUNE_XT_LA_CONTAINER_EIGEN_SPARSE_HH
 
 #include <memory>
 #include <type_traits>
@@ -472,4 +472,4 @@ struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_CONTAINER_EIGEN_SPARSE_HH
+#endif // DUNE_XT_LA_CONTAINER_EIGEN_SPARSE_HH

@@ -7,8 +7,8 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_TEST_LA_CONTAINER_HH
-#define DUNE_STUFF_TEST_LA_CONTAINER_HH
+#ifndef DUNE_XT_TEST_LA_CONTAINER_HH
+#define DUNE_XT_TEST_LA_CONTAINER_HH
 
 #include <complex>
 #include <memory>
@@ -140,4 +140,4 @@ public:
     EXPECT_DOUBLE_EQ(0, std::imag(actual));                                                                            \
   }
 
-#endif // DUNE_STUFF_TEST_LA_CONTAINER_HH
+#endif // DUNE_XT_TEST_LA_CONTAINER_HH

@@ -7,8 +7,8 @@
 //   Rene Milk       (2013, 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_LA_SOLVER_HH
-#define DUNE_STUFF_LA_SOLVER_HH
+#ifndef DUNE_XT_LA_SOLVER_HH
+#define DUNE_XT_LA_SOLVER_HH
 
 #include <string>
 #include <vector>
@@ -139,4 +139,4 @@ public:
 #include "solver/eigen.hh"
 #include "solver/istl.hh"
 
-#endif // DUNE_STUFF_LA_SOLVER_HH
+#endif // DUNE_XT_LA_SOLVER_HH

@@ -8,8 +8,8 @@
 //   Rene Milk        (2014 - 2015)
 //   Tobias Leibner   (2014)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_COMMON_HH
-#define DUNE_STUFF_LA_CONTAINER_COMMON_HH
+#ifndef DUNE_XT_LA_CONTAINER_COMMON_HH
+#define DUNE_XT_LA_CONTAINER_COMMON_HH
 
 #include <cmath>
 #include <initializer_list>
@@ -634,4 +634,4 @@ struct MatrixAbstraction<LA::CommonDenseMatrix<T>>
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_CONTAINER_COMMON_HH
+#endif // DUNE_XT_LA_CONTAINER_COMMON_HH

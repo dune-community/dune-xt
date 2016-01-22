@@ -6,8 +6,8 @@
 //   Felix Schindler (2013 - 2014)
 //   Rene Milk       (2015)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_HH
-#define DUNE_STUFF_LA_CONTAINER_HH
+#ifndef DUNE_XT_LA_CONTAINER_HH
+#define DUNE_XT_LA_CONTAINER_HH
 
 #include "container/interfaces.hh"
 #include "container/common.hh"
@@ -89,4 +89,4 @@ void ensure_parallel_dof_consistency(VectorImp<typename Space::RangeFieldType>& 
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_CONTAINER_HH
+#endif // DUNE_XT_LA_CONTAINER_HH

@@ -8,8 +8,8 @@
 //   Rene Milk        (2015)
 //   Tobias Leibner   (2014)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_EIGEN_BASE_HH
-#define DUNE_STUFF_LA_CONTAINER_EIGEN_BASE_HH
+#ifndef DUNE_XT_LA_CONTAINER_EIGEN_BASE_HH
+#define DUNE_XT_LA_CONTAINER_EIGEN_BASE_HH
 
 #include <memory>
 #include <type_traits>
@@ -315,4 +315,4 @@ class EigenBaseVector
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_CONTAINER_EIGEN_BASE_HH
+#endif // DUNE_XT_LA_CONTAINER_EIGEN_BASE_HH

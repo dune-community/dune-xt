@@ -7,8 +7,8 @@
 //   Rene Milk       (2014 - 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_CONTAINER_INTERFACE_HH
-#define DUNE_STUFF_LA_CONTAINER_CONTAINER_INTERFACE_HH
+#ifndef DUNE_XT_LA_CONTAINER_CONTAINER_INTERFACE_HH
+#define DUNE_XT_LA_CONTAINER_CONTAINER_INTERFACE_HH
 
 #include <cmath>
 #include <limits>
@@ -273,4 +273,4 @@ public:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // #ifndef DUNE_STUFF_LA_CONTAINER_CONTAINER_INTERFACE_HH
+#endif // #ifndef DUNE_XT_LA_CONTAINER_CONTAINER_INTERFACE_HH

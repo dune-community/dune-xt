@@ -8,8 +8,8 @@
 //   Rene Milk        (2014 - 2015)
 //   Tobias Leibner   (2014 - 2015)
 
-#ifndef DUNE_STUFF_LA_SOLVER_ISTL_HH
-#define DUNE_STUFF_LA_SOLVER_ISTL_HH
+#ifndef DUNE_XT_LA_SOLVER_ISTL_HH
+#define DUNE_XT_LA_SOLVER_ISTL_HH
 
 #include <type_traits>
 #include <cmath>
@@ -320,4 +320,4 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_SOLVER_ISTL_HH
+#endif // DUNE_XT_LA_SOLVER_ISTL_HH

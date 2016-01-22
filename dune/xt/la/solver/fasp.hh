@@ -6,8 +6,8 @@
 //   Felix Schindler (2013 - 2014)
 //   Rene Milk       (2013, 2015)
 
-#ifndef DUNE_STUFF_LA_SOLVER_FASP_HH
-#define DUNE_STUFF_LA_SOLVER_FASP_HH
+#ifndef DUNE_XT_LA_SOLVER_FASP_HH
+#define DUNE_XT_LA_SOLVER_FASP_HH
 
 #if HAVE_FASP
 #if HAVE_EIGEN
@@ -366,4 +366,4 @@ private:
 #endif // HAVE_EIGEN
 #endif // HAVE_FASP
 
-#endif // DUNE_STUFF_LA_SOLVER_FASP_HH
+#endif // DUNE_XT_LA_SOLVER_FASP_HH

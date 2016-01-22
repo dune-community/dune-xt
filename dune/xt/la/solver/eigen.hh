@@ -8,8 +8,8 @@
 //   Rene Milk        (2012 - 2013, 2015)
 //   Tobias Leibner   (2014)
 
-#ifndef DUNE_STUFF_LA_SOLVER_EIGEN_HH
-#define DUNE_STUFF_LA_SOLVER_EIGEN_HH
+#ifndef DUNE_XT_LA_SOLVER_EIGEN_HH
+#define DUNE_XT_LA_SOLVER_EIGEN_HH
 
 #include <string>
 #include <vector>
@@ -599,4 +599,4 @@ class Solver<EigenRowMajorSparseMatrix<S>>
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_SOLVER_EIGEN_HH
+#endif // DUNE_XT_LA_SOLVER_EIGEN_HH

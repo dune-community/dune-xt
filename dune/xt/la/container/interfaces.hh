@@ -7,11 +7,11 @@
 //   Rene Milk       (2013 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_INTERFACES_HH
-#define DUNE_STUFF_LA_CONTAINER_INTERFACES_HH
+#ifndef DUNE_XT_LA_CONTAINER_INTERFACES_HH
+#define DUNE_XT_LA_CONTAINER_INTERFACES_HH
 
 #include "container-interface.hh"
 #include "vector-interface.hh"
 #include "matrix-interface.hh"
 
-#endif // DUNE_STUFF_LA_CONTAINER_INTERFACES_HH
+#endif // DUNE_XT_LA_CONTAINER_INTERFACES_HH

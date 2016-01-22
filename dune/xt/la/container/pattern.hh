@@ -7,8 +7,8 @@
 //   Rene Milk       (2013 - 2015)
 //   Sven Kaulmann   (2014)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_PATTERN_HH
-#define DUNE_STUFF_LA_CONTAINER_PATTERN_HH
+#ifndef DUNE_XT_LA_CONTAINER_PATTERN_HH
+#define DUNE_XT_LA_CONTAINER_PATTERN_HH
 
 #include <cstddef>
 #include <vector>
@@ -57,4 +57,4 @@ private:
 } // namespace Stuff
 } // namespace Dune
 
-#endif // DUNE_STUFF_LA_CONTAINER_PATTERN_HH
+#endif // DUNE_XT_LA_CONTAINER_PATTERN_HH

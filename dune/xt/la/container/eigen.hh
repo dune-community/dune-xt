@@ -8,10 +8,10 @@
 //   Sven Kaulmann   (2014)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_STUFF_LA_CONTAINER_EIGEN_HH
-#define DUNE_STUFF_LA_CONTAINER_EIGEN_HH
+#ifndef DUNE_XT_LA_CONTAINER_EIGEN_HH
+#define DUNE_XT_LA_CONTAINER_EIGEN_HH
 
 #include "eigen/dense.hh"
 #include "eigen/sparse.hh"
 
-#endif // DUNE_STUFF_LA_CONTAINER_EIGEN_HH
+#endif // DUNE_XT_LA_CONTAINER_EIGEN_HH
