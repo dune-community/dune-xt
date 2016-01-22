@@ -33,8 +33,8 @@ dune_enable_all_packages(MODULE_LIBRARIES dunextfunctions
                          VERBOSE)
 
 # add header of this module for header listing
-file(GLOB_RECURSE xtgrid "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh")
-set(COMMON_HEADER ${xtgrid} ${DUNE_HEADERS})
+file(GLOB_RECURSE xtfunctions "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh")
+set(COMMON_HEADER ${xtfunctions} ${DUNE_HEADERS})
 
 # add header of dependent modules for header listing
 foreach(_mod ${ALL_DEPENDENCIES})
