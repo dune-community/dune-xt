@@ -28,13 +28,14 @@ using namespace Dune::XT::Common;
 
 struct PeriodicViewTest : public testing::Test
 {
+  static const bool use_less_memory = USE_LESS_MEMORY;
   typedef TESTGRIDTYPE GridType;
   typedef typename GridType::ctype ctype;
   typedef typename GridType::template Codim<0>::Geometry GeometryType;
   typedef Dune::XT::Grid::Providers::template Cube<GridType> GridProviderType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename GridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
-  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType> PeriodicGridViewType;
+  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType,use_less_memory> PeriodicGridViewType;
   typedef typename PeriodicGridViewType::IndexSet IndexSet;
   typedef typename PeriodicGridViewType::template Codim<0>::Entity EntityType;
   typedef typename PeriodicGridViewType::template Codim<0>::Iterator EntityIteratorType;
@@ -76,8 +77,9 @@ struct PeriodicViewTest : public testing::Test
     const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
 
     // check interface
-    const GridType& DXTC_UNUSED(test_grid) = periodic_grid_view.grid();
-    const IndexSet& DXTC_UNUSED(test_indexSet) = periodic_grid_view.indexSet();
+    const GridType& test_grid = periodic_grid_view.grid();
+    (void)test_grid;
+    const IndexSet& index_set = periodic_grid_view.indexSet();
     const int codim0_size = periodic_grid_view.size(0);
     EXPECT_EQ(grid_view.size(0), codim0_size);
     if (is_cube)
@@ -90,16 +92,21 @@ struct PeriodicViewTest : public testing::Test
     EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
     EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));
     EXPECT_EQ(grid_view.ghostSize(1), periodic_grid_view.ghostSize(1));
-    const CollectiveCommunication& DXTC_UNUSED(test_comm) = periodic_grid_view.comm();
+    const CollectiveCommunication& test_comm = periodic_grid_view.comm();
+    (void)test_comm;
+
 
     size_t neighbor_count = 0;
     size_t boundary_count = 0;
     size_t periodic_count = 0;
-    // iterate over all entities
+    // iterate over codim 0 entities
     const EntityIteratorType it_end = periodic_grid_view.template end<0>();
     for (EntityIteratorType it = periodic_grid_view.template begin<0>(); it != it_end; ++it) {
       const EntityType& entity = *it;
       EXPECT_TRUE(periodic_grid_view.contains(entity));
+      EXPECT_TRUE(index_set.contains(entity));
+      const auto sub_index = index_set.subIndex(entity, 0, 1);
+      (void)sub_index;
       // iterate over all intersections on current entity
       const PeriodicIntersectionIteratorType i_it_end = periodic_grid_view.iend(entity);
       for (PeriodicIntersectionIteratorType i_it = periodic_grid_view.ibegin(entity); i_it != i_it_end; ++i_it) {
@@ -158,16 +165,15 @@ struct PeriodicViewTest : public testing::Test
 
     // the cube/rectangle grid has 2*dimDomain faces
     const size_t num_faces = 2 * dimDomain;
-    // on each face, there are 8**(dimDomain-1) intersections. For a simplex grid in 3 dimensions, there are twice as
-    // much.
+    /* on each face, there are 8**(dimDomain-1) intersections. For a simplex grid in 3 dimensions, there are twice as
+     * much. */
     size_t num_intersections_on_face = std::pow(8, dimDomain - 1);
-    // use dimDomain from config here to avoid "code will never be executed" warning
     assert(dimDomain == Common::from_string<int>(grid_config["dimDomain"]));
-    if (is_simplex && Common::from_string<int>(grid_config["dimDomain"]) == 3)
+    const auto domainDim = Common::from_string<int>(grid_config["dimDomain"]);
+    if (is_simplex && domainDim == 3)   // use dimDomain from config here to avoid "code will never be executed" warning
       num_intersections_on_face *= 2;
-    // In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
-    // two
-    // faces are periodic. In a nonperiodic grid, no intersections are periodic.
+    /* In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
+     * two faces are periodic. In a nonperiodic grid, no intersections are periodic. */
     size_t num_periodic_faces = is_partially_periodic ? 2 : num_faces;
     if (is_nonperiodic)
       num_periodic_faces *= 0;
@@ -181,6 +187,44 @@ struct PeriodicViewTest : public testing::Test
     const size_t num_intersections_per_entity = is_cube ? 2 * dimDomain : dimDomain + 1;
     const size_t num_entities = grid_view.size(0);
     EXPECT_EQ(num_entities * num_intersections_per_entity - expected_num_boundary_intersections, neighbor_count);
+
+    // the nonperiodic grid has 7**dimDomain inner vertices
+    size_t expected_num_vertices = std::pow(7,dimDomain);
+    // add number of vertices on faces (codim 1)
+    expected_num_vertices += std::pow(7, dimDomain-1)*(num_faces - num_periodic_faces/2);
+    // add number of vertices on edges (codim 2)
+    const size_t num_edges = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
+    size_t num_periodic_edges = is_partially_periodic ? num_periodic_faces*std::pow(2,dimDomain-1) : num_edges;
+    if (is_nonperiodic)
+      num_periodic_edges = 0;
+    expected_num_vertices += dimDomain == 1 ? 0 : std::pow(7, dimDomain-2)*((num_edges - num_periodic_edges) + num_periodic_edges/(is_partially_periodic ? 2 : 4));
+    // add vertices on corners (codim 3) of grid
+    if (domainDim == 3)
+      expected_num_vertices += is_partially_periodic ? 4 : (is_nonperiodic ? 8 : 1);
+
+    const size_t num_vertices = periodic_grid_view.size(dimDomain);
+    EXPECT_EQ(expected_num_vertices, num_vertices);
+
+    // check Codim iterator
+    size_t codim_iterator_size = 0;
+    const auto codim_it_end = periodic_grid_view.template end<dimDomain>();
+    for (auto codim_it = periodic_grid_view.template begin<dimDomain>(); codim_it != codim_it_end; ++codim_it) {
+      const auto& entity = *codim_it;
+      (void)entity;
+      ++codim_iterator_size;
+    }
+    EXPECT_EQ(num_vertices, codim_iterator_size);
+
+    // check that new indices are zero-starting and consecutive
+    std::vector<size_t> index_counter(num_vertices);
+    const auto real_codim_it_end = grid_view.template end<dimDomain>();
+    for (auto codim_it = grid_view.template begin<dimDomain>(); codim_it != real_codim_it_end; ++codim_it) {
+      const auto& entity = *codim_it;
+      ++(index_counter[index_set.index(entity)]);
+    }
+    for (auto& count : index_counter)
+      EXPECT_GT(count, 0);
+
   } // void check(...)
 };
 
