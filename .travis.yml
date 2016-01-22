@@ -69,7 +69,7 @@ before_script:
 
 script:
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} test
-    - ${TRAVIS_BUILD_DIR}/bin/upload_test_logs.bash
+    - $HOME/src/scripts/bash/travis_upload_test_logs.bash ${DUNE_BUILD_DIR}/${MY_MODULE}/dune/xt/*/test/
 
     - PYTHONPATH=$HOME/src/scripts/python/ python3 -c "import travis_report as tp; tp.clang_format_status(\"${TRAVIS_BUILD_DIR}\")"
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} headercheck
