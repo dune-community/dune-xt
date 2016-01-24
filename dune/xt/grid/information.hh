@@ -124,20 +124,13 @@ struct Dimensions
 
     virtual void apply_local(const EntityType& ent)
     {
-      const auto geo = ent.geometry();
-      std::cout << "test 1" << std::endl << std::flush;
+      const auto& geo = ent.geometry();
       entity_volume_(geo.volume());
-      std::cout << "test 2" << std::endl << std::flush;
       entity_width_(entity_diameter(ent));
-      std::cout << "test 3" << std::endl << std::flush;
       for (auto i : Common::value_range(geo.corners())) {
-        std::cout << "test 4, " << i << std::endl << std::flush;
-        const auto corner(geo.corner(i));
-        std::cout << "test 5, " << i << std::endl << std::flush;
-        for (size_t k = 0; k < GridType::dimensionworld; ++k) {
+        const auto& corner(geo.corner(i));
+        for (size_t k = 0; k < GridType::dimensionworld; ++k)
           coord_limits_[k](corner[k]);
-          std::cout << "test 6, " << i << ", " << k << std::endl << std::flush;
-        }
       }
     } // ()
   };

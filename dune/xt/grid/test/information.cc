@@ -55,7 +55,7 @@ struct GridInfoTest : public ::testing::Test
     const auto gv       = grid_prv.grid().leafGridView();
     const auto entities = gv.size(0);
     check_dimensions(DimensionsType(grid_prv.grid().leafGridView()), entities);
-    const auto first_entity = *(grid_prv.grid().leafGridView().template begin<0>());
+    const auto& first_entity = *(grid_prv.grid().leafGridView().template begin<0>());
     check_dimensions(DimensionsType(first_entity), 1u);
     const Statistics st(gv);
     const auto line = std::pow(2, level);
