@@ -14,6 +14,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <set>
 
 #include <dune/grid/common/gridview.hh>
 #include <dune/grid/common/rangegenerators.hh>
