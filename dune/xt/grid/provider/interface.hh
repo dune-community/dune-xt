@@ -147,20 +147,20 @@ private:
   {
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
-    for (auto level : Common::value_range(grid().maxLevel() + 1)) {
-      auto grid_view = level_view(level);
+    for (auto lvl : Common::value_range(grid().maxLevel() + 1)) {
+      auto grid_view = level_view(lvl);
       // vtk writer
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(level));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(level));
+      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
 #endif
       // write
-      vtkwriter.write(filename + "__level_" + Common::to_string(level), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_plain(...)
 
@@ -172,26 +172,26 @@ private:
     typedef XT::Grid::BoundaryInfoProvider<typename LevelGridViewType::Intersection> BoundaryInfoProvider;
     auto boundary_info_ptr =
         BoundaryInfoProvider::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
-    for (auto level : Common::value_range(grid().maxLevel() + 1)) {
-      auto grid_view = level_view(level);
+    for (auto lvl : Common::value_range(grid().maxLevel() + 1)) {
+      auto grid_view = level_view(lvl);
       // vtk writer
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(level));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
 #if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(level));
+      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
 #endif
       // dirichlet values
       std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
-      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(level));
+      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(lvl));
       // neumann values
       std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
-      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::to_string(level));
+      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::to_string(lvl));
       // write
-      vtkwriter.write(filename + "__level_" + Common::to_string(level), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_with_boundary(...)
 
