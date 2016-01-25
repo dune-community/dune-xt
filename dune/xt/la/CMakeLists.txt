@@ -6,9 +6,9 @@
 #   Felix Schindler (2016)
 
 set(lib_dune_xt_la_sources
-    pattern.cc)
+    container/pattern.cc)
 
-dune_library_add_sources(dunextla SOURCES ${lib_dune_la_common_sources})
+dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
 
 add_subdirectory(test EXCLUDE_FROM_ALL)
 
