@@ -42,38 +42,38 @@ public:
   typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
 }; // class EntitySearchBase
 
-template<int codim>
+template <int codim>
 struct CheckInside
 {
-    template< class GeometryType, class GlobalCoordinateType>
-    static bool check(const GeometryType& geometry, const GlobalCoordinateType& point)
-    {
-        if (codim == point.size()) {
-            return Common::FloatCmp::eq(geometry.center(),point);
-        } else {
-            if (Common::FloatCmp::ne(geometry.global(geometry.local(point)), point))
-                return false;
-            const auto& refElement = reference_element(geometry);
-            return refElement.checkInside(geometry.local(point));
-        }
+  template <class GeometryType, class GlobalCoordinateType>
+  static bool check(const GeometryType& geometry, const GlobalCoordinateType& point)
+  {
+    if (codim == point.size()) {
+      return Common::FloatCmp::eq(geometry.center(), point);
+    } else {
+      if (Common::FloatCmp::ne(geometry.global(geometry.local(point)), point))
+        return false;
+      const auto& refElement = reference_element(geometry);
+      return refElement.checkInside(geometry.local(point));
     }
+  }
 };
 
-template<>
+template <>
 struct CheckInside<0>
 {
-    template< class GeometryType, class GlobalCoordinateType>
-    static bool check(const GeometryType& geometry, const GlobalCoordinateType& point)
-    {
-        const auto& refElement = reference_element(geometry);
-        return refElement.checkInside(geometry.local(point));
-    }
+  template <class GeometryType, class GlobalCoordinateType>
+  static bool check(const GeometryType& geometry, const GlobalCoordinateType& point)
+  {
+    const auto& refElement = reference_element(geometry);
+    return refElement.checkInside(geometry.local(point));
+  }
 };
 
 template <class GridViewType, int codim = 0>
 class EntityInlevelSearch : public EntitySearchBase<GridViewType>
 {
-  typedef EntitySearchBase<GridViewType,codim> BaseType;
+  typedef EntitySearchBase<GridViewType, codim> BaseType;
 
   typedef typename GridViewType::template Codim<codim>::Iterator IteratorType;
 
