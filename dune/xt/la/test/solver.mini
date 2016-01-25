@@ -11,6 +11,6 @@ vector2 = {__local.vector_common}, {__local.vector_eigen2}, {__local.vector_istl
 '{matrix}' == 'IstlRowMajorSparseMatrix' and '{fieldtype_short}' == 'complex'  | exclude
 
 [__static]
-TESTMATRIXTYPE = Dune::Stuff::LA::{matrix}<{fieldtype}>
-TESTRHSVECTORTYPE = Dune::Stuff::LA::{vector}<{fieldtype}>
-TESTSOLUTIONVECTORTYPE = Dune::Stuff::LA::{vector2}<{fieldtype}>
+TESTMATRIXTYPE = Dune::XT::LA::{matrix}<{fieldtype}>
+TESTRHSVECTORTYPE = Dune::XT::LA::{vector}<{fieldtype}>
+TESTSOLUTIONVECTORTYPE = Dune::XT::LA::{vector2}<{fieldtype}>

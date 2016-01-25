@@ -6,8 +6,8 @@ include vectors.mini
 include matrices.mini
 
 [__static]
-TESTMATRIXTYPE = Dune::Stuff::LA::{matrix}<{fieldtype}>
-TESTVECTORTYPE = Dune::Stuff::LA::{vector}<{fieldtype}>
+TESTMATRIXTYPE = Dune::XT::LA::{matrix}<{fieldtype}>
+TESTVECTORTYPE = Dune::XT::LA::{vector}<{fieldtype}>
 
 
 

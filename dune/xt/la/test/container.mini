@@ -8,5 +8,5 @@ include matrices.mini
 container = {vector}, {matrix} | expand
 
 [__static]
-TESTCONTAINERTYPE = Dune::Stuff::LA::{container}<{fieldtype}>
+TESTCONTAINERTYPE = Dune::XT::LA::{container}<{fieldtype}>
 
