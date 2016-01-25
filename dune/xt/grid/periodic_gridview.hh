@@ -36,6 +36,16 @@ namespace internal {
 template <class RealGridViewImp, bool use_less_memory>
 class PeriodicGridViewTraits;
 
+/** \brief IndexSet for PeriodicGridView
+ *
+ * PeriodicIndexSet is derived from the IndexSet of the underlying GridView. Other than the IndexSet,
+ * PeriodicIndexSet returns the same index for entities that are periodically equivalent, i.e. entities on periodic
+ * boundaries that are regarded as the same entity in the periodic setting. Consequently, the PeriodicIndexSet is
+ * usually smaller than the IndexSet and the size(...) methods return lower values than the corresponding methods of
+ * the non-periodic IndexSet.
+ *
+ * \see PeriodicGridView
+ */
 template <class RealGridViewImp, bool use_less_memory>
 class PeriodicIndexSet
     : public Dune::IndexSet<typename RealGridViewImp::Grid, PeriodicIndexSet<RealGridViewImp, use_less_memory>,
@@ -352,6 +362,8 @@ public:
   template <int cd>
   struct Codim
   {
+    /* PeriodicIterator is the same as the Iterator of the RealGridViewType, except that it visits only one entity of
+     * several periodically equivalent entities */
     class PeriodicIterator : public RealGridViewTraits::template Codim<cd>::Iterator
     {
       typedef typename RealGridViewTraits::template Codim<cd>::Iterator BaseType;
@@ -399,6 +411,8 @@ public:
     template <PartitionIteratorType pit>
     struct Partition
     {
+      /* PeriodicIterator is the same as the Iterator of the RealGridViewType, except that it visits only one entity of
+       * several periodically equivalent entities */
       class PeriodicIterator : public RealGridViewTraits::template Codim<cd>::template Partition<pit>::Iterator
       {
         typedef typename RealGridViewTraits::template Codim<cd>::template Partition<pit>::Iterator BaseType;
@@ -860,27 +874,35 @@ private:
 /** \brief GridView that takes an arbitrary Dune::GridView and adds periodic boundaries
  *
  * PeriodicGridView is templated by and derived from an arbitrary Dune::GridView. All methods are forwarded to the
- * underlying GridView except for the ibegin and iend methods. These methods return a PeriodicIntersectionIterator
- * which again behaves like the underlying IntersectionIterator except that it returns a PeriodicIntersection in its
- * operator*. The PeriodicIntersection again behaves like an Intersection of the underlying GridView, but may return
- * neighbor() == true and an outside() entity even if it is on the boundary. The outside() entity is the entity
- * adjacent to the intersection if it is identified with the intersection on the other side of the grid.
- * In the constructor, PeriodicGridViewImp will build a map mapping boundary entity indices to a map mapping local
- * intersection indices to a std::pair containing the information whether this intersection shall be periodic and the
- * outside entity. This may take quite long as finding the outside entity requires a grid walk for each periodic
- * intersection.
+ * underlying GridView except for begin, end, ibegin, iend, size and indexSet.
+ * The ibegin and iend methods return a PeriodicIntersectionIterator which behaves like the underlying
+ * IntersectionIterator except that it returns a PeriodicIntersection in its operator*. The PeriodicIntersection behaves
+ * like an Intersection of the underlying GridView, but may return neighbor() == true and an outside() entity even if it
+ * is on the boundary. The outside() entity is the entity adjacent to the periodically equivalent intersection, i.e. the
+ * intersection at the same position on the opposite side of the grid.
+ * The begin and end methods return a PeriodicIterator, which behaves exactly like the corresponding Iterator of the
+ * underlying GridView except that visits only one entity of several periodically equivalent entities.
+ * The indexSet() method returns a PeriodicIndexSet which returns the same index for entities that are periodically
+ * equivalent. Consequently, the PeriodicIndexSet is usually smaller than the IndexSet. The size(...) methods return
+ * the corresponding sizes of the PeriodicIndexSet
+ * In the constructor, PeriodicGridViewImp will build a map mapping intersections on a periodic boundary to the
+ * corresponding outside entity. Further, periodically equivalent entities will be identified and given the same index.
+ * Thus, the construction may take quite some time as several grid walks have to be done.
+ * By default, new indices will be assigned for all entities. This may take a lot of memory for fine grids. If
+ * use_less_memory is set to true, as few entities as possible will get new indices, which saves memory but may
+ * degrade performance.
  * By default, all coordinate directions will be made periodic. By supplying a std::bitset< dimension > you can decide
  * for each direction whether it should be periodic (1 means periodic, 0 means 'behave like underlying GridView in that
  * direction').
 
    \note
-      -  Currently, PeriodicGridView will only work with GridViews on the unit hypercube
+      -  PeriodicGridView will only work with GridViews on axis-parallel hyperrectangle grids
       -  Only cube and regular simplex grids have been tested so far. Other grids may not work properly. This is due to
       the heuristics for finding the periodic neighbor entity: Given an intersection on the boundary that shall be
-      periodic, the coordinates intersection.geometry().center() are moved to the other side of the grid and then
+      periodic, the coordinates intersection.geometry().center() are moved to the opposite side of the grid and then
       supplied to Dune::XT::Grid::EntityInLevelSearch. As the coordinates are on the boundary of the wanted entity,
       this search will fail for some grids. Thus, the coordinates are moved a little to the inside of the grid before
-      searching for the entity. The moved coordinates will be inside the wanted entity for cube and usual simplex grids
+      searching for the entity. The moved coordinates will be inside the correct entity for cube and usual simplex grids
       but this is not guaranteed for arbitrary grids.
  */
 template <class RealGridViewImp, bool use_less_memory = false>
