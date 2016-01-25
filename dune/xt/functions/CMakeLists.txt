@@ -8,5 +8,8 @@
 set(lib_dune_xt_functions_sources
     expression/mathexpr.cc)
 
+FILE( GLOB_RECURSE _header "${CMAKE_CURRENT_SOURCE_DIR}/*.hh" )
+add_format(${lib_dune_xt_functions_sources} ${_header})
+
 dune_library_add_sources(dunextfunctions SOURCES ${lib_dune_xt_functions_sources})
 
