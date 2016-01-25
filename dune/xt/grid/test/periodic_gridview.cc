@@ -35,7 +35,7 @@ struct PeriodicViewTest : public testing::Test
   typedef Dune::XT::Grid::Providers::template Cube<GridType> GridProviderType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename GridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
-  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType,use_less_memory> PeriodicGridViewType;
+  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType, use_less_memory> PeriodicGridViewType;
   typedef typename PeriodicGridViewType::IndexSet IndexSet;
   typedef typename PeriodicGridViewType::template Codim<0>::Entity EntityType;
   typedef typename PeriodicGridViewType::template Codim<0>::Iterator EntityIteratorType;
@@ -86,8 +86,8 @@ struct PeriodicViewTest : public testing::Test
       EXPECT_EQ(std::pow(int(8), dimDomain), codim0_size);
     if (is_simplex)
       EXPECT_EQ(std::pow(int(8), dimDomain) * factorial(dimDomain), codim0_size);
-    //EXPECT_EQ(grid_view.size(Dune::GeometryType::cube), periodic_grid_view.size(Dune::GeometryType::cube));
-    //EXPECT_EQ(grid_view.size(Dune::GeometryType::simplex), periodic_grid_view.size(Dune::GeometryType::simplex));
+    // EXPECT_EQ(grid_view.size(Dune::GeometryType::cube), periodic_grid_view.size(Dune::GeometryType::cube));
+    // EXPECT_EQ(grid_view.size(Dune::GeometryType::simplex), periodic_grid_view.size(Dune::GeometryType::simplex));
     EXPECT_EQ(grid_view.overlapSize(0), periodic_grid_view.overlapSize(0));
     EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
     EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));
@@ -170,7 +170,7 @@ struct PeriodicViewTest : public testing::Test
     size_t num_intersections_on_face = std::pow(8, dimDomain - 1);
     assert(dimDomain == Common::from_string<int>(grid_config["dimDomain"]));
     const auto domainDim = Common::from_string<int>(grid_config["dimDomain"]);
-    if (is_simplex && domainDim == 3)   // use dimDomain from config here to avoid "code will never be executed" warning
+    if (is_simplex && domainDim == 3) // use dimDomain from config here to avoid "code will never be executed" warning
       num_intersections_on_face *= 2;
     /* In a fully periodic grid, all intersections are periodic. In a partially periodic grid, only the intersections on
      * two faces are periodic. In a nonperiodic grid, no intersections are periodic. */
@@ -189,15 +189,17 @@ struct PeriodicViewTest : public testing::Test
     EXPECT_EQ(num_entities * num_intersections_per_entity - expected_num_boundary_intersections, neighbor_count);
 
     // the nonperiodic grid has 7**dimDomain inner vertices
-    size_t expected_num_vertices = std::pow(7,dimDomain);
+    size_t expected_num_vertices = std::pow(7, dimDomain);
     // add number of vertices on faces (codim 1)
-    expected_num_vertices += std::pow(7, dimDomain-1)*(num_faces - num_periodic_faces/2);
+    expected_num_vertices += std::pow(7, dimDomain - 1) * (num_faces - num_periodic_faces / 2);
     // add number of vertices on edges (codim 2)
-    const size_t num_edges = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
-    size_t num_periodic_edges = is_partially_periodic ? num_periodic_faces*std::pow(2,dimDomain-1) : num_edges;
+    const size_t num_edges    = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
+    size_t num_periodic_edges = is_partially_periodic ? num_periodic_faces * std::pow(2, dimDomain - 1) : num_edges;
     if (is_nonperiodic)
       num_periodic_edges = 0;
-    expected_num_vertices += dimDomain == 1 ? 0 : std::pow(7, dimDomain-2)*((num_edges - num_periodic_edges) + num_periodic_edges/(is_partially_periodic ? 2 : 4));
+    expected_num_vertices +=
+        dimDomain == 1 ? 0 : std::pow(7, dimDomain - 2) * ((num_edges - num_periodic_edges)
+                                                           + num_periodic_edges / (is_partially_periodic ? 2 : 4));
     // add vertices on corners (codim 3) of grid
     if (domainDim == 3)
       expected_num_vertices += is_partially_periodic ? 4 : (is_nonperiodic ? 8 : 1);
