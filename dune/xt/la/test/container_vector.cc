@@ -9,7 +9,7 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include "la_container.hh"
+#include "container.hh"
 
 using namespace Dune;
 using namespace Dune::XT;
@@ -54,7 +54,7 @@ struct VectorTest : public ::testing::Test
       d_by_size_and_value.set_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
       d_by_size_and_value.add_to_entry(ii, D_ScalarType(0.5) + D_ScalarType(ii));
       EXPECT_FALSE(
-          DSC::FloatCmp::ne(d_by_size_and_value.get_entry(ii), D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(1)))
+          Common::FloatCmp::ne(d_by_size_and_value.get_entry(ii), D_ScalarType(2) * D_ScalarType(ii) + D_ScalarType(1)))
           << d_by_size_and_value.get_entry(ii);
       EXPECT_FALSE(Common::FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value[ii]))
           << d_by_size_and_value[ii];
@@ -245,37 +245,37 @@ struct VectorTest : public ::testing::Test
     ScalarType dot_operator   = ones * zeros;
     ScalarType dot2           = zeros.dot(ones);
     ScalarType dot_operator_2 = zeros * ones;
-    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
-                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
-                && DSC::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && Common::FloatCmp::eq(dot, dot2)
+                && Common::FloatCmp::eq(dot_operator, dot_operator_2)
+                && Common::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
     dot          = ones.dot(ones);
     dot_operator = ones * ones;
-    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(4)) && DSC::FloatCmp::eq(dot_operator, ScalarType(4)))
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(4)) && Common::FloatCmp::eq(dot_operator, ScalarType(4)))
         << "These should equal 4: " << dot << ", " << dot_operator;
     dot            = ones.dot(testvector_3);
     dot_operator   = ones * testvector_3;
     dot2           = testvector_3.dot(ones);
     dot_operator_2 = testvector_3 * ones;
-    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && DSC::FloatCmp::eq(dot, dot2)
-                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
-                && DSC::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && Common::FloatCmp::eq(dot, dot2)
+                && Common::FloatCmp::eq(dot_operator, dot_operator_2)
+                && Common::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
     dot            = countingup.dot(testvector_5);
     dot_operator   = countingup * testvector_5;
     dot2           = testvector_5.dot(countingup);
     dot_operator_2 = testvector_5 * countingup;
-    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-5.5)) && DSC::FloatCmp::eq(dot, dot2)
-                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
-                && DSC::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-5.5)) && Common::FloatCmp::eq(dot, dot2)
+                && Common::FloatCmp::eq(dot_operator, dot_operator_2)
+                && Common::FloatCmp::eq(dot, dot_operator))
         << "These should all equal -5.5: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
     dot            = testvector_3.dot(testvector_5);
     dot_operator   = testvector_3 * testvector_5;
     dot2           = testvector_5.dot(testvector_3);
     dot_operator_2 = testvector_5 * testvector_3;
-    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-7.25)) && DSC::FloatCmp::eq(dot, dot2)
-                && DSC::FloatCmp::eq(dot_operator, dot_operator_2)
-                && DSC::FloatCmp::eq(dot, dot_operator))
+    EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-7.25)) && Common::FloatCmp::eq(dot, dot2)
+                && Common::FloatCmp::eq(dot_operator, dot_operator_2)
+                && Common::FloatCmp::eq(dot, dot_operator))
         << "These should all equal -7.25: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
 
     // test operator==

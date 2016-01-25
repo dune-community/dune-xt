@@ -45,6 +45,20 @@ foreach(_mod ${ALL_DEPENDENCIES})
 endforeach(_mod DEPENDENCIES)
 set_source_files_properties(${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1)
 
+# add symlink for dune_execute.py to build-directory to be able to access it from other (xt-) modules
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+dune_symlink_to_source_files(FILES bin/dune_execute.py)
+
+#disable most warnings from dependent modules
+foreach(_mod ${ALL_DEPENDENCIES})
+    dune_module_to_uppercase(_upper_case "${_mod}")
+    if(${_mod}_INCLUDE_DIRS)
+        foreach( _idir ${${_mod}_INCLUDE_DIRS} )
+            add_definitions("-isystem ${_idir}")
+        endforeach( _idir )
+    endif(${_mod}_INCLUDE_DIRS)
+endforeach(_mod DEPENDENCIES)
+
 add_subdirectory(dune)
 add_subdirectory(doc)
 

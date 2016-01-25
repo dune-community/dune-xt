@@ -8,7 +8,7 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include "la_container.hh"
+#include "container.hh"
 
 using namespace Dune;
 using namespace Dune::XT;
@@ -209,7 +209,7 @@ struct MatrixTest : public ::testing::Test
     VectorImp a = vector_ones;
     matrix_zeros_dense.mv(vector_zeros, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUECommon::FloatCmp::eq(ScalarType(1), vector_ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), vector_ones[ii])) << "check copy-on-write";
     }
 
     // test scal, operator*
@@ -252,9 +252,9 @@ struct MatrixTest : public ::testing::Test
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
         EXPECT_TRUE(
-            DSC::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25), scaled.get_entry(ii, jj)));
-        EXPECT_TRUECommon::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25),
-                                      scaled_by_operator.get_entry(ii, jj)));
+            Common::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25), scaled.get_entry(ii, jj)));
+        EXPECT_TRUE(Common::FloatCmp::eq(testmatrix_sparse.get_entry(ii, jj) * ScalarType(-1.25),
+                                         scaled_by_operator.get_entry(ii, jj)));
       }
     }
     scaled             = testmatrix_1;
@@ -263,16 +263,16 @@ struct MatrixTest : public ::testing::Test
     scaled_by_operator *= ScalarType(10);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUECommon::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled.get_entry(ii, jj)));
-        EXPECT_TRUE(
-            DSC::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled_by_operator.get_entry(ii, jj)));
+        EXPECT_TRUE(Common::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10), scaled.get_entry(ii, jj)));
+        EXPECT_TRUE(Common::FloatCmp::eq(testmatrix_1.get_entry(ii, jj) * ScalarType(10),
+                                         scaled_by_operator.get_entry(ii, jj)));
       }
     }
     MatrixImp b = matrix_ones;
     b.scal(ScalarType(0));
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUECommon::FloatCmp::eq(ScalarType(1), matrix_ones.get_entry(ii, jj))) << "check copy-on-write";
+        EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), matrix_ones.get_entry(ii, jj))) << "check copy-on-write";
       }
     }
 
@@ -296,22 +296,23 @@ struct MatrixTest : public ::testing::Test
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
         EXPECT_TRUE(
-            DSC::FloatCmp::eq(ScalarType(0.5) * testmatrix_sparse.get_entry(ii, jj), result_axpy.get_entry(ii, jj)));
+            Common::FloatCmp::eq(ScalarType(0.5) * testmatrix_sparse.get_entry(ii, jj), result_axpy.get_entry(ii, jj)));
       }
     }
     result_axpy = testmatrix_1;
     result_axpy.axpy(ScalarType(2), testmatrix_2);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUECommon::FloatCmp::eq(ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj),
-                                      result_axpy.get_entry(ii, jj)));
+        EXPECT_TRUE(
+            Common::FloatCmp::eq(ScalarType(2) * testmatrix_2.get_entry(ii, jj) + testmatrix_1.get_entry(ii, jj),
+                                 result_axpy.get_entry(ii, jj)));
       }
     }
     b = matrix_zeros_dense;
     b.axpy(ScalarType(1), matrix_ones);
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
-        EXPECT_TRUECommon::FloatCmp::eq(ScalarType(0), matrix_zeros_dense.get_entry(ii, jj))) << "check copy-on-write";
+        EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(0), matrix_zeros_dense.get_entry(ii, jj))) << "check copy-on-write";
       }
     }
   } // void produces_correct_results() const

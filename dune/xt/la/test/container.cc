@@ -9,7 +9,7 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include "la_container.hh"
+#include "container.hh"
 
 using namespace Dune;
 using namespace Dune::XT;
