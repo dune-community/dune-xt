@@ -192,10 +192,10 @@ private:
   }
 }; // class EntityHierarchicSearch
 
-template <class GV>
-EntityInlevelSearch<GV> make_entity_in_level_search(const GV& grid_view)
+template <class GV, int codim = 0>
+EntityInlevelSearch<GV, codim> make_entity_in_level_search(const GV& grid_view)
 {
-  return EntityInlevelSearch<GV>(grid_view);
+  return EntityInlevelSearch<GV, codim>(grid_view);
 }
 
 template <class GV>
