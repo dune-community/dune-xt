@@ -27,7 +27,7 @@
 #endif
 
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/common/profiler.hh>
+#include <dune/xt/common/timings.hh>
 #include <dune/xt/common/math.hh>
 
 #include "interfaces.hh"
@@ -508,7 +508,7 @@ public:
 
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
-    DUNE_XT_COMMON_PROFILE_SCOPE(static_id() + ".mv");
+    DUNE_XT_COMMON_TIMING_SCOPE(static_id() + ".mv");
     backend_->mv(*(xx.backend_), yy.backend());
   }
 
@@ -649,7 +649,7 @@ public:
 private:
   void build_sparse_matrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
   {
-    DUNE_XT_COMMON_PROFILE_SCOPE(static_id() + ".build");
+    DUNE_XT_COMMON_TIMING_SCOPE(static_id() + ".build");
     backend_ = std::make_shared<BackendType>(rr, cc, BackendType::random);
     for (size_t ii = 0; ii < patt.size(); ++ii)
       backend_->setrowsize(ii, patt.inner(ii).size());
