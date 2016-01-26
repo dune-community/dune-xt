@@ -8,5 +8,7 @@
 enable_testing()
 
 BEGIN_TESTCASES(dunextla)
+
+add_format(${test_sources})
  
 END_TESTCASES()
