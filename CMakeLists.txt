@@ -29,7 +29,7 @@ include(DuneUtils)
 
 # start a dune project with information from dune.module
 dune_project()
-dune_enable_all_packages(INCLUDE_DIRS ${dune-ls-common_SOURCE_DIR}/dune
+dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-la_SOURCE_DIR}/dune
                          MODULE_LIBRARIES dunextla
                          VERBOSE)
 
@@ -44,10 +44,6 @@ foreach(_mod ${ALL_DEPENDENCIES})
         list(APPEND COMMON_HEADER ${HEADER_LIST})
 endforeach(_mod DEPENDENCIES)
 set_source_files_properties(${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1)
-
-# add symlink for dune_execute.py to build-directory to be able to access it from other (xt-) modules
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-dune_symlink_to_source_files(FILES bin/dune_execute.py)
 
 #disable most warnings from dependent modules
 foreach(_mod ${ALL_DEPENDENCIES})
