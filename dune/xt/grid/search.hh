@@ -5,7 +5,7 @@
 // Authors:
 //   Felix Schindler (2013 - 2016)
 //   Rene Milk       (2013 - 2015)
-//   Tobias Leibner  (2014 - 2015)
+//   Tobias Leibner  (2014 - 2016)
 
 #ifndef DUNE_XT_GRID_SEARCH_HH
 #define DUNE_XT_GRID_SEARCH_HH

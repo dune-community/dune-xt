@@ -3,6 +3,7 @@
 // The copyright lies with the authors of this file (see below).
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 // Authors:
+//   Felix Schindler (2016)
 
 /**
   * This file is intended as a starting point for quick testing.
