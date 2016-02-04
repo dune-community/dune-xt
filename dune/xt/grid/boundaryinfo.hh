@@ -15,7 +15,7 @@
 #include "boundaryinfo/allneumann.hh"
 #include "boundaryinfo/interfaces.hh"
 #include "boundaryinfo/normalbased.hh"
-#include "boundaryinfo/provider.hh"
+#include "boundaryinfo/factory.hh"
 #include "boundaryinfo/types.hh"
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_HH

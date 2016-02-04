@@ -5,8 +5,8 @@
 // Authors:
 //   Felix Schindler (2016)
 
-#ifndef DUNE_XT_GRID_BOUNDARYINFO_PROVIDER_HH
-#define DUNE_XT_GRID_BOUNDARYINFO_PROVIDER_HH
+#ifndef DUNE_XT_GRID_BOUNDARYINFO_FACTORY_HH
+#define DUNE_XT_GRID_BOUNDARYINFO_FACTORY_HH
 
 #include "interfaces.hh"
 #include "alldirichlet.hh"
@@ -19,7 +19,7 @@ namespace Grid {
 
 
 template <class I>
-class BoundaryInfoProvider
+class BoundaryInfoFactory
 {
 public:
   static std::vector<std::string> available()
@@ -61,11 +61,11 @@ public:
     return create(config.get<std::string>("type"), config);
   }
 
-}; // class BoundaryInfoProvider
+}; // class BoundaryInfoFactory
 
 
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_BOUNDARYINFO_PROVIDER_HH
+#endif // DUNE_XT_GRID_BOUNDARYINFO_FACTORY_HH
