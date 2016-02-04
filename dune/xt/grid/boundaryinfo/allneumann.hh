@@ -40,9 +40,9 @@ public:
 
 
 template <class I>
-std::unique_ptr<AllNeumannBoundaryInfo<I>> make_allneumann_boundaryInfo()
+std::unique_ptr<AllNeumannBoundaryInfo<I>> make_allneumann_boundaryInfo(const Common::Configuration& /*config*/)
 {
-  return AllNeumannBoundaryInfo<I>();
+  return XT::Common::make_unique<AllNeumannBoundaryInfo<I>>();
 }
 
 

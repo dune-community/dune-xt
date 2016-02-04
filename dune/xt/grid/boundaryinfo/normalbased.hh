@@ -29,16 +29,25 @@ public:
     return BaseType::static_id() + ".normalbased";
   }
 
-  virtual BoundaryType type(const IntersectionType& intersection) const override final;
+  virtual BoundaryType type(const IntersectionType& /*intersection*/) const override final
+  {
+    DUNE_THROW(NotImplemented, "");
+  }
+
 }; // class NormalBasedBoundaryInfo
 
 
 template <class I>
-std::unique_ptr<NormalBasedBoundaryInfo<I>> make_normalbased_boundaryInfo(/*...*/)
+std::unique_ptr<NormalBasedBoundaryInfo<I>> make_normalbased_boundaryInfo(const Common::Configuration& /*config*/)
 {
-  return NormalBasedBoundaryInfo<I>(/*...*/);
+  return XT::Common::make_unique<NormalBasedBoundaryInfo<I>>(/*...*/);
 }
 
+Common::Configuration normalbased_boundaryinfo_default_config()
+{
+  DUNE_THROW(NotImplemented, "");
+  return Common::Configuration("type", "xt.grid.boundaryinfo.normalbased");
+}
 
 } // namespace Grid
 } // namespace XT

@@ -169,9 +169,9 @@ private:
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
-    typedef XT::Grid::BoundaryInfoProvider<typename LevelGridViewType::Intersection> BoundaryInfoProvider;
+    typedef XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection> BoundaryInfoFactory;
     auto boundary_info_ptr =
-        BoundaryInfoProvider::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
+        BoundaryInfoFactory::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
     for (auto lvl : Common::value_range(grid().maxLevel() + 1)) {
       auto grid_view = level_view(lvl);
       // vtk writer
@@ -232,6 +232,8 @@ private:
   std::vector<double> generateBoundaryVisualization(const LevelGridViewType& gridView,
                                                     const BoundaryInfoType& boundaryInfo, const std::string type) const
   {
+    constexpr DirichletBoundary dirichlet_type{};
+    constexpr NeumannBoundary neumann_type{};
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
     for (auto&& entity : elements(gridView)) {
@@ -239,10 +241,10 @@ private:
       data[index] = 0.0;
       for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
         if (type == "dirichlet") {
-          if (boundaryInfo.dirichlet(*intersectionIt))
+          if (boundaryInfo.type(*intersectionIt)==dirichlet_type)
             data[index] = 1.0;
         } else if (type == "neumann") {
-          if (boundaryInfo.neumann(*intersectionIt))
+          if (boundaryInfo.type(*intersectionIt)==neumann_type)
             data[index] = 1.0;
         } else
           DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type << "'!");

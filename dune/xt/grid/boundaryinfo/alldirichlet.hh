@@ -52,7 +52,7 @@ template <class I>
 std::unique_ptr<AllDirichletBoundaryInfo<I>>
 make_alldirichlet_boundaryinfo(const Common::Configuration& /*cfg*/ = Common::Configuration())
 {
-  return AllDirichletBoundaryInfo<I>();
+  return XT::Common::make_unique<AllDirichletBoundaryInfo<I>>();
 }
 
 

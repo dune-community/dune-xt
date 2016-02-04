@@ -267,7 +267,7 @@ public:
   typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  explicit DirichletIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit DirichletIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
   {
   }
@@ -278,7 +278,7 @@ public:
   }
 
 private:
-  const BoundaryInfoInterface<IntersectionType>& boundary_info_;
+  const BoundaryInfo<IntersectionType>& boundary_info_;
 }; // class DirichletIntersections
 
 template <class GridViewImp>
@@ -290,7 +290,7 @@ public:
   typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  explicit NeumannIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit NeumannIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
   {
   }
@@ -301,7 +301,7 @@ public:
   }
 
 private:
-  const BoundaryInfoInterface<IntersectionType>& boundary_info_;
+  const BoundaryInfo<IntersectionType>& boundary_info_;
 }; // class NeumannIntersections
 
 } // namespace ApplyOn

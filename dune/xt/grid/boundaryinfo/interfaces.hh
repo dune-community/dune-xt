@@ -23,19 +23,14 @@ protected:
   virtual std::string id() const = 0;
 
 public:
-  static std::string static_id()
-  {
-    return "xt.grid.boundaryinfo";
-  }
-
-  virtual operator=(const BoundaryType& other) const
+  virtual bool operator==(const BoundaryType& other) const
   {
     return id() == other.id();
   }
 
-  virtual operator!=(const BoundaryType& other) const
+  virtual bool operator!=(const BoundaryType& other) const
   {
-    return !operator=(other);
+    return !operator==(other);
   }
 }; // class BoundaryType
 
@@ -49,6 +44,11 @@ public:
   typedef IntersectionImp IntersectionType;
 
   virtual BoundaryType type(const IntersectionType& intersection) const = 0;
+
+  static std::string static_id()
+  {
+    return "xt.grid.boundaryinfo";
+  }
 }; // class BoundaryInfo
 
 

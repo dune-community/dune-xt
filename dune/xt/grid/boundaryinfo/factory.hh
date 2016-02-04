@@ -46,11 +46,11 @@ public:
                                                  const Common::Configuration config = Common::Configuration())
   {
     if (type == AllDirichletBoundaryInfo<I>::static_id())
-      return AllDirichletBoundaryInfo<I>::create(config);
+      return make_alldirichlet_boundaryinfo<I>(config);
     else if (type == AllNeumannBoundaryInfo<I>::static_id())
-      return AllNeumannBoundaryInfo<I>::create(config);
+      return make_allneumann_boundaryInfo<I>(config);
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
-      return NormalBasedBoundaryInfo<I>::create(config);
+      return make_normalbased_boundaryInfo<I>(config);
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
