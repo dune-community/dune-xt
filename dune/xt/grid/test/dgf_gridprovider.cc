@@ -12,18 +12,18 @@
 #include "provider.hh"
 
 
-struct CubeGridProvider : public GridProviderBase<TESTGRIDTYPE>
+struct DgfGridProvider : public GridProviderBase<TESTGRIDTYPE>
 {
   typedef GridProviderBase<TESTGRIDTYPE> BaseType;
 
   void const_interface()
   {
-    BaseType::const_interface(Dune::XT::Grid::make_cube_grid<TESTGRIDTYPE>());
+    BaseType::const_interface(Dune::XT::Grid::make_dgf_grid<TESTGRIDTYPE>());
   }
 };
 
 
-TEST_F(CubeGridProvider, const_interface)
+TEST_F(DgfGridProvider, const_interface)
 {
   this->const_interface();
 }
