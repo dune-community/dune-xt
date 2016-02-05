@@ -32,15 +32,22 @@ public:
     return BaseType::static_id() + ".alldirichlet";
   }
 
-  virtual BoundaryType type(const IntersectionType& intersection) const override final
+  virtual const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (intersection.boundary())
-      return DirichletBoundary();
-    else
-      return NoBoundary();
+      return dirichlet_boundary_;
+    return  no_boundary_;
   }
+
+protected:
+  static constexpr NoBoundary no_boundary_{};
+  static constexpr DirichletBoundary dirichlet_boundary_{};
 }; // class AllDirichletBoundaryInfo
 
+template <class I>
+constexpr NoBoundary AllDirichletBoundaryInfo<I>::no_boundary_;
+template <class I>
+constexpr DirichletBoundary AllDirichletBoundaryInfo<I>::dirichlet_boundary_;
 
 Common::Configuration alldirichlet_boundaryinfo_default_config()
 {

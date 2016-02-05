@@ -32,14 +32,21 @@ public:
     return BaseType::static_id() + ".allneumann";
   }
 
-  virtual BoundaryType type(const IntersectionType& intersection) const override final
+  virtual const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (intersection.boundary())
-      return NeumannBoundary();
-    else
-      return NoBoundary();
+      return neumann_boundary_;
+    return  no_boundary_;
   }
+protected:
+  static constexpr NoBoundary no_boundary_{};
+  static constexpr NeumannBoundary neumann_boundary_{};
 }; // class AllNeumannBoundaryInfo
+
+template <class I>
+constexpr NoBoundary AllNeumannBoundaryInfo<I>::no_boundary_;
+template <class I>
+constexpr NeumannBoundary AllNeumannBoundaryInfo<I>::neumann_boundary_;
 
 
 template <class I>

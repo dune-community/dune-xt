@@ -43,7 +43,7 @@ class BoundaryInfo
 public:
   typedef IntersectionImp IntersectionType;
 
-  virtual BoundaryType type(const IntersectionType& intersection) const = 0;
+  virtual const BoundaryType& type(const IntersectionType& intersection) const = 0;
 
   static std::string static_id()
   {

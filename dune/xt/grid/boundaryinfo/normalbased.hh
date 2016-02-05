@@ -33,13 +33,23 @@ public:
     return BaseType::static_id() + ".normalbased";
   }
 
-  virtual BoundaryType type(const IntersectionType& /*intersection*/) const override final
+  virtual const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     DUNE_THROW(NotImplemented, "");
-  }
 
+  }
+protected:
+  static constexpr NoBoundary no_boundary_{};
+  static constexpr DirichletBoundary dirichlet_boundary_{};
+  static constexpr NeumannBoundary neumann_boundary_{};
 }; // class NormalBasedBoundaryInfo
 
+template <class I>
+constexpr NoBoundary NormalBasedBoundaryInfo<I>::no_boundary_;
+template <class I>
+constexpr DirichletBoundary NormalBasedBoundaryInfo<I>::dirichlet_boundary_;
+template <class I>
+constexpr NeumannBoundary NormalBasedBoundaryInfo<I>::neumann_boundary_;
 
 template <class I>
 std::unique_ptr<NormalBasedBoundaryInfo<I>> make_normalbased_boundaryInfo(const Common::Configuration& /*config*/)
