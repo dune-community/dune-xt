@@ -1,7 +1,9 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2016)
@@ -197,9 +199,8 @@ private:
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
-    typedef XT::Grid::BoundaryInfoProvider<typename LevelGridViewType::Intersection> BoundaryInfoProvider;
-    auto boundary_info_ptr =
-        BoundaryInfoProvider::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
+    typedef XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection> BoundaryInfoFactory;
+    auto boundary_info_ptr = BoundaryInfoFactory::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
     for (auto lvl : Common::value_range(max_level() + 1)) {
       auto grid_view = level_view(lvl);
       // vtk writer
@@ -260,6 +261,8 @@ private:
   std::vector<double> generateBoundaryVisualization(const LevelGridViewType& gridView,
                                                     const BoundaryInfoType& boundaryInfo, const std::string type) const
   {
+    constexpr DirichletBoundary dirichlet_type{};
+    constexpr NeumannBoundary neumann_type{};
     std::vector<double> data(gridView.indexSet().size(0));
     // walk the grid
     for (auto&& entity : elements(gridView)) {
@@ -267,10 +270,10 @@ private:
       data[index] = 0.0;
       for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
         if (type == "dirichlet") {
-          if (boundaryInfo.dirichlet(*intersectionIt))
+          if (boundaryInfo.type(*intersectionIt) == dirichlet_type)
             data[index] = 1.0;
         } else if (type == "neumann") {
-          if (boundaryInfo.neumann(*intersectionIt))
+          if (boundaryInfo.type(*intersectionIt) == neumann_type)
             data[index] = 1.0;
         } else
           DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type << "'!");

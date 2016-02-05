@@ -1,7 +1,9 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2013 - 2016)
 //   Rene Milk       (2013 - 2015)
@@ -70,6 +72,12 @@ struct CheckInside<0>
   }
 };
 
+/** Provides a facility to search a given gridview for entities with arbitrary codim
+ * that contain a set of points. The search is "in-level", meaning no grid hierarchy
+ * is used in the search. The search position iterator on the grid persists
+ * between searches, reducing complexity of repeated searches on the grid.
+ * \attention This makes it inherently not thread safe
+**/
 template <class GridViewType, int codim = 0>
 class EntityInlevelSearch : public EntitySearchBase<GridViewType>
 {
@@ -98,6 +106,10 @@ public:
   {
   }
 
+  /** \arg points iterable sequence of global coordinates to search for
+   *  \return a vector of size points.size() of, potentially nullptr if no corresponding one was found,
+   *          unique_ptr<Entity>
+   **/
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points)
   {

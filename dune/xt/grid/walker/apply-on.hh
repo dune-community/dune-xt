@@ -1,7 +1,9 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2014, 2016)
 //   Rene Milk       (2014 - 2015)
@@ -267,7 +269,7 @@ public:
   typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  explicit DirichletIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit DirichletIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
   {
   }
@@ -278,7 +280,7 @@ public:
   }
 
 private:
-  const BoundaryInfoInterface<IntersectionType>& boundary_info_;
+  const BoundaryInfo<IntersectionType>& boundary_info_;
 }; // class DirichletIntersections
 
 template <class GridViewImp>
@@ -290,7 +292,7 @@ public:
   typedef typename BaseType::GridViewType GridViewType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  explicit NeumannIntersections(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit NeumannIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
   {
   }
@@ -301,7 +303,7 @@ public:
   }
 
 private:
-  const BoundaryInfoInterface<IntersectionType>& boundary_info_;
+  const BoundaryInfo<IntersectionType>& boundary_info_;
 }; // class NeumannIntersections
 
 } // namespace ApplyOn

@@ -1,7 +1,9 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2014, 2016)
 //   Rene Milk       (2014 - 2015)
@@ -100,7 +102,7 @@ public:
   typedef typename BaseType::EntityType EntityType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  explicit DirichletDetector(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit DirichletDetector(const BoundaryInfo<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
     , found_(0)
   {
@@ -123,7 +125,7 @@ public:
   }
 
 private:
-  const BoundaryInfoInterface<IntersectionType>& boundary_info_;
+  const BoundaryInfo<IntersectionType>& boundary_info_;
   size_t found_;
 }; // class DirichletDetector
 
