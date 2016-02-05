@@ -36,7 +36,7 @@ public:
   {
     if (intersection.boundary())
       return dirichlet_boundary_;
-    return  no_boundary_;
+    return no_boundary_;
   }
 
 protected:

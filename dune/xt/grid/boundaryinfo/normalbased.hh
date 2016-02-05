@@ -36,8 +36,8 @@ public:
   virtual const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     DUNE_THROW(NotImplemented, "");
-
   }
+
 protected:
   static constexpr NoBoundary no_boundary_{};
   static constexpr DirichletBoundary dirichlet_boundary_{};

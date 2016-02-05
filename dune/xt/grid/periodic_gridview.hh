@@ -71,7 +71,8 @@ public:
   static const int dimDomain = RealGridViewType::dimension;
 
   PeriodicIndexSet(const RealIndexSetType& real_index_set, const std::vector<IndexMapType>& index_maps,
-                   const std::vector<size_t>& entity_counts, const std::map<Dune::GeometryType, size_t>& geometry_type_counts,
+                   const std::vector<size_t>& entity_counts,
+                   const std::map<Dune::GeometryType, size_t>& geometry_type_counts,
                    const std::vector<std::vector<IndexType>>& new_indices_vector)
     : BaseType()
     , real_index_set_(real_index_set)
@@ -666,7 +667,7 @@ public:
   {
     // find lower left and upper right corner of the grid
     auto entity_it         = BaseType::template begin<0>();
-    nonperiodic_pair_ = std::make_pair(bool(false), EntityType(*entity_it));
+    nonperiodic_pair_      = std::make_pair(bool(false), EntityType(*entity_it));
     DomainType lower_left  = entity_it->geometry().center();
     DomainType upper_right = lower_left;
     for (const auto& entity : Dune::elements(*this)) {
@@ -841,7 +842,8 @@ public:
                                 entity,
                                 entity.hasBoundaryIntersections()
                                     ? entity_to_intersection_map_map_.at(this->indexSet().index(entity))
-                                    : (const IntersectionMapType&)empty_intersection_map_, nonperiodic_pair_);
+                                    : (const IntersectionMapType&)empty_intersection_map_,
+                                nonperiodic_pair_);
 
   } // ... ibegin(...)
 
@@ -852,7 +854,8 @@ public:
                                 entity,
                                 entity.hasBoundaryIntersections()
                                     ? entity_to_intersection_map_map_.at(this->indexSet().index(entity))
-                                    : (const IntersectionMapType&)empty_intersection_map_, nonperiodic_pair_);
+                                    : (const IntersectionMapType&)empty_intersection_map_,
+                                nonperiodic_pair_);
   } // ... iend(...)
 
 private:
@@ -861,45 +864,48 @@ private:
   static const IntersectionMapType empty_intersection_map_;
   const std::bitset<dimDomain> periodic_directions_;
   std::shared_ptr<IndexSet> index_set_;
-  static std::vector< size_t > entity_counts_;
-  static std::map< Dune::GeometryType, size_t > type_counts_;
+  static std::vector<size_t> entity_counts_;
+  static std::map<Dune::GeometryType, size_t> type_counts_;
   static std::vector<std::set<IndexType>> entities_to_skip_vector_;
   static std::vector<std::vector<IndexType>> new_indices_vector_;
   const typename BaseType::IndexSet& real_index_set_;
   static std::pair<bool, EntityType> nonperiodic_pair_;
 }; // ... class PeriodicGridViewImp ...
 
-template <class RealGridViewImp, bool use_less_memory >
-std::map<typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexType, typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IntersectionMapType>
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::entity_to_intersection_map_map_;
+template <class RealGridViewImp, bool use_less_memory>
+std::map<typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexType,
+         typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IntersectionMapType>
+    PeriodicGridViewImp<RealGridViewImp, use_less_memory>::entity_to_intersection_map_map_;
 
-template <class RealGridViewImp, bool use_less_memory >
-std::vector< typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexMapType>
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::index_maps_(PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain+1);
+template <class RealGridViewImp, bool use_less_memory>
+std::vector<typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexMapType>
+    PeriodicGridViewImp<RealGridViewImp, use_less_memory>::index_maps_(
+        PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain + 1);
 
-template <class RealGridViewImp, bool use_less_memory >
+template <class RealGridViewImp, bool use_less_memory>
 const typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IntersectionMapType
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::empty_intersection_map_;
+    PeriodicGridViewImp<RealGridViewImp, use_less_memory>::empty_intersection_map_;
 
-template <class RealGridViewImp, bool use_less_memory >
-std::vector<std::set< typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexType >>
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::entities_to_skip_vector_(PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain+1);
+template <class RealGridViewImp, bool use_less_memory>
+std::vector<std::set<typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexType>>
+    PeriodicGridViewImp<RealGridViewImp, use_less_memory>::entities_to_skip_vector_(
+        PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain + 1);
 
-template <class RealGridViewImp, bool use_less_memory >
-std::vector< std::vector< typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexType > >
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::new_indices_vector_(PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain+1);
+template <class RealGridViewImp, bool use_less_memory>
+std::vector<std::vector<typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::IndexType>>
+    PeriodicGridViewImp<RealGridViewImp, use_less_memory>::new_indices_vector_(
+        PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain + 1);
 
-template <class RealGridViewImp, bool use_less_memory >
-std::vector< size_t >
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::entity_counts_(PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain+1);
+template <class RealGridViewImp, bool use_less_memory>
+std::vector<size_t> PeriodicGridViewImp<RealGridViewImp, use_less_memory>::entity_counts_(
+    PeriodicGridViewImp<RealGridViewImp, use_less_memory>::dimDomain + 1);
 
-template <class RealGridViewImp, bool use_less_memory >
-std::map< Dune::GeometryType, size_t >
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::type_counts_;
+template <class RealGridViewImp, bool use_less_memory>
+std::map<Dune::GeometryType, size_t> PeriodicGridViewImp<RealGridViewImp, use_less_memory>::type_counts_;
 
-template <class RealGridViewImp, bool use_less_memory >
+template <class RealGridViewImp, bool use_less_memory>
 std::pair<bool, typename PeriodicGridViewImp<RealGridViewImp, use_less_memory>::EntityType>
-PeriodicGridViewImp<RealGridViewImp, use_less_memory>::nonperiodic_pair_;
+    PeriodicGridViewImp<RealGridViewImp, use_less_memory>::nonperiodic_pair_;
 
 } // namespace internal
 

@@ -105,7 +105,8 @@ public:
   }
 
   /** \arg points iterable sequence of global coordinates to search for
-   *  \return a vector of size points.size() of, potentially nullptr if no corresponding one was found, unique_ptr<Entity>
+   *  \return a vector of size points.size() of, potentially nullptr if no corresponding one was found,
+   *          unique_ptr<Entity>
    **/
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points)

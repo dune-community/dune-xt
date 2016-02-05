@@ -36,8 +36,9 @@ public:
   {
     if (intersection.boundary())
       return neumann_boundary_;
-    return  no_boundary_;
+    return no_boundary_;
   }
+
 protected:
   static constexpr NoBoundary no_boundary_{};
   static constexpr NeumannBoundary neumann_boundary_{};

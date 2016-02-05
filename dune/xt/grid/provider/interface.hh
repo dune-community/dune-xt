@@ -170,8 +170,7 @@ private:
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
     typedef XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection> BoundaryInfoFactory;
-    auto boundary_info_ptr =
-        BoundaryInfoFactory::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
+    auto boundary_info_ptr = BoundaryInfoFactory::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
     for (auto lvl : Common::value_range(grid().maxLevel() + 1)) {
       auto grid_view = level_view(lvl);
       // vtk writer
@@ -241,10 +240,10 @@ private:
       data[index] = 0.0;
       for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
         if (type == "dirichlet") {
-          if (boundaryInfo.type(*intersectionIt)==dirichlet_type)
+          if (boundaryInfo.type(*intersectionIt) == dirichlet_type)
             data[index] = 1.0;
         } else if (type == "neumann") {
-          if (boundaryInfo.type(*intersectionIt)==neumann_type)
+          if (boundaryInfo.type(*intersectionIt) == neumann_type)
             data[index] = 1.0;
         } else
           DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type << "'!");
