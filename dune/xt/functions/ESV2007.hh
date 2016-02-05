@@ -360,7 +360,7 @@ public:
   }
 
   CutoffFunction(const DiffusionType& diffusion, const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
-         const std::string nm = static_id())
+                 const std::string nm = static_id())
     : diffusion_(diffusion)
     , poincare_constant_(poincare_constant)
     , name_(nm)
@@ -582,7 +582,7 @@ public:
   }
 
   CutoffFunction(const DiffusionFactorType& diffusion_factor, const DiffusionTensorType& diffusion_tensor,
-         const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl), const std::string nm = static_id())
+                 const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl), const std::string nm = static_id())
     : diffusion_factor_(diffusion_factor)
     , diffusion_tensor_(diffusion_tensor)
     , poincare_constant_(poincare_constant)

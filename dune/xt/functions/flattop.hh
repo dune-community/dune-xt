@@ -92,9 +92,10 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  FlatTopFunction(const StuffDomainType& lower_left, const StuffDomainType& upper_right, const StuffDomainType& boundary_layer,
-          const StuffRangeType& value = default_config().get<StuffRangeType>("value"),
-          const std::string name_in = default_config().get<std::string>("name"))
+  FlatTopFunction(const StuffDomainType& lower_left, const StuffDomainType& upper_right,
+                  const StuffDomainType& boundary_layer,
+                  const StuffRangeType& value = default_config().get<StuffRangeType>("value"),
+                  const std::string name_in = default_config().get<std::string>("name"))
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , boundary_layer_(boundary_layer)

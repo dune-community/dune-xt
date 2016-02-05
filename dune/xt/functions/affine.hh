@@ -85,7 +85,7 @@ public:
   } // ... create(...)
 
   explicit AffineFunction(const MatrixType& matrix, const RangeType& vector = RangeType(0),
-                  const std::string name_in = static_id())
+                          const std::string name_in = static_id())
     : A_(matrix)
     , b_(vector)
     , name_(name_in)

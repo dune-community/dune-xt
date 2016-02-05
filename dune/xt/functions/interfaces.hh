@@ -387,7 +387,8 @@ public:
   }
 
   template <class OtherType>
-  typename std::enable_if<is_localizable_function<OtherType>::value, Functions::ProductFunction<ThisType, OtherType>>::type
+  typename std::enable_if<is_localizable_function<OtherType>::value,
+                          Functions::ProductFunction<ThisType, OtherType>>::type
   operator*(const OtherType& other) const
   {
     return Functions::ProductFunction<ThisType, OtherType>(*this, other);

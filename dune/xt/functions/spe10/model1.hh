@@ -178,9 +178,9 @@ public:
   } // ... create(...)
 
   Model1Function(const std::string& filename, const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
-         const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
-         const RangeFieldType min = internal::model1_min_value, const RangeFieldType max = internal::model1_max_value,
-         const std::string nm = BaseType::static_id())
+                 const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
+                 const RangeFieldType min = internal::model1_min_value,
+                 const RangeFieldType max = internal::model1_max_value, const std::string nm = BaseType::static_id())
     : BaseType(filename, lower_left, upper_right, min, max, nm, unit_matrix())
   {
   }

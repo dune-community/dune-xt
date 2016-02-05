@@ -154,9 +154,9 @@ public:
   } // ... create(...)
 
   CheckerboardFunction(const Common::FieldVector<DomainFieldType, dimDomain>& lowerLeft,
-               const Common::FieldVector<DomainFieldType, dimDomain>& upperRight,
-               const Common::FieldVector<size_t, dimDomain>& numElements, const std::vector<RangeType>& values,
-               const std::string nm = static_id())
+                       const Common::FieldVector<DomainFieldType, dimDomain>& upperRight,
+                       const Common::FieldVector<size_t, dimDomain>& numElements, const std::vector<RangeType>& values,
+                       const std::string nm = static_id())
     : lowerLeft_(new Common::FieldVector<DomainFieldType, dimDomain>(lowerLeft))
     , upperRight_(new Common::FieldVector<DomainFieldType, dimDomain>(upperRight))
     , numElements_(new Common::FieldVector<size_t, dimDomain>(numElements))

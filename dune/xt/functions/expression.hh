@@ -119,7 +119,8 @@ public:
    * [[x[1] x[0]; x[1] x[0]] [x[1] x[0] x[1] x[0]].
    */
   ExpressionFunction(const std::string variable, const std::string expression, const size_t ord = 0,
-             const std::string nm = static_id(), const std::vector<std::string> gradient = std::vector<std::string>())
+                     const std::string nm                    = static_id(),
+                     const std::vector<std::string> gradient = std::vector<std::string>())
     : order_(ord)
     , name_(nm)
   {
@@ -145,9 +146,10 @@ public:
    * This constructor just expands expressions and gradient_expressions from a std::vector< std::string > and
    * std::vector< std::vector< std::string > to ExpressionStringVectorType and GradientStringVectorType, respectively.
    */
-  ExpressionFunction(const std::string variable, const std::vector<std::string> expressions,
-             const size_t ord = default_config().get<size_t>("order"), const std::string nm = static_id(),
-             const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
+  ExpressionFunction(
+      const std::string variable, const std::vector<std::string> expressions,
+      const size_t ord = default_config().get<size_t>("order"), const std::string nm = static_id(),
+      const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
     : function_(new MathExpressionFunctionType(variable, expressions))
     , order_(ord)
     , name_(nm)
@@ -174,8 +176,8 @@ public:
    *  dimDomain = dimRange = dimRangeCols = 2)
    */
   ExpressionFunction(const std::string variable, const ExpressionStringVectorType expressions, const size_t ord = 0,
-             const std::string nm                                = static_id(),
-             const GradientStringVectorType gradient_expressions = GradientStringVectorType())
+                     const std::string nm                                = static_id(),
+                     const GradientStringVectorType gradient_expressions = GradientStringVectorType())
     : order_(ord)
     , name_(nm)
   {

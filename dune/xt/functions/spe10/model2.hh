@@ -40,7 +40,7 @@ class Model2Function : public GlobalFunctionInterface<EntityImp, DomainFieldImp,
 
 public:
   Model2Function(std::string data_filename = "perm_case2a.dat",
-         Common::FieldVector<double, dim_domain> upper_right = default_upper_right)
+                 Common::FieldVector<double, dim_domain> upper_right = default_upper_right)
     : deltas_{{upper_right[0] / num_elements[0], upper_right[1] / num_elements[1], upper_right[2] / num_elements[2]}}
     , permeability_(nullptr)
     , permMatrix_(0.0)

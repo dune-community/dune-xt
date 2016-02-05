@@ -39,10 +39,8 @@ enum class Combination
 template <class LeftType, class RightType, Combination comb>
 class SelectCombined
 {
-  static_assert(is_localizable_function<LeftType>::value,
-                "LeftType has to be a LocalizableFunction!");
-  static_assert(is_localizable_function<RightType>::value,
-                "RightType has to be a LocalizableFunction!");
+  static_assert(is_localizable_function<LeftType>::value, "LeftType has to be a LocalizableFunction!");
+  static_assert(is_localizable_function<RightType>::value, "RightType has to be a LocalizableFunction!");
 
 public:
   typedef typename LeftType::EntityType E;
@@ -468,7 +466,8 @@ std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(const T1& left, cons
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right,
+                                                            Args&&... args)
 {
   return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
@@ -492,7 +491,8 @@ std::shared_ptr<ProductFunction<T1, T2>> make_product(const T1& left, const T2& 
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<ProductFunction<T1, T2>> make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+std::shared_ptr<ProductFunction<T1, T2>> make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right,
+                                                      Args&&... args)
 {
   return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
