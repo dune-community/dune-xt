@@ -145,7 +145,7 @@ struct Layer<GridType, Layers::level, Backends::part>
  * \brief Allows to statically create a leaf or level part or view (leaf part variant, only from a non-const grid).
  */
 template <class GridType>
-struct Layer<GridType, Layers::leaf, Backends::part>
+struct Layer<GridType, Layers::adaptive_leaf, Backends::part>
 {
   typedef Fem::AdaptiveLeafGridPart<GridType> type;
 
