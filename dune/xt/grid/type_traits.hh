@@ -20,6 +20,8 @@
 
 #include <dune/xt/common/type_traits.hh>
 
+#include <dune/xt/grid/grids.hh>
+
 namespace Dune {
 namespace XT {
 namespace Grid {
@@ -34,6 +36,39 @@ template <class G, class I>
 struct is_intersection<Dune::Intersection<G, I>> : public std::true_type
 {
 };
+
+
+template <class T>
+struct is_grid : public std::false_type
+{
+};
+
+template <int dim, class Coordinates>
+struct is_grid<Dune::YaspGrid<dim, Coordinates>> : public std::true_type
+{
+};
+
+template <int dim, int dimworld, class ctype>
+struct is_grid<Dune::SGrid<dim, dimworld, ctype>> : public std::true_type
+{
+};
+
+#if HAVE_ALBERTA
+
+template <int dim, int dimworld>
+struct is_grid<Dune::AlbertaGrid<dim, dimworld>> : public std::true_type
+{
+};
+
+#endif // HAVE_ALBERTA
+#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
+
+template <int dim, int dimworld, ALUGridElementType elType, ALUGridRefinementType refineType, class Comm>
+struct is_grid<Dune::ALUGrid<dim, dimworld, elType, refineType, Comm>> : public std::true_type
+{
+};
+
+#endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
 
 template <class T>
