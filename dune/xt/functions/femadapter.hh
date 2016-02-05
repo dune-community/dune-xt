@@ -21,7 +21,7 @@ namespace XT {
 namespace Functions {
 
 template <class DiscreteFunctionType>
-class FemAdapter
+class FemAdapterFunction
     : public LocalizableFunctionInterface<
           typename DiscreteFunctionType::EntityType, typename DiscreteFunctionType::DomainFieldType,
           DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain, typename DiscreteFunctionType::RangeFieldType,
@@ -31,7 +31,7 @@ class FemAdapter
       typename DiscreteFunctionType::EntityType, typename DiscreteFunctionType::DomainFieldType,
       DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain, typename DiscreteFunctionType::RangeFieldType,
       DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange, 1> BaseType;
-  typedef FemAdapter<DiscreteFunctionType> ThisType;
+  typedef FemAdapterFunction<DiscreteFunctionType> ThisType;
 
   class Localfunction
       : public LocalfunctionInterface<
@@ -85,7 +85,7 @@ public:
   typedef typename BaseType::EntityType EntityType;
   typedef typename BaseType::LocalfunctionType LocalfunctionType;
 
-  FemAdapter(const DiscreteFunctionType& df)
+  FemAdapterFunction(const DiscreteFunctionType& df)
     : df_(df)
   {
   }
@@ -118,7 +118,7 @@ public:
 
 private:
   const DiscreteFunctionType& df_;
-}; // class Checkerboard
+}; // class CheckerboardFunction
 
 } // namespace Functions
 } // namespace XT

@@ -7,4 +7,4 @@ dimRange = 3
 dimRangeCols = 3
 
 [__static]
-TESTFUNCTIONTYPE = Dune::XT::Functions::Spe10::Model2<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>
+TESTFUNCTIONTYPE = Dune::XT::Functions::Spe10::Model2Function<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

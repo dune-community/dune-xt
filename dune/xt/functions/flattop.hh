@@ -29,19 +29,19 @@ namespace Functions {
  *           Subsection 2.1.1
  */
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class FlatTop : public LocalizableFunctionInterface<E, D, d, R, r, rC>
+class FlatTopFunction : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
-  FlatTop()
+  FlatTopFunction()
   {
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
 
 template <class E, class D, size_t d, class R>
-class FlatTop<E, D, d, R, 1, 1> : public GlobalFunctionInterface<E, D, d, R, 1, 1>
+class FlatTopFunction<E, D, d, R, 1, 1> : public GlobalFunctionInterface<E, D, d, R, 1, 1>
 {
   typedef GlobalFunctionInterface<E, D, d, R, 1, 1> BaseType;
-  typedef FlatTop<E, D, d, R, 1, 1> ThisType;
+  typedef FlatTopFunction<E, D, d, R, 1, 1> ThisType;
 
 public:
   typedef typename BaseType::EntityType EntityType;
@@ -92,7 +92,7 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  FlatTop(const StuffDomainType& lower_left, const StuffDomainType& upper_right, const StuffDomainType& boundary_layer,
+  FlatTopFunction(const StuffDomainType& lower_left, const StuffDomainType& upper_right, const StuffDomainType& boundary_layer,
           const StuffRangeType& value = default_config().get<StuffRangeType>("value"),
           const std::string name_in = default_config().get<std::string>("name"))
     : lower_left_(lower_left)
@@ -104,11 +104,11 @@ public:
     check_input();
   }
 
-  FlatTop(const ThisType& other) = default;
+  FlatTopFunction(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  virtual ~FlatTop()
+  virtual ~FlatTopFunction()
   {
   }
 
@@ -210,7 +210,7 @@ private:
   const StuffDomainType boundary_layer_;
   const StuffRangeType value_;
   const std::string name_;
-}; // class FlatTop< ..., 1, 1 >
+}; // class FlatTopFunction< ..., 1, 1 >
 
 } // namespace Functions
 } // namespace XT

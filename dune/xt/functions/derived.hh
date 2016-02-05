@@ -246,28 +246,28 @@ private:
 } // namespace internal
 
 template <class FunctionType>
-class Divergence : public internal::Derived<FunctionType, internal::Derivative::divergence>
+class DivergenceFunction : public internal::Derived<FunctionType, internal::Derivative::divergence>
 {
   typedef internal::Derived<FunctionType, internal::Derivative::divergence> BaseType;
 
 public:
   template <class... Args>
-  Divergence(Args&&... args)
+  DivergenceFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {
   }
-}; // class Divergence
+}; // class DivergenceFunction
 
 template <class T, class... Args>
-std::shared_ptr<Divergence<T>> make_divergence(const T& func, Args&&... args)
+std::shared_ptr<DivergenceFunction<T>> make_divergence(const T& func, Args&&... args)
 {
-  return std::make_shared<Divergence<T>>(func, std::forward<Args>(args)...);
+  return std::make_shared<DivergenceFunction<T>>(func, std::forward<Args>(args)...);
 }
 
 template <class T, class... Args>
-std::shared_ptr<Divergence<T>> make_divergence(std::shared_ptr<T> func, Args&&... args)
+std::shared_ptr<DivergenceFunction<T>> make_divergence(std::shared_ptr<T> func, Args&&... args)
 {
-  return std::make_shared<Divergence<T>>(func, std::forward<Args>(args)...);
+  return std::make_shared<DivergenceFunction<T>>(func, std::forward<Args>(args)...);
 }
 
 } // namespace Functions

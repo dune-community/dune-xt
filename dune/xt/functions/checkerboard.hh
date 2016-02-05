@@ -28,12 +28,12 @@ namespace Functions {
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
-class Checkerboard
+class CheckerboardFunction
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       BaseType;
-  typedef Checkerboard<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
+  typedef CheckerboardFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
 
   class Localfunction
       : public LocalfunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -153,7 +153,7 @@ public:
         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  Checkerboard(const Common::FieldVector<DomainFieldType, dimDomain>& lowerLeft,
+  CheckerboardFunction(const Common::FieldVector<DomainFieldType, dimDomain>& lowerLeft,
                const Common::FieldVector<DomainFieldType, dimDomain>& upperRight,
                const Common::FieldVector<size_t, dimDomain>& numElements, const std::vector<RangeType>& values,
                const std::string nm = static_id())
@@ -178,7 +178,7 @@ public:
                  "values too small (is " << values_->size() << ", should be " << totalSubdomains << ")");
   } // Checkerboard(...)
 
-  Checkerboard(const ThisType& other) = default;
+  CheckerboardFunction(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
 
@@ -225,7 +225,7 @@ private:
   std::shared_ptr<const Common::FieldVector<size_t, dimDomain>> numElements_;
   std::shared_ptr<const std::vector<RangeType>> values_;
   std::string name_;
-}; // class Checkerboard
+}; // class CheckerboardFunction
 
 } // namespace Functions
 } // namespace XT

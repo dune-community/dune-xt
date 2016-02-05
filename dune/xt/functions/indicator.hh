@@ -26,19 +26,19 @@ namespace XT {
 namespace Functions {
 
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class Indicator : public LocalizableFunctionInterface<E, D, d, R, r, rC>
+class IndicatorFunction : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
-  Indicator()
+  IndicatorFunction()
   {
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
 
 template <class E, class D, size_t d, class R>
-class Indicator<E, D, d, R, 1> : public LocalizableFunctionInterface<E, D, d, R, 1>
+class IndicatorFunction<E, D, d, R, 1> : public LocalizableFunctionInterface<E, D, d, R, 1>
 {
   typedef LocalizableFunctionInterface<E, D, d, R, 1> BaseType;
-  typedef Indicator<E, D, d, R, 1> ThisType;
+  typedef IndicatorFunction<E, D, d, R, 1> ThisType;
 
   class Localfunction : public LocalfunctionInterface<E, D, d, R, 1>
   {
@@ -140,20 +140,20 @@ public:
     return Common::make_unique<ThisType>(values, cfg.get("name", def_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  Indicator(const std::vector<std::tuple<DomainType, DomainType, R>>& values, const std::string name_in = "indicator")
+  IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, R>>& values, const std::string name_in = "indicator")
     : values_(values)
     , name_(name_in)
   {
   }
 
-  Indicator(const std::vector<std::pair<std::pair<Common::FieldVector<D, d>, Common::FieldVector<D, d>>, R>>& values,
+  IndicatorFunction(const std::vector<std::pair<std::pair<Common::FieldVector<D, d>, Common::FieldVector<D, d>>, R>>& values,
             const std::string name_in = "indicator")
     : values_(convert(values))
     , name_(name_in)
   {
   }
 
-  virtual ~Indicator()
+  virtual ~IndicatorFunction()
   {
   }
 
@@ -183,7 +183,7 @@ private:
 
   const std::vector<std::tuple<DomainType, DomainType, R>> values_;
   const std::string name_;
-}; // class Indicator
+}; // class IndicatorFunction
 
 } // namespace Functions
 } // namespace XT

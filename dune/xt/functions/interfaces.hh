@@ -46,6 +46,7 @@
 
 namespace Dune {
 namespace XT {
+namespace Functions {
 namespace internal {
 
 template <class F>
@@ -70,7 +71,6 @@ struct is_localizable_function_helper
 template <class F, bool candidate = internal::is_localizable_function_helper<F>::is_candidate>
 struct is_localizable_function;
 
-namespace Functions {
 namespace internal {
 
 // additional argument for member functions to differentiate between dimRangeCols = 1 and dimRangeCols > 1 by
@@ -84,29 +84,21 @@ struct ChooseVariant
 
 
 template <class GridViewType, size_t dimRange, size_t dimRangeCols = 1>
-class VisualizationAdapter;
+class VisualizationAdapterFunction;
 
 
 template <class MinuendType, class SubtrahendType>
-class Difference;
+class DifferenceFunction;
 
 template <class LeftSummandType, class RightSummandType>
-class Sum;
+class SumFunction;
 
 template <class LeftSummandType, class RightSummandType>
-class Product;
+class ProductFunction;
 
 template <class FunctionImp>
-class Divergence;
+class DivergenceFunction;
 
-} // namespace Functions
-namespace Tags {
-
-class LocalizableFunction
-{
-};
-
-} // namespace Tags
 
 /**
  *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
@@ -327,7 +319,7 @@ class IsLocalizableFunction
  */
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
-class LocalizableFunctionInterface : public IsLocalizableFunction, public Tags::LocalizableFunction
+class LocalizableFunctionInterface : public IsLocalizableFunction
 {
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       ThisType;
@@ -351,9 +343,9 @@ public:
 
   static const bool available = false;
 
-  typedef Functions::Difference<ThisType, ThisType> DifferenceType;
-  typedef Functions::Sum<ThisType, ThisType> SumType;
-  typedef Functions::Divergence<ThisType> DivergenceType;
+  typedef Functions::DifferenceFunction<ThisType, ThisType> DifferenceType;
+  typedef Functions::SumFunction<ThisType, ThisType> SumType;
+  typedef Functions::DivergenceFunction<ThisType> DivergenceType;
 
   virtual ~LocalizableFunctionInterface()
   {
@@ -395,10 +387,10 @@ public:
   }
 
   template <class OtherType>
-  typename std::enable_if<is_localizable_function<OtherType>::value, Functions::Product<ThisType, OtherType>>::type
+  typename std::enable_if<is_localizable_function<OtherType>::value, Functions::ProductFunction<ThisType, OtherType>>::type
   operator*(const OtherType& other) const
   {
-    return Functions::Product<ThisType, OtherType>(*this, other);
+    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
   }
 
   DivergenceType divergence() const
@@ -418,7 +410,7 @@ public:
       DUNE_THROW(RangeError, "Empty path given!");
     const auto directory = Common::directory_only(path);
     const auto filename  = Common::filename_only(path);
-    auto adapter = std::make_shared<Functions::VisualizationAdapter<GridViewType, dimRange, dimRangeCols>>(*this);
+    const auto adapter = std::make_shared<VisualizationAdapterFunction<GridViewType, dimRange, dimRangeCols>>(*this);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
         subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
                     : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
@@ -749,6 +741,7 @@ struct is_localizable_function<F, false> : public std::false_type
 {
 };
 
+} // namespace Functions
 } // namespace XT
 } // namespace Dune
 

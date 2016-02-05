@@ -46,9 +46,9 @@ static const double model1_min_value     = 0.001;
 static const double model1_max_value     = 998.915;
 
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r, size_t rC>
-class Model1Base : public Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC>
+class Model1Base : public CheckerboardFunction<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC>
 {
-  typedef Checkerboard<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC> BaseType;
+  typedef CheckerboardFunction<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC> BaseType;
 
 public:
   typedef typename BaseType::EntityType EntityType;
@@ -147,9 +147,9 @@ public:
 
 // default, to allow for specialization
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class Model1 : public LocalizableFunctionInterface<E, D, d, R, r, rC>
+class Model1Function : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
-  Model1()
+  Model1Function()
   {
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
@@ -159,11 +159,11 @@ class Model1 : public LocalizableFunctionInterface<E, D, d, R, r, rC>
  * We read only the Kx values from file and scale the unit matrix atm.
  */
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r>
-class Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r>
+class Model1Function<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r>
     : public internal::Model1Base<EntityImp, DomainFieldImp, RangeFieldImp, r, r>
 {
   typedef internal::Model1Base<EntityImp, DomainFieldImp, RangeFieldImp, r, r> BaseType;
-  typedef Model1<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r> ThisType;
+  typedef Model1Function<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r> ThisType;
 
 public:
   using typename BaseType::DomainFieldType;
@@ -177,7 +177,7 @@ public:
     return BaseType::template create_derived<ThisType>(config, sub_name);
   } // ... create(...)
 
-  Model1(const std::string& filename, const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
+  Model1Function(const std::string& filename, const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
          const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
          const RangeFieldType min = internal::model1_min_value, const RangeFieldType max = internal::model1_max_value,
          const std::string nm = BaseType::static_id())

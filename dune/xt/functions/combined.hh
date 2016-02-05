@@ -39,9 +39,9 @@ enum class Combination
 template <class LeftType, class RightType, Combination comb>
 class SelectCombined
 {
-  static_assert(std::is_base_of<Tags::LocalizableFunction, LeftType>::value,
+  static_assert(is_localizable_function<LeftType>::value,
                 "LeftType has to be a LocalizableFunction!");
-  static_assert(std::is_base_of<Tags::LocalizableFunction, RightType>::value,
+  static_assert(is_localizable_function<RightType>::value,
                 "RightType has to be a LocalizableFunction!");
 
 public:
@@ -413,17 +413,17 @@ private:
  * \see internal::Combined
  */
 template <class MinuendType, class SubtrahendType>
-class Difference : public internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference>
+class DifferenceFunction : public internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference>
 {
   typedef internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference> BaseType;
 
 public:
   template <class... Args>
-  Difference(Args&&... args)
+  DifferenceFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {
   }
-}; // class Difference
+}; // class DifferenceFunction
 
 /**
  * \brief Function representing the sum of two functions.
@@ -431,17 +431,17 @@ public:
  * \see internal::Combined
  */
 template <class LeftSummandType, class RightSummandType>
-class Sum : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>
+class SumFunction : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>
 {
   typedef internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum> BaseType;
 
 public:
   template <class... Args>
-  Sum(Args&&... args)
+  SumFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {
   }
-}; // class Sum
+}; // class SumFunction
 
 /**
  * \brief Function representing the product of two functions.
@@ -449,52 +449,52 @@ public:
  * \see internal::Combined
  */
 template <class LeftSummandType, class RightSummandType>
-class Product : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>
+class ProductFunction : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>
 {
   typedef internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product> BaseType;
 
 public:
   template <class... Args>
-  Product(Args&&... args)
+  ProductFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {
   }
-}; // class Product
+}; // class ProductFunction
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<Difference<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
+std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
 {
-  return std::make_shared<Difference<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<Difference<T1, T2>> make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
-  return std::make_shared<Difference<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<Sum<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
+std::shared_ptr<SumFunction<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
 {
-  return std::make_shared<Sum<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<Sum<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+std::shared_ptr<SumFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
-  return std::make_shared<Sum<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<Product<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
+std::shared_ptr<ProductFunction<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
 {
-  return std::make_shared<Product<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<Product<T1, T2>> make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+std::shared_ptr<ProductFunction<T1, T2>> make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
-  return std::make_shared<Product<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 } // namespace Functions

@@ -45,7 +45,7 @@ class FlatTopFunctionType
   static const size_t rC = 1;
 
 public:
-  typedef Functions::FlatTop<E, D, d, R, r, rC> value;
+  typedef Functions::FlatTopFunction<E, D, d, R, r, rC> value;
 }; // struct FlatTopFunctionType
 
 template <class DimDomain>

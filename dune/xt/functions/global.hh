@@ -19,6 +19,7 @@
 
 namespace Dune {
 namespace XT {
+namespace Functions {
 
 /**
  * Global-valued function you can pass a lambda expression to that gets evaluated
@@ -77,6 +78,7 @@ private:
   const std::string name_;
 };
 
+} // namespace Functions
 } // namespace XT
 } // namespace Dune
 

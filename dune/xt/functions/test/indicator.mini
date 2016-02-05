@@ -7,4 +7,4 @@ dimRangeCols = 1
 include grids.mini
 
 [__static]
-TESTFUNCTIONTYPE = Dune::XT::Functions::Indicator<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>
+TESTFUNCTIONTYPE = Dune::XT::Functions::IndicatorFunction<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

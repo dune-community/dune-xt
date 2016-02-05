@@ -31,7 +31,7 @@ namespace Functions {
 
 /**
  *  \brief base class that makes a function out of the from mathexpr.hh
- *  \attention  Most surely you do not want to use this class directly, but Functions::Expression!
+ *  \attention  Most surely you do not want to use this class directly, but Functions::ExpressionFunction!
  */
 template <class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
 class MathExpressionBase

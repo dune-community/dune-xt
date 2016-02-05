@@ -31,7 +31,7 @@ namespace Spe10 {
  *
  */
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
-class Model2 : public GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>
+class Model2Function : public GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>
 {
   static_assert(r == rC, "");
   static_assert(dim_domain == rC, "");
@@ -39,7 +39,7 @@ class Model2 : public GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_dom
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC> BaseType;
 
 public:
-  Model2(std::string data_filename = "perm_case2a.dat",
+  Model2Function(std::string data_filename = "perm_case2a.dat",
          Common::FieldVector<double, dim_domain> upper_right = default_upper_right)
     : deltas_{{upper_right[0] / num_elements[0], upper_right[1] / num_elements[1], upper_right[2] / num_elements[2]}}
     , permeability_(nullptr)
@@ -53,7 +53,7 @@ public:
   // unsigned int mandated by CubeGrid provider
   static const Common::FieldVector<unsigned int, dim_domain> num_elements;
 
-  virtual ~Model2()
+  virtual ~Model2Function()
   {
     delete permeability_;
     permeability_ = nullptr;
@@ -119,10 +119,10 @@ private:
 
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
 const Common::FieldVector<unsigned int, dim_domain>
-    Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::num_elements{{60, 220, 85}};
+    Model2Function<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::num_elements{{60, 220, 85}};
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
 const Common::FieldVector<double, dim_domain>
-    Model2<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::default_upper_right{{1, 3.667, 1.417}};
+    Model2Function<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::default_upper_right{{1, 3.667, 1.417}};
 } // namespace Spe10
 } // namespace Functions
 } // namespace XT

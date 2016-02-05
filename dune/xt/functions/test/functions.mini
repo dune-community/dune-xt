@@ -7,4 +7,4 @@ dimRangeCols = 1, 2, 3 | expand
 include grids.mini
 
 [__static]
-TESTFUNCTIONTYPE = Dune::XT::Functions::Constant<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>
+TESTFUNCTIONTYPE = Dune::XT::Functions::ConstantFunction<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

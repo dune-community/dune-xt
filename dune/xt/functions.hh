@@ -28,7 +28,7 @@
 
 namespace Dune {
 namespace XT {
-
+namespace Functions {
 /**
  * \note If you want to add a new function FooBar, do the following: provide a definition that is available for all
  *       template arguments, like:
@@ -144,14 +144,14 @@ private:
     return ret;
   } // ... available_as_str(...)
 
-  typedef Functions::Checkerboard<E, D, d, R, r, rC> CheckerboardType;
-  typedef Functions::Constant<E, D, d, R, r, rC> ConstantType;
-  typedef Functions::Expression<E, D, d, R, r, rC> ExpressionType;
-  typedef Functions::FlatTop<E, D, d, R, r, rC> FlattopType;
+  typedef Functions::CheckerboardFunction<E, D, d, R, r, rC> CheckerboardType;
+  typedef Functions::ConstantFunction<E, D, d, R, r, rC> ConstantType;
+  typedef Functions::ExpressionFunction<E, D, d, R, r, rC> ExpressionType;
+  typedef Functions::FlatTopFunction<E, D, d, R, r, rC> FlattopType;
   typedef Functions::ESV2007::Testcase1Force<E, D, d, R, r, rC> ESV2007Testcase1ForceType;
   typedef Functions::ESV2007::Testcase1ExactSolution<E, D, d, R, r, rC> ESV2007Testcase1ExactSolutionType;
-  typedef Functions::Indicator<E, D, d, R, r, rC> IndicatorType;
-  typedef Functions::Spe10::Model1<E, D, d, R, r, rC> Spe10Model1Type;
+  typedef Functions::IndicatorFunction<E, D, d, R, r, rC> IndicatorType;
+  typedef Functions::Spe10::Model1Function<E, D, d, R, r, rC> Spe10Model1Type;
 
 public:
   static std::vector<std::string> available()
@@ -247,6 +247,7 @@ public:
   }
 }; // class FunctionsProvider
 
+} // namespace Functions {
 } // namespace XT
 } // namespace Dune
 

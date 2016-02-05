@@ -3,4 +3,4 @@ include functions.mini
 __name = global
 
 [__static]
-TESTFUNCTIONTYPE = Dune::XT::GlobalLambdaFunction<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>
+TESTFUNCTIONTYPE = Dune::XT::Functions::GlobalLambdaFunction<{entity_type}, double, {dimDomain}, double, {dimRange}, {dimRangeCols}>

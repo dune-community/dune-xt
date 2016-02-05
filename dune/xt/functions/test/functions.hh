@@ -41,7 +41,7 @@ protected:
   typedef typename FunctionImp::DomainType DomainType;
   typedef typename FunctionImp::RangeType RangeType;
   typedef typename FunctionImp::JacobianRangeType JacobianRangeType;
-  typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+  typedef Functions::LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
       InterfaceType;
 
   static void static_interface_check()

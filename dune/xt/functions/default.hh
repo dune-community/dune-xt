@@ -24,7 +24,7 @@ namespace Functions {
 
 
 template <class GridViewType, size_t dimRange, size_t dimRangeCols>
-class VisualizationAdapter : public VTKFunction<GridViewType>
+class VisualizationAdapterFunction : public VTKFunction<GridViewType>
 {
 public:
   typedef typename GridViewType::template Codim<0>::Entity EntityType;
@@ -36,7 +36,7 @@ public:
   typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, double, dimRange, dimRangeCols>
       FunctionType;
 
-  VisualizationAdapter(const FunctionType& function, const std::string nm = "")
+  VisualizationAdapterFunction(const FunctionType& function, const std::string nm = "")
     : function_(function)
     , tmp_value_(0)
     , name_(nm)
@@ -101,7 +101,7 @@ private:
   const FunctionType& function_;
   mutable typename FunctionType::RangeType tmp_value_;
   const std::string name_;
-}; // class VisualizationAdapter
+}; // class VisualizationAdapterFunction
 
 
 } // namespace Functions

@@ -244,21 +244,21 @@ private:
 }; // class Testcase1ExactSolution
 
 template <class DiffusionFactorType, class DiffusionTensorType = void>
-class Cutoff;
+class CutoffFunction;
 
 template <class DiffusionType>
-class Cutoff<DiffusionType, void>
+class CutoffFunction<DiffusionType, void>
     : public LocalizableFunctionInterface<typename DiffusionType::EntityType, typename DiffusionType::DomainFieldType,
                                           DiffusionType::dimDomain, typename DiffusionType::RangeFieldType, 1, 1>
 {
-  static_assert(std::is_base_of<Tags::LocalizableFunction, DiffusionType>::value,
+  static_assert(is_localizable_function<DiffusionType>::value,
                 "DiffusionType has to be tagged as a LocalizableFunction!");
   typedef typename DiffusionType::EntityType E_;
   typedef typename DiffusionType::DomainFieldType D_;
   static const size_t d_ = DiffusionType::dimDomain;
   typedef typename DiffusionType::RangeFieldType R_;
   typedef LocalizableFunctionInterface<E_, D_, d_, R_, 1> BaseType;
-  typedef Cutoff<DiffusionType> ThisType;
+  typedef CutoffFunction<DiffusionType> ThisType;
 
   class Localfunction : public LocalfunctionInterface<E_, D_, d_, R_, 1, 1>
   {
@@ -359,7 +359,7 @@ public:
     return BaseType::static_id() + ".ESV2007.cutoff";
   }
 
-  Cutoff(const DiffusionType& diffusion, const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
+  CutoffFunction(const DiffusionType& diffusion, const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
          const std::string nm = static_id())
     : diffusion_(diffusion)
     , poincare_constant_(poincare_constant)
@@ -367,7 +367,7 @@ public:
   {
   }
 
-  Cutoff(const ThisType& other) = default;
+  CutoffFunction(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
 
@@ -388,21 +388,21 @@ private:
 }; // class Cutoff
 
 template <class DiffusionFactorType, class DiffusionTensorType>
-class Cutoff
+class CutoffFunction
     : public LocalizableFunctionInterface<typename DiffusionFactorType::EntityType,
                                           typename DiffusionFactorType::DomainFieldType, DiffusionFactorType::dimDomain,
                                           typename DiffusionFactorType::RangeFieldType, 1, 1>
 {
-  static_assert(std::is_base_of<Tags::LocalizableFunction, DiffusionFactorType>::value,
+  static_assert(is_localizable_function<DiffusionFactorType>::value,
                 "DiffusionFactorType has to be tagged as a LocalizableFunction!");
-  static_assert(std::is_base_of<Tags::LocalizableFunction, DiffusionTensorType>::value,
+  static_assert(is_localizable_function<DiffusionTensorType>::value,
                 "DiffusionTensorType has to be tagged as a LocalizableFunction!");
   typedef typename DiffusionFactorType::EntityType E_;
   typedef typename DiffusionFactorType::DomainFieldType D_;
   static const size_t d_ = DiffusionFactorType::dimDomain;
   typedef typename DiffusionFactorType::RangeFieldType R_;
   typedef LocalizableFunctionInterface<E_, D_, d_, R_, 1> BaseType;
-  typedef Cutoff<DiffusionFactorType, DiffusionTensorType> ThisType;
+  typedef CutoffFunction<DiffusionFactorType, DiffusionTensorType> ThisType;
 
   static_assert(DiffusionFactorType::dimRange == 1, "The diffusion factor has to be scalar!");
   static_assert(DiffusionFactorType::dimRangeCols == 1, "The diffusion factor has to be scalar!");
@@ -581,7 +581,7 @@ public:
     return BaseType::static_id() + ".ESV2007.cutoff";
   }
 
-  Cutoff(const DiffusionFactorType& diffusion_factor, const DiffusionTensorType& diffusion_tensor,
+  CutoffFunction(const DiffusionFactorType& diffusion_factor, const DiffusionTensorType& diffusion_tensor,
          const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl), const std::string nm = static_id())
     : diffusion_factor_(diffusion_factor)
     , diffusion_tensor_(diffusion_tensor)
@@ -590,7 +590,7 @@ public:
   {
   }
 
-  Cutoff(const ThisType& other) = default;
+  CutoffFunction(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
 

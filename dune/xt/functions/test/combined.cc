@@ -40,8 +40,8 @@ class DifferenceFunctionType
   static const size_t rC = 1;
 
 public:
-  typedef Functions::Constant<E, D, d, R, r, rC> ConstantFunctionType;
-  typedef Functions::Difference<ConstantFunctionType, ConstantFunctionType> value;
+  typedef Functions::ConstantFunction<E, D, d, R, r, rC> ConstantFunctionType;
+  typedef Functions::DifferenceFunction<ConstantFunctionType, ConstantFunctionType> value;
 }; // struct DifferenceFunctionType
 
 template <class DimDomain>

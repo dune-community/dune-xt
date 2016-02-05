@@ -114,11 +114,11 @@ struct Get<R, 1, 1>
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
-class Constant
+class ConstantFunction
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
-  typedef Constant<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
+  typedef ConstantFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
 
 public:
   typedef typename BaseType::DomainType DomainType;
@@ -162,19 +162,19 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  explicit Constant(const RangeType& constant, const std::string name_in = static_id())
+  explicit ConstantFunction(const RangeType& constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
   {
   }
 
-  explicit Constant(const RangeFieldImp& constant, const std::string name_in = static_id())
+  explicit ConstantFunction(const RangeFieldImp& constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
   {
   }
 
-  Constant(const ThisType& other) = default;
+  ConstantFunction(const ThisType& other) = default;
 
   virtual std::string type() const override final
   {

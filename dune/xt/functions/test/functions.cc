@@ -24,6 +24,7 @@
 
 using namespace Dune;
 using namespace Dune::XT;
+using namespace Dune::XT::Functions;
 
 /* we just take the constant function as a container for the types we need */
 /* since this one always exists for all combinations */

@@ -28,20 +28,20 @@ namespace Functions {
  */
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
-class Affine
+class AffineFunction
 {
-  Affine()
+  AffineFunction()
   {
     static_assert(AlwaysFalse<EntityImp>::value, "Not available for rangeDimCols > 1!");
   }
 };
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
-class Affine<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
+class AffineFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 {
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> BaseType;
-  typedef Affine<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
+  typedef AffineFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1> ThisType;
 
 public:
   typedef typename BaseType::DomainType DomainType;
@@ -84,7 +84,7 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  explicit Affine(const MatrixType& matrix, const RangeType& vector = RangeType(0),
+  explicit AffineFunction(const MatrixType& matrix, const RangeType& vector = RangeType(0),
                   const std::string name_in = static_id())
     : A_(matrix)
     , b_(vector)
@@ -92,7 +92,7 @@ public:
   {
   }
 
-  Affine(const ThisType& other) = default;
+  AffineFunction(const ThisType& other) = default;
 
   virtual std::string type() const override final
   {

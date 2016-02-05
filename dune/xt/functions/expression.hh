@@ -31,12 +31,12 @@ namespace Functions {
 
 template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
           size_t rangeDimCols = 1>
-class Expression
+class ExpressionFunction
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       BaseType;
-  typedef Expression<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
+  typedef ExpressionFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim * rangeDimCols>
       MathExpressionFunctionType;
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, domainDim> MathExpressionGradientType;
@@ -118,7 +118,7 @@ public:
    * ["x[1]" "x[0]"]. Then the resulting function is [x[0]*x[1] x[0]*x[1]; x[0]*x[1] x[0]*x[1]] and the gradient is
    * [[x[1] x[0]; x[1] x[0]] [x[1] x[0] x[1] x[0]].
    */
-  Expression(const std::string variable, const std::string expression, const size_t ord = 0,
+  ExpressionFunction(const std::string variable, const std::string expression, const size_t ord = 0,
              const std::string nm = static_id(), const std::vector<std::string> gradient = std::vector<std::string>())
     : order_(ord)
     , name_(nm)
@@ -145,7 +145,7 @@ public:
    * This constructor just expands expressions and gradient_expressions from a std::vector< std::string > and
    * std::vector< std::vector< std::string > to ExpressionStringVectorType and GradientStringVectorType, respectively.
    */
-  Expression(const std::string variable, const std::vector<std::string> expressions,
+  ExpressionFunction(const std::string variable, const std::vector<std::string> expressions,
              const size_t ord = default_config().get<size_t>("order"), const std::string nm = static_id(),
              const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
     : function_(new MathExpressionFunctionType(variable, expressions))
@@ -173,7 +173,7 @@ public:
    *  [[[0 0] [2 0]] [[cos(x[0]) 0] [0 1]]] would be the gradient_expression corresponding to the expression above (if
    *  dimDomain = dimRange = dimRangeCols = 2)
    */
-  Expression(const std::string variable, const ExpressionStringVectorType expressions, const size_t ord = 0,
+  ExpressionFunction(const std::string variable, const ExpressionStringVectorType expressions, const size_t ord = 0,
              const std::string nm                                = static_id(),
              const GradientStringVectorType gradient_expressions = GradientStringVectorType())
     : order_(ord)
@@ -183,7 +183,7 @@ public:
     build_gradients(variable, gradient_expressions);
   }
 
-  Expression(const ThisType& other) = default;
+  ExpressionFunction(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other)
   {
@@ -388,7 +388,7 @@ private:
   mutable typename Common::PerThreadValue<FieldVector<RangeFieldType, dimRange * dimRangeCols>> tmp_vector_;
   mutable typename Common::PerThreadValue<FieldVector<RangeFieldType, dimRangeCols>> tmp_row_;
   std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
-}; // class Expression
+}; // class ExpressionFunction
 
 } // namespace Functions
 } // namespace XT
