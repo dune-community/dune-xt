@@ -16,7 +16,7 @@
 #include <dune/xt/common/ranges.hh>
 
 #include <dune/xt/grid/information.hh>
-#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/gridprovider/cube.hh>
 
 using namespace std;
 using namespace Dune::XT;

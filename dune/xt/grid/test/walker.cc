@@ -16,7 +16,7 @@
 #include <dune/xt/common/logstreams.hh>
 #include <dune/xt/common/parallel/partitioner.hh>
 
-#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/gridprovider/cube.hh>
 #include <dune/xt/grid/walker.hh>
 
 

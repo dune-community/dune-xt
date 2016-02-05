@@ -100,7 +100,7 @@ public:
     return *grid_ptr_;
   }
 
-  GridType& grid_ptr()
+  GridType& grid()
   {
     return *grid_ptr_;
   }

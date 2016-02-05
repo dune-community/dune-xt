@@ -19,7 +19,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/periodic_gridview.hh>
-#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/gridprovider/cube.hh>
 #include <dune/xt/grid/provider/interface.hh>
 
 using namespace Dune::XT;
