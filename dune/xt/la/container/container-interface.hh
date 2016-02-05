@@ -26,38 +26,38 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
-enum class ChooseBackend
+enum class Backends
 {
   common_dense,
   istl_sparse,
   eigen_dense,
   eigen_sparse,
   none
-}; // enum class ChooseBackend
+}; // enum class Backends
 
-static constexpr ChooseBackend default_backend =
+static constexpr Backends default_backend =
 #if HAVE_EIGEN
-    ChooseBackend::eigen_sparse;
+    Backends::eigen_sparse;
 #elif HAVE_DUNE_ISTL
-    ChooseBackend::istl_sparse;
+    Backends::istl_sparse;
 #else
-    ChooseBackend::common_dense;
+    Backends::common_dense;
 #endif
 
-static constexpr ChooseBackend default_sparse_backend =
+static constexpr Backends default_sparse_backend =
 #if HAVE_EIGEN
-    ChooseBackend::eigen_sparse;
+    Backends::eigen_sparse;
 #elif HAVE_DUNE_ISTL
-    ChooseBackend::istl_sparse;
+    Backends::istl_sparse;
 #else
-    ChooseBackend::none;
+    Backends::none;
 #endif
 
-static constexpr ChooseBackend default_dense_backend =
+static constexpr Backends default_dense_backend =
 #if HAVE_EIGEN
-    ChooseBackend::eigen_dense;
+    Backends::eigen_dense;
 #else
-    ChooseBackend::common_dense;
+    Backends::common_dense;
 #endif
 
 /**
