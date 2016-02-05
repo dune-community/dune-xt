@@ -13,6 +13,11 @@
 #include <dune/grid/common/intersection.hh>
 #include <dune/grid/common/gridview.hh>
 
+
+#if HAVE_DUNE_FEM
+#include <dune/fem/gridpart/common/gridpart.hh>
+#endif
+
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
@@ -38,6 +43,28 @@ struct is_grid_view : public std::false_type
 
 template <class T>
 struct is_grid_view<Dune::GridView<T>> : public std::true_type
+{
+};
+
+
+template <class T>
+struct is_grid_part : public std::false_type
+{
+};
+
+#if HAVE_DUNE_FEM
+
+template <class T>
+struct is_grid_part<Dune::Fem::GridPartInterface<T>> : public std::true_type
+{
+};
+
+
+#endif // HAVE_DUNE_FEM
+
+
+template <class T>
+struct is_layer : public std::integral_constant<bool, is_grid_view<T>::value || is_grid_part<T>::value>
 {
 };
 
