@@ -50,7 +50,7 @@ static const bool available = true;
  *       in this file (of course) and the appropriate type below (just like the rest, should be obvious).
  */
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class FunctionsProvider
+class FunctionsFactory
 {
 public:
   typedef LocalizableFunctionInterface<E, D, d, R, r, rC> InterfaceType;

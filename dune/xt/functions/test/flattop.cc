@@ -27,7 +27,7 @@
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/string.hh>
 
-#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/flattop.hh>
 
@@ -62,7 +62,7 @@ protected:
 
   static std::shared_ptr<GridType> create_grid()
   {
-    return XT::Grid::Providers::Cube<GridType>(0, 3, 12).grid_ptr();
+    return XT::Grid::make_cube_grid<GridType>(0, 3, 12).grid_ptr();
   }
 
   template <class P, class V, class L, class R, class D, class E>

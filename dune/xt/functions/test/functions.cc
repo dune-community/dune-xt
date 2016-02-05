@@ -32,7 +32,7 @@ using namespace Dune::XT::Functions;
 /* since this one always exists for all combinations */
 struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
-  typedef FunctionsProvider<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+  typedef FunctionsFactory<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
       FunctionsProviderType;
   typedef typename FunctionsProviderType::InterfaceType InterfaceType;
 

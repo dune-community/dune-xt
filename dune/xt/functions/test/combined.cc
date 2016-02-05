@@ -21,7 +21,7 @@
 
 #include <dune/xt/common/float_cmp.hh>
 
-#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/combined.hh>
 #include <dune/xt/functions/constant.hh>
@@ -58,7 +58,7 @@ protected:
 
   static std::shared_ptr<GridType> create_grid()
   {
-    return XT::Grid::Providers::Cube<GridType>(0.0, 1.0, 4).grid_ptr();
+    return XT::Grid::make_cube_grid<GridType>(0.0, 1.0, 4).grid_ptr();
   }
 
   static std::unique_ptr<FunctionType> create(const double ll, const double rr)
