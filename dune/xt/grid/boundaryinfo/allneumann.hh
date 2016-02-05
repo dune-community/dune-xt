@@ -8,6 +8,9 @@
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_ALLNEUMANN_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_ALLNEUMANN_HH
 
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/memory.hh>
+
 #include "interfaces.hh"
 #include "types.hh"
 
@@ -34,7 +37,7 @@ public:
     if (intersection.boundary())
       return NeumannBoundary();
     else
-      return UnknownBoundary();
+      return NoBoundary();
   }
 }; // class AllNeumannBoundaryInfo
 

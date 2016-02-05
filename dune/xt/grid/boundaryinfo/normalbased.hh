@@ -8,6 +8,10 @@
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_NORMALBASED_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_NORMALBASED_HH
 
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/memory.hh>
+
 #include "interfaces.hh"
 #include "types.hh"
 

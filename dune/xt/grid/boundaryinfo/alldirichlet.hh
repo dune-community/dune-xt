@@ -9,7 +9,7 @@
 #define DUNE_XT_GRID_BOUNDARYINFO_ALLDIRICHLET_HH
 
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/memory.hh>
 
 #include "interfaces.hh"
 #include "types.hh"
@@ -37,7 +37,7 @@ public:
     if (intersection.boundary())
       return DirichletBoundary();
     else
-      return UnknownBoundary();
+      return NoBoundary();
   }
 }; // class AllDirichletBoundaryInfo
 

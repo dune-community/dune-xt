@@ -14,6 +14,14 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
+class NoBoundary : public BoundaryType
+{
+protected:
+  virtual std::string id() const override final
+  {
+    return "no boundary";
+  }
+};
 
 class UnknownBoundary : public BoundaryType
 {
