@@ -100,7 +100,7 @@ public:
   typedef typename BaseType::EntityType EntityType;
   typedef typename BaseType::IntersectionType IntersectionType;
 
-  explicit DirichletDetector(const BoundaryInfoInterface<IntersectionType>& boundary_info)
+  explicit DirichletDetector(const BoundaryInfo<IntersectionType>& boundary_info)
     : boundary_info_(boundary_info)
     , found_(0)
   {
@@ -123,7 +123,7 @@ public:
   }
 
 private:
-  const BoundaryInfoInterface<IntersectionType>& boundary_info_;
+  const BoundaryInfo<IntersectionType>& boundary_info_;
   size_t found_;
 }; // class DirichletDetector
 

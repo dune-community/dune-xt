@@ -101,8 +101,8 @@ private:
     auto type_str = Dune::XT::Common::Typename<GPT>::value();
     grid_provider.visualize();
     grid_provider.visualize(type_str + "_a");
-    grid_provider.visualize(Dune::XT::Grid::BoundaryInfoConfigs::AllDirichlet::default_config());
-    grid_provider.visualize(Dune::XT::Grid::BoundaryInfoConfigs::AllDirichlet::default_config(), type_str + "_b");
+    grid_provider.visualize(Dune::XT::Grid::alldirichlet_boundaryinfo_default_config());
+    grid_provider.visualize(Dune::XT::Grid::alldirichlet_boundaryinfo_default_config(), type_str + "_b");
   } // ... check_visualize(...)
 
 public:
