@@ -18,18 +18,16 @@
 
 #include <dune/xt/common/configuration.hh>
 
-#include "provider/interface.hh"
-#include "provider/cube.hh"
+#include "cube.hh"
 
 namespace Dune {
 namespace XT {
-
+namespace Grid {
 
 template <class GridType = Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>
-class GridProviders
+class GridProviderFactory
 {
 public:
-  typedef XT::Grid::ProviderInterface<GridType> InterfaceType;
 
 protected:
   template <class GridProviderType>
@@ -44,18 +42,20 @@ protected:
 public:
   static std::vector<std::string> available()
   {
-    namespace Providers = XT::Grid::Providers;
-    return {Providers::Cube<GridType>::static_id()};
+    DUNE_THROW(NotImplemented,"");
+//    namespace Providers = XT::Grid::Providers;
+//    return {Providers::Cube<GridType>::static_id()};
   } // ... available()
 
   static Common::Configuration default_config(const std::string type, const std::string subname = "")
   {
-    namespace Providers = XT::Grid::Providers;
-    if (type == Providers::Cube<GridType>::static_id())
-      return Providers::Cube<GridType>::default_config(subname);
-    else
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+    DUNE_THROW(NotImplemented,"");
+//    namespace Providers = XT::Grid::Providers;
+//    if (type == Providers::Cube<GridType>::static_id())
+//      return Providers::Cube<GridType>::default_config(subname);
+//    else
+//      DUNE_THROW(Common::Exceptions::wrong_input_given,
+//                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... default_config(...)
 
   static std::unique_ptr<InterfaceType> create(const Common::Configuration& config)
@@ -66,16 +66,17 @@ public:
   static std::unique_ptr<InterfaceType> create(const std::string& type = available()[0],
                                                const Common::Configuration config = Common::Configuration())
   {
-    namespace Providers = XT::Grid::Providers;
-    if (type == Providers::Cube<GridType>::static_id())
-      return call_create<Providers::Cube<GridType>>(config);
-    else
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
+    DUNE_THROW(NotImplemented,"");
+//    namespace Providers = XT::Grid::Providers;
+//    if (type == Providers::Cube<GridType>::static_id())
+//      return call_create<Providers::Cube<GridType>>(config);
+//    else
+//      DUNE_THROW(Common::Exceptions::wrong_input_given,
+//                 "'" << type << "' is not a valid " << InterfaceType::static_id() << "!");
   } // ... create(...)
 }; // class GridProviders
 
-
+} // namespace Grid
 } // namespace XT
 } // namespace Dune
 

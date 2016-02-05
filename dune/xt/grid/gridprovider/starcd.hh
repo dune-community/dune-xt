@@ -36,11 +36,12 @@
 #include <dune/xt/common/logging.hh>
 #include <dune/xt/common/string.hh>
 
-#include <dune/xt/grid/provider/interface.hh>
+#include <dune/xt/grid/gridprovider.hh>
 
 namespace Dune {
 namespace XT {
 
+#if 0 // temporarily defunct during major refactor (05.02.16)
 /**
  * \brief   StarCD grid provider
  *
@@ -231,6 +232,8 @@ public:
 private:
   std::shared_ptr<GridType> grid_;
 }; // class GridProviderStarCD
+
+#endif // #if 0 // temporarily defunct during major refactor (05.02.16)
 
 } // namespace XT
 } // namespace Dune

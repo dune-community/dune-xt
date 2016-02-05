@@ -29,13 +29,14 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 
-#include <dune/xt/grid/provider/interface.hh>
+#include <dune/xt/grid/gridprovider.hh>
 
 namespace Dune {
 namespace XT {
 namespace Grid {
 namespace Providers {
 
+#if 0 // temporarily defunct during major refactor (05.02.16)
 /**
  * \brief   Gmsh grid provider
  */
@@ -119,6 +120,8 @@ public:
 private:
   std::shared_ptr<GridType> grid_;
 }; // class Gmsh
+
+#endif // #if 0 // temporarily defunct during major refactor (05.02.16)
 
 } // namespace Providers
 } // namespace Grid

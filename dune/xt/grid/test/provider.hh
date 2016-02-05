@@ -54,14 +54,12 @@ struct GridProviderBase : public testing::Test
     auto DUNE_UNUSED(leaf_grid_view_1) = grid_provider.leaf_view();
     auto DUNE_UNUSED(leaf_grid_view_2) = grid_provider.template layer<Layers::leaf, Backends::view>();
 #if HAVE_DUNE_FEM
-    auto DUNE_UNUSED(leaf_grid_part_1) = grid_provider.leaf_part();
     auto DUNE_UNUSED(leaf_grid_part_2) = grid_provider.template layer<Layers::leaf, Backends::part>();
 #endif
     for (int level = 0; level <= grid_provider.max_level(); ++level) {
       auto DUNE_UNUSED(level_grid_view_1) = grid_provider.level_view(level);
       auto DUNE_UNUSED(level_grid_view_2) = grid_provider.template layer<Layers::leaf, Backends::view>(level);
 #if HAVE_DUNE_FEM
-      auto DUNE_UNUSED(level_grid_part_1) = grid_provider.level_part(level);
       auto DUNE_UNUSED(level_grid_part_2) = grid_provider.template layer<Layers::leaf, Backends::part>(level);
 #endif
     }
@@ -94,8 +92,8 @@ struct GridProviderBase : public testing::Test
   //    grid_provider.visualize();
   //    grid_provider.visualize(type_str + "_a");
   //    grid_provider.visualize(Dune::XT::Grid::BoundaryInfoConfigs::AllDirichlet::default_config());
-    grid_provider.visualize(Dune::XT::Grid::alldirichlet_boundaryinfo_default_config());
-    grid_provider.visualize(Dune::XT::Grid::alldirichlet_boundaryinfo_default_config(), type_str + "_b");
+//    grid_provider.visualize(Dune::XT::Grid::alldirichlet_boundaryinfo_default_config());
+//    grid_provider.visualize(Dune::XT::Grid::alldirichlet_boundaryinfo_default_config(), type_str + "_b");
 
   //  static void visualize()
   //  {
