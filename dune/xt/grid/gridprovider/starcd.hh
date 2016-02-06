@@ -10,8 +10,8 @@
 //   Rene Milk       (2012 - 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_XT_GRID_PROVIDER_STARCD_HH
-#define DUNE_XT_GRID_PROVIDER_STARCD_HH
+#ifndef DUNE_XT_GRID_GRIDPROVIDER_STARCD_HH
+#define DUNE_XT_GRID_GRIDPROVIDER_STARCD_HH
 
 #include <fstream>
 #include <iostream>
@@ -19,17 +19,12 @@
 #include <sstream>
 #include <type_traits>
 
-#include <boost/assign/list_of.hpp>
-
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
-#include <dune/common/parametertree.hh>
-#include <dune/common/shared_ptr.hh>
 
 #include <dune/geometry/type.hh>
 
 #include <dune/grid/common/gridfactory.hh>
-#include <dune/grid/sgrid.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 
 #include <dune/xt/common/configuration.hh>
@@ -40,50 +35,49 @@
 
 namespace Dune {
 namespace XT {
+namespace Grid {
 
-#if 0 // temporarily defunct during major refactor (05.02.16)
+
+static inline std::string starcd_gridprovider_id()
+{
+  return "xt.grid.gridprovider.starcd";
+}
+
+
+static inline Common::Configuration starcd_gridprovider_default_config()
+{
+  Common::Configuration config;
+  config["type"]            = starcd_gridprovider_id();
+  config["filename_prefix"] = "grid";
+  return config;
+}
+
+
 /**
  * \brief   StarCD grid provider
  *
  *          Implemented for dimensions 1, 2, and 3.
  *
  */
-template <class GridImp>
-class GridProviderStarCD : public Grid::ProviderInterface<GridImp>
+template <class GridType>
+class StarCDGridProviderFactory
 {
-  typedef Grid::ProviderInterface<GridImp> BaseType;
-  typedef GridProviderStarCD<GridImp> ThisType;
+  static const size_t dimDomain = GridType::dimension;
 
 public:
-  using typename BaseType::GridType;
-  using BaseType::dimDomain;
+  static const bool available = true;
 
   static const std::string static_id()
   {
-    return BaseType::static_id() + ".starcd";
+    return starcd_gridprovider_id();
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration default_config()
   {
-    Common::Configuration config("filename_prefix", "sample");
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
+    return starcd_gridprovider_default_config();
   }
 
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
-  {
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    return Common::make_unique<ThisType>(cfg.get("filename", default_cfg.get<std::string>("filename")));
-  }
-
-  GridProviderStarCD(const std::string& filename)
+  static GridProvider<GridType> create(const std::string& filename_prefix)
   {
     std::ostream& out = Dune::XT::Common::Logger().devnull();
 
@@ -91,7 +85,7 @@ public:
     GridFactory<GridType> factory;
 
     // read the vertices
-    const std::string vertexFileName = filename + ".vrt";
+    const std::string vertexFileName = filename_prefix + ".vrt";
     std::ifstream vertexFile(vertexFileName);
     if (!vertexFile)
       DUNE_THROW(Dune::IOError, "Could not open " << vertexFileName);
@@ -118,7 +112,7 @@ public:
     out << "done: " << numberOfVertices << " vertices read." << std::endl;
 
     // read the elements
-    std::string elementFileName = filename + ".cel";
+    std::string elementFileName = filename_prefix + ".cel";
     std::ifstream elementFile(elementFileName);
     if (!elementFile)
       DUNE_THROW(Dune::IOError, "Could not open " << elementFileName);
@@ -186,56 +180,18 @@ public:
     // finish the construction of the grid object
     out << "Starting createGrid() ... " << std::endl;
 
-    grid_ = std::shared_ptr<GridType>(factory.createGrid());
-  } // GridProviderStarCD(...)
+    return GridProvider<GridType>(factory.createGrid());
+  } // ... create(...)
 
-  GridProviderStarCD(ThisType&& source) = default;
-  GridProviderStarCD(const ThisType& other) = default;
-
-  virtual ~GridProviderStarCD() = default;
-
-  ThisType& operator=(ThisType&& source) = default;
-  ThisType& operator=(const ThisType& other) = default;
-
-  virtual const GridType& grid() const override final
+  static GridProvider<GridType> create(const Common::Configuration cfg = default_config())
   {
-    return *grid_;
+    return create(cfg.get("filename_prefix", default_config().get<std::string>("filename_prefix")));
   }
+}; // class StarCDGridProviderFactory
 
-  virtual GridType& grid() override final
-  {
-    return *grid_;
-  }
 
-  const std::shared_ptr<const GridType> grid_ptr() const
-  {
-    return grid_;
-  }
-
-  std::shared_ptr<GridType> grid_ptr()
-  {
-    return grid_;
-  }
-
-  virtual std::unique_ptr<Grid::ConstProviderInterface<GridType>> copy() const override final
-  {
-    DUNE_THROW(NotImplemented, "");
-    return nullptr;
-  }
-
-  virtual std::unique_ptr<Grid::ProviderInterface<GridType>> copy() override final
-  {
-    DUNE_THROW(NotImplemented, "");
-    return nullptr;
-  }
-
-private:
-  std::shared_ptr<GridType> grid_;
-}; // class GridProviderStarCD
-
-#endif // #if 0 // temporarily defunct during major refactor (05.02.16)
-
+} // namespace Grid
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_PROVIDER_STARCD_HH
+#endif // DUNE_XT_GRID_GRIDPROVIDER_STARCD_HH

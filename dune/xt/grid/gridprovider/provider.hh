@@ -154,23 +154,23 @@ public:
 #endif // HAVE_DUNE_FEM
 
   void visualize(const std::string filename = static_id(),
-                 const Common::Configuration& /*boundary_info_cfg*/ = Common::Configuration()) const
+                 const Common::Configuration& boundary_info_cfg = Common::Configuration()) const
   {
-    //    if (boundary_info_cfg.empty())
-    visualize_plain(filename);
-    //    else
-    //      visualize_with_boundary(boundary_info_cfg, filename);
+    if (boundary_info_cfg.empty())
+      visualize_plain(filename);
+    else
+      visualize_with_boundary(boundary_info_cfg, filename);
   } // ... visualize(...)
 
-  //  void visualize(const Common::Configuration& boundary_info_cfg) const
-  //  {
-  //    visualize_with_boundary(boundary_info_cfg, static_id());
-  //  }
+  void visualize(const Common::Configuration& boundary_info_cfg) const
+  {
+    visualize_with_boundary(boundary_info_cfg, static_id());
+  }
 
-  //  void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename) const
-  //  {
-  //    visualize_with_boundary(boundary_info_cfg, filename);
-  //  }
+  void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename) const
+  {
+    visualize_with_boundary(boundary_info_cfg, filename);
+  }
 
 private:
   void visualize_plain(const std::string filename) const

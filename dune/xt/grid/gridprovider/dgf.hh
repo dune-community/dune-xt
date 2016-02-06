@@ -9,8 +9,8 @@
 //   Rene Milk       (2012 - 2013, 2015)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_XT_GRID_PROVIDER_DGF_HH
-#define DUNE_XT_GRID_PROVIDER_DGF_HH
+#ifndef DUNE_XT_GRID_GRIDPROVIDER_DGF_HH
+#define DUNE_XT_GRID_GRIDPROVIDER_DGF_HH
 
 #include <memory>
 
@@ -35,42 +35,68 @@
 namespace Dune {
 namespace XT {
 namespace Grid {
-namespace internal {
 
 
-template <class GridType>
-static GridProvider<GridType> create_dgf_grid(const std::string& filename)
+static inline std::string dgf_gridprovider_id()
 {
-  return GridProvider<GridType>(GridPtr<GridType>(filename).release());
+  return "xt.grid.gridprovider.dgf";
 }
-
-
-} // namespace internal
 
 
 static inline Common::Configuration dgf_gridprovider_default_config()
 {
   Common::Configuration config;
-  config["type"]     = "xt.grid.gridprovider.dgf";
+  config["type"]     = dgf_gridprovider_id();
   config["filename"] = "dgf_1d_interval.dgf";
   return config;
 }
 
 
 template <class GridType>
+class DgfGridProviderFactory
+{
+  static_assert(is_grid<GridType>::value, "");
+
+public:
+  static const bool available = true;
+
+  static std::string static_id()
+  {
+    return dgf_gridprovider_id();
+  }
+
+  static Common::Configuration default_config()
+  {
+    auto cfg        = dgf_gridprovider_default_config();
+    cfg["filename"] = std::string("dgf_") + Common::to_string(size_t(GridType::dimension)) + "d_interval.dgf";
+    return cfg;
+  }
+
+  static GridProvider<GridType> create(const std::string& filename)
+  {
+    return GridProvider<GridType>(GridPtr<GridType>(filename).release());
+  }
+
+  static GridProvider<GridType> create(const Common::Configuration& cfg = default_config())
+  {
+    return create(cfg.get("filename", default_config().get<std::string>("filename")));
+  }
+}; // class DgfGridProviderFactory
+
+
+template <class GridType>
 typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
 make_dgf_grid(const std::string& filename)
 {
-  return internal::create_dgf_grid<GridType>(filename);
+  return DgfGridProviderFactory<GridType>(filename);
 }
 
 
 template <class GridType>
 typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
-make_dgf_grid(const Common::Configuration& cfg = dgf_gridprovider_default_config())
+make_dgf_grid(const Common::Configuration& cfg = DgfGridProviderFactory<GridType>::default_config())
 {
-  auto filename = cfg.get("filename", dgf_gridprovider_default_config().get<std::string>("filename"));
-  return internal::create_dgf_grid<GridType>(filename);
+  return DgfGridProviderFactory<GridType>::create(cfg);
 }
 
 
@@ -78,4 +104,4 @@ make_dgf_grid(const Common::Configuration& cfg = dgf_gridprovider_default_config
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_PROVIDER_DGF_HH
+#endif // DUNE_XT_GRID_GRIDPROVIDER_DGF_HH

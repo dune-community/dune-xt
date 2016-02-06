@@ -11,121 +11,99 @@
 //   Rene Milk       (2012 - 2013, 2015)
 //   Tobias Leibner  (2014 - 2015)
 
-#ifndef DUNE_XT_GRID_PROVIDER_GMSH_HH
-#define DUNE_XT_GRID_PROVIDER_GMSH_HH
+#ifndef DUNE_XT_GRID_GRIDPROVIDER_GMSH_HH
+#define DUNE_XT_GRID_GRIDPROVIDER_GMSH_HH
 
 #include <memory>
 #include <type_traits>
 
 #include <dune/grid/io/file/gmshreader.hh>
-#include <dune/grid/sgrid.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
-#include <dune/grid/yaspgrid.hh>
-
-#if HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
-#endif
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 
-#include <dune/xt/grid/gridprovider.hh>
+#include <dune/xt/grid/grids.hh>
+
+#include "provider.hh"
 
 namespace Dune {
 namespace XT {
 namespace Grid {
-namespace Providers {
 
-#if 0 // temporarily defunct during major refactor (05.02.16)
-/**
- * \brief   Gmsh grid provider
- */
-template <class GridImp>
-class Gmsh : public Grid::ProviderInterface<GridImp>
+
+static inline std::string gmsh_gridprovider_id()
 {
-  static_assert(!(std::is_same<GridImp, Dune::YaspGrid<GridImp::dimension>>::value),
-                "GmshReader does not work with YaspGrid!");
-  static_assert(!(std::is_same<GridImp, Dune::SGrid<GridImp::dimension, GridImp::dimension>>::value),
-                "GmshReader does not work with SGrid!");
-  typedef Grid::ProviderInterface<GridImp> BaseType;
-  typedef Gmsh<GridImp> ThisType;
+  return "xt.grid.gridprovider.gmsh";
+}
 
+
+static inline Common::Configuration gmsh_gridprovider_default_config()
+{
+  Common::Configuration config;
+  config["type"]     = gmsh_gridprovider_id();
+  config["filename"] = "g.msh";
+  return config;
+}
+
+
+template <class GridType>
+class GmshGridProviderFactory;
+
+
+template <int dim, class Coordinates>
+class GmshGridProviderFactory<Dune::YaspGrid<dim, Coordinates>>
+{
 public:
-  using typename BaseType::GridType;
+  static const bool available = false;
+};
 
-  static const std::string static_id()
+
+template <int dim, int dimworld, typename _ctype>
+class GmshGridProviderFactory<Dune::SGrid<dim, dimworld, _ctype>>
+{
+public:
+  static const bool available = false;
+};
+
+
+template <class GridType>
+class GmshGridProviderFactory
+{
+public:
+  static const bool available = false;
+
+  static std::string static_id()
   {
-    return BaseType::static_id() + ".gmsh";
+    return gmsh_gridprovider_id();
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration default_config()
   {
-    std::string filename = "g.msh";
+    auto cfg = gmsh_gridprovider_default_config();
 #if HAVE_ALUGRID
     if (std::is_same<ALUGrid<2, 2, simplex, conforming>, GridType>::value
-        || std::is_same<ALUGrid<2, 2, simplex, nonconforming>, GridType>::value)
-      filename = "gmsh_2d_simplices.msh";
-#endif // HAVE_ALUGRID
-    Common::Configuration config("filename", filename);
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
+        || std::is_same<ALUGrid<2, 2, simplex, nonconforming>, GridType>::value) {
+      cfg["filename"] = "gmsh_2d_simplices.msh";
     }
-  } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
-  {
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    return Common::make_unique<ThisType>(cfg.get("filename", default_cfg.get<std::string>("filename")));
+#endif // HAVE_ALUGRID
+    return cfg;
   }
 
-  Gmsh(const std::string filename)
+  static GridProvider<GridType> create(const std::string& filename)
   {
-    grid_ = std::shared_ptr<GridType>(GmshReader<GridType>::read(filename));
+    return GridProvider<GridType>(GmshReader<GridType>::read(filename));
   }
 
-  Gmsh(ThisType&& source) = default;
-  Gmsh(const ThisType& other) = default;
-
-  virtual ~Gmsh() = default;
-
-  ThisType& operator=(const ThisType& other) = default;
-  ThisType& operator=(ThisType&& source) = default;
-
-  virtual const GridType& grid() const override final
+  static GridProvider<GridType> create(const Common::Configuration& cfg = default_config())
   {
-    return *grid_;
+    return create(cfg.get("filename", default_config().get<std::string>("filename")));
   }
+}; // class GmshGridProviderFactory
 
-  virtual GridType& grid() override final
-  {
-    return *grid_;
-  }
 
-  const std::shared_ptr<const GridType> grid_ptr() const
-  {
-    return grid_;
-  }
-
-  std::shared_ptr<GridType> grid_ptr()
-  {
-    return grid_;
-  }
-
-private:
-  std::shared_ptr<GridType> grid_;
-}; // class Gmsh
-
-#endif // #if 0 // temporarily defunct during major refactor (05.02.16)
-
-} // namespace Providers
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_PROVIDER_GMSH_HH
+#endif // DUNE_XT_GRID_GRIDPROVIDER_GMSH_HH
