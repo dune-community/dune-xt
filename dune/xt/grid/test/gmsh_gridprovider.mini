@@ -1,0 +1,14 @@
+dimDomain = 2, 3 | expand
+
+__local.geometry = cube, simplex | expand 2
+__local.refinement = nonconforming, conforming | expand
+__local.grid_alu = Dune::ALUGrid<{dimDomain},{dimDomain},Dune::{__local.geometry},Dune::{__local.refinement}>
+
+grid = {__local.grid_alu}  | expand grid
+
+'{grid}' == 'Dune::ALUGrid<{dimDomain},{dimDomain},Dune::cube,Dune::conforming>' | exclude
+
+1, ALUGRID_FOUND | expand grid | cmake_guard
+
+[__static]
+TESTGRIDTYPE = {grid}
