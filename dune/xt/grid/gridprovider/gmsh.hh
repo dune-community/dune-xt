@@ -1,14 +1,14 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2016)
 //   Kirsten Weber   (2012)
-//   Rene Milk       (2012 - 2013, 2015)
+//   Rene Milk       (2012 - 2013, 2015 - 2016)
 //   Tobias Leibner  (2014 - 2015)
 
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_GMSH_HH
