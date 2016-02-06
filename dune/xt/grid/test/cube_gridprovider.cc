@@ -3,9 +3,6 @@
 // The copyright lies with the authors of this file (see below).
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 // Authors:
-//   Felix Schindler (2012 - 2016)
-//   Rene Milk       (2012 - 2016)
-//   Tobias Leibner  (2014 - 2016)
 
 #include <dune/xt/common/test/main.hxx>
 
@@ -16,26 +13,23 @@ struct CubeGridProvider : public GridProviderBase<TESTGRIDTYPE>
 {
   typedef GridProviderBase<TESTGRIDTYPE> BaseType;
 
-  void const_interface()
+  void check_layers()
   {
-    BaseType::const_interface(Dune::XT::Grid::make_cube_grid<TESTGRIDTYPE>());
+    BaseType::check_layers(Dune::XT::Grid::make_cube_grid<TESTGRIDTYPE>());
+  }
+
+  void check_visualize()
+  {
+    BaseType::check_visualize(Dune::XT::Grid::make_cube_grid<TESTGRIDTYPE>());
   }
 };
 
 
-TEST_F(CubeGridProvider, const_interface)
+TEST_F(CubeGridProvider, layers)
 {
-  this->const_interface();
+  this->check_layers();
 }
-// TEST_F(TestGridProvider, fulfills_const_interface)
-//{
-//  this->const_interface();
-//}
-// TEST_F(TestGridProvider, is_visualizable)
-//{
-//  this->visualize();
-//}
-// TEST_F(TestGridProvider, fulfills_non_const_interface)
-//{
-//  this->non_const_interface();
-//}
+TEST_F(CubeGridProvider, visualize)
+{
+  this->check_visualize();
+}
