@@ -1,7 +1,7 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
@@ -18,7 +18,7 @@
 #include <dune/xt/common/logstreams.hh>
 #include <dune/xt/common/parallel/partitioner.hh>
 
-#include <dune/xt/grid/provider/cube.hh>
+#include <dune/xt/grid/gridprovider/cube.hh>
 #include <dune/xt/grid/walker.hh>
 
 
@@ -37,9 +37,9 @@ struct GridWalkerTest : public ::testing::Test
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename Entity<GridViewType>::Type EntityType;
   typedef typename Intersection<GridViewType>::Type IntersectionType;
-  const Providers::Cube<GridType> grid_prv;
+  const GridProvider<GridType> grid_prv;
   GridWalkerTest()
-    : grid_prv(0.f, 1.f, level)
+    : grid_prv(make_cube_grid<GridType>(0.f, 1.f, level))
   {
   }
 

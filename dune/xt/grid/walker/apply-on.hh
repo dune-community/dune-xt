@@ -1,12 +1,12 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2014, 2016)
-//   Rene Milk       (2014 - 2015)
+//   Rene Milk       (2014 - 2016)
 //   Tobias Leibner  (2015)
 
 #ifndef DUNE_XT_GRID_WALKER_APPLY_ON_HH
@@ -276,7 +276,7 @@ public:
 
   virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
   {
-    return boundary_info_.dirichlet(intersection);
+    return boundary_info_.type(intersection) == DirichletBoundary();
   }
 
 private:
@@ -299,7 +299,7 @@ public:
 
   virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
   {
-    return boundary_info_.neumann(intersection);
+    return boundary_info_.type(intersection) == NeumannBoundary();
   }
 
 private:

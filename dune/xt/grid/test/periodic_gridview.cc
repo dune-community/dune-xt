@@ -1,7 +1,7 @@
 // This file is part of the dune-xt-grid project:
 //   https://github.com/dune-community/dune-xt-grid
 // The copyright lies with the authors of this file (see below).
-// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
@@ -21,8 +21,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/periodic_gridview.hh>
-#include <dune/xt/grid/provider/cube.hh>
-#include <dune/xt/grid/provider/interface.hh>
+#include <dune/xt/grid/gridprovider.hh>
 
 using namespace Dune::XT;
 using namespace Dune::XT::Common;
@@ -34,7 +33,6 @@ struct PeriodicViewTest : public testing::Test
   typedef TESTGRIDTYPE GridType;
   typedef typename GridType::ctype ctype;
   typedef typename GridType::template Codim<0>::Geometry GeometryType;
-  typedef Dune::XT::Grid::Providers::template Cube<GridType> GridProviderType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename GridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
   typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType, use_less_memory> PeriodicGridViewType;
@@ -57,7 +55,7 @@ struct PeriodicViewTest : public testing::Test
   {
     // create grid and get gridview
     Configuration grid_config                  = DXTC_CONFIG.sub("test_grid_periodicview");
-    GridProviderType grid_provider             = *(GridProviderType::create(grid_config));
+    auto grid_provider                         = Dune::XT::Grid::make_cube_grid<GridType>(grid_config);
     const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
     const GridViewType grid_view               = grid->leafGridView();
 
