@@ -276,7 +276,7 @@ public:
 
   virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
   {
-    return boundary_info_.dirichlet(intersection);
+    return boundary_info_.type(intersection) == DirichletBoundary();
   }
 
 private:
@@ -299,7 +299,7 @@ public:
 
   virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
   {
-    return boundary_info_.neumann(intersection);
+    return boundary_info_.type(intersection) == NeumannBoundary();
   }
 
 private:

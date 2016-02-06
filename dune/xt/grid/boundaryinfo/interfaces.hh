@@ -12,6 +12,8 @@
 
 #include <string>
 
+#include <dune/xt/common/fvector.hh>
+
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
@@ -44,6 +46,11 @@ class BoundaryInfo
 
 public:
   typedef IntersectionImp IntersectionType;
+  typedef typename IntersectionType::ctype DomainFieldType;
+  static const size_t dimDomain = IntersectionType::dimension;
+  static const size_t dimWorld  = IntersectionType::dimensionworld;
+  typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
+  typedef Common::FieldVector<DomainFieldType, dimWorld> WorldType;
 
   virtual const BoundaryType& type(const IntersectionType& intersection) const = 0;
 

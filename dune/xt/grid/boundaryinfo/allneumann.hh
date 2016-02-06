@@ -21,6 +21,12 @@ namespace XT {
 namespace Grid {
 
 
+Common::Configuration allneumann_boundaryinfo_default_config()
+{
+  return Common::Configuration("type", "xt.grid.boundaryinfo.allneumann");
+}
+
+
 template <class IntersectionImp>
 class AllNeumannBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
@@ -31,7 +37,7 @@ public:
 
   static std::string static_id()
   {
-    return BaseType::static_id() + ".allneumann";
+    return allneumann_boundaryinfo_default_config().get<std::string>("type");
   }
 
   virtual const BoundaryType& type(const IntersectionType& intersection) const override final
@@ -53,7 +59,8 @@ constexpr NeumannBoundary AllNeumannBoundaryInfo<I>::neumann_boundary_;
 
 
 template <class I>
-std::unique_ptr<AllNeumannBoundaryInfo<I>> make_allneumann_boundaryInfo(const Common::Configuration& /*config*/)
+std::unique_ptr<AllNeumannBoundaryInfo<I>>
+make_allneumann_boundaryinfo(const Common::Configuration& /*cfg*/ = Common::Configuration())
 {
   return XT::Common::make_unique<AllNeumannBoundaryInfo<I>>();
 }

@@ -36,9 +36,9 @@ public:
     if (type == AllDirichletBoundaryInfo<I>::static_id())
       return alldirichlet_boundaryinfo_default_config();
     else if (type == AllNeumannBoundaryInfo<I>::static_id())
-      return /**/ Common::Configuration();
+      return allneumann_boundaryinfo_default_config();
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
-      return /**/ Common::Configuration();
+      return normalbased_boundaryinfo_default_config();
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
@@ -50,9 +50,9 @@ public:
     if (type == AllDirichletBoundaryInfo<I>::static_id())
       return make_alldirichlet_boundaryinfo<I>(config);
     else if (type == AllNeumannBoundaryInfo<I>::static_id())
-      return make_allneumann_boundaryInfo<I>(config);
+      return make_allneumann_boundaryinfo<I>(config);
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
-      return make_normalbased_boundaryInfo<I>(config);
+      return make_normalbased_boundaryinfo<I>(config);
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");

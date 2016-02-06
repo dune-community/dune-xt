@@ -21,6 +21,12 @@ namespace XT {
 namespace Grid {
 
 
+Common::Configuration alldirichlet_boundaryinfo_default_config()
+{
+  return Common::Configuration("type", "xt.grid.boundaryinfo.alldirichlet");
+}
+
+
 template <class IntersectionImp>
 class AllDirichletBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
@@ -31,7 +37,7 @@ public:
 
   static std::string static_id()
   {
-    return BaseType::static_id() + ".alldirichlet";
+    return alldirichlet_boundaryinfo_default_config().get<std::string>("type");
   }
 
   virtual const BoundaryType& type(const IntersectionType& intersection) const override final
@@ -50,11 +56,6 @@ template <class I>
 constexpr NoBoundary AllDirichletBoundaryInfo<I>::no_boundary_;
 template <class I>
 constexpr DirichletBoundary AllDirichletBoundaryInfo<I>::dirichlet_boundary_;
-
-Common::Configuration alldirichlet_boundaryinfo_default_config()
-{
-  return Common::Configuration("type", "xt.grid.boundaryinfo.alldirichlet");
-}
 
 
 template <class I>
