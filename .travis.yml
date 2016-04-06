@@ -37,8 +37,8 @@ before_install:
     : ${BUILD_CMD:="ninja -k 10000 -j 2"} && export BUILD_CMD
   # workaround for https://github.com/travis-ci/travis-ci/issues/5285
   - sudo -E apt-get install -y -q python-pip python3-pip
-  - sudo -E pip3 install virtualenv cpp-coveralls
-  - sudo -E pip install virtualenv cpp-coveralls
+  - sudo -E pip3 install -U requests virtualenv cpp-coveralls
+  - sudo -E pip install -U requests virtualenv cpp-coveralls
   - export PATH=/usr/lib/ccache:$PATH
   - cd $HOME
   - test -d src || git clone https://github.com/dune-community/dune-xt-super.git src
