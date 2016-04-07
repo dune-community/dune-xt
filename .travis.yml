@@ -73,7 +73,11 @@ script:
     # retry this step becuase of the implicated race condition in cloning an pushing with multiple builder running in parallel
     - travis_retry $HOME/src/scripts/bash/travis_upload_test_logs.bash ${DUNE_BUILD_DIR}/${MY_MODULE}/dune/xt/*/test/
 
-    - PYTHONPATH=$HOME/src/scripts/python/ python3 -c "import travis_report as tp; tp.clang_format_status(\"${TRAVIS_BUILD_DIR}\")"
+    - |
+     if [ "x${CLANG_FORMAT}" != "x" ] ; then
+        git config --global hooks.clangformat ${CLANG_FORMAT}
+        PYTHONPATH=$HOME/src/scripts/python/ python3 -c "import travis_report as tp; tp.clang_format_status(\"${TRAVIS_BUILD_DIR}\")"
+     fi
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} headercheck
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} install | grep -v "Installing"
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} package_source
@@ -120,7 +124,7 @@ matrix:
           packages:
           - *commonpackages
           - ['g++-4.9', 'gcc-4.9']
-      env: CXX=g++-4.9 CC=gcc-4.9
+      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-grid dune-xt-la dune-xt-functions"
     - os: linux
       compiler: gcc
       addons: *gcc49
@@ -151,8 +155,8 @@ matrix:
           - ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
           packages:
           - *commonpackages
-          - ['clang-3.7']
-      env: CXX=clang++-3.7 CC=clang-3.7
+          - ['clang-3.7', 'clang-format-3.7']
+      env: CXX=clang++-3.7 CC=clang-3.7 MODULES_TO_DELETE="" CLANG_FORMAT="/usr/bin/clang-format-3.7"
 
     - os: linux
       compiler: clang
@@ -164,7 +168,8 @@ matrix:
           packages:
           - *commonpackages
           - ['clang-3.7']
-      env: OPTS=config.opts/travis.make BUILD_CMD="make -k -j2" CXX=clang++-3.7 CC=clang-3.7
+      # fake last module to delete to distinguish testlogs
+      env: OPTS=config.opts/travis.make BUILD_CMD="make -k -j2" CXX=clang++-3.7 CC=clang-3.7 MODULES_TO_DELETE="with-make"
 
     #- os: linux
       #compiler: clang
@@ -176,4 +181,4 @@ matrix:
           #packages:
           #- *commonpackages
           #- ['clang-3.8']
-      #env: CXX=clang++-3.8 CC=clang-3.8
+      #env: CXX=clang++-3.8 CC=clang-3.8 MODULES_TO_DELETE="dune-xt-grid dune-xt-la dune-xt-functions"
