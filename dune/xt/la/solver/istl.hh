@@ -181,7 +181,7 @@ public:
     const auto actual_value = opts.get("verbose", default_opts.get<int>("verbose"));
     return
 #if HAVE_MPI
-        (communicator_.storage_access().communicator().rank() == 0) ? actual_value : 0;
+        (communicator_.access().communicator().rank() == 0) ? actual_value : 0;
 #else
         actual_value;
 #endif
@@ -197,7 +197,7 @@ public:
     typedef typename Traits::MatrixOperatorType MatrixOperatorType;
     typedef BiCGSTABSolver<IstlVectorType> BiCgSolverType;
     InverseOperatorResult solver_result;
-    auto scalar_product = Traits::make_scalarproduct(communicator_.storage_access());
+    auto scalar_product = Traits::make_scalarproduct(communicator_.access());
 
     try {
       if (!opts.has_key("type"))
@@ -209,16 +209,16 @@ public:
       IstlDenseVector<S> writable_rhs          = rhs.copy();
 
       if (type.substr(0, 13) == "bicgstab.amg.") {
-        solver_result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.storage_access())
+        solver_result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.access())
                             .call(writable_rhs, solution, opts, default_opts, type.substr(13));
       } else if (type == "bicgstab.ilut") {
-        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.storage_access());
+        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         typedef SeqILUn<typename MatrixType::BackendType, IstlVectorType, IstlVectorType> SequentialPreconditionerType;
         SequentialPreconditionerType seq_preconditioner(
             matrix_.backend(),
             opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
             opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
-        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.storage_access());
+        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         BiCgSolverType solver(matrix_operator,
                               scalar_product,
                               preconditioner,
@@ -227,13 +227,13 @@ public:
                               verbosity(opts, default_opts));
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
       } else if (type == "bicgstab.ssor") {
-        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.storage_access());
+        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         typedef SeqSSOR<typename MatrixType::BackendType, IstlVectorType, IstlVectorType> SequentialPreconditionerType;
         SequentialPreconditionerType seq_preconditioner(
             matrix_.backend(),
             opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
             opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
-        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.storage_access());
+        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         BiCgSolverType solver(matrix_operator,
                               scalar_product,
                               preconditioner,
@@ -242,11 +242,11 @@ public:
                               verbosity(opts, default_opts));
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
       } else if (type == "bicgstab") {
-        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.storage_access());
+        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         constexpr auto cat   = decltype(matrix_operator)::category;
         typedef IdentityPreconditioner<MatrixOperatorType, cat> SequentialPreconditioner;
         SequentialPreconditioner seq_preconditioner;
-        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.storage_access());
+        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         // define the BiCGStab as the actual solver
         BiCgSolverType solver(matrix_operator,
                               scalar_product,
@@ -282,7 +282,7 @@ public:
           opts.get("post_check_solves_system", default_opts.get<R>("post_check_solves_system"));
       if (post_check_solves_system_threshold > 0) {
         matrix_.mv(solution, writable_rhs);
-        communicator_.storage_access().copyOwnerToAll(writable_rhs.backend(), writable_rhs.backend());
+        communicator_.access().copyOwnerToAll(writable_rhs.backend(), writable_rhs.backend());
         writable_rhs -= rhs;
         const R sup_norm = writable_rhs.sup_norm();
         if (sup_norm > post_check_solves_system_threshold || Common::isnan(sup_norm) || Common::isinf(sup_norm))
