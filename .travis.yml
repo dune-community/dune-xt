@@ -164,7 +164,8 @@ matrix:
           packages:
           - *commonpackages
           - ['clang-3.7']
-      env: OPTS=config.opts/travis.make BUILD_CMD="make -k -j2" CXX=clang++-3.7 CC=clang-3.7 MODULES_TO_DELETE="dune-xt-grid dune-xt-la dune-xt-functions"
+      # fake last module to delete to distinguish testlogs
+      env: OPTS=config.opts/travis.make BUILD_CMD="make -k -j2" CXX=clang++-3.7 CC=clang-3.7 MODULES_TO_DELETE="dune-xt-grid dune-xt-la dune-xt-functions with-make"
 
     #- os: linux
       #compiler: clang
