@@ -43,6 +43,7 @@ before_install:
   - cd $HOME
   - test -d src || git clone https://github.com/dune-community/dune-xt-super.git src
   - cd $HOME/src
+  - pushd .travis ; ./init_sshkey.sh ${encrypted_862ca47045d1_key} ${encrypted_862ca47045d1_iv} ; popd
   - git submodule update --init --recursive
   - git submodule status
   - export DCTRL_ARG="--builddir=${DUNE_BUILD_DIR}  --opts=${OPTS}"
