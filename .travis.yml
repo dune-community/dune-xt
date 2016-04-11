@@ -124,7 +124,7 @@ matrix:
           packages:
           - *commonpackages
           - ['g++-4.9', 'gcc-4.9']
-      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-grid dune-xt-la dune-xt-functions"
+      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-la" 
     - os: linux
       compiler: gcc
       addons: *gcc49
