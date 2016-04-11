@@ -361,8 +361,8 @@ public:
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
     , name_(nm.empty()
-                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->storage_access().name()
-                      + "' and '" + right_->storage_access().name() + "'"
+                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
+                      + "' and '" + right_->access().name() + "'"
                 : nm)
   {
   }
@@ -380,7 +380,7 @@ public:
     typedef CombinedLocalFunction<LeftType, RightType, comb> RealLocalFunctionType;
     assert(left_);
     assert(right_);
-    return Common::make_unique<RealLocalFunctionType>(left_->storage_access(), right_->storage_access(), entity);
+    return Common::make_unique<RealLocalFunctionType>(left_->access(), right_->access(), entity);
   } // ... local_function(...)
 
   virtual ThisType* copy() const
@@ -390,8 +390,8 @@ public:
 
   virtual std::string type() const override final
   {
-    return SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->storage_access().type() + "' and '"
-           + right_->storage_access().type() + "'";
+    return SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().type() + "' and '"
+           + right_->access().type() + "'";
   } // ... type(...)
 
   virtual std::string name() const override final

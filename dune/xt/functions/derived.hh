@@ -207,7 +207,7 @@ public:
   Derived(const std::shared_ptr<const FunctionType> func, const std::string nm = "")
     : func_(Common::make_unique<FunctionStorageType>(func))
     , name_(nm.empty()
-                ? SelectDerived<FunctionType, derivative>::type() + " of '" + func_->storage_access().name() + "'"
+                ? SelectDerived<FunctionType, derivative>::type() + " of '" + func_->access().name() + "'"
                 : nm)
   {
   }
@@ -222,7 +222,7 @@ public:
   {
     typedef DerivedLocalFunction<FunctionType, derivative> RealLocalFunctionType;
     assert(func_);
-    return Common::make_unique<RealLocalFunctionType>(func_->storage_access(), entity);
+    return Common::make_unique<RealLocalFunctionType>(func_->access(), entity);
   } // ... local_function(...)
 
   virtual ThisType* copy() const
@@ -232,7 +232,7 @@ public:
 
   virtual std::string type() const override final
   {
-    return SelectDerived<FunctionType, derivative>::type() + " of '" + func_->storage_access().type() + "'";
+    return SelectDerived<FunctionType, derivative>::type() + " of '" + func_->access().type() + "'";
   }
 
   virtual std::string name() const override final
