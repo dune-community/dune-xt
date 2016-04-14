@@ -73,11 +73,6 @@ script:
     # retry this step becuase of the implicated race condition in cloning an pushing with multiple builder running in parallel
     - travis_retry $HOME/src/scripts/bash/travis_upload_test_logs.bash ${DUNE_BUILD_DIR}/${MY_MODULE}/dune/xt/*/test/
 
-    - |
-     if [ "x${CLANG_FORMAT}" != "x" ] ; then
-        git config --global hooks.clangformat ${CLANG_FORMAT}
-        PYTHONPATH=$HOME/src/scripts/python/ python3 -c "import travis_report as tp; tp.clang_format_status(\"${TRAVIS_BUILD_DIR}\")"
-     fi
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} headercheck
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} install | grep -v "Installing"
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} package_source
@@ -89,6 +84,12 @@ after_script:
         git config --global hooks.clangformat ${CLANG_FORMAT}
         PYTHONPATH=$HOME/src/scripts/python/ python3 -c "import travis_report as tp; tp.clang_format_status(\"${TRAVIS_BUILD_DIR}\")"
      fi
+    - |
+      if [[ $TRAVIS_JOB_NUMBER == *.1 ]] ; then
+        ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec ${BUILD_CMD} doc
+        ./.travis/init_sshkey.sh $encrypted_862ca47045d1_key $encrypted_862ca47045d1_iv dune-community.github.io
+        ./.travis/deploy_docs.sh ${MY_MODULE} ${DUNE_BUILD_DIR}
+      fi
     # reset for ctest
     - ${SRC_DCTRL} ${DCTRL_ARG} --only=${MY_MODULE} bexec make clean
     - export CTEST_ARG="--output-on-failure -S ${TRAVIS_BUILD_DIR}/.travis.ctest"
