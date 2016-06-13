@@ -1,12 +1,4 @@
-# This file is part of the dune-xt-la project:
-#   https://github.com/dune-community/dune-xt-common
-# The copyright lies with the authors of this file (see below).
-# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-# Authors:
-#   Felix Schindler (2015 - 2016)
-#   Rene Milk       (2009, 2015)
 #
-# http://llvm.org/releases/3.7.0/tools/clang/docs/ClangFormatStyleOptions.html
 AlignAfterOpenBracket: true
 AlignConsecutiveAssignments: true
 AlignEscapedNewlinesLeft: false
@@ -21,6 +13,7 @@ AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: true
+# Authors:
 BasedOnStyle: Mozilla
 BinPackArguments: false
 BinPackParameters: true # this applies to template arguments, function arguments and typedefs, so we cannot set this to false (very much unfortunately)!
@@ -35,11 +28,15 @@ ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 ExperimentalAutoDetectBinPacking: false
+#   Felix Schindler (2015 - 2016)
+# http://llvm.org/releases/3.7.0/tools/clang/docs/ClangFormatStyleOptions.html
+#   https://github.com/dune-community/dune-xt-common
 IndentCaseLabels: true
 IndentWidth: 2
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: true
 Language: Cpp
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 MaxEmptyLinesToKeep: 2
 NamespaceIndentation: None
 PenaltyBreakComment: 60
@@ -48,6 +45,8 @@ PenaltyBreakString: 1000
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Left
+#   Rene Milk       (2009, 2015)
+SortIncludes:    false
 SpaceAfterCStyleCast: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
@@ -59,4 +58,6 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: Cpp11
 TabWidth: 2
+# The copyright lies with the authors of this file (see below).
+# This file is part of the dune-xt-la project:
 UseTab: Never
