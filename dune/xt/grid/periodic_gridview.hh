@@ -333,6 +333,7 @@ public:
 private:
   std::unique_ptr<Intersection> create_current_intersection() const
   {
+    assert(!has_boundary_intersections_ || intersection_map_.count((BaseType::operator*()).indexInInside()));
     return Common::make_unique<Intersection>(BaseType::operator*(),
                                              real_grid_view_,
                                              has_boundary_intersections_
@@ -344,6 +345,7 @@ private:
   {
     const bool is_iend                            = (*this == real_grid_view_.iend(entity_));
     const RealIntersectionType& real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
+    assert(!has_boundary_intersections_ || intersection_map_.count(real_intersection.indexInInside()));
     return Common::make_unique<Intersection>(real_intersection,
                                              real_grid_view_,
                                              has_boundary_intersections_
@@ -552,19 +554,22 @@ private:
         type_counts.insert(std::make_pair(geometry_type, size_t(1)));
       // check if entity is on a periodic boundary and, if it is, replace index by indices of periodic entity
       auto periodic_coords           = entity.geometry().center();
-      std::size_t upper_right_coords = 0;
+      std::size_t num_upper_right_coords = 0;
       for (std::size_t ii = 0; ii < dimDomain; ++ii) {
         if (periodic_directions[ii]) {
           if (XT::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
-            ++upper_right_coords;
+            ++num_upper_right_coords;
             periodic_coords[ii] = lower_left[ii];
           }
         }
       }
-      if (upper_right_coords > 0) { // find periodic adjacent entity
+      if (num_upper_right_coords > 0) { // find periodic adjacent entity
         // dont count this entity as it is identified with the single periodic equivalent entity
         --num_codim_entities;
-        --(type_counts.at(geometry_type));
+        if (type_counts.count(geometry_type))
+          --(type_counts.at(geometry_type));
+        else
+          type_counts.insert(std::make_pair(geometry_type, size_t(-1)));
         free_indices.insert(real_index_set.index(entity));
         entities_to_skip.insert(real_index_set.index(entity));
         periodic_coords_vector.push_back(periodic_coords);
@@ -610,6 +615,7 @@ private:
 
     // assign index of periodic equivalent entity to entities that are replaced
     for (const auto& pair : entity_to_vector_index_map) {
+      assert(periodic_entity_ptrs.size() > pair.second);
       const auto& periodic_entity_ptr = periodic_entity_ptrs.at(pair.second);
       if (periodic_entity_ptr == nullptr)
         DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
@@ -746,7 +752,7 @@ public:
                 }
               }
             }
-            assert(num_boundary_coords = 1);
+            assert(num_boundary_coords == 1);
             if (is_periodic) {
               periodic_neighbor_coords_vector.push_back(periodic_neighbor_coords);
               intersection_to_vector_index_map.insert(
@@ -772,9 +778,11 @@ public:
 
     for (auto& pair : entity_to_intersection_to_vector_index_map) {
       for (auto& intersection_to_vector : pair.second) {
+        assert(outside_ptrs.size() > intersection_to_vector.second);
         const auto& outside_ptr = outside_ptrs.at(intersection_to_vector.second);
         if (outside_ptr == nullptr)
           DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
+        assert(entity_to_intersection_map_map_.count(pair.first));
         entity_to_intersection_map_map_.at(pair.first)
             .insert(std::make_pair(intersection_to_vector.first, std::make_pair(bool(true), *outside_ptr)));
       }
@@ -851,6 +859,7 @@ public:
 
   IntersectionIterator ibegin(const typename Codim<0>::Entity& entity) const
   {
+    assert(!entity.hasBoundaryIntersections() || entity_to_intersection_map_map_.count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::ibegin(entity),
                                 *this,
                                 entity,
@@ -863,6 +872,7 @@ public:
 
   IntersectionIterator iend(const typename Codim<0>::Entity& entity) const
   {
+    assert(!entity.hasBoundaryIntersections() || entity_to_intersection_map_map_.count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::iend(entity),
                                 *this,
                                 entity,
