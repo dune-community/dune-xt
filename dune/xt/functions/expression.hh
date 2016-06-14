@@ -225,10 +225,10 @@ public:
     for (size_t rr = 0; rr < dimRange; ++rr) {
       *tmp_row_ = ret[rr];
       for (size_t cc = 0; cc < dimRangeCols; ++cc) {
-        if (isnan(tmp_row_->operator[](cc))) {
+        if (Dune::XT::Common::isnan(tmp_row_->operator[](cc))) {
           failure    = true;
           error_type = "NaN";
-        } else if (isinf(tmp_row_->operator[](cc))) {
+        } else if (Dune::XT::Common::isinf(tmp_row_->operator[](cc))) {
           failure    = true;
           error_type = "inf";
         } else if (std::abs(tmp_row_->operator[](cc)) > (0.9 * std::numeric_limits<double>::max())) {
