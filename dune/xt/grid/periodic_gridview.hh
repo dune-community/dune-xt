@@ -345,10 +345,10 @@ private:
   {
     const bool is_iend                            = (*this == real_grid_view_.iend(entity_));
     const RealIntersectionType& real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
-    assert(!has_boundary_intersections_ || intersection_map_.count(real_intersection.indexInInside()));
+    assert(is_iend || !has_boundary_intersections_ || intersection_map_.count(real_intersection.indexInInside()));
     return Common::make_unique<Intersection>(real_intersection,
                                              real_grid_view_,
-                                             has_boundary_intersections_
+                                             has_boundary_intersections_ && !is_iend
                                                  ? intersection_map_.at(real_intersection.indexInInside())
                                                  : (const PeriodicPairType&)nonperiodic_pair_);
   } // ... create_current_intersection_safely() const
