@@ -14,5 +14,3 @@ add_subdirectory(test EXCLUDE_FROM_ALL)
 
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 
-FILE( GLOB_RECURSE _header "${CMAKE_CURRENT_SOURCE_DIR}/*.hh" )
-add_format(${_header} ${lib_dune_xt_la_sources})
