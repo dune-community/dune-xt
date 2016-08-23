@@ -73,7 +73,8 @@ public:
   {
     if (!opts.has_key("type"))
       DUNE_THROW(Common::Exceptions::configuration_error,
-                 "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+                 "Given options (see below) need to have at least the key 'type' set!\n\n"
+                     << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);

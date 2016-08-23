@@ -202,11 +202,12 @@ public:
     try {
       if (!opts.has_key("type"))
         DUNE_THROW(Common::Exceptions::configuration_error,
-                   "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+                   "Given options (see below) need to have at least the key 'type' set!\n\n"
+                       << opts);
       const auto type = opts.get<std::string>("type");
       SolverUtils::check_given(type, types());
       const Common::Configuration default_opts = options(type);
-      IstlDenseVector<S> writable_rhs          = rhs.copy();
+      IstlDenseVector<S> writable_rhs = rhs.copy();
 
       if (type.substr(0, 13) == "bicgstab.amg.") {
         solver_result = AmgApplicator<S, CommunicatorType>(matrix_, communicator_.access())
@@ -243,7 +244,7 @@ public:
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
       } else if (type == "bicgstab") {
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
-        constexpr auto cat   = decltype(matrix_operator)::category;
+        constexpr auto cat = decltype(matrix_operator)::category;
         typedef IdentityPreconditioner<MatrixOperatorType, cat> SequentialPreconditioner;
         SequentialPreconditioner seq_preconditioner;
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());

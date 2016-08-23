@@ -93,7 +93,7 @@ struct VectorTest : public ::testing::Test
     // * of the vector as the interface
     VectorImp d_by_size_2(dim);
     VectorImp d_by_size_and_value_2(dim, D_ScalarType(1));
-    InterfaceType& i_by_size           = static_cast<InterfaceType&>(d_by_size_2);
+    InterfaceType& i_by_size = static_cast<InterfaceType&>(d_by_size_2);
     InterfaceType& i_by_size_and_value = static_cast<InterfaceType&>(d_by_size_and_value_2);
     auto DUNE_UNUSED(i_dim) = i_by_size.dim();
     EXPECT_TRUE(i_by_size.almost_equal(d_by_size_2));
@@ -243,37 +243,37 @@ struct VectorTest : public ::testing::Test
     EXPECT_DOUBLE_EQ(RealType(3.5), sup_norm);
 
     // test dot(), operator*
-    ScalarType dot            = ones.dot(zeros);
-    ScalarType dot_operator   = ones * zeros;
-    ScalarType dot2           = zeros.dot(ones);
+    ScalarType dot = ones.dot(zeros);
+    ScalarType dot_operator = ones * zeros;
+    ScalarType dot2 = zeros.dot(ones);
     ScalarType dot_operator_2 = zeros * ones;
     EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && Common::FloatCmp::eq(dot, dot2)
                 && Common::FloatCmp::eq(dot_operator, dot_operator_2)
                 && Common::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
-    dot          = ones.dot(ones);
+    dot = ones.dot(ones);
     dot_operator = ones * ones;
     EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(4)) && Common::FloatCmp::eq(dot_operator, ScalarType(4)))
         << "These should equal 4: " << dot << ", " << dot_operator;
-    dot            = ones.dot(testvector_3);
-    dot_operator   = ones * testvector_3;
-    dot2           = testvector_3.dot(ones);
+    dot = ones.dot(testvector_3);
+    dot_operator = ones * testvector_3;
+    dot2 = testvector_3.dot(ones);
     dot_operator_2 = testvector_3 * ones;
     EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(0)) && Common::FloatCmp::eq(dot, dot2)
                 && Common::FloatCmp::eq(dot_operator, dot_operator_2)
                 && Common::FloatCmp::eq(dot, dot_operator))
         << "These should all equal 0: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
-    dot            = countingup.dot(testvector_5);
-    dot_operator   = countingup * testvector_5;
-    dot2           = testvector_5.dot(countingup);
+    dot = countingup.dot(testvector_5);
+    dot_operator = countingup * testvector_5;
+    dot2 = testvector_5.dot(countingup);
     dot_operator_2 = testvector_5 * countingup;
     EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-5.5)) && Common::FloatCmp::eq(dot, dot2)
                 && Common::FloatCmp::eq(dot_operator, dot_operator_2)
                 && Common::FloatCmp::eq(dot, dot_operator))
         << "These should all equal -5.5: " << dot << ", " << dot2 << ", " << dot_operator << ", " << dot_operator_2;
-    dot            = testvector_3.dot(testvector_5);
-    dot_operator   = testvector_3 * testvector_5;
-    dot2           = testvector_5.dot(testvector_3);
+    dot = testvector_3.dot(testvector_5);
+    dot_operator = testvector_3 * testvector_5;
+    dot2 = testvector_5.dot(testvector_3);
     dot_operator_2 = testvector_5 * testvector_3;
     EXPECT_TRUE(Common::FloatCmp::eq(dot, ScalarType(-7.25)) && Common::FloatCmp::eq(dot, dot2)
                 && Common::FloatCmp::eq(dot_operator, dot_operator_2)
@@ -300,13 +300,13 @@ struct VectorTest : public ::testing::Test
     EXPECT_FALSE(testvector_3 != testvector_3);
 
     // test scal, operator*=
-    VectorImp scaled             = zeros;
+    VectorImp scaled = zeros;
     VectorImp scaled_by_operator = zeros;
     scaled.scal(ScalarType(1));
     scaled_by_operator *= ScalarType(1);
     EXPECT_EQ(zeros, scaled);
     EXPECT_EQ(zeros, scaled_by_operator);
-    scaled             = ones;
+    scaled = ones;
     scaled_by_operator = ones;
     scaled.scal(ScalarType(1));
     scaled_by_operator *= ScalarType(1);
@@ -355,7 +355,7 @@ struct VectorTest : public ::testing::Test
     }
 
     // test operator+, operator+=, add, iadd
-    VectorImp sum_operator_plus  = zeros + ones;
+    VectorImp sum_operator_plus = zeros + ones;
     VectorImp sum_operator_iplus = zeros;
     sum_operator_iplus += ones;
     VectorImp sum_add_1 = zeros.add(ones);
@@ -371,10 +371,15 @@ struct VectorTest : public ::testing::Test
     EXPECT_FALSE(sum_operator_iplus != sum_operator_plus || sum_add_1 != sum_add_2 || sum_iadd != sum_add_1
                  || sum_add_1 != sum_operator_plus
                  || sum_add_1 != sum_correct)
-        << "These should all be equal:\n" << sum_add_1 << ",\n" << sum_add_2 << ",\n" << sum_operator_iplus << ",\n"
-        << sum_operator_plus << ",\n" << sum_iadd << ",\n" << sum_correct;
+        << "These should all be equal:\n"
+        << sum_add_1 << ",\n"
+        << sum_add_2 << ",\n"
+        << sum_operator_iplus << ",\n"
+        << sum_operator_plus << ",\n"
+        << sum_iadd << ",\n"
+        << sum_correct;
 
-    sum_operator_plus  = countingup + testvector_1;
+    sum_operator_plus = countingup + testvector_1;
     sum_operator_iplus = countingup;
     sum_operator_iplus += testvector_1;
     sum_add_1 = countingup.add(testvector_1);
@@ -388,10 +393,15 @@ struct VectorTest : public ::testing::Test
     EXPECT_FALSE(sum_operator_iplus != sum_operator_plus || sum_add_1 != sum_add_2 || sum_iadd != sum_add_1
                  || sum_add_1 != sum_operator_plus
                  || sum_add_1 != sum_correct)
-        << "These should all be equal:\n" << sum_add_1 << ",\n" << sum_add_2 << ",\n" << sum_operator_iplus << ",\n"
-        << sum_operator_plus << ",\n" << sum_iadd << ",\n" << sum_correct;
+        << "These should all be equal:\n"
+        << sum_add_1 << ",\n"
+        << sum_add_2 << ",\n"
+        << sum_operator_iplus << ",\n"
+        << sum_operator_plus << ",\n"
+        << sum_iadd << ",\n"
+        << sum_correct;
 
-    sum_operator_plus  = testvector_3 + testvector_5;
+    sum_operator_plus = testvector_3 + testvector_5;
     sum_operator_iplus = testvector_3;
     sum_operator_iplus += testvector_5;
     sum_add_1 = testvector_3.add(testvector_5);
@@ -405,8 +415,13 @@ struct VectorTest : public ::testing::Test
     EXPECT_FALSE(sum_operator_iplus != sum_operator_plus || sum_add_1 != sum_add_2 || sum_iadd != sum_add_1
                  || sum_add_1 != sum_operator_plus
                  || sum_add_1 != sum_correct)
-        << "These should all be equal:\n" << sum_add_1 << ",\n" << sum_add_2 << ",\n" << sum_operator_iplus << ",\n"
-        << sum_operator_plus << ",\n" << sum_iadd << ",\n" << sum_correct;
+        << "These should all be equal:\n"
+        << sum_add_1 << ",\n"
+        << sum_add_2 << ",\n"
+        << sum_operator_iplus << ",\n"
+        << sum_operator_plus << ",\n"
+        << sum_iadd << ",\n"
+        << sum_correct;
 
     a = ones;
     a += testvector_3;
@@ -425,7 +440,7 @@ struct VectorTest : public ::testing::Test
     }
 
     // test operator-, operator-=, sub, isub
-    VectorImp diff_operator_minus  = zeros - ones;
+    VectorImp diff_operator_minus = zeros - ones;
     VectorImp diff_operator_iminus = zeros;
     diff_operator_iminus -= ones;
     VectorImp diff_sub_1 = zeros.sub(ones);
@@ -441,10 +456,15 @@ struct VectorTest : public ::testing::Test
     EXPECT_TRUE(diff_operator_iminus == diff_operator_minus && diff_sub_1 == diff_sub_2 && diff_isub == diff_sub_1
                 && diff_sub_1 == diff_operator_minus
                 && diff_sub_1 == diff_correct)
-        << "These should all be equal:\n" << diff_sub_1 << ",\n" << diff_sub_2 << ",\n" << diff_operator_iminus << ",\n"
-        << diff_operator_minus << ",\n" << diff_isub << ",\n" << diff_correct;
+        << "These should all be equal:\n"
+        << diff_sub_1 << ",\n"
+        << diff_sub_2 << ",\n"
+        << diff_operator_iminus << ",\n"
+        << diff_operator_minus << ",\n"
+        << diff_isub << ",\n"
+        << diff_correct;
 
-    diff_operator_minus  = testvector_1 - testvector_4;
+    diff_operator_minus = testvector_1 - testvector_4;
     diff_operator_iminus = testvector_1;
     diff_operator_iminus -= testvector_4;
     diff_sub_1 = testvector_1.sub(testvector_4);
@@ -458,10 +478,15 @@ struct VectorTest : public ::testing::Test
     EXPECT_TRUE(diff_operator_iminus == diff_operator_minus && diff_sub_1 == diff_sub_2 && diff_isub == diff_sub_1
                 && diff_sub_1 == diff_operator_minus
                 && diff_sub_1 == diff_correct)
-        << "These should all be equal:\n" << diff_sub_1 << ",\n" << diff_sub_2 << ",\n" << diff_operator_iminus << ",\n"
-        << diff_operator_minus << ",\n" << diff_isub << ",\n" << diff_correct;
+        << "These should all be equal:\n"
+        << diff_sub_1 << ",\n"
+        << diff_sub_2 << ",\n"
+        << diff_operator_iminus << ",\n"
+        << diff_operator_minus << ",\n"
+        << diff_isub << ",\n"
+        << diff_correct;
 
-    diff_operator_minus  = testvector_5 - testvector_2;
+    diff_operator_minus = testvector_5 - testvector_2;
     diff_operator_iminus = testvector_5;
     diff_operator_iminus -= testvector_2;
     diff_sub_1 = testvector_5.sub(testvector_2);
@@ -475,8 +500,13 @@ struct VectorTest : public ::testing::Test
     EXPECT_TRUE(diff_operator_iminus == diff_operator_minus && diff_sub_1 == diff_sub_2 && diff_isub == diff_sub_1
                 && diff_sub_1 == diff_operator_minus
                 && diff_sub_1 == diff_correct)
-        << "These should all be equal:\n" << diff_sub_1 << ",\n" << diff_sub_2 << ",\n" << diff_operator_iminus << ",\n"
-        << diff_operator_minus << ",\n" << diff_isub << ",\n" << diff_correct;
+        << "These should all be equal:\n"
+        << diff_sub_1 << ",\n"
+        << diff_sub_2 << ",\n"
+        << diff_operator_iminus << ",\n"
+        << diff_operator_minus << ",\n"
+        << diff_isub << ",\n"
+        << diff_correct;
 
     a = ones;
     a -= testvector_3;
@@ -498,7 +528,7 @@ struct VectorTest : public ::testing::Test
     VectorImp result_eq = countingup;
     result_eq = ScalarType(0);
     EXPECT_EQ(zeros, result_eq);
-    result_eq                    = ScalarType(-2.25);
+    result_eq = ScalarType(-2.25);
     VectorImp result_eq_expected = ones;
     result_eq_expected *= ScalarType(-2.25);
     EXPECT_EQ(result_eq_expected, result_eq);

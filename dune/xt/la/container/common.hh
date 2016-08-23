@@ -106,7 +106,8 @@ public:
 
   CommonDenseVector(const ThisType& other) = default;
 
-  explicit CommonDenseVector(const BackendType& other, const bool /*prune*/ = false,
+  explicit CommonDenseVector(const BackendType& other,
+                             const bool /*prune*/ = false,
                              const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
     : backend_(new BackendType(other))
   {
@@ -192,7 +193,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
     ensure_uniqueness();
-    auto& this_ref     = *backend_;
+    auto& this_ref = *backend_;
     const auto& xx_ref = *(xx.backend_);
     for (size_t ii = 0; ii < this_ref.size(); ++ii)
       this_ref[ii] += alpha * xx_ref[ii];
@@ -302,7 +303,7 @@ public:
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     BackendType& result_ref = result.backend();
     for (size_t ii = 0; ii < size(); ++ii)
-      result_ref[ii] = backend_->operator[](ii)-other.backend_->operator[](ii);
+      result_ref[ii] = backend_->operator[](ii) - other.backend_->operator[](ii);
   } // ... sub(...)
 
   virtual void isub(const ThisType& other) override final
@@ -373,7 +374,8 @@ public:
   /**
    * \note If prune == true, this implementation is not optimal!
    */
-  explicit CommonDenseMatrix(const BackendType& other, const bool prune = false,
+  explicit CommonDenseMatrix(const BackendType& other,
+                             const bool prune = false,
                              const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                  Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
@@ -541,7 +543,7 @@ public:
     auto& row = backend()[ii];
     for (size_t jj = 0; jj < cols(); ++jj)
       row[jj] = ScalarType(0);
-    row[ii]   = ScalarType(1);
+    row[ii] = ScalarType(1);
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)

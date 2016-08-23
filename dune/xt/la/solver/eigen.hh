@@ -104,12 +104,13 @@ public:
   }
 
   template <class T1, class T2>
-  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution,
-             const Common::Configuration& opts) const
+  void
+  apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution, const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW(Common::Exceptions::configuration_error,
-                 "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+                 "Given options (see below) need to have at least the key 'type' set!\n\n"
+                     << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
@@ -123,7 +124,8 @@ public:
             std::stringstream msg;
             msg << "Given matrix contains inf or nan and you requested checking (see options below)!\n"
                 << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-                << "Those were the given options:\n\n" << opts;
+                << "Those were the given options:\n\n"
+                << opts;
             if (rhs.size() <= internal::max_size_to_print)
               msg << "\nThis was the given matrix:\n\n" << matrix_ << "\n";
             DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
@@ -136,7 +138,8 @@ public:
           std::stringstream msg;
           msg << "Given rhs contains inf or nan and you requested checking (see options below)!\n"
               << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-              << "Those were the given options:\n\n" << opts;
+              << "Those were the given options:\n\n"
+              << opts;
           if (rhs.size() <= internal::max_size_to_print)
             msg << "\nThis was the given right hand side:\n\n" << rhs << "\n";
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
@@ -155,7 +158,8 @@ public:
           msg << "Given matrix is not symmetric and you requested checking (see options below)!\n"
               << "If you want to disable this check, set 'pre_check_symmetry = 0' in the options.\n\n"
               << "  (A - A').sup_norm() = " << error << "\n\n"
-              << "Those were the given options:\n\n" << opts;
+              << "Those were the given options:\n\n"
+              << opts;
           if (rhs.size() <= internal::max_size_to_print)
             msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\n";
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
@@ -189,10 +193,13 @@ public:
           msg << "The computed solution contains inf or nan and you requested checking (see options "
               << "below)!\n"
               << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
-              << "Those were the given options:\n\n" << opts;
+              << "Those were the given options:\n\n"
+              << opts;
           if (rhs.size() <= internal::max_size_to_print)
-            msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\nThis was the given right hand side b:\n\n"
-                << rhs << "\nThis is the computed solution:\n\n" << solution << "\n";
+            msg << "\nThis was the given matrix A:\n\n"
+                << matrix_ << "\nThis was the given right hand side b:\n\n"
+                << rhs << "\nThis is the computed solution:\n\n"
+                << solution << "\n";
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements, msg.str());
         }
       }
@@ -209,10 +216,13 @@ public:
             << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
             << "\n\n"
             << "  (A * x - b).sup_norm() = " << tmp.sup_norm() << "\n\n"
-            << "Those were the given options:\n\n" << opts;
+            << "Those were the given options:\n\n"
+            << opts;
         if (rhs.size() <= internal::max_size_to_print)
-          msg << "\nThis was the given matrix A:\n\n" << matrix_ << "\nThis was the given right hand side b:\n\n" << rhs
-              << "\nThis is the computed solution:\n\n" << solution << "\n";
+          msg << "\nThis was the given matrix A:\n\n"
+              << matrix_ << "\nThis was the given right hand side b:\n\n"
+              << rhs << "\nThis is the computed solution:\n\n"
+              << solution << "\n";
         DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system, msg.str());
       }
     }
@@ -324,12 +334,13 @@ public:
   }
 
   template <class T1, class T2>
-  void apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution,
-             const Common::Configuration& opts) const
+  void
+  apply(const EigenBaseVector<T1, S>& rhs, EigenBaseVector<T2, S>& solution, const Common::Configuration& opts) const
   {
     if (!opts.has_key("type"))
       DUNE_THROW(Common::Exceptions::configuration_error,
-                 "Given options (see below) need to have at least the key 'type' set!\n\n" << opts);
+                 "Given options (see below) need to have at least the key 'type' set!\n\n"
+                     << opts);
     const auto type = opts.get<std::string>("type");
     SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
@@ -384,7 +395,8 @@ public:
     if (type == "cg.diagonal.lower") {
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Lower,
-                                         ::Eigen::DiagonalPreconditioner<S>> SolverType;
+                                         ::Eigen::DiagonalPreconditioner<S>>
+          SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
@@ -393,7 +405,8 @@ public:
     } else if (type == "cg.diagonal.upper") {
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Upper,
-                                         ::Eigen::DiagonalPreconditioner<S>> SolverType;
+                                         ::Eigen::DiagonalPreconditioner<S>>
+          SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
@@ -402,7 +415,8 @@ public:
     } else if (type == "cg.identity.lower") {
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Lower,
-                                         ::Eigen::IdentityPreconditioner> SolverType;
+                                         ::Eigen::IdentityPreconditioner>
+          SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
@@ -411,7 +425,8 @@ public:
     } else if (type == "cg.identity.upper") {
       typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
                                          ::Eigen::Lower,
-                                         ::Eigen::IdentityPreconditioner> SolverType;
+                                         ::Eigen::IdentityPreconditioner>
+          SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));

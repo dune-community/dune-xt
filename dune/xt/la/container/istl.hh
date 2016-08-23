@@ -120,7 +120,8 @@ public:
 
   IstlDenseVector(const ThisType& other) = default;
 
-  explicit IstlDenseVector(const BackendType& other, const bool /*prune*/ = false,
+  explicit IstlDenseVector(const BackendType& other,
+                           const bool /*prune*/ = false,
                            const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
     : backend_(new BackendType(other))
   {
@@ -400,7 +401,8 @@ public:
 
   IstlRowMajorSparseMatrix(const ThisType& other) = default;
 
-  explicit IstlRowMajorSparseMatrix(const BackendType& mat, const bool prune = false,
+  explicit IstlRowMajorSparseMatrix(const BackendType& mat,
+                                    const bool prune = false,
                                     const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                         Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
@@ -551,7 +553,7 @@ public:
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii) {
-      auto& row                = backend_->operator[](ii);
+      auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
       if (search_result != row.end())
         row.operator[](jj)[0][0] = ScalarType(0);
@@ -587,7 +589,7 @@ public:
                  "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
     ensure_uniqueness();
     for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
-      auto& row                = backend_->operator[](ii);
+      auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
       if (search_result != row.end())
         row.operator[](jj)[0][0] = ScalarType(0);
@@ -618,10 +620,9 @@ public:
     return backend_->nonzeroes();
   }
 
-  virtual SparsityPatternDefault
-  pattern(const bool prune = false,
-          const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
-              eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  virtual SparsityPatternDefault pattern(const bool prune = false,
+                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                             Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     SparsityPatternDefault ret(rows());
     if (prune) {
@@ -629,7 +630,7 @@ public:
     } else {
       for (size_t ii = 0; ii < rows(); ++ii) {
         if (backend_->getrowsize(ii) > 0) {
-          const auto& row   = backend_->operator[](ii);
+          const auto& row = backend_->operator[](ii);
           const auto it_end = row.end();
           for (auto it = row.begin(); it != it_end; ++it)
             ret.insert(ii, it.index());
@@ -640,8 +641,8 @@ public:
     return ret;
   } // ... pattern(...)
 
-  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
-                              eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
     return ThisType(*backend_, true, eps);
   }
@@ -670,7 +671,7 @@ private:
     SparsityPatternDefault ret(mat.N());
     for (size_t ii = 0; ii < mat.N(); ++ii) {
       if (mat.getrowsize(ii) > 0) {
-        const auto& row   = mat[ii];
+        const auto& row = mat[ii];
         const auto it_end = row.end();
         for (auto it = row.begin(); it != it_end; ++it) {
           const auto val = it->operator[](0)[0];

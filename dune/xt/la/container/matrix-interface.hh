@@ -169,8 +169,8 @@ public:
    * returned pattern
    */
   virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
-                                             eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                             Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     SparsityPatternDefault ret(rows());
     const ScalarType zero(0);
@@ -197,8 +197,8 @@ public:
    * \sa    pattern
    * \param eps Is forwarded to pattern(true, eps)
    */
-  virtual derived_type pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type
-                                  eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  virtual derived_type pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                  Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
   {
     const auto pruned_pattern = pattern(true, eps);
     derived_type ret(rows(), cols(), pruned_pattern);
@@ -281,8 +281,8 @@ struct MatrixAbstractionBase
     return MatrixType(rows, cols);
   }
 
-  static inline typename std::enable_if<is_matrix, MatrixType>::type create(const size_t rows, const size_t cols,
-                                                                            const ScalarType& val)
+  static inline typename std::enable_if<is_matrix, MatrixType>::type
+  create(const size_t rows, const size_t cols, const ScalarType& val)
   {
     return MatrixType(rows, cols, val);
   }
@@ -302,8 +302,8 @@ struct MatrixAbstractionBase
     mat.set_entry(row, col, val);
   }
 
-  static inline typename std::enable_if<is_matrix, ScalarType>::type get_entry(const MatrixType& mat, const size_t row,
-                                                                               const size_t col)
+  static inline typename std::enable_if<is_matrix, ScalarType>::type
+  get_entry(const MatrixType& mat, const size_t row, const size_t col)
   {
     return mat.get_entry(row, col);
   }

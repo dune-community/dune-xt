@@ -215,9 +215,9 @@ struct MatrixTest : public ::testing::Test
     }
 
     // test scal, operator*
-    MatrixImp scaled             = matrix_zeros_dense;
+    MatrixImp scaled = matrix_zeros_dense;
     MatrixImp scaled_by_operator = matrix_zeros_dense;
-    size_t rows                  = scaled.rows();
+    size_t rows = scaled.rows();
     size_t cols = scaled.cols();
     scaled.scal(ScalarType(1));
     scaled_by_operator *= ScalarType(1);
@@ -227,7 +227,7 @@ struct MatrixTest : public ::testing::Test
         EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), scaled_by_operator.get_entry(ii, jj));
       }
     }
-    scaled             = matrix_zeros_sparse;
+    scaled = matrix_zeros_sparse;
     scaled_by_operator = matrix_zeros_sparse;
     scaled.scal(ScalarType(1));
     scaled_by_operator *= ScalarType(1);
@@ -237,7 +237,7 @@ struct MatrixTest : public ::testing::Test
         EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), scaled_by_operator.get_entry(ii, jj));
       }
     }
-    scaled             = matrix_ones;
+    scaled = matrix_ones;
     scaled_by_operator = matrix_ones;
     scaled.scal(ScalarType(0.5));
     scaled_by_operator *= ScalarType(0.5);
@@ -247,7 +247,7 @@ struct MatrixTest : public ::testing::Test
         EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), scaled_by_operator.get_entry(ii, jj));
       }
     }
-    scaled             = testmatrix_sparse;
+    scaled = testmatrix_sparse;
     scaled_by_operator = testmatrix_sparse;
     scaled.scal(ScalarType(-1.25));
     scaled_by_operator *= ScalarType(-1.25);
@@ -259,7 +259,7 @@ struct MatrixTest : public ::testing::Test
                                          scaled_by_operator.get_entry(ii, jj)));
       }
     }
-    scaled             = testmatrix_1;
+    scaled = testmatrix_1;
     scaled_by_operator = testmatrix_1;
     scaled.scal(ScalarType(10));
     scaled_by_operator *= ScalarType(10);

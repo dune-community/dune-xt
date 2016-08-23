@@ -137,13 +137,14 @@ public:
 
   explicit EigenDenseVector(const std::initializer_list<ScalarType>& other)
   {
-    backend_  = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
     size_t ii = 0;
     for (auto element : other)
       backend_->operator[](ii++) = element;
   }
 
-  explicit EigenDenseVector(const BackendType& other, const bool /*prune*/ = false,
+  explicit EigenDenseVector(const BackendType& other,
+                            const bool /*prune*/ = false,
                             const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
     backend_ = std::make_shared<BackendType>(other);
@@ -266,7 +267,8 @@ public:
   /**
    * \brief This constructor does a deep copy.
    */
-  explicit EigenMappedDenseVector(const BackendType& other, const bool /*prune*/ = false,
+  explicit EigenMappedDenseVector(const BackendType& other,
+                                  const bool /*prune*/ = false,
                                   const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
@@ -294,7 +296,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    backend_          = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
+    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     backend_->operator=(other);
     return *this;
   }
@@ -309,9 +311,9 @@ private:
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique()) {
-      auto new_backend     = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
+      auto new_backend = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
       new_backend->operator=(*(backend_));
-      backend_             = new_backend;
+      backend_ = new_backend;
     }
   } // ... ensure_uniqueness(...)
 
@@ -359,7 +361,8 @@ public:
   /**
    * \note If prune == true, this implementation is not optimal!
    */
-  explicit EigenDenseMatrix(const BackendType& other, const bool prune = false,
+  explicit EigenDenseMatrix(const BackendType& other,
+                            const bool prune = false,
                             const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                 Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {

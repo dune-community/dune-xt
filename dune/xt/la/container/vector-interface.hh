@@ -180,7 +180,7 @@ public:
     for (size_t ii = 0; ii < size(); ++ii) {
       const auto value = std::abs(get_entry_ref(ii));
       if (value > result.second) {
-        result.first  = ii;
+        result.first = ii;
         result.second = value;
       }
     }

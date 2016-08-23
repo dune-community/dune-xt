@@ -39,9 +39,9 @@ struct SolverTest : public ::testing::Test
 
   static void produces_correct_results()
   {
-    const size_t dim        = 10;
+    const size_t dim = 10;
     const MatrixType matrix = ContainerFactory<MatrixType>::create(dim);
-    const RhsType rhs       = ContainerFactory<RhsType>::create(dim);
+    const RhsType rhs = ContainerFactory<RhsType>::create(dim);
     SolutionType solution = ContainerFactory<SolutionType>::create(dim);
     solution.scal(0);
 

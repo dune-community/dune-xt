@@ -137,7 +137,8 @@ public:
   {
   }
 
-  explicit EigenRowMajorSparseMatrix(const BackendType& mat, const bool prune = false,
+  explicit EigenRowMajorSparseMatrix(const BackendType& mat,
+                                     const bool prune = false,
                                      const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                          Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
   {

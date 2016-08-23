@@ -168,16 +168,16 @@ public:
 
   virtual std::pair<size_t, RealType> amax() const override final
   {
-    auto result            = std::make_pair(size_t(0), RealType(0));
-    size_t min_index       = 0;
-    size_t max_index       = 0;
+    auto result = std::make_pair(size_t(0), RealType(0));
+    size_t min_index = 0;
+    size_t max_index = 0;
     const RealType minimum = (backend_->cwiseAbs()).minCoeff(&min_index);
     const RealType maximum = (backend_->cwiseAbs()).maxCoeff(&max_index);
     if (maximum < minimum || (Common::FloatCmp::eq(maximum, minimum) && max_index > min_index)) {
-      result.first  = min_index;
+      result.first = min_index;
       result.second = minimum;
     } else {
-      result.first  = max_index;
+      result.first = max_index;
       result.second = maximum;
     }
     return result;

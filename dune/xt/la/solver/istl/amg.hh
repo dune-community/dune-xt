@@ -83,8 +83,11 @@ public:
   {
   }
 
-  InverseOperatorResult call(IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::Configuration& opts,
-                             const Common::Configuration& default_opts, const std::string& smoother_type)
+  InverseOperatorResult call(IstlDenseVector<S>& rhs,
+                             IstlDenseVector<S>& solution,
+                             const Common::Configuration& opts,
+                             const Common::Configuration& default_opts,
+                             const std::string& smoother_type)
   {
     // define the matrix operator
 
@@ -192,8 +195,11 @@ public:
   {
   }
 
-  InverseOperatorResult call(IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::Configuration& opts,
-                             const Common::Configuration& default_opts, const std::string& smoother_type)
+  InverseOperatorResult call(IstlDenseVector<S>& rhs,
+                             IstlDenseVector<S>& solution,
+                             const Common::Configuration& opts,
+                             const Common::Configuration& default_opts,
+                             const std::string& smoother_type)
   {
     typedef MatrixAdapter<IstlMatrixType, IstlVectorType, IstlVectorType> MatrixOperatorType;
     MatrixOperatorType matrix_operator(matrix_.backend());
