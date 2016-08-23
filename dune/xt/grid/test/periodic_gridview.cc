@@ -54,13 +54,13 @@ struct PeriodicViewTest : public testing::Test
   static void check()
   {
     // create grid and get gridview
-    Configuration grid_config                  = DXTC_CONFIG.sub("test_grid_periodicview");
-    auto grid_provider                         = Dune::XT::Grid::make_cube_grid<GridType>(grid_config);
+    Configuration grid_config = DXTC_CONFIG.sub("test_grid_periodicview");
+    auto grid_provider = Dune::XT::Grid::make_cube_grid<GridType>(grid_config);
     const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
-    const GridViewType grid_view               = grid->leafGridView();
+    const GridViewType grid_view = grid->leafGridView();
 
     // check whether grid is periodic
-    const bool is_nonperiodic        = grid_config["periodicity"] == "nonperiodic";
+    const bool is_nonperiodic = grid_config["periodicity"] == "nonperiodic";
     const bool is_partially_periodic = grid_config["periodicity"] == "partially_periodic";
 
     // create periodic grid_view
@@ -71,9 +71,9 @@ struct PeriodicViewTest : public testing::Test
       periodic_directions.set();
     const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
 
-    const bool is_simplex        = Common::from_string<bool>(grid_config["is_simplex"]);
-    const bool is_cube           = !is_simplex;
-    const DomainType lower_left  = Common::from_string<DomainType>(grid_config["lower_left"]);
+    const bool is_simplex = Common::from_string<bool>(grid_config["is_simplex"]);
+    const bool is_cube = !is_simplex;
+    const DomainType lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
     const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
 
     // check interface
@@ -115,8 +115,8 @@ struct PeriodicViewTest : public testing::Test
           ++neighbor_count;
           const EntityType outside = intersection.outside();
           // find corresponding intersection in outside
-          const auto index_in_outside                             = intersection.indexInOutside();
-          PeriodicIntersectionIteratorType i_it_outside           = periodic_grid_view.ibegin(outside);
+          const auto index_in_outside = intersection.indexInOutside();
+          PeriodicIntersectionIteratorType i_it_outside = periodic_grid_view.ibegin(outside);
           const PeriodicIntersectionIteratorType i_it_outside_end = periodic_grid_view.iend(outside);
           for (; i_it_outside != i_it_outside_end; ++i_it_outside) {
             const PeriodicIntersectionType* outside_intersection = i_it_outside.operator->();
@@ -126,13 +126,13 @@ struct PeriodicViewTest : public testing::Test
           }
           const PeriodicIntersectionType& intersection_in_outside = *i_it_outside;
           // check outside_intersection coords
-          const auto coords_in_outside   = intersection.geometryInOutside().center();
+          const auto coords_in_outside = intersection.geometryInOutside().center();
           const auto coords_in_outside_2 = intersection_in_outside.geometryInInside().center();
           EXPECT_TRUE(Dune::XT::Common::FloatCmp::eq(coords_in_outside, coords_in_outside_2));
           // check global intersection coords in periodic case
-          const auto global_intersection_coords         = intersection.geometry().center();
+          const auto global_intersection_coords = intersection.geometry().center();
           const auto global_outside_intersection_coords = intersection_in_outside.geometry().center();
-          size_t coord_difference_count                 = 0;
+          size_t coord_difference_count = 0;
           size_t differing_coordinate;
           for (size_t ii = 0; ii < dimDomain; ++ii) {
             if (Dune::XT::Common::FloatCmp::ne(global_outside_intersection_coords[ii],
@@ -193,7 +193,7 @@ struct PeriodicViewTest : public testing::Test
     // add number of vertices on faces (codim 1)
     expected_num_vertices += std::pow(7, dimDomain - 1) * (num_faces - num_periodic_faces / 2);
     // add number of vertices on edges (codim 2)
-    const size_t num_edges    = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
+    const size_t num_edges = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
     size_t num_periodic_edges = is_partially_periodic ? num_periodic_faces * std::pow(2, dimDomain - 1) : num_edges;
     if (is_nonperiodic)
       num_periodic_edges = 0;

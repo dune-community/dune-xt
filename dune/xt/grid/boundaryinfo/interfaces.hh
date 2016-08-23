@@ -49,7 +49,7 @@ public:
   typedef IntersectionImp IntersectionType;
   typedef typename IntersectionType::ctype DomainFieldType;
   static const size_t dimDomain = IntersectionType::dimension;
-  static const size_t dimWorld  = IntersectionType::dimensionworld;
+  static const size_t dimWorld = IntersectionType::dimensionworld;
   typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef Common::FieldVector<DomainFieldType, dimWorld> WorldType;
 

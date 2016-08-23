@@ -52,8 +52,10 @@ public:
 
 
 template <class EntityType>
-void print_entity(const EntityType& entity, const std::string name = Common::Typename<EntityType>::value(),
-                  std::ostream& out = std::cout, const std::string prefix = "")
+void print_entity(const EntityType& entity,
+                  const std::string name = Common::Typename<EntityType>::value(),
+                  std::ostream& out = std::cout,
+                  const std::string prefix = "")
 {
   if (!name.empty())
     out << prefix << name << ":\n";
@@ -67,7 +69,7 @@ void print_entity(const EntityType& entity, const std::string name = Common::Typ
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
 {
-  auto max_dist        = std::numeric_limits<typename GridImp::ctype>::min();
+  auto max_dist = std::numeric_limits<typename GridImp::ctype>::min();
   const auto& geometry = entity.geometry();
   for (auto i : Common::value_range(geometry.corners())) {
     const auto xi = geometry.corner(i);

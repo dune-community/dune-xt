@@ -174,7 +174,8 @@ public:
     return *this;
   } // ... add(...)
 
-  ThisType& add(ThisType& other, const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
+  ThisType& add(ThisType& other,
+                const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
                 const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
   {
     if (&other == this)
@@ -221,8 +222,8 @@ public:
         functor->apply_local(entity);
   } // ... apply_local(...)
 
-  virtual void apply_local(const IntersectionType& intersection, const EntityType& inside_entity,
-                           const EntityType& outside_entity)
+  virtual void
+  apply_local(const IntersectionType& intersection, const EntityType& inside_entity, const EntityType& outside_entity)
   {
     for (auto& functor : codim1_functors_)
       if (functor->apply_on(this->grid_view_, intersection))

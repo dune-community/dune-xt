@@ -32,7 +32,7 @@ template <class T>
 struct GridWalkerTest : public ::testing::Test
 {
   static const size_t griddim = T::value;
-  static const size_t level   = 4;
+  static const size_t level = 4;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename Entity<GridViewType>::Type EntityType;
@@ -61,7 +61,7 @@ struct GridWalkerTest : public ::testing::Test
     auto test3 = [&] { walker.add(counter).walk(true); };
     list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
-    auto test0        = [&] {
+    auto test0 = [&] {
       const auto& set = gv.grid().leafIndexSet();
       IndexSetPartitioner<GridViewType> partitioner(set);
       EXPECT_EQ(set.size(0), partitioner.partitions());
@@ -87,7 +87,7 @@ struct GridWalkerTest : public ::testing::Test
     size_t filter_count = 0, all_count = 0;
     auto boundaries = [=](const GridViewType&, const IntersectionType& inter) { return inter.boundary(); };
     auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
-    auto all_counter    = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
+    auto all_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
 
     auto on_filter_boundaries = new ApplyOn::FilteredIntersections<GridViewType>(boundaries);
     auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridViewType>();

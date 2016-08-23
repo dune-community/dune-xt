@@ -231,11 +231,11 @@ private:
     // walk the grid
     const auto it_end = gridView.template end<0>();
     for (auto it = gridView.template begin<0>(); it != it_end; ++it) {
-      const auto& entity              = *it;
-      const auto& index               = gridView.indexSet().index(entity);
-      data[index]                     = 0.0;
+      const auto& entity = *it;
+      const auto& index = gridView.indexSet().index(entity);
+      data[index] = 0.0;
       size_t numberOfBoundarySegments = 0;
-      bool isOnBoundary               = false;
+      bool isOnBoundary = false;
       const auto intersectionItEnd = gridView.iend(entity);
       for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != intersectionItEnd; ++intersectionIt) {
         if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
@@ -259,7 +259,8 @@ private:
 
   template <class BoundaryInfoType>
   std::vector<double> generateBoundaryVisualization(const LevelGridViewType& gridView,
-                                                    const BoundaryInfoType& boundaryInfo, const std::string type) const
+                                                    const BoundaryInfoType& boundaryInfo,
+                                                    const std::string type) const
   {
     constexpr DirichletBoundary dirichlet_type{};
     constexpr NeumannBoundary neumann_type{};
@@ -287,7 +288,7 @@ private:
     std::vector<double> data(gridView.indexSet().size(0));
     for (auto&& entity : elements(gridView)) {
       const auto& index = gridView.indexSet().index(entity);
-      data[index]       = double(index);
+      data[index] = double(index);
     } // walk the grid
     return data;
   } // ... generateEntityVisualization(...)

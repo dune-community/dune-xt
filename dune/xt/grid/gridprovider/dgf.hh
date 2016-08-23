@@ -48,7 +48,7 @@ static inline std::string dgf_gridprovider_id()
 static inline Common::Configuration dgf_gridprovider_default_config()
 {
   Common::Configuration config;
-  config["type"]     = dgf_gridprovider_id();
+  config["type"] = dgf_gridprovider_id();
   config["filename"] = "dgf_1d_interval.dgf";
   return config;
 }
@@ -69,7 +69,7 @@ public:
 
   static Common::Configuration default_config()
   {
-    auto cfg        = dgf_gridprovider_default_config();
+    auto cfg = dgf_gridprovider_default_config();
     cfg["filename"] = std::string("dgf_") + Common::to_string(size_t(GridType::dimension)) + "d_interval.dgf";
     return cfg;
   }

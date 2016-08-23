@@ -47,7 +47,7 @@ static inline std::string starcd_gridprovider_id()
 static inline Common::Configuration starcd_gridprovider_default_config()
 {
   Common::Configuration config;
-  config["type"]            = starcd_gridprovider_id();
+  config["type"] = starcd_gridprovider_id();
   config["filename_prefix"] = "grid";
   return config;
 }
@@ -123,10 +123,10 @@ public:
                  "First line of File " << elementFileName << " (" << line << "is not equal to 'PROSTAR_CELL' !");
     if (!std::getline(elementFile, line))
       DUNE_THROW(Dune::IOError, "File " << elementFileName << " is too short!");
-    size_t numberOfElements      = 0;
-    size_t numberOfPrisms        = 0;
-    size_t numberOfCubes         = 0;
-    size_t numberOfVerticesCube  = pow(2, dimDomain);
+    size_t numberOfElements = 0;
+    size_t numberOfPrisms = 0;
+    size_t numberOfCubes = 0;
+    size_t numberOfVerticesCube = pow(2, dimDomain);
     size_t numberOfVerticesPrism = 6;
     std::vector<unsigned int> cubeVertices(numberOfVerticesCube); // unsigned int required by the grid factory
     std::vector<unsigned int> prismVertices(numberOfVerticesPrism);
@@ -141,7 +141,7 @@ public:
       numberOfElements++;
 
       const auto items1 = Dune::XT::Common::tokenize<int>(firstLine, " ");
-      auto items2       = Dune::XT::Common::tokenize<int>(secondLine, " ");
+      auto items2 = Dune::XT::Common::tokenize<int>(secondLine, " ");
 
       // Erase zeros at the beginning of the line
       items2.erase(std::remove(items2.begin(), items2.end(), 0), items2.end());

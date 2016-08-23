@@ -67,7 +67,8 @@ public:
               std::ostream, into which the information is printed
   **/
 template <class IntersectionType>
-void print_intersection(const IntersectionType& intersection, std::ostream& out = std::cout,
+void print_intersection(const IntersectionType& intersection,
+                        std::ostream& out = std::cout,
                         const std::string prefix = "")
 {
   out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
@@ -85,7 +86,8 @@ void print_intersection(const IntersectionType& intersection, std::ostream& out 
  */
 template <class G, class I, class D>
 typename std::enable_if<Dune::Intersection<G, I>::dimension == 2, bool>::type
-contains(const Dune::Intersection<G, I>& intersection, const Dune::FieldVector<D, 2>& global_point,
+contains(const Dune::Intersection<G, I>& intersection,
+         const Dune::FieldVector<D, 2>& global_point,
          const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
 {
   const auto& geometry = intersection.geometry();

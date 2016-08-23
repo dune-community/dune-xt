@@ -124,9 +124,9 @@ public:
       for (; it_current != end; ++it_current) {
         if ((tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
-          tmp_ptr    = nullptr;
-          it_reset   = false;
-          it_last_   = it_current;
+          tmp_ptr = nullptr;
+          it_reset = false;
+          it_last_ = it_current;
           break;
         }
       }
@@ -135,9 +135,9 @@ public:
       for (it_current = begin; it_current != it_last_; ++it_current) {
         if ((tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
-          tmp_ptr    = nullptr;
-          it_reset   = false;
-          it_last_   = it_current;
+          tmp_ptr = nullptr;
+          it_reset = false;
+          it_last_ = it_current;
           break;
         }
       }
@@ -182,8 +182,8 @@ private:
     EntityVectorType ret;
 
     for (const auto& my_ent : range) {
-      const auto my_level    = my_ent.level();
-      const auto& geometry   = my_ent.geometry();
+      const auto my_level = my_ent.level();
+      const auto& geometry = my_ent.geometry();
       const auto& refElement = reference_element(geometry);
       for (const auto& point : quad_points) {
         if (refElement.checkInside(geometry.local(point))) {
@@ -191,7 +191,7 @@ private:
           if (gridview_.grid().maxLevel() <= my_level || gridview_.contains(my_ent)) {
             ret.emplace_back(my_ent);
           } else {
-            const auto h_end   = my_ent.hend(my_level + 1);
+            const auto h_end = my_ent.hend(my_level + 1);
             const auto h_begin = my_ent.hbegin(my_level + 1);
             const auto h_range = boost::make_iterator_range(h_begin, h_end);
             const auto kids = process(QuadpointContainerType(1, point), h_range);

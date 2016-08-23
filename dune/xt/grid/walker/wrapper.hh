@@ -118,7 +118,8 @@ public:
     return where_->apply_on(grid_view, intersection);
   }
 
-  virtual void apply_local(const IntersectionType& intersection, const EntityType& inside_entity,
+  virtual void apply_local(const IntersectionType& intersection,
+                           const EntityType& inside_entity,
                            const EntityType& outside_entity) override final
   {
     wrapped_functor_.apply_local(intersection, inside_entity, outside_entity);
@@ -179,7 +180,8 @@ public:
     grid_walker_.apply_local(entity);
   }
 
-  virtual void apply_local(const IntersectionType& intersection, const EntityType& inside_entity,
+  virtual void apply_local(const IntersectionType& intersection,
+                           const EntityType& inside_entity,
                            const EntityType& outside_entity) override final
   {
     grid_walker_.apply_local(intersection, inside_entity, outside_entity);
@@ -251,7 +253,8 @@ public:
     return where_->apply_on(grid_view, intersection);
   }
 
-  virtual void apply_local(const IntersectionType& intersection, const EntityType& inside_entity,
+  virtual void apply_local(const IntersectionType& intersection,
+                           const EntityType& inside_entity,
                            const EntityType& outside_entity) override final
   {
     lambda_(intersection, inside_entity, outside_entity);

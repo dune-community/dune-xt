@@ -41,7 +41,7 @@ static inline std::string gmsh_gridprovider_id()
 static inline Common::Configuration gmsh_gridprovider_default_config()
 {
   Common::Configuration config;
-  config["type"]     = gmsh_gridprovider_id();
+  config["type"] = gmsh_gridprovider_id();
   config["filename"] = "g.msh";
   return config;
 }

@@ -100,7 +100,9 @@ class PgfEntityFunctorIntersections : public Functor::Codim0And1<GridViewType>
   typedef Functor::Codim0And1<GridViewType> BaseType;
 
 public:
-  PgfEntityFunctorIntersections(const GridViewType& grid_view, std::ostream& file, const std::string color = "black",
+  PgfEntityFunctorIntersections(const GridViewType& grid_view,
+                                std::ostream& file,
+                                const std::string color = "black",
                                 const bool print_entityIndex = false)
     : file_(file)
     , color_(color)
@@ -166,8 +168,10 @@ class PgfEntityFunctorIntersectionsWithShift : public PgfEntityFunctorIntersecti
   typedef PgfEntityFunctorIntersections<GridViewType> BaseType;
 
 public:
-  PgfEntityFunctorIntersectionsWithShift(const GridViewType& grid_view, std::ostream& file,
-                                         const std::string color = "black", const int level = 0,
+  PgfEntityFunctorIntersectionsWithShift(const GridViewType& grid_view,
+                                         std::ostream& file,
+                                         const std::string color = "black",
+                                         const int level = 0,
                                          bool print_entityIndex = false)
     : BaseType(grid_view, file, color, print_entityIndex)
     , level_(level)
@@ -319,7 +323,7 @@ public:
 
       switch (GridType::dimensionworld) {
         case 1: {
-          char buffer[80]     = {'\0'};
+          char buffer[80] = {'\0'};
           const double offset = 0.2;
           const char* format = "\\node[scale=\\gridcoordscale] at (%f,0) {(%d)};\n";
           std::snprintf(buffer, 80, format, minMaxCoord.minima_[0] - offset, minMaxCoord.minima_[0]);
@@ -331,7 +335,7 @@ public:
         case 2:
         case 3: {
           const double offset = 0.2;
-          const char* format  = "\\node[scale=\\gridcoordscale] at (%f,%f) {(%d,%d)};\n";
+          const char* format = "\\node[scale=\\gridcoordscale] at (%f,%f) {(%d,%d)};\n";
           char buffer[100] = {'\0'};
           std::snprintf(buffer,
                         100,

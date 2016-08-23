@@ -58,7 +58,8 @@ public:
   {
   }
 
-  virtual void apply_local(const IntersectionType& /*intersection*/, const EntityType& /*inside_entity*/,
+  virtual void apply_local(const IntersectionType& /*intersection*/,
+                           const EntityType& /*inside_entity*/,
                            const EntityType& /*outside_entity*/) = 0;
 
   virtual void finalize()
@@ -84,7 +85,8 @@ public:
 
   virtual void apply_local(const EntityType& entity) = 0;
 
-  virtual void apply_local(const IntersectionType& /*intersection*/, const EntityType& /*inside_entity*/,
+  virtual void apply_local(const IntersectionType& /*intersection*/,
+                           const EntityType& /*inside_entity*/,
                            const EntityType& /*outside_entity*/) = 0;
 
   virtual void finalize()
@@ -112,7 +114,8 @@ public:
   {
   }
 
-  virtual void apply_local(const IntersectionType& intersection, const EntityType& /*inside_entity*/,
+  virtual void apply_local(const IntersectionType& intersection,
+                           const EntityType& /*inside_entity*/,
                            const EntityType& /*outside_entity*/) override
   {
     if (boundary_info_.type(intersection) == DirichletBoundary())

@@ -27,7 +27,7 @@ using namespace Dune::XT::Grid;
 
 struct GridInfoTest : public ::testing::Test
 {
-  static const size_t griddim     = TESTGRIDDIM;
+  static const size_t griddim = TESTGRIDDIM;
   static const unsigned int level = 1;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef Dimensions<typename GridType::LeafGridView> DimensionsType;
@@ -54,7 +54,7 @@ struct GridInfoTest : public ::testing::Test
 
   void check()
   {
-    const auto gv       = grid_prv.grid().leafGridView();
+    const auto gv = grid_prv.grid().leafGridView();
     const auto entities = gv.size(0);
     check_dimensions(DimensionsType(grid_prv.grid().leafGridView()), entities);
     const auto first_entity = *(grid_prv.grid().leafGridView().template begin<0>());

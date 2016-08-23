@@ -26,10 +26,10 @@ namespace Grid {
 Common::Configuration normalbased_boundaryinfo_default_config()
 {
   Common::Configuration config;
-  config["type"]              = "xt.grid.boundaryinfo.normalbased";
-  config["default"]           = "dirichlet";
+  config["type"] = "xt.grid.boundaryinfo.normalbased";
+  config["default"] = "dirichlet";
   config["compare_tolerance"] = "1e-10";
-  config["neumann.0"]         = "[1 0 0 0]";
+  config["neumann.0"] = "[1 0 0 0]";
   return config;
 }
 
@@ -65,14 +65,14 @@ public:
     const DomainFieldType tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
     // get dirichlet and neumann
     std::vector<WorldType> dirichlets = getVectors(cfg, "dirichlet");
-    std::vector<WorldType> neumanns   = getVectors(cfg, "neumann");
+    std::vector<WorldType> neumanns = getVectors(cfg, "neumann");
     // return
     return Common::make_unique<ThisType>(default_to_dirichlet, dirichlets, neumanns, tol);
   } // ... create(...)
 
   NormalBasedBoundaryInfo(const bool default_to_dirichlet = true,
                           const std::vector<WorldType> dirichlet_normals = std::vector<WorldType>(),
-                          const std::vector<WorldType> neumann_normals   = std::vector<WorldType>(),
+                          const std::vector<WorldType> neumann_normals = std::vector<WorldType>(),
                           const DomainFieldType tol = 1e-10)
     : default_to_dirichlet_(default_to_dirichlet)
     , dirichlet_normals_(dirichlet_normals)
@@ -110,7 +110,7 @@ protected:
   {
     std::vector<WorldType> ret;
     if (config.has_sub(key)) {
-      bool found     = true;
+      bool found = true;
       size_t counter = 0;
       while (found) {
         const std::string localKey = key + "." + Dune::XT::Common::to_string(counter);
