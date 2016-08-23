@@ -12,5 +12,3 @@
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 add_subdirectory(grid/test EXCLUDE_FROM_ALL )
 
-FILE( GLOB_RECURSE _header "${CMAKE_CURRENT_SOURCE_DIR}/*.hh" )
-add_format(${_header})

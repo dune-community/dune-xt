@@ -15,6 +15,5 @@ dune_symlink_to_source_files(FILES gmsh_2d_simplices.msh dgf_1d_interval.dgf dgf
 
 BEGIN_TESTCASES()
 
-add_format(${test_sources})
  
 END_TESTCASES()
