@@ -112,6 +112,18 @@ public:
     return grid_ptr_->maxLevel();
   }
 
+  template <Backends backend>
+  typename Layer<GridType, Layers::level, backend>::type level(const int lvl = 0) const
+  {
+    return Layer<GridType, Layers::level, backend>::create(*grid_ptr_, lvl);
+  }
+
+  template <Backends backend>
+  typename Layer<GridType, Layers::leaf, backend>::type leaf() const
+  {
+    return Layer<GridType, Layers::leaf, backend>::create(*grid_ptr_);
+  }
+
   template <Layers lr, Backends backend>
   typename Layer<GridType, lr, backend>::type layer(const int lvl = 0) const
   {
@@ -170,6 +182,14 @@ public:
   void visualize(const Common::Configuration& boundary_info_cfg, const std::string filename) const
   {
     visualize_with_boundary(boundary_info_cfg, filename);
+  }
+
+  void global_refine(size_t count)
+  {
+    grid().preAdapt();
+    grid().globalRefine(count);
+    grid().postAdapt();
+    grid().loadBalance();
   }
 
 private:
