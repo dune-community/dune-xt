@@ -31,8 +31,6 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-#if HAVE_DUNE_GRID
-
 namespace internal {
 
 // forward
@@ -421,6 +419,12 @@ public:
       ThisType operator++(int)
       {
         return this->operator++();
+      }
+
+      ThisType& operator=(PeriodicIterator other)
+      {
+        std::swap(*this, other);
+        return *this;
       }
 
     private:
@@ -1020,16 +1024,10 @@ public:
   }
 }; // class PeriodicGridView
 
-#else // HAVE_DUNE_GRID
-
-template <class RealGridViewImp>
-class PeriodicGridView
+template <class T, bool bb>
+struct is_grid_view<PeriodicGridView<T, bb>> : public std::true_type
 {
-  static_assert(AlwaysFalse<RealGridViewImp>::value, "You are missing dune-grid!");
 };
-
-#endif // HAVE_DUNE_GRID
-
 
 } // namespace Grid
 } // namespace XT
