@@ -59,5 +59,7 @@ add_subdirectory(doc)
 # enable headercheck
 add_definitions("-DENABLE_HEADERCHECK=1")
 
+add_format(${CMAKE_CURRENT_SOURCE_DIR})
+
 # finalize the dune project, e.g. generating config.h etc.
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
