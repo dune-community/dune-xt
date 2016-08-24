@@ -237,6 +237,27 @@ public:
 }; // class PeriodicIntersections
 
 template <class GridViewImp>
+class PeriodicIntersectionsPrimally : public WhichIntersection<GridViewImp>
+{
+  typedef WhichIntersection<GridViewImp> BaseType;
+
+public:
+  typedef typename BaseType::GridViewType GridViewType;
+  typedef typename BaseType::IntersectionType IntersectionType;
+
+  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
+  {
+    if (intersection.neighbor() && intersection.boundary()) {
+      const auto insideEntityPtr = intersection.inside();
+      const auto outsideNeighborPtr = intersection.outside();
+      return grid_view.indexSet().index(*insideEntityPtr) < grid_view.indexSet().index(*outsideNeighborPtr);
+    } else {
+      return false;
+    }
+  }
+}; // class PeriodicIntersectionsPrimally
+
+template <class GridViewImp>
 class FilteredIntersections : public WhichIntersection<GridViewImp>
 {
   typedef WhichIntersection<GridViewImp> BaseType;
