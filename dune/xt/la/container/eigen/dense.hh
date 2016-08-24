@@ -68,6 +68,8 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef EigenDenseVector<ScalarType> derived_type;
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, 1> BackendType;
+  static const constexpr Backends dense_matrix_type = Backends::eigen_dense;
+  static const constexpr Backends sparse_matrix_type = Backends::eigen_sparse;
 }; // class EigenDenseVectorTraits
 
 /**
@@ -83,6 +85,8 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef EigenMappedDenseVector<ScalarType> derived_type;
   typedef Eigen::Map<PlainBackendType> BackendType;
+  static const constexpr Backends dense_matrix_type = Backends::eigen_dense;
+  static const constexpr Backends sparse_matrix_type = Backends::eigen_sparse;
 }; // class EigenMappedDenseVectorTraits
 
 /**
@@ -96,6 +100,7 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef EigenDenseMatrix<ScalarType> derived_type;
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
+  static const constexpr Backends vector_type = Backends::eigen_dense;
 }; // class EigenDenseMatrixTraits
 
 } // namespace internal

@@ -76,7 +76,7 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonSparseMatrix<ScalarType> derived_type;
   typedef std::vector<ScalarType> BackendType;
-  static const constexpr ChooseBackend vector_type = ChooseBackend::common_dense;
+  static const constexpr Backends vector_type = Backends::common_dense;
 };
 
 } // namespace internal
