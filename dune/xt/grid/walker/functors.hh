@@ -42,6 +42,24 @@ public:
   }
 }; // class Codim0
 
+template <class GridViewImp, class ReturnImp>
+class Codim0Return : public Codim0<GridViewImp>
+{
+  typedef Codim0<GridViewImp> BaseType;
+
+public:
+  typedef ReturnImp ReturnType;
+  using typename BaseType::EntityType;
+
+  virtual ~Codim0Return()
+  {
+  }
+
+  virtual ReturnType compute_locally(const EntityType& entity) = 0;
+
+  virtual ReturnType result() const = 0;
+}; // class Codim0ReturnFunctor
+
 template <class GridViewImp>
 class Codim1
 {

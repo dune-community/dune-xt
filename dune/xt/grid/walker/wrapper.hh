@@ -35,6 +35,20 @@ public:
   virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const = 0;
 };
 
+template <class GridViewImp, class ReturnType>
+class Codim0ReturnObject : public Functor::Codim0Return<GridViewImp, ReturnType>
+{
+  typedef Functor::Codim0Return<GridViewImp, ReturnType> BaseType;
+
+public:
+  using typename BaseType::GridViewType;
+  using typename BaseType::EntityType;
+
+  virtual ~Codim0ReturnObject() = default;
+
+  virtual bool apply_on(const GridViewType& grid_view, const EntityType& entity) const = 0;
+};
+
 template <class GridViewType, class Codim0FunctorType>
 class Codim0FunctorWrapper : public Codim0Object<GridViewType>
 {
