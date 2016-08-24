@@ -37,14 +37,15 @@ protected:
   typedef typename FunctionImp::DomainFieldType DomainFieldType;
   static const size_t dimDomain = FunctionImp::dimDomain;
   typedef typename FunctionImp::RangeFieldType RangeFieldType;
-  static const size_t dimRange     = FunctionImp::dimRange;
+  static const size_t dimRange = FunctionImp::dimRange;
   static const size_t dimRangeCols = FunctionImp::dimRangeCols;
   typedef typename FunctionImp::LocalfunctionType LocalfunctionType;
   typedef typename FunctionImp::DomainType DomainType;
   typedef typename FunctionImp::RangeType RangeType;
   typedef typename FunctionImp::JacobianRangeType JacobianRangeType;
-  typedef Functions::LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange,
-                                                  dimRangeCols> InterfaceType;
+  typedef Functions::
+      LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+          InterfaceType;
 
   static void static_interface_check()
   {
@@ -74,8 +75,8 @@ protected:
   {
     for (auto&& entity : elements(grid.leafGridView()))
       std::unique_ptr<LocalfunctionType> local_func = func.local_function(entity);
-    std::string tp                                  = func.type();
-    std::string nm                                  = func.name();
+    std::string tp = func.type();
+    std::string nm = func.name();
   } // ... dynamic_interface_check(...)
 
 }; // class FunctionTest

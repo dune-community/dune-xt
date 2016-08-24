@@ -67,8 +67,8 @@ public:
   {
     if (this != &_other) {
       cleanup();
-      variable_    = "";
-      variables_   = std::vector<std::string>();
+      variable_ = "";
+      variables_ = std::vector<std::string>();
       expressions_ = std::vector<std::string>();
       setup(_other.variable(), _other.expression());
     }
@@ -150,7 +150,8 @@ public:
       ret[ii] = op_[ii]->Val();
   }
 
-  void report(const std::string _name = "function.mathexpressionbase", std::ostream& stream = std::cout,
+  void report(const std::string _name = "function.mathexpressionbase",
+              std::ostream& stream = std::cout,
               const std::string& _prefix = "") const
   {
     const std::string tmp = _name + "(" + variable() + ") = ";
@@ -190,8 +191,8 @@ private:
     }
     // create expressions
     for (size_t ii = 0; ii < dimDomain; ++ii) {
-      arg_[ii]      = new DomainFieldType(0.0);
-      var_arg_[ii]  = new RVar(variables_[ii].c_str(), arg_[ii]);
+      arg_[ii] = new DomainFieldType(0.0);
+      var_arg_[ii] = new RVar(variables_[ii].c_str(), arg_[ii]);
       vararray_[ii] = var_arg_[ii];
     }
     for (size_t ii = 0; ii < dimRange; ++ii) {

@@ -67,10 +67,10 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["lower_left"]     = "[0.0 0.0 0.0]";
-    config["upper_right"]    = "[1.0 1.0 1.0]";
+    config["lower_left"] = "[0.0 0.0 0.0]";
+    config["upper_right"] = "[1.0 1.0 1.0]";
     config["boundary_layer"] = "[1e-1 1e-1 1e-1]";
-    config["value"]          = "1.0";
+    config["value"] = "1.0";
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
@@ -85,7 +85,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     return Common::make_unique<ThisType>(cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
                                          cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
@@ -94,7 +94,8 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  FlatTopFunction(const StuffDomainType& lower_left, const StuffDomainType& upper_right,
+  FlatTopFunction(const StuffDomainType& lower_left,
+                  const StuffDomainType& upper_right,
                   const StuffDomainType& boundary_layer,
                   const StuffRangeType& value = default_config().get<StuffRangeType>("value"),
                   const std::string name_in = default_config().get<std::string>("name"))
@@ -134,7 +135,7 @@ public:
   {
     ret = value_;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
-      const auto& left  = lower_left_[dd];
+      const auto& left = lower_left_[dd];
       const auto& right = upper_right_[dd];
       const auto& point = xx[dd];
       const auto& delta = boundary_layer_[dd];

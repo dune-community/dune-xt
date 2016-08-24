@@ -114,7 +114,11 @@ struct Get<R, 1, 1>
 
 } // namespace internal
 
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class ConstantFunction
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -158,7 +162,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     return Common::make_unique<ThisType>(cfg.get("value", default_cfg.get<RangeType>("value")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));

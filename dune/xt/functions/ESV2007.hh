@@ -80,7 +80,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<size_t>("integration_order")),
@@ -127,11 +127,11 @@ public:
    */
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
   {
-    const DomainFieldType pre   = -0.25 * M_PIl * M_PIl * M_PIl;
+    const DomainFieldType pre = -0.25 * M_PIl * M_PIl * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
     const DomainFieldType y_arg = M_PI_2l * xx[1];
-    ret[0][0]                   = pre * sin(x_arg) * cos(y_arg);
-    ret[0][1]                   = pre * cos(x_arg) * sin(y_arg);
+    ret[0][0] = pre * sin(x_arg) * cos(y_arg);
+    ret[0][1] = pre * cos(x_arg) * sin(y_arg);
   } // ... jacobian(...)
 
 private:
@@ -186,7 +186,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     // create
     return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<size_t>("integration_order")),
@@ -233,11 +233,11 @@ public:
    */
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
   {
-    const DomainFieldType pre   = -0.5 * M_PIl;
+    const DomainFieldType pre = -0.5 * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
     const DomainFieldType y_arg = M_PI_2l * xx[1];
-    ret[0][0]                   = pre * sin(x_arg) * cos(y_arg);
-    ret[0][1]                   = pre * cos(x_arg) * sin(y_arg);
+    ret[0][0] = pre * sin(x_arg) * cos(y_arg);
+    ret[0][1] = pre * cos(x_arg) * sin(y_arg);
   } // ... jacobian(...)
 
 private:
@@ -249,9 +249,12 @@ template <class DiffusionFactorType, class DiffusionTensorType = void>
 class CutoffFunction;
 
 template <class DiffusionType>
-class CutoffFunction<DiffusionType, void>
-    : public LocalizableFunctionInterface<typename DiffusionType::EntityType, typename DiffusionType::DomainFieldType,
-                                          DiffusionType::dimDomain, typename DiffusionType::RangeFieldType, 1, 1>
+class CutoffFunction<DiffusionType, void> : public LocalizableFunctionInterface<typename DiffusionType::EntityType,
+                                                                                typename DiffusionType::DomainFieldType,
+                                                                                DiffusionType::dimDomain,
+                                                                                typename DiffusionType::RangeFieldType,
+                                                                                1,
+                                                                                1>
 {
   static_assert(is_localizable_function<DiffusionType>::value,
                 "DiffusionType has to be tagged as a LocalizableFunction!");
@@ -274,7 +277,7 @@ class CutoffFunction<DiffusionType, void>
     typedef typename BaseType::DomainType DomainType;
 
     typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const size_t dimRange     = BaseType::dimRange;
+    static const size_t dimRange = BaseType::dimRange;
     static const size_t dimRangeCols = BaseType::dimRangeCols;
     typedef typename BaseType::RangeType RangeType;
 
@@ -309,7 +312,7 @@ class CutoffFunction<DiffusionType, void>
                                                                                                           ent);
       assert(min_eigen_value > 0.0);
       const DomainFieldType hh = compute_diameter_of_(ent);
-      value_                   = (poincare_constant * hh * hh) / min_eigen_value;
+      value_ = (poincare_constant * hh * hh) / min_eigen_value;
     }
 
     Localfunction(const Localfunction& /*other*/) = delete;
@@ -341,8 +344,8 @@ class CutoffFunction<DiffusionType, void>
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
         for (auto dd : Common::value_range(cc + 1, ent.template count<dimDomain>())) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
-          const auto diff         = vertex - other_vertex;
-          ret                     = std::max(ret, diff.two_norm());
+          const auto diff = vertex - other_vertex;
+          ret = std::max(ret, diff.two_norm());
         }
       }
       return ret;
@@ -361,7 +364,8 @@ public:
     return BaseType::static_id() + ".ESV2007.cutoff";
   }
 
-  CutoffFunction(const DiffusionType& diffusion, const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
+  CutoffFunction(const DiffusionType& diffusion,
+                 const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
                  const std::string nm = static_id())
     : diffusion_(diffusion)
     , poincare_constant_(poincare_constant)
@@ -390,10 +394,12 @@ private:
 }; // class Cutoff
 
 template <class DiffusionFactorType, class DiffusionTensorType>
-class CutoffFunction
-    : public LocalizableFunctionInterface<typename DiffusionFactorType::EntityType,
-                                          typename DiffusionFactorType::DomainFieldType, DiffusionFactorType::dimDomain,
-                                          typename DiffusionFactorType::RangeFieldType, 1, 1>
+class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFactorType::EntityType,
+                                                           typename DiffusionFactorType::DomainFieldType,
+                                                           DiffusionFactorType::dimDomain,
+                                                           typename DiffusionFactorType::RangeFieldType,
+                                                           1,
+                                                           1>
 {
   static_assert(is_localizable_function<DiffusionFactorType>::value,
                 "DiffusionFactorType has to be tagged as a LocalizableFunction!");
@@ -429,7 +435,7 @@ class CutoffFunction
     typedef typename BaseType::DomainType DomainType;
 
     typedef typename BaseType::RangeFieldType RangeFieldType;
-    static const size_t dimRange     = BaseType::dimRange;
+    static const size_t dimRange = BaseType::dimRange;
     static const size_t dimRangeCols = BaseType::dimRangeCols;
     typedef typename BaseType::RangeType RangeType;
 
@@ -453,7 +459,7 @@ class CutoffFunction
       static RangeFieldType min_of(const DF& diffusion_factor, const EntityType& ent)
       {
         typename DF::RangeType tmp_value(0);
-        RangeFieldType minimum            = std::numeric_limits<RangeFieldType>::max();
+        RangeFieldType minimum = std::numeric_limits<RangeFieldType>::max();
         const auto local_diffusion_factor = diffusion_factor.local_function(ent);
         const size_t ord = local_diffusion_factor->order();
         const auto& quadrature =
@@ -507,8 +513,10 @@ class CutoffFunction
     }; // class Compute< ..., d, d >
 
   public:
-    Localfunction(const EntityType& ent, const DiffusionFactorType& diffusion_factor,
-                  const DiffusionTensorType& diffusion_tensor, const RangeFieldType poincare_constant)
+    Localfunction(const EntityType& ent,
+                  const DiffusionFactorType& diffusion_factor,
+                  const DiffusionTensorType& diffusion_tensor,
+                  const RangeFieldType poincare_constant)
       : BaseType(ent)
       , value_(0)
     {
@@ -523,7 +531,7 @@ class CutoffFunction
       assert(min_diffusion_factor > RangeFieldType(0));
       assert(min_eigen_value_diffusion_tensor > RangeFieldType(0));
       const DomainFieldType hh = compute_diameter_of_(ent);
-      value_                   = (poincare_constant * hh * hh) / (min_diffusion_factor * min_eigen_value_diffusion_tensor);
+      value_ = (poincare_constant * hh * hh) / (min_diffusion_factor * min_eigen_value_diffusion_tensor);
     } // Localfunction(...)
 
     Localfunction(const Localfunction& /*other*/) = delete;
@@ -555,8 +563,8 @@ class CutoffFunction
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
         for (auto dd : Common::value_range(cc + 1, ent.template count<dimDomain>())) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
-          const auto diff         = vertex - other_vertex;
-          ret                     = std::max(ret, diff.two_norm());
+          const auto diff = vertex - other_vertex;
+          ret = std::max(ret, diff.two_norm());
         }
       }
       return ret;
@@ -574,7 +582,7 @@ public:
   typedef typename BaseType::DomainType DomainType;
 
   typedef typename BaseType::RangeFieldType RangeFieldType;
-  static const size_t dimRange     = BaseType::dimRange;
+  static const size_t dimRange = BaseType::dimRange;
   static const size_t dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType RangeType;
 
@@ -583,8 +591,10 @@ public:
     return BaseType::static_id() + ".ESV2007.cutoff";
   }
 
-  CutoffFunction(const DiffusionFactorType& diffusion_factor, const DiffusionTensorType& diffusion_tensor,
-                 const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl), const std::string nm = static_id())
+  CutoffFunction(const DiffusionFactorType& diffusion_factor,
+                 const DiffusionTensorType& diffusion_tensor,
+                 const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
+                 const std::string nm = static_id())
     : diffusion_factor_(diffusion_factor)
     , diffusion_tensor_(diffusion_tensor)
     , poincare_constant_(poincare_constant)

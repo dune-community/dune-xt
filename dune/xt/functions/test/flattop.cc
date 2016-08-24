@@ -43,7 +43,7 @@ class FlatTopFunctionType
   typedef typename G::ctype D;
   static const size_t d = G::dimension;
   typedef double R;
-  static const size_t r  = 1;
+  static const size_t r = 1;
   static const size_t rC = 1;
 
 public:
@@ -113,12 +113,12 @@ TYPED_TEST(FlatTopFunctionTest, evaluate_check)
   typename TestFixture::FunctionType func(left, right, delta, value, "bar");
   func.visualize(grid_ptr->leafGridView(), "dim_" + Common::to_string(int(TypeParam::value)));
   for (auto&& entity : elements(grid_ptr->leafGridView())) {
-    const auto local_func  = func.local_function(entity);
+    const auto local_func = func.local_function(entity);
     const auto& quadrature = QuadratureRules<double, TypeParam::value>::rule(
         entity.type(), boost::numeric_cast<int>(local_func->order() + 2));
     for (const auto& element : quadrature) {
       const auto& local_point = element.position();
-      const auto point        = entity.geometry().global(local_point);
+      const auto point = entity.geometry().global(local_point);
       const auto val = local_func->evaluate(local_point);
       this->check(point, val, left, right, delta, value);
     }

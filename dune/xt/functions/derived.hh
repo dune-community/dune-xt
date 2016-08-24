@@ -58,17 +58,17 @@ private:
     class Dimension<d, d, 1, Derivative::divergence, anything>
     {
     public:
-      static const size_t r  = 1;
+      static const size_t r = 1;
       static const size_t rC = 1;
     };
 
   public:
-    static const size_t r  = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::r;
+    static const size_t r = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::r;
     static const size_t rC = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::rC;
   }; // class SelectDerived
 
 public:
-  static const size_t r  = Choose<FunctionType>::r;
+  static const size_t r = Choose<FunctionType>::r;
   static const size_t rC = Choose<FunctionType>::rC;
 
   typedef typename FunctionType::LocalfunctionType FunctionLocalfunctionType;
@@ -106,8 +106,8 @@ private:
         ret[0] += tmp_jac[dd][dd];
     } // ... evaluate(...)
 
-    static void jacobian(const FunctionLocalfunctionType& /*func_local*/, const DomainType& /*xx*/,
-                         JacobianRangeType& /*ret*/)
+    static void
+    jacobian(const FunctionLocalfunctionType& /*func_local*/, const DomainType& /*xx*/, JacobianRangeType& /*ret*/)
     {
       DUNE_THROW(NotImplemented, "for divergence!");
     }
@@ -136,16 +136,20 @@ public:
 }; // class SelectDerived
 
 template <class FunctionType, Derivative derivative>
-class DerivedLocalFunction
-    : public LocalfunctionInterface<
-          typename SelectDerived<FunctionType, derivative>::E, typename SelectDerived<FunctionType, derivative>::D,
-          SelectDerived<FunctionType, derivative>::d, typename SelectDerived<FunctionType, derivative>::R,
-          SelectDerived<FunctionType, derivative>::r, SelectDerived<FunctionType, derivative>::rC>
+class DerivedLocalFunction : public LocalfunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                                           typename SelectDerived<FunctionType, derivative>::D,
+                                                           SelectDerived<FunctionType, derivative>::d,
+                                                           typename SelectDerived<FunctionType, derivative>::R,
+                                                           SelectDerived<FunctionType, derivative>::r,
+                                                           SelectDerived<FunctionType, derivative>::rC>
 {
-  typedef LocalfunctionInterface<
-      typename SelectDerived<FunctionType, derivative>::E, typename SelectDerived<FunctionType, derivative>::D,
-      SelectDerived<FunctionType, derivative>::d, typename SelectDerived<FunctionType, derivative>::R,
-      SelectDerived<FunctionType, derivative>::r, SelectDerived<FunctionType, derivative>::rC> BaseType;
+  typedef LocalfunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                 typename SelectDerived<FunctionType, derivative>::D,
+                                 SelectDerived<FunctionType, derivative>::d,
+                                 typename SelectDerived<FunctionType, derivative>::R,
+                                 SelectDerived<FunctionType, derivative>::r,
+                                 SelectDerived<FunctionType, derivative>::rC>
+      BaseType;
 
   typedef SelectDerived<FunctionType, derivative> Select;
 
@@ -181,16 +185,20 @@ private:
 }; // class DerivedLocalFunction
 
 template <class FunctionType, Derivative derivative>
-class Derived
-    : public LocalizableFunctionInterface<
-          typename SelectDerived<FunctionType, derivative>::E, typename SelectDerived<FunctionType, derivative>::D,
-          SelectDerived<FunctionType, derivative>::d, typename SelectDerived<FunctionType, derivative>::R,
-          SelectDerived<FunctionType, derivative>::r, SelectDerived<FunctionType, derivative>::rC>
+class Derived : public LocalizableFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                                    typename SelectDerived<FunctionType, derivative>::D,
+                                                    SelectDerived<FunctionType, derivative>::d,
+                                                    typename SelectDerived<FunctionType, derivative>::R,
+                                                    SelectDerived<FunctionType, derivative>::r,
+                                                    SelectDerived<FunctionType, derivative>::rC>
 {
-  typedef LocalizableFunctionInterface<
-      typename SelectDerived<FunctionType, derivative>::E, typename SelectDerived<FunctionType, derivative>::D,
-      SelectDerived<FunctionType, derivative>::d, typename SelectDerived<FunctionType, derivative>::R,
-      SelectDerived<FunctionType, derivative>::r, SelectDerived<FunctionType, derivative>::rC> BaseType;
+  typedef LocalizableFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                       typename SelectDerived<FunctionType, derivative>::D,
+                                       SelectDerived<FunctionType, derivative>::d,
+                                       typename SelectDerived<FunctionType, derivative>::R,
+                                       SelectDerived<FunctionType, derivative>::r,
+                                       SelectDerived<FunctionType, derivative>::rC>
+      BaseType;
   typedef Common::ConstStorageProvider<FunctionType> FunctionStorageType;
   typedef Derived<FunctionType, derivative> ThisType;
 
@@ -206,9 +214,7 @@ public:
 
   Derived(const std::shared_ptr<const FunctionType> func, const std::string nm = "")
     : func_(Common::make_unique<FunctionStorageType>(func))
-    , name_(nm.empty()
-                ? SelectDerived<FunctionType, derivative>::type() + " of '" + func_->access().name() + "'"
-                : nm)
+    , name_(nm.empty() ? SelectDerived<FunctionType, derivative>::type() + " of '" + func_->access().name() + "'" : nm)
   {
   }
 

@@ -83,7 +83,7 @@ public:
     const int offset = permIntervalls_[0] + permIntervalls_[1] * num_elements[0]
                        + permIntervalls_[2] * num_elements[1] * num_elements[0];
     for (size_t dim = 0; dim < dim_domain; ++dim) {
-      const auto idx      = offset + dim * 1122000;
+      const auto idx = offset + dim * 1122000;
       diffusion[dim][dim] = permeability_[idx];
     }
   }
@@ -102,7 +102,7 @@ private:
       return;
     }
     file >> val;
-    int counter   = 0;
+    int counter = 0;
     permeability_ = new double[3366000];
     while (!file.eof()) {
       // keep reading until end-of-file

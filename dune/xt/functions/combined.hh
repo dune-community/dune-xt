@@ -69,7 +69,7 @@ private:
     class Dimension<r_in, r_in, rC_in, rC_in, Combination::difference, anything>
     {
     public:
-      static const size_t r  = r_in;
+      static const size_t r = r_in;
       static const size_t rC = rC_in;
     };
 
@@ -77,7 +77,7 @@ private:
     class Dimension<r_in, r_in, rC_in, rC_in, Combination::sum, anything>
     {
     public:
-      static const size_t r  = r_in;
+      static const size_t r = r_in;
       static const size_t rC = rC_in;
     };
 
@@ -85,17 +85,17 @@ private:
     class Dimension<1, r_in, 1, rC_in, Combination::product, anything>
     {
     public:
-      static const size_t r  = r_in;
+      static const size_t r = r_in;
       static const size_t rC = rC_in;
     };
 
   public:
-    static const size_t r  = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::r;
+    static const size_t r = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::r;
     static const size_t rC = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::rC;
   }; // class Choose
 
 public:
-  static const size_t r  = Choose<LeftType, RightType>::r;
+  static const size_t r = Choose<LeftType, RightType>::r;
   static const size_t rC = Choose<LeftType, RightType>::rC;
 
   typedef typename LeftType::LocalfunctionType LeftLocalfunctionType;
@@ -125,16 +125,22 @@ private:
       return std::max(left_order, right_order);
     }
 
-    static void evaluate(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
-                         const DomainType& xx, RangeType& ret, RangeType& tmp_ret)
+    static void evaluate(const LeftLocalfunctionType& left_local,
+                         const RightLocalfunctionType& right_local,
+                         const DomainType& xx,
+                         RangeType& ret,
+                         RangeType& tmp_ret)
     {
       left_local.evaluate(xx, ret);
       right_local.evaluate(xx, tmp_ret);
       ret -= tmp_ret;
     } // ... evaluate(...)
 
-    static void jacobian(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
-                         const DomainType& xx, JacobianRangeType& ret, JacobianRangeType& tmp_ret)
+    static void jacobian(const LeftLocalfunctionType& left_local,
+                         const RightLocalfunctionType& right_local,
+                         const DomainType& xx,
+                         JacobianRangeType& ret,
+                         JacobianRangeType& tmp_ret)
     {
       left_local.jacobian(xx, ret);
       right_local.jacobian(xx, tmp_ret);
@@ -156,16 +162,22 @@ private:
       return std::max(left_order, right_order);
     }
 
-    static void evaluate(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
-                         const DomainType& xx, RangeType& ret, RangeType& tmp_ret)
+    static void evaluate(const LeftLocalfunctionType& left_local,
+                         const RightLocalfunctionType& right_local,
+                         const DomainType& xx,
+                         RangeType& ret,
+                         RangeType& tmp_ret)
     {
       left_local.evaluate(xx, ret);
       right_local.evaluate(xx, tmp_ret);
       ret += tmp_ret;
     } // ... evaluate(...)
 
-    static void jacobian(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
-                         const DomainType& xx, JacobianRangeType& ret, JacobianRangeType& tmp_ret)
+    static void jacobian(const LeftLocalfunctionType& left_local,
+                         const RightLocalfunctionType& right_local,
+                         const DomainType& xx,
+                         JacobianRangeType& ret,
+                         JacobianRangeType& tmp_ret)
     {
       left_local.jacobian(xx, ret);
       right_local.jacobian(xx, tmp_ret);
@@ -188,16 +200,22 @@ private:
       return left_order + right_order;
     }
 
-    static void evaluate(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
-                         const DomainType& xx, RangeType& ret, RangeType& /*tmp_ret*/)
+    static void evaluate(const LeftLocalfunctionType& left_local,
+                         const RightLocalfunctionType& right_local,
+                         const DomainType& xx,
+                         RangeType& ret,
+                         RangeType& /*tmp_ret*/)
     {
       auto left_value = left_local.evaluate(xx);
       right_local.evaluate(xx, ret);
       ret *= left_value;
     } // ... evaluate(...)
 
-    static void jacobian(const LeftLocalfunctionType& /*left_local*/, const RightLocalfunctionType& /*right_local*/,
-                         const DomainType& /*xx*/, JacobianRangeType& /*ret*/, JacobianRangeType& /*tmp_ret*/)
+    static void jacobian(const LeftLocalfunctionType& /*left_local*/,
+                         const RightLocalfunctionType& /*right_local*/,
+                         const DomainType& /*xx*/,
+                         JacobianRangeType& /*ret*/,
+                         JacobianRangeType& /*tmp_ret*/)
     {
       DUNE_THROW(NotImplemented, "If you need this, implement it!");
     }
@@ -214,14 +232,20 @@ public:
     return Call<comb>::order(left_order, right_order);
   }
 
-  static void evaluate(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
-                       const DomainType& xx, RangeType& ret, RangeType& tmp_ret)
+  static void evaluate(const LeftLocalfunctionType& left_local,
+                       const RightLocalfunctionType& right_local,
+                       const DomainType& xx,
+                       RangeType& ret,
+                       RangeType& tmp_ret)
   {
     Call<comb>::evaluate(left_local, right_local, xx, ret, tmp_ret);
   }
 
-  static void jacobian(const LeftLocalfunctionType& left_local, const RightLocalfunctionType& right_local,
-                       const DomainType& xx, JacobianRangeType& ret, JacobianRangeType& tmp_ret)
+  static void jacobian(const LeftLocalfunctionType& left_local,
+                       const RightLocalfunctionType& right_local,
+                       const DomainType& xx,
+                       JacobianRangeType& ret,
+                       JacobianRangeType& tmp_ret)
   {
     Call<comb>::jacobian(left_local, right_local, xx, ret, tmp_ret);
   }
@@ -233,16 +257,20 @@ public:
  * \note Most likely you do not want to use this class directly, but Combined.
  */
 template <class LeftType, class RightType, Combination type>
-class CombinedLocalFunction
-    : public LocalfunctionInterface<
-          typename SelectCombined<LeftType, RightType, type>::E, typename SelectCombined<LeftType, RightType, type>::D,
-          SelectCombined<LeftType, RightType, type>::d, typename SelectCombined<LeftType, RightType, type>::R,
-          SelectCombined<LeftType, RightType, type>::r, SelectCombined<LeftType, RightType, type>::rC>
+class CombinedLocalFunction : public LocalfunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
+                                                            typename SelectCombined<LeftType, RightType, type>::D,
+                                                            SelectCombined<LeftType, RightType, type>::d,
+                                                            typename SelectCombined<LeftType, RightType, type>::R,
+                                                            SelectCombined<LeftType, RightType, type>::r,
+                                                            SelectCombined<LeftType, RightType, type>::rC>
 {
-  typedef LocalfunctionInterface<
-      typename SelectCombined<LeftType, RightType, type>::E, typename SelectCombined<LeftType, RightType, type>::D,
-      SelectCombined<LeftType, RightType, type>::d, typename SelectCombined<LeftType, RightType, type>::R,
-      SelectCombined<LeftType, RightType, type>::r, SelectCombined<LeftType, RightType, type>::rC> BaseType;
+  typedef LocalfunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
+                                 typename SelectCombined<LeftType, RightType, type>::D,
+                                 SelectCombined<LeftType, RightType, type>::d,
+                                 typename SelectCombined<LeftType, RightType, type>::R,
+                                 SelectCombined<LeftType, RightType, type>::r,
+                                 SelectCombined<LeftType, RightType, type>::rC>
+      BaseType;
 
   typedef SelectCombined<LeftType, RightType, type> Select;
 
@@ -328,16 +356,20 @@ Difference< ConstantType, ConstantType > stupid_difference()
  * \note  Most likely you do not want to use this class diretly, but one of Difference, Sum or Product.
  */
 template <class LeftType, class RightType, Combination comb>
-class Combined
-    : public LocalizableFunctionInterface<
-          typename SelectCombined<LeftType, RightType, comb>::E, typename SelectCombined<LeftType, RightType, comb>::D,
-          SelectCombined<LeftType, RightType, comb>::d, typename SelectCombined<LeftType, RightType, comb>::R,
-          SelectCombined<LeftType, RightType, comb>::r, SelectCombined<LeftType, RightType, comb>::rC>
+class Combined : public LocalizableFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
+                                                     typename SelectCombined<LeftType, RightType, comb>::D,
+                                                     SelectCombined<LeftType, RightType, comb>::d,
+                                                     typename SelectCombined<LeftType, RightType, comb>::R,
+                                                     SelectCombined<LeftType, RightType, comb>::r,
+                                                     SelectCombined<LeftType, RightType, comb>::rC>
 {
-  typedef LocalizableFunctionInterface<
-      typename SelectCombined<LeftType, RightType, comb>::E, typename SelectCombined<LeftType, RightType, comb>::D,
-      SelectCombined<LeftType, RightType, comb>::d, typename SelectCombined<LeftType, RightType, comb>::R,
-      SelectCombined<LeftType, RightType, comb>::r, SelectCombined<LeftType, RightType, comb>::rC> BaseType;
+  typedef LocalizableFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
+                                       typename SelectCombined<LeftType, RightType, comb>::D,
+                                       SelectCombined<LeftType, RightType, comb>::d,
+                                       typename SelectCombined<LeftType, RightType, comb>::R,
+                                       SelectCombined<LeftType, RightType, comb>::r,
+                                       SelectCombined<LeftType, RightType, comb>::rC>
+      BaseType;
   typedef Common::ConstStorageProvider<LeftType> LeftStorageType;
   typedef Common::ConstStorageProvider<RightType> RightStorageType;
   typedef Combined<LeftType, RightType, comb> ThisType;
@@ -356,13 +388,15 @@ public:
   {
   }
 
-  Combined(const std::shared_ptr<const LeftType> left, const std::shared_ptr<const RightType> right,
+  Combined(const std::shared_ptr<const LeftType> left,
+           const std::shared_ptr<const RightType> right,
            const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
     , name_(nm.empty()
-                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
-                      + "' and '" + right_->access().name() + "'"
+                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name() + "' and '"
+                      + right_->access().name()
+                      + "'"
                 : nm)
   {
   }
@@ -468,8 +502,8 @@ std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(const T1& left, cons
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right,
-                                                            Args&&... args)
+std::shared_ptr<DifferenceFunction<T1, T2>>
+make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
   return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
@@ -493,8 +527,8 @@ std::shared_ptr<ProductFunction<T1, T2>> make_product(const T1& left, const T2& 
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<ProductFunction<T1, T2>> make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right,
-                                                      Args&&... args)
+std::shared_ptr<ProductFunction<T1, T2>>
+make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
   return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }

@@ -52,7 +52,11 @@ struct Ellipsoid
   }
 };
 
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class RandomEllipsoidsFunction
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -142,7 +146,7 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["lower_left"]  = "[0.0 0.0 0.0]";
+    config["lower_left"] = "[0.0 0.0 0.0]";
     config["upper_right"] = "[1.0 1.0 1.0]";
     config["name"] = static_id();
     if (sub_name.empty())
@@ -158,14 +162,15 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     DUNE_THROW(NotImplemented, "");
   } // ... create(...)
 
   RandomEllipsoidsFunction(const Common::FieldVector<DomainFieldType, dimDomain>& lowerLeft,
                            const Common::FieldVector<DomainFieldType, dimDomain>& upperRight,
-                           const Common::Configuration& ellipsoid_cfg, const std::string nm = static_id())
+                           const Common::Configuration& ellipsoid_cfg,
+                           const std::string nm = static_id())
     : lowerLeft_(lowerLeft)
     , upperRight_(upperRight)
     , name_(nm)
@@ -173,14 +178,14 @@ public:
   {
     typedef unsigned long UL;
     const UL level_0_count = ellipsoid_cfg.get("ellipsoids.count", 10);
-    const UL max_depth     = ellipsoid_cfg.get("ellipsoids.recursion_depth", 1);
-    const UL children      = ellipsoid_cfg.get<UL>("ellipsoids.children", 3u); //, ValidateLess<UL>(0));
+    const UL max_depth = ellipsoid_cfg.get("ellipsoids.recursion_depth", 1);
+    const UL children = ellipsoid_cfg.get<UL>("ellipsoids.children", 3u); //, ValidateLess<UL>(0));
     const UL total_count = level_0_count + level_0_count * std::pow(children, max_depth + 1);
     ellipsoids_.resize(level_0_count);
     ellipsoids_.reserve(total_count);
-    const auto seed               = DomainFieldType(ellipsoid_cfg.get("ellipsoids.seed", 0));
-    const auto min_radius         = ellipsoid_cfg.get("ellipsoids.min_radius", 0.01);
-    const auto max_radius         = ellipsoid_cfg.get("ellipsoids.max_radius", 0.02);
+    const auto seed = DomainFieldType(ellipsoid_cfg.get("ellipsoids.seed", 0));
+    const auto min_radius = ellipsoid_cfg.get("ellipsoids.min_radius", 0.01);
+    const auto max_radius = ellipsoid_cfg.get("ellipsoids.max_radius", 0.02);
     const auto child_displacement = ellipsoid_cfg.get("ellipsoids.max_child_displacement", max_radius);
     typedef Common::DefaultRNG<DomainFieldType> RNG;
     RNG center_rng(0, 1, seed);
@@ -200,9 +205,9 @@ public:
         return;
       for (const auto unused_counter : Common::value_range(children)) {
         EllipsoidType child = parent;
-        const double scale  = std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
+        const double scale = std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
         const auto displace = [&](DomainFieldType& coord) {
-          const auto disp   = dist_rng() * signum(sign_rng());
+          const auto disp = dist_rng() * signum(sign_rng());
           coord += disp;
           DXTC_LOG_DEBUG_0 << disp << ";";
         };

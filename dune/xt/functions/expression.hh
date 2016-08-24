@@ -31,7 +31,11 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class ExpressionFunction
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -63,9 +67,9 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["variable"]   = "x";
+    config["variable"] = "x";
     config["expression"] = "[x[0] sin(x[0]) exp(x[0]); x[0] sin(x[0]) exp(x[0]); x[0] sin(x[0]) exp(x[0])]";
-    config["order"]      = "3";
+    config["order"] = "3";
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
@@ -80,7 +84,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     // get expression
     ExpressionStringVectorType expression_as_vectors;
@@ -120,8 +124,10 @@ public:
    * ["x[1]" "x[0]"]. Then the resulting function is [x[0]*x[1] x[0]*x[1]; x[0]*x[1] x[0]*x[1]] and the gradient is
    * [[x[1] x[0]; x[1] x[0]] [x[1] x[0] x[1] x[0]].
    */
-  ExpressionFunction(const std::string variable, const std::string expression, const size_t ord = 0,
-                     const std::string nm                    = static_id(),
+  ExpressionFunction(const std::string variable,
+                     const std::string expression,
+                     const size_t ord = 0,
+                     const std::string nm = static_id(),
                      const std::vector<std::string> gradient = std::vector<std::string>())
     : order_(ord)
     , name_(nm)
@@ -149,8 +155,10 @@ public:
    * std::vector< std::vector< std::string > to ExpressionStringVectorType and GradientStringVectorType, respectively.
    */
   ExpressionFunction(
-      const std::string variable, const std::vector<std::string> expressions,
-      const size_t ord = default_config().get<size_t>("order"), const std::string nm = static_id(),
+      const std::string variable,
+      const std::vector<std::string> expressions,
+      const size_t ord = default_config().get<size_t>("order"),
+      const std::string nm = static_id(),
       const std::vector<std::vector<std::string>> gradient_expressions = std::vector<std::vector<std::string>>())
     : function_(new MathExpressionFunctionType(variable, expressions))
     , order_(ord)
@@ -177,8 +185,10 @@ public:
    *  [[[0 0] [2 0]] [[cos(x[0]) 0] [0 1]]] would be the gradient_expression corresponding to the expression above (if
    *  dimDomain = dimRange = dimRangeCols = 2)
    */
-  ExpressionFunction(const std::string variable, const ExpressionStringVectorType expressions, const size_t ord = 0,
-                     const std::string nm                                = static_id(),
+  ExpressionFunction(const std::string variable,
+                     const ExpressionStringVectorType expressions,
+                     const size_t ord = 0,
+                     const std::string nm = static_id(),
                      const GradientStringVectorType gradient_expressions = GradientStringVectorType())
     : order_(ord)
     , name_(nm)
@@ -192,9 +202,9 @@ public:
   ThisType& operator=(const ThisType& other)
   {
     if (this != &other) {
-      function_  = other.function_;
-      order_     = other.order_;
-      name_      = other.name_;
+      function_ = other.function_;
+      order_ = other.order_;
+      name_ = other.name_;
       gradients_ = other.gradients_;
     }
     return *this;
@@ -226,13 +236,13 @@ public:
       *tmp_row_ = ret[rr];
       for (size_t cc = 0; cc < dimRangeCols; ++cc) {
         if (Dune::XT::Common::isnan(tmp_row_->operator[](cc))) {
-          failure    = true;
+          failure = true;
           error_type = "NaN";
         } else if (Dune::XT::Common::isinf(tmp_row_->operator[](cc))) {
-          failure    = true;
+          failure = true;
           error_type = "inf";
         } else if (std::abs(tmp_row_->operator[](cc)) > (0.9 * std::numeric_limits<double>::max())) {
-          failure    = true;
+          failure = true;
           error_type = "an unlikely value";
         }
         if (failure)
@@ -337,7 +347,8 @@ private:
   } // ... jacobian_helper(..., ...< 1 >)
 
   template <size_t rC>
-  static void get_expression_helper(const Common::Configuration& cfg, ExpressionStringVectorType& expression_as_vectors,
+  static void get_expression_helper(const Common::Configuration& cfg,
+                                    ExpressionStringVectorType& expression_as_vectors,
                                     internal::ChooseVariant<rC>)
   {
     typedef typename Dune::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
@@ -351,7 +362,8 @@ private:
     }
   } // ... get_expression_helper(...)
 
-  static void get_expression_helper(const Common::Configuration& cfg, ExpressionStringVectorType& expression_as_vectors,
+  static void get_expression_helper(const Common::Configuration& cfg,
+                                    ExpressionStringVectorType& expression_as_vectors,
                                     internal::ChooseVariant<1>)
   {
     typedef typename Dune::FieldVector<std::string, dimRange> ExpressionVectorType;
@@ -363,7 +375,8 @@ private:
     }
   } // ... get_expression_helper(..., ...< 1 >)
 
-  static void get_gradient(const Common::Configuration& cfg, GradientStringVectorType& gradient_as_vectors,
+  static void get_gradient(const Common::Configuration& cfg,
+                           GradientStringVectorType& gradient_as_vectors,
                            const std::string first_gradient_key)
   {
     // create vector of gradient keys

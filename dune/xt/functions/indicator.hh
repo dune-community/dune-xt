@@ -119,7 +119,7 @@ public:
   static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
                                           const std::string sub_name = static_id())
   {
-    const Common::Configuration cfg     = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration def_cfg = default_config();
     std::vector<std::tuple<DomainType, DomainType, RangeFieldType>> values;
     DomainType tmp_lower;

@@ -38,14 +38,14 @@ namespace Spe10 {
 namespace internal {
 
 static const std::string model1_filename = "perm_case1.dat";
-static const size_t model1_x_elements    = 100;
-static const size_t model1_y_elements    = 1;
-static const size_t model1_z_elements    = 20;
-static const double model_1_length_x     = 762.0;
-static const double model_1_length_y     = 7.62;
-static const double model_1_length_z     = 15.24;
-static const double model1_min_value     = 0.001;
-static const double model1_max_value     = 998.915;
+static const size_t model1_x_elements = 100;
+static const size_t model1_y_elements = 1;
+static const size_t model1_z_elements = 20;
+static const double model_1_length_x = 762.0;
+static const double model_1_length_y = 7.62;
+static const double model_1_length_z = 15.24;
+static const double model1_min_value = 0.001;
+static const double model1_max_value = 998.915;
 
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r, size_t rC>
 class Model1Base : public CheckerboardFunction<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC>
@@ -69,8 +69,10 @@ public:
   } // ... static_id(...)
 
 private:
-  static std::vector<RangeType> read_values_from_file(const std::string& filename, const RangeFieldType& min,
-                                                      const RangeFieldType& max, const RangeType& unit_range)
+  static std::vector<RangeType> read_values_from_file(const std::string& filename,
+                                                      const RangeFieldType& min,
+                                                      const RangeFieldType& max,
+                                                      const RangeType& unit_range)
 
   {
     if (!(max > min))
@@ -83,7 +85,7 @@ private:
       static const size_t entriesPerDim = model1_x_elements * model1_y_elements * model1_z_elements;
       // create storage (there should be exactly 6000 values in the file, but we onyl read the first 2000)
       std::vector<RangeType> data(entriesPerDim, unit_range);
-      double tmp     = 0;
+      double tmp = 0;
       size_t counter = 0;
       while (datafile >> tmp && counter < entriesPerDim)
         data[counter++] *= (tmp * scale) + shift;
@@ -101,7 +103,7 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["filename"]   = internal::model1_filename;
+    config["filename"] = internal::model1_filename;
     config["lower_left"] = "[0.0 0.0]";
     config["upper_right"] =
         "[" + Common::to_string(internal::model_1_length_x) + " " + Common::to_string(internal::model_1_length_z) + "]";
@@ -121,7 +123,7 @@ public:
   static std::unique_ptr<DerivedType> create_derived(const Common::Configuration config, const std::string sub_name)
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     // create
     return Common::make_unique<DerivedType>(cfg.get("filename", default_cfg.get<std::string>("filename")),
@@ -132,10 +134,18 @@ public:
                                             cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  Model1Base(const std::string& filename, const DomainType& lowerLeft, const DomainType& upperRight,
-             const RangeFieldType min, const RangeFieldType max, const std::string nm, const RangeType& unit_range)
-    : BaseType(lowerLeft, upperRight, {model1_x_elements, model1_z_elements},
-               read_values_from_file(filename, min, max, unit_range), nm)
+  Model1Base(const std::string& filename,
+             const DomainType& lowerLeft,
+             const DomainType& upperRight,
+             const RangeFieldType min,
+             const RangeFieldType max,
+             const std::string nm,
+             const RangeType& unit_range)
+    : BaseType(lowerLeft,
+               upperRight,
+               {model1_x_elements, model1_z_elements},
+               read_values_from_file(filename, min, max, unit_range),
+               nm)
   {
   }
 
@@ -179,10 +189,12 @@ public:
     return BaseType::template create_derived<ThisType>(config, sub_name);
   } // ... create(...)
 
-  Model1Function(const std::string& filename, const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
+  Model1Function(const std::string& filename,
+                 const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
                  const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
                  const RangeFieldType min = internal::model1_min_value,
-                 const RangeFieldType max = internal::model1_max_value, const std::string nm = BaseType::static_id())
+                 const RangeFieldType max = internal::model1_max_value,
+                 const std::string nm = BaseType::static_id())
     : BaseType(filename, lower_left, upper_right, min, max, nm, unit_matrix())
   {
   }

@@ -105,7 +105,11 @@ class DivergenceFunction;
 /**
  *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  */
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class LocalfunctionSetInterface
 {
@@ -143,7 +147,7 @@ public:
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
-  static const size_t dimRange     = rangeDim;
+  static const size_t dimRange = rangeDim;
   static const size_t dimRangeCols = rangeDimCols;
   typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::type RangeType;
   typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::type JacobianRangeType;
@@ -217,7 +221,11 @@ protected:
 /**
  *  \brief  Interface for functions, which can be evaluated locally on one Entity.
  */
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class LocalfunctionInterface
     : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -319,7 +327,11 @@ class IsLocalizableFunction
 /**
  * \brief Interface for functions which provide a LocalfunctionInterface for an entity.
  */
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class LocalizableFunctionInterface : public IsLocalizableFunction
 {
@@ -333,7 +345,7 @@ public:
   static const size_t dimDomain = domainDim;
 
   typedef RangeFieldImp RangeFieldType;
-  static const size_t dimRange     = rangeDim;
+  static const size_t dimRange = rangeDim;
   static const size_t dimRangeCols = rangeDimCols;
 
   typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
@@ -406,13 +418,15 @@ public:
    *        see in the visualization is a refinement of the actual grid!
    */
   template <class GridViewType>
-  void visualize(const GridViewType& grid_view, const std::string path, const bool subsampling = true,
+  void visualize(const GridViewType& grid_view,
+                 const std::string path,
+                 const bool subsampling = true,
                  const VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
     if (path.empty())
       DUNE_THROW(RangeError, "Empty path given!");
     const auto directory = Common::directory_only(path);
-    const auto filename  = Common::filename_only(path);
+    const auto filename = Common::filename_only(path);
     const auto adapter = std::make_shared<VisualizationAdapterFunction<GridViewType, dimRange, dimRangeCols>>(*this);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
         subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
@@ -449,7 +463,11 @@ class TransferredGlobalFunction;
  * base class for global matrix-valued valued functions that provides automatic local functions via
  * LocalizableFunctionInterface
  */
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class GlobalFunctionInterface
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -565,16 +583,20 @@ class GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldIm
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>
 #if HAVE_DUNE_FEM
       ,
-      public Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                 GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim,
-                                                         1>>
+      public Dune::Fem::
+          Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+                   GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
 #endif // HAVE_DUNE_FEM
 #if HAVE_DUNE_PDELAB
       ,
       public TypeTree::LeafNode,
       public PDELab::
-          FunctionInterface<PDELab::FunctionTraits<DomainFieldImp, domainDim, FieldVector<DomainFieldImp, domainDim>,
-                                                   RangeFieldImp, rangeDim, FieldVector<RangeFieldImp, rangeDim>>,
+          FunctionInterface<PDELab::FunctionTraits<DomainFieldImp,
+                                                   domainDim,
+                                                   FieldVector<DomainFieldImp, domainDim>,
+                                                   RangeFieldImp,
+                                                   rangeDim,
+                                                   FieldVector<RangeFieldImp, rangeDim>>,
                             GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>
 #endif
 {
@@ -592,9 +614,10 @@ public:
   using typename BaseType::LocalfunctionType;
   using typename BaseType::EntityType;
 #if HAVE_DUNE_FEM
-  typedef typename Dune::Fem::Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
-                                       GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp,
-                                                               rangeDim, 1>>::JacobianRangeType JacobianRangeType;
+  typedef typename Dune::Fem::
+      Function<Dune::Fem::FunctionSpace<DomainFieldImp, RangeFieldImp, domainDim, rangeDim>,
+               GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1>>::
+          JacobianRangeType JacobianRangeType;
 #else
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
 #endif
@@ -693,14 +716,20 @@ public:
 }; // class GlobalFunctionInterface< ..., 1 >
 
 template <class OtherEntityImp, class GlobalFunctionImp>
-class TransferredGlobalFunction
-    : public GlobalFunctionInterface<OtherEntityImp, typename GlobalFunctionImp::DomainFieldType,
-                                     GlobalFunctionImp::dimDomain, typename GlobalFunctionImp::RangeFieldType,
-                                     GlobalFunctionImp::dimRange, GlobalFunctionImp::dimRangeCols>
+class TransferredGlobalFunction : public GlobalFunctionInterface<OtherEntityImp,
+                                                                 typename GlobalFunctionImp::DomainFieldType,
+                                                                 GlobalFunctionImp::dimDomain,
+                                                                 typename GlobalFunctionImp::RangeFieldType,
+                                                                 GlobalFunctionImp::dimRange,
+                                                                 GlobalFunctionImp::dimRangeCols>
 {
-  typedef GlobalFunctionInterface<OtherEntityImp, typename GlobalFunctionImp::DomainFieldType,
-                                  GlobalFunctionImp::dimDomain, typename GlobalFunctionImp::RangeFieldType,
-                                  GlobalFunctionImp::dimRange, GlobalFunctionImp::dimRangeCols> BaseType;
+  typedef GlobalFunctionInterface<OtherEntityImp,
+                                  typename GlobalFunctionImp::DomainFieldType,
+                                  GlobalFunctionImp::dimDomain,
+                                  typename GlobalFunctionImp::RangeFieldType,
+                                  GlobalFunctionImp::dimRange,
+                                  GlobalFunctionImp::dimRangeCols>
+      BaseType;
 
 public:
   TransferredGlobalFunction(const GlobalFunctionImp& function)
@@ -726,14 +755,22 @@ private:
 template <class FunctionImp, template <class, class, size_t, class, size_t, size_t> class OutTemplate>
 struct FunctionTypeGenerator
 {
-  typedef OutTemplate<typename FunctionImp::EntityType, typename FunctionImp::DomainFieldType, FunctionImp::dimDomain,
-                      typename FunctionImp::RangeFieldType, FunctionImp::dimRange, FunctionImp::dimRangeCols> type;
+  typedef OutTemplate<typename FunctionImp::EntityType,
+                      typename FunctionImp::DomainFieldType,
+                      FunctionImp::dimDomain,
+                      typename FunctionImp::RangeFieldType,
+                      FunctionImp::dimRange,
+                      FunctionImp::dimRangeCols>
+      type;
 };
 
 template <class F>
 struct is_localizable_function<F, true>
-    : public std::is_base_of<LocalizableFunctionInterface<typename F::EntityType, typename F::DomainFieldType,
-                                                          F::dimDomain, typename F::RangeFieldType, F::dimRange,
+    : public std::is_base_of<LocalizableFunctionInterface<typename F::EntityType,
+                                                          typename F::DomainFieldType,
+                                                          F::dimDomain,
+                                                          typename F::RangeFieldType,
+                                                          F::dimRange,
                                                           F::dimRangeCols>,
                              F>
 {

@@ -28,7 +28,11 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class CheckerboardFunction
     : public LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
@@ -114,10 +118,10 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["lower_left"]   = "[0.0 0.0 0.0]";
-    config["upper_right"]  = "[1.0 1.0 1.0]";
+    config["lower_left"] = "[0.0 0.0 0.0]";
+    config["upper_right"] = "[1.0 1.0 1.0]";
     config["num_elements"] = "[2 2 2]";
-    config["values"]       = "[1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0]";
+    config["values"] = "[1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0]";
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
@@ -132,7 +136,7 @@ public:
                                           const std::string sub_name = static_id())
   {
     // get correct config
-    const Common::Configuration cfg         = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     // calculate number of values and get values
     auto num_elements =
@@ -157,7 +161,8 @@ public:
 
   CheckerboardFunction(const Common::FieldVector<DomainFieldType, dimDomain>& lowerLeft,
                        const Common::FieldVector<DomainFieldType, dimDomain>& upperRight,
-                       const Common::FieldVector<size_t, dimDomain>& numElements, const std::vector<RangeType>& values,
+                       const Common::FieldVector<size_t, dimDomain>& numElements,
+                       const std::vector<RangeType>& values,
                        const std::string nm = static_id())
     : lowerLeft_(new Common::FieldVector<DomainFieldType, dimDomain>(lowerLeft))
     , upperRight_(new Common::FieldVector<DomainFieldType, dimDomain>(upperRight))

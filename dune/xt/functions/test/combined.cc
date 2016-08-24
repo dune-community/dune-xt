@@ -38,7 +38,7 @@ class DifferenceFunctionType
   typedef typename G::ctype D;
   static const size_t d = G::dimension;
   typedef double R;
-  static const size_t r  = 1;
+  static const size_t r = 1;
   static const size_t rC = 1;
 
 public:
@@ -66,7 +66,7 @@ protected:
     typedef typename DifferenceFunctionType<YaspGrid<DimDomain::value,
                                                      EquidistantOffsetCoordinates<double, DimDomain::value>>>::
         ConstantFunctionType ConstantFunctionType;
-    auto left  = std::make_shared<ConstantFunctionType>(ll);
+    auto left = std::make_shared<ConstantFunctionType>(ll);
     auto right = std::make_shared<ConstantFunctionType>(rr);
     return std::unique_ptr<FunctionType>(new FunctionType(left, right));
   } // ... create(...)
@@ -86,10 +86,10 @@ TYPED_TEST(DifferenceFunctionTest, dynamic_interface_check)
 TYPED_TEST(DifferenceFunctionTest, evaluate_check)
 {
   auto grid_ptr = this->create_grid();
-  auto func     = this->create(1.0, 2.0);
+  auto func = this->create(1.0, 2.0);
   //  func->visualize(grid_ptr->leafGridView(), "foo");
   for (auto&& entity : elements(grid_ptr->leafGridView())) {
-    const auto local_func  = func->local_function(entity);
+    const auto local_func = func->local_function(entity);
     const auto& quadrature = QuadratureRules<double, TypeParam::value>::rule(
         entity.type(), boost::numeric_cast<int>(local_func->order() + 2));
     for (const auto& element : quadrature) {

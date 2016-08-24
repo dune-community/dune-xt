@@ -24,27 +24,36 @@ namespace Functions {
 
 template <class DiscreteFunctionType>
 class FemAdapterFunction
-    : public LocalizableFunctionInterface<
-          typename DiscreteFunctionType::EntityType, typename DiscreteFunctionType::DomainFieldType,
-          DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain, typename DiscreteFunctionType::RangeFieldType,
-          DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange, 1>
+    : public LocalizableFunctionInterface<typename DiscreteFunctionType::EntityType,
+                                          typename DiscreteFunctionType::DomainFieldType,
+                                          DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain,
+                                          typename DiscreteFunctionType::RangeFieldType,
+                                          DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange,
+                                          1>
 {
-  typedef LocalizableFunctionInterface<
-      typename DiscreteFunctionType::EntityType, typename DiscreteFunctionType::DomainFieldType,
-      DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain, typename DiscreteFunctionType::RangeFieldType,
-      DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange, 1> BaseType;
+  typedef LocalizableFunctionInterface<typename DiscreteFunctionType::EntityType,
+                                       typename DiscreteFunctionType::DomainFieldType,
+                                       DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain,
+                                       typename DiscreteFunctionType::RangeFieldType,
+                                       DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange,
+                                       1>
+      BaseType;
   typedef FemAdapterFunction<DiscreteFunctionType> ThisType;
 
-  class Localfunction
-      : public LocalfunctionInterface<
-            typename DiscreteFunctionType::EntityType, typename DiscreteFunctionType::DomainFieldType,
-            DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain, typename DiscreteFunctionType::RangeFieldType,
-            DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange, 1>
+  class Localfunction : public LocalfunctionInterface<typename DiscreteFunctionType::EntityType,
+                                                      typename DiscreteFunctionType::DomainFieldType,
+                                                      DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain,
+                                                      typename DiscreteFunctionType::RangeFieldType,
+                                                      DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange,
+                                                      1>
   {
-    typedef LocalfunctionInterface<
-        typename DiscreteFunctionType::EntityType, typename DiscreteFunctionType::DomainFieldType,
-        DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain, typename DiscreteFunctionType::RangeFieldType,
-        DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange, 1> BaseType;
+    typedef LocalfunctionInterface<typename DiscreteFunctionType::EntityType,
+                                   typename DiscreteFunctionType::DomainFieldType,
+                                   DiscreteFunctionType::DiscreteFunctionSpaceType::dimDomain,
+                                   typename DiscreteFunctionType::RangeFieldType,
+                                   DiscreteFunctionType::DiscreteFunctionSpaceType::dimRange,
+                                   1>
+        BaseType;
 
   public:
     typedef typename BaseType::EntityType EntityType;

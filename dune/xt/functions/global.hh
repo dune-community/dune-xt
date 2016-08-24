@@ -27,7 +27,11 @@ namespace Functions {
  * Global-valued function you can pass a lambda expression to that gets evaluated
  * \example LambdaType lambda([](DomainType x) { return x;}, 1 );
  */
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim,
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
           size_t rangeDimCols = 1>
 class GlobalLambdaFunction
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
