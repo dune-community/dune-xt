@@ -26,6 +26,8 @@
 #include <dune/common/float_cmp.hh>
 #include <dune/common/ftraits.hh>
 
+#include <dune/xt/common/exceptions.hh>
+
 #include "interfaces.hh"
 #include "pattern.hh"
 
@@ -39,6 +41,9 @@ class CommonDenseVector;
 
 template <class ScalarImp>
 class CommonDenseMatrix;
+
+template <class ScalarImp>
+class CommonSparseMatrix;
 
 namespace internal {
 
@@ -61,6 +66,17 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonDenseMatrix<ScalarType> derived_type;
   typedef Dune::DynamicMatrix<ScalarType> BackendType;
+};
+
+template <class ScalarImp = double>
+class CommonSparseMatrixTraits
+{
+public:
+  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
+  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  typedef CommonSparseMatrix<ScalarType> derived_type;
+  typedef std::vector<ScalarType> BackendType;
+  static const constexpr ChooseBackend vector_type = ChooseBackend::common_dense;
 };
 
 } // namespace internal
@@ -597,8 +613,6 @@ class CommonSparseMatrix : public MatrixInterface<internal::CommonSparseMatrixTr
 {
   typedef CommonSparseMatrix<ScalarImp> ThisType;
   typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
-  static_assert(!std::is_same<DUNE_STUFF_SSIZE_T, int>::value,
-                "You have to manually disable the constructor below which uses DUNE_STUFF_SSIZE_T!");
 
 public:
   typedef internal::CommonSparseMatrixTraits<ScalarImp> Traits;
@@ -660,12 +674,6 @@ public:
     }
   }
 
-  /// This constructor is needed for the python bindings.
-  explicit CommonSparseMatrix(const DUNE_STUFF_SSIZE_T rr, const DUNE_STUFF_SSIZE_T cc = 0)
-    : CommonSparseMatrix(size_t(rr), size_t(cc), ScalarType(0))
-  {
-  }
-
   explicit CommonSparseMatrix(const int rr, const int cc = 0)
     : CommonSparseMatrix(size_t(rr), size_t(cc), ScalarType(0))
   {
@@ -684,11 +692,11 @@ public:
   template <class OtherMatrixType>
   explicit CommonSparseMatrix(
       const OtherMatrixType& mat,
-      const typename std::enable_if<DSC::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune = false,
+      const typename std::enable_if<Common::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune = false,
       const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
           Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
-    : num_rows_(DSC::MatrixAbstraction<OtherMatrixType>::rows(mat))
-    , num_cols_(DSC::MatrixAbstraction<OtherMatrixType>::cols(mat))
+    : num_rows_(Common::MatrixAbstraction<OtherMatrixType>::rows(mat))
+    , num_cols_(Common::MatrixAbstraction<OtherMatrixType>::cols(mat))
     , backend_(std::make_shared<BackendType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
@@ -696,8 +704,8 @@ public:
     for (size_t rr = 0; rr < num_rows_; ++rr) {
       size_t num_nonzero_entries_in_row = 0;
       for (size_t cc = 0; cc < num_cols_; ++cc) {
-        const auto& value = DSC::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
-        if (!prune || DSC::FloatCmp::ne(value, ScalarType(0), eps)) {
+        const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
+        if (!prune || XT::Common::FloatCmp::ne(value, ScalarType(0), eps)) {
           ++num_nonzero_entries_in_row;
           backend_->push_back(value);
           column_indices_->push_back(cc);
@@ -854,7 +862,8 @@ public:
   {
     // iterate over non-zero entries
     for (const auto& entry : *backend_)
-      if (DSC::isnan(std::real(entry)) || DSC::isnan(std::imag(entry)) || DSC::isinf(std::abs(entry)))
+      if (XT::Common::isnan(std::real(entry)) || XT::Common::isnan(std::imag(entry))
+          || XT::Common::isinf(std::abs(entry)))
         return false;
     return true;
   }

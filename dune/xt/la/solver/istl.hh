@@ -130,7 +130,7 @@ public:
     };
   } // ... types()
 
-  static Common::Configuration options(const std::string type = "")
+  static XT::Common::Configuration options(const std::string type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
     SolverUtils::check_given(tp, types());

@@ -29,6 +29,7 @@ namespace LA {
 enum class Backends
 {
   common_dense,
+  common_sparse,
   istl_sparse,
   eigen_dense,
   eigen_sparse,
@@ -41,7 +42,7 @@ static constexpr Backends default_backend =
 #elif HAVE_DUNE_ISTL
     Backends::istl_sparse;
 #else
-    Backends::common_dense;
+    ChooseBackend::common_sparse;
 #endif
 
 static constexpr Backends default_sparse_backend =
@@ -50,7 +51,7 @@ static constexpr Backends default_sparse_backend =
 #elif HAVE_DUNE_ISTL
     Backends::istl_sparse;
 #else
-    Backends::none;
+    ChooseBackend::common_sparse;
 #endif
 
 static constexpr Backends default_dense_backend =
