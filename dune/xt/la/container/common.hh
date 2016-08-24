@@ -634,7 +634,7 @@ public:
   {
     if (num_rows_ > 0 && num_cols_ > 0) {
       if (size_t(patt.size()) != num_rows_)
-        DUNE_THROW(Exceptions::shapes_do_not_match,
+        DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                    "The size of the pattern (" << patt.size() << ") does not match the number of rows of this ("
                                                << num_rows_
                                                << ")!");
@@ -645,7 +645,7 @@ public:
         for (size_t col = 0; col < num_nonzero_entries_in_row; ++col) {
 #ifndef NDEBUG
           if (col >= num_cols_)
-            DUNE_THROW(Exceptions::shapes_do_not_match,
+            DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                        "The size of row " << row << " of the pattern does not match the number of columns of this ("
                                           << num_cols_
                                           << ")!");
