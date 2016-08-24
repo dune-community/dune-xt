@@ -22,7 +22,7 @@ namespace XT {
 namespace Grid {
 
 
-Common::Configuration alldirichlet_boundaryinfo_default_config()
+static Common::Configuration alldirichlet_boundaryinfo_default_config()
 {
   return Common::Configuration("type", "xt.grid.boundaryinfo.alldirichlet");
 }

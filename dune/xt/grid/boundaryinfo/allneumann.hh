@@ -22,7 +22,7 @@ namespace XT {
 namespace Grid {
 
 
-Common::Configuration allneumann_boundaryinfo_default_config()
+static Common::Configuration allneumann_boundaryinfo_default_config()
 {
   return Common::Configuration("type", "xt.grid.boundaryinfo.allneumann");
 }
