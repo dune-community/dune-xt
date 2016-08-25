@@ -40,8 +40,7 @@ template <class EntityImp,
 class ExpressionFunction
     : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
 {
-  typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-      BaseType;
+  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
   typedef ExpressionFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim * rangeDimCols>
       MathExpressionFunctionType;
@@ -225,6 +224,8 @@ public:
     return order_;
   }
 
+  using BaseType::evaluate;
+
   virtual void evaluate(const DomainType& xx, RangeType& ret) const override
   {
     evaluate_helper(xx, ret, internal::ChooseVariant<dimRangeCols>());
@@ -268,6 +269,8 @@ public:
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
   } // ... evaluate(...)
+
+  using BaseType::jacobian;
 
   virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
   {
