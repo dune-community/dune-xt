@@ -24,22 +24,42 @@ namespace XT {
 namespace Functions {
 namespace internal {
 
-template <class K, int dim>
-struct UnitMatrix
+//! TODO move
+template <class K, int rows, int cols>
+struct EyeMatrix
 {
-  typedef FieldMatrix<K, dim, dim> type;
+  typedef FieldMatrix<K, rows, cols> type;
 
   static type value()
   {
     type ret(0);
-    for (size_t dd = 0; dd < dim; ++dd)
+    for (size_t dd = 0; dd < std::min(rows, cols); ++dd)
       ret[dd][dd] = 1;
     return ret;
   }
-}; // struct UnitMatrix
+
+  static std::string value_str()
+  {
+    std::string str = "[";
+    for (size_t rr = 0; rr < rows; ++rr) {
+      if (rr > 0)
+        str += "; ";
+      for (size_t cc = 0; cc < cols; ++cc) {
+        if (cc > 0)
+          str += " ";
+        if (cc == rr)
+          str += "1";
+        else
+          str += "0";
+      }
+    }
+    str += "]";
+    return str;
+  }
+}; // struct EyeMatrix
 
 template <class K>
-struct UnitMatrix<K, 1>
+struct EyeMatrix<K, 1, 1>
 {
   typedef FieldVector<K, 1> type;
 
@@ -47,13 +67,24 @@ struct UnitMatrix<K, 1>
   {
     return type(1);
   }
-}; // struct UnitMatrix
+
+  static std::string value_str()
+  {
+    return "1";
+  }
+}; // struct EyeMatrix< K, 1, 1 >
+
+template <class K, int dim>
+struct UnitMatrix : EyeMatrix<K, dim, dim>
+{
+};
 
 template <class K, int dim>
 typename UnitMatrix<K, dim>::type unit_matrix()
 {
   return UnitMatrix<K, dim>::value();
 }
+
 
 template <class R, size_t r, size_t rC>
 struct Get
