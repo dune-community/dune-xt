@@ -1001,6 +1001,8 @@ class PeriodicGridView
     : XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, use_less_memory>>,
       public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp, use_less_memory>>
 {
+  static_assert(!is_alugrid<typename RealGridViewImp::Grid>::value,
+                "ALUGrid 1.52 and older cannot be used here due to missing entitity default ctor");
   typedef RealGridViewImp RealGridViewType;
   typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType, use_less_memory>> BaseType;
   typedef typename XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, use_less_memory>>
