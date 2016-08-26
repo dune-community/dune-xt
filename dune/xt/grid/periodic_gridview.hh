@@ -26,6 +26,7 @@
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/grid/search.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
 namespace XT {

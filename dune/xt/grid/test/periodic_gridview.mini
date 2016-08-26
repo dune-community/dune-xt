@@ -1,7 +1,7 @@
 __name = {periodicity}_{griddomain}
-__exec_suffix = yasp_{dimDomain}d_{memory}, alu_{__local.geometry}_{__local.refinement}_{dimDomain}d_{memory} | expand grid
+__exec_suffix = yasp_{dimDomain}d_{memory} | expand grid
 
-include grids.mini
+include periodic_grids.mini
 
 use_less_memory = true, false | expand memory
 memory = normal_memory, less_memory | expand memory
