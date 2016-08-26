@@ -116,7 +116,7 @@ struct is_conforming_alugrid : public std::false_type
 {
 };
 
-#if DSC_HAVE_ALUGRID
+#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
 template <int dim, int dimworld, ALUGridElementType elType, ALUGridRefinementType refineType, class Comm>
 struct is_alugrid<ALUGrid<dim, dimworld, elType, refineType, Comm>> : public std::true_type
