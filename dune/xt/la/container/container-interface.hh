@@ -42,7 +42,7 @@ static constexpr Backends default_backend =
 #elif HAVE_DUNE_ISTL
     Backends::istl_sparse;
 #else
-    ChooseBackend::common_sparse;
+    Backends::common_sparse;
 #endif
 
 static constexpr Backends default_sparse_backend =
@@ -51,7 +51,7 @@ static constexpr Backends default_sparse_backend =
 #elif HAVE_DUNE_ISTL
     Backends::istl_sparse;
 #else
-    ChooseBackend::common_sparse;
+    Backends::common_sparse;
 #endif
 
 static constexpr Backends default_dense_backend =
