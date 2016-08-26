@@ -237,6 +237,7 @@ private:
   std::string name_;
 }; // class CheckerboardFunction
 
+#if HAVE_DUNE_XT_LA
 
 // forward ////////////////////////
 template <class LocalizableFunctionImp,
@@ -697,8 +698,9 @@ private:
   std::shared_ptr<const Common::FieldVector<size_t, dimDomain>> numElements_;
   std::vector<std::shared_ptr<const LocalizableFunctionType>> values_;
   std::string name_;
-}; // class FunctionCheckerboard
+}; // class FunctionCheckerboardFunction
 
+#endif // HAVE_DUNE_XT_LA
 
 } // namespace Functions
 } // namespace XT

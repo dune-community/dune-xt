@@ -13,6 +13,8 @@
 #ifndef DUNE_XT_FUNCTIONS_AFFINE_HH
 #define DUNE_XT_FUNCTIONS_AFFINE_HH
 
+#if HAVE_DUNE_XT_LA
+
 #include <memory>
 
 #include <dune/xt/common/configuration.hh>
@@ -214,5 +216,7 @@ private:
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
+
+#endif // HAVE_DUNE_XT_LA
 
 #endif // DUNE_XT_FUNCTIONS_AFFINE_HH
