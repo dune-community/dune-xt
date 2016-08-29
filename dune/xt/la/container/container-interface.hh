@@ -61,19 +61,7 @@ static constexpr Backends default_dense_backend =
     Backends::common_dense;
 #endif
 
-/**
- *  \brief  Contains tags mostly needed for python bindings.
- */
-namespace Tags {
 
-class ContainerInterface
-{
-};
-class ProvidesDataAccess
-{
-};
-
-} // namespace Tags
 namespace internal {
 
 /**
@@ -131,8 +119,7 @@ public:
 \endcode
  */
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
-class ContainerInterface : public Tags::ContainerInterface,
-                           public CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
+class ContainerInterface : public CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
 {
   typedef CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits> CRTP;
   static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value, "");
@@ -261,7 +248,7 @@ public:
 }; // class ProvidesContainer
 
 template <class Traits>
-class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>, public Tags::ProvidesDataAccess
+class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>
 {
 public:
   typedef typename Traits::ScalarType ScalarType;

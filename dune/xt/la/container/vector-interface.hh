@@ -35,19 +35,9 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
-/**
- *  \brief  Contains tags mostly needed for python bindings.
- */
-namespace Tags {
-
-class VectorInterface
-{
-};
-
-} // namespace Tags
 
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
-class VectorInterface : public ContainerInterface<Traits, ScalarImp>, public Tags::VectorInterface
+class VectorInterface : public ContainerInterface<Traits, ScalarImp>
 {
 public:
   typedef typename Traits::derived_type derived_type;
