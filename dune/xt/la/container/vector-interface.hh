@@ -129,7 +129,8 @@ public:
    */
   inline ScalarType& operator[](const size_t ii)
   {
-    return get_entry_ref(ii);
+    CHECK_CRTP(this->as_imp()[ii]);
+    return this->as_imp()[ii];
   }
 
   /**
@@ -137,7 +138,8 @@ public:
    */
   inline const ScalarType& operator[](const size_t ii) const
   {
-    return get_entry_ref(ii);
+    CHECK_CRTP(this->as_imp()[ii]);
+    return this->as_imp()[ii];
   }
 
   /**

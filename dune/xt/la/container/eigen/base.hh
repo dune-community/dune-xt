@@ -149,7 +149,6 @@ public:
     return backend_->operator[](ii);
   }
 
-protected:
   inline ScalarType& get_entry_ref(const size_t ii)
   {
     return backend()[ii];
@@ -160,9 +159,18 @@ protected:
     return backend()[ii];
   }
 
+  inline ScalarType& operator[](const size_t ii)
+  {
+    return get_entry_ref(ii);
+  }
+
+  inline const ScalarType& operator[](const size_t ii) const
+  {
+    return get_entry_ref(ii);
+  }
+
   /// \}
 
-public:
   /// \name These methods override default implementations from VectorInterface.
   /// \{
 

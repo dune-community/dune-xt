@@ -244,7 +244,6 @@ public:
     return backend_->operator[](ii)[0];
   }
 
-private:
   inline ScalarType& get_entry_ref(const size_t ii)
   {
     return backend()[ii][0];
@@ -255,7 +254,16 @@ private:
     return backend_->operator[](ii)[0];
   }
 
-public:
+  inline ScalarType& operator[](const size_t ii)
+  {
+    return get_entry_ref(ii);
+  }
+
+  inline const ScalarType& operator[](const size_t ii) const
+  {
+    return get_entry_ref(ii);
+  }
+
   /// \}
   /// \name These methods override default implementations from VectorInterface..
   /// \{
