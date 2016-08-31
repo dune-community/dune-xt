@@ -49,10 +49,10 @@ struct ContainerTest : public ::testing::Test
 
     // dynamic tests
     // * of the container as itself (aka the derived type)
-    ContainerImp DUNE_UNUSED(d_empty);
+    ContainerImp d_empty DUNE_UNUSED;
     ContainerImp d_by_size = ContainerFactory<ContainerImp>::create(dim);
     ContainerImp d_copy_constructor(d_by_size);
-    ContainerImp DUNE_UNUSED(d_copy_assignment) = d_by_size;
+    ContainerImp d_copy_assignment DUNE_UNUSED = d_by_size;
     ContainerImp d_deep_copy = d_by_size.copy();
     d_by_size.scal(D_ScalarType(1));
     d_by_size.axpy(D_ScalarType(1), d_deep_copy);
