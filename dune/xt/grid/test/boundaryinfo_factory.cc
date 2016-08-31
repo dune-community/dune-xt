@@ -27,8 +27,8 @@ TEST(BoundaryInfoFactory, all)
 
   for (auto type : Factory::available()) {
     auto opts = Factory::default_config(type);
-    auto DUNE_UNUSED(aa) = Factory::create();
-    auto DUNE_UNUSED(bb) = Factory::create(type);
-    auto DUNE_UNUSED(cc) = Factory::create(opts);
+    auto aa DUNE_UNUSED = Factory::create();
+    auto bb DUNE_UNUSED = Factory::create(type);
+    auto cc DUNE_UNUSED = Factory::create(opts);
   }
 }

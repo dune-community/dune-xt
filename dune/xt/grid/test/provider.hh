@@ -29,17 +29,17 @@ struct GridProviderBase : public testing::Test
   static void check_layers(const GridProviderType& grid_provider)
   {
     using namespace Dune::XT::Grid;
-    const std::shared_ptr<GridType>& DUNE_UNUSED(grid_ptr) = grid_provider.grid_ptr();
-    auto DUNE_UNUSED(leaf_grid_view_1) = grid_provider.leaf_view();
-    auto DUNE_UNUSED(leaf_grid_view_2) = grid_provider.template layer<Layers::leaf, Backends::view>();
+    const std::shared_ptr<GridType>& grid_ptr DUNE_UNUSED = grid_provider.grid_ptr();
+    auto leaf_grid_view_1 DUNE_UNUSED = grid_provider.leaf_view();
+    auto leaf_grid_view_2 DUNE_UNUSED = grid_provider.template layer<Layers::leaf, Backends::view>();
 #if HAVE_DUNE_FEM
-    auto DUNE_UNUSED(leaf_grid_part_2) = grid_provider.template layer<Layers::leaf, Backends::part>();
+    auto leaf_grid_part_2 DUNE_UNUSED = grid_provider.template layer<Layers::leaf, Backends::part>();
 #endif
     for (int level = 0; level <= grid_provider.max_level(); ++level) {
-      auto DUNE_UNUSED(level_grid_view_1) = grid_provider.level_view(level);
-      auto DUNE_UNUSED(level_grid_view_2) = grid_provider.template layer<Layers::leaf, Backends::view>(level);
+      auto level_grid_view_1 DUNE_UNUSED = grid_provider.level_view(level);
+      auto level_grid_view_2 DUNE_UNUSED = grid_provider.template layer<Layers::leaf, Backends::view>(level);
 #if HAVE_DUNE_FEM
-      auto DUNE_UNUSED(level_grid_part_2) = grid_provider.template layer<Layers::leaf, Backends::part>(level);
+      auto level_grid_part_2 DUNE_UNUSED = grid_provider.template layer<Layers::leaf, Backends::part>(level);
 #endif
     }
   } // ... check_layers()
