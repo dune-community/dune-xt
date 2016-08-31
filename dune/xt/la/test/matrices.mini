@@ -3,4 +3,4 @@ __local.matrix_eigen = EigenRowMajorSparseMatrix, EigenDenseMatrix | expand
 __local.matrix_istl = IstlRowMajorSparseMatrix
 matrix = {__local.matrix_common}, {__local.matrix_eigen}, {__local.matrix_istl} | expand types
 
-1, EIGEN_FOUND, dune-istl_FOUND | expand types | cmake_guard
+1, EIGEN3_FOUND, dune-istl_FOUND | expand types | cmake_guard
