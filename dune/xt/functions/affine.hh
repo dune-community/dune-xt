@@ -18,6 +18,7 @@
 #include <memory>
 
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/fmatrix.hh>
 
 #include <dune/xt/functions/constant.hh>
 
