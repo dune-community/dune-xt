@@ -204,7 +204,7 @@ private:
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
-#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
+#if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
       vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
@@ -228,7 +228,7 @@ private:
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
-#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
+#if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
       vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
@@ -244,7 +244,7 @@ private:
     }
   } // ... visualize_with_boundary(...)
 
-#if DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
+#if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
   std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
   {
     std::vector<double> data(gridView.indexSet().size(0));
