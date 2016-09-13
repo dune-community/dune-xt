@@ -51,11 +51,6 @@ struct is_grid<Dune::YaspGrid<dim, Coordinates>> : public std::true_type
 {
 };
 
-template <int dim, int dimworld, class ctype>
-struct is_grid<Dune::SGrid<dim, dimworld, ctype>> : public std::true_type
-{
-};
-
 #if HAVE_ALBERTA
 
 template <int dim, int dimworld>

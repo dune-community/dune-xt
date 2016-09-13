@@ -21,7 +21,6 @@
 #endif
 #include <dune/grid/io/file/dgfparser/dgfgridfactory.hh> // How convenient that GridPtr requires DGFGridFactory but ...
 #include <dune/grid/io/file/dgfparser/dgfoned.hh>
-#include <dune/grid/io/file/dgfparser/dgfs.hh>
 #include <dune/grid/io/file/dgfparser/dgfyasp.hh>
 #include <dune/grid/io/file/dgfparser/gridptr.hh> // ... does not include it!
 

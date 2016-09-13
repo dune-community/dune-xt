@@ -59,14 +59,6 @@ public:
 };
 
 
-template <int dim, int dimworld, typename _ctype>
-class GmshGridProviderFactory<Dune::SGrid<dim, dimworld, _ctype>>
-{
-public:
-  static const bool available = false;
-};
-
-
 template <class GridType>
 class GmshGridProviderFactory
 {

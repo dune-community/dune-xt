@@ -18,7 +18,6 @@
 #if HAVE_ALUGRID
 # include <dune/grid/alugrid.hh>
 #endif
-# include <dune/grid/sgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 
 #if HAVE_DUNE_ALUGRID

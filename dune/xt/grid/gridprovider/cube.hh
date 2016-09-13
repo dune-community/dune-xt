@@ -73,12 +73,6 @@ class CubeGridProviderFactory
     static const int id = 2;
   };
 
-  template <int dd, int dw>
-  struct ElementVariant<Dune::SGrid<dd, dw>>
-  {
-    static const int id = 1;
-  };
-
   template <int dim, class Coords>
   struct ElementVariant<Dune::YaspGrid<dim, Coords>>
   {

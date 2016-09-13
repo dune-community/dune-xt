@@ -90,7 +90,7 @@ public:
    *  \param upperRight Upper right corner of the grid
    *  \param elements   Number of elements in each coordinate direction
    *
-   *  \note Simplices are not supported in SGrid, so this functions
+   *  \note Simplices are not supported in SPGrid, so this functions
    *        unconditionally throws a GridError.
    */
   static shared_ptr<GridType> createSimplexGrid(const FieldVector<ctype, dimworld>& /*lowerLeft*/,
