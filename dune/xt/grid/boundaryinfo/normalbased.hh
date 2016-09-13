@@ -23,7 +23,7 @@ namespace XT {
 namespace Grid {
 
 
-static Common::Configuration normalbased_boundaryinfo_default_config()
+static inline Common::Configuration normalbased_boundaryinfo_default_config()
 {
   Common::Configuration config;
   config["type"] = "xt.grid.boundaryinfo.normalbased";
