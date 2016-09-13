@@ -27,7 +27,10 @@ static Common::Configuration alldirichlet_boundaryinfo_default_config()
   return Common::Configuration("type", "xt.grid.boundaryinfo.alldirichlet");
 }
 
-
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#endif
 template <class IntersectionImp>
 class AllDirichletBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
@@ -52,6 +55,9 @@ protected:
   static constexpr NoBoundary no_boundary_{};
   static constexpr DirichletBoundary dirichlet_boundary_{};
 }; // class AllDirichletBoundaryInfo
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 template <class I>
 constexpr NoBoundary AllDirichletBoundaryInfo<I>::no_boundary_;

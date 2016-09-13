@@ -17,6 +17,10 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#endif
 class NoBoundary : public BoundaryType
 {
 protected:
@@ -64,6 +68,9 @@ protected:
     return "robin boundary";
   }
 };
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 
 } // namespace Grid

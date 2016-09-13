@@ -27,7 +27,10 @@ static Common::Configuration allneumann_boundaryinfo_default_config()
   return Common::Configuration("type", "xt.grid.boundaryinfo.allneumann");
 }
 
-
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#endif
 template <class IntersectionImp>
 class AllNeumannBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
@@ -52,6 +55,9 @@ protected:
   static constexpr NoBoundary no_boundary_{};
   static constexpr NeumannBoundary neumann_boundary_{};
 }; // class AllNeumannBoundaryInfo
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 template <class I>
 constexpr NoBoundary AllNeumannBoundaryInfo<I>::no_boundary_;

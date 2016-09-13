@@ -33,7 +33,10 @@ static Common::Configuration normalbased_boundaryinfo_default_config()
   return config;
 }
 
-
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#endif
 template <class IntersectionImp>
 class NormalBasedBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
@@ -141,6 +144,9 @@ protected:
   static constexpr DirichletBoundary dirichlet_boundary_{};
   static constexpr NeumannBoundary neumann_boundary_{};
 }; // class NormalBasedBoundaryInfo
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 template <class I>
 constexpr NoBoundary NormalBasedBoundaryInfo<I>::no_boundary_;
