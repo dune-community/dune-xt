@@ -21,6 +21,7 @@
 #include <dune/grid/common/gridview.hh>
 #include <dune/grid/common/rangegenerators.hh>
 
+#include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/ranges.hh>
 
