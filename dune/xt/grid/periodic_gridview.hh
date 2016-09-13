@@ -76,7 +76,7 @@ public:
 
   PeriodicIndexSet(const RealIndexSetType& real_index_set,
                    const std::vector<IndexMapType>& index_maps,
-                   const std::vector<size_t>& entity_counts,
+                   const std::vector<IndexType>& entity_counts,
                    const std::map<Dune::GeometryType, size_t>& geometry_type_counts,
                    const std::vector<std::vector<IndexType>>& new_indices_vector)
     : BaseType()
@@ -166,7 +166,7 @@ public:
 private:
   const RealIndexSetType& real_index_set_;
   const std::vector<IndexMapType>& index_maps_;
-  const std::vector<size_t>& entity_counts_;
+  const std::vector<IndexType>& entity_counts_;
   const std::map<Dune::GeometryType, size_t>& geometry_type_counts_;
   const std::vector<std::vector<IndexType>>& new_indices_vector_;
 }; // class PeriodicIndexSet<...>
@@ -540,7 +540,7 @@ private:
                                std::vector<IndexMapType>& index_maps,
                                ThisType* this_ptr,
                                const BaseType& real_grid_view,
-                               std::vector<size_t>& entity_counts,
+                               std::vector<IndexType>& entity_counts,
                                std::map<Dune::GeometryType, size_t>& type_counts,
                                std::vector<std::set<IndexType>>& entities_to_skip_vector,
                                std::vector<std::vector<IndexType>>& new_indices_vector)
@@ -553,7 +553,7 @@ private:
     if (!use_less_memory)
       new_indices_vector[codim].resize(real_index_set.size(codim));
     auto& new_indices = new_indices_vector[codim];
-    size_t num_codim_entities = 0;
+    IndexType num_codim_entities = 0;
     std::set<IndexType> free_indices;
     std::set<IndexType> entities_to_skip;
     for (const auto& entity : entities(*this_ptr, Dune::Codim<codim>())) {
@@ -654,7 +654,7 @@ private:
                     std::vector<IndexMapType>& index_maps,
                     ThisType* this_ptr,
                     const BaseType& real_grid_view,
-                    std::vector<size_t>& entity_counts,
+                    std::vector<IndexType>& entity_counts,
                     std::map<Dune::GeometryType, size_t>& type_counts,
                     std::vector<std::set<IndexType>>& entities_to_skip_vector,
                     std::vector<std::vector<IndexType>>& new_indices_vector)
@@ -692,7 +692,7 @@ private:
                     std::vector<IndexMapType>& /*index_maps*/,
                     ThisType* /*this_ptr*/,
                     const BaseType& /*real_grid_view*/,
-                    std::vector<size_t>& /*entity_counts*/,
+                    std::vector<IndexType>& /*entity_counts*/,
                     std::map<Dune::GeometryType, size_t>& /*type_counts*/,
                     std::vector<std::set<IndexType>>& /*entities_to_skip_vector*/,
                     std::vector<std::vector<IndexType>>& /*new_indices_vector*/)
@@ -706,7 +706,7 @@ public:
     , entity_to_intersection_map_map_(std::make_shared<std::map<IndexType, IntersectionMapType>>())
     , index_maps_(std::make_shared<std::vector<IndexMapType>>(dimDomain+1))
     , periodic_directions_(periodic_directions)
-    , entity_counts_(std::make_shared<std::vector<size_t>>(dimDomain+1))
+    , entity_counts_(std::make_shared<std::vector<IndexType>>(dimDomain+1))
     , type_counts_(std::make_shared<std::map<Dune::GeometryType, size_t>>())
     , entities_to_skip_vector_(std::make_shared<std::vector<std::set<IndexType>>>(dimDomain+1))
     , new_indices_vector_(std::make_shared<std::vector<std::vector<IndexType>>>(dimDomain+1))
@@ -915,7 +915,7 @@ private:
   static const IntersectionMapType empty_intersection_map_;
   const std::bitset<dimDomain> periodic_directions_;
   std::shared_ptr<IndexSet> index_set_;
-  std::shared_ptr<std::vector<size_t>> entity_counts_;
+  std::shared_ptr<std::vector<IndexType>> entity_counts_;
   std::shared_ptr<std::map<Dune::GeometryType, size_t>> type_counts_;
   std::shared_ptr<std::vector<std::set<IndexType>>> entities_to_skip_vector_;
   std::shared_ptr<std::vector<std::vector<IndexType>>> new_indices_vector_;
