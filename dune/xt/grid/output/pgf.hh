@@ -321,7 +321,7 @@ public:
       leafWalk.add(minMaxCoord);
       leafWalk.walk();
 
-      switch (GridType::dimensionworld) {
+      switch (int(GridType::dimensionworld)) {
         case 1: {
           char buffer[80] = {'\0'};
           const double offset = 0.2;
