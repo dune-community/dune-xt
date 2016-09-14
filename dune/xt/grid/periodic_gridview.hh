@@ -425,7 +425,7 @@ public:
     private:
       const std::set<IndexType>* entities_to_skip_;
       const RealIndexSetType* real_index_set_;
-      std::shared_ptr< const BaseType > real_it_end_;
+      std::shared_ptr<const BaseType> real_it_end_;
     };
 
     typedef PeriodicIterator Iterator;
@@ -463,7 +463,8 @@ public:
         ThisType& operator++()
         {
           BaseType::operator++();
-          while (cd > 0 && *this != *real_it_end_ && entities_to_skip_->count(real_index_set_->index(this->operator*())))
+          while (cd > 0 && *this != *real_it_end_
+                 && entities_to_skip_->count(real_index_set_->index(this->operator*())))
             BaseType::operator++();
           return *this;
         }
@@ -476,7 +477,7 @@ public:
       private:
         const std::set<IndexType>* entities_to_skip_;
         const RealIndexSetType* real_index_set_;
-        std::shared_ptr< const BaseType > real_it_end_;
+        std::shared_ptr<const BaseType> real_it_end_;
       };
       typedef PeriodicIterator Iterator;
     };
@@ -704,12 +705,12 @@ public:
   PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
     : BaseType(real_grid_view)
     , entity_to_intersection_map_map_(std::make_shared<std::map<IndexType, IntersectionMapType>>())
-    , index_maps_(std::make_shared<std::vector<IndexMapType>>(dimDomain+1))
+    , index_maps_(std::make_shared<std::vector<IndexMapType>>(dimDomain + 1))
     , periodic_directions_(periodic_directions)
-    , entity_counts_(std::make_shared<std::vector<IndexType>>(dimDomain+1))
+    , entity_counts_(std::make_shared<std::vector<IndexType>>(dimDomain + 1))
     , type_counts_(std::make_shared<std::map<Dune::GeometryType, size_t>>())
-    , entities_to_skip_vector_(std::make_shared<std::vector<std::set<IndexType>>>(dimDomain+1))
-    , new_indices_vector_(std::make_shared<std::vector<std::vector<IndexType>>>(dimDomain+1))
+    , entities_to_skip_vector_(std::make_shared<std::vector<std::set<IndexType>>>(dimDomain + 1))
+    , new_indices_vector_(std::make_shared<std::vector<std::vector<IndexType>>>(dimDomain + 1))
     , real_index_set_(BaseType::indexSet())
   {
     // find lower left and upper right corner of the grid
@@ -856,8 +857,10 @@ public:
   template <int cd>
   typename Codim<cd>::Iterator end() const
   {
-    return typename Codim<cd>::Iterator(
-        BaseType::template end<cd>(), &((*entities_to_skip_vector_)[cd]), &real_index_set_, BaseType::template end<cd>());
+    return typename Codim<cd>::Iterator(BaseType::template end<cd>(),
+                                        &((*entities_to_skip_vector_)[cd]),
+                                        &real_index_set_,
+                                        BaseType::template end<cd>());
   }
 
   template <int cd, PartitionIteratorType pitype>
@@ -886,7 +889,8 @@ public:
 
   IntersectionIterator ibegin(const typename Codim<0>::Entity& entity) const
   {
-    assert(!entity.hasBoundaryIntersections() || entity_to_intersection_map_map_->count(this->indexSet().index(entity)));
+    assert(!entity.hasBoundaryIntersections()
+           || entity_to_intersection_map_map_->count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::ibegin(entity),
                                 *this,
                                 entity,
@@ -899,7 +903,8 @@ public:
 
   IntersectionIterator iend(const typename Codim<0>::Entity& entity) const
   {
-    assert(!entity.hasBoundaryIntersections() || entity_to_intersection_map_map_->count(this->indexSet().index(entity)));
+    assert(!entity.hasBoundaryIntersections()
+           || entity_to_intersection_map_map_->count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::iend(entity),
                                 *this,
                                 entity,
