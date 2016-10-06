@@ -176,7 +176,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -265,7 +264,7 @@ public:
 
   inline const ScalarType& operator[](const size_t ii) const
   {
-    return backend_->operator[](ii)[0];
+    return backend()[ii][0];
   }
 
   /// \}
@@ -277,22 +276,22 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return backend_->dot(*(other.backend_));
+    return backend().dot(other.backend());
   } // ... dot(...)
 
   virtual RealType l1_norm() const override final
   {
-    return backend_->one_norm();
+    return backend().one_norm();
   }
 
   virtual RealType l2_norm() const override final
   {
-    return backend_->two_norm();
+    return backend().two_norm();
   }
 
   virtual RealType sup_norm() const override final
   {
-    return backend_->infinity_norm();
+    return backend().infinity_norm();
   }
 
   virtual void add(const ThisType& other, ThisType& result) const override final
@@ -322,7 +321,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += *(other.backend_);
+    backend() += other.backend();
   } // ... iadd(...)
 
   virtual void sub(const ThisType& other, ThisType& result) const override final
@@ -352,7 +351,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() -= (*(other.backend_));
+    backend() -= other.backend();
   } // ... isub(...)
 
   /// \}
@@ -361,7 +360,7 @@ protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
@@ -371,7 +370,7 @@ private:
   friend class VectorInterface<internal::IstlDenseVectorTraits<ScalarType>, ScalarType>;
   friend class IstlRowMajorSparseMatrix<ScalarType>;
 
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
 }; // class IstlDenseVector
 
 /**
@@ -474,7 +473,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -501,7 +499,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend().axpy(alpha, *(xx.backend_));
+    backend().axpy(alpha, xx.backend());
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -526,7 +524,7 @@ public:
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
     DUNE_XT_COMMON_TIMING_SCOPE(static_id() + ".mv");
-    backend_->mv(*(xx.backend_), yy.backend());
+    backend().mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -561,10 +559,10 @@ public:
 
   void clear_col(const size_t jj)
   {
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii) {
       auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
@@ -575,6 +573,7 @@ public:
 
   void unit_row(const size_t ii)
   {
+    ensure_uniqueness();
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
@@ -584,13 +583,13 @@ public:
     if (!backend_->exists(ii, ii))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
-    ensure_uniqueness();
     backend_->operator[](ii) *= ScalarType(0);
     backend_->operator[](ii)[ii] = ScalarType(1);
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
   {
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -600,7 +599,6 @@ public:
     if (!backend_->exists(jj, jj))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
-    ensure_uniqueness();
     for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
       auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
@@ -710,14 +708,14 @@ protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
 private:
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
 }; // class IstlRowMajorSparseMatrix
 
 template <class S>
