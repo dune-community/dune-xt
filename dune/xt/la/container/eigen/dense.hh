@@ -18,6 +18,7 @@
 #include <vector>
 #include <initializer_list>
 #include <complex>
+#include <mutex>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -30,6 +31,7 @@
 #include <dune/common/typetraits.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/ftraits.hh>
+#include <dune/common/unused.hh>
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/crtp.hh>
@@ -175,6 +177,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(this->mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   } // ... operator=(...)
@@ -199,8 +202,10 @@ private:
 protected:
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
+    if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(this->mutex_);
       backend_ = std::make_shared<BackendType>(*(backend_));
+    }
   } // ... ensure_uniqueness(...)
 
 private:
@@ -303,6 +308,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(this->mutex_);
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     backend_->operator=(other);
     return *this;
@@ -319,6 +325,7 @@ protected:
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(this->mutex_);
       auto new_backend = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
       new_backend->operator=(*(backend_));
       backend_ = new_backend;
@@ -365,7 +372,10 @@ public:
     backend_->setZero();
   }
 
-  EigenDenseMatrix(const ThisType& other) = default;
+  EigenDenseMatrix(const ThisType& other)
+    : backend_(other.backend_)
+  {
+  }
 
   /**
    * \note If prune == true, this implementation is not optimal!
@@ -423,6 +433,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   }
@@ -456,11 +467,13 @@ public:
 
   ThisType copy() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend() *= alpha;
   }
 
@@ -473,6 +486,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -498,6 +512,7 @@ public:
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     yy.backend().transpose() = backend() * xx.backend();
   }
 
@@ -505,6 +520,7 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend()(ii, jj) += value;
   } // ... add_to_entry(...)
 
@@ -512,6 +528,7 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend()(ii, jj) = value;
   } // ... set_entry(...)
 
@@ -519,6 +536,7 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return backend()(ii, jj);
   } // ... get_entry(...)
 
@@ -528,6 +546,7 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t jj = 0; jj < cols(); ++jj)
       backend_->operator()(ii, jj) = ScalarType(0);
   } // ... clear_row(...)
@@ -538,6 +557,7 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_->operator()(ii, jj) = ScalarType(0);
   } // ... clear_col(...)
@@ -551,6 +571,7 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t jj = 0; jj < cols(); ++jj)
       backend_->operator()(ii, jj) = ScalarType(0);
     backend_->operator()(ii, ii) = ScalarType(1);
@@ -565,6 +586,7 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_->operator()(ii, jj) = ScalarType(0);
     backend_->operator()(jj, jj) = ScalarType(1);
@@ -572,6 +594,7 @@ public:
 
   bool valid() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t ii = 0; ii < rows(); ++ii) {
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = backend_->operator()(ii, jj);
@@ -589,12 +612,15 @@ public:
 protected:
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
+    if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
       backend_ = std::make_shared<BackendType>(*backend_);
+    }
   } // ... ensure_uniqueness(...)
 
 private:
   std::shared_ptr<BackendType> backend_;
+  mutable std::mutex mutex_;
 }; // class EigenDenseMatrix
 
 #else // HAVE_EIGEN

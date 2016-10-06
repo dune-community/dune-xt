@@ -17,6 +17,7 @@
 #include <type_traits>
 #include <vector>
 #include <complex>
+#include <mutex>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -28,6 +29,7 @@
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
+#include <dune/common/unused.hh>
 
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -187,6 +189,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   }
@@ -211,16 +214,19 @@ public:
 
   ThisType copy() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend() *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
@@ -253,11 +259,13 @@ public:
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     yy.backend().transpose() = backend() * xx.backend();
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(these_are_valid_indices(ii, jj));
     backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
                        internal::boost_numeric_cast<EIGEN_size_t>(jj)) += value;
@@ -265,6 +273,7 @@ public:
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(these_are_valid_indices(ii, jj));
     backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii), internal::boost_numeric_cast<EIGEN_size_t>(jj)) =
         value;
@@ -272,6 +281,7 @@ public:
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < rows());
     assert(jj < cols());
     return backend().coeff(internal::boost_numeric_cast<EIGEN_size_t>(ii),
@@ -280,6 +290,7 @@ public:
 
   void clear_row(const size_t ii)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
@@ -289,6 +300,7 @@ public:
   void clear_col(const size_t jj)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -309,6 +321,7 @@ public:
 
   void unit_row(const size_t ii)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
@@ -325,6 +338,7 @@ public:
   void unit_col(const size_t jj)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -352,6 +366,7 @@ public:
 
   bool valid() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     // iterate over non-zero entries
     typedef typename BackendType::InnerIterator InnerIterator;
     for (EIGEN_size_t ii = 0; ii < backend_->outerSize(); ++ii) {
@@ -372,6 +387,7 @@ public:
   pattern(const bool prune = false,
           const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     SparsityPatternDefault ret(rows());
     const auto zero = typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type(0);
     if (prune) {
@@ -396,6 +412,7 @@ public:
   virtual ThisType
   pruned(const ScalarType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_, true, eps);
   }
 
@@ -425,12 +442,15 @@ private:
 protected:
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
+    if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
       backend_ = std::make_shared<BackendType>(*backend_);
+    }
   } // ... ensure_uniqueness(...)
 
 private:
   std::shared_ptr<BackendType> backend_;
+  mutable std::mutex mutex_;
 }; // class EigenRowMajorSparseMatrix
 
 #else // HAVE_EIGEN
