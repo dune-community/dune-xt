@@ -107,18 +107,20 @@ public:
 
   void scal(const ScalarType& alpha)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    backend() *= alpha;
+    backend_ref *= alpha;
   }
 
   template <class T>
   void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += alpha * xx.backend();
+    backend_ref += alpha * xx.backend();
   } // ... axpy(...)
 
   bool has_equal_shape(const VectorImpType& other) const
@@ -137,16 +139,18 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    backend()(ii) += value;
+    backend_ref(ii) += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    backend()(ii) = value;
+    backend_ref(ii) = value;
   }
 
   ScalarType get_entry(const size_t ii) const
@@ -207,7 +211,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return backend_->transpose() * other.backend();
+    return backend().transpose() * other.backend();
   } // ... dot(...)
 
   virtual ScalarType dot(const VectorImpType& other) const override final
@@ -236,11 +240,12 @@ public:
   template <class T>
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += other.backend();
+    backend_ref += other.backend();
   } // ... iadd(...)
 
   virtual void iadd(const VectorImpType& other) override final
@@ -251,11 +256,12 @@ public:
   template <class T>
   void isub(const EigenBaseVector<T, ScalarType>& other)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() -= *(other.backend_);
+    backend_ref -= *(other.backend_);
   } // ... isub(...)
 
   virtual void isub(const VectorImpType& other) override final

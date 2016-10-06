@@ -207,17 +207,19 @@ public:
 
   void scal(const ScalarType& alpha)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    backend() *= alpha;
+    backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    backend().axpy(alpha, *(xx.backend_));
+    backend_ref.axpy(alpha, xx.backend());
   }
 
   bool has_equal_shape(const ThisType& other) const
@@ -239,16 +241,18 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    backend()[ii][0] += value;
+    backend_ref[ii][0] += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    backend()[ii][0] = value;
+    backend_ref[ii][0] = value;
   }
 
   ScalarType get_entry(const size_t ii) const
@@ -312,20 +316,22 @@ public:
 
   virtual void iadd(const ThisType& other) override final
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += other.backend();
+    backend_ref += other.backend();
   } // ... iadd(...)
 
   virtual void isub(const ThisType& other) override final
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() -= other.backend();
+    backend_ref -= other.backend();
   } // ... isub(...)
 
   /// \}
@@ -469,12 +475,14 @@ public:
 
   void scal(const ScalarType& alpha)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    backend() *= alpha;
+    backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -483,7 +491,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend().axpy(alpha, xx.backend());
+    backend_ref.axpy(alpha, xx.backend());
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -507,23 +515,26 @@ public:
 
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     DUNE_XT_COMMON_TIMING_SCOPE(static_id() + ".mv");
-    backend().mv(xx.backend(), yy.backend());
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    backend_ref.mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(these_are_valid_indices(ii, jj));
-    backend()[ii][jj][0][0] += value;
+    backend_ref[ii][jj][0][0] += value;
   }
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(these_are_valid_indices(ii, jj));
-    backend()[ii][jj][0][0] = value;
+    backend_ref[ii][jj][0][0] = value;
   }
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
@@ -538,11 +549,12 @@ public:
 
   void clear_row(const size_t ii)
   {
+    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend()[ii] *= ScalarType(0);
+    backend_ref[ii] *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
