@@ -248,9 +248,10 @@ public:
     return backend_->operator[](ii);
   } // ... get_entry(...)
 
+protected:
   inline ScalarType& get_entry_ref(const size_t ii)
   {
-    return backend()[ii];
+    return backend_->operator[](ii);
   }
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
@@ -258,14 +259,15 @@ public:
     return backend_->operator[](ii);
   }
 
+public:
   inline ScalarType& operator[](const size_t ii)
   {
-    return get_entry_ref(ii);
+    return backend()[ii];
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
-    return get_entry_ref(ii);
+    return backend()[ii];
   }
 
   /// \}
