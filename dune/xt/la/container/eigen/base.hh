@@ -145,7 +145,7 @@ public:
   ScalarType get_entry(const size_t ii) const
   {
     assert(ii < size());
-    return backend_->operator[](ii);
+    return backend()[ii];
   }
 
 protected:
@@ -198,7 +198,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return backend_->transpose() * *(other.backend_);
+    return backend_->transpose() * other.backend();
   } // ... dot(...)
 
   virtual ScalarType dot(const VectorImpType& other) const override final
@@ -208,17 +208,17 @@ public:
 
   virtual RealType l1_norm() const override final
   {
-    return backend_->template lpNorm<1>();
+    return backend().template lpNorm<1>();
   }
 
   virtual RealType l2_norm() const override final
   {
-    return backend_->template lpNorm<2>();
+    return backend().template lpNorm<2>();
   }
 
   virtual RealType sup_norm() const override final
   {
-    return backend_->template lpNorm<::Eigen::Infinity>();
+    return backend().template lpNorm<::Eigen::Infinity>();
   }
 
   template <class T1, class T2>
@@ -244,7 +244,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += *(other.backend_);
+    backend() += other.backend();
   } // ... iadd(...)
 
   virtual void iadd(const VectorImpType& other) override final

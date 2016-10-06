@@ -473,8 +473,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    const auto& xx_ref = *(xx.backend_);
-    backend() += alpha * xx_ref;
+    backend() += alpha * xx.backend();
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -499,7 +498,7 @@ public:
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
-    yy.backend().transpose() = backend_->operator*(*xx.backend_);
+    yy.backend().transpose() = backend() * xx.backend();
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -520,7 +519,7 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend_->operator()(ii, jj);
+    return backend()(ii, jj);
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)

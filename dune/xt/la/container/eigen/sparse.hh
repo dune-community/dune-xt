@@ -217,7 +217,7 @@ public:
   void scal(const ScalarType& alpha)
   {
     backend() *= alpha;
-  } // ... scal(...)
+  }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
@@ -228,8 +228,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    const auto& xx_ref = *(xx.backend_);
-    backend() += alpha * xx_ref;
+    backend() += alpha * xx.backend();
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -254,7 +253,7 @@ public:
   template <class T1, class T2>
   inline void mv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
   {
-    yy.backend().transpose() = backend_->operator*(*xx.backend_);
+    yy.backend().transpose() = backend() * xx.backend();
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -275,7 +274,7 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend_->coeff(internal::boost_numeric_cast<EIGEN_size_t>(ii),
+    return backend().coeff(internal::boost_numeric_cast<EIGEN_size_t>(ii),
                            internal::boost_numeric_cast<EIGEN_size_t>(jj));
   }
 
@@ -289,10 +288,10 @@ public:
 
   void clear_col(const size_t jj)
   {
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    ensure_uniqueness();
     for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, internal::boost_numeric_cast<EIGEN_size_t>(row));
            row_it;
@@ -325,13 +324,13 @@ public:
 
   void unit_col(const size_t jj)
   {
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     if (jj >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
-    ensure_uniqueness();
     for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend_->outerSize(); ++row) {
       for (typename BackendType::InnerIterator row_it(*backend_, internal::boost_numeric_cast<EIGEN_size_t>(row));
            row_it;
@@ -429,6 +428,7 @@ protected:
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
+
 private:
   std::shared_ptr<BackendType> backend_;
 }; // class EigenRowMajorSparseMatrix
