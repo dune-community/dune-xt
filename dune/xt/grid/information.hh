@@ -155,6 +155,16 @@ struct Dimensions
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
     f.apply_local(entity);
   }
+
+  XT::Common::FieldVector<typename GridType::ctype, GridType::dimensionworld> view_center() const
+  {
+    XT::Common::FieldVector<typename GridType::ctype, GridType::dimensionworld> center;
+    size_t idx = 0;
+    for (auto&& axis_min_max : coord_limits) {
+      center[idx++] = axis_min_max.average();
+    }
+    return center;
+  }
 };
 
 template <class GridType>
