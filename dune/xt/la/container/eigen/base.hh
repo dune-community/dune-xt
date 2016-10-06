@@ -90,7 +90,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -291,7 +290,7 @@ private:
   /**
    * \see ContainerInterface
    */
-  void ensure_uniqueness() const
+  void ensure_uniqueness()
   {
     CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
     VectorInterfaceType::as_imp().ensure_uniqueness();
@@ -307,7 +306,7 @@ private:
   friend class EigenRowMajorSparseMatrix<ScalarType>;
 
 protected:
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
 }; // class EigenBaseVector
 
 #else // HAVE_EIGEN

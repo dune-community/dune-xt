@@ -176,7 +176,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   } // ... backend(...)
 
@@ -351,7 +350,7 @@ private:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
@@ -360,7 +359,7 @@ private:
   friend class VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>;
   friend class CommonDenseMatrix<ScalarType>;
 
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseVector
 
 /**

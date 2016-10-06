@@ -196,7 +196,7 @@ public:
 private:
   using BaseType::backend_;
 
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*(backend_));
@@ -434,7 +434,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -585,13 +584,13 @@ public:
    */
 
 private:
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
 }; // class EigenDenseMatrix
 
 #else // HAVE_EIGEN
