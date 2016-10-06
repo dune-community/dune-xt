@@ -355,7 +355,7 @@ public:
 
   /// \}
 
-private:
+protected:
   /**
    * \see ContainerInterface
    */
@@ -365,6 +365,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+private:
   friend class VectorInterface<internal::IstlDenseVectorTraits<ScalarType>, ScalarType>;
   friend class IstlRowMajorSparseMatrix<ScalarType>;
 
@@ -703,6 +704,7 @@ private:
     return backend_->exists(ii, jj);
   } // ... these_are_valid_indices(...)
 
+protected:
   /**
    * \see ContainerInterface
    */
@@ -712,6 +714,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+private:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class IstlRowMajorSparseMatrix
 

@@ -196,12 +196,14 @@ public:
 private:
   using BaseType::backend_;
 
+protected:
   inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*(backend_));
   } // ... ensure_uniqueness(...)
 
+private:
   friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenDenseVector
 
@@ -313,6 +315,7 @@ public:
 private:
   using BaseType::backend_;
 
+protected:
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique()) {
@@ -322,6 +325,7 @@ private:
     }
   } // ... ensure_uniqueness(...)
 
+private:
   friend class EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenMappedDenseVector
 
@@ -583,13 +587,14 @@ public:
    * \}
    */
 
-private:
+protected:
   inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+private:
   std::shared_ptr<BackendType> backend_;
 }; // class EigenDenseMatrix
 

@@ -346,7 +346,7 @@ public:
 
   /// \}
 
-private:
+protected:
   /**
    * \see ContainerInterface
    */
@@ -356,6 +356,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+private:
   friend class VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>;
   friend class CommonDenseMatrix<ScalarType>;
 
@@ -598,7 +599,7 @@ public:
 
   /// \}
 
-private:
+protected:
   /**
    * \see ContainerInterface
    */
@@ -608,6 +609,7 @@ private:
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+private:
   mutable std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseMatrix
 
@@ -909,12 +911,14 @@ private:
     return size_t(-1);
   }
 
+protected:
   inline void ensure_uniqueness() const
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
+private:
   size_t num_rows_, num_cols_;
   mutable std::shared_ptr<BackendType> backend_;
   std::shared_ptr<IndexVectorType> row_pointers_;

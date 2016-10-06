@@ -286,7 +286,7 @@ public:
   //! disambiguation necessary since it exists in multiple bases
   using VectorInterfaceType::as_imp;
 
-private:
+protected:
   /**
    * \see ContainerInterface
    */
@@ -296,6 +296,7 @@ private:
     VectorInterfaceType::as_imp().ensure_uniqueness();
   }
 
+private:
 #ifndef NDEBUG
   //! disambiguation necessary since it exists in multiple bases
   using VectorInterfaceType::crtp_mutex_;

@@ -423,12 +423,13 @@ private:
     return false;
   } // ... these_are_valid_indices(...)
 
+protected:
   inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
-
+private:
   std::shared_ptr<BackendType> backend_;
 }; // class EigenRowMajorSparseMatrix
 
