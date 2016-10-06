@@ -172,12 +172,12 @@ public:
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
+  }
 
   const BackendType& backend() const
   {
     return *backend_;
-  } // ... backend(...)
+  }
 
   /// \}
   /// \name Required by ProvidesDataAccess.
@@ -200,16 +200,15 @@ public:
   void scal(const ScalarType& alpha)
   {
     backend() *= alpha;
-  } // ... scal(...)
+  }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    ensure_uniqueness();
-    auto& this_ref = *backend_;
-    const auto& xx_ref = *(xx.backend_);
+    auto& this_ref = backend();
+    const auto& xx_ref = xx.backend();
     for (size_t ii = 0; ii < this_ref.size(); ++ii)
       this_ref[ii] += alpha * xx_ref[ii];
   } // ... axpy(...)
@@ -231,22 +230,20 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator[](ii) += value;
-  } // ... add_to_entry(...)
+    backend()[ii] += value;
+  }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator[](ii) = value;
-  } // ... set_entry(...)
+    backend()[ii] = value;
+  }
 
   ScalarType get_entry(const size_t ii) const
   {
     assert(ii < size());
-    return backend_->operator[](ii);
-  } // ... get_entry(...)
+    return backend()[ii];
+  }
 
 protected:
   inline ScalarType& get_entry_ref(const size_t ii)
@@ -279,22 +276,22 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return backend_->operator*(*(other.backend_));
+    return backend() * other.backend();
   } // ... dot(...)
 
   virtual RealType l1_norm() const override final
   {
-    return backend_->one_norm();
+    return backend().one_norm();
   }
 
   virtual RealType l2_norm() const override final
   {
-    return backend_->two_norm();
+    return backend().two_norm();
   }
 
   virtual RealType sup_norm() const override final
   {
-    return backend_->infinity_norm();
+    return backend().infinity_norm();
   }
 
   virtual void add(const ThisType& other, ThisType& result) const override final
@@ -315,7 +312,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += *(other.backend_);
+    backend() += other.backend();
   } // ... iadd(...)
 
   virtual void sub(const ThisType& other, ThisType& result) const override final
@@ -336,7 +333,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() -= *(other.backend_);
+    backend() -= other.backend();
   } // ... isub(...)
 
   /// \}
@@ -459,7 +456,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -486,7 +482,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend().axpy(alpha, *(xx.backend_));
+    backend().axpy(alpha, xx.backend());
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -500,12 +496,12 @@ public:
 
   inline size_t rows() const
   {
-    return backend_->rows();
+    return backend().rows();
   }
 
   inline size_t cols() const
   {
-    return backend_->cols();
+    return backend().cols();
   }
 
   inline void mv(const VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
@@ -516,7 +512,7 @@ public:
 
   inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
   {
-    backend_->mv(*(xx.backend_), yy.backend());
+    backend().mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -537,7 +533,7 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend_->operator[](ii)[jj];
+    return backend()[ii][jj];
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)
@@ -553,7 +549,7 @@ public:
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    BackendType& backend_ref = backend();
+    auto& backend_ref = backend();
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_ref[ii][jj] = ScalarType(0);
   } // ... clear_col(...)
@@ -580,16 +576,17 @@ public:
     if (jj >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
-    ensure_uniqueness();
+    auto& backend_ref = backend();
     for (size_t ii = 0; ii < rows(); ++ii)
-      backend_->operator[](ii)[jj] = ScalarType(0);
-    backend_->operator[](jj)[jj] = ScalarType(1);
+      backend_ref[ii][jj] = ScalarType(0);
+    backend_ref[jj][jj] = ScalarType(1);
   } // ... unit_col(...)
 
   bool valid() const
   {
+    const auto& backend_ref = backend();
     for (size_t ii = 0; ii < rows(); ++ii) {
-      const auto& row_vec = backend_->operator[](ii);
+      const auto& row_vec = backend_ref[ii];
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = row_vec[jj];
         if (Common::isnan(entry) || Common::isinf(entry))
@@ -605,14 +602,14 @@ protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
 private:
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
 }; // class CommonDenseMatrix
 
 /**
@@ -781,8 +778,8 @@ public:
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    assert(has_equal_shape(xx));
     ensure_uniqueness();
+    assert(has_equal_shape(xx));
     const auto& xx_backend = xx.backend();
     for (size_t ii = 0; ii < backend_->size(); ++ii)
       backend_->operator[](ii) += alpha * xx_backend[ii];
@@ -914,7 +911,7 @@ private:
   }
 
 protected:
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
@@ -922,7 +919,7 @@ protected:
 
 private:
   size_t num_rows_, num_cols_;
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
   std::shared_ptr<IndexVectorType> row_pointers_;
   std::shared_ptr<IndexVectorType> column_indices_;
 }; // class CommonSparseMatrix
