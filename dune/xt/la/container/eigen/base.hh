@@ -221,23 +221,6 @@ public:
     return backend().template lpNorm<::Eigen::Infinity>();
   }
 
-  template <class T1, class T2>
-  void add(const EigenBaseVector<T1, ScalarType>& other, EigenBaseVector<T2, ScalarType>& result) const
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    result.backend() = *backend_ + *(other.backend_);
-  } // ... add(...)
-
-  virtual void add(const VectorImpType& other, VectorImpType& result) const override final
-  {
-    return this->template add<Traits, Traits>(other, result);
-  }
-
   template <class T>
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
@@ -250,23 +233,6 @@ public:
   virtual void iadd(const VectorImpType& other) override final
   {
     return this->template iadd<Traits>(other);
-  }
-
-  template <class T1, class T2>
-  void sub(const EigenBaseVector<T1, ScalarType>& other, EigenBaseVector<T2, ScalarType>& result) const
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    result.backend() = *backend_ - *(other.backend_);
-  } // ... sub(...)
-
-  virtual void sub(const VectorImpType& other, VectorImpType& result) const override final
-  {
-    return this->template sub<Traits, Traits>(other, result);
   }
 
   template <class T>

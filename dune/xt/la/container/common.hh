@@ -294,18 +294,6 @@ public:
     return backend().infinity_norm();
   }
 
-  virtual void add(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    BackendType& result_ref = result.backend();
-    for (size_t ii = 0; ii < size(); ++ii)
-      result_ref[ii] = backend_->operator[](ii) + other.backend_->operator[](ii);
-  } // ... add(...)
 
   virtual void iadd(const ThisType& other) override final
   {
@@ -315,18 +303,6 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  virtual void sub(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    BackendType& result_ref = result.backend();
-    for (size_t ii = 0; ii < size(); ++ii)
-      result_ref[ii] = backend_->operator[](ii) - other.backend_->operator[](ii);
-  } // ... sub(...)
 
   virtual void isub(const ThisType& other) override final
   {
@@ -335,15 +311,6 @@ public:
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend() -= other.backend();
   } // ... isub(...)
-
-  /// \}
-  /// \name Imported from VectorInterface.
-  /// \{
-
-  using VectorInterfaceType::add;
-  using VectorInterfaceType::sub;
-
-  /// \}
 
 protected:
   /**

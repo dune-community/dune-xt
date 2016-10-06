@@ -294,28 +294,6 @@ public:
     return backend().infinity_norm();
   }
 
-  virtual void add(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    result.backend() = *(backend_);
-    result.backend() += *(other.backend_);
-  } // ... add(...)
-
-  virtual ThisType add(const ThisType& other) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    ThisType result = copy();
-    result.backend_->operator+=(*(other.backend_));
-    return result;
-  } // ... add(...)
-
   virtual void iadd(const ThisType& other) override final
   {
     if (other.size() != size())
@@ -323,28 +301,6 @@ public:
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend() += other.backend();
   } // ... iadd(...)
-
-  virtual void sub(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    result.backend() = *(backend_);
-    result.backend() -= *(other.backend_);
-  } // ... sub(...)
-
-  virtual ThisType sub(const ThisType& other) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    ThisType result = copy();
-    result.backend_->operator-=(*(other.backend_));
-    return result;
-  } // ... sub(...)
 
   virtual void isub(const ThisType& other) override final
   {
