@@ -24,6 +24,7 @@
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/ranges.hh>
+#include <dune/xt/common/parallel/threadstorage.hh>
 
 #include <dune/xt/grid/entity.hh>
 
@@ -119,7 +120,7 @@ public:
     EntityVectorType ret(points.size());
     typename EntityVectorType::size_type idx(0);
     for (const auto& point : points) {
-      IteratorType it_current = it_last_;
+      IteratorType it_current = *it_last_;
       bool it_reset = true;
       typename EntityVectorType::value_type tmp_ptr(nullptr);
       for (; it_current != end; ++it_current) {
@@ -127,18 +128,18 @@ public:
           ret[idx++] = std::move(tmp_ptr);
           tmp_ptr = nullptr;
           it_reset = false;
-          it_last_ = it_current;
+          *it_last_ = it_current;
           break;
         }
       }
       if (!it_reset)
         continue;
-      for (it_current = begin; it_current != it_last_; ++it_current) {
+      for (it_current = begin; it_current != *it_last_; ++it_current) {
         if ((tmp_ptr = check_add(*it_current, point))) {
           ret[idx++] = std::move(tmp_ptr);
           tmp_ptr = nullptr;
           it_reset = false;
-          it_last_ = it_current;
+          *it_last_ = it_current;
           break;
         }
       }
@@ -148,7 +149,7 @@ public:
 
 private:
   const GridViewType gridview_;
-  IteratorType it_last_;
+  Common::PerThreadValue<IteratorType> it_last_;
 }; // class EntityInlevelSearch
 
 template <class GridViewType>
