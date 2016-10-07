@@ -762,7 +762,6 @@ public:
   inline ThisType copy() const
   {
     ThisType ret(*this);
-    ensure_uniqueness();
     return ret;
   }
 
@@ -887,7 +886,6 @@ public:
                                          const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     SparsityPatternDefault ret(num_rows_);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
       for (size_t kk = row_pointers_->operator[](rr + 1); kk < row_pointers_->operator[](rr + 1); ++kk) {
@@ -904,7 +902,6 @@ public:
 private:
   size_t get_entry_index(const size_t rr, const size_t cc, const bool throw_if_not_in_pattern = true) const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const auto& row_offset = row_pointers_->operator[](rr);
     const auto& next_row_offset = row_pointers_->operator[](rr+1);
     const auto column_indices_it = column_indices_->begin() + row_offset;
