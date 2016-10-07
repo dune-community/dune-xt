@@ -176,6 +176,13 @@ public:
     return this->as_imp().has_equal_shape(other);
   }
 
+protected:
+  inline void ensure_uniqueness()
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().ensure_uniqueness());
+  }
+
+public:
   /// \}
   /// \name Are provided by the interface for convenience!
   /// \note Those marked as virtual may be implemented more efficiently in a derived class!

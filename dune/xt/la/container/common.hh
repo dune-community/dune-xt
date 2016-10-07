@@ -19,12 +19,14 @@
 #include <type_traits>
 #include <vector>
 #include <complex>
+#include <mutex>
 
 #include <dune/common/dynvector.hh>
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/float_cmp.hh>
 #include <dune/common/ftraits.hh>
+#include <dune/common/unused.hh>
 
 #include <dune/xt/common/exceptions.hh>
 
@@ -120,7 +122,10 @@ public:
     }
   } // CommonDenseVector(...)
 
-  CommonDenseVector(const ThisType& other) = default;
+  CommonDenseVector(const ThisType& other)
+    : backend_(other.backend_)
+  {
+  }
 
   explicit CommonDenseVector(const BackendType& other,
                              const bool /*prune*/ = false,
@@ -151,6 +156,7 @@ public:
   ThisType& operator=(const ScalarType& value)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (auto& element : *this)
       element = value;
     return *this;
@@ -161,6 +167,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   }
@@ -172,13 +179,12 @@ public:
   {
     ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
+  }
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
-  } // ... backend(...)
+  }
 
   /// \}
   /// \name Required by ProvidesDataAccess.
@@ -195,24 +201,26 @@ public:
 
   ThisType copy() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
-    backend() *= alpha;
-  } // ... scal(...)
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    backend_ref *= alpha;
+  }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    ensure_uniqueness();
-    auto& this_ref = *backend_;
-    const auto& xx_ref = *(xx.backend_);
-    for (size_t ii = 0; ii < this_ref.size(); ++ii)
-      this_ref[ii] += alpha * xx_ref[ii];
+    for (size_t ii = 0; ii < backend_ref.size(); ++ii)
+      backend_ref[ii] += alpha * xx.backend()[ii];
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -231,27 +239,30 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator[](ii) += value;
-  } // ... add_to_entry(...)
+    backend_ref[ii] += value;
+  }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    ensure_uniqueness();
-    backend_->operator[](ii) = value;
-  } // ... set_entry(...)
+    backend_ref[ii] = value;
+  }
 
   ScalarType get_entry(const size_t ii) const
   {
     assert(ii < size());
-    return backend_->operator[](ii);
-  } // ... get_entry(...)
+    return backend()[ii];
+  }
 
+protected:
   inline ScalarType& get_entry_ref(const size_t ii)
   {
-    return backend()[ii];
+    return backend_->operator[](ii);
   }
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
@@ -259,14 +270,15 @@ public:
     return backend_->operator[](ii);
   }
 
+public:
   inline ScalarType& operator[](const size_t ii)
   {
-    return get_entry_ref(ii);
+    return backend()[ii];
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
-    return get_entry_ref(ii);
+    return backend()[ii];
   }
 
   /// \}
@@ -275,93 +287,71 @@ public:
 
   virtual ScalarType dot(const ThisType& other) const override final
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return backend_->operator*(*(other.backend_));
+    return backend() * other.backend();
   } // ... dot(...)
 
   virtual RealType l1_norm() const override final
   {
-    return backend_->one_norm();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    return backend().one_norm();
   }
 
   virtual RealType l2_norm() const override final
   {
-    return backend_->two_norm();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    return backend().two_norm();
   }
 
   virtual RealType sup_norm() const override final
   {
-    return backend_->infinity_norm();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    return backend().infinity_norm();
   }
-
-  virtual void add(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    BackendType& result_ref = result.backend();
-    for (size_t ii = 0; ii < size(); ++ii)
-      result_ref[ii] = backend_->operator[](ii) + other.backend_->operator[](ii);
-  } // ... add(...)
 
   virtual void iadd(const ThisType& other) override final
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += *(other.backend_);
+    backend_ref += other.backend();
   } // ... iadd(...)
-
-  virtual void sub(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    BackendType& result_ref = result.backend();
-    for (size_t ii = 0; ii < size(); ++ii)
-      result_ref[ii] = backend_->operator[](ii) - other.backend_->operator[](ii);
-  } // ... sub(...)
 
   virtual void isub(const ThisType& other) override final
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() -= *(other.backend_);
+    backend_ref -= other.backend();
   } // ... isub(...)
 
-  /// \}
-  /// \name Imported from VectorInterface.
-  /// \{
-
-  using VectorInterfaceType::add;
-  using VectorInterfaceType::sub;
-
-  /// \}
-
-private:
+protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
+    if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
       backend_ = std::make_shared<BackendType>(*backend_);
+    }
   } // ... ensure_uniqueness(...)
 
+private:
   friend class VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>;
   friend class CommonDenseMatrix<ScalarType>;
 
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
+  mutable std::mutex mutex_;
 }; // class CommonDenseVector
+
 
 /**
  *  \brief  A dense matrix implementation of MatrixInterface using the Dune::DynamicMatrix.
@@ -433,6 +423,7 @@ public:
 
   ThisType& operator=(const ThisType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = other.backend_;
     return *this;
   }
@@ -442,6 +433,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   }
@@ -457,7 +449,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -467,16 +458,21 @@ public:
 
   ThisType copy() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
-    backend() *= alpha;
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
@@ -484,7 +480,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend().axpy(alpha, *(xx.backend_));
+    backend_ref.axpy(alpha, xx.backend());
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -498,12 +494,12 @@ public:
 
   inline size_t rows() const
   {
-    return backend_->rows();
+    return backend().rows();
   }
 
   inline size_t cols() const
   {
-    return backend_->cols();
+    return backend().cols();
   }
 
   inline void mv(const VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
@@ -514,57 +510,67 @@ public:
 
   inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
   {
-    backend_->mv(*(xx.backend_), yy.backend());
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    backend().mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < rows());
     assert(jj < cols());
-    backend()[ii][jj] += value;
+    backend_ref[ii][jj] += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < rows());
     assert(jj < cols());
-    backend()[ii][jj] = value;
+    backend_ref[ii][jj] = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend_->operator[](ii)[jj];
+    return backend()[ii][jj];
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend()[ii] *= ScalarType(0);
+    backend_ref[ii] *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    BackendType& backend_ref = backend();
     for (size_t ii = 0; ii < rows(); ++ii)
       backend_ref[ii][jj] = ScalarType(0);
   } // ... clear_col(...)
 
   void unit_row(const size_t ii)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    auto& row = backend()[ii];
+    auto& row = backend_ref[ii];
     for (size_t jj = 0; jj < cols(); ++jj)
       row[jj] = ScalarType(0);
     row[ii] = ScalarType(1);
@@ -572,22 +578,24 @@ public:
 
   void unit_col(const size_t jj)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     if (jj >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
-    ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii)
-      backend_->operator[](ii)[jj] = ScalarType(0);
-    backend_->operator[](jj)[jj] = ScalarType(1);
+      backend_ref[ii][jj] = ScalarType(0);
+    backend_ref[jj][jj] = ScalarType(1);
   } // ... unit_col(...)
 
   bool valid() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t ii = 0; ii < rows(); ++ii) {
-      const auto& row_vec = backend_->operator[](ii);
+      const auto& row_vec = backend()[ii];
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = row_vec[jj];
         if (Common::isnan(entry) || Common::isinf(entry))
@@ -599,17 +607,21 @@ public:
 
   /// \}
 
-private:
+protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
+    if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
       backend_ = std::make_shared<BackendType>(*backend_);
+    }
   } // ... ensure_uniqueness(...)
 
-  mutable std::shared_ptr<BackendType> backend_;
+private:
+  std::shared_ptr<BackendType> backend_;
+  mutable std::mutex mutex_;
 }; // class CommonDenseMatrix
 
 /**
@@ -628,7 +640,6 @@ public:
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
   typedef std::vector<size_t> IndexVectorType;
-
 
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
@@ -726,6 +737,7 @@ public:
   template <int ROWS, int COLS>
   explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ROWS == num_rows_ && COLS == num_cols_);
     Dune::FieldMatrix<ScalarType, ROWS, COLS> ret(ScalarType(0));
     for (size_t rr = 0; rr < ROWS; ++rr)
@@ -772,14 +784,16 @@ public:
   inline void scal(const ScalarType& alpha)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     std::transform(
         backend_->begin(), backend_->end(), backend_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
   }
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    assert(has_equal_shape(xx));
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    assert(has_equal_shape(xx));
     const auto& xx_backend = xx.backend();
     for (size_t ii = 0; ii < backend_->size(); ++ii)
       backend_->operator[](ii) += alpha * xx_backend[ii];
@@ -807,6 +821,7 @@ public:
   template <class XX, class YY>
   inline void mv(const XX& xx, YY& yy) const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     std::fill(yy.begin(), yy.end(), ScalarType(0));
     for (size_t rr = 0; rr < num_rows_; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
@@ -816,6 +831,7 @@ public:
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const size_t index = get_index_in_backend(rr, cc);
     assert(index != size_t(-1) && "Entry has to be in the sparsity pattern!");
     backend_->operator[](index) += value;
@@ -823,6 +839,7 @@ public:
 
   inline ScalarType get_entry(const size_t rr, const size_t cc) const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const size_t index = get_index_in_backend(rr, cc);
     return index == size_t(-1) ? ScalarType(0) : backend_->operator[](index);
   }
@@ -830,6 +847,7 @@ public:
   inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const size_t index = get_index_in_backend(rr, cc);
     assert(index != size_t(-1) && "Entry has to be in the sparsity pattern!");
     backend_->operator[](index) = value;
@@ -838,6 +856,7 @@ public:
   inline void clear_row(const size_t rr)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     std::fill(backend_->begin() + row_pointers_->operator[](rr),
               backend_->begin() + row_pointers_->operator[](rr + 1),
               ScalarType(0));
@@ -846,6 +865,7 @@ public:
   inline void clear_col(const size_t cc)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t kk = 0; kk < backend_->size(); ++kk) {
       if (column_indices_->operator[](kk) == cc)
         backend_->operator[](kk) = ScalarType(0);
@@ -868,6 +888,7 @@ public:
 
   bool valid() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     // iterate over non-zero entries
     for (const auto& entry : *backend_)
       if (XT::Common::isnan(std::real(entry)) || XT::Common::isnan(std::imag(entry))
@@ -885,6 +906,7 @@ public:
                                          const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     SparsityPatternDefault ret(num_rows_);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
       for (size_t kk = row_pointers_->operator[](rr + 1); kk < row_pointers_->operator[](rr + 1); ++kk) {
@@ -901,6 +923,7 @@ public:
 private:
   size_t get_index_in_backend(const size_t rr, const size_t cc) const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const auto& row_offset = row_pointers_->operator[](rr);
     auto column_indices_iterator = column_indices_->begin();
     column_indices_iterator += row_offset;
@@ -910,16 +933,21 @@ private:
     return size_t(-1);
   }
 
-  inline void ensure_uniqueness() const
+protected:
+  inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
+    if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
       backend_ = std::make_shared<BackendType>(*backend_);
+    }
   } // ... ensure_uniqueness(...)
 
+private:
   size_t num_rows_, num_cols_;
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
   std::shared_ptr<IndexVectorType> row_pointers_;
   std::shared_ptr<IndexVectorType> column_indices_;
+  mutable std::mutex mutex_;
 }; // class CommonSparseMatrix
 
 } // namespace LA

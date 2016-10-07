@@ -84,7 +84,6 @@ public:
 
   /**
    * \brief Get the iith entry.
-   * \todo  Default implement using get_entry_ref!
    */
   inline ScalarType get_entry(const size_t ii) const
   {
@@ -92,6 +91,11 @@ public:
     return this->as_imp().get_entry(ii);
   }
 
+protected:
+  /**
+   * The purpose of get_entry_ref is to allow direct access to the underlying data without any checks (regarding cow
+   * or thread safety). This allows default implementations in the interface with locking prior to for-loops.
+   */
   inline ScalarType& get_entry_ref(const size_t ii)
   {
     CHECK_CRTP(this->as_imp().get_entry_ref(ii));
@@ -104,6 +108,7 @@ public:
     return this->as_imp().get_entry_ref(ii);
   }
 
+public:
   /// \}
   /// \name Provided by the interface for convenience!
   /// \note Those marked as virtual may be implemented more efficiently in a derived class!

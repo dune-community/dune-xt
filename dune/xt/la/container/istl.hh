@@ -17,11 +17,13 @@
 #include <vector>
 #include <initializer_list>
 #include <complex>
+#include <mutex>
 
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
+#include <dune/common/unused.hh>
 
 #if HAVE_DUNE_ISTL
 #include <dune/istl/bvector.hh>
@@ -120,7 +122,10 @@ public:
     }
   } // IstlDenseVector(...)
 
-  IstlDenseVector(const ThisType& other) = default;
+  IstlDenseVector(const ThisType& other)
+    : backend_(other.backend_)
+  {
+  }
 
   explicit IstlDenseVector(const BackendType& other,
                            const bool /*prune*/ = false,
@@ -153,6 +158,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   }
@@ -163,6 +169,7 @@ public:
   ThisType& operator=(const ScalarType& value)
   {
     ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (auto& element : *this)
       element = value;
     return *this;
@@ -176,7 +183,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -195,20 +201,25 @@ public:
 
   ThisType copy() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
-    backend() *= alpha;
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    backend().axpy(alpha, *(xx.backend_));
+    backend_ref.axpy(alpha, xx.backend());
   }
 
   bool has_equal_shape(const ThisType& other) const
@@ -230,14 +241,18 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    backend()[ii][0] += value;
+    backend_ref[ii][0] += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ii < size());
-    backend()[ii][0] = value;
+    backend_ref[ii][0] = value;
   }
 
   ScalarType get_entry(const size_t ii) const
@@ -246,9 +261,10 @@ public:
     return backend_->operator[](ii)[0];
   }
 
+protected:
   inline ScalarType& get_entry_ref(const size_t ii)
   {
-    return backend()[ii][0];
+    return backend_->operator[](ii)[0];
   }
 
   inline const ScalarType& get_entry_ref(const size_t ii) const
@@ -256,14 +272,15 @@ public:
     return backend_->operator[](ii)[0];
   }
 
+public:
   inline ScalarType& operator[](const size_t ii)
   {
-    return get_entry_ref(ii);
+    return backend()[ii][0];
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
-    return get_entry_ref(ii);
+    return backend()[ii][0];
   }
 
   /// \}
@@ -272,103 +289,71 @@ public:
 
   virtual ScalarType dot(const ThisType& other) const override final
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    return backend_->dot(*(other.backend_));
+    return backend().dot(other.backend());
   } // ... dot(...)
 
   virtual RealType l1_norm() const override final
   {
-    return backend_->one_norm();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    return backend().one_norm();
   }
 
   virtual RealType l2_norm() const override final
   {
-    return backend_->two_norm();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    return backend().two_norm();
   }
 
   virtual RealType sup_norm() const override final
   {
-    return backend_->infinity_norm();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    return backend().infinity_norm();
   }
-
-  virtual void add(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    result.backend() = *(backend_);
-    result.backend() += *(other.backend_);
-  } // ... add(...)
-
-  virtual ThisType add(const ThisType& other) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    ThisType result = copy();
-    result.backend_->operator+=(*(other.backend_));
-    return result;
-  } // ... add(...)
 
   virtual void iadd(const ThisType& other) override final
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() += *(other.backend_);
+    backend_ref += other.backend();
   } // ... iadd(...)
-
-  virtual void sub(const ThisType& other, ThisType& result) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    if (result.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
-    result.backend() = *(backend_);
-    result.backend() -= *(other.backend_);
-  } // ... sub(...)
-
-  virtual ThisType sub(const ThisType& other) const override final
-  {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    ThisType result = copy();
-    result.backend_->operator-=(*(other.backend_));
-    return result;
-  } // ... sub(...)
 
   virtual void isub(const ThisType& other) override final
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend() -= (*(other.backend_));
+    backend_ref -= other.backend();
   } // ... isub(...)
 
   /// \}
 
-private:
+protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
+    if (!backend_.unique()) {
+      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
       backend_ = std::make_shared<BackendType>(*backend_);
+    }
   } // ... ensure_uniqueness(...)
 
+private:
   friend class VectorInterface<internal::IstlDenseVectorTraits<ScalarType>, ScalarType>;
   friend class IstlRowMajorSparseMatrix<ScalarType>;
 
-  mutable std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<BackendType> backend_;
+  mutable std::mutex mutex_;
 }; // class IstlDenseVector
 
 /**
@@ -409,7 +394,10 @@ public:
   {
   }
 
-  IstlRowMajorSparseMatrix(const ThisType& other) = default;
+  IstlRowMajorSparseMatrix(const ThisType& other)
+    : backend_(other.backend_)
+  {
+  }
 
   explicit IstlRowMajorSparseMatrix(const BackendType& mat,
                                     const bool prune = false,
@@ -456,6 +444,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   } // ... operator=(...)
@@ -471,7 +460,6 @@ public:
 
   const BackendType& backend() const
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -481,16 +469,21 @@ public:
 
   ThisType copy() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
-    backend() *= alpha;
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
@@ -498,7 +491,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend().axpy(alpha, *(xx.backend_));
+    backend_ref.axpy(alpha, xx.backend());
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -523,19 +516,25 @@ public:
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
     DUNE_XT_COMMON_TIMING_SCOPE(static_id() + ".mv");
-    backend_->mv(*(xx.backend_), yy.backend());
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    backend_ref.mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(these_are_valid_indices(ii, jj));
-    backend()[ii][jj][0][0] += value;
+    backend_ref[ii][jj][0][0] += value;
   }
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(these_are_valid_indices(ii, jj));
-    backend()[ii][jj][0][0] = value;
+    backend_ref[ii][jj][0][0] = value;
   }
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
@@ -550,18 +549,21 @@ public:
 
   void clear_row(const size_t ii)
   {
+    auto& backend_ref = backend();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend()[ii] *= ScalarType(0);
+    backend_ref[ii] *= ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
   {
+    ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    ensure_uniqueness();
     for (size_t ii = 0; ii < rows(); ++ii) {
       auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
@@ -572,6 +574,8 @@ public:
 
   void unit_row(const size_t ii)
   {
+    ensure_uniqueness();
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
@@ -581,13 +585,13 @@ public:
     if (!backend_->exists(ii, ii))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
-    ensure_uniqueness();
     backend_->operator[](ii) *= ScalarType(0);
     backend_->operator[](ii)[ii] = ScalarType(1);
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
   {
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -597,18 +601,20 @@ public:
     if (!backend_->exists(jj, jj))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
-    ensure_uniqueness();
+    mutex_.lock();
     for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
       auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
       if (search_result != row.end())
         row.operator[](jj)[0][0] = ScalarType(0);
     }
+    mutex_.unlock();
     set_entry(jj, jj, ScalarType(1));
   } // ... unit_col(...)
 
   bool valid() const
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t ii = 0; ii < rows(); ++ii) {
       const auto& row_vec = backend_->operator[](ii);
       for (size_t jj = 0; jj < cols(); ++jj)
@@ -634,6 +640,7 @@ public:
                                          const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     SparsityPatternDefault ret(rows());
     if (prune) {
       return pruned_pattern_from_backend(*backend_, eps);
@@ -654,6 +661,7 @@ public:
   virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                               Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_, true, eps);
   }
 
@@ -703,16 +711,19 @@ private:
     return backend_->exists(ii, jj);
   } // ... these_are_valid_indices(...)
 
+protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
   } // ... ensure_uniqueness(...)
 
-  mutable std::shared_ptr<BackendType> backend_;
+private:
+  std::shared_ptr<BackendType> backend_;
+  mutable std::mutex mutex_;
 }; // class IstlRowMajorSparseMatrix
 
 template <class S>
