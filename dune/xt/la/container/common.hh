@@ -77,7 +77,7 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonSparseMatrix<ScalarType> derived_type;
-  typedef std::vector<ScalarType> BackendType;
+  typedef std::vector<ScalarType> EntriesVectorType;
   static const constexpr Backends vector_type = Backends::common_dense;
 };
 
@@ -628,15 +628,14 @@ private:
  * \brief A sparse matrix implementation of the MatrixInterface with row major memory layout.
  */
 template <class ScalarImp = double>
-class CommonSparseMatrix : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp>, ScalarImp>,
-                           public ProvidesBackend<internal::CommonSparseMatrixTraits<ScalarImp>>
+class CommonSparseMatrix : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp>, ScalarImp>
 {
   typedef CommonSparseMatrix<ScalarImp> ThisType;
   typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
 
 public:
   typedef internal::CommonSparseMatrixTraits<ScalarImp> Traits;
-  typedef typename Traits::BackendType BackendType;
+  typedef typename Traits::EntriesVectorType EntriesVectorType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
   typedef std::vector<size_t> IndexVectorType;
@@ -647,7 +646,7 @@ public:
   CommonSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
     : num_rows_(rr)
     , num_cols_(cc)
-    , backend_(std::make_shared<BackendType>())
+    , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
   {
@@ -671,7 +670,7 @@ public:
 #endif // NDEBUG
           column_indices_->push_back(columns[col]);
         }
-        backend_->resize(column_indices_->size());
+        entries_->resize(column_indices_->size());
       }
     }
   }
@@ -679,7 +678,7 @@ public:
   CommonSparseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType& value = ScalarType(0))
     : num_rows_(rr)
     , num_cols_(cc)
-    , backend_(std::make_shared<BackendType>(num_rows_ * num_cols_, value))
+    , entries_(std::make_shared<EntriesVectorType>(num_rows_ * num_cols_, value))
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
   {
@@ -702,7 +701,7 @@ public:
   CommonSparseMatrix(const ThisType& other)
     : num_rows_(other.num_rows_)
     , num_cols_(other.num_cols_)
-    , backend_(other.backend_)
+    , entries_(other.entries_)
     , row_pointers_(other.row_pointers_)
     , column_indices_(other.column_indices_)
   {
@@ -716,7 +715,7 @@ public:
           Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
     : num_rows_(Common::MatrixAbstraction<OtherMatrixType>::rows(mat))
     , num_cols_(Common::MatrixAbstraction<OtherMatrixType>::cols(mat))
-    , backend_(std::make_shared<BackendType>())
+    , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
   {
@@ -726,7 +725,7 @@ public:
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
         if (!prune || XT::Common::FloatCmp::ne(value, ScalarType(0), eps)) {
           ++num_nonzero_entries_in_row;
-          backend_->push_back(value);
+          entries_->push_back(value);
           column_indices_->push_back(cc);
         }
       }
@@ -742,32 +741,18 @@ public:
     Dune::FieldMatrix<ScalarType, ROWS, COLS> ret(ScalarType(0));
     for (size_t rr = 0; rr < ROWS; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
-        ret[rr][column_indices_->operator[](kk)] = backend_->operator[](kk);
+        ret[rr][column_indices_->operator[](kk)] = entries_->operator[](kk);
     return ret;
   }
 
   ThisType& operator=(const ThisType& other)
   {
-    backend_ = other.backend_;
+    entries_ = other.entries_;
     row_pointers_ = other.row_pointers_;
     column_indices_ = other.column_indices_;
     num_rows_ = other.num_rows_;
     num_cols_ = other.num_cols_;
     return *this;
-  }
-
-  /// \name Required by the ProvidesBackend interface.
-  /// \{
-
-  BackendType& backend()
-  {
-    ensure_uniqueness();
-    return *backend_;
-  }
-
-  const BackendType& backend() const
-  {
-    return *backend_;
   }
 
   /// \}
@@ -776,8 +761,7 @@ public:
 
   inline ThisType copy() const
   {
-    CommonSparseMatrix ret(*this);
-    ensure_uniqueness();
+    ThisType ret(*this);
     return ret;
   }
 
@@ -786,7 +770,7 @@ public:
     ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     std::transform(
-        backend_->begin(), backend_->end(), backend_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
+        entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
   }
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
@@ -794,9 +778,9 @@ public:
     ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(has_equal_shape(xx));
-    const auto& xx_backend = xx.backend();
-    for (size_t ii = 0; ii < backend_->size(); ++ii)
-      backend_->operator[](ii) += alpha * xx_backend[ii];
+    const auto& xx_entries = *xx.entries_;
+    for (size_t ii = 0; ii < entries_->size(); ++ii)
+      entries_->operator[](ii) += alpha * xx_entries[ii];
   }
 
   inline bool has_equal_shape(const ThisType& other) const
@@ -825,40 +809,36 @@ public:
     std::fill(yy.begin(), yy.end(), ScalarType(0));
     for (size_t rr = 0; rr < num_rows_; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
-        yy[rr] += backend_->operator[](kk) * xx[column_indices_->operator[](kk)];
+        yy[rr] += entries_->operator[](kk) * xx[column_indices_->operator[](kk)];
   }
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
     ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    const size_t index = get_index_in_backend(rr, cc);
-    assert(index != size_t(-1) && "Entry has to be in the sparsity pattern!");
-    backend_->operator[](index) += value;
+    entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 
   inline ScalarType get_entry(const size_t rr, const size_t cc) const
   {
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    const size_t index = get_index_in_backend(rr, cc);
-    return index == size_t(-1) ? ScalarType(0) : backend_->operator[](index);
+    const size_t index = get_entry_index(rr, cc, false);
+    return index == size_t(-1) ? ScalarType(0) : entries_->operator[](index);
   }
 
   inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)
   {
     ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    const size_t index = get_index_in_backend(rr, cc);
-    assert(index != size_t(-1) && "Entry has to be in the sparsity pattern!");
-    backend_->operator[](index) = value;
+    entries_->operator[](get_entry_index(rr, cc)) = value;
   }
 
   inline void clear_row(const size_t rr)
   {
     ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    std::fill(backend_->begin() + row_pointers_->operator[](rr),
-              backend_->begin() + row_pointers_->operator[](rr + 1),
+    std::fill(entries_->begin() + row_pointers_->operator[](rr),
+              entries_->begin() + row_pointers_->operator[](rr + 1),
               ScalarType(0));
   }
 
@@ -866,9 +846,9 @@ public:
   {
     ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    for (size_t kk = 0; kk < backend_->size(); ++kk) {
+    for (size_t kk = 0; kk < entries_->size(); ++kk) {
       if (column_indices_->operator[](kk) == cc)
-        backend_->operator[](kk) = ScalarType(0);
+        entries_->operator[](kk) = ScalarType(0);
     }
   }
 
@@ -890,7 +870,7 @@ public:
   {
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     // iterate over non-zero entries
-    for (const auto& entry : *backend_)
+    for (const auto& entry : *entries_)
       if (XT::Common::isnan(std::real(entry)) || XT::Common::isnan(std::imag(entry))
           || XT::Common::isinf(std::abs(entry)))
         return false;
@@ -899,18 +879,17 @@ public:
 
   virtual size_t non_zeros() const override final
   {
-    return backend_->size();
+    return entries_->size();
   }
 
   virtual SparsityPatternDefault pattern(const bool prune = false,
                                          const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     SparsityPatternDefault ret(num_rows_);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
       for (size_t kk = row_pointers_->operator[](rr + 1); kk < row_pointers_->operator[](rr + 1); ++kk) {
-        const auto& val = backend_->operator[](kk);
+        const auto& val = entries_->operator[](kk);
         if (!prune || Common::FloatCmp::ne(val, ScalarType(0), eps))
           ret.insert(rr, column_indices_->operator[](kk));
       }
@@ -921,30 +900,32 @@ public:
   /// \}
 
 private:
-  size_t get_index_in_backend(const size_t rr, const size_t cc) const
+  size_t get_entry_index(const size_t rr, const size_t cc, const bool throw_if_not_in_pattern = true) const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const auto& row_offset = row_pointers_->operator[](rr);
-    auto column_indices_iterator = column_indices_->begin();
-    column_indices_iterator += row_offset;
-    for (size_t kk = row_offset; kk < row_pointers_->operator[](rr + 1); ++kk, ++column_indices_iterator)
-      if (*column_indices_iterator == cc)
-        return kk;
+    const auto& next_row_offset = row_pointers_->operator[](rr + 1);
+    const auto column_indices_it = column_indices_->begin() + row_offset;
+    const auto column_indices_it_end = column_indices_->begin() + next_row_offset;
+    const auto entry_it = std::find(column_indices_it, column_indices_it_end, cc);
+    if (entry_it != column_indices_it_end)
+      return row_offset + std::distance(column_indices_it, entry_it);
+    if (throw_if_not_in_pattern)
+      DUNE_THROW(Common::Exceptions::index_out_of_range, "Entry is not in the sparsity pattern!");
     return size_t(-1);
   }
 
 protected:
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique()) {
+    if (!entries_.unique()) {
       std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-      backend_ = std::make_shared<BackendType>(*backend_);
+      entries_ = std::make_shared<EntriesVectorType>(*entries_);
     }
   } // ... ensure_uniqueness(...)
 
 private:
   size_t num_rows_, num_cols_;
-  std::shared_ptr<BackendType> backend_;
+  std::shared_ptr<EntriesVectorType> entries_;
   std::shared_ptr<IndexVectorType> row_pointers_;
   std::shared_ptr<IndexVectorType> column_indices_;
   mutable std::mutex mutex_;
