@@ -41,7 +41,7 @@ public:
 
   static std::string static_id()
   {
-    return allneumann_boundaryinfo_default_config().get<std::string>("type");
+    return allneumann_boundaryinfo_default_config().template get<std::string>("type");
   }
 
   virtual const BoundaryType& type(const IntersectionType& intersection) const override final

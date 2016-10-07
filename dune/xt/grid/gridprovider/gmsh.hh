@@ -89,7 +89,7 @@ public:
 
   static GridProvider<GridType> create(const Common::Configuration& cfg = default_config())
   {
-    return create(cfg.get("filename", default_config().get<std::string>("filename")));
+    return create(cfg.get("filename", default_config().template get<std::string>("filename")));
   }
 }; // class GmshGridProviderFactory
 

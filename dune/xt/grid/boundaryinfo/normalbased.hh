@@ -53,7 +53,7 @@ public:
 
   static std::string static_id()
   {
-    return normalbased_boundaryinfo_default_config().get<std::string>("type");
+    return normalbased_boundaryinfo_default_config().template get<std::string>("type");
   }
 
   static std::unique_ptr<ThisType> create(const Common::Configuration cfg = normalbased_boundaryinfo_default_config())

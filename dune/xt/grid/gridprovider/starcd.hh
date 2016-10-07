@@ -185,7 +185,7 @@ public:
 
   static GridProvider<GridType> create(const Common::Configuration cfg = default_config())
   {
-    return create(cfg.get("filename_prefix", default_config().get<std::string>("filename_prefix")));
+    return create(cfg.get("filename_prefix", default_config().template get<std::string>("filename_prefix")));
   }
 }; // class StarCDGridProviderFactory
 

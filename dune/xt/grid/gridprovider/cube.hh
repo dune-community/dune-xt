@@ -161,10 +161,11 @@ public:
   create(const typename GridType::ctype& lower_left,
          const typename GridType::ctype& upper_right,
          const unsigned int num_elements =
-             cube_gridprovider_default_config().get<std::vector<unsigned int>>("num_elements")[0],
-         const unsigned int num_refinements = cube_gridprovider_default_config().get<unsigned int>("num_refinements"),
+             cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")[0],
+         const unsigned int num_refinements =
+             cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
          const unsigned int overlap_size =
-             cube_gridprovider_default_config().get<std::vector<unsigned int>>("overlap_size")[0])
+             cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")[0])
   {
     return create(FieldVector<typename GridType::ctype, GridType::dimension>(lower_left),
                   FieldVector<typename GridType::ctype, GridType::dimension>(upper_right),
@@ -176,7 +177,7 @@ public:
   static GridProvider<GridType> create(const Common::Configuration& cfg = cube_gridprovider_default_config())
   {
     static const size_t d = GridType::dimension;
-    auto overlap_size = cube_gridprovider_default_config().get<std::vector<unsigned int>>("overlap_size");
+    auto overlap_size = cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size");
     std::array<unsigned int, d> overlap_size_array;
     if (overlap_size.size() >= d) {
       overlap_size_array = Common::make_array<unsigned int, d>(overlap_size);
@@ -188,16 +189,16 @@ public:
                                                                                      << overlap_size.size()
                                                                                      << " elements!");
     }
-    auto lower_left =
-        cfg.get("lower_left",
-                cube_gridprovider_default_config().get<FieldVector<typename GridType::ctype, GridType::dimension>>(
-                    "lower_left"));
-    auto upper_right =
-        cfg.get("upper_right",
-                cube_gridprovider_default_config().get<FieldVector<typename GridType::ctype, GridType::dimension>>(
-                    "upper_right"));
-    auto num_elements =
-        cfg.get("num_elements", cube_gridprovider_default_config().get<std::vector<unsigned int>>("num_elements"));
+    auto lower_left = cfg.get(
+        "lower_left",
+        cube_gridprovider_default_config().template get<FieldVector<typename GridType::ctype, GridType::dimension>>(
+            "lower_left"));
+    auto upper_right = cfg.get(
+        "upper_right",
+        cube_gridprovider_default_config().template get<FieldVector<typename GridType::ctype, GridType::dimension>>(
+            "upper_right"));
+    auto num_elements = cfg.get(
+        "num_elements", cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements"));
     std::array<unsigned int, d> num_elements_array;
     if (num_elements.size() >= d) {
       num_elements_array = Common::make_array<unsigned int, d>(num_elements);
@@ -210,22 +211,23 @@ public:
                                                                                      << " elements!");
     }
     auto num_refinements =
-        cfg.get("num_refinements", cube_gridprovider_default_config().get<unsigned int>("num_refinements"));
+        cfg.get("num_refinements", cube_gridprovider_default_config().template get<unsigned int>("num_refinements"));
     return create(lower_left, upper_right, num_elements_array, num_refinements, overlap_size_array);
   } // ... create(...)
 }; // struct CubeGridProviderFactory
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type make_cube_grid(
-    const FieldVector<typename GridType::ctype, GridType::dimension>& lower_left,
-    const FieldVector<typename GridType::ctype, GridType::dimension>& upper_right,
-    const std::array<unsigned int, GridType::dimension> num_elements =
-        cube_gridprovider_default_config().get<std::vector<unsigned int>>("num_elements")[0],
-    const unsigned int num_refinements = cube_gridprovider_default_config().get<unsigned int>("num_refinements"),
-    const std::array<unsigned int, GridType::dimension> overlap_size =
-        Common::make_array<unsigned int, GridType::dimension>(
-            cube_gridprovider_default_config().get<std::vector<unsigned int>>("overlap_size")))
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+make_cube_grid(const FieldVector<typename GridType::ctype, GridType::dimension>& lower_left,
+               const FieldVector<typename GridType::ctype, GridType::dimension>& upper_right,
+               const std::array<unsigned int, GridType::dimension> num_elements =
+                   cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")[0],
+               const unsigned int num_refinements =
+                   cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
+               const std::array<unsigned int, GridType::dimension> overlap_size =
+                   Common::make_array<unsigned int, GridType::dimension>(
+                       cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")))
 {
   return CubeGridProviderFactory<GridType>::create(
       lower_left, upper_right, num_elements, num_refinements, overlap_size);
@@ -233,14 +235,15 @@ typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type 
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type make_cube_grid(
-    const typename GridType::ctype& lower_left,
-    const typename GridType::ctype& upper_right,
-    const unsigned int num_elements =
-        cube_gridprovider_default_config().get<std::vector<unsigned int>>("num_elements")[0],
-    const unsigned int num_refinements = cube_gridprovider_default_config().get<unsigned int>("num_refinements"),
-    const unsigned int overlap_size =
-        cube_gridprovider_default_config().get<std::vector<unsigned int>>("overlap_size")[0])
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+make_cube_grid(const typename GridType::ctype& lower_left,
+               const typename GridType::ctype& upper_right,
+               const unsigned int num_elements =
+                   cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")[0],
+               const unsigned int num_refinements =
+                   cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
+               const unsigned int overlap_size =
+                   cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")[0])
 {
   return CubeGridProviderFactory<GridType>::create(
       lower_left, upper_right, num_elements, num_refinements, overlap_size);
