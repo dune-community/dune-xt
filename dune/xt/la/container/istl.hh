@@ -592,7 +592,6 @@ public:
   void unit_col(const size_t jj)
   {
     ensure_uniqueness();
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -602,12 +601,14 @@ public:
     if (!backend_->exists(jj, jj))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
+    mutex_.lock();
     for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
       auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
       if (search_result != row.end())
         row.operator[](jj)[0][0] = ScalarType(0);
     }
+    mutex_.unlock();
     set_entry(jj, jj, ScalarType(1));
   } // ... unit_col(...)
 
