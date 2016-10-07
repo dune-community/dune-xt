@@ -903,7 +903,7 @@ private:
   size_t get_entry_index(const size_t rr, const size_t cc, const bool throw_if_not_in_pattern = true) const
   {
     const auto& row_offset = row_pointers_->operator[](rr);
-    const auto& next_row_offset = row_pointers_->operator[](rr+1);
+    const auto& next_row_offset = row_pointers_->operator[](rr + 1);
     const auto column_indices_it = column_indices_->begin() + row_offset;
     const auto column_indices_it_end = column_indices_->begin() + next_row_offset;
     const auto entry_it = std::find(column_indices_it, column_indices_it_end, cc);
