@@ -15,3 +15,7 @@ dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 add_subdirectory(grid/test EXCLUDE_FROM_ALL )
 
+if(dune-pybindxi_FOUND)
+  dune_pybindxi_add_module(grid grid/bindings.cc)
+  target_link_dune_default_libraries(grid)
+endif()
