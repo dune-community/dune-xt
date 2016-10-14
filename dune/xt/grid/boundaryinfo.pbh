@@ -1,0 +1,69 @@
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2016)
+
+#ifndef DUNE_XT_GRID_BOUNDARYINFO_PBH
+#define DUNE_XT_GRID_BOUNDARYINFO_PBH
+#if HAVE_DUNE_PYBINDXI
+
+#include <sstream>
+#include <type_traits>
+
+#include <dune/pybindxi/pybind11.h>
+#include <dune/pybindxi/operators.h>
+
+#include "boundaryinfo/interfaces.hh"
+
+namespace Dune {
+namespace XT {
+namespace Grid {
+
+
+pybind11::class_<BoundaryType> bind_BoundaryTypeInterface(pybind11::module& m)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  typedef BoundaryType C;
+
+  py::class_<C> c(m, "BoundaryType", "BoundaryType");
+
+  c.def("__eq__", [](const C& self, const C& other) { return self == other; });
+  c.def("__ne__", [](const C& self, const C& other) { return self != other; });
+
+  return c;
+} // ... bind_BoundaryTypeInterface(...)
+
+
+template <class C>
+typename std::enable_if<std::is_base_of<BoundaryType, C>::value, pybind11::class_<C>>::type
+bind_BoundaryType(pybind11::module& m, const std::string& id)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  py::class_<C, BoundaryType> c(m, id.c_str(), id.c_str());
+
+  c.def(py::init<>());
+
+  c.def("__repr__", [](const C& self) {
+    std::stringstream ss;
+    ss << self;
+    return ss.str();
+  });
+
+  return c;
+} // ... bind_BoundaryType(...)
+
+
+} // namespace Grid
+} // namespace XT
+} // namespace Dune
+
+#endif // HAVE_DUNE_PYBINDXI
+#endif // DUNE_XT_GRID_BOUNDARYINFO_PBH
