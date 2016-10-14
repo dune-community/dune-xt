@@ -1,0 +1,49 @@
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2016)
+
+#ifndef DUNE_XT_GRID_WALKER_PBH
+#define DUNE_XT_GRID_WALKER_PBH
+#if HAVE_DUNE_PYBINDXI
+
+#include <dune/pybindxi/pybind11.h>
+
+#include "type_traits.hh"
+#include "walker.hh"
+
+namespace Dune {
+namespace XT {
+namespace Grid {
+
+
+template <class G>
+typename std::enable_if<is_layer<G>::value, pybind11::class_<Walker<G>>>::type bind_Walker(pybind11::module& m,
+                                                                                           const std::string& grid_id)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  typedef Walker<G> C;
+
+  py::class_<Walker<G>> c(m, std::string("Walker__" + grid_id).c_str(), std::string("Walker__" + grid_id).c_str());
+
+  c.def("clear", &C::clear);
+  c.def("prepare", &C::prepare);
+  c.def("finalize", &C::finalize);
+  c.def("walk", [](C& self, const bool use_tbb) { self.walk(use_tbb); }, "use_tbb"_a = false);
+
+  return c;
+} // ... bind_BoundaryType(...)
+
+
+} // namespace Grid
+} // namespace XT
+} // namespace Dune
+
+#endif // HAVE_DUNE_PYBINDXI
+#endif // DUNE_XT_GRID_WALKER_PBH
