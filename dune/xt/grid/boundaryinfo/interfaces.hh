@@ -40,7 +40,17 @@ public:
   {
     return !operator==(other);
   }
+
+private:
+  friend std::ostream& operator<<(std::ostream&, const BoundaryType&);
 }; // class BoundaryType
+
+
+std::ostream& operator<<(std::ostream& out, const BoundaryType& type)
+{
+  out << type.id();
+  return out;
+}
 
 
 template <class IntersectionImp>
