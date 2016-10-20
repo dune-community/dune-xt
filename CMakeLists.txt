@@ -27,6 +27,8 @@ list(APPEND CMAKE_MODULE_PATH
      "${dune-xt-common_MODULE_PATH}")
 include(DuneUtils)
 
+include(DunePybindxiUtils)
+
 # start a dune project with information from dune.module
 dune_project()
 dune_enable_all_packages(MODULE_LIBRARIES dunextfunctions

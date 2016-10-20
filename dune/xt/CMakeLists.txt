@@ -9,4 +9,9 @@ add_subdirectory(functions)
 
 add_subdirectory(functions/test EXCLUDE_FROM_ALL)
 
+if(dune-pybindxi_FOUND)
+  dune_pybindxi_add_module(functions functions/bindings.cc)
+  target_link_dune_default_libraries(functions)
+endif()
+
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
