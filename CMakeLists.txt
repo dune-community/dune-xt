@@ -26,18 +26,19 @@ find_package(dune-xt-common REQUIRED)
 list(APPEND CMAKE_MODULE_PATH
      "${dune-xt-common_MODULE_PATH}")
 
+include(DuneUtils)
+
 # start a dune project with information from dune.module
 dune_project()
 dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-la_SOURCE_DIR}/dune
                          MODULE_LIBRARIES dunextla)
 
-include(DuneUtils)
+add_header_listing()
+make_dependent_modules_sys_included()
 
 add_subdirectory(dune)
 add_subdirectory(doc)
 
-add_header_listing()
-make_dependent_modules_sys_included()
 add_format(${CMAKE_CURRENT_SOURCE_DIR})
 add_tidy(${CMAKE_CURRENT_SOURCE_DIR})
 
