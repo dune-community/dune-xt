@@ -1,6 +1,12 @@
+# This file is part of the dune-pybindx1 project:
+#   https://github.com/dune-community/dune-pybindx1
+# The copyright lies with the authors of this file (see below).
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+# Authors:
+#   Felix Schindler (2016)
+#
 # The code below is a renamed copy of parts of ../../pybind11/CMakeLists.txt,
 # see ../../pybind11/LICENSE for license information.
-
 
 # Add a CMake parameter for choosing a desired Python version
 set(DUNE_PYBINDXI_PYTHON_VERSION "" CACHE STRING "Python version to use for dune-pybindxi")

@@ -1,6 +1,12 @@
+# This file is part of the dune-pybindx1 project:
+#   https://github.com/dune-community/dune-pybindx1
+# The copyright lies with the authors of this file (see below).
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+# Authors:
+#   Felix Schindler (2016)
+#
 # The code below is a renamed copy of parts of ../../pybind11/CMakeLists.txt,
 # see ../../pybind11/LICENSE for license information.
-
 
 # Build a Python extension module:
 # dune_pybindxi_add_module(<name> source1 [source2 ...])
