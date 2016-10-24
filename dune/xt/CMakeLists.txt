@@ -6,3 +6,9 @@
 #   Felix Schindler (2016)
 
 add_subdirectory(la)
+
+if(dune-pybindxi_FOUND)
+  dune_pybindxi_add_module(la la/bindings.cc)
+  target_link_dune_default_libraries(la)
+endif()
+
