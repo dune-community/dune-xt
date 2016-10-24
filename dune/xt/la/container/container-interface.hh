@@ -30,6 +30,7 @@ enum class Backends
 {
   common_dense,
   common_sparse,
+  istl_dense,
   istl_sparse,
   eigen_dense,
   eigen_sparse,

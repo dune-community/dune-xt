@@ -22,6 +22,7 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
 template <class ScalarType, Backends backend = default_backend>
 struct Container;
 
@@ -30,28 +31,43 @@ struct Container<ScalarType, Backends::common_dense>
 {
   typedef CommonDenseVector<ScalarType> VectorType;
   typedef CommonDenseMatrix<ScalarType> MatrixType;
-}; // struct Container< ..., common_dense >
+}; // struct Container<..., common_dense>
+
+template <class ScalarType>
+struct Container<ScalarType, Backends::common_sparse>
+{
+  typedef CommonDenseVector<ScalarType> VectorType;
+  typedef CommonSparseMatrix<ScalarType> MatrixType;
+}; // struct Container<..., common_sparse>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::eigen_dense>
 {
   typedef EigenDenseVector<ScalarType> VectorType;
   typedef EigenDenseMatrix<ScalarType> MatrixType;
-}; // struct Container< ..., eigen_dense >
+}; // struct Container<..., eigen_dense>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::eigen_sparse>
 {
   typedef EigenDenseVector<ScalarType> VectorType;
   typedef EigenRowMajorSparseMatrix<ScalarType> MatrixType;
-}; // struct Container< ..., eigen_sparse >
+}; // struct Container<..., eigen_sparse>
+
+template <class ScalarType>
+struct Container<ScalarType, Backends::istl_dense>
+{
+  typedef IstlDenseVector<ScalarType> VectorType;
+  typedef IstlRowMajorSparseMatrix<ScalarType> MatrixType;
+}; // struct Container<..., istl_dense>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::istl_sparse>
 {
   typedef IstlDenseVector<ScalarType> VectorType;
   typedef IstlRowMajorSparseMatrix<ScalarType> MatrixType;
-}; // struct Container< ..., istl_sparse >
+}; // struct Container<..., istl_sparse>
+
 
 } // namespace LA
 } // namespace XT
