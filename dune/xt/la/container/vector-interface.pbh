@@ -1,0 +1,86 @@
+// This file is part of the dune-xt-la project:
+//   https://github.com/dune-community/dune-xt-la
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2016)
+
+#ifndef DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH
+#define DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH
+#if HAVE_DUNE_PYBINDXI
+
+#include <boost/numeric/conversion/cast.hpp>
+
+#include <dune/pybindxi/pybind11.h>
+#include <dune/pybindxi/operators.h>
+
+#include <dune/xt/common/string.hh>
+
+#include <dune/xt/la/type_traits.hh>
+
+#include "vector-interface.hh"
+#include "container-interface.pbh"
+
+namespace Dune {
+namespace XT {
+namespace LA {
+
+
+template <class C>
+typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vector(pybind11::module& m,
+                                                                                    const std::string& id)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  typedef typename C::ScalarType S;
+  typedef typename C::RealType R;
+
+  py::class_<C> c(m, std::string(id).c_str(), std::string(id).c_str());
+
+  c.def("__init__",
+        [](C& vec, const ssize_t size, const S& value) {
+          try {
+            new (&vec) C(boost::numeric_cast<size_t>(size), value);
+          } catch (boost::bad_numeric_cast& ee) {
+            DUNE_THROW(Common::Exceptions::wrong_input_given,
+                       "Given size has to be positive!\n\n The error in boost while converting '"
+                           << size
+                           << "' to '"
+                           << Common::Typename<size_t>::value()
+                           << "' was: "
+                           << ee.what());
+          }
+        },
+        "size"_a = 0,
+        "value"_a = 0.0);
+  c.def("__init__",
+        [](C& vec, py::iterable it) {
+          std::vector<S> tmp;
+          try {
+            for (py::handle h : it)
+              tmp.push_back(h.cast<S>());
+            new (&vec) C(tmp);
+          } catch (...) {
+            vec.~C();
+            throw;
+          }
+        },
+        "Assigns the elements of the iterable to the vector.");
+
+  addbind_ContainerInterface(c);
+  addbind_ProvidesBackend(c);
+  addbind_ProvidesDataAccess(c);
+
+  return c;
+} // ... bind_Vector(...)
+
+
+} // namespace LA
+} // namespace XT
+} // namespace Dune
+
+#endif // HAVE_DUNE_PYBINDXI
+#endif // DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH
