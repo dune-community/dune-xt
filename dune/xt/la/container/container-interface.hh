@@ -240,12 +240,18 @@ template <class Traits>
 class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>
 {
 public:
-  typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::DataType DataType;
 
-  inline ScalarType* data()
+  inline DataType* data()
   {
     CHECK_CRTP(this->as_imp().data());
     return this->as_imp().data();
+  }
+
+  inline size_t data_size() const
+  {
+    CHECK_CRTP(this->as_imp().data_size());
+    return this->as_imp().data_size();
   }
 }; // class ProvidesDataAccess
 

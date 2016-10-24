@@ -22,6 +22,9 @@ namespace LA {
 template <class Traits>
 class ProvidesBackend;
 
+template <class Traits>
+class ProvidesDataAccess;
+
 template <class Traits, class ScalarImp>
 class ContainerInterface;
 
@@ -36,6 +39,16 @@ struct provides_backend_helper
 
   static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value;
 }; // provides_backend_helper
+
+
+template <class C>
+struct provides_data_access_helper
+{
+  DXTC_has_typedef_initialize_once(Traits);
+  DXTC_has_typedef_initialize_once(DataType);
+
+  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(DataType)<C>::value;
+}; // provides_data_access_helper
 
 
 template <class C>
@@ -71,6 +84,18 @@ template <class C>
 struct provides_backend<C, false> : public std::false_type
 {
 };
+
+
+template <class C, bool candidate = internal::provides_data_access_helper<C>::is_candidate>
+struct provides_data_access : public std::is_base_of<ProvidesDataAccess<typename C::Traits>, C>
+{
+};
+
+template <class C>
+struct provides_data_access<C, false> : public std::false_type
+{
+};
+
 
 } // namespace LA
 } // namespace XT

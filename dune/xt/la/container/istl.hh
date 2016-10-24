@@ -61,6 +61,7 @@ class IstlDenseVectorTraits
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  typedef ScalarType DataType;
   typedef IstlDenseVector<ScalarImp> derived_type;
   typedef BlockVector<FieldVector<ScalarType, 1>> BackendType;
   static const constexpr Backends backend_type = Backends::istl_dense;
@@ -100,6 +101,7 @@ public:
   typedef internal::IstlDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
+  typedef typename Traits::DataType DataType;
   typedef typename Traits::BackendType BackendType;
 
   explicit IstlDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
@@ -193,9 +195,15 @@ public:
   /// \name Required by ProvidesDataAccess.
   /// \{
 
-  ScalarType* data()
+  /** \attention This makes only sense for scalar data types, not for complex! **/
+  DataType* data()
   {
     return &(backend()[0][0]);
+  }
+
+  size_t data_size() const
+  {
+    return size();
   }
 
   /// \}

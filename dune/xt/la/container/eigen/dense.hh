@@ -68,6 +68,7 @@ class EigenDenseVectorTraits
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  typedef ScalarType DataType;
   typedef EigenDenseVector<ScalarType> derived_type;
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, 1> BackendType;
   static const constexpr Backends backend_type = Backends::eigen_dense;
@@ -125,6 +126,7 @@ public:
   typedef internal::EigenDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
+  typedef typename Traits::DataType DataType;
   typedef typename Traits::BackendType BackendType;
 
 private:
@@ -192,9 +194,15 @@ public:
   /// \name Required by ProvidesDataAccess.
   /// \{
 
-  ScalarType* data()
+  /** \attention I have no idea if this makes sense for complex! **/
+  DataType* data()
   {
     return backend().data();
+  }
+
+  size_t data_size() const
+  {
+    return this->size();
   }
 
   /// \}

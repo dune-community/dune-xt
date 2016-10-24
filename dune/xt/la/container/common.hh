@@ -56,6 +56,7 @@ class CommonDenseVectorTraits
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  typedef ScalarType DataType;
   typedef CommonDenseVector<ScalarType> derived_type;
   typedef Dune::DynamicVector<ScalarType> BackendType;
   static const Backends backend_type = Backends::common_dense;
@@ -104,6 +105,7 @@ public:
   typedef internal::CommonDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
+  typedef typename Traits::DataType DataType;
   typedef typename Traits::BackendType BackendType;
 
   explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
@@ -196,9 +198,15 @@ public:
   /// \name Required by ProvidesDataAccess.
   /// \{
 
+  /** \attention This makes only sense for scalar data types, not for complex! **/
   ScalarType* data()
   {
     return &(backend()[0]);
+  }
+
+  size_t data_size() const
+  {
+    return size();
   }
 
   /// \}
