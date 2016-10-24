@@ -35,25 +35,8 @@ include(DuneUtils)
 dune_project()
 dune_enable_all_packages()
 
-# add header of this module for header listing
-file(GLOB_RECURSE xtgrid "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh")
-set(COMMON_HEADER ${xtgrid} ${DUNE_HEADERS})
-
-# add header of dependent modules for header listing
-foreach(_mod ${ALL_DEPENDENCIES})
-file(GLOB_RECURSE HEADER_LIST "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/*.hh")
-list(APPEND COMMON_HEADER ${HEADER_LIST})
-endforeach(_mod DEPENDENCIES)
-set_source_files_properties(${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1)
-
-#disable most warnings from dependent modules
-foreach(_mod ${ALL_DEPENDENCIES})
-    if(${_mod}_INCLUDE_DIRS)
-        foreach( _idir ${${_mod}_INCLUDE_DIRS} )
-            add_definitions("-isystem ${_idir}")
-        endforeach( _idir )
-    endif(${_mod}_INCLUDE_DIRS)
-endforeach(_mod DEPENDENCIES)
+add_header_listing()
+make_dependent_modules_sys_included()
 
 add_subdirectory(dune)
 add_subdirectory(doc)
