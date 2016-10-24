@@ -41,6 +41,7 @@ before_install:
   - sudo -E add-apt-repository -y ppa:pymor/travis && sudo -E aptitude update && sudo -E aptitude install git -yq
   - test -d ${SUPERDIR}/ || git clone https://github.com/dune-community/dune-xt-super.git ${SUPERDIR}/
   - cd ${SUPERDIR}/
+  - git checkout python-bindings
   - git submodule update --init --recursive
   - git submodule status ; git status
   - ${SUPERDIR}/.travis/trusty_apt_setup.bash
