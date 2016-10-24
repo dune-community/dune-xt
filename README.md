@@ -14,8 +14,9 @@ To create Python bindings you should
 
 * define the cmake variable `DUNE_PYBINDXI_PYTHON_VERSION` (optional)
 * `include(DunePybindxiUtils)` in your CMakeLists.txt
-* call `dune_pybindxi_add_module(module)`, where module is one or several C++
+* call `dune_pybindxi_add_module(module, sources)`, where sources is one or several C++
   source files
+* call `target_link_dune_default_libraries(module)`
 
 In your sources, you may include the pybind11 header `pybind11/foo.h` as
 ```
