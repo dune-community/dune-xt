@@ -42,6 +42,7 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  static const constexpr Backends vector_type = Traits::vector_type;
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
   virtual ~MatrixInterface()

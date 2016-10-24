@@ -89,6 +89,7 @@ class ProvidesBackend : public CRTPInterface<ProvidesBackend<Traits>, Traits>
 {
 public:
   typedef typename Traits::BackendType BackendType;
+  static const constexpr Backends backend_type = Traits::backend_type;
 
   inline BackendType& backend()
   {
@@ -216,6 +217,7 @@ public:
   }
 }; // class ProvidesConstContainer
 
+
 template <class Traits>
 class ProvidesContainer : public ProvidesConstContainer<Traits>
 {
@@ -233,6 +235,7 @@ public:
   }
 }; // class ProvidesContainer
 
+
 template <class Traits>
 class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>
 {
@@ -245,6 +248,7 @@ public:
     return this->as_imp().data();
   }
 }; // class ProvidesDataAccess
+
 
 } // namespace LA
 } // namespace XT

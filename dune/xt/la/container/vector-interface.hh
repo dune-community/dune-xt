@@ -43,6 +43,8 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  static const constexpr Backends dense_matrix_type = Traits::dense_matrix_type;
+  static const constexpr Backends sparse_matrix_type = Traits::sparse_matrix_type;
 
   typedef internal::VectorInputIterator<Traits, ScalarType> const_iterator;
   typedef internal::VectorOutputIterator<Traits, ScalarType> iterator;
