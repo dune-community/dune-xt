@@ -202,28 +202,6 @@ public:
   /// \}
 }; // class ContainerInterface
 
-namespace internal {
-
-template <class C>
-struct is_container_helper
-{
-  DXTC_has_typedef_initialize_once(Traits);
-  DXTC_has_typedef_initialize_once(ScalarType);
-
-  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(ScalarType)<C>::value;
-}; // class is_container_helper
-
-} // namespace internal
-
-template <class C, bool candidate = internal::is_container_helper<C>::is_candidate>
-struct is_container : public std::is_base_of<ContainerInterface<typename C::Traits, typename C::ScalarType>, C>
-{
-};
-
-template <class C>
-struct is_container<C, false> : public std::false_type
-{
-};
 
 template <class Traits>
 class ProvidesConstContainer : public CRTPInterface<ProvidesConstContainer<Traits>, Traits>
