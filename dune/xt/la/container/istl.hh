@@ -63,7 +63,8 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef IstlDenseVector<ScalarImp> derived_type;
   typedef BlockVector<FieldVector<ScalarType, 1>> BackendType;
-  static const constexpr Backends dense_matrix_type = Backends::common_dense;
+  static const constexpr Backends backend_type = Backends::istl_dense;
+  static const constexpr Backends dense_matrix_type = Backends::none;
   static const constexpr Backends sparse_matrix_type = Backends::istl_sparse;
 }; // class IstlDenseVectorTraits
 
@@ -78,6 +79,8 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef IstlRowMajorSparseMatrix<ScalarType> derived_type;
   typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
+  static const constexpr Backends backend_type = Backends::istl_sparse;
+  static const constexpr Backends vector_type = Backends::istl_dense;
 }; // class RowMajorSparseMatrixTraits
 
 } // namespace internal

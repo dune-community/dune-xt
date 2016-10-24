@@ -58,6 +58,9 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonDenseVector<ScalarType> derived_type;
   typedef Dune::DynamicVector<ScalarType> BackendType;
+  static const Backends backend_type = Backends::common_dense;
+  static const Backends dense_matrix_type = Backends::common_dense;
+  static const Backends sparse_matrix_type = Backends::common_sparse;
 };
 
 template <class ScalarImp = double>
@@ -68,6 +71,8 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonDenseMatrix<ScalarType> derived_type;
   typedef Dune::DynamicMatrix<ScalarType> BackendType;
+  static const Backends backend_type = Backends::common_dense;
+  static const Backends vector_type = Backends::common_dense;
 };
 
 template <class ScalarImp = double>
@@ -78,6 +83,7 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   typedef CommonSparseMatrix<ScalarType> derived_type;
   typedef std::vector<ScalarType> EntriesVectorType;
+  static const Backends backend_type = Backends::common_dense;
   static const constexpr Backends vector_type = Backends::common_dense;
 };
 
