@@ -66,6 +66,13 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::derived_type VectorImpType;
 
+  EigenBaseVector() = default;
+
+  EigenBaseVector(EigenBaseVector&& source)
+    : backend_(std::move(source.backend_))
+  {
+  }
+
   VectorImpType& operator=(const ThisType& other)
   {
     if (this != &other)
