@@ -378,7 +378,7 @@ public:
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     // iterate over non-zero entries
     typedef typename BackendType::InnerIterator InnerIterator;
-    for (EIGEN_size_t ii = 0; ii < backend_().outerSize(); ++ii) {
+    for (EIGEN_size_t ii = 0; ii < backend().outerSize(); ++ii) {
       for (InnerIterator it(backend(), ii); it; ++it) {
         if (Common::isnan(it.value()) || Common::isinf(it.value()))
           return false;
