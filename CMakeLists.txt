@@ -33,7 +33,9 @@ include(DuneUtils)
 
 # start a dune project with information from dune.module
 dune_project()
-dune_enable_all_packages()
+dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-grid_SOURCE_DIR}/dune
+                         MODULE_LIBRARIES dunextgrid
+                         )
 
 add_header_listing()
 make_dependent_modules_sys_included()

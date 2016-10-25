@@ -46,11 +46,7 @@ private:
 }; // class BoundaryType
 
 
-std::ostream& operator<<(std::ostream& out, const BoundaryType& type)
-{
-  out << type.id();
-  return out;
-}
+std::ostream& operator<<(std::ostream& out, const BoundaryType& type);
 
 
 template <class IntersectionImp>

@@ -9,6 +9,9 @@
 #   Rene Milk       (2016)
 #   Tobias Leibner  (2016)
 
+set(lib_dune_xt_grid_sources grid/boundaryinfo/interfaces.cc)
+dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
+
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 add_subdirectory(grid/test EXCLUDE_FROM_ALL )
 
