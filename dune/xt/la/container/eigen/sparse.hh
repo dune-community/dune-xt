@@ -340,7 +340,8 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
     backend_ref.row(internal::boost_numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
-    backend_ref(ii, ii) = ScalarType(1);
+    backend_ref.coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
+                         internal::boost_numeric_cast<EIGEN_size_t>(ii)) = ScalarType(1);
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
