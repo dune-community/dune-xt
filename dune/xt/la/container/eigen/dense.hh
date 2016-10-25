@@ -103,6 +103,7 @@ class EigenDenseMatrixTraits
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  typedef ScalarType DataType;
   typedef EigenDenseMatrix<ScalarType> derived_type;
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
   static const constexpr Backends backend_type = Backends::eigen_dense;
@@ -134,6 +135,7 @@ private:
 
 public:
   EigenDenseVector(const ThisType& other)
+    : BaseType()
   {
     backend_ = other.backend_;
   }
@@ -368,6 +370,7 @@ public:
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
+  typedef typename Traits::DataType DataType;
 
 private:
   typedef typename BackendType::Index EIGEN_size_t;
@@ -472,9 +475,14 @@ public:
   /// \name Required by the ProvidesDataAccess interface.
   /// \{
 
-  ScalarType* data()
+  DataType* data()
   {
     return backend_->data();
+  }
+
+  size_t data_size() const
+  {
+    return rows() * cols();
   }
 
   /// \}
