@@ -8,13 +8,9 @@
 #include <dune/pybindxi/pybind11.h>
 //#include <dune/pybindxi/stl_bind.h> // <- see dune/xt/common/bindings.cc
 
-// PYBIND11_MAKE_OPAQUE(std::vector<ssize_t>);
-// PYBIND11_MAKE_OPAQUE(std::vector<std::string>);
-// PYBIND11_MAKE_OPAQUE(std::vector<double>);
+#include <dune/xt/common/configuration.pbh>
+#include <dune/xt/common/fvector.pbh>
 
-// PYBIND11_MAKE_OPAQUE(std::vector<std::vector<ssize_t>>);
-// PYBIND11_MAKE_OPAQUE(std::vector<std::vector<std::string>>);
-// PYBIND11_MAKE_OPAQUE(std::vector<std::vector<double>>);
 
 #include <dune/xt/grid/grids.hh>
 

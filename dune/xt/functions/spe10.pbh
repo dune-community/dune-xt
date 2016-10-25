@@ -11,11 +11,10 @@
 #define DUNE_XT_FUNCTIONS_SPE10_PBH
 #if HAVE_DUNE_PYBINDXI
 
-#include <dune/xt/common/disable_warnings.hh>
 #include <dune/pybindxi/pybind11.h>
-#include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/xt/common/string.hh>
+#include <dune/xt/common/fvector.pbh>
 
 #include <dune/xt/grid/type_traits.hh>
 
