@@ -52,6 +52,8 @@ PYBIND11_PLUGIN(la)
 
 #undef BIND_VECTOR
 
+  Dune::XT::LA::bind_SparsityPatternDefault(m);
+
   return m.ptr();
 } // PYBIND11_PLUGIN(la)
 
