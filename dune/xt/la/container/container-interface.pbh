@@ -53,7 +53,7 @@ typename std::enable_if<is_container<C>::value, void>::type addbind_ContainerInt
 
   c.def("copy", &C::copy);
   c.def("scal", &C::scal);
-  c.def("axpy", &C::axpy, "alpha"_a, "xx"_a);
+  c.def("axpy", [](C& self, const S& alpha, const C& xx) { self.axpy(alpha, xx); });
   c.def("has_equal_shape", &C::has_equal_shape);
   c.def(py::self *= S());
 } // ... addbind_ContainerInterface(...)
