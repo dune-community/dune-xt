@@ -21,11 +21,9 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/xt/common/disable_warnings.hh>
 #if HAVE_EIGEN
 #include <Eigen/SparseCore>
 #endif
-#include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/ftraits.hh>
