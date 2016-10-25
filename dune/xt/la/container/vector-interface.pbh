@@ -11,6 +11,8 @@
 #define DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH
 #if HAVE_DUNE_PYBINDXI
 
+#include <sstream>
+
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/pybindxi/pybind11.h>
@@ -70,9 +72,66 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
         },
         "Assigns the elements of the iterable to the vector.");
 
+  c.def("__repr__", [id](const C& self) {
+    std::stringstream ss;
+    ss << id << "([";
+    if (self.size() > 0)
+      ss << self[0];
+    for (size_t ii = 1; ii < self.size(); ++ii)
+      ss << " " << self[ii];
+    ss << "])";
+    return ss.str();
+  });
+  c.def("__len__", [](const C& self) { return self.size(); });
+  c.def("__getitem__", [](const C& vec, size_t ii) -> S {
+    if (ii >= vec.size())
+      throw pybind11::index_error();
+    return vec[ii];
+  });
+  c.def("__setitem__", [](C& vec, size_t ii, const S& value) {
+    if (ii >= vec.size())
+      throw pybind11::index_error();
+    vec[ii] = value;
+  });
+  c.def("__iter__",
+        [](C& vec) {
+          return py::
+              make_iterator<py::return_value_policy::reference_internal, typename C::iterator, typename C::iterator, S>(
+                  vec.begin(), vec.end());
+        },
+        pybind11::keep_alive<0, 1>() /*Essential: keep object alive while iterator exists!*/);
+
+  c.def(py::self == py::self);
+  c.def(py::self != py::self);
+  c.def(py::self + py::self);
+  c.def(py::self += py::self);
+  c.def(py::self - py::self);
+  c.def(py::self -= py::self);
+  c.def(py::self * py::self);
+  c.def(py::self * R());
+  c.def(py::self *= R());
+  c.def(py::self /= R());
+
+  c.def("size", &C::size);
+  c.def("add_to_entry", &C::add_to_entry, "ii"_a, "value"_a);
+  c.def("set_entry", &C::set_entry, "ii"_a, "value"_a);
+  c.def("get_entry", &C::get_entry);
+  c.def("set_all", &C::set_all);
+  c.def("valid", &C::valid);
+  c.def("dim", &C::dim);
+  c.def("mean", &C::mean);
+  c.def("amax", &C::amax);
+  c.def("almost_equal",
+        [](const C& self, const C& other, const S& epsilon) { return self.almost_equal(other, epsilon); },
+        "other"_a,
+        "epsilon"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
+  c.def("dot", [](const C& self, const C& other) { return self.dot(other); });
+  c.def("l1_norm", &C::l1_norm);
+  c.def("l2_norm", &C::l2_norm);
+  c.def("sup_norm", &C::sup_norm);
+  c.def("standard_deviation", &C::standard_deviation);
+
   addbind_ContainerInterface(c);
-  addbind_ProvidesBackend(c);
-  addbind_ProvidesDataAccess(c);
 
   return c;
 } // ... bind_Vector(...)
