@@ -20,7 +20,6 @@
 #include <cmath>
 #include <complex>
 
-#include <dune/xt/common/disable_warnings.hh>
 #if HAVE_EIGEN
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
@@ -37,7 +36,6 @@
 //#     include <Eigen/SuperLUSupport>
 //#   endif
 #endif // HAVE_EIGEN
-#include <dune/xt/common/reenable_warnings.hh>
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
