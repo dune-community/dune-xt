@@ -9,7 +9,7 @@ add_subdirectory(functions)
 
 add_subdirectory(functions/test EXCLUDE_FROM_ALL)
 
-if(dune-pybindxi_FOUND)
+if(dune-pybindxi_FOUND AND CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.9)
   dune_pybindxi_add_module(functions functions/bindings.cc)
   target_link_dune_default_libraries(functions)
 endif()
