@@ -133,6 +133,11 @@ private:
   typedef typename BackendType::Index EIGEN_size_t;
 
 public:
+  EigenDenseVector(const ThisType& other)
+  {
+    backend_ = other.backend_;
+  }
+
   explicit EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
   {
     backend_ = std::make_shared<BackendType>(ss);
