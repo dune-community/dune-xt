@@ -1,0 +1,176 @@
+// This file is part of the dune-xt-la project:
+//   https://github.com/dune-community/dune-xt-la
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2016)
+
+#ifndef DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_PBH
+#define DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_PBH
+#if HAVE_DUNE_PYBINDXI
+
+#include <sstream>
+
+#include <boost/numeric/conversion/cast.hpp>
+
+#include <dune/pybindxi/pybind11.h>
+#include <dune/pybindxi/operators.h>
+
+#include <dune/xt/common/string.hh>
+
+#include <dune/xt/la/type_traits.hh>
+
+#include "matrix-interface.hh"
+#include "container-interface.pbh"
+
+namespace Dune {
+namespace XT {
+namespace LA {
+namespace internal {
+
+
+template <class T, bool sparse = false>
+struct addbind_Matrix
+{
+  template <class S, class C>
+  static void ctor(C& c)
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+
+    c.def("__init__",
+          [](T& self, const ssize_t rows, const ssize_t cols, const S& value) {
+            size_t rr = 0;
+            size_t cc = 0;
+            try {
+              rr = boost::numeric_cast<size_t>(rows);
+            } catch (boost::bad_numeric_cast& ee) {
+              DUNE_THROW(Common::Exceptions::wrong_input_given,
+                         "Given rows has to be positive!\n\n The error in boost while converting '"
+                             << rows
+                             << "' to '"
+                             << Common::Typename<size_t>::value()
+                             << "' was: "
+                             << ee.what());
+            }
+            try {
+              cc = boost::numeric_cast<size_t>(cols);
+            } catch (boost::bad_numeric_cast& ee) {
+              DUNE_THROW(Common::Exceptions::wrong_input_given,
+                         "Given cols has to be positive!\n\n The error in boost while converting '"
+                             << cols
+                             << "' to '"
+                             << Common::Typename<size_t>::value()
+                             << "' was: "
+                             << ee.what());
+            }
+            new (&self) T(rr, cc, value);
+          },
+          "rows"_a = 0,
+          "cols"_a = 0,
+          "value"_a = 0.0);
+  }
+};
+
+template <class T>
+struct addbind_Matrix<T, true>
+{
+  template <class S, class C>
+  static void ctor(C& /*c*/)
+  {
+  }
+};
+
+} // namespace internal
+
+
+template <class C, bool sparse>
+typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Matrix(pybind11::module& m,
+                                                                                    const std::string& id)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  typedef typename C::ScalarType S;
+
+  py::class_<C> c(m, std::string(id).c_str(), std::string(id).c_str());
+
+  internal::addbind_Matrix<C, sparse>::template ctor<S>(c);
+  c.def("__init__",
+        [](C& self, const ssize_t rows, const ssize_t cols, const SparsityPatternDefault& pattern) {
+          size_t rr = 0;
+          size_t cc = 0;
+          try {
+            rr = boost::numeric_cast<size_t>(rows);
+          } catch (boost::bad_numeric_cast& ee) {
+            DUNE_THROW(Common::Exceptions::wrong_input_given,
+                       "Given rows has to be positive!\n\n The error in boost while converting '"
+                           << rows
+                           << "' to '"
+                           << Common::Typename<size_t>::value()
+                           << "' was: "
+                           << ee.what());
+          }
+          try {
+            cc = boost::numeric_cast<size_t>(cols);
+          } catch (boost::bad_numeric_cast& ee) {
+            DUNE_THROW(Common::Exceptions::wrong_input_given,
+                       "Given cols has to be positive!\n\n The error in boost while converting '"
+                           << cols
+                           << "' to '"
+                           << Common::Typename<size_t>::value()
+                           << "' was: "
+                           << ee.what());
+          }
+          new (&self) C(rr, cc, pattern);
+        },
+        "rows"_a,
+        "cols"_a,
+        "pattern"_a);
+
+  c.def("__repr__", [id](const C& self) {
+    std::stringstream ss;
+    ss << id << "(" << self << ")";
+    return ss.str();
+  });
+
+  c.def("rows", &C::rows);
+  c.def("cols", &C::cols);
+  c.def("add_to_entry", &C::add_to_entry, "ii"_a, "jj"_a, "value"_a);
+  c.def("set_entry", &C::set_entry, "ii"_a, "jj"_a, "value"_a);
+  c.def("get_entry", &C::get_entry);
+  c.def("clear_row", &C::clear_row);
+  c.def("clear_col", &C::clear_col);
+  c.def("unit_row", &C::unit_row);
+  c.def("unit_col", &C::unit_col);
+  c.def("valid", &C::valid);
+  c.def("sup_norm", &C::sup_norm);
+  c.def("non_zeros", &C::non_zeros);
+  c.def("pattern", &C::pattern, "prune"_a = false, "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
+  c.def("pruned", &C::pruned);
+
+  addbind_ContainerInterface(c);
+
+  return c;
+} // ... bind_Matrix(...)
+
+
+template <class V, class M>
+void addbind_Matrix_Vector_interaction(pybind11::class_<M>& c)
+{
+  namespace py = pybind11;
+
+  c.def("mv", [](const M& self, const V& xx, V& yy) { self.mv(xx, yy); }, "source", "range");
+
+  c.def(py::self * V());
+} // ... addbind_Matrix_Vector_interaction(...)
+
+
+} // namespace LA
+} // namespace XT
+} // namespace Dune
+
+#endif // HAVE_DUNE_PYBINDXI
+#endif // DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_PBH
