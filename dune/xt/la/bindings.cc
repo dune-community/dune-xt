@@ -17,6 +17,10 @@
 #include <dune/pybindxi/pybind11.h>
 //#include <dune/pybindxi/stl_bind.h> // <- see dune/xt/common/bindings.cc
 
+#include <dune/xt/common/configuration.pbh>
+#include <dune/xt/common/fvector.pbh>
+
+#include <dune/xt/la/container/container-interface.pbh>
 #include <dune/xt/la/container/vector-interface.pbh>
 
 #include <dune/xt/la/container.hh>
@@ -32,7 +36,21 @@ PYBIND11_PLUGIN(la)
   py::module::import("common");
 
   Dune::XT::LA::bind_Backends(m);
-  Dune::XT::LA::bind_Vector<Dune::XT::LA::CommonDenseVector<double>>(m, "CommonDenseVector_double");
+
+#define BIND_VECTOR(V, v, s)                                                                                           \
+  auto v = Dune::XT::LA::bind_Vector<V>(m, s);                                                                         \
+  Dune::XT::LA::addbind_ProvidesBackend(v);                                                                            \
+  Dune::XT::LA::addbind_ProvidesDataAccess(v)
+
+  BIND_VECTOR(Dune::XT::LA::CommonDenseVector<double>, common_dense_vector_double, "CommonDenseVector_double");
+#if HAVE_DUNE_ISTL
+  BIND_VECTOR(Dune::XT::LA::IstlDenseVector<double>, istl_dense_vector_double, "IstlDenseVector_double");
+#endif
+#if HAVE_EIGEN
+  BIND_VECTOR(Dune::XT::LA::EigenDenseVector<double>, eigen_dense_vector_double, "EigenDenseVector_double");
+#endif
+
+#undef BIND_VECTOR
 
   return m.ptr();
 } // PYBIND11_PLUGIN(la)
