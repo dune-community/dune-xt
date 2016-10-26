@@ -62,7 +62,9 @@ typename std::enable_if<is_container<C>::value, void>::type addbind_ContainerInt
 template <class C>
 typename std::enable_if<provides_backend<C>::value, void>::type addbind_ProvidesBackend(pybind11::class_<C>& c)
 {
-  c.def_property_readonly("backend_type", [](const C& /*self*/) { return C::backend_type; });
+  namespace py = pybind11;
+
+  c.def_property_readonly_static("backend_type", [](py::object /*self*/) { return C::backend_type; });
 }
 
 template <class C>
