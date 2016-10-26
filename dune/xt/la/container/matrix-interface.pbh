@@ -97,6 +97,8 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
 
   py::class_<C> c(m, std::string(id).c_str(), std::string(id).c_str());
 
+  c.def_property_readonly_static("vector_type", [](py::object /*self*/) { return C::vector_type; });
+
   internal::addbind_Matrix<C, sparse>::template ctor<S>(c);
   c.def("__init__",
         [](C& self, const ssize_t rows, const ssize_t cols, const SparsityPatternDefault& pattern) {
