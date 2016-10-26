@@ -24,6 +24,7 @@
 #include "container/vector-interface.pbh"
 #include "container/pattern.pbh"
 #include "container/matrix-interface.pbh"
+#include "solver.pbh"
 
 #include "container.hh"
 
@@ -85,6 +86,16 @@ PYBIND11_PLUGIN(la)
   Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::EigenDenseVector<double>>(eigen_dense_matrix_double);
   Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::EigenDenseVector<double>>(
       eigen_row_major_sparse_matrix_double);
+#endif
+
+  Dune::XT::LA::bind_Solver<Dune::XT::LA::CommonDenseMatrix<double>>(m, "CommonDenseMatrix_double");
+//  Dune::XT::LA::bind_Solver<Dune::XT::LA::CommonSparseMatrix<double>>(m, "CommonSparseMatrix_double");
+#if HAVE_DUNE_ISTL
+  Dune::XT::LA::bind_Solver<Dune::XT::LA::IstlRowMajorSparseMatrix<double>>(m, "IstlRowMajorSparseMatrix_double");
+#endif
+#if HAVE_EIGEN
+  Dune::XT::LA::bind_Solver<Dune::XT::LA::EigenDenseMatrix<double>>(m, "EigenDenseMatrix");
+  Dune::XT::LA::bind_Solver<Dune::XT::LA::EigenRowMajorSparseMatrix<double>>(m, "EigenRowMajorSparseMatrix");
 #endif
 
   return m.ptr();
