@@ -115,6 +115,12 @@ public:
   {
   }
 
+  Solver(Solver&& source)
+    : matrix_(source.matrix_)
+    , communicator_(source.communicator_.access())
+  {
+  }
+
   static std::vector<std::string> types()
   {
     return
