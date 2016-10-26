@@ -77,11 +77,15 @@ PYBIND11_PLUGIN(la)
 #undef BIND_MATRIX
   Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::CommonDenseVector<double>>(common_dense_matrix_double);
   Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::CommonDenseVector<double>>(common_sparse_matrix_double);
+#if HAVE_DUNE_ISTL
   Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::IstlDenseVector<double>>(
       istl_row_major_sparse_matrix_double);
+#endif
+#if HAVE_EIGEN
   Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::EigenDenseVector<double>>(eigen_dense_matrix_double);
   Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::EigenDenseVector<double>>(
       eigen_row_major_sparse_matrix_double);
+#endif
 
   return m.ptr();
 } // PYBIND11_PLUGIN(la)
