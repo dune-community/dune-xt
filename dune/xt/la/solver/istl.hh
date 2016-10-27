@@ -125,7 +125,7 @@ public:
   {
     return
     {
-#if !HAVE_MPI && HAVE_SUPERLU
+#if HAVE_SUPERLU
       "superlu",
 #endif
           "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor", "bicgstab"
@@ -163,10 +163,10 @@ public:
     } else if (tp == "umfpack") {
       return general_opts;
 #endif
-#if !HAVE_MPI && HAVE_SUPERLU
+#if HAVE_SUPERLU
     } else if (tp == "superlu") {
       return general_opts;
-#endif // !HAVE_MPI && HAVE_SUPERLU
+#endif
     } else
       DUNE_THROW(Common::Exceptions::internal_error, "Given solver type '" << tp << "' has no default options");
     return Common::Configuration();
@@ -268,13 +268,13 @@ public:
                                                          opts.get("verbose", default_opts.get<int>("verbose")));
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
 #endif // HAVE_UMFPACK
-#if !HAVE_MPI && HAVE_SUPERLU
+#if HAVE_SUPERLU
       } else if (type == "superlu") {
         SuperLU<typename MatrixType::BackendType> solver(matrix_.backend(),
                                                          opts.get("verbose", default_opts.get<int>("verbose")));
 
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
-#endif // !HAVE_MPI && HAVE_SUPERLU
+#endif // HAVE_SUPERLU
       } else
         DUNE_THROW(Common::Exceptions::internal_error,
                    "Given type '" << type << "' is not supported, although it was reported by types()!");
