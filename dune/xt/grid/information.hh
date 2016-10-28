@@ -21,11 +21,10 @@
 #include <dune/common/unused.hh>
 
 #include <dune/grid/common/gridview.hh>
-#include <dune/grid/common/rangegenerators.hh>
-
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/ranges.hh>
 
+#include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/walker.hh>

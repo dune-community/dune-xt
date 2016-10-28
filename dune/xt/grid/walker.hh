@@ -30,8 +30,6 @@
 #include <tbb/tbb_stddef.h>
 #endif // HAVE_TBB
 
-#include <dune/grid/common/rangegenerators.hh>
-
 #include <dune/xt/common/parallel/threadmanager.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
@@ -39,6 +37,7 @@
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/layers.hh>
+#include <dune/xt/grid/rangegenerators.hh>
 
 #include "walker/apply-on.hh"
 #include "walker/functors.hh"
@@ -337,10 +336,7 @@ protected:
       // only walk the intersections, if there are codim1 functors present
       if (codim1_functors_.size() > 0) {
         // walk the intersections
-        const auto intersection_it_end = this->grid_view_.iend(entity);
-        for (auto intersection_it = this->grid_view_.ibegin(entity); intersection_it != intersection_it_end;
-             ++intersection_it) {
-          const auto& intersection = *intersection_it;
+        for (auto&& intersection : intersections(this->grid_view_, entity)) {
 
           // apply codim1 functors
           if (intersection.neighbor()) {

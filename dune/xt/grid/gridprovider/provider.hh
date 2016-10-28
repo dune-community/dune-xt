@@ -18,12 +18,11 @@
 #include <memory>
 
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
-#include <dune/grid/common/rangegenerators.hh>
-
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/ranges.hh>
 
+#include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/layers.hh>
