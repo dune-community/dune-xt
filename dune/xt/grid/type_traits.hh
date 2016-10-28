@@ -147,6 +147,25 @@ struct is_conforming_alugrid<ALUGrid<dim, dimworld, elType, Dune::conforming, Co
 
 #endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
 
+
+template <class L, bool is_view = is_grid_view<L>::value, bool is_part = is_grid_part<L>::value>
+struct extract_grid : public std::false_type
+{
+};
+
+template <class L>
+struct extract_grid<L, true, false>
+{
+  typedef typename L::Grid type;
+};
+
+template <class L>
+struct extract_grid<L, false, true>
+{
+  typedef typename L::GridType type;
+};
+
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
