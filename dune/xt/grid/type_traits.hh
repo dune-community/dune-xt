@@ -80,7 +80,29 @@ struct is_grid_view<Dune::GridView<T>> : public std::true_type
 };
 
 
+namespace internal {
+
+
+// the following did not work, so we need to use the messy approach below
+
+// template <class T>
+// struct is_grid_part : public std::false_type {};
+// template <class T>
+// struct is_grid_part<Dune::Fem::GridPartInterface<T>> : public std::true_type {};
+
+
 template <class T>
+struct is_grid_part_helper
+{
+  DXTC_has_typedef_initialize_once(Traits);
+  static const bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
+};
+
+
+} // namespace internal
+
+
+template <class T, bool is_candidate = internal::is_grid_part_helper<T>::is_candidate>
 struct is_grid_part : public std::false_type
 {
 };
@@ -88,7 +110,7 @@ struct is_grid_part : public std::false_type
 #if HAVE_DUNE_FEM
 
 template <class T>
-struct is_grid_part<Dune::Fem::GridPartInterface<T>> : public std::true_type
+struct is_grid_part<T, true> : public std::is_base_of<Dune::Fem::GridPartInterface<typename T::Traits>, T>
 {
 };
 
