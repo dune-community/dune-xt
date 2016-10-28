@@ -17,48 +17,29 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
 
-#include "boundaryinfo/interfaces.hh"
+#include "gridprovider/provider.hh"
+#include "boundaryinfo.hh"
 
 namespace Dune {
 namespace XT {
 namespace Grid {
 
 
-pybind11::class_<BoundaryType> bind_BoundaryTypeInterface(pybind11::module& m)
-{
-  namespace py = pybind11;
-  using namespace pybind11::literals;
-
-  typedef BoundaryType C;
-
-  py::class_<C> c(m, "BoundaryType", "BoundaryType");
-
-  c.def("__eq__", [](const C& self, const C& other) { return self == other; });
-  c.def("__ne__", [](const C& self, const C& other) { return self != other; });
-
-  return c;
-} // ... bind_BoundaryTypeInterface(...)
-
-
 template <class C>
-typename std::enable_if<std::is_base_of<BoundaryType, C>::value, pybind11::class_<C>>::type
-bind_BoundaryType(pybind11::module& m, const std::string& id)
+pybind11::class_<C> bind_BoundaryInfo(pybind11::module& m, const std::string& id /*, const std::string& method_id*/)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  py::class_<C, BoundaryType> c(m, id.c_str(), id.c_str());
+  py::class_<C> c(m, id.c_str(), id.c_str());
 
   c.def(py::init<>());
 
-  c.def("__repr__", [](const C& self) {
-    std::stringstream ss;
-    ss << self;
-    return ss.str();
-  });
+  c.def_property_readonly_static("static_id", [](const C& /*self*/) { return C::static_id(); });
+  c.def("__repr__", [id](const C& /*self*/) { return id + "(" + C::static_id() + ")"; });
 
   return c;
-} // ... bind_BoundaryType(...)
+} // ... bind_BoundaryInfo(...)
 
 
 } // namespace Grid
