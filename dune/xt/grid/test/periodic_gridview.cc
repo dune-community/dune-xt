@@ -42,7 +42,6 @@ struct PeriodicViewTest : public testing::Test
   typedef typename Dune::XT::Grid::internal::template PeriodicIntersectionIterator<GridViewType>
       PeriodicIntersectionIteratorType;
   typedef typename Dune::XT::Grid::internal::template PeriodicIntersection<GridViewType> PeriodicIntersectionType;
-  typedef typename PeriodicIntersectionType::EntityPointer EntityPointerType;
   typedef typename GridViewType::CollectiveCommunication CollectiveCommunication;
   static const size_t dimDomain = GridViewType::dimension;
 

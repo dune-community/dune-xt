@@ -152,6 +152,97 @@ private:
   Common::PerThreadValue<IteratorType> it_last_;
 }; // class EntityInlevelSearch
 
+/** Like EntityInlevelSearch, but works also for grids where there is no iterator for the given
+ * codimension (e.g. UGGrid for codim != dim && codim != 0)
+ * \see EntityInlevelSearch
+**/
+template <class GridViewType, int codim = 0>
+class FallbackEntityInlevelSearch : public EntitySearchBase<GridViewType>
+{
+  typedef EntitySearchBase<GridViewType, codim> BaseType;
+
+  typedef typename GridViewType::template Codim<0>::Iterator IteratorType;
+
+public:
+  typedef typename BaseType::EntityVectorType EntityVectorType;
+
+private:
+  inline typename EntityVectorType::value_type check_add(const typename BaseType::EntityType& entity,
+                                                         const typename BaseType::GlobalCoordinateType& point) const
+  {
+    const auto& geometry = entity.geometry();
+    if (CheckInside<codim>::check(geometry, point)) {
+      return Common::make_unique<typename BaseType::EntityType>(entity);
+    }
+    return nullptr;
+  }
+
+public:
+  FallbackEntityInlevelSearch(const GridViewType& gridview)
+    : gridview_(gridview)
+    , it_last_(gridview_.template begin<0>())
+  {
+  }
+
+  /** \arg points iterable sequence of global coordinates to search for
+   *  \return a vector of size points.size() of, potentially nullptr if no corresponding one was found,
+   *          unique_ptr<Entity>
+   **/
+  template <class PointContainerType>
+  EntityVectorType operator()(const PointContainerType& points)
+  {
+    const IteratorType begin = gridview_.template begin<0>();
+    const IteratorType end = gridview_.template end<0>();
+    EntityVectorType ret(points.size());
+    typename EntityVectorType::size_type idx(0);
+    for (const auto& point : points) {
+      IteratorType it_current = it_last_;
+      bool entity_found = false;
+      bool it_reset = true;
+      typename EntityVectorType::value_type tmp_ptr(nullptr);
+      for (; it_current != end; ++it_current) {
+        const auto& entity = *it_current;
+        for (unsigned int local_index = 0; local_index < entity.subEntities(codim); ++local_index) {
+          const auto& sub_entity = entity.template subEntity<codim>(local_index);
+          if ((tmp_ptr = check_add(sub_entity, point))) {
+            ret[idx++] = std::move(tmp_ptr);
+            tmp_ptr = nullptr;
+            it_reset = false;
+            it_last_ = it_current;
+            entity_found = true;
+            break;
+          }
+        } // loop over subentities
+        if (entity_found)
+          break;
+      } // loop over codim 0 entities
+      if (!it_reset)
+        continue;
+      for (it_current = begin; it_current != it_last_; ++it_current) {
+        const auto& entity = *it_current;
+        for (unsigned int local_index = 0; local_index < entity.subEntities(codim); ++local_index) {
+          const auto& sub_entity = entity.template subEntity<codim>(local_index);
+          if ((tmp_ptr = check_add(sub_entity, point))) {
+            ret[idx++] = std::move(tmp_ptr);
+            tmp_ptr = nullptr;
+            it_reset = false;
+            it_last_ = it_current;
+            entity_found = true;
+            break;
+          }
+        } // loop over subentities
+        if (entity_found)
+          break;
+      } // loop over codim 0 entities
+    } // loop over points
+    return ret;
+  } // ... operator()
+
+private:
+  const GridViewType gridview_;
+  IteratorType it_last_;
+}; // class FallbackEntityInlevelSearch
+
 template <class GridViewType>
 class EntityHierarchicSearch : public EntitySearchBase<GridViewType>
 {
