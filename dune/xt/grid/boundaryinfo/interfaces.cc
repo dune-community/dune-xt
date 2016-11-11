@@ -7,7 +7,9 @@
 // Authors:
 //   Felix Schindler (2016)
 
-#include "config.h"
+#include <config.h>
+
+#include <ostream>
 
 #include "interfaces.hh"
 
