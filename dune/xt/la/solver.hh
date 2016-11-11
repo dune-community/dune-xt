@@ -15,10 +15,11 @@
 #include <string>
 #include <vector>
 
-#include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/parallel/helper.hh>
+
+#include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {
@@ -133,6 +134,32 @@ public:
                    << "'!");
   }
 }; // class Solver
+
+
+template <class M>
+typename std::enable_if<XT::LA::is_matrix<M>::value, Solver<M>>::type make_solver(const M& matrix)
+{
+  return Solver<M>(matrix);
+}
+
+
+template <class M, class V, class... Args>
+typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, void>::type
+solve(const M& A, const V& b, V& x, Args&&... args)
+{
+  make_solver(A).apply(b, x, std::forward<Args>(args)...);
+}
+
+
+template <class M, class V, class... Args>
+typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, V>::type
+solve(const M& A, const V& b, Args&&... args)
+{
+  V x(A.cols());
+  solve(A, b, x, std::forward<Args>(args)...);
+  return x;
+}
+
 
 } // namespace LA
 } // namespace XT
