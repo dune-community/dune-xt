@@ -50,10 +50,10 @@ class GridProviderFactory
       return Common::Configuration(0);
     }
 
-    static std::unique_ptr<G> create(const Common::Configuration& /*cfg*/)
+    static GridProvider<GridType> create(const Common::Configuration& /*cfg*/)
     {
       DUNE_THROW(Common::Exceptions::internal_error, "This should not happen!");
-      return std::unique_ptr<G>(nullptr);
+      return GridProvider<GridType>(nullptr);
     }
   }; // struct Helper
 
@@ -76,7 +76,7 @@ class GridProviderFactory
       return G::default_config();
     }
 
-    static std::unique_ptr<G> create(const Common::Configuration& cfg)
+    static GridProvider<GridType> create(const Common::Configuration& cfg)
     {
       if (cfg.empty())
         return G::create();
@@ -104,7 +104,7 @@ class GridProviderFactory
   }
 
   template <class G>
-  static std::unique_ptr<G> call_create(const Common::Configuration& cfg)
+  static GridProvider<GridType> call_create(const Common::Configuration& cfg)
   {
     return Helper<G, G::available>::create(cfg);
   }
@@ -154,7 +154,7 @@ public:
                                     << available_as_str());
   } // ... default_config(...)
 
-  static std::unique_ptr<InterfaceType> create(const Common::Configuration& config)
+  static GridProvider<GridType> create(const Common::Configuration& config)
   {
     return create(config.get<std::string>("type"), config);
   }
@@ -165,9 +165,9 @@ public:
     if (call_compare<CubeType>(type))
       return call_create<CubeType>(config);
     else if (call_compare<DgfType>(type))
-      return call_create<DgfType>();
+      return call_create<DgfType>(config);
     else if (call_compare<GmshType>(type))
-      return call_create<GmshType>();
+      return call_create<GmshType>(config);
     else if (available().empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "There is no grid provider available for " << Common::Typename<GridType>::value() << "!");
