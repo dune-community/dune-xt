@@ -48,7 +48,6 @@ struct IndexMapCreator {
                                std::vector<std::set<IndexType>>& entities_to_skip_vector,
                                std::vector<std::vector<IndexType>>& new_indices_vector)
   {
-    EntityInlevelSearch<RealGridViewType, codim> entity_search_codim(real_grid_view);
     IndexMapType index_map;
     std::map<IndexType, size_t> entity_to_vector_index_map;
     std::vector<DomainType> periodic_coords_vector;
@@ -98,6 +97,7 @@ struct IndexMapCreator {
     entities_to_skip_vector[codim] = entities_to_skip;
 
     // find periodic entities
+    EntityInlevelSearch<RealGridViewType, codim> entity_search_codim(real_grid_view);
     const auto periodic_entity_ptrs = entity_search_codim(periodic_coords_vector);
 
     // assign new indices to the entities
@@ -564,7 +564,7 @@ public:
   }
 
   // methods that differ from BaseType
-  const Intersection& operator*() const
+  const Intersection operator*() const
   {
     current_intersection_ = create_current_intersection();
     return *current_intersection_;
@@ -590,7 +590,7 @@ private:
   std::unique_ptr<Intersection> create_current_intersection_safely() const
   {
     const bool is_iend = (*this == real_grid_view_.iend(entity_));
-    const RealIntersectionType& real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
+    const RealIntersectionType real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
     assert(is_iend || !has_boundary_intersections_ || intersection_map_.count(real_intersection.indexInInside()));
     return Common::make_unique<Intersection>(real_intersection,
                                              real_grid_view_,
@@ -1107,8 +1107,8 @@ class PeriodicGridView
     : XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>>,
       public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>>
 {
-  static_assert(!is_alugrid<typename RealGridViewImp::Grid>::value,
-                "ALUGrid 1.52 and older cannot be used here due to missing entitity default ctor");
+//  static_assert(!is_alugrid<typename RealGridViewImp::Grid>::value,
+//                "ALUGrid 1.52 and older cannot be used here due to missing entitity default ctor");
   typedef RealGridViewImp RealGridViewType;
   typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType, gridview_provides_all_codim_iterators, use_less_memory>> BaseType;
   typedef typename XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>>
