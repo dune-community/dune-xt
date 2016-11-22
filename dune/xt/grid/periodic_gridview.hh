@@ -36,7 +36,7 @@ namespace Grid {
 namespace internal {
 
 
-template<bool all_iterators_available, int codim>
+template<bool codim_iterators_provided, int codim>
 struct IndexMapCreator {
   template <class DomainType, size_t dimDomain, class RealGridViewType, class IndexType>
   static void create_index_map(const DomainType& lower_left,
@@ -48,54 +48,63 @@ struct IndexMapCreator {
                                std::vector<std::set<IndexType>>& entities_to_skip_vector,
                                std::map<size_t, std::vector<IndexType>>& new_indices_vector)
   {
+    // geometry type index to entity index to vector index
     std::map<size_t, std::map<IndexType, size_t>> entity_to_vector_index_map;
     std::vector<DomainType> periodic_coords_vector;
     const auto& real_index_set = real_grid_view.indexSet();
     IndexType num_codim_entities = 0;
     std::set<IndexType> entities_to_skip;
+    std::map<size_t, IndexType> type_counts_codim;
+    std::map<size_t, std::set<IndexType>> visited_entities;
 
     for (const auto& codim0_entity : elements(real_grid_view)) {
       for (IndexType local_index = 0; local_index < codim0_entity.subEntities(codim); ++local_index) {
         const auto& entity = codim0_entity.template subEntity<codim>(local_index);
+        const auto old_index = real_index_set.index(entity);
+        const auto type_index = Dune::GlobalGeometryTypeIndex::index(entity.type());
+        if (!visited_entities[type_index].count(old_index)) {
 
-        //    for (const auto& entity : entities(real_grid_view, Dune::Codim<codim>())) {
+          //    for (const auto& entity : entities(real_grid_view, Dune::Codim<codim>())) {
 
-        // check if entity is on a periodic boundary
-        auto periodic_coords = entity.geometry().center();
-        std::size_t num_upper_right_coords = 0;
-        for (std::size_t ii = 0; ii < dimDomain; ++ii) {
-          if (periodic_directions[ii]) {
-            if (XT::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
-              ++num_upper_right_coords;
-              periodic_coords[ii] = lower_left[ii];
+          // check if entity is on a periodic boundary
+          auto periodic_coords = entity.geometry().center();
+          std::size_t num_upper_right_coords = 0;
+          for (std::size_t ii = 0; ii < dimDomain; ++ii) {
+            if (periodic_directions[ii]) {
+              if (XT::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
+                ++num_upper_right_coords;
+                periodic_coords[ii] = lower_left[ii];
+              }
             }
           }
-        }
 
-        const auto type_index = Dune::GlobalGeometryTypeIndex::index(entity.type());
-        if (num_upper_right_coords == 0) {
-          // increase codim counter
-          ++num_codim_entities;
-          // increase GeometryType counter
-          if (type_counts.count(type_index))
-            ++(type_counts.at(type_index));
-          else
-            type_counts.insert(std::make_pair(type_index, size_t(1)));
-        }
+          if (num_upper_right_coords == 0) {
+            // increase codim counter
+            ++num_codim_entities;
+            // increase GeometryType counter
+            if (type_counts_codim.count(type_index))
+              ++(type_counts_codim.at(type_index));
+            else
+              type_counts_codim.insert(std::make_pair(type_index, size_t(1)));
+          }
 
-        if (num_upper_right_coords > 0) { // find periodic adjacent entity
-          entities_to_skip.insert(real_index_set.index(entity));
-          periodic_coords_vector.push_back(periodic_coords);
-          entity_to_vector_index_map[type_index].insert(std::make_pair(real_index_set.index(entity), periodic_coords_vector.size() - 1));
-        }
-      } // walk entities in a given codimension
-    }
+          if (num_upper_right_coords > 0) { // find periodic adjacent entity
+            entities_to_skip.insert(old_index);
+            periodic_coords_vector.push_back(periodic_coords);
+            entity_to_vector_index_map[type_index].insert(std::make_pair(old_index, periodic_coords_vector.size() - 1));
+          }
+          visited_entities[type_index].insert(old_index);
+        } // if (entity has not been visited before)
+      } // walk subentities in a given codimension
+    } // walk codim0 entities
 
     entity_counts[codim] = num_codim_entities;
+    for (const auto& pair: type_counts_codim)
+      type_counts[pair.first] = pair.second;
     entities_to_skip_vector[codim] = entities_to_skip;
 
     // find periodic entities
-    typename std::conditional<all_iterators_available,
+    typename std::conditional<codim_iterators_provided,
         EntityInlevelSearch<RealGridViewType, codim>,
         FallbackEntityInlevelSearch<RealGridViewType, codim>>::type entity_search_codim(real_grid_view);
     const auto periodic_entity_ptrs = entity_search_codim(periodic_coords_vector);
@@ -107,7 +116,6 @@ struct IndexMapCreator {
     // assign new indices to entities that are not replaced by their periodic equivalent entity
     for (const auto& type : geometry_types) {
       const auto type_index = Dune::GlobalGeometryTypeIndex::index(type);
-      std::cout << "codim: " << codim << "and type_index " << type_index << std::endl;
       const auto num_type_entities = real_index_set.size(type);
       new_indices_vector[type_index] = std::vector<IndexType>(num_type_entities);
       for (IndexType old_index = 0; old_index < num_type_entities; ++old_index) {
