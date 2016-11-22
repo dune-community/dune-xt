@@ -18,6 +18,7 @@
 #include <vector>
 #include <set>
 
+#include <dune/geometry/typeindex.hh>
 #include <dune/grid/common/gridview.hh>
 
 #include <dune/xt/common/exceptions.hh>
@@ -35,249 +36,108 @@ namespace Grid {
 namespace internal {
 
 
-template< bool use_less_memory, bool all_iterators_available, int codim >
+template<bool all_iterators_available, int codim>
 struct IndexMapCreator {
-  template <class DomainType, size_t dimDomain, class IndexMapType, class RealGridViewType, class IndexType>
+  template <class DomainType, size_t dimDomain, class RealGridViewType, class IndexType>
   static void create_index_map(const DomainType& lower_left,
                                const DomainType& upper_right,
                                const std::bitset<dimDomain>& periodic_directions,
-                               std::vector<IndexMapType>& index_maps,
                                const RealGridViewType& real_grid_view,
                                std::vector<IndexType>& entity_counts,
-                               std::map<Dune::GeometryType, size_t>& type_counts,
+                               std::map<size_t, IndexType>& type_counts,
                                std::vector<std::set<IndexType>>& entities_to_skip_vector,
-                               std::vector<std::vector<IndexType>>& new_indices_vector)
+                               std::map<size_t, std::vector<IndexType>>& new_indices_vector)
   {
-    IndexMapType index_map;
-    std::map<IndexType, size_t> entity_to_vector_index_map;
+    std::map<size_t, std::map<IndexType, size_t>> entity_to_vector_index_map;
     std::vector<DomainType> periodic_coords_vector;
     const auto& real_index_set = real_grid_view.indexSet();
-    if (!use_less_memory)
-      new_indices_vector[codim].resize(real_index_set.size(codim));
-    auto& new_indices = new_indices_vector[codim];
     IndexType num_codim_entities = 0;
-    std::set<IndexType> free_indices;
     std::set<IndexType> entities_to_skip;
-    for (const auto& entity : entities(real_grid_view, Dune::Codim<codim>())) {
-      // increase codim counter
-      ++num_codim_entities;
-      // increase GeometryType counter
-      const auto geometry_type = entity.type();
-      if (type_counts.count(geometry_type))
-        ++(type_counts.at(geometry_type));
-      else
-        type_counts.insert(std::make_pair(geometry_type, size_t(1)));
-      // check if entity is on a periodic boundary and, if it is, replace index by indices of periodic entity
-      auto periodic_coords = entity.geometry().center();
-      std::size_t num_upper_right_coords = 0;
-      for (std::size_t ii = 0; ii < dimDomain; ++ii) {
-        if (periodic_directions[ii]) {
-          if (XT::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
-            ++num_upper_right_coords;
-            periodic_coords[ii] = lower_left[ii];
+
+    for (const auto& codim0_entity : elements(real_grid_view)) {
+      for (IndexType local_index = 0; local_index < codim0_entity.subEntities(codim); ++local_index) {
+        const auto& entity = codim0_entity.template subEntity<codim>(local_index);
+
+        //    for (const auto& entity : entities(real_grid_view, Dune::Codim<codim>())) {
+
+        // check if entity is on a periodic boundary
+        auto periodic_coords = entity.geometry().center();
+        std::size_t num_upper_right_coords = 0;
+        for (std::size_t ii = 0; ii < dimDomain; ++ii) {
+          if (periodic_directions[ii]) {
+            if (XT::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
+              ++num_upper_right_coords;
+              periodic_coords[ii] = lower_left[ii];
+            }
           }
         }
-      }
-      if (num_upper_right_coords > 0) { // find periodic adjacent entity
-        // dont count this entity as it is identified with the single periodic equivalent entity
-        --num_codim_entities;
-        if (type_counts.count(geometry_type))
-          --(type_counts.at(geometry_type));
-        else
-          type_counts.insert(std::make_pair(geometry_type, size_t(-1)));
-        free_indices.insert(real_index_set.index(entity));
-        entities_to_skip.insert(real_index_set.index(entity));
-        periodic_coords_vector.push_back(periodic_coords);
-        entity_to_vector_index_map.insert(
-            std::make_pair(real_index_set.index(entity), periodic_coords_vector.size() - 1));
-      }
-    } // walk entities in a given codimension
+
+        const auto type_index = Dune::GlobalGeometryTypeIndex::index(entity.type());
+        if (num_upper_right_coords == 0) {
+          // increase codim counter
+          ++num_codim_entities;
+          // increase GeometryType counter
+          if (type_counts.count(type_index))
+            ++(type_counts.at(type_index));
+          else
+            type_counts.insert(std::make_pair(type_index, size_t(1)));
+        }
+
+        if (num_upper_right_coords > 0) { // find periodic adjacent entity
+          entities_to_skip.insert(real_index_set.index(entity));
+          periodic_coords_vector.push_back(periodic_coords);
+          entity_to_vector_index_map[type_index].insert(std::make_pair(real_index_set.index(entity), periodic_coords_vector.size() - 1));
+        }
+      } // walk entities in a given codimension
+    }
 
     entity_counts[codim] = num_codim_entities;
     entities_to_skip_vector[codim] = entities_to_skip;
 
     // find periodic entities
-    EntityInlevelSearch<RealGridViewType, codim> entity_search_codim(real_grid_view);
+    typename std::conditional<all_iterators_available,
+        EntityInlevelSearch<RealGridViewType, codim>,
+        FallbackEntityInlevelSearch<RealGridViewType, codim>>::type entity_search_codim(real_grid_view);
     const auto periodic_entity_ptrs = entity_search_codim(periodic_coords_vector);
 
     // assign new indices to the entities
     IndexType current_new_index = 0;
-
-    // to save memory, only entities with an index greater than the number of entities in this codim will get a new
-    // index
-    if (use_less_memory) {
-      for (const auto& index : free_indices)
-        if (index >= num_codim_entities)
-          free_indices.erase(index);
-    }
+    const auto geometry_types = real_index_set.types(codim);
 
     // assign new indices to entities that are not replaced by their periodic equivalent entity
-    for (const auto& entity : entities(real_grid_view, Dune::Codim<codim>())) {
-      const auto old_index = real_index_set.index(entity);
-      if (!entity_to_vector_index_map.count(old_index)) {
-        if (!use_less_memory) {
-          new_indices[old_index] = current_new_index;
+    for (const auto& type : geometry_types) {
+      const auto type_index = Dune::GlobalGeometryTypeIndex::index(type);
+      std::cout << "codim: " << codim << "and type_index " << type_index << std::endl;
+      const auto num_type_entities = real_index_set.size(type);
+      new_indices_vector[type_index] = std::vector<IndexType>(num_type_entities);
+      for (IndexType old_index = 0; old_index < num_type_entities; ++old_index) {
+        if (!entity_to_vector_index_map[type_index].count(old_index)) {
+          new_indices_vector[type_index][old_index] = current_new_index;
           ++current_new_index;
-        } else {
-          if (old_index >= num_codim_entities) {
-            assert(free_indices.begin() != free_indices.end());
-            auto free_index = *free_indices.begin();
-            index_map.insert(std::make_pair(old_index, free_index));
-            free_indices.erase(free_index);
-          }
         }
       }
     }
 
     // assign index of periodic equivalent entity to entities that are replaced
     for (const auto& pair : entity_to_vector_index_map) {
-      assert(periodic_entity_ptrs.size() > pair.second);
-      const auto& periodic_entity_ptr = periodic_entity_ptrs.at(pair.second);
-      if (periodic_entity_ptr == nullptr)
-        DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
-      auto index_of_periodic_entity = real_index_set.index(*periodic_entity_ptr);
-      if (!use_less_memory)
-        new_indices[pair.first] = new_indices[index_of_periodic_entity];
-      else
-        index_map.insert(std::make_pair(pair.first,
-                                        index_map.count(index_of_periodic_entity)
-                                            ? index_map.at(index_of_periodic_entity)
-                                            : index_of_periodic_entity));
+      const auto& type_index = pair.first;
+      for (const auto& entity_index_to_vector_index : pair.second) {
+        const auto& entity_index = entity_index_to_vector_index.first;
+        const auto& vector_index = entity_index_to_vector_index.second;
+        assert(periodic_entity_ptrs.size() > vector_index);
+        const auto& periodic_entity_ptr = periodic_entity_ptrs.at(vector_index);
+        if (periodic_entity_ptr == nullptr)
+          DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
+        auto index_of_periodic_entity = real_index_set.index(*periodic_entity_ptr);
+        assert(type_index == Dune::GlobalGeometryTypeIndex::index(periodic_entity_ptr->type()) && "Periodic equivalent entities cannot have different geometry types!");
+        new_indices_vector[type_index][entity_index] = new_indices_vector[type_index][index_of_periodic_entity];
+      }
     }
-    index_maps[codim] = index_map;
   } // ... create_index_map(...)
-}; // struct IndexMapCreator< ..., true >
-
-template<bool use_less_memory, int codim>
-struct IndexMapCreator<use_less_memory, false, codim>
-{
-  // function that is used in the constructor to create the index map and the counter for the PeriodicIndexSet
-  // specialization for the case that the gridview does not provide iterators for all codimensions
-  template <class DomainType, size_t dimDomain, class IndexMapType, class RealGridViewType, class IndexType>
-  static void create_index_map(const DomainType& lower_left,
-                               const DomainType& upper_right,
-                               const std::bitset<dimDomain>& periodic_directions,
-                               std::vector<IndexMapType>& index_maps,
-                               const RealGridViewType& real_grid_view,
-                               std::vector<IndexType>& entity_counts,
-                               std::map<Dune::GeometryType, size_t>& type_counts,
-                               std::vector<std::set<IndexType>>& entities_to_skip_vector,
-                               std::vector<std::vector<IndexType>>& new_indices_vector)
-  {
-    FallbackEntityInlevelSearch<RealGridViewType, codim> entity_search_codim(real_grid_view);
-    IndexMapType index_map;
-    std::map<IndexType, size_t> entity_to_vector_index_map;
-    std::vector<DomainType> periodic_coords_vector;
-    const auto& real_index_set = real_grid_view.indexSet();
-    if (!use_less_memory)
-      new_indices_vector[codim].resize(real_index_set.size(codim));
-    auto& new_indices = new_indices_vector[codim];
-    IndexType num_codim_entities = 0;
-    std::set<IndexType> free_indices;
-    std::set<IndexType> entities_to_skip;
-    std::set<IndexType> visited_indices;
-    for (const auto& entity : elements(real_grid_view)) {
-      for (IndexType local_index = 0; local_index < entity.subEntities(codim); ++local_index) {
-        const auto& sub_entity = entity.template subEntity<codim>(local_index);
-        const auto& global_index = real_index_set.index(sub_entity);
-        if (!visited_indices.count(global_index)) {
-          // check if sub_entity is on a periodic boundary and, if it is, replace index by indices of
-          // periodic equivalent entity
-          auto periodic_coords = sub_entity.geometry().center();
-          std::size_t num_upper_right_coords = 0;
-          for (std::size_t ii = 0; ii < dimDomain; ++ii) {
-            if (periodic_directions[ii]) {
-              if (XT::Common::FloatCmp::eq(periodic_coords[ii], upper_right[ii])) {
-                ++num_upper_right_coords;
-                periodic_coords[ii] = lower_left[ii];
-              }
-            }
-          }
-
-          if (num_upper_right_coords > 0) { // find periodically equivalent entity
-            // dont count this sub_entity as it is identified with the single periodically
-            // equivalent entity
-            free_indices.insert(real_index_set.index(sub_entity));
-            entities_to_skip.insert(real_index_set.index(sub_entity));
-            periodic_coords_vector.push_back(periodic_coords);
-            entity_to_vector_index_map.insert(
-                  std::make_pair(real_index_set.index(sub_entity), periodic_coords_vector.size() - 1));
-          } else {
-            // increase entity counter
-            ++num_codim_entities;
-            // increase GeometryType counter
-            const auto geometry_type = sub_entity.type();
-            if (type_counts.count(geometry_type))
-              ++(type_counts.at(geometry_type));
-            else
-              type_counts.insert(std::make_pair(geometry_type, size_t(1)));
-          } // if ( subentity replaced by periodically equivalent entity )
-          visited_indices.insert(global_index);
-        } // if ( subentity has not been visited before )
-      } // walk subentities
-    } // walk codim 0 entities
-
-    entity_counts[codim] = num_codim_entities;
-    entities_to_skip_vector[codim] = entities_to_skip;
-
-    // find periodic entities
-    const auto periodic_entity_ptrs = entity_search_codim(periodic_coords_vector);
-
-    // assign new indices to the entities
-    IndexType current_new_index = 0;
-
-    // to save memory, only entities with an index greater than the number of entities in this codim will get a new
-    // index
-    if (use_less_memory) {
-      for (const auto& index : free_indices)
-        if (index >= num_codim_entities)
-          free_indices.erase(index);
-    }
-
-    // assign new indices to entities that are not replaced by their periodic equivalent entity
-    visited_indices.clear();
-    for (const auto& entity : elements(real_grid_view)) {
-      for (IndexType local_index = 0; local_index < entity.subEntities(codim); ++local_index) {
-        const auto& sub_entity = entity.template subEntity<codim>(local_index);
-        const auto& old_index = real_index_set.index(sub_entity);
-        if (!visited_indices.count(old_index) && !entity_to_vector_index_map.count(old_index)) {
-          if (!use_less_memory) {
-            new_indices[old_index] = current_new_index;
-            ++current_new_index;
-          } else {
-            if (old_index >= num_codim_entities) {
-              assert(free_indices.begin() != free_indices.end());
-              auto free_index = *free_indices.begin();
-              index_map.insert(std::make_pair(old_index, free_index));
-              free_indices.erase(free_index);
-            }
-          } // if (!use_less_memory)
-          visited_indices.insert(old_index);
-        } // if (has not been visited and is not replaced)
-      } // walk subentities
-    } // walk codim 0 entities
-
-    // assign index of periodically equivalent entity to entities that are replaced
-    for (const auto& pair : entity_to_vector_index_map) {
-      assert(periodic_entity_ptrs.size() > pair.second);
-      const auto& periodic_entity_ptr = periodic_entity_ptrs.at(pair.second);
-      if (periodic_entity_ptr == nullptr)
-        DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
-      auto index_of_periodic_entity = real_index_set.index(*periodic_entity_ptr);
-      if (!use_less_memory)
-        new_indices[pair.first] = new_indices[index_of_periodic_entity];
-      else
-        index_map.insert(std::make_pair(pair.first,
-                                        index_map.count(index_of_periodic_entity)
-                                            ? index_map.at(index_of_periodic_entity)
-                                            : index_of_periodic_entity));
-    }
-    index_maps[codim] = index_map;
-  } // ... create_index_map(...)
-}; // IndexMapCreator< ..., false >
+}; // struct IndexMapCreator< ... >
 
 // forward
-template <class RealGridViewImp, bool gridview_provides_all_codim_iterators, bool use_less_memory>
+template <class RealGridViewImp, bool codim_iterators_provided>
 class PeriodicGridViewTraits;
 
 /** \brief IndexSet for PeriodicGridView
@@ -290,14 +150,14 @@ class PeriodicGridViewTraits;
  *
  * \see PeriodicGridView
  */
-template <class RealGridViewImp, bool use_less_memory>
+template <class RealGridViewImp>
 class PeriodicIndexSet : public Dune::IndexSet<typename RealGridViewImp::Grid,
-                                               PeriodicIndexSet<RealGridViewImp, use_less_memory>,
+                                               PeriodicIndexSet<RealGridViewImp>,
                                                typename RealGridViewImp::IndexSet::IndexType,
                                                typename RealGridViewImp::IndexSet::Types>
 {
   typedef RealGridViewImp RealGridViewType;
-  typedef PeriodicIndexSet<RealGridViewType, use_less_memory> ThisType;
+  typedef PeriodicIndexSet<RealGridViewType> ThisType;
   typedef typename RealGridViewType::IndexSet RealIndexSetType;
   typedef typename Dune::IndexSet<typename RealGridViewType::Grid,
                                   ThisType,
@@ -310,44 +170,33 @@ public:
   typedef typename RealIndexSetType::Types Types;
 
 private:
-  typedef std::map<IndexType, IndexType> IndexMapType;
+  typedef std::map<Dune::GeometryType, std::map<IndexType, IndexType>> IndexMapType;
 
 public:
   static const int dimDomain = RealGridViewType::dimension;
 
   PeriodicIndexSet(const RealIndexSetType& real_index_set,
-                   const std::vector<IndexMapType>& index_maps,
                    const std::vector<IndexType>& entity_counts,
-                   const std::map<Dune::GeometryType, size_t>& geometry_type_counts,
-                   const std::vector<std::vector<IndexType>>& new_indices_vector)
+                   const std::map<size_t, IndexType>& geometry_type_counts,
+                   const std::map<size_t, std::vector<IndexType>>& new_indices_vector)
     : BaseType()
     , real_index_set_(real_index_set)
-    , index_maps_(index_maps)
     , entity_counts_(entity_counts)
     , geometry_type_counts_(geometry_type_counts)
     , new_indices_vector_(new_indices_vector)
   {
-    assert(index_maps_.size() >= dimDomain + 1);
     assert(entity_counts_.size() >= dimDomain + 1);
-    assert(new_indices_vector_.size() >= dimDomain + 1);
   }
 
   template <int cd>
   IndexType index(const typename RealGridViewType::Traits::template Codim<cd>::Entity& entity) const
   {
     IndexType real_entity_index = real_index_set_.template index<cd>(entity);
-    if (cd == 0) {
+    if (cd == 0)
       return real_entity_index;
-    } else {
-      if (!use_less_memory) {
-        return new_indices_vector_[cd][real_entity_index];
-      } else {
-        auto iterator_to_index = index_maps_[cd].find(real_entity_index);
-        if (iterator_to_index != index_maps_[cd].end())
-          return (*iterator_to_index).second;
-        else
-          return real_entity_index;
-      }
+    else {
+      const auto type_index = Dune::GlobalGeometryTypeIndex::index(entity.type());
+      return new_indices_vector_.at(type_index)[real_entity_index];
     }
   }
 
@@ -361,18 +210,12 @@ public:
   IndexType subIndex(const typename RealGridViewType::Traits::template Codim<cd>::Entity& entity, int i, unsigned int codim) const
   {
     IndexType real_sub_index = real_index_set_.template subIndex<cd>(entity, i, codim);
-    if (codim == 0) {
+    if (codim == 0)
       return real_sub_index;
-    } else {
-      if (!use_less_memory) {
-        return new_indices_vector_[codim][real_sub_index];
-      } else {
-        auto iterator_to_index = index_maps_[codim].find(real_sub_index);
-        if (iterator_to_index != index_maps_[codim].end())
-          return (*iterator_to_index).second;
-        else
-          return real_sub_index;
-      }
+    else {
+      const auto& ref_element = reference_element(entity.geometry());
+      const auto type_index = Dune::GlobalGeometryTypeIndex::index(ref_element.type(i, codim));
+      return new_indices_vector_.at(type_index)[real_sub_index];
     }
   }
 
@@ -389,7 +232,8 @@ public:
 
   IndexType size(Dune::GeometryType type) const
   {
-    return geometry_type_counts_.count(type) ? geometry_type_counts_.at(type) : 0;
+    const auto type_index = Dune::GlobalGeometryTypeIndex::index(type);
+    return geometry_type_counts_.count(type_index) ? geometry_type_counts_.at(type_index) : 0;
   }
 
   IndexType size(int codim) const
@@ -398,18 +242,11 @@ public:
     return entity_counts_[codim];
   }
 
-  template <class EntityType>
-  bool contains(const EntityType& entity) const
-  {
-    return real_index_set_.contains(entity);
-  }
-
 private:
   const RealIndexSetType& real_index_set_;
-  const std::vector<IndexMapType>& index_maps_;
   const std::vector<IndexType>& entity_counts_;
-  const std::map<Dune::GeometryType, size_t>& geometry_type_counts_;
-  const std::vector<std::vector<IndexType>>& new_indices_vector_;
+  const std::map<size_t, IndexType>& geometry_type_counts_;
+  const std::map<size_t, std::vector<IndexType>>& new_indices_vector_;
 }; // class PeriodicIndexSet<...>
 
 /** \brief Intersection for PeriodicGridView
@@ -540,7 +377,7 @@ public:
   PeriodicIntersectionIterator(BaseType real_intersection_iterator,
                                const RealGridViewType& real_grid_view,
                                const EntityType& entity,
-                               const std::map<IntersectionIndexType, PeriodicPairType>& intersection_map,
+                               const std::vector<PeriodicPairType>& intersection_map,
                                const PeriodicPairType& nonperiodic_pair)
     : BaseType(real_intersection_iterator)
     , real_grid_view_(real_grid_view)
@@ -579,11 +416,11 @@ public:
 private:
   std::unique_ptr<Intersection> create_current_intersection() const
   {
-    assert(!has_boundary_intersections_ || intersection_map_.count((BaseType::operator*()).indexInInside()));
+    assert(!has_boundary_intersections_ || intersection_map_.size() > (BaseType::operator*()).indexInInside());
     return Common::make_unique<Intersection>(BaseType::operator*(),
                                              real_grid_view_,
                                              has_boundary_intersections_
-                                                 ? intersection_map_.at((BaseType::operator*()).indexInInside())
+                                                 ? intersection_map_[(BaseType::operator*()).indexInInside()]
                                                  : (const PeriodicPairType&)nonperiodic_pair_);
   } // ... create_current_intersection() const
 
@@ -591,36 +428,36 @@ private:
   {
     const bool is_iend = (*this == real_grid_view_.iend(entity_));
     const RealIntersectionType real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
-    assert(is_iend || !has_boundary_intersections_ || intersection_map_.count(real_intersection.indexInInside()));
+    assert(is_iend || !has_boundary_intersections_ || intersection_map_.size() > real_intersection.indexInInside());
     return Common::make_unique<Intersection>(real_intersection,
                                              real_grid_view_,
                                              has_boundary_intersections_ && !is_iend
-                                                 ? intersection_map_.at(real_intersection.indexInInside())
+                                                 ? intersection_map_[real_intersection.indexInInside()]
                                                  : (const PeriodicPairType&)nonperiodic_pair_);
   } // ... create_current_intersection_safely() const
 
   const RealGridViewType& real_grid_view_;
   const EntityType& entity_;
   const bool has_boundary_intersections_;
-  const std::map<IntersectionIndexType, PeriodicPairType>& intersection_map_;
+  const std::vector<PeriodicPairType>& intersection_map_;
   const PeriodicPairType& nonperiodic_pair_;
   mutable std::unique_ptr<Intersection> current_intersection_;
 }; // ... class PeriodicIntersectionIterator ...
 
 // forward
-template <class RealGridViewImp, bool gridview_provides_all_codim_iterators, bool use_less_memory>
+template <class RealGridViewImp, bool codim_iterators_provided>
 class PeriodicGridViewImp;
 
 //! Traits for PeriodicGridView
-template <class RealGridViewImp, bool gridview_provides_all_codim_iterators, bool use_less_memory>
+template <class RealGridViewImp, bool codim_iterators_provided>
 class PeriodicGridViewTraits : public RealGridViewImp::Traits
 {
 public:
   typedef RealGridViewImp RealGridViewType;
   // use types from RealGridViewType...
-  typedef PeriodicGridViewImp<RealGridViewType, gridview_provides_all_codim_iterators, use_less_memory> GridViewImp;
+  typedef PeriodicGridViewImp<RealGridViewType, codim_iterators_provided> GridViewImp;
   typedef typename RealGridViewType::Grid Grid;
-  typedef PeriodicIndexSet<RealGridViewType, use_less_memory> IndexSet;
+  typedef PeriodicIndexSet<RealGridViewType> IndexSet;
   typedef typename RealGridViewType::CollectiveCommunication CollectiveCommunication;
   typedef typename RealGridViewType::Traits RealGridViewTraits;
 
@@ -742,16 +579,16 @@ public:
 /** \brief Actual Implementation of PeriodicGridView
  *  \see PeriodicGridView
 */
-template <class RealGridViewImp, bool gridview_provides_all_codim_iterators, bool use_less_memory>
+template <class RealGridViewImp, bool codim_iterators_provided>
 class PeriodicGridViewImp : public RealGridViewImp
 {
   typedef RealGridViewImp BaseType;
-  typedef PeriodicGridViewImp<BaseType, gridview_provides_all_codim_iterators, use_less_memory> ThisType;
-  typedef PeriodicGridViewTraits<BaseType, gridview_provides_all_codim_iterators, use_less_memory> Traits;
+  typedef PeriodicGridViewImp<BaseType, codim_iterators_provided> ThisType;
+  typedef PeriodicGridViewTraits<BaseType, codim_iterators_provided> Traits;
 
 public:
   typedef typename BaseType::Grid Grid;
-  typedef PeriodicIndexSet<BaseType, use_less_memory> IndexSet;
+  typedef PeriodicIndexSet<BaseType> IndexSet;
   typedef typename BaseType::template Codim<0>::Entity EntityType;
   typedef PeriodicIntersectionIterator<BaseType> IntersectionIterator;
   typedef typename IntersectionIterator::RealIntersectionType RealIntersectionType;
@@ -759,8 +596,8 @@ public:
   typedef int IntersectionIndexType;
   typedef typename RealIntersectionType::GlobalCoordinate DomainType;
   typedef PeriodicIntersection<BaseType> Intersection;
-  typedef std::map<IntersectionIndexType, std::pair<bool, EntityType>> IntersectionMapType;
-  typedef typename std::map<IndexType, IndexType> IndexMapType;
+  typedef std::vector<std::pair<bool, EntityType>> IntersectionMapType;
+  typedef typename std::map<Dune::GeometryType, std::map<IndexType, IndexType>> IndexMapType;
   static const size_t dimDomain = BaseType::dimension;
 
   template <int cd>
@@ -777,17 +614,15 @@ private:
     void operator()(const DomainType& lower_left,
                     const DomainType& upper_right,
                     const std::bitset<dimDomain>& periodic_directions,
-                    std::vector<IndexMapType>& index_maps,
                     const BaseType& real_grid_view,
                     std::vector<IndexType>& entity_counts,
-                    std::map<Dune::GeometryType, size_t>& type_counts,
+                    std::map<size_t, IndexType>& type_counts,
                     std::vector<std::set<IndexType>>& entities_to_skip_vector,
-                    std::vector<std::vector<IndexType>>& new_indices_vector)
+                    std::map<size_t, std::vector<IndexType>>& new_indices_vector)
     {
-      IndexMapCreator<use_less_memory, gridview_provides_all_codim_iterators, codim>::create_index_map(lower_left,
+      IndexMapCreator<codim_iterators_provided, codim>::create_index_map(lower_left,
                               upper_right,
                               periodic_directions,
-                              index_maps,
                               real_grid_view,
                               entity_counts,
                               type_counts,
@@ -796,7 +631,6 @@ private:
       static_for_loop_for_index_maps<codim + 1, to>()(lower_left,
                                                       upper_right,
                                                       periodic_directions,
-                                                      index_maps,
                                                       real_grid_view,
                                                       entity_counts,
                                                       type_counts,
@@ -812,12 +646,11 @@ private:
     void operator()(const DomainType& /*lower_left*/,
                     const DomainType& /*upper_right*/,
                     const std::bitset<dimDomain>& /*periodic_directions*/,
-                    std::vector<IndexMapType>& /*index_maps*/,
                     const BaseType& /*real_grid_view*/,
                     std::vector<IndexType>& /*entity_counts*/,
-                    std::map<Dune::GeometryType, size_t>& /*type_counts*/,
+                    std::map<size_t, IndexType>& /*type_counts*/,
                     std::vector<std::set<IndexType>>& /*entities_to_skip_vector*/,
-                    std::vector<std::vector<IndexType>>& /*new_indices_vector*/)
+                    std::map<size_t, std::vector<IndexType>>& /*new_indices_vector*/)
     {
     }
   };
@@ -826,12 +659,11 @@ public:
   PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
     : BaseType(real_grid_view)
     , entity_to_intersection_map_map_(std::make_shared<std::map<IndexType, IntersectionMapType>>())
-    , index_maps_(std::make_shared<std::vector<IndexMapType>>(dimDomain + 1))
     , periodic_directions_(periodic_directions)
     , entity_counts_(std::make_shared<std::vector<IndexType>>(dimDomain + 1))
-    , type_counts_(std::make_shared<std::map<Dune::GeometryType, size_t>>())
+    , type_counts_(std::make_shared<std::map<size_t, IndexType>>())
     , entities_to_skip_vector_(std::make_shared<std::vector<std::set<IndexType>>>(dimDomain + 1))
-    , new_indices_vector_(std::make_shared<std::vector<std::vector<IndexType>>>(dimDomain + 1))
+    , new_indices_vector_(std::make_shared<std::map<size_t, std::vector<IndexType>>>())
     , real_index_set_(BaseType::indexSet())
   {
     this->update();
@@ -848,19 +680,16 @@ public:
       if (entity.hasBoundaryIntersections()) {
         const auto i_it_end = BaseType::iend(entity);
         for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
-          const RealIntersectionType& intersection = *i_it;
-          const auto intersection_coords = intersection.geometry().center();
+          const auto intersection_coords = i_it->geometry().center();
           for (std::size_t ii = 0; ii < dimDomain; ++ii) {
-            if (intersection_coords[ii] > upper_right[ii])
-              upper_right[ii] = intersection_coords[ii];
-            if (intersection_coords[ii] < lower_left[ii])
-              lower_left[ii] = intersection_coords[ii];
+            upper_right[ii] = std::max(upper_right[ii], intersection_coords[ii]);
+            lower_left[ii] = std::min(lower_left[ii], intersection_coords[ii]);
           }
         }
       }
     }
 
-    /* walk the grid and create a map that maps each entity(index) on the boundary to a map that maps every
+    /* walk the grid and create a map that maps each entity(index) on the boundary to a vector that maps every
     local intersection index to a std::pair< bool, EntityType >, where the bool component of the pair
     indicates whether the intersection is on a periodic boundary and the second component is the periodic neighbor
     entity if the first component is true. If the first component is false, the Entity is not meant to be used. */
@@ -869,22 +698,25 @@ public:
     IntersectionMapType intersection_neighbor_map;
     std::vector<DomainType> periodic_neighbor_coords_vector;
     /* we don't want to do the entitysearch on each entity separately, so we collect the coordinates in a vector to do
-     * the search after the gridwalk. This map maps the entity indices to a map mapping local intersection indices to
+     * the search after the gridwalk. This map maps the entity indices to a vector mapping local intersection indices to
      * the index of the corresponding coordinate in the periodic_neighbor_coords_vector. */
-    std::map<IndexType, std::map<IntersectionIndexType, size_t>> entity_to_intersection_to_vector_index_map;
-    std::map<IntersectionIndexType, size_t> intersection_to_vector_index_map;
+    std::map<IndexType, std::vector<size_t>> entity_to_intersection_to_vector_index_map;
+    std::vector<size_t> intersection_to_vector_index_map;
     type_counts_->clear();
     entity_to_intersection_map_map_->clear();
     for (const auto& entity : Dune::elements(*this)) {
       // count entities per geometry type for the PeriodicIndexSet
       const auto geometry_type = entity.type();
-      if (type_counts_->count(geometry_type))
-        ++(type_counts_->at(geometry_type));
+      const auto type_index = Dune::GlobalGeometryTypeIndex::index(geometry_type);
+      if (type_counts_->count(type_index))
+        ++(type_counts_->at(type_index));
       else
-        type_counts_->insert(std::make_pair(geometry_type, size_t(1)));
+        type_counts_->insert(std::make_pair(type_index, size_t(1)));
       if (entity.hasBoundaryIntersections()) {
         intersection_neighbor_map.clear();
         intersection_to_vector_index_map.clear();
+        intersection_neighbor_map.resize(entity.subEntities(1));
+        intersection_to_vector_index_map.resize(entity.subEntities(1));
         const auto i_it_end = BaseType::iend(entity);
         for (auto i_it = BaseType::ibegin(entity); i_it != i_it_end; ++i_it) {
           const RealIntersectionType& intersection = *i_it;
@@ -911,36 +743,34 @@ public:
             if (is_periodic) {
               assert(num_boundary_coords == 1);
               periodic_neighbor_coords_vector.push_back(periodic_neighbor_coords);
-              intersection_to_vector_index_map.insert(
-                  std::make_pair(index_in_inside, periodic_neighbor_coords_vector.size() - 1));
+              intersection_to_vector_index_map[index_in_inside] = periodic_neighbor_coords_vector.size() - 1;
             } else {
-              intersection_neighbor_map.insert(
-                  std::make_pair(index_in_inside, std::make_pair(is_periodic, EntityType(entity))));
+              intersection_neighbor_map[index_in_inside] = std::make_pair(is_periodic, EntityType(entity));
             }
           } else {
-            intersection_neighbor_map.insert(
-                std::make_pair(index_in_inside, std::make_pair(bool(false), EntityType(entity))));
+            intersection_neighbor_map[index_in_inside] = std::make_pair(false, EntityType(entity));
           }
         }
         entity_to_intersection_to_vector_index_map.insert(
             std::make_pair(real_index_set_.index(entity), intersection_to_vector_index_map));
         entity_to_intersection_map_map_->insert(
             std::make_pair(real_index_set_.index(entity), intersection_neighbor_map));
-      }
+      } // if (entity.hasBoundaryIntersections)
     } // walk Entities
 
     // search the periodic neighbor entities
     const auto outside_ptrs = entity_search(periodic_neighbor_coords_vector);
 
     for (auto& pair : entity_to_intersection_to_vector_index_map) {
-      for (auto& intersection_to_vector : pair.second) {
-        assert(outside_ptrs.size() > intersection_to_vector.second);
-        const auto& outside_ptr = outside_ptrs.at(intersection_to_vector.second);
+      const auto& vector_indices = pair.second;
+      for (size_t ii = 0; ii < vector_indices.size(); ++ii) { // loop over local intersection indices
+        const size_t vector_index = vector_indices[ii];
+        assert(vector_index < outside_ptrs.size());
+        const auto& outside_ptr = outside_ptrs[vector_index];
         if (outside_ptr == nullptr)
           DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
         assert(entity_to_intersection_map_map_->count(pair.first));
-        entity_to_intersection_map_map_->at(pair.first)
-            .insert(std::make_pair(intersection_to_vector.first, std::make_pair(bool(true), *outside_ptr)));
+        entity_to_intersection_map_map_->at(pair.first)[ii] = std::make_pair(true, *outside_ptr);
       }
     }
 
@@ -951,15 +781,13 @@ public:
     static_for_loop_for_index_maps<1, dimDomain + 1>()(lower_left,
                                                        upper_right,
                                                        periodic_directions_,
-                                                       *index_maps_,
                                                        (const BaseType&)(*this),
                                                        *entity_counts_,
                                                        *type_counts_,
                                                        *entities_to_skip_vector_,
                                                        *new_indices_vector_);
     // create index_set
-    index_set_ =
-        std::make_shared<IndexSet>(real_index_set_, *index_maps_, *entity_counts_, *type_counts_, *new_indices_vector_);
+    index_set_ = std::make_shared<IndexSet>(real_index_set_, *entity_counts_, *type_counts_, *new_indices_vector_);
 
   }
 
@@ -1044,25 +872,24 @@ public:
 
 private:
   std::shared_ptr<std::map<IndexType, IntersectionMapType>> entity_to_intersection_map_map_;
-  std::shared_ptr<std::vector<IndexMapType>> index_maps_;
   static const IntersectionMapType empty_intersection_map_;
   const std::bitset<dimDomain> periodic_directions_;
   std::shared_ptr<IndexSet> index_set_;
   std::shared_ptr<std::vector<IndexType>> entity_counts_;
-  std::shared_ptr<std::map<Dune::GeometryType, size_t>> type_counts_;
+  std::shared_ptr<std::map<size_t, IndexType>> type_counts_;
   std::shared_ptr<std::vector<std::set<IndexType>>> entities_to_skip_vector_;
-  std::shared_ptr<std::vector<std::vector<IndexType>>> new_indices_vector_;
+  std::shared_ptr<std::map<size_t, std::vector<IndexType>>> new_indices_vector_;
   const typename BaseType::IndexSet& real_index_set_;
   static std::pair<bool, EntityType> nonperiodic_pair_;
 }; // ... class PeriodicGridViewImp ...
 
-template <class RealGridViewImp, bool gridview_provides_all_codim_iterators, bool use_less_memory>
-const typename PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>::IntersectionMapType
-    PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>::empty_intersection_map_;
+template <class RealGridViewImp, bool codim_iterators_provided>
+const typename PeriodicGridViewImp<RealGridViewImp, codim_iterators_provided>::IntersectionMapType
+    PeriodicGridViewImp<RealGridViewImp, codim_iterators_provided>::empty_intersection_map_;
 
-template <class RealGridViewImp, bool gridview_provides_all_codim_iterators, bool use_less_memory>
-std::pair<bool, typename PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>::EntityType>
-    PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>::nonperiodic_pair_;
+template <class RealGridViewImp, bool codim_iterators_provided>
+std::pair<bool, typename PeriodicGridViewImp<RealGridViewImp, codim_iterators_provided>::EntityType>
+    PeriodicGridViewImp<RealGridViewImp, codim_iterators_provided>::nonperiodic_pair_;
 
 } // namespace internal
 
@@ -1102,16 +929,16 @@ std::pair<bool, typename PeriodicGridViewImp<RealGridViewImp, gridview_provides_
       - Currently the indices are zero-starting and consecutive per codimension. By the DUNE
       documentation, it should rather be zero-starting and consecutive per codimension AND GeometryType.
  */
-template <class RealGridViewImp, bool gridview_provides_all_codim_iterators = true, bool use_less_memory = false>
+template <class RealGridViewImp, bool codim_iterators_provided = true>
 class PeriodicGridView
-    : XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>>,
-      public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>>
+    : XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, codim_iterators_provided>>,
+      public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp, codim_iterators_provided>>
 {
 //  static_assert(!is_alugrid<typename RealGridViewImp::Grid>::value,
 //                "ALUGrid 1.52 and older cannot be used here due to missing entitity default ctor");
   typedef RealGridViewImp RealGridViewType;
-  typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType, gridview_provides_all_codim_iterators, use_less_memory>> BaseType;
-  typedef typename XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, gridview_provides_all_codim_iterators, use_less_memory>>
+  typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType, codim_iterators_provided>> BaseType;
+  typedef typename XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, codim_iterators_provided>>
       ConstStorProv;
   typedef typename RealGridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
 
@@ -1121,13 +948,13 @@ public:
   PeriodicGridView(const RealGridViewType& real_grid_view,
                    const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
     : ConstStorProv(
-          new internal::PeriodicGridViewImp<RealGridViewType, gridview_provides_all_codim_iterators, use_less_memory>(real_grid_view, periodic_directions))
+          new internal::PeriodicGridViewImp<RealGridViewType, codim_iterators_provided>(real_grid_view, periodic_directions))
     , BaseType(ConstStorProv::access())
   {
   }
 
   PeriodicGridView(const PeriodicGridView& other)
-    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType, gridview_provides_all_codim_iterators, use_less_memory>(other.access()))
+    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType, codim_iterators_provided>(other.access()))
     , BaseType(ConstStorProv::access())
   {
   }
@@ -1139,8 +966,8 @@ public:
 
 }; // class PeriodicGridView
 
-template <class T, bool bb, bool bbb>
-struct is_grid_view<PeriodicGridView<T, bb, bbb>> : public std::true_type
+template <class T, bool bb>
+struct is_grid_view<PeriodicGridView<T, bb>> : public std::true_type
 {
 };
 
