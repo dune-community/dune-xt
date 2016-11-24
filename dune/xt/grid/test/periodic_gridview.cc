@@ -14,6 +14,9 @@
 #if HAVE_ALUGRID
 #include <dune/grid/alugrid.hh>
 #endif
+#if HAVE_DUNE_UGGRID
+#include <dune/grid/uggrid.hh>
+#endif
 #include <dune/grid/yaspgrid.hh>
 
 #include <dune/xt/common/configuration.hh>
@@ -29,13 +32,13 @@ using namespace Dune::XT::Common;
 
 struct PeriodicViewTest : public testing::Test
 {
-  static const bool use_less_memory = USE_LESS_MEMORY;
+  static const bool codim_iters_provided = CODIM_ITERS_PROVIDED;
   typedef TESTGRIDTYPE GridType;
   typedef typename GridType::ctype ctype;
   typedef typename GridType::template Codim<0>::Geometry GeometryType;
   typedef typename GridType::LeafGridView GridViewType;
   typedef typename GridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
-  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType, use_less_memory> PeriodicGridViewType;
+  typedef typename Dune::XT::Grid::template PeriodicGridView<GridViewType, codim_iters_provided> PeriodicGridViewType;
   typedef typename PeriodicGridViewType::IndexSet IndexSet;
   typedef typename PeriodicGridViewType::template Codim<0>::Entity EntityType;
   typedef typename PeriodicGridViewType::template Codim<0>::Iterator EntityIteratorType;
@@ -54,8 +57,16 @@ struct PeriodicViewTest : public testing::Test
   {
     // create grid and get gridview
     Configuration grid_config = DXTC_CONFIG.sub("test_grid_periodicview");
-    auto grid_provider = Dune::XT::Grid::make_cube_grid<GridType>(grid_config);
-    const std::shared_ptr<const GridType> grid = grid_provider.grid_ptr();
+    const bool is_simplex = Common::from_string<bool>(grid_config["is_simplex"]);
+    const bool is_cube = !is_simplex;
+    const DomainType lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
+    const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
+    const auto num_elements = Common::from_string<std::array<unsigned int, dimDomain>>(grid_config["num_elements"]);
+    std::shared_ptr<GridType> grid;
+    if (is_cube)
+      grid = Dune::StructuredGridFactory< GridType >::createCubeGrid(lower_left, upper_right, num_elements);
+    else
+      grid = Dune::StructuredGridFactory< GridType >::createSimplexGrid(lower_left, upper_right, num_elements);
     const GridViewType grid_view = grid->leafGridView();
 
     // check whether grid is periodic
@@ -68,12 +79,8 @@ struct PeriodicViewTest : public testing::Test
       periodic_directions[0] = 1;
     else if (!is_nonperiodic)
       periodic_directions.set();
+    std::cout << periodic_directions << std::endl;
     const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
-
-    const bool is_simplex = Common::from_string<bool>(grid_config["is_simplex"]);
-    const bool is_cube = !is_simplex;
-    const DomainType lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
-    const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
 
     // check interface
     const GridType& test_grid = periodic_grid_view.grid();
@@ -127,7 +134,7 @@ struct PeriodicViewTest : public testing::Test
           // check outside_intersection coords
           const auto coords_in_outside = intersection.geometryInOutside().center();
           const auto coords_in_outside_2 = intersection_in_outside.geometryInInside().center();
-          EXPECT_TRUE(Dune::XT::Common::FloatCmp::eq(coords_in_outside, coords_in_outside_2));
+          EXPECT_TRUE(Dune::XT::Common::FloatCmp::eq(coords_in_outside, coords_in_outside_2, 1e-14));
           // check global intersection coords in periodic case
           const auto global_intersection_coords = intersection.geometry().center();
           const auto global_outside_intersection_coords = intersection_in_outside.geometry().center();
