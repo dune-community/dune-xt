@@ -57,9 +57,9 @@ struct PeriodicViewTest : public testing::Test
     const auto num_elements = Common::from_string<std::array<unsigned int, dimDomain>>(grid_config["num_elements"]);
     std::shared_ptr<GridType> grid;
     if (is_cube)
-      grid = Dune::StructuredGridFactory< GridType >::createCubeGrid(lower_left, upper_right, num_elements);
+      grid = Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left, upper_right, num_elements);
     else
-      grid = Dune::StructuredGridFactory< GridType >::createSimplexGrid(lower_left, upper_right, num_elements);
+      grid = Dune::StructuredGridFactory<GridType>::createSimplexGrid(lower_left, upper_right, num_elements);
     const GridViewType grid_view = grid->leafGridView();
 
     // check whether grid is periodic
