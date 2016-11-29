@@ -73,7 +73,7 @@ public:
   static Common::Configuration default_config()
   {
     auto cfg = gmsh_gridprovider_default_config();
-#if HAVE_ALUGRID
+#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
     if (std::is_same<ALUGrid<2, 2, simplex, conforming>, GridType>::value
         || std::is_same<ALUGrid<2, 2, simplex, nonconforming>, GridType>::value) {
       cfg["filename"] = "gmsh_2d_simplices.msh";

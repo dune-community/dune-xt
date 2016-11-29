@@ -1,4 +1,6 @@
 include grids.mini
 
+{gridname} == 'ug' | exclude
+
 [__static]
 TESTGRIDTYPE = {grid}

@@ -56,7 +56,7 @@ public:
                                                   const array<unsigned int, dim>& elements)
   {
     Dune::array<int, dim> cells;
-    for (const auto i : Common::value_range(dim))
+    for (const auto i : XT::Common::value_range(dim))
       cells[i] = elements[i];
     return std::make_shared<GridType>(lowerLeft, upperRight, cells);
   }
@@ -77,7 +77,7 @@ public:
   {
     Dune::array<int, dim> cells;
     Dune::array<int, dim> over;
-    for (const auto i : Common::value_range(dim)) {
+    for (const auto i : XT::Common::value_range(dim)) {
       cells[i] = elements[i];
       over[i] = overlap[i];
     }

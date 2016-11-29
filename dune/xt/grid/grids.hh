@@ -26,6 +26,10 @@
 
 #if HAVE_DUNE_SPGRID
 # include <dune/grid/spgrid.hh>
+#endif
+
+#if HAVE_DUNE_UGGRID
+# include <dune/grid/uggrid.hh>
 #endif // clang-format on
 
 #endif // DUNE_XT_GRID_GRIDS_HH

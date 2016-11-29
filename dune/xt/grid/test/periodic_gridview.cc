@@ -11,18 +11,11 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#if HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
-#endif
-#if HAVE_DUNE_UGGRID
-#include <dune/grid/uggrid.hh>
-#endif
-#include <dune/grid/yaspgrid.hh>
-
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
 
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/periodic_gridview.hh>
 #include <dune/xt/grid/gridprovider.hh>
 

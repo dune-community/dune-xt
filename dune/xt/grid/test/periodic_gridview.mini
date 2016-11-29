@@ -1,9 +1,10 @@
 __name = {test_grid_periodicview.periodicity}_{griddomain}_{test_grid_periodicview.geometry}
 __exec_suffix = {gridname}_{dimDomain}d
 
-include periodic_grids.mini
+include grids.mini
 
-codim_iters_provided = true, false | expand grid
+{gridname} == 'yasp' and {__local.geometry} == 'simplex' | exclude
+
 griddomain = unit_cube, rectangle | expand coords
 
 [test_grid_periodicview]
