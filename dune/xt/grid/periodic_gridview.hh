@@ -13,6 +13,7 @@
 #define DUNE_XT_GRID_PERIODICVIEW_HH
 
 #include <bitset>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -144,7 +145,7 @@ struct IndexMapCreatorBase
           if (is_periodic) {
             assert(num_boundary_coords == 1);
             periodic_coords_.push_back(periodic_neighbor_coords);
-            periodic_coords_index_.push_back({type_index, entity_index, index_in_inside});
+            periodic_coords_index_.push_back(std::make_tuple(type_index, entity_index, index_in_inside));
           } else {
             intersection_neighbor_map[index_in_inside] = nonperiodic_pair_;
           }
@@ -362,7 +363,7 @@ public:
       return real_sub_index;
     else {
       const auto& ref_element = reference_element(entity);
-      const auto& type_index = GlobalGeometryTypeIndex::index(ref_element.type(i, codim));
+      const auto type_index = GlobalGeometryTypeIndex::index(ref_element.type(i, codim));
       return new_indices_[type_index][real_sub_index];
     }
   }
@@ -809,7 +810,7 @@ public:
   {
     // find lower left and upper right corner of the grid
     auto entity_it = BaseType::template begin<0>();
-    nonperiodic_pair_ = std::make_pair(bool(false), EntityType(*entity_it));
+    nonperiodic_pair_ = {false, EntityType(*entity_it)};
     DomainType lower_left = entity_it->geometry().center();
     DomainType upper_right = lower_left;
     for (const auto& entity : Dune::elements(*this)) {
