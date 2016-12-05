@@ -86,9 +86,9 @@ double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
 auto reference_element(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
-    -> decltype(ReferenceElements<typename GridImp::ctype, worlddim>::general(entity.geometry().type()))
+    -> decltype(ReferenceElements<typename GridImp::ctype, worlddim>::general(entity.type()))
 {
-  return ReferenceElements<typename GridImp::ctype, worlddim>::general(entity.geometry().type());
+  return ReferenceElements<typename GridImp::ctype, worlddim>::general(entity.type());
 }
 
 template <int mydim, int cdim, class GridImp, template <int, int, class> class GeometryImp>
