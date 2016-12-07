@@ -168,30 +168,29 @@ struct IndexMapCreatorBase
                               FallbackEntityInlevelSearch<RealGridViewType, codim>>::type
         entity_search_codim(real_grid_view_);
     const auto periodic_entity_ptrs = entity_search_codim(periodic_coords_);
-
     // assign index of periodic equivalent entity to entities that are replaced
     for (size_t vector_index = 0; vector_index < periodic_entity_ptrs.size(); ++vector_index) {
       const auto& index = periodic_coords_index_[vector_index];
       const auto& periodic_entity_ptr = periodic_entity_ptrs[vector_index];
-      if (periodic_entity_ptr == nullptr)
+      if (!periodic_entity_ptr)
         DUNE_THROW(Dune::InvalidStateException, "Could not find periodic neighbor entity");
       assign_after_search(index, *periodic_entity_ptr);
     }
   } // after_loop()
 
   template <class EntityType, size_t cd = codim>
-  typename std::enable_if<cd != 0, void>::type assign_after_search(const std::pair<size_t, IndexType> index,
+  typename std::enable_if<cd != 0, void>::type assign_after_search(const std::pair<size_t, IndexType>& index,
                                                                    const EntityType& periodic_entity)
   {
     const auto& type_index = index.first;
     const auto& entity_index = index.second;
-    auto periodic_entity_index = real_index_set_.index(periodic_entity);
+    const auto periodic_entity_index = real_index_set_.index(periodic_entity);
     const auto& periodic_entity_type_index = GlobalGeometryTypeIndex::index(periodic_entity.type());
     new_indices_[type_index][entity_index] = new_indices_[periodic_entity_type_index][periodic_entity_index];
   }
 
   template <class EntityType, size_t cd = codim>
-  typename std::enable_if<cd == 0, void>::type assign_after_search(const std::tuple<size_t, IndexType, int> index,
+  typename std::enable_if<cd == 0, void>::type assign_after_search(const std::tuple<size_t, IndexType, int>& index,
                                                                    const EntityType& periodic_entity)
   {
     const auto& type_index = std::get<0>(index);
@@ -825,6 +824,7 @@ public:
         }
       }
     }
+
 
     // reset
     std::fill(entity_counts_->begin(), entity_counts_->end(), IndexType(0));

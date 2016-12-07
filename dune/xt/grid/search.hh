@@ -146,6 +146,9 @@ public:
           break;
         }
       }
+      if (!it_reset)
+        continue;
+      idx++;
     }
     return ret;
   } // ... operator()
@@ -200,7 +203,6 @@ public:
     typename EntityVectorType::size_type idx(0);
     for (const auto& point : points) {
       IteratorType it_current = it_last_;
-      bool entity_found = false;
       bool it_reset = true;
       typename EntityVectorType::value_type tmp_ptr(nullptr);
       for (; it_current != end; ++it_current) {
@@ -212,11 +214,10 @@ public:
             tmp_ptr = nullptr;
             it_reset = false;
             it_last_ = it_current;
-            entity_found = true;
             break;
           }
         } // loop over subentities
-        if (entity_found)
+        if (!it_reset)
           break;
       } // loop over codim 0 entities
       if (!it_reset)
@@ -230,13 +231,15 @@ public:
             tmp_ptr = nullptr;
             it_reset = false;
             it_last_ = it_current;
-            entity_found = true;
             break;
           }
         } // loop over subentities
-        if (entity_found)
+        if (!it_reset)
           break;
       } // loop over codim 0 entities
+      if (!it_reset)
+        continue;
+      idx++;
     } // loop over points
     return ret;
   } // ... operator()
