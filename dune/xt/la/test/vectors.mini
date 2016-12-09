@@ -5,5 +5,6 @@ __local.vector_common = CommonDenseVector
 __local.vector_eigen = EigenDenseVector, EigenMappedDenseVector | expand
 __local.vector_istl = IstlDenseVector
 vector = {__local.vector_common}, {__local.vector_eigen}, {__local.vector_istl} | expand types
+'{vector}' == 'EigenMappedDenseVector' and '{fieldtype_short}' == 'complex'  | exclude
 
-1, EIGEN_FOUND, dune-istl_FOUND | expand types | cmake_guard
+1, EIGEN3_FOUND, dune-istl_FOUND | expand types | cmake_guard

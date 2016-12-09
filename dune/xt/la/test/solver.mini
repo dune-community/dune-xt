@@ -8,6 +8,7 @@ __local.vector_eigen2 = EigenDenseVector, EigenMappedDenseVector | expand
 vector2 = {__local.vector_common}, {__local.vector_eigen2}, {__local.vector_istl} | expand types
 
 ('{vector}' == 'EigenMappedDenseVector' or '{vector2}' == 'EigenMappedDenseVector') and '{matrix}' == 'EigenRowMajorSparseMatrix'  | exclude
+'{vector2}' == 'EigenMappedDenseVector' and '{fieldtype_short}' == 'complex'  | exclude
 '{matrix}' == 'CommonSparseMatrix'  | exclude
 '{matrix}' == 'IstlRowMajorSparseMatrix' and '{fieldtype_short}' == 'complex'  | exclude
 
