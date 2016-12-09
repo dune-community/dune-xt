@@ -34,7 +34,6 @@ struct GeneralLocalfunctionChooser
   typedef typename LocalizableFunctionInterfaceType::DomainType DomainType;
   typedef typename LocalizableFunctionInterfaceType::RangeType RangeType;
   typedef typename LocalizableFunctionInterfaceType::JacobianRangeType JacobianRangeType;
-  typedef typename OuterGridViewType::Grid::template Codim<0>::EntityPointer EntityPointerType;
   static const size_t dimDomain = LocalizableFunctionInterfaceType::dimDomain;
   static const size_t dimRange = LocalizableFunctionInterfaceType::dimRange;
   static const size_t dimRangeCols = LocalizableFunctionInterfaceType::dimRangeCols;
@@ -49,7 +48,7 @@ struct GeneralLocalfunctionChooser
     Localfunction(const EntityType& entity,
                   const InnerType& inner_function,
                   const OuterType& outer_function,
-                  typename Common::PerThreadValue<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search)
+                  typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>>& entity_search)
       : BaseType(entity)
       , inner_function_(inner_function)
       , outer_function_(outer_function)
@@ -72,14 +71,14 @@ struct GeneralLocalfunctionChooser
       // evaluate inner function
       const auto inner_value = inner_function_.local_function(entity_)->evaluate(xx);
       // find entity on outer grid the value of inner function belongs to
-      const auto entity_ptr_ptrs = (*entity_search_)(std::vector<typename OuterType::DomainType>(1, inner_value));
-      const auto& entity_ptr_ptr = entity_ptr_ptrs.at(0);
-      if (entity_ptr_ptr == nullptr)
+      const auto entity_ptrs = (**entity_search_)(std::vector<typename OuterType::DomainType>(1, inner_value));
+      const auto& entity_ptr = entity_ptrs[0];
+      if (entity_ptr == nullptr)
         DUNE_THROW(Dune::InvalidStateException,
                    "Could not find entity, maybe inner function does not map to the domain of outer function");
-      const auto& outer_entity_ptr = *entity_ptr_ptr;
+      const auto& outer_entity = *entity_ptr;
       // evaluate outer function
-      outer_function_.local_function(*outer_entity_ptr)->evaluate(outer_entity_ptr->geometry().local(inner_value), ret);
+      outer_function_.local_function(outer_entity)->evaluate(outer_entity.geometry().local(inner_value), ret);
     }
 
     virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const override
@@ -90,7 +89,7 @@ struct GeneralLocalfunctionChooser
   private:
     const InnerType& inner_function_;
     const OuterType& outer_function_;
-    typename Common::PerThreadValue<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search_;
+    typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>>& entity_search_;
     const EntityType& entity_;
   }; // class Localfunction
 }; // GeneralLocalfunctionChooser
@@ -126,7 +125,7 @@ struct LocalfunctionForGlobalChooser
         const EntityType& entity,
         const InnerType& localizable_function,
         const OuterType& global_function,
-        const typename Common::PerThreadValue<typename Grid::EntityInlevelSearch<OuterGridViewType>>& /*entity_search*/)
+        const typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>>& /*entity_search*/)
       : BaseType(entity)
       , localizable_function_(localizable_function)
       , global_function_(global_function)
@@ -228,7 +227,7 @@ public:
                       const std::string nm = static_id())
     : inner_function_(inner_function)
     , outer_function_(outer_function)
-    , entity_search_(typename Grid::EntityInlevelSearch<OuterGridViewType>(outer_grid_view))
+    , entity_search_(std::make_shared<typename Grid::EntityInlevelSearch<OuterGridViewType>>(outer_grid_view))
     , name_(nm)
   {
   }
@@ -273,7 +272,7 @@ public:
 private:
   const InnerType inner_function_;
   const OuterType outer_function_;
-  mutable typename Common::PerThreadValue<typename Grid::EntityInlevelSearch<OuterGridViewType>> entity_search_;
+  mutable typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>> entity_search_;
   std::string name_;
 }; // class Composition
 

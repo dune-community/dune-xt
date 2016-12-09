@@ -639,7 +639,7 @@ private:
                                     internal::ChooseVariant<rC>)
   {
     typedef typename Dune::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
-    const ExpressionMatrixType expression_as_matrix = cfg.get<ExpressionMatrixType>("expression");
+    const ExpressionMatrixType expression_as_matrix = cfg.get<ExpressionMatrixType>("expression", dimRange, dimRangeCols);
     // convert FieldMatrix to ExpressionStringVectorType
     for (size_t rr = 0; rr < dimRange; ++rr) {
       std::vector<std::string> expression_row;

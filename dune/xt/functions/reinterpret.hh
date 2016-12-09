@@ -105,8 +105,7 @@ private:
         DUNE_THROW(XT::Common::Exceptions::reinterpretation_error,
                    "It was not possible to find a source entity for this point:\n\n"
                        << points_[0]);
-      const auto source_entity_ptr = *source_entity_ptr_unique_ptrs[0];
-      const auto& source_entity = *source_entity_ptr;
+      const auto& source_entity = *source_entity_ptr_unique_ptrs[0];
       const auto source_local_function = func_.source_.local_function(source_entity);
       source_local_function->evaluate(source_entity.geometry().local(points_[0]), ret);
     } // ... evaluate(...)
@@ -119,8 +118,7 @@ private:
         DUNE_THROW(XT::Common::Exceptions::reinterpretation_error,
                    "It was not possible to find a source entity for this point:\n\n"
                        << points_[0]);
-      const auto source_entity_ptr = *source_entity_ptr_unique_ptrs[0];
-      const auto& source_entity = *source_entity_ptr;
+      const auto& source_entity = *source_entity_ptr_unique_ptrs[0];
       const auto source_local_function = func_.source_.local_function(source_entity);
       source_local_function->jacobian(source_entity.geometry().local(points_[0]), ret);
     } // ... jacobian(...)
