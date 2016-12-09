@@ -340,7 +340,7 @@ private:
   using BaseType::backend_;
 
 protected:
-  inline void ensure_uniqueness() const
+  inline void ensure_uniqueness()
   {
     if (!backend_.unique()) {
       std::lock_guard<std::mutex> DUNE_UNUSED(lock)(this->mutex_);
