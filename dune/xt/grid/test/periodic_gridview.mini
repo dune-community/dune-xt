@@ -4,6 +4,7 @@ __exec_suffix = {gridname}_{dimDomain}d
 include grids.mini
 
 {gridname} == 'yasp' and {__local.geometry} == 'simplex' | exclude
+{gridname} == 'ug' and {dimDomain} == '3' | exclude
 
 griddomain = unit_cube, rectangle | expand coords
 
