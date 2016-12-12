@@ -16,9 +16,6 @@
 
 #include <memory>
 
-#if HAVE_ALUGRID
-#include <dune/grid/io/file/dgfparser/dgfalu.hh>
-#endif
 #include <dune/grid/io/file/dgfparser/dgfgridfactory.hh> // How convenient that GridPtr requires DGFGridFactory but ...
 #include <dune/grid/io/file/dgfparser/dgfoned.hh>
 #include <dune/grid/io/file/dgfparser/dgfyasp.hh>

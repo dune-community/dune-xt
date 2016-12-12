@@ -15,9 +15,6 @@
 #   include <dune/grid/albertagrid.hh>
 # include <dune/xt/common/reenable_warnings.hh>
 #endif
-#if HAVE_ALUGRID
-# include <dune/grid/alugrid.hh>
-#endif
 #include <dune/grid/yaspgrid.hh>
 
 #if HAVE_DUNE_ALUGRID

@@ -59,14 +59,14 @@ struct is_grid<Dune::AlbertaGrid<dim, dimworld>> : public std::true_type
 };
 
 #endif // HAVE_ALBERTA
-#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
+#if HAVE_DUNE_ALUGRID
 
 template <int dim, int dimworld, ALUGridElementType elType, ALUGridRefinementType refineType, class Comm>
 struct is_grid<Dune::ALUGrid<dim, dimworld, elType, refineType, Comm>> : public std::true_type
 {
 };
 
-#endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
+#endif // HAVE_DUNE_ALUGRID
 
 #if HAVE_DUNE_UGGRID
 
@@ -149,7 +149,7 @@ struct is_conforming_alugrid : public std::false_type
 {
 };
 
-#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
+#if HAVE_DUNE_ALUGRID
 
 template <int dim, int dimworld, ALUGridElementType elType, ALUGridRefinementType refineType, class Comm>
 struct is_alugrid<ALUGrid<dim, dimworld, elType, refineType, Comm>> : public std::true_type
@@ -161,7 +161,7 @@ struct is_conforming_alugrid<ALUGrid<dim, dimworld, elType, Dune::conforming, Co
 {
 };
 
-#endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
+#endif // HAVE_DUNE_ALUGRID
 
 
 template <class L, bool is_view = is_grid_view<L>::value, bool is_part = is_grid_part<L>::value>
