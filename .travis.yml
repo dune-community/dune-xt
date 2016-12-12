@@ -39,7 +39,7 @@ before_install:
   # workaround for gnutls bug is using git built against curl-openssl (cannot go into apt script below)
   - sudo -E rm /etc/apt/sources.list.d/*git*.list
   - sudo -E add-apt-repository -y ppa:pymor/travis && sudo -E aptitude update && sudo -E aptitude install git -yq
-  - test -d ${SUPERDIR}/ || git clone https://github.com/dune-community/dune-xt-super.git ${SUPERDIR}/
+  - test -d ${SUPERDIR}/ || git clone --branch=core_release_2.5 https://github.com/dune-community/dune-xt-super.git ${SUPERDIR}/
   - cd ${SUPERDIR}/
   - git submodule update --init --recursive
   - git submodule status ; git status
