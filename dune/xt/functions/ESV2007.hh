@@ -342,9 +342,9 @@ class CutoffFunction<DiffusionType, void> : public LocalizableFunctionInterface<
     static DomainFieldType compute_diameter_of_(const EntityType& ent)
     {
       DomainFieldType ret(0);
-      for (auto cc : Common::value_range(ent.template count<dimDomain>())) {
+      for (auto cc : Common::value_range(ent.subEntities(dimDomain))) {
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
-        for (auto dd : Common::value_range(cc + 1, ent.template count<dimDomain>())) {
+        for (auto dd : Common::value_range(cc + 1, ent.subEntities(dimDomain))) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
           const auto diff = vertex - other_vertex;
           ret = std::max(ret, diff.two_norm());
@@ -564,9 +564,9 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
     static DomainFieldType compute_diameter_of_(const EntityType& ent)
     {
       DomainFieldType ret(0);
-      for (auto cc : Common::value_range(ent.template count<dimDomain>())) {
+      for (auto cc : Common::value_range(ent.subEntities(dimDomain))) {
         const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
-        for (auto dd : Common::value_range(cc + 1, ent.template count<dimDomain>())) {
+        for (auto dd : Common::value_range(cc + 1, ent.subEntities(dimDomain))) {
           const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
           const auto diff = vertex - other_vertex;
           ret = std::max(ret, diff.two_norm());
