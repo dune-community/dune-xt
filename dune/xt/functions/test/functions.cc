@@ -13,8 +13,8 @@
 
 #include <memory>
 
-#if HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
+#if HAVE_DUNE_ALUGRID
+#include <dune/alugrid/grid.hh>
 #endif
 #include <dune/grid/yaspgrid.hh>
 

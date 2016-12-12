@@ -16,8 +16,8 @@
 #include <dune/xt/common/exceptions.hh>
 
 #include <dune/grid/yaspgrid.hh>
-#if HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
+#if HAVE_DUNE_ALUGRID
+#include <dune/alugrid/grid.hh>
 #endif
 
 #include <dune/xt/functions/interfaces.hh>
