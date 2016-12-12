@@ -13,6 +13,6 @@ grid = {__local.grid_yasp}, {__local.grid_alu}  | expand grid
 
 entity_type = {grid}::Codim<0>::Entity
 
-1, ALUGRID_FOUND | expand grid | cmake_guard
+1, dune-alugrid_FOUND | expand grid | cmake_guard
 
 

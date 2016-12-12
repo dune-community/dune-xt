@@ -13,4 +13,4 @@ testcase_short = force, exact | expand testcase
 [__static]
 TESTFUNCTIONTYPE = {testcase1}, {testcase2} | expand testcase
 
-1, ALUGRID_FOUND | expand grid | cmake_guard
+1, dune-alugrid_FOUND | expand grid | cmake_guard
