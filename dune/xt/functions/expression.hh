@@ -90,7 +90,7 @@ public:
     // try to get expression as FieldVector (if dimRangeCols == 1) or as FieldMatrix (else)
     try {
       get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
-    } catch (Common::Exceptions::conversion_error) {
+    } catch (std::exception) {
       // if dimRangeCols == 1 and we could not get expression as FieldVector, get it as FieldMatrix with one col
       if (dimRangeCols == 1) { // the 2 in ChooseVariant is here on purpose, anything > 1 will suffice
         get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<2>());
@@ -101,9 +101,7 @@ public:
     // get gradient
     GradientStringVectorType gradient_as_vectors;
     if (cfg.has_key("gradient")) {
-      if (cfg.has_key("gradient.0"))
-        assert((cfg.get<std::string>("gradient") == cfg.get<std::string>("gradient.0"))
-               && "gradient and gradient.0 differ but should be synonymous!");
+      assert(dimRangeCols == 1 && "Use gradient.0, gradient.1, ... for the gradient of the first, second, ... row, respectively!");
       get_gradient(cfg, gradient_as_vectors, "gradient");
     } else if (cfg.has_key("gradient.0")) {
       get_gradient(cfg, gradient_as_vectors, "gradient.0");
@@ -486,7 +484,7 @@ public:
     // try to get expression as FieldVector (if dimRangeCols == 1) or as FieldMatrix (else)
     try {
       get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
-    } catch (Common::Exceptions::conversion_error) {
+    } catch (std::exception) {
       // if dimRangeCols == 1 and we could not get expression as FieldVector, get it as FieldMatrix with one col
       if (dimRangeCols == 1) {
         get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<2>());
@@ -497,9 +495,7 @@ public:
     // get gradient
     GradientStringVectorType gradient_as_vectors;
     if (cfg.has_key("gradient")) {
-      if (cfg.has_key("gradient.0"))
-        assert((cfg.get<std::string>("gradient") == cfg.get<std::string>("gradient.0"))
-               && "gradient and gradient.0 differ but should be synonymous!");
+      assert(dimRangeCols == 1 && "Use gradient.0, gradient.1, ... for the gradient of the first, second, ... row, respectively!");
       get_gradient(cfg, gradient_as_vectors, "gradient");
     } else if (cfg.has_key("gradient.0")) {
       get_gradient(cfg, gradient_as_vectors, "gradient.0");

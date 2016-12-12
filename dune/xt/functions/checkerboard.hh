@@ -425,7 +425,7 @@ public:
           }
           values.emplace_back(ExpressionFunctionType(variable, expression_vector));
         }
-      } catch (const Common::Exceptions::conversion_error& e) {
+      } catch (const std::exception& e) {
         if (rangeDimCols == 1) { // get value as vector
           for (size_t ii = 0; ii < num_values; ++ii) {
             const auto values_vector = cfg.get<std::vector<std::string>>("values." + Common::to_string(ii), rangeDim);
