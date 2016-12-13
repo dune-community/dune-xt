@@ -343,9 +343,9 @@ class CutoffFunction<DiffusionType, void> : public LocalizableFunctionInterface<
     {
       DomainFieldType ret(0);
       for (auto cc : Common::value_range(ent.subEntities(dimDomain))) {
-        const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
+        const auto vertex = ent.template subEntity<dimDomain>(cc).geometry().center();
         for (auto dd : Common::value_range(cc + 1, ent.subEntities(dimDomain))) {
-          const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
+          const auto other_vertex = ent.template subEntity<dimDomain>(dd).geometry().center();
           const auto diff = vertex - other_vertex;
           ret = std::max(ret, diff.two_norm());
         }
@@ -565,9 +565,9 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
     {
       DomainFieldType ret(0);
       for (auto cc : Common::value_range(ent.subEntities(dimDomain))) {
-        const auto vertex = ent.template subEntity<dimDomain>(cc)->geometry().center();
+        const auto vertex = ent.template subEntity<dimDomain>(cc).geometry().center();
         for (auto dd : Common::value_range(cc + 1, ent.subEntities(dimDomain))) {
-          const auto other_vertex = ent.template subEntity<dimDomain>(dd)->geometry().center();
+          const auto other_vertex = ent.template subEntity<dimDomain>(dd).geometry().center();
           const auto diff = vertex - other_vertex;
           ret = std::max(ret, diff.two_norm());
         }
