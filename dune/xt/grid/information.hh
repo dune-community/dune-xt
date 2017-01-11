@@ -145,7 +145,7 @@ struct Dimensions
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
     Walker<GridViewType> gw(gridView);
-    gw.add(f);
+    gw.append(f);
     gw.walk();
   }
 
