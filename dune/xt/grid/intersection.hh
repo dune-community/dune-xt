@@ -53,6 +53,7 @@ class Intersection
 
 public:
   typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
+  typedef Type type;
 }; // class Intersection
 
 
