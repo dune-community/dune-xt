@@ -51,14 +51,14 @@ struct GridWalkerTest : public ::testing::Test
     atomic<size_t> count(0);
     auto counter = [&](const EntityType&) { count++; };
     auto test1 = [&] {
-      walker.add(counter);
+      walker.append(counter);
       walker.walk(false);
     };
     auto test2 = [&] {
-      walker.add(counter);
+      walker.append(counter);
       walker.walk(true);
     };
-    auto test3 = [&] { walker.add(counter).walk(true); };
+    auto test3 = [&] { walker.append(counter).walk(true); };
     list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     auto test0 = [&] {
@@ -66,7 +66,7 @@ struct GridWalkerTest : public ::testing::Test
       IndexSetPartitioner<GridViewType> partitioner(set);
       EXPECT_EQ(set.size(0), partitioner.partitions());
       Dune::SeedListPartitioning<GridType, 0> partitioning(gv, partitioner);
-      walker.add(counter);
+      walker.append(counter);
       walker.walk(partitioning);
     };
     tests.push_back(test0);
@@ -91,8 +91,8 @@ struct GridWalkerTest : public ::testing::Test
 
     auto on_filter_boundaries = new ApplyOn::FilteredIntersections<GridViewType>(boundaries);
     auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridViewType>();
-    walker.add(filter_counter, on_filter_boundaries);
-    walker.add(all_counter, on_all_boundaries);
+    walker.append(filter_counter, on_filter_boundaries);
+    walker.append(all_counter, on_all_boundaries);
     walker.walk();
     EXPECT_EQ(filter_count, all_count);
   }
