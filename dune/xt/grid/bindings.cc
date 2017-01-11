@@ -24,6 +24,29 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 
+template <class I, bool required = true>
+struct for_Grid_and_Intersection
+{
+  template <class G>
+  static void addbind(py::module& m, const std::string& grid_id, const std::string& id)
+  {
+    using namespace Dune::XT::Grid;
+    bind_BoundaryInfo<AllDirichletBoundaryInfo<I>>(m, "AllDirichletBoundaryInfo__" + grid_id + id);
+    bind_BoundaryInfo<AllNeumannBoundaryInfo<I>>(m, "AllNeumannBoundaryInfo__" + grid_id + id);
+    bind_BoundaryInfo<NormalBasedBoundaryInfo<I>>(m, "NormalBasedBoundaryInfo__" + grid_id + id);
+  }
+};
+
+template <class I>
+struct for_Grid_and_Intersection<I, false>
+{
+  template <class G>
+  static void addbind(py::module& /*m*/, const std::string& /*grid_id*/, const std::string& /*id*/)
+  {
+  }
+};
+
+
 template <class G>
 void addbind_for_Grid(py::module& m, const std::string& grid_id)
 {
@@ -32,22 +55,40 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
 
   typedef typename Layer<G, Layers::level, Backends::view>::type LevelView;
   typedef typename Layer<G, Layers::leaf, Backends::view>::type LeafView;
+  typedef typename Intersection<LeafView>::type FVI;
+  typedef typename Intersection<LevelView>::type LVI;
 #if HAVE_DUNE_FEM
   typedef typename Layer<G, Layers::level, Backends::part>::type LevelPart;
   typedef typename Layer<G, Layers::leaf, Backends::part>::type LeafPart;
+  typedef typename Intersection<LeafPart>::type FPI;
+  typedef typename Intersection<LevelPart>::type LPI;
 #endif
 
   bind_GridProvider<G>(m, grid_id);
   bind_make_cube_grid<G>(m, grid_id);
 
+  for_Grid_and_Intersection<FVI, true>::template addbind<G>(m,
+                                                            grid_id,
+                                                            (std::is_same<FVI, LVI>::value
+#if HAVE_DUNE_FEM
+                                                             && std::is_same<FVI, FPI>::value
+                                                             && std::is_same<FVI, LPI>::value
+#endif
+                                                             )
+                                                                ? ""
+                                                                : "_leaf_view");
+  for_Grid_and_Intersection<LVI, !(std::is_same<LVI, FVI>::value)>::template addbind<G>(m, grid_id, "_level_view");
+#if HAVE_DUNE_FEM
+  for_Grid_and_Intersection<FPI,
+                            !(std::is_same<FPI, FVI>::value
+                              || std::is_same<FPI, LVI>::value)>::template addbind<G>(m, grid_id, "_leaf_part");
+  for_Grid_and_Intersection<LPI,
+                            !(std::is_same<LPI, FVI>::value || std::is_same<LPI, LVI>::value
+                              || std::is_same<LPI, FPI>::value)>::template addbind<G>(m, grid_id, "_level_part");
+#endif // HAVE_DUNE_FEM
+
 #define BIND(V, id)                                                                                                    \
   bind_Walker<V>(m, grid_id + "_" + id);                                                                               \
-  bind_BoundaryInfo<AllDirichletBoundaryInfo<typename Intersection<V>::Type>>(                                         \
-      m, "AllDirichletBoundaryInfo__" + grid_id + "_" + id);                                                           \
-  bind_BoundaryInfo<AllNeumannBoundaryInfo<typename Intersection<V>::Type>>(                                           \
-      m, "AllNeumannBoundaryInfo__" + grid_id + "_" + id);                                                             \
-  bind_BoundaryInfo<NormalBasedBoundaryInfo<typename Intersection<V>::Type>>(                                          \
-      m, "NormalBasedBoundaryInfo__" + grid_id + "_" + id);                                                            \
                                                                                                                        \
   m.def(std::string(std::string("make_all_dirichlet_boundary_info__") + id).c_str(),                                   \
         [](const GridProvider<typename extract_grid<V>::type>& /*grid_provider*/) {                                    \
