@@ -85,7 +85,7 @@ size_t max_number_of_neighbors(const GridViewType& gridView)
   size_t maxNeighbours = 0;
   for (auto&& entity : elements(gridView)) {
     size_t neighbours = 0;
-    for (auto&& DXTC_UNUSED(i) : intersections(gridView, entity)) {
+    for (DUNE_UNUSED auto&& i : intersections(gridView, entity)) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);
