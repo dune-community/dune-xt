@@ -31,61 +31,49 @@ PYBIND11_PLUGIN(functions)
   py::module::import("common");
   py::module::import("grid");
 
-  typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>> YaspGrid2dType;
-  const std::string yasp_grid_2d_id = "2d_cube_yaspgrid";
+  typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> G;
+  const std::string grid_id = "2d_simplex_aluconform";
 
-  auto i_1_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<YaspGrid2dType, 1, 1>(m, yasp_grid_2d_id);
-  auto i_1_2 = Dune::XT::Functions::bind_LocalizableFunctionInterface<YaspGrid2dType, 1, 2>(m, yasp_grid_2d_id);
-  auto i_1_3 = Dune::XT::Functions::bind_LocalizableFunctionInterface<YaspGrid2dType, 1, 3>(m, yasp_grid_2d_id);
-  auto i_1_4 = Dune::XT::Functions::bind_LocalizableFunctionInterface<YaspGrid2dType, 1, 4>(m, yasp_grid_2d_id);
+  auto i_1_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
+  auto i_1_2 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 2>(m, grid_id);
+  auto i_1_3 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 3>(m, grid_id);
+  auto i_1_4 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 4>(m, grid_id);
 
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         1,
-                                                         1,
-                                                         1,
-                                                         1>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::difference, 1, 1, 1, 1>(m,
+                                                                                                               grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::difference,
                                                        1,
                                                        1,
                                                        1,
                                                        1>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         1,
-                                                         2,
-                                                         1,
-                                                         2>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::difference, 1, 2, 1, 2>(m,
+                                                                                                               grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::difference,
                                                        1,
                                                        2,
                                                        1,
                                                        2>(i_1_2);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         1,
-                                                         3,
-                                                         1,
-                                                         3>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::difference, 1, 3, 1, 3>(m,
+                                                                                                               grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::difference,
                                                        1,
                                                        3,
                                                        1,
                                                        3>(i_1_3);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         1,
-                                                         4,
-                                                         1,
-                                                         4>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::difference, 1, 4, 1, 4>(m,
+                                                                                                               grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::difference,
                                                        1,
                                                        4,
@@ -93,111 +81,79 @@ PYBIND11_PLUGIN(functions)
                                                        4>(i_1_4);
 
   Dune::XT::Functions::
-      bind_combined_LocalizableFunction<YaspGrid2dType, Dune::XT::Functions::internal::Combination::sum, 1, 1, 1, 1>(
-          m, yasp_grid_2d_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        1,
-                                                                        1,
-                                                                        1,
-                                                                        1>(i_1_1);
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::sum, 1, 1, 1, 1>(m, grid_id);
   Dune::XT::Functions::
-      bind_combined_LocalizableFunction<YaspGrid2dType, Dune::XT::Functions::internal::Combination::sum, 1, 2, 1, 2>(
-          m, yasp_grid_2d_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        1,
-                                                                        2,
-                                                                        1,
-                                                                        2>(i_1_2);
+      addbind_LocalizableFunctionInterface_combined_op<G, Dune::XT::Functions::internal::Combination::sum, 1, 1, 1, 1>(
+          i_1_1);
   Dune::XT::Functions::
-      bind_combined_LocalizableFunction<YaspGrid2dType, Dune::XT::Functions::internal::Combination::sum, 1, 3, 1, 3>(
-          m, yasp_grid_2d_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        1,
-                                                                        3,
-                                                                        1,
-                                                                        3>(i_1_3);
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::sum, 1, 2, 1, 2>(m, grid_id);
   Dune::XT::Functions::
-      bind_combined_LocalizableFunction<YaspGrid2dType, Dune::XT::Functions::internal::Combination::sum, 1, 4, 1, 4>(
-          m, yasp_grid_2d_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        1,
-                                                                        4,
-                                                                        1,
-                                                                        4>(i_1_4);
+      addbind_LocalizableFunctionInterface_combined_op<G, Dune::XT::Functions::internal::Combination::sum, 1, 2, 1, 2>(
+          i_1_2);
+  Dune::XT::Functions::
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::sum, 1, 3, 1, 3>(m, grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G, Dune::XT::Functions::internal::Combination::sum, 1, 3, 1, 3>(
+          i_1_3);
+  Dune::XT::Functions::
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::sum, 1, 4, 1, 4>(m, grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G, Dune::XT::Functions::internal::Combination::sum, 1, 4, 1, 4>(
+          i_1_4);
 
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         1,
-                                                         1>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::product, 1, 1, 1, 1>(m, grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::product,
                                                        1,
                                                        1,
                                                        1,
                                                        1>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         1,
-                                                         2>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::product, 1, 1, 1, 2>(m, grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::product,
                                                        1,
                                                        1,
                                                        1,
                                                        2>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         1,
-                                                         3>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::product, 1, 1, 1, 3>(m, grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::product,
                                                        1,
                                                        1,
                                                        1,
                                                        3>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<YaspGrid2dType,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         1,
-                                                         4>(m, yasp_grid_2d_id);
   Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<YaspGrid2dType,
+      bind_combined_LocalizableFunction<G, Dune::XT::Functions::internal::Combination::product, 1, 1, 1, 4>(m, grid_id);
+  Dune::XT::Functions::
+      addbind_LocalizableFunctionInterface_combined_op<G,
                                                        Dune::XT::Functions::internal::Combination::product,
                                                        1,
                                                        1,
                                                        1,
                                                        4>(i_1_1);
 
-  Dune::XT::Functions::bind_ConstantFunction<YaspGrid2dType, 1, 1>(m, yasp_grid_2d_id);
-  Dune::XT::Functions::bind_ConstantFunction<YaspGrid2dType, 1, 2>(m, yasp_grid_2d_id);
-  Dune::XT::Functions::bind_ConstantFunction<YaspGrid2dType, 1, 3>(m, yasp_grid_2d_id);
-  Dune::XT::Functions::bind_ConstantFunction<YaspGrid2dType, 1, 4>(m, yasp_grid_2d_id);
+  Dune::XT::Functions::bind_ConstantFunction<G, 1, 1>(m, grid_id);
+  Dune::XT::Functions::bind_ConstantFunction<G, 1, 2>(m, grid_id);
+  Dune::XT::Functions::bind_ConstantFunction<G, 1, 3>(m, grid_id);
+  Dune::XT::Functions::bind_ConstantFunction<G, 1, 4>(m, grid_id);
 
-  Dune::XT::Functions::bind_CheckerboardFunction<YaspGrid2dType, 1, 1>(m, yasp_grid_2d_id);
-  //  Dune::XT::Functions::bind_CheckerboardFunction<YaspGrid2dType, 1, 2>(m, yasp_grid_2d_id);
-  //  Dune::XT::Functions::bind_CheckerboardFunction<YaspGrid2dType, 1, 3>(m, yasp_grid_2d_id);
-  //  Dune::XT::Functions::bind_CheckerboardFunction<YaspGrid2dType, 1, 4>(m, yasp_grid_2d_id);
+  Dune::XT::Functions::bind_CheckerboardFunction<G, 1, 1>(m, grid_id);
+  //  Dune::XT::Functions::bind_CheckerboardFunction<G, 1, 2>(m, grid_id);
+  //  Dune::XT::Functions::bind_CheckerboardFunction<G, 1, 3>(m, grid_id);
+  //  Dune::XT::Functions::bind_CheckerboardFunction<G, 1, 4>(m, grid_id);
 
-  Dune::XT::Functions::bind_ExpressionFunction<YaspGrid2dType, 1, 1>(m, yasp_grid_2d_id);
-  Dune::XT::Functions::bind_ExpressionFunction<YaspGrid2dType, 1, 2>(m, yasp_grid_2d_id);
-  Dune::XT::Functions::bind_ExpressionFunction<YaspGrid2dType, 1, 3>(m, yasp_grid_2d_id);
-  Dune::XT::Functions::bind_ExpressionFunction<YaspGrid2dType, 1, 4>(m, yasp_grid_2d_id);
+  Dune::XT::Functions::bind_ExpressionFunction<G, 1, 1>(m, grid_id);
+  Dune::XT::Functions::bind_ExpressionFunction<G, 1, 2>(m, grid_id);
+  Dune::XT::Functions::bind_ExpressionFunction<G, 1, 3>(m, grid_id);
+  Dune::XT::Functions::bind_ExpressionFunction<G, 1, 4>(m, grid_id);
 
-  Dune::XT::Functions::bind_Spe10Model1Function<YaspGrid2dType, 1, 1>(m, yasp_grid_2d_id);
+  Dune::XT::Functions::bind_Spe10Model1Function<G, 1, 1>(m, grid_id);
 
   return m.ptr();
 }
