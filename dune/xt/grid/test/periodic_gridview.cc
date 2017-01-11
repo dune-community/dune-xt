@@ -55,6 +55,10 @@ struct PeriodicViewTest : public testing::Test
     const DomainType lower_left = Common::from_string<DomainType>(grid_config["lower_left"]);
     const DomainType upper_right = Common::from_string<DomainType>(grid_config["upper_right"]);
     const auto num_elements = Common::from_string<std::array<unsigned int, dimDomain>>(grid_config["num_elements"]);
+    for (const auto& elements : num_elements)
+      if (elements != num_elements[0])
+        DUNE_THROW(Dune::NotImplemented, "Test works only if the grid has the same number of elements in each direction!");
+    const int elements_per_direction = num_elements[0];
     std::shared_ptr<GridType> grid;
     if (is_cube)
       grid = Dune::StructuredGridFactory<GridType>::createCubeGrid(lower_left, upper_right, num_elements);
@@ -82,11 +86,9 @@ struct PeriodicViewTest : public testing::Test
     const int codim0_size = periodic_grid_view.size(0);
     EXPECT_EQ(grid_view.size(0), codim0_size);
     if (is_cube)
-      EXPECT_EQ(std::pow(int(8), dimDomain), codim0_size);
+      EXPECT_EQ(std::pow(elements_per_direction, dimDomain), codim0_size);
     if (is_simplex)
-      EXPECT_EQ(std::pow(int(8), dimDomain) * factorial(dimDomain), codim0_size);
-    // EXPECT_EQ(grid_view.size(Dune::GeometryType::cube), periodic_grid_view.size(Dune::GeometryType::cube));
-    // EXPECT_EQ(grid_view.size(Dune::GeometryType::simplex), periodic_grid_view.size(Dune::GeometryType::simplex));
+      EXPECT_EQ(std::pow(elements_per_direction, dimDomain) * factorial(dimDomain), codim0_size);
     EXPECT_EQ(grid_view.overlapSize(0), periodic_grid_view.overlapSize(0));
     EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
     EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));
@@ -164,9 +166,9 @@ struct PeriodicViewTest : public testing::Test
 
     // the cube/rectangle grid has 2*dimDomain faces
     const size_t num_faces = 2 * dimDomain;
-    /* on each face, there are 8**(dimDomain-1) intersections. For a simplex grid in 3 dimensions, there are twice as
+    /* on each face, there are elements_per_direction**(dimDomain-1) intersections. For a simplex grid in 3 dimensions, there are twice as
      * much. */
-    size_t num_intersections_on_face = std::pow(8, dimDomain - 1);
+    size_t num_intersections_on_face = std::pow(elements_per_direction, dimDomain - 1);
     assert(dimDomain == Common::from_string<int>(grid_config["dimDomain"]));
     const auto domainDim = Common::from_string<int>(grid_config["dimDomain"]);
     if (is_simplex && domainDim == 3) // use dimDomain from config here to avoid "code will never be executed" warning
@@ -187,17 +189,17 @@ struct PeriodicViewTest : public testing::Test
     const size_t num_entities = grid_view.size(0);
     EXPECT_EQ(num_entities * num_intersections_per_entity - expected_num_boundary_intersections, neighbor_count);
 
-    // the nonperiodic grid has 7**dimDomain inner vertices
-    size_t expected_num_vertices = std::pow(7, dimDomain);
+    // the nonperiodic grid has (elements_per_direction-1)**dimDomain inner vertices
+    size_t expected_num_vertices = std::pow(elements_per_direction - 1, dimDomain);
     // add number of vertices on faces (codim 1)
-    expected_num_vertices += std::pow(7, dimDomain - 1) * (num_faces - num_periodic_faces / 2);
+    expected_num_vertices += std::pow(elements_per_direction - 1, dimDomain - 1) * (num_faces - num_periodic_faces / 2);
     // add number of vertices on edges (codim 2)
     const size_t num_edges = dimDomain == 1 ? 0 : (dimDomain == 2 ? 4 : 12);
     size_t num_periodic_edges = is_partially_periodic ? num_periodic_faces * std::pow(2, dimDomain - 1) : num_edges;
     if (is_nonperiodic)
       num_periodic_edges = 0;
     expected_num_vertices +=
-        dimDomain == 1 ? 0 : std::pow(7, dimDomain - 2) * ((num_edges - num_periodic_edges)
+        dimDomain == 1 ? 0 : std::pow(elements_per_direction - 1, dimDomain - 2) * ((num_edges - num_periodic_edges)
                                                            + num_periodic_edges / (is_partially_periodic ? 2 : 4));
     // add vertices on corners (codim 3) of grid
     if (domainDim == 3)
