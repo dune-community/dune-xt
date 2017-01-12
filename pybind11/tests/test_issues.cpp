@@ -11,7 +11,7 @@
 #include "constructor_stats.h"
 #include <pybind11/stl.h>
 #include <pybind11/operators.h>
-
+#include <pybind11/complex.h>
 
 #define TRACKERS(CLASS) CLASS() { print_default_created(this); } ~CLASS() { print_destroyed(this); }
 struct NestABase { int value = -2; TRACKERS(NestABase) };
@@ -35,6 +35,45 @@ OpTest2 operator+(const OpTest2 &, const OpTest1 &) {
     py::print("Add OpTest2 with OpTest1");
     return OpTest2();
 }
+
+// #461
+class Dupe1 {
+public:
+    Dupe1(int v) : v_{v} {}
+    int get_value() const { return v_; }
+private:
+    int v_;
+};
+class Dupe2 {};
+class Dupe3 {};
+class DupeException : public std::runtime_error {};
+
+// #478
+template <typename T> class custom_unique_ptr {
+public:
+    custom_unique_ptr() { print_default_created(this); }
+    custom_unique_ptr(T *ptr) : _ptr{ptr} { print_created(this, ptr); }
+    custom_unique_ptr(custom_unique_ptr<T> &&move) : _ptr{move._ptr} { move._ptr = nullptr; print_move_created(this); }
+    custom_unique_ptr &operator=(custom_unique_ptr<T> &&move) { print_move_assigned(this); if (_ptr) destruct_ptr(); _ptr = move._ptr; move._ptr = nullptr; return *this; }
+    custom_unique_ptr(const custom_unique_ptr<T> &) = delete;
+    void operator=(const custom_unique_ptr<T> &copy) = delete;
+    ~custom_unique_ptr() { print_destroyed(this); if (_ptr) destruct_ptr(); }
+private:
+    T *_ptr = nullptr;
+    void destruct_ptr() { delete _ptr; }
+};
+PYBIND11_DECLARE_HOLDER_TYPE(T, custom_unique_ptr<T>);
+
+/// Issue #528: templated constructor
+struct TplConstrClass {
+    template <typename T> TplConstrClass(const T &arg) : str{arg} {}
+    std::string str;
+    bool operator==(const TplConstrClass &t) const { return t.str == str; }
+};
+namespace std {
+template <> struct hash<TplConstrClass> { size_t operator()(const TplConstrClass &t) const { return std::hash<std::string>()(t.str); } };
+}
+
 
 void init_issues(py::module &m) {
     py::module m2 = m.def_submodule("issues");
@@ -237,6 +276,125 @@ void init_issues(py::module &m) {
     static std::vector<int> list = { 1, 2, 3 };
     m2.def("make_iterator_1", []() { return py::make_iterator<py::return_value_policy::copy>(list); });
     m2.def("make_iterator_2", []() { return py::make_iterator<py::return_value_policy::automatic>(list); });
+
+    static std::vector<std::string> nothrows;
+    // Issue 461: registering two things with the same name:
+    py::class_<Dupe1>(m2, "Dupe1")
+        .def("get_value", &Dupe1::get_value)
+        ;
+    m2.def("dupe1_factory", [](int v) { return new Dupe1(v); });
+
+    py::class_<Dupe2>(m2, "Dupe2");
+    py::exception<DupeException>(m2, "DupeException");
+
+    try {
+        m2.def("Dupe1", [](int v) { return new Dupe1(v); });
+        nothrows.emplace_back("Dupe1");
+    }
+    catch (std::runtime_error &) {}
+    try {
+        py::class_<Dupe3>(m2, "dupe1_factory");
+        nothrows.emplace_back("dupe1_factory");
+    }
+    catch (std::runtime_error &) {}
+    try {
+        py::exception<Dupe3>(m2, "Dupe2");
+        nothrows.emplace_back("Dupe2");
+    }
+    catch (std::runtime_error &) {}
+    try {
+        m2.def("DupeException", []() { return 30; });
+        nothrows.emplace_back("DupeException1");
+    }
+    catch (std::runtime_error &) {}
+    try {
+        py::class_<DupeException>(m2, "DupeException");
+        nothrows.emplace_back("DupeException2");
+    }
+    catch (std::runtime_error &) {}
+    m2.def("dupe_exception_failures", []() {
+        py::list l;
+        for (auto &e : nothrows) l.append(py::cast(e));
+        return l;
+    });
+
+    /// Issue #471: shared pointer instance not dellocated
+    class SharedChild : public std::enable_shared_from_this<SharedChild> {
+    public:
+        SharedChild() { print_created(this); }
+        ~SharedChild() { print_destroyed(this); }
+    };
+
+    class SharedParent {
+    public:
+        SharedParent() : child(std::make_shared<SharedChild>()) { }
+        const SharedChild &get_child() const { return *child; }
+
+    private:
+        std::shared_ptr<SharedChild> child;
+    };
+
+    py::class_<SharedChild, std::shared_ptr<SharedChild>>(m, "SharedChild");
+    py::class_<SharedParent, std::shared_ptr<SharedParent>>(m, "SharedParent")
+        .def(py::init<>())
+        .def("get_child", &SharedParent::get_child, py::return_value_policy::reference);
+
+    /// Issue/PR #478: unique ptrs constructed and freed without destruction
+    class SpecialHolderObj {
+    public:
+        int val = 0;
+        SpecialHolderObj *ch = nullptr;
+        SpecialHolderObj(int v, bool make_child = true) : val{v}, ch{make_child ? new SpecialHolderObj(val+1, false) : nullptr}
+        { print_created(this, val); }
+        ~SpecialHolderObj() { delete ch; print_destroyed(this); }
+        SpecialHolderObj *child() { return ch; }
+    };
+
+    py::class_<SpecialHolderObj, custom_unique_ptr<SpecialHolderObj>>(m, "SpecialHolderObj")
+        .def(py::init<int>())
+        .def("child", &SpecialHolderObj::child, pybind11::return_value_policy::reference_internal)
+        .def_readwrite("val", &SpecialHolderObj::val)
+        .def_static("holder_cstats", &ConstructorStats::get<custom_unique_ptr<SpecialHolderObj>>,
+                py::return_value_policy::reference);
+
+    /// Issue #484: number conversion generates unhandled exceptions
+    m2.def("test_complex", [](float x) { py::print("{}"_s.format(x)); });
+    m2.def("test_complex", [](std::complex<float> x) { py::print("({}, {})"_s.format(x.real(), x.imag())); });
+
+    /// Issue #511: problem with inheritance + overwritten def_static
+    struct MyBase {
+        static std::unique_ptr<MyBase> make() {
+            return std::unique_ptr<MyBase>(new MyBase());
+        }
+    };
+
+    struct MyDerived : MyBase {
+        static std::unique_ptr<MyDerived> make() {
+            return std::unique_ptr<MyDerived>(new MyDerived());
+        }
+    };
+
+    py::class_<MyBase>(m2, "MyBase")
+        .def_static("make", &MyBase::make);
+
+    py::class_<MyDerived, MyBase>(m2, "MyDerived")
+        .def_static("make", &MyDerived::make)
+        .def_static("make2", &MyDerived::make);
+
+    py::dict d;
+    std::string bar = "bar";
+    d["str"] = bar;
+    d["num"] = 3.7;
+
+    /// Issue #528: templated constructor
+    m2.def("tpl_constr_vector", [](std::vector<TplConstrClass> &) {});
+    m2.def("tpl_constr_map", [](std::unordered_map<TplConstrClass, TplConstrClass> &) {});
+    m2.def("tpl_constr_set", [](std::unordered_set<TplConstrClass> &) {});
+#if defined(PYBIND11_HAS_OPTIONAL)
+    m2.def("tpl_constr_optional", [](std::optional<TplConstrClass> &) {});
+#elif defined(PYBIND11_HAS_EXP_OPTIONAL)
+    m2.def("tpl_constr_optional", [](std::experimental::optional<TplConstrClass> &) {});
+#endif
 }
 
 // MSVC workaround: trying to use a lambda here crashes MSCV

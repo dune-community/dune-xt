@@ -18,11 +18,11 @@
 using arr = py::array;
 using arr_t = py::array_t<uint16_t, 0>;
 
-template<typename... Ix> arr data(const arr& a, Ix&&... index) {
+template<typename... Ix> arr data(const arr& a, Ix... index) {
     return arr(a.nbytes() - a.offset_at(index...), (const uint8_t *) a.data(index...));
 }
 
-template<typename... Ix> arr data_t(const arr_t& a, Ix&&... index) {
+template<typename... Ix> arr data_t(const arr_t& a, Ix... index) {
     return arr(a.size() - a.index_at(index...), a.data(index...));
 }
 
@@ -40,26 +40,26 @@ arr_t& mutate_data_t(arr_t& a) {
     return a;
 }
 
-template<typename... Ix> arr& mutate_data(arr& a, Ix&&... index) {
+template<typename... Ix> arr& mutate_data(arr& a, Ix... index) {
     auto ptr = (uint8_t *) a.mutable_data(index...);
     for (size_t i = 0; i < a.nbytes() - a.offset_at(index...); i++)
         ptr[i] = (uint8_t) (ptr[i] * 2);
     return a;
 }
 
-template<typename... Ix> arr_t& mutate_data_t(arr_t& a, Ix&&... index) {
+template<typename... Ix> arr_t& mutate_data_t(arr_t& a, Ix... index) {
     auto ptr = a.mutable_data(index...);
     for (size_t i = 0; i < a.size() - a.index_at(index...); i++)
         ptr[i]++;
     return a;
 }
 
-template<typename... Ix> size_t index_at(const arr& a, Ix&&... idx) { return a.index_at(idx...); }
-template<typename... Ix> size_t index_at_t(const arr_t& a, Ix&&... idx) { return a.index_at(idx...); }
-template<typename... Ix> size_t offset_at(const arr& a, Ix&&... idx) { return a.offset_at(idx...); }
-template<typename... Ix> size_t offset_at_t(const arr_t& a, Ix&&... idx) { return a.offset_at(idx...); }
-template<typename... Ix> size_t at_t(const arr_t& a, Ix&&... idx) { return a.at(idx...); }
-template<typename... Ix> arr_t& mutate_at_t(arr_t& a, Ix&&... idx) { a.mutable_at(idx...)++; return a; }
+template<typename... Ix> size_t index_at(const arr& a, Ix... idx) { return a.index_at(idx...); }
+template<typename... Ix> size_t index_at_t(const arr_t& a, Ix... idx) { return a.index_at(idx...); }
+template<typename... Ix> size_t offset_at(const arr& a, Ix... idx) { return a.offset_at(idx...); }
+template<typename... Ix> size_t offset_at_t(const arr_t& a, Ix... idx) { return a.offset_at(idx...); }
+template<typename... Ix> size_t at_t(const arr_t& a, Ix... idx) { return a.at(idx...); }
+template<typename... Ix> arr_t& mutate_at_t(arr_t& a, Ix... idx) { a.mutable_at(idx...)++; return a; }
 
 #define def_index_fn(name, type) \
     sm.def(#name, [](type a) { return name(a); }); \
@@ -124,4 +124,30 @@ test_initializer numpy_array([](py::module &m) {
             return py::array_t<int>({2}, {4}, a.data, obj);
         }
     );
+
+    sm.def("function_taking_uint64", [](uint64_t) { });
+
+    sm.def("isinstance_untyped", [](py::object yes, py::object no) {
+        return py::isinstance<py::array>(yes) && !py::isinstance<py::array>(no);
+    });
+
+    sm.def("isinstance_typed", [](py::object o) {
+        return py::isinstance<py::array_t<double>>(o) && !py::isinstance<py::array_t<int>>(o);
+    });
+
+    sm.def("default_constructors", []() {
+        return py::dict(
+            "array"_a=py::array(),
+            "array_t<int32>"_a=py::array_t<std::int32_t>(),
+            "array_t<double>"_a=py::array_t<double>()
+        );
+    });
+
+    sm.def("converting_constructors", [](py::object o) {
+        return py::dict(
+            "array"_a=py::array(o),
+            "array_t<int32>"_a=py::array_t<std::int32_t>(o),
+            "array_t<double>"_a=py::array_t<double>(o)
+        );
+    });
 });

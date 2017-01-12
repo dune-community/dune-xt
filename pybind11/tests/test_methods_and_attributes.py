@@ -31,6 +31,11 @@ def test_methods_and_attributes():
     assert instance1.internal4() == 320
     assert instance1.internal5() == 320
 
+    assert instance1.overloaded(1, 1.0) == "(int, float)"
+    assert instance1.overloaded(2.0, 2) == "(float, int)"
+    assert instance1.overloaded_const(3, 3.0) == "(int, float) const"
+    assert instance1.overloaded_const(4.0, 4) == "(float, int) const"
+
     assert instance1.value == 320
     instance1.value = 100
     assert str(instance1) == "ExampleMandA[value=100]"
@@ -85,6 +90,54 @@ def test_static_properties():
     assert Type.def_property_static == 3
 
 
+@pytest.mark.parametrize("access", ["ro", "rw", "static_ro", "static_rw"])
+def test_property_return_value_policies(access):
+    from pybind11_tests import TestPropRVP
+
+    if not access.startswith("static"):
+        obj = TestPropRVP()
+    else:
+        obj = TestPropRVP
+
+    ref = getattr(obj, access + "_ref")
+    assert ref.value == 1
+    ref.value = 2
+    assert getattr(obj, access + "_ref").value == 2
+    ref.value = 1  # restore original value for static properties
+
+    copy = getattr(obj, access + "_copy")
+    assert copy.value == 1
+    copy.value = 2
+    assert getattr(obj, access + "_copy").value == 1
+
+    copy = getattr(obj, access + "_func")
+    assert copy.value == 1
+    copy.value = 2
+    assert getattr(obj, access + "_func").value == 1
+
+
+def test_property_rvalue_policy():
+    """When returning an rvalue, the return value policy is automatically changed from
+    `reference(_internal)` to `move`. The following would not work otherwise.
+    """
+    from pybind11_tests import TestPropRVP
+
+    instance = TestPropRVP()
+    o = instance.rvalue
+    assert o.value == 1
+
+
+def test_property_rvalue_policy_static():
+    """When returning an rvalue, the return value policy is automatically changed from
+    `reference(_internal)` to `move`. The following would not work otherwise.
+    """
+    from pybind11_tests import TestPropRVP
+    o = TestPropRVP.static_rvalue
+    assert o.value == 1
+
+
+# https://bitbucket.org/pypy/pypy/issues/2447
+@pytest.unsupported_on_pypy
 def test_dynamic_attributes():
     from pybind11_tests import DynamicClass, CppDerivedDynamicClass
 
@@ -127,6 +180,8 @@ def test_dynamic_attributes():
         assert cstats.alive() == 0
 
 
+# https://bitbucket.org/pypy/pypy/issues/2447
+@pytest.unsupported_on_pypy
 def test_cyclic_gc():
     from pybind11_tests import DynamicClass
 

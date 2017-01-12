@@ -82,7 +82,11 @@ private:
 };
 
 /// Make pybind aware of the ref-counted wrapper type (s)
-PYBIND11_DECLARE_HOLDER_TYPE(T, ref<T>); // Required for custom holder type
+
+// ref<T> is a wrapper for 'Object' which uses intrusive reference counting
+// It is always possible to construct a ref<T> from an Object* pointer without
+// possible incosistencies, hence the 'true' argument at the end.
+PYBIND11_DECLARE_HOLDER_TYPE(T, ref<T>, true);
 PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>); // Not required any more for std::shared_ptr,
                                                      // but it should compile without error
 
@@ -125,6 +129,18 @@ test_initializer smart_ptr([](py::module &m) {
     py::class_<MyObject1, ref<MyObject1>>(m, "MyObject1", obj)
         .def(py::init<int>());
 
+    m.def("test_object1_refcounting",
+        []() -> bool {
+            ref<MyObject1> o = new MyObject1(0);
+            bool good = o->getRefCount() == 1;
+            py::object o2 = py::cast(o, py::return_value_policy::reference);
+            // always request (partial) ownership for objects with intrusive
+            // reference counting even when using the 'reference' RVP
+            good &= o->getRefCount() == 2;
+            return good;
+        }
+    );
+
     m.def("make_object_1", &make_object_1);
     m.def("make_object_2", &make_object_2);
     m.def("make_myobject1_1", &make_myobject1_1);
@@ -164,4 +180,61 @@ test_initializer smart_ptr([](py::module &m) {
 
     // Expose constructor stats for the ref type
     m.def("cstats_ref", &ConstructorStats::get<ref_tag>);
+});
+
+struct SharedPtrRef {
+    struct A {
+        A() { print_created(this); }
+        A(const A &) { print_copy_created(this); }
+        A(A &&) { print_move_created(this); }
+        ~A() { print_destroyed(this); }
+    };
+
+    A value = {};
+    std::shared_ptr<A> shared = std::make_shared<A>();
+};
+
+struct SharedFromThisRef {
+    struct B : std::enable_shared_from_this<B> {
+        B() { print_created(this); }
+        B(const B &) : std::enable_shared_from_this<B>() { print_copy_created(this); }
+        B(B &&) : std::enable_shared_from_this<B>() { print_move_created(this); }
+        ~B() { print_destroyed(this); }
+    };
+
+    B value = {};
+    std::shared_ptr<B> shared = std::make_shared<B>();
+};
+
+test_initializer smart_ptr_and_references([](py::module &pm) {
+    auto m = pm.def_submodule("smart_ptr");
+
+    using A = SharedPtrRef::A;
+    py::class_<A, std::shared_ptr<A>>(m, "A");
+
+    py::class_<SharedPtrRef>(m, "SharedPtrRef")
+        .def(py::init<>())
+        .def_readonly("ref", &SharedPtrRef::value)
+        .def_property_readonly("copy", [](const SharedPtrRef &s) { return s.value; },
+                               py::return_value_policy::copy)
+        .def_readonly("holder_ref", &SharedPtrRef::shared)
+        .def_property_readonly("holder_copy", [](const SharedPtrRef &s) { return s.shared; },
+                               py::return_value_policy::copy)
+        .def("set_ref", [](SharedPtrRef &, const A &) { return true; })
+        .def("set_holder", [](SharedPtrRef &, std::shared_ptr<A>) { return true; });
+
+    using B = SharedFromThisRef::B;
+    py::class_<B, std::shared_ptr<B>>(m, "B");
+
+    py::class_<SharedFromThisRef>(m, "SharedFromThisRef")
+        .def(py::init<>())
+        .def_readonly("bad_wp", &SharedFromThisRef::value)
+        .def_property_readonly("ref", [](const SharedFromThisRef &s) -> const B & { return *s.shared; })
+        .def_property_readonly("copy", [](const SharedFromThisRef &s) { return s.value; },
+                               py::return_value_policy::copy)
+        .def_readonly("holder_ref", &SharedFromThisRef::shared)
+        .def_property_readonly("holder_copy", [](const SharedFromThisRef &s) { return s.shared; },
+                               py::return_value_policy::copy)
+        .def("set_ref", [](SharedFromThisRef &, const B &) { return true; })
+        .def("set_holder", [](SharedFromThisRef &, std::shared_ptr<B>) { return true; });
 });

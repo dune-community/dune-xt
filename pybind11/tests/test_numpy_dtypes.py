@@ -1,11 +1,20 @@
+import re
 import pytest
+
 with pytest.suppress(ImportError):
     import numpy as np
 
-    simple_dtype = np.dtype({'names': ['x', 'y', 'z'],
-                             'formats': ['?', 'u4', 'f4'],
-                             'offsets': [0, 4, 8]})
-    packed_dtype = np.dtype([('x', '?'), ('y', 'u4'), ('z', 'f4')])
+
+@pytest.fixture(scope='module')
+def simple_dtype():
+    return np.dtype({'names': ['x', 'y', 'z'],
+                     'formats': ['?', 'u4', 'f4'],
+                     'offsets': [0, 4, 8]})
+
+
+@pytest.fixture(scope='module')
+def packed_dtype():
+    return np.dtype([('x', '?'), ('y', 'u4'), ('z', 'f4')])
 
 
 def assert_equal(actual, expected_data, expected_dtype):
@@ -18,31 +27,35 @@ def test_format_descriptors():
 
     with pytest.raises(RuntimeError) as excinfo:
         get_format_unbound()
-    assert 'unsupported buffer format' in str(excinfo.value)
+    assert re.match('^NumPy type info missing for .*UnboundStruct.*$', str(excinfo.value))
 
     assert print_format_descriptors() == [
-        "T{=?:x:3x=I:y:=f:z:}",
-        "T{=?:x:=I:y:=f:z:}",
-        "T{=T{=?:x:3x=I:y:=f:z:}:a:=T{=?:x:=I:y:=f:z:}:b:}",
-        "T{=?:x:3x=I:y:=f:z:12x}",
-        "T{8x=T{=?:x:3x=I:y:=f:z:12x}:a:8x}",
-        "T{=3s:a:=3s:b:}",
-        'T{=q:e1:=B:e2:}'
+        "T{?:x:3xI:y:f:z:}",
+        "T{?:x:=I:y:=f:z:}",
+        "T{T{?:x:3xI:y:f:z:}:a:T{?:x:=I:y:=f:z:}:b:}",
+        "T{?:x:3xI:y:f:z:12x}",
+        "T{8xT{?:x:3xI:y:f:z:12x}:a:8x}",
+        "T{3s:a:3s:b:}",
+        'T{q:e1:B:e2:}'
     ]
 
 
 @pytest.requires_numpy
-def test_dtype():
-    from pybind11_tests import print_dtypes, test_dtype_ctors, test_dtype_methods
+def test_dtype(simple_dtype):
+    from pybind11_tests import (print_dtypes, test_dtype_ctors, test_dtype_methods,
+                                trailing_padding_dtype, buffer_to_dtype)
 
     assert print_dtypes() == [
         "{'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8], 'itemsize':12}",
         "[('x', '?'), ('y', '<u4'), ('z', '<f4')]",
-        "[('a', {'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8], 'itemsize':12}), ('b', [('x', '?'), ('y', '<u4'), ('z', '<f4')])]",
+        "[('a', {'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8],"
+        " 'itemsize':12}), ('b', [('x', '?'), ('y', '<u4'), ('z', '<f4')])]",
         "{'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8], 'itemsize':24}",
-        "{'names':['a'], 'formats':[{'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8], 'itemsize':24}], 'offsets':[8], 'itemsize':40}",
+        "{'names':['a'], 'formats':[{'names':['x','y','z'], 'formats':['?','<u4','<f4'],"
+        " 'offsets':[0,4,8], 'itemsize':24}], 'offsets':[8], 'itemsize':40}",
         "[('a', 'S3'), ('b', 'S3')]",
-        "[('e1', '<i8'), ('e2', 'u1')]"
+        "[('e1', '<i8'), ('e2', 'u1')]",
+        "[('x', 'i1'), ('y', '<u8')]"
     ]
 
     d1 = np.dtype({'names': ['a', 'b'], 'formats': ['int32', 'float64'],
@@ -54,9 +67,11 @@ def test_dtype():
     assert test_dtype_methods() == [np.dtype('int32'), simple_dtype, False, True,
                                     np.dtype('int32').itemsize, simple_dtype.itemsize]
 
+    assert trailing_padding_dtype() == buffer_to_dtype(np.zeros(1, trailing_padding_dtype()))
+
 
 @pytest.requires_numpy
-def test_recarray():
+def test_recarray(simple_dtype, packed_dtype):
     from pybind11_tests import (create_rec_simple, create_rec_packed, create_rec_nested,
                                 print_rec_simple, print_rec_packed, print_rec_nested,
                                 create_rec_partial, create_rec_partial_nested)
@@ -105,7 +120,8 @@ def test_recarray():
     ]
 
     arr = create_rec_partial(3)
-    assert str(arr.dtype) == "{'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8], 'itemsize':24}"
+    assert str(arr.dtype) == \
+        "{'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8], 'itemsize':24}"
     partial_dtype = arr.dtype
     assert '' not in arr.dtype.fields
     assert partial_dtype.itemsize > simple_dtype.itemsize
@@ -113,7 +129,9 @@ def test_recarray():
     assert_equal(arr, elements, packed_dtype)
 
     arr = create_rec_partial_nested(3)
-    assert str(arr.dtype) == "{'names':['a'], 'formats':[{'names':['x','y','z'], 'formats':['?','<u4','<f4'], 'offsets':[0,4,8], 'itemsize':24}], 'offsets':[8], 'itemsize':40}"
+    assert str(arr.dtype) == \
+        "{'names':['a'], 'formats':[{'names':['x','y','z'], 'formats':['?','<u4','<f4']," \
+        " 'offsets':[0,4,8], 'itemsize':24}], 'offsets':[8], 'itemsize':40}"
     assert '' not in arr.dtype.fields
     assert '' not in arr.dtype.fields['a'][0].fields
     assert arr.dtype.itemsize > partial_dtype.itemsize
@@ -174,3 +192,34 @@ def test_signature(doc):
     from pybind11_tests import create_rec_nested
 
     assert doc(create_rec_nested) == "create_rec_nested(arg0: int) -> numpy.ndarray[NestedStruct]"
+
+
+@pytest.requires_numpy
+def test_scalar_conversion():
+    from pybind11_tests import (create_rec_simple, f_simple,
+                                create_rec_packed, f_packed,
+                                create_rec_nested, f_nested,
+                                create_enum_array)
+
+    n = 3
+    arrays = [create_rec_simple(n), create_rec_packed(n),
+              create_rec_nested(n), create_enum_array(n)]
+    funcs = [f_simple, f_packed, f_nested]
+
+    for i, func in enumerate(funcs):
+        for j, arr in enumerate(arrays):
+            if i == j and i < 2:
+                assert [func(arr[k]) for k in range(n)] == [k * 10 for k in range(n)]
+            else:
+                with pytest.raises(TypeError) as excinfo:
+                    func(arr[0])
+                assert 'incompatible function arguments' in str(excinfo.value)
+
+
+@pytest.requires_numpy
+def test_register_dtype():
+    from pybind11_tests import register_dtype
+
+    with pytest.raises(RuntimeError) as excinfo:
+        register_dtype()
+    assert 'dtype is already registered' in str(excinfo.value)

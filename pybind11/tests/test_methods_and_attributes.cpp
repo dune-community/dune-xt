@@ -50,6 +50,11 @@ public:
     int *internal4() { return &value; }                           // return by pointer
     const int *internal5() { return &value; }                     // return by const pointer
 
+    py::str overloaded(int, float) { return "(int, float)"; }
+    py::str overloaded(float, int) { return "(float, int)"; }
+    py::str overloaded(int, float) const { return "(int, float) const"; }
+    py::str overloaded(float, int) const { return "(float, int) const"; }
+
     int value = 0;
 };
 
@@ -65,6 +70,24 @@ struct TestProperties {
 };
 
 int TestProperties::static_value = 1;
+
+struct SimpleValue { int value = 1; };
+
+struct TestPropRVP {
+    SimpleValue v1;
+    SimpleValue v2;
+    static SimpleValue sv1;
+    static SimpleValue sv2;
+
+    const SimpleValue &get1() const { return v1; }
+    const SimpleValue &get2() const { return v2; }
+    SimpleValue get_rvalue() const { return v2; }
+    void set1(int v) { v1.value = v; }
+    void set2(int v) { v2.value = v; }
+};
+
+SimpleValue TestPropRVP::sv1{};
+SimpleValue TestPropRVP::sv2{};
 
 class DynamicClass {
 public:
@@ -99,11 +122,21 @@ test_initializer methods_and_attributes([](py::module &m) {
         .def("internal3", &ExampleMandA::internal3)
         .def("internal4", &ExampleMandA::internal4)
         .def("internal5", &ExampleMandA::internal5)
+#if defined(PYBIND11_OVERLOAD_CAST)
+        .def("overloaded", py::overload_cast<int, float>(&ExampleMandA::overloaded))
+        .def("overloaded", py::overload_cast<float, int>(&ExampleMandA::overloaded))
+        .def("overloaded_const", py::overload_cast<int, float>(&ExampleMandA::overloaded, py::const_))
+        .def("overloaded_const", py::overload_cast<float, int>(&ExampleMandA::overloaded, py::const_))
+#else
+        .def("overloaded", static_cast<py::str (ExampleMandA::*)(int, float)>(&ExampleMandA::overloaded))
+        .def("overloaded", static_cast<py::str (ExampleMandA::*)(float, int)>(&ExampleMandA::overloaded))
+        .def("overloaded_const", static_cast<py::str (ExampleMandA::*)(int, float) const>(&ExampleMandA::overloaded))
+        .def("overloaded_const", static_cast<py::str (ExampleMandA::*)(float, int) const>(&ExampleMandA::overloaded))
+#endif
         .def("__str__", &ExampleMandA::toString)
-        .def_readwrite("value", &ExampleMandA::value)
-        ;
+        .def_readwrite("value", &ExampleMandA::value);
 
-    py::class_<TestProperties>(m, "TestProperties")
+    py::class_<TestProperties>(m, "TestProperties", py::metaclass())
         .def(py::init<>())
         .def_readonly("def_readonly", &TestProperties::value)
         .def_readwrite("def_readwrite", &TestProperties::value)
@@ -117,9 +150,37 @@ test_initializer methods_and_attributes([](py::module &m) {
                              [](py::object) { return TestProperties::static_get(); },
                              [](py::object, int v) { return TestProperties::static_set(v); });
 
+    py::class_<SimpleValue>(m, "SimpleValue")
+        .def_readwrite("value", &SimpleValue::value);
+
+    auto static_get1 = [](py::object) -> const SimpleValue & { return TestPropRVP::sv1; };
+    auto static_get2 = [](py::object) -> const SimpleValue & { return TestPropRVP::sv2; };
+    auto static_set1 = [](py::object, int v) { TestPropRVP::sv1.value = v; };
+    auto static_set2 = [](py::object, int v) { TestPropRVP::sv2.value = v; };
+    auto rvp_copy = py::return_value_policy::copy;
+
+    py::class_<TestPropRVP>(m, "TestPropRVP", py::metaclass())
+        .def(py::init<>())
+        .def_property_readonly("ro_ref", &TestPropRVP::get1)
+        .def_property_readonly("ro_copy", &TestPropRVP::get2, rvp_copy)
+        .def_property_readonly("ro_func", py::cpp_function(&TestPropRVP::get2, rvp_copy))
+        .def_property("rw_ref", &TestPropRVP::get1, &TestPropRVP::set1)
+        .def_property("rw_copy", &TestPropRVP::get2, &TestPropRVP::set2, rvp_copy)
+        .def_property("rw_func", py::cpp_function(&TestPropRVP::get2, rvp_copy), &TestPropRVP::set2)
+        .def_property_readonly_static("static_ro_ref", static_get1)
+        .def_property_readonly_static("static_ro_copy", static_get2, rvp_copy)
+        .def_property_readonly_static("static_ro_func", py::cpp_function(static_get2, rvp_copy))
+        .def_property_static("static_rw_ref", static_get1, static_set1)
+        .def_property_static("static_rw_copy", static_get2, static_set2, rvp_copy)
+        .def_property_static("static_rw_func", py::cpp_function(static_get2, rvp_copy), static_set2)
+        .def_property_readonly("rvalue", &TestPropRVP::get_rvalue)
+        .def_property_readonly_static("static_rvalue", [](py::object) { return SimpleValue(); });
+
+#if !defined(PYPY_VERSION)
     py::class_<DynamicClass>(m, "DynamicClass", py::dynamic_attr())
         .def(py::init());
 
     py::class_<CppDerivedDynamicClass, DynamicClass>(m, "CppDerivedDynamicClass")
         .def(py::init());
+#endif
 });

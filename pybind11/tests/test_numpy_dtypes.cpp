@@ -67,6 +67,11 @@ struct StringStruct {
     std::array<char, 3> b;
 };
 
+PYBIND11_PACKED(struct StructWithUglyNames {
+    int8_t __x__;
+    uint64_t __y__;
+});
+
 enum class E1 : int64_t { A = -1, B = 1 };
 enum E2 : uint8_t { X = 1, Y = 2 };
 
@@ -191,13 +196,14 @@ py::list print_format_descriptors() {
 
 py::list print_dtypes() {
     const auto dtypes = {
-        py::dtype::of<SimpleStruct>().str(),
-        py::dtype::of<PackedStruct>().str(),
-        py::dtype::of<NestedStruct>().str(),
-        py::dtype::of<PartialStruct>().str(),
-        py::dtype::of<PartialNestedStruct>().str(),
-        py::dtype::of<StringStruct>().str(),
-        py::dtype::of<EnumStruct>().str()
+        py::str(py::dtype::of<SimpleStruct>()),
+        py::str(py::dtype::of<PackedStruct>()),
+        py::str(py::dtype::of<NestedStruct>()),
+        py::str(py::dtype::of<PartialStruct>()),
+        py::str(py::dtype::of<PartialNestedStruct>()),
+        py::str(py::dtype::of<StringStruct>()),
+        py::str(py::dtype::of<EnumStruct>()),
+        py::str(py::dtype::of<StructWithUglyNames>())
     };
     auto l = py::list();
     for (const auto &s : dtypes) {
@@ -276,9 +282,22 @@ py::list test_dtype_ctors() {
     dict["itemsize"] = py::int_(20);
     list.append(py::dtype::from_args(dict));
     list.append(py::dtype(names, formats, offsets, 20));
-    list.append(py::dtype(py::buffer_info((void *) 0, 1, "I", 1)));
-    list.append(py::dtype(py::buffer_info((void *) 0, 1, "T{i:a:f:b:}", 1)));
+    list.append(py::dtype(py::buffer_info((void *) 0, sizeof(unsigned int), "I", 1)));
+    list.append(py::dtype(py::buffer_info((void *) 0, 0, "T{i:a:f:b:}", 1)));
     return list;
+}
+
+struct TrailingPaddingStruct {
+    int32_t a;
+    char b;
+};
+
+py::dtype trailing_padding_dtype() {
+    return py::dtype::of<TrailingPaddingStruct>();
+}
+
+py::dtype buffer_to_dtype(py::buffer& buf) {
+    return py::dtype(buf.request());
 }
 
 py::list test_dtype_methods() {
@@ -298,6 +317,9 @@ test_initializer numpy_dtypes([](py::module &m) {
         return;
     }
 
+    // typeinfo may be registered before the dtype descriptor for scalar casts to work...
+    py::class_<SimpleStruct>(m, "SimpleStruct");
+
     PYBIND11_NUMPY_DTYPE(SimpleStruct, x, y, z);
     PYBIND11_NUMPY_DTYPE(PackedStruct, x, y, z);
     PYBIND11_NUMPY_DTYPE(NestedStruct, a, b);
@@ -305,6 +327,12 @@ test_initializer numpy_dtypes([](py::module &m) {
     PYBIND11_NUMPY_DTYPE(PartialNestedStruct, a);
     PYBIND11_NUMPY_DTYPE(StringStruct, a, b);
     PYBIND11_NUMPY_DTYPE(EnumStruct, e1, e2);
+    PYBIND11_NUMPY_DTYPE(TrailingPaddingStruct, a, b);
+
+    // ... or after
+    py::class_<PackedStruct>(m, "PackedStruct");
+
+    PYBIND11_NUMPY_DTYPE_EX(StructWithUglyNames, __x__, "x", __y__, "y");
 
     m.def("create_rec_simple", &create_recarray<SimpleStruct>);
     m.def("create_rec_packed", &create_recarray<PackedStruct>);
@@ -324,6 +352,12 @@ test_initializer numpy_dtypes([](py::module &m) {
     m.def("test_array_ctors", &test_array_ctors);
     m.def("test_dtype_ctors", &test_dtype_ctors);
     m.def("test_dtype_methods", &test_dtype_methods);
+    m.def("trailing_padding_dtype", &trailing_padding_dtype);
+    m.def("buffer_to_dtype", &buffer_to_dtype);
+    m.def("f_simple", [](SimpleStruct s) { return s.y * 10; });
+    m.def("f_packed", [](PackedStruct s) { return s.y * 10; });
+    m.def("f_nested", [](NestedStruct s) { return s.a.y * 10; });
+    m.def("register_dtype", []() { PYBIND11_NUMPY_DTYPE(SimpleStruct, x, y, z); });
 });
 
 #undef PYBIND11_PACKED
