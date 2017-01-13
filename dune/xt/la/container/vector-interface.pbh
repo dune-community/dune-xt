@@ -40,7 +40,8 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   typedef typename C::ScalarType S;
   typedef typename C::RealType R;
 
-  py::class_<C> c(m, std::string(id).c_str(), std::string(id).c_str());
+  py::class_<C> c = bind_ProvidesDataAccess<C>(m, id, id);
+  addbind_ProvidesBackend(c);
 
   c.def_property_readonly_static("dense_matrix_type", [](py::object /*self*/) { return C::dense_matrix_type; });
   c.def_property_readonly_static("sparse_matrix_type", [](py::object /*self*/) { return C::sparse_matrix_type; });

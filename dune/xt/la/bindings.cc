@@ -15,7 +15,7 @@
 #include <vector>
 
 #include <dune/pybindxi/pybind11.h>
-//#include <dune/pybindxi/stl_bind.h> // <- see dune/xt/common/bindings.cc
+#include <dune/pybindxi/stl.h>
 
 #include <dune/xt/common/configuration.pbh>
 #include <dune/xt/common/fvector.pbh>
@@ -30,6 +30,7 @@
 
 
 namespace py = pybind11;
+namespace LA = Dune::XT::LA;
 
 
 PYBIND11_PLUGIN(la)
@@ -38,64 +39,54 @@ PYBIND11_PLUGIN(la)
 
   py::module::import("common");
 
-  Dune::XT::LA::bind_Backends(m);
+  LA::bind_Backends(m);
 
-#define BIND_VECTOR(C, c, id)                                                                                          \
-  auto c = Dune::XT::LA::bind_Vector<C>(m, id);                                                                        \
-  Dune::XT::LA::addbind_ProvidesBackend(c);                                                                            \
-  Dune::XT::LA::addbind_ProvidesDataAccess(c)
-
-  BIND_VECTOR(Dune::XT::LA::CommonDenseVector<double>, common_dense_vector_double, "CommonDenseVector_double");
+  LA::bind_Vector<LA::CommonDenseVector<double>>(m, "CommonDenseVector_double");
 #if HAVE_DUNE_ISTL
-  BIND_VECTOR(Dune::XT::LA::IstlDenseVector<double>, istl_dense_vector_double, "IstlDenseVector_double");
+  LA::bind_Vector<LA::IstlDenseVector<double>>(m, "IstlDenseVector_double");
 #endif
 #if HAVE_EIGEN
-  BIND_VECTOR(Dune::XT::LA::EigenDenseVector<double>, eigen_dense_vector_double, "EigenDenseVector_double");
+  LA::bind_Vector<LA::EigenDenseVector<double>>(m, "EigenDenseVector_double");
 #endif
-#undef BIND_VECTOR
 
-  Dune::XT::LA::bind_SparsityPatternDefault(m);
+  LA::bind_SparsityPatternDefault(m);
 
-#define BIND_MATRIX(C, s, c, id)                                                                                       \
-  auto c = Dune::XT::LA::bind_Matrix<C, s>(m, id);                                                                     \
-  Dune::XT::LA::addbind_ProvidesBackend(c);
+#define BIND_MATRIX(C, s, c, id) auto c = LA::bind_Matrix<C, s>(m, id);
 
-  BIND_MATRIX(Dune::XT::LA::CommonDenseMatrix<double>, false, common_dense_matrix_double, "CommonDenseMatrix_double");
-  BIND_MATRIX(Dune::XT::LA::CommonSparseMatrix<double>, true, common_sparse_matrix_double, "CommonSparseMatrix_double");
+  BIND_MATRIX(LA::CommonDenseMatrix<double>, false, common_dense_matrix_double, "CommonDenseMatrix_double");
+  BIND_MATRIX(LA::CommonSparseMatrix<double>, true, common_sparse_matrix_double, "CommonSparseMatrix_double");
 #if HAVE_DUNE_ISTL
-  BIND_MATRIX(Dune::XT::LA::IstlRowMajorSparseMatrix<double>,
+  BIND_MATRIX(LA::IstlRowMajorSparseMatrix<double>,
               true,
               istl_row_major_sparse_matrix_double,
               "IstlRowMajorSparseMatrix_double");
 #endif
 #if HAVE_EIGEN
-  BIND_MATRIX(Dune::XT::LA::EigenDenseMatrix<double>, false, eigen_dense_matrix_double, "EigenDenseMatrix_double");
-  BIND_MATRIX(Dune::XT::LA::EigenRowMajorSparseMatrix<double>,
+  BIND_MATRIX(LA::EigenDenseMatrix<double>, false, eigen_dense_matrix_double, "EigenDenseMatrix_double");
+  BIND_MATRIX(LA::EigenRowMajorSparseMatrix<double>,
               true,
               eigen_row_major_sparse_matrix_double,
               "EigenRowMajorSparseMatrix_double");
 #endif
 #undef BIND_MATRIX
-  Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::CommonDenseVector<double>>(common_dense_matrix_double);
-  Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::CommonDenseVector<double>>(common_sparse_matrix_double);
+  LA::addbind_Matrix_Vector_interaction<LA::CommonDenseVector<double>>(common_dense_matrix_double);
+  LA::addbind_Matrix_Vector_interaction<LA::CommonDenseVector<double>>(common_sparse_matrix_double);
 #if HAVE_DUNE_ISTL
-  Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::IstlDenseVector<double>>(
-      istl_row_major_sparse_matrix_double);
+  LA::addbind_Matrix_Vector_interaction<LA::IstlDenseVector<double>>(istl_row_major_sparse_matrix_double);
 #endif
 #if HAVE_EIGEN
-  Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::EigenDenseVector<double>>(eigen_dense_matrix_double);
-  Dune::XT::LA::addbind_Matrix_Vector_interaction<Dune::XT::LA::EigenDenseVector<double>>(
-      eigen_row_major_sparse_matrix_double);
+  LA::addbind_Matrix_Vector_interaction<LA::EigenDenseVector<double>>(eigen_dense_matrix_double);
+  LA::addbind_Matrix_Vector_interaction<LA::EigenDenseVector<double>>(eigen_row_major_sparse_matrix_double);
 #endif
 
-  Dune::XT::LA::bind_Solver<Dune::XT::LA::CommonDenseMatrix<double>>(m, "CommonDenseMatrix_double");
-//  Dune::XT::LA::bind_Solver<Dune::XT::LA::CommonSparseMatrix<double>>(m, "CommonSparseMatrix_double");
+  LA::bind_Solver<LA::CommonDenseMatrix<double>>(m, "CommonDenseMatrix_double");
+//  LA::bind_Solver<LA::CommonSparseMatrix<double>>(m, "CommonSparseMatrix_double");
 #if HAVE_DUNE_ISTL
-  Dune::XT::LA::bind_Solver<Dune::XT::LA::IstlRowMajorSparseMatrix<double>>(m, "IstlRowMajorSparseMatrix_double");
+  LA::bind_Solver<LA::IstlRowMajorSparseMatrix<double>>(m, "IstlRowMajorSparseMatrix_double");
 #endif
 #if HAVE_EIGEN
-  Dune::XT::LA::bind_Solver<Dune::XT::LA::EigenDenseMatrix<double>>(m, "EigenDenseMatrix");
-  Dune::XT::LA::bind_Solver<Dune::XT::LA::EigenRowMajorSparseMatrix<double>>(m, "EigenRowMajorSparseMatrix");
+  LA::bind_Solver<LA::EigenDenseMatrix<double>>(m, "EigenDenseMatrix");
+  LA::bind_Solver<LA::EigenRowMajorSparseMatrix<double>>(m, "EigenRowMajorSparseMatrix");
 #endif
 
   return m.ptr();

@@ -95,7 +95,9 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
 
   typedef typename C::ScalarType S;
 
-  py::class_<C> c(m, std::string(id).c_str(), std::string(id).c_str());
+  py::class_<C> c(m, std::string(id).c_str(), std::string(id).c_str(), py::metaclass());
+
+  addbind_ProvidesBackend(c);
 
   c.def_property_readonly_static("vector_type", [](py::object /*self*/) { return C::vector_type; });
 
