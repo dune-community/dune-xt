@@ -15,6 +15,7 @@
 
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/fvector.pbh>
+#include <dune/xt/common/fmatrix.pbh>
 
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
