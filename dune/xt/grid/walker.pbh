@@ -33,6 +33,7 @@ typename std::enable_if<is_layer<G>::value, pybind11::class_<Walker<G>>>::type b
   py::class_<Walker<G>> c(m, std::string("Walker__" + grid_id).c_str(), std::string("Walker__" + grid_id).c_str());
 
   c.def("clear", &C::clear);
+  c.def("append", [](C& self, C& other) { self.append(other); }, "other"_a);
   c.def("prepare", &C::prepare);
   c.def("finalize", &C::finalize);
   c.def("walk", [](C& self, const bool use_tbb) { self.walk(use_tbb); }, "use_tbb"_a = false);
