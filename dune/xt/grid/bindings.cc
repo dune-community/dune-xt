@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <dune/pybindxi/pybind11.h>
-//#include <dune/pybindxi/stl_bind.h> // <- see dune/xt/common/bindings.cc
+#include <dune/pybindxi/stl.h>
 
 #include <dune/xt/common/configuration.pbh>
 #include <dune/xt/common/fvector.pbh>
