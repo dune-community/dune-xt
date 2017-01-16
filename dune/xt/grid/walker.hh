@@ -34,6 +34,7 @@
 #include <dune/xt/common/parallel/threadmanager.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
+#include <dune/xt/common/timedlogging.hh>
 
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
@@ -49,6 +50,7 @@ namespace XT {
 namespace Grid {
 namespace internal {
 
+
 template <class GPV, bool is_grd_vw = is_grid_view<GPV>::value>
 struct GridPartViewHolder
 {
@@ -58,6 +60,9 @@ struct GridPartViewHolder
     : grid_view_(grid_view)
   {
   }
+
+  GridPartViewHolder(const GridPartViewHolder& other) = default;
+  GridPartViewHolder(GridPartViewHolder&& source) = default;
 
   const type& real_grid_view() const
   {
@@ -71,6 +76,9 @@ template <class GPV>
 struct GridPartViewHolder<GPV, false>
 {
   typedef typename GPV::GridViewType type;
+
+  GridPartViewHolder(const GridPartViewHolder& other) = default;
+  GridPartViewHolder(GridPartViewHolder&& source) = default;
 
   GridPartViewHolder(GPV grid_part)
     : grid_view_(grid_part)
@@ -86,6 +94,7 @@ struct GridPartViewHolder<GPV, false>
   const GPV grid_view_;
   const type grid_part_;
 };
+
 
 } // namespace internal
 
@@ -104,6 +113,11 @@ public:
     : internal::GridPartViewHolder<GridViewImp>(grd_vw)
   {
   }
+
+  /// \sa https://github.com/dune-community/dune-gdt/issues/89
+  Walker(const Walker& other) = delete; // <- b.c. of the functors: type-erasue = no copy!
+
+  Walker(Walker&& source) = default;
 
   const GridViewType& grid_view() const
   {
