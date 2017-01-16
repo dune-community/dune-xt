@@ -189,7 +189,8 @@ public:
   } // ... append(...)
 
   template <class... Args>
-  DUNE_DEPRECATED_MSG("Use append() instead (since 11.01.2017)!") ThisType& add(Args&&... args)
+  DUNE_DEPRECATED_MSG("Use append() instead (since 11.01.2017)!")
+  ThisType& add(Args&&... args)
   {
     return append(std::forward<Args>(args)...);
   }
