@@ -8,6 +8,7 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
+#include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/common/configuration.pbh>
 #include <dune/xt/common/fvector.pbh>
 
@@ -125,6 +126,25 @@ PYBIND11_PLUGIN(grid)
 
   addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m, "2d_cube_yaspgrid");
   addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m, "2d_simplex_aluconform");
+
+  m.def("init_logger",
+        [](const ssize_t max_info_level,
+           const ssize_t max_debug_level,
+           const bool enable_warnings,
+           const bool enable_colors,
+           const std::string& info_color,
+           const std::string& debug_color,
+           const std::string& warning_color) {
+          Dune::XT::Common::TimedLogger().create(
+              max_info_level, max_debug_level, enable_warnings, enable_colors, info_color, debug_color, warning_color);
+        },
+        "max_info_level"_a = -1,
+        "max_debug_level"_a = -1,
+        "enable_warnings"_a = true,
+        "enable_colors"_a = true,
+        "info_color"_a = "blue",
+        "debug_color"_a = "darkgray",
+        "warning_color"_a = "red");
 
   return m.ptr();
 }
