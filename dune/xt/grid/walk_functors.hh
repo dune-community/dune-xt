@@ -59,7 +59,7 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
   while (true) {
     grid.preAdapt();
     Walker<View> gw(view);
-    gw.add(f);
+    gw.append(f);
     gw.walk();
     if (!grid.adapt())
       break;

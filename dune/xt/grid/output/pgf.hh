@@ -237,7 +237,7 @@ public:
       file << "\\begin{tikzpicture}\n";
     Walker<typename GridType::LeafGridView> gridWalk(grid_.leafGridView());
     PgfEntityFunctorIntersections<typename GridType::LeafGridView> pgf(grid_.leafGridView(), file);
-    gridWalk.add(pgf);
+    gridWalk.append(pgf);
     gridWalk.walk();
 
     file << "\\end{tikzpicture}\n";
@@ -271,7 +271,7 @@ public:
       Walker<ViewType> gridWalk(view);
       PgfEntityFunctorIntersectionsWithShift<ViewType> pgf(
           view, file, texcolors_[std::min(i, int(texcolors_.size()))], i, true);
-      gridWalk.add(pgf);
+      gridWalk.append(pgf);
       gridWalk.walk();
       file << "%%%%%%%%%%%%%%%" << view.size(0) << "%%%%%%%%%%%%%%%%\n";
     }
@@ -312,13 +312,13 @@ public:
         file << buffer;
         Walker<ViewType> gridWalk(view);
         PgfEntityFunctorIntersections<ViewType> thisLevel(view, file, "black", true);
-        gridWalk.add(thisLevel);
+        gridWalk.append(thisLevel);
         gridWalk.walk();
       }
       typedef typename GridType::LeafGridView LeafView;
       Walker<LeafView> leafWalk(grid_.leafGridView());
       MinMaxCoordinateFunctor<LeafView> minMaxCoord;
-      leafWalk.add(minMaxCoord);
+      leafWalk.append(minMaxCoord);
       leafWalk.walk();
 
       switch (int(GridType::dimensionworld)) {
