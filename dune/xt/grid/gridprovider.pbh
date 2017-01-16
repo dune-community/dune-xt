@@ -56,38 +56,25 @@ void bind_make_cube_grid(pybind11::module& m, const std::string& grid_id)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef GridProvider<G> GridProviderType;
-
   m.def(std::string("make_cube_grid__" + grid_id).c_str(),
-        (GridProviderType(*)(const Common::Configuration&))make_cube_grid<G>,
+        [](const Common::Configuration& cfg) { return make_cube_grid<G>(cfg); },
         "cfg"_a = cube_gridprovider_default_config());
 
-  m.def(
-      std::string("make_cube_grid__" + grid_id).c_str(),
-      (GridProviderType(*)(const typename G::ctype&,
-                           const typename G::ctype&,
-                           const unsigned int,
-                           const unsigned int,
-                           const unsigned int))make_cube_grid<G>,
-      "lower_left"_a,
-      "upper_right"_a,
-      "num_elements"_a = cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")[0],
-      "num_refinements"_a = cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
-      "overlap_size"_a = cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")[0]);
-
-  m.def(
-      std::string("make_cube_grid__" + grid_id).c_str(),
-      (GridProviderType(*)(const FieldVector<typename G::ctype, G::dimension>&,
-                           const FieldVector<typename G::ctype, G::dimension>&,
-                           const std::array<unsigned int, G::dimension>,
-                           const unsigned int,
-                           const std::array<unsigned int, G::dimension>))make_cube_grid<G>,
-      "lower_left"_a,
-      "upper_right"_a,
-      "num_elements"_a = cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")[0],
-      "num_refinements"_a = cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
-      "overlap_size"_a = cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")[0]);
-
+  m.def(std::string("make_cube_grid__" + grid_id).c_str(),
+        [](const FieldVector<typename G::ctype, G::dimension>& lower_left,
+           const FieldVector<typename G::ctype, G::dimension>& upper_right,
+           const std::array<unsigned int, G::dimension>& num_elements,
+           const unsigned int num_refinements,
+           const std::array<unsigned int, G::dimension>& overlap_size) {
+          return make_cube_grid<G>(lower_left, upper_right, num_elements, num_refinements, overlap_size);
+        },
+        "lower_left"_a,
+        "upper_right"_a,
+        "num_elements"_a =
+            cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements").at(0),
+        "num_refinements"_a = cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
+        "overlap_size"_a =
+            cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size").at(0));
 } // ... bind_make_cube_grid(...)
 
 
