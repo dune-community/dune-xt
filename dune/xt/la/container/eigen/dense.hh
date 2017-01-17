@@ -288,7 +288,7 @@ public:
    *  \brief  This constructor does not do a deep copy.
    */
   EigenMappedDenseVector(const ThisType& other)
-   : BaseType()
+    : BaseType()
   {
     backend_ = other.backend_;
   }
