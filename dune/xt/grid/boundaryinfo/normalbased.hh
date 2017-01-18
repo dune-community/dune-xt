@@ -33,6 +33,8 @@ static inline Common::Configuration normalbased_boundaryinfo_default_config()
   return config;
 }
 
+// We do not want to add a virtual destructor (to be able to use this as constexpr),
+// so just silence the warning.
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
