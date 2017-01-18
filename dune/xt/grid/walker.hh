@@ -21,10 +21,8 @@
 #include <dune/common/deprecated.hh>
 
 #if HAVE_TBB
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) // EXADUNE
-#include <dune/grid/utility/partitioning/ranged.hh>
+#include <dune/xt/grid/parallel/partitioning/ranged.hh>
 #include <dune/xt/common/parallel/threadmanager.hh>
-#endif
 
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
@@ -264,16 +262,17 @@ public:
 
   void walk(const bool use_tbb = false)
   {
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
+#if HAVE_TBB
     if (use_tbb) {
-      const auto num_partitions = DSC_CONFIG_GET("threading.partition_factor", 1u) * threadManager().current_threads();
+      const auto num_partitions =
+          DXTC_CONFIG_GET("threading.partition_factor", 1u) * XT::Common::threadManager().current_threads();
       RangedPartitioning<typename internal::GridPartViewHolder<GridViewType>::type, 0> partitioning(
           this->real_grid_view(), num_partitions);
       this->walk(partitioning);
       return;
     }
 #else
-    const auto DXTC_UNUSED(no_warning_for_use_tbb) = use_tbb;
+    DUNE_UNUSED const auto no_warning_for_use_tbb = use_tbb;
 #endif
     // prepare functors
     prepare();
