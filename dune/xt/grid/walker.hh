@@ -21,11 +21,7 @@
 #include <dune/common/deprecated.hh>
 
 #if HAVE_TBB
-#if DUNE_VERSION_NEWER(DUNE_GRID, 3, 9) // EXADUNE
-#include <dune/grid/utility/partitioning/ranged.hh>
-#else
 #include <dune/xt/grid/parallel/partitioning/ranged.hh>
-#endif
 #include <dune/xt/common/parallel/threadmanager.hh>
 
 #include <tbb/blocked_range.h>
