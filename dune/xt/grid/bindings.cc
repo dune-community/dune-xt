@@ -20,6 +20,7 @@
 #include "boundaryinfo.pbh"
 #include "gridprovider.pbh"
 #include "walker.pbh"
+#include "walker/apply-on.pbh"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -108,7 +109,9 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
           return *NormalBasedBoundaryInfo<typename Intersection<V>::Type>::create(cfg);                                \
         },                                                                                                             \
         "grid_provider"_a,                                                                                             \
-        "cfg"_a = normalbased_boundaryinfo_default_config()) /* end BIND */
+        "cfg"_a = normalbased_boundaryinfo_default_config());                                                          \
+  addbind_WhichIntersection<V>(m, grid_id, id); /*                                                           end BIND  \
+                                                   */
 
   BIND(LevelView, "level_view");
   BIND(LeafView, "leaf_view");
