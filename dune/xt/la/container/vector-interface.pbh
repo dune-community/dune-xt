@@ -76,16 +76,38 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
         },
         "Assigns the elements of the iterable to the vector.");
 
-  c.def("__repr__", [id](const C& self) {
-    std::stringstream ss;
-    ss << id << "([";
-    if (self.size() > 0)
-      ss << self[0];
-    for (size_t ii = 1; ii < self.size(); ++ii)
-      ss << " " << self[ii];
-    ss << "])";
-    return ss.str();
-  });
+  c.def("__repr__",
+        [id](const C& self) {
+          std::stringstream ss;
+          ss << id << "([";
+          if (self.size() > 0)
+            ss << self[0];
+          for (size_t ii = 1; ii < std::min(size_t(3), self.size()); ++ii)
+            ss << " " << self[ii];
+          if (self.size() > 8) {
+            ss << " ...";
+          } else {
+            for (ssize_t ii = std::min(size_t(3), self.size()); ii < ssize_t(self.size()) - 3; ++ii)
+              ss << " " << self[ii];
+          }
+          for (size_t ii = std::max(ssize_t(3), ssize_t(self.size()) - 3); ii < self.size(); ++ii)
+            ss << " " << self[ii];
+          ss << "])";
+          return ss.str();
+        },
+        "A compact representation of the vector (only the first and last three elements).");
+  c.def("__str__",
+        [id](const C& self) {
+          std::stringstream ss;
+          ss << id << "([";
+          if (self.size() > 0)
+            ss << self[0];
+          for (size_t ii = 1; ii < self.size(); ++ii)
+            ss << " " << self[ii];
+          ss << "])";
+          return ss.str();
+        },
+        "A full representation of the vector.");
   c.def("__len__", [](const C& self) { return self.size(); });
   c.def("__getitem__", [](const C& vec, size_t ii) -> S {
     if (ii >= vec.size())
