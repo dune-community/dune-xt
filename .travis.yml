@@ -39,9 +39,8 @@ before_install:
   # workaround for gnutls bug is using git built against curl-openssl (cannot go into apt script below)
   - sudo -E rm /etc/apt/sources.list.d/*git*.list
   - sudo -E add-apt-repository -y ppa:pymor/travis && sudo -E aptitude update && sudo -E aptitude install git -yq
-  - test -d ${SUPERDIR}/ || git clone https://github.com/dune-community/dune-xt-super.git ${SUPERDIR}/
+  - test -d ${SUPERDIR}/ || git clone --branch=python-bindings https://github.com/dune-community/dune-xt-super.git ${SUPERDIR}/
   - cd ${SUPERDIR}/
-  - git checkout python-bindings
   - git submodule update --init --recursive
   - git submodule status ; git status
   - ${SUPERDIR}/.travis/trusty_apt_setup.bash
@@ -138,13 +137,10 @@ matrix:
       env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-la"
     - os: linux
       addons: *gcc49
-      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-la dune-fem dune-pdelab dune-typetree  dune-istl"
-    - os: linux
-      addons: *gcc49
-      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-la dune-fem dune-pdelab"
+      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-la dune-fem dune-pdelab dune-typetree  dune-istl dune-pybindxi"
 
     - os: linux
-      addons:
+      addons: &gcc5
         apt:
           sources:
           - *commonsources
@@ -153,9 +149,12 @@ matrix:
           - *commonpackages
           - ['g++-5', 'gcc-5']
       env: CXX=g++-5 CC=gcc-5 MODULES_TO_DELETE="dune-xt-la"
+    - os: linux
+      addons: *gcc5
+      env: CXX=g++-5 CC=gcc-5 MODULES_TO_DELETE="dune-xt-la dune-fem dune-pdelab dune-typetree  dune-istl dune-pybindxi"
 
     - os: linux
-      addons:
+      addons: &clang38
         apt:
           sources:
           - *commonsources
@@ -163,6 +162,9 @@ matrix:
           packages:
           - *commonpackages
       env: CXX=clang++-3.8 CC=clang-3.8 MODULES_TO_DELETE="dune-xt-la" CLANG_FORMAT="/usr/bin/clang-format-3.8"
+    - os: linux
+      addons: *clang38
+      env: CXX=clang++-3.8 CC=clang-3.8 MODULES_TO_DELETE="dune-xt-la dune-fem dune-pdelab dune-typetree  dune-istl dune-pybindxi" CLANG_FORMAT="/usr/bin/clang-format-3.8"
 
     - os: linux
       addons:
@@ -174,14 +176,3 @@ matrix:
           - *commonpackages
       # fake last module to delete to distinguish testlogs
       env: OPTS=config.opts/travis.make BUILD_CMD="make -k -j2" CXX=clang++-3.8 CC=clang-3.8 MODULES_TO_DELETE="dune-xt-la with-make"
-
-    #- os: linux
-      #addons:
-        #apt:
-          #sources:
-          #- *commonsources
-          #- ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8']
-          #packages:
-          #- *commonpackages
-          #- ['clang-3.8']
-      #env: CXX=clang++-3.8 CC=clang-3.8 MODULES_TO_DELETE="dune-xt-la"
