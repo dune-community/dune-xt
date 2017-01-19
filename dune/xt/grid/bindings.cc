@@ -91,6 +91,7 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
                               || std::is_same<LPI, FPI>::value)>::template addbind<G>(m, grid_id, "_level_part");
 #endif // HAVE_DUNE_FEM
 
+
 #define BIND(V, id)                                                                                                    \
   bind_Walker<V>(m, grid_id + "_" + id);                                                                               \
                                                                                                                        \
@@ -104,7 +105,7 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
           return AllNeumannBoundaryInfo<typename Intersection<V>::Type>();                                             \
         },                                                                                                             \
         "grid_provider"_a);                                                                                            \
-  m.def(std::string(std::string("make_all_normalbased_boundary_info__") + id).c_str(),                                 \
+  m.def(std::string(std::string("make_normalbased_boundary_info__") + id).c_str(),                                     \
         [](const GridProvider<typename extract_grid<V>::type>& /*grid_provider*/, const Common::Configuration& cfg) {  \
           return *NormalBasedBoundaryInfo<typename Intersection<V>::Type>::create(cfg);                                \
         },                                                                                                             \
