@@ -32,6 +32,8 @@ struct for_Grid_and_Intersection
   static void addbind(py::module& m, const std::string& grid_id, const std::string& id)
   {
     using namespace Dune::XT::Grid;
+    pybind11::class_<BoundaryInfo<I>>(
+        m, std::string("BoundaryInfo__" + grid_id + id).c_str(), std::string("BoundaryInfo__" + grid_id + id).c_str());
     bind_BoundaryInfo<AllDirichletBoundaryInfo<I>>(m, "AllDirichletBoundaryInfo__" + grid_id + id);
     bind_BoundaryInfo<AllNeumannBoundaryInfo<I>>(m, "AllNeumannBoundaryInfo__" + grid_id + id);
     bind_BoundaryInfo<NormalBasedBoundaryInfo<I>>(m, "NormalBasedBoundaryInfo__" + grid_id + id);
