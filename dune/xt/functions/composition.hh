@@ -48,7 +48,7 @@ struct GeneralLocalfunctionChooser
     Localfunction(const EntityType& entity,
                   const InnerType& inner_function,
                   const OuterType& outer_function,
-                  typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>>& entity_search)
+                  std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search)
       : BaseType(entity)
       , inner_function_(inner_function)
       , outer_function_(outer_function)
@@ -71,7 +71,7 @@ struct GeneralLocalfunctionChooser
       // evaluate inner function
       const auto inner_value = inner_function_.local_function(entity_)->evaluate(xx);
       // find entity on outer grid the value of inner function belongs to
-      const auto entity_ptrs = (**entity_search_)(std::vector<typename OuterType::DomainType>(1, inner_value));
+      const auto entity_ptrs = (*entity_search_)(std::vector<typename OuterType::DomainType>(1, inner_value));
       const auto& entity_ptr = entity_ptrs[0];
       if (entity_ptr == nullptr)
         DUNE_THROW(Dune::InvalidStateException,
@@ -89,7 +89,7 @@ struct GeneralLocalfunctionChooser
   private:
     const InnerType& inner_function_;
     const OuterType& outer_function_;
-    typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>>& entity_search_;
+    mutable std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search_;
     const EntityType& entity_;
   }; // class Localfunction
 }; // GeneralLocalfunctionChooser
@@ -121,11 +121,10 @@ struct LocalfunctionForGlobalChooser
         BaseType;
 
   public:
-    Localfunction(
-        const EntityType& entity,
-        const InnerType& localizable_function,
-        const OuterType& global_function,
-        const typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>>& /*entity_search*/)
+    Localfunction(const EntityType& entity,
+                  const InnerType& localizable_function,
+                  const OuterType& global_function,
+                  std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& /*entity_search*/)
       : BaseType(entity)
       , localizable_function_(localizable_function)
       , global_function_(global_function)
@@ -272,7 +271,7 @@ public:
 private:
   const InnerType inner_function_;
   const OuterType outer_function_;
-  mutable typename Common::PerThreadValue<std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>> entity_search_;
+  mutable std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>> entity_search_;
   std::string name_;
 }; // class Composition
 
