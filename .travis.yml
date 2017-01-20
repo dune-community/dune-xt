@@ -124,20 +124,6 @@ env:
 matrix:
   include:
     - os: linux
-      addons: &gcc49
-        apt:
-          sources:
-          - *commonsources
-          - 'ubuntu-toolchain-r-test'
-          packages:
-          - *commonpackages
-          - ['g++-4.9', 'gcc-4.9']
-      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-la dune-xt-functions"
-    - os: linux
-      addons: *gcc49
-      env: CXX=g++-4.9 CC=gcc-4.9 MODULES_TO_DELETE="dune-xt-la dune-xt-functions dune-fem dune-pdelab dune-typetree  dune-istl dune-pybindxi"
-
-    - os: linux
       addons: &gcc5
         apt:
           sources:
