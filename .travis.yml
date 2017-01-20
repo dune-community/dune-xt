@@ -29,6 +29,9 @@ addons:
     - curl
     - ninja-build
     - python3-requests
+    - libmetis-dev
+    - metis
+    - libparmetis-dev
 
 before_install:
   - |-
