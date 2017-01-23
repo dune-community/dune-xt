@@ -10,7 +10,11 @@ set(lib_dune_xt_la_sources
 
 dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
 
+if(dune-pybindxi_FOUND)
+  dune_pybindxi_add_module(_la bindings.cc)
+  target_link_dune_default_libraries(_la)
+endif()
+
 add_subdirectory(test EXCLUDE_FROM_ALL)
 
-include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 

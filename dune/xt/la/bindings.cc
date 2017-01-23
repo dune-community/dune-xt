@@ -35,11 +35,11 @@ namespace LA = Dune::XT::LA;
 using namespace pybind11::literals;
 
 
-PYBIND11_PLUGIN(la)
+PYBIND11_PLUGIN(_la)
 {
-  py::module m("la", "dune-xt-la");
+  py::module m("_la", "dune-xt-la");
 
-  py::module::import("common");
+  py::module::import("dune.xt.common");
 
   LA::bind_Backends(m);
 
