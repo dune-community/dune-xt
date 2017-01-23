@@ -1,3 +1,12 @@
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2016 - 2017)
+
 #include "config.h"
 
 #if HAVE_DUNE_PYBINDXI
@@ -124,11 +133,11 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
 } // ... addbind_for_Grid(...)
 
 
-PYBIND11_PLUGIN(grid)
+PYBIND11_PLUGIN(_grid)
 {
-  py::module m("grid", "dune-xt-grid");
+  py::module m("_grid", "dune-xt-grid");
 
-  py::module::import("common");
+  py::module::import("dune.xt.common");
 
   addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m, "2d_cube_yaspgrid");
 #if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
