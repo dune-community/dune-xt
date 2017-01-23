@@ -178,12 +178,12 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
 } // ... addbind_for_Grid(...)
 
 
-PYBIND11_PLUGIN(functions)
+PYBIND11_PLUGIN(_functions)
 {
-  py::module m("functions", "dune-xt-functions");
+  py::module m("_functions", "dune-xt-functions");
 
-  py::module::import("common");
-  py::module::import("grid");
+  py::module::import("dune.xt.common");
+  py::module::import("dune.xt.grid");
 
   addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m, "2d_cube_yaspgrid");
 #if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
