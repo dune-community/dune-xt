@@ -183,7 +183,7 @@ public:
     visualize_with_boundary(boundary_info_cfg, filename);
   }
 
-  void global_refine(size_t count)
+  void global_refine(int count)
   {
     grid().preAdapt();
     grid().globalRefine(count);
