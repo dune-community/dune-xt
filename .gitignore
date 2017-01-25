@@ -34,3 +34,5 @@ CMakeLists.txt.user
 *.o
 *.la
 *.user
+.idea
+cmake/modules/petsc
