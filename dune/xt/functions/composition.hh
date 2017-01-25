@@ -89,7 +89,7 @@ struct GeneralLocalfunctionChooser
   private:
     const InnerType& inner_function_;
     const OuterType& outer_function_;
-    mutable std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search_;
+    std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search_;
     const EntityType& entity_;
   }; // class Localfunction
 }; // GeneralLocalfunctionChooser
