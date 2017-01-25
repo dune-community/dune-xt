@@ -35,3 +35,5 @@ data
 *.o
 *.la
 *.user
+cmake/modules/petsc
+.idea
