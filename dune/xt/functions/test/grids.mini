@@ -1,4 +1,4 @@
-dimDomain = 1, 2, 3 | expand
+dimDomain = 1, 3 | expand
 
 __local.geometry = cube, simplex | expand 2
 __local.geometry_is_simplex = false, true | expand 2
