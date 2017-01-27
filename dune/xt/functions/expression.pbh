@@ -62,7 +62,16 @@ struct addbind_ExpressionFunction_scalar_ctor<r, 1>
 } // namespace internal
 
 
-template <class G, size_t r, size_t rC>
+/**
+ * \note We would like to drop the d template paremter and use either of
+\code
+static const           size_t d = G::dimension;
+static const constexpr size_t d = G::dimension;
+\endcode
+ *       but this triggers a bug in gcc-4.9 and we thus need to use G::dimension
+ *       everywhere: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
+ */
+template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<Grid::is_grid<G>::value,
                         pybind11::class_<ExpressionFunction<typename G::template Codim<0>::Entity,
                                                             typename G::ctype,
@@ -77,7 +86,6 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id)
 
   typedef typename G::template Codim<0>::Entity E;
   typedef typename G::ctype D;
-  static const size_t d = G::dimension;
   typedef double R;
 
   typedef LocalizableFunctionInterface<E, D, d, R, r, rC> I;

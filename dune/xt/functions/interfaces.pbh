@@ -157,7 +157,15 @@ bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_i
 } // ... bind_LocalizableFunctionInterface(...)
 
 
-template <class G, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
+/**
+ * \note We would like to drop the d template paremter and use either of
+\code
+static const           size_t d = G::dimension;
+static const constexpr size_t d = G::dimension;
+\endcode
+ *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
+ */
+template <class G, size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
 pybind11::class_<typename internal::get_combined<LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
                                                                               typename G::ctype,
                                                                               G::dimension,
@@ -177,7 +185,6 @@ bind_combined_LocalizableFunction(pybind11::module& m, const std::string& grid_i
 
   typedef typename G::template Codim<0>::Entity E;
   typedef typename G::ctype D;
-  static const size_t d = G::dimension;
   typedef double R;
   typedef LocalizableFunctionInterface<E, D, d, R, lr, lrC> Left;
   typedef LocalizableFunctionInterface<E, D, d, R, rr, rrC> Right;
@@ -199,14 +206,21 @@ bind_combined_LocalizableFunction(pybind11::module& m, const std::string& grid_i
 } // ... bind_combined_LocalizableFunction(...)
 
 
-template <class G, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+/**
+ * \note We would like to drop the d template paremter and use either of
+\code
+static const           size_t d = G::dimension;
+static const constexpr size_t d = G::dimension;
+\endcode
+ *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
+ */
+template <class G, size_t d, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
 void addbind_LocalizableFunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
 
   typedef typename G::template Codim<0>::Entity E;
   typedef typename G::ctype D;
-  static const size_t d = G::dimension;
   typedef LocalizableFunctionInterface<E, D, d, double, r, rC> S;
   typedef LocalizableFunctionInterface<E, D, d, double, oR, orC> O;
 
