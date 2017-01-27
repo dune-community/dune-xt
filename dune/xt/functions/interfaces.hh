@@ -143,12 +143,12 @@ public:
   typedef EntityImp EntityType;
 
   typedef DomainFieldImp DomainFieldType;
-  static const size_t dimDomain = domainDim;
+  static const constexpr size_t dimDomain = domainDim;
   typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
 
   typedef RangeFieldImp RangeFieldType;
-  static const size_t dimRange = rangeDim;
-  static const size_t dimRangeCols = rangeDimCols;
+  static const constexpr size_t dimRange = rangeDim;
+  static const constexpr size_t dimRangeCols = rangeDimCols;
   typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::type RangeType;
   typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::type JacobianRangeType;
 
@@ -237,7 +237,7 @@ public:
   typedef EntityImp EntityType;
 
   typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const size_t dimDomain = BaseType::dimDomain;
+  static const constexpr size_t dimDomain = BaseType::dimDomain;
   typedef typename BaseType::DomainType DomainType;
   typedef typename BaseType::RangeType RangeType;
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
@@ -342,11 +342,11 @@ public:
   typedef EntityImp EntityType;
 
   typedef DomainFieldImp DomainFieldType;
-  static const size_t dimDomain = domainDim;
+  static const constexpr size_t dimDomain = domainDim;
 
   typedef RangeFieldImp RangeFieldType;
-  static const size_t dimRange = rangeDim;
-  static const size_t dimRangeCols = rangeDimCols;
+  static const constexpr size_t dimRange = rangeDim;
+  static const constexpr size_t dimRangeCols = rangeDimCols;
 
   typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
       LocalfunctionType;
