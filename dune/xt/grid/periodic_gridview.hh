@@ -13,6 +13,7 @@
 #define DUNE_XT_GRID_PERIODICVIEW_HH
 
 #include <bitset>
+#include <iterator>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -631,6 +632,11 @@ public:
 
     public:
       typedef typename IndexSet::IndexType IndexType;
+      typedef std::ptrdiff_t difference_type;
+      typedef const typename RealGridViewImp::template Codim<0>::Entity value_type;
+      typedef value_type* pointer;
+      typedef value_type& reference;
+      typedef std::forward_iterator_tag iterator_category;
 
       PeriodicIterator(BaseType real_iterator,
                        const std::array<std::unordered_set<IndexType>, num_geometries>* entities_to_skip,
@@ -679,6 +685,11 @@ public:
 
       public:
         typedef typename IndexSet::IndexType IndexType;
+        typedef std::ptrdiff_t difference_type;
+        typedef const typename RealGridViewImp::template Codim<0>::Entity value_type;
+        typedef value_type* pointer;
+        typedef value_type& reference;
+        typedef std::forward_iterator_tag iterator_category;
 
         PeriodicIterator(BaseType real_iterator,
                          const std::array<std::unordered_set<IndexType>, num_geometries>* entities_to_skip,
