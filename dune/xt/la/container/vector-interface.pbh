@@ -142,11 +142,11 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   c.def("add_to_entry", &C::add_to_entry, "ii"_a, "value"_a);
   c.def("set_entry", &C::set_entry, "ii"_a, "value"_a);
   c.def("get_entry", &C::get_entry);
-  c.def("set_all", &C::set_all);
-  c.def("valid", &C::valid);
-  c.def("dim", &C::dim);
-  c.def("mean", &C::mean);
-  c.def("amax", &C::amax);
+  c.def("set_all", [](C& self, const S& value) { self.set_all(value); }, "value"_a);
+  c.def("valid", [](const C& self) { return self.valid(); });
+  c.def("dim", [](const C& self) { return self.dim(); });
+  c.def("mean", [](const C& self) { return self.mean(); });
+  c.def("amax", [](const C& self) { return self.amax(); });
   c.def("almost_equal",
         [](const C& self, const C& other, const S& epsilon) { return self.almost_equal(other, epsilon); },
         "other"_a,
@@ -155,7 +155,7 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   c.def("l1_norm", &C::l1_norm);
   c.def("l2_norm", &C::l2_norm);
   c.def("sup_norm", &C::sup_norm);
-  c.def("standard_deviation", &C::standard_deviation);
+  c.def("standard_deviation", [](const C& self) { return self.standard_deviation(); });
 
   addbind_ContainerInterface(c);
 
