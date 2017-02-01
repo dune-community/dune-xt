@@ -51,7 +51,14 @@ typename std::enable_if<is_container<C>::value, void>::type addbind_ContainerInt
 
   typedef typename C::ScalarType S;
 
-  c.def("copy", &C::copy);
+  c.def("copy",
+        [](C& self, const bool deep) {
+          if (deep)
+            return self.copy();
+          else
+            return C(self);
+        },
+        "deep"_a = false);
   c.def("scal", &C::scal);
   c.def("axpy", [](C& self, const S& alpha, const C& xx) { self.axpy(alpha, xx); });
   c.def("has_equal_shape", &C::has_equal_shape);
