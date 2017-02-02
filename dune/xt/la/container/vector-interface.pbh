@@ -157,6 +157,19 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   c.def("sup_norm", &C::sup_norm);
   c.def("standard_deviation", [](const C& self) { return self.standard_deviation(); });
 
+  c.def("__getstate__", [](const C& self) { return py::make_tuple(std::vector<S>(self)); });
+  c.def("__setstate__", [](C& self, py::tuple t) {
+    if (t.size() != 1)
+      throw std::runtime_error("Invalid state!");
+    auto data = t[0].cast<std::vector<S>>();
+    /* Invoke the in-place constructor. Note that this is needed even
+    when the object just has a trivial default constructor */
+    new (&self) C(data.size());
+    /* Assign any additional state */
+    for (size_t ii = 0; ii < self.size(); ++ii)
+      self[ii] = data[ii];
+  });
+
   addbind_ContainerInterface(c);
 
   return c;
