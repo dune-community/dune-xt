@@ -38,4 +38,18 @@ def init_mpi(args=list()):
     _init_mpi(args)
 
 
+try:
+    from ._la import IstlDenseVector_double
+    HAVE_DUNE_ISTL = True
+except ImportError:
+    HAVE_DUNE_ISTL = False
+
+try:
+    from ._la import EigenDenseVector_double
+    HAVE_EIGEN = True
+except ImportError:
+    HAVE_EIGEN = False
+
+
 from ._la import *
+
