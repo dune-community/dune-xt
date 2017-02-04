@@ -99,8 +99,6 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
 
   addbind_ProvidesBackend(c);
 
-  c.def_property_readonly_static("vector_type", [](py::object /*self*/) { return C::vector_type; });
-
   internal::addbind_Matrix<C, sparse>::template ctor<S>(c);
   c.def("__init__",
         [](C& self, const ssize_t rows, const ssize_t cols, const SparsityPatternDefault& pattern) {
@@ -161,14 +159,17 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
 } // ... bind_Matrix(...)
 
 
-template <class V, class M>
-void addbind_Matrix_Vector_interaction(pybind11::class_<M>& c)
+template <class M, class V>
+void addbind_Matrix_Vector_interaction(pybind11::class_<M>& mat, pybind11::class_<V>& vec)
 {
   namespace py = pybind11;
 
-  c.def("mv", [](const M& self, const V& xx, V& yy) { self.mv(xx, yy); }, "source", "range");
+  mat.def("mv", [](const M& self, const V& xx, V& yy) { self.mv(xx, yy); }, "source", "range");
 
-  c.def(py::self * V());
+  mat.def(py::self * V());
+
+  mat.def("vector_type", [vec](M& /*self*/) { return vec; });
+  vec.def("matrix_type", [mat](V& /*self*/) { return mat; });
 } // ... addbind_Matrix_Vector_interaction(...)
 
 

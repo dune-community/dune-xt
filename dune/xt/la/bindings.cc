@@ -43,12 +43,12 @@ PYBIND11_PLUGIN(_la)
 
   LA::bind_Backends(m);
 
-  LA::bind_Vector<LA::CommonDenseVector<double>>(m, "CommonDenseVector_double");
+  auto common_dense_vector_double = LA::bind_Vector<LA::CommonDenseVector<double>>(m, "CommonDenseVector_double");
 #if HAVE_DUNE_ISTL
-  LA::bind_Vector<LA::IstlDenseVector<double>>(m, "IstlDenseVector_double");
+  auto istl_dense_vector_double = LA::bind_Vector<LA::IstlDenseVector<double>>(m, "IstlDenseVector_double");
 #endif
 #if HAVE_EIGEN
-  LA::bind_Vector<LA::EigenDenseVector<double>>(m, "EigenDenseVector_double");
+  auto eigen_dense_vector_double = LA::bind_Vector<LA::EigenDenseVector<double>>(m, "EigenDenseVector_double");
 #endif
 
   LA::bind_SparsityPatternDefault(m);
@@ -56,7 +56,7 @@ PYBIND11_PLUGIN(_la)
 #define BIND_MATRIX(C, s, c, id) auto c = LA::bind_Matrix<C, s>(m, id);
 
   BIND_MATRIX(LA::CommonDenseMatrix<double>, false, common_dense_matrix_double, "CommonDenseMatrix_double");
-  BIND_MATRIX(LA::CommonSparseMatrix<double>, true, common_sparse_matrix_double, "CommonSparseMatrix_double");
+//  BIND_MATRIX(LA::CommonSparseMatrix<double>, true, common_sparse_matrix_double, "CommonSparseMatrix_double");
 #if HAVE_DUNE_ISTL
   BIND_MATRIX(LA::IstlRowMajorSparseMatrix<double>,
               true,
@@ -71,14 +71,14 @@ PYBIND11_PLUGIN(_la)
               "EigenRowMajorSparseMatrix_double");
 #endif
 #undef BIND_MATRIX
-  LA::addbind_Matrix_Vector_interaction<LA::CommonDenseVector<double>>(common_dense_matrix_double);
-  LA::addbind_Matrix_Vector_interaction<LA::CommonDenseVector<double>>(common_sparse_matrix_double);
+  LA::addbind_Matrix_Vector_interaction(common_dense_matrix_double, common_dense_vector_double);
+//  LA::addbind_Matrix_Vector_interaction(common_sparse_matrix_double, common_dense_vector_double);
 #if HAVE_DUNE_ISTL
-  LA::addbind_Matrix_Vector_interaction<LA::IstlDenseVector<double>>(istl_row_major_sparse_matrix_double);
+  LA::addbind_Matrix_Vector_interaction(istl_row_major_sparse_matrix_double, istl_dense_vector_double);
 #endif
 #if HAVE_EIGEN
-  LA::addbind_Matrix_Vector_interaction<LA::EigenDenseVector<double>>(eigen_dense_matrix_double);
-  LA::addbind_Matrix_Vector_interaction<LA::EigenDenseVector<double>>(eigen_row_major_sparse_matrix_double);
+  LA::addbind_Matrix_Vector_interaction(eigen_dense_matrix_double, eigen_dense_vector_double);
+  LA::addbind_Matrix_Vector_interaction(eigen_row_major_sparse_matrix_double, eigen_dense_vector_double);
 #endif
 
   LA::bind_Solver<LA::CommonDenseMatrix<double>>(m, "CommonDenseMatrix_double");
