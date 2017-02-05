@@ -1038,10 +1038,29 @@ public:
 
 }; // class PeriodicGridView
 
+
+template <bool use_less_memory, class GV>
+PeriodicGridView<GV, use_less_memory>
+make_periodic_grid_view(const GV& real_grid_view,
+                        const std::bitset<GV::dimension> periodic_directions = std::bitset<GV::dimension>().set())
+{
+  return PeriodicGridView<GV, use_less_memory>(real_grid_view, periodic_directions);
+}
+
+template <class GV>
+PeriodicGridView<GV>
+make_periodic_grid_view(const GV& real_grid_view,
+                        const std::bitset<GV::dimension> periodic_directions = std::bitset<GV::dimension>().set())
+{
+  return PeriodicGridView<GV>(real_grid_view, periodic_directions);
+}
+
+
 template <class T, bool bb>
 struct is_grid_view<PeriodicGridView<T, bb>> : public std::true_type
 {
 };
+
 
 } // namespace Grid
 } // namespace XT
