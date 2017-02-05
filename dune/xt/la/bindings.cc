@@ -64,7 +64,7 @@ PYBIND11_PLUGIN(_la)
               "IstlRowMajorSparseMatrix_double");
 #endif
 #if HAVE_EIGEN
-  BIND_MATRIX(LA::EigenDenseMatrix<double>, false, eigen_dense_matrix_double, "EigenDenseMatrix_double");
+  //  BIND_MATRIX(LA::EigenDenseMatrix<double>, false, eigen_dense_matrix_double, "EigenDenseMatrix_double");
   BIND_MATRIX(LA::EigenRowMajorSparseMatrix<double>,
               true,
               eigen_row_major_sparse_matrix_double,
@@ -77,7 +77,7 @@ PYBIND11_PLUGIN(_la)
   LA::addbind_Matrix_Vector_interaction(istl_row_major_sparse_matrix_double, istl_dense_vector_double);
 #endif
 #if HAVE_EIGEN
-  LA::addbind_Matrix_Vector_interaction(eigen_dense_matrix_double, eigen_dense_vector_double);
+  //  LA::addbind_Matrix_Vector_interaction(eigen_dense_matrix_double, eigen_dense_vector_double);
   LA::addbind_Matrix_Vector_interaction(eigen_row_major_sparse_matrix_double, eigen_dense_vector_double);
 #endif
 
