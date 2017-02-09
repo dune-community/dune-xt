@@ -5,7 +5,7 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2014 - 2017)
+//   Felix Schindler (2014 - 2016)
 //   Rene Milk       (2014 - 2016)
 //   Tobias Leibner  (2014 - 2015)
 
@@ -384,41 +384,4 @@ protected:
 } // namespace XT
 } // namespace Dune
 
-#if HAVE_DUNE_PYBINDXI
-
-#include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/layers.hh>
-
-namespace Dune {
-namespace XT {
-namespace Grid {
-
-
-extern template class Walker<
-    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::leaf, Backends::view>::type>;
-extern template class Walker<
-    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::level, Backends::view>::type>;
-#if HAVE_DUNE_FEM
-extern template class Walker<
-    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::leaf, Backends::part>::type>;
-extern template class Walker<
-    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::level, Backends::part>::type>;
-#endif // HAVE_DUNE_FEM
-
-
-#if HAVE_ALUGRID
-extern template class Walker<typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::leaf, Backends::view>::type>;
-extern template class Walker<typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::level, Backends::view>::type>;
-#if HAVE_DUNE_FEM
-extern template class Walker<typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::leaf, Backends::part>::type>;
-extern template class Walker<typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::level, Backends::part>::type>;
-#endif // HAVE_DUNE_FEM
-#endif // HAVE_ALUGRID
-
-
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
-
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_GRID_WALKER_HH

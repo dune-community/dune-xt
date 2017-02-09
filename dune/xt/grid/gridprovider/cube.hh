@@ -7,10 +7,10 @@
 // Authors:
 //   Andreas Buhr     (2014)
 //   Barbara Verfürth (2015)
-//   Felix Schindler  (2012 - 2017)
+//   Felix Schindler  (2012 - 2016)
 //   Kirsten Weber    (2012)
-//   Rene Milk        (2012 - 2016)
-//   Tobias Leibner   (2014, 2016)
+//   Rene Milk        (2012 - 2015)
+//   Tobias Leibner   (2014)
 
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_CUBE_HH
 #define DUNE_XT_GRID_GRIDPROVIDER_CUBE_HH
@@ -262,58 +262,4 @@ make_cube_grid(const Common::Configuration& cfg = cube_gridprovider_default_conf
 } // namespace XT
 } // namespace Dune
 
-// somhow this does not work yet
-
-//#if HAVE_DUNE_PYBINDXI
-
-//#include <dune/xt/grid/grids.hh>
-
-// namespace Dune {
-// namespace XT {
-// namespace Grid {
-
-
-// extern template GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>
-// make_cube_grid(const FieldVector<typename YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>::ctype, 2>&,
-//               const FieldVector<typename YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>::ctype, 2>&,
-//               const std::array<unsigned int, 2> num_elements,
-//               const unsigned int num_refinements,
-//               const std::array<unsigned int, 2>);
-
-// extern template GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>
-// make_cube_grid(const typename YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>::ctype&,
-//               const typename YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>::ctype&,
-//               const unsigned int num_elements,
-//               const unsigned int num_refinements,
-//               const unsigned int overlap_size);
-
-// extern template GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>
-// make_cube_grid(const Common::Configuration&);
-
-//#if HAVE_ALUGRID
-
-// extern template GridProvider<ALUGrid<2, 2, simplex, conforming>>
-// make_cube_grid(const FieldVector<typename ALUGrid<2, 2, simplex, conforming>::ctype, 2>&,
-//               const FieldVector<typename ALUGrid<2, 2, simplex, conforming>::ctype, 2>&,
-//               const std::array<unsigned int, 2> num_elements,
-//               const unsigned int num_refinements,
-//               const std::array<unsigned int, 2>);
-
-// extern template GridProvider<ALUGrid<2, 2, simplex, conforming>>
-// make_cube_grid(const typename ALUGrid<2, 2, simplex, conforming>::ctype&,
-//               const typename ALUGrid<2, 2, simplex, conforming>::ctype&,
-//               const unsigned int num_elements,
-//               const unsigned int num_refinements,
-//               const unsigned int overlap_size);
-
-// extern template GridProvider<ALUGrid<2, 2, simplex, conforming>> make_cube_grid(const Common::Configuration&);
-
-//#endif // HAVE_ALUGRID
-
-
-//} // namespace Grid
-//} // namespace XT
-//} // namespace Dune
-
-//#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_GRID_GRIDPROVIDER_CUBE_HH

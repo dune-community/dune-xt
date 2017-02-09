@@ -9,21 +9,7 @@
 #   Rene Milk       (2016)
 #   Tobias Leibner  (2016)
 
-set(lib_dune_xt_grid_sources
-    grid/boundaryinfo/interfaces.cc
-    )
-
-if(dune-pybindxi_FOUND)
-  list(APPEND lib_dune_xt_grid_sources
-              grid/boundaryinfo/alldirichlet.cc
-              grid/boundaryinfo/allneumann.cc
-              grid/boundaryinfo/normalbased.cc
-              grid/gridprovider/cube.cc
-              grid/gridprovider/provider.cc
-              grid/walker.cc
-       )
-endif()
-
+set(lib_dune_xt_grid_sources grid/boundaryinfo/interfaces.cc)
 dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
 
 add_subdirectory(grid)
