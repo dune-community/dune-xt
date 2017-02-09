@@ -1,14 +1,14 @@
 // This file is part of the dune-xt-la project:
 //   https://github.com/dune-community/dune-xt-la
 // The copyright lies with the authors of this file (see below).
-// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Barbara Verfürth (2015)
-//   Felix Schindler  (2013 - 2017)
-//   Rene Milk        (2014 - 2016)
-//   Tobias Leibner   (2014, 2016)
+//   Felix Schindler  (2013 - 2016)
+//   Rene Milk        (2014 - 2015)
+//   Tobias Leibner   (2014)
 
 #ifndef DUNE_XT_LA_CONTAINER_COMMON_HH
 #define DUNE_XT_LA_CONTAINER_COMMON_HH
@@ -970,23 +970,4 @@ struct MatrixAbstraction<LA::CommonSparseMatrix<T>>
 } // namespace XT
 } // namespace Dune
 
-#if HAVE_DUNE_PYBINDXI
-
-namespace Dune {
-namespace XT {
-namespace LA {
-
-
-extern template class CommonDenseVector<double>;
-
-extern template class CommonDenseMatrix<double>;
-
-extern template class CommonSparseMatrix<double>;
-
-
-} // namespace LA
-} // namespace XT
-} // namespace Dune
-
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_LA_CONTAINER_COMMON_HH

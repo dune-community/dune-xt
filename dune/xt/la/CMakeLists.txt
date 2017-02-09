@@ -1,28 +1,12 @@
 # This file is part of the dune-xt-la project:
 #   https://github.com/dune-community/dune-xt-la
 # The copyright lies with the authors of this file (see below).
-# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
-#          with "runtime exception" (http://www.dune-project.org/license.html)
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 # Authors:
-#   Felix Schindler (2016 - 2017)
-#   Rene Milk       (2016)
-#   Tobias Leibner  (2016)
+#   Felix Schindler (2016)
 
 set(lib_dune_xt_la_sources
-    container/pattern.cc
-    )
-
-if(dune-pybindxi_FOUND)
-  list(APPEND lib_dune_xt_la_sources
-       container/common.cc
-       container/eigen.cc
-       container/istl.cc
-       solver/common.cc
-       solver/eigen.cc
-       solver/istl.cc
-       )
-endif()
+    container/pattern.cc)
 
 dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
 
