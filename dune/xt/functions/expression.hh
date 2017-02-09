@@ -1,13 +1,13 @@
 // This file is part of the dune-xt-functions project:
 //   https://github.com/dune-community/dune-xt-functions
 // The copyright lies with the authors of this file (see below).
-// License: Dual licensed as  BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2012 - 2016)
+//   Felix Schindler (2012 - 2017)
 //   Kirsten Weber   (2013)
-//   Rene Milk       (2012 - 2015)
+//   Rene Milk       (2012 - 2016)
 //   Tobias Leibner  (2014 - 2015)
 
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_HH
@@ -697,4 +697,109 @@ private:
 } // namespace XT
 } // namespace Dune
 
+#if HAVE_DUNE_PYBINDXI
+
+#include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/layers.hh>
+#include <dune/xt/grid/entity.hh>
+
+namespace Dune {
+namespace XT {
+namespace Functions {
+
+
+#define _GRID YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>
+extern template class ExpressionFunction<
+    typename XT::Grid::Entity<
+        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+    typename _GRID::ctype,
+    _GRID::dimension,
+    double,
+    1,
+    1>;
+extern template class ExpressionFunction<
+    typename XT::Grid::Entity<
+        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+    typename _GRID::ctype,
+    _GRID::dimension,
+    double,
+    2,
+    1>;
+// extern template class ExpressionFunction<
+//    typename XT::Grid::Entity<
+//        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+//    typename _GRID::ctype,
+//    _GRID::dimension,
+//    double,
+//    2,
+//    2>;
+extern template class ExpressionFunction<
+    typename XT::Grid::Entity<
+        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+    typename _GRID::ctype,
+    _GRID::dimension,
+    double,
+    3,
+    1>;
+// extern template class ExpressionFunction<
+//    typename XT::Grid::Entity<
+//        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+//    typename _GRID::ctype,
+//    _GRID::dimension,
+//    double,
+//    3,
+//    3>;
+#undef _GRID
+
+#if HAVE_ALUGRID
+#define _GRID ALUGrid<2, 2, simplex, conforming>
+extern template class ExpressionFunction<
+    typename XT::Grid::Entity<
+        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+    typename _GRID::ctype,
+    _GRID::dimension,
+    double,
+    1,
+    1>;
+extern template class ExpressionFunction<
+    typename XT::Grid::Entity<
+        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+    typename _GRID::ctype,
+    _GRID::dimension,
+    double,
+    2,
+    1>;
+// extern template class ExpressionFunction<
+//    typename XT::Grid::Entity<
+//        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+//    typename _GRID::ctype,
+//    _GRID::dimension,
+//    double,
+//    2,
+//    2>;
+extern template class ExpressionFunction<
+    typename XT::Grid::Entity<
+        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+    typename _GRID::ctype,
+    _GRID::dimension,
+    double,
+    3,
+    1>;
+// extern template class ExpressionFunction<
+//    typename XT::Grid::Entity<
+//        typename XT::Grid::Layer<_GRID, XT::Grid::Layers::leaf, XT::Grid::Backends::view>::type>::type,
+//    typename _GRID::ctype,
+//    _GRID::dimension,
+//    double,
+//    3,
+//    3>;
+#undef _GRID
+#endif // HAVE_ALUGRID
+
+
+} // namespace Functions
+} // namespace XT
+} // namespace Dune
+
+#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_HH
