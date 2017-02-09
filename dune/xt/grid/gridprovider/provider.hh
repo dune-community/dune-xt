@@ -6,7 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Andreas Buhr    (2014)
-//   Felix Schindler (2012 - 2016)
+//   Felix Schindler (2012 - 2017)
 //   Kirsten Weber   (2012)
 //   Rene Milk       (2012 - 2016)
 //   Sven Kaulmann   (2014)
@@ -71,7 +71,7 @@ public:
   }
 
   GridProvider(std::unique_ptr<GridType>&& grd_ptr)
-    : grid_ptr_(grd_ptr)
+    : grid_ptr_(std::move(grd_ptr))
   {
   }
 
@@ -129,11 +129,11 @@ public:
     return Layer<GridType, lr, backend>::create(*grid_ptr_, lvl);
   }
 
-  template <Layers lr>
-  typename Layer<GridType, lr, Backends::part>::type layer(const int lvl = 0)
-  {
-    return Layer<GridType, lr, Backends::part>::create(*grid_ptr_, lvl);
-  }
+  //  template <Layers lr>
+  //  typename Layer<GridType, lr, Backends::part>::type layer(const int lvl = 0)
+  //  {
+  //    return Layer<GridType, lr, Backends::part>::create(*grid_ptr_, lvl);
+  //  }
 
   LevelGridViewType level_view(const int lvl) const
   {
@@ -319,5 +319,92 @@ private:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
+
+#if HAVE_DUNE_PYBINDXI
+
+#include <dune/xt/grid/grids.hh>
+
+namespace Dune {
+namespace XT {
+namespace Grid {
+
+
+extern template class GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>;
+
+extern template
+    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::level, Backends::view>::type
+    GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::level<Backends::view>(const int) const;
+
+extern template typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::leaf, Backends::view>::type
+GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::leaf<Backends::view>() const;
+
+extern template typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::leaf, Backends::view>::type
+GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::layer<Layers::leaf, Backends::view>(
+    const int) const;
+
+extern template
+    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::level, Backends::view>::type
+    GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::layer<Layers::level, Backends::view>(
+        const int) const;
+
+#if HAVE_DUNE_FEM
+
+extern template
+    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::level, Backends::part>::type
+    GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::level<Backends::part>(const int lvl) const;
+
+extern template typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::leaf, Backends::part>::type
+GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::leaf<Backends::part>() const;
+
+extern template typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::leaf, Backends::part>::type
+GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::layer<Layers::leaf, Backends::part>(
+    const int) const;
+
+extern template
+    typename Layer<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Layers::level, Backends::part>::type
+    GridProvider<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>::layer<Layers::level, Backends::part>(
+        const int) const;
+
+#endif // HAVE_DUNE_FEM
+
+
+#if HAVE_ALUGRID
+
+extern template class GridProvider<ALUGrid<2, 2, simplex, conforming>>;
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::level, Backends::view>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::level<Backends::view>(const int) const;
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::leaf, Backends::view>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::leaf<Backends::view>() const;
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::leaf, Backends::view>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::layer<Layers::leaf, Backends::view>(const int) const;
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::level, Backends::view>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::layer<Layers::level, Backends::view>(const int) const;
+
+#if HAVE_DUNE_FEM
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::level, Backends::part>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::level<Backends::part>(const int lvl) const;
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::leaf, Backends::part>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::leaf<Backends::part>() const;
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::leaf, Backends::part>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::layer<Layers::leaf, Backends::part>(const int) const;
+
+extern template typename Layer<ALUGrid<2, 2, simplex, conforming>, Layers::level, Backends::part>::type
+GridProvider<ALUGrid<2, 2, simplex, conforming>>::layer<Layers::level, Backends::part>(const int) const;
+
+#endif // HAVE_DUNE_FEM
+#endif // HAVE_ALUGRID
+
+} // namespace Grid
+} // namespace XT
+} // namespace Dune
+
+#endif // HAVE_DUNE_PYBINDXI
 
 #endif // DUNE_XT_GRID_PROVIDER_PROVIDER_HH
