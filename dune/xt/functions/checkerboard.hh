@@ -82,22 +82,29 @@ class CheckerboardFunction
     virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override
     {
       assert(this->is_a_valid_point(xx));
-      jacobian_helper(ret, internal::ChooseVariant<rangeDimCols>());
+      clear_jacobian<rangeDim, rangeDimCols>()(ret);
     }
 
   private:
-    template <size_t rC>
-    void jacobian_helper(JacobianRangeType& ret, internal::ChooseVariant<rC>) const
+    template <size_t _r, size_t _rC, class Anything = void>
+    struct clear_jacobian
     {
-      for (auto& col_jacobian : ret) {
-        col_jacobian *= RangeFieldType(0);
+      void operator()(JacobianRangeType& ret)
+      {
+        for (auto& col_jacobian : ret)
+          col_jacobian *= 0.;
       }
-    }
+    };
 
-    void jacobian_helper(JacobianRangeType& ret, internal::ChooseVariant<1>) const
+    template <class Anything>
+    struct clear_jacobian<1, 1, Anything>
     {
-      ret *= RangeFieldType(0);
-    }
+      void operator()(JacobianRangeType& ret)
+      {
+        ret *= 0.;
+      }
+    };
+
     const RangeType value_;
   }; // class Localfunction
 
