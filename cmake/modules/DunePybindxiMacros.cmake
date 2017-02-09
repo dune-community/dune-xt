@@ -39,3 +39,5 @@ if(NOT MSVC AND NOT DUNE_PYBINDXI_CPP_STANDARD)
 endif()
 
 include(DunePybindxiUtils)
+include(DunePybindxiHelper)
+
