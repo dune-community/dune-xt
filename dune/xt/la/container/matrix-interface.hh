@@ -250,7 +250,9 @@ struct is_matrix<M, false> : public std::false_type
 {
 };
 
+
 namespace internal {
+
 
 template <class MatrixImp>
 struct MatrixAbstractionBase
@@ -299,6 +301,7 @@ struct MatrixAbstractionBase
     return mat.get_entry(row, col);
   }
 }; // struct MatrixAbstractionBase
+
 
 } // namespace internal
 } // namespace LA

@@ -27,6 +27,7 @@ namespace XT {
 namespace LA {
 namespace Exceptions {
 
+
 class linear_solver_failed_bc_data_did_not_fulfill_requirements : public Common::Exceptions::linear_solver_failed
 {
 };
@@ -39,6 +40,7 @@ class linear_solver_failed_bc_it_was_not_set_up_correctly : public Common::Excep
 class linear_solver_failed_bc_the_solution_does_not_solve_the_system : public Common::Exceptions::linear_solver_failed
 {
 };
+
 
 } // namespace Exceptions
 namespace internal {
