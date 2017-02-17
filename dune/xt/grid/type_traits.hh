@@ -67,6 +67,14 @@ struct is_grid<Dune::ALUGrid<dim, dimworld, elType, refineType, Comm>> : public 
 };
 
 #endif // HAVE_ALUGRID || HAVE_DUNE_ALUGRID
+#if HAVE_UG
+
+template <int dim>
+struct is_grid<UGGrid<dim>> : public std::true_type
+{
+};
+
+#endif // HAVE_UG
 
 
 template <class T>
