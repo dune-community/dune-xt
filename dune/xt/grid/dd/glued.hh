@@ -1,10 +1,14 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_MULTISCALE_GLUED_HH
-#define DUNE_GRID_MULTISCALE_GLUED_HH
+#ifndef DUNE_XT_GRID_DD_GLUED_HH
+#define DUNE_XT_GRID_DD_GLUED_HH
 
 #include <array>
 #include <algorithm>
@@ -30,8 +34,9 @@
 #include <dune/xt/grid/search.hh>
 
 namespace Dune {
-namespace grid {
-namespace Multiscale {
+namespace XT {
+namespace Grid {
+namespace DD {
 namespace Exceptions {
 
 
@@ -41,6 +46,9 @@ class intersection_orientation_is_broken : public Dune::InvalidStateException
 
 
 } // namespace Exceptions
+
+
+#if HAVE_DUNE_GRID_GLUE
 
 
 template <typename P0, typename P1>
@@ -1062,8 +1070,29 @@ private:
 }; // class GluedVTKWriter
 
 
-} // namespace Multiscale
-} // namespace grid
+#else // HAVE_DUNE_GRID_GLUE
+
+
+template <class MacroGridType, class LocalGridType>
+class GluedVTKWriter
+{
+  static_assert(AlwaysFalse<MacroGridImp>::value, "You are missing dune-grid-glue!");
+};
+
+
+template <class MacroGridImp, class LocalGridImp>
+class Glued
+{
+  static_assert(AlwaysFalse<MacroGridImp>::value, "You are missing dune-grid-glue!");
+};
+
+
+#endif // HAVE_DUNE_GRID_GLUE
+
+
+} // namespace DD
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 
-#endif // DUNE_GRID_MULTISCALE_GLUED_HH
+#endif // DUNE_XT_GRID_DD_GLUED_HH

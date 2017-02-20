@@ -1,5 +1,15 @@
-#ifndef DUNE_GRID_MULTISCALE_TEST_GLUED_HH
-#define DUNE_GRID_MULTISCALE_TEST_GLUED_HH
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
+
+#ifndef DUNE_XT_GRID_TEST_DD_GLUED_HH
+#define DUNE_XT_GRID_TEST_DD_GLUED_HH
+#if HAVE_DUNE_GRID_GLUE
 
 #include <map>
 #include <set>
@@ -18,8 +28,7 @@
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/test/gtest/gtest.h>
 #include <dune/xt/grid/gridprovider.hh>
-
-#include <dune/grid/multiscale/glued.hh>
+#include <dune/xt/grid/dd/glued.hh>
 
 
 template <class T>
@@ -72,9 +81,8 @@ std::string convert_to_initializer_list_str(const std::map<F, S>& results)
 
 
 namespace Dune {
-namespace grid {
-namespace Multiscale {
-namespace Test {
+namespace XT {
+namespace Grid {
 
 
 template <class M, class L, bool aything = true>
@@ -95,11 +103,11 @@ struct GluedMultiscaleGridTest : public ::testing::Test
   void setup()
   {
     if (!macro_grid_)
-      macro_grid_ = std::make_unique<XT::Grid::GridProvider<MacroGridType>>(
-          XT::Grid::make_cube_grid<MacroGridType>(0., 1., 3, Expectations::num_coarse_refinements()));
+      macro_grid_ = std::make_unique<GridProvider<MacroGridType>>(
+          make_cube_grid<MacroGridType>(0., 1., 3, Expectations::num_coarse_refinements()));
     ASSERT_NE(macro_grid_, nullptr) << "This should not happen!";
     if (!multiscale_grid_)
-      multiscale_grid_ = std::make_unique<grid::Multiscale::Glued<MacroGridType, LocalGridType>>(
+      multiscale_grid_ = std::make_unique<DD::Glued<MacroGridType, LocalGridType>>(
           *macro_grid_,
           Expectations::num_local_refinements(),
           /*prepare_glues=*/false,
@@ -212,8 +220,8 @@ struct GluedMultiscaleGridTest : public ::testing::Test
           << "missing expected results for entity and neighbor level "
           << convert_to_initializer_list_str(std::make_pair(entity_level, neighbor_level)) << ".\n"
           << "-> PLEASE ADD A RECORD TO\n"
-          << "   ExpectedResults<" << XT::Common::Typename<MacroGridType>::value() << ", "
-          << XT::Common::Typename<LocalGridType>::value() << ">!";
+          << "   ExpectedResults<" << Common::Typename<MacroGridType>::value() << ", "
+          << Common::Typename<LocalGridType>::value() << ">!";
       if (search_for_levels_in_expected_results == expected_results.end()) {
         DUNE_THROW(InvalidStateException,
                    "Cannot use ASSERT_EQ above, so we need to exit this way.\n\n"
@@ -227,8 +235,8 @@ struct GluedMultiscaleGridTest : public ::testing::Test
           << "\nTHIS IS A GOOD THING, AN ACTUAL NUMBER OF FAILURES WHICH IS LOWER THAN THE EXPECTED NUMBER OF "
           << "FAILURES IS AN IMPROVEMENT!\n"
           << "-> BE HAPPY AND UPDATE THE RECORD IN!\n"
-          << "   ExpectedResults<" << XT::Common::Typename<MacroGridType>::value() << ", "
-          << XT::Common::Typename<LocalGridType>::value() << ">!\n"
+          << "   ExpectedResults<" << Common::Typename<MacroGridType>::value() << ", "
+          << Common::Typename<LocalGridType>::value() << ">!\n"
           << "IF THE UPDATED RECORDS DO NOT INDICATE FAILURES ANYMORE, UPDATE THE TESTS!\n";
     } else {
       if (actual_num_wrongly_oriented_intersections != 0)
@@ -274,21 +282,21 @@ struct GluedMultiscaleGridTest : public ::testing::Test
                                          macro_neighbor,
                                          neighbor_level,
                                          /*allow_for_broken_orientation_of_coupling_intersections=*/true);
-          failures += Dune::grid::Multiscale::check_for_broken_coupling_intersections(coupling_glue);
+          failures += DD::check_for_broken_coupling_intersections(coupling_glue);
         }
       }
     }
     return failures;
   } // ... count_wrong_intersections(...)
 
-  std::unique_ptr<XT::Grid::GridProvider<MacroGridType>> macro_grid_;
-  std::unique_ptr<grid::Multiscale::Glued<MacroGridType, LocalGridType>> multiscale_grid_;
+  std::unique_ptr<GridProvider<MacroGridType>> macro_grid_;
+  std::unique_ptr<DD::Glued<MacroGridType, LocalGridType>> multiscale_grid_;
 }; // struct GluedMultiscaleGridTest
 
 
-} // namespace Test
-} // namespace Multiscale
-} // namespace grid
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 
-#endif // DUNE_GRID_MULTISCALE_TEST_GLUED_HH
+#endif // HAVE_DUNE_GRID_GLUE
+#endif // DUNE_XT_GRID_TEST_DD_GLUED_HH

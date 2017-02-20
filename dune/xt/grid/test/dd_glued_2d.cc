@@ -1,18 +1,21 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Schindler
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-
-#define DUNE_XT_COMMON_TEST_MAIN_CATCH_EXCEPTIONS 1
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
 #include <dune/xt/common/test/main.hxx> // <- this one has to come first (includes the config.h)!
 
-#include "glued.hh"
+#include "dd_glued.hh"
+
+#if HAVE_DUNE_GRID_GLUE
 
 namespace Dune {
-namespace grid {
-namespace Multiscale {
-namespace Test {
+namespace XT {
+namespace Grid {
 
 
 template <bool anything>
@@ -294,14 +297,13 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGG
 #endif // HAVE_UG
 
 
-} // namespace Test
-} // namespace Multiscale
-} // namespace grid
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 
 
 using namespace Dune;
-using namespace Dune::grid::Multiscale::Test;
+using namespace Dune::XT::Grid;
 
 
 // clang-format off
@@ -343,3 +345,6 @@ TYPED_TEST(GluedMultiscaleGridTest,
 {
   this->check_intersection_orientation_for_lower_or_equal_neighbor_levels();
 }
+
+
+#endif // HAVE_DUNE_GRID_GLUE
