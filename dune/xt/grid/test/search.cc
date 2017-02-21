@@ -17,15 +17,6 @@
 #include <dune/xt/grid/information.hh>
 #include <dune/xt/common/logging.hh>
 
-static inline Dune::XT::Common::Configuration cube_gridprovider_default_config()
-{
-  auto config = Dune::XT::Grid::cube_gridprovider_default_config();
-  config["lower_left"] = "[0 0 0 0]";
-  config["upper_right"] = "[1 1 1 1]";
-  config["num_elements"] = "[3 3 3 3]";
-  return config;
-}
-
 struct InLevelSearch : public testing::Test
 {
   typedef TESTGRIDTYPE GridType;
