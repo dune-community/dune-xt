@@ -269,6 +269,9 @@ PYBIND11_PLUGIN(_functions)
 #if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
   addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m, "2d_simplex_aluconform");
 #endif
+#if HAVE_UG
+  addbind_for_Grid<Dune::UGGrid<2>>(m, "2d_simplex_uggrid");
+#endif
 
   m.def("init_logger",
         [](const ssize_t max_info_level,
