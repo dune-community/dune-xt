@@ -25,7 +25,6 @@ include(DuneMacros)
 find_package(dune-xt-common REQUIRED)
 list(APPEND CMAKE_MODULE_PATH
      "${dune-xt-common_MODULE_PATH}")
-
 include(DuneUtils)
 
 # start a dune project with information from dune.module
@@ -42,6 +41,18 @@ endif (EIGEN3_FOUND)
 add_subdirectory(dune)
 add_subdirectory(doc)
 
+if(dune-pybindxi_FOUND)
+  foreach(_file
+          dune/__init__.py
+          dune/xt/__init__.py
+          dune/xt/la/__init__.py
+         )
+  execute_process(COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/python/${_file} ${CMAKE_CURRENT_BINARY_DIR}/${_file})
+  endforeach()
+endif()
+
+# enable headercheck
+add_definitions("-DENABLE_HEADERCHECK=1")
 add_format(${CMAKE_CURRENT_SOURCE_DIR})
 add_tidy(${CMAKE_CURRENT_SOURCE_DIR})
 
