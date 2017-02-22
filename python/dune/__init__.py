@@ -6,11 +6,5 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Felix Schindler (2016 - 2017)
-#   Rene Milk       (2016)
-#   Tobias Leibner  (2016)
 
-set(lib_dune_xt_grid_sources grid/boundaryinfo/interfaces.cc)
-dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
-
-add_subdirectory(grid)
-
+__import__('pkg_resources').declare_namespace(__name__)

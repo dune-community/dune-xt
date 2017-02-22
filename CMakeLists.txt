@@ -5,7 +5,7 @@
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   Felix Schindler (2016)
+#   Felix Schindler (2016 - 2017)
 #   Rene Milk       (2016)
 #   Tobias Leibner  (2016)
 
@@ -43,9 +43,20 @@ make_dependent_modules_sys_included()
 add_subdirectory(dune)
 add_subdirectory(doc)
 
+if(dune-pybindxi_FOUND)
+  foreach(_file
+          dune/__init__.py
+          dune/xt/__init__.py
+          dune/xt/grid/__init__.py
+         )
+  execute_process(COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/python/${_file} ${CMAKE_CURRENT_BINARY_DIR}/${_file})
+  endforeach()
+endif()
+
 # enable headercheck
 add_definitions("-DENABLE_HEADERCHECK=1")
 add_format(${CMAKE_CURRENT_SOURCE_DIR})
+add_tidy(${CMAKE_CURRENT_SOURCE_DIR})
 
 # finalize the dune project, e.g. generating config.h etc.
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)

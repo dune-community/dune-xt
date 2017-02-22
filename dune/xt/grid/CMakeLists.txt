@@ -9,8 +9,15 @@
 #   Rene Milk       (2016)
 #   Tobias Leibner  (2016)
 
-set(lib_dune_xt_grid_sources grid/boundaryinfo/interfaces.cc)
-dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
+include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
+add_subdirectory(test EXCLUDE_FROM_ALL )
 
-add_subdirectory(grid)
-
+if(dune-pybindxi_FOUND)
+  dune_pybindxi_add_module(_grid bindings.cc)
+  target_link_dune_default_libraries(_grid)
+  if(DUNE_XT_WITH_PYTHON_BINDINGS)
+    add_custom_target(bindings ALL DEPENDS _grid)
+  else()
+    add_custom_target(bindings DEPENDS _grid)
+  endif()
+endif()

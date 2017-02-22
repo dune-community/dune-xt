@@ -81,7 +81,7 @@ void print_intersection(const IntersectionType& intersection,
 
 
 /**
- * \brief Checks if intersection contains the given global_point.
+ * \brief Checks if intersection contains the given global_point (2d variant).
  *
  *        Returns true, if global_point lies on the line between the corners of intersection.
  */
@@ -113,6 +113,44 @@ contains(const Dune::Intersection<G, I>& intersection,
     return false;
   // At this point we cannot reject the assumption that the point lies on the line between the two corners.
   return true;
+} // ... contains(...)
+
+
+/**
+ * \brief Checks if intersection contains the given global_point (3d variant).
+ *
+ *        Checks if global_point lies within the plane spanned by the first three corners of intersection.
+ *
+ * \sa
+ * http://math.stackexchange.com/questions/684141/check-if-a-point-is-on-a-plane-minimize-the-use-of-multiplications-and-divisio
+ */
+template <class G, class I, class D>
+typename std::enable_if<Dune::Intersection<G, I>::dimension == 3, bool>::type
+contains(const Dune::Intersection<G, I>& intersection,
+         const Dune::FieldVector<D, 3>& global_point,
+         const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
+{
+  const auto& geometry = intersection.geometry();
+  // get the global coordinates of the intersections corners, there should be at least 3 (ignore the fourth if there is
+  // one, 3 points is enough in 3d)
+  assert(geometry.corners() >= 3);
+  std::vector<Dune::FieldVector<D, 3>> points(4, Dune::FieldVector<D, 3>(0.));
+  for (size_t ii = 0; ii < 3; ++ii)
+    points[ii] = geometry.corner(ii);
+  points[3] = global_point;
+  // form a matrix of these points, where the top three entries of each column are given by the three entries of each
+  // point and the bottom row is given by one, i.e.
+  // a_0 b_0 c_0 d_0
+  // a_1 b_1 c_1 d_1
+  // a_2 b_2 c_2 d_2
+  //   1   1   1   1
+  FieldMatrix<D, 4, 4> matrix(1.); // ensures the 1 on the last row
+  for (size_t ii = 0; ii < 3; ++ii) // only set the first three rows
+    for (size_t jj = 0; jj < 4; ++jj)
+      matrix[ii][jj] = points[jj][ii];
+  // the point lies on the plane given by the corners if the determinant of this matrix is zero
+  const D det = matrix.determinant();
+  return std::abs(det) < tolerance;
 } // ... contains(...)
 
 
