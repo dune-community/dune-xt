@@ -101,7 +101,8 @@ public:
     // get gradient
     GradientStringVectorType gradient_as_vectors;
     if (cfg.has_key("gradient")) {
-      assert(dimRangeCols == 1 && "Use gradient.0, gradient.1, ... for the gradient of the first, second, ... row, respectively!");
+      assert(dimRangeCols == 1
+             && "Use gradient.0, gradient.1, ... for the gradient of the first, second, ... row, respectively!");
       get_gradient(cfg, gradient_as_vectors, "gradient");
     } else if (cfg.has_key("gradient.0")) {
       get_gradient(cfg, gradient_as_vectors, "gradient.0");
@@ -495,7 +496,8 @@ public:
     // get gradient
     GradientStringVectorType gradient_as_vectors;
     if (cfg.has_key("gradient")) {
-      assert(dimRangeCols == 1 && "Use gradient.0, gradient.1, ... for the gradient of the first, second, ... row, respectively!");
+      assert(dimRangeCols == 1
+             && "Use gradient.0, gradient.1, ... for the gradient of the first, second, ... row, respectively!");
       get_gradient(cfg, gradient_as_vectors, "gradient");
     } else if (cfg.has_key("gradient.0")) {
       get_gradient(cfg, gradient_as_vectors, "gradient.0");
@@ -635,7 +637,8 @@ private:
                                     internal::ChooseVariant<rC>)
   {
     typedef typename Dune::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
-    const ExpressionMatrixType expression_as_matrix = cfg.get<ExpressionMatrixType>("expression", dimRange, dimRangeCols);
+    const ExpressionMatrixType expression_as_matrix =
+        cfg.get<ExpressionMatrixType>("expression", dimRange, dimRangeCols);
     // convert FieldMatrix to ExpressionStringVectorType
     for (size_t rr = 0; rr < dimRange; ++rr) {
       std::vector<std::string> expression_row;
