@@ -1,0 +1,239 @@
+// This file is part of the dune-xt-functions project:
+//   https://github.com/dune-community/dune-xt-functions
+// The copyright lies with the authors of this file (see below).
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2016 - 2017)
+
+#ifndef DUNE_XT_FUNCTIONS_INTERFACE_PBH
+#define DUNE_XT_FUNCTIONS_INTERFACE_PBH
+#if HAVE_DUNE_PYBINDXI
+
+#include <dune/pybindxi/pybind11.h>
+#include <dune/pybindxi/operators.h>
+
+#include <dune/xt/common/string.hh>
+
+#include <dune/xt/grid/gridprovider/provider.hh>
+
+#include "interfaces.hh"
+
+namespace Dune {
+namespace XT {
+namespace Functions {
+namespace internal {
+
+
+template <class L, class R, internal::Combination comb>
+struct get_combined
+{
+}; // struct get_combined
+
+template <class L, class R>
+struct get_combined<L, R, internal::Combination::difference>
+{
+  typedef DifferenceFunction<L, R> type;
+
+  static std::string id()
+  {
+    return "DifferenceFunction";
+  }
+
+  static std::string doc()
+  {
+    return "difference";
+  }
+
+  static std::string op()
+  {
+    return "__sub__";
+  }
+
+  static auto call(const L& l, const R& r) -> decltype(l - r)
+  {
+    return l - r;
+  }
+}; // struct get_combined
+
+template <class L, class R>
+struct get_combined<L, R, internal::Combination::sum>
+{
+  typedef SumFunction<L, R> type;
+
+  static std::string id()
+  {
+    return "SumFunction";
+  }
+
+  static std::string doc()
+  {
+    return "sum";
+  }
+
+  static std::string op()
+  {
+    return "__add__";
+  }
+
+  static auto call(const L& l, const R& r) -> decltype(l + r)
+  {
+    return l + r;
+  }
+}; // struct get_combined
+
+template <class L, class R>
+struct get_combined<L, R, internal::Combination::product>
+{
+  typedef ProductFunction<L, R> type;
+
+  static std::string id()
+  {
+    return "ProductFunction";
+  }
+
+  static std::string doc()
+  {
+    return "product";
+  }
+
+  static std::string op()
+  {
+    return "__mul__";
+  }
+
+  static auto call(const L& l, const R& r) -> decltype(l * r)
+  {
+    return l * r;
+  }
+}; // struct get_combined
+
+
+} // namespace internal
+
+
+template <class G, size_t r, size_t rC>
+pybind11::class_<LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
+                                              typename G::ctype,
+                                              G::dimension,
+                                              double,
+                                              r,
+                                              rC>>
+bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_id)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  typedef LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
+                                       typename G::ctype,
+                                       G::dimension,
+                                       double,
+                                       r,
+                                       rC>
+      C;
+
+  py::class_<C> c(m,
+                  std::string("LocalizableFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x"
+                              + Common::to_string(rC))
+                      .c_str(),
+                  std::string("LocalizableFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x"
+                              + Common::to_string(rC))
+                      .c_str());
+
+  c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
+  c.def_property_readonly("type", [](const C& self) { return self.type(); });
+  c.def_property_readonly("name", [](const C& self) { return self.name(); });
+
+  c.def("visualize",
+        [](const C& self, const Grid::GridProvider<G>& grid_provider, const std::string& path, const bool subsampling) {
+          self.visualize(grid_provider.leaf_view(), path, subsampling);
+        },
+        "grid_provider"_a,
+        "path"_a,
+        "subsampling"_a = true);
+
+  return c;
+} // ... bind_LocalizableFunctionInterface(...)
+
+
+/**
+ * \note We would like to drop the d template paremter and use either of
+\code
+static const           size_t d = G::dimension;
+static const constexpr size_t d = G::dimension;
+\endcode
+ *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
+ */
+template <class G, size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
+pybind11::class_<typename internal::get_combined<LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
+                                                                              typename G::ctype,
+                                                                              G::dimension,
+                                                                              double,
+                                                                              lr,
+                                                                              lrC>,
+                                                 LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
+                                                                              typename G::ctype,
+                                                                              G::dimension,
+                                                                              double,
+                                                                              rr,
+                                                                              rrC>,
+                                                 comb>::type>
+bind_combined_LocalizableFunction(pybind11::module& m, const std::string& grid_id)
+{
+  namespace py = pybind11;
+
+  typedef typename G::template Codim<0>::Entity E;
+  typedef typename G::ctype D;
+  typedef double R;
+  typedef LocalizableFunctionInterface<E, D, d, R, lr, lrC> Left;
+  typedef LocalizableFunctionInterface<E, D, d, R, rr, rrC> Right;
+  typedef typename internal::get_combined<Left, Right, comb>::type C;
+  static const size_t r = C::dimRange;
+  static const size_t rC = C::dimRangeCols;
+  const std::string id = internal::get_combined<Left, Right, comb>::id();
+  const std::string op = internal::get_combined<Left, Right, comb>::doc();
+  const std::string class_name = id + "__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC);
+  const std::string doc = class_name + " (as a " + op + " of functions of dimensions " + Common::to_string(lr) + "x"
+                          + Common::to_string(lrC) + " and " + Common::to_string(rr) + "x" + Common::to_string(rrC)
+                          + ")";
+
+  py::class_<C, LocalizableFunctionInterface<E, D, d, R, r, rC>> c(m, std::string(class_name).c_str(), doc.c_str());
+
+  c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
+
+  return c;
+} // ... bind_combined_LocalizableFunction(...)
+
+
+/**
+ * \note We would like to drop the d template paremter and use either of
+\code
+static const           size_t d = G::dimension;
+static const constexpr size_t d = G::dimension;
+\endcode
+ *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
+ */
+template <class G, size_t d, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+void addbind_LocalizableFunctionInterface_combined_op(C& c)
+{
+  namespace py = pybind11;
+
+  typedef typename G::template Codim<0>::Entity E;
+  typedef typename G::ctype D;
+  typedef LocalizableFunctionInterface<E, D, d, double, r, rC> S;
+  typedef LocalizableFunctionInterface<E, D, d, double, oR, orC> O;
+
+  c.def(internal::get_combined<S, O, comb>::op().c_str(),
+        [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
+        py::keep_alive<0, 1>(),
+        py::keep_alive<0, 2>());
+} // ... addbind_LocalizableFunctionInterface_combined_op(...)
+
+
+} // namespace Functions
+} // namespace XT
+} // namespace Dune
+
+#endif // HAVE_DUNE_PYBINDXI
+#endif // DUNE_XT_FUNCTIONS_INTERFACE_PBH
