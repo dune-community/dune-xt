@@ -1,3 +1,5 @@
+__exec_suffix = {gridname}_{dimDomain}d
+
 include grids.mini
 
 [__static]

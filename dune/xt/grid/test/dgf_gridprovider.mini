@@ -1,6 +1,6 @@
-include grids.mini
+__exec_suffix = {gridname}_{dimDomain}d
 
-{gridname} == 'ug' | exclude
+include grids.mini
 
 [__static]
 TESTGRIDTYPE = {grid}
