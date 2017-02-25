@@ -14,6 +14,8 @@
 #ifndef DUNE_XT_GRID_INTERSECTION_HH
 #define DUNE_XT_GRID_INTERSECTION_HH
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <dune/common/deprecated.hh>
 #include <dune/common/fvector.hh>
 
@@ -125,7 +127,7 @@ contains(const Dune::Intersection<G, I>& intersection,
  * http://math.stackexchange.com/questions/684141/check-if-a-point-is-on-a-plane-minimize-the-use-of-multiplications-and-divisio
  */
 template <class G, class I, class D>
-typename std::enable_if<Dune::Intersection<G, I>::dimension == 3, bool>::type
+typename std::enable_if<G::dimension == 3, bool>::type
 contains(const Dune::Intersection<G, I>& intersection,
          const Dune::FieldVector<D, 3>& global_point,
          const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
@@ -136,7 +138,7 @@ contains(const Dune::Intersection<G, I>& intersection,
   assert(geometry.corners() >= 3);
   std::vector<Dune::FieldVector<D, 3>> points(4, Dune::FieldVector<D, 3>(0.));
   for (size_t ii = 0; ii < 3; ++ii)
-    points[ii] = geometry.corner(ii);
+    points[ii] = geometry.corner(boost::numeric_cast<int>(ii));
   points[3] = global_point;
   // form a matrix of these points, where the top three entries of each column are given by the three entries of each
   // point and the bottom row is given by one, i.e.
