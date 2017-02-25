@@ -9,3 +9,9 @@
 #
 # File for module specific CMake tests.
 
+if(ALBERTA_FOUND)
+  add_definitions("-DENABLE_ALBERTA=1")
+  add_definitions("-DALBERTA_DIM=1")
+  include_directories(${ALBERTA_INCLUDES})
+endif()
+
