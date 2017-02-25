@@ -22,6 +22,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/ranges.hh>
 
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/boundaryinfo.hh>
@@ -183,12 +184,39 @@ public:
     visualize_with_boundary(boundary_info_cfg, filename);
   }
 
+private:
+  template <class G, bool anything = true>
+  struct global_refine_helper
+  {
+    void operator()(G& g, int count)
+    {
+      g.preAdapt();
+      g.globalRefine(count);
+      g.postAdapt();
+      g.loadBalance();
+    }
+  }; // struct refine_helper
+
+#if HAVE_ALBERTA
+
+  template <int d, int dW, bool anything>
+  struct global_refine_helper<AlbertaGrid<d, dW>, anything>
+  {
+    typedef AlbertaGrid<d, dW> G;
+
+    void operator()(G& g, int count)
+    {
+      g.globalRefine(count);
+      g.loadBalance();
+    }
+  }; // struct refine_helper
+
+#endif // HAVE_ALBERTA
+
+public:
   void global_refine(int count)
   {
-    grid().preAdapt();
-    grid().globalRefine(count);
-    grid().postAdapt();
-    grid().loadBalance();
+    global_refine_helper<GridType>()(grid(), count);
   }
 
 private:
