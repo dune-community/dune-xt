@@ -58,7 +58,7 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
     return false;
   }
 
-  static std::map<std::pair<size_t, size_t>, size_t> results()
+  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
   {
     return {{{0, 0}, 0},
             {{0, 1}, 0},
@@ -211,7 +211,7 @@ struct ExpectedResults<ALUGrid<2, 2, simplex, conforming, Comm>, ALUGrid<2, 2, s
     return false;
   }
 
-  static std::map<std::pair<size_t, size_t>, size_t> results()
+  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
   {
 #if HAVE_ALUGRID
     return {{{0, 0}, 0},
@@ -280,7 +280,7 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGG
     return false;
   }
 
-  static std::map<std::pair<size_t, size_t>, size_t> results()
+  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
   {
     return {{{0, 0}, 0},
             {{0, 1}, 0},

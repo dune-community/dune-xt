@@ -16,17 +16,11 @@
 #include <sstream>
 #include <vector>
 
-#include <dune/grid/yaspgrid.hh>
 #include <dune/grid/common/rangegenerators.hh>
-
-#if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/grid.hh>
-#elif HAVE_ALUGRID
-#include <dune/grid/alugrid.hh>
-#endif
 
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider.hh>
 #include <dune/xt/grid/dd/glued.hh>
 
@@ -85,7 +79,7 @@ namespace XT {
 namespace Grid {
 
 
-template <class M, class L, bool aything = true>
+template <class M, class L, bool anything = true>
 struct ExpectedResults
 {
   static_assert(AlwaysFalse<M>::value, "Please add me for this grid!");
@@ -100,6 +94,24 @@ struct GluedMultiscaleGridTest : public ::testing::Test
   typedef typename std::tuple_element<1, GridTuple>::type LocalGridType;
   typedef ExpectedResults<MacroGridType, LocalGridType> Expectations;
 
+  template <class G, bool anything = true>
+  struct get_local_layer
+  {
+    static const constexpr Layers type = Layers::level;
+  };
+
+#if HAVE_ALBERTA
+
+  template <int d, int dw, bool anything>
+  struct get_local_layer<AlbertaGrid<d, dw>, anything>
+  {
+    static const constexpr Layers type = Layers::leaf;
+  };
+
+#endif
+
+  static const constexpr Layers local_layer = get_local_layer<LocalGridType>::type;
+
   void setup()
   {
     if (!macro_grid_)
@@ -107,14 +119,15 @@ struct GluedMultiscaleGridTest : public ::testing::Test
           make_cube_grid<MacroGridType>(0., 1., 3, Expectations::num_coarse_refinements()));
     ASSERT_NE(macro_grid_, nullptr) << "This should not happen!";
     if (!multiscale_grid_)
-      multiscale_grid_ = std::make_unique<DD::Glued<MacroGridType, LocalGridType>>(
+      multiscale_grid_ = std::make_unique<DD::Glued<MacroGridType, LocalGridType, local_layer>>(
           *macro_grid_,
           Expectations::num_local_refinements(),
           /*prepare_glues=*/false,
           /*allow_for_broken_orientation_of_coupling_intersections=*/true);
     ASSERT_NE(multiscale_grid_, nullptr) << "This should not happen!";
     for (auto&& macro_entity : Dune::elements(multiscale_grid_->macro_grid_view())) {
-      EXPECT_EQ(multiscale_grid_->max_local_level(macro_entity), Expectations::num_local_refinements());
+      EXPECT_EQ(multiscale_grid_->max_local_level(macro_entity),
+                (local_layer == Layers::level) ? Expectations::num_local_refinements() : -1);
     }
   } // ... setup()
 
@@ -133,9 +146,9 @@ struct GluedMultiscaleGridTest : public ::testing::Test
           const auto neighbor_index = macro_grid_view.indexSet().index(macro_neighbor);
           const auto& coupling =
               multiscale_grid_->coupling(macro_entity,
-                                         1,
+                                         (local_layer == Layers::level) ? 1 : -1,
                                          macro_neighbor,
-                                         Expectations::num_local_refinements(),
+                                         (local_layer == Layers::level) ? Expectations::num_local_refinements() : -1,
                                          /*allow_for_broken_orientation_of_coupling_intersections=*/true);
           EXPECT_EQ(Expectations::num_local_couplings_intersections().count(coupling.size()), 1)
               << "entity: " << entity_index << "\n"
@@ -164,8 +177,12 @@ struct GluedMultiscaleGridTest : public ::testing::Test
     ASSERT_NE(multiscale_grid_, nullptr) << "This should not happen!";
     size_t failure = 0;
 
-    for (ssize_t level = 0; level <= multiscale_grid_->max_local_level(0); ++level)
-      failure += check_intersections_for_levels(level, level, expect_failure);
+    if (local_layer == Layers::level) {
+      for (int level = 0; level <= multiscale_grid_->max_local_level(0); ++level)
+        failure += check_intersections_for_levels(level, level, expect_failure);
+    } else {
+      failure += check_intersections_for_levels(-1, -1, expect_failure);
+    }
 
     if (failure)
       std::cout << "The actual numbers of broken intersections are\n"
@@ -180,10 +197,12 @@ struct GluedMultiscaleGridTest : public ::testing::Test
     ASSERT_NE(multiscale_grid_, nullptr) << "This should not happen!";
     size_t failure = 0;
 
-    for (ssize_t entity_level = 0; entity_level <= multiscale_grid_->max_local_level(0); ++entity_level)
-      for (ssize_t neighbor_level = entity_level; neighbor_level <= multiscale_grid_->max_local_level(0);
-           ++neighbor_level)
-        failure += check_intersections_for_levels(entity_level, neighbor_level, expect_failure);
+    if (local_layer == Layers::level) {
+      for (int entity_level = 0; entity_level <= multiscale_grid_->max_local_level(0); ++entity_level)
+        for (int neighbor_level = entity_level; neighbor_level <= multiscale_grid_->max_local_level(0);
+             ++neighbor_level)
+          failure += check_intersections_for_levels(entity_level, neighbor_level, expect_failure);
+    }
 
     if (failure)
       std::cout << "The actual numbers of broken intersections are\n"
@@ -198,17 +217,18 @@ struct GluedMultiscaleGridTest : public ::testing::Test
     ASSERT_NE(multiscale_grid_, nullptr) << "This should not happen!";
     size_t failure = 0;
 
-    for (ssize_t entity_level = 0; entity_level <= multiscale_grid_->max_local_level(0); ++entity_level)
-      for (ssize_t neighbor_level = 0; neighbor_level <= entity_level; ++neighbor_level)
-        failure += check_intersections_for_levels(entity_level, neighbor_level, expect_failure);
+    if (local_layer == Layers::level) {
+      for (int entity_level = 0; entity_level <= multiscale_grid_->max_local_level(0); ++entity_level)
+        for (int neighbor_level = 0; neighbor_level <= entity_level; ++neighbor_level)
+          failure += check_intersections_for_levels(entity_level, neighbor_level, expect_failure);
+    }
 
     if (failure)
       std::cout << "The actual numbers of broken intersections are\n"
                 << convert_to_initializer_list_str(count_wrong_intersections_on_all_levels()) << std::endl;
   } // ... check_intersection_orientation_for_lower_or_equal_neighbor_levels(...)
 
-  size_t
-  check_intersections_for_levels(const ssize_t entity_level, const ssize_t neighbor_level, const bool expect_failure)
+  size_t check_intersections_for_levels(const int entity_level, const int neighbor_level, const bool expect_failure)
   {
     size_t failure = 0;
     const auto actual_num_wrongly_oriented_intersections = count_wrong_intersections(entity_level, neighbor_level);
@@ -246,7 +266,7 @@ struct GluedMultiscaleGridTest : public ::testing::Test
     return failure;
   } // ... check_intersections(...)
 
-  std::map<std::pair<size_t, size_t>, size_t> count_wrong_intersections_on_all_levels()
+  std::map<std::pair<ssize_t, ssize_t>, size_t> count_wrong_intersections_on_all_levels()
   {
     setup();
     if (!macro_grid_)
@@ -254,14 +274,19 @@ struct GluedMultiscaleGridTest : public ::testing::Test
     if (!multiscale_grid_)
       DUNE_THROW(InvalidStateException, "This should not happen!"); // <- s.a.
 
-    std::map<std::pair<size_t, size_t>, size_t> results;
-    for (ssize_t entity_level = 0; entity_level <= multiscale_grid_->max_local_level(0); ++entity_level)
-      for (ssize_t neighbor_level = 0; neighbor_level <= multiscale_grid_->max_local_level(0); ++neighbor_level)
-        results[std::make_pair(entity_level, neighbor_level)] = count_wrong_intersections(entity_level, neighbor_level);
+    std::map<std::pair<ssize_t, ssize_t>, size_t> results;
+    if (local_layer == Layers::level) {
+      for (int entity_level = 0; entity_level <= multiscale_grid_->max_local_level(0); ++entity_level)
+        for (int neighbor_level = 0; neighbor_level <= multiscale_grid_->max_local_level(0); ++neighbor_level)
+          results[std::make_pair(entity_level, neighbor_level)] =
+              count_wrong_intersections(entity_level, neighbor_level);
+    } else {
+      results[std::make_pair(-1, -1)] = count_wrong_intersections(-1, -1);
+    }
     return results;
   }
 
-  size_t count_wrong_intersections(const size_t entity_level, const size_t neighbor_level)
+  size_t count_wrong_intersections(const int entity_level, const int neighbor_level)
   {
     setup();
     if (!macro_grid_)
@@ -290,7 +315,7 @@ struct GluedMultiscaleGridTest : public ::testing::Test
   } // ... count_wrong_intersections(...)
 
   std::unique_ptr<GridProvider<MacroGridType>> macro_grid_;
-  std::unique_ptr<DD::Glued<MacroGridType, LocalGridType>> multiscale_grid_;
+  std::unique_ptr<DD::Glued<MacroGridType, LocalGridType, local_layer>> multiscale_grid_;
 }; // struct GluedMultiscaleGridTest
 
 
