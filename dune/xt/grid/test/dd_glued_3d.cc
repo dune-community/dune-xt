@@ -243,6 +243,53 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGG
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>, anything>
 
 #endif // HAVE_UG
+#if HAVE_ALBERTA
+
+template <bool anything>
+struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, AlbertaGrid<3, 3>, anything>
+{
+  static int num_coarse_refinements()
+  {
+    return 0;
+  }
+
+  static int num_local_refinements()
+  {
+    return 2;
+  }
+
+  static std::string id()
+  {
+    return "3d_yaspgrid_albertagrid";
+  }
+
+  static std::set<size_t> num_local_couplings_intersections()
+  {
+    return {10};
+  }
+
+  static bool failure_for_lower_or_equal()
+  {
+    return true;
+  }
+
+  static bool failure_for_equal()
+  {
+    return true;
+  }
+
+  static bool failure_for_higher()
+  {
+    return true;
+  }
+
+  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
+  {
+    return {{{-1, -1}, 702}};
+  }
+}; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, AlbertaGrid<3>, anything>
+
+#endif // HAVE_ALBERTA
 
 } // namespace Grid
 } // namespace XT
@@ -274,6 +321,9 @@ typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<do
 #endif // HAVE_DUNE_ALUGRID
 #if HAVE_UG
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>>
+#endif
+#if HAVE_ALBERTA
+                        , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, AlbertaGrid<3, 3>>
 #endif
                         > GridTypes; // clang-format on
 

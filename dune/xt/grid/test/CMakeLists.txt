@@ -16,5 +16,8 @@ dune_symlink_to_source_files(FILES gmsh_2d_simplices.msh dgf_1d_interval.dgf dgf
 
 BEGIN_TESTCASES(dunextgrid)
 
- 
 END_TESTCASES()
+
+add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)
+add_dune_alberta_flags(GRIDDIM 3 test_dd_glued_3d)
+ 

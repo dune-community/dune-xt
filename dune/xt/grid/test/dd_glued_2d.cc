@@ -128,6 +128,53 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGG
 }; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>, anything>
 
 #endif // HAVE_UG
+#if HAVE_ALBERTA
+
+template <bool anything>
+struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>, anything>
+{
+  static int num_coarse_refinements()
+  {
+    return 0;
+  }
+
+  static int num_local_refinements()
+  {
+    return 2;
+  }
+
+  static std::string id()
+  {
+    return "2d_yaspgrid_albertagrid";
+  }
+
+  static std::set<size_t> num_local_couplings_intersections()
+  {
+    return {2};
+  }
+
+  static bool failure_for_lower_or_equal()
+  {
+    return true;
+  }
+
+  static bool failure_for_equal()
+  {
+    return false;
+  }
+
+  static bool failure_for_higher()
+  {
+    return false;
+  }
+
+  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
+  {
+    return {};
+  }
+}; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>, anything>
+
+#endif // HAVE_ALBERTA
 
 
 } // namespace Grid
@@ -149,6 +196,9 @@ typedef ::testing::Types< std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<do
 //#if HAVE_UG
 //                      , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>>
 //#endif
+#if HAVE_ALBERTA
+                        , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>>
+#endif
                         > GridTypes; // clang-format on
 
 TYPED_TEST_CASE(GluedMultiscaleGridTest, GridTypes);
