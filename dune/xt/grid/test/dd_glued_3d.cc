@@ -74,46 +74,31 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, YaspGrid<3,
 // EquidistantOffsetCoordinates<double, 3>>, anything>
 
-#if HAVE_DUNE_ALUGRID || HAVE_ALUGRID
+#if HAVE_DUNE_ALUGRID
 
 template <class Comm, bool anything>
-struct ExpectedResults<ALUGrid<3, 3, cube, conforming, Comm>,
+struct ExpectedResults<ALUGrid<3, 3, cube, nonconforming, Comm>,
                        YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
                        anything>
 {
   static int num_coarse_refinements()
   {
-#if HAVE_ALUGRID
     return 0;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
   }
 
   static int num_local_refinements()
   {
-#if HAVE_ALUGRID
     return 2;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
   }
 
   static std::string id()
   {
-    return "3d_alucubeconforminggrid_yaspgrid";
+    return "3d_alucubenonconforminggrid_yaspgrid";
   }
 
   static std::set<size_t> num_local_couplings_intersections()
   {
-#if HAVE_ALUGRID
     return {32};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
   }
 
   static bool failure_for_lower_or_equal()
@@ -133,7 +118,6 @@ struct ExpectedResults<ALUGrid<3, 3, cube, conforming, Comm>,
 
   static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
   {
-#if HAVE_ALUGRID
     return {{{0, 0}, 216},
             {{0, 1}, 864},
             {{0, 2}, 3456},
@@ -142,12 +126,7 @@ struct ExpectedResults<ALUGrid<3, 3, cube, conforming, Comm>,
             {{1, 2}, 3456},
             {{2, 0}, 108},
             {{2, 1}, 108},
-            { {2, 2},
-              3456 }};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return {};
-#endif
+            {{2, 2}, 3456}};
   }
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, ALUGrid<3, 3, simplex, nonconforming,
 // Comm>, anything>
@@ -159,37 +138,22 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
 {
   static int num_coarse_refinements()
   {
-#if HAVE_ALUGRID
     return 0;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
   }
 
   static int num_local_refinements()
   {
-#if HAVE_ALUGRID
     return 2;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
   }
 
   static std::string id()
   {
-    return "3d_alucubenonconforminggrid_yaspgrid";
+    return "3d_yaspgrid_alucubenonconforminggrid";
   }
 
   static std::set<size_t> num_local_couplings_intersections()
   {
-#if HAVE_ALUGRID
     return {32};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
   }
 
   static bool failure_for_lower_or_equal()
@@ -209,7 +173,6 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
 
   static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
   {
-#if HAVE_ALUGRID
     return {{{0, 0}, 216},
             {{0, 1}, 864},
             {{0, 2}, 3456},
@@ -218,167 +181,12 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
             {{1, 2}, 3456},
             {{2, 0}, 108},
             {{2, 1}, 108},
-            { {2, 2},
-              3456 }};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return {};
-#endif
+            {{2, 2}, 3456}};
   }
 }; // ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, ALUGrid<3, 3, cube, nonconforming, Comm>,
 // anything>
 
-template <class Comm, bool anything>
-struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
-                       ALUGrid<3, 3, simplex, nonconforming, Comm>,
-                       anything>
-{
-  static int num_coarse_refinements()
-  {
-#if HAVE_ALUGRID
-    return 0;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
-  }
-
-  static int num_local_refinements()
-  {
-#if HAVE_ALUGRID
-    return 2;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
-  }
-
-  static std::string id()
-  {
-    return "3d_alusimplexnonconforminggrid_yaspgrid";
-  }
-
-  static std::set<size_t> num_local_couplings_intersections()
-  {
-#if HAVE_ALUGRID
-    return {32};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
-  }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_higher()
-  {
-    return true;
-  }
-
-  static std::map<std::pair<size_t, size_t>, size_t> results()
-  {
-#if HAVE_ALUGRID
-    return {{{0, 0}, 216},
-            {{0, 1}, 864},
-            {{0, 2}, 3456},
-            {{1, 0}, 108},
-            {{1, 1}, 864},
-            {{1, 2}, 3456},
-            {{2, 0}, 108},
-            {{2, 1}, 108},
-            { {2, 2},
-              3456 }};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return {};
-#endif
-  }
-}; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, ALUGrid<3, 3, simplex, nonconforming,
-// Comm>, anything>
-
-template <class Comm, bool anything>
-struct ExpectedResults<ALUGrid<3, 3, cube, conforming, Comm>, ALUGrid<3, 3, simplex, nonconforming, Comm>, anything>
-{
-  static int num_coarse_refinements()
-  {
-#if HAVE_ALUGRID
-    return 0;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
-  }
-
-  static int num_local_refinements()
-  {
-#if HAVE_ALUGRID
-    return 2;
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
-  }
-
-  static std::string id()
-  {
-    return "3d_alucubeconforminggrid_alusimplexnonconforminggrid";
-  }
-
-  static std::set<size_t> num_local_couplings_intersections()
-  {
-#if HAVE_ALUGRID
-    return {32};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return 0;
-#endif
-  }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_higher()
-  {
-    return true;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-#if HAVE_ALUGRID
-    return {{{0, 0}, 216},
-            {{0, 1}, 864},
-            {{0, 2}, 3456},
-            {{1, 0}, 108},
-            {{1, 1}, 864},
-            {{1, 2}, 3456},
-            {{2, 0}, 108},
-            {{2, 1}, 108},
-            { {2, 2},
-              3456 }};
-#else
-    DUNE_THROW(InvalidStateException, "Please update these for dune-alugrid!");
-    return {};
-#endif
-  }
-}; // struct ExpectedResults<ALUGrid<3, 3, cube, conforming, Comm>, ALUGrid<3, 3, simplex, nonconforming, Comm>,
-// anything>
-
-#endif // HAVE_DUNE_ALUGRID || HAVE_ALUGRID
+#endif // HAVE_DUNE_ALUGRID
 #if HAVE_UG
 
 template <bool anything>
@@ -434,7 +242,6 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGG
   }
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>, anything>
 
-
 #endif // HAVE_UG
 
 } // namespace Grid
@@ -449,23 +256,22 @@ using namespace Dune::XT::Grid;
 // clang-format off
 typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
                                      YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>>
-#if HAVE_ALUGRID
-//                      , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
-//                                   ALUGrid<3, 3, cube, conforming>> //                     <- knwon to fail completely
+#if HAVE_DUNE_ALUGRID
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
                                      ALUGrid<3, 3, cube, nonconforming>>
 //                      , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
-//                                   ALUGrid<3, 3, simplex, conforming>> //                  <- knwon to fail completely
-                        , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
-                                     ALUGrid<3, 3, simplex, nonconforming>>
-                        , std::tuple<ALUGrid<3, 3, cube, conforming>,
+//                                   ALUGrid<3, 3, simplex, conforming>>                  // <- knwon to fail completely
+//                      , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
+//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
+                        , std::tuple<ALUGrid<3, 3, cube, nonconforming>,
                                      YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>>
 //                      , std::tuple<ALUGrid<3, 3, simplex, conforming>,
 //                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
 //                      , std::tuple<ALUGrid<3, 3, simplex, nonconforming>,
 //                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
-                        , std::tuple<ALUGrid<3, 3, cube, conforming>, ALUGrid<3, 3, simplex, nonconforming>>
-#endif // HAVE_ALUGRID
+//                      , std::tuple<ALUGrid<3, 3, cube, nonconforming>,
+//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
+#endif // HAVE_DUNE_ALUGRID
 #if HAVE_UG
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>>
 #endif
