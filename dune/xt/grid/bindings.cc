@@ -146,6 +146,9 @@ PYBIND11_PLUGIN(_grid)
 #if HAVE_UG
   addbind_for_Grid<Dune::UGGrid<2>>(m, "2d_simplex_uggrid");
 #endif
+#if HAVE_ALBERTA
+  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, "2d_simplex_albertagrid");
+#endif
 
   m.def("init_logger",
         [](const ssize_t max_info_level,
