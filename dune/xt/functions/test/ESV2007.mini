@@ -1,16 +1,13 @@
 __name = ESV2007
-__exec_suffix = yasp_{testcase_short}, alu_{testcase_short} | expand grid
+__exec_suffix = {testcase_short}_{gridname}_{dimDomain}d_r{dimRange}_rc{dimRangeCols}
 
-grid1 = Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>
-grid2 = Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming>
-grid = {grid1}, {grid2} | expand grid
-entity_type = {grid}::Codim<0>::Entity
+include functions.mini
 
 testcase1 = Dune::XT::Functions::ESV2007::Testcase1Force<{entity_type}, double, 2, double, 1, 1>
 testcase2 = Dune::XT::Functions::ESV2007::Testcase1ExactSolution<{entity_type}, double, 2, double, 1, 1>
 testcase_short = force, exact | expand testcase
 
+dimDomain = 2
+
 [__static]
 TESTFUNCTIONTYPE = {testcase1}, {testcase2} | expand testcase
-
-1, dune-alugrid_FOUND | expand grid | cmake_guard

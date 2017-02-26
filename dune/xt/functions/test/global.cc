@@ -10,15 +10,11 @@
 //   Tobias Leibner  (2014 - 2016)
 
 #include <dune/xt/common/test/main.hxx>
+
 #include <memory>
 
-#if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/grid.hh>
-#endif
-#include <dune/grid/yaspgrid.hh>
-
 #include <dune/xt/common/exceptions.hh>
-
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/functions/global.hh>
 #include <dune/xt/functions/interfaces.hh>
 

@@ -14,12 +14,7 @@
 #include <memory>
 
 #include <dune/xt/common/exceptions.hh>
-
-#include <dune/grid/yaspgrid.hh>
-#if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/grid.hh>
-#endif
-
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/spe10/model1.hh>
 #include <dune/xt/functions/spe10/model2.hh>
