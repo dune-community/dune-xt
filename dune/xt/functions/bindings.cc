@@ -275,11 +275,14 @@ PYBIND11_PLUGIN(_functions)
   py::module::import("dune.xt.grid");
 
   addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m, "2d_cube_yaspgrid");
-#if HAVE_ALUGRID || HAVE_DUNE_ALUGRID
+#if HAVE_DUNE_ALUGRID
   addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m, "2d_simplex_aluconform");
 #endif
 #if HAVE_UG
   addbind_for_Grid<Dune::UGGrid<2>>(m, "2d_simplex_uggrid");
+#endif
+#if HAVE_ALBERTA
+  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, "2d_simplex_albertagrid");
 #endif
 
   m.def("init_logger",
