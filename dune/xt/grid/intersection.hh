@@ -88,7 +88,7 @@ void print_intersection(const IntersectionType& intersection,
  *        Returns true, if global_point lies on the line between the corners of intersection.
  */
 template <class G, class I, class D>
-typename std::enable_if<Dune::Intersection<G, I>::dimension == 2, bool>::type
+typename std::enable_if<G::dimension == 2, bool>::type
 contains(const Dune::Intersection<G, I>& intersection,
          const Dune::FieldVector<D, 2>& global_point,
          const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
