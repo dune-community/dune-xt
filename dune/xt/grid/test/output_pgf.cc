@@ -21,7 +21,7 @@ using namespace Dune::XT::Grid;
 
 /** output files are compiled in test-compile-pgfoutput.sh target
  **/
-TEST(PgfOutput, YaspGrid)
+GTEST_TEST(PgfOutput, YaspGrid)
 {
   const size_t dim = 2;
   typedef Dune::YaspGrid<dim> GridType;

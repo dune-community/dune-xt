@@ -15,6 +15,6 @@
 #include <dune/xt/common/test/main.hxx>
 
 
-TEST(empty, main)
+GTEST_TEST(empty, main)
 {
 }

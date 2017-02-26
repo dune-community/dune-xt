@@ -22,7 +22,7 @@
 #include <dune/xt/grid/boundaryinfo.hh>
 
 
-TEST(BoundaryInfoFactory, all)
+GTEST_TEST(BoundaryInfoFactory, all)
 {
   typedef Dune::XT::Grid::BoundaryInfoFactory<INTERSECTIONTYPE> Factory;
 
