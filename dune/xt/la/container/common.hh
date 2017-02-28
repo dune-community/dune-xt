@@ -553,6 +553,13 @@ public:
     return backend()[ii][jj];
   } // ... get_entry(...)
 
+  ScalarType& get_entry_ref(const size_t ii, const size_t jj)
+  {
+    assert(ii < rows());
+    assert(jj < cols());
+    return backend()[ii][jj];
+  } // ... get_entry(...)
+
   void clear_row(const size_t ii)
   {
     auto& backend_ref = backend();
@@ -838,6 +845,15 @@ public:
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const size_t index = get_entry_index(rr, cc, false);
     return index == size_t(-1) ? ScalarType(0) : entries_->operator[](index);
+  }
+
+  inline ScalarType& get_entry_ref(const size_t rr, const size_t cc)
+  {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    const size_t index = get_entry_index(rr, cc, false);
+    if (index == size_t(-1))
+      DUNE_THROW(Dune::RangeError, "Entry not in matrix pattern!");
+    return entries_->operator[](index);
   }
 
   inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)

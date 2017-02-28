@@ -566,6 +566,13 @@ public:
     return backend()(ii, jj);
   } // ... get_entry(...)
 
+  ScalarType& get_entry_ref(const size_t ii, const size_t jj)
+  {
+    assert(ii < rows());
+    assert(jj < cols());
+    return backend()(ii, jj);
+  } // ... get_entry(...)
+
   void clear_row(const size_t ii)
   {
     auto& backend_ref = backend();
