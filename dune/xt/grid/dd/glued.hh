@@ -120,7 +120,7 @@ class Glued
     static const bool value = true;
   };
 
-#if HAVE_ALUGRID
+#if HAVE_DUNE_ALUGRID || HAVE_ALUGRID
   template <class Comm, bool anything>
   struct allowed_local_grid<ALUGrid<3, 3, simplex, conforming, Comm>, anything>
   {
@@ -1186,7 +1186,7 @@ private:
 #else // HAVE_DUNE_GRID_GLUE
 
 
-template <class MacroGridType, class LocalGridType, Layers layer = Layers::level>
+template <class MacroGridImp, class LocalGridImp, Layers layer = Layers::level>
 class GluedVTKWriter
 {
   static_assert(AlwaysFalse<MacroGridImp>::value, "You are missing dune-grid-glue!");
