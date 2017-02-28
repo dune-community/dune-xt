@@ -17,6 +17,8 @@ codim_iters_provided = true, true, false, true | expand grid
 '{gridname}' == 'alu' and '{dimDomain}' == '1' | exclude
 '{gridname}' == 'ug' and '{dimDomain}' == '1' | exclude
 '{gridname}' == 'alu' and {__local.refinement} == 'conforming' and {__local.geometry} == 'cube' | exclude
+'{gridname}' == 'yasp' and {__local.geometry} == 'simplex' | exclude
+'{gridname}' == 'alberta' and {__local.geometry} == 'cube' | exclude
 
 entity_type = {grid}::Codim<0>::Entity
 
