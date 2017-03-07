@@ -47,6 +47,11 @@ struct is_grid : public std::false_type
 {
 };
 
+template <>
+struct is_grid<Dune::OneDGrid> : public std::true_type
+{
+};
+
 template <int dim, class Coordinates>
 struct is_grid<Dune::YaspGrid<dim, Coordinates>> : public std::true_type
 {

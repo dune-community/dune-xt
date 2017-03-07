@@ -29,6 +29,7 @@
 #include <dune/grid/uggrid.hh>
 #endif
 
+#include <dune/grid/onedgrid.hh>
 #include <dune/grid/yaspgrid.hh>
 
 #endif // DUNE_XT_GRID_GRIDS_HH
