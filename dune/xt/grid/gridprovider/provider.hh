@@ -22,6 +22,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/ranges.hh>
 
+#include <dune/xt/grid/capabilities.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/type_traits.hh>
@@ -220,6 +221,52 @@ public:
   }
 
 private:
+  template <class G, bool enable = has_boundary_id<G>::value>
+  struct add_boundary_id_visualization
+  {
+    template <class V, class GV>
+    void operator()(V& vtk_writer, const GV& grid_view, const int lvl)
+    {
+      std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
+      vtk_writer.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
+    }
+
+    std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
+    {
+      std::vector<double> data(gridView.indexSet().size(0));
+      // walk the grid
+      const auto it_end = gridView.template end<0>();
+      for (auto it = gridView.template begin<0>(); it != it_end; ++it) {
+        const auto& entity = *it;
+        const auto& index = gridView.indexSet().index(entity);
+        data[index] = 0.0;
+        size_t numberOfBoundarySegments = 0;
+        bool isOnBoundary = false;
+        const auto intersectionItEnd = gridView.iend(entity);
+        for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != intersectionItEnd; ++intersectionIt) {
+          if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
+            isOnBoundary = true;
+            numberOfBoundarySegments += 1;
+            data[index] += double(intersectionIt->boundaryId());
+          }
+        }
+        if (isOnBoundary) {
+          data[index] /= double(numberOfBoundarySegments);
+        }
+      } // walk the grid
+      return data;
+    }
+  }; // struct add_boundary_id_visualization<..., true>
+
+  template <class G>
+  struct add_boundary_id_visualization<G, false>
+  {
+    template <class V, class GV>
+    void operator()(V& /*vtk_writer*/, const GV& /*grid_view*/, const int /*lvl*/)
+    {
+    }
+  };
+
   void visualize_plain(const std::string filename) const
   {
     if (GridType::dimension > 3) // give us a call if you have any idea!
@@ -231,11 +278,8 @@ private:
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
-#if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
-      std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
-#endif
+      add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
       // write
       vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
@@ -255,11 +299,8 @@ private:
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
-#if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
       // boundary id
-      std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtkwriter.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
-#endif
+      add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
       // dirichlet values
       std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
       vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(lvl));
@@ -270,39 +311,6 @@ private:
       vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_with_boundary(...)
-
-#if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
-  std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
-  {
-    std::vector<double> data(gridView.indexSet().size(0));
-    // walk the grid
-    const auto it_end = gridView.template end<0>();
-    for (auto it = gridView.template begin<0>(); it != it_end; ++it) {
-      const auto& entity = *it;
-      const auto& index = gridView.indexSet().index(entity);
-      data[index] = 0.0;
-      size_t numberOfBoundarySegments = 0;
-      bool isOnBoundary = false;
-      const auto intersectionItEnd = gridView.iend(entity);
-      for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != intersectionItEnd; ++intersectionIt) {
-        if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
-          isOnBoundary = true;
-          numberOfBoundarySegments += 1;
-          data[index] += double(intersectionIt->boundaryId());
-        }
-      }
-      if (isOnBoundary) {
-        data[index] /= double(numberOfBoundarySegments);
-      }
-    } // walk the grid
-    return data;
-  }
-#else
-  std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& /*gridView*/) const
-  {
-    DUNE_THROW(InvalidStateException, "Experimental Grid Extensions missing");
-  }
-#endif
 
   template <class BoundaryInfoType>
   std::vector<double> generateBoundaryVisualization(const LevelGridViewType& gridView,
