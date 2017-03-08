@@ -327,29 +327,28 @@ typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<do
 #endif
                         > GridTypes; // clang-format on
 
-TYPED_TEST_CASE(GluedMultiscaleGridTest, GridTypes);
-TYPED_TEST(GluedMultiscaleGridTest, setup_works)
+TYPED_TEST_CASE(GluedDdGridTest, GridTypes);
+TYPED_TEST(GluedDdGridTest, setup_works)
 {
   this->setup();
 }
-TYPED_TEST(GluedMultiscaleGridTest, visualize_is_callable)
+TYPED_TEST(GluedDdGridTest, visualize_is_callable)
 {
   this->visualize_is_callable();
 }
-TYPED_TEST(GluedMultiscaleGridTest, couplings_are_of_correct_size)
+TYPED_TEST(GluedDdGridTest, couplings_are_of_correct_size)
 {
   this->couplings_are_of_correct_size();
 }
-TYPED_TEST(GluedMultiscaleGridTest, __STILL_BROKEN__intersections_are_correctly_oriented_for_equal_levels)
+TYPED_TEST(GluedDdGridTest, __STILL_BROKEN__intersections_are_correctly_oriented_for_equal_levels)
 {
   this->check_intersection_orientation_for_equal_levels();
 }
-TYPED_TEST(GluedMultiscaleGridTest, __STILL_BROKEN__intersections_are_correctly_oriented_for_higher_neighbor_levels)
+TYPED_TEST(GluedDdGridTest, __STILL_BROKEN__intersections_are_correctly_oriented_for_higher_neighbor_levels)
 {
   this->check_intersection_orientation_for_higher_neighbor_levels();
 }
-TYPED_TEST(GluedMultiscaleGridTest,
-           __STILL_BROKEN__intersection_orientation_is_wrong_for_lower_or_equal_neighbor_levels)
+TYPED_TEST(GluedDdGridTest, __STILL_BROKEN__intersection_orientation_is_wrong_for_lower_or_equal_neighbor_levels)
 {
   this->check_intersection_orientation_for_lower_or_equal_neighbor_levels();
 }
