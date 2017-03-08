@@ -16,7 +16,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/periodic_gridview.hh>
+#include <dune/xt/grid/view/periodic.hh>
 #include <dune/xt/grid/gridprovider.hh>
 
 using namespace Dune::XT;

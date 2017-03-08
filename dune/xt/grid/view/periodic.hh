@@ -9,8 +9,8 @@
 //   Rene Milk       (2015 - 2016)
 //   Tobias Leibner  (2015 - 2017)
 
-#ifndef DUNE_XT_GRID_PERIODICVIEW_HH
-#define DUNE_XT_GRID_PERIODICVIEW_HH
+#ifndef DUNE_XT_GRID_VIEW_PERIODIC_HH
+#define DUNE_XT_GRID_VIEW_PERIODIC_HH
 
 #include <bitset>
 #include <iterator>
@@ -1066,4 +1066,4 @@ struct is_grid_view<PeriodicGridView<T, bb>> : public std::true_type
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_PERIODICVIEW_HH
+#endif // DUNE_XT_GRID_VIEW_PERIODIC_HH
