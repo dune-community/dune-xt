@@ -199,47 +199,27 @@ class SubdomainGridFactory
 {
 public:
   typedef GridImp GridType;
-
   typedef SubdomainGridFactory<GridType> ThisType;
-
   static const unsigned int dim = GridType::dimension;
-
   typedef SubdomainGrid<GridType> DdGridType;
-
   typedef typename GridType::template Codim<0>::Entity EntityType;
-
-  static const std::string id()
-  {
-    return "xt.grid.dd.subdomaingridfactory";
-  }
 
 private:
   typedef typename DdGridType::GlobalGridPartType GlobalGridPartType;
-
   typedef typename DdGridType::LocalGridPartType LocalGridPartType;
-
   typedef typename DdGridType::BoundaryGridPartType BoundaryGridPartType;
-
   typedef typename DdGridType::CouplingGridPartType CouplingGridPartType;
-
   typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
-
   typedef Dune::GeometryType GeometryType;
-
   // i.e. maps a local to a globl index
   typedef std::map<IndexType, IndexType> IndexMapType;
-
   // i.e. maps a GeometryType to a map of local and global indices
   typedef std::map<GeometryType, IndexMapType> GeometryMapType;
-
   // i.e. contains a GeometryMap for each subdomain
   typedef std::map<size_t, std::shared_ptr<GeometryMapType>> SubdomainMapType;
-
   // map type which maps from an entity index (of the global grid parts index set) to a subdomain
   typedef std::map<IndexType, size_t> EntityToSubdomainMapType;
-
-  typedef Dune::FieldVector<size_t, dim + 1> CodimSizesType;
-
+  typedef FieldVector<size_t, dim + 1> CodimSizesType;
   // for the neighbor information between the subdomains
   typedef std::set<size_t> NeighboringSubdomainsSetType;
 
@@ -249,27 +229,24 @@ private:
     static void subEntities(ThisType& factory,
                             const EntityType& entity,
                             GeometryMapType& geometryMap,
-                            CodimSizesType& localCodimSizes /*, const std::string prefix = "",
-                            std::ostream& out                                         = Dune::Stuff::Common::Logger().devnull()*/)
+                            CodimSizesType& localCodimSizes)
     {
-      //      // suppress output, since we are not codim 0
-      //      Dune::Stuff::Common::LogStream& devnull = Dune::Stuff::Common::Logger().devnull();
       // loop over all codim c subentities of the entity
       for (size_t i = 0; i < entity.subEntities(c); ++i) {
         const auto codimCentity = entity.template subEntity<c>(i);
         const GeometryType& geometryType = codimCentity.type();
         const IndexType globalIndex = factory.globalGridPart_->indexSet().index(codimCentity);
-        factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex /*, prefix, out*/);
-      } // loop over all codim c subentities of the entity
+        factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex);
+      }
       // add all codim c + 1 subentities
-      Add<c + 1, d>::subEntities(factory, entity, geometryMap, localCodimSizes /*, prefix, out*/);
-    } // static void subEntities()
+      Add<c + 1, d>::subEntities(factory, entity, geometryMap, localCodimSizes);
+    } // ... subEntities(...)
   }; // struct Add
 
 public:
   SubdomainGridFactory(const GridType& grid,
                        const size_t boundary_segment_index = std::numeric_limits<size_t>::max() - 42)
-    : grid_(Dune::stackobject_to_shared_ptr(grid))
+    : grid_(stackobject_to_shared_ptr(grid))
     , boundary_segment_index_(boundary_segment_index)
     , prepared_(false)
     , finalized_(false)
@@ -295,8 +272,8 @@ public:
       globalGridPart_ = std::make_shared<const GlobalGridPartType>(const_cast<GridType&>(*grid_));
       entityToSubdomainMap_ = std::shared_ptr<EntityToSubdomainMapType>(new EntityToSubdomainMapType());
       prepared_ = true;
-    } // if (!prepared_)
-  } // void prepare()
+    }
+  } // ... prepare()
 
   const std::shared_ptr<const GlobalGridPartType> globalGridPart() const
   {
@@ -304,34 +281,27 @@ public:
     return globalGridPart_;
   }
 
-  void add(const EntityType& entity, const size_t subdomain /*, const std::string prefix = "",
-           std::ostream& out = Dune::Stuff::Common::Logger().debug()*/)
+  void add(const EntityType& entity, const size_t subdomain)
   {
     // prepare
     assert(prepared_ && "Please call prepare() before calling add()!");
     assert(!finalized_ && "Do not call add() after calling finalized()!");
     const IndexType globalIndex = globalGridPart_->indexSet().index(entity);
-    //#ifndef NDEBUG
-    //    out << prefix << "adding entity " << globalIndex << " to subdomain " << subdomain << ":" << std::endl;
-    //#endif
     // add subdomain to this entity index
     typename EntityToSubdomainMapType::iterator indexIt = entityToSubdomainMap_->find(globalIndex);
     if (indexIt == entityToSubdomainMap_->end()) {
       entityToSubdomainMap_->insert(std::pair<IndexType, size_t>(globalIndex, subdomain));
     } else {
-      if (indexIt->second != subdomain) {
-        std::stringstream msg;
-        msg << "Error in " << id() << ": can not add entity to more than one subdomain!";
-        DUNE_THROW(Dune::InvalidStateException, msg.str());
-      }
-    } // add subdomain to this entity index
+      if (indexIt->second != subdomain)
+        DUNE_THROW(InvalidStateException, "can not add entity to more than one subdomain!");
+    }
     // create geometry map for this subdomain if needed (doing this explicitly (instead of just using insert()) only to
     // increment size)
     if (subdomainToEntityMap_.find(subdomain) == subdomainToEntityMap_.end()) {
       subdomainToEntityMap_.insert(std::pair<size_t, std::shared_ptr<GeometryMapType>>(
           subdomain, std::shared_ptr<GeometryMapType>(new GeometryMapType())));
       ++size_;
-    } // create geometry map for this subdomain if needed
+    }
     // create local codim sizes for this subdomain
     localCodimSizes_.insert(std::pair<size_t, CodimSizesType>(subdomain, CodimSizesType(0)));
     // add this entity and all subentities to the geometry map (geometry map has to exist, see above)
@@ -340,21 +310,18 @@ public:
     // add geometry and global index of this codim 0 entity
     const GeometryType& geometryType = entity.type();
     CodimSizesType& localCodimSizes = localCodimSizes_.find(subdomain)->second;
-    addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex /*, prefix, out*/);
+    addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex);
     // add all remaining codims
-    Add<1, dim>::subEntities(*this, entity, geometryMap, localCodimSizes /*, prefix, out*/);
-  } // void add()
+    Add<1, dim>::subEntities(*this, entity, geometryMap, localCodimSizes);
+  } // ... add(...)
 
-  void
-  finalize(const size_t oversamplingLayers = 0,
-           const size_t neighbor_recursion_level = internal::NeighborRecursionLevel<GridType>::compute(),
-           //                const std::string prefix = "", std::ostream& out = Dune::Stuff::Common::Logger().debug(),
-           bool assert_connected = true)
+  void finalize(const size_t oversamplingLayers = 0,
+                const size_t neighbor_recursion_level = internal::NeighborRecursionLevel<GridType>::compute(),
+                bool assert_connected = true)
   {
     assert(prepared_ && "Please call prepare() and add() before calling finalize()!");
     if (!finalized_) {
       // prepare
-      //      out << prefix << "finalizing " << std::flush;
       // init data structures
       // for the subdomains inner boundaries
       //   * to map the local intersection index to the desired fake boundary id
@@ -396,9 +363,7 @@ public:
         // test if this subdomain exists
         typename SubdomainMapType::iterator subdomainToEntityMapIt = subdomainToEntityMap_.find(subdomain);
         if (subdomainToEntityMapIt == subdomainToEntityMap_.end()) {
-          std::stringstream msg;
-          msg << "Error in " << id() << ": numbering of subdomains has to be consecutive upon calling finalize()!";
-          DUNE_THROW(InvalidStateException, msg.str());
+          DUNE_THROW(InvalidStateException, "numbering of subdomains has to be consecutive upon calling finalize()!");
         } else {
           // compute number of codim 0 entities
           const GeometryMapType& subdomainGeometryMap = *(subdomainToEntityMapIt->second);
@@ -420,10 +385,8 @@ public:
               std::shared_ptr<EntityToIntersectionInfoMapType>(new EntityToIntersectionInfoMapType());
         } // test if this subdomain exists
       } // loop over all subdomains
-      //      out << size_ << " subdomains:" << std::endl;
       // walk the global grid part
       //   * to generate the information which sudomains neighbor each other
-      //      out << prefix << "  generating boundary information:" << std::endl;
       for (typename GlobalGridPartType::template Codim<0>::IteratorType entityIt = globalGridPart_->template begin<0>();
            entityIt != globalGridPart_->template end<0>();
            ++entityIt) {
@@ -446,12 +409,6 @@ public:
           if (intersection.boundary() && !intersection.neighbor()) {
             // get local index of the intersection
             const int intersectionLocalIndex = intersection.indexInInside();
-            // report
-            //#ifndef NDEBUG
-            //            out << prefix << "    entity " << entityGlobalIndex << " lies at the domain boundary of
-            //            subdomain "
-            //                << entitySubdomain << std::endl;
-            //#endif
             // for the boundary grid part
             //   * get the maps for this subdomain (and create them, if necessary)
             if (boundaryGeometryMapMap.find(entitySubdomain) == boundaryGeometryMapMap.end())
@@ -487,14 +444,6 @@ public:
             if (neighborSubdomain != entitySubdomain) {
               // get local index of the intersection
               const int intersectionLocalIndex = intersection.indexInInside();
-              //#ifndef NDEBUG
-              //              // report
-              //              out << prefix << "    entity " << entityGlobalIndex << " lies at an inner boundary of
-              //              subdomain "
-              //                  << entitySubdomain << std::endl;
-              //              out << prefix << "      at intersection " << intersectionLocalIndex << " with neighbor "
-              //                  << neighborGlobalIndex << " of subdomain " << neighborSubdomain << std::endl;
-              //#endif
               // for the neighbor information between the subdomains
               //   * the subdomain of the neighbor is a neighboring subdomain of the entities subdomain
               neighborsOfSubdomain.insert(neighborSubdomain);
@@ -544,10 +493,10 @@ public:
         } // walk the neighbors
         // check if this entity is connected to the other entities of this subdomain
         if (assert_connected && subdomainSizes[entitySubdomain] != 1 && !subdomainsEntitiesAreConnected) {
-          std::stringstream msg;
-          msg << "Error in " << id() << ": at least one entity of subdomain " << entitySubdomain
-              << " is not connected to entity " << entityGlobalIndex << " (connected)!";
-          DUNE_THROW(Dune::InvalidStateException, msg.str());
+          DUNE_THROW(InvalidStateException,
+                     "at least one entity of subdomain " << entitySubdomain << " is not connected to entity "
+                                                         << entityGlobalIndex
+                                                         << " (connected)!");
         } // check if this entity is connected to the other entities of this subdomain
       } // walk the global grid part
       // walk the subdomains
@@ -555,17 +504,10 @@ public:
       localGridParts_ = std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>>(
           new std::vector<std::shared_ptr<const LocalGridPartType>>(size_));
       std::vector<std::shared_ptr<const LocalGridPartType>>& localGridParts = *localGridParts_;
-      //      out << prefix << "creating local grid parts:" << std::endl;
       for (typename SubdomainMapType::const_iterator subdomainIterator = subdomainToEntityMap_.begin();
            subdomainIterator != subdomainToEntityMap_.end();
            ++subdomainIterator) {
-        // report
         const size_t subdomain = subdomainIterator->first;
-        //        const size_t subdomainSize = subdomainSizes[subdomain];
-        //#ifndef NDEBUG
-        //        out << prefix << "  subdomain " << subdomain << " (of size " << subdomainSize << ")... " <<
-        //        std::flush;
-        //#endif
         // for the local grid part
         //   * get the geometry map
         const std::shared_ptr<const GeometryMapType> localGeometryMap = subdomainIterator->second;
@@ -575,13 +517,9 @@ public:
         //   * and create the local grid part
         localGridParts[subdomain] = std::shared_ptr<const LocalGridPartType>(
             new LocalGridPartType(globalGridPart_, localGeometryMap, localBoundaryInfo));
-        //#ifndef NDEBUG
-        //        out << "done" << std::endl;
-        //#endif
       } // walk the subdomains
 
       // walk those subdomains which have a boundary grid part
-      //      out << prefix << "creating boundary grid parts:" << std::endl;
       //   * to create the boundary grid parts
       boundaryGridParts_ = std::shared_ptr<std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>>(
           new std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>());
@@ -598,10 +536,6 @@ public:
                && "We should not get here: we are in big trouble, if these maps do not correspond to each other!");
         assert(boundarySubdomain == boundaryInfoMapIt->first
                && "We should not get here: we are in big trouble, if these maps do not correspond to each other!");
-        //#ifndef NDEBUG
-        //        out << prefix << "  subdomain " << boundarySubdomain << " (of size "
-        //            << boundaryCodimSizesMapIt->second.operator[](0) << ")... " << std::flush;
-        //#endif
         // for the boundary grid part
         //   * get the geometry map
         const std::shared_ptr<const GeometryMapType> boundaryGeometryMap = boundaryGeometryMapMapIt->second;
@@ -612,9 +546,6 @@ public:
             boundarySubdomain,
             std::shared_ptr<const BoundaryGridPartType>(new BoundaryGridPartType(
                 globalGridPart_, boundaryGeometryMap, boundaryBoundaryInfo, localGridParts[boundarySubdomain]))));
-        //#ifndef NDEBUG
-        //        out << "done" << std::endl;
-        //#endif
       } // walk those subdomains which have a boundary grid part
       // walk the subdomains
       //   * to create the coupling grid parts
@@ -623,7 +554,6 @@ public:
               new std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>(size_));
       std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>& couplingGridPartsMaps =
           *couplingGridPartsMaps_;
-      //      out << prefix << "creating coupling grid parts:" << std::endl;
       for (size_t subdomain = 0; subdomain < couplingMaps.size(); ++subdomain) {
         // get the coupling map for this subdomain
         const SubdomainMapType& couplingMap = couplingMaps[subdomain];
@@ -637,9 +567,6 @@ public:
              neighborIt != couplingMap.end();
              ++neighborIt) {
           const size_t neighbor = neighborIt->first;
-          //#ifndef NDEBUG
-          //          out << prefix << "  subdomain " << subdomain << ", neighbor " << neighbor << "... " << std::flush;
-          //#endif
           // get the geometry map
           const std::shared_ptr<const GeometryMapType> couplingGeometryMap = neighborIt->second;
           // get the boundary info map
@@ -654,9 +581,6 @@ public:
                                                                                    coupling_boundary_info,
                                                                                    localGridParts[subdomain],
                                                                                    localGridParts[neighbor]))));
-          //#ifndef NDEBUG
-          //          out << "done" << std::endl;
-          //#endif
         } // loop over all neighbors
       } // walk the subdomains
 
@@ -683,38 +607,37 @@ public:
       // done
       finalized_ = true;
     } // if (!finalized_)
-  } // void finalize()
+  } // ... finalize(...)
 
   std::shared_ptr<DdGridType> createMsGrid()
   {
     assert(finalized_ && "Please call finalize() before calling createMsGrid()!");
     if (oversampled_)
-      return Dune::make_shared<DdGridType>(grid_,
-                                           globalGridPart_,
-                                           size_,
-                                           neighboringSubdomainSets_,
-                                           entityToSubdomainMap_,
-                                           localGridParts_,
-                                           boundaryGridParts_,
-                                           couplingGridPartsMaps_,
-                                           oversampledLocalGridParts_);
+      return std::make_shared<DdGridType>(grid_,
+                                          globalGridPart_,
+                                          size_,
+                                          neighboringSubdomainSets_,
+                                          entityToSubdomainMap_,
+                                          localGridParts_,
+                                          boundaryGridParts_,
+                                          couplingGridPartsMaps_,
+                                          oversampledLocalGridParts_);
     else
-      return Dune::make_shared<DdGridType>(grid_,
-                                           globalGridPart_,
-                                           size_,
-                                           neighboringSubdomainSets_,
-                                           entityToSubdomainMap_,
-                                           localGridParts_,
-                                           boundaryGridParts_,
-                                           couplingGridPartsMaps_);
-  } // const std::shared_ptr< const DdGridType > createMsGrid() const
+      return std::make_shared<DdGridType>(grid_,
+                                          globalGridPart_,
+                                          size_,
+                                          neighboringSubdomainSets_,
+                                          entityToSubdomainMap_,
+                                          localGridParts_,
+                                          boundaryGridParts_,
+                                          couplingGridPartsMaps_);
+  } // ... createMsGrid(...)
 
 private:
   void addGeometryAndIndex(GeometryMapType& geometryMap,
                            CodimSizesType& localCodimSizes,
                            const GeometryType& geometryType,
-                           const IndexType& globalIndex /*,
-                           const std::string& prefix = "", std::ostream& out = Dune::Stuff::Common::Logger().devnull()*/)
+                           const IndexType& globalIndex)
   {
     // get the map to this geometry type
     typename GeometryMapType::mapped_type& indexMap = geometryMap[geometryType];
@@ -725,25 +648,16 @@ private:
       indexMap.insert(std::pair<IndexType, IndexType>(globalIndex, localIndex));
       // increase count for this codim
       ++(localCodimSizes[codim]);
-      // report
-      //#ifndef NDEBUG
-      //      out << prefix << "- " << geometryType << ", global index " << globalIndex << ", local index " <<
-      //      localIndex
-      //          << std::endl;
-      //#endif
-    } // add if needed
-  } // void addGeometryAndIndex()
+    }
+  } // ... addGeometryAndIndex(...)
 
   size_t getSubdomainOf(const IndexType& globalIndex) const
   {
     const typename EntityToSubdomainMapType::const_iterator result = entityToSubdomainMap_->find(globalIndex);
-    if (result == entityToSubdomainMap_->end()) {
-      std::stringstream msg;
-      msg << "Error in " << id() << ": entity " << globalIndex << " not added to any subdomain!";
-      DUNE_THROW(Dune::InvalidStateException, msg.str());
-    }
+    if (result == entityToSubdomainMap_->end())
+      DUNE_THROW(InvalidStateException, "entity " << globalIndex << " not added to any subdomain!");
     return result->second;
-  } // size_t getSubdomainOf(const IndexType& globalIndex) const
+  } // ... getSubdomainOf(...)
 
   std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>>
   addOneLayerOfOverSampling(const SubdomainMapType& subdomainToEntityMap,
@@ -764,9 +678,9 @@ private:
       const size_t subdomain = subdomainIt->first;
       const GeometryMapType& geometryMap = *(subdomainIt->second);
       // * therefore, hardcopy the existing map we want to extend,
-      std::shared_ptr<GeometryMapType> geometryMapCopy = Dune::make_shared<GeometryMapType>(geometryMap);
+      std::shared_ptr<GeometryMapType> geometryMapCopy = std::make_shared<GeometryMapType>(geometryMap);
       // * and create an empty local boundary info map for later use
-      oversamplingSubdomainInnerBoundaryInfos[subdomain] = Dune::make_shared<EntityToIntersectionInfoMapType>();
+      oversamplingSubdomainInnerBoundaryInfos[subdomain] = std::make_shared<EntityToIntersectionInfoMapType>();
       // * then walk the local grid part to find the local boundary entities
       const LocalGridPartType& localGridPart = *(localGridParts[subdomain]);
       for (auto entityIt = localGridPart.template begin<0>(); entityIt != localGridPart.template end<0>(); ++entityIt) {
@@ -971,30 +885,28 @@ private:
   bool oversampled_;
 }; // class SubdomainGridFactory
 
+
 //! specialization to stop the recursion
 template <class GridType>
 template <int c>
 struct SubdomainGridFactory<GridType>::Add<c, c>
 {
-  static void subEntities(
-      SubdomainGridFactory<GridType>& factory,
-      const typename SubdomainGridFactory<GridType>::EntityType& entity,
-      typename SubdomainGridFactory<GridType>::GeometryMapType& geometryMap,
-      typename SubdomainGridFactory<GridType>::CodimSizesType& localCodimSizes /*, const std::string prefix = "",
-                          std::ostream& out                                                                     = Dune::Stuff::Common::Logger().devnull()*/)
+  static void subEntities(SubdomainGridFactory<GridType>& factory,
+                          const typename SubdomainGridFactory<GridType>::EntityType& entity,
+                          typename SubdomainGridFactory<GridType>::GeometryMapType& geometryMap,
+                          typename SubdomainGridFactory<GridType>::CodimSizesType& localCodimSizes)
   {
-    //    // suppress output, since we are not codim 0
-    //    Dune::Stuff::Common::LogStream& devnull = Dune::Stuff::Common::Logger().devnull();
     // loop over all codim c subentities of this entity
     for (size_t i = 0; i < entity.subEntities(c); ++i) {
       const auto codimCentity = entity.template subEntity<c>(i);
       const SubdomainGridFactory<GridType>::GeometryType& geometryType = codimCentity.type();
       const typename SubdomainGridFactory<GridType>::IndexType globalIndex =
           factory.globalGridPart_->indexSet().index(codimCentity);
-      factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex /*, prefix, out*/);
+      factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex);
     } // loop over all codim c subentities of this entity
   } // static void subEntities()
 }; // struct SubdomainGridFactory< GridType >::Add< c, c >
+
 
 } // namespace DD
 } // namespace Grid
