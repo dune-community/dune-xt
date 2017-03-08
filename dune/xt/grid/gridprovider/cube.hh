@@ -283,7 +283,7 @@ class CubeDdSubdomainsGridProviderFactory
   static_assert(XT::Grid::is_grid<GridType>::value, "");
 
 public:
-  typedef grid::Multiscale::Default<GridType> DdGridType;
+  typedef DD::SubdomainGrid<GridType> DdGridType;
 
   static std::string static_id()
   {
@@ -308,10 +308,10 @@ public:
     auto grid =
         make_cube_grid<GridType>(lower_left, upper_right, num_elements, num_refinements, overlap_size).grid_ptr();
 
-    typedef grid::Multiscale::Factory::Default<GridType> MsGridFactoryType;
-    const size_t neighbor_recursion_level = grid::Multiscale::Factory::NeighborRecursionLevel<GridType>::compute();
+    typedef DD::SubdomainGridFactory<GridType> DdGridFactoryType;
+    const size_t neighbor_recursion_level = DD::internal::NeighborRecursionLevel<GridType>::compute();
     // prepare
-    MsGridFactoryType factory(*grid, inner_boundary_segment_index);
+    DdGridFactoryType factory(*grid, inner_boundary_segment_index);
     factory.prepare();
     // global grid part
     const auto global_grid_part = factory.globalGridPart();
@@ -351,8 +351,7 @@ public:
 
 
 template <class GridType>
-typename std::enable_if<XT::Grid::is_grid<GridType>::value,
-                        GridProvider<GridType, grid::Multiscale::Default<GridType>>>::type
+typename std::enable_if<XT::Grid::is_grid<GridType>::value, GridProvider<GridType, DD::SubdomainGrid<GridType>>>::type
 make_cube_dd_subdomains_grid(
     const FieldVector<typename GridType::ctype, GridType::dimension>& lower_left,
     const FieldVector<typename GridType::ctype, GridType::dimension>& upper_right,
@@ -393,8 +392,7 @@ class CubeDdSubdomainsGridProviderFactory
 
 
 template <class GridType>
-typename std::enable_if<XT::Grid::is_grid<GridType>::value,
-                        GridProvider<GridType, grid::Multiscale::Default<GridType>>>::type
+typename std::enable_if<XT::Grid::is_grid<GridType>::value, GridProvider<GridType, DD::SubdomainGrid<GridType>>>::type
 make_cube_dd_subdomains_grid(
     const FieldVector<typename GridType::ctype, GridType::dimension>& /*lower_left*/,
     const FieldVector<typename GridType::ctype, GridType::dimension>& /*upper_right*/,

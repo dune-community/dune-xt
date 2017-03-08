@@ -1,10 +1,14 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// Copyright 2009-2017 dune-xt-grid developers and contributors. All rights reserved.
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_PART_ITERATOR_INTERSECTION_LOCAL_HH
-#define DUNE_GRID_PART_ITERATOR_INTERSECTION_LOCAL_HH
+#ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_ITERATOR_HH
+#define DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_ITERATOR_HH
 
 #include <map>
 #include <vector>
@@ -12,23 +16,23 @@
 
 #include <dune/common/shared_ptr.hh>
 
+#include "intersection-wrapper.hh"
+
 namespace Dune {
 
-namespace grid {
+namespace XT {
 
-namespace Part {
+namespace Grid {
 
-namespace Iterator {
-
-namespace Intersection {
+namespace internal {
 
 template <class GlobalGridPartImp>
-class Local : public GlobalGridPartImp::IntersectionIteratorType
+class LocalIntersectionIterator : public GlobalGridPartImp::IntersectionIteratorType
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
 
-  typedef Local<GlobalGridPartType> ThisType;
+  typedef LocalIntersectionIterator<GlobalGridPartType> ThisType;
 
   typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
 
@@ -40,10 +44,10 @@ public:
 
   typedef std::vector<int> IndexContainerType;
 
-  Local(const GlobalGridPartType& globalGridPart,
-        const EntityType& entity,
-        const IndexContainerType& indexContainer,
-        const bool end = false)
+  LocalIntersectionIterator(const GlobalGridPartType& globalGridPart,
+                            const EntityType& entity,
+                            const IndexContainerType& indexContainer,
+                            const bool end = false)
     : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
     , globalGridPart_(globalGridPart)
     , entity_(entity)
@@ -58,7 +62,7 @@ public:
       }
       forward();
     } // if (!end)
-  } // Local
+  } // LocalIntersectionIterator
 
   ThisType& operator++()
   {
@@ -94,17 +98,16 @@ private:
   unsigned int workAtAll_;
   int last_;
   typename IndexContainerType::const_iterator end_;
-}; // class Local
+}; // class LocalIntersectionIterator
 
-namespace Wrapper {
 
 template <class GlobalGridPartImp>
-class FakeDomainBoundary : public GlobalGridPartImp::IntersectionIteratorType
+class FakeDomainBoundaryIntersectionIterator : public GlobalGridPartImp::IntersectionIteratorType
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
 
-  typedef FakeDomainBoundary<GlobalGridPartType> ThisType;
+  typedef FakeDomainBoundaryIntersectionIterator<GlobalGridPartType> ThisType;
 
   typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
 
@@ -116,19 +119,21 @@ private:
   typedef typename BaseType::Intersection BaseIntersectionType;
 
 public:
-  typedef Dune::grid::Part::Intersection::Wrapper::FakeDomainBoundary<ThisType, BaseIntersectionType> Intersection;
+  typedef FakeDomainBoundaryIntersection<ThisType, BaseIntersectionType> Intersection;
 
-  FakeDomainBoundary(const GlobalGridPartType& globalGridPart, const EntityType& entity, bool end = false)
+  FakeDomainBoundaryIntersectionIterator(const GlobalGridPartType& globalGridPart,
+                                         const EntityType& entity,
+                                         bool end = false)
     : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
     , passThrough_(true)
     , intersection_(*this)
   {
   }
 
-  FakeDomainBoundary(const GlobalGridPartType& globalGridPart,
-                     const EntityType& entity,
-                     const InfoContainerType infoContainer,
-                     bool end = false)
+  FakeDomainBoundaryIntersectionIterator(const GlobalGridPartType& globalGridPart,
+                                         const EntityType& entity,
+                                         const InfoContainerType infoContainer,
+                                         bool end = false)
     : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
     , passThrough_(false)
     , intersection_(*this)
@@ -149,7 +154,7 @@ public:
   }
 
 private:
-  friend class Dune::grid::Part::Intersection::Wrapper::FakeDomainBoundary<ThisType, BaseIntersectionType>;
+  friend class FakeDomainBoundaryIntersection<ThisType, BaseIntersectionType>;
 
   const BaseIntersectionType& getBaseIntersection() const
   {
@@ -177,18 +182,14 @@ private:
   bool passThrough_;
   mutable Intersection intersection_;
   const InfoContainerType infoContainer_;
-}; // class FakeDomainBoundary
+}; // class FakeDomainBoundaryIntersectionIterator
 
-} // namespace Wrapper
+} // namespace internal
 
-} // namespace Intersection
+} // namespace Grid
 
-} // namespace Iterator
-
-} // namespace Part
-
-} // namespace grid
+} // namespace XT
 
 } // namespace Dune
 
-#endif // DUNE_GRID_PART_ITERATOR_INTERSECTION_LOCAL_HH
+#endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_ITERATOR_HH

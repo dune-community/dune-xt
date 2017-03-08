@@ -1,10 +1,14 @@
-﻿// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// Copyright 2009-2017 dune-xt-grid developers and contributors. All rights reserved.
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_MULTISCALE_FACTORY_DEFAULT_HH
-#define DUNE_GRID_MULTISCALE_FACTORY_DEFAULT_HH
+#ifndef DUNE_XT_GRID_DD_SUBDOMAINS_FACTORY_HH
+#define DUNE_XT_GRID_DD_SUBDOMAINS_FACTORY_HH
 
 #include <memory>
 #include <vector>
@@ -22,13 +26,15 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 
-#include <dune/grid/part/local/indexbased.hh>
-#include <dune/grid/multiscale/default.hh>
+#include <dune/xt/grid/view/subdomain/part.hh>
+
+#include "grid.hh"
 
 namespace Dune {
-namespace grid {
-namespace Multiscale {
-namespace Factory {
+namespace XT {
+namespace Grid {
+namespace DD {
+namespace internal {
 
 
 /// \todo: collect all specializations below into this implementation, differentiate at runtime using std::is_same,
@@ -185,34 +191,36 @@ public:
 
 #endif // HAVE_ALBERTA
 
+} // namespace internal
+
 
 template <class GridImp>
-class Default
+class SubdomainGridFactory
 {
 public:
   typedef GridImp GridType;
 
-  typedef Default<GridType> ThisType;
+  typedef SubdomainGridFactory<GridType> ThisType;
 
   static const unsigned int dim = GridType::dimension;
 
-  typedef Dune::grid::Multiscale::Default<GridType> MsGridType;
+  typedef SubdomainGrid<GridType> DdGridType;
 
   typedef typename GridType::template Codim<0>::Entity EntityType;
 
   static const std::string id()
   {
-    return "grid.multiscale.factory.default";
+    return "xt.grid.dd.subdomaingridfactory";
   }
 
 private:
-  typedef typename MsGridType::GlobalGridPartType GlobalGridPartType;
+  typedef typename DdGridType::GlobalGridPartType GlobalGridPartType;
 
-  typedef typename MsGridType::LocalGridPartType LocalGridPartType;
+  typedef typename DdGridType::LocalGridPartType LocalGridPartType;
 
-  typedef typename MsGridType::BoundaryGridPartType BoundaryGridPartType;
+  typedef typename DdGridType::BoundaryGridPartType BoundaryGridPartType;
 
-  typedef typename MsGridType::CouplingGridPartType CouplingGridPartType;
+  typedef typename DdGridType::CouplingGridPartType CouplingGridPartType;
 
   typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
 
@@ -259,7 +267,8 @@ private:
   }; // struct Add
 
 public:
-  Default(const GridType& grid, const size_t boundary_segment_index = std::numeric_limits<size_t>::max() - 42)
+  SubdomainGridFactory(const GridType& grid,
+                       const size_t boundary_segment_index = std::numeric_limits<size_t>::max() - 42)
     : grid_(Dune::stackobject_to_shared_ptr(grid))
     , boundary_segment_index_(boundary_segment_index)
     , prepared_(false)
@@ -269,8 +278,8 @@ public:
   {
   }
 
-  Default(const std::shared_ptr<const GridType> grid,
-          const size_t boundary_segment_index = std::numeric_limits<size_t>::max() - 42)
+  SubdomainGridFactory(const std::shared_ptr<const GridType> grid,
+                       const size_t boundary_segment_index = std::numeric_limits<size_t>::max() - 42)
     : grid_(grid)
     , boundary_segment_index_(boundary_segment_index)
     , prepared_(false)
@@ -338,7 +347,7 @@ public:
 
   void
   finalize(const size_t oversamplingLayers = 0,
-           const size_t neighbor_recursion_level = NeighborRecursionLevel<GridType>::compute(),
+           const size_t neighbor_recursion_level = internal::NeighborRecursionLevel<GridType>::compute(),
            //                const std::string prefix = "", std::ostream& out = Dune::Stuff::Common::Logger().debug(),
            bool assert_connected = true)
   {
@@ -676,11 +685,11 @@ public:
     } // if (!finalized_)
   } // void finalize()
 
-  std::shared_ptr<MsGridType> createMsGrid()
+  std::shared_ptr<DdGridType> createMsGrid()
   {
     assert(finalized_ && "Please call finalize() before calling createMsGrid()!");
     if (oversampled_)
-      return Dune::make_shared<MsGridType>(grid_,
+      return Dune::make_shared<DdGridType>(grid_,
                                            globalGridPart_,
                                            size_,
                                            neighboringSubdomainSets_,
@@ -690,7 +699,7 @@ public:
                                            couplingGridPartsMaps_,
                                            oversampledLocalGridParts_);
     else
-      return Dune::make_shared<MsGridType>(grid_,
+      return Dune::make_shared<DdGridType>(grid_,
                                            globalGridPart_,
                                            size_,
                                            neighboringSubdomainSets_,
@@ -698,7 +707,7 @@ public:
                                            localGridParts_,
                                            boundaryGridParts_,
                                            couplingGridPartsMaps_);
-  } // const std::shared_ptr< const MsGridType > createMsGrid() const
+  } // const std::shared_ptr< const DdGridType > createMsGrid() const
 
 private:
   void addGeometryAndIndex(GeometryMapType& geometryMap,
@@ -960,18 +969,18 @@ private:
   // for the coupling grid parts
   std::shared_ptr<std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>> couplingGridPartsMaps_;
   bool oversampled_;
-}; // class Default
+}; // class SubdomainGridFactory
 
 //! specialization to stop the recursion
 template <class GridType>
 template <int c>
-struct Default<GridType>::Add<c, c>
+struct SubdomainGridFactory<GridType>::Add<c, c>
 {
-  static void
-  subEntities(Default<GridType>& factory,
-              const typename Default<GridType>::EntityType& entity,
-              typename Default<GridType>::GeometryMapType& geometryMap,
-              typename Default<GridType>::CodimSizesType& localCodimSizes /*, const std::string prefix = "",
+  static void subEntities(
+      SubdomainGridFactory<GridType>& factory,
+      const typename SubdomainGridFactory<GridType>::EntityType& entity,
+      typename SubdomainGridFactory<GridType>::GeometryMapType& geometryMap,
+      typename SubdomainGridFactory<GridType>::CodimSizesType& localCodimSizes /*, const std::string prefix = "",
                           std::ostream& out                                                                     = Dune::Stuff::Common::Logger().devnull()*/)
   {
     //    // suppress output, since we are not codim 0
@@ -979,16 +988,17 @@ struct Default<GridType>::Add<c, c>
     // loop over all codim c subentities of this entity
     for (size_t i = 0; i < entity.subEntities(c); ++i) {
       const auto codimCentity = entity.template subEntity<c>(i);
-      const Default<GridType>::GeometryType& geometryType = codimCentity.type();
-      const typename Default<GridType>::IndexType globalIndex = factory.globalGridPart_->indexSet().index(codimCentity);
+      const SubdomainGridFactory<GridType>::GeometryType& geometryType = codimCentity.type();
+      const typename SubdomainGridFactory<GridType>::IndexType globalIndex =
+          factory.globalGridPart_->indexSet().index(codimCentity);
       factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex /*, prefix, out*/);
     } // loop over all codim c subentities of this entity
   } // static void subEntities()
-}; // struct Default< GridType >::Add< c, c >
+}; // struct SubdomainGridFactory< GridType >::Add< c, c >
 
-} // namespace Factory
-} // namespace Multiscale
-} // namespace grid
+} // namespace DD
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 
-#endif // DUNE_GRID_MULTISCALE_FACTORY_DEFAULT_HH
+#endif // DUNE_XT_GRID_DD_SUBDOMAINS_FACTORY_HH

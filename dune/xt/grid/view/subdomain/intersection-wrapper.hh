@@ -1,10 +1,14 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// Copyright 2009-2017 dune-xt-grid developers and contributors. All rights reserved.
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_PART_INTERSECTION_WRAPPER_HH
-#define DUNE_GRID_PART_INTERSECTION_WRAPPER_HH
+#ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_WRAPPER_HH
+#define DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_WRAPPER_HH
 
 #ifdef HAVE_CMAKE_CONFIG
 #include "cmake_config.h"
@@ -26,23 +30,21 @@
 
 namespace Dune {
 
-namespace grid {
+namespace XT {
 
-namespace Part {
+namespace Grid {
 
-namespace Intersection {
-
-namespace Wrapper {
+namespace internal {
 
 template <class IntersectionIteratorImp, class WrappedIntersectionImp>
-class FakeDomainBoundary
+class FakeDomainBoundaryIntersection
 {
 public:
   typedef IntersectionIteratorImp IntersectionIteratorType;
 
   typedef WrappedIntersectionImp WrappedIntersectionType;
 
-  typedef FakeDomainBoundary<IntersectionIteratorType, WrappedIntersectionType> ThisType;
+  typedef FakeDomainBoundaryIntersection<IntersectionIteratorType, WrappedIntersectionType> ThisType;
 
   static const int dimension = WrappedIntersectionType::dimension;
 
@@ -62,7 +64,7 @@ public:
 
   typedef typename WrappedIntersectionType::ctype ctype;
 
-  FakeDomainBoundary(const IntersectionIteratorType& intersectionIterator)
+  FakeDomainBoundaryIntersection(const IntersectionIteratorType& intersectionIterator)
     : intersectionIterator_(intersectionIterator)
     , passThrough_(true)
     , boundary_segment_index_(std::numeric_limits<size_t>::max())
@@ -187,16 +189,14 @@ private:
   const IntersectionIteratorType& intersectionIterator_;
   bool passThrough_;
   size_t boundary_segment_index_;
-}; // class FakeDomainBoundary
+}; // class FakeDomainBoundaryIntersection
 
-} // namespace Wrapper
+} // namespace internal
 
-} // namespace Intersection
+} // namespace Grid
 
-} // namespace Part
-
-} // namespace grid
+} // namespace XT
 
 } // namespace Dune
 
-#endif // DUNE_GRID_PART_INTERSECTION_WRAPPER_HH
+#endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_WRAPPER_HH

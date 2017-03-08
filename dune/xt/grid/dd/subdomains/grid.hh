@@ -1,10 +1,14 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// Copyright 2009-2017 dune-xt-grid developers and contributors. All rights reserved.
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_MULTISCALE_DEFAULT_HH
-#define DUNE_GRID_MULTISCALE_DEFAULT_HH
+#ifndef DUNE_XT_GRID_DD_SUBDOMAINS_GRID_HH
+#define DUNE_XT_GRID_DD_SUBDOMAINS_GRID_HH
 
 #include <vector>
 #include <set>
@@ -22,16 +26,17 @@
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include <dune/grid/part/local/indexbased.hh>
+#include <dune/xt/grid/view/subdomain/part.hh>
 
 namespace Dune {
-namespace grid {
-namespace Multiscale {
+namespace XT {
+namespace Grid {
+namespace DD {
 
 #if HAVE_DUNE_FEM
 
 /**
- *  \brief      Default implementation of a Dune::grid::Multiscale::Interface
+ *  \brief      Implementation of domain decomposition by subdomain grid parts.
  *
  *              The basic assumption is, that each entity of the global grid part is added to at most one local grid
  *              part. Overlapping or the like is then handled afterwards by adding additional overlapping regions to
@@ -46,12 +51,12 @@ namespace Multiscale {
  *              reference imho.
  */
 template <class GridImp>
-class Default
+class SubdomainGrid
 {
 public:
   typedef GridImp GridType;
 
-  typedef Default<GridType> ThisType;
+  typedef SubdomainGrid<GridType> ThisType;
 
   static const unsigned int dim = GridType::dimension;
   static const unsigned int dimension = GridType::dimension;
@@ -62,15 +67,15 @@ public:
 
   //  typedef typename GlobalGridPartType::GridViewType GlobalGridViewType;
 
-  typedef Dune::grid::Part::Local::IndexBased::Const<GlobalGridPartType> LocalGridPartType;
+  typedef SubdomainGridPart<GlobalGridPartType> LocalGridPartType;
 
   //  typedef typename LocalGridPartType::GridViewType LocalGridViewType;
 
-  typedef Dune::grid::Part::Local::IndexBased::ConstBoundary<GlobalGridPartType> BoundaryGridPartType;
+  typedef SubdomainBoundaryGridPart<GlobalGridPartType> BoundaryGridPartType;
 
   //  typedef typename BoundaryGridPartType::GridViewType BoundaryGridViewType;
 
-  typedef Dune::grid::Part::Local::IndexBased::ConstCoupling<GlobalGridPartType> CouplingGridPartType;
+  typedef SubdomainCouplingGridPart<GlobalGridPartType> CouplingGridPartType;
 
   //  typedef typename CouplingGridPartType::GridViewType CouplingGridViewType;
 
@@ -85,18 +90,19 @@ public:
 
   static const std::string id()
   {
-    return "grid.multiscale.default";
+    return "xt.grid.dd.subdomaingrid";
   }
 
-  Default(const std::shared_ptr<const GridType> grd,
-          const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
-          const size_t sz,
-          const std::shared_ptr<const std::vector<NeighborSetType>> neighboringSets,
-          const std::shared_ptr<const EntityToSubdomainMapType> entityToSubdMap,
-          const std::shared_ptr<const std::vector<std::shared_ptr<const LocalGridPartType>>> localGridParts,
-          const std::shared_ptr<const std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>> boundaryGridParts,
-          const std::shared_ptr<const std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>>
-              couplingGridPartsMaps)
+  SubdomainGrid(
+      const std::shared_ptr<const GridType> grd,
+      const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
+      const size_t sz,
+      const std::shared_ptr<const std::vector<NeighborSetType>> neighboringSets,
+      const std::shared_ptr<const EntityToSubdomainMapType> entityToSubdMap,
+      const std::shared_ptr<const std::vector<std::shared_ptr<const LocalGridPartType>>> localGridParts,
+      const std::shared_ptr<const std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>> boundaryGridParts,
+      const std::shared_ptr<const std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>>
+          couplingGridPartsMaps)
     : grid_(grd)
     , globalGridPart_(globalGrdPrt)
     , size_(sz)
@@ -129,18 +135,19 @@ public:
       DUNE_THROW(Dune::InvalidStateException, msg.str());
     //    // create grid views
     //    createGridViews();
-  } // Default()
+  } // SubdomainGrid()
 
-  Default(const std::shared_ptr<const GridType> grd,
-          const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
-          const size_t sz,
-          const std::shared_ptr<const std::vector<NeighborSetType>> neighboringSets,
-          const std::shared_ptr<const EntityToSubdomainMapType> entityToSubdMap,
-          const std::shared_ptr<const std::vector<std::shared_ptr<const LocalGridPartType>>> localGridParts,
-          const std::shared_ptr<const std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>> boundaryGridParts,
-          const std::shared_ptr<const std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>>
-              couplingGridPartsMaps,
-          const std::shared_ptr<const std::vector<std::shared_ptr<const LocalGridPartType>>> oversampledLocalGridParts)
+  SubdomainGrid(
+      const std::shared_ptr<const GridType> grd,
+      const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
+      const size_t sz,
+      const std::shared_ptr<const std::vector<NeighborSetType>> neighboringSets,
+      const std::shared_ptr<const EntityToSubdomainMapType> entityToSubdMap,
+      const std::shared_ptr<const std::vector<std::shared_ptr<const LocalGridPartType>>> localGridParts,
+      const std::shared_ptr<const std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>> boundaryGridParts,
+      const std::shared_ptr<const std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>>
+          couplingGridPartsMaps,
+      const std::shared_ptr<const std::vector<std::shared_ptr<const LocalGridPartType>>> oversampledLocalGridParts)
     : grid_(grd)
     , globalGridPart_(globalGrdPrt)
     , size_(sz)
@@ -174,11 +181,11 @@ public:
       DUNE_THROW(Dune::InvalidStateException, msg.str());
     //    // create grid views
     //    createGridViews();
-  } // Default()
+  } // SubdomainGrid()
 
-  Default(const ThisType& other) = default;
+  SubdomainGrid(const ThisType& other) = default;
 
-  Default(ThisType&& source) = default;
+  SubdomainGrid(ThisType&& source) = default;
 
   const std::shared_ptr<const GridType>& grid() const
   {
@@ -411,20 +418,21 @@ private:
   //  std::shared_ptr<std::vector<std::map<size_t, std::shared_ptr<const CouplingGridViewType>>>>
   //  couplingGridViewsMaps_;
   //  std::shared_ptr<const GlobalGridViewType> globalGridView_;
-}; // class Default
+}; // class SubdomainGrid
 
 #else // HAVE_DUNE_FEM
 
 template <class GridImp>
-class Default
+class SubdomainGrid
 {
   static_assert(AlwaysFalse<GridImp>::value, "You are missing dune-fem!");
 };
 
 #endif // HAVE_DUNE_FEM
 
-} // namespace Multiscale
-} // namespace grid
+} // namespace DD
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 
-#endif // DUNE_GRID_MULTISCALE_DEFAULT_HH
+#endif // DUNE_XT_GRID_DD_SUBDOMAINS_GRID_HH

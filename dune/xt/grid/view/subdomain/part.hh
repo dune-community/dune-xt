@@ -1,10 +1,14 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// Copyright 2009-2017 dune-xt-grid developers and contributors. All rights reserved.
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_PART_LOCAL_INDEXBASED_HH
-#define DUNE_GRID_PART_LOCAL_INDEXBASED_HH
+#ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_PART_HH
+#define DUNE_XT_GRID_VIEW_SUBDOMAIN_PART_HH
 
 #include <map>
 #include <set>
@@ -20,36 +24,35 @@
 #include <dune/fem/gridpart/common/gridpart.hh>
 #endif
 
-#include <dune/grid/part/iterator/local/indexbased.hh>
-#include <dune/grid/part/iterator/intersection/local.hh>
-#include <dune/grid/part/iterator/intersection/wrapper.hh>
-#include <dune/grid/part/indexset/local.hh>
+#include "entity-iterator.hh"
+#include "indexset.hh"
+#include "intersection-iterator.hh"
+#include "intersection-wrapper.hh"
 
 namespace Dune {
-namespace grid {
-namespace Part {
-namespace Local {
-namespace IndexBased {
+namespace XT {
+namespace Grid {
+
 
 template <class GlobalGridPartImp>
-class Const;
+class SubdomainGridPart;
 
 template <class GlobalGridPartImp>
-class ConstTraits
+class SubdomainGridPartTraits
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
 
-  typedef Const<GlobalGridPartImp> GridPartType;
+  typedef SubdomainGridPart<GlobalGridPartImp> GridPartType;
   typedef typename GlobalGridPartType::GridType GridType;
-  typedef typename IndexSet::Local::IndexBased<GlobalGridPartType> IndexSetType;
+  typedef typename internal::IndexBasedIndexSet<GlobalGridPartType> IndexSetType;
   typedef typename GlobalGridPartType::CollectiveCommunicationType CollectiveCommunicationType;
   typedef typename GlobalGridPartType::TwistUtilityType TwistUtilityType;
 
   static const PartitionIteratorType indexSetPartitionType = GlobalGridPartType::indexSetPartitionType;
   static const InterfaceType indexSetInterfaceType = GlobalGridPartType::indexSetInterfaceType;
 
-  typedef Iterator::Intersection::Wrapper::FakeDomainBoundary<GlobalGridPartType> IntersectionIteratorType;
+  typedef internal::FakeDomainBoundaryIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
 
   template <int codim>
   struct Codim : public GlobalGridPartType::template Codim<codim>
@@ -57,26 +60,26 @@ public:
     template <PartitionIteratorType pitype>
     struct Partition
     {
-      typedef typename Iterator::Local::IndexBased<GlobalGridPartType, codim, pitype> IteratorType;
+      typedef typename internal::IndexBasedEntityIterator<GlobalGridPartType, codim, pitype> IteratorType;
     };
   };
 
   static const bool conforming = GlobalGridPartType::Traits::conforming;
-}; // class ConstTraits
+}; // class SubdomainGridPartTraits
 
 template <class GlobalGridPartImp>
-class Const
+class SubdomainGridPart
 #if HAVE_DUNE_FEM
-    : public Fem::GridPartInterface<ConstTraits<GlobalGridPartImp>>
+    : public Fem::GridPartInterface<SubdomainGridPartTraits<GlobalGridPartImp>>
 #endif
 {
 public:
-  typedef Const<GlobalGridPartImp> ThisType;
-  typedef ConstTraits<GlobalGridPartImp> Traits;
+  typedef SubdomainGridPart<GlobalGridPartImp> ThisType;
+  typedef SubdomainGridPartTraits<GlobalGridPartImp> Traits;
 
 private:
 #if HAVE_DUNE_FEM
-  typedef Fem::GridPartInterface<ConstTraits<GlobalGridPartImp>> BaseType;
+  typedef Fem::GridPartInterface<SubdomainGridPartTraits<GlobalGridPartImp>> BaseType;
   typedef BaseType BaseTraits;
 #else
   typedef Traits BaseTraits;
@@ -98,9 +101,9 @@ public:
   //! container type for the boundary information
   typedef std::map<IndexType, std::map<int, size_t>> BoundaryInfoContainerType;
 
-  Const(const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
-        const std::shared_ptr<const IndexContainerType> indexContainer,
-        const std::shared_ptr<const BoundaryInfoContainerType> boundaryInfoContainer)
+  SubdomainGridPart(const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
+                    const std::shared_ptr<const IndexContainerType> indexContainer,
+                    const std::shared_ptr<const BoundaryInfoContainerType> boundaryInfoContainer)
     : globalGridPart_(globalGrdPrt)
     , indexContainer_(indexContainer)
     , boundaryInfoContainer_(boundaryInfoContainer)
@@ -108,9 +111,9 @@ public:
   {
   }
 
-  Const(const ThisType& other) = default;
+  SubdomainGridPart(const ThisType& other) = default;
 
-  Const(ThisType&& source) = default;
+  SubdomainGridPart(ThisType&& source) = default;
 
   const IndexSetType& indexSet() const
   {
@@ -216,31 +219,31 @@ private:
   const std::shared_ptr<const IndexContainerType> indexContainer_;
   const std::shared_ptr<const BoundaryInfoContainerType> boundaryInfoContainer_;
   const IndexSetType indexSet_;
-}; // class Const
+}; // class SubdomainGridPart
 
 template <class GlobalGridPartImp>
-class ConstCoupling;
+class SubdomainCouplingGridPart;
 
 template <class GlobalGridPartImp>
-struct ConstCouplingTraits : public ConstTraits<GlobalGridPartImp>
+struct SubdomainCouplingGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
 {
   typedef GlobalGridPartImp GlobalGridPartType;
 
-  typedef Dune::grid::Part::Local::IndexBased::ConstCoupling<GlobalGridPartImp> GridPartType;
+  typedef Dune::XT::Grid::SubdomainCouplingGridPart<GlobalGridPartImp> GridPartType;
 
   //! localized intersection iterator
-  typedef Dune::grid::Part::Iterator::Intersection::Local<GlobalGridPartType> IntersectionIteratorType;
-}; // class ConstCouplingTraits
+  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
+}; // class SubdomainCouplingGridPartTraits
 
 template <class GlobalGridPartImp>
-class ConstCoupling : public Const<GlobalGridPartImp>
+class SubdomainCouplingGridPart : public SubdomainGridPart<GlobalGridPartImp>
 {
 public:
-  typedef ConstCoupling<GlobalGridPartImp> ThisType;
+  typedef SubdomainCouplingGridPart<GlobalGridPartImp> ThisType;
 
-  typedef Dune::grid::Part::Local::IndexBased::ConstCouplingTraits<GlobalGridPartImp> Traits;
+  typedef Dune::XT::Grid::SubdomainCouplingGridPartTraits<GlobalGridPartImp> Traits;
 
-  typedef Const<GlobalGridPartImp> BaseType;
+  typedef SubdomainGridPart<GlobalGridPartImp> BaseType;
 
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
 
@@ -263,11 +266,11 @@ public:
   //! container type for the intersection information
   typedef std::map<IndexType, std::vector<int>> IntersectionInfoContainerType;
 
-  ConstCoupling(const std::shared_ptr<const GlobalGridPartType> globalGrdPart,
-                const std::shared_ptr<const IndexContainerType> indexContainer,
-                const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer,
-                const std::shared_ptr<const InsideType> insd,
-                const std::shared_ptr<const OutsideType> outsd)
+  SubdomainCouplingGridPart(const std::shared_ptr<const GlobalGridPartType> globalGrdPart,
+                            const std::shared_ptr<const IndexContainerType> indexContainer,
+                            const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer,
+                            const std::shared_ptr<const InsideType> insd,
+                            const std::shared_ptr<const OutsideType> outsd)
     : BaseType(globalGrdPart,
                indexContainer,
                std::shared_ptr<const BoundaryInfoContainerType>(new BoundaryInfoContainerType()))
@@ -277,9 +280,9 @@ public:
   {
   }
 
-  ConstCoupling(const ThisType& other) = default;
+  SubdomainCouplingGridPart(const ThisType& other) = default;
 
-  ConstCoupling(ThisType&& source) = default;
+  SubdomainCouplingGridPart(ThisType&& source) = default;
 
   IntersectionIteratorType ibegin(const EntityType& ent) const
   {
@@ -317,31 +320,31 @@ private:
   const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer_;
   const std::shared_ptr<const InsideType> inside_;
   const std::shared_ptr<const OutsideType> outside_;
-}; // class ConstCoupling
+}; // class SubdomainCouplingGridPart
 
 template <class GlobalGridPartImp>
-class ConstBoundary;
+class SubdomainBoundaryGridPart;
 
 template <class GlobalGridPartImp>
-struct ConstBoundaryTraits : public ConstTraits<GlobalGridPartImp>
+struct SubdomainBoundaryGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
 {
   typedef GlobalGridPartImp GlobalGridPartType;
 
-  typedef Dune::grid::Part::Local::IndexBased::ConstBoundary<GlobalGridPartImp> GridPartType;
+  typedef Dune::XT::Grid::SubdomainBoundaryGridPart<GlobalGridPartImp> GridPartType;
 
   //! localized intersection iterator
-  typedef Dune::grid::Part::Iterator::Intersection::Local<GlobalGridPartType> IntersectionIteratorType;
-}; // class ConstBoundaryTraits
+  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
+}; // class SubdomainBoundaryGridPartTraits
 
 template <class GlobalGridPartImp>
-class ConstBoundary : public Const<GlobalGridPartImp>
+class SubdomainBoundaryGridPart : public SubdomainGridPart<GlobalGridPartImp>
 {
 public:
-  typedef ConstBoundary<GlobalGridPartImp> ThisType;
+  typedef SubdomainBoundaryGridPart<GlobalGridPartImp> ThisType;
 
-  typedef Dune::grid::Part::Local::IndexBased::ConstBoundaryTraits<GlobalGridPartImp> Traits;
+  typedef Dune::XT::Grid::SubdomainBoundaryGridPartTraits<GlobalGridPartImp> Traits;
 
-  typedef Const<GlobalGridPartImp> BaseType;
+  typedef SubdomainGridPart<GlobalGridPartImp> BaseType;
 
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
 
@@ -364,10 +367,10 @@ public:
   //! container type for the intersection information
   typedef std::map<IndexType, std::vector<int>> IntersectionInfoContainerType;
 
-  ConstBoundary(const std::shared_ptr<const GlobalGridPartType> globalGrdPart,
-                const std::shared_ptr<const IndexContainerType> indexContainer,
-                const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer,
-                const std::shared_ptr<const InsideType> insd)
+  SubdomainBoundaryGridPart(const std::shared_ptr<const GlobalGridPartType> globalGrdPart,
+                            const std::shared_ptr<const IndexContainerType> indexContainer,
+                            const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer,
+                            const std::shared_ptr<const InsideType> insd)
     : BaseType(globalGrdPart,
                indexContainer,
                std::shared_ptr<const BoundaryInfoContainerType>(new BoundaryInfoContainerType()))
@@ -376,9 +379,9 @@ public:
   {
   }
 
-  ConstBoundary(const ThisType& other) = default;
+  SubdomainBoundaryGridPart(const ThisType& other) = default;
 
-  ConstBoundary(ThisType&& source) = default;
+  SubdomainBoundaryGridPart(ThisType&& source) = default;
 
   IntersectionIteratorType ibegin(const EntityType& ent) const
   {
@@ -410,12 +413,10 @@ public:
 private:
   const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer_;
   const std::shared_ptr<const InsideType> inside_;
-}; // class ConstBoundary
+}; // class SubdomainBoundaryGridPart
 
-} // namespace IndexBased
-} // namespace Local
-} // namespace Part
-} // namespace grid
+} // namespace Grid
+} // namespace XT
 
 #if HAVE_DUNE_FEM
 
@@ -423,38 +424,38 @@ namespace Fem {
 namespace GridPartCapabilities {
 
 template <class GridPartType>
-struct hasGrid<grid::Part::Local::IndexBased::Const<GridPartType>>
+struct hasGrid<XT::Grid::SubdomainGridPart<GridPartType>>
 {
   static const bool v = hasGrid<GridPartType>::v;
 };
 
 template <class GridPartType>
-struct hasSingleGeometryType<grid::Part::Local::IndexBased::Const<GridPartType>>
+struct hasSingleGeometryType<XT::Grid::SubdomainGridPart<GridPartType>>
 {
   static const bool v = hasSingleGeometryType<GridPartType>::v;
   static const unsigned int topologyId = hasSingleGeometryType<GridPartType>::topologyId;
 };
 
 template <class GridPartType>
-struct isCartesian<grid::Part::Local::IndexBased::Const<GridPartType>>
+struct isCartesian<XT::Grid::SubdomainGridPart<GridPartType>>
 {
   static const bool v = isCartesian<GridPartType>::v;
 };
 
 template <class GridPartType, int codim>
-struct hasEntity<grid::Part::Local::IndexBased::Const<GridPartType>, codim>
+struct hasEntity<XT::Grid::SubdomainGridPart<GridPartType>, codim>
 {
   static const bool v = hasEntity<GridPartType, codim>::v;
 };
 
 template <class GridPartType, int codim>
-struct canCommunicate<grid::Part::Local::IndexBased::Const<GridPartType>, codim>
+struct canCommunicate<XT::Grid::SubdomainGridPart<GridPartType>, codim>
 {
   static const bool v = false;
 };
 
 template <class GridPartType>
-struct isConforming<grid::Part::Local::IndexBased::Const<GridPartType>>
+struct isConforming<XT::Grid::SubdomainGridPart<GridPartType>>
 {
   static const bool v = false;
 };
@@ -466,4 +467,4 @@ struct isConforming<grid::Part::Local::IndexBased::Const<GridPartType>>
 
 } // namespace Dune
 
-#endif // DUNE_GRID_PART_LOCAL_INDEXBASED_HH
+#endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_PART_HH

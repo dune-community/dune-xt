@@ -1,10 +1,14 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// Copyright 2009-2017 dune-xt-grid developers and contributors. All rights reserved.
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_MULTISCALE_gridPart_INDEXSET_LOCAL_HH
-#define DUNE_GRID_MULTISCALE_gridPart_INDEXSET_LOCAL_HH
+#ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_INDEXSET_HH
+#define DUNE_XT_GRID_VIEW_SUBDOMAIN_INDEXSET_HH
 
 #include <map>
 #include <vector>
@@ -18,10 +22,9 @@
 #include <dune/geometry/type.hh>
 
 namespace Dune {
-namespace grid {
-namespace Part {
-namespace IndexSet {
-namespace Local {
+namespace XT {
+namespace Grid {
+namespace internal {
 
 /**
  *  \brief      Given a Dune::IndexSet and a set of entity indices, provides an index set on those entities only.
@@ -29,12 +32,12 @@ namespace Local {
  *  \todo       Document!
  */
 template <class GlobalGridPartImp>
-class IndexBased : public GlobalGridPartImp::IndexSetType
+class IndexBasedIndexSet : public GlobalGridPartImp::IndexSetType
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
 
-  typedef IndexBased<GlobalGridPartType> ThisType;
+  typedef IndexBasedIndexSet<GlobalGridPartType> ThisType;
 
   static const std::string id;
 
@@ -54,7 +57,8 @@ private:
   typedef std::map<IndexType, IndexType> Indices_MapType;
 
 public:
-  IndexBased(const GlobalGridPartType& globalGridPart, const Dune::shared_ptr<const IndexContainerType> indexContainer)
+  IndexBasedIndexSet(const GlobalGridPartType& globalGridPart,
+                     const Dune::shared_ptr<const IndexContainerType> indexContainer)
     : BaseType(globalGridPart.indexSet())
     , indexContainer_(indexContainer)
     , sizeByCodim_(dimension + 1, IndexType(0))
@@ -72,7 +76,7 @@ public:
       assert(codim <= dimension);
       sizeByCodim_[codim] += sz;
     }
-  } // IndexBased(const GridPartType& localGridPart)
+  } // IndexBasedIndexSet(const GridPartType& localGridPart)
 
   template <int cc>
   IndexType index(const typename GridType::template Codim<cc>::Entity& entity) const
@@ -240,15 +244,14 @@ private:
   std::vector<IndexType> sizeByCodim_;
   std::vector<std::vector<GeometryType>> geometryTypesByCodim_;
   std::map<GeometryType, IndexType> sizeByGeometryType_;
-}; // class IndexBased
+}; // class IndexBasedIndexSet
 
 template <class GlobalGridPartType>
-const std::string IndexBased<GlobalGridPartType>::id = "grid.part.indexset.local.indexbased";
+const std::string IndexBasedIndexSet<GlobalGridPartType>::id = "xt.grid.internal.indexbasedindexset";
 
-} // namespace Local
-} // namespace IndexSet
-} // namespace Part
-} // namespace grid
+} // namespace internal
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 
-#endif // DUNE_GRID_MULTISCALE_gridPart_INDEXSET_LOCAL_HH
+#endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_INDEXSET_HH

@@ -1,10 +1,14 @@
-// This file is part of the dune-grid-multiscale project:
-//   http://users.dune-project.org/projects/dune-grid-multiscale
-// Copyright holders: Felix Albrecht
-// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// This file is part of the dune-xt-grid project:
+//   https://github.com/dune-community/dune-xt-grid
+// Copyright 2009-2017 dune-xt-grid developers and contributors. All rights reserved.
+// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+//      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+//          with "runtime exception" (http://www.dune-project.org/license.html)
+// Authors:
+//   Felix Schindler (2017)
 
-#ifndef DUNE_GRID_PART_ITERATOR_CODIM0_HH
-#define DUNE_GRID_PART_ITERATOR_CODIM0_HH
+#ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_ENTITY_ITERATOR_HH
+#define DUNE_XT_GRID_VIEW_SUBDOMAIN_ENTITY_ITERATOR_HH
 
 // system
 #include <map>
@@ -20,10 +24,9 @@
 #include <dune/grid/common/grid.hh>
 
 namespace Dune {
-namespace grid {
-namespace Part {
-namespace Iterator {
-namespace Local {
+namespace XT {
+namespace Grid {
+namespace internal {
 
 /**
  *  \brief  Iterates over those entities of a grid part, the indices of which match predefined ones.
@@ -31,12 +34,13 @@ namespace Local {
  *  \todo   Document!
  */
 template <class GlobalGridPartImp, int codim, Dune::PartitionIteratorType pitype>
-class IndexBased : public GlobalGridPartImp::template Codim<codim>::template Partition<pitype>::IteratorType
+class IndexBasedEntityIterator
+    : public GlobalGridPartImp::template Codim<codim>::template Partition<pitype>::IteratorType
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
 
-  typedef IndexBased<GlobalGridPartType, codim, pitype> ThisType;
+  typedef IndexBasedEntityIterator<GlobalGridPartType, codim, pitype> ThisType;
 
   typedef typename GlobalGridPartImp::template Codim<codim>::template Partition<pitype>::IteratorType BaseType;
 
@@ -52,9 +56,9 @@ public:
 
   typedef typename BaseType::Entity Entity;
 
-  IndexBased(const GlobalGridPartType& globalGridPart,
-             const Dune::shared_ptr<const IndexContainerType> indexContainer,
-             const bool end = false)
+  IndexBasedEntityIterator(const GlobalGridPartType& globalGridPart,
+                           const Dune::shared_ptr<const IndexContainerType> indexContainer,
+                           const bool end = false)
     : BaseType(end ? globalGridPart.template end<codim, pitype>() : globalGridPart.template begin<codim, pitype>())
     , globalGridPart_(globalGridPart)
     , indexContainer_(indexContainer)
@@ -74,7 +78,7 @@ public:
       } // loop over all GeometryTypes
       forward();
     } // if (!end)
-  } // IndexBased
+  } // IndexBasedEntityIterator
 
   ThisType& operator++()
   {
@@ -114,20 +118,19 @@ private:
   unsigned int workAtAll_;
   std::map<GeometryType, IndexType> last_;
   std::map<GeometryType, typename IndexMapType::const_iterator> end_;
-}; // class IndexBased
+}; // class IndexBasedEntityIterator
 
-} // namespace Local
-} // namespace Iterator
-} // namespace Part
-} // namespace grid
+} // namespace internal
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 namespace std {
 
 template <class GlobalGridPartImp, int codim, Dune::PartitionIteratorType pitype>
-struct iterator_traits<Dune::grid::Part::Iterator::Local::IndexBased<GlobalGridPartImp, codim, pitype>>
+struct iterator_traits<Dune::XT::Grid::internal::IndexBasedEntityIterator<GlobalGridPartImp, codim, pitype>>
 {
   typedef ptrdiff_t difference_type;
-  typedef const typename Dune::grid::Part::Iterator::Local::IndexBased<GlobalGridPartImp, codim, pitype>::Entity
+  typedef const typename Dune::XT::Grid::internal::IndexBasedEntityIterator<GlobalGridPartImp, codim, pitype>::Entity
       value_type;
   typedef value_type* pointer;
   typedef value_type& reference;
@@ -136,4 +139,4 @@ struct iterator_traits<Dune::grid::Part::Iterator::Local::IndexBased<GlobalGridP
 
 } // namespace std
 
-#endif // DUNE_GRID_PART_ITERATOR_CODIM0_HH
+#endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_ENTITY_ITERATOR_HH

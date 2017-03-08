@@ -376,7 +376,7 @@ private:
     void operator()(V& vtk_writer, const GV& grid_view, const int lvl)
     {
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtk_writer.addCellData(boundaryId, "boundary_id__level_" + Common::Common::to_string(lvl));
+      vtk_writer.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
     }
 
     std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
@@ -425,11 +425,11 @@ private:
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::Common::to_string(lvl));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
       add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
       // write
-      vtkwriter.write(filename + "__level_" + Common::Common::to_string(lvl), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_plain(...)
 
@@ -446,17 +446,17 @@ private:
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::Common::to_string(lvl));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
       add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
       // dirichlet values
       std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
-      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::Common::to_string(lvl));
+      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(lvl));
       // neumann values
       std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
-      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::Common::to_string(lvl));
+      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::to_string(lvl));
       // write
-      vtkwriter.write(filename + "__level_" + Common::Common::to_string(lvl), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_with_boundary(...)
 
