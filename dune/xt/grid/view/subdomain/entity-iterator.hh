@@ -10,23 +10,20 @@
 #ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_ENTITY_ITERATOR_HH
 #define DUNE_XT_GRID_VIEW_SUBDOMAIN_ENTITY_ITERATOR_HH
 
-// system
 #include <map>
 
-// dune-common
 #include <dune/common/exceptions.hh>
 #include <dune/common/shared_ptr.hh>
 
-// dune-geometry
 #include <dune/geometry/type.hh>
 
-// dune-grid
 #include <dune/grid/common/grid.hh>
 
 namespace Dune {
 namespace XT {
 namespace Grid {
 namespace internal {
+
 
 /**
  *  \brief  Iterates over those entities of a grid part, the indices of which match predefined ones.
@@ -39,13 +36,9 @@ class IndexBasedEntityIterator
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
-
   typedef IndexBasedEntityIterator<GlobalGridPartType, codim, pitype> ThisType;
-
   typedef typename GlobalGridPartImp::template Codim<codim>::template Partition<pitype>::IteratorType BaseType;
-
   typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
-
   typedef Dune::GeometryType GeometryType;
 
 private:
@@ -53,7 +46,6 @@ private:
 
 public:
   typedef std::map<GeometryType, std::map<IndexType, IndexType>> IndexContainerType;
-
   typedef typename BaseType::Entity Entity;
 
   IndexBasedEntityIterator(const GlobalGridPartType& globalGridPart,
@@ -120,11 +112,13 @@ private:
   std::map<GeometryType, typename IndexMapType::const_iterator> end_;
 }; // class IndexBasedEntityIterator
 
+
 } // namespace internal
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
 namespace std {
+
 
 template <class GlobalGridPartImp, int codim, Dune::PartitionIteratorType pitype>
 struct iterator_traits<Dune::XT::Grid::internal::IndexBasedEntityIterator<GlobalGridPartImp, codim, pitype>>
@@ -136,6 +130,7 @@ struct iterator_traits<Dune::XT::Grid::internal::IndexBasedEntityIterator<Global
   typedef value_type& reference;
   typedef forward_iterator_tag iterator_category;
 };
+
 
 } // namespace std
 

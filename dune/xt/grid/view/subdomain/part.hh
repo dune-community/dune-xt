@@ -34,8 +34,19 @@ namespace XT {
 namespace Grid {
 
 
+// forwards, needed for the traits below
 template <class GlobalGridPartImp>
 class SubdomainGridPart;
+
+template <class GlobalGridPartImp>
+class SubdomainCouplingGridPart;
+
+template <class GlobalGridPartImp>
+class SubdomainBoundaryGridPart;
+
+
+namespace internal {
+
 
 template <class GlobalGridPartImp>
 class SubdomainGridPartTraits
@@ -67,19 +78,41 @@ public:
   static const bool conforming = GlobalGridPartType::Traits::conforming;
 }; // class SubdomainGridPartTraits
 
+
+template <class GlobalGridPartImp>
+struct SubdomainCouplingGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
+{
+  typedef GlobalGridPartImp GlobalGridPartType;
+  typedef SubdomainCouplingGridPart<GlobalGridPartImp> GridPartType;
+  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
+};
+
+
+template <class GlobalGridPartImp>
+struct SubdomainBoundaryGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
+{
+  typedef GlobalGridPartImp GlobalGridPartType;
+  typedef SubdomainBoundaryGridPart<GlobalGridPartImp> GridPartType;
+  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
+}; // class SubdomainBoundaryGridPartTraits
+
+
+} // namespace internal
+
+
 template <class GlobalGridPartImp>
 class SubdomainGridPart
 #if HAVE_DUNE_FEM
-    : public Fem::GridPartInterface<SubdomainGridPartTraits<GlobalGridPartImp>>
+    : public Fem::GridPartInterface<internal::SubdomainGridPartTraits<GlobalGridPartImp>>
 #endif
 {
 public:
   typedef SubdomainGridPart<GlobalGridPartImp> ThisType;
-  typedef SubdomainGridPartTraits<GlobalGridPartImp> Traits;
+  typedef internal::SubdomainGridPartTraits<GlobalGridPartImp> Traits;
 
 private:
 #if HAVE_DUNE_FEM
-  typedef Fem::GridPartInterface<SubdomainGridPartTraits<GlobalGridPartImp>> BaseType;
+  typedef Fem::GridPartInterface<internal::SubdomainGridPartTraits<GlobalGridPartImp>> BaseType;
   typedef BaseType BaseTraits;
 #else
   typedef Traits BaseTraits;
@@ -221,48 +254,23 @@ private:
   const IndexSetType indexSet_;
 }; // class SubdomainGridPart
 
-template <class GlobalGridPartImp>
-class SubdomainCouplingGridPart;
-
-template <class GlobalGridPartImp>
-struct SubdomainCouplingGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
-{
-  typedef GlobalGridPartImp GlobalGridPartType;
-
-  typedef Dune::XT::Grid::SubdomainCouplingGridPart<GlobalGridPartImp> GridPartType;
-
-  //! localized intersection iterator
-  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
-}; // class SubdomainCouplingGridPartTraits
 
 template <class GlobalGridPartImp>
 class SubdomainCouplingGridPart : public SubdomainGridPart<GlobalGridPartImp>
 {
 public:
   typedef SubdomainCouplingGridPart<GlobalGridPartImp> ThisType;
-
-  typedef Dune::XT::Grid::SubdomainCouplingGridPartTraits<GlobalGridPartImp> Traits;
-
+  typedef internal::SubdomainCouplingGridPartTraits<GlobalGridPartImp> Traits;
   typedef SubdomainGridPart<GlobalGridPartImp> BaseType;
-
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
-
   typedef typename IntersectionIteratorType::Intersection IntersectionType;
-
   typedef typename BaseType::EntityType EntityType;
-
   typedef typename BaseType::GlobalGridPartType GlobalGridPartType;
-
   typedef typename BaseType::IndexType IndexType;
-
   typedef typename BaseType::IndexContainerType IndexContainerType;
-
   typedef typename BaseType::BoundaryInfoContainerType BoundaryInfoContainerType;
-
   typedef BaseType InsideType;
-
   typedef BaseType OutsideType;
-
   //! container type for the intersection information
   typedef std::map<IndexType, std::vector<int>> IntersectionInfoContainerType;
 
@@ -322,48 +330,23 @@ private:
   const std::shared_ptr<const OutsideType> outside_;
 }; // class SubdomainCouplingGridPart
 
-template <class GlobalGridPartImp>
-class SubdomainBoundaryGridPart;
-
-template <class GlobalGridPartImp>
-struct SubdomainBoundaryGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
-{
-  typedef GlobalGridPartImp GlobalGridPartType;
-
-  typedef Dune::XT::Grid::SubdomainBoundaryGridPart<GlobalGridPartImp> GridPartType;
-
-  //! localized intersection iterator
-  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
-}; // class SubdomainBoundaryGridPartTraits
 
 template <class GlobalGridPartImp>
 class SubdomainBoundaryGridPart : public SubdomainGridPart<GlobalGridPartImp>
 {
 public:
   typedef SubdomainBoundaryGridPart<GlobalGridPartImp> ThisType;
-
-  typedef Dune::XT::Grid::SubdomainBoundaryGridPartTraits<GlobalGridPartImp> Traits;
-
+  typedef internal::SubdomainBoundaryGridPartTraits<GlobalGridPartImp> Traits;
   typedef SubdomainGridPart<GlobalGridPartImp> BaseType;
-
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
-
   typedef typename IntersectionIteratorType::Intersection IntersectionType;
-
   typedef typename BaseType::EntityType EntityType;
-
   typedef typename BaseType::GlobalGridPartType GlobalGridPartType;
-
   typedef typename BaseType::IndexType IndexType;
-
   typedef typename BaseType::IndexContainerType IndexContainerType;
-
   typedef typename BaseType::BoundaryInfoContainerType BoundaryInfoContainerType;
-
   typedef BaseType InsideType;
-
   typedef BaseType OutsideType;
-
   //! container type for the intersection information
   typedef std::map<IndexType, std::vector<int>> IntersectionInfoContainerType;
 
@@ -423,6 +406,7 @@ private:
 namespace Fem {
 namespace GridPartCapabilities {
 
+
 template <class GridPartType>
 struct hasGrid<XT::Grid::SubdomainGridPart<GridPartType>>
 {
@@ -459,6 +443,7 @@ struct isConforming<XT::Grid::SubdomainGridPart<GridPartType>>
 {
   static const bool v = false;
 };
+
 
 } // namespace GridPartCapabilities
 } // namespace Fem

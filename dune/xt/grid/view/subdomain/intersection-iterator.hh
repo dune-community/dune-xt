@@ -19,12 +19,10 @@
 #include "intersection-wrapper.hh"
 
 namespace Dune {
-
 namespace XT {
-
 namespace Grid {
-
 namespace internal {
+
 
 template <class GlobalGridPartImp>
 class LocalIntersectionIterator : public GlobalGridPartImp::IntersectionIteratorType
@@ -184,12 +182,10 @@ private:
   const InfoContainerType infoContainer_;
 }; // class FakeDomainBoundaryIntersectionIterator
 
+
 } // namespace internal
-
 } // namespace Grid
-
 } // namespace XT
-
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_ITERATOR_HH

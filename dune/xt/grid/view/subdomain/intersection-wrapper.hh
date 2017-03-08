@@ -10,31 +10,21 @@
 #ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_WRAPPER_HH
 #define DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_WRAPPER_HH
 
-#ifdef HAVE_CMAKE_CONFIG
-#include "cmake_config.h"
-#elif defined(HAVE_CONFIG_H)
-#include <config.h>
-#endif // ifdef HAVE_CMAKE_CONFIG
-
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/common/deprecated.hh>
 
-// dune-geometry
 #include <dune/geometry/type.hh>
 
-// dune-grid
 #include <dune/grid/common/intersection.hh>
 
 #include <dune/xt/common/exceptions.hh>
 
 namespace Dune {
-
 namespace XT {
-
 namespace Grid {
-
 namespace internal {
+
 
 template <class IntersectionIteratorImp, class WrappedIntersectionImp>
 class FakeDomainBoundaryIntersection
@@ -191,12 +181,10 @@ private:
   size_t boundary_segment_index_;
 }; // class FakeDomainBoundaryIntersection
 
+
 } // namespace internal
-
 } // namespace Grid
-
 } // namespace XT
-
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_INTERSECTION_WRAPPER_HH

@@ -26,6 +26,7 @@ namespace XT {
 namespace Grid {
 namespace internal {
 
+
 /**
  *  \brief      Given a Dune::IndexSet and a set of entity indices, provides an index set on those entities only.
  *  \todo       Replace GlobalGridPartImp by Interface!
@@ -38,8 +39,6 @@ public:
   typedef GlobalGridPartImp GlobalGridPartType;
 
   typedef IndexBasedIndexSet<GlobalGridPartType> ThisType;
-
-  static const std::string id;
 
   typedef typename GlobalGridPartImp::IndexSetType BaseType;
 
@@ -118,8 +117,7 @@ public:
     // if we came this far we did not find it
     std::stringstream msg;
     msg << std::endl
-        << "Error in " << id << ".subIndex< " << cc << " >(" << entity.type() << ", " << i << ", " << codim
-        << "):" << std::endl
+        << "Error in subIndex< " << cc << " >(" << entity.type() << ", " << i << ", " << codim << "):" << std::endl
         << "  subIndex in the global index set is " << globalSubIndex << ", local subIndex could not be found!"
         << std::endl;
     DUNE_THROW(Dune::InvalidStateException, msg.str());
@@ -154,7 +152,7 @@ public:
     // if we came this far we did not find it
     std::stringstream msg;
     msg << std::endl
-        << "Error in " << id << ".subIndex(" << entity.type() << ", " << i << ", " << codim << "):" << std::endl
+        << "Error in subIndex(" << entity.type() << ", " << i << ", " << codim << "):" << std::endl
         << "  subIndex in the global index set is " << globalSubIndex << ", local subIndex could not be found!"
         << std::endl;
     DUNE_THROW(Dune::InvalidStateException, msg.str());
@@ -246,8 +244,6 @@ private:
   std::map<GeometryType, IndexType> sizeByGeometryType_;
 }; // class IndexBasedIndexSet
 
-template <class GlobalGridPartType>
-const std::string IndexBasedIndexSet<GlobalGridPartType>::id = "xt.grid.internal.indexbasedindexset";
 
 } // namespace internal
 } // namespace Grid
