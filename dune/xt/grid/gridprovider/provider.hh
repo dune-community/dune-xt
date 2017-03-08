@@ -34,15 +34,16 @@ namespace XT {
 namespace Grid {
 
 
-template <class GridImp>
+template <class GridImp, typename DdGridImp = int>
 class GridProvider
 {
   static_assert(is_grid<GridImp>::value, "");
 
 public:
-  typedef GridProvider<GridImp> ThisType;
+  typedef GridProvider<GridImp, DdGridImp> ThisType;
 
   typedef GridImp GridType;
+  typedef DdGridImp DdGridType;
   static const size_t dimDomain = GridImp::dimension;
   typedef typename GridType::ctype DomainFieldType;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
@@ -67,18 +68,21 @@ public:
   /**
    * \attention Do not delete grd_ptr manually afterwards!
    */
-  GridProvider(GridType* grd_ptr)
+  GridProvider(GridType* grd_ptr, DdGridType* dd_grd_ptr = nullptr)
     : grid_ptr_(grd_ptr)
+    , dd_grid_ptr_(dd_grd_ptr)
   {
   }
 
-  GridProvider(std::unique_ptr<GridType>&& grd_ptr)
+  GridProvider(std::unique_ptr<GridType>&& grd_ptr, std::unique_ptr<DdGridType>&& dd_grd_ptr = nullptr)
     : grid_ptr_(grd_ptr)
+    , dd_grid_ptr_(dd_grd_ptr)
   {
   }
 
-  GridProvider(std::shared_ptr<GridType> grd_ptr)
+  GridProvider(std::shared_ptr<GridType> grd_ptr, std::shared_ptr<DdGridType> dd_grd_ptr = nullptr)
     : grid_ptr_(grd_ptr)
+    , dd_grid_ptr_(dd_grd_ptr)
   {
   }
 
@@ -106,6 +110,34 @@ public:
   GridType& grid()
   {
     return *grid_ptr_;
+  }
+
+  const std::shared_ptr<DdGridType>& dd_grid_ptr() const
+  {
+    if (!dd_grid_ptr_)
+      DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
+    return dd_grid_ptr_;
+  }
+
+  std::shared_ptr<DdGridType> dd_grid_ptr()
+  {
+    if (!dd_grid_ptr_)
+      DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
+    return dd_grid_ptr_;
+  }
+
+  const DdGridType& dd_grid() const
+  {
+    if (!dd_grid_ptr_)
+      DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
+    return *dd_grid_ptr_;
+  }
+
+  DdGridType& dd_grid()
+  {
+    if (!dd_grid_ptr_)
+      DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
+    return *dd_grid_ptr_;
   }
 
   int max_level() const
@@ -185,6 +217,122 @@ public:
     visualize_with_boundary(boundary_info_cfg, filename);
   }
 
+  void visualize_dd(const std::string filename, const bool with_coupling) const
+  {
+    if (!dd_grid_ptr_)
+      DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
+    // vtk writer
+    typedef typename DdGridType::GlobalGridPartType GlobalGridPartType;
+    const auto& globalGridPart = dd_grid().globalGridPart();
+    typedef Dune::Fem::GridPart2GridView<GlobalGridPartType> GVT;
+    GVT globalGridView(globalGridPart);
+    Dune::VTKWriter<GVT> vtkwriter(globalGridView);
+    // data
+    std::map<std::string, std::vector<double>> data;
+    data["subdomain"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+    data["global entity id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+    data["global boundary id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+    data["local boundary id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+    // walk the global grid view
+    for (auto it = globalGridView.template begin<0>(); it != globalGridView.template end<0>(); ++it) {
+      const auto& entity = *it;
+      const auto index = globalGridView.indexSet().index(entity);
+      data["subdomain"][index] = dd_grid().subdomainOf(index);
+      data["global entity id"][index] = double(index);
+      // compute global boundary id
+      data["global boundary id"][index] = 0.0;
+      int numberOfBoundarySegments = 0;
+      bool isOnBoundary = false;
+      for (auto intersectionIt = globalGridView.ibegin(entity); intersectionIt != globalGridView.iend(entity);
+           ++intersectionIt) {
+        if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
+          isOnBoundary = true;
+          numberOfBoundarySegments += 1;
+          data["global boundary id"][index] += double(intersectionIt->boundarySegmentIndex());
+        }
+      }
+      if (isOnBoundary) {
+        data["global boundary id"][index] /= double(numberOfBoundarySegments);
+      } // compute global boundary id
+    } // walk the global grid view
+    // walk the subdomains
+    for (unsigned int s = 0; s < dd_grid().size(); ++s) {
+      // walk the local grid view
+      const auto localGridView = dd_grid().localGridPart(s);
+      for (auto it = localGridView.template begin<0>(); it != localGridView.template end<0>(); ++it) {
+        const auto& entity = *it;
+        const unsigned int index = globalGridView.indexSet().index(entity);
+        // compute local boundary id
+        unsigned int numberOfBoundarySegments = 0u;
+        for (auto intersectionIt = localGridView.ibegin(entity); intersectionIt != localGridView.iend(entity);
+             ++intersectionIt) {
+          if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
+            numberOfBoundarySegments += 1u;
+            data["local boundary id"][index] += double(intersectionIt->boundarySegmentIndex());
+          }
+        }
+        if (numberOfBoundarySegments > 0)
+          data["local boundary id"][index] /= double(numberOfBoundarySegments);
+        // visualize coupling
+        if (with_coupling) {
+          for (auto nn : dd_grid().neighborsOf(s)) {
+            const auto coupling_grid_view = dd_grid().couplingGridPart(s, nn);
+            const std::string coupling_str = "coupling (" + Common::to_string(s) + ", " + Common::to_string(nn) + ")";
+            data[coupling_str] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+            const auto entity_it_end = coupling_grid_view.template end<0>();
+            for (auto entity_it = coupling_grid_view.template begin<0>(); entity_it != entity_it_end; ++entity_it) {
+              const auto& coupling_entity = *entity_it;
+              const size_t global_entity_id = globalGridView.indexSet().index(coupling_entity);
+              data[coupling_str][global_entity_id] = 1.0;
+              for (auto intersection_it = coupling_grid_view.ibegin(coupling_entity);
+                   intersection_it != coupling_grid_view.iend(coupling_entity);
+                   ++intersection_it) {
+                const auto& intersection = *intersection_it;
+                if (intersection.neighbor() && !intersection.boundary()) {
+                  const auto neighbor = intersection.outside();
+                  const size_t global_neighbor_id = globalGridView.indexSet().index(neighbor);
+                  data[coupling_str][global_neighbor_id] = 0.5;
+                }
+              }
+            }
+          }
+        } // if (with_coupling)
+      } // walk the local grid view
+    } // walk the subdomains
+    if (dd_grid().oversampling()) {
+      // walk the oversampled grid parts
+      for (size_t ss = 0; ss < dd_grid().size(); ++ss) {
+        const std::string string_id = "oversampled subdomain " + Common::to_string(ss);
+        data[string_id] = std::vector<double>(globalGridView.indexSet().size(0), -1.0);
+        typedef typename DdGridType::LocalGridPartType LocalGridPartType;
+        const LocalGridPartType oversampledGridPart = dd_grid().localGridPart(ss, true);
+        for (auto it = oversampledGridPart.template begin<0>(); it != oversampledGridPart.template end<0>(); ++it) {
+          const auto& entity = *it;
+          const auto index = globalGridView.indexSet().index(entity);
+          data[string_id][index] = 0.0;
+          // compute local boundary id
+          unsigned int numberOfBoundarySegments = 0u;
+          for (auto intersectionIt = oversampledGridPart.ibegin(entity);
+               intersectionIt != oversampledGridPart.iend(entity);
+               ++intersectionIt) {
+            if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
+              numberOfBoundarySegments += 1u;
+              data[string_id][index] += double(intersectionIt->boundarySegmentIndex());
+            }
+          }
+          if (numberOfBoundarySegments > 0) {
+            data[string_id][index] /= double(numberOfBoundarySegments);
+          } // compute global boundary id
+        }
+      }
+    } // if (dd_grid().oversampling())
+
+    // write
+    for (const auto& data_pair : data)
+      vtkwriter.addCellData(data_pair.second, data_pair.first);
+    vtkwriter.write(filename, Dune::VTK::appendedraw);
+  } // ... visualize(...)
+
 private:
   template <class G, bool anything = true>
   struct global_refine_helper
@@ -228,7 +376,7 @@ private:
     void operator()(V& vtk_writer, const GV& grid_view, const int lvl)
     {
       std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtk_writer.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
+      vtk_writer.addCellData(boundaryId, "boundary_id__level_" + Common::Common::to_string(lvl));
     }
 
     std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
@@ -277,11 +425,11 @@ private:
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::Common::to_string(lvl));
       // boundary id
       add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
       // write
-      vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_plain(...)
 
@@ -298,17 +446,17 @@ private:
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
       std::vector<double> entityId = generateEntityVisualization(grid_view);
-      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
+      vtkwriter.addCellData(entityId, "entity_id__level_" + Common::Common::to_string(lvl));
       // boundary id
       add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
       // dirichlet values
       std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
-      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(lvl));
+      vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::Common::to_string(lvl));
       // neumann values
       std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
-      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::to_string(lvl));
+      vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::Common::to_string(lvl));
       // write
-      vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
+      vtkwriter.write(filename + "__level_" + Common::Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_with_boundary(...)
 
@@ -349,6 +497,7 @@ private:
   } // ... generateEntityVisualization(...)
 
   std::shared_ptr<GridType> grid_ptr_;
+  std::shared_ptr<DdGridType> dd_grid_ptr_;
 }; // class GridProvider
 
 
