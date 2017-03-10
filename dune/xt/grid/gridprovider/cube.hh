@@ -368,7 +368,7 @@ make_cube_dd_subdomains_grid(
     const size_t num_oversampling_layers =
         cube_dd_subdomains_gridprovider_default_config().template get<size_t>("num_refinements"),
     const size_t inner_boundary_segment_index =
-        cube_dd_subdomains_gridprovider_default_config().template get<int>("inner_boundary_segment_index"))
+        cube_dd_subdomains_gridprovider_default_config().template get<size_t>("inner_boundary_segment_index"))
 {
   return CubeDdSubdomainsGridProviderFactory<GridType>::create(lower_left,
                                                                upper_right,
