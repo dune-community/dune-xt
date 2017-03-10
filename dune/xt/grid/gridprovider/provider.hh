@@ -158,15 +158,15 @@ public:
   }
 
   template <Layers lr, Backends backend>
-  typename Layer<GridType, lr, backend>::type layer(const int lvl = 0) const
+  typename Layer<GridType, lr, backend, DdGridType>::type layer(const int lvl = 0) const
   {
-    return Layer<GridType, lr, backend>::create(*grid_ptr_, lvl);
+    return Layer<GridType, lr, backend, DdGridType>::create(*grid_ptr_, lvl, dd_grid_ptr_);
   }
 
   template <Layers lr>
-  typename Layer<GridType, lr, Backends::part>::type layer(const int lvl = 0)
+  typename Layer<GridType, lr, Backends::part, DdGridType>::type layer(const int lvl = 0)
   {
-    return Layer<GridType, lr, Backends::part>::create(*grid_ptr_, lvl);
+    return Layer<GridType, lr, Backends::part, DdGridType>::create(*grid_ptr_, lvl, dd_grid_ptr_);
   }
 
   LevelGridViewType level_view(const int lvl) const
