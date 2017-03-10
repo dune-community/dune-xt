@@ -107,14 +107,15 @@ private:
   typedef typename BaseType::Intersection BaseIntersectionType;
 
 public:
-  typedef FakeDomainBoundaryIntersection<ThisType, BaseIntersectionType> Intersection;
+  typedef FakeDomainBoundaryIntersection<ThisType, BaseIntersectionType> IntersectionImp;
+  typedef Dune::Intersection<typename GlobalGridPartImp::GridType, IntersectionImp> Intersection;
 
   FakeDomainBoundaryIntersectionIterator(const GlobalGridPartType& globalGridPart,
                                          const EntityType& entity,
                                          bool end = false)
     : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
     , passThrough_(true)
-    , intersection_(*this)
+    , intersection_(IntersectionImp(*this))
   {
   }
 
@@ -124,7 +125,7 @@ public:
                                          bool end = false)
     : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
     , passThrough_(false)
-    , intersection_(*this)
+    , intersection_(IntersectionImp(*this))
     , infoContainer_(infoContainer)
   {
   }
@@ -153,16 +154,16 @@ private:
   {
     // if we are on an entity of interest
     if (passThrough_) {
-      intersection_.setPassThrough(true);
+      intersection_.impl().setPassThrough(true);
     } else {
       const int intersectionIndex = getBaseIntersection().indexInInside();
       // if this intersection is special
       typename InfoContainerType::const_iterator result = infoContainer_.find(intersectionIndex);
       if (result != infoContainer_.end()) {
-        intersection_.setPassThrough(false);
-        intersection_.setBoundarySegmentIndex(result->second);
+        intersection_.impl().setPassThrough(false);
+        intersection_.impl().setBoundarySegmentIndex(result->second);
       } else {
-        intersection_.setPassThrough(true);
+        intersection_.impl().setPassThrough(true);
       } // if this intersection is special
     } // if we are not on an entity of interest
   } // void setIntersectionState() const
