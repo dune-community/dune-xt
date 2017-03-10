@@ -37,19 +37,12 @@ class IndexBasedIndexSet : public GlobalGridPartImp::IndexSetType
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
-
   typedef IndexBasedIndexSet<GlobalGridPartType> ThisType;
-
   typedef typename GlobalGridPartImp::IndexSetType BaseType;
-
   typedef typename GlobalGridPartType::GridType GridType;
-
   typedef Dune::GeometryType GeometryType;
-
   typedef typename BaseType::IndexType IndexType;
-
   static const unsigned int dimension = GridType::dimension;
-
   typedef std::map<GeometryType, std::map<IndexType, IndexType>> IndexContainerType;
 
 private:

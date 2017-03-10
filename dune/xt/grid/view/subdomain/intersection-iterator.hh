@@ -29,17 +29,11 @@ class LocalIntersectionIterator : public GlobalGridPartImp::IntersectionIterator
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
-
   typedef LocalIntersectionIterator<GlobalGridPartType> ThisType;
-
   typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
-
   typedef typename BaseType::Intersection Intersection;
-
   typedef typename GlobalGridPartType::template Codim<0>::EntityType EntityType;
-
   typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
-
   typedef std::vector<int> IndexContainerType;
 
   LocalIntersectionIterator(const GlobalGridPartType& globalGridPart,
@@ -104,13 +98,9 @@ class FakeDomainBoundaryIntersectionIterator : public GlobalGridPartImp::Interse
 {
 public:
   typedef GlobalGridPartImp GlobalGridPartType;
-
   typedef FakeDomainBoundaryIntersectionIterator<GlobalGridPartType> ThisType;
-
   typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
-
   typedef typename GlobalGridPartType::template Codim<0>::EntityType EntityType;
-
   typedef std::map<int, size_t> InfoContainerType;
 
 private:

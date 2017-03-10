@@ -31,27 +31,15 @@ class FakeDomainBoundaryIntersection
 {
 public:
   typedef IntersectionIteratorImp IntersectionIteratorType;
-
   typedef WrappedIntersectionImp WrappedIntersectionType;
-
   typedef FakeDomainBoundaryIntersection<IntersectionIteratorType, WrappedIntersectionType> ThisType;
-
   static const int dimension = WrappedIntersectionType::dimension;
-
   static const int dimensionworld = WrappedIntersectionType::dimensionworld;
-
   typedef typename WrappedIntersectionType::Entity Entity;
-
   typedef typename WrappedIntersectionType::Geometry Geometry;
-
   typedef typename WrappedIntersectionType::LocalCoordinate LocalCoordinate;
-
   typedef typename WrappedIntersectionType::GlobalCoordinate GlobalCoordinate;
-
   typedef typename WrappedIntersectionType::LocalGeometry LocalGeometry;
-
-  //  typedef Dune::Intersection<const GridImp, Dune::SIntersectionIterator> Intersection;
-
   typedef typename WrappedIntersectionType::ctype ctype;
 
   FakeDomainBoundaryIntersection(const IntersectionIteratorType& intersectionIterator)
