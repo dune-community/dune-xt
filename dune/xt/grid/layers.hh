@@ -21,10 +21,12 @@
 #endif
 
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/view/subdomain/part.hh>
 
 namespace Dune {
 namespace XT {
 namespace Grid {
+
 
 enum class Backends
 {
