@@ -32,6 +32,7 @@
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/dd/subdomains/factory.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
+#include <dune/xt/grid/information.hh>
 
 #include "provider.hh"
 
@@ -307,6 +308,9 @@ public:
   {
     auto grid =
         make_cube_grid<GridType>(lower_left, upper_right, num_elements, num_refinements, overlap_size).grid_ptr();
+    grid->loadBalance();
+    const auto dims = XT::Grid::dimensions(grid->leafGridView());
+    const auto bounding_box = dims.bounding_box();
 
     typedef DD::SubdomainGridFactory<GridType> DdGridFactoryType;
     const size_t neighbor_recursion_level = DD::internal::NeighborRecursionLevel<GridType>::compute();
@@ -316,8 +320,9 @@ public:
     // global grid part
     const auto global_grid_part = factory.globalGridPart();
     // walk the grid
-    const auto entity_it_end = global_grid_part->template end<0>();
-    for (auto entity_it = global_grid_part->template begin<0>(); entity_it != entity_it_end; ++entity_it) {
+    const auto entity_it_end = global_grid_part->template end<0, All_Partition>();
+    for (auto entity_it = global_grid_part->template begin<0, All_Partition>(); entity_it != entity_it_end;
+         ++entity_it) {
       // get center of entity
       const auto& entity = *entity_it;
       const auto center = entity.geometry().center();
@@ -325,8 +330,8 @@ public:
       std::vector<size_t> whichPartition(GridType::dimension, 0);
       for (size_t dd = 0; dd < GridType::dimension; ++dd)
         whichPartition[dd] =
-            (std::min((unsigned int)(std::floor(
-                          num_partitions[dd] * ((center[dd] - lower_left[dd]) / (upper_right[dd] - lower_left[dd])))),
+            (std::min((unsigned int)(std::floor(num_partitions[dd] * ((center[dd] - bounding_box[0][dd])
+                                                                      / (bounding_box[1][dd] - bounding_box[0][dd])))),
                       num_partitions[dd] - 1));
       size_t subdomain = 0;
       if (GridType::dimension == 1)
