@@ -25,6 +25,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/view/subdomain/part.hh>
 
 namespace Dune {
 namespace XT {
@@ -120,6 +121,12 @@ struct is_grid_part_helper
   static const bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
 };
 
+template <class T>
+struct is_subdomain_part_helper
+{
+  DXTC_has_typedef_initialize_once(GlobalGridPartType);
+  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
+};
 
 } // namespace internal
 
@@ -141,7 +148,9 @@ struct is_grid_part<T, true> : public std::is_base_of<Dune::Fem::GridPartInterfa
 
 
 template <class T>
-struct is_layer : public std::integral_constant<bool, is_grid_view<T>::value || is_grid_part<T>::value>
+struct is_layer : public std::integral_constant<bool,
+                                                is_grid_view<T>::value || is_grid_part<T>::value
+                                                    || internal::is_subdomain_part_helper<T>::value>
 {
 };
 
