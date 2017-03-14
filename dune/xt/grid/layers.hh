@@ -180,7 +180,7 @@ struct Layer<GridType, Layers::dd_subdomain, Backends::part, DdGridType>
   create(const GridType& /*grid*/, const int /*subdomain*/ = 0, const std::shared_ptr<DdGridType> /*dd_grid*/ = nullptr)
   {
     static_assert(AlwaysFalse<GridType>::value,
-                  "dune-fem does not allow the creation of a grid parts from a non-const grid!");
+                  "dune-fem does not allow the creation of a grid parts from a const grid!");
   }
 
   static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DdGridType> dd_grid)
