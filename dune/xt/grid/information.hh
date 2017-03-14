@@ -104,6 +104,7 @@ struct Dimensions
   typedef Dune::XT::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
   typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
   typedef typename GridType::template Codim<0>::Entity EntityType;
+  using BoundingBoxType = std::array<FieldVector<typename GridType::ctype, GridType::dimensionworld>, 2>;
   CoordLimitsType coord_limits;
   MinMaxAvgType entity_volume;
   MinMaxAvgType entity_width;
@@ -164,6 +165,16 @@ struct Dimensions
     }
     return center;
   }
+
+  BoundingBoxType bounding_box() const
+  {
+    BoundingBoxType box;
+    for (auto i : Common::value_range(GridType::dimensionworld)) {
+      box[0][i] = coord_limits[i].min();
+      box[1][i] = coord_limits[i].max();
+    }
+    return box;
+  };
 };
 
 template <class GridType>
@@ -184,7 +195,20 @@ Dimensions<GridViewType> dimensions(const typename GridViewType::Grid::template 
   return Dimensions<GridViewType>(entity);
 }
 
+//! returns size() - overlap - ghosts
+template <class GridType>
+int parallel_size(const GridType& grid, int level, int codim)
+{
+  int size = grid.size(level, codim) - grid.overlapSize(level, codim) - grid.ghostSize(level, codim);
+  return grid.comm().sum(size);
+}
 
+//! returns size() - overlap - ghosts
+template <class GridType>
+int parallel_size(const GridType& grid, int codim)
+{
+  return parallel_size(grid, grid.maxLevel(), codim);
+}
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
