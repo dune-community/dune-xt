@@ -196,6 +196,8 @@ struct extract_grid<L, false, true>
   typedef typename L::GridType type;
 };
 
+template <class L>
+using extract_grid_t = typename extract_grid<L>::type;
 
 } // namespace Grid
 } // namespace XT
