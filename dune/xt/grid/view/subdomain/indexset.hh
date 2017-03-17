@@ -50,7 +50,7 @@ private:
 
 public:
   IndexBasedIndexSet(const GlobalGridPartType& globalGridPart,
-                     const Dune::shared_ptr<const IndexContainerType> indexContainer)
+                     const std::shared_ptr<const IndexContainerType> indexContainer)
     : BaseType(globalGridPart.indexSet())
     , indexContainer_(indexContainer)
     , sizeByCodim_(dimension + 1, IndexType(0))

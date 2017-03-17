@@ -49,7 +49,7 @@ public:
   typedef typename BaseType::Entity Entity;
 
   IndexBasedEntityIterator(const GlobalGridPartType& globalGridPart,
-                           const Dune::shared_ptr<const IndexContainerType> indexContainer,
+                           const std::shared_ptr<const IndexContainerType> indexContainer,
                            const bool end = false)
     : BaseType(end ? globalGridPart.template end<codim, pitype>() : globalGridPart.template begin<codim, pitype>())
     , globalGridPart_(globalGridPart)
@@ -106,7 +106,7 @@ private:
   } // void forward()
 
   const GlobalGridPartType& globalGridPart_;
-  const Dune::shared_ptr<const IndexContainerType> indexContainer_;
+  const std::shared_ptr<const IndexContainerType> indexContainer_;
   unsigned int workAtAll_;
   std::map<GeometryType, IndexType> last_;
   std::map<GeometryType, typename IndexMapType::const_iterator> end_;
