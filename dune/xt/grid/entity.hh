@@ -51,6 +51,10 @@ public:
   typedef Type type;
 }; // class Entity
 
+template <class T>
+using entity_t = typename Entity<T>::type;
+template <class T>
+using extract_entity_t = typename Entity<T>::type;
 
 template <class EntityType>
 void print_entity(const EntityType& entity,
