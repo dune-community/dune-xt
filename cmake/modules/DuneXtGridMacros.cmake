@@ -9,3 +9,5 @@
 #
 # File for module specific CMake tests.
 
+set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
+
