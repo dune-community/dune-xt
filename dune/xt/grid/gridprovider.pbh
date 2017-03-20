@@ -70,11 +70,11 @@ void bind_make_cube_grid(pybind11::module& m, const std::string& grid_id)
         },
         "lower_left"_a,
         "upper_right"_a,
-        "num_elements"_a =
-            cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements").at(0),
+        "num_elements"_a = XT::Common::make_array<unsigned int, G::dimension>(
+            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")),
         "num_refinements"_a = cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
-        "overlap_size"_a =
-            cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size").at(0));
+        "overlap_size"_a = XT::Common::make_array<unsigned int, G::dimension>(
+            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")));
 } // ... bind_make_cube_grid(...)
 
 
