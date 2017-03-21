@@ -80,6 +80,9 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
   bind_GridProvider<G>(m, grid_id);
   bind_make_cube_grid<G>(m, grid_id);
 
+  bind_DdSubdomainsGridProvider<G>(m, grid_id);
+  bind_make_cube_dd_subdomains_grid<G>(m, grid_id);
+
   for_Grid_and_Intersection<FVI, true>::template addbind<G>(m,
                                                             grid_id,
                                                             (std::is_same<FVI, LVI>::value
