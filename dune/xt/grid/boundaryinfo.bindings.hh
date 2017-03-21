@@ -119,6 +119,45 @@ public:
 } // namespace Dune
 
 
+// begin: this is what we need for the lib
+
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, _G, _layer, _backend)                                          \
+  prefix class Dune::XT::Grid::bindings::                                                                              \
+      BoundaryInfo<_B<Dune::XT::Grid::extract_intersection_t<                                                          \
+                       typename Dune::XT::Grid::Layer<_G,                                                              \
+                                                      Dune::XT::Grid::Layers::_layer,                                  \
+                                                      Dune::XT::Grid::Backends::_backend,                              \
+                                                      Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
+                   _G>
+
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view);                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, part)
+
+#if HAVE_DUNE_ALUGRID
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view);                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part)
+#else
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
+#endif
+
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, _B)                                                            \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B);                                                                \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
+
+#define DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix)                                                                     \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::AllDirichletBoundaryInfo);                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::AllNeumannBoundaryInfo);                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::BoundarySegmentIndexBasedBoundaryInfo);              \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::NormalBasedBoundaryInfo)
+
+DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
+
+// end: this is what we need for the lib
+
+
 // begin: this is what we need for the .so
 
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, _G, _layer, _backend, _class_name, _layer_name)                        \
