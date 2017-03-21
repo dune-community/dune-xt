@@ -26,7 +26,7 @@
 #include "intersection.hh"
 #include "type_traits.hh"
 
-#include "boundaryinfo.pbh"
+#include "boundaryinfo.bindings.hh"
 #include "gridprovider.pbh"
 #include "walker.pbh"
 #include "walker/apply-on.pbh"

@@ -7,8 +7,8 @@
 // Authors:
 //   Felix Schindler (2016 - 2017)
 
-#ifndef DUNE_XT_GRID_BOUNDARYINFO_PBH
-#define DUNE_XT_GRID_BOUNDARYINFO_PBH
+#ifndef DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH
+#define DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH
 #if HAVE_DUNE_PYBINDXI
 
 #include <sstream>
@@ -47,4 +47,4 @@ pybind11::class_<C> bind_BoundaryInfo(pybind11::module& m, const std::string& id
 } // namespace Dune
 
 #endif // HAVE_DUNE_PYBINDXI
-#endif // DUNE_XT_GRID_BOUNDARYINFO_PBH
+#endif // DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH
