@@ -90,6 +90,18 @@ public:
   }
 };
 
+#if HAVE_DUNE_SPGRID
+template <class ct, int dim, template <int> class Ref, class Comm>
+class NeighborRecursionLevel<SPGrid<ct, dim, Ref, Comm>>
+{
+public:
+  static size_t compute()
+  {
+    return NeighborRecursionLevel<YaspGrid<dim>>::compute();
+  }
+};
+#endif // HAVE_DUNE_SPGRID
+
 // ALUGrid
 #if HAVE_DUNE_ALUGRID
 

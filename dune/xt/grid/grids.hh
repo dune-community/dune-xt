@@ -23,6 +23,7 @@
 
 #if HAVE_DUNE_SPGRID
 #include <dune/grid/spgrid.hh>
+#include <dune/grid/spgrid/dgfparser.hh>
 #endif
 
 #if HAVE_DUNE_UGGRID || HAVE_UG
