@@ -12,7 +12,7 @@ namespace Grid {
 static inline Common::Configuration boundarysegment_boundaryinfo_default_config()
 {
   Common::Configuration config;
-  config["type"] = "xt.grid.boundaryinfo.boundarysegment";
+  config["type"] = "xt.grid.boundaryinfo.boundarysegmentindexbased";
   config["default"] = "dirichlet";
   config["neumann"] = "[5 7]"; // all ids from 5 to 7-1
   config["robin"] = "[1 3]";
@@ -27,10 +27,10 @@ static inline Common::Configuration boundarysegment_boundaryinfo_default_config(
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #endif
 template <class IntersectionImp>
-class BoundarySegmentBoundaryInfo : public BoundaryInfo<IntersectionImp>
+class BoundarySegmentIndexBasedBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
   typedef BoundaryInfo<IntersectionImp> BaseType;
-  typedef BoundarySegmentBoundaryInfo<IntersectionImp> ThisType;
+  typedef BoundarySegmentIndexBasedBoundaryInfo<IntersectionImp> ThisType;
 
 public:
   using typename BaseType::IntersectionType;
@@ -68,7 +68,8 @@ public:
     return Common::make_unique<ThisType>(default_type, id_map);
   } // ... create(...)
 
-  BoundarySegmentBoundaryInfo(const std::string& def, const std::map<std::string, std::pair<size_t, size_t>>& id_map)
+  BoundarySegmentIndexBasedBoundaryInfo(const std::string& def,
+                                        const std::map<std::string, std::pair<size_t, size_t>>& id_map)
     : default_(def)
     , id_map_(id_map)
   {
@@ -101,29 +102,29 @@ private:
   static constexpr NeumannBoundary neumann_boundary_{};
   static constexpr RobinBoundary robin_boundary_{};
   static constexpr UnknownBoundary unknown_boundary_{};
-}; // class BoundarySegmentBoundaryInfo
+}; // class BoundarySegmentIndexBasedBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #pragma GCC diagnostic pop
 #endif
 
 
 template <class I>
-constexpr NoBoundary BoundarySegmentBoundaryInfo<I>::no_boundary_;
+constexpr NoBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::no_boundary_;
 template <class I>
-constexpr DirichletBoundary BoundarySegmentBoundaryInfo<I>::dirichlet_boundary_;
+constexpr DirichletBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::dirichlet_boundary_;
 template <class I>
-constexpr NeumannBoundary BoundarySegmentBoundaryInfo<I>::neumann_boundary_;
+constexpr NeumannBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::neumann_boundary_;
 template <class I>
-constexpr RobinBoundary BoundarySegmentBoundaryInfo<I>::robin_boundary_;
+constexpr RobinBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::robin_boundary_;
 template <class I>
-constexpr UnknownBoundary BoundarySegmentBoundaryInfo<I>::unknown_boundary_;
+constexpr UnknownBoundary BoundarySegmentIndexBasedBoundaryInfo<I>::unknown_boundary_;
 
 
 template <class I>
-std::unique_ptr<BoundarySegmentBoundaryInfo<I>>
+std::unique_ptr<BoundarySegmentIndexBasedBoundaryInfo<I>>
 make_boundarysegment_boundaryinfo(const Common::Configuration& cfg = boundarysegment_boundaryinfo_default_config())
 {
-  return BoundarySegmentBoundaryInfo<I>::create(cfg);
+  return BoundarySegmentIndexBasedBoundaryInfo<I>::create(cfg);
 }
 
 

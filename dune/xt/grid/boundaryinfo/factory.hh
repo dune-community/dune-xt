@@ -31,7 +31,7 @@ public:
     return {AllDirichletBoundaryInfo<I>::static_id(),
             AllNeumannBoundaryInfo<I>::static_id(),
             NormalBasedBoundaryInfo<I>::static_id(),
-            BoundarySegmentBoundaryInfo<I>::static_id()};
+            BoundarySegmentIndexBasedBoundaryInfo<I>::static_id()};
   }
 
   static Common::Configuration default_config(const std::string type)
@@ -40,7 +40,7 @@ public:
       return alldirichlet_boundaryinfo_default_config();
     else if (type == AllNeumannBoundaryInfo<I>::static_id())
       return allneumann_boundaryinfo_default_config();
-    else if (type == BoundarySegmentBoundaryInfo<I>::static_id())
+    else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
       return boundarysegment_boundaryinfo_default_config();
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
       return normalbased_boundaryinfo_default_config();
@@ -56,7 +56,7 @@ public:
       return make_alldirichlet_boundaryinfo<I>(config);
     else if (type == AllNeumannBoundaryInfo<I>::static_id())
       return make_allneumann_boundaryinfo<I>(config);
-    else if (type == BoundarySegmentBoundaryInfo<I>::static_id())
+    else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
       return make_boundarysegment_boundaryinfo<I>(config);
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
       return make_normalbased_boundaryinfo<I>(config);
