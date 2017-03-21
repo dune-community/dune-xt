@@ -15,36 +15,147 @@
 #include <type_traits>
 
 #include <dune/pybindxi/pybind11.h>
-#include <dune/pybindxi/operators.h>
+#include <dune/pybindxi/stl.h>
 
-#include "gridprovider/provider.hh"
+#include <dune/xt/common/configuration.pbh>
+#include <dune/xt/grid/gridprovider/provider.hh>
+#include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/layers.hh>
+#include <dune/xt/grid/dd/subdomains/grid.hh>
+#include <dune/xt/grid/grids.bindings.hh>
+
 #include "boundaryinfo.hh"
 
 namespace Dune {
 namespace XT {
 namespace Grid {
+namespace bindings {
+namespace internal {
 
 
-template <class C>
-pybind11::class_<C> bind_BoundaryInfo(pybind11::module& m, const std::string& id /*, const std::string& method_id*/)
+template <class I>
+class BoundaryInfoFactory
 {
-  namespace py = pybind11;
-  using namespace pybind11::literals;
+public:
+  template <class GP>
+  static void bind(pybind11::module& m)
+  {
+    using namespace pybind11::literals;
 
-  py::class_<C, BoundaryInfo<typename C::IntersectionType>> c(m, id.c_str(), id.c_str(), py::metaclass());
+    try { // guard since we might not be the first to do so for this grid/intersection
+      m.def("available_boundary_infos",
+            [](const GP& /*grid_provider*/) { return XT::Grid::BoundaryInfoFactory<I>::available(); },
+            "grid_provider"_a);
+      m.def("default_boundary_info_config",
+            [](const GP& /*grid_provider*/, const std::string& type) {
+              return XT::Grid::BoundaryInfoFactory<I>::default_config(type);
+            },
+            "grid_provider"_a,
+            "type"_a);
+      m.def("make_boundary_info",
+            [](const GP& /*grid_provider*/, const std::string& type, const Common::Configuration& cfg) {
+              return XT::Grid::BoundaryInfoFactory<I>::create(type, cfg).release();
+            },
+            "grid_provider"_a,
+            "type"_a,
+            "cfg"_a = Common::Configuration());
+      m.def("make_boundary_info",
+            [](const GP& /*grid_provider*/, const Common::Configuration& cfg) {
+              return XT::Grid::BoundaryInfoFactory<I>::create(cfg).release();
+            },
+            "grid_provider"_a,
+            "cfg"_a);
+    } catch (std::runtime_error&) {
+    }
+  } // ... bind(...)
+}; // class BoundaryInfoFactory
 
-  c.def(py::init<>());
 
-  c.def_property_readonly_static("static_id", [](const C& /*self*/) { return C::static_id(); });
-  c.def("__repr__", [id](const C& /*self*/) { return id + "(" + C::static_id() + ")"; });
-
-  return c;
-} // ... bind_BoundaryInfo(...)
+} // namespace internal
 
 
+template <class Imp, class G>
+class BoundaryInfo
+{
+  typedef typename Imp::IntersectionType I;
+  typedef XT::Grid::BoundaryInfo<I> InterfaceType;
+
+public:
+  typedef Imp type;
+  typedef pybind11::class_<type, InterfaceType> bound_type;
+
+
+  static bound_type bind(pybind11::module& m, const std::string& class_name, const std::string& layer_name)
+  {
+    namespace py = pybind11;
+
+    const auto grid_name = bindings::grid_name<G>::value();
+    const auto InterfaceName = Common::to_camel_case("BoundaryInfo_" + layer_name + "_" + grid_name);
+
+    // bind interface, guard since we might not be the first to do so for this intersection
+    try {
+      py::class_<InterfaceType>(m, InterfaceName.c_str(), InterfaceName.c_str(), py::metaclass());
+    } catch (std::runtime_error&) {
+    }
+
+    // bind factory
+    internal::BoundaryInfoFactory<I>::template bind<GridProvider<G>>(m);
+    internal::BoundaryInfoFactory<I>::template bind<GridProvider<G, DD::SubdomainGrid<G>>>(m);
+
+    // bind class
+    const auto ClassName = Common::to_camel_case(class_name + "_" + layer_name + "_" + grid_name);
+    bound_type c(m, ClassName.c_str(), ClassName.c_str(), py::metaclass());
+    c.def_property_readonly_static("static_id", [](const type& /*self*/) { return type::static_id(); });
+    c.def("__repr__", [ClassName](const type& /*self*/) { return ClassName; });
+
+    return c;
+  } // ... bind(...)
+}; // class BoundaryInfo
+
+
+} // namespace bindings
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
+
+
+// begin: this is what we need for the .so
+
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, _G, _layer, _backend, _class_name, _layer_name)                        \
+  Dune::XT::Grid::bindings::                                                                                           \
+      BoundaryInfo<_B<Dune::XT::Grid::extract_intersection_t<                                                          \
+                       typename Dune::XT::Grid::Layer<_G,                                                              \
+                                                      Dune::XT::Grid::Layers::_layer,                                  \
+                                                      Dune::XT::Grid::Backends::_backend,                              \
+                                                      Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
+                   _G>::bind(_m, _class_name, _layer_name)
+
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, _B, _class_name)                                                      \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, part, _class_name, "dd_subdomain")
+
+#if HAVE_DUNE_ALUGRID
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)                                                       \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view, _class_name, "leaf");                 \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, level, view, _class_name, "level");               \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part, _class_name, "dd_subdomain")
+#else
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)
+#endif
+
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, _B, _class_name)                                                       \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, Dune::XT::Grid::_B, _class_name);                                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, Dune::XT::Grid::_B, _class_name)
+
+#define DUNE_XT_GRID_BOUNDARYINFO_BIND(_m)                                                                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, AllDirichletBoundaryInfo, "all_dirichlet_boundary_info");                    \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, AllNeumannBoundaryInfo, "all_neumann_boundary_info");                        \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(                                                                                 \
+      _m, BoundarySegmentIndexBasedBoundaryInfo, "boundary_segment_index_based_boundary_info");                        \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, NormalBasedBoundaryInfo, "normal_based_boundary_info")
+
+// end: this is what we need for the .so
+
 
 #endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH
