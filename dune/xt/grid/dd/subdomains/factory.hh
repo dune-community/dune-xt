@@ -134,7 +134,7 @@ public:
 };
 
 #endif // HAVE_DUNE_ALUGRID
-#if HAVE_DUNE_UGGRID
+#if HAVE_DUNE_UGGRID || HAVE_UG
 
 template <>
 class NeighborRecursionLevel<UGGrid<2>>
@@ -156,7 +156,7 @@ public:
   }
 };
 
-#endif // HAVE_DUNE_UGGRID
+#endif // HAVE_DUNE_UGGRID || HAVE_UG
 #if HAVE_ALBERTA
 
 template <>

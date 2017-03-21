@@ -187,7 +187,7 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
 // anything>
 
 #endif // HAVE_DUNE_ALUGRID
-#if HAVE_UG
+#if HAVE_DUNE_UGGRID || HAVE_UG
 
 template <bool anything>
 struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>, anything>
@@ -242,7 +242,7 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGG
   }
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>, anything>
 
-#endif // HAVE_UG
+#endif // HAVE_DUNE_UGGRID || HAVE_UG
 #if HAVE_ALBERTA
 
 template <bool anything>
@@ -319,7 +319,7 @@ typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<do
 //                      , std::tuple<ALUGrid<3, 3, cube, nonconforming>,
 //                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
 #endif // HAVE_DUNE_ALUGRID
-#if HAVE_UG
+#if HAVE_DUNE_UGGRID || HAVE_UG
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>>
 #endif
 #if HAVE_ALBERTA
