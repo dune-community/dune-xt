@@ -122,7 +122,7 @@ class Glued
     static const bool value = true;
   };
 
-#if HAVE_DUNE_ALUGRID || HAVE_ALUGRID
+#if HAVE_DUNE_ALUGRID
   template <class Comm, bool anything>
   struct allowed_local_grid<ALUGrid<3, 3, simplex, conforming, Comm>, anything>
   {
@@ -134,7 +134,7 @@ class Glued
   {
     static const bool value = false;
   };
-#endif
+#endif // HAVE_DUNE_ALUGRID
 
   static_assert(allowed_macro_grid<MacroGridImp>::value,
                 "This macro grid is known to fail, enable on your onw risk by disabling this check!");
