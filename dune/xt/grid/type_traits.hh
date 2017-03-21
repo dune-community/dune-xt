@@ -40,6 +40,7 @@ struct is_intersection : public std::false_type
 template <class G, class I>
 struct is_intersection<Dune::Intersection<G, I>> : public std::true_type
 {
+  typedef std::remove_const_t<G> GridType;
 };
 
 
@@ -74,7 +75,6 @@ struct is_grid<Dune::ALUGrid<dim, dimworld, elType, refineType, Comm>> : public 
 };
 
 #endif // HAVE_DUNE_ALUGRID
-
 #if HAVE_DUNE_UGGRID || HAVE_UG
 
 template <int dim>
@@ -179,25 +179,35 @@ struct is_conforming_alugrid<ALUGrid<dim, dimworld, elType, Dune::conforming, Co
 #endif // HAVE_DUNE_ALUGRID
 
 
-template <class L, bool is_view = is_grid_view<L>::value, bool is_part = is_grid_part<L>::value>
+template <class T,
+          bool view = is_grid_view<T>::value,
+          bool part = is_grid_part<T>::value,
+          bool intersection = is_intersection<T>::value>
 struct extract_grid : public std::false_type
 {
 };
 
-template <class L>
-struct extract_grid<L, true, false>
+template <class T>
+struct extract_grid<T, true, false, false>
 {
-  typedef typename L::Grid type;
+  typedef typename T::Grid type;
 };
 
-template <class L>
-struct extract_grid<L, false, true>
+template <class T>
+struct extract_grid<T, false, true, false>
 {
-  typedef typename L::GridType type;
+  typedef typename T::GridType type;
 };
 
-template <class L>
-using extract_grid_t = typename extract_grid<L>::type;
+template <class T>
+struct extract_grid<T, false, false, true>
+{
+  typedef typename is_intersection<T>::GridType type;
+};
+
+
+template <class T>
+using extract_grid_t = typename extract_grid<T>::type;
 
 } // namespace Grid
 } // namespace XT
