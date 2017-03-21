@@ -143,8 +143,18 @@ public:
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
 #endif
 
+#if HAVE_DUNE_UGGRID || HAVE_UG
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)                                                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, leaf, view);                                                  \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, level, view);                                                 \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, dd_subdomain, part)
+#else
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)
+#endif
+
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, _B)                                                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B);                                                                \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B);                                                                  \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
 
 #define DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix)                                                                     \
@@ -182,8 +192,18 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)
 #endif
 
+#if HAVE_DUNE_UGGRID
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)                                                        \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, leaf, view, _class_name, "leaf");                                     \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, level, view, _class_name, "level");                                   \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, dd_subdomain, part, _class_name, "dd_subdomain")
+#else
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)
+#endif
+
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, _B, _class_name)                                                       \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, Dune::XT::Grid::_B, _class_name);                                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, Dune::XT::Grid::_B, _class_name);                                             \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, Dune::XT::Grid::_B, _class_name)
 
 #define DUNE_XT_GRID_BOUNDARYINFO_BIND(_m)                                                                             \
