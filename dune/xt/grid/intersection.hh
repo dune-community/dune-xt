@@ -30,33 +30,20 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
 
+#include <dune/xt/grid/type_traits.hh>
+
 namespace Dune {
 namespace XT {
 namespace Grid {
 
 
 template <class GridPartOrViewType>
-class Intersection
+class DUNE_DEPRECATED_MSG("Use extract_intersection_t<> instead (21.03.2017)!") Intersection
 {
-  template <class GridViewType, bool is_view>
-  struct Choose
-  {
-    typedef typename GridViewType::Intersection Type;
-  };
-
-  template <class GridPartType>
-  struct Choose<GridPartType, false>
-  {
-    typedef typename GridPartType::IntersectionType Type;
-  };
-
-  static const bool this_is_a_grid_view =
-      std::is_base_of<GridView<typename GridPartOrViewType::Traits>, GridPartOrViewType>::value;
-
 public:
-  typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
-  typedef Type type;
-}; // class Intersection
+  typedef extract_intersection_t<GridPartOrViewType> Type;
+  typedef extract_intersection_t<GridPartOrViewType> type;
+};
 
 
 /**

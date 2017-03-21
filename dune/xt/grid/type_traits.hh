@@ -209,6 +209,29 @@ struct extract_grid<T, false, false, true>
 template <class T>
 using extract_grid_t = typename extract_grid<T>::type;
 
+
+template <class T, bool view = is_grid_view<T>::value, bool part = is_grid_part<T>::value>
+struct extract_intersection : public std::false_type
+{
+};
+
+template <class T>
+struct extract_intersection<T, true, false>
+{
+  typedef typename T::Intersection type;
+};
+
+template <class T>
+struct extract_intersection<T, false, true>
+{
+  typedef typename T::IntersectionType type;
+};
+
+
+template <class T>
+using extract_intersection_t = typename extract_intersection<T>::type;
+
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
