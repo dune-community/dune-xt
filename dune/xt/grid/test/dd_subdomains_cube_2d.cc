@@ -131,7 +131,7 @@ struct ExpectedResults<Dune::ALUGrid<2, 2, simplex, nonconforming>, anything>
 };
 
 #endif // HAVE_DUNE_ALUGRID
-#if HAVE_DUNE_UGGRID || HAVE_UG
+#if HAVE_DUNE_UGGRID
 
 template <bool anything>
 struct ExpectedResults<UGGrid<2>, anything> : public Expected2dSimplexNonconformingResults
@@ -142,7 +142,7 @@ struct ExpectedResults<UGGrid<2>, anything> : public Expected2dSimplexNonconform
   }
 };
 
-#endif // HAVE_DUNE_UGGRID || HAVE_UG
+#endif // HAVE_DUNE_UGGRID
 #if HAVE_ALBERTA
 
 template <bool anything>
@@ -164,7 +164,7 @@ typedef ::testing::Types< YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>
                         , Dune::ALUGrid<2, 2, simplex, conforming>
                         , Dune::ALUGrid<2, 2, simplex, nonconforming>
 #endif
-#if HAVE_DUNE_UGGRID || HAVE_UG
+#if (HAVE_DUNE_UGGRID || HAVE_UG) and not HAVE_MPI
                         , UGGrid<2>
 #endif
 #if HAVE_ALBERTA
