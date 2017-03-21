@@ -20,6 +20,9 @@ typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>> YASP_2D
 #if HAVE_DUNE_ALUGRID
 typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> ALU_2D_SIMPLEX_CONFORMING;
 #endif
+#if HAVE_DUNE_UGGRID || HAVE_UG
+typedef Dune::UGGrid<2> UG_2D;
+#endif
 
 
 namespace Dune {
@@ -64,7 +67,20 @@ struct grid_name<ALUGrid<dim, dim, simplex, conforming, Comm>>
 
 
 #endif // HAVE_DUNE_ALUGRID
+#if HAVE_DUNE_UGGRID || HAVE_UG
 
+
+template <int dim>
+struct grid_name<UGGrid<dim>>
+{
+  static std::string value()
+  { // the "simplex" is due to the fact that our grid provider currently only creates ug grids with simplices
+    return Common::to_string(dim) + "d_simplex_uggrid";
+  }
+};
+
+
+#endif // HAVE_DUNE_UGGRID || HAVE_UG
 
 } // namespace bindings
 } // namespace Grid
