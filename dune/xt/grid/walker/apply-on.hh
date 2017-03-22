@@ -106,7 +106,7 @@ class WhichIntersection
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename XT::Grid::Intersection<GridViewType>::Type IntersectionType;
+  using IntersectionType = extract_intersection_t<GridViewType>;
 
   virtual ~WhichIntersection<GridViewImp>()
   {

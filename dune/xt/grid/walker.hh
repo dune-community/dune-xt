@@ -105,7 +105,7 @@ class Walker : internal::GridPartViewHolder<GridViewImp>, public Functor::Codim0
 public:
   typedef GridViewImp GridViewType;
   typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
-  typedef typename XT::Grid::Intersection<GridViewType>::Type IntersectionType;
+  using IntersectionType = extract_intersection_t<GridViewType>;
 
   explicit Walker(GridViewType grd_vw)
     : internal::GridPartViewHolder<GridViewImp>(grd_vw)
