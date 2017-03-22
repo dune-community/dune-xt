@@ -653,8 +653,8 @@ public:
       {
         BaseType::operator++();
         while (cd > 0 && *this != *real_it_end_
-               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index(this->type())].count(
-                      real_index_set_->index(this->operator*())))
+               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->type())].count(
+		      real_index_set_->index(this->operator*())))
           BaseType::operator++();
         return *this;
       }
@@ -707,7 +707,7 @@ public:
         {
           BaseType::operator++();
           while (cd > 0 && *this != *real_it_end_
-                 && (*entities_to_skip_)[GlobalGeometryTypeIndex::index(this->type())].count(
+                 && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->type())].count(
                         real_index_set_->index(this->operator*())))
             BaseType::operator++();
           return *this;
