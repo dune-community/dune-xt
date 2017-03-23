@@ -21,9 +21,11 @@
 #include <dune/xt/common/string.hh>
 
 #include <dune/xt/la/type_traits.hh>
+#include <dune/xt/la/container.bindings.hh>
 
 #include "vector-interface.hh"
 #include "container-interface.pbh"
+
 
 namespace Dune {
 namespace XT {
@@ -31,8 +33,7 @@ namespace LA {
 
 
 template <class C>
-typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vector(pybind11::module& m,
-                                                                                    const std::string& id)
+typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vector(pybind11::module& m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -40,7 +41,9 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   typedef typename C::ScalarType S;
   typedef typename C::RealType R;
 
-  py::class_<C> c = bind_ProvidesDataAccess<C>(m, id, id);
+  const auto ClassName = Common::to_camel_case(bindings::container_name<C>::value());
+
+  py::class_<C> c = bind_ProvidesDataAccess<C>(m, ClassName, ClassName);
   addbind_ProvidesBackend(c);
 
   c.def("__init__",
@@ -74,9 +77,9 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
         "Assigns the elements of the iterable to the vector.");
 
   c.def("__repr__",
-        [id](const C& self) {
+        [ClassName](const C& self) {
           std::stringstream ss;
-          ss << id << "([";
+          ss << ClassName << "([";
           if (self.size() > 0)
             ss << self[0];
           for (size_t ii = 1; ii < std::min(size_t(3), self.size()); ++ii)
@@ -94,9 +97,9 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
         },
         "A compact representation of the vector (only the first and last three elements).");
   c.def("__str__",
-        [id](const C& self) {
+        [ClassName](const C& self) {
           std::stringstream ss;
-          ss << id << "([";
+          ss << ClassName << "([";
           if (self.size() > 0)
             ss << self[0];
           for (size_t ii = 1; ii < self.size(); ++ii)
