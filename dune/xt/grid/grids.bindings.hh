@@ -11,6 +11,7 @@
 #define DUNE_XT_GRID_GRIDS_BINDINGS_HH
 
 #include <dune/xt/common/string.hh>
+#include <dune/xt/grid/layers.hh>
 
 #include "grids.hh"
 
@@ -22,6 +23,9 @@ typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> ALU_2D_SIMPLEX_CONF
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
 typedef Dune::UGGrid<2> UG_2D;
+#endif
+#if HAVE_ALBERTA
+typedef Dune::AlbertaGrid<2, 2> ALBERTA_2D;
 #endif
 
 
@@ -67,6 +71,20 @@ struct grid_name<ALUGrid<dim, dim, simplex, conforming, Comm>>
 
 
 #endif // HAVE_DUNE_ALUGRID
+#if HAVE_ALBERTA
+
+
+template <int dim>
+struct grid_name<Dune::AlbertaGrid<dim, dim>>
+{
+  static std::string value()
+  {
+    return Common::to_string(dim) + "d_simplex_albertagrid";
+  }
+};
+
+
+#endif // HAVE_ALBERTA
 #if HAVE_DUNE_UGGRID || HAVE_UG
 
 
