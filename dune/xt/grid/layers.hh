@@ -44,6 +44,26 @@ enum class Layers
 };
 
 
+namespace internal {
+
+
+template <Backends backend>
+struct backend_dependent_typename
+{
+  typedef void type;
+};
+
+
+template <Layers layer>
+struct layer_dependent_typename
+{
+  typedef void type;
+};
+
+
+} // namespace  internal
+
+
 /**
  * \brief Allows to statically create a leaf or level part or view (unspecialized variant).
  */
