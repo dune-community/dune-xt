@@ -15,8 +15,6 @@
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/grid/boundaryinfo.hh>
-#include <dune/xt/grid/entity.hh>
-#include <dune/xt/grid/intersection.hh>
 
 namespace Dune {
 namespace XT {
@@ -32,7 +30,7 @@ class WhichEntity
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  using EntityType = extract_entity_t<GridViewType>;
 
   virtual ~WhichEntity()
   {

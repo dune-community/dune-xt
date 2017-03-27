@@ -34,8 +34,6 @@
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/timedlogging.hh>
 
-#include <dune/xt/grid/entity.hh>
-#include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/rangegenerators.hh>
 
@@ -104,7 +102,7 @@ class Walker : internal::GridPartViewHolder<GridViewImp>, public Functor::Codim0
 
 public:
   typedef GridViewImp GridViewType;
-  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  using EntityType = extract_entity_t<GridViewType>;
   using IntersectionType = extract_intersection_t<GridViewType>;
 
   explicit Walker(GridViewType grd_vw)

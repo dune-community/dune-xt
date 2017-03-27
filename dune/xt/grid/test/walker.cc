@@ -35,8 +35,8 @@ struct GridWalkerTest : public ::testing::Test
   static const size_t level = 4;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridViewType;
-  typedef typename Entity<GridViewType>::Type EntityType;
-  typedef typename Intersection<GridViewType>::Type IntersectionType;
+  using EntityType = extract_entity_t<GridViewType>;
+  using IntersectionType = extract_intersection_t<GridViewType>;
   const GridProvider<GridType> grid_prv;
   GridWalkerTest()
     : grid_prv(make_cube_grid<GridType>(0.f, 1.f, level))

@@ -25,7 +25,7 @@ class Codim0
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  using EntityType = extract_entity_t<GridViewType>;
 
   virtual ~Codim0()
   {
@@ -65,7 +65,7 @@ class Codim1
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  using EntityType = extract_entity_t<GridViewType>;
   using IntersectionType = extract_intersection_t<GridViewType>;
 
   virtual ~Codim1()
@@ -90,7 +90,7 @@ class Codim0And1
 {
 public:
   typedef GridViewImp GridViewType;
-  typedef typename XT::Grid::Entity<GridViewType>::Type EntityType;
+  using EntityType = extract_entity_t<GridViewType>;
   using IntersectionType = extract_intersection_t<GridViewType>;
 
   virtual ~Codim0And1()
