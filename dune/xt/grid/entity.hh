@@ -13,6 +13,8 @@
 #ifndef DUNE_XT_GRID_ENTITY_HH
 #define DUNE_XT_GRID_ENTITY_HH
 
+#include <dune/common/deprecated.hh>
+
 #include <dune/geometry/referenceelements.hh>
 
 #include <dune/grid/common/entity.hh>
@@ -29,7 +31,7 @@ namespace Grid {
 
 
 template <class GridPartOrViewType>
-class Entity
+class DUNE_DEPRECATED_MSG("Use extract_entity_t<GridPartOrViewType> instead (27.03.2017)!") Entity
 {
   template <class GridViewType, bool is_view>
   struct Choose
@@ -51,10 +53,6 @@ public:
   typedef Type type;
 }; // class Entity
 
-template <class T>
-using entity_t = typename Entity<T>::type;
-template <class T>
-using extract_entity_t = typename Entity<T>::type;
 
 template <class EntityType>
 void print_entity(const EntityType& entity,

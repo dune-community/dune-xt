@@ -14,6 +14,7 @@
 
 #include <type_traits>
 
+#include <dune/grid/common/entity.hh>
 #include <dune/grid/common/intersection.hh>
 #include <dune/grid/common/gridview.hh>
 
@@ -25,7 +26,6 @@
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/grids.hh>
-//#include <dune/xt/grid/view/subdomain/part.hh>
 
 namespace Dune {
 namespace XT {
@@ -230,6 +230,29 @@ struct extract_intersection<T, false, true>
 
 template <class T>
 using extract_intersection_t = typename extract_intersection<T>::type;
+
+
+template <class T, bool view = is_grid_view<T>::value, bool part = is_grid_part<T>::value>
+struct extract_entity : public std::false_type
+{
+};
+
+template <class T>
+struct extract_entity<T, true, false>
+{
+  typedef typename T::template Codim<0>::Entity type;
+};
+
+template <class T>
+struct extract_entity<T, false, true>
+{
+  typedef typename T::template Codim<0>::EntityType type;
+};
+
+
+template <class T>
+using extract_entity_t = typename extract_entity<T>::type;
+
 
 } // namespace Grid
 } // namespace XT
