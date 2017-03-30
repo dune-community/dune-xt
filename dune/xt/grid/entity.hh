@@ -30,19 +30,19 @@ namespace XT {
 namespace Grid {
 
 
-template <class GridPartOrViewType>
+template <class GridPartOrViewType, size_t codim = 0>
 class DUNE_DEPRECATED_MSG("Use extract_entity_t<GridPartOrViewType> instead (27.03.2017)!") Entity
 {
   template <class GridViewType, bool is_view>
   struct Choose
   {
-    typedef typename GridViewType::template Codim<0>::Entity Type;
+    typedef typename GridViewType::template Codim<codim>::Entity Type;
   };
 
   template <class GridPartType>
   struct Choose<GridPartType, false>
   {
-    typedef typename GridPartType::template Codim<0>::EntityType Type;
+    typedef typename GridPartType::template Codim<codim>::EntityType Type;
   };
 
   static const bool this_is_a_grid_view =
@@ -52,7 +52,6 @@ public:
   typedef typename Choose<GridPartOrViewType, this_is_a_grid_view>::Type Type;
   typedef Type type;
 }; // class Entity
-
 
 template <class EntityType>
 void print_entity(const EntityType& entity,

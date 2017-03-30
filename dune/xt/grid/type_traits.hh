@@ -306,27 +306,28 @@ using extract_intersection_t = typename extract_intersection<T>::type;
 
 
 template <class T,
+          size_t codim = 0,
           bool view = is_view<T>::value,
           bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
 struct extract_entity : public std::false_type
 {
 };
 
-template <class T>
-struct extract_entity<T, true, false>
+template <class T, size_t codim>
+struct extract_entity<T, codim, true, false>
 {
-  typedef typename T::template Codim<0>::Entity type;
+  typedef typename T::template Codim<codim>::Entity type;
 };
 
-template <class T>
-struct extract_entity<T, false, true>
+template <class T, size_t codim>
+struct extract_entity<T, codim, false, true>
 {
-  typedef typename T::template Codim<0>::EntityType type;
+  typedef typename T::template Codim<codim>::EntityType type;
 };
 
 
-template <class T>
-using extract_entity_t = typename extract_entity<T>::type;
+template <class T, size_t codim = 0>
+using extract_entity_t = typename extract_entity<T, codim>::type;
 
 
 template <class T,
