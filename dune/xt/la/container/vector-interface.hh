@@ -19,7 +19,8 @@
 #include <vector>
 #include <complex>
 
-#include <dune/common/ftraits.hh>
+#include <dune/common/bigunsignedint.hh>
+#include <dune/common/unused.hh>
 
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -175,6 +176,7 @@ public:
    */
   virtual std::pair<size_t, RealType> amax() const
   {
+    using std::abs;
     auto result = std::make_pair(size_t(0), RealType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
       const auto value = std::abs(get_entry_ref(ii));
@@ -230,12 +232,13 @@ public:
    */
   virtual ScalarType dot(const derived_type& other) const
   {
+    using std::conj;
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += std::conj(get_entry_ref(ii)) * other.get_entry_ref(ii);
+      result += conj(get_entry_ref(ii)) * other.get_entry_ref(ii);
     return result;
   } // ... dot(...)
 
@@ -246,9 +249,10 @@ public:
    */
   virtual RealType l1_norm() const
   {
+    using std::abs;
     RealType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += std::abs(get_entry_ref(ii));
+      result += abs(get_entry_ref(ii));
     return result;
   } // ... l1_norm(...)
 
@@ -259,7 +263,9 @@ public:
    */
   virtual RealType l2_norm() const
   {
-    return std::sqrt(std::abs(dot(this->as_imp(*this)))); // std::abs is only needed for the right return type:
+    using std::abs;
+    using std::sqrt;
+    return sqrt(abs(dot(this->as_imp(*this)))); // std::abs is only needed for the right return type:
     // v.dot(v) should always be a ScalarType with zero imaginary part
   }
 
@@ -275,12 +281,14 @@ public:
 
   virtual ScalarType standard_deviation() const
   {
+    using std::pow;
+    using std::sqrt;
     const ScalarType mu = mean();
     ScalarType sigma = 0.0;
     for (const auto& x_i : *this)
-      sigma += std::pow(x_i - mu, 2);
+      sigma += pow(x_i - mu, 2);
     sigma /= size();
-    return std::sqrt(sigma);
+    return sqrt(sigma);
   } // ... standard_deviation(...)
 
   /**

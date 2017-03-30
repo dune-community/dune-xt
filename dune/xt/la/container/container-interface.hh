@@ -19,6 +19,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/math.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/type_traits.hh>
 
