@@ -29,7 +29,7 @@
 #include "boundaryinfo.bindings.hh"
 #include "gridprovider.pbh"
 #include "walker.pbh"
-#include "walker/apply-on.pbh"
+#include "walker/apply-on.bindings.hh"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -84,6 +84,7 @@ PYBIND11_PLUGIN(_grid)
   //#endif
 
   DUNE_XT_GRID_BOUNDARYINFO_BIND(m);
+  DUNE_XT_GRID_WALKER_APPLYON_BIND(m);
 
   m.def("init_logger",
         [](const ssize_t max_info_level,
