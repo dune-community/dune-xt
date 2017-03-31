@@ -9,7 +9,7 @@ namespace bindings {
 template <Layers layer>
 struct layer_name
 {
-  static_assert(AlwaysFalse<typename internal::layer_dependent_typename<layer>::type>::value,
+  static_assert(AlwaysFalse<typename XT::Grid::internal::layer_dependent_typename<layer>::type>::value,
                 "Please add a specialization for this layer!");
 
   static std::string value()
