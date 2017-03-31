@@ -21,6 +21,7 @@
 #include <dune/xt/common/configuration.pbh>
 #include <dune/xt/common/fvector.pbh>
 
+#include "dd/subdomains/grid.hh"
 #include "grids.hh"
 #include "layers.hh"
 #include "intersection.hh"
@@ -46,6 +47,7 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
 #if HAVE_DUNE_FEM
   typedef typename Layer<G, Layers::level, Backends::part>::type LevelPart;
   typedef typename Layer<G, Layers::leaf, Backends::part>::type LeafPart;
+  typedef typename Layer<G, Layers::dd_subdomain, Backends::part, DD::SubdomainGrid<G>>::type DdSubdomainPart;
 #endif
 
   bind_GridProvider<G>(m, grid_id);
@@ -61,6 +63,7 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
 #if HAVE_DUNE_FEM
   BIND(LevelPart, "level_part");
   BIND(LeafPart, "leaf_part");
+  BIND(DdSubdomainPart, "dd_subdomain_part");
 #endif
 #undef BIND
 } // ... addbind_for_Grid(...)
