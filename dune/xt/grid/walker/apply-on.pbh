@@ -77,15 +77,13 @@ void addbind_WhichIntersection(pybind11::module& m, const std::string& grid_id, 
                                              std::string("ApplyOnWhichIntersection__" + grid_id + "_" + layer).c_str(),
                                              std::string("ApplyOnWhichIntersection__" + grid_id + "_" + layer).c_str());
 
-  internal::bind_WhichIntersection<ApplyOn::AllIntersections<GV>,
-                                   BoundaryInfo<typename Intersection<GV>::type>,
-                                   false>()(
-      m, "ApplyOnAllIntersections__" + grid_id + "_" + layer, "make_apply_on_all_intersections__" + layer);
+  internal::
+      bind_WhichIntersection<ApplyOn::AllIntersections<GV>, BoundaryInfo<typename Intersection<GV>::type>, false>()(
+          m, "ApplyOnAllIntersections__" + grid_id + "_" + layer, "make_apply_on_all_intersections__" + layer);
 
-  internal::bind_WhichIntersection<ApplyOn::InnerIntersections<GV>,
-                                   BoundaryInfo<typename Intersection<GV>::type>,
-                                   false>()(
-      m, "ApplyOnInnerIntersections__" + grid_id + "_" + layer, "make_apply_on_inner_intersections__" + layer);
+  internal::
+      bind_WhichIntersection<ApplyOn::InnerIntersections<GV>, BoundaryInfo<typename Intersection<GV>::type>, false>()(
+          m, "ApplyOnInnerIntersections__" + grid_id + "_" + layer, "make_apply_on_inner_intersections__" + layer);
 
   internal::bind_WhichIntersection<ApplyOn::InnerIntersectionsPrimally<GV>,
                                    BoundaryInfo<typename Intersection<GV>::type>,
@@ -120,10 +118,9 @@ void addbind_WhichIntersection(pybind11::module& m, const std::string& grid_id, 
                                    true>()(
       m, "ApplyOnDirichletIntersections__" + grid_id + "_" + layer, "make_apply_on_dirichlet_intersections__" + layer);
 
-  internal::bind_WhichIntersection<ApplyOn::NeumannIntersections<GV>,
-                                   BoundaryInfo<typename Intersection<GV>::type>,
-                                   true>()(
-      m, "ApplyOnNeumannIntersections__" + grid_id + "_" + layer, "make_apply_on_neumann_intersections__" + layer);
+  internal::
+      bind_WhichIntersection<ApplyOn::NeumannIntersections<GV>, BoundaryInfo<typename Intersection<GV>::type>, true>()(
+          m, "ApplyOnNeumannIntersections__" + grid_id + "_" + layer, "make_apply_on_neumann_intersections__" + layer);
 } // ... addbind_WhichIntersection(...)
 
 
