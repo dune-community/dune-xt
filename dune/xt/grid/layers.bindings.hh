@@ -6,6 +6,37 @@ namespace Grid {
 namespace bindings {
 
 
+template <Backends backend>
+struct backend_name
+{
+  static_assert(AlwaysFalse<typename XT::Grid::internal::backend_dependent_typename<backend>::type>::value,
+                "Please add a specialization for this backend!");
+
+  static std::string value()
+  {
+    return "";
+  }
+};
+
+template <>
+struct backend_name<Backends::part>
+{
+  static std::string value()
+  {
+    return "part";
+  }
+};
+
+template <>
+struct backend_name<Backends::view>
+{
+  static std::string value()
+  {
+    return "view";
+  }
+};
+
+
 template <Layers layer>
 struct layer_name
 {
