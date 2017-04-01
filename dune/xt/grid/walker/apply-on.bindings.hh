@@ -48,24 +48,27 @@ private:
   template <bool with_bi = ctor_expects_boundary_info, bool anything = true>
   struct addbind // with_bi = false
   {
-    void operator()(pybind11::module& m, bound_type& c, const std::string& class_name)
+    void operator()(pybind11::module& m, bound_type& c, const std::string& class_name, const std::string& layer_name)
     {
       c.def(pybind11::init<>());
 
-      m.def(std::string("make_" + class_name).c_str(), []() { return type(); });
+      m.def(std::string("make_apply_on_" + class_name + "_" + XT::Grid::bindings::grid_name<G>::value() + "_"
+                        + layer_name)
+                .c_str(),
+            []() { return type(); });
     }
   };
 
   template <bool anything>
   struct addbind<true, anything>
   {
-    void operator()(pybind11::module& m, bound_type& c, const std::string& class_name)
+    void operator()(pybind11::module& m, bound_type& c, const std::string& class_name, const std::string& layer_name)
     {
       using namespace pybind11::literals;
 
       c.def(pybind11::init<const BoundaryInfoType&>());
 
-      m.def(std::string("make_" + class_name).c_str(),
+      m.def(std::string("make_apply_on_" + class_name + "_" + layer_name).c_str(),
             [](const BoundaryInfoType& boundary_info) { return type(boundary_info); },
             "boundary_info"_a);
     }
@@ -77,7 +80,7 @@ public:
     namespace py = pybind11;
 
     const auto grid_name = XT::Grid::bindings::grid_name<G>::value();
-    const auto InterfaceName = Common::to_camel_case("WhichIntersection_" + grid_name + "_" + layer_name);
+    const auto InterfaceName = Common::to_camel_case("ApplyOnWhichIntersection_" + grid_name + "_" + layer_name);
 
     // bind interface, guard since we might not be the first to do so for this intersection
     try {
@@ -86,11 +89,9 @@ public:
     }
 
     // bind class
-    const auto full_class_name = class_name + "_" + grid_name + "_" + layer_name;
-    const auto ClassName = Common::to_camel_case(full_class_name);
+    const auto ClassName = Common::to_camel_case("apply_on_" + class_name + "_" + grid_name + "_" + layer_name);
     bound_type c(m, ClassName.c_str(), ClassName.c_str(), py::metaclass());
-    addbind<>()(m, c, full_class_name);
-
+    addbind<>()(m, c, class_name, layer_name);
 
     return c;
   } // ... bind(...)
@@ -112,44 +113,48 @@ public:
                                                           Dune::XT::Grid::Layers::_layer,                              \
                                                           Dune::XT::Grid::Backends::_backend,                          \
                                                           Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>,               \
-                        _w>::bind(_m,                                                                                  \
-                                  _class_name,                                                                         \
-                                  Dune::XT::Grid::bindings::layer_name<Dune::XT::Grid::Layers::_layer>::value())
+                        _w>::                                                                                          \
+          bind(_m,                                                                                                     \
+               _class_name,                                                                                            \
+               Dune::XT::Grid::bindings::layer_name<Dune::XT::Grid::Layers::_layer>::value() + "_"                     \
+                   + Dune::XT::Grid::bindings::backend_name<Dune::XT::Grid::Backends::_backend>::value())
 
 //#if HAVE_ALBERTA
-//#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _class_name)                                   \
-//  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALBERTA_2D, _layer, part, _class_name)
+//#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _backend, _class_name)                                   \
+//  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALBERTA_2D, _layer, _backend, _class_name)
 //#else
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _class_name)
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _backend, _class_name)
 //#endif
 
 #if HAVE_DUNE_ALUGRID
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _class_name)                                         \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALU_2D_SIMPLEX_CONFORMING, _layer, part, _class_name)
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _backend, _class_name)                               \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALU_2D_SIMPLEX_CONFORMING, _layer, _backend, _class_name)
 #else
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _class_name)
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _backend, _class_name)
 #endif
 
 //#if HAVE_DUNE_UGGRID
-//#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, _W, _w, _layer, _class_name)                                        \
-//  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, UG_2D, _layer, part, _class_name)
+//#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, _W, _w, _layer, _backend, _class_name)                                        \
+//  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, UG_2D, _layer, _backend, _class_name)
 //#else
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, _W, _w, _layer, _class_name)
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, _W, _w, _layer, _backend, _class_name)
 //#endif
 
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_YASP(_m, _W, _w, _layer, _class_name)                                        \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, YASP_2D_EQUIDISTANT_OFFSET, _layer, part, _class_name)
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_YASP(_m, _W, _w, _layer, _backend, _class_name)                              \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, YASP_2D_EQUIDISTANT_OFFSET, _layer, _backend, _class_name)
 
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, _layer, _class_name)                                   \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _class_name);                 \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _class_name);                     \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _class_name);                      \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_YASP(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _class_name)
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, _layer, _backend, _class_name)                         \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _backend, _class_name);       \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _backend, _class_name);           \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _backend, _class_name);            \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_YASP(_m, Dune::XT::Grid::ApplyOn::_W, _w, _layer, _backend, _class_name)
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, _W, _w, _class_name)                                                 \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, leaf, _class_name);                                          \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, _class_name);                                         \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain, _class_name)
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, leaf, part, _class_name);                                    \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, leaf, view, _class_name);                                    \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, part, _class_name);                                   \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, view, _class_name);                                   \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain, part, _class_name)
 
 #define DUNE_XT_GRID_WALKER_APPLYON_BIND(_m)                                                                           \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, AllIntersections, false, "all_intersections");                             \
