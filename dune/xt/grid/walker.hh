@@ -36,6 +36,7 @@
 
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/rangegenerators.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 #include "walker/apply-on.hh"
 #include "walker/functors.hh"
@@ -44,69 +45,22 @@
 namespace Dune {
 namespace XT {
 namespace Grid {
-namespace internal {
 
 
-template <class GPV, bool is_grd_vw = is_grid_view<GPV>::value>
-struct GridPartViewHolder
+template <class GridLayerImp>
+class Walker : public Functor::Codim0And1<GridLayerImp>
 {
-  typedef GPV type;
-
-  GridPartViewHolder(GPV grid_view)
-    : grid_view_(grid_view)
-  {
-  }
-
-  GridPartViewHolder(const GridPartViewHolder& other) = default;
-  GridPartViewHolder(GridPartViewHolder&& source) = default;
-
-  const type& real_grid_view() const
-  {
-    return grid_view_;
-  }
-
-  const GPV grid_view_;
-};
-
-template <class GPV>
-struct GridPartViewHolder<GPV, false>
-{
-  typedef typename GPV::GridViewType type;
-
-  GridPartViewHolder(const GridPartViewHolder& other) = default;
-  GridPartViewHolder(GridPartViewHolder&& source) = default;
-
-  GridPartViewHolder(GPV grid_part)
-    : grid_view_(grid_part)
-    , grid_part_(grid_view_.gridView())
-  {
-  }
-
-  const type& real_grid_view() const
-  {
-    return grid_part_;
-  }
-
-  const GPV grid_view_;
-  const type grid_part_;
-};
-
-
-} // namespace internal
-
-
-template <class GridViewImp>
-class Walker : internal::GridPartViewHolder<GridViewImp>, public Functor::Codim0And1<GridViewImp>
-{
-  typedef Walker<GridViewImp> ThisType;
+  static_assert(is_layer<GridLayerImp>::value, "");
+  typedef Walker<GridLayerImp> ThisType;
 
 public:
-  typedef GridViewImp GridViewType;
-  using EntityType = extract_entity_t<GridViewType>;
-  using IntersectionType = extract_intersection_t<GridViewType>;
+  typedef GridLayerImp GridViewType DUNE_DEPRECATED_MSG("Use GridLayerType instead (02.04.2017)!");
+  typedef GridLayerImp GridLayerType;
+  using EntityType = extract_entity_t<GridLayerType>;
+  using IntersectionType = extract_intersection_t<GridLayerType>;
 
-  explicit Walker(GridViewType grd_vw)
-    : internal::GridPartViewHolder<GridViewImp>(grd_vw)
+  explicit Walker(GridLayerType grd_lr)
+    : grid_layer_(grd_lr)
   {
   }
 
@@ -115,86 +69,100 @@ public:
 
   Walker(Walker&& source) = default;
 
-  const GridViewType& grid_view() const
+  const GridLayerType& grid_view() const DUNE_DEPRECATED_MSG("Use grid_layer() instead (02.04.2017)!")
   {
-    return this->grid_view_;
+    return grid_layer_;
+  }
+
+  const GridLayerType& grid_layer() const
+  {
+    return grid_layer_;
+  }
+
+  GridLayerType& grid_layer()
+  {
+    return grid_layer_;
   }
 
   ThisType& append(std::function<void(const EntityType&)> lambda,
-                   const ApplyOn::WhichEntity<GridViewType>* where = new ApplyOn::AllEntities<GridViewType>())
+                   const ApplyOn::WhichEntity<GridLayerType>* where = new ApplyOn::AllEntities<GridLayerType>())
   {
-    codim0_functors_.emplace_back(new internal::Codim0LambdaWrapper<GridViewType>(lambda, where));
+    codim0_functors_.emplace_back(new internal::Codim0LambdaWrapper<GridLayerType>(lambda, where));
     return *this;
   }
 
   ThisType&
   append(std::function<void(const IntersectionType&, const EntityType&, const EntityType&)> lambda,
-         const ApplyOn::WhichIntersection<GridViewType>* where = new ApplyOn::AllIntersections<GridViewType>())
+         const ApplyOn::WhichIntersection<GridLayerType>* where = new ApplyOn::AllIntersections<GridLayerType>())
   {
-    codim1_functors_.emplace_back(new internal::Codim1LambdaWrapper<GridViewType>(lambda, where));
+    codim1_functors_.emplace_back(new internal::Codim1LambdaWrapper<GridLayerType>(lambda, where));
     return *this;
   }
 
-  ThisType& append(Functor::Codim0<GridViewType>& functor,
-                   const ApplyOn::WhichEntity<GridViewType>* where = new ApplyOn::AllEntities<GridViewType>())
+  ThisType& append(Functor::Codim0<GridLayerType>& functor,
+                   const ApplyOn::WhichEntity<GridLayerType>* where = new ApplyOn::AllEntities<GridLayerType>())
   {
     codim0_functors_.emplace_back(
-        new internal::Codim0FunctorWrapper<GridViewType, Functor::Codim0<GridViewType>>(functor, where));
+        new internal::Codim0FunctorWrapper<GridLayerType, Functor::Codim0<GridLayerType>>(functor, where));
     return *this;
   }
 
   ThisType&
-  append(Functor::Codim1<GridViewType>& functor,
-         const ApplyOn::WhichIntersection<GridViewType>* where = new ApplyOn::AllIntersections<GridViewType>())
+  append(Functor::Codim1<GridLayerType>& functor,
+         const ApplyOn::WhichIntersection<GridLayerType>* where = new ApplyOn::AllIntersections<GridLayerType>())
   {
     codim1_functors_.emplace_back(
-        new internal::Codim1FunctorWrapper<GridViewType, Functor::Codim1<GridViewType>>(functor, where));
+        new internal::Codim1FunctorWrapper<GridLayerType, Functor::Codim1<GridLayerType>>(functor, where));
     return *this;
   }
 
-  ThisType& append(Functor::Codim0And1<GridViewType>& functor,
-                   const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>(),
-                   const ApplyOn::WhichIntersection<GridViewType>* which_intersections =
-                       new ApplyOn::AllIntersections<GridViewType>())
+  ThisType&
+  append(Functor::Codim0And1<GridLayerType>& functor,
+         const ApplyOn::WhichEntity<GridLayerType>* which_entities = new ApplyOn::AllEntities<GridLayerType>(),
+         const ApplyOn::WhichIntersection<GridLayerType>* which_intersections =
+             new ApplyOn::AllIntersections<GridLayerType>())
   {
     codim0_functors_.emplace_back(
-        new internal::Codim0FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(functor, which_entities));
-    codim1_functors_.emplace_back(new internal::Codim1FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(
+        new internal::Codim0FunctorWrapper<GridLayerType, Functor::Codim0And1<GridLayerType>>(functor, which_entities));
+    codim1_functors_.emplace_back(new internal::Codim1FunctorWrapper<GridLayerType, Functor::Codim0And1<GridLayerType>>(
         functor, which_intersections));
     return *this;
   }
 
-  ThisType& append(Functor::Codim0And1<GridViewType>& functor,
-                   const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
-                   const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
+  ThisType&
+  append(Functor::Codim0And1<GridLayerType>& functor,
+         const ApplyOn::WhichIntersection<GridLayerType>* which_intersections,
+         const ApplyOn::WhichEntity<GridLayerType>* which_entities = new ApplyOn::AllEntities<GridLayerType>())
   {
     codim0_functors_.emplace_back(
-        new internal::Codim0FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(functor, which_entities));
-    codim1_functors_.emplace_back(new internal::Codim1FunctorWrapper<GridViewType, Functor::Codim0And1<GridViewType>>(
+        new internal::Codim0FunctorWrapper<GridLayerType, Functor::Codim0And1<GridLayerType>>(functor, which_entities));
+    codim1_functors_.emplace_back(new internal::Codim1FunctorWrapper<GridLayerType, Functor::Codim0And1<GridLayerType>>(
         functor, which_intersections));
     return *this;
   }
 
-  ThisType& append(ThisType& other,
-                   const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>(),
-                   const ApplyOn::WhichIntersection<GridViewType>* which_intersections =
-                       new ApplyOn::AllIntersections<GridViewType>())
+  ThisType&
+  append(ThisType& other,
+         const ApplyOn::WhichEntity<GridLayerType>* which_entities = new ApplyOn::AllEntities<GridLayerType>(),
+         const ApplyOn::WhichIntersection<GridLayerType>* which_intersections =
+             new ApplyOn::AllIntersections<GridLayerType>())
   {
     if (&other == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
-    codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
+    codim0_functors_.emplace_back(new internal::WalkerWrapper<GridLayerType, ThisType>(other, which_entities));
+    codim1_functors_.emplace_back(new internal::WalkerWrapper<GridLayerType, ThisType>(other, which_intersections));
     return *this;
   } // ... append(...)
 
-  ThisType& append(ThisType& other,
-                   const ApplyOn::WhichIntersection<GridViewType>* which_intersections,
-                   const ApplyOn::WhichEntity<GridViewType>* which_entities = new ApplyOn::AllEntities<GridViewType>())
+  ThisType&
+  append(ThisType& other,
+         const ApplyOn::WhichIntersection<GridLayerType>* which_intersections,
+         const ApplyOn::WhichEntity<GridLayerType>* which_entities = new ApplyOn::AllEntities<GridLayerType>())
   {
     if (&other == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    codim0_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_entities));
-    codim1_functors_.emplace_back(new internal::WalkerWrapper<GridViewType, ThisType>(other, which_intersections));
+    codim0_functors_.emplace_back(new internal::WalkerWrapper<GridLayerType, ThisType>(other, which_entities));
+    codim1_functors_.emplace_back(new internal::WalkerWrapper<GridLayerType, ThisType>(other, which_intersections));
     return *this;
   } // ... append(...)
 
@@ -222,7 +190,7 @@ public:
   bool apply_on(const EntityType& entity) const
   {
     for (const auto& functor : codim0_functors_)
-      if (functor->apply_on(this->grid_view_, entity))
+      if (functor->apply_on(grid_layer_, entity))
         return true;
     return false;
   } // ... apply_on(...)
@@ -230,7 +198,7 @@ public:
   bool apply_on(const IntersectionType& intersection) const
   {
     for (const auto& functor : codim1_functors_)
-      if (functor->apply_on(this->grid_view_, intersection))
+      if (functor->apply_on(grid_layer_, intersection))
         return true;
     return false;
   } // ... apply_on(...)
@@ -238,7 +206,7 @@ public:
   virtual void apply_local(const EntityType& entity)
   {
     for (auto& functor : codim0_functors_)
-      if (functor->apply_on(this->grid_view_, entity))
+      if (functor->apply_on(grid_layer_, entity))
         functor->apply_local(entity);
   } // ... apply_local(...)
 
@@ -246,7 +214,7 @@ public:
   apply_local(const IntersectionType& intersection, const EntityType& inside_entity, const EntityType& outside_entity)
   {
     for (auto& functor : codim1_functors_)
-      if (functor->apply_on(this->grid_view_, intersection))
+      if (functor->apply_on(grid_layer_, intersection))
         functor->apply_local(intersection, inside_entity, outside_entity);
   } // ... apply_local(...)
 
@@ -264,8 +232,7 @@ public:
     if (use_tbb) {
       const auto num_partitions =
           DXTC_CONFIG_GET("threading.partition_factor", 1u) * XT::Common::threadManager().current_threads();
-      RangedPartitioning<typename internal::GridPartViewHolder<GridViewType>::type, 0> partitioning(
-          this->real_grid_view(), num_partitions);
+      RangedPartitioning<GridLayerType, 0> partitioning(grid_layer_, num_partitions);
       this->walk(partitioning);
       return;
     }
@@ -277,7 +244,7 @@ public:
 
     // only do something, if we have to
     if ((codim0_functors_.size() + codim1_functors_.size()) > 0) {
-      walk_range(elements(this->grid_view_));
+      walk_range(elements(grid_layer_));
     } // only do something, if we have to
 
     // finalize functors
@@ -358,7 +325,7 @@ protected:
       // only walk the intersections, if there are codim1 functors present
       if (codim1_functors_.size() > 0) {
         // walk the intersections
-        for (auto&& intersection : intersections(this->grid_view_, entity)) {
+        for (auto&& intersection : intersections(grid_layer_, entity)) {
 
           // apply codim1 functors
           if (intersection.neighbor()) {
@@ -372,8 +339,9 @@ protected:
     }
   } // ... walk_range(...)
 
-  std::vector<std::unique_ptr<internal::Codim0Object<GridViewType>>> codim0_functors_;
-  std::vector<std::unique_ptr<internal::Codim1Object<GridViewType>>> codim1_functors_;
+  GridLayerType grid_layer_;
+  std::vector<std::unique_ptr<internal::Codim0Object<GridLayerType>>> codim0_functors_;
+  std::vector<std::unique_ptr<internal::Codim1Object<GridLayerType>>> codim1_functors_;
 }; // class Walker
 
 
