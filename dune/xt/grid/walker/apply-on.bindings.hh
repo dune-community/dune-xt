@@ -34,16 +34,16 @@ namespace bindings {
 template <class Imp, bool ctor_expects_boundary_info>
 class WhichIntersection
 {
-  typedef typename Imp::GridViewType GV;
-  typedef typename extract_grid<GV>::type G;
-  typedef XT::Grid::ApplyOn::WhichIntersection<GV> InterfaceType;
+  typedef typename Imp::GridLayerType GL;
+  typedef typename extract_grid<GL>::type G;
+  typedef XT::Grid::ApplyOn::WhichIntersection<GL> InterfaceType;
 
 public:
   typedef Imp type;
   typedef pybind11::class_<type, InterfaceType> bound_type;
 
 private:
-  typedef XT::Grid::BoundaryInfo<extract_intersection_t<GV>> BoundaryInfoType;
+  typedef XT::Grid::BoundaryInfo<extract_intersection_t<GL>> BoundaryInfoType;
 
   template <bool with_bi = ctor_expects_boundary_info, bool anything = true>
   struct addbind // with_bi = false

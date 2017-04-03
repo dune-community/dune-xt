@@ -35,6 +35,7 @@
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 #include <dune/xt/grid/search.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
 namespace XT {
@@ -154,7 +155,7 @@ public:
   typedef typename LocalGridProviderType::LevelGridPartType MicroGridPartType;
 #endif
   typedef typename LocalGridType::LevelGridView MicroGridViewType;
-  typedef typename MicroGridViewType::template Codim<0>::Entity MicroEntityType;
+  using MicroEntityType = XT::Grid::extract_entity_t<MicroGridViewType>;
 
   typedef typename MacroGridType::ctype ctype;
   static const size_t dimDomain = MacroGridType::dimension;
@@ -168,7 +169,7 @@ private:
   template <class GridView, class MacroIntersectionType>
   class CouplingFaceDescriptor : public GridGlue::ExtractorPredicate<GridView, 1>
   {
-    typedef typename GridView::Traits::template Codim<0>::Entity LocalEntityType;
+    using LocalEntityType = XT::Grid::extract_entity_t<GridView>;
     typedef typename GridView::ctype ctype;
 
   public:

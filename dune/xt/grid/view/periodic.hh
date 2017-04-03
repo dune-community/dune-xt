@@ -525,7 +525,7 @@ public:
   typedef typename BaseType::Intersection RealIntersectionType;
   typedef int IntersectionIndexType;
   typedef PeriodicIntersection<RealGridViewType> Intersection;
-  typedef typename RealGridViewType::template Codim<0>::Entity EntityType;
+  using EntityType = extract_entity_t<RealGridViewType>;
   typedef std::pair<bool, EntityType> PeriodicPairType;
   static const size_t dimDomain = RealGridViewType::dimension;
 
@@ -633,7 +633,7 @@ public:
     public:
       typedef typename IndexSet::IndexType IndexType;
       typedef std::ptrdiff_t difference_type;
-      typedef const typename RealGridViewImp::template Codim<0>::Entity value_type;
+      using value_type = const extract_entity_t<RealGridViewImp>;
       typedef value_type* pointer;
       typedef value_type& reference;
       typedef std::forward_iterator_tag iterator_category;
@@ -654,7 +654,7 @@ public:
         BaseType::operator++();
         while (cd > 0 && *this != *real_it_end_
                && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->type())].count(
-		      real_index_set_->index(this->operator*())))
+                      real_index_set_->index(this->operator*())))
           BaseType::operator++();
         return *this;
       }
@@ -686,7 +686,7 @@ public:
       public:
         typedef typename IndexSet::IndexType IndexType;
         typedef std::ptrdiff_t difference_type;
-        typedef const typename RealGridViewImp::template Codim<0>::Entity value_type;
+        using value_type = const extract_entity_t<RealGridViewImp>;
         typedef value_type* pointer;
         typedef value_type& reference;
         typedef std::forward_iterator_tag iterator_category;
@@ -760,7 +760,7 @@ class PeriodicGridViewImp : public RealGridViewImp
 public:
   typedef typename BaseType::Grid Grid;
   typedef PeriodicIndexSet<BaseType> IndexSet;
-  typedef typename BaseType::template Codim<0>::Entity EntityType;
+  using EntityType = extract_entity_t<BaseType>;
   typedef PeriodicIntersectionIterator<BaseType> IntersectionIterator;
   typedef typename IntersectionIterator::RealIntersectionType RealIntersectionType;
   typedef typename Traits::IndexSet::IndexType IndexType;
@@ -1057,7 +1057,7 @@ make_periodic_grid_view(const GV& real_grid_view,
 
 
 template <class T, bool bb>
-struct is_grid_view<PeriodicGridView<T, bb>> : public std::true_type
+struct is_view<PeriodicGridView<T, bb>> : public std::true_type
 {
 };
 

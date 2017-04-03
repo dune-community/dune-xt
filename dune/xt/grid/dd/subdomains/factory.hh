@@ -401,8 +401,7 @@ public:
     } // loop over all subdomains
     // walk the global grid part
     //   * to generate the information which sudomains neighbor each other
-    for (typename GlobalGridPartType::template Codim<0>::IteratorType entityIt = globalGridPart_->template begin<0>();
-         entityIt != globalGridPart_->template end<0>();
+    for (auto entityIt = globalGridPart_->template begin<0>(); entityIt != globalGridPart_->template end<0>();
          ++entityIt) {
       // find the subdomains this entity lives in
       const EntityType& entity = *entityIt;

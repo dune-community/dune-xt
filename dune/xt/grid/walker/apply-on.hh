@@ -25,41 +25,41 @@ namespace ApplyOn {
 /**
  *  \brief Interface for functors to select on which entities to apply.
  */
-template <class GridViewImp>
+template <class GridLayerImp>
 class WhichEntity
 {
 public:
-  typedef GridViewImp GridViewType;
-  using EntityType = extract_entity_t<GridViewType>;
+  typedef GridLayerImp GridLayerType;
+  using EntityType = extract_entity_t<GridLayerType>;
 
   virtual ~WhichEntity()
   {
   }
 
-  virtual WhichEntity<GridViewImp>* copy() const = 0; // required for the python bindings
+  virtual WhichEntity<GridLayerImp>* copy() const = 0; // required for the python bindings
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const EntityType& /*entity*/) const = 0;
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& /*entity*/) const = 0;
 }; // class WhichEntity
 
 
 /**
  *  \brief Selects all entities.
  */
-template <class GridViewImp>
-class AllEntities : public WhichEntity<GridViewImp>
+template <class GridLayerImp>
+class AllEntities : public WhichEntity<GridLayerImp>
 {
-  typedef WhichEntity<GridViewImp> BaseType;
+  typedef WhichEntity<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   typedef typename BaseType::EntityType EntityType;
 
-  virtual WhichEntity<GridViewImp>* copy() const override final
+  virtual WhichEntity<GridLayerImp>* copy() const override final
   {
-    return new AllEntities<GridViewImp>();
+    return new AllEntities<GridLayerImp>();
   }
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const EntityType& /*entity*/) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& /*entity*/) const override final
   {
     return true;
   }
@@ -69,21 +69,21 @@ public:
 /**
  *  \brief Selects entities which have a boundary intersection.
  */
-template <class GridViewImp>
-class BoundaryEntities : public WhichEntity<GridViewImp>
+template <class GridLayerImp>
+class BoundaryEntities : public WhichEntity<GridLayerImp>
 {
-  typedef WhichEntity<GridViewImp> BaseType;
+  typedef WhichEntity<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   typedef typename BaseType::EntityType EntityType;
 
-  virtual WhichEntity<GridViewImp>* copy() const override final
+  virtual WhichEntity<GridLayerImp>* copy() const override final
   {
-    return new BoundaryEntities<GridViewImp>();
+    return new BoundaryEntities<GridLayerImp>();
   }
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const EntityType& entity) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
   {
     return entity.hasBoundaryIntersections();
   }
@@ -99,20 +99,20 @@ public:
  *         not have any members, derive from internal::WhichIntersectionBase<...>, \sa InnerIntersections. In all other
  *         circumstances, one has to manually implement copy, \sa FilteredIntersections.
  */
-template <class GridViewImp>
+template <class GridLayerImp>
 class WhichIntersection
 {
 public:
-  typedef GridViewImp GridViewType;
-  using IntersectionType = extract_intersection_t<GridViewType>;
+  typedef GridLayerImp GridLayerType;
+  using IntersectionType = extract_intersection_t<GridLayerType>;
 
-  virtual ~WhichIntersection<GridViewImp>()
+  virtual ~WhichIntersection<GridLayerImp>()
   {
   }
 
-  virtual WhichIntersection<GridViewImp>* copy() const = 0; // required for redirect lambdas, i.e., in python bindings
+  virtual WhichIntersection<GridLayerImp>* copy() const = 0; // required for redirect lambdas, i.e., in python bindings
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& /*intersection*/) const = 0;
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& /*intersection*/) const = 0;
 };
 
 
@@ -156,16 +156,16 @@ protected:
 /**
  *  \brief Selects all intersections.
  */
-template <class GridViewImp>
-class AllIntersections : public internal::WhichIntersectionBase<GridViewImp, AllIntersections<GridViewImp>>
+template <class GridLayerImp>
+class AllIntersections : public internal::WhichIntersectionBase<GridLayerImp, AllIntersections<GridLayerImp>>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/,
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/,
                         const IntersectionType& /*intersection*/) const override final
   {
     return true;
@@ -182,16 +182,16 @@ intersection.neighbor() && !intersection.boundary()
 \endcode
  *  is used.
  */
-template <class GridViewImp>
-class InnerIntersections : public internal::WhichIntersectionBase<GridViewImp, InnerIntersections<GridViewImp>>
+template <class GridLayerImp>
+class InnerIntersections : public internal::WhichIntersectionBase<GridLayerImp, InnerIntersections<GridLayerImp>>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.neighbor() && !intersection.boundary();
   }
@@ -208,55 +208,55 @@ intersection.neighbor() && !intersection.boundary()
  *  is used, and true is returned, if the index of the inside() entity is smaller than the index of the outside()
  *  entity.
  */
-template <class GridViewImp>
+template <class GridLayerImp>
 class InnerIntersectionsPrimally
-    : public internal::WhichIntersectionBase<GridViewImp, InnerIntersectionsPrimally<GridViewImp>>
+    : public internal::WhichIntersectionBase<GridLayerImp, InnerIntersectionsPrimally<GridLayerImp>>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && !intersection.boundary()) {
       const auto insideEntity = intersection.inside();
       const auto outsideNeighbor = intersection.outside();
-      return grid_view.indexSet().index(insideEntity) < grid_view.indexSet().index(outsideNeighbor);
+      return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
     } else
       return false;
   }
 }; // class InnerIntersections
 
 
-template <class GridViewImp>
-class BoundaryIntersections : public internal::WhichIntersectionBase<GridViewImp, BoundaryIntersections<GridViewImp>>
+template <class GridLayerImp>
+class BoundaryIntersections : public internal::WhichIntersectionBase<GridLayerImp, BoundaryIntersections<GridLayerImp>>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.boundary();
   }
 }; // class BoundaryIntersections
 
 
-template <class GridViewImp>
+template <class GridLayerImp>
 class NonPeriodicBoundaryIntersections
-    : public internal::WhichIntersectionBase<GridViewImp, NonPeriodicBoundaryIntersections<GridViewImp>>
+    : public internal::WhichIntersectionBase<GridLayerImp, NonPeriodicBoundaryIntersections<GridLayerImp>>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.boundary() && !intersection.neighbor();
   }
@@ -272,38 +272,38 @@ intersection.neighbor() && intersection.boundary()
 \endcode
  *  is used.
  */
-template <class GridViewImp>
-class PeriodicIntersections : public internal::WhichIntersectionBase<GridViewImp, PeriodicIntersections<GridViewImp>>
+template <class GridLayerImp>
+class PeriodicIntersections : public internal::WhichIntersectionBase<GridLayerImp, PeriodicIntersections<GridLayerImp>>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.neighbor() && intersection.boundary();
   }
 }; // class PeriodicIntersections
 
 
-template <class GridViewImp>
+template <class GridLayerImp>
 class PeriodicIntersectionsPrimally
-    : public internal::WhichIntersectionBase<GridViewImp, PeriodicIntersectionsPrimally<GridViewImp>>
+    : public internal::WhichIntersectionBase<GridLayerImp, PeriodicIntersectionsPrimally<GridLayerImp>>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && intersection.boundary()) {
       const auto insideEntity = intersection.inside();
       const auto outsideNeighbor = intersection.outside();
-      return grid_view.indexSet().index(insideEntity) < grid_view.indexSet().index(outsideNeighbor);
+      return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
     } else {
       return false;
     }
@@ -311,30 +311,30 @@ public:
 }; // class PeriodicIntersectionsPrimally
 
 
-template <class GridViewImp>
-class FilteredIntersections : public WhichIntersection<GridViewImp>
+template <class GridLayerImp>
+class FilteredIntersections : public WhichIntersection<GridLayerImp>
 {
-  typedef WhichIntersection<GridViewImp> BaseType;
-  typedef FilteredIntersections<GridViewImp> ThisType;
+  typedef WhichIntersection<GridLayerImp> BaseType;
+  typedef FilteredIntersections<GridLayerImp> ThisType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
-  typedef std::function<bool(const GridViewType&, const IntersectionType&)> FilterType;
+  typedef std::function<bool(const GridLayerType&, const IntersectionType&)> FilterType;
 
   FilteredIntersections(FilterType filter)
     : filter_(filter)
   {
   }
 
-  virtual WhichIntersection<GridViewImp>* copy() const override final
+  virtual WhichIntersection<GridLayerImp>* copy() const override final
   {
-    return new FilteredIntersections<GridViewImp>(filter_);
+    return new FilteredIntersections<GridLayerImp>(filter_);
   }
 
-  virtual bool apply_on(const GridViewType& grid_view, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
-    return filter_(grid_view, intersection);
+    return filter_(grid_layer, intersection);
   }
 
 private:
@@ -342,14 +342,14 @@ private:
 }; // class BoundaryIntersections
 
 
-template <class GridViewImp>
+template <class GridLayerImp>
 class DirichletIntersections
-    : public internal::WhichIntersectionBase<GridViewImp, DirichletIntersections<GridViewImp>, true>
+    : public internal::WhichIntersectionBase<GridLayerImp, DirichletIntersections<GridLayerImp>, true>
 {
-  typedef internal::WhichIntersectionBase<GridViewImp, DirichletIntersections<GridViewImp>, true> BaseType;
+  typedef internal::WhichIntersectionBase<GridLayerImp, DirichletIntersections<GridLayerImp>, true> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
   explicit DirichletIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
@@ -357,7 +357,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return boundary_info_.access().type(intersection) == DirichletBoundary();
   }
@@ -367,14 +367,14 @@ protected:
 }; // class DirichletIntersections
 
 
-template <class GridViewImp>
+template <class GridLayerImp>
 class NeumannIntersections
-    : public internal::WhichIntersectionBase<GridViewImp, NeumannIntersections<GridViewImp>, true>
+    : public internal::WhichIntersectionBase<GridLayerImp, NeumannIntersections<GridLayerImp>, true>
 {
-  typedef internal::WhichIntersectionBase<GridViewImp, NeumannIntersections<GridViewImp>, true> BaseType;
+  typedef internal::WhichIntersectionBase<GridLayerImp, NeumannIntersections<GridLayerImp>, true> BaseType;
 
 public:
-  using typename BaseType::GridViewType;
+  using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
   explicit NeumannIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
@@ -382,7 +382,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridViewType& /*grid_view*/, const IntersectionType& intersection) const override final
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return boundary_info_.access().type(intersection) == NeumannBoundary();
   }

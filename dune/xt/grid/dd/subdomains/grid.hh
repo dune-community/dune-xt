@@ -25,7 +25,7 @@
 
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/type_traits.hh>
-
+#include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/view/subdomain/part.hh>
 
 namespace Dune {
@@ -64,7 +64,7 @@ public:
   typedef SubdomainGridPart<GlobalGridPartType> LocalGridPartType;
   typedef SubdomainBoundaryGridPart<GlobalGridPartType> BoundaryGridPartType;
   typedef SubdomainCouplingGridPart<GlobalGridPartType> CouplingGridPartType;
-  typedef typename GlobalGridPartType::template Codim<0>::EntityType EntityType;
+  using EntityType = XT::Grid::extract_entity_t<GlobalGridPartType>;
   typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
   typedef std::set<size_t> NeighborSetType;
   //! map type which maps from an entity index (of the global grid parts index set) to a subdomain

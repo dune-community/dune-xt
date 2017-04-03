@@ -29,6 +29,7 @@
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/walker.hh>
 #include <dune/xt/grid/walker/functors.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
 namespace XT {
@@ -190,7 +191,7 @@ Dimensions<GridViewType> dimensions(const GridViewType& gridView)
 }
 
 template <class GridViewType>
-Dimensions<GridViewType> dimensions(const typename GridViewType::Grid::template Codim<0>::Entity& entity)
+Dimensions<GridViewType> dimensions(const extract_entity_t<GridViewType>& entity)
 {
   return Dimensions<GridViewType>(entity);
 }

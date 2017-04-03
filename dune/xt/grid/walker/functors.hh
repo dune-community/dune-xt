@@ -20,12 +20,12 @@ namespace XT {
 namespace Grid {
 namespace Functor {
 
-template <class GridViewImp>
+template <class GridLayerImp>
 class Codim0
 {
 public:
-  typedef GridViewImp GridViewType;
-  using EntityType = extract_entity_t<GridViewType>;
+  typedef GridLayerImp GridLayerType;
+  using EntityType = extract_entity_t<GridLayerType>;
 
   virtual ~Codim0()
   {
@@ -42,10 +42,10 @@ public:
   }
 }; // class Codim0
 
-template <class GridViewImp, class ReturnImp>
-class Codim0Return : public Codim0<GridViewImp>
+template <class GridLayerImp, class ReturnImp>
+class Codim0Return : public Codim0<GridLayerImp>
 {
-  typedef Codim0<GridViewImp> BaseType;
+  typedef Codim0<GridLayerImp> BaseType;
 
 public:
   typedef ReturnImp ReturnType;
@@ -60,13 +60,13 @@ public:
   virtual ReturnType result() const = 0;
 }; // class Codim0ReturnFunctor
 
-template <class GridViewImp>
+template <class GridLayerImp>
 class Codim1
 {
 public:
-  typedef GridViewImp GridViewType;
-  using EntityType = extract_entity_t<GridViewType>;
-  using IntersectionType = extract_intersection_t<GridViewType>;
+  typedef GridLayerImp GridLayerType;
+  using EntityType = extract_entity_t<GridLayerType>;
+  using IntersectionType = extract_intersection_t<GridLayerType>;
 
   virtual ~Codim1()
   {
@@ -85,13 +85,13 @@ public:
   }
 }; // class Codim1
 
-template <class GridViewImp>
+template <class GridLayerImp>
 class Codim0And1
 {
 public:
-  typedef GridViewImp GridViewType;
-  using EntityType = extract_entity_t<GridViewType>;
-  using IntersectionType = extract_intersection_t<GridViewType>;
+  typedef GridLayerImp GridLayerType;
+  using EntityType = extract_entity_t<GridLayerType>;
+  using IntersectionType = extract_intersection_t<GridLayerType>;
 
   virtual ~Codim0And1()
   {
@@ -112,13 +112,13 @@ public:
   }
 }; // class Codim0And1
 
-template <class GridViewImp>
-class DirichletDetector : public Codim1<GridViewImp>
+template <class GridLayerImp>
+class DirichletDetector : public Codim1<GridLayerImp>
 {
-  typedef Codim1<GridViewImp> BaseType;
+  typedef Codim1<GridLayerImp> BaseType;
 
 public:
-  typedef typename BaseType::GridViewType GridViewType;
+  typedef typename BaseType::GridLayerType GridLayerType;
   typedef typename BaseType::EntityType EntityType;
   typedef typename BaseType::IntersectionType IntersectionType;
 

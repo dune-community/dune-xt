@@ -16,6 +16,8 @@
 
 #include <dune/common/shared_ptr.hh>
 
+#include <dune/xt/grid/type_traits.hh>
+
 #include "intersection-wrapper.hh"
 
 namespace Dune {
@@ -32,7 +34,7 @@ public:
   typedef LocalIntersectionIterator<GlobalGridPartType> ThisType;
   typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
   typedef typename BaseType::Intersection Intersection;
-  typedef typename GlobalGridPartType::template Codim<0>::EntityType EntityType;
+  using EntityType = extract_entity_t<GlobalGridPartType>;
   typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
   typedef std::vector<int> IndexContainerType;
 
@@ -100,7 +102,7 @@ public:
   typedef GlobalGridPartImp GlobalGridPartType;
   typedef FakeDomainBoundaryIntersectionIterator<GlobalGridPartType> ThisType;
   typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
-  typedef typename GlobalGridPartType::template Codim<0>::EntityType EntityType;
+  using EntityType = extract_entity_t<GlobalGridPartType>;
   typedef std::map<int, size_t> InfoContainerType;
 
 private:
