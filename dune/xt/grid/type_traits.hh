@@ -93,12 +93,17 @@ struct is_grid<Dune::SPGrid<ct, dim, Ref, Comm>> : public std::true_type
 #endif // HAVE_DUNE_SPGRID
 
 template <class T>
-struct is_grid_view : public std::false_type
+struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_view : public std::false_type
 {
 };
 
 template <class T>
-struct is_grid_view<Dune::GridView<T>> : public std::true_type
+struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_view<Dune::GridView<T>> : public std::true_type
+{
+};
+
+template <class T>
+struct is_grid_view : public is_view<T>
 {
 };
 
@@ -132,24 +137,28 @@ struct is_subdomain_part_helper
 
 
 template <class T, bool is_candidate = internal::is_grid_part_helper<T>::is_candidate>
-struct is_grid_part : public std::false_type
+struct is_part : public std::false_type
 {
 };
 
 #if HAVE_DUNE_FEM
 
 template <class T>
-struct is_grid_part<T, true> : public std::is_base_of<Dune::Fem::GridPartInterface<typename T::Traits>, T>
+struct is_part<T, true> : public std::is_base_of<Dune::Fem::GridPartInterface<typename T::Traits>, T>
+{
+};
+
+#endif // HAVE_DUNE_FEM
+
+template <class T>
+struct DUNE_DEPRECATED_MSG("Use is_part instead (03.04.2017)!") is_grid_part : public is_part<T>
 {
 };
 
 
-#endif // HAVE_DUNE_FEM
-
-
 template <class T>
 struct is_layer : public std::integral_constant<bool,
-                                                is_grid_view<T>::value || is_grid_part<T>::value
+                                                is_view<T>::value || is_part<T>::value
                                                     || internal::is_subdomain_part_helper<T>::value>
 {
 };
