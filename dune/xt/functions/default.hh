@@ -17,6 +17,7 @@
 #include <dune/grid/io/file/vtk/function.hh>
 
 #include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 #include "interfaces.hh"
 
@@ -29,7 +30,7 @@ template <class GridViewType, size_t dimRange, size_t dimRangeCols>
 class VisualizationAdapterFunction : public VTKFunction<GridViewType>
 {
 public:
-  typedef typename GridViewType::template Codim<0>::Entity EntityType;
+  using EntityType = XT::Grid::extract_entity_t<GridViewType>;
 
   typedef typename GridViewType::ctype DomainFieldType;
   static const size_t dimDomain = GridViewType::dimension;

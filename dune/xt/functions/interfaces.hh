@@ -45,6 +45,7 @@
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/grid/view/from-part.hh>
 
 namespace Dune {
 namespace XT {
@@ -414,19 +415,22 @@ public:
   }
 
   /**
-   * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default. This means that the grid you
-   *        see in the visualization is a refinement of the actual grid!
+   * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default. The grid you see in the
+   *  visualization may thus be a refinement of the actual grid!
    */
-  template <class GridViewType>
-  void visualize(const GridViewType& grid_view,
-                 const std::string path,
-                 const bool subsampling = true,
-                 const VTK::OutputType vtk_output_type = VTK::appendedraw) const
+  template <class GridLayerType>
+  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
+  visualize(const GridLayerType& grid_layer,
+            const std::string path,
+            const bool subsampling = true,
+            const VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
     if (path.empty())
       DUNE_THROW(RangeError, "Empty path given!");
     const auto directory = Common::directory_only(path);
-    const auto filename = Common::filename_only(path);
+    const auto tmp_grid_view = Grid::make_tmp_view(grid_layer);
+    const auto& grid_view = tmp_grid_view.access();
+    using GridViewType = std::decay_t<decltype(grid_view)>;
     const auto adapter = std::make_shared<VisualizationAdapterFunction<GridViewType, dimRange, dimRangeCols>>(*this);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
         subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
@@ -436,7 +440,7 @@ public:
     if (MPIHelper::getCollectiveCommunication().size() == 1)
       vtk_writer->write(path, vtk_output_type);
     else
-      vtk_writer->pwrite(filename, directory, "", vtk_output_type);
+      vtk_writer->pwrite(Common::filename_only(path), directory, "", vtk_output_type);
   } // ... visualize(...)
 
   virtual void report(std::ostream& out, const std::string prefix = "") const
