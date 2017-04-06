@@ -433,7 +433,7 @@ public:
     using GridViewType = std::decay_t<decltype(grid_view)>;
     const auto adapter = std::make_shared<VisualizationAdapterFunction<GridViewType, dimRange, dimRangeCols>>(*this);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
-        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, VTK::nonconforming)
+        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
                     : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
     vtk_writer->addVertexData(adapter);
     Common::test_create_directory(directory);
