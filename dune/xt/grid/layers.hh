@@ -255,6 +255,48 @@ struct Layer<GridType, Layers::dd_subdomain, Backends::part>
 
 #endif // HAVE_DUNE_FEM
 
+
+namespace internal {
+
+
+template <class GL,
+          bool view = is_view<GL>::value,
+          bool part = is_part<GL>::value,
+          bool dd_subdomain = is_dd_subdomain<GL>::value>
+struct extract_layer_backend_helper
+{
+  static_assert(AlwaysFalse<GL>::value, "Please add a specialization for this case!");
+};
+
+template <class GL>
+struct extract_layer_backend_helper<GL, true, false, false>
+{
+  static const constexpr Backends value = Backends::view;
+};
+
+template <class GL>
+struct extract_layer_backend_helper<GL, false, true, false>
+{
+  static const constexpr Backends value = Backends::part;
+};
+
+template <class GL>
+struct extract_layer_backend_helper<GL, false, false, true>
+{
+  static const constexpr Backends value = Backends::part;
+};
+
+
+} // namespace internal
+
+
+template <class GridLayerType>
+struct extract_layer_backend
+{
+  static const constexpr Backends value = internal::extract_layer_backend_helper<GridLayerType>::value;
+};
+
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
