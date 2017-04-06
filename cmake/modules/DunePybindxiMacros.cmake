@@ -41,3 +41,5 @@ endif()
 include(DunePybindxiUtils)
 include(DunePybindxiHelper)
 
+dune_register_package_flags(INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS})
+
