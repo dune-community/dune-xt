@@ -181,7 +181,7 @@ public:
     using std::abs;
     auto result = std::make_pair(size_t(0), RealType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
-      const auto value = std::abs(get_entry_ref(ii));
+      const auto value = abs(get_entry_ref(ii));
       if (value > result.second) {
         result.first = ii;
         result.second = value;
