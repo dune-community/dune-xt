@@ -14,6 +14,14 @@
 #include <string>
 #include <vector>
 
+#include <dune/xt/common/exceptions.hh>
+
+#include <dune/common/parallel/mpihelper.hh>
+
+#if HAVE_DUNE_FEM
+#include <dune/fem/misc/mpimanager.hh>
+#endif
+
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
@@ -30,13 +38,12 @@
 #include "container.hh"
 
 
-namespace py = pybind11;
-namespace LA = Dune::XT::LA;
-using namespace pybind11::literals;
-
-
 PYBIND11_PLUGIN(_la)
 {
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+  namespace LA = Dune::XT::LA;
+
   py::module m("_la", "dune-xt-la");
 
   py::module::import("dune.xt.common");
@@ -85,7 +92,18 @@ PYBIND11_PLUGIN(_la)
   LA::bind_Solver<LA::EigenRowMajorSparseMatrix<double>>(m);
 #endif
 
-  m.def("init_logger",
+  m.def("_init_mpi",
+        [](const std::vector<std::string>& args) {
+          int argc = boost::numeric_cast<int>(args.size());
+          char** argv = Dune::XT::Common::vector_to_main_args(args);
+          Dune::MPIHelper::instance(argc, argv);
+#if HAVE_DUNE_FEM
+          Dune::Fem::MPIManager::initialize(argc, argv);
+#endif
+        },
+        "args"_a = std::vector<std::string>());
+
+  m.def("_init_logger",
         [](const ssize_t max_info_level,
            const ssize_t max_debug_level,
            const bool enable_warnings,
