@@ -32,6 +32,11 @@ namespace XT {
 namespace Grid {
 
 
+// forwards
+template <class GlobalGridPartImp>
+class SubdomainGridPart;
+
+
 template <class T>
 struct is_intersection : public std::false_type
 {
@@ -126,12 +131,6 @@ struct is_grid_part_helper
   static const bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
 };
 
-template <class T>
-struct is_subdomain_part_helper
-{
-  DXTC_has_typedef_initialize_once(GlobalGridPartType);
-  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
-};
 
 } // namespace internal
 
@@ -156,12 +155,37 @@ struct DUNE_DEPRECATED_MSG("Use is_part instead (03.04.2017)!") is_grid_part : p
 };
 
 
+namespace internal {
+
+
 template <class T>
-struct is_layer : public std::integral_constant<bool,
-                                                is_view<T>::value || is_part<T>::value
-                                                    || internal::is_subdomain_part_helper<T>::value>
+struct is_dd_subdomain_helper
+{
+  DXTC_has_typedef_initialize_once(GlobalGridPartType);
+  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
+};
+
+
+} // namespace internal
+
+
+template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
+struct is_dd_subdomain : public std::false_type
 {
 };
+
+template <class T>
+struct is_dd_subdomain<T, true> : public std::is_base_of<SubdomainGridPart<typename T::GlobalGridPartType>, T>
+{
+};
+
+
+template <class T>
+struct is_layer
+    : public std::integral_constant<bool, is_view<T>::value || is_part<T>::value || is_dd_subdomain<T>::value>
+{
+};
+
 
 template <class T>
 struct is_alugrid : public std::false_type
