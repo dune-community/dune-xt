@@ -14,6 +14,14 @@
 #include <string>
 #include <vector>
 
+#include <dune/xt/common/exceptions.hh>
+
+#include <dune/common/parallel/mpihelper.hh>
+
+#if HAVE_DUNE_FEM
+#include <dune/fem/misc/mpimanager.hh>
+#endif
+
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
@@ -29,12 +37,9 @@
 #include "expression.pbh"
 #include "spe10.pbh"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
-
 
 template <class G>
-void addbind_for_Grid(py::module& m, const std::string& grid_id)
+void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
 {
   auto i_1_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
   auto i_2_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
@@ -269,6 +274,9 @@ void addbind_for_Grid(py::module& m, const std::string& grid_id)
 
 PYBIND11_PLUGIN(_functions)
 {
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
   py::module m("_functions", "dune-xt-functions");
 
   py::module::import("dune.xt.common");
@@ -285,7 +293,18 @@ PYBIND11_PLUGIN(_functions)
   //  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, "2d_simplex_albertagrid");
   //#endif
 
-  m.def("init_logger",
+  m.def("_init_mpi",
+        [](const std::vector<std::string>& args) {
+          int argc = boost::numeric_cast<int>(args.size());
+          char** argv = Dune::XT::Common::vector_to_main_args(args);
+          Dune::MPIHelper::instance(argc, argv);
+#if HAVE_DUNE_FEM
+          Dune::Fem::MPIManager::initialize(argc, argv);
+#endif
+        },
+        "args"_a = std::vector<std::string>());
+
+  m.def("_init_logger",
         [](const ssize_t max_info_level,
            const ssize_t max_debug_level,
            const bool enable_warnings,
