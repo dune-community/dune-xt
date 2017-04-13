@@ -83,6 +83,27 @@ struct addbind_Matrix<T, true>
   }
 };
 
+
+template <class M>
+void print_row_sparsely(const M& self, const size_t row, std::stringstream& ss)
+{
+  ss << "[";
+  if (self.cols() > 0)
+    ss << self.get_entry(row, 0);
+  for (size_t ii = 1; ii < std::min(size_t(3), self.cols()); ++ii)
+    ss << " " << self.get_entry(row, ii);
+  if (self.cols() > 8) {
+    ss << " ...";
+  } else {
+    for (ssize_t ii = std::min(size_t(3), self.cols()); ii < ssize_t(self.cols()) - 3; ++ii)
+      ss << " " << self.get_entry(row, ii);
+  }
+  for (size_t ii = std::max(ssize_t(3), ssize_t(self.cols()) - 3); ii < self.cols(); ++ii)
+    ss << " " << self.get_entry(row, ii);
+  ss << "]";
+} // ... print_row_sparsely(...)
+
+
 } // namespace internal
 
 
@@ -133,11 +154,45 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
         "cols"_a,
         "pattern"_a);
 
-  c.def("__repr__", [ClassName](const C& self) {
-    std::stringstream ss;
-    ss << ClassName << "(" << self << ")";
-    return ss.str();
-  });
+  c.def("__repr__",
+        [ClassName](const C& self) {
+          std::stringstream ss;
+          ss << ClassName << "(";
+          if (self.rows() > 0) {
+            ss << "\n  ";
+            internal::print_row_sparsely(self, 0, ss);
+            ss << "\n";
+          }
+          for (size_t ii = 1; ii < std::min(size_t(3), self.rows()); ++ii) {
+            ss << "  ";
+            internal::print_row_sparsely(self, ii, ss);
+            ss << "\n";
+          }
+          if (self.rows() > 8) {
+            ss << "   ...\n";
+          } else {
+            for (ssize_t ii = std::min(size_t(3), self.rows()); ii < ssize_t(self.rows()) - 3; ++ii) {
+              ss << "  ";
+              internal::print_row_sparsely(self, ii, ss);
+              ss << "\n";
+            }
+          }
+          for (size_t ii = std::max(ssize_t(3), ssize_t(self.rows()) - 3); ii < self.rows(); ++ii) {
+            ss << "  ";
+            internal::print_row_sparsely(self, ii, ss);
+            ss << "\n";
+          }
+          ss << ")";
+          return ss.str();
+        },
+        "A compact representation of the matrix (only the outer three elements).");
+  c.def("__str__",
+        [ClassName](const C& self) {
+          std::stringstream ss;
+          ss << ClassName << "(" << self << ")";
+          return ss.str();
+        },
+        "A full representation of the matrix.");
 
   c.def("rows", &C::rows);
   c.def("cols", &C::cols);
