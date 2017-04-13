@@ -38,6 +38,7 @@ enum class Backends
   none
 }; // enum class Backends
 
+
 static constexpr Backends default_backend =
 #if HAVE_EIGEN
     Backends::eigen_sparse;
@@ -200,6 +201,18 @@ public:
   {
     scal(alpha);
     return this->as_imp();
+  }
+
+  /**
+   *  \brief  Multiplies every component of this by a scalar.
+   *  \param  alpha The scalar.
+   *  \return The scaled copy of this.
+   */
+  virtual derived_type operator*(const ScalarType& alpha) const
+  {
+    auto ret = this->copy();
+    ret.scal(alpha);
+    return ret;
   }
   /// \}
 }; // class ContainerInterface

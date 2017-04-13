@@ -40,6 +40,8 @@ namespace LA {
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class VectorInterface : public ContainerInterface<Traits, ScalarImp>
 {
+  typedef ContainerInterface<Traits, ScalarImp> BaseType;
+
 public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
@@ -383,17 +385,7 @@ public:
       set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
   } // ... isub(...)
 
-  /**
-   *  \brief  Multiplies every component of this by a scalar.
-   *  \param  alpha The scalar.
-   *  \return The scaled copy of this.
-   */
-  virtual derived_type operator*(const ScalarType& alpha) const
-  {
-    derived_type ret = this->copy();
-    ret *= alpha;
-    return ret;
-  } // ... operator*() ...
+  using BaseType::operator*;
 
   /**
    *  \brief  Computes the scalar products between this and another vector.

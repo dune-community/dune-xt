@@ -38,6 +38,8 @@ namespace LA {
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class MatrixInterface : public ContainerInterface<Traits, ScalarImp>
 {
+  typedef ContainerInterface<Traits, ScalarImp> BaseType;
+
 public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
@@ -126,6 +128,8 @@ public:
   /// \name Provided by the interface for convenience.
   /// \note Those marked with vitual should be overriden by any devired class that can do better.
   /// \{
+
+  using BaseType::operator*;
 
   template <class XX>
   typename XX::derived_type operator*(const VectorInterface<XX, ScalarType>& xx) const

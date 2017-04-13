@@ -134,7 +134,6 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   c.def(py::self - py::self);
   c.def(py::self -= py::self);
   c.def(py::self * py::self);
-  c.def(py::self * R());
   c.def(py::self *= R());
   c.def(py::self /= R());
 
