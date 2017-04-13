@@ -58,3 +58,6 @@ def init_mpi(args=list()):
     for init_mpi_method in init_mpi_methods:
         init_mpi_method(args)
 
+
+HAVE_DUNE_ALUGRID = 'GridProvider__2d_simplex_aluconform' in globals()
+
