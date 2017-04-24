@@ -439,7 +439,7 @@ private:
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
     typedef XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection> BoundaryInfoFactory;
-    auto boundary_info_ptr = BoundaryInfoFactory::create(boundary_info_cfg.get<std::string>("type"), boundary_info_cfg);
+    auto boundary_info_ptr = BoundaryInfoFactory::create(boundary_info_cfg);
     for (auto lvl : Common::value_range(max_level() + 1)) {
       auto grid_view = level_view(lvl);
       // vtk writer
