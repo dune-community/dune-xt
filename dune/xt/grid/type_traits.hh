@@ -36,6 +36,9 @@ namespace Grid {
 template <class GlobalGridPartImp>
 class SubdomainGridPart;
 
+template <class GlobalGridPartImp>
+class SubdomainBoundaryGridPart;
+
 
 template <class T>
 struct is_intersection : public std::false_type
@@ -116,16 +119,23 @@ struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_grid_view : p
 namespace internal {
 
 
+template <class T>
+struct is_dd_subdomain_helper
+{
+  DXTC_has_typedef_initialize_once(GlobalGridPartType);
+  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
+};
+
+
 // the following did not work, so we need to use the messy approach below
 
 // template <class T>
-// struct is_grid_part : public std::false_type {};
+// struct is_part : public std::false_type {};
 // template <class T>
-// struct is_grid_part<Dune::Fem::GridPartInterface<T>> : public std::true_type {};
-
+// struct is_part<Dune::Fem::GridPartInterface<T>> : public std::true_type {};
 
 template <class T>
-struct is_grid_part_helper
+struct is_part_helper
 {
   DXTC_has_typedef_initialize_once(Traits);
   static const bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
@@ -135,7 +145,30 @@ struct is_grid_part_helper
 } // namespace internal
 
 
-template <class T, bool is_candidate = internal::is_grid_part_helper<T>::is_candidate>
+template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
+struct is_dd_subdomain : public std::false_type
+{
+};
+
+template <class T>
+struct is_dd_subdomain<T, true> : public std::is_base_of<SubdomainGridPart<typename T::GlobalGridPartType>, T>
+{
+};
+
+
+template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
+struct is_dd_subdomain_boundary : public std::false_type
+{
+};
+
+template <class T>
+struct is_dd_subdomain_boundary<T, true>
+    : public std::is_base_of<SubdomainBoundaryGridPart<typename T::GlobalGridPartType>, T>
+{
+};
+
+
+template <class T, bool is_candidate = internal::is_part_helper<T>::is_candidate>
 struct is_part : public std::false_type
 {
 };
@@ -155,34 +188,10 @@ struct DUNE_DEPRECATED_MSG("Use is_part instead (03.04.2017)!") is_grid_part : p
 };
 
 
-namespace internal {
-
-
 template <class T>
-struct is_dd_subdomain_helper
-{
-  DXTC_has_typedef_initialize_once(GlobalGridPartType);
-  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
-};
-
-
-} // namespace internal
-
-
-template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
-struct is_dd_subdomain : public std::false_type
-{
-};
-
-template <class T>
-struct is_dd_subdomain<T, true> : public std::is_base_of<SubdomainGridPart<typename T::GlobalGridPartType>, T>
-{
-};
-
-
-template <class T>
-struct is_layer
-    : public std::integral_constant<bool, is_view<T>::value || is_part<T>::value || is_dd_subdomain<T>::value>
+struct is_layer : public std::integral_constant<bool,
+                                                is_view<T>::value || is_part<T>::value || is_dd_subdomain<T>::value
+                                                    || is_dd_subdomain_boundary<T>::value>
 {
 };
 
@@ -213,8 +222,8 @@ struct is_conforming_alugrid<ALUGrid<dim, dimworld, elType, Dune::conforming, Co
 
 
 template <class T,
-          bool view = is_grid_view<T>::value,
-          bool part = is_grid_part<T>::value,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool intersection = is_intersection<T>::value>
 struct extract_grid : public std::false_type
 {
@@ -243,7 +252,9 @@ template <class T>
 using extract_grid_t = typename extract_grid<T>::type;
 
 
-template <class T, bool view = is_grid_view<T>::value, bool part = is_grid_part<T>::value>
+template <class T,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
 struct extract_intersection : public std::false_type
 {
 };
@@ -265,7 +276,9 @@ template <class T>
 using extract_intersection_t = typename extract_intersection<T>::type;
 
 
-template <class T, bool view = is_grid_view<T>::value, bool part = is_grid_part<T>::value>
+template <class T,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
 struct extract_entity : public std::false_type
 {
 };
