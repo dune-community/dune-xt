@@ -141,6 +141,7 @@ public:
 //#endif
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_YASP(_m, _W, _w, _layer, _backend, _class_name)                              \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, YASP_1D_EQUIDISTANT_OFFSET, _layer, _backend, _class_name);            \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, YASP_2D_EQUIDISTANT_OFFSET, _layer, _backend, _class_name)
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, _layer, _backend, _class_name)                         \

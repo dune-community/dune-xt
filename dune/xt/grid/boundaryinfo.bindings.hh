@@ -130,6 +130,8 @@ public:
                    _G>
 
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view);                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, part);                     \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view);                             \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, part)
 
@@ -188,6 +190,9 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
                    _G>::bind(_m, _class_name, _layer_name)
 
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, _B, _class_name)                                                      \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
+      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, part, _class_name, "dd_subdomain");                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, part, _class_name, "dd_subdomain")
 
