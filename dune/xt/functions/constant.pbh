@@ -16,9 +16,9 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/fvector.pbh>
 #include <dune/xt/common/fmatrix.pbh>
-
-#include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 #include "interfaces.hh"
 #include "constant.hh"
@@ -76,9 +76,23 @@ bind_ConstantFunction(pybind11::module& m, const std::string& grid_id)
         "value"_a,
         "name"_a = C::static_id());
   m.def(std::string(make_name).c_str(),
+        [](const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& /*grid*/,
+           const typename C::RangeType& value,
+           const std::string& name) { return C(value, name); },
+        "grid_provider"_a,
+        "value"_a,
+        "name"_a = C::static_id());
+  m.def(std::string(make_name).c_str(),
         [](const Grid::GridProvider<G>& /*grid*/, const typename C::RangeFieldType& value, const std::string& name) {
           return C(value, name);
         },
+        "grid_provider"_a,
+        "value"_a,
+        "name"_a = C::static_id());
+  m.def(std::string(make_name).c_str(),
+        [](const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& /*grid*/,
+           const typename C::RangeFieldType& value,
+           const std::string& name) { return C(value, name); },
         "grid_provider"_a,
         "value"_a,
         "name"_a = C::static_id());
