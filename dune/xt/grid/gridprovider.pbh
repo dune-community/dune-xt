@@ -14,7 +14,9 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
+#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/configuration.pbh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.pbh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 
@@ -43,7 +45,7 @@ pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const s
         },
         "filename"_a = C::static_id(),
         "boundary_info_cfg"_a = Common::Configuration());
-
+  c.def_property_readonly("num_subdomains", [](const C& /*self*/) { return 1; });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
 
@@ -52,7 +54,8 @@ pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const s
 
 
 template <class G>
-pybind11::class_<GridProvider<G>> bind_DdSubdomainsGridProvider(pybind11::module& m, const std::string& grid_id)
+pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridProvider(pybind11::module& m,
+                                                                                      const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -69,9 +72,24 @@ pybind11::class_<GridProvider<G>> bind_DdSubdomainsGridProvider(pybind11::module
         },
         "filename"_a = C::static_id(),
         "with_coupling"_a = true);
-
+  c.def_property_readonly("num_subdomains", [](const C& self) { return self.dd_grid().size(); });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
+  c.def("subdomain_on_boundary",
+        [](const C& self, const ssize_t subdomain) {
+          return self.dd_grid().boundary(XT::Common::numeric_cast<size_t>(subdomain));
+        },
+        "subdomain"_a);
+  c.def("boundary_subdomains", [](const C& self) {
+    std::vector<size_t> boundary_subdomains;
+    for (size_t ss = 0; ss < self.dd_grid().size(); ++ss)
+      if (self.dd_grid().boundary(ss))
+        boundary_subdomains.emplace_back(ss);
+    return boundary_subdomains;
+  });
+  c.def("neighboring_subdomains", [](const C& self, const ssize_t subdomain) {
+    return self.dd_grid().neighborsOf(XT::Common::numeric_cast<size_t>(subdomain));
+  });
 
   return c;
 } // ... bind_DdSubdomainsGridProvider(...)
