@@ -23,6 +23,7 @@
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.bindings.hh>
+#include <dune/xt/grid/layers.bindings.hh>
 
 #include "boundaryinfo.hh"
 
@@ -33,33 +34,32 @@ namespace bindings {
 namespace internal {
 
 
-template <class I>
+template <class I, class GP, Layers layer, bool anything = true>
 class BoundaryInfoFactory
 {
 public:
-  template <class GP>
   static void bind(pybind11::module& m)
   {
     using namespace pybind11::literals;
 
     try { // guard since we might not be the first to do so for this grid/intersection
-      m.def("available_boundary_infos",
+      m.def(std::string("available_boundary_infos_on_" + layer_name<layer>::value() + "_layer").c_str(),
             [](const GP& /*grid_provider*/) { return XT::Grid::BoundaryInfoFactory<I>::available(); },
             "grid_provider"_a);
-      m.def("default_boundary_info_config",
+      m.def(std::string("default_boundary_info_config_on_" + layer_name<layer>::value() + "_layer").c_str(),
             [](const GP& /*grid_provider*/, const std::string& type) {
               return XT::Grid::BoundaryInfoFactory<I>::default_config(type);
             },
             "grid_provider"_a,
             "type"_a);
-      m.def("make_boundary_info",
+      m.def(std::string("make_boundary_info_on_" + layer_name<layer>::value() + "_layer").c_str(),
             [](const GP& /*grid_provider*/, const std::string& type, const Common::Configuration& cfg) {
               return XT::Grid::BoundaryInfoFactory<I>::create(type, cfg).release();
             },
             "grid_provider"_a,
             "type"_a,
             "cfg"_a = Common::Configuration());
-      m.def("make_boundary_info",
+      m.def(std::string("make_boundary_info_on_" + layer_name<layer>::value() + "_layer").c_str(),
             [](const GP& /*grid_provider*/, const Common::Configuration& cfg) {
               return XT::Grid::BoundaryInfoFactory<I>::create(cfg).release();
             },
@@ -71,10 +71,20 @@ public:
 }; // class BoundaryInfoFactory
 
 
+template <class I, class G, bool anything>
+class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain, anything>
+{
+public:
+  static void bind(pybind11::module& /*m*/)
+  {
+  }
+};
+
+
 } // namespace internal
 
 
-template <class Imp, class G>
+template <class Imp, class G, Layers layer>
 class BoundaryInfo
 {
   typedef typename Imp::IntersectionType I;
@@ -98,8 +108,8 @@ public:
     }
 
     // bind factory
-    internal::BoundaryInfoFactory<I>::template bind<GridProvider<G>>(m);
-    internal::BoundaryInfoFactory<I>::template bind<GridProvider<G, DD::SubdomainGrid<G>>>(m);
+    internal::BoundaryInfoFactory<I, GridProvider<G>, layer>::bind(m);
+    internal::BoundaryInfoFactory<I, GridProvider<G, DD::SubdomainGrid<G>>, layer>::bind(m);
 
     // bind class
     const auto ClassName = Common::to_camel_case(class_name + "_" + layer_name + "_" + grid_name);
@@ -127,7 +137,8 @@ public:
                                                       Dune::XT::Grid::Layers::_layer,                                  \
                                                       Dune::XT::Grid::Backends::_backend,                              \
                                                       Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
-                   _G>
+                   _G,                                                                                                 \
+                   Dune::XT::Grid::Layers::_layer>
 
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view);                             \
@@ -187,7 +198,8 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
                                                       Dune::XT::Grid::Layers::_layer,                                  \
                                                       Dune::XT::Grid::Backends::_backend,                              \
                                                       Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
-                   _G>::bind(_m, _class_name, _layer_name)
+                   _G,                                                                                                 \
+                   Dune::XT::Grid::Layers::_layer>::bind(_m, _class_name, _layer_name)
 
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, _B, _class_name)                                                      \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
