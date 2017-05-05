@@ -1,3 +1,6 @@
+#ifndef DUNE_XT_GRID_LAYERS_BINDINGS_HH
+#define DUNE_XT_GRID_LAYERS_BINDINGS_HH
+
 #include "layers.hh"
 
 namespace Dune {
@@ -90,3 +93,5 @@ struct layer_name<Layers::level>
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
+
+#endif // DUNE_XT_GRID_LAYERS_BINDINGS_HH
