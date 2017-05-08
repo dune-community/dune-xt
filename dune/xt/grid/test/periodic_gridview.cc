@@ -77,7 +77,6 @@ struct PeriodicViewTest : public testing::Test
       periodic_directions[0] = 1;
     else if (!is_nonperiodic)
       periodic_directions.set();
-    std::cout << periodic_directions << std::endl;
     const PeriodicGridViewType periodic_grid_view(grid_view, periodic_directions);
 
     // check interface
