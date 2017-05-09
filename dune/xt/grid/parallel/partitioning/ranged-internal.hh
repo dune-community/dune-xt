@@ -3,7 +3,8 @@
 
 // This file is copied from the EXADUNE dune-grid module,
 // https://gitlab.dune-project.org/exadune/dune-grid, commit 96d51e79acad503bf430e7c3cfde6cbd0515f621,
-// with minor adaptions to remove the dune/grid/utility/entityrange.hh include.
+// with adaptions to remove the dune/grid/utility/entityrange.hh include and to be usable with grid views and grid
+// parts alike.
 
 // clang-format off
 
@@ -14,13 +15,15 @@
 #include <tbb/tbb_stddef.h>
 #endif
 
+#include <dune/xt/grid/type_traits.hh>
+
 namespace Dune {
 
-  //! Partioning base on remambering iterator ranges
+  //! Partioning base on remembering iterator ranges
   template<class GridView, int codim>
   class RangedPartitioning
   {
-    typedef typename GridView::template Codim<codim>::Iterator Iterator;
+    typedef XT::Grid::extract_iterator_t<GridView> Iterator;
   public:
     //! type of partitions
     class Partition;
@@ -94,9 +97,9 @@ namespace Dune {
   {
   public:
     //! type of iterator
-    typedef typename GridView::template Codim<codim>::Iterator Iterator;
+    typedef XT::Grid::extract_iterator_t<GridView> Iterator;
     //! type of entity
-    typedef typename GridView::template Codim<codim>::Entity Entity;
+    typedef XT::Grid::extract_entity_t<GridView> Entity;
     //! type used to count entites
     typedef typename std::iterator_traits<Iterator>::difference_type Size;
 
