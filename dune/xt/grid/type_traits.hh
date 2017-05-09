@@ -300,6 +300,30 @@ template <class T>
 using extract_entity_t = typename extract_entity<T>::type;
 
 
+template <class T,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
+struct extract_iterator : public std::false_type
+{
+};
+
+template <class T>
+struct extract_iterator<T, true, false>
+{
+  typedef typename T::template Codim<0>::Iterator type;
+};
+
+template <class T>
+struct extract_iterator<T, false, true>
+{
+  typedef typename T::template Codim<0>::IteratorType type;
+};
+
+
+template <class T>
+using extract_iterator_t = typename extract_iterator<T>::type;
+
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
