@@ -11,10 +11,21 @@
 
 set(lib_dune_xt_functions_sources
     expression/mathexpr.cc
-    interfaces.lib/yasp_1d.cc
-    interfaces.lib/yasp_2d.cc
-    interfaces.lib/yasp_3d.cc
-    interfaces.lib/alu_2d.cc)
+    constant.lib/alu_2d_simplex_conforming.cc
+    constant.lib/yasp_1d_equidistant_offset.cc
+    constant.lib/yasp_2d_equidistant_offset.cc
+    constant.lib/yasp_3d_equidistant_offset.cc
+    expression.lib/alu_2d_simplex_conforming.cc
+    expression.lib/yasp_1d_equidistant_offset.cc
+    expression.lib/yasp_2d_equidistant_offset.cc
+    expression.lib/yasp_3d_equidistant_offset.cc
+    interfaces.lib/alu_2d_simplex_conforming.cc
+    interfaces.lib/yasp_1d_equidistant_offset.cc
+    interfaces.lib/yasp_2d_equidistant_offset.cc
+    interfaces.lib/yasp_3d_equidistant_offset.cc
+    spe10/model1.lib/alu_2d_simplex_conforming.cc
+    spe10/model1.lib/yasp_2d_equidistant_offset.cc
+    spe10/model2.lib/yasp_3d_equidistant_offset.cc)
 
 dune_library_add_sources(dunextfunctions SOURCES ${lib_dune_xt_functions_sources})
 

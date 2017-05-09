@@ -8,8 +8,8 @@
 //   Felix Schindler (2016)
 //   Rene Milk       (2015 - 2016)
 
-#ifndef DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
-#define DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
+#ifndef DUNE_XT_FUNCTIONS_SPE10_MODEL2_HH
+#define DUNE_XT_FUNCTIONS_SPE10_MODEL2_HH
 
 #include <iostream>
 #include <memory>
@@ -27,6 +27,7 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 namespace Spe10 {
+
 
 /**
  * Grid originally had LL (0,0,0) to UR (365.76, 670.56, 51.816) corners
@@ -125,9 +126,26 @@ const Common::FieldVector<unsigned int, dim_domain>
 template <class EntityImp, class DomainFieldImp, size_t dim_domain, class RangeFieldImp, size_t r, size_t rC>
 const Common::FieldVector<double, dim_domain>
     Model2Function<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC>::default_upper_right{{1, 3.667, 1.417}};
+
+
 } // namespace Spe10
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_SPE10MODEL2_HH
+
+// begin: this is what we need for the lib
+
+#define _DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB(_p, _G, _R, _r, _rC)                                                       \
+  _p class Dune::XT::Functions::Spe10::                                                                                \
+      Model2Function<typename _G::template Codim<0>::Entity, typename _G::ctype, _G::dimension, _R, _r, _rC>
+
+#define DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB_YASP_3D(_p)                                                                 \
+  _DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB(_p, YASP_3D_EQUIDISTANT_OFFSET, double, 3, 3)
+
+DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB_YASP_3D(extern template);
+
+// end: this is what we need for the lib
+
+
+#endif // DUNE_XT_FUNCTIONS_SPE10_MODEL2_HH
