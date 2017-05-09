@@ -18,16 +18,17 @@
 #include <memory>
 
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
+
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/ranges.hh>
-
+#include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/capabilities.hh>
+#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/grid/boundaryinfo.hh>
-#include <dune/xt/grid/layers.hh>
 
 namespace Dune {
 namespace XT {
@@ -69,12 +70,6 @@ public:
    * \attention Do not delete grd_ptr manually afterwards!
    */
   GridProvider(GridType* grd_ptr, DdGridType* dd_grd_ptr = nullptr)
-    : grid_ptr_(grd_ptr)
-    , dd_grid_ptr_(dd_grd_ptr)
-  {
-  }
-
-  GridProvider(std::unique_ptr<GridType>&& grd_ptr, std::unique_ptr<DdGridType>&& dd_grd_ptr = nullptr)
     : grid_ptr_(grd_ptr)
     , dd_grid_ptr_(dd_grd_ptr)
   {
@@ -146,13 +141,15 @@ public:
   }
 
   template <Backends backend>
-  typename Layer<GridType, Layers::level, backend>::type level(const int lvl = 0) const
+  typename Layer<GridType, Layers::level, backend>::type DUNE_DEPRECATED_MSG("Use level_view() instead (09.05.2017)!")
+      level(const int lvl = 0) const
   {
     return Layer<GridType, Layers::level, backend>::create(*grid_ptr_, lvl);
   }
 
   template <Backends backend>
-  typename Layer<GridType, Layers::leaf, backend>::type leaf() const
+  typename Layer<GridType, Layers::leaf, backend>::type DUNE_DEPRECATED_MSG("Use leaf_view() instead (09.05.2017)!")
+      leaf() const
   {
     return Layer<GridType, Layers::leaf, backend>::create(*grid_ptr_);
   }
@@ -217,121 +214,145 @@ public:
     visualize_with_boundary(boundary_info_cfg, filename);
   }
 
-  void visualize_dd(const std::string filename, const bool with_coupling) const
+private:
+  template <bool is_dd_subdomain = std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value, bool anything = true>
+  struct visualize_dd_helper
   {
-    if (!dd_grid_ptr_)
-      DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
-    // vtk writer
-    typedef typename DdGridType::GlobalGridPartType GlobalGridPartType;
-    const auto& globalGridPart = dd_grid().globalGridPart();
-    typedef Dune::Fem::GridPart2GridView<GlobalGridPartType> GVT;
-    GVT globalGridView(globalGridPart);
-    Dune::VTKWriter<GVT> vtkwriter(globalGridView);
-    // data
-    std::map<std::string, std::vector<double>> data;
-    data["subdomain"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
-    data["global entity id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
-    data["global boundary id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
-    data["local boundary id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
-    // walk the global grid view
-    for (auto it = globalGridView.template begin<0>(); it != globalGridView.template end<0>(); ++it) {
-      const auto& entity = *it;
-      const auto index = globalGridView.indexSet().index(entity);
-      data["subdomain"][index] = dd_grid().subdomainOf(index);
-      data["global entity id"][index] = double(index);
-      // compute global boundary id
-      data["global boundary id"][index] = 0.0;
-      int numberOfBoundarySegments = 0;
-      bool isOnBoundary = false;
-      for (auto intersectionIt = globalGridView.ibegin(entity); intersectionIt != globalGridView.iend(entity);
-           ++intersectionIt) {
-        if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
-          isOnBoundary = true;
-          numberOfBoundarySegments += 1;
-          data["global boundary id"][index] += double(intersectionIt->boundarySegmentIndex());
-        }
-      }
-      if (isOnBoundary) {
-        data["global boundary id"][index] /= double(numberOfBoundarySegments);
-      } // compute global boundary id
-    } // walk the global grid view
-    // walk the subdomains
-    for (unsigned int s = 0; s < dd_grid().size(); ++s) {
-      // walk the local grid view
-      const auto localGridView = dd_grid().localGridPart(s);
-      for (auto it = localGridView.template begin<0>(); it != localGridView.template end<0>(); ++it) {
+    void
+    operator()(const std::shared_ptr<DdGridType>& dd_grid_ptr, const std::string filename, const bool with_coupling)
+    {
+      if (!dd_grid_ptr)
+        DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
+      const auto& dd_grid = *dd_grid_ptr;
+      // vtk writer
+      typedef typename DdGridType::GlobalGridPartType GlobalGridPartType;
+      const auto& globalGridPart = dd_grid.globalGridPart();
+      typedef Dune::Fem::GridPart2GridView<GlobalGridPartType> GVT;
+      GVT globalGridView(globalGridPart);
+      Dune::VTKWriter<GVT> vtkwriter(globalGridView);
+      // data
+      std::map<std::string, std::vector<double>> data;
+      data["subdomain"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+      data["global entity id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+      data["global boundary id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+      data["local boundary id"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+      // walk the global grid view
+      for (auto it = globalGridView.template begin<0>(); it != globalGridView.template end<0>(); ++it) {
         const auto& entity = *it;
-        const unsigned int index = globalGridView.indexSet().index(entity);
-        // compute local boundary id
-        unsigned int numberOfBoundarySegments = 0u;
-        for (auto intersectionIt = localGridView.ibegin(entity); intersectionIt != localGridView.iend(entity);
+        const auto index = globalGridView.indexSet().index(entity);
+        data["subdomain"][index] = dd_grid.subdomainOf(index);
+        data["global entity id"][index] = double(index);
+        // compute global boundary id
+        data["global boundary id"][index] = 0.0;
+        int numberOfBoundarySegments = 0;
+        bool isOnBoundary = false;
+        for (auto intersectionIt = globalGridView.ibegin(entity); intersectionIt != globalGridView.iend(entity);
              ++intersectionIt) {
           if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
-            numberOfBoundarySegments += 1u;
-            data["local boundary id"][index] += double(intersectionIt->boundarySegmentIndex());
+            isOnBoundary = true;
+            numberOfBoundarySegments += 1;
+            data["global boundary id"][index] += double(intersectionIt->boundarySegmentIndex());
           }
         }
-        if (numberOfBoundarySegments > 0)
-          data["local boundary id"][index] /= double(numberOfBoundarySegments);
-        // visualize coupling
-        if (with_coupling) {
-          for (auto nn : dd_grid().neighborsOf(s)) {
-            const auto coupling_grid_view = dd_grid().couplingGridPart(s, nn);
-            const std::string coupling_str = "coupling (" + Common::to_string(s) + ", " + Common::to_string(nn) + ")";
-            data[coupling_str] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
-            const auto entity_it_end = coupling_grid_view.template end<0>();
-            for (auto entity_it = coupling_grid_view.template begin<0>(); entity_it != entity_it_end; ++entity_it) {
-              const auto& coupling_entity = *entity_it;
-              const size_t global_entity_id = globalGridView.indexSet().index(coupling_entity);
-              data[coupling_str][global_entity_id] = 1.0;
-              for (auto intersection_it = coupling_grid_view.ibegin(coupling_entity);
-                   intersection_it != coupling_grid_view.iend(coupling_entity);
-                   ++intersection_it) {
-                const auto& intersection = *intersection_it;
-                if (intersection.neighbor() && !intersection.boundary()) {
-                  const auto neighbor = intersection.outside();
-                  const size_t global_neighbor_id = globalGridView.indexSet().index(neighbor);
-                  data[coupling_str][global_neighbor_id] = 0.5;
-                }
-              }
-            }
-          }
-        } // if (with_coupling)
-      } // walk the local grid view
-    } // walk the subdomains
-    if (dd_grid().oversampling()) {
-      // walk the oversampled grid parts
-      for (size_t ss = 0; ss < dd_grid().size(); ++ss) {
-        const std::string string_id = "oversampled subdomain " + Common::to_string(ss);
-        data[string_id] = std::vector<double>(globalGridView.indexSet().size(0), -1.0);
-        typedef typename DdGridType::LocalGridPartType LocalGridPartType;
-        const LocalGridPartType oversampledGridPart = dd_grid().localGridPart(ss, true);
-        for (auto it = oversampledGridPart.template begin<0>(); it != oversampledGridPart.template end<0>(); ++it) {
+        if (isOnBoundary) {
+          data["global boundary id"][index] /= double(numberOfBoundarySegments);
+        } // compute global boundary id
+      } // walk the global grid view
+      // walk the subdomains
+      for (unsigned int s = 0; s < dd_grid.size(); ++s) {
+        // walk the local grid view
+        const auto localGridView = dd_grid.localGridPart(s);
+        for (auto it = localGridView.template begin<0>(); it != localGridView.template end<0>(); ++it) {
           const auto& entity = *it;
-          const auto index = globalGridView.indexSet().index(entity);
-          data[string_id][index] = 0.0;
+          const unsigned int index = globalGridView.indexSet().index(entity);
           // compute local boundary id
           unsigned int numberOfBoundarySegments = 0u;
-          for (auto intersectionIt = oversampledGridPart.ibegin(entity);
-               intersectionIt != oversampledGridPart.iend(entity);
+          for (auto intersectionIt = localGridView.ibegin(entity); intersectionIt != localGridView.iend(entity);
                ++intersectionIt) {
             if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
               numberOfBoundarySegments += 1u;
-              data[string_id][index] += double(intersectionIt->boundarySegmentIndex());
+              data["local boundary id"][index] += double(intersectionIt->boundarySegmentIndex());
             }
           }
-          if (numberOfBoundarySegments > 0) {
-            data[string_id][index] /= double(numberOfBoundarySegments);
-          } // compute global boundary id
+          if (numberOfBoundarySegments > 0)
+            data["local boundary id"][index] /= double(numberOfBoundarySegments);
+          // visualize coupling
+          if (with_coupling) {
+            for (auto nn : dd_grid.neighborsOf(s)) {
+              const auto coupling_grid_view = dd_grid.couplingGridPart(s, nn);
+              const std::string coupling_str = "coupling (" + Common::to_string(s) + ", " + Common::to_string(nn) + ")";
+              data[coupling_str] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
+              const auto entity_it_end = coupling_grid_view.template end<0>();
+              for (auto entity_it = coupling_grid_view.template begin<0>(); entity_it != entity_it_end; ++entity_it) {
+                const auto& coupling_entity = *entity_it;
+                const size_t global_entity_id = globalGridView.indexSet().index(coupling_entity);
+                data[coupling_str][global_entity_id] = 1.0;
+                for (auto intersection_it = coupling_grid_view.ibegin(coupling_entity);
+                     intersection_it != coupling_grid_view.iend(coupling_entity);
+                     ++intersection_it) {
+                  const auto& intersection = *intersection_it;
+                  if (intersection.neighbor() && !intersection.boundary()) {
+                    const auto neighbor = intersection.outside();
+                    const size_t global_neighbor_id = globalGridView.indexSet().index(neighbor);
+                    data[coupling_str][global_neighbor_id] = 0.5;
+                  }
+                }
+              }
+            }
+          } // if (with_coupling)
+        } // walk the local grid view
+      } // walk the subdomains
+      if (dd_grid.oversampling()) {
+        // walk the oversampled grid parts
+        for (size_t ss = 0; ss < dd_grid.size(); ++ss) {
+          const std::string string_id = "oversampled subdomain " + Common::to_string(ss);
+          data[string_id] = std::vector<double>(globalGridView.indexSet().size(0), -1.0);
+          typedef typename DdGridType::LocalGridPartType LocalGridPartType;
+          const LocalGridPartType oversampledGridPart = dd_grid.localGridPart(ss, true);
+          for (auto it = oversampledGridPart.template begin<0>(); it != oversampledGridPart.template end<0>(); ++it) {
+            const auto& entity = *it;
+            const auto index = globalGridView.indexSet().index(entity);
+            data[string_id][index] = 0.0;
+            // compute local boundary id
+            unsigned int numberOfBoundarySegments = 0u;
+            for (auto intersectionIt = oversampledGridPart.ibegin(entity);
+                 intersectionIt != oversampledGridPart.iend(entity);
+                 ++intersectionIt) {
+              if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
+                numberOfBoundarySegments += 1u;
+                data[string_id][index] += double(intersectionIt->boundarySegmentIndex());
+              }
+            }
+            if (numberOfBoundarySegments > 0) {
+              data[string_id][index] /= double(numberOfBoundarySegments);
+            } // compute global boundary id
+          }
         }
-      }
-    } // if (dd_grid().oversampling())
+      } // if (dd_grid.oversampling())
 
-    // write
-    for (const auto& data_pair : data)
-      vtkwriter.addCellData(data_pair.second, data_pair.first);
-    vtkwriter.write(filename, Dune::VTK::appendedraw);
-  } // ... visualize(...)
+      // write
+      for (const auto& data_pair : data)
+        vtkwriter.addCellData(data_pair.second, data_pair.first);
+      vtkwriter.write(filename, Dune::VTK::appendedraw);
+    } // ... operator()(...)
+  }; // struct visualize_dd_helper<true, ...>
+
+  template <bool anything>
+  struct visualize_dd_helper<false, anything>
+  {
+    void operator()(const std::shared_ptr<DdGridType>& /*dd_grid_ptr*/,
+                    const std::string /*filename*/,
+                    const bool /*with_coupling*/)
+    {
+      DUNE_THROW(NotImplemented, "Only available for DD::SubdomainGrid!");
+    }
+  };
+
+public:
+  void visualize_dd(const std::string filename, const bool with_coupling) const
+  {
+    visualize_dd_helper<>()(dd_grid_ptr_, filename, with_coupling);
+  }
 
 private:
   template <class G, bool anything = true>
@@ -504,5 +525,81 @@ private:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
+
+
+// begin: this is what we need for the lib
+
+#if HAVE_DUNE_FEM
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_DD_SUBDOMAIN(_prefix, _GRID, _type, _backend)                        \
+  _prefix typename Dune::XT::Grid::Layer<_GRID,                                                                        \
+                                         Dune::XT::Grid::Layers::_type,                                                \
+                                         Dune::XT::Grid::Backends::_backend,                                           \
+                                         Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::type                               \
+  Dune::XT::Grid::GridProvider<_GRID, Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::                                      \
+      layer<Dune::XT::Grid::Layers::_type, Dune::XT::Grid::Backends::_backend>(const int) const
+#else
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_DD_SUBDOMAIN(_prefix, _GRID, _type, _backend)
+#endif
+
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, _type, _backend)                                     \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_DD_SUBDOMAIN(_prefix, _GRID, _type, _backend);                             \
+  _prefix                                                                                                              \
+      typename Dune::XT::Grid::Layer<_GRID, Dune::XT::Grid::Layers::_type, Dune::XT::Grid::Backends::_backend>::type   \
+      Dune::XT::Grid::GridProvider<_GRID>::layer<Dune::XT::Grid::Layers::_type, Dune::XT::Grid::Backends::_backend>(   \
+          const int) const
+
+#if HAVE_DUNE_FEM
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART_DD_SUBDOMAIN(_prefix, _GRID, _type)                             \
+  _prefix typename Dune::XT::Grid::Layer<_GRID,                                                                        \
+                                         Dune::XT::Grid::Layers::_type,                                                \
+                                         Dune::XT::Grid::Backends::part,                                               \
+                                         Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::type                               \
+  Dune::XT::Grid::GridProvider<_GRID, Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::layer<Dune::XT::Grid::Layers::_type>( \
+      const int)
+
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART(_prefix, _GRID, _type)                                          \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART_DD_SUBDOMAIN(_prefix, _GRID, _type);                                  \
+  _prefix typename Dune::XT::Grid::Layer<_GRID, Dune::XT::Grid::Layers::_type, Dune::XT::Grid::Backends::part>::type   \
+  Dune::XT::Grid::GridProvider<_GRID>::layer<Dune::XT::Grid::Layers::_type>(const int)
+
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_PART(_prefix, _GRID)                                                       \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, level, part);                                              \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, leaf, part);                                               \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, adaptive_leaf, part);                                      \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_DD_SUBDOMAIN(_prefix, _GRID, dd_subdomain, part);                          \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART(_prefix, _GRID, level);                                               \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART(_prefix, _GRID, leaf);                                                \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART(_prefix, _GRID, adaptive_leaf);                                       \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART_DD_SUBDOMAIN(_prefix, _GRID, dd_subdomain)
+#else
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_PART(_prefix, _GRID)
+#endif
+
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_ALL_LAYERS(_prefix, _GRID)                                                 \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_PART(_prefix, _GRID);                                                            \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, level, view);                                              \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, leaf, view)
+
+#if HAVE_DUNE_FEM
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_DD_SUBDOMAIN(_prefix, _GRID)                                               \
+  _prefix class Dune::XT::Grid::GridProvider<_GRID, Dune::XT::Grid::DD::SubdomainGrid<_GRID>>
+#else
+#define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_DD_SUBDOMAIN(_prefix, _GRID)
+#endif
+
+#define DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(_prefix, _GRID)                                                             \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_DD_SUBDOMAIN(_prefix, _GRID);                                                    \
+  _prefix class Dune::XT::Grid::GridProvider<_GRID>;                                                                   \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_ALL_LAYERS(_prefix, _GRID)
+
+#if HAVE_DUNE_ALUGRID
+DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(extern template, ALU_2D_SIMPLEX_CONFORMING);
+#endif
+DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(extern template, YASP_1D_EQUIDISTANT_OFFSET);
+DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(extern template, YASP_2D_EQUIDISTANT_OFFSET);
+DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(extern template, YASP_3D_EQUIDISTANT_OFFSET);
+
+// end: this is what we need for the lib
+
 
 #endif // DUNE_XT_GRID_PROVIDER_PROVIDER_HH
