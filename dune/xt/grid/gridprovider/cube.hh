@@ -27,12 +27,12 @@
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/misc.hh>
-#include <dune/xt/grid/structuredgridfactory.hh>
-#include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/dd/subdomains/factory.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/information.hh>
+#include <dune/xt/grid/structuredgridfactory.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 #include "provider.hh"
 
@@ -425,5 +425,50 @@ make_cube_dd_subdomains_grid(
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
+
+
+// begin: this is what we need for the lib
+
+#if HAVE_DUNE_FEM
+#define _DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS_DD_SUBDOMAINS_GRID(_prefix, _GRID)                         \
+  _prefix Dune::XT::Grid::GridProvider<_GRID, Dune::XT::Grid::DD::SubdomainGrid<_GRID>>                                \
+  Dune::XT::Grid::make_cube_dd_subdomains_grid<_GRID>(                                                                 \
+      const Dune::FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                               \
+      const Dune::FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                               \
+      const std::array<unsigned int, _GRID::dimension>,                                                                \
+      const unsigned int,                                                                                              \
+      const std::array<unsigned int, _GRID::dimension>,                                                                \
+      const std::array<unsigned int, _GRID::dimension>,                                                                \
+      const size_t,                                                                                                    \
+      const size_t)
+#else
+#define _DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS_DD_SUBDOMAINS_GRID(_prefix, _GRID)
+#endif
+
+#define DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(_prefix, _GRID)                                             \
+  _DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS_DD_SUBDOMAINS_GRID(_prefix, _GRID);                              \
+  _prefix Dune::XT::Grid::GridProvider<_GRID> Dune::XT::Grid::make_cube_grid<_GRID>(                                   \
+      const FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                                     \
+      const Dune::FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                               \
+      const std::array<unsigned int, _GRID::dimension>,                                                                \
+      const unsigned int,                                                                                              \
+      const std::array<unsigned int, _GRID::dimension>);                                                               \
+  _prefix Dune::XT::Grid::GridProvider<_GRID> Dune::XT::Grid::make_cube_grid<_GRID>(const typename _GRID::ctype&,      \
+                                                                                    const typename _GRID::ctype&,      \
+                                                                                    const unsigned int,                \
+                                                                                    const unsigned int,                \
+                                                                                    const unsigned int);               \
+  _prefix Dune::XT::Grid::GridProvider<_GRID> Dune::XT::Grid::make_cube_grid<_GRID>(                                   \
+      const Dune::XT::Common::Configuration&)
+
+#if HAVE_DUNE_ALUGRID
+DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(extern template, ALU_2D_SIMPLEX_CONFORMING);
+#endif
+DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(extern template, YASP_1D_EQUIDISTANT_OFFSET);
+DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(extern template, YASP_2D_EQUIDISTANT_OFFSET);
+DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(extern template, YASP_3D_EQUIDISTANT_OFFSET);
+
+// end: this is what we need for the lib
+
 
 #endif // DUNE_XT_GRID_GRIDPROVIDER_CUBE_HH
