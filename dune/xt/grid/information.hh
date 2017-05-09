@@ -20,7 +20,6 @@
 
 #include <dune/common/unused.hh>
 
-#include <dune/grid/common/gridview.hh>
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/ranges.hh>
 
@@ -43,16 +42,16 @@ struct Statistics
   size_t numberOfInnerIntersections;
   size_t numberOfBoundaryIntersections;
   double maxGridWidth;
-  template <class GridViewType>
-  Statistics(const GridViewType& gridView)
-    : numberOfEntities(gridView.size(0))
+  template <class GridLayerType>
+  Statistics(const GridLayerType& grid_layer)
+    : numberOfEntities(grid_layer.size(0))
     , numberOfIntersections(0)
     , numberOfInnerIntersections(0)
     , numberOfBoundaryIntersections(0)
     , maxGridWidth(0)
   {
-    for (auto&& entity : elements(gridView)) {
-      for (auto&& intIt : intersections(gridView, entity)) {
+    for (auto&& entity : elements(grid_layer)) {
+      for (auto&& intIt : intersections(grid_layer, entity)) {
         ++numberOfIntersections;
         maxGridWidth = std::max(intIt.geometry().volume(), maxGridWidth);
         // if we are inside the grid
@@ -66,10 +65,10 @@ struct Statistics
 
 /** \brief grid statistic output to given stream
    */
-template <class GridViewType>
-void print_info(const GridViewType& gridView, std::ostream& out)
+template <class GridLayerType>
+void print_info(const GridLayerType& grid_layer, std::ostream& out)
 {
-  const Statistics st(gridView);
+  const Statistics st(grid_layer);
   out << "found " << st.numberOfEntities << " entities," << std::endl;
   out << "found " << st.numberOfIntersections << " intersections," << std::endl;
   out << "      " << st.numberOfInnerIntersections << " intersections inside and" << std::endl;
@@ -80,13 +79,13 @@ void print_info(const GridViewType& gridView, std::ostream& out)
 /**
 * \attention Not optimal, does a whole grid walk!
 **/
-template <class GridViewType>
-size_t max_number_of_neighbors(const GridViewType& gridView)
+template <class GridLayerType>
+size_t max_number_of_neighbors(const GridLayerType& grid_layer)
 {
   size_t maxNeighbours = 0;
-  for (auto&& entity : elements(gridView)) {
+  for (auto&& entity : elements(grid_layer)) {
     size_t neighbours = 0;
-    for (DUNE_UNUSED auto&& i : intersections(gridView, entity)) {
+    for (DUNE_UNUSED auto&& i : intersections(grid_layer, entity)) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);
@@ -94,13 +93,12 @@ size_t max_number_of_neighbors(const GridViewType& gridView)
   return maxNeighbours;
 } // ... max_number_of_neighbors(...)
 
-//! Provide min/max coordinates for all space dimensions of a GridView
-template <class GridViewType>
+//! Provide min/max coordinates for all space dimensions of a grid layer
+template <class GridLayerType>
 struct Dimensions
 {
-  static_assert(std::is_base_of<GridView<typename GridViewType::Traits>, GridViewType>::value,
-                "GridViewType is no GridView");
-  typedef typename GridViewType::Grid GridType;
+  static_assert(is_layer<GridLayerType>::value, "");
+  typedef extract_grid_t<GridLayerType> GridType;
   //! automatic running min/max
   typedef Dune::XT::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
   typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
@@ -111,7 +109,7 @@ struct Dimensions
   MinMaxAvgType entity_width;
 
   //! gridwalk functor that does the actual work for \ref GridDimensions
-  class GridDimensionsFunctor : public Functor::Codim0<GridViewType>
+  class GridDimensionsFunctor : public Functor::Codim0<GridLayerType>
   {
     CoordLimitsType& coord_limits_;
     MinMaxAvgType& entity_volume_;
@@ -143,10 +141,10 @@ struct Dimensions
     return entity_volume.min() != 0.0 ? entity_volume.max() / entity_volume.min() : -1;
   }
 
-  Dimensions(const GridViewType& gridView)
+  Dimensions(const GridLayerType& grid_layer)
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
-    Walker<GridViewType> gw(gridView);
+    Walker<GridLayerType> gw(grid_layer);
     gw.append(f);
     gw.walk();
   }
@@ -184,16 +182,16 @@ Dimensions<typename GridType::LeafGridViewType> dimensions(const GridType& grid)
   return Dimensions<typename GridType::LeafGridViewType>(grid.leafGridView());
 }
 
-template <class GridViewType>
-Dimensions<GridViewType> dimensions(const GridViewType& gridView)
+template <class GridLayerType>
+Dimensions<GridLayerType> dimensions(const GridLayerType& grid_layer)
 {
-  return Dimensions<GridViewType>(gridView);
+  return Dimensions<GridLayerType>(grid_layer);
 }
 
-template <class GridViewType>
-Dimensions<GridViewType> dimensions(const extract_entity_t<GridViewType>& entity)
+template <class GridLayerType>
+Dimensions<GridLayerType> dimensions(const extract_entity_t<GridLayerType>& entity)
 {
-  return Dimensions<GridViewType>(entity);
+  return Dimensions<GridLayerType>(entity);
 }
 
 //! returns size() - overlap - ghosts
