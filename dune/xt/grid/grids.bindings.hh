@@ -16,20 +16,6 @@
 #include "grids.hh"
 
 
-// this is used by other headers
-typedef Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>> YASP_1D_EQUIDISTANT_OFFSET;
-typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>> YASP_2D_EQUIDISTANT_OFFSET;
-#if HAVE_DUNE_ALUGRID
-typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> ALU_2D_SIMPLEX_CONFORMING;
-#endif
-#if HAVE_DUNE_UGGRID || HAVE_UG
-typedef Dune::UGGrid<2> UG_2D;
-#endif
-#if HAVE_ALBERTA
-typedef Dune::AlbertaGrid<2, 2> ALBERTA_2D;
-#endif
-
-
 namespace Dune {
 namespace XT {
 namespace Grid {
