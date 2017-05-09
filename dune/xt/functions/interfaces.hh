@@ -45,7 +45,11 @@
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/grid/dd/subdomains/grid.hh>
+#include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/view/from-part.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
 namespace XT {
@@ -834,5 +838,54 @@ struct is_localizable_function<F, false> : public std::false_type
 #include "combined.hh"
 #include "default.hh"
 #include "derived.hh"
+
+
+// begin: this is what we need for the lib
+
+#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, _G, _R, _r, _rC)                                                          \
+  _p class Dune::XT::Functions::LocalfunctionSetInterface<typename _G::template Codim<0>::Entity,                      \
+                                                          typename _G::ctype,                                          \
+                                                          _G::dimension,                                               \
+                                                          _R,                                                          \
+                                                          _r,                                                          \
+                                                          _rC>;                                                        \
+  _p class Dune::XT::Functions::                                                                                       \
+      LocalfunctionInterface<typename _G::template Codim<0>::Entity, typename _G::ctype, _G::dimension, _R, _r, _rC>;  \
+  _p class Dune::XT::Functions::LocalizableFunctionInterface<typename _G::template Codim<0>::Entity,                   \
+                                                             typename _G::ctype,                                       \
+                                                             _G::dimension,                                            \
+                                                             _R,                                                       \
+                                                             _r,                                                       \
+                                                             _rC>
+
+#if HAVE_DUNE_ALUGRID
+#define DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALU_2D(_p)                                                                     \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, ALU_2D_SIMPLEX_CONFORMING, double, 1, 1);                                       \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, ALU_2D_SIMPLEX_CONFORMING, double, 2, 2)
+#else
+#define DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALU_2D(_p)
+#endif
+
+#define DUNE_XT_FUNCTIONS_INTERFACE_LIB_YASP_1D(_p)                                                                    \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, YASP_1D_EQUIDISTANT_OFFSET, double, 1, 1)
+
+#define DUNE_XT_FUNCTIONS_INTERFACE_LIB_YASP_2D(_p)                                                                    \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, YASP_2D_EQUIDISTANT_OFFSET, double, 1, 1);                                      \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, YASP_2D_EQUIDISTANT_OFFSET, double, 2, 2)
+
+#define DUNE_XT_FUNCTIONS_INTERFACE_LIB_YASP_3D(_p)                                                                    \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, YASP_3D_EQUIDISTANT_OFFSET, double, 1, 1);                                      \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, YASP_3D_EQUIDISTANT_OFFSET, double, 3, 3)
+
+#define DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALL_GRIDS(_p)                                                                  \
+  DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALU_2D(_p);                                                                          \
+  DUNE_XT_FUNCTIONS_INTERFACE_LIB_YASP_1D(_p);                                                                         \
+  DUNE_XT_FUNCTIONS_INTERFACE_LIB_YASP_2D(_p);                                                                         \
+  DUNE_XT_FUNCTIONS_INTERFACE_LIB_YASP_3D(_p)
+
+DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALL_GRIDS(extern template);
+
+// end: this is what we need for the lib
+
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACE_HH

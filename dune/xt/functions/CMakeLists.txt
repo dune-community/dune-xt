@@ -10,7 +10,11 @@
 #   Tobias Leibner  (2016)
 
 set(lib_dune_xt_functions_sources
-    expression/mathexpr.cc)
+    expression/mathexpr.cc
+    interfaces.lib/yasp_1d.cc
+    interfaces.lib/yasp_2d.cc
+    interfaces.lib/yasp_3d.cc
+    interfaces.lib/alu_2d.cc)
 
 dune_library_add_sources(dunextfunctions SOURCES ${lib_dune_xt_functions_sources})
 
