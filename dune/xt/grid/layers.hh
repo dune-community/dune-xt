@@ -247,6 +247,29 @@ struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::part, DdGridType
 }; // struct Layer<..., dd_subdomain_coupling, part>
 
 
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::part, DdGridType>
+{
+  typedef SubdomainBoundaryGridPart<Fem::LeafGridPart<GridType>> type;
+
+  static type create(const GridType& /*grid*/,
+                     const int /*subdomain*/ = 0,
+                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
+  {
+    static_assert(AlwaysFalse<GridType>::value,
+                  "dune-fem does not allow the creation of grid parts from a const grid!");
+  }
+
+  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  {
+    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
+                  "Only available for DD::SubdomainGrid!");
+    DUNE_THROW(NotImplemented, "Only usable to extract the layer type, not the actual layer!");
+    return dd_grid->couplingGridPart(0, 0);
+  }
+}; // struct Layer<..., dd_subdomain_boundary, part>
+
+
 #else // HAVE_DUNE_FEM
 
 
