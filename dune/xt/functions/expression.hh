@@ -152,8 +152,11 @@ public:
    * This constructor just expands expressions and gradient_expressions from a std::vector< std::string > and
    * std::vector< std::vector< std::string > to ExpressionStringVectorType and GradientStringVectorType, respectively.
    */
+  template <typename std_str = std::string,
+            typename = typename std::enable_if<(std::is_same<std_str, std::string>::value) && (dimRangeCols == 1)
+                                               && sizeof(std_str)>::type>
   ExpressionFunction(
-      const std::string variable,
+      const std_str variable,
       const std::vector<std::string> expressions,
       const size_t ord = default_config().template get<size_t>("order"),
       const std::string nm = static_id(),
@@ -223,11 +226,66 @@ public:
     return order_;
   }
 
+private:
+  template <bool is_not_tensor = (rangeDimCols == 1), bool anything = true>
+  struct helper
+  {
+    static void
+    evaluate(const std::shared_ptr<const MathExpressionFunctionType>& func,
+             typename Common::PerThreadValue<FieldVector<RangeFieldType, dimRange * dimRangeCols>>& /*tmp_vector*/,
+             const DomainType& xx,
+             RangeType& ret)
+    {
+      func->evaluate(xx, ret);
+    }
+
+    static void jacobian(const std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>>& gradients,
+                         const DomainType& xx,
+                         JacobianRangeType& ret)
+    {
+      assert(gradients[0].size() == dimRange);
+      for (size_t rr = 0; rr < dimRange; ++rr) {
+        gradients[0][rr]->evaluate(xx, ret[rr]);
+      }
+    }
+  }; // struct helper<true, ...>
+
+  template <bool anything>
+  struct helper<false, anything>
+  {
+    static void
+    evaluate(const std::shared_ptr<const MathExpressionFunctionType>& func,
+             typename Common::PerThreadValue<FieldVector<RangeFieldType, dimRange * dimRangeCols>>& tmp_vector,
+             const DomainType& xx,
+             RangeType& ret)
+    {
+      func->evaluate(xx, *tmp_vector);
+      for (size_t rr = 0; rr < dimRange; ++rr) {
+        auto& retRow = ret[rr];
+        for (size_t cc = 0; cc < dimRangeCols; ++cc)
+          retRow[cc] = (*tmp_vector)[rr * dimRangeCols + cc];
+      }
+    } // ... evaluate(...)
+
+    static void jacobian(const std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>>& gradients,
+                         const DomainType& xx,
+                         JacobianRangeType& ret)
+    {
+      for (size_t cc = 0; cc < dimRangeCols; ++cc) {
+        assert(gradients[cc].size() == dimRange);
+        for (size_t rr = 0; rr < dimRange; ++rr) {
+          gradients[cc][rr]->evaluate(xx, ret[cc][rr]);
+        }
+      }
+    } // ... jacobian(...)
+  }; // struct helper<false, ...>
+
+public:
   using BaseType::evaluate;
 
   virtual void evaluate(const DomainType& xx, RangeType& ret) const override
   {
-    evaluate_helper(xx, ret, internal::ChooseVariant<dimRangeCols>());
+    helper<>::evaluate(function_, tmp_vector_, xx, ret);
 #ifndef NDEBUG
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
@@ -277,7 +335,7 @@ public:
       DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
     } else {
       assert(gradients_.size() == dimRangeCols);
-      jacobian_helper(xx, ret, internal::ChooseVariant<dimRangeCols>());
+      helper<>::jacobian(gradients_, xx, ret);
     }
   } // ... jacobian(...)
 
@@ -312,41 +370,6 @@ private:
       }
     }
   } // ... build_gradients(...)
-
-  template <size_t rC>
-  void evaluate_helper(const DomainType& xx, RangeType& ret, internal::ChooseVariant<rC>) const
-  {
-    function_->evaluate(xx, *tmp_vector_);
-    for (size_t rr = 0; rr < dimRange; ++rr) {
-      auto& retRow = ret[rr];
-      for (size_t cc = 0; cc < dimRangeCols; ++cc)
-        retRow[cc] = (*tmp_vector_)[rr * dimRangeCols + cc];
-    }
-  } // ... evaluate_helper(...)
-
-  void evaluate_helper(const DomainType& xx, RangeType& ret, internal::ChooseVariant<1>) const
-  {
-    function_->evaluate(xx, ret);
-  } // ... evaluate_helper(..., ...< 1 >)
-
-  template <size_t rC>
-  void jacobian_helper(const DomainType& xx, JacobianRangeType& ret, internal::ChooseVariant<rC>) const
-  {
-    for (size_t cc = 0; cc < dimRangeCols; ++cc) {
-      assert(gradients_[cc].size() == dimRange);
-      for (size_t rr = 0; rr < dimRange; ++rr) {
-        gradients_[cc][rr]->evaluate(xx, ret[cc][rr]);
-      }
-    }
-  } // ... jacobian_helper(...)
-
-  void jacobian_helper(const DomainType& xx, JacobianRangeType& ret, internal::ChooseVariant<1>) const
-  {
-    assert(gradients_[0].size() == dimRange);
-    for (size_t rr = 0; rr < dimRange; ++rr) {
-      gradients_[0][rr]->evaluate(xx, ret[rr]);
-    }
-  } // ... jacobian_helper(..., ...< 1 >)
 
   template <size_t rC>
   static void get_expression_helper(const Common::Configuration& cfg,
