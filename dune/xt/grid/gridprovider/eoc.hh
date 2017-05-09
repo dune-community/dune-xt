@@ -73,7 +73,13 @@ public:
     return reference_level_;
   }
 
-  typename BaseType::LevelGridViewType reference_grid_view() const
+  template <Backends backend>
+  typename Layer<GridType, Layers::level, backend>::type reference_layer() const
+  {
+    return this->template level<backend>(reference_level_);
+  }
+
+  typename Layer<GridType, Layers::level, Backends::view>::type reference_grid_view() const
   {
     return this->level_view(reference_level_);
   }
