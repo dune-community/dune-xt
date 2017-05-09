@@ -9,6 +9,10 @@
 #   Rene Milk       (2016)
 #   Tobias Leibner  (2016)
 
+set(lib_dune_xt_grid_sources boundaryinfo/interfaces.cc)
+dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
+add_dune_alberta_flags(GRIDDIM 1 SOURCE_ONLY dunextgrid)
+
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 add_subdirectory(test EXCLUDE_FROM_ALL )
 
@@ -26,3 +30,4 @@ if(dune-pybindxi_FOUND)
     add_custom_target(bindings DEPENDS _grid)
   endif()
 endif()
+

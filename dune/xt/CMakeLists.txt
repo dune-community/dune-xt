@@ -9,9 +9,5 @@
 #   Rene Milk       (2016)
 #   Tobias Leibner  (2016)
 
-set(lib_dune_xt_grid_sources grid/boundaryinfo/interfaces.cc)
-dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
-add_dune_alberta_flags(GRIDDIM 1 SOURCE_ONLY dunextgrid)
-
 add_subdirectory(grid)
 
