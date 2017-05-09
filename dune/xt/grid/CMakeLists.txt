@@ -9,7 +9,11 @@
 #   Rene Milk       (2016)
 #   Tobias Leibner  (2016)
 
-set(lib_dune_xt_grid_sources boundaryinfo/interfaces.cc)
+set(lib_dune_xt_grid_sources boundaryinfo/interfaces.cc
+                             walker.lib/alu_2d_simplex_conforming.cc
+                             walker.lib/yasp_1d_equidistant_offset.cc
+                             walker.lib/yasp_2d_equidistant_offset.cc
+                             walker.lib/yasp_3d_equidistant_offset.cc)
 dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
 add_dune_alberta_flags(GRIDDIM 1 SOURCE_ONLY dunextgrid)
 

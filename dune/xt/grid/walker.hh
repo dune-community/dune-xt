@@ -33,7 +33,8 @@
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/timedlogging.hh>
-
+#include <dune/xt/grid/dd/subdomains/grid.hh>
+#include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/type_traits.hh>
@@ -348,5 +349,42 @@ protected:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
+
+
+// begin: this is what we need for the lib
+
+#define _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, _type, _backend)                                                      \
+  _prefix class Dune::XT::Grid::Walker<typename Dune::XT::Grid::Layer<_GRID,                                           \
+                                                                      Dune::XT::Grid::Layers::_type,                   \
+                                                                      Dune::XT::Grid::Backends::_backend,              \
+                                                                      Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::type>
+
+#if HAVE_DUNE_FEM
+#define _DUNE_XT_GRID_WALKER_LIB_PART(_prefix, _GRID)                                                                  \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, part);                                                               \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, leaf, part);                                                                \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, adaptive_leaf, part);                                                       \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain, part);                                                        \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_coupling, part);                                               \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_boundary, part)
+#else
+#define _DUNE_XT_GRID_WALKER_LIB_PART(_prefix, _GRID)
+#endif
+
+#define DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID)                                                                        \
+  _DUNE_XT_GRID_WALKER_LIB_PART(_prefix, _GRID);                                                                       \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, view);                                                               \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, leaf, view)
+
+#if HAVE_DUNE_ALUGRID
+DUNE_XT_GRID_WALKER_LIB(extern template, ALU_2D_SIMPLEX_CONFORMING);
+#endif
+
+DUNE_XT_GRID_WALKER_LIB(extern template, YASP_1D_EQUIDISTANT_OFFSET);
+DUNE_XT_GRID_WALKER_LIB(extern template, YASP_2D_EQUIDISTANT_OFFSET);
+DUNE_XT_GRID_WALKER_LIB(extern template, YASP_3D_EQUIDISTANT_OFFSET);
+
+// end: this is what we need for the lib
+
 
 #endif // DUNE_XT_GRID_WALKER_HH
