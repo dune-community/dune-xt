@@ -46,9 +46,9 @@ enum class Backends
 
 enum class Layers
 {
-  level,
-  leaf,
   adaptive_leaf,
+  leaf,
+  level,
   dd_subdomain,
   dd_subdomain_coupling,
   dd_subdomain_boundary
