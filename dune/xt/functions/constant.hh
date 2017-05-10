@@ -269,6 +269,8 @@ private:
 
 
 // begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS
+
 
 #define _DUNE_XT_FUNCTIONS_CONSTANT_LIB(_p, _G, _R, _r, _rC)                                                           \
   _p class Dune::XT::Functions::                                                                                       \
@@ -301,6 +303,8 @@ private:
 
 DUNE_XT_FUNCTIONS_CONSTANT_LIB_ALL_GRIDS(extern template);
 
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 // end: this is what we need for the lib
 
 

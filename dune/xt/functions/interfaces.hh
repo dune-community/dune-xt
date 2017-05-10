@@ -841,6 +841,55 @@ struct is_localizable_function<F, false> : public std::false_type
 
 
 // begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS
+
+
+#if HAVE_DUNE_FEM
+#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_DD_SUBDOMAIN(_p, _G, _t, _b, _R, _r, _rC)                           \
+  _p void Dune::XT::Functions::LocalizableFunctionInterface<                                                           \
+      typename _G::template Codim<0>::Entity,                                                                          \
+      typename _G::ctype,                                                                                              \
+      _G::dimension,                                                                                                   \
+      _R,                                                                                                              \
+      _r,                                                                                                              \
+      _rC>::visualize(const typename Dune::XT::Grid::Layer<_G,                                                         \
+                                                           Dune::XT::Grid::Layers::_t,                                 \
+                                                           Dune::XT::Grid::Backends::_b,                               \
+                                                           Dune::XT::Grid::DD::SubdomainGrid<_G>>::type&,              \
+                      const std::string,                                                                               \
+                      const bool,                                                                                      \
+                      const VTK::OutputType) const
+#else
+#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_DD_SUBDOMAIN(_p, _G, _t, _b, _R, _r, _rC)
+#endif
+
+#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, _t, _b, _R, _r, _rC)                                        \
+  _p void Dune::XT::Functions::LocalizableFunctionInterface<typename _G::template Codim<0>::Entity,                    \
+                                                            typename _G::ctype,                                        \
+                                                            _G::dimension,                                             \
+                                                            _R,                                                        \
+                                                            _r,                                                        \
+                                                            _rC>::                                                     \
+      visualize(                                                                                                       \
+          const typename Dune::XT::Grid::Layer<_G, Dune::XT::Grid::Layers::_t, Dune::XT::Grid::Backends::_b>::type&,   \
+          const std::string,                                                                                           \
+          const bool,                                                                                                  \
+          const VTK::OutputType) const
+
+#if HAVE_DUNE_FEM
+#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_PART(_p, _G, _R, _r, _rC)                                           \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, adaptive_leaf, part, _R, _r, _rC);                                \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, leaf, part, _R, _r, _rC);                                         \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, level, part, _R, _r, _rC);                                        \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_DD_SUBDOMAIN(_p, _G, dd_subdomain, part, _R, _r, _rC)
+#else
+#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_PART(_p, _G, _R, _r, _rC)
+#endif
+
+#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_ALL_LAYERS(_p, _G, _R, _r, _rC)                                     \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_PART(_p, _G, _R, _r, _rC);                                                \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, leaf, view, _R, _r, _rC);                                         \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, level, view, _R, _r, _rC)
 
 #define _DUNE_XT_FUNCTIONS_INTERFACE_LIB(_p, _G, _R, _r, _rC)                                                          \
   _p class Dune::XT::Functions::LocalfunctionSetInterface<typename _G::template Codim<0>::Entity,                      \
@@ -856,7 +905,8 @@ struct is_localizable_function<F, false> : public std::false_type
                                                              _G::dimension,                                            \
                                                              _R,                                                       \
                                                              _r,                                                       \
-                                                             _rC>
+                                                             _rC>;                                                     \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_ALL_LAYERS(_p, _G, _R, _r, _rC)
 
 #if HAVE_DUNE_ALUGRID
 #define DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALU_2D(_p)                                                                     \
@@ -885,6 +935,8 @@ struct is_localizable_function<F, false> : public std::false_type
 
 DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALL_GRIDS(extern template);
 
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 // end: this is what we need for the lib
 
 
