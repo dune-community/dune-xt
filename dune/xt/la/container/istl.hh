@@ -816,4 +816,18 @@ struct MatrixAbstraction<LA::IstlRowMajorSparseMatrix<T>>
 } // namespace XT
 } // namespace Dune
 
+
+// begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+
+
+extern template class Dune::XT::LA::IstlDenseVector<double>;
+extern template class Dune::XT::LA::IstlRowMajorSparseMatrix<double>;
+// extern template std::ostream& operator<<(std::ostream&, const Dune::XT::LA::IstlRowMajorSparseMatrix<double>&);
+
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+// end: this is what we need for the lib
+
+
 #endif // DUNE_XT_LA_CONTAINER_ISTL_HH

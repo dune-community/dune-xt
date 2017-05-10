@@ -328,4 +328,16 @@ class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
 } // namespace XT
 } // namespace Dune
 
+
+// begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+
+
+extern template class Dune::XT::LA::Solver<Dune::XT::LA::IstlRowMajorSparseMatrix<double>>;
+
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+// end: this is what we need for the lib
+
+
 #endif // DUNE_XT_LA_SOLVER_ISTL_HH

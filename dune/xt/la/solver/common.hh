@@ -117,4 +117,16 @@ private:
 } // namespace XT
 } // namespace Dune
 
+
+// begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS
+
+
+extern template class Dune::XT::LA::Solver<Dune::XT::LA::CommonDenseMatrix<double>>;
+
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
+// end: this is what we need for the lib
+
+
 #endif // DUNE_XT_LA_SOLVER_COMMON_HH

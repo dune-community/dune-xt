@@ -986,4 +986,20 @@ struct MatrixAbstraction<LA::CommonSparseMatrix<T>>
 } // namespace XT
 } // namespace Dune
 
+
+// begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS
+
+
+extern template class Dune::XT::LA::CommonDenseVector<double>;
+extern template class Dune::XT::LA::CommonDenseMatrix<double>;
+extern template class Dune::XT::LA::CommonSparseMatrix<double>;
+// extern template void Dune::XT::LA::CommonSparseMatrix<double>::mv(const Dune::XT::LA::CommonDenseVector<double>&,
+//                                                                  Dune::XT::LA::CommonDenseVector<double>) const;
+
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
+// end: this is what we need for the lib
+
+
 #endif // DUNE_XT_LA_CONTAINER_COMMON_HH
