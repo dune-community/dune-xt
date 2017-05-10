@@ -18,33 +18,31 @@
 
 #include <dune/geometry/referenceelements.hh>
 
-#include <dune/grid/common/gridview.hh>
 #include <dune/xt/grid/rangegenerators.hh>
 
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
-
-#include <dune/xt/grid/entity.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace Grid {
 
-template <class GridViewType, int codim = 0>
+
+template <class GridLayerType, int codim = 0>
 class EntitySearchBase
 {
-  typedef typename GridViewType::Traits ViewTraits;
-  static_assert(std::is_base_of<GridView<ViewTraits>, GridViewType>::value,
-                "GridViewType has to be derived from GridView!");
+  static_assert(is_layer<GridLayerType>::value, "");
 
 public:
-  typedef typename ViewTraits::template Codim<codim>::Entity EntityType;
+  typedef extract_entity_t<GridLayerType> EntityType;
   typedef typename EntityType::Geometry::LocalCoordinate LocalCoordinateType;
   typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
   typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
 }; // class EntitySearchBase
+
 
 template <int codim>
 struct CheckInside
@@ -67,6 +65,7 @@ struct CheckInside
   }
 };
 
+
 template <>
 struct CheckInside<0>
 {
@@ -78,18 +77,18 @@ struct CheckInside<0>
   }
 };
 
-/** Provides a facility to search a given gridview for entities with arbitrary codim
+
+/** Provides a facility to search a given grid layer for entities with arbitrary codim
  * that contain a set of points. The search is "in-level", meaning no grid hierarchy
  * is used in the search. The search position iterator on the grid persists
  * between searches, reducing complexity of repeated searches on the grid.
  * \attention This makes it inherently not thread safe
 **/
-template <class GridViewType, int codim = 0>
-class EntityInlevelSearch : public EntitySearchBase<GridViewType>
+template <class GridLayerType, int codim = 0>
+class EntityInlevelSearch : public EntitySearchBase<GridLayerType>
 {
-  typedef EntitySearchBase<GridViewType, codim> BaseType;
-
-  typedef typename GridViewType::template Codim<codim>::Iterator IteratorType;
+  typedef EntitySearchBase<GridLayerType, codim> BaseType;
+  typedef typename extract_iterator<GridLayerType, codim>::type IteratorType;
 
 public:
   typedef typename BaseType::EntityVectorType EntityVectorType;
@@ -106,9 +105,9 @@ private:
   }
 
 public:
-  EntityInlevelSearch(const GridViewType& gridview)
-    : gridview_(gridview)
-    , it_last_(gridview_.template begin<codim>())
+  EntityInlevelSearch(const GridLayerType& grid_layer)
+    : grid_layer_(grid_layer)
+    , it_last_(grid_layer_.template begin<codim>())
   {
   }
 
@@ -119,8 +118,8 @@ public:
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points)
   {
-    const IteratorType begin = gridview_.template begin<codim>();
-    const IteratorType end = gridview_.template end<codim>();
+    const IteratorType begin = grid_layer_.template begin<codim>();
+    const IteratorType end = grid_layer_.template end<codim>();
     EntityVectorType ret(points.size());
     typename EntityVectorType::size_type idx(0);
     for (const auto& point : points) {
@@ -155,20 +154,20 @@ public:
   } // ... operator()
 
 private:
-  const GridViewType gridview_;
+  const GridLayerType grid_layer_;
   Common::PerThreadValue<IteratorType> it_last_;
 }; // class EntityInlevelSearch
+
 
 /** Like EntityInlevelSearch, but works also for grids where there is no iterator for the given
  * codimension (e.g. UGGrid for codim != dim && codim != 0)
  * \see EntityInlevelSearch
 **/
-template <class GridViewType, int codim = 0>
-class FallbackEntityInlevelSearch : public EntitySearchBase<GridViewType>
+template <class GridLayerType, int codim = 0>
+class FallbackEntityInlevelSearch : public EntitySearchBase<GridLayerType>
 {
-  typedef EntitySearchBase<GridViewType, codim> BaseType;
-
-  typedef typename GridViewType::template Codim<0>::Iterator IteratorType;
+  typedef EntitySearchBase<GridLayerType, codim> BaseType;
+  typedef typename extract_iterator<GridLayerType, 0>::type IteratorType;
 
 public:
   typedef typename BaseType::EntityVectorType EntityVectorType;
@@ -185,9 +184,9 @@ private:
   }
 
 public:
-  FallbackEntityInlevelSearch(const GridViewType& gridview)
-    : gridview_(gridview)
-    , it_last_(gridview_.template begin<0>())
+  FallbackEntityInlevelSearch(const GridLayerType& grid_layer)
+    : grid_layer_(grid_layer)
+    , it_last_(grid_layer_.template begin<0>())
   {
   }
 
@@ -198,8 +197,8 @@ public:
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points)
   {
-    const IteratorType begin = gridview_.template begin<0>();
-    const IteratorType end = gridview_.template end<0>();
+    const IteratorType begin = grid_layer_.template begin<0>();
+    const IteratorType end = grid_layer_.template end<0>();
     EntityVectorType ret(points.size());
     typename EntityVectorType::size_type idx(0);
     for (const auto& point : points) {
@@ -246,21 +245,22 @@ public:
   } // ... operator()
 
 private:
-  const GridViewType gridview_;
+  const GridLayerType grid_layer_;
   IteratorType it_last_;
 }; // class FallbackEntityInlevelSearch
 
-template <class GridViewType>
-class EntityHierarchicSearch : public EntitySearchBase<GridViewType>
-{
-  typedef EntitySearchBase<GridViewType> BaseType;
 
-  const GridViewType gridview_;
+template <class GridLayerType>
+class EntityHierarchicSearch : public EntitySearchBase<GridLayerType>
+{
+  typedef EntitySearchBase<GridLayerType> BaseType;
+
+  const GridLayerType grid_layer_;
   const int start_level_;
 
 public:
-  EntityHierarchicSearch(const GridViewType& gridview)
-    : gridview_(gridview)
+  EntityHierarchicSearch(const GridLayerType& grid_layer)
+    : grid_layer_(grid_layer)
     , start_level_(0)
   {
   }
@@ -270,8 +270,8 @@ public:
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points) const
   {
-    auto level = std::min(gridview_.grid().maxLevel(), start_level_);
-    auto range = elements(gridview_.grid().levelView(level));
+    auto level = std::min(grid_layer_.grid().maxLevel(), start_level_);
+    auto range = elements(grid_layer_.grid().levelView(level));
     return process(points, range);
   }
 
@@ -288,7 +288,7 @@ private:
       for (const auto& point : quad_points) {
         if (refElement.checkInside(geometry.local(point))) {
           // if I cannot descend further add this entity even if it's not my view
-          if (gridview_.grid().maxLevel() <= my_level || gridview_.contains(my_ent)) {
+          if (grid_layer_.grid().maxLevel() <= my_level || grid_layer_.contains(my_ent)) {
             ret.emplace_back(my_ent);
           } else {
             const auto h_end = my_ent.hend(my_level + 1);
@@ -304,17 +304,20 @@ private:
   }
 }; // class EntityHierarchicSearch
 
+
 template <class GV, int codim = 0>
 EntityInlevelSearch<GV, codim> make_entity_in_level_search(const GV& grid_view)
 {
   return EntityInlevelSearch<GV, codim>(grid_view);
 }
 
+
 template <class GV>
 EntityHierarchicSearch<GV> make_entity_hierarchic_search(const GV& grid_view)
 {
   return EntityHierarchicSearch<GV>(grid_view);
 }
+
 
 } // namespace Grid
 } // namespace XT

@@ -301,22 +301,23 @@ using extract_entity_t = typename extract_entity<T>::type;
 
 
 template <class T,
+          int c = 0,
           bool view = is_view<T>::value,
           bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
 struct extract_iterator : public std::false_type
 {
 };
 
-template <class T>
-struct extract_iterator<T, true, false>
+template <class T, int c>
+struct extract_iterator<T, c, true, false>
 {
-  typedef typename T::template Codim<0>::Iterator type;
+  typedef typename T::template Codim<c>::Iterator type;
 };
 
-template <class T>
-struct extract_iterator<T, false, true>
+template <class T, int c>
+struct extract_iterator<T, c, false, true>
 {
-  typedef typename T::template Codim<0>::IteratorType type;
+  typedef typename T::template Codim<c>::IteratorType type;
 };
 
 
