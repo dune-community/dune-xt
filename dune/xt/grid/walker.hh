@@ -352,6 +352,8 @@ protected:
 
 
 // begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS
+
 
 #define _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, _type, _backend)                                                      \
   _prefix class Dune::XT::Grid::Walker<typename Dune::XT::Grid::Layer<_GRID,                                           \
@@ -384,6 +386,8 @@ DUNE_XT_GRID_WALKER_LIB(extern template, YASP_1D_EQUIDISTANT_OFFSET);
 DUNE_XT_GRID_WALKER_LIB(extern template, YASP_2D_EQUIDISTANT_OFFSET);
 DUNE_XT_GRID_WALKER_LIB(extern template, YASP_3D_EQUIDISTANT_OFFSET);
 
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 // end: this is what we need for the lib
 
 

@@ -428,6 +428,8 @@ make_cube_dd_subdomains_grid(
 
 
 // begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS
+
 
 #if HAVE_DUNE_FEM
 #define _DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS_DD_SUBDOMAINS_GRID(_prefix, _GRID)                         \
@@ -468,6 +470,8 @@ DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(extern template, YASP_1D_EQUI
 DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(extern template, YASP_2D_EQUIDISTANT_OFFSET);
 DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(extern template, YASP_3D_EQUIDISTANT_OFFSET);
 
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 // end: this is what we need for the lib
 
 

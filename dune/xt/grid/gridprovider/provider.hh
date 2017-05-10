@@ -528,6 +528,8 @@ private:
 
 
 // begin: this is what we need for the lib
+#if DUNE_XT_WITH_PYTHON_BINDINGS
+
 
 #if HAVE_DUNE_FEM
 #define _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_DD_SUBDOMAIN(_prefix, _GRID, _type, _backend)                        \
@@ -599,6 +601,8 @@ DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(extern template, YASP_1D_EQUIDISTANT_OFFSET);
 DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(extern template, YASP_2D_EQUIDISTANT_OFFSET);
 DUNE_XT_GRID_PROVIDER_PROVIDER_LIB(extern template, YASP_3D_EQUIDISTANT_OFFSET);
 
+
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 // end: this is what we need for the lib
 
 
