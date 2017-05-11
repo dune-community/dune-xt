@@ -50,8 +50,8 @@ enum class Layers
   leaf,
   level,
   dd_subdomain,
-  dd_subdomain_coupling,
-  dd_subdomain_boundary
+  dd_subdomain_boundary,
+  dd_subdomain_coupling
 };
 
 
