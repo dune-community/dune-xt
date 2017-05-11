@@ -153,8 +153,7 @@ public:
    * std::vector< std::vector< std::string > to ExpressionStringVectorType and GradientStringVectorType, respectively.
    */
   template <typename std_str = std::string,
-            typename = typename std::enable_if<(std::is_same<std_str, std::string>::value) && (dimRangeCols == 1)
-                                               && sizeof(std_str)>::type>
+            typename = typename std::enable_if<(dimRangeCols == 1) && sizeof(std_str)>::type>
   ExpressionFunction(
       const std_str variable,
       const std::vector<std::string> expressions,
