@@ -39,6 +39,9 @@ class SubdomainGridPart;
 template <class GlobalGridPartImp>
 class SubdomainBoundaryGridPart;
 
+template <class GlobalGridPartImp>
+class SubdomainCouplingGridPart;
+
 
 template <class T>
 struct is_intersection : public std::false_type
@@ -164,6 +167,18 @@ struct is_dd_subdomain_boundary : public std::false_type
 template <class T>
 struct is_dd_subdomain_boundary<T, true>
     : public std::is_base_of<SubdomainBoundaryGridPart<typename T::GlobalGridPartType>, T>
+{
+};
+
+
+template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
+struct is_dd_subdomain_coupling : public std::false_type
+{
+};
+
+template <class T>
+struct is_dd_subdomain_coupling<T, true>
+    : public std::is_base_of<SubdomainCouplingGridPart<typename T::GlobalGridPartType>, T>
 {
 };
 
