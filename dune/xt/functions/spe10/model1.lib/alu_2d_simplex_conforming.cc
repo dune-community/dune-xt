@@ -9,7 +9,7 @@
 
 #if HAVE_DUNE_ALUGRID
 
-#include "../model1.hh"
+#include "../model1.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_SPE10_MODEL1_LIB_ALU_2D(template);

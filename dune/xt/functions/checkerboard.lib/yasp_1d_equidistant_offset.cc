@@ -7,7 +7,7 @@
 
 #include <config.h>
 
-#include "../checkerboard.hh"
+#include "../checkerboard.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_CHECKERBOARD_LIB_YASP_1D(template);

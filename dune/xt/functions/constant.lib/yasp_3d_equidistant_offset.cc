@@ -7,7 +7,7 @@
 
 #include <config.h>
 
-#include "../constant.hh"
+#include "../constant.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_CONSTANT_LIB_YASP_3D(template);

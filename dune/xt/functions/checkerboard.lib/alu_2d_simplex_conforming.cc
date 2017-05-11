@@ -9,7 +9,7 @@
 
 #if HAVE_DUNE_ALUGRID
 
-#include "../checkerboard.hh"
+#include "../checkerboard.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_CHECKERBOARD_LIB_ALU_2D(template);

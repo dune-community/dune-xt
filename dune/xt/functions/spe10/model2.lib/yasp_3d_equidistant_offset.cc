@@ -7,7 +7,7 @@
 
 #include <config.h>
 
-#include "../model2.hh"
+#include "../model2.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB_YASP_3D(template);

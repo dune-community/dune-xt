@@ -9,7 +9,7 @@
 
 #if HAVE_DUNE_ALUGRID
 
-#include "../interfaces.hh"
+#include "../interfaces.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_INTERFACE_LIB_ALU_2D(template);

@@ -9,7 +9,7 @@
 
 #if HAVE_DUNE_ALUGRID
 
-#include "../constant.hh"
+#include "../constant.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_CONSTANT_LIB_ALU_2D(template);

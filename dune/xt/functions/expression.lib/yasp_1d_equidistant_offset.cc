@@ -7,7 +7,7 @@
 
 #include <config.h>
 
-#include "../expression.hh"
+#include "../expression.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_EXPRESSION_LIB_YASP_1D(template);

@@ -7,7 +7,7 @@
 
 #include <config.h>
 
-#include "../interfaces.hh"
+#include "../interfaces.lib.hh"
 
 
 DUNE_XT_FUNCTIONS_INTERFACE_LIB_YASP_2D(template);

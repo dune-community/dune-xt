@@ -134,22 +134,7 @@ const Common::FieldVector<double, dim_domain>
 } // namespace Dune
 
 
-// begin: this is what we need for the lib
-#if DUNE_XT_WITH_PYTHON_BINDINGS
-
-
-#define _DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB(_p, _G, _R, _r, _rC)                                                       \
-  _p class Dune::XT::Functions::Spe10::                                                                                \
-      Model2Function<typename _G::template Codim<0>::Entity, typename _G::ctype, _G::dimension, _R, _r, _rC>
-
-#define DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB_YASP_3D(_p)                                                                 \
-  _DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB(_p, YASP_3D_EQUIDISTANT_OFFSET, double, 3, 3)
-
-DUNE_XT_FUNCTIONS_SPE10_MODEL2_LIB_YASP_3D(extern template);
-
-
-#endif // DUNE_XT_WITH_PYTHON_BINDINGS
-// end: this is what we need for the lib
+#include "model2.lib.hh"
 
 
 #endif // DUNE_XT_FUNCTIONS_SPE10_MODEL2_HH
