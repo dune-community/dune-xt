@@ -5,6 +5,7 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
+//   Felix Schindler (2017)
 
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_HH
 #define DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_HH
