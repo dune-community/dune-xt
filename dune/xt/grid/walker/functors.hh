@@ -5,8 +5,8 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2014, 2016)
-//   Rene Milk       (2014 - 2016)
+//   Felix Schindler (2014, 2016 - 2017)
+//   Rene Milk       (2014 - 2017)
 
 #ifndef DUNE_XT_GRID_WALKER_FUNCTORS_HH
 #define DUNE_XT_GRID_WALKER_FUNCTORS_HH

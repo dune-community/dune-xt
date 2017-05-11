@@ -6,8 +6,8 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Andreas Buhr    (2014)
-//   Felix Schindler (2014 - 2016)
-//   Rene Milk       (2014 - 2016)
+//   Felix Schindler (2014 - 2017)
+//   Rene Milk       (2014 - 2017)
 
 #ifndef DUNE_XT_GRID_LAYERS_HH
 #define DUNE_XT_GRID_LAYERS_HH

@@ -6,6 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017)
+//   Rene Milk       (2017)
 
 #ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_ENTITY_ITERATOR_HH
 #define DUNE_XT_GRID_VIEW_SUBDOMAIN_ENTITY_ITERATOR_HH
