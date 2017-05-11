@@ -51,33 +51,11 @@
 #include <dune/xt/grid/view/from-part.hh>
 #include <dune/xt/grid/type_traits.hh>
 
+#include "type_traits.hh"
+
 namespace Dune {
 namespace XT {
 namespace Functions {
-namespace internal {
-
-template <class F>
-struct is_localizable_function_helper
-{
-  DXTC_has_typedef_initialize_once(EntityType);
-  DXTC_has_typedef_initialize_once(DomainFieldType);
-  DXTC_has_typedef_initialize_once(RangeFieldType);
-  DXTC_has_static_member_initialize_once(dimDomain);
-  DXTC_has_static_member_initialize_once(dimRange);
-  DXTC_has_static_member_initialize_once(dimRangeCols);
-
-  static const bool is_candidate =
-      DXTC_has_typedef(EntityType)<F>::value && DXTC_has_typedef(DomainFieldType)<F>::value
-      && DXTC_has_typedef(RangeFieldType)<F>::value && DXTC_has_static_member(dimDomain)<F>::value
-      && DXTC_has_static_member(dimRange)<F>::value && DXTC_has_static_member(dimRangeCols)<F>::value;
-}; // class is_localizable_function_helper
-
-} // namespace internal
-
-// forwards, includes are below
-template <class F, bool candidate = internal::is_localizable_function_helper<F>::is_candidate>
-struct is_localizable_function;
-
 namespace internal {
 
 // additional argument for member functions to differentiate between dimRangeCols = 1 and dimRangeCols > 1 by
@@ -325,9 +303,6 @@ public:
   /* @} */
 }; // class LocalfunctionInterface
 
-class IsLocalizableFunction
-{
-};
 
 /**
  * \brief Interface for functions which provide a LocalfunctionInterface for an entity.
@@ -338,7 +313,7 @@ template <class EntityImp,
           class RangeFieldImp,
           size_t rangeDim,
           size_t rangeDimCols = 1>
-class LocalizableFunctionInterface : public IsLocalizableFunction
+class LocalizableFunctionInterface
 {
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       ThisType;
@@ -814,22 +789,6 @@ struct FunctionTypeGenerator
       type;
 };
 
-template <class F>
-struct is_localizable_function<F, true>
-    : public std::is_base_of<LocalizableFunctionInterface<typename F::EntityType,
-                                                          typename F::DomainFieldType,
-                                                          F::dimDomain,
-                                                          typename F::RangeFieldType,
-                                                          F::dimRange,
-                                                          F::dimRangeCols>,
-                             F>
-{
-};
-
-template <class F>
-struct is_localizable_function<F, false> : public std::false_type
-{
-};
 
 } // namespace Functions
 } // namespace XT
