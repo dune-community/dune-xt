@@ -445,6 +445,82 @@ struct isConforming<XT::Grid::SubdomainGridPart<GridPartType>>
 };
 
 
+template <class GridPartType>
+struct hasGrid<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
+{
+  static const bool v = hasGrid<GridPartType>::v;
+};
+
+template <class GridPartType>
+struct hasSingleGeometryType<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
+{
+  static const bool v = hasSingleGeometryType<GridPartType>::v;
+  static const unsigned int topologyId = hasSingleGeometryType<GridPartType>::topologyId;
+};
+
+template <class GridPartType>
+struct isCartesian<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
+{
+  static const bool v = isCartesian<GridPartType>::v;
+};
+
+template <class GridPartType, int codim>
+struct hasEntity<XT::Grid::SubdomainCouplingGridPart<GridPartType>, codim>
+{
+  static const bool v = hasEntity<GridPartType, codim>::v;
+};
+
+template <class GridPartType, int codim>
+struct canCommunicate<XT::Grid::SubdomainCouplingGridPart<GridPartType>, codim>
+{
+  static const bool v = false;
+};
+
+template <class GridPartType>
+struct isConforming<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
+{
+  static const bool v = false;
+};
+
+
+template <class GridPartType>
+struct hasGrid<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
+{
+  static const bool v = hasGrid<GridPartType>::v;
+};
+
+template <class GridPartType>
+struct hasSingleGeometryType<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
+{
+  static const bool v = hasSingleGeometryType<GridPartType>::v;
+  static const unsigned int topologyId = hasSingleGeometryType<GridPartType>::topologyId;
+};
+
+template <class GridPartType>
+struct isCartesian<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
+{
+  static const bool v = isCartesian<GridPartType>::v;
+};
+
+template <class GridPartType, int codim>
+struct hasEntity<XT::Grid::SubdomainBoundaryGridPart<GridPartType>, codim>
+{
+  static const bool v = hasEntity<GridPartType, codim>::v;
+};
+
+template <class GridPartType, int codim>
+struct canCommunicate<XT::Grid::SubdomainBoundaryGridPart<GridPartType>, codim>
+{
+  static const bool v = false;
+};
+
+template <class GridPartType>
+struct isConforming<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
+{
+  static const bool v = false;
+};
+
+
 } // namespace GridPartCapabilities
 } // namespace Fem
 
