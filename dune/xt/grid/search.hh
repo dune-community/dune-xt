@@ -24,6 +24,7 @@
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
+#include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
