@@ -37,37 +37,37 @@ namespace Functions {
 
 
 /**
- * \brief Allows to reinterpret a given LocalizableFunctionInterface, associated with a given grid view, on a different
- *        grid view.
+ * \brief Allows to reinterpret a given LocalizableFunctionInterface, associated with a given grid layer, on a different
+ *        grid layer.
  *
- *        Therefore, we search for the correct entity in the original grid view and use the corresponding local_function
- *        to provide an evaluation for a point on the new grid view. The physical domain covered by the new grid view
- *        should thus be contained in the physical domain of the original grid view. This is mainly used in the
- *        context of prolongation.
+ *        Therefore, we search for the correct entity in the original grid layer and use the corresponding
+ *        local_function to provide an evaluation for a point on the new grid layer. The physical domain covered by the
+ *        new grid layer should thus be contained in the physical domain of the original grid layer. This is mainly used
+ *        in the context of prolongations.
  *
  * \note  The current implementation is not thread safe (due to the entity search).
  *
  * \note  There is no way to reliably obtain the local polynomial order of the source, and we thus use the order of the
  *        local_function corresponding to the first entity.
  */
-template <class SourceType, class GridViewType>
-class ReinterpretFunction : public LocalizableFunctionInterface<typename XT::Grid::Entity<GridViewType>::type,
-                                                                typename GridViewType::ctype,
-                                                                GridViewType::dimension,
+template <class SourceType, class GridLayerType>
+class ReinterpretFunction : public LocalizableFunctionInterface<XT::Grid::extract_entity_t<GridLayerType>,
+                                                                typename GridLayerType::ctype,
+                                                                GridLayerType::dimension,
                                                                 typename SourceType::RangeFieldType,
                                                                 SourceType::dimRange,
                                                                 SourceType::dimRangeCols>
 {
   static_assert(is_localizable_function<SourceType>::value, "");
-  static_assert(Grid::is_layer<GridViewType>::value, "");
-  typedef LocalizableFunctionInterface<typename XT::Grid::Entity<GridViewType>::type,
-                                       typename GridViewType::ctype,
-                                       GridViewType::dimension,
+  static_assert(Grid::is_layer<GridLayerType>::value, "");
+  typedef LocalizableFunctionInterface<XT::Grid::extract_entity_t<GridLayerType>,
+                                       typename GridLayerType::ctype,
+                                       GridLayerType::dimension,
                                        typename SourceType::RangeFieldType,
                                        SourceType::dimRange,
                                        SourceType::dimRangeCols>
       BaseType;
-  typedef ReinterpretFunction<SourceType, GridViewType> ThisType;
+  typedef ReinterpretFunction<SourceType, GridLayerType> ThisType;
 
 public:
   using typename BaseType::EntityType;
@@ -98,12 +98,12 @@ private:
     {
     }
 
-    virtual size_t order() const override final
+    size_t order() const override final
     {
       return order_;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+    void evaluate(const DomainType& xx, RangeType& ret) const override final
     {
       points_[0] = this->entity().geometry().global(xx);
       const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);
@@ -116,7 +116,7 @@ private:
       source_local_function->evaluate(source_entity.geometry().local(points_[0]), ret);
     } // ... evaluate(...)
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const
+    void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
     {
       points_[0] = this->entity().geometry().global(xx);
       const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);
@@ -141,11 +141,11 @@ public:
     return BaseType::static_id() + ".reinterpret";
   }
 
-  ReinterpretFunction(const SourceType& source, const GridViewType& source_grid_view)
+  ReinterpretFunction(const SourceType& source, const GridLayerType& source_grid_layer)
     : source_(source)
-    , source_grid_view_(source_grid_view)
-    , entity_search_(source_grid_view_)
-    , guessed_source_order_(source_.local_function(*source_grid_view_.template begin<0>())->order())
+    , source_grid_layer_(source_grid_layer)
+    , entity_search_(source_grid_layer_)
+    , guessed_source_order_(source_.local_function(*source_grid_layer_.template begin<0>())->order())
   {
   }
 
@@ -170,8 +170,8 @@ private:
   friend class ReinterpretLocalfunction;
 
   const SourceType& source_;
-  const GridViewType& source_grid_view_;
-  mutable XT::Grid::EntityInlevelSearch<GridViewType> entity_search_;
+  const GridLayerType& source_grid_layer_;
+  mutable XT::Grid::EntityInlevelSearch<GridLayerType> entity_search_;
   const size_t guessed_source_order_;
 }; // class ReinterpretFunction
 
