@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/exceptions.bindings.hh>
 
 #include <dune/common/parallel/mpihelper.hh>
 
@@ -45,6 +45,8 @@ PYBIND11_PLUGIN(_la)
   namespace LA = Dune::XT::LA;
 
   py::module m("_la", "dune-xt-la");
+
+  Dune::XT::Common::bindings::addbind_exceptions(m);
 
   py::module::import("dune.xt.common");
 
