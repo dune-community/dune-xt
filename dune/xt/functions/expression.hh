@@ -197,7 +197,9 @@ public:
     build_gradients(variable, gradient_expressions);
   }
 
+#if !DUNE_XT_WITH_PYTHON_BINDINGS
   ExpressionFunction(const ThisType& other) = default;
+#endif
 
   ThisType& operator=(const ThisType& other)
   {

@@ -211,7 +211,9 @@ public:
   {
   }
 
+#if !DUNE_XT_WITH_PYTHON_BINDINGS
   ConstantFunction(const ThisType& other) = default;
+#endif
 
   virtual std::string type() const override final
   {

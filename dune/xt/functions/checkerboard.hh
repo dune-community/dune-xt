@@ -195,11 +195,12 @@ public:
                  "values too small (is " << values_->size() << ", should be " << totalSubdomains << ")");
   } // Checkerboard(...)
 
+#if !DUNE_XT_WITH_PYTHON_BINDINGS
   CheckerboardFunction(const ThisType& other) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
-
   ThisType& operator=(ThisType&& source) = delete;
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 
   virtual std::string type() const override
   {
