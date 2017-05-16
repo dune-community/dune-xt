@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/exceptions.bindings.hh>
 
 #include <dune/common/parallel/mpihelper.hh>
 
@@ -80,6 +80,8 @@ PYBIND11_PLUGIN(_grid)
   using namespace pybind11::literals;
 
   py::module m("_grid", "dune-xt-grid");
+
+  Dune::XT::Common::bindings::addbind_exceptions(m);
 
   py::module::import("dune.xt.common");
 
