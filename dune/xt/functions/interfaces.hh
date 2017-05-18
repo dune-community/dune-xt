@@ -766,20 +766,6 @@ public:
   /* @} */
 };
 
-//! Utility to generate a complete Function Type from an existing one and a template
-template <class FunctionImp, template <class, class, size_t, class, size_t, size_t> class OutTemplate>
-struct FunctionTypeGenerator
-{
-  typedef OutTemplate<typename FunctionImp::EntityType,
-                      typename FunctionImp::DomainFieldType,
-                      FunctionImp::dimDomain,
-                      typename FunctionImp::RangeFieldType,
-                      FunctionImp::dimRange,
-                      FunctionImp::dimRangeCols>
-      type;
-};
-
-
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
