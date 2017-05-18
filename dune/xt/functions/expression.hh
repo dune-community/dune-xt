@@ -14,6 +14,7 @@
 #define DUNE_XT_FUNCTIONS_EXPRESSION_HH
 
 #include "expression/default.hh"
+#include "expression/parametric.hh"
 #include "expression/timedependent.hh"
 #include "expression.lib.hh"
 
