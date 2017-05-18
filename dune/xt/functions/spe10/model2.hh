@@ -21,7 +21,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include <dune/xt/functions/global.hh>
+#include <dune/xt/functions/interfaces/global-function.hh>
 
 namespace Dune {
 namespace XT {

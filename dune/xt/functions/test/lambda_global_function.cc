@@ -15,7 +15,7 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/grid/grids.hh>
-#include <dune/xt/functions/global.hh>
+#include <dune/xt/functions/lambda/global-function.hh>
 #include <dune/xt/functions/interfaces.hh>
 
 #include "functions.hh"
