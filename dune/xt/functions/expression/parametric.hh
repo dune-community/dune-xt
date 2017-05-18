@@ -114,15 +114,19 @@ public:
   void
   evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    if (!param_type_.empty() && mu.type() != param_type_)
-      DUNE_THROW(Common::Exceptions::parameter_error,
-                 "parameter_type(): " << param_type_ << "\n   "
-                                      << "mu.type(): "
-                                      << mu.type());
+    Common::Parameter parsed_mu;
+    if (!param_type_.empty()) {
+      parsed_mu = this->parse_parameter(mu);
+      if (parsed_mu.type() != param_type_)
+        DUNE_THROW(Common::Exceptions::parameter_error,
+                   "parameter_type(): " << param_type_ << "\n   "
+                                        << "mu.type(): "
+                                        << mu.type());
+    }
     DynamicVector<D> args(num_parameter_variables_ + dimDomain);
     size_t II = 0;
     for (const auto& key : param_type_.keys()) {
-      for (const auto& value : mu.get(key)) {
+      for (const auto& value : parsed_mu.get(key)) {
         args[II] = value;
         ++II;
       }
