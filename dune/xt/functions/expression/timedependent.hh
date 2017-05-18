@@ -10,6 +10,8 @@
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_TIMEDEPENDENT_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_TIMEDEPENDENT_HH
 
+#include <dune/common/deprecated.hh>
+
 #include "default.hh"
 
 namespace Dune {
@@ -24,13 +26,14 @@ template <class EntityImp,
           size_t rangeDim,
           size_t rangeDimCols = 1,
           class TimeFieldImp = double>
-class TimeDependentExpressionFunction : TimeDependentFunctionInterface<ExpressionFunction<EntityImp,
-                                                                                          DomainFieldImp,
-                                                                                          domainDim,
-                                                                                          RangeFieldImp,
-                                                                                          rangeDim,
-                                                                                          rangeDimCols>,
-                                                                       TimeFieldImp>
+class DUNE_DEPRECATED_MSG("Use ParametricExpressionFuntion instead (18.05.2017)!") TimeDependentExpressionFunction
+    : TimeDependentFunctionInterface<ExpressionFunction<EntityImp,
+                                                        DomainFieldImp,
+                                                        domainDim,
+                                                        RangeFieldImp,
+                                                        rangeDim,
+                                                        rangeDimCols>,
+                                     TimeFieldImp>
 {
   typedef TimeDependentExpressionFunction<EntityImp,
                                           DomainFieldImp,
