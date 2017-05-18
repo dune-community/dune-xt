@@ -120,14 +120,16 @@ public:
   }
 
   /**
-   * \defgroup haveto ´´These methods have to be implemented.''
-   * @{
+   * \name ´´These methods have to be implemented.''
+   * \{
    **/
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
-  /* @} */
+  /* \} */
 
-  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
-  /* @{ */
+  /**
+   * \name ´´These methods should be implemented in order to identify the function.''
+   * \{
+   */
   virtual std::string type() const
   {
     return "function";
@@ -137,7 +139,7 @@ public:
   {
     return "function";
   }
-  /* @} */
+  /* \} */
 
   DifferenceType operator-(const ThisType& other) const
   {

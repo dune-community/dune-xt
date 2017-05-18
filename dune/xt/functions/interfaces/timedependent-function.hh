@@ -28,14 +28,16 @@ public:
   }
 
   /**
-   * \defgroup haveto ´´These methods have to be implemented.''
-   * @{
+   * \name ´´These methods have to be implemented.''
+   * \{
    **/
   virtual std::unique_ptr<TimeIndependentFunctionType> evaluate_at_time(const TimeFieldType t) const = 0;
-  /* @} */
+  /* \} */
 
-  /** \defgroup info ´´These methods should be implemented in order to identify the function.'' */
-  /* @{ */
+  /**
+   * \name ´´These methods should be implemented in order to identify the function.''
+   * \{
+   */
   virtual std::string type() const
   {
     return "xt.functions.timedependentfunction";
@@ -45,7 +47,7 @@ public:
   {
     return "xt.functions.timedependentfunction";
   }
-  /* @} */
+  /* \} */
 };
 
 

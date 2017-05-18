@@ -89,8 +89,8 @@ public:
   }
 
   /**
-   * \defgroup haveto ´´These methods have to be implemented.''
-   * @{
+   * \name ´´These methods have to be implemented.''
+   * \{
    **/
   virtual size_t size() const = 0;
 
@@ -103,11 +103,11 @@ public:
   virtual void jacobian(const DomainType& /*xx*/,
                         std::vector<JacobianRangeType>& /*ret*/,
                         const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
-  /* @} */
+  /* \} */
 
   /**
-   * \defgroup provided ´´These methods are provided by the interface.''
-   * @{
+   * \name ´´These methods are provided by the interface.''
+   * \{
    **/
   std::vector<RangeType> evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
@@ -122,7 +122,7 @@ public:
     jacobian(xx, ret, mu);
     return ret;
   }
-  /* @} */
+  /* \} */
 
 protected:
   bool is_a_valid_point(const DomainType&
@@ -179,8 +179,8 @@ public:
   }
 
   /**
-   * \defgroup haveto ´´These methods have to be implemented in addition to the ones required from the BaseType.''
-   * @{
+   * \name ´´These methods have to be implemented in addition to the ones required from the BaseType.''
+   * \{
    **/
   virtual void evaluate(const DomainType& /*xx*/,
                         RangeType& /*ret*/,
@@ -189,11 +189,11 @@ public:
   virtual void jacobian(const DomainType& /*xx*/,
                         JacobianRangeType& /*ret*/,
                         const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
-  /* @} */
+  /* \} */
 
   /**
-   * \defgroup providedbase ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
-   * @{
+   * \name ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
+   * \{
    **/
   virtual size_t size() const override final
   {
@@ -215,11 +215,11 @@ public:
     assert(ret.size() >= 1);
     jacobian(xx, ret[0], mu);
   }
-  /* @} */
+  /* \} */
 
   /**
-   * \defgroup provided ´´These methods are provided by the interface.''
-   * @{
+   * \name ´´These methods are provided by the interface.''
+   * \{
    **/
   RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
@@ -256,7 +256,7 @@ public:
     for (const auto& point : quadrature)
       jacobian(point.position(), ret[i++], mu);
   }
-  /* @} */
+  /* \} */
 }; // class LocalfunctionInterface
 
 
