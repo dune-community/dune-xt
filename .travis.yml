@@ -1,13 +1,11 @@
 # This file is part of the dune-xt-la project:
 #   https://github.com/dune-community/dune-xt-la
-# Copyright 2009-2017 dune-xt-la developers and contributors. All rights reserved.
-# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
-#          with "runtime exception" (http://www.dune-project.org/license.html)
+# The copyright lies with the authors of this file (see below).
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 # Authors:
-#   Felix Schindler (2016 - 2017)
-#   Rene Milk       (2016 - 2017)
-#   Tobias Leibner  (2016)
+#   Felix Schindler (2015 - 2016)
+#   Rene Milk       (2015 - 2016)
+#   Tobias Leibner  (2015)
 
 sudo: required
 dist: trusty
@@ -15,9 +13,9 @@ language: generic
 services: docker
 
 before_script:
-    - export IMAGE="dunecommunity/${MY_MODULE}-testing:${DOCKER_TAG}_${TRAVIS_BRANCH}"
+    - export IMAGE="dunecommunity/${MY_MODULE}-testing_${DOCKER_TAG}:${TRAVIS_BRANCH}"
     # get image with fallback to master branch of the super repo
-    - docker pull ${IMAGE} || export IMAGE="dunecommunity/${MY_MODULE}-testing:${DOCKER_TAG}_master" ; docker pull ${IMAGE}
+    - docker pull ${IMAGE} || export IMAGE="dunecommunity/${MY_MODULE}-testing_${DOCKER_TAG}:master" ; docker pull ${IMAGE}
     - export ENV_FILE=${HOME}/env
     - printenv | \grep TRAVIS > ${ENV_FILE}
     - printenv | \grep encrypt >> ${ENV_FILE}
@@ -51,10 +49,7 @@ env:
 
 matrix:
   include:
-    - env: DOCKER_TAG=gcc-6_full
-    - env: DOCKER_TAG=gcc-6_no_istl_no_disc
-    - env: DOCKER_TAG=gcc-6_no_disc
-    - env: DOCKER_TAG=clang-3.8_full
-
-    #- env: OPTS=config.opts/travis.make BUILD_CMD="make -k -j2" CXX=clang++-3.8 CC=clang-3.8 MODULES_TO_DELETE=" with-make"
-
+    - env: DOCKER_TAG=gcc_full
+    - env: DOCKER_TAG=gcc_no_istl_no_disc
+    - env: DOCKER_TAG=gcc_no_disc
+    - env: DOCKER_TAG=clang_full
