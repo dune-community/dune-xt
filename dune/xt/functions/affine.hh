@@ -156,18 +156,60 @@ public:
     return 1;
   }
 
+private:
+  template <bool is_not_tensor = (rangeDimCols == 1), bool anything = true>
+  struct helper
+  {
+    static void evaluate(
+        const std::vector<MatrixType>& A, const RangeType& b, const bool b_zero, const DomainType& x, RangeType& ret)
+    {
+      A[0].mv(x, ret);
+      if (!b_zero)
+        ret += b;
+    }
+
+    static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
+    {
+      ret = A[0].operator FieldMatrixType();
+    }
+  }; // struct helper<true, ...>
+
+  template <bool anything>
+  struct helper<false, anything>
+  {
+    static void evaluate(
+        const std::vector<MatrixType>& A, const RangeType& b, const bool b_zero, const DomainType& x, RangeType& ret)
+    {
+      for (size_t cc = 0; cc < rangeDimCols; ++cc) {
+        Dune::FieldVector<RangeFieldType, dimRange> tmp_col;
+        A[cc].mv(x, tmp_col);
+        for (size_t rr = 0; rr < dimRange; ++rr)
+          ret[rr][cc] = tmp_col[rr];
+      }
+      if (!b_zero)
+        ret += b;
+    }
+
+    static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
+    {
+      for (size_t cc = 0; cc < rangeDimCols; ++cc)
+        ret[cc] = A[cc].operator FieldMatrixType();
+    }
+  }; // struct helper<false, ...>
+
+public:
   using BaseType::evaluate;
 
   virtual void evaluate(const DomainType& x, RangeType& ret) const override final
   {
-    evaluate_helper(x, ret, internal::ChooseVariant<dimRangeCols>());
+    helper<>::evaluate(A_, b_, b_zero_, x, ret);
   }
 
   using BaseType::jacobian;
 
   virtual void jacobian(const DomainType& x, JacobianRangeType& ret) const override final
   {
-    jacobian_helper(x, ret, internal::ChooseVariant<dimRangeCols>());
+    helper<>::jacobian(A_, ret);
   }
 
   virtual std::string name() const override final
@@ -176,38 +218,6 @@ public:
   }
 
 private:
-  template <size_t rC>
-  void evaluate_helper(const DomainType& x, RangeType& ret, const internal::ChooseVariant<rC>) const
-  {
-    for (size_t cc = 0; cc < rC; ++cc) {
-      Dune::FieldVector<RangeFieldType, dimRange> tmp_col;
-      A_[cc].mv(x, tmp_col);
-      for (size_t rr = 0; rr < dimRange; ++rr)
-        ret[rr][cc] = tmp_col[rr];
-    }
-    if (!b_zero_)
-      ret += b_;
-  }
-
-  void evaluate_helper(const DomainType& x, RangeType& ret, const internal::ChooseVariant<1>) const
-  {
-    A_[0].mv(x, ret);
-    if (!b_zero_)
-      ret += b_;
-  }
-
-  template <size_t rC>
-  void jacobian_helper(const DomainType& /*x*/, JacobianRangeType& ret, const internal::ChooseVariant<rC>) const
-  {
-    for (size_t cc = 0; cc < rC; ++cc)
-      ret[cc] = A_[cc].operator FieldMatrixType();
-  }
-
-  void jacobian_helper(const DomainType& /*x*/, JacobianRangeType& ret, const internal::ChooseVariant<1>) const
-  {
-    ret = A_[0].operator FieldMatrixType();
-  }
-
   std::vector<MatrixType> A_;
   RangeType b_;
   bool b_zero_;

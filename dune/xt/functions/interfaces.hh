@@ -56,16 +56,6 @@
 namespace Dune {
 namespace XT {
 namespace Functions {
-namespace internal {
-
-// additional argument for member functions to differentiate between dimRangeCols = 1 and dimRangeCols > 1 by
-// overloading
-template <size_t rangeDimCols>
-struct ChooseVariant
-{
-};
-
-} // namespace internal
 
 
 template <class GridViewType, size_t dimRange, size_t dimRangeCols = 1>

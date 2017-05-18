@@ -31,6 +31,18 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+
+// forward, needed for friendliness
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
+          size_t rangeDimCols,
+          class TimeFieldImp>
+class TimeDependentExpressionFunction;
+
+
 template <class EntityImp,
           class DomainFieldImp,
           size_t domainDim,
@@ -89,14 +101,13 @@ public:
     ExpressionStringVectorType expression_as_vectors;
     // try to get expression as FieldVector (if dimRangeCols == 1) or as FieldMatrix (else)
     try {
-      get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
+      get_helper<>::get_expression(cfg, expression_as_vectors);
     } catch (std::exception) {
       // if dimRangeCols == 1 and we could not get expression as FieldVector, get it as FieldMatrix with one col
-      if (dimRangeCols == 1) { // the 2 in ChooseVariant is here on purpose, anything > 1 will suffice
-        get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<2>());
-      } else { // if dimRangeCols > 1 do the same again (to throw exception without catching it)
-        get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
-      }
+      if (dimRangeCols == 1) { // the 2 here is on purpose, anything > 1 will suffice
+        get_helper<2>::get_expression(cfg, expression_as_vectors);
+      } else
+        std::rethrow_exception(std::current_exception());
     }
     // get gradient
     GradientStringVectorType gradient_as_vectors;
@@ -229,7 +240,7 @@ public:
 
 private:
   template <bool is_not_tensor = (rangeDimCols == 1), bool anything = true>
-  struct helper
+  struct eval_helper
   {
     static void
     evaluate(const std::shared_ptr<const MathExpressionFunctionType>& func,
@@ -249,10 +260,10 @@ private:
         gradients[0][rr]->evaluate(xx, ret[rr]);
       }
     }
-  }; // struct helper<true, ...>
+  }; // struct evap_helper<true, ...>
 
   template <bool anything>
-  struct helper<false, anything>
+  struct eval_helper<false, anything>
   {
     static void
     evaluate(const std::shared_ptr<const MathExpressionFunctionType>& func,
@@ -279,14 +290,14 @@ private:
         }
       }
     } // ... jacobian(...)
-  }; // struct helper<false, ...>
+  }; // struct eval_helper<false, ...>
 
 public:
   using BaseType::evaluate;
 
   virtual void evaluate(const DomainType& xx, RangeType& ret) const override
   {
-    helper<>::evaluate(function_, tmp_vector_, xx, ret);
+    eval_helper<>::evaluate(function_, tmp_vector_, xx, ret);
 #ifndef NDEBUG
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
@@ -336,7 +347,7 @@ public:
       DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
     } else {
       assert(gradients_.size() == dimRangeCols);
-      helper<>::jacobian(gradients_, xx, ret);
+      eval_helper<>::jacobian(gradients_, xx, ret);
     }
   } // ... jacobian(...)
 
@@ -372,34 +383,38 @@ private:
     }
   } // ... build_gradients(...)
 
-  template <size_t rC>
-  static void get_expression_helper(const Common::Configuration& cfg,
-                                    ExpressionStringVectorType& expression_as_vectors,
-                                    internal::ChooseVariant<rC>)
+  template <size_t cols = rangeDimCols, bool anything = false>
+  struct get_helper
   {
-    typedef typename Dune::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
-    const ExpressionMatrixType expression_as_matrix = cfg.get<ExpressionMatrixType>("expression");
-    // convert FieldMatrix to ExpressionStringVectorType
-    for (size_t rr = 0; rr < dimRange; ++rr) {
-      std::vector<std::string> expression_row;
-      for (size_t cc = 0; cc < dimRangeCols; ++cc)
-        expression_row.emplace_back(expression_as_matrix[rr][cc]);
-      expression_as_vectors.emplace_back(expression_row);
+    static void get_expression(const Common::Configuration& cfg, ExpressionStringVectorType& expression_as_vectors)
+    {
+      typedef typename Dune::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
+      const ExpressionMatrixType expression_as_matrix =
+          cfg.get<ExpressionMatrixType>("expression", dimRange, dimRangeCols);
+      // convert FieldMatrix to ExpressionStringVectorType
+      for (size_t rr = 0; rr < dimRange; ++rr) {
+        std::vector<std::string> expression_row;
+        for (size_t cc = 0; cc < dimRangeCols; ++cc)
+          expression_row.emplace_back(expression_as_matrix[rr][cc]);
+        expression_as_vectors.emplace_back(expression_row);
+      }
     }
-  } // ... get_expression_helper(...)
+  }; // struct get_helper
 
-  static void get_expression_helper(const Common::Configuration& cfg,
-                                    ExpressionStringVectorType& expression_as_vectors,
-                                    internal::ChooseVariant<1>)
+  template <bool anything>
+  struct get_helper<1, anything>
   {
-    typedef typename Dune::FieldVector<std::string, dimRange> ExpressionVectorType;
-    const ExpressionVectorType expression_as_vector = cfg.get<ExpressionVectorType>("expression");
-    // convert Vector to ExpressionStringVectorType
-    for (size_t rr = 0; rr < dimRange; ++rr) {
-      std::vector<std::string> expression_row(1, expression_as_vector[rr]);
-      expression_as_vectors.emplace_back(expression_row);
+    static void get_expression(const Common::Configuration& cfg, ExpressionStringVectorType& expression_as_vectors)
+    {
+      typedef typename Dune::FieldVector<std::string, dimRange> ExpressionVectorType;
+      const ExpressionVectorType expression_as_vector = cfg.get<ExpressionVectorType>("expression");
+      // convert Vector to ExpressionStringVectorType
+      for (size_t rr = 0; rr < dimRange; ++rr) {
+        std::vector<std::string> expression_row(1, expression_as_vector[rr]);
+        expression_as_vectors.emplace_back(expression_row);
+      }
     }
-  } // ... get_expression_helper(..., ...< 1 >)
+  }; // struct get_helper<1, ...>
 
   static void get_gradient(const Common::Configuration& cfg,
                            GradientStringVectorType& gradient_as_vectors,
@@ -425,6 +440,9 @@ private:
     }
   } // ... get_gradient(...)
 
+  template <class _E, class _D, size_t _d, class _R, size_t _r, size_t _rC, class _T>
+  friend class TimeDependentExpressionFunction;
+
   std::shared_ptr<const MathExpressionFunctionType> function_;
   size_t order_;
   std::string name_;
@@ -432,6 +450,7 @@ private:
   mutable typename Common::PerThreadValue<FieldVector<RangeFieldType, dimRangeCols>> tmp_row_;
   std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
 }; // class ExpressionFunction
+
 
 template <class EntityImp,
           class DomainFieldImp,
@@ -508,14 +527,13 @@ public:
     ExpressionStringVectorType expression_as_vectors;
     // try to get expression as FieldVector (if dimRangeCols == 1) or as FieldMatrix (else)
     try {
-      get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
+      ExpressionFunctionType::template get_helper<>::get_expression(cfg, expression_as_vectors);
     } catch (std::exception) {
       // if dimRangeCols == 1 and we could not get expression as FieldVector, get it as FieldMatrix with one col
-      if (dimRangeCols == 1) {
-        get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<2>());
-      } else { // if dimRangeCols > 1 do the same again (to throw exception without catching it)
-        get_expression_helper(cfg, expression_as_vectors, internal::ChooseVariant<dimRangeCols>());
-      }
+      if (dimRangeCols == 1) { // the 2 here is on purpose, anything > 1 will suffice
+        ExpressionFunctionType::template get_helper<2>::get_expression(cfg, expression_as_vectors);
+      } else
+        std::rethrow_exception(std::current_exception());
     }
     // get gradient
     GradientStringVectorType gradient_as_vectors;
@@ -533,7 +551,6 @@ public:
                                          cfg.get("name", default_cfg.get<std::string>("name")),
                                          gradient_as_vectors);
   } // ... create(...)
-
 
   /**
    * \brief Creates a TimeDependentExpression function where every component is identical
@@ -654,37 +671,6 @@ private:
     source.swap(newString);
   } // ... replaceAll(...)
 
-  // the following and the create() methods are simply copied from Expression, TODO: remove code duplication
-  template <size_t rC>
-  static void get_expression_helper(const Common::Configuration& cfg,
-                                    ExpressionStringVectorType& expression_as_vectors,
-                                    internal::ChooseVariant<rC>)
-  {
-    typedef typename Dune::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
-    const ExpressionMatrixType expression_as_matrix =
-        cfg.get<ExpressionMatrixType>("expression", dimRange, dimRangeCols);
-    // convert FieldMatrix to ExpressionStringVectorType
-    for (size_t rr = 0; rr < dimRange; ++rr) {
-      std::vector<std::string> expression_row;
-      for (size_t cc = 0; cc < dimRangeCols; ++cc)
-        expression_row.emplace_back(expression_as_matrix[rr][cc]);
-      expression_as_vectors.emplace_back(expression_row);
-    }
-  } // ... get_expression_helper(...)
-
-  static void get_expression_helper(const Common::Configuration& cfg,
-                                    ExpressionStringVectorType& expression_as_vectors,
-                                    internal::ChooseVariant<1>)
-  {
-    typedef typename Dune::FieldVector<std::string, dimRange> ExpressionVectorType;
-    const ExpressionVectorType expression_as_vector = cfg.get<ExpressionVectorType>("expression");
-    // convert Vector to ExpressionStringVectorType
-    for (size_t rr = 0; rr < dimRange; ++rr) {
-      std::vector<std::string> expression_row(1, expression_as_vector[rr]);
-      expression_as_vectors.emplace_back(expression_row);
-    }
-  } // ... get_expression_helper(..., ...< 1 >)
-
   static void get_gradient(const Common::Configuration& cfg,
                            GradientStringVectorType& gradient_as_vectors,
                            const std::string first_gradient_key)
@@ -715,6 +701,7 @@ private:
   ExpressionStringVectorType expressions_;
   GradientStringVectorType gradient_expressions_;
 }; // class TimeDependentExpression
+
 
 } // namespace Functions
 } // namespace XT
