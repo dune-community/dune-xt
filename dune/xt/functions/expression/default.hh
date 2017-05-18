@@ -222,17 +222,17 @@ public:
     return *this;
   }
 
-  virtual std::string type() const override final
+  std::string type() const override final
   {
     return BaseType::static_id() + ".expression";
   }
 
-  virtual std::string name() const override
+  std::string name() const override final
   {
     return name_;
   }
 
-  virtual size_t order() const override
+  size_t order() const override final
   {
     return order_;
   }
@@ -294,8 +294,9 @@ private:
 public:
   using BaseType::evaluate;
 
-  virtual void
-  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = Common::Parameter()) const override
+  void evaluate(const DomainType& xx,
+                RangeType& ret,
+                const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     eval_helper<>::evaluate(function_, tmp_vector_, xx, ret);
 #ifndef NDEBUG
@@ -341,9 +342,9 @@ public:
 
   using BaseType::jacobian;
 
-  virtual void jacobian(const DomainType& xx,
-                        JacobianRangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override
+  void jacobian(const DomainType& xx,
+                JacobianRangeType& ret,
+                const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     if (gradients_.size() == 0) {
       DUNE_THROW(NotImplemented, "This function does not provide any gradients!");
