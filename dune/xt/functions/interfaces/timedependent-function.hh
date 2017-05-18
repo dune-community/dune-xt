@@ -4,13 +4,16 @@
 #include <memory>
 #include <string>
 
+#include <dune/common/deprecated.hh>
+
 namespace Dune {
 namespace XT {
 namespace Functions {
 
 
 template <class TimeIndependentFunctionImp, class TimeFieldImp = double>
-class TimeDependentFunctionInterface
+class DUNE_DEPRECATED_MSG("All functions are parametric by now, use '_t' as the parameter for time, see "
+                          "ParametricExpressionFunction! (18.05.2017)") TimeDependentFunctionInterface
 {
 public:
   typedef TimeIndependentFunctionImp TimeIndependentFunctionType;
