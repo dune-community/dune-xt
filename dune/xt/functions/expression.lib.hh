@@ -10,7 +10,7 @@
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_LIB_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_LIB_HH
 
-#include "expression.hh"
+#include "expression/default.hh"
 
 #if DUNE_XT_WITH_PYTHON_BINDINGS
 
