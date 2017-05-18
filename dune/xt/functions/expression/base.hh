@@ -228,6 +228,10 @@ private:
 }; // class MathExpressionBase
 
 
+/**
+ *  \brief      Base class that makes a function out of the stuff from mathexpr.hh
+ *  \attention  Most surely you do not want to use this class directly, but Functions::ParametricExpressionFunction!
+ */
 template <class D, class R, size_t r, size_t max_d = DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE>
 class DynamicMathExpressionBase
 {
@@ -277,7 +281,7 @@ public:
     return expressions_;
   }
 
-  void evaluate(const DynamicVector<DomainFieldType>& arg, DynamicVector<RangeFieldType>& ret) const
+  void evaluate(const DynamicVector<DomainFieldType>& arg, FieldVector<RangeFieldType, dimRange>& ret) const
   {
     std::lock_guard<std::mutex> guard(mutex_);
     // check for sizes
@@ -286,8 +290,6 @@ public:
                  "arg.size(): " << arg.size() << "\n   "
                                 << "variables.size(): "
                                 << original_variables_.size());
-    if (ret.size() < dimRange)
-      ret = Dune::DynamicVector<RangeFieldType>(dimRange);
     // copy arg
     for (size_t ii = 0; ii < original_variables_.size(); ++ii)
       *(arg_[ii]) = arg[ii];
