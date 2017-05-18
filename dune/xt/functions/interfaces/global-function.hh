@@ -50,24 +50,28 @@ public:
 
   virtual size_t order() const = 0;
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const = 0;
+  virtual void evaluate(const DomainType& /*xx*/,
+                        RangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
+  virtual void jacobian(const DomainType& /*x*/,
+                        JacobianRangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const
   {
     DUNE_THROW(NotImplemented, "This does not make sense yet for matrix-valued functions!");
   }
 
-  virtual RangeType evaluate(const DomainType& xx) const
+  virtual RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     RangeType ret;
-    evaluate(xx, ret);
+    evaluate(xx, ret, mu);
     return ret;
   }
 
-  virtual JacobianRangeType jacobian(const DomainType& xx) const
+  virtual JacobianRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     JacobianRangeType ret;
-    jacobian(xx, ret);
+    jacobian(xx, ret, mu);
     return ret;
   }
 
@@ -101,16 +105,20 @@ private:
     {
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+    virtual void evaluate(const DomainType& xx,
+                          RangeType& ret,
+                          const Common::Parameter& mu = Common::Parameter()) const override final
     {
       const auto xx_global = geometry_.global(xx);
-      global_function_.evaluate(xx_global, ret);
+      global_function_.evaluate(xx_global, ret, mu);
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
+    virtual void jacobian(const DomainType& xx,
+                          JacobianRangeType& ret,
+                          const Common::Parameter& mu = Common::Parameter()) const override final
     {
       const auto xx_global = geometry_.global(xx);
-      global_function_.jacobian(xx_global, ret);
+      global_function_.jacobian(xx_global, ret, mu);
     }
 
     virtual size_t order() const override final
@@ -195,24 +203,28 @@ public:
 
   virtual size_t order() const = 0;
 
-  virtual void evaluate(const DomainType& x, RangeType& ret) const = 0;
+  virtual void evaluate(const DomainType& /*x*/,
+                        RangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
-  virtual void jacobian(const DomainType& /*x*/, JacobianRangeType& /*ret*/) const
+  virtual void jacobian(const DomainType& /*x*/,
+                        JacobianRangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const
   {
     DUNE_THROW(NotImplemented, "You have to imlement it if you intend to use it!");
   }
 
-  virtual RangeType evaluate(const DomainType& xx) const
+  virtual RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     RangeType ret;
-    evaluate(xx, ret);
+    evaluate(xx, ret, mu);
     return ret;
   }
 
-  virtual JacobianRangeType jacobian(const DomainType& xx) const
+  virtual JacobianRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     JacobianRangeType ret;
-    jacobian(xx, ret);
+    jacobian(xx, ret, mu);
     return ret;
   }
 
@@ -242,16 +254,20 @@ private:
     {
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+    virtual void evaluate(const DomainType& xx,
+                          RangeType& ret,
+                          const Common::Parameter& mu = Common::Parameter()) const override final
     {
       const auto xx_global = geometry_.global(xx);
-      global_function_.evaluate(xx_global, ret);
+      global_function_.evaluate(xx_global, ret, mu);
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
+    virtual void jacobian(const DomainType& xx,
+                          JacobianRangeType& ret,
+                          const Common::Parameter& mu = Common::Parameter()) const override final
     {
       const auto xx_global = geometry_.global(xx);
-      global_function_.jacobian(xx_global, ret);
+      global_function_.jacobian(xx_global, ret, mu);
     }
 
     virtual size_t order() const override final
@@ -306,9 +322,11 @@ public:
     return function_.order();
   }
 
-  virtual void evaluate(const typename BaseType::DomainType& x, typename BaseType::RangeType& ret) const
+  virtual void evaluate(const typename BaseType::DomainType& x,
+                        typename BaseType::RangeType& ret,
+                        const Common::Parameter& mu = Common::Parameter()) const
   {
-    function_.evaluate(x, ret);
+    function_.evaluate(x, ret, mu);
   }
 
 private:

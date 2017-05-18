@@ -80,7 +80,7 @@ template <class EntityImp,
           class RangeFieldImp,
           size_t rangeDim,
           size_t rangeDimCols = 1>
-class LocalizableFunctionInterface
+class LocalizableFunctionInterface : public Common::ParametricInterface
 {
   typedef LocalizableFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
       ThisType;

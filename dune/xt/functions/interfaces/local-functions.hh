@@ -19,6 +19,8 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/geometry/referenceelements.hh>
 
+#include <dune/xt/common/parameter.hh>
+
 namespace Dune {
 namespace XT {
 namespace Functions {
@@ -33,7 +35,7 @@ template <class EntityImp,
           class RangeFieldImp,
           size_t rangeDim,
           size_t rangeDimCols = 1>
-class LocalfunctionSetInterface
+class LocalfunctionSetInterface : public Common::ParametricInterface
 {
   static_assert(EntityImp::dimension == domainDim, "Dimensions do not match!");
 
@@ -94,26 +96,30 @@ public:
 
   virtual size_t order() const = 0;
 
-  virtual void evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/) const = 0;
+  virtual void evaluate(const DomainType& /*xx*/,
+                        std::vector<RangeType>& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
-  virtual void jacobian(const DomainType& /*xx*/, std::vector<JacobianRangeType>& /*ret*/) const = 0;
+  virtual void jacobian(const DomainType& /*xx*/,
+                        std::vector<JacobianRangeType>& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
   /* @} */
 
   /**
    * \defgroup provided ´´These methods are provided by the interface.''
    * @{
    **/
-  std::vector<RangeType> evaluate(const DomainType& xx) const
+  std::vector<RangeType> evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     std::vector<RangeType> ret(size(), RangeType(0));
-    evaluate(xx, ret);
+    evaluate(xx, ret, mu);
     return ret;
   }
 
-  std::vector<JacobianRangeType> jacobian(const DomainType& xx) const
+  std::vector<JacobianRangeType> jacobian(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
-    jacobian(xx, ret);
+    jacobian(xx, ret, mu);
     return ret;
   }
   /* @} */
@@ -176,9 +182,13 @@ public:
    * \defgroup haveto ´´These methods have to be implemented in addition to the ones required from the BaseType.''
    * @{
    **/
-  virtual void evaluate(const DomainType& /*xx*/, RangeType& /*ret*/) const = 0;
+  virtual void evaluate(const DomainType& /*xx*/,
+                        RangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
-  virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const = 0;
+  virtual void jacobian(const DomainType& /*xx*/,
+                        JacobianRangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
   /* @} */
 
   /**
@@ -190,16 +200,20 @@ public:
     return 1;
   }
 
-  virtual void evaluate(const DomainType& xx, std::vector<RangeType>& ret) const override final
+  virtual void evaluate(const DomainType& xx,
+                        std::vector<RangeType>& ret,
+                        const Common::Parameter& mu = Common::Parameter()) const override final
   {
     assert(ret.size() >= 1);
-    evaluate(xx, ret[0]);
+    evaluate(xx, ret[0], mu);
   }
 
-  virtual void jacobian(const DomainType& xx, std::vector<JacobianRangeType>& ret) const override final
+  virtual void jacobian(const DomainType& xx,
+                        std::vector<JacobianRangeType>& ret,
+                        const Common::Parameter& mu = Common::Parameter()) const override final
   {
     assert(ret.size() >= 1);
-    jacobian(xx, ret[0]);
+    jacobian(xx, ret[0], mu);
   }
   /* @} */
 
@@ -207,36 +221,40 @@ public:
    * \defgroup provided ´´These methods are provided by the interface.''
    * @{
    **/
-  RangeType evaluate(const DomainType& xx) const
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     RangeType ret(0);
-    evaluate(xx, ret);
+    evaluate(xx, ret, mu);
     return ret;
   }
 
-  JacobianRangeType jacobian(const DomainType& xx) const
+  JacobianRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
   {
     JacobianRangeType ret(0);
-    jacobian(xx, ret);
+    jacobian(xx, ret, mu);
     return ret;
   }
 
   //! evaluate at N quadrature points into vector of size >= N
-  void evaluate(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature, std::vector<RangeType>& ret)
+  void evaluate(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature,
+                std::vector<RangeType>& ret,
+                const Common::Parameter& mu = Common::Parameter())
   {
     assert(ret.size() >= quadrature.size());
     std::size_t i = 0;
     for (const auto& point : quadrature)
-      evaluate(point.position(), ret[i++]);
+      evaluate(point.position(), ret[i++], mu);
   }
 
   //! jacobian at N quadrature points into vector of size >= N
-  void jacobian(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature, std::vector<JacobianRangeType>& ret)
+  void jacobian(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature,
+                std::vector<JacobianRangeType>& ret,
+                const Common::Parameter& mu = Common::Parameter())
   {
     assert(ret.size() >= quadrature.size());
     std::size_t i = 0;
     for (const auto& point : quadrature)
-      jacobian(point.position(), ret[i++]);
+      jacobian(point.position(), ret[i++], mu);
   }
   /* @} */
 }; // class LocalfunctionInterface
