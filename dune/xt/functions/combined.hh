@@ -26,12 +26,14 @@ namespace XT {
 namespace Functions {
 namespace internal {
 
+
 enum class Combination
 {
   difference,
   sum,
   product
 }; // enum class Combination
+
 
 /**
  * \brief Helper class defining types of combined functions, if available.
@@ -129,10 +131,11 @@ private:
                          const RightLocalfunctionType& right_local,
                          const DomainType& xx,
                          RangeType& ret,
+                         const Common::Parameter& mu,
                          RangeType& tmp_ret)
     {
-      left_local.evaluate(xx, ret);
-      right_local.evaluate(xx, tmp_ret);
+      left_local.evaluate(xx, ret, mu);
+      right_local.evaluate(xx, tmp_ret, mu);
       ret -= tmp_ret;
     } // ... evaluate(...)
 
@@ -140,10 +143,11 @@ private:
                          const RightLocalfunctionType& right_local,
                          const DomainType& xx,
                          JacobianRangeType& ret,
+                         const Common::Parameter& mu,
                          JacobianRangeType& tmp_ret)
     {
-      left_local.jacobian(xx, ret);
-      right_local.jacobian(xx, tmp_ret);
+      left_local.jacobian(xx, ret, mu);
+      right_local.jacobian(xx, tmp_ret, mu);
       ret -= tmp_ret;
     } // ... jacobian(...)
   }; // class Call< ..., difference >
@@ -166,10 +170,11 @@ private:
                          const RightLocalfunctionType& right_local,
                          const DomainType& xx,
                          RangeType& ret,
+                         const Common::Parameter& mu,
                          RangeType& tmp_ret)
     {
-      left_local.evaluate(xx, ret);
-      right_local.evaluate(xx, tmp_ret);
+      left_local.evaluate(xx, ret, mu);
+      right_local.evaluate(xx, tmp_ret, mu);
       ret += tmp_ret;
     } // ... evaluate(...)
 
@@ -177,10 +182,11 @@ private:
                          const RightLocalfunctionType& right_local,
                          const DomainType& xx,
                          JacobianRangeType& ret,
+                         const Common::Parameter& mu,
                          JacobianRangeType& tmp_ret)
     {
-      left_local.jacobian(xx, ret);
-      right_local.jacobian(xx, tmp_ret);
+      left_local.jacobian(xx, ret, mu);
+      right_local.jacobian(xx, tmp_ret, mu);
       ret += tmp_ret;
     } // ... jacobian(...)
   }; // class Call< ..., sum >
@@ -204,10 +210,11 @@ private:
                          const RightLocalfunctionType& right_local,
                          const DomainType& xx,
                          RangeType& ret,
+                         const Common::Parameter& mu,
                          RangeType& /*tmp_ret*/)
     {
-      auto left_value = left_local.evaluate(xx);
-      right_local.evaluate(xx, ret);
+      auto left_value = left_local.evaluate(xx, mu);
+      right_local.evaluate(xx, ret, mu);
       ret *= left_value;
     } // ... evaluate(...)
 
@@ -215,6 +222,7 @@ private:
                          const RightLocalfunctionType& /*right_local*/,
                          const DomainType& /*xx*/,
                          JacobianRangeType& /*ret*/,
+                         const Common::Parameter& /*mu*/,
                          JacobianRangeType& /*tmp_ret*/)
     {
       DUNE_THROW(NotImplemented, "If you need this, implement it!");
@@ -236,18 +244,20 @@ public:
                        const RightLocalfunctionType& right_local,
                        const DomainType& xx,
                        RangeType& ret,
+                       const Common::Parameter& mu,
                        RangeType& tmp_ret)
   {
-    Call<comb>::evaluate(left_local, right_local, xx, ret, tmp_ret);
+    Call<comb>::evaluate(left_local, right_local, xx, ret, mu, tmp_ret);
   }
 
   static void jacobian(const LeftLocalfunctionType& left_local,
                        const RightLocalfunctionType& right_local,
                        const DomainType& xx,
                        JacobianRangeType& ret,
+                       const Common::Parameter& mu,
                        JacobianRangeType& tmp_ret)
   {
-    Call<comb>::jacobian(left_local, right_local, xx, ret, tmp_ret);
+    Call<comb>::jacobian(left_local, right_local, xx, ret, mu, tmp_ret);
   }
 }; // class SelectCombined
 
@@ -294,14 +304,17 @@ public:
     return Select::order(left_local_->order(), right_local_->order());
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+  virtual void
+  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    Select::evaluate(*left_local_, *right_local_, xx, ret, tmp_range_);
+    Select::evaluate(*left_local_, *right_local_, xx, ret, mu, tmp_range_);
   }
 
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
+  virtual void jacobian(const DomainType& xx,
+                        JacobianRangeType& ret,
+                        const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    Select::jacobian(*left_local_, *right_local_, xx, ret, tmp_jacobian_);
+    Select::jacobian(*left_local_, *right_local_, xx, ret, mu, tmp_jacobian_);
   }
 
 private:
@@ -532,6 +545,7 @@ make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args
 {
   return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
+
 
 } // namespace Functions
 } // namespace XT

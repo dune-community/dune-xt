@@ -35,6 +35,7 @@ namespace XT {
 namespace Functions {
 namespace ESV2007 {
 
+
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Testcase1Force : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
@@ -43,6 +44,7 @@ class Testcase1Force : public LocalizableFunctionInterface<E, D, d, R, r, rC>
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
+
 
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
 class Testcase1Force<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
@@ -118,7 +120,9 @@ public:
   /**
    * \brief "0.5 * pi * pi * cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+  virtual void evaluate(const DomainType& xx,
+                        RangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     ret[0] = M_PI_2l * M_PIl * cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]);
   }
@@ -127,7 +131,9 @@ public:
    * \brief ["-0.25 * pi * pi * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.25 * pi * pi * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
+  virtual void jacobian(const DomainType& xx,
+                        JacobianRangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     const DomainFieldType pre = -0.25 * M_PIl * M_PIl * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
@@ -141,6 +147,7 @@ private:
   const std::string name_;
 }; // class Testcase1Force
 
+
 template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
 class Testcase1ExactSolution : public LocalizableFunctionInterface<E, D, d, R, r, rC>
 {
@@ -149,6 +156,7 @@ class Testcase1ExactSolution : public LocalizableFunctionInterface<E, D, d, R, r
     static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
   }
 };
+
 
 template <class EntityImp, class DomainFieldImp, class RangeFieldImp>
 class Testcase1ExactSolution<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>
@@ -224,7 +232,9 @@ public:
   /**
    * \brief "cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+  virtual void evaluate(const DomainType& xx,
+                        RangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     ret[0] = cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]);
   }
@@ -233,7 +243,9 @@ public:
    * \brief ["-0.5 * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.5 * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
+  virtual void jacobian(const DomainType& xx,
+                        JacobianRangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     const DomainFieldType pre = -0.5 * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
@@ -246,6 +258,7 @@ private:
   const size_t order_;
   const std::string name_;
 }; // class Testcase1ExactSolution
+
 
 template <class DiffusionFactorType, class DiffusionTensorType = void>
 class CutoffFunction;
@@ -326,13 +339,17 @@ class CutoffFunction<DiffusionType, void> : public LocalizableFunctionInterface<
       return 0;
     }
 
-    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx), RangeType& ret) const override final
+    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
+                          RangeType& ret,
+                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override final
+    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
+                          JacobianRangeType& ret,
+                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -548,13 +565,17 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
       return 0;
     }
 
-    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx), RangeType& ret) const override final
+    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
+                          RangeType& ret,
+                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
     }
 
-    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override final
+    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
+                          JacobianRangeType& ret,
+                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);

@@ -200,14 +200,18 @@ private:
 public:
   using BaseType::evaluate;
 
-  virtual void evaluate(const DomainType& x, RangeType& ret) const override final
+  virtual void evaluate(const DomainType& x,
+                        RangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     helper<>::evaluate(A_, b_, b_zero_, x, ret);
   }
 
   using BaseType::jacobian;
 
-  virtual void jacobian(const DomainType& x, JacobianRangeType& ret) const override final
+  virtual void jacobian(const DomainType& x,
+                        JacobianRangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     helper<>::jacobian(A_, ret);
   }

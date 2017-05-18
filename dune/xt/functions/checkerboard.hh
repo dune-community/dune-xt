@@ -73,13 +73,17 @@ class CheckerboardFunction
       return 0;
     }
 
-    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx), RangeType& ret) const override
+    virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
+                          RangeType& ret,
+                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override
     {
       assert(this->is_a_valid_point(xx));
       ret = value_;
     }
 
-    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx), JacobianRangeType& ret) const override
+    virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
+                          JacobianRangeType& ret,
+                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override
     {
       assert(this->is_a_valid_point(xx));
       clear_jacobian<rangeDim, rangeDimCols>()(ret);

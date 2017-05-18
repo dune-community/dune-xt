@@ -23,6 +23,7 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+
 /**
  * Global-valued function you can pass a lambda expression to that gets evaluated
  * \example LambdaType lambda([](DomainType x) { return x;}, 1 );
@@ -58,12 +59,15 @@ public:
     return order_;
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+  virtual void evaluate(const DomainType& xx,
+                        RangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     ret = lambda_(xx);
   }
 
-  virtual RangeType evaluate(const DomainType& xx) const override final
+  virtual RangeType evaluate(const DomainType& xx,
+                             const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     return lambda_(xx);
   }
@@ -83,6 +87,7 @@ private:
   const size_t order_;
   const std::string name_;
 };
+
 
 } // namespace Functions
 } // namespace XT

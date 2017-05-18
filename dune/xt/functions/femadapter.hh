@@ -22,6 +22,7 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+
 template <class DiscreteFunctionType>
 class FemAdapterFunction
     : public LocalizableFunctionInterface<typename DiscreteFunctionType::EntityType,
@@ -77,12 +78,15 @@ class FemAdapterFunction
       return wrapped_localfunction_.order();
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+    virtual void
+    evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = Common::Parameter()) const override
     {
       wrapped_localfunction_.evaluate(xx, ret);
     }
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
+    virtual void jacobian(const DomainType& xx,
+                          JacobianRangeType& ret,
+                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override
     {
       wrapped_localfunction_.jacobian(xx, ret);
     }
@@ -130,6 +134,7 @@ public:
 private:
   const DiscreteFunctionType& df_;
 }; // class CheckerboardFunction
+
 
 } // namespace Functions
 } // namespace XT

@@ -64,7 +64,8 @@ public:
 
   //! currently used in gdt assembler
   virtual void evaluate(const typename BaseType::DomainType& x,
-                        typename BaseType::RangeType& diffusion) const final override
+                        typename BaseType::RangeType& diffusion,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const final override
   {
 
     if (!permeability_) {

@@ -24,6 +24,7 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+
 /**
  * Based on: Brenner, S. C. and Davis, C. B. and Sung, L.-y.
  *           A partition of unity method for the displacement obstacle problem of clamped Kirchhoff plates
@@ -131,7 +132,8 @@ public:
     return 3 * dimDomain;
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+  virtual void
+  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = Common::Parameter()) const override
   {
     ret = value_;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
@@ -215,6 +217,7 @@ private:
   const StuffRangeType value_;
   const std::string name_;
 }; // class FlatTopFunction< ..., 1, 1 >
+
 
 } // namespace Functions
 } // namespace XT

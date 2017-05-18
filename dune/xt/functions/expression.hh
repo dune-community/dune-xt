@@ -295,7 +295,8 @@ private:
 public:
   using BaseType::evaluate;
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+  virtual void
+  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = Common::Parameter()) const override
   {
     eval_helper<>::evaluate(function_, tmp_vector_, xx, ret);
 #ifndef NDEBUG
@@ -341,7 +342,9 @@ public:
 
   using BaseType::jacobian;
 
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
+  virtual void jacobian(const DomainType& xx,
+                        JacobianRangeType& ret,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override
   {
     if (gradients_.size() == 0) {
       DUNE_THROW(NotImplemented, "This function does not provide any gradients!");

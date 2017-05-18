@@ -28,10 +28,12 @@ namespace XT {
 namespace Functions {
 namespace internal {
 
+
 enum class Derivative
 {
   divergence
 };
+
 
 template <class FunctionType, Derivative derivative>
 class SelectDerived
@@ -97,17 +99,22 @@ private:
       return boost::numeric_cast<size_t>(std::max(boost::numeric_cast<ssize_t>(ord) - 1, ssize_t(0)));
     }
 
-    static void evaluate(const FunctionLocalfunctionType& func_local, const DomainType& xx, RangeType& ret)
+    static void evaluate(const FunctionLocalfunctionType& func_local,
+                         const DomainType& xx,
+                         RangeType& ret,
+                         const Common::Parameter& mu)
     {
       typename FunctionLocalfunctionType::JacobianRangeType tmp_jac(0.0);
-      func_local.jacobian(xx, tmp_jac);
+      func_local.jacobian(xx, tmp_jac, mu);
       ret *= 0.0;
       for (size_t dd = 0; dd < d; ++dd)
         ret[0] += tmp_jac[dd][dd];
     } // ... evaluate(...)
 
-    static void
-    jacobian(const FunctionLocalfunctionType& /*func_local*/, const DomainType& /*xx*/, JacobianRangeType& /*ret*/)
+    static void jacobian(const FunctionLocalfunctionType& /*func_local*/,
+                         const DomainType& /*xx*/,
+                         JacobianRangeType& /*ret*/,
+                         const Common::Parameter& /*mu*/)
     {
       DUNE_THROW(NotImplemented, "for divergence!");
     }
@@ -124,16 +131,23 @@ public:
     return Call<derivative>::order(ord);
   }
 
-  static void evaluate(const FunctionLocalfunctionType& func_local, const DomainType& xx, RangeType& ret)
+  static void evaluate(const FunctionLocalfunctionType& func_local,
+                       const DomainType& xx,
+                       RangeType& ret,
+                       const Common::Parameter& mu)
   {
-    Call<derivative>::evaluate(func_local, xx, ret);
+    Call<derivative>::evaluate(func_local, xx, ret, mu);
   }
 
-  static void jacobian(const FunctionLocalfunctionType& func_local, const DomainType& xx, JacobianRangeType& ret)
+  static void jacobian(const FunctionLocalfunctionType& func_local,
+                       const DomainType& xx,
+                       JacobianRangeType& ret,
+                       const Common::Parameter& mu)
   {
-    Call<derivative>::jacobian(func_local, xx, ret);
+    Call<derivative>::jacobian(func_local, xx, ret, mu);
   }
 }; // class SelectDerived
+
 
 template <class FunctionType, Derivative derivative>
 class DerivedLocalFunction : public LocalfunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
@@ -170,19 +184,23 @@ public:
     return Select::order(func_local_->order());
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const override final
+  virtual void
+  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    Select::evaluate(*func_local_, xx, ret);
+    Select::evaluate(*func_local_, xx, ret, mu);
   }
 
-  virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override final
+  virtual void jacobian(const DomainType& xx,
+                        JacobianRangeType& ret,
+                        const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    Select::jacobian(*func_local_, xx, ret);
+    Select::jacobian(*func_local_, xx, ret, mu);
   }
 
 private:
   const std::unique_ptr<const typename FunctionType::LocalfunctionType> func_local_;
 }; // class DerivedLocalFunction
+
 
 template <class FunctionType, Derivative derivative>
 class Derived : public LocalizableFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
@@ -251,7 +269,9 @@ private:
   const std::string name_;
 }; // class Derived
 
+
 } // namespace internal
+
 
 template <class FunctionType>
 class DivergenceFunction : public internal::Derived<FunctionType, internal::Derivative::divergence>
@@ -266,6 +286,7 @@ public:
   }
 }; // class DivergenceFunction
 
+
 template <class T, class... Args>
 std::shared_ptr<DivergenceFunction<T>> make_divergence(const T& func, Args&&... args)
 {
@@ -277,6 +298,7 @@ std::shared_ptr<DivergenceFunction<T>> make_divergence(std::shared_ptr<T> func, 
 {
   return std::make_shared<DivergenceFunction<T>>(func, std::forward<Args>(args)...);
 }
+
 
 } // namespace Functions
 } // namespace XT
