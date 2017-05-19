@@ -330,7 +330,10 @@ struct CubeProviderTest : public ::testing::Test
       auto local_grid_view = ms_grid_provider_->dd_grid().local_grid_view(ss, false);
       for (auto&& entity : elements(local_grid_view)) {
         // we cannot use entity.hasBoundaryIntersections() here!
-        for (auto&& local_intersection : intersections(local_grid_view, entity)) {
+        for (auto local_intersection_it = local_grid_view.ibegin(entity); // <- DO NOT USE intersection_range HERE!
+             local_intersection_it != local_grid_view.iend(entity);
+             ++local_intersection_it) {
+          const auto& local_intersection = *local_intersection_it;
           const auto local_intersection_index = local_intersection.indexInInside();
           if (local_intersection.boundary() && !local_intersection.neighbor()) {
             size_t global_equals_local = 0;
