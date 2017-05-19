@@ -97,6 +97,34 @@ struct SubdomainBoundaryGridPartTraits : public SubdomainGridPartTraits<GlobalGr
 }; // class SubdomainBoundaryGridPartTraits
 
 
+template <class SubdomainGridPartImp>
+class SubdomainGridPartIntersectionRange
+{
+  typedef typename SubdomainGridPartImp::EntityType EntityType;
+  typedef typename SubdomainGridPartImp::IntersectionIteratorType IntersectionIteratorType;
+
+public:
+  SubdomainGridPartIntersectionRange(const SubdomainGridPartImp& layer, const EntityType& entity)
+    : layer_(layer)
+    , entity_(entity)
+  {
+  }
+
+  IntersectionIteratorType begin() const
+  {
+    return layer_.ibegin(entity_);
+  }
+
+  IntersectionIteratorType end() const
+  {
+    return layer_.iend(entity_);
+  }
+
+  const SubdomainGridPartImp& layer_;
+  const EntityType& entity_;
+}; // class SubdomainGridPartIntersectionRange
+
+
 } // namespace internal
 
 
@@ -525,6 +553,31 @@ struct isConforming<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
 } // namespace Fem
 
 #endif // HAVE_DUNE_FEM
+
+
+template <typename GP, class Entity>
+inline auto intersections(const XT::Grid::SubdomainGridPart<GP>& gv, const Entity& e)
+    -> XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainGridPart<GP>>
+{
+  return XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainGridPart<GP>>(gv, e);
+}
+
+
+template <typename GP, class Entity>
+inline auto intersections(const XT::Grid::SubdomainBoundaryGridPart<GP>& gv, const Entity& e)
+    -> XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainBoundaryGridPart<GP>>
+{
+  return XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainBoundaryGridPart<GP>>(gv, e);
+}
+
+
+template <typename GP, class Entity>
+inline auto intersections(const XT::Grid::SubdomainCouplingGridPart<GP>& gv, const Entity& e)
+    -> XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainCouplingGridPart<GP>>
+{
+  return XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainCouplingGridPart<GP>>(gv, e);
+}
+
 
 } // namespace Dune
 
