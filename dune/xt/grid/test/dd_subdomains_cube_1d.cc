@@ -83,22 +83,38 @@ TYPED_TEST(CubeProviderTest, visualize_is_callable)
 {
   this->visualize_is_callable(XT::Common::filename_only(::testing::internal::GetInjectableArgvs().at(0)));
 }
-TYPED_TEST(CubeProviderTest, entity_to_subdomain_mapping_is_correct)
+TYPED_TEST(CubeProviderTest, global_grid_part_entity_to_subdomain_mapping_is_correct)
 {
-  this->entity_to_subdomain_mapping_is_correct();
+  this->global_grid_part_entity_to_subdomain_mapping_is_correct();
+}
+TYPED_TEST(CubeProviderTest, global_grid_view_entity_to_subdomain_mapping_is_correct)
+{
+  this->global_grid_view_entity_to_subdomain_mapping_is_correct();
 }
 
 TYPED_TEST(CubeProviderTest, local_parts_are_of_correct_size)
 {
   this->local_parts_are_of_correct_size();
 }
+TYPED_TEST(CubeProviderTest, local_views_are_of_correct_size)
+{
+  this->local_views_are_of_correct_size();
+}
 TYPED_TEST(CubeProviderTest, local_parts_are_indexed_consecutively)
 {
   this->local_parts_are_indexed_consecutively();
 }
+TYPED_TEST(CubeProviderTest, local_views_are_indexed_consecutively)
+{
+  this->local_views_are_indexed_consecutively();
+}
 TYPED_TEST(CubeProviderTest, local_parts_report_correct_boundary_id)
 {
   this->local_parts_report_correct_boundary_id();
+}
+TYPED_TEST(CubeProviderTest, local_views_report_correct_boundary_id)
+{
+  this->local_views_report_correct_boundary_id();
 }
 
 TYPED_TEST(CubeProviderTest, boundary_parts_are_of_correct_size)

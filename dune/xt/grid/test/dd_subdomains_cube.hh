@@ -14,7 +14,6 @@
 
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/test/gtest/gtest.h>
-#include <dune/xt/common/test/gtest/gtest.h>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
@@ -151,13 +150,13 @@ struct CubeProviderTest : public ::testing::Test
     //    + "_with_oversampling_without_coupling", /*with_coupling=*/false);
   } // ... visualize_is_callable(...)
 
-  void entity_to_subdomain_mapping_is_correct()
+  void global_grid_part_entity_to_subdomain_mapping_is_correct()
   {
     setup();
     ASSERT_NE(nullptr, ms_grid_provider_);
     ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
 
-    auto global_grid_part = ms_grid_provider_->dd_grid().globalGridPart();
+    const auto& global_grid_part = ms_grid_provider_->dd_grid().globalGridPart();
     const auto& entity_to_subdomain_map = *ms_grid_provider_->dd_grid().entityToSubdomainMap();
     ASSERT_EQ(global_grid_part.indexSet().size(0), entity_to_subdomain_map.size());
     for (auto&& entity : elements(global_grid_part)) {
@@ -168,7 +167,26 @@ struct CubeProviderTest : public ::testing::Test
       EXPECT_EQ(expected_subdomain, ms_grid_provider_->dd_grid().subdomainOf(entity));
       EXPECT_EQ(expected_subdomain, ms_grid_provider_->dd_grid().subdomainOf(entity_index));
     }
-  } // ... entity_to_subdomain_mapping_is_correct(...)
+  } // ... global_grid_part_entity_to_subdomain_mapping_is_correct(...)
+
+  void global_grid_view_entity_to_subdomain_mapping_is_correct()
+  {
+    setup();
+    ASSERT_NE(nullptr, ms_grid_provider_);
+    ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
+
+    const auto& global_grid_view = ms_grid_provider_->dd_grid().global_grid_view();
+    const auto& entity_to_subdomain_map = *ms_grid_provider_->dd_grid().entityToSubdomainMap();
+    ASSERT_EQ(global_grid_view.indexSet().size(0), entity_to_subdomain_map.size());
+    for (auto&& entity : elements(global_grid_view)) {
+      const auto entity_index = global_grid_view.indexSet().index(entity);
+      auto expected_subdomain = compute_subdomain(entity);
+      ASSERT_NE(entity_to_subdomain_map.end(), entity_to_subdomain_map.find(entity_index));
+      EXPECT_EQ(expected_subdomain, entity_to_subdomain_map.at(entity_index));
+      EXPECT_EQ(expected_subdomain, ms_grid_provider_->dd_grid().subdomainOf(entity));
+      EXPECT_EQ(expected_subdomain, ms_grid_provider_->dd_grid().subdomainOf(entity_index));
+    }
+  } // ... global_grid_view_entity_to_subdomain_mapping_is_correct(...)
 
   void local_parts_are_of_correct_size()
   {
@@ -195,6 +213,31 @@ struct CubeProviderTest : public ::testing::Test
     EXPECT_EQ(ms_grid_provider_->dd_grid().globalGridPart().indexSet().size(0), total_size);
   } // ... local_parts_are_of_correct_size(...)
 
+  void local_views_are_of_correct_size()
+  {
+    setup();
+    ASSERT_NE(nullptr, ms_grid_provider_);
+    ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
+
+    auto expected_local_sizes = Expected::local_sizes();
+    ASSERT_EQ(ms_grid_provider_->dd_grid().size(), expected_local_sizes.size())
+        << "Please update the expected results!"
+        << "\n"
+        << "expected_local_sizes: " << expected_local_sizes << "\n"
+        << "actual local sizes:   " << compute_local_sizes(*ms_grid_provider_);
+    size_t total_size = 0;
+
+    for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
+      total_size += expected_local_sizes[ss];
+      auto local_grid_view = ms_grid_provider_->dd_grid().local_grid_view(ss, false);
+      EXPECT_EQ(expected_local_sizes[ss], local_grid_view.indexSet().size(0))
+          << "ss: " << ss << "\n"
+          << "expected_local_sizes: " << expected_local_sizes << "\n"
+          << "actual local sizes:   " << compute_local_sizes(*ms_grid_provider_);
+    }
+    EXPECT_EQ(ms_grid_provider_->dd_grid().global_grid_view().indexSet().size(0), total_size);
+  } // ... local_views_are_of_correct_size(...)
+
   void local_parts_are_indexed_consecutively()
   {
     setup();
@@ -213,6 +256,25 @@ struct CubeProviderTest : public ::testing::Test
           << "local_indices: " << local_indices;
     }
   } // ... local_parts_are_indexed_consecutively(...)
+
+  void local_views_are_indexed_consecutively()
+  {
+    setup();
+    ASSERT_NE(nullptr, ms_grid_provider_);
+    ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
+
+    for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
+      auto local_grid_view = ms_grid_provider_->dd_grid().local_grid_view(ss, false);
+      auto local_indices = compute_local_indices(local_grid_view);
+      EXPECT_EQ(1, local_indices.count(0)) << "local indices have to start with 0!\n"
+                                           << "ss: " << ss << "\n"
+                                           << "local_indices: " << local_indices;
+      EXPECT_EQ(Expected::local_sizes()[ss] - 1, *local_indices.rbegin())
+          << "local indices have to be numbered consecutively!\n"
+          << "ss: " << ss << "\n"
+          << "local_indices: " << local_indices;
+    }
+  } // ... local_views_are_indexed_consecutively(...)
 
   void local_parts_report_correct_boundary_id()
   {
@@ -256,6 +318,49 @@ struct CubeProviderTest : public ::testing::Test
       }
     }
   } // ... local_parts_report_correct_boundary_id(...)
+
+  void local_views_report_correct_boundary_id()
+  {
+    setup();
+    ASSERT_NE(nullptr, ms_grid_provider_);
+    ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
+
+    auto global_grid_view = ms_grid_provider_->dd_grid().global_grid_view();
+    for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
+      auto local_grid_view = ms_grid_provider_->dd_grid().local_grid_view(ss, false);
+      for (auto&& entity : elements(local_grid_view)) {
+        // we cannot use entity.hasBoundaryIntersections() here!
+        for (auto&& local_intersection : intersections(local_grid_view, entity)) {
+          const auto local_intersection_index = local_intersection.indexInInside();
+          if (local_intersection.boundary() && !local_intersection.neighbor()) {
+            size_t global_equals_local = 0;
+            // this entity lies on the boundary of the subdomain, so lets see
+            // what it looks like globally
+            for (auto&& global_intersection : intersections(global_grid_view, entity)) {
+              if (global_intersection.indexInInside() == local_intersection_index) {
+                // this should be the corresponding global intersection
+                ++global_equals_local;
+                if (global_intersection.boundary() && !global_intersection.neighbor()) {
+                  // and this is also on the domain boundary
+                  EXPECT_EQ(global_intersection.boundarySegmentIndex(), local_intersection.boundarySegmentIndex());
+                } else if (global_intersection.neighbor() && !global_intersection.boundary()) {
+                  // and this is an inner intersection globally
+                  EXPECT_EQ(local_boundary_id(), local_intersection.boundarySegmentIndex())
+                      << "The wrapped intersections of the local grid view "
+                         "should report a predefined boundary id on "
+                         "subdomain boundaries!";
+                } else
+                  DUNE_THROW(Dune::InvalidStateException,
+                             "This should only happen in parallel runs, which "
+                             "are not yet considered here!");
+              }
+            }
+            EXPECT_EQ(1, global_equals_local) << "This must not happen!";
+          }
+        }
+      }
+    }
+  } // ... local_views_report_correct_boundary_id(...)
 
   void boundary_parts_are_of_correct_size()
   {
@@ -395,8 +500,7 @@ struct CubeProviderTest : public ::testing::Test
 
     // test that there were no more
     EXPECT_EQ(sum_of_local_boundary_entities, global_boundary_entities);
-  } // ...
-  // domain_boundary_is_exactly_covered_by_the_sum_of_local_boundaries(...)
+  } // ... domain_boundary_is_exactly_covered_by_the_sum_of_local_boundaries(...)
 
   void coupling_parts_are_of_correct_size()
   {
