@@ -95,6 +95,13 @@ public:
   static const constexpr size_t dimRange = rangeDim;
   static const constexpr size_t dimRangeCols = rangeDimCols;
 
+  typedef EntityType E;
+  typedef DomainFieldType D;
+  static const constexpr size_t d = dimDomain;
+  typedef RangeFieldType R;
+  static const constexpr size_t r = dimRange;
+  static const constexpr size_t rC = dimRangeCols;
+
   typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
       LocalfunctionType;
 
@@ -110,9 +117,7 @@ public:
   typedef void
       DUNE_DEPRECATED_MSG("use make_divergence(func) instead of func.divergence() (09.05.2017)!") DivergenceType;
 
-  virtual ~LocalizableFunctionInterface()
-  {
-  }
+  virtual ~LocalizableFunctionInterface() = default;
 
   static std::string static_id()
   {

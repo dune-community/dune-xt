@@ -76,6 +76,13 @@ public:
   typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::type RangeType;
   typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::type JacobianRangeType;
 
+  typedef EntityType E;
+  typedef DomainFieldType D;
+  static const constexpr size_t d = dimDomain;
+  typedef RangeFieldType R;
+  static const constexpr size_t r = dimRange;
+  static const constexpr size_t rC = dimRangeCols;
+
   LocalfunctionSetInterface(const EntityType& ent)
     : entity_(ent)
   {
