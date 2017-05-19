@@ -136,7 +136,9 @@ struct ElementVisualization
       int numberOfBoundarySegments(0);
       bool isOnBoundary = false;
       const auto leafview = grid_.leafGridView();
-      for (auto&& intersection : intersections(leafview, entity)) {
+      const auto intersection_it_end = leafview.iend(entity);
+      for (auto intersection_it = leafview.ibegin(entity); intersection_it != intersection_it_end; ++intersection_it) {
+        const auto& intersection = *intersection_it;
         if (!intersection.neighbor() && intersection.boundary()) {
           isOnBoundary = true;
           numberOfBoundarySegments += 1;

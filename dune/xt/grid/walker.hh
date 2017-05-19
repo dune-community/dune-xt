@@ -326,8 +326,13 @@ protected:
 
       // only walk the intersections, if there are codim1 functors present
       if (codim1_functors_.size() > 0) {
-        // walk the intersections
-        for (auto&& intersection : intersections(grid_layer_, entity)) {
+        // walk the intersections, do not use intersections(...) here, since that does not work for a SubdomainGridPart
+        // which is based on alugrid and then wrapped as a grid view (see also
+        // https://github.com/dune-community/dune-xt-grid/issues/26)
+        const auto intersection_it_end = grid_layer_.iend(entity);
+        for (auto intersection_it = grid_layer_.ibegin(entity); intersection_it != intersection_it_end;
+             ++intersection_it) {
+          const auto& intersection = *intersection_it;
 
           // apply codim1 functors
           if (intersection.neighbor()) {

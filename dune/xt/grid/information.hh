@@ -51,7 +51,10 @@ struct Statistics
     , maxGridWidth(0)
   {
     for (auto&& entity : elements(grid_layer)) {
-      for (auto&& intIt : intersections(grid_layer, entity)) {
+      const auto intersection_it_end = grid_layer.iend(entity);
+      for (auto intersection_it = grid_layer.ibegin(entity); intersection_it != intersection_it_end;
+           ++intersection_it) {
+        const auto& intIt = *intersection_it;
         ++numberOfIntersections;
         maxGridWidth = std::max(intIt.geometry().volume(), maxGridWidth);
         // if we are inside the grid
@@ -85,7 +88,9 @@ size_t max_number_of_neighbors(const GridLayerType& grid_layer)
   size_t maxNeighbours = 0;
   for (auto&& entity : elements(grid_layer)) {
     size_t neighbours = 0;
-    for (DUNE_UNUSED auto&& i : intersections(grid_layer, entity)) {
+    const auto intersection_it_end = grid_layer.iend(entity);
+    for (DUNE_UNUSED auto intersection_it = grid_layer.ibegin(entity); intersection_it != intersection_it_end;
+         ++intersection_it) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);
