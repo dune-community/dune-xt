@@ -54,30 +54,29 @@ public:
   {
   }
 
-  virtual size_t order() const override final
+  size_t order() const override final
   {
     return order_;
   }
 
-  virtual void evaluate(const DomainType& xx,
-                        RangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  void evaluate(const DomainType& xx,
+                RangeType& ret,
+                const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     ret = lambda_(xx);
   }
 
-  virtual RangeType evaluate(const DomainType& xx,
-                             const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     return lambda_(xx);
   }
 
-  virtual std::string type() const override
+  std::string type() const override final
   {
     return "globallambdafunction";
   }
 
-  virtual std::string name() const override
+  std::string name() const override final
   {
     return name_;
   }
