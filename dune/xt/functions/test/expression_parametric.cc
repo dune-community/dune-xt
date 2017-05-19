@@ -9,8 +9,6 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include <dune/common/exceptions.hh>
-
 #include <dune/grid/common/rangegenerators.hh>
 
 #include <dune/xt/grid/grids.hh>
