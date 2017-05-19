@@ -18,6 +18,7 @@
 #include <memory>
 
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
+#include <dune/grid/common/rangegenerators.hh>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -27,7 +28,6 @@
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
-#include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {

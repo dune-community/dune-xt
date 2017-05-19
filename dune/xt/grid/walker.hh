@@ -17,18 +17,20 @@
 #include <type_traits>
 #include <vector>
 
-#include <dune/common/version.hh>
-#include <dune/common/deprecated.hh>
-
 #if HAVE_TBB
-#include <dune/xt/grid/parallel/partitioning/ranged.hh>
-#include <dune/xt/common/parallel/threadmanager.hh>
-
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
 #include <tbb/tbb_stddef.h>
-#endif // HAVE_TBB
+#endif
 
+#include <dune/common/version.hh>
+#include <dune/common/deprecated.hh>
+
+#include <dune/grid/common/rangegenerators.hh>
+
+#if HAVE_TBB
+#include <dune/xt/grid/parallel/partitioning/ranged.hh>
+#endif
 #include <dune/xt/common/parallel/threadmanager.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
@@ -36,7 +38,6 @@
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
-#include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 #include "walker/apply-on.hh"

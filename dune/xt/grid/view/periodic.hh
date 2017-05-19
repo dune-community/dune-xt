@@ -21,14 +21,14 @@
 #include <vector>
 
 #include <dune/geometry/typeindex.hh>
+
 #include <dune/grid/common/gridview.hh>
+#include <dune/grid/common/rangegenerators.hh>
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
-
 #include <dune/xt/grid/entity.hh>
-#include <dune/xt/grid/rangegenerators.hh>
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
 
