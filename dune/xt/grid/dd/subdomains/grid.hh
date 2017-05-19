@@ -247,6 +247,10 @@ public:
 
   BoundaryGridViewType boundary_grid_view(const size_t subdomain) const
   {
+    // See for instance test_dd_subdomains_cube_2d, when adapting
+    // boundary_parts_contain_only_boundary_entities_and_intersections to use these views!
+    DUNE_THROW(InvalidStateException,
+               "The intersections of the boundary grid view are currently broken, use boundaryGridPart() instead!");
     assert(subdomain < size_);
     const auto result = boundary_grid_views_->find(subdomain);
     assert(result != boundary_grid_views_->end()
@@ -269,6 +273,10 @@ public:
 
   CouplingGridViewType coupling_grid_view(const size_t subdomain, const size_t neighbor) const
   {
+    // See for instance test_dd_subdomains_cube_2d, when adapting
+    // coupling_parts_contain_only_inner_entities_and_intersections to use these views!
+    DUNE_THROW(InvalidStateException,
+               "The intersections of the coupling grid view are currently broken, use couplingGridPart() instead!");
     assert(subdomain < size_);
     assert(neighbor < size_);
     const auto& coupling_grid_views_map = (*coupling_grid_views_maps_)[subdomain];
