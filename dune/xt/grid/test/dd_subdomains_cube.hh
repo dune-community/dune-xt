@@ -225,20 +225,13 @@ struct CubeProviderTest : public ::testing::Test
       auto local_grid_part = ms_grid_provider_->dd_grid().localGridPart(ss, false);
       for (auto&& entity : elements(local_grid_part)) {
         // we cannot use entity.hasBoundaryIntersections() here!
-        for (auto local_intersection_it = local_grid_part.ibegin(entity); // <- DO NOT USE intersection_range HERE!
-             local_intersection_it != local_grid_part.iend(entity);
-             ++local_intersection_it) {
-          const auto& local_intersection = *local_intersection_it;
+        for (auto&& local_intersection : intersections(local_grid_part, entity)) {
           const auto local_intersection_index = local_intersection.indexInInside();
           if (local_intersection.boundary() && !local_intersection.neighbor()) {
             size_t global_equals_local = 0;
             // this entity lies on the boundary of the subdomain, so lets see
             // what it looks like globally
-            for (auto global_intersection_it =
-                     global_grid_part.ibegin(entity); // <- DO NOT USE intersection_range HERE!
-                 global_intersection_it != global_grid_part.iend(entity);
-                 ++global_intersection_it) {
-              const auto& global_intersection = *global_intersection_it;
+            for (auto&& global_intersection : intersections(global_grid_part, entity)) {
               if (global_intersection.indexInInside() == local_intersection_index) {
                 // this should be the corresponding global intersection
                 ++global_equals_local;
@@ -341,10 +334,7 @@ struct CubeProviderTest : public ::testing::Test
         auto boundary_grid_part = ms_grid_provider_->dd_grid().boundaryGridPart(ss);
         for (auto&& entity : elements(boundary_grid_part)) {
           EXPECT_TRUE(entity.hasBoundaryIntersections()) << "ss: " << ss;
-          for (auto intersection_it = boundary_grid_part.ibegin(entity); // <- DO NOT USE intersection_range HERE!
-               intersection_it != boundary_grid_part.iend(entity);
-               ++intersection_it) {
-            const auto& intersection = *intersection_it;
+          for (auto&& intersection : intersections(boundary_grid_part, entity)) {
             EXPECT_TRUE(intersection.boundary() && !intersection.neighbor())
                 << "ss: " << ss << "\n"
                 << "intersection.boundary(): " << intersection.boundary() << "\n"
@@ -467,10 +457,7 @@ struct CubeProviderTest : public ::testing::Test
       for (const auto& nn : ms_grid_provider_->dd_grid().neighborsOf(ss)) {
         auto coupling_grid_part = ms_grid_provider_->dd_grid().couplingGridPart(ss, nn);
         for (auto&& entity : elements(coupling_grid_part)) {
-          for (auto intersection_it = coupling_grid_part.ibegin(entity); // <- DO NOT USE intersection_range HERE!
-               intersection_it != coupling_grid_part.iend(entity);
-               ++intersection_it) {
-            const auto& intersection = *intersection_it;
+          for (auto&& intersection : intersections(coupling_grid_part, entity)) {
             EXPECT_TRUE(!intersection.boundary() && intersection.neighbor())
                 << "ss: " << ss << "\n"
                 << "intersection.boundary(): " << intersection.boundary() << "\n"
@@ -501,10 +488,7 @@ struct CubeProviderTest : public ::testing::Test
         for (auto&& entity : elements(coupling_grid_part)) {
           EXPECT_EQ(compute_subdomain(entity), ss);
           size_t num_coupling_intersections = 0;
-          for (auto intersection_it = coupling_grid_part.ibegin(entity); // <- DO NOT USE intersection_range HERE!
-               intersection_it != coupling_grid_part.iend(entity);
-               ++intersection_it) {
-            const auto& intersection = *intersection_it;
+          for (auto&& intersection : intersections(coupling_grid_part, entity)) {
             const auto neighbor = intersection.outside(); // has to exist, see test above
             EXPECT_EQ(compute_subdomain(neighbor), nn);
             actual_coupling_indices[ss][nn][global_grid_part.indexSet().index(entity)].insert(
@@ -586,10 +570,7 @@ struct CubeProviderTest : public ::testing::Test
     for (auto&& entity : elements(grid_view))
       if (entity.hasBoundaryIntersections()) {
         std::set<size_t> intersection_indices;
-        for (auto intersection_it = grid_view.ibegin(entity); // <- DO NOT USE intersection_range HERE!
-             intersection_it != grid_view.iend(entity);
-             ++intersection_it) {
-          const auto& intersection = *intersection_it;
+        for (auto&& intersection : intersections(grid_view, entity)) {
           if (intersection.boundary() && !intersection.neighbor())
             intersection_indices.insert(intersection.indexInInside());
         }
