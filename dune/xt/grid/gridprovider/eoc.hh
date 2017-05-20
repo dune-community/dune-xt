@@ -33,26 +33,8 @@ class EOCGridProvider : public GridProvider<GridImp>
 public:
   using typename BaseType::GridType;
 
-  explicit EOCGridProvider(GridType& grd, const size_t num_refs)
-    : BaseType(grd)
-  {
-    setup(num_refs);
-  }
-
-  explicit EOCGridProvider(GridType* grid_ptr, const size_t num_refs)
-    : BaseType(grid_ptr)
-  {
-    setup(num_refs);
-  }
-
-  explicit EOCGridProvider(std::shared_ptr<GridType> grid_ptr, const size_t num_refs)
-    : BaseType(grid_ptr)
-  {
-    setup(num_refs);
-  }
-
-  explicit EOCGridProvider(std::unique_ptr<GridType>&& grid_ptr, const size_t num_refs)
-    : BaseType(grid_ptr)
+  EOCGridProvider(const Common::Configuration& grid_cfg, const size_t num_refs)
+    : BaseType(GridProviderFactory<GridType>::create(grid_cfg).grid_ptr())
   {
     setup(num_refs);
   }
@@ -72,12 +54,6 @@ public:
   int reference_level() const
   {
     return reference_level_;
-  }
-
-  template <Backends backend>
-  typename Layer<GridType, Layers::level, backend>::type reference_layer() const
-  {
-    return this->template level<backend>(reference_level_);
   }
 
   typename Layer<GridType, Layers::level, Backends::view>::type reference_grid_view() const
