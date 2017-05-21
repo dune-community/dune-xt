@@ -503,7 +503,9 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
     {
       static RangeFieldType min_eigenvalue_of(const DT& diffusion_tensor, const EntityType& ent)
       {
-#if HAVE_DUNE_XT_LA
+#if !HAVE_DUNE_XT_LA
+        static_assert(AlwaysFalse<DT>::value, "You are missing dune-xt-la!");
+#else
 #if !HAVE_EIGEN
         static_assert(AlwaysFalse<DT>::value, "You are missing eigen!");
 #else
@@ -528,8 +530,6 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
         }
         return min_ev;
 #endif // HAVE_EIGEN
-#else
-        DUNE_THROW(NotImplemented, "missing LA");
 #endif // HAVE_DUNE_XT_LA
       } // ... min_eigenvalue_of_(...)
     }; // class Compute< ..., d, d >
