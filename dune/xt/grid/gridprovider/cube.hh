@@ -285,6 +285,8 @@ class CubeDdSubdomainsGridProviderFactory
 public:
   typedef DD::SubdomainGrid<GridType> DdGridType;
 
+  static const bool available = true;
+
   static std::string static_id()
   {
     return cube_dd_subdomains_gridprovider_id();
@@ -293,6 +295,23 @@ public:
   static XT::Common::Configuration default_config()
   {
     return cube_dd_subdomains_gridprovider_default_config();
+  }
+
+  static GridProvider<GridType, DdGridType>
+  create(const Common::Configuration& cfg = cube_dd_subdomains_gridprovider_default_config())
+  {
+    const auto default_cfg = cube_dd_subdomains_gridprovider_default_config();
+    return create(
+        cfg.get("lower_left",
+                default_cfg.get<FieldVector<typename GridType::ctype, GridType::dimension>>("lower_left")),
+        cfg.get("upper_right",
+                default_cfg.get<FieldVector<typename GridType::ctype, GridType::dimension>>("upper_right")),
+        cfg.get("num_elements", default_cfg.get<std::array<unsigned int, GridType::dimension>>("num_elements")),
+        cfg.get("num_refinements", default_cfg.get<unsigned int>("num_refinements")),
+        cfg.get("overlap_size", default_cfg.get<std::array<unsigned int, GridType::dimension>>("overlap_size")),
+        cfg.get("num_partitions", default_cfg.get<std::array<unsigned int, GridType::dimension>>("num_partitions")),
+        cfg.get("oversampling_layers", default_cfg.get<size_t>("oversampling_layers")),
+        cfg.get("inner_boundary_segment_index", default_cfg.get<size_t>("inner_boundary_segment_index")));
   }
 
   static GridProvider<GridType, DdGridType>
@@ -353,6 +372,17 @@ public:
   } // ... create(...)
 }; // class CubeDdSubdomainsGridProviderFactory
 
+#else // HAVE_DUNE_FEM
+
+template <class GridType>
+class CubeDdSubdomainsGridProviderFactory
+{
+  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
+};
+
+
+#endif // HAVE_DUNE_FEM
+
 
 template <class GridType>
 typename std::enable_if<XT::Grid::is_grid<GridType>::value, GridProvider<GridType, DD::SubdomainGrid<GridType>>>::type
@@ -385,42 +415,13 @@ make_cube_dd_subdomains_grid(
                                                                inner_boundary_segment_index);
 }
 
-
-#else // HAVE_DUNE_FEM
-
-
-template <class GridType>
-class CubeDdSubdomainsGridProviderFactory
-{
-  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
-};
-
-
 template <class GridType>
 typename std::enable_if<XT::Grid::is_grid<GridType>::value, GridProvider<GridType, DD::SubdomainGrid<GridType>>>::type
-make_cube_dd_subdomains_grid(
-    const FieldVector<typename GridType::ctype, GridType::dimension>& /*lower_left*/,
-    const FieldVector<typename GridType::ctype, GridType::dimension>& /*upper_right*/,
-    const std::array<unsigned int, GridType::dimension> /*num_elements*/ =
-        cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")[0],
-    const unsigned int /*num_refinements*/ =
-        cube_dd_subdomains_gridprovider_default_config().template get<unsigned int>("num_refinements"),
-    const std::array<unsigned int, GridType::dimension> /*overlap_size*/ =
-        XT::Common::make_array<unsigned int, GridType::dimension>(
-            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")),
-    const std::array<unsigned int, GridType::dimension> /*num_partitions*/ =
-        XT::Common::make_array<unsigned int, GridType::dimension>(
-            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("num_partitions")),
-    const size_t /*num_oversampling_layers*/ =
-        cube_dd_subdomains_gridprovider_default_config().template get<size_t>("num_refinements"),
-    const size_t /*inner_boundary_segment_index*/ =
-        cube_dd_subdomains_gridprovider_default_config().template get<int>("inner_boundary_segment_index"))
+make_cube_dd_subdomains_grid(const Common::Configuration& cfg = cube_dd_subdomains_gridprovider_default_config())
 {
-  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
+  return CubeDdSubdomainsGridProviderFactory<GridType>::create(cfg);
 }
 
-
-#endif // HAVE_DUNE_FEM
 
 } // namespace Grid
 } // namespace XT
