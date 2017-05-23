@@ -59,9 +59,9 @@ typename std::enable_if<is_container<C>::value, void>::type addbind_ContainerInt
             return C(self);
         },
         "deep"_a = false);
-  c.def("scal", &C::scal);
+  c.def("scal", [](C& self, const S& alpha) { self.scal(alpha); }, "alpha"_a);
   c.def("axpy", [](C& self, const S& alpha, const C& xx) { self.axpy(alpha, xx); });
-  c.def("has_equal_shape", &C::has_equal_shape);
+  c.def("has_equal_shape", [](const C& self, const C& other) { return self.has_equal_shape(other); }, "other"_a);
   c.def(py::self *= S());
   c.def(py::self * S());
 } // ... addbind_ContainerInterface(...)

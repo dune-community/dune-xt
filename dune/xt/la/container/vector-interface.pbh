@@ -13,11 +13,10 @@
 
 #include <sstream>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
 
+#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/string.hh>
 
 #include <dune/xt/la/type_traits.hh>
@@ -47,19 +46,7 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   addbind_ProvidesBackend(c);
 
   c.def("__init__",
-        [](C& vec, const ssize_t size, const S& value) {
-          try {
-            new (&vec) C(boost::numeric_cast<size_t>(size), value);
-          } catch (boost::bad_numeric_cast& ee) {
-            DUNE_THROW(Common::Exceptions::wrong_input_given,
-                       "Given size has to be positive!\n\n The error in boost while converting '"
-                           << size
-                           << "' to '"
-                           << Common::Typename<size_t>::value()
-                           << "' was: "
-                           << ee.what());
-          }
-        },
+        [](C& vec, const ssize_t size, const S& value) { new (&vec) C(Common::numeric_cast<size_t>(size), value); },
         "size"_a = 0,
         "value"_a = 0.0);
   c.def("__init__",
@@ -137,10 +124,18 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   c.def(py::self *= R());
   c.def(py::self /= R());
 
-  c.def("size", &C::size);
-  c.def("add_to_entry", &C::add_to_entry, "ii"_a, "value"_a);
-  c.def("set_entry", &C::set_entry, "ii"_a, "value"_a);
-  c.def("get_entry", &C::get_entry);
+  c.def_property_readonly("size", [](const C& self) { return self.size(); });
+  c.def("add_to_entry",
+        [](C& self, const ssize_t ii, const S& value) { self.add_to_entry(Common::numeric_cast<size_t>(ii), value); },
+        "ii"_a,
+        "value"_a);
+  c.def("set_entry",
+        [](C& self, const ssize_t ii, const S& value) { self.set_entry(Common::numeric_cast<size_t>(ii), value); },
+        "ii"_a,
+        "value"_a);
+  c.def("get_entry",
+        [](const C& self, const ssize_t ii) { return self.get_entry(Common::numeric_cast<size_t>(ii)); },
+        "jj"_a);
   c.def("set_all", [](C& self, const S& value) { self.set_all(value); }, "value"_a);
   c.def("valid", [](const C& self) { return self.valid(); });
   c.def("dim", [](const C& self) { return self.dim(); });
@@ -151,9 +146,9 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
         "other"_a,
         "epsilon"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
   c.def("dot", [](const C& self, const C& other) { return self.dot(other); });
-  c.def("l1_norm", &C::l1_norm);
-  c.def("l2_norm", &C::l2_norm);
-  c.def("sup_norm", &C::sup_norm);
+  c.def("l1_norm", [](const C& self) { return self.l1_norm(); });
+  c.def("l2_norm", [](const C& self) { return self.l2_norm(); });
+  c.def("sup_norm", [](const C& self) { return self.sup_norm(); });
   c.def("standard_deviation", [](const C& self) { return self.standard_deviation(); });
 
   c.def("__getstate__", [](const C& self) { return py::make_tuple(std::vector<S>(self)); });

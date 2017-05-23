@@ -13,13 +13,13 @@
 
 #include <sstream>
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
 
+#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/string.hh>
 
+#include <dune/xt/la/container/io.hh>
 #include <dune/xt/la/type_traits.hh>
 
 #include "matrix-interface.hh"
@@ -42,31 +42,7 @@ struct addbind_Matrix
 
     c.def("__init__",
           [](T& self, const ssize_t rows, const ssize_t cols, const S& value) {
-            size_t rr = 0;
-            size_t cc = 0;
-            try {
-              rr = boost::numeric_cast<size_t>(rows);
-            } catch (boost::bad_numeric_cast& ee) {
-              DUNE_THROW(Common::Exceptions::wrong_input_given,
-                         "Given rows has to be positive!\n\n The error in boost while converting '"
-                             << rows
-                             << "' to '"
-                             << Common::Typename<size_t>::value()
-                             << "' was: "
-                             << ee.what());
-            }
-            try {
-              cc = boost::numeric_cast<size_t>(cols);
-            } catch (boost::bad_numeric_cast& ee) {
-              DUNE_THROW(Common::Exceptions::wrong_input_given,
-                         "Given cols has to be positive!\n\n The error in boost while converting '"
-                             << cols
-                             << "' to '"
-                             << Common::Typename<size_t>::value()
-                             << "' was: "
-                             << ee.what());
-            }
-            new (&self) T(rr, cc, value);
+            new (&self) T(Common::numeric_cast<size_t>(rows), Common::numeric_cast<size_t>(cols), value);
           },
           "rows"_a = 0,
           "cols"_a = 0,
@@ -124,31 +100,7 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
   internal::addbind_Matrix<C, sparse>::template ctor<S>(c);
   c.def("__init__",
         [](C& self, const ssize_t rows, const ssize_t cols, const SparsityPatternDefault& pattern) {
-          size_t rr = 0;
-          size_t cc = 0;
-          try {
-            rr = boost::numeric_cast<size_t>(rows);
-          } catch (boost::bad_numeric_cast& ee) {
-            DUNE_THROW(Common::Exceptions::wrong_input_given,
-                       "Given rows has to be positive!\n\n The error in boost while converting '"
-                           << rows
-                           << "' to '"
-                           << Common::Typename<size_t>::value()
-                           << "' was: "
-                           << ee.what());
-          }
-          try {
-            cc = boost::numeric_cast<size_t>(cols);
-          } catch (boost::bad_numeric_cast& ee) {
-            DUNE_THROW(Common::Exceptions::wrong_input_given,
-                       "Given cols has to be positive!\n\n The error in boost while converting '"
-                           << cols
-                           << "' to '"
-                           << Common::Typename<size_t>::value()
-                           << "' was: "
-                           << ee.what());
-          }
-          new (&self) C(rr, cc, pattern);
+          new (&self) C(Common::numeric_cast<size_t>(rows), Common::numeric_cast<size_t>(cols), pattern);
         },
         "rows"_a,
         "cols"_a,
@@ -194,20 +146,56 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
         },
         "A full representation of the matrix.");
 
-  c.def("rows", &C::rows);
-  c.def("cols", &C::cols);
-  c.def("add_to_entry", &C::add_to_entry, "ii"_a, "jj"_a, "value"_a);
-  c.def("set_entry", &C::set_entry, "ii"_a, "jj"_a, "value"_a);
-  c.def("get_entry", &C::get_entry);
-  c.def("clear_row", &C::clear_row);
-  c.def("clear_col", &C::clear_col);
-  c.def("unit_row", &C::unit_row);
-  c.def("unit_col", &C::unit_col);
-  c.def("valid", &C::valid);
-  c.def("sup_norm", &C::sup_norm);
-  c.def("non_zeros", &C::non_zeros);
-  c.def("pattern", &C::pattern, "prune"_a = false, "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
-  c.def("pruned", &C::pruned);
+  c.def_property_readonly("rows", [](const C& self) { return self.rows(); });
+  c.def_property_readonly("cols", [](const C& self) { return self.cols(); });
+  c.def("add_to_entry",
+        [](C& self, const ssize_t ii, const ssize_t jj, const S& value) {
+          self.add_to_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj), value);
+        },
+        "ii"_a,
+        "jj"_a,
+        "value"_a);
+  c.def("set_entry",
+        [](C& self, const ssize_t ii, const ssize_t jj, const S& value) {
+          self.set_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj), value);
+        },
+        "ii"_a,
+        "jj"_a,
+        "value"_a);
+  c.def("get_entry",
+        [](const C& self, const ssize_t ii, const ssize_t jj) {
+          return self.get_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj));
+        },
+        "ii"_a,
+        "jj"_a);
+  c.def("clear_row", [](C& self, const ssize_t ii) { self.clear_row(Common::numeric_cast<size_t>(ii)); }, "ii"_a);
+  c.def("clear_col", [](C& self, const ssize_t jj) { self.clear_row(Common::numeric_cast<size_t>(jj)); }, "jj"_a);
+  c.def("unit_row", [](C& self, const ssize_t ii) { self.unit_row(Common::numeric_cast<size_t>(ii)); }, "ii"_a);
+  c.def("unit_col", [](C& self, const ssize_t jj) { self.unit_col(Common::numeric_cast<size_t>(jj)); }, "jj"_a);
+  c.def("valid", [](const C& self) { return self.valid(); });
+  c.def("sup_norm", [](const C& self) { return self.sup_norm(); });
+  c.def_property_readonly("non_zeros", [](const C& self) { return self.non_zeros(); });
+  c.def("pattern",
+        [](const C& self, const bool prune, const S& eps) { return self.pattern(prune, eps); },
+        "prune"_a = false,
+        "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
+  c.def("pruned",
+        [](const C& self, const S& eps) { return self.pruned(eps); },
+        "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
+  c.def("almost_equal", [](const C& self, const C& other) { return self.almost_equal(other); });
+  c.def("to_file",
+        [](const C& self, const std::string& filename, const std::string& mode) { to_file(self, filename, mode); },
+        "filename"_a,
+        "mode"_a = "ascii");
+  c.def_static(
+      "from_file",
+      [](const std::string& filename, const ssize_t min_rows, const ssize_t min_cols, const std::string& mode) {
+        return from_file<C>(filename, min_rows, min_cols, mode);
+      },
+      "filename"_a,
+      "min_rows"_a,
+      "min_cols"_a,
+      "mode"_a = "ascii");
 
   addbind_ContainerInterface(c);
 
