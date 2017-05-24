@@ -42,6 +42,21 @@ void to_file(const MatrixInterface<M>& matrix, const std::string& filename, cons
 } // ... to_file(...)
 
 
+template <class V>
+void to_file(const VectorInterface<V>& vector, const std::string& filename, const std::string& mode = "ascii")
+{
+  if (filename.empty())
+    DUNE_THROW(Common::Exceptions::wrong_input_given, "'filename' must not be empty!");
+  if (mode != "ascii")
+    DUNE_THROW(NotImplemented, "Currently, only 'ascii' is implemented!");
+  std::ofstream file(filename);
+  if (!file.is_open())
+    DUNE_THROW(IOError, "Could not open '" << filename << "' for writing!");
+  for (size_t ii = 0; ii < vector.size(); ++ii)
+    file << ii << " " << std::scientific << std::setprecision(15) << vector[ii] << std::endl;
+} // ... to_file(...)
+
+
 template <class M>
 typename std::enable_if<is_matrix<M>::value, M>::type from_file(const std::string& filename,
                                                                 const ssize_t min_rows = -1,
@@ -71,7 +86,7 @@ typename std::enable_if<is_matrix<M>::value, M>::type from_file(const std::strin
                      << "'");
     auto ii = Common::from_string<size_t>(words[0]);
     auto jj = Common::from_string<size_t>(words[1]);
-    auto value = Common::from_string<typename M::ScalarType>(words[2]);
+    auto value = Common::from_string<R>(words[2]);
     rows.insert(ii);
     max_row = std::max(max_row, ii);
     max_col = std::max(max_col, jj);
@@ -92,6 +107,44 @@ typename std::enable_if<is_matrix<M>::value, M>::type from_file(const std::strin
   for (const auto& element : values)
     matrix.set_entry(std::get<0>(element), std::get<1>(element), std::get<2>(element));
   return matrix;
+} // ... from_file(...)
+
+
+template <class V>
+typename std::enable_if<is_vector<V>::value, V>::type
+from_file(const std::string& filename, const ssize_t min_size = -1, const std::string& mode = "ascii")
+{
+  if (filename.empty())
+    DUNE_THROW(Common::Exceptions::wrong_input_given, "Given filename must not be empty!");
+  if (mode != "ascii")
+    DUNE_THROW(NotImplemented, "Currently, only 'ascii' is implemented!");
+  std::ifstream file(filename);
+  if (!file.is_open())
+    DUNE_THROW(IOError, "Could not open '" << filename << "' for reading!");
+  typedef typename V::ScalarType R;
+  std::vector<std::tuple<size_t, R>> values;
+  size_t max_size = 0;
+  std::string line;
+  while (std::getline(file, line)) {
+    const auto words = Common::tokenize(line, " ");
+    if (words.size() != 2)
+      DUNE_THROW(IOError,
+                 "Encountered illegal line (see below), Each line has to be of the form 'ii value'!\n\n"
+                     << "The line is '"
+                     << line
+                     << "'");
+    auto ii = Common::from_string<size_t>(words[0]);
+    auto value = Common::from_string<R>(words[1]);
+    max_size = std::max(max_size, ii);
+    values.emplace_back(std::tuple<size_t, R>(ii, value));
+  }
+  if (values.size() == 0)
+    DUNE_THROW(IOError, "Given file '" << filename << "' must not be empty!");
+  const size_t vector_size = std::max(min_size, ssize_t(max_size) + 1);
+  V vector(vector_size);
+  for (const auto& element : values)
+    vector[std::get<0>(element)] = std::get<1>(element);
+  return vector;
 } // ... from_file(...)
 
 
