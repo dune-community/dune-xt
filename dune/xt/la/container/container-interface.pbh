@@ -64,6 +64,12 @@ typename std::enable_if<is_container<C>::value, void>::type addbind_ContainerInt
   c.def("has_equal_shape", [](const C& self, const C& other) { return self.has_equal_shape(other); }, "other"_a);
   c.def(py::self *= S());
   c.def(py::self * S());
+  c.def("__sub__", [](const C& self, const C& other) {
+    auto ret = self.copy();
+    ret.axpy(-1, other);
+    return ret;
+  });
+
 } // ... addbind_ContainerInterface(...)
 
 
