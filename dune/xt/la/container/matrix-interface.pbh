@@ -141,7 +141,7 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
   c.def("__str__",
         [ClassName](const C& self) {
           std::stringstream ss;
-          ss << ClassName << "(" << self << ")";
+          ss << ClassName << "(\n" << self << "\n)";
           return ss.str();
         },
         "A full representation of the matrix.");
@@ -193,8 +193,8 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
         return from_file<C>(filename, min_rows, min_cols, mode);
       },
       "filename"_a,
-      "min_rows"_a,
-      "min_cols"_a,
+      "min_rows"_a = -1,
+      "min_cols"_a = -1,
       "mode"_a = "ascii");
 
   addbind_ContainerInterface(c);
