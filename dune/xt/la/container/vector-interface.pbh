@@ -22,6 +22,7 @@
 #include <dune/xt/la/type_traits.hh>
 #include <dune/xt/la/container.bindings.hh>
 
+#include "io.hh"
 #include "vector-interface.hh"
 #include "container-interface.pbh"
 
@@ -150,6 +151,17 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   c.def("l2_norm", [](const C& self) { return self.l2_norm(); });
   c.def("sup_norm", [](const C& self) { return self.sup_norm(); });
   c.def("standard_deviation", [](const C& self) { return self.standard_deviation(); });
+  c.def("to_file",
+        [](const C& self, const std::string& filename, const std::string& mode) { to_file(self, filename, mode); },
+        "filename"_a,
+        "mode"_a = "ascii");
+  c.def_static("from_file",
+               [](const std::string& filename, const ssize_t min_size, const std::string& mode) {
+                 return from_file<C>(filename, min_size, mode);
+               },
+               "filename"_a,
+               "min_size"_a = -1,
+               "mode"_a = "ascii");
 
   c.def("__getstate__", [](const C& self) { return py::make_tuple(std::vector<S>(self)); });
   c.def("__setstate__", [](C& self, py::tuple t) {
