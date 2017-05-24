@@ -156,6 +156,7 @@ public:
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, part, _class_name);                                   \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, view, _class_name);                                   \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain, part, _class_name);                            \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain_boundary, part, _class_name);                   \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain_coupling, part, _class_name)
 
 #define DUNE_XT_GRID_WALKER_APPLYON_BIND(_m)                                                                           \

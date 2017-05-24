@@ -80,6 +80,24 @@ public:
   }
 };
 
+template <class I, class G, bool anything>
+class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain_boundary, anything>
+{
+public:
+  static void bind(pybind11::module& /*m*/)
+  {
+  }
+};
+
+template <class I, class G, bool anything>
+class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain_coupling, anything>
+{
+public:
+  static void bind(pybind11::module& /*m*/)
+  {
+  }
+};
+
 
 } // namespace internal
 
@@ -150,7 +168,8 @@ public:
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part)
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part);                      \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, part)
 #else
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
 #endif
@@ -212,7 +231,9 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)                                                       \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view, _class_name, "leaf");                 \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, level, view, _class_name, "level");               \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part, _class_name, "dd_subdomain")
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part, _class_name, "dd_subdomain"); \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
+      _m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, part, _class_name, "dd_subdomain_boundary")
 #else
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)
 #endif
