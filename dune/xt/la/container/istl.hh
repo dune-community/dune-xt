@@ -31,7 +31,6 @@
 #endif
 
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/common/timings.hh>
 #include <dune/xt/common/math.hh>
 
 #include "interfaces.hh"
@@ -154,7 +153,9 @@ public:
 
   ThisType& operator=(const ThisType& other)
   {
-    backend_ = other.backend_;
+    if (this != &other) {
+      backend_ = other.backend_;
+    }
     return *this;
   }
 
@@ -170,15 +171,6 @@ public:
 
   /// \name Required by the ProvidesBackend interface.
   /// \{
-
-  ThisType& operator=(const ScalarType& value)
-  {
-    ensure_uniqueness();
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    for (auto& element : *this)
-      element = value;
-    return *this;
-  }
 
   BackendType& backend()
   {
@@ -526,7 +518,6 @@ public:
 
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
-    DUNE_XT_COMMON_TIMING_SCOPE(static_id() + ".mv");
     auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ref.mv(xx.backend(), yy.backend());
@@ -690,7 +681,6 @@ public:
 private:
   void build_sparse_matrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
   {
-    DUNE_XT_COMMON_TIMING_SCOPE(static_id() + ".build");
     backend_ = std::make_shared<BackendType>(rr, cc, BackendType::random);
     for (size_t ii = 0; ii < patt.size(); ++ii)
       backend_->setrowsize(ii, patt.inner(ii).size());
