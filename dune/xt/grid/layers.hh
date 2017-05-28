@@ -131,6 +131,28 @@ struct Layer<GridType, Layers::level, Backends::view, DdGridType>
 }; // struct Layer<..., level, view>
 
 
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::dd_subdomain, Backends::view, DdGridType>
+{
+  typedef typename DD::SubdomainGrid<GridType>::LocalGridViewType type;
+
+  static type create(const GridType& /*grid*/,
+                     const int /*subdomain*/ = 0,
+                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
+  {
+    static_assert(AlwaysFalse<GridType>::value,
+                  "dune-fem does not allow the creation of grid parts from a const grid!");
+  }
+
+  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  {
+    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
+                  "Only available for DD::SubdomainGrid!");
+    return dd_grid->local_grid_view(subdomain, /*oversampling=*/false);
+  }
+}; // struct Layer<..., dd_subdomain, view>
+
+
 #if HAVE_DUNE_FEM
 
 
