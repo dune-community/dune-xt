@@ -15,7 +15,7 @@
 #include <dune/pybindxi/operators.h>
 
 #include <dune/xt/common/string.hh>
-
+#include <dune/xt/grid/grids.bindings.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
 #include "interfaces.hh"
@@ -229,6 +229,34 @@ void addbind_LocalizableFunctionInterface_combined_op(C& c)
         py::keep_alive<0, 1>(),
         py::keep_alive<0, 2>());
 } // ... addbind_LocalizableFunctionInterface_combined_op(...)
+
+
+template <class G, class E, class D, size_t d, class R, size_t r, size_t rC>
+void addbind_make_divergence(pybind11::module& m, pybind11::class_<LocalizableFunctionInterface<E, D, d, R, r, rC>>& c)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+  using Common::to_string;
+
+  try { // guard since we might not be the first to do bind this combination
+    py::class_<DivergenceFunction<LocalizableFunctionInterface<E, D, d, R, r, rC>>,
+               LocalizableFunctionInterface<E, D, d, R, 1, 1>>(
+        m,
+        Common::to_camel_case(
+            "divergence_of_function_from_" + Grid::bindings::grid_name<G>::value() + "_to_" + to_string(r) + "x"
+            + to_string(rC))
+            .c_str(),
+        "DivergenceFunction");
+  } catch (std::runtime_error&) {
+  }
+
+  c.def("divergence",
+        [](const LocalizableFunctionInterface<E, D, d, R, r, rC>& self, const std::string& name) {
+          return new DivergenceFunction<LocalizableFunctionInterface<E, D, d, R, r, rC>>(self, name);
+        },
+        "name"_a = "",
+        py::keep_alive<0, 1>());
+} // ... addbind_make_divergence(...)
 
 
 } // namespace Functions

@@ -38,6 +38,7 @@ void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
 {
   auto i_1_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
   auto i_2_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
+  Dune::XT::Functions::addbind_make_divergence<G>(m, i_2_1);
   auto i_3_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 3, 1>(m, grid_id);
   auto i_4_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 4, 1>(m, grid_id);
 
