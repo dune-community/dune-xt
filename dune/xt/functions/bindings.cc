@@ -38,11 +38,10 @@ void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
 {
   auto i_1_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
   auto i_2_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
-  Dune::XT::Functions::addbind_make_divergence<G>(m, i_2_1);
   auto i_3_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 3, 1>(m, grid_id);
   auto i_4_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 4, 1>(m, grid_id);
 
-  auto i_2_2 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 2, 2>(m, grid_id);
+  auto i_d_d = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, G::dimension, G::dimension>(m, grid_id);
 
   Dune::XT::Functions::bind_combined_LocalizableFunction<G,
                                                          G::dimension,
@@ -115,10 +114,10 @@ void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
       addbind_LocalizableFunctionInterface_combined_op<G,
                                                        G::dimension,
                                                        Dune::XT::Functions::internal::Combination::difference,
-                                                       2,
-                                                       2,
-                                                       2,
-                                                       2>(i_2_2);
+                                                       G::dimension,
+                                                       G::dimension,
+                                                       G::dimension,
+                                                       G::dimension>(i_d_d);
 
 
   Dune::XT::Functions::
@@ -167,10 +166,10 @@ void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
   Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<G,
                                                                         G::dimension,
                                                                         Dune::XT::Functions::internal::Combination::sum,
-                                                                        2,
-                                                                        2,
-                                                                        2,
-                                                                        2>(i_2_2);
+                                                                        G::dimension,
+                                                                        G::dimension,
+                                                                        G::dimension,
+                                                                        G::dimension>(i_d_d);
 
   Dune::XT::Functions::bind_combined_LocalizableFunction<G,
                                                          G::dimension,
