@@ -29,6 +29,7 @@
 #include "interfaces.pbh"
 #include "constant.pbh"
 #include "checkerboard.pbh"
+#include "ESV2007.bindings.hh"
 #include "expression.pbh"
 #include "spe10.pbh"
 
@@ -257,6 +258,8 @@ void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
   //  Dune::XT::Functions::bind_CheckerboardFunction<G, G::dimension, 2, 1>(m, grid_id);
   //  Dune::XT::Functions::bind_CheckerboardFunction<G, G::dimension, 3, 1>(m, grid_id);
   //  Dune::XT::Functions::bind_CheckerboardFunction<G, G::dimension, 4, 1>(m, grid_id);
+
+  Dune::XT::Functions::bindings::ESV2007::CutoffFunction<G>::bind(m);
 
   Dune::XT::Functions::bind_ExpressionFunction<G, G::dimension, 1, 1>(m, grid_id);
   Dune::XT::Functions::bind_ExpressionFunction<G, G::dimension, 2, 1>(m, grid_id);
