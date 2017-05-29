@@ -24,7 +24,7 @@
 #include <dune/pybindxi/stl.h>
 
 #include <dune/xt/common/bindings.hh>
-#include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/grids.bindings.hh>
 
 #include "interfaces.pbh"
 #include "constant.pbh"
@@ -35,8 +35,10 @@
 
 
 template <class G>
-void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
+void addbind_for_Grid(pybind11::module& m)
 {
+  const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
+
   auto i_1_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
   auto i_2_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
   auto i_3_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 3, 1>(m, grid_id);
@@ -282,10 +284,10 @@ PYBIND11_PLUGIN(_functions)
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.grid");
 
-  addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m, "1d_yaspgrid");
-  addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m, "2d_cube_yaspgrid");
+  addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m);
+  addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m);
 #if HAVE_DUNE_ALUGRID
-  addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m, "2d_simplex_aluconform");
+  addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m);
 #endif
   //#if HAVE_UG
   //  addbind_for_Grid<Dune::UGGrid<2>>(m, "2d_simplex_uggrid");
