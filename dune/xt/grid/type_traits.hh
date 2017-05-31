@@ -103,6 +103,18 @@ struct is_grid<Dune::SPGrid<ct, dim, Ref, Comm>> : public std::true_type
 
 #endif // HAVE_DUNE_SPGRID
 
+
+template <class T, int codim = 0>
+struct is_entity : public std::false_type
+{
+};
+
+template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
+struct is_entity<Dune::Entity<cd, dim, GridImp, EntityImp>, cd> : public std::true_type
+{
+};
+
+
 template <class T>
 struct is_view : public std::false_type
 {
@@ -112,6 +124,7 @@ template <class T>
 struct is_view<Dune::GridView<T>> : public std::true_type
 {
 };
+
 
 template <class T>
 struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_grid_view : public is_view<T>
