@@ -126,6 +126,15 @@ struct is_view<Dune::GridView<T>> : public std::true_type
 };
 
 
+#if HAVE_DUNE_FEM
+
+template <class T>
+struct is_view<Dune::Fem::GridPart2GridView<T>> : public std::true_type
+{
+};
+
+#endif // HAVE_DUNE_FEM
+
 template <class T>
 struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_grid_view : public is_view<T>
 {
