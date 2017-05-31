@@ -240,8 +240,9 @@ template <class T,
           bool view = is_view<T>::value,
           bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool intersection = is_intersection<T>::value>
-struct extract_grid : public std::false_type
+struct extract_grid
 {
+  static_assert(Dune::AlwaysFalse<T>::value, "type T is not something we can extract a gridtype from");
 };
 
 template <class T>
