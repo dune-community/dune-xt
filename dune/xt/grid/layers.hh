@@ -50,6 +50,7 @@ enum class Layers
   leaf,
   level,
   dd_subdomain,
+  dd_subdomain_oversampled,
   dd_subdomain_boundary,
   dd_subdomain_coupling
 };
@@ -153,6 +154,28 @@ struct Layer<GridType, Layers::dd_subdomain, Backends::view, DdGridType>
 }; // struct Layer<..., dd_subdomain, view>
 
 
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::view, DdGridType>
+{
+  typedef typename DD::SubdomainGrid<GridType>::LocalGridViewType type;
+
+  static type create(const GridType& /*grid*/,
+                     const int /*subdomain*/ = 0,
+                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
+  {
+    static_assert(AlwaysFalse<GridType>::value,
+                  "dune-fem does not allow the creation of grid parts from a const grid!");
+  }
+
+  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  {
+    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
+                  "Only available for DD::SubdomainGrid!");
+    return dd_grid->local_grid_view(subdomain, /*oversampling=*/true);
+  }
+}; // struct Layer<..., dd_subdomain_oversampled, view>
+
+
 #if HAVE_DUNE_FEM
 
 
@@ -244,6 +267,28 @@ struct Layer<GridType, Layers::dd_subdomain, Backends::part, DdGridType>
     return dd_grid->localGridPart(subdomain, /*oversampling=*/false);
   }
 }; // struct Layer<..., dd_subdomain, part>
+
+
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::part, DdGridType>
+{
+  typedef SubdomainGridPart<Fem::LeafGridPart<GridType>> type;
+
+  static type create(const GridType& /*grid*/,
+                     const int /*subdomain*/ = 0,
+                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
+  {
+    static_assert(AlwaysFalse<GridType>::value,
+                  "dune-fem does not allow the creation of grid parts from a const grid!");
+  }
+
+  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  {
+    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
+                  "Only available for DD::SubdomainGrid!");
+    return dd_grid->localGridPart(subdomain, /*oversampling=*/true);
+  }
+}; // struct Layer<..., dd_subdomain_oversampled, part>
 
 
 template <class GridType, class DdGridType>
