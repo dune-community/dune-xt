@@ -90,6 +90,20 @@ pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridPro
   c.def("neighboring_subdomains", [](const C& self, const ssize_t subdomain) {
     return self.dd_grid().neighborsOf(XT::Common::numeric_cast<size_t>(subdomain));
   });
+  c.def("neighborhood_of",
+        [](const C& self, const ssize_t subdomain) {
+          const auto ss = XT::Common::numeric_cast<size_t>(subdomain);
+          if (ss >= self.dd_grid().size())
+            DUNE_THROW(XT::Common::Exceptions::index_out_of_range,
+                       "subdomain: " << ss << "\n   self.num_blocks: " << self.dd_grid().size());
+          std::set<size_t> neighborhood;
+          neighborhood.insert(ss);
+          if (self.dd_grid().oversampling())
+            for (auto&& entity : elements(self.dd_grid().localGridPart(ss, /*oversampling=*/true)))
+              neighborhood.insert(self.dd_grid().subdomainOf(entity));
+          return neighborhood;
+        },
+        "subdomain"_a);
 
   return c;
 } // ... bind_DdSubdomainsGridProvider(...)
