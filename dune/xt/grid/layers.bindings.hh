@@ -80,6 +80,15 @@ struct layer_name<Layers::dd_subdomain>
 };
 
 template <>
+struct layer_name<Layers::dd_subdomain_boundary>
+{
+  static std::string value()
+  {
+    return "dd_subdomain_boundary";
+  }
+};
+
+template <>
 struct layer_name<Layers::dd_subdomain_coupling>
 {
   static std::string value()
@@ -89,11 +98,11 @@ struct layer_name<Layers::dd_subdomain_coupling>
 };
 
 template <>
-struct layer_name<Layers::dd_subdomain_boundary>
+struct layer_name<Layers::dd_subdomain_oversampled>
 {
   static std::string value()
   {
-    return "dd_subdomain_boundary";
+    return "dd_subdomain_oversampled";
   }
 };
 
