@@ -43,6 +43,28 @@ template <class GlobalGridPartImp>
 class SubdomainCouplingGridPart;
 
 
+namespace internal {
+
+
+template <class T>
+struct is_dd_subdomain_helper
+{
+  DXTC_has_typedef_initialize_once(GlobalGridPartType);
+  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
+};
+
+
+template <class T>
+struct has_traits_helper
+{
+  DXTC_has_typedef_initialize_once(Traits);
+  static const bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
+};
+
+
+} // namespace internal
+
+
 template <class T>
 struct is_intersection : public std::false_type
 {
@@ -115,13 +137,13 @@ struct is_entity<Dune::Entity<cd, dim, GridImp, EntityImp>, cd> : public std::tr
 };
 
 
-template <class T>
+template <class T, bool candidate = internal::has_traits_helper<T>::is_candidate>
 struct is_view : public std::false_type
 {
 };
 
 template <class T>
-struct is_view<Dune::GridView<T>> : public std::true_type
+struct is_view<T, true> : public std::is_base_of<Dune::GridView<typename T::Traits>, T>
 {
 };
 
@@ -144,35 +166,6 @@ template <class T>
 struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_grid_view : public is_view<T>
 {
 };
-
-
-namespace internal {
-
-
-template <class T>
-struct is_dd_subdomain_helper
-{
-  DXTC_has_typedef_initialize_once(GlobalGridPartType);
-  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
-};
-
-
-// the following did not work, so we need to use the messy approach below
-
-// template <class T>
-// struct is_part : public std::false_type {};
-// template <class T>
-// struct is_part<Dune::Fem::GridPartInterface<T>> : public std::true_type {};
-
-template <class T>
-struct is_part_helper
-{
-  DXTC_has_typedef_initialize_once(Traits);
-  static const bool is_candidate = DXTC_has_typedef(Traits)<T>::value;
-};
-
-
-} // namespace internal
 
 
 template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
@@ -210,7 +203,7 @@ struct is_dd_subdomain_coupling<T, true>
 };
 
 
-template <class T, bool is_candidate = internal::is_part_helper<T>::is_candidate>
+template <class T, bool is_candidate = internal::has_traits_helper<T>::is_candidate>
 struct is_part : public std::false_type
 {
 };
