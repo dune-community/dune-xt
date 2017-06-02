@@ -280,8 +280,7 @@ public:
   static std::vector<std::string> available()
   {
     std::vector<std::string> ret;
-    call_append<CubeType>(ret);
-    return ret;
+    return call_append<CubeType>(ret);
   }
 
   static Common::Configuration default_config(const std::string type)
