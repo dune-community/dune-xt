@@ -114,6 +114,84 @@ struct FunctionTypeGenerator
       type;
 };
 
+//! Utility for uniform handling of RangeType for functions with dimRangeCols == 1
+//! and functions with dimRangeCols > 1.
+template <size_t dimRange, size_t dimRangeCols>
+struct RangeTypeConverter
+{
+  typedef Dune::FieldMatrix<double, dimRange, dimRangeCols> UnifiedRangeType;
+  typedef UnifiedRangeType RangeType;
+
+  static UnifiedRangeType convert(const UnifiedRangeType& in)
+  {
+    return in;
+  }
+
+  static RangeType convert_back(const UnifiedRangeType& in)
+  {
+    return in;
+  }
+};
+
+template <size_t dimRange>
+struct RangeTypeConverter<dimRange, 1>
+{
+  typedef Dune::FieldMatrix<double, dimRange, 1> UnifiedRangeType;
+  typedef Dune::FieldVector<double, dimRange> RangeType;
+
+  static UnifiedRangeType convert(const RangeType& in)
+  {
+    UnifiedRangeType out;
+    for (size_t ii = 0; ii < dimRange; ++ii)
+      out[ii][0] = in[ii];
+    return out;
+  }
+
+  static RangeType convert_back(const UnifiedRangeType& in)
+  {
+    RangeType out;
+    for (size_t ii = 0; ii < dimRange; ++ii)
+      out[ii] = in[ii][0];
+    return out;
+  }
+};
+
+//! Utility for uniform handling of JacobianRangeType for functions with dimRangeCols == 1
+//! and functions with dimRangeCols > 1.
+template <size_t dimDomain, size_t dimRange, size_t dimRangeCols>
+struct JacobianRangeTypeConverter
+{
+  typedef typename Dune::FieldVector<Dune::FieldMatrix<double, dimRange, dimDomain>, dimRangeCols> JacobianRangeType;
+  typedef JacobianRangeType UnifiedJacobianRangeType;
+
+  static UnifiedJacobianRangeType convert(const JacobianRangeType& ret)
+  {
+    return ret;
+  }
+
+  static JacobianRangeType convert_back(const UnifiedJacobianRangeType& ret)
+  {
+    return ret;
+  }
+};
+
+template <size_t dimDomain, size_t dimRange>
+struct JacobianRangeTypeConverter<dimDomain, dimRange, 1>
+{
+  typedef typename Dune::FieldMatrix<double, dimRange, dimDomain> JacobianRangeType;
+  typedef typename Dune::FieldVector<JacobianRangeType, 1> UnifiedJacobianRangeType;
+
+  static UnifiedJacobianRangeType convert(const JacobianRangeType& in)
+  {
+    return UnifiedJacobianRangeType(in);
+  }
+
+  static JacobianRangeType convert_back(const UnifiedJacobianRangeType& in)
+  {
+    return in[0];
+  }
+};
+
 
 } // namespace Functions
 } // namespace XT
