@@ -26,6 +26,31 @@ namespace XT {
 namespace Functions {
 
 
+template <class RangeFieldType, size_t dimRange, size_t dimRangeCols>
+struct RangeTypeSelector
+{
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> type;
+};
+
+template <class RangeFieldType, size_t dimRange>
+struct RangeTypeSelector<RangeFieldType, dimRange, 1>
+{
+  typedef Dune::FieldVector<RangeFieldType, dimRange> type;
+};
+
+template <size_t dimDomain, class RangeFieldType, size_t dimRange, size_t dimRangeCols>
+struct JacobianRangeTypeSelector
+{
+  typedef Dune::FieldVector<Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain>, dimRangeCols> type;
+};
+
+template <size_t dimDomain, class RangeFieldType, size_t dimRange>
+struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
+{
+  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> type;
+};
+
+
 /**
  *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  */
@@ -38,30 +63,6 @@ template <class EntityImp,
 class LocalfunctionSetInterface : public Common::ParametricInterface
 {
   static_assert(EntityImp::dimension == domainDim, "Dimensions do not match!");
-
-  template <class RangeFieldType, size_t dimRange, size_t dimRangeCols>
-  struct RangeTypeSelector
-  {
-    typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> type;
-  };
-
-  template <class RangeFieldType, size_t dimRange>
-  struct RangeTypeSelector<RangeFieldType, dimRange, 1>
-  {
-    typedef Dune::FieldVector<RangeFieldType, dimRange> type;
-  };
-
-  template <size_t dimDomain, class RangeFieldType, size_t dimRange, size_t dimRangeCols>
-  struct JacobianRangeTypeSelector
-  {
-    typedef Dune::FieldVector<Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain>, dimRangeCols> type;
-  };
-
-  template <size_t dimDomain, class RangeFieldType, size_t dimRange>
-  struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
-  {
-    typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> type;
-  };
 
 public:
   typedef EntityImp EntityType;
