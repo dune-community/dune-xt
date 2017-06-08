@@ -46,6 +46,13 @@ public:
   typedef LocalFluxFunctionInterface<E, D, d, typename U::LocalfunctionType, state_derivative_order, R, r, rC>
       LocalfunctionType;
 
+  typedef typename LocalfunctionType::DomainType DomainType;
+  typedef typename LocalfunctionType::RangeType RangeType;
+  typedef typename LocalfunctionType::StateRangeType StateRangeType;
+  typedef typename LocalfunctionType::JacobianWrtXRangeType JacobianWrtXRangeType;
+  typedef typename LocalfunctionType::JacobianWrtURangeType JacobianWrtURangeType;
+
+  static const bool available = false;
   virtual ~LocalizableFluxFunctionInterface() = default;
 
   static std::string static_id()

@@ -55,7 +55,8 @@ public:
   static const constexpr size_t rC = rC_;
   static const constexpr size_t dimRangeCols = rC_;
   typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::RangeType RangeType;
-  typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::JacobianRangeType JacobianRangeType;
+  typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::JacobianRangeType JacobianWrtXRangeType;
+  typedef typename JacobianRangeTypeSelector<StateType::dimRange, R, r, rC>::type JacobianWrtURangeType;
 
   LocalFluxFunctionInterface(const EntityType& en)
     : entity_(en)
@@ -69,15 +70,28 @@ public:
     return entity_;
   }
 
+  virtual size_t order() const = 0;
+
   virtual void evaluate(const DomainType& /*x*/,
                         const StateRangeType& /*u*/,
                         RangeType& /*ret*/,
                         const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
-  virtual void jacobian(const DomainType& /*x*/,
-                        const StateRangeType& /*u*/,
-                        JacobianRangeType& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+  virtual void jacobian_wrt_x(const DomainType& /*x*/,
+                              const StateRangeType& /*u*/,
+                              JacobianWrtXRangeType& /*ret*/,
+                              const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  {
+    DUNE_THROW(NotImplemented, "");
+  }
+
+  virtual void jacobian_wrt_u(const DomainType& /*x*/,
+                              const StateRangeType& /*u*/,
+                              JacobianWrtURangeType& /*ret*/,
+                              const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  {
+    DUNE_THROW(NotImplemented, "");
+  }
 
   /**
    * \name ´´These methods are provided by the interface.''
@@ -91,13 +105,22 @@ public:
     return ret;
   }
 
-  JacobianRangeType
-  jacobian(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
+  JacobianWrtXRangeType
+  jacobian_wrt_x(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
   {
-    JacobianRangeType ret(0);
-    jacobian(x, u, ret, mu);
+    JacobianWrtXRangeType ret(0);
+    jacobian_wrt_x(x, u, ret, mu);
     return ret;
   }
+
+  JacobianWrtURangeType
+  jacobian_wrt_u(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
+  {
+    JacobianWrtURangeType ret(0);
+    jacobian_wrt_u(x, u, ret, mu);
+    return ret;
+  }
+
   /**
    * \}
    **/
