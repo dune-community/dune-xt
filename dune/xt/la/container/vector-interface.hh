@@ -230,6 +230,41 @@ public:
     return Common::FloatCmp::eq(this->as_imp(), other.as_imp(), epsilon);
   } // ... almost_equal(...)
 
+private:
+  template <bool is_complex = XT::Common::is_complex<ScalarType>::value, bool anything = true>
+  struct dot_helper
+  {
+    static ScalarType compute(const derived_type& ths, const derived_type& other)
+    {
+      using std::conj;
+      if (other.size() != ths.size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << ths.size()
+                                         << ")!");
+      ScalarType result = 0;
+      for (size_t ii = 0; ii < ths.size(); ++ii)
+        result += conj(ths.get_entry_ref(ii)) * other.get_entry_ref(ii);
+      return result;
+    }
+  }; // struct dot_helper<true, ...>
+
+  template <bool anything>
+  struct dot_helper<false, anything>
+  {
+    static ScalarType compute(const derived_type& ths, const derived_type& other)
+    {
+      if (other.size() != ths.size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << ths.size()
+                                         << ")!");
+      ScalarType result = 0;
+      for (size_t ii = 0; ii < ths.size(); ++ii)
+        result += ths.get_entry_ref(ii) * other.get_entry_ref(ii);
+      return result;
+    }
+  }; // struct dot_helper<false, ...>
+
+public:
   /**
    *  \brief  Computes the scalar products between two vectors.
    *  \param  other The second factor.
@@ -238,15 +273,8 @@ public:
    */
   virtual ScalarType dot(const derived_type& other) const
   {
-    using std::conj;
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    ScalarType result = 0;
-    for (size_t ii = 0; ii < size(); ++ii)
-      result += conj(get_entry_ref(ii)) * other.get_entry_ref(ii);
-    return result;
-  } // ... dot(...)
+    return dot_helper<>::compute(this->as_imp(), other);
+  }
 
   /**
    *  \brief  The l1-norm of the vector.
