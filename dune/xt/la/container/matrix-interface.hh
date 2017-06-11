@@ -352,6 +352,32 @@ struct MatrixAbstractionBase
 }; // struct MatrixAbstractionBase
 
 
+template <class XtLaMatrixImp, size_t rows, size_t cols>
+struct FieldMatrixToLaDenseMatrix
+{
+  typedef XtLaMatrixImp LaMatrixType;
+  typedef Dune::FieldMatrix<typename LaMatrixType::ScalarType, rows, cols> FieldMatrixType;
+
+  static LaMatrixType convert(const FieldMatrixType& in)
+  {
+    LaMatrixType out(rows, cols);
+    for (size_t ii = 0; ii < rows; ++ii)
+      for (size_t jj = 0; jj < cols; ++jj)
+        out.set_entry(ii, jj, in[ii][jj]);
+    return out;
+  }
+
+  static FieldMatrixType convert_back(const LaMatrixType& in)
+  {
+    FieldMatrixType out;
+    for (size_t ii = 0; ii < rows; ++ii)
+      for (size_t jj = 0; jj < cols; ++jj)
+        out[ii][jj] = in.get_entry(ii, jj);
+    return out;
+  }
+};
+
+
 } // namespace internal
 } // namespace LA
 } // namespace XT

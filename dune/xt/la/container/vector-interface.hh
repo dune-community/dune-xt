@@ -566,7 +566,32 @@ struct VectorAbstractionBase
   }
 }; // struct VectorAbstractionBase
 
+template <class XtLaVectorImp, size_t size>
+struct FieldVectorToLaVector
+{
+  typedef XtLaVectorImp LaVectorType;
+  typedef Dune::FieldVector<typename LaVectorType::ScalarType, size> FieldVectorType;
+
+  static LaVectorType convert(const FieldVectorType& in)
+  {
+    LaVectorType out(size);
+    for (size_t ii = 0; ii < size; ++ii)
+      out.set_entry(ii, in[ii]);
+    return out;
+  }
+
+  static FieldVectorType convert_back(const LaVectorType& in)
+  {
+    FieldVectorType out;
+    for (size_t ii = 0; ii < size; ++ii)
+      out[ii] = in.get_entry(ii);
+    return out;
+  }
+};
+
+
 } // namespace internal
+
 
 template <class T, class S>
 std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
@@ -582,6 +607,7 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
   out << "]";
   return out;
 } // ... operator<<(...)
+
 
 } // namespace LA
 } // namespace XT
