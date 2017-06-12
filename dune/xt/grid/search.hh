@@ -38,7 +38,7 @@ class EntitySearchBase
   static_assert(is_layer<GridLayerType>::value, "");
 
 public:
-  typedef extract_entity_t<GridLayerType> EntityType;
+  typedef extract_entity_t<GridLayerType, codim> EntityType;
   typedef typename EntityType::Geometry::LocalCoordinate LocalCoordinateType;
   typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
   typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
