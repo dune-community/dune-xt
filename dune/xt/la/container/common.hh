@@ -285,16 +285,6 @@ protected:
   }
 
 public:
-  inline ScalarType& operator[](const size_t ii)
-  {
-    return backend()[ii];
-  }
-
-  inline const ScalarType& operator[](const size_t ii) const
-  {
-    return backend()[ii];
-  }
-
   /// \}
   /// \name These methods override default implementations from VectorInterface.
   /// \{

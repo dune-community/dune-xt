@@ -51,6 +51,8 @@ public:
 
   typedef internal::VectorInputIterator<Traits, ScalarType> const_iterator;
   typedef internal::VectorOutputIterator<Traits, ScalarType> iterator;
+  friend const_iterator;
+  friend iterator;
 
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
@@ -133,24 +135,6 @@ public:
     }
     return true;
   } // ... valid()
-
-  /**
-   * \brief Get writable reference to the iith entry.
-   */
-  inline ScalarType& operator[](const size_t ii)
-  {
-    CHECK_CRTP(this->as_imp()[ii]);
-    return this->as_imp()[ii];
-  }
-
-  /**
-   * \brief Get read-only reference to the iith entry.
-   */
-  inline const ScalarType& operator[](const size_t ii) const
-  {
-    CHECK_CRTP(this->as_imp()[ii]);
-    return this->as_imp()[ii];
-  }
 
   /**
    * \brief   The dimension of the vector.
@@ -564,6 +548,16 @@ struct VectorAbstractionBase
   {
     return VectorType(sz, val);
   }
+
+  static inline ScalarType get_entry(const VectorType& vector, const size_t ii)
+  {
+    return vector.get_entry(ii);
+  }
+
+  static inline void set_entry(VectorType& vector, const size_t ii, const ScalarType& val)
+  {
+    vector.set_entry(ii, val);
+  }
 }; // struct VectorAbstractionBase
 
 template <class XtLaVectorImp, size_t size>
@@ -599,9 +593,9 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
   out << "[";
   const size_t sz = vector.size();
   if (sz > 0) {
-    out << vector[0];
+    out << vector.get_entry(0);
     for (size_t ii = 1; ii < sz; ++ii)
-      out << "\n " << vector[ii];
+      out << "\n " << vector.get_entry(ii);
   } else
     out << " ";
   out << "]";
