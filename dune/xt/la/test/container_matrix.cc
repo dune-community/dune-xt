@@ -168,20 +168,20 @@ struct MatrixTest : public ::testing::Test
     for (size_t ii = 0; ii < dim; ++ii)
       vector_countingup.set_entry(ii, ScalarType(ii));
     VectorImp testvector_1(dim); // [0, -2, 2, 1]
-    testvector_1[0] = ScalarType(0);
-    testvector_1[1] = ScalarType(-2);
-    testvector_1[2] = ScalarType(2);
-    testvector_1[3] = ScalarType(1);
+    testvector_1.set_entry(0, ScalarType(0));
+    testvector_1.set_entry(1, ScalarType(-2));
+    testvector_1.set_entry(2, ScalarType(2));
+    testvector_1.set_entry(3, ScalarType(1));
     VectorImp testvector_3(dim); // [-1, 1, -1, 1]
-    testvector_3[0] = ScalarType(-1);
-    testvector_3[1] = ScalarType(1);
-    testvector_3[2] = ScalarType(-1);
-    testvector_3[3] = ScalarType(1);
+    testvector_3.set_entry(0, ScalarType(-1));
+    testvector_3.set_entry(1, ScalarType(1));
+    testvector_3.set_entry(2, ScalarType(-1));
+    testvector_3.set_entry(3, ScalarType(1));
     VectorImp testvector_5(dim); // [1.25, 0, 2.5, -3.5]
-    testvector_5[0] = ScalarType(1.25);
-    testvector_5[1] = ScalarType(0);
-    testvector_5[2] = ScalarType(2.5);
-    testvector_5[3] = ScalarType(-3.5);
+    testvector_5.set_entry(0, ScalarType(1.25));
+    testvector_5.set_entry(1, ScalarType(0));
+    testvector_5.set_entry(2, ScalarType(2.5));
+    testvector_5.set_entry(3, ScalarType(-3.5));
 
     // test mv
     VectorImp result_mv_1(dim);
@@ -191,28 +191,28 @@ struct MatrixTest : public ::testing::Test
     EXPECT_EQ(vector_zeros, result_mv_1);
     EXPECT_EQ(vector_zeros, result_mv_2);
     testmatrix_sparse.mv(testvector_5, result_mv_1);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.25), result_mv_1[0]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.25), result_mv_1[1]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.75), result_mv_1[2]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), result_mv_1[3]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.25), result_mv_1.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.25), result_mv_1.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.75), result_mv_1.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), result_mv_1.get_entry(3));
     testmatrix_2.mv(testvector_3, result_mv_1);
     result_mv_2 = vector_ones;
     result_mv_2.scal(ScalarType(3));
     EXPECT_EQ(result_mv_1, result_mv_2);
     testmatrix_1.mv(testvector_1, result_mv_1);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(5), result_mv_1[0]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(6), result_mv_1[1]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(7), result_mv_1[2]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(8), result_mv_1[3]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(5), result_mv_1.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(6), result_mv_1.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(7), result_mv_1.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(8), result_mv_1.get_entry(3));
     testmatrix_sparse.mv(vector_ones, result_mv_1);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), result_mv_1[0]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2.5), result_mv_1[1]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(-0.5), result_mv_1[2]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), result_mv_1[3]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), result_mv_1.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2.5), result_mv_1.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(-0.5), result_mv_1.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), result_mv_1.get_entry(3));
     VectorImp a = vector_ones;
     matrix_zeros_dense.mv(vector_zeros, a);
     for (size_t ii = 0; ii < dim; ++ii) {
-      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), vector_ones[ii])) << "check copy-on-write";
+      EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(1), vector_ones.get_entry(ii))) << "check copy-on-write";
     }
 
     // test scal, operator*
