@@ -229,14 +229,14 @@ public:
       const auto other_cols = std::set<size_t>(other_pattern.inner(ii).begin(), other_pattern.inner(ii).end());
       for (const auto& jj : my_cols)
         if (other_cols.count(jj) == 0) {
-          if (Common::FloatCmp::ne(get_entry(ii, jj), 0., epsilon))
+          if (Common::FloatCmp::ne(get_entry(ii, jj), ScalarType(0.), epsilon))
             return false;
         } else {
           if (Common::FloatCmp::ne(get_entry(ii, jj), other.get_entry(ii, jj), epsilon))
             return false;
         }
       for (const auto& jj : other_cols)
-        if (my_cols.count(jj) == 0 && Common::FloatCmp::ne(other.get_entry(ii, jj), 0., epsilon))
+        if (my_cols.count(jj) == 0 && Common::FloatCmp::ne(other.get_entry(ii, jj), ScalarType(0.), epsilon))
           return false;
     }
     return true;
