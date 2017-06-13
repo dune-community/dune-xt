@@ -80,6 +80,7 @@ public:
 
   VectorImpType& operator=(const ScalarType& value)
   {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
     for (auto& element : *this)
       element = value;
