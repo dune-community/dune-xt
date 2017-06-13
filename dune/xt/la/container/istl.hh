@@ -159,6 +159,14 @@ public:
     return *this;
   }
 
+  ThisType& operator=(const ScalarType& val)
+  {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    ensure_uniqueness();
+    std::fill(this->begin(), this->end(), val);
+    return *this;
+  }
+
   /**
    *  \note Does a deep copy.
    */
