@@ -223,6 +223,7 @@ protected:
   } // ... ensure_uniqueness(...)
 
 private:
+  friend class VectorInterface<internal::EigenDenseVectorTraits<ScalarType>, ScalarType>;
   friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenDenseVector
 
@@ -347,6 +348,7 @@ protected:
   } // ... ensure_uniqueness(...)
 
 private:
+  friend class VectorInterface<internal::EigenMappedDenseVectorTraits<ScalarType>, ScalarType>;
   friend class EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenMappedDenseVector
 
