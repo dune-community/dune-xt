@@ -285,6 +285,16 @@ protected:
   }
 
 public:
+  inline ScalarType& operator[](const size_t ii)
+  {
+    return get_entry_ref(ii);
+  }
+
+  inline const ScalarType& operator[](const size_t ii) const
+  {
+    return get_entry_ref(ii);
+  }
+
   /// \}
   /// \name These methods override default implementations from VectorInterface.
   /// \{

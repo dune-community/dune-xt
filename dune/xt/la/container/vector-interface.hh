@@ -137,6 +137,26 @@ public:
   } // ... valid()
 
   /**
+   * \brief Get writable reference to the iith entry.
+   * \note \attention The returned reference may be invalid once (any entry of) the vector is changed!
+   */
+  inline ScalarType& operator[](const size_t ii)
+  {
+    CHECK_CRTP(this->as_imp()[ii]);
+    return this->as_imp()[ii];
+  }
+
+  /**
+   * \brief Get read-only reference to the iith entry.
+   * \note \attention The returned reference may be invalid once (any entry of) the vector is changed!
+   */
+  inline const ScalarType& operator[](const size_t ii) const
+  {
+    CHECK_CRTP(this->as_imp()[ii]);
+    return this->as_imp()[ii];
+  }
+
+  /**
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    * \see     size()
