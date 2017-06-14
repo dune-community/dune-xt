@@ -821,13 +821,10 @@ public:
 
   //! Matrix-Vector multiplication for dune-xt-la vectors
   template <class XX, class YY>
-  inline std::enable_if_t<std::is_base_of<VectorInterface<typename XX::Traits, ScalarType>, XX>::value
-                              && std::is_base_of<VectorInterface<typename YY::Traits, ScalarType>, YY>::value,
-                          void>
-  mv(const XX& xx, YY& yy) const
+  inline std::enable_if_t<LA::is_vector<XX>::value && LA::is_vector<YY>::value, void> mv(const XX& xx, YY& yy) const
   {
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    std::fill(yy.begin(), yy.end(), ScalarType(0));
+    yy.scal(ScalarType(0));
     for (size_t rr = 0; rr < num_rows_; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
         yy.add_to_entry(rr, entries_->operator[](kk) * xx.get_entry(column_indices_->operator[](kk)));
@@ -836,10 +833,7 @@ public:
   //! Matrix-Vector multiplication for arbitrary vectors that support operator[]
   //! \note This method may not be thread-safe.
   template <class XX, class YY>
-  inline std::enable_if_t<!std::is_base_of<VectorInterface<typename XX::Traits, ScalarType>, XX>::value
-                              || !std::is_base_of<VectorInterface<typename YY::Traits, ScalarType>, YY>::value,
-                          void>
-  mv(const XX& xx, YY& yy) const
+  inline std::enable_if_t<!LA::is_vector<XX>::value || !LA::is_vector<YY>::value, void> mv(const XX& xx, YY& yy) const
   {
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     std::fill(yy.begin(), yy.end(), ScalarType(0));
