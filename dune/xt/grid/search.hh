@@ -86,10 +86,10 @@ struct CheckInside<0>
  * \attention This makes it inherently not thread safe
 **/
 template <class GridLayerType, int codim = 0>
-class EntityInlevelSearch : public EntitySearchBase<GridLayerType>
+class EntityInlevelSearch : public EntitySearchBase<GridLayerType, codim>
 {
   typedef EntitySearchBase<GridLayerType, codim> BaseType;
-  typedef typename extract_iterator<GridLayerType, codim>::type IteratorType;
+  typedef extract_iterator_t<GridLayerType, codim> IteratorType;
 
 public:
   typedef typename BaseType::EntityVectorType EntityVectorType;

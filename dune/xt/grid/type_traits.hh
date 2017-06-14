@@ -125,6 +125,11 @@ struct is_view<Dune::GridView<T>> : public std::true_type
 {
 };
 
+template <class T>
+struct is_view<const T> : public is_view<T>
+{
+};
+
 
 #if HAVE_DUNE_FEM
 
@@ -360,8 +365,8 @@ struct extract_iterator<T, c, false, true>
 };
 
 
-template <class T>
-using extract_iterator_t = typename extract_iterator<T>::type;
+template <class T, int c = 0>
+using extract_iterator_t = typename extract_iterator<T, c>::type;
 
 
 } // namespace Grid
