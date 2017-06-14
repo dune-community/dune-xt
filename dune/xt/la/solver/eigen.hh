@@ -131,7 +131,7 @@ public:
         }
       }
       for (size_t ii = 0; ii < rhs.size(); ++ii) {
-        const S& val = rhs[ii];
+        const S val = rhs.get_entry(ii);
         if (Common::isnan(val) || Common::isinf(val)) {
           std::stringstream msg;
           msg << "Given rhs contains inf or nan and you requested checking (see options below)!\n"
@@ -185,7 +185,7 @@ public:
     // check
     if (check_for_inf_nan)
       for (size_t ii = 0; ii < solution.size(); ++ii) {
-        const S& val = solution[ii];
+        const S val = solution.get_entry(ii);
         if (Common::isnan(val) || Common::isinf(val)) {
           std::stringstream msg;
           msg << "The computed solution contains inf or nan and you requested checking (see options "
@@ -359,7 +359,7 @@ public:
         }
       }
       for (size_t ii = 0; ii < rhs.size(); ++ii) {
-        const S& val = rhs[ii];
+        const S val = rhs.get_entry(ii);
         if (Common::isnan(val) || Common::isinf(val))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "Given rhs contains inf or nan and you requested checking (see options below)!\n"
@@ -561,7 +561,7 @@ public:
     // check
     if (check_for_inf_nan)
       for (size_t ii = 0; ii < solution.size(); ++ii) {
-        const S& val = solution[ii];
+        const S& val = solution.get_entry(ii);
         if (Common::isnan(val) || Common::isinf(val))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                      "The computed solution contains inf or nan and you requested checking (see options "

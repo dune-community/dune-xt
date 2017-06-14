@@ -220,15 +220,15 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
@@ -267,8 +267,8 @@ public:
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(these_are_valid_indices(ii, jj));
     backend_ref.coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
                          internal::boost_numeric_cast<EIGEN_size_t>(jj)) += value;
@@ -276,8 +276,8 @@ public:
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(these_are_valid_indices(ii, jj));
     backend_ref.coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
                          internal::boost_numeric_cast<EIGEN_size_t>(jj)) = value;
@@ -303,8 +303,8 @@ public:
 
   void clear_row(const size_t ii)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
@@ -313,8 +313,8 @@ public:
 
   void clear_col(const size_t jj)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -335,8 +335,8 @@ public:
 
   void unit_row(const size_t ii)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
@@ -353,8 +353,8 @@ public:
 
   void unit_col(const size_t jj)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -458,10 +458,8 @@ private:
 protected:
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique()) {
-      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
-    }
   } // ... ensure_uniqueness(...)
 
 private:

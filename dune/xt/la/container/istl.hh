@@ -159,6 +159,14 @@ public:
     return *this;
   }
 
+  ThisType& operator=(const ScalarType& val)
+  {
+    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    ensure_uniqueness();
+    std::fill(this->begin(), this->end(), val);
+    return *this;
+  }
+
   /**
    *  \note Does a deep copy.
    */
@@ -210,15 +218,15 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
@@ -244,16 +252,16 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(ii < size());
     backend_ref[ii][0] += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(ii < size());
     backend_ref[ii][0] = value;
   }
@@ -319,8 +327,8 @@ public:
 
   virtual void iadd(const ThisType& other) override final
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
@@ -329,8 +337,8 @@ public:
 
   virtual void isub(const ThisType& other) override final
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
@@ -339,16 +347,20 @@ public:
 
   /// \}
 
+  // without these using declarations, the free operator+/* function in xt/common/vector.hh is chosen instead of the
+  // member function
+  using VectorInterfaceType::operator+;
+  using VectorInterfaceType::operator-;
+  using VectorInterfaceType::operator*;
+
 protected:
   /**
    * \see ContainerInterface
    */
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique()) {
-      std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    if (!backend_.unique())
       backend_ = std::make_shared<BackendType>(*backend_);
-    }
   } // ... ensure_uniqueness(...)
 
 private:
@@ -478,15 +490,15 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
@@ -518,23 +530,23 @@ public:
 
   inline void mv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     backend_ref.mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(these_are_valid_indices(ii, jj));
     backend_ref[ii][jj][0][0] += value;
   }
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(these_are_valid_indices(ii, jj));
     backend_ref[ii][jj][0][0] = value;
   }
@@ -560,8 +572,8 @@ public:
 
   void clear_row(const size_t ii)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
@@ -570,8 +582,8 @@ public:
 
   void clear_col(const size_t jj)
   {
-    ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -585,8 +597,8 @@ public:
 
   void unit_row(const size_t ii)
   {
-    ensure_uniqueness();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    ensure_uniqueness();
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
@@ -602,6 +614,7 @@ public:
 
   void unit_col(const size_t jj)
   {
+    mutex_.lock();
     ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
@@ -612,7 +625,6 @@ public:
     if (!backend_->exists(jj, jj))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
-    mutex_.lock();
     for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
       auto& row = backend_->operator[](ii);
       const auto search_result = row.find(jj);
