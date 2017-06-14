@@ -488,6 +488,7 @@ public:
 
   iterator begin()
   {
+    this->as_imp().ensure_uniqueness();
     return iterator(*this);
   }
 
