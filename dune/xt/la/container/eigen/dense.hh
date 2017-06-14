@@ -194,6 +194,9 @@ public:
 
   using VectorInterfaceType::add;
   using VectorInterfaceType::sub;
+  using VectorInterfaceType::operator+;
+  using VectorInterfaceType::operator-;
+  using VectorInterfaceType::operator*;
   using BaseType::backend;
 
   /// \name Required by ProvidesDataAccess.
@@ -332,6 +335,9 @@ public:
 
   using VectorInterfaceType::add;
   using VectorInterfaceType::sub;
+  using VectorInterfaceType::operator+;
+  using VectorInterfaceType::operator-;
+  using VectorInterfaceType::operator*;
   using BaseType::backend;
 
 private:

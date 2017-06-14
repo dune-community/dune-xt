@@ -346,6 +346,12 @@ public:
     backend_ref -= other.backend();
   } // ... isub(...)
 
+  // without these using declarations, the free operator+/* function in xt/common/vector.hh is chosen instead of the
+  // member function
+  using VectorInterfaceType::operator+;
+  using VectorInterfaceType::operator-;
+  using VectorInterfaceType::operator*;
+
 protected:
   /**
    * \see ContainerInterface
