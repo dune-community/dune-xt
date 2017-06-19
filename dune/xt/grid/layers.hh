@@ -354,15 +354,15 @@ struct Layer<GridType, Layers::level, Backends::part, DdGridType>
 };
 
 
-template <class GridType, class DdGridType, DdGridType>
-struct Layer<GridType, Layers::adaptive_leaf, Backends::part>
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::adaptive_leaf, Backends::part, DdGridType>
 {
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
 };
 
 
-template <class GridType, class DdGridType, DdGridType>
-struct Layer<GridType, Layers::dd_subdomain, Backends::part>
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::dd_subdomain, Backends::part, DdGridType>
 {
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
 };
