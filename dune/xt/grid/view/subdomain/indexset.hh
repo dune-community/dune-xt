@@ -11,9 +11,10 @@
 #ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_INDEXSET_HH
 #define DUNE_XT_GRID_VIEW_SUBDOMAIN_INDEXSET_HH
 
+#include <iostream>
 #include <map>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include <boost/numeric/conversion/cast.hpp>
 
