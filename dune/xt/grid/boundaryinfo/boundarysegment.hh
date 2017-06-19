@@ -10,6 +10,8 @@
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_BOUNDARYSEGMENT_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_BOUNDARYSEGMENT_HH
 
+#include <dune/xt/common/configuration.hh>
+
 #include "interfaces.hh"
 #include "types.hh"
 
