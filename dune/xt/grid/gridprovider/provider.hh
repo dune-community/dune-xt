@@ -393,11 +393,10 @@ private:
   template <class G, bool enable = has_boundary_id<G>::value>
   struct add_boundary_id_visualization
   {
-    template <class V, class GV>
-    void operator()(V& vtk_writer, const GV& grid_view, const int lvl)
+    template <class V>
+    void operator()(V& vtk_writer, const std::vector<double>& boundary_id, const int lvl) const
     {
-      std::vector<double> boundaryId = generateBoundaryIdVisualization(grid_view);
-      vtk_writer.addCellData(boundaryId, "boundary_id__level_" + Common::to_string(lvl));
+      vtk_writer.addCellData(boundary_id, "boundary_id__level_" + Common::to_string(lvl));
     }
 
     std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
@@ -430,9 +429,14 @@ private:
   template <class G>
   struct add_boundary_id_visualization<G, false>
   {
-    template <class V, class GV>
-    void operator()(V& /*vtk_writer*/, const GV& /*grid_view*/, const int /*lvl*/)
+    template <class V>
+    void operator()(V& /*vtk_writer*/, const std::vector<double>& /*boundary_id*/, const int /*lvl*/) const
     {
+    }
+
+    std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType&) const
+    {
+      return std::vector<double>();
     }
   };
 
@@ -448,7 +452,9 @@ private:
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
-      add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
+      const add_boundary_id_visualization<GridType> add_boundary_id;
+      const std::vector<double> boundary_id = add_boundary_id.generateBoundaryIdVisualization(grid_view);
+      add_boundary_id(vtkwriter, boundary_id, lvl);
       // write
       vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
@@ -469,7 +475,9 @@ private:
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
-      add_boundary_id_visualization<GridType>()(vtkwriter, grid_view, lvl);
+      const add_boundary_id_visualization<GridType> add_boundary_id;
+      const std::vector<double> boundary_id = add_boundary_id.generateBoundaryIdVisualization(grid_view);
+      add_boundary_id(vtkwriter, boundary_id, lvl);
       // dirichlet values
       std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
       vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(lvl));
