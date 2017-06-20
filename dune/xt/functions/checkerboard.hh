@@ -99,22 +99,34 @@ public:
 }; // class CheckerboardFunctionFactory< ... >
 
 template <>
-template <class EntityImp, class DomainFieldImp, size_t domainDim, class RangeFieldImp>
+template <class EntityImp,
+          class DomainFieldImp,
+          size_t domainDim,
+          class RangeFieldImp,
+          size_t rangeDim,
+          size_t rangeDimCols>
 class CheckerboardFunctionFactory<CheckerboardFunction<EntityImp,
                                                        DomainFieldImp,
                                                        domainDim,
                                                        RangeFieldImp,
-                                                       1,
-                                                       1,
+                                                       rangeDim,
+                                                       rangeDimCols,
                                                        ConstantFunction<EntityImp,
                                                                         DomainFieldImp,
                                                                         domainDim,
                                                                         RangeFieldImp,
-                                                                        1,
-                                                                        1>>>
+                                                                        rangeDim,
+                                                                        rangeDimCols>>>
 {
-  typedef ConstantFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, 1, 1> ConstantFunctionType;
-  typedef CheckerboardFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, 1, 1, ConstantFunctionType>
+  typedef ConstantFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+      ConstantFunctionType;
+  typedef CheckerboardFunction<EntityImp,
+                               DomainFieldImp,
+                               domainDim,
+                               RangeFieldImp,
+                               rangeDim,
+                               rangeDimCols,
+                               ConstantFunctionType>
       CheckerboardFunctionType;
 
 public:
@@ -131,9 +143,10 @@ public:
     for (size_t ii = 0; ii < num_elements.size(); ++ii)
       num_values *= num_elements[ii];
     std::vector<ConstantFunctionType> values;
-    auto values_rf = cfg.get("values", default_cfg.get<std::vector<RangeFieldImp>>("values"), num_values);
-    for (size_t ii = 0; ii < values_rf.size(); ++ii)
-      values.emplace_back(ConstantFunctionType(values_rf[ii], "constant in tile " + Common::to_string(ii)));
+    auto values_range = cfg.get(
+        "values", default_cfg.get<std::vector<typename CheckerboardFunctionType::RangeType>>("values"), num_values);
+    for (size_t ii = 0; ii < values_range.size(); ++ii)
+      values.emplace_back(ConstantFunctionType(values_range[ii], "constant in tile " + Common::to_string(ii)));
     // create
     return Common::make_unique<CheckerboardFunctionType>(
         cfg.get("lower_left", default_cfg.get<FieldVector<DomainFieldImp, domainDim>>("lower_left"), domainDim),
