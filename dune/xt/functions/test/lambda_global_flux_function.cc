@@ -15,6 +15,7 @@
 
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
+#include <dune/xt/functions/lambda/global-function.hh>
 #include <dune/xt/functions/lambda/global-flux-function.hh>
 
 #include "functions.hh"
@@ -23,7 +24,7 @@ using namespace Dune;
 using namespace Dune::XT;
 
 
-struct LocalLambdaFluxFunctionTest : public ::testing::Test
+struct GlobalLambdaFluxFunctionTest : public ::testing::Test
 {
   void check() const
   {
@@ -31,12 +32,12 @@ struct LocalLambdaFluxFunctionTest : public ::testing::Test
     U u([](typename U::DomainType xx) { return xx[0]; }, 1);
 
     typedef XT::Functions::GlobalLambdaFluxFunction<U> FluxType;
-    FluxType F([](const typename FluxType::EntityType& /*entity*/,
-                  const typename FluxType::DomainType& /*xx*/,
+    FluxType F([](const typename FluxType::DomainType& /*xx*/,
                   const typename FluxType::StateRangeType& uu,
                   const XT::Common::Parameter& mu) { return std::pow(uu[0], mu.get("power").at(0)); },
                XT::Common::ParameterType("power", 1),
-               "burgers_flux");
+               "burgers_flux",
+               [](const XT::Common::Parameter& mu) { return mu.get("power").at(0); });
 
     auto grid = XT::Grid::make_cube_grid<GRIDTYPE>();
 
@@ -46,12 +47,14 @@ struct LocalLambdaFluxFunctionTest : public ::testing::Test
       auto u_value = u.local_function(entity)->evaluate(xx_local)[0];
       ASSERT_EQ(std::pow(u_value, 2.), F.local_function(entity)->evaluate(xx_local, u_value, {"power", 2.}));
       ASSERT_EQ(std::pow(u_value, 2.), F.evaluate(xx_global, u_value, {"power", 2.}));
+      ASSERT_EQ(2, F.local_function(entity)->order({"power", 2.}));
+      ASSERT_EQ(2, F.order({"power", 2.}));
     }
   }
 };
 
 
-TEST_F(LocalLambdaFluxFunctionTest, creation_and_evalution)
+TEST_F(GlobalLambdaFluxFunctionTest, creation_and_evalution)
 {
   this->check();
 }

@@ -24,36 +24,40 @@ namespace XT {
 namespace Functions {
 
 
-/**
- * Global-valued flux function you can pass a lambda expression to that gets evaluated
- * \example LambdaType lambda([](DomainType x, StateRangeType u) { return u;}, 1 );
- */
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class U_,
-          size_t state_derivative_order,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols = 1>
-class GlobalLambdaFluxFunction : public GlobalFluxFunctionInterface<EntityImp,
-                                                                    DomainFieldImp,
-                                                                    domainDim,
-                                                                    U_,
-                                                                    state_derivative_order,
-                                                                    RangeFieldImp,
-                                                                    rangeDim,
-                                                                    rangeDimCols>
+template <class U, size_t state_derivative_order = 0, class R = typename U::RangeFieldType, size_t r = 1, size_t rC = 1>
+class GlobalLambdaFluxFunction
 {
-  typedef GlobalFluxFunctionInterface<EntityImp,
-                                      DomainFieldImp,
-                                      domainDim,
-                                      U_,
-                                      state_derivative_order,
-                                      RangeFieldImp,
-                                      rangeDim,
-                                      rangeDimCols>
-      BaseType;
+  static_assert(AlwaysFalse<U>::value, "Not available for these dimensions or this state_derivative_order!");
+};
+
+/**
+ * \brief A flux function given by a lambda expression which can be evaluated without an entity.
+ *
+ *        To model the flux F in a Burgers equation, F(u) := u^p, with a variable exponent p given a localizable
+ *        function u, use as
+ * \code
+typedef some_localizable_function U;
+typedef LocalLambdaFluxFunction<U> FluxType;
+
+FluxType F([](const typename F::DomainType& x,
+              const typename F::StateRangeType& u,
+              const XT::Common::Parameter& mu) { return std::pow(u[0], mu.get("power").at(0)); },
+           XT::Common::ParameterType("power", 1),
+           "burgers_flux",
+           [](const XT::Common::Parameter& mu) { return mu.get("power").at(0);});
+\endcode
+ *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter mu which is
+ *        passed on to the lambda is of correct type.
+ *        The (optional) fourth argument is a lambda function that takes a parameter and returns the order of the
+ *        GlobalLambdaFluxFunction with this parameter. If you do no provide this order lambda, you can't call
+ *        the order() method, everything else will work as expected.
+ * \note  This function does not implement jacobians.
+ */
+template <class U, class R, size_t r, size_t rC>
+class GlobalLambdaFluxFunction<U, 0, R, r, rC>
+    : public GlobalFluxFunctionInterface<typename U::E, typename U::D, U::d, U, 0, R, r, rC>
+{
+  typedef GlobalFluxFunctionInterface<typename U::E, typename U::D, U::d, U, 0, R, r, rC> BaseType;
 
 public:
   using typename BaseType::DomainType;
@@ -61,38 +65,40 @@ public:
   using typename BaseType::RangeType;
 
 private:
-  typedef std::function<RangeType(DomainType, StateRangeType)> LambdaType;
+  typedef std::function<RangeType(const DomainType&, const StateRangeType&, const Common::Parameter&)> LambdaType;
+  typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
 
 public:
   GlobalLambdaFluxFunction(LambdaType lambda,
-                           const size_t order_in,
                            const Common::ParameterType& param_type,
-                           const std::string nm = "globallambdafunction")
+                           const std::string nm = "globallambdafunction",
+                           OrderLambdaType order_lambda =
+                               [](const Common::Parameter&) {
+                                 DUNE_THROW(NotImplemented, "");
+                                 return 0;
+                               })
     : lambda_(lambda)
-    , order_(order_in)
     , param_type_(param_type)
     , name_(nm)
+    , order_lambda_(order_lambda)
   {
   }
 
-  size_t order() const override final
+  virtual size_t order(const Common::Parameter& mu) const override final
   {
-    return order_;
+    auto parsed_mu = parse_and_check(mu);
+    return order_lambda_(parsed_mu);
   }
+
+  using BaseType::evaluate;
 
   void evaluate(const DomainType& xx,
                 const StateRangeType& uu,
                 RangeType& ret,
-                const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    ret = lambda_(xx, uu);
-  }
-
-  RangeType evaluate(const DomainType& xx,
-                     const StateRangeType& uu,
-                     const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
-  {
-    return lambda_(xx, uu);
+    auto parsed_mu = parse_and_check(mu);
+    ret = lambda_(xx, uu, parsed_mu);
   }
 
   std::string type() const override final
@@ -111,10 +117,24 @@ public:
   }
 
 private:
+  Common::Parameter parse_and_check(const Common::Parameter& mu) const
+  {
+    Common::Parameter parsed_mu;
+    if (!param_type_.empty()) {
+      parsed_mu = this->parse_parameter(mu);
+      if (parsed_mu.type() != param_type_)
+        DUNE_THROW(Common::Exceptions::parameter_error,
+                   "parameter_type(): " << param_type_ << "\n   "
+                                        << "mu.type(): "
+                                        << mu.type());
+    }
+    return parsed_mu;
+  }
+
   const LambdaType lambda_;
-  const size_t order_;
   const Common::ParameterType param_type_;
   const std::string name_;
+  const OrderLambdaType order_lambda_;
 };
 
 

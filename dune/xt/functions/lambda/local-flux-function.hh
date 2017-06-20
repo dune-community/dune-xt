@@ -45,11 +45,15 @@ FluxType F([](const typename F::EntityType& entity,
               const typename F::StateRangeType& u,
               const XT::Common::Parameter& mu) { return std::pow(u[0], mu.get("power").at(0)); },
            XT::Common::ParameterType("power", 1),
-           "burgers_flux");
+           "burgers_flux",
+           [](const XT::Common::Parameter& mu) { return mu.get("power").at(0);});
 \endcode
  *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter mu which is
  *        passed on to the lambda is of correct type.
- * \note  The Localfunction does not implement jacobian.
+ *        The (optional) fourth argument is a lambda function that takes a parameter and returns the order of the
+ *        LocalLambdaFluxLocalFunction with this parameter. If you do no provide this order lambda, you can't call
+ *        the order() method of the LocalLambdaFluxLocalFunction, everything else will work as expected.
+ * \note  The Localfunction does not implement jacobians.
  */
 template <class U, class R, size_t r, size_t rC>
 class LocalLambdaFluxFunction<U, 0, R, r, rC>
@@ -82,18 +86,23 @@ private:
         const EntityType&, const DomainType&, const StateRangeType&, const Common::Parameter&)>
         LambdaType;
 
+    typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
+
     LocalLambdaFluxLocalFunction(const EntityType& ent,
                                  const LambdaType& lambda,
+                                 const OrderLambdaType& order_lambda,
                                  const Common::ParameterType& param_type)
       : BaseType(ent)
       , lambda_(lambda)
+      , order_lambda_(order_lambda)
       , param_type_(param_type)
     {
     }
 
-    virtual size_t order() const override
+    virtual size_t order(const XT::Common::Parameter& mu = Common::Parameter()) const override
     {
-      DUNE_THROW(NotImplemented, "");
+      auto parsed_mu = parse_and_check(mu);
+      return order_lambda_(parsed_mu);
     }
 
     void evaluate(const DomainType& x,
@@ -101,15 +110,7 @@ private:
                   RangeType& ret,
                   const Common::Parameter& mu = Common::Parameter()) const override final
     {
-      Common::Parameter parsed_mu;
-      if (!param_type_.empty()) {
-        parsed_mu = this->parse_parameter(mu);
-        if (parsed_mu.type() != param_type_)
-          DUNE_THROW(Common::Exceptions::parameter_error,
-                     "parameter_type(): " << param_type_ << "\n   "
-                                          << "mu.type(): "
-                                          << mu.type());
-      }
+      auto parsed_mu = parse_and_check(mu);
       ret = lambda_(this->entity(), x, u, parsed_mu);
     } // ... evaluate(...)
 
@@ -135,7 +136,22 @@ private:
     }
 
   private:
+    Common::Parameter parse_and_check(const Common::Parameter& mu) const
+    {
+      Common::Parameter parsed_mu;
+      if (!param_type_.empty()) {
+        parsed_mu = this->parse_parameter(mu);
+        if (parsed_mu.type() != param_type_)
+          DUNE_THROW(Common::Exceptions::parameter_error,
+                     "parameter_type(): " << param_type_ << "\n   "
+                                          << "mu.type(): "
+                                          << mu.type());
+      }
+      return parsed_mu;
+    }
+
     const LambdaType lambda_;
+    const OrderLambdaType order_lambda_;
     const Common::ParameterType param_type_;
   }; // class LocalLambdaFluxLocalFunction
 
@@ -146,13 +162,20 @@ public:
   typedef std::function<RangeType(
       const EntityType&, const DomainType&, const StateRangeType&, const Common::Parameter&)>
       LambdaType; // we do not use the typedef from LocalLambdaFluxLocalFunction here to document the type of the lambda
+  typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
 
   LocalLambdaFluxFunction(LambdaType lambda,
                           const Common::ParameterType& param_type = Common::ParameterType(),
-                          const std::string nm = "locallambdafluxfunction")
+                          const std::string nm = "locallambdafluxfunction",
+                          OrderLambdaType order_lambda =
+                              [](const Common::Parameter&) {
+                                DUNE_THROW(NotImplemented, "");
+                                return 0;
+                              })
     : lambda_(lambda)
     , param_type_(param_type)
     , name_(nm)
+    , order_lambda_(order_lambda)
   {
   }
 
@@ -173,13 +196,14 @@ public:
 
   std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
   {
-    return std::make_unique<LocalLambdaFluxLocalFunction>(entity, lambda_, param_type_);
+    return std::make_unique<LocalLambdaFluxLocalFunction>(entity, lambda_, order_lambda_, param_type_);
   }
 
 private:
   const LambdaType lambda_;
   const Common::ParameterType param_type_;
   const std::string name_;
+  const OrderLambdaType order_lambda_;
 }; // class LocalLambdaFluxFunction
 
 

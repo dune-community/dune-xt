@@ -37,7 +37,8 @@ struct LocalLambdaFluxFunctionTest : public ::testing::Test
                   const typename FluxType::StateRangeType& uu,
                   const XT::Common::Parameter& mu) { return std::pow(uu[0], mu.get("power").at(0)); },
                XT::Common::ParameterType("power", 1),
-               "burgers_flux");
+               "burgers_flux",
+               [](const XT::Common::Parameter& mu) { return mu.get("power").at(0); });
 
     auto grid = XT::Grid::make_cube_grid<GRIDTYPE>();
 
@@ -46,6 +47,7 @@ struct LocalLambdaFluxFunctionTest : public ::testing::Test
       auto xx_local = entity.geometry().local(xx_global);
       auto u_value = u.local_function(entity)->evaluate(xx_local)[0];
       ASSERT_EQ(std::pow(u_value, 2.), F.local_function(entity)->evaluate(xx_local, u_value, {"power", 2.}));
+      ASSERT_EQ(2, F.local_function(entity)->order({"power", 2.}));
     }
   }
 };

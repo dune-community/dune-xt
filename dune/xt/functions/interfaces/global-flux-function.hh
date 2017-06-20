@@ -74,7 +74,7 @@ public:
   {
   }
 
-  virtual size_t order() const = 0;
+  virtual size_t order(const Common::Parameter& /*mu*/) const = 0;
 
   virtual void evaluate(const DomainType& /*x*/,
                         const StateRangeType& /*u*/,
@@ -153,6 +153,11 @@ private:
     {
     }
 
+    virtual size_t order(const Common::Parameter& mu) const override final
+    {
+      return global_function_.order(mu);
+    }
+
     virtual void evaluate(const DomainType& xx,
                           const StateRangeType& uu,
                           RangeType& ret,
@@ -178,11 +183,6 @@ private:
     {
       const auto xx_global = geometry_.global(xx);
       global_function_.jacobian_wrt_u(xx_global, uu, ret, mu);
-    }
-
-    size_t order() const
-    {
-      return global_function_.order();
     }
 
   private:
