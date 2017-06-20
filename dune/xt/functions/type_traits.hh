@@ -10,6 +10,9 @@
 #ifndef DUNE_XT_FUNCTIONS_TYPE_TRAITS_HH
 #define DUNE_XT_FUNCTIONS_TYPE_TRAITS_HH
 
+#include <dune/common/fvector.hh>
+#include <dune/common/fmatrix.hh>
+
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
