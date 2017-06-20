@@ -27,7 +27,21 @@ struct CheckerboardFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   void check() const
   {
+    typedef typename FunctionType::DomainType DomainType;
+    typedef typename FunctionType::RangeType RangeType;
+    static const size_t dimDomain = FunctionType::dimDomain;
     const std::unique_ptr<const FunctionType> function(FunctionType::create(FunctionType::default_config()));
+    const FunctionType function2(DomainType(0),
+                                 DomainType(1),
+                                 FieldVector<size_t, dimDomain>(2),
+                                 std::vector<RangeType>{RangeType(1),
+                                                        RangeType(2),
+                                                        RangeType(3),
+                                                        RangeType(4),
+                                                        RangeType(5),
+                                                        RangeType(6),
+                                                        RangeType(7),
+                                                        RangeType(8)});
   }
 };
 

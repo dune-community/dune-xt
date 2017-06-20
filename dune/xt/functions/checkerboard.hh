@@ -187,6 +187,7 @@ class CheckerboardFunction : public internal::CheckerboardInterfaceChooser<Local
 public:
   using typename BaseType::EntityType;
   using typename BaseType::DomainType;
+  using typename BaseType::RangeType;
   using typename BaseType::LocalfunctionType;
 
   using BaseType::dimDomain;
@@ -223,9 +224,24 @@ public:
     return internal::CheckerboardFunctionFactory<ThisType>::create(config, sub_name);
   } // ... create(...)
 
-  CheckerboardFunction(const DomainType& lowerLeft,
-                       const DomainType& upperRight,
-                       const FieldVector<size_t, dimDomain>& numElements,
+  // constructor for constant function
+  template <class L = LocalizableFunctionType,
+            typename std::enable_if<std::is_base_of<ConstantFunction<EntityImp,
+                                                                     DomainFieldImp,
+                                                                     domainDim,
+                                                                     RangeFieldImp,
+                                                                     rangeDim,
+                                                                     rangeDimCols>,
+                                                    L>::value>::type...>
+  CheckerboardFunction(const DomainType& lower_left,
+                       const DomainType& upper_right,
+                       const FieldVector<size_t, dimDomain>& num_elements,
+                       const std::vector<RangeType>& values,
+                       const std::string nm = static_id())
+    : CheckerboardFunction(lower_left, upper_right, num_elements, make_constant_functions<L>(values), nm)
+  {
+  }
+
                        const std::vector<LocalizableFunctionType>& values,
                        const std::string nm = static_id())
     : lowerLeft_(new DomainType(lowerLeft))
@@ -275,6 +291,15 @@ public:
   }
 
 private:
+  template <class L>
+  std::vector<L> make_constant_functions(const std::vector<RangeType>& values)
+  {
+    std::vector<L> functions;
+    for (size_t ii = 0; ii < values.size(); ++ii)
+      functions.emplace_back(values[ii], "constant value " + Common::to_string(ii));
+    return functions;
+  }
+
   size_t find_subdomain(const EntityType& entity) const
   {
     // decide on the subdomain the center of the entity belongs to
