@@ -242,31 +242,34 @@ public:
   {
   }
 
+  CheckerboardFunction(const DomainType& lower_left,
+                       const DomainType& upper_right,
+                       const FieldVector<size_t, dimDomain>& num_elements,
                        const std::vector<LocalizableFunctionType>& values,
                        const std::string nm = static_id())
-    : lowerLeft_(new DomainType(lowerLeft))
-    , upperRight_(new DomainType(upperRight))
-    , numElements_(new FieldVector<size_t, dimDomain>(numElements))
+    : lower_left_(new DomainType(lower_left))
+    , upper_right_(new DomainType(upper_right))
+    , num_elements_(new FieldVector<size_t, dimDomain>(num_elements))
     , name_(nm)
   {
     for (size_t ii = 0; ii < values.size(); ++ii)
       values_.emplace_back(new LocalizableFunctionType(values[ii]));
 #ifndef NDEBUG
     // checks
-    size_t totalSubdomains = 1;
+    size_t total_subdomains = 1;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
-      const auto& ll = (*lowerLeft_)[dd];
-      const auto& ur = (*upperRight_)[dd];
-      const auto& ne = (*numElements_)[dd];
+      const auto& ll = (*lower_left_)[dd];
+      const auto& ur = (*upper_right_)[dd];
+      const auto& ne = (*num_elements_)[dd];
       if (!(ll < ur))
-        DUNE_THROW(Dune::RangeError, "lowerLeft has to be elementwise smaller than upperRight!");
-      totalSubdomains *= ne;
+        DUNE_THROW(Dune::RangeError, "lower_left has to be elementwise smaller than upper_right!");
+      total_subdomains *= ne;
     }
-    if (values_.size() < totalSubdomains)
+    if (values_.size() < total_subdomains)
       DUNE_THROW(Dune::RangeError,
-                 "values too small (is " << values_.size() << ", should be " << totalSubdomains << ")");
+                 "values too small (is " << values_.size() << ", should be " << total_subdomains << ")");
 #endif
-  } // Checkerboard(...)
+  } // CheckerboardFunction(...)
 
   CheckerboardFunction(const ThisType& other) = default;
 
@@ -304,29 +307,29 @@ private:
   {
     // decide on the subdomain the center of the entity belongs to
     const auto center = entity.geometry().center();
-    std::vector<size_t> whichPartition(dimDomain, 0);
-    const auto& ll = *lowerLeft_;
-    const auto& ur = *upperRight_;
-    const auto& ne = *numElements_;
+    std::vector<size_t> which_partition(dimDomain, 0);
+    const auto& ll = *lower_left_;
+    const auto& ur = *upper_right_;
+    const auto& ne = *num_elements_;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
-      // for points that are on upperRight_[d], this selects one partition too much
+      // for points that are on upper_right_[d], this selects one partition too much
       // so we need to cap this
-      whichPartition[dd] =
+      which_partition[dd] =
           std::min(size_t(std::floor(ne[dd] * ((center[dd] - ll[dd]) / (ur[dd] - ll[dd])))), ne[dd] - 1);
     }
     size_t subdomain = 0;
     if (dimDomain == 1)
-      subdomain = whichPartition[0];
+      subdomain = which_partition[0];
     else if (dimDomain == 2)
-      subdomain = whichPartition[0] + whichPartition[1] * ne[0];
+      subdomain = which_partition[0] + which_partition[1] * ne[0];
     else
-      subdomain = whichPartition[0] + whichPartition[1] * ne[0] + whichPartition[2] * ne[1] * ne[0];
+      subdomain = which_partition[0] + which_partition[1] * ne[0] + which_partition[2] * ne[1] * ne[0];
     return subdomain;
   } // ... find_subdomain(...)
 
-  std::shared_ptr<const DomainType> lowerLeft_;
-  std::shared_ptr<const DomainType> upperRight_;
-  std::shared_ptr<const FieldVector<size_t, dimDomain>> numElements_;
+  std::shared_ptr<const DomainType> lower_left_;
+  std::shared_ptr<const DomainType> upper_right_;
+  std::shared_ptr<const FieldVector<size_t, dimDomain>> num_elements_;
   std::vector<std::shared_ptr<const LocalizableFunctionType>> values_;
   std::string name_;
 }; // class CheckerboardFunction
