@@ -8,7 +8,7 @@
 //   Felix Schindler (2012 - 2017)
 //   Rene Milk       (2012 - 2016)
 //   Sven Kaulmann   (2013)
-//   Tobias Leibner  (2014 - 2015)
+//   Tobias Leibner  (2014 - 2015, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_HH
