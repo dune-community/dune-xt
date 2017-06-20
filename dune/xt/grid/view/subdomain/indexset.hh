@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2017)
+//   Tobias Leibner  (2017)
 
 #ifndef DUNE_XT_GRID_VIEW_SUBDOMAIN_INDEXSET_HH
 #define DUNE_XT_GRID_VIEW_SUBDOMAIN_INDEXSET_HH

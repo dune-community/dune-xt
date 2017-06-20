@@ -10,7 +10,7 @@
 //   Kirsten Weber   (2012)
 //   Rene Milk       (2012 - 2016)
 //   Sven Kaulmann   (2014)
-//   Tobias Leibner  (2014, 2016)
+//   Tobias Leibner  (2014, 2016 - 2017)
 
 #ifndef DUNE_XT_GRID_PROVIDER_PROVIDER_HH
 #define DUNE_XT_GRID_PROVIDER_PROVIDER_HH
