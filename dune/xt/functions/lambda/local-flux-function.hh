@@ -75,7 +75,8 @@ private:
     using typename BaseType::DomainType;
     using typename BaseType::StateRangeType;
     using typename BaseType::RangeType;
-    using typename BaseType::JacobianRangeType;
+    using typename BaseType::JacobianWrtURangeType;
+    using typename BaseType::JacobianWrtXRangeType;
 
     typedef std::function<RangeType(
         const EntityType&, const DomainType&, const StateRangeType&, const Common::Parameter&)>
@@ -88,6 +89,11 @@ private:
       , lambda_(lambda)
       , param_type_(param_type)
     {
+    }
+
+    virtual size_t order() const override
+    {
+      DUNE_THROW(NotImplemented, "");
     }
 
     void evaluate(const DomainType& x,
@@ -107,10 +113,18 @@ private:
       ret = lambda_(this->entity(), x, u, parsed_mu);
     } // ... evaluate(...)
 
-    void jacobian(const DomainType& /*x*/,
-                  const StateRangeType& /*u*/,
-                  JacobianRangeType& /*ret*/,
-                  const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+    void jacobian_wrt_x(const DomainType& /*x*/,
+                        const StateRangeType& /*u*/,
+                        JacobianWrtXRangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+    {
+      DUNE_THROW(NotImplemented, "");
+    }
+
+    void jacobian_wrt_u(const DomainType& /*x*/,
+                        const StateRangeType& /*u*/,
+                        JacobianWrtURangeType& /*ret*/,
+                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
     {
       DUNE_THROW(NotImplemented, "");
     }
