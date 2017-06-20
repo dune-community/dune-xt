@@ -8,7 +8,7 @@
 //   Barbara Verfürth (2015)
 //   Felix Schindler  (2014 - 2017)
 //   Rene Milk        (2015 - 2016)
-//   Tobias Leibner   (2014)
+//   Tobias Leibner   (2014, 2017)
 
 #ifndef DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_HH
 #define DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_HH

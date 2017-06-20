@@ -6,9 +6,9 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Barbara Verfürth (2015)
-//   Felix Schindler  (2012 - 2016)
-//   Rene Milk        (2013 - 2016)
-//   Tobias Leibner   (2014)
+//   Felix Schindler  (2012 - 2017)
+//   Rene Milk        (2013 - 2017)
+//   Tobias Leibner   (2014, 2017)
 
 #ifndef DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_HH
 #define DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_HH
