@@ -64,9 +64,13 @@ private:
   typedef std::function<RangeType(DomainType, StateRangeType)> LambdaType;
 
 public:
-  GlobalLambdaFluxFunction(LambdaType lambda, const size_t order_in, const std::string nm = "globallambdafunction")
+  GlobalLambdaFluxFunction(LambdaType lambda,
+                           const size_t order_in,
+                           const Common::ParameterType& param_type,
+                           const std::string nm = "globallambdafunction")
     : lambda_(lambda)
     , order_(order_in)
+    , param_type_(param_type)
     , name_(nm)
   {
   }
@@ -101,9 +105,15 @@ public:
     return name_;
   }
 
+  const Common::ParameterType& parameter_type() const override final
+  {
+    return param_type_;
+  }
+
 private:
   const LambdaType lambda_;
   const size_t order_;
+  const Common::ParameterType param_type_;
   const std::string name_;
 };
 

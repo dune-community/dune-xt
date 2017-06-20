@@ -123,7 +123,6 @@ public:
     return ret;
   }
 
-
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityImp& entity) const override final
   {
     return Common::make_unique<Localfunction>(entity, *this);
