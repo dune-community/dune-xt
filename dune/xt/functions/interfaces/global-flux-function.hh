@@ -67,8 +67,8 @@ public:
   typedef typename BaseType::StateType StateType;
   typedef typename BaseType::StateRangeType StateRangeType;
   typedef typename BaseType::RangeType RangeType;
-  typedef typename LocalfunctionType::JacobianWrtXRangeType JacobianWrtXRangeType;
-  typedef typename LocalfunctionType::JacobianWrtURangeType JacobianWrtURangeType;
+  typedef typename LocalfunctionType::PartialXRangeType PartialXRangeType;
+  typedef typename LocalfunctionType::PartialURangeType PartialURangeType;
 
   virtual ~GlobalFluxFunctionInterface()
   {
@@ -81,18 +81,18 @@ public:
                         RangeType& /*ret*/,
                         const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
-  virtual void jacobian_wrt_x(const DomainType& /*x*/,
-                              const StateRangeType& /*u*/,
-                              JacobianWrtXRangeType& /*ret*/,
-                              const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  virtual void partial_x(const DomainType& /*x*/,
+                         const StateRangeType& /*u*/,
+                         PartialXRangeType& /*ret*/,
+                         const Common::Parameter& /*mu*/ = Common::Parameter()) const
   {
     DUNE_THROW(NotImplemented, "This does not make sense yet for matrix-valued functions!");
   }
 
-  virtual void jacobian_wrt_u(const DomainType& /*x*/,
-                              const StateRangeType& /*u*/,
-                              JacobianWrtURangeType& /*ret*/,
-                              const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  virtual void partial_u(const DomainType& /*x*/,
+                         const StateRangeType& /*u*/,
+                         PartialURangeType& /*ret*/,
+                         const Common::Parameter& /*mu*/ = Common::Parameter()) const
   {
     DUNE_THROW(NotImplemented, "This does not make sense yet for matrix-valued functions!");
   }
@@ -105,21 +105,19 @@ public:
     return ret;
   }
 
-  virtual JacobianWrtXRangeType jacobian_wrt_x(const DomainType& xx,
-                                               const StateRangeType& uu,
-                                               const Common::Parameter& mu = Common::Parameter()) const
+  virtual PartialXRangeType
+  partial_x(const DomainType& xx, const StateRangeType& uu, const Common::Parameter& mu = Common::Parameter()) const
   {
-    JacobianWrtXRangeType ret;
-    jacobian_wrt_x(xx, uu, ret, mu);
+    PartialXRangeType ret;
+    partial_x(xx, uu, ret, mu);
     return ret;
   }
 
-  virtual JacobianWrtURangeType jacobian_wrt_u(const DomainType& xx,
-                                               const StateRangeType& uu,
-                                               const Common::Parameter& mu = Common::Parameter()) const
+  virtual PartialURangeType
+  partial_u(const DomainType& xx, const StateRangeType& uu, const Common::Parameter& mu = Common::Parameter()) const
   {
-    JacobianWrtURangeType ret;
-    jacobian_wrt_u(xx, uu, ret, mu);
+    PartialURangeType ret;
+    partial_u(xx, uu, ret, mu);
     return ret;
   }
 
@@ -167,22 +165,22 @@ private:
       global_function_.evaluate(xx_global, uu, ret, mu);
     }
 
-    virtual void jacobian_wrt_x(const DomainType& xx,
-                                const StateRangeType& uu,
-                                JacobianWrtXRangeType& ret,
-                                const Common::Parameter& mu = Common::Parameter()) const override final
+    virtual void partial_x(const DomainType& xx,
+                           const StateRangeType& uu,
+                           PartialXRangeType& ret,
+                           const Common::Parameter& mu = Common::Parameter()) const override final
     {
       const auto xx_global = geometry_.global(xx);
-      global_function_.jacobian_wrt_x(xx_global, uu, ret, mu);
+      global_function_.partial_x(xx_global, uu, ret, mu);
     }
 
-    virtual void jacobian_wrt_u(const DomainType& xx,
-                                const StateRangeType& uu,
-                                JacobianWrtURangeType& ret,
-                                const Common::Parameter& mu = Common::Parameter()) const override final
+    virtual void partial_u(const DomainType& xx,
+                           const StateRangeType& uu,
+                           PartialURangeType& ret,
+                           const Common::Parameter& mu = Common::Parameter()) const override final
     {
       const auto xx_global = geometry_.global(xx);
-      global_function_.jacobian_wrt_u(xx_global, uu, ret, mu);
+      global_function_.partial_u(xx_global, uu, ret, mu);
     }
 
   private:

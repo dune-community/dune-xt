@@ -313,7 +313,7 @@ public:
   typedef typename InterfaceType::DomainType DomainType;
   typedef typename InterfaceType::RangeFieldType RangeFieldType;
   typedef typename InterfaceType::RangeType RangeType;
-  typedef typename InterfaceType::JacobianWrtURangeType JacobianWrtURangeType;
+  typedef typename InterfaceType::PartialURangeType PartialURangeType;
   using InterfaceType::dimDomain;
   using InterfaceType::dimRange;
   using InterfaceType::dimRangeCols;
@@ -387,12 +387,12 @@ public:
     BaseType::template helper<>::evaluate(A_, b_, b_zero_, u, ret);
   }
 
-  using InterfaceType::jacobian_wrt_u;
+  using InterfaceType::partial_u;
 
-  virtual void jacobian_wrt_u(const DomainType& /*x*/,
-                              const StateRangeType& /*u*/,
-                              JacobianWrtURangeType& ret,
-                              const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void partial_u(const DomainType& /*x*/,
+                         const StateRangeType& /*u*/,
+                         PartialURangeType& ret,
+                         const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     BaseType::template helper<>::jacobian(A_, ret);
   }

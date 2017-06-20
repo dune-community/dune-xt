@@ -49,8 +49,8 @@ public:
   typedef typename LocalfunctionType::DomainType DomainType;
   typedef typename LocalfunctionType::RangeType RangeType;
   typedef typename LocalfunctionType::StateRangeType StateRangeType;
-  typedef typename LocalfunctionType::JacobianWrtXRangeType JacobianWrtXRangeType;
-  typedef typename LocalfunctionType::JacobianWrtURangeType JacobianWrtURangeType;
+  typedef typename LocalfunctionType::PartialXRangeType PartialXRangeType;
+  typedef typename LocalfunctionType::PartialURangeType PartialURangeType;
 
   static const bool available = false;
   virtual ~LocalizableFluxFunctionInterface() = default;

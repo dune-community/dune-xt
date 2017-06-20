@@ -55,8 +55,8 @@ public:
   static const constexpr size_t rC = rC_;
   static const constexpr size_t dimRangeCols = rC_;
   typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::RangeType RangeType;
-  typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::JacobianRangeType JacobianWrtXRangeType;
-  typedef typename JacobianRangeTypeSelector<StateType::dimRange, R, r, rC>::type JacobianWrtURangeType;
+  typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::JacobianRangeType PartialXRangeType;
+  typedef typename JacobianRangeTypeSelector<StateType::dimRange, R, r, rC>::type PartialURangeType;
 
   LocalFluxFunctionInterface(const EntityType& en)
     : entity_(en)
@@ -77,18 +77,18 @@ public:
                         RangeType& /*ret*/,
                         const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
-  virtual void jacobian_wrt_x(const DomainType& /*x*/,
-                              const StateRangeType& /*u*/,
-                              JacobianWrtXRangeType& /*ret*/,
-                              const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  virtual void partial_x(const DomainType& /*x*/,
+                         const StateRangeType& /*u*/,
+                         PartialXRangeType& /*ret*/,
+                         const Common::Parameter& /*mu*/ = Common::Parameter()) const
   {
     DUNE_THROW(NotImplemented, "");
   }
 
-  virtual void jacobian_wrt_u(const DomainType& /*x*/,
-                              const StateRangeType& /*u*/,
-                              JacobianWrtURangeType& /*ret*/,
-                              const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  virtual void partial_u(const DomainType& /*x*/,
+                         const StateRangeType& /*u*/,
+                         PartialURangeType& /*ret*/,
+                         const Common::Parameter& /*mu*/ = Common::Parameter()) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -105,19 +105,19 @@ public:
     return ret;
   }
 
-  JacobianWrtXRangeType
-  jacobian_wrt_x(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
+  PartialXRangeType
+  partial_x(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
   {
-    JacobianWrtXRangeType ret(0);
-    jacobian_wrt_x(x, u, ret, mu);
+    PartialXRangeType ret(0);
+    partial_x(x, u, ret, mu);
     return ret;
   }
 
-  JacobianWrtURangeType
-  jacobian_wrt_u(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
+  PartialURangeType
+  partial_u(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
   {
-    JacobianWrtURangeType ret(0);
-    jacobian_wrt_u(x, u, ret, mu);
+    PartialURangeType ret(0);
+    partial_u(x, u, ret, mu);
     return ret;
   }
 
