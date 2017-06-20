@@ -170,7 +170,9 @@ public:
                           const std::string nm = "locallambdafluxfunction",
                           OrderLambdaType order_lambda =
                               [](const Common::Parameter&) {
-                                DUNE_THROW(NotImplemented, "");
+                                DUNE_THROW(
+                                    NotImplemented,
+                                    "To call the order method, you have to provide an order lambda on construction!");
                                 return 0;
                               })
     : lambda_(lambda)

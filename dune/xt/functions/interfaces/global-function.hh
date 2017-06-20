@@ -22,7 +22,7 @@ class TransferredGlobalFunction;
 
 
 /**
- * base class for global matrix-valued valued functions that provides automatic local functions via
+ * base class for global matrix-valued functions that provides automatic local functions via
  * LocalizableFunctionInterface
  */
 template <class EntityImp,

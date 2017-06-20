@@ -34,7 +34,7 @@ class GlobalLambdaFluxFunction
  *        function u, use as
  * \code
 typedef some_localizable_function U;
-typedef LocalLambdaFluxFunction<U> FluxType;
+typedef GlobalLambdaFluxFunction<U> FluxType;
 
 FluxType F([](const typename F::DomainType& x,
               const typename F::StateRangeType& u,
@@ -71,7 +71,9 @@ public:
                            const std::string nm = "globallambdafunction",
                            OrderLambdaType order_lambda =
                                [](const Common::Parameter&) {
-                                 DUNE_THROW(NotImplemented, "");
+                                 DUNE_THROW(
+                                     NotImplemented,
+                                     "To call the order method, you have to provide an order lambda on construction!");
                                  return 0;
                                })
     : lambda_(lambda)

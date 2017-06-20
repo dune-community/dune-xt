@@ -22,8 +22,8 @@ class TransferredGlobalFluxFunction;
 
 
 /**
- * base class for global functions that provides automatic local functions via
- * LocalizableFunctionInterface
+ * Base class for flux functions that can be evaluated in global coordinates without an entity. Provides automatic local
+ * functions via LocalizableFluxFunctionInterface. Used to model functions that are continuous in x and u.
  */
 template <class EntityImp,
           class DomainFieldImp,
