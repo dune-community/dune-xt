@@ -11,6 +11,8 @@
 #define DUNE_XT_GRID_GRIDPROVIDER_PBH
 #if HAVE_DUNE_PYBINDXI
 
+#include <algorithm>
+
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
@@ -95,13 +97,15 @@ pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridPro
           const auto ss = XT::Common::numeric_cast<size_t>(subdomain);
           if (ss >= self.dd_grid().size())
             DUNE_THROW(XT::Common::Exceptions::index_out_of_range,
-                       "subdomain: " << ss << "\n   self.num_blocks: " << self.dd_grid().size());
+                       "subdomain: " << ss << "\n   self.num_subdomains: " << self.dd_grid().size());
           std::set<size_t> neighborhood;
           neighborhood.insert(ss);
           if (self.dd_grid().oversampling())
             for (auto&& entity : elements(self.dd_grid().localGridPart(ss, /*oversampling=*/true)))
               neighborhood.insert(self.dd_grid().subdomainOf(entity));
-          return neighborhood;
+          std::vector<size_t> result(neighborhood.begin(), neighborhood.end());
+          std::sort(result.begin(), result.end());
+          return result;
         },
         "subdomain"_a);
 
