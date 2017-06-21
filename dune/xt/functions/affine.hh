@@ -330,7 +330,7 @@ public:
     return BaseType::static_id() + ".affineflux";
   }
 
-  virtual size_t order() const override
+  virtual size_t order(const Common::Parameter& /*param*/ = Common::Parameter()) const override
   {
     return 1;
   }
