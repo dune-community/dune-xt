@@ -31,6 +31,9 @@ class LocalfunctionInterface;
 template <class E, class D, size_t d, class R, size_t r, size_t rC>
 class LocalizableFunctionInterface;
 
+template <class E, class D, size_t d, class U_, size_t s_, class R, size_t r, size_t rC>
+class LocalizableFluxFunctionInterface;
+
 
 namespace internal {
 
@@ -48,6 +51,24 @@ struct is_localfunction_set_helper
       DXTC_has_typedef(EntityType)<Tt>::value && DXTC_has_typedef(DomainFieldType)<Tt>::value
       && DXTC_has_typedef(RangeFieldType)<Tt>::value && DXTC_has_static_member(dimDomain)<Tt>::value
       && DXTC_has_static_member(dimRange)<Tt>::value && DXTC_has_static_member(dimRangeCols)<Tt>::value;
+}; // struct is_localfunction_set_helper
+
+template <class Tt>
+struct is_localizable_flux_function_helper
+{
+  DXTC_has_typedef_initialize_once(EntityType);
+  DXTC_has_typedef_initialize_once(DomainFieldType);
+  DXTC_has_typedef_initialize_once(StateType);
+  DXTC_has_typedef_initialize_once(RangeFieldType);
+  DXTC_has_static_member_initialize_once(dimDomain);
+  DXTC_has_static_member_initialize_once(dimRange);
+  DXTC_has_static_member_initialize_once(dimRangeCols);
+  DXTC_has_static_member_initialize_once(stateDerivativeOrder);
+  static const bool is_candidate =
+      DXTC_has_typedef(EntityType)<Tt>::value && DXTC_has_typedef(DomainFieldType)<Tt>::value
+      && DXTC_has_typedef(StateType)<Tt>::value && DXTC_has_typedef(RangeFieldType)<Tt>::value
+      && DXTC_has_static_member(dimDomain)<Tt>::value && DXTC_has_static_member(dimRange)<Tt>::value
+      && DXTC_has_static_member(dimRangeCols)<Tt>::value && DXTC_has_static_member(stateDerivativeOrder)<Tt>::value;
 }; // struct is_localfunction_set_helper
 
 
@@ -101,6 +122,26 @@ struct is_localizable_function : public std::is_base_of<LocalizableFunctionInter
 
 template <class T>
 struct is_localizable_function<T, false> : public std::false_type
+{
+};
+
+
+template <class T, bool candidate = internal::is_localizable_flux_function_helper<T>::is_candidate>
+struct is_localizable_flux_function
+    : public std::is_base_of<LocalizableFluxFunctionInterface<typename T::EntityType,
+                                                              typename T::DomainFieldType,
+                                                              T::dimDomain,
+                                                              typename T::StateType,
+                                                              T::stateDerivativeOrder,
+                                                              typename T::RangeFieldType,
+                                                              T::dimRange,
+                                                              T::dimRangeCols>,
+                             T>
+{
+};
+
+template <class T>
+struct is_localizable_flux_function<T, false> : public std::false_type
 {
 };
 

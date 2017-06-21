@@ -24,7 +24,7 @@ namespace XT {
 namespace Functions {
 
 
-template <class E_, class D_, size_t d_, class U_, size_t state_derivative_order, class R_, size_t r_, size_t rC_ = 1>
+template <class E_, class D_, size_t d_, class U_, size_t s_, class R_, size_t r_, size_t rC_ = 1>
 class LocalizableFluxFunctionInterface : public Common::ParametricInterface
 {
   static_assert(is_localizable_function<U_>::value, "");
@@ -38,14 +38,15 @@ public:
   static const constexpr size_t dimDomain = d_;
   typedef U_ U;
   typedef U_ StateType;
+  static const constexpr size_t s = s_;
+  static const constexpr size_t stateDerivativeOrder = s_;
   typedef R_ R;
   typedef R_ RangeFieldType;
   static const constexpr size_t r = r_;
   static const constexpr size_t dimRange = r_;
   static const constexpr size_t rC = rC_;
   static const constexpr size_t dimRangeCols = rC_;
-  typedef LocalFluxFunctionInterface<E, D, d, typename U::LocalfunctionType, state_derivative_order, R, r, rC>
-      LocalfunctionType;
+  typedef LocalFluxFunctionInterface<E, D, d, typename U::LocalfunctionType, s, R, r, rC> LocalfunctionType;
 
   typedef typename LocalfunctionType::DomainType DomainType;
   typedef typename LocalfunctionType::RangeType RangeType;
