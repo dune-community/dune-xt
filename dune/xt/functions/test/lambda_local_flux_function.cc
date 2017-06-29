@@ -30,7 +30,7 @@ struct LocalLambdaFluxFunctionTest : public ::testing::Test
   void check() const
   {
     typedef TESTFUNCTIONTYPE U;
-    U u([](typename U::DomainType xx) { return xx[0]; }, 1);
+    U u([](typename U::DomainType xx, const XT::Common::Parameter&) { return xx[0]; }, 1);
 
     typedef XT::Functions::LocalLambdaFluxFunction<U> FluxType;
     FluxType F([](const typename FluxType::EntityType& /*entity*/,

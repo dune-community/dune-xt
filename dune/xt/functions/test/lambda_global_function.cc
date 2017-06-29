@@ -27,8 +27,8 @@ struct GlobalLambdaFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   virtual void check() const
   {
-    const FunctionType zero([](DomainType /*x*/) { return RangeType(0); }, 0);
-    const FunctionType one([](DomainType /*x*/) { return RangeType(1); }, 0);
+    const FunctionType zero([](DomainType /*x*/, const Common::Parameter& /*mu*/ = Common::Parameter()) { return RangeType(0); }, 0);
+    const FunctionType one([](DomainType /*x*/, const Common::Parameter& /*mu*/ = Common::Parameter()) { return RangeType(1); }, 0);
     const auto diff = zero - one;
     const auto xx = DomainType(666);
     EXPECT_EQ(zero.evaluate(xx), RangeType(0));
