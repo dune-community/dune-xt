@@ -647,6 +647,11 @@ public:
    * \}
    */
 
+  using MatrixInterfaceType::operator+;
+  using MatrixInterfaceType::operator-;
+  using MatrixInterfaceType::operator+=;
+  using MatrixInterfaceType::operator-=;
+
 protected:
   inline void ensure_uniqueness()
   {

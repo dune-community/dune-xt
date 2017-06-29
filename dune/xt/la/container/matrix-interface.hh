@@ -114,6 +114,36 @@ public:
     CHECK_AND_CALL_CRTP(this->as_imp().unit_col(jj));
   }
 
+  template <class MM>
+  derived_type operator*(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    return multiply(other);
+  }
+
+  template <class MM>
+  derived_type operator+(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    return add(other);
+  }
+
+  template <class MM>
+  derived_type operator-(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    return subtract(other);
+  }
+
+  template <class MM>
+  derived_type& operator+=(const MatrixInterface<MM, ScalarType>& other)
+  {
+    return add_assign(other);
+  }
+
+  template <class MM>
+  derived_type& operator-=(const MatrixInterface<MM, ScalarType>& other)
+  {
+    return subtract_assign(other);
+  }
+
   /**
    * \brief  Checks entries for inf or nan.
    * \return false if any entry is inf or nan, else true
@@ -147,6 +177,15 @@ public:
         ret = std::max(ret, std::abs(get_entry(ii, jj)));
     return ret;
   } // ... sup_norm(...)
+
+  derived_type transposed() const
+  {
+    derived_type yy(rows(), cols(), 0.);
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (size_t cc = 0; cc < cols(); ++cc)
+        yy.set_entry(rr, cc, get_entry(cc, rr));
+    return yy;
+  }
 
   /**
    * \brief Returns the number of entries in the sparsity pattern of the matrix.
@@ -242,6 +281,78 @@ public:
     return true;
   } // ... almost_equal(...)
   /// \}
+
+protected:
+  template <class MM>
+  derived_type multiply(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    if (other.rows() != cols())
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be multiplied do not match!");
+    derived_type yy(rows(), other.cols(), 0.);
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (size_t cc = 0; cc < other.cols(); ++cc)
+        for (size_t kk = 0; kk < cols(); ++kk)
+          yy.add_to_entry(rr, cc, get_entry(rr, kk) * other.get_entry(kk, cc));
+    return yy;
+  }
+
+  template <class MM>
+  derived_type add(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    if (other.rows() != rows() || other.cols() != cols())
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
+    auto new_pattern = pattern() + other.pattern();
+    derived_type yy(rows(), other.cols(), new_pattern);
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (const auto& cc : new_pattern[rr])
+        yy.set_entry(rr, cc, get_entry(rr, cc) + other.get_entry(rr, cc));
+    return yy;
+  }
+
+  template <class MM>
+  derived_type subtract(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    if (other.rows() != rows() || other.cols() != cols())
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
+    auto new_pattern = pattern() + other.pattern();
+    derived_type yy(rows(), other.cols(), new_pattern);
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (const auto& cc : new_pattern[rr])
+        yy.set_entry(rr, cc, get_entry(rr, cc) - other.get_entry(rr, cc));
+    return yy;
+  }
+
+  template <class MM>
+  derived_type& add_assign(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    if (other.rows() != rows() || other.cols() != cols())
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
+    const auto this_pattern = pattern();
+    auto new_pattern = this_pattern + other.pattern();
+    if (new_pattern != this_pattern)
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
+                 "The matrix to be added contains entries that are not in this' pattern!");
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (const auto& cc : this_pattern[rr])
+        add_to_entry(rr, cc, other.get_entry(rr, cc));
+    return this->as_imp();
+  }
+
+  template <class MM>
+  derived_type& subtract_assign(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    if (other.rows() != rows() || other.cols() != cols())
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
+    const auto this_pattern = pattern();
+    auto new_pattern = this_pattern + other.pattern();
+    if (new_pattern != this_pattern)
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
+                 "The matrix to be added contains entries that are not in this' pattern!");
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (const auto& cc : this_pattern[rr])
+        add_to_entry(rr, cc, -other.get_entry(rr, cc));
+    return this->as_imp();
+  }
 
 private:
   template <class T, class S>

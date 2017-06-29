@@ -632,6 +632,11 @@ public:
 
   /// \}
 
+  using MatrixInterfaceType::operator+;
+  using MatrixInterfaceType::operator-;
+  using MatrixInterfaceType::operator+=;
+  using MatrixInterfaceType::operator-=;
+
 protected:
   /**
    * \see ContainerInterface
@@ -944,6 +949,18 @@ public:
 
   /// \}
 
+  using MatrixInterfaceType::operator+;
+  using MatrixInterfaceType::operator-;
+  using MatrixInterfaceType::operator+=;
+  using MatrixInterfaceType::operator-=;
+
+protected:
+  inline void ensure_uniqueness()
+  {
+    if (!entries_.unique())
+      entries_ = std::make_shared<EntriesVectorType>(*entries_);
+  } // ... ensure_uniqueness(...)
+
 private:
   size_t get_entry_index(const size_t rr, const size_t cc, const bool throw_if_not_in_pattern = true) const
   {
@@ -959,14 +976,6 @@ private:
     return size_t(-1);
   }
 
-protected:
-  inline void ensure_uniqueness()
-  {
-    if (!entries_.unique())
-      entries_ = std::make_shared<EntriesVectorType>(*entries_);
-  } // ... ensure_uniqueness(...)
-
-private:
   size_t num_rows_, num_cols_;
   std::shared_ptr<EntriesVectorType> entries_;
   std::shared_ptr<IndexVectorType> row_pointers_;

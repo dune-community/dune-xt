@@ -45,6 +45,8 @@ public:
 
   bool operator!=(const SparsityPatternDefault& other) const;
 
+  SparsityPatternDefault operator+(const SparsityPatternDefault& other) const;
+
   void insert(const size_t outer_index, const size_t inner_index);
 
   void sort(const size_t outer_index);

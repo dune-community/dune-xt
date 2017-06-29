@@ -63,6 +63,17 @@ bool SparsityPatternDefault::operator!=(const SparsityPatternDefault& other) con
   return vector_of_vectors_ != other.vector_of_vectors_;
 }
 
+SparsityPatternDefault operator+(const SparsityPatternDefault& other) const
+{
+  assert(other.size() == size() && "SparsityPatterns must have the same number of rows for addition!");
+  SparsityPatternDefault ret = *this;
+  for (size_t rr = 0; rr < size(); ++rr)
+    for (const auto& cc : vector_of_vectors_[rr])
+      ret.insert(rr, cc);
+  ret.sort();
+  return ret;
+}
+
 void SparsityPatternDefault::insert(const size_t outer_index, const size_t inner_index)
 {
   assert(outer_index < size() && "Wrong index requested!");
