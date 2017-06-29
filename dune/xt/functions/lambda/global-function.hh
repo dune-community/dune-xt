@@ -44,7 +44,7 @@ public:
   typedef typename BaseType::RangeType RangeType;
 
 private:
-  typedef std::function<RangeType(DomainType)> LambdaType;
+  typedef std::function<RangeType(DomainType, XT::Common::Parameter)> LambdaType;
 
 public:
   GlobalLambdaFunction(LambdaType lambda, const size_t order_in, const std::string nm = "globallambdafunction")
@@ -59,16 +59,15 @@ public:
     return order_;
   }
 
-  void evaluate(const DomainType& xx,
-                RangeType& ret,
-                const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  void
+  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    ret = lambda_(xx);
+    ret = lambda_(xx, mu);
   }
 
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const override final
   {
-    return lambda_(xx);
+    return lambda_(xx, mu);
   }
 
   std::string type() const override final
