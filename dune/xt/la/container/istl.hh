@@ -379,6 +379,7 @@ class IstlRowMajorSparseMatrix : public MatrixInterface<internal::IstlRowMajorSp
                                  public ProvidesBackend<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>>
 {
   typedef IstlRowMajorSparseMatrix<ScalarImp> ThisType;
+  typedef MatrixInterface<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
 
 public:
   typedef internal::IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
