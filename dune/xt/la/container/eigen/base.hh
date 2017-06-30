@@ -113,16 +113,16 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     backend_ref *= alpha;
   }
 
   template <class T>
   void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
@@ -145,16 +145,16 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(ii < size());
     backend_ref(ii) += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     assert(ii < size());
     backend_ref(ii) = value;
   }
@@ -246,8 +246,8 @@ public:
   template <class T>
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
@@ -262,8 +262,8 @@ public:
   template <class T>
   void isub(const EigenBaseVector<T, ScalarType>& other)
   {
-    auto& backend_ref = backend();
     std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    auto& backend_ref = backend();
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
