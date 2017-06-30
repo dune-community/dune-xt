@@ -293,6 +293,21 @@ public:
     return values_[subdomain]->local_function(entity);
   }
 
+  size_t subdomain(const EntityType& entity) const
+  {
+    return find_subdomain(entity);
+  }
+
+  size_t subdomains() const
+  {
+    return values_.size();
+  }
+
+  const std::vector<std::shared_ptr<const LocalizableFunctionType>>& values() const
+  {
+    return values_;
+  }
+
 private:
   template <class L>
   std::vector<L> make_constant_functions(const std::vector<RangeType>& values)
