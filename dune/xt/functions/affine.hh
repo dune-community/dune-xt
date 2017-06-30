@@ -114,6 +114,16 @@ public:
   }
 #endif
 
+  const std::vector<MatrixType>& A() const
+  {
+    return A_;
+  }
+
+  const RangeType& b() const
+  {
+    return b_;
+  }
+
 protected:
   template <bool is_not_tensor = (rangeDimCols == 1), class anything = void>
   struct helper
