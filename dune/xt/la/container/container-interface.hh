@@ -90,7 +90,7 @@ static Out boost_numeric_cast(const In& in)
 struct VectorLockGuard
 {
   VectorLockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes)
-    : mutexes_(mutexes)
+    : mutexes_(mutexes ? mutexes.get() : nullptr)
   {
     if (mutexes_)
       boost::lock(mutexes_->begin(), mutexes_->end());
@@ -103,13 +103,13 @@ struct VectorLockGuard
         mutex.unlock();
   }
 
-  std::shared_ptr<std::vector<std::mutex>>& mutexes_;
+  std::vector<std::mutex>* mutexes_;
 }; // VectorLockGuard
 
 struct LockGuard
 {
   LockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes, const size_t& ii, const size_t& size)
-    : mutexes_(mutexes)
+    : mutexes_(mutexes ? mutexes.get() : nullptr)
     , index_(ii / size_t(std::ceil(double(size) / mutexes_->size()) + 0.5))
   {
     if (mutexes_)
@@ -122,7 +122,7 @@ struct LockGuard
       mutexes_->operator[](index_).unlock();
   }
 
-  std::shared_ptr<std::vector<std::mutex>>& mutexes_;
+  std::vector<std::mutex>* mutexes_;
   const size_t index_;
 }; // LockGuard
 
