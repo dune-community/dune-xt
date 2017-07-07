@@ -132,27 +132,26 @@ private:
   typedef typename BackendType::Index EIGEN_size_t;
 
 public:
-  EigenDenseVector(const ThisType& other)
-    : BaseType()
-  {
-    backend_ = other.backend_;
-  }
+  EigenDenseVector(const ThisType& other) = default;
 
-  explicit EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
+  explicit EigenDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0), const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(ss);
     backend_->setOnes();
     backend_->operator*=(value);
   }
 
-  explicit EigenDenseVector(const std::vector<ScalarType>& other)
+  explicit EigenDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
     for (size_t ii = 0; ii < other.size(); ++ii)
       backend_->operator[](ii) = other[ii];
   }
 
-  explicit EigenDenseVector(const std::initializer_list<ScalarType>& other)
+  explicit EigenDenseVector(const std::initializer_list<ScalarType>& other, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
     size_t ii = 0;
@@ -162,7 +161,9 @@ public:
 
   explicit EigenDenseVector(const BackendType& other,
                             const bool /*prune*/ = false,
-                            const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
+                            const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
+                            const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(other);
   }
@@ -170,12 +171,14 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  explicit EigenDenseVector(BackendType* backend_ptr)
+  explicit EigenDenseVector(BackendType* backend_ptr, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::shared_ptr<BackendType>(backend_ptr);
   }
 
-  explicit EigenDenseVector(std::shared_ptr<BackendType> backend_ptr)
+  explicit EigenDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = backend_ptr;
   }
@@ -187,8 +190,9 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(this->mutex_);
     backend_ = std::make_shared<BackendType>(other);
+    mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+    unshareable_ = false;
     return *this;
   } // ... operator=(...)
 
@@ -217,12 +221,20 @@ public:
 
 private:
   using BaseType::backend_;
+  using BaseType::mutexes_;
+  using BaseType::unshareable_;
 
 protected:
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
-      backend_ = std::make_shared<BackendType>(*(backend_));
+    if (!backend_.unique()) {
+      assert(!unshareable_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      if (!backend_.unique()) {
+        backend_ = std::make_shared<BackendType>(*(backend_));
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+      }
+    }
   } // ... ensure_uniqueness(...)
 
 private:
@@ -289,11 +301,7 @@ public:
   /**
    *  \brief  This constructor does not do a deep copy.
    */
-  EigenMappedDenseVector(const ThisType& other)
-    : BaseType()
-  {
-    backend_ = other.backend_;
-  }
+  EigenMappedDenseVector(const ThisType& other) = default;
 
   /**
    * \brief This constructor does a deep copy.
@@ -327,7 +335,6 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(this->mutex_);
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     backend_->operator=(other);
     return *this;
@@ -342,14 +349,21 @@ public:
 
 private:
   using BaseType::backend_;
+  using BaseType::mutexes_;
+  using BaseType::unshareable_;
 
 protected:
   inline void ensure_uniqueness()
   {
     if (!backend_.unique()) {
-      auto new_backend = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
-      new_backend->operator=(*(backend_));
-      backend_ = new_backend;
+      assert(!unshareable_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      if (!backend_.unique()) {
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+        auto new_backend = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
+        new_backend->operator=(*(backend_));
+        backend_ = new_backend;
+      }
     }
   } // ... ensure_uniqueness(...)
 

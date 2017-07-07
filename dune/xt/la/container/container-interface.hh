@@ -17,6 +17,8 @@
 #include <type_traits>
 
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/lock_algorithms.hpp>
 
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/math.hh>
@@ -26,6 +28,7 @@
 namespace Dune {
 namespace XT {
 namespace LA {
+
 
 enum class Backends
 {
@@ -37,7 +40,6 @@ enum class Backends
   eigen_sparse,
   none
 }; // enum class Backends
-
 
 static constexpr Backends default_backend =
 #if HAVE_EIGEN
@@ -67,6 +69,7 @@ static constexpr Backends default_dense_backend =
 
 namespace internal {
 
+
 /**
  * \brief Tries a boost::numeric_cast and throws an Exceptions::wrong_input_given on failure.
  *
@@ -84,7 +87,48 @@ static Out boost_numeric_cast(const In& in)
   }
 } // ... boost_numeric_cast(...)
 
+struct VectorLockGuard
+{
+  VectorLockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes)
+    : mutexes_(mutexes)
+  {
+    if (mutexes_)
+      boost::lock(mutexes_->begin(), mutexes_->end());
+  }
+
+  ~VectorLockGuard()
+  {
+    if (mutexes_)
+      for (auto& mutex : *mutexes_)
+        mutex.unlock();
+  }
+
+  std::shared_ptr<std::vector<std::mutex>>& mutexes_;
+}; // VectorLockGuard
+
+struct LockGuard
+{
+  LockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes, const size_t& ii, const size_t& size)
+    : mutexes_(mutexes)
+    , index_(ii / size_t(std::ceil(double(size) / mutexes_->size()) + 0.5))
+  {
+    if (mutexes_)
+      mutexes_->operator[](index_).lock();
+  }
+
+  ~LockGuard()
+  {
+    if (mutexes_)
+      mutexes_->operator[](index_).unlock();
+  }
+
+  std::shared_ptr<std::vector<std::mutex>>& mutexes_;
+  const size_t index_;
+}; // LockGuard
+
+
 } // namespace internal
+
 
 template <class Traits>
 class ProvidesBackend : public CRTPInterface<ProvidesBackend<Traits>, Traits>
