@@ -195,6 +195,8 @@ public:
 
   inline const ScalarType& operator[](const size_t ii) const
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     return backend()[ii];
   }
 

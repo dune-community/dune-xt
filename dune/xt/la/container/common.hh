@@ -108,20 +108,26 @@ public:
   typedef typename Traits::DataType DataType;
   typedef typename Traits::BackendType BackendType;
 
-  explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
+  explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0), const size_t num_mutexes = 1)
     : backend_(new BackendType(ss, value))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
-  explicit CommonDenseVector(const std::vector<ScalarType>& other)
+  explicit CommonDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.size()))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
     for (size_t ii = 0; ii < other.size(); ++ii)
       backend_->operator[](ii) = other[ii];
   }
 
-  explicit CommonDenseVector(const std::initializer_list<ScalarType>& other)
+  explicit CommonDenseVector(const std::initializer_list<ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.size()))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
     size_t ii = 0;
     for (auto element : other) {
@@ -131,39 +137,52 @@ public:
   } // CommonDenseVector(...)
 
   CommonDenseVector(const ThisType& other)
-    : backend_(other.backend_)
+    : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
+    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
+    , unshareable_(false)
   {
   }
 
   explicit CommonDenseVector(const BackendType& other,
                              const bool /*prune*/ = false,
-                             const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
+                             const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
+                             const size_t num_mutexes = 1)
     : backend_(new BackendType(other))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  explicit CommonDenseVector(BackendType* backend_ptr)
+  explicit CommonDenseVector(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
-  explicit CommonDenseVector(std::shared_ptr<BackendType> backend_ptr)
+  explicit CommonDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
   ThisType& operator=(const ThisType& other)
   {
-    backend_ = other.backend_;
+    if (this != &other) {
+      backend_ = other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
+      unshareable_ = false;
+    }
     return *this;
   }
 
   ThisType& operator=(const ScalarType& value)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
     for (auto& element : *this)
       element = value;
@@ -175,7 +194,6 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   }
@@ -215,21 +233,20 @@ public:
 
   ThisType copy() const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
@@ -253,15 +270,14 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii, size());
     assert(ii < size());
     backend_ref[ii] += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
     assert(ii < size());
     backend_ref[ii] = value;
@@ -287,11 +303,15 @@ protected:
 public:
   inline ScalarType& operator[](const size_t ii)
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     return get_entry_ref(ii);
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     return get_entry_ref(ii);
   }
 
@@ -301,7 +321,6 @@ public:
 
   virtual ScalarType dot(const ThisType& other) const override final
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
@@ -310,39 +329,38 @@ public:
 
   virtual RealType l1_norm() const override final
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return backend().one_norm();
   }
 
   virtual RealType l2_norm() const override final
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return backend().two_norm();
   }
 
   virtual RealType sup_norm() const override final
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return backend().infinity_norm();
   }
 
   virtual void iadd(const ThisType& other) override final
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+      if (other.size() != size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend_ref += other.backend();
   } // ... iadd(...)
 
   virtual void isub(const ThisType& other) override final
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+      if (other.size() != size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     backend_ref -= other.backend();
   } // ... isub(...)
 
@@ -358,8 +376,14 @@ protected:
    */
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
-      backend_ = std::make_shared<BackendType>(*backend_);
+    if (!backend_.unique()) {
+      assert(!unshareable_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      if (!backend_.unique()) {
+        backend_ = std::make_shared<BackendType>(*(backend_));
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+      }
+    }
   } // ... ensure_uniqueness(...)
 
 private:
@@ -367,7 +391,8 @@ private:
   friend class CommonDenseMatrix<ScalarType>;
 
   std::shared_ptr<BackendType> backend_;
-  mutable std::mutex mutex_;
+  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
+  bool unshareable_;
 }; // class CommonDenseVector
 
 
@@ -387,19 +412,31 @@ public:
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
 
-  explicit CommonDenseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType value = ScalarType(0))
+  explicit CommonDenseMatrix(const size_t rr = 0,
+                             const size_t cc = 0,
+                             const ScalarType value = ScalarType(0),
+                             const size_t num_mutexes = 1)
     : backend_(new BackendType(rr, cc, value))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
-  CommonDenseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& /*pattern*/)
+  CommonDenseMatrix(const size_t rr,
+                    const size_t cc,
+                    const SparsityPatternDefault& /*pattern*/,
+                    const size_t num_mutexes = 1)
     : backend_(new BackendType(rr, cc, ScalarType(0)))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
   CommonDenseMatrix(const ThisType& other)
-    : backend_(other.backend_)
+    : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
+    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
+    , unshareable_(false)
   {
   }
 
@@ -409,7 +446,10 @@ public:
   explicit CommonDenseMatrix(const BackendType& other,
                              const bool prune = false,
                              const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                 Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
+                                 Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
+                             const size_t num_mutexes = 1)
+    : mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
     if (prune)
       backend_ = ThisType(other).pruned(eps).backend_;
@@ -418,8 +458,10 @@ public:
   }
 
   template <class T>
-  CommonDenseMatrix(const DenseMatrix<T>& other)
+  CommonDenseMatrix(const DenseMatrix<T>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.rows(), other.cols()))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
     for (size_t ii = 0; ii < other.rows(); ++ii)
       for (size_t jj = 0; jj < other.cols(); ++jj)
@@ -429,20 +471,28 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  explicit CommonDenseMatrix(BackendType* backend_ptr)
+  explicit CommonDenseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
-  explicit CommonDenseMatrix(std::shared_ptr<BackendType> backend_ptr)
+  explicit CommonDenseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
   }
 
   ThisType& operator=(const ThisType& other)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
-    backend_ = other.backend_;
+    if (this != &other) {
+      backend_ = other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
+      unshareable_ = false;
+    }
     return *this;
   }
 
@@ -451,7 +501,6 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend_ = std::make_shared<BackendType>(other);
     return *this;
   }
@@ -462,11 +511,14 @@ public:
   BackendType& backend()
   {
     ensure_uniqueness();
+    unshareable_ = true;
     return *backend_;
   }
 
   const BackendType& backend() const
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     return *backend_;
   }
 
@@ -476,21 +528,20 @@ public:
 
   ThisType copy() const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     return ThisType(*backend_);
   }
 
   void scal(const ScalarType& alpha)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
@@ -528,14 +579,13 @@ public:
 
   inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     backend().mv(xx.backend(), yy.backend());
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
+    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii, rows());
     assert(ii < rows());
     assert(jj < cols());
     backend_ref[ii][jj] += value;
@@ -543,7 +593,6 @@ public:
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
     assert(ii < rows());
     assert(jj < cols());
@@ -559,14 +608,24 @@ public:
 
   ScalarType& get_entry_ref(const size_t ii, const size_t jj)
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     assert(ii < rows());
     assert(jj < cols());
     return backend()[ii][jj];
-  } // ... get_entry(...)
+  } // ... get_entry_ref(...)
+
+  const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    assert(ii < rows());
+    assert(jj < cols());
+    return backend()[ii][jj];
+  } // ... get_entry_ref(...)
 
   void clear_row(const size_t ii)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
@@ -576,7 +635,6 @@ public:
 
   void clear_col(const size_t jj)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
@@ -587,7 +645,6 @@ public:
 
   void unit_row(const size_t ii)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
@@ -603,7 +660,6 @@ public:
 
   void unit_col(const size_t jj)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     auto& backend_ref = backend();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
@@ -618,7 +674,6 @@ public:
 
   bool valid() const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     for (size_t ii = 0; ii < rows(); ++ii) {
       const auto& row_vec = backend()[ii];
       for (size_t jj = 0; jj < cols(); ++jj) {
@@ -643,13 +698,20 @@ protected:
    */
   inline void ensure_uniqueness()
   {
-    if (!backend_.unique())
-      backend_ = std::make_shared<BackendType>(*backend_);
+    if (!backend_.unique()) {
+      assert(!unshareable_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      if (!backend_.unique()) {
+        backend_ = std::make_shared<BackendType>(*backend_);
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+      }
+    }
   } // ... ensure_uniqueness(...)
 
 private:
   std::shared_ptr<BackendType> backend_;
-  mutable std::mutex mutex_;
+  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
+  bool unshareable_;
 }; // class CommonDenseMatrix
 
 /**
@@ -671,12 +733,14 @@ public:
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
   */
-  CommonSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt)
+  CommonSparseMatrix(const size_t rr, const size_t cc, const SparsityPatternDefault& patt, const size_t num_mutexes = 1)
     : num_rows_(rr)
     , num_cols_(cc)
     , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
     if (num_rows_ > 0 && num_cols_ > 0) {
       if (size_t(patt.size()) != num_rows_)
@@ -703,12 +767,17 @@ public:
     }
   }
 
-  CommonSparseMatrix(const size_t rr = 0, const size_t cc = 0, const ScalarType& value = ScalarType(0))
+  CommonSparseMatrix(const size_t rr = 0,
+                     const size_t cc = 0,
+                     const ScalarType& value = ScalarType(0),
+                     const size_t num_mutexes = 1)
     : num_rows_(rr)
     , num_cols_(cc)
     , entries_(std::make_shared<EntriesVectorType>(num_rows_ * num_cols_, value))
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
     IndexVectorType row_column_indices(num_cols_);
     for (size_t col = 0; col < num_cols_; ++col) {
@@ -720,6 +789,7 @@ public:
     }
   }
 
+  // TODO: Why is this constructor needed? Remove?
   explicit CommonSparseMatrix(const int rr, const int cc = 0)
     : CommonSparseMatrix(size_t(rr), size_t(cc), ScalarType(0))
   {
@@ -729,9 +799,11 @@ public:
   CommonSparseMatrix(const ThisType& other)
     : num_rows_(other.num_rows_)
     , num_cols_(other.num_cols_)
-    , entries_(other.entries_)
+    , entries_(other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_)
     , row_pointers_(other.row_pointers_)
     , column_indices_(other.column_indices_)
+    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
+    , unshareable_(false)
   {
   }
 
@@ -740,12 +812,15 @@ public:
       const OtherMatrixType& mat,
       const typename std::enable_if<Common::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune = false,
       const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-          Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
+          Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
+      const size_t num_mutexes = 1)
     : num_rows_(Common::MatrixAbstraction<OtherMatrixType>::rows(mat))
     , num_cols_(Common::MatrixAbstraction<OtherMatrixType>::cols(mat))
     , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
   {
     for (size_t rr = 0; rr < num_rows_; ++rr) {
       size_t num_nonzero_entries_in_row = 0;
@@ -764,7 +839,6 @@ public:
   template <int ROWS, int COLS>
   explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     assert(ROWS == num_rows_ && COLS == num_cols_);
     Dune::FieldMatrix<ScalarType, ROWS, COLS> ret(ScalarType(0));
     for (size_t rr = 0; rr < ROWS; ++rr)
@@ -775,36 +849,42 @@ public:
 
   ThisType& operator=(const ThisType& other)
   {
-    entries_ = other.entries_;
-    row_pointers_ = other.row_pointers_;
-    column_indices_ = other.column_indices_;
-    num_rows_ = other.num_rows_;
-    num_cols_ = other.num_cols_;
+    if (this != &other) {
+      row_pointers_ = other.row_pointers_;
+      column_indices_ = other.column_indices_;
+      num_rows_ = other.num_rows_;
+      num_cols_ = other.num_cols_;
+      entries_ = other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
+      unshareable_ = false;
+    }
     return *this;
   }
 
   /// \}
   /// \name Required by ContainerInterface.
   /// \{
-
   inline ThisType copy() const
   {
     ThisType ret(*this);
+    ret.entries_ = std::make_shared<EntriesVectorType>(*entries_);
+    ret.mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
     return ret;
   }
 
   inline void scal(const ScalarType& alpha)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     std::transform(
         entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
   }
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     assert(has_equal_shape(xx));
     const auto& xx_entries = *xx.entries_;
     for (size_t ii = 0; ii < entries_->size(); ++ii)
@@ -834,7 +914,6 @@ public:
   template <class XX, class YY>
   inline std::enable_if_t<LA::is_vector<XX>::value && LA::is_vector<YY>::value, void> mv(const XX& xx, YY& yy) const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     yy.scal(ScalarType(0));
     for (size_t rr = 0; rr < num_rows_; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
@@ -846,7 +925,6 @@ public:
   template <class XX, class YY>
   inline std::enable_if_t<!LA::is_vector<XX>::value || !LA::is_vector<YY>::value, void> mv(const XX& xx, YY& yy) const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     std::fill(yy.begin(), yy.end(), ScalarType(0));
     for (size_t rr = 0; rr < num_rows_; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
@@ -855,21 +933,31 @@ public:
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
+    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 
   inline ScalarType get_entry(const size_t rr, const size_t cc) const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     const size_t index = get_entry_index(rr, cc, false);
     return index == size_t(-1) ? ScalarType(0) : entries_->operator[](index);
   }
 
   inline ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
+    ensure_uniqueness();
+    unshareable_ = true;
+    const size_t index = get_entry_index(rr, cc, false);
+    if (index == size_t(-1))
+      DUNE_THROW(Dune::RangeError, "Entry not in matrix pattern!");
+    return entries_->operator[](index);
+  }
+
+  inline const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
     const size_t index = get_entry_index(rr, cc, false);
     if (index == size_t(-1))
       DUNE_THROW(Dune::RangeError, "Entry not in matrix pattern!");
@@ -878,14 +966,12 @@ public:
 
   inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
     entries_->operator[](get_entry_index(rr, cc)) = value;
   }
 
   inline void clear_row(const size_t rr)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
     std::fill(entries_->begin() + row_pointers_->operator[](rr),
               entries_->begin() + row_pointers_->operator[](rr + 1),
@@ -894,7 +980,6 @@ public:
 
   inline void clear_col(const size_t cc)
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     ensure_uniqueness();
     for (size_t kk = 0; kk < entries_->size(); ++kk) {
       if (column_indices_->operator[](kk) == cc)
@@ -904,21 +989,18 @@ public:
 
   inline void unit_row(const size_t rr)
   {
-    ensure_uniqueness();
     clear_row(rr);
     set_entry(rr, rr, ScalarType(1));
   }
 
   inline void unit_col(const size_t cc)
   {
-    ensure_uniqueness();
     clear_col(cc);
     set_entry(cc, cc, ScalarType(1));
   }
 
   bool valid() const
   {
-    std::lock_guard<std::mutex> DUNE_UNUSED(lock)(mutex_);
     // iterate over non-zero entries
     for (const auto& entry : *entries_)
       if (XT::Common::isnan(std::real(entry)) || XT::Common::isnan(std::imag(entry))
@@ -957,8 +1039,14 @@ public:
 protected:
   inline void ensure_uniqueness()
   {
-    if (!entries_.unique())
-      entries_ = std::make_shared<EntriesVectorType>(*entries_);
+    if (!entries_.unique()) {
+      assert(!unshareable_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      if (!entries_.unique()) {
+        entries_ = std::make_shared<EntriesVectorType>(*entries_);
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+      }
+    }
   } // ... ensure_uniqueness(...)
 
 private:
@@ -980,7 +1068,8 @@ private:
   std::shared_ptr<EntriesVectorType> entries_;
   std::shared_ptr<IndexVectorType> row_pointers_;
   std::shared_ptr<IndexVectorType> column_indices_;
-  mutable std::mutex mutex_;
+  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
+  bool unshareable_;
 }; // class CommonSparseMatrix
 
 } // namespace LA
