@@ -271,7 +271,7 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     auto& backend_ref = backend();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii, size());
+    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
     assert(ii < size());
     backend_ref[ii] += value;
   }
@@ -308,10 +308,10 @@ public:
     return get_entry_ref(ii);
   }
 
+  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
+  // ensure_uniqueness const and all members mutable
   inline const ScalarType& operator[](const size_t ii) const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return get_entry_ref(ii);
   }
 
@@ -585,7 +585,7 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     auto& backend_ref = backend();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii, rows());
+    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
     assert(ii < rows());
     assert(jj < cols());
     backend_ref[ii][jj] += value;
@@ -615,10 +615,10 @@ public:
     return backend()[ii][jj];
   } // ... get_entry_ref(...)
 
+  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
+  // ensure_uniqueness const and all members mutable
   const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     assert(ii < rows());
     assert(jj < cols());
     return backend()[ii][jj];
@@ -934,7 +934,7 @@ public:
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
     ensure_uniqueness();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, rr, rows());
+    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, rr);
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 
@@ -954,10 +954,10 @@ public:
     return entries_->operator[](index);
   }
 
+  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
+  // ensure_uniqueness const and entries_, mutexes_ and unshareable_ mutable
   inline const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     const size_t index = get_entry_index(rr, cc, false);
     if (index == size_t(-1))
       DUNE_THROW(Dune::RangeError, "Entry not in matrix pattern!");

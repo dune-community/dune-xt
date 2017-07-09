@@ -156,7 +156,7 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     auto& backend_ref = backend();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii, size());
+    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
     assert(ii < size());
     backend_ref(ii) += value;
   }
@@ -193,10 +193,10 @@ public:
     return backend()[ii];
   }
 
+  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
+  // ensure_uniqueness const and all members mutable
   inline const ScalarType& operator[](const size_t ii) const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return backend()[ii];
   }
 
@@ -310,7 +310,7 @@ private:
 
 protected:
   std::shared_ptr<BackendType> backend_;
-  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
+  std::shared_ptr<std::vector<std::mutex>> mutexes_;
   bool unshareable_;
 }; // class EigenBaseVector
 
