@@ -207,15 +207,22 @@ template <size_t dimDomain, size_t dimRange, size_t dimRangeCols>
 struct JacobianRangeTypeConverter
 {
   typedef typename Dune::FieldVector<Dune::FieldMatrix<double, dimRange, dimDomain>, dimRangeCols> JacobianRangeType;
-  typedef JacobianRangeType UnifiedJacobianRangeType;
+  typedef typename Dune::FieldVector<Dune::DynamicMatrix<double>, dimRangeCols> DynamicJacobianRangeType;
+  typedef DynamicJacobianRangeType UnifiedJacobianRangeType;
 
-  static UnifiedJacobianRangeType convert(const JacobianRangeType& ret)
+  static UnifiedJacobianRangeType convert(const JacobianRangeType& in)
   {
+    DynamicJacobianRangeType ret;
+    for (size_t ii = 0; ii < dimDomain; ++ii)
+      ret[ii] = DynamicMatrix<double>(in[ii]);
     return ret;
   }
 
-  static JacobianRangeType convert_back(const UnifiedJacobianRangeType& ret)
+  static JacobianRangeType convert_back(const UnifiedJacobianRangeType& in)
   {
+    JacobianRangeType ret;
+    for (size_t ii = 0; ii < dimDomain; ++ii)
+      ret[ii] = FieldMatrix<double, dimRange, dimDomain>(in[ii]);
     return ret;
   }
 };
