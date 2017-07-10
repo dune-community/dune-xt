@@ -836,12 +836,10 @@ public:
     }
   } // CommonSparseMatrix(...)
 
-  template <int ROWS, int COLS>
-  explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
+  explicit operator Dune::DynamicMatrix<ScalarType>() const
   {
-    assert(ROWS == num_rows_ && COLS == num_cols_);
-    Dune::FieldMatrix<ScalarType, ROWS, COLS> ret(ScalarType(0));
-    for (size_t rr = 0; rr < ROWS; ++rr)
+    Dune::DynamicMatrix<ScalarType> ret(rows(), cols(), ScalarType(0));
+    for (size_t rr = 0; rr < rows(); ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
         ret[rr][column_indices_->operator[](kk)] = entries_->operator[](kk);
     return ret;
