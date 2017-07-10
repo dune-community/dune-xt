@@ -611,6 +611,17 @@ public:
 
   ScalarType& get_entry_ref(const size_t ii, const size_t jj)
   {
+    ensure_uniqueness();
+    unshareable_ = true;
+    assert(ii < rows());
+    assert(jj < cols());
+    return backend()(ii, jj);
+  } // ... get_entry(...)
+
+  const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
     assert(ii < rows());
     assert(jj < cols());
     return backend()(ii, jj);
@@ -686,15 +697,22 @@ public:
   using MatrixInterfaceType::operator-=;
 
 protected:
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
-    if (!backend_.unique())
-      backend_ = std::make_shared<BackendType>(*backend_);
+    if (!backend_.unique()) {
+      assert(!unshareable_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      if (!backend_.unique()) {
+        backend_ = std::make_shared<BackendType>(*backend_);
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+      }
+    }
   } // ... ensure_uniqueness(...)
 
 private:
-  std::shared_ptr<BackendType> backend_;
-  mutable std::mutex mutex_;
+  mutable std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
+  mutable bool unshareable_;
 }; // class EigenDenseMatrix
 
 #else // HAVE_EIGEN
