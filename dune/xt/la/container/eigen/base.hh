@@ -193,10 +193,10 @@ public:
     return backend()[ii];
   }
 
-  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
-  // ensure_uniqueness const and all members mutable
   inline const ScalarType& operator[](const size_t ii) const
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     return backend()[ii];
   }
 
@@ -292,7 +292,7 @@ protected:
   /**
    * \see ContainerInterface
    */
-  void ensure_uniqueness()
+  void ensure_uniqueness() const
   {
     CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
     VectorInterfaceType::as_imp().ensure_uniqueness();
@@ -309,9 +309,9 @@ private:
   friend class EigenRowMajorSparseMatrix<ScalarType>;
 
 protected:
-  std::shared_ptr<BackendType> backend_;
-  std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  bool unshareable_;
+  mutable std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
+  mutable bool unshareable_;
 }; // class EigenBaseVector
 
 #else // HAVE_EIGEN

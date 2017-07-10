@@ -308,10 +308,10 @@ public:
     return get_entry_ref(ii);
   }
 
-  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
-  // ensure_uniqueness const and all members mutable
   inline const ScalarType& operator[](const size_t ii) const
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     return get_entry_ref(ii);
   }
 
@@ -374,7 +374,7 @@ protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
     if (!backend_.unique()) {
       assert(!unshareable_);
@@ -615,10 +615,10 @@ public:
     return backend()[ii][jj];
   } // ... get_entry_ref(...)
 
-  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
-  // ensure_uniqueness const and all members mutable
   const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     assert(ii < rows());
     assert(jj < cols());
     return backend()[ii][jj];
@@ -696,7 +696,7 @@ protected:
   /**
    * \see ContainerInterface
    */
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
     if (!backend_.unique()) {
       assert(!unshareable_);
@@ -709,9 +709,9 @@ protected:
   } // ... ensure_uniqueness(...)
 
 private:
-  std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<BackendType> backend_;
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  bool unshareable_;
+  mutable bool unshareable_;
 }; // class CommonDenseMatrix
 
 /**
@@ -954,10 +954,10 @@ public:
     return entries_->operator[](index);
   }
 
-  // TODO: Need to ensure uniqueness() and unshareable_ = true also in this method, but that would imply making
-  // ensure_uniqueness const and entries_, mutexes_ and unshareable_ mutable
   inline const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
+    ensure_uniqueness();
+    unshareable_ = true;
     const size_t index = get_entry_index(rr, cc, false);
     if (index == size_t(-1))
       DUNE_THROW(Dune::RangeError, "Entry not in matrix pattern!");
@@ -1037,7 +1037,7 @@ public:
   using MatrixInterfaceType::operator-=;
 
 protected:
-  inline void ensure_uniqueness()
+  inline void ensure_uniqueness() const
   {
     if (!entries_.unique()) {
       assert(!unshareable_);
@@ -1065,11 +1065,11 @@ private:
   }
 
   size_t num_rows_, num_cols_;
-  std::shared_ptr<EntriesVectorType> entries_;
+  mutable std::shared_ptr<EntriesVectorType> entries_;
   std::shared_ptr<IndexVectorType> row_pointers_;
   std::shared_ptr<IndexVectorType> column_indices_;
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  bool unshareable_;
+  mutable bool unshareable_;
 }; // class CommonSparseMatrix
 
 } // namespace LA
