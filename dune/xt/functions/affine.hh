@@ -43,7 +43,7 @@ public:
   typedef typename XT::Functions::JacobianRangeTypeSelector<domainDim, RangeFieldImp, rangeDim, rangeDimCols>::type
       JacobianRangeType;
   typedef typename LA::CommonSparseMatrix<RangeFieldImp> MatrixType;
-  typedef DynamicMatrix<RangeFieldImp> DynamicMatrixType;
+  typedef FieldMatrix<RangeFieldImp, rangeDim, domainDim> FieldMatrixType;
 
   static std::string static_id()
   {
@@ -66,8 +66,8 @@ public:
   } // ... default_config(...)
 
   // constructor
-  explicit AffineFunctionBase(const std::vector<MatrixType> A,
-                              const RangeType b = RangeType(0),
+  explicit AffineFunctionBase(const std::vector<MatrixType>& A,
+                              const RangeType& b = RangeType(0),
                               const std::string name_in = static_id())
     : A_(A)
     , b_(b)
@@ -77,8 +77,8 @@ public:
     assert(A.size() >= rangeDimCols);
   }
 
-  explicit AffineFunctionBase(const FieldVector<DynamicMatrixType, rangeDimCols> A,
-                              const RangeType b = RangeType(0),
+  explicit AffineFunctionBase(const FieldVector<FieldMatrixType, rangeDimCols>& A,
+                              const RangeType& b = RangeType(0),
                               const bool prune = true,
                               const std::string name_in = static_id())
     : A_(A.size())
@@ -90,9 +90,23 @@ public:
       A_[cc] = MatrixType(A[cc], prune);
   }
 
+  explicit AffineFunctionBase(const std::vector<FieldMatrixType>& A,
+                              const RangeType& b = RangeType(0),
+                              const bool prune = true,
+                              const std::string name_in = static_id())
+    : A_(A.size())
+    , b_(b)
+    , name_(name_in)
+    , b_zero_(Common::FloatCmp::eq(b_, RangeType(0)))
+  {
+    assert(A.size() >= rangeDimCols);
+    for (size_t cc = 0; cc < rangeDimCols; ++cc)
+      A_[cc] = MatrixType(A[cc], prune);
+  }
+
   // constructor for dimRangeCols = 1.
-  explicit AffineFunctionBase(const MatrixType A,
-                              const RangeType b = RangeType(0),
+  explicit AffineFunctionBase(const MatrixType& A,
+                              const RangeType& b = RangeType(0),
                               const std::string name_in = static_id())
     : AffineFunctionBase(std::vector<MatrixType>(1, A), b, name_in)
   {
@@ -138,7 +152,7 @@ protected:
 
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
-      ret = A[0].operator DynamicMatrixType();
+      ret = A[0].operator FieldMatrixType();
     }
   }; // struct helper<true, ...>
 
@@ -161,7 +175,7 @@ protected:
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
       for (size_t cc = 0; cc < rangeDimCols; ++cc)
-        ret[cc] = A[cc].operator DynamicMatrixType();
+        ret[cc] = A[cc].operator FieldMatrixType();
     }
   }; // struct helper<false, ...>
 
@@ -204,7 +218,7 @@ public:
   using InterfaceType::dimRange;
   using InterfaceType::dimRangeCols;
   using typename BaseType::MatrixType;
-  using typename BaseType::DynamicMatrixType;
+  using typename BaseType::FieldMatrixType;
 
   using BaseType::default_config;
 
@@ -237,15 +251,23 @@ public:
   } // ... create(...)
 
   // constructor
-  explicit AffineFunction(const std::vector<MatrixType> A,
-                          const RangeType b = RangeType(0),
+  explicit AffineFunction(const std::vector<MatrixType>& A,
+                          const RangeType& b = RangeType(0),
                           const std::string name_in = static_id())
     : BaseType(A, b, name_in)
   {
   }
 
-  explicit AffineFunction(const Dune::FieldVector<DynamicMatrixType, dimRangeCols> A,
-                          const RangeType b = RangeType(0),
+  explicit AffineFunction(const FieldVector<FieldMatrixType, dimRangeCols>& A,
+                          const RangeType& b = RangeType(0),
+                          const bool prune = true,
+                          const std::string name_in = static_id())
+    : BaseType(A, b, prune, name_in)
+  {
+  }
+
+  explicit AffineFunction(const std::vector<FieldMatrixType>& A,
+                          const RangeType& b = RangeType(0),
                           const bool prune = true,
                           const std::string name_in = static_id())
     : BaseType(A, b, prune, name_in)
@@ -253,7 +275,9 @@ public:
   }
 
   // constructor for dimRangeCols = 1.
-  explicit AffineFunction(const MatrixType A, const RangeType b = RangeType(0), const std::string name_in = static_id())
+  explicit AffineFunction(const MatrixType& A,
+                          const RangeType& b = RangeType(0),
+                          const std::string name_in = static_id())
     : BaseType(A, b, name_in)
   {
   }
@@ -331,7 +355,7 @@ public:
   typedef typename InterfaceType::StateRangeType StateRangeType;
   typedef typename InterfaceType::LocalfunctionType LocalfunctionType;
   typedef typename BaseType::MatrixType MatrixType;
-  typedef typename BaseType::DynamicMatrixType DynamicMatrixType;
+  typedef typename BaseType::FieldMatrixType FieldMatrixType;
 
   using BaseType::default_config;
 
@@ -364,15 +388,23 @@ public:
   } // ... create(...)
 
   // constructor
-  explicit AffineFluxFunction(const std::vector<MatrixType> A,
-                              const RangeType b = RangeType(0),
+  explicit AffineFluxFunction(const std::vector<MatrixType>& A,
+                              const RangeType& b = RangeType(0),
                               const std::string name_in = static_id())
     : BaseType(A, b, name_in)
   {
   }
 
-  explicit AffineFluxFunction(const Dune::FieldVector<DynamicMatrixType, dimRangeCols> A,
-                              const RangeType b = RangeType(0),
+  explicit AffineFluxFunction(const Dune::FieldVector<FieldMatrixType, dimRangeCols>& A,
+                              const RangeType& b = RangeType(0),
+                              const bool prune = true,
+                              const std::string name_in = static_id())
+    : BaseType(A, b, prune, name_in)
+  {
+  }
+
+  explicit AffineFluxFunction(const std::vector<FieldMatrixType>& A,
+                              const RangeType& b = RangeType(0),
                               const bool prune = true,
                               const std::string name_in = static_id())
     : BaseType(A, b, prune, name_in)
@@ -380,8 +412,8 @@ public:
   }
 
   // constructor for dimRangeCols = 1.
-  explicit AffineFluxFunction(const MatrixType A,
-                              const RangeType b = RangeType(0),
+  explicit AffineFluxFunction(const MatrixType& A,
+                              const RangeType& b = RangeType(0),
                               const std::string name_in = static_id())
     : BaseType(A, b, name_in)
   {
