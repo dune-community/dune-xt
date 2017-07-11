@@ -478,13 +478,13 @@ struct FieldMatrixToLaDenseMatrix
     return out;
   }
 
-  static FieldMatrixType convert_back(const LaMatrixType& in)
+  static std::unique_ptr<FieldMatrixType> convert_back(const LaMatrixType& in)
   {
-    FieldMatrixType out;
+    auto out = XT::Common::make_unique<FieldMatrixType>();
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
-        out[ii][jj] = in.get_entry(ii, jj);
-    return out;
+        (*out)[ii][jj] = in.get_entry(ii, jj);
+    return std::move(out);
   }
 };
 
