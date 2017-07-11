@@ -152,7 +152,7 @@ protected:
 
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
-      ret = A[0].operator FieldMatrixType();
+      ret = *(A[0].operator std::unique_ptr<FieldMatrixType>());
     }
   }; // struct helper<true, ...>
 
@@ -175,7 +175,7 @@ protected:
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
       for (size_t cc = 0; cc < rangeDimCols; ++cc)
-        ret[cc] = A[cc].operator FieldMatrixType();
+        ret[cc] = *(A[cc].operator std::unique_ptr<FieldMatrixType>());
     }
   }; // struct helper<false, ...>
 
