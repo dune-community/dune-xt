@@ -789,13 +789,6 @@ public:
     }
   }
 
-  // TODO: Why is this constructor needed? Remove?
-  explicit CommonSparseMatrix(const int rr, const int cc = 0)
-    : CommonSparseMatrix(size_t(rr), size_t(cc), ScalarType(0))
-  {
-    assert(rr >= 0 && cc >= 0);
-  }
-
   CommonSparseMatrix(const ThisType& other)
     : num_rows_(other.num_rows_)
     , num_cols_(other.num_cols_)
@@ -844,7 +837,7 @@ public:
     for (size_t rr = 0; rr < ROWS; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
         (*ret)[rr][column_indices_->operator[](kk)] = entries_->operator[](kk);
-    return std::move(ret);
+    return ret;
   }
 
   explicit operator Dune::DynamicMatrix<ScalarType>() const
