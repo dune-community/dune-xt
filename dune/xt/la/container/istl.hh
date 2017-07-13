@@ -174,6 +174,7 @@ public:
           other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
       unshareable_ = false;
     }
+    return *this;
   }
 
   ThisType& operator=(const ScalarType& val)
@@ -531,14 +532,12 @@ public:
     auto& backend_ref = backend();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     backend_ref *= alpha;
-    backend_ref *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     auto& backend_ref = backend();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
-    backend_ref *= alpha;
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
