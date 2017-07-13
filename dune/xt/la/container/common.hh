@@ -393,7 +393,7 @@ private:
 
   mutable std::shared_ptr<BackendType> backend_;
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  bool unshareable_;
+  mutable bool unshareable_;
 }; // class CommonDenseVector
 
 
