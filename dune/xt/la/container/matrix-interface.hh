@@ -94,6 +94,12 @@ public:
     return this->as_imp().get_entry_ref(ii, jj);
   }
 
+  inline const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
+  {
+    CHECK_CRTP(this->as_imp().get_entry_ref(ii, jj));
+    return this->as_imp().get_entry_ref(ii, jj);
+  }
+
   inline void clear_row(const size_t ii)
   {
     CHECK_AND_CALL_CRTP(this->as_imp().clear_row(ii));

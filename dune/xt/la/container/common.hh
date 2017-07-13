@@ -195,6 +195,7 @@ public:
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
+    unshareable_ = false;
     return *this;
   }
 
@@ -290,12 +291,12 @@ public:
   }
 
 protected:
-  inline ScalarType& get_entry_ref(const size_t ii)
+  inline ScalarType& get_unchecked_ref(const size_t ii)
   {
     return backend_->operator[](ii);
   }
 
-  inline const ScalarType& get_entry_ref(const size_t ii) const
+  inline const ScalarType& get_unchecked_ref(const size_t ii) const
   {
     return backend_->operator[](ii);
   }
@@ -305,14 +306,14 @@ public:
   {
     ensure_uniqueness();
     unshareable_ = true;
-    return get_entry_ref(ii);
+    return get_unchecked_ref(ii);
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
     ensure_uniqueness();
     unshareable_ = true;
-    return get_entry_ref(ii);
+    return get_unchecked_ref(ii);
   }
 
   /// \}
@@ -380,7 +381,7 @@ protected:
       assert(!unshareable_);
       const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
       if (!backend_.unique()) {
-        backend_ = std::make_shared<BackendType>(*(backend_));
+        backend_ = std::make_shared<BackendType>(*backend_);
         mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
       }
     }
@@ -390,7 +391,7 @@ private:
   friend class VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>;
   friend class CommonDenseMatrix<ScalarType>;
 
-  std::shared_ptr<BackendType> backend_;
+  mutable std::shared_ptr<BackendType> backend_;
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
   bool unshareable_;
 }; // class CommonDenseVector
@@ -502,6 +503,7 @@ public:
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
+    unshareable_ = false;
     return *this;
   }
 

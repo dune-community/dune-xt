@@ -191,7 +191,6 @@ public:
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
-    mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
     unshareable_ = false;
     return *this;
   } // ... operator=(...)
@@ -337,6 +336,7 @@ public:
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     backend_->operator=(other);
+    unshareable_ = false;
     return *this;
   }
 
@@ -499,6 +499,7 @@ public:
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
+    unshareable_ = false;
     return *this;
   }
 

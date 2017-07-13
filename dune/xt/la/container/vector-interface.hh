@@ -100,19 +100,19 @@ public:
 
 protected:
   /**
-   * The purpose of get_entry_ref is to allow direct access to the underlying data without any checks (regarding cow
+   * The purpose of get_unchecked_ref is to allow direct access to the underlying data without any checks (regarding cow
    * or thread safety). This allows default implementations in the interface with locking prior to for-loops.
    */
-  inline ScalarType& get_entry_ref(const size_t ii)
+  inline ScalarType& get_unchecked_ref(const size_t ii)
   {
-    CHECK_CRTP(this->as_imp().get_entry_ref(ii));
-    return this->as_imp().get_entry_ref(ii);
+    CHECK_CRTP(this->as_imp().get_unchecked_ref(ii));
+    return this->as_imp().get_unchecked_ref(ii);
   }
 
-  inline const ScalarType& get_entry_ref(const size_t ii) const
+  inline const ScalarType& get_unchecked_ref(const size_t ii) const
   {
-    CHECK_CRTP(this->as_imp().get_entry_ref(ii));
-    return this->as_imp().get_entry_ref(ii);
+    CHECK_CRTP(this->as_imp().get_unchecked_ref(ii));
+    return this->as_imp().get_unchecked_ref(ii);
   }
 
 public:
@@ -138,7 +138,6 @@ public:
 
   /**
    * \brief Get writable reference to the iith entry.
-   * \note \attention The returned reference may be invalid once (any entry of) the vector is changed!
    */
   inline ScalarType& operator[](const size_t ii)
   {
@@ -148,12 +147,27 @@ public:
 
   /**
    * \brief Get read-only reference to the iith entry.
-   * \note \attention The returned reference may be invalid once (any entry of) the vector is changed!
    */
   inline const ScalarType& operator[](const size_t ii) const
   {
     CHECK_CRTP(this->as_imp()[ii]);
     return this->as_imp()[ii];
+  }
+
+  /**
+  * \brief Get writable reference to the iith entry.
+  */
+  inline ScalarType& get_entry_ref(const size_t ii)
+  {
+    return this->operator[](ii);
+  }
+
+  /**
+   * \brief Get read-only reference to the iith entry.
+   */
+  inline const ScalarType& get_entry_ref(const size_t ii) const
+  {
+    return this->operator[](ii);
   }
 
   /**
@@ -185,7 +199,7 @@ public:
     using std::abs;
     auto result = std::make_pair(size_t(0), RealType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
-      const auto value = abs(get_entry_ref(ii));
+      const auto value = abs(get_unchecked_ref(ii));
       if (value > result.second) {
         result.first = ii;
         result.second = value;
@@ -244,7 +258,7 @@ public:
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     ScalarType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += conj(get_entry_ref(ii)) * other.get_entry_ref(ii);
+      result += conj(get_unchecked_ref(ii)) * other.get_unchecked_ref(ii);
     return result;
   } // ... dot(...)
 
@@ -258,7 +272,7 @@ public:
     using std::abs;
     RealType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
-      result += abs(get_entry_ref(ii));
+      result += abs(get_unchecked_ref(ii));
     return result;
   } // ... l1_norm(...)
 
@@ -313,7 +327,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      result.set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
+      result.set_entry(ii, get_unchecked_ref(ii) + other.get_unchecked_ref(ii));
   } // ... add(...)
 
   /**
@@ -341,7 +355,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, get_entry_ref(ii) + other.get_entry_ref(ii));
+      add_to_entry(ii, other.get_unchecked_ref(ii));
   } // ... iadd(...)
 
   /**
@@ -359,7 +373,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of result (" << result.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      result.set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
+      result.set_entry(ii, get_unchecked_ref(ii) - other.get_unchecked_ref(ii));
   } // ... sub(...)
 
   /**
@@ -386,7 +400,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, get_entry_ref(ii) - other.get_entry_ref(ii));
+      add_to_entry(ii, -other.get_unchecked_ref(ii));
   } // ... isub(...)
 
   using BaseType::operator*;
