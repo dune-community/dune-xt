@@ -81,9 +81,9 @@ public:
   }
 
 private:
-  const LambdaType lambda_;
-  const size_t order_;
-  const std::string name_;
+  LambdaType lambda_;
+  size_t order_;
+  std::string name_;
 };
 
 
