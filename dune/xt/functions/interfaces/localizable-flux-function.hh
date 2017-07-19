@@ -53,6 +53,8 @@ public:
   typedef typename LocalfunctionType::StateRangeType StateRangeType;
   typedef typename LocalfunctionType::PartialXRangeType PartialXRangeType;
   typedef typename LocalfunctionType::PartialURangeType PartialURangeType;
+  typedef typename LocalfunctionType::ColRangeType ColRangeType;
+  typedef typename LocalfunctionType::ColPartialURangeType ColPartialURangeType;
 
   static const bool available = false;
   virtual ~LocalizableFluxFunctionInterface() = default;

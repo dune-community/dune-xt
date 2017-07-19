@@ -58,6 +58,9 @@ public:
   typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::RangeType RangeType;
   typedef typename LocalfunctionSetInterface<E, D, d, R, r, rC>::JacobianRangeType PartialXRangeType;
   typedef typename JacobianRangeTypeSelector<StateType::dimRange, R, r, rC>::type PartialURangeType;
+  typedef typename LocalfunctionSetInterface<E, D, d, R, r, 1>::RangeType ColRangeType;
+  typedef typename LocalfunctionSetInterface<E, D, d, R, r, 1>::JacobianRangeType ColPartialXRangeType;
+  typedef typename JacobianRangeTypeSelector<StateType::dimRange, R, r, 1>::type ColPartialURangeType;
 
   LocalFluxFunctionInterface(const EntityType& en)
     : entity_(en)
@@ -78,6 +81,15 @@ public:
                         RangeType& /*ret*/,
                         const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
+  virtual void evaluate_col(const size_t col,
+                            const DomainType& /*x*/,
+                            const StateRangeType& /*u*/,
+                            ColRangeType& /*ret*/,
+                            const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  {
+    DUNE_THROW(NotImplemented, "");
+  }
+
   virtual void partial_x(const DomainType& /*x*/,
                          const StateRangeType& /*u*/,
                          PartialXRangeType& /*ret*/,
@@ -94,6 +106,16 @@ public:
     DUNE_THROW(NotImplemented, "");
   }
 
+  virtual void partial_u_col(const size_t /*col*/,
+                             const DomainType& /*x*/,
+                             const StateRangeType& /*u*/,
+                             ColPartialURangeType& /*ret*/,
+                             const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  {
+    DUNE_THROW(NotImplemented, "");
+  }
+
+
   /**
    * \name ´´These methods are provided by the interface.''
    * \{
@@ -103,6 +125,16 @@ public:
   {
     RangeType ret(0);
     evaluate(x, u, ret, mu);
+    return ret;
+  }
+
+  ColRangeType evaluate_col(const size_t col,
+                            const DomainType& x,
+                            const StateRangeType& u,
+                            const Common::Parameter& mu = Common::Parameter()) const
+  {
+    ColRangeType ret(0);
+    evaluate_col(col, x, u, ret, mu);
     return ret;
   }
 
@@ -122,6 +154,16 @@ public:
     return ret;
   }
 
+  ColPartialURangeType partial_u_col(const size_t col,
+                                     const DomainType& x,
+                                     const StateRangeType& u,
+                                     const Common::Parameter& mu = Common::Parameter()) const
+  {
+    assert(col < dimRangeCols && "Column index is out of bounds!");
+    ColPartialURangeType ret(0);
+    partial_u_col(col, x, u, ret, mu);
+    return ret;
+  }
   /**
    * \}
    **/

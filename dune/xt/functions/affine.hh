@@ -42,6 +42,9 @@ public:
   typedef typename XT::Functions::RangeTypeSelector<RangeFieldImp, rangeDim, rangeDimCols>::type RangeType;
   typedef typename XT::Functions::JacobianRangeTypeSelector<domainDim, RangeFieldImp, rangeDim, rangeDimCols>::type
       JacobianRangeType;
+  typedef typename XT::Functions::RangeTypeSelector<RangeFieldImp, rangeDim, 1>::type ColRangeType;
+  typedef typename XT::Functions::JacobianRangeTypeSelector<domainDim, RangeFieldImp, rangeDim, 1>::type
+      ColJacobianRangeType;
   typedef typename LA::CommonSparseMatrix<RangeFieldImp> MatrixType;
   typedef FieldMatrix<RangeFieldImp, rangeDim, domainDim> FieldMatrixType;
 
@@ -150,9 +153,26 @@ protected:
         ret += b;
     }
 
+    static void evaluate_col(const size_t col,
+                             const std::vector<MatrixType>& A,
+                             const RangeType& b,
+                             const bool b_zero,
+                             const DomainType& x,
+                             RangeType& ret)
+    {
+      assert(col == 0);
+      evaluate(A, b, b_zero, x, ret);
+    }
+
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
       ret = *(A[0].operator std::unique_ptr<FieldMatrixType>());
+    }
+
+    static void jacobian_col(const size_t col, const std::vector<MatrixType>& A, JacobianRangeType& ret)
+    {
+      assert(col == 0);
+      jacobian(A, ret);
     }
   }; // struct helper<true, ...>
 
@@ -172,10 +192,28 @@ protected:
         ret += b;
     }
 
+    static void evaluate_col(const size_t col,
+                             const std::vector<MatrixType>& A,
+                             const RangeType& b,
+                             const bool b_zero,
+                             const DomainType& x,
+                             ColRangeType& ret)
+    {
+      A[col].mv(x, ret);
+      if (!b_zero)
+        for (size_t rr = 0; rr < rangeDim; ++rr)
+          ret += b[rr][col];
+    }
+
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
       for (size_t cc = 0; cc < rangeDimCols; ++cc)
         ret[cc] = *(A[cc].operator std::unique_ptr<FieldMatrixType>());
+    }
+
+    static void jacobian_col(const size_t col, const std::vector<MatrixType>& A, ColJacobianRangeType& ret)
+    {
+      ret = *(A[col].operator std::unique_ptr<FieldMatrixType>());
     }
   }; // struct helper<false, ...>
 
@@ -348,6 +386,8 @@ public:
   typedef typename InterfaceType::RangeFieldType RangeFieldType;
   typedef typename InterfaceType::RangeType RangeType;
   typedef typename InterfaceType::PartialURangeType PartialURangeType;
+  typedef typename InterfaceType::ColRangeType ColRangeType;
+  typedef typename InterfaceType::ColPartialURangeType ColPartialURangeType;
   using InterfaceType::dimDomain;
   using InterfaceType::dimRange;
   using InterfaceType::dimRangeCols;
@@ -429,6 +469,15 @@ public:
     BaseType::template helper<>::evaluate(A_, b_, b_zero_, u, ret);
   }
 
+  virtual void evaluate_col(const size_t col,
+                            const DomainType& /*x*/,
+                            const StateRangeType& u,
+                            ColRangeType& ret,
+                            const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  {
+    BaseType::template helper<>::evaluate_col(col, A_, b_, b_zero_, u, ret);
+  }
+
   using InterfaceType::partial_u;
 
   virtual void partial_u(const DomainType& /*x*/,
@@ -437,6 +486,15 @@ public:
                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
   {
     BaseType::template helper<>::jacobian(A_, ret);
+  }
+
+  virtual void partial_u_col(const size_t col,
+                             const DomainType& /*x*/,
+                             const StateRangeType& /*u*/,
+                             ColPartialURangeType& ret,
+                             const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  {
+    BaseType::template helper<>::jacobian_col(col, A_, ret);
   }
 
 private:
