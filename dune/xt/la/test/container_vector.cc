@@ -162,6 +162,40 @@ struct VectorTest : public ::testing::Test
     testvector_5.set_entry(2, ScalarType(2.5));
     testvector_5.set_entry(3, ScalarType(-3.5));
 
+    // test get_entry()
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), testvector_1.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(-2), testvector_1.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2), testvector_1.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), testvector_1.get_entry(3));
+
+    // test operator[] and get_entry_ref
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), testvector_1[0]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(-2), testvector_1[1]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2), testvector_1.get_entry_ref(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), testvector_1.get_entry_ref(3));
+    VectorImp testvector_1_copy = testvector_1;
+    const ScalarType& entry0 = testvector_1_copy[0];
+    ScalarType& entry3 = testvector_1_copy[3];
+    testvector_1.scal(ScalarType(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), entry0);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), entry3);
+    testvector_1.scal(ScalarType(0.5));
+    testvector_1_copy.scal(ScalarType(3));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), entry0);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(3), entry3);
+    entry3 = ScalarType(42);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(42), testvector_1_copy.get_entry(3));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), testvector_1.get_entry(3));
+
+    // test iterators
+    const auto it_end = countingup.end();
+    size_t count = 0;
+    for (auto it = countingup.begin(); it != it_end; ++it)
+      EXPECT_DOUBLE_OR_COMPLEX_EQ(*it, ScalarType(count++));
+    count = 0;
+    for (const auto& entry : countingup)
+      EXPECT_DOUBLE_OR_COMPLEX_EQ(entry, ScalarType(count++));
+
     // test amax()
     std::pair<size_t, RealType> amax = zeros.amax();
     EXPECT_EQ(0, amax.first);
