@@ -24,6 +24,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_traits.hh>
 
 #include "container-interface.hh"
