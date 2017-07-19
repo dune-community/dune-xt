@@ -293,7 +293,7 @@ public:
   {
   }
 
-  virtual size_t order() const
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const
   {
     return function_.order();
   }

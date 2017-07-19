@@ -221,7 +221,7 @@ public:
     return BaseType::static_id() + ".constant";
   }
 
-  virtual size_t order() const override final
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override final
   {
     return 0;
   }

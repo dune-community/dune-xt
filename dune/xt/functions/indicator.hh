@@ -58,7 +58,7 @@ class IndicatorFunction<E, D, d, R, 1> : public LocalizableFunctionInterface<E, 
     {
     }
 
-    virtual size_t order() const override final
+    virtual size_t order(const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
     {
       return 0;
     }

@@ -299,7 +299,7 @@ public:
   {
   }
 
-  virtual size_t order() const override final
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override final
   {
     return Select::order(left_local_->order(), right_local_->order());
   }

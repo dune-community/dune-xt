@@ -73,7 +73,7 @@ class FemAdapterFunction
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order() const override
+    virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override
     {
       return wrapped_localfunction_.order();
     }

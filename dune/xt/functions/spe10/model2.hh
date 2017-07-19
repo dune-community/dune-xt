@@ -90,7 +90,7 @@ public:
     }
   }
 
-  virtual size_t order() const override
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override
   {
     return 0u;
   }
