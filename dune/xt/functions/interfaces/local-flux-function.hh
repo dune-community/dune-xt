@@ -74,7 +74,7 @@ public:
     return entity_;
   }
 
-  virtual size_t order(const Common::Parameter& /*mu*/) const = 0;
+  virtual size_t order(const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
 
   virtual void evaluate(const DomainType& /*x*/,
                         const StateRangeType& /*u*/,
@@ -94,6 +94,15 @@ public:
                          const StateRangeType& /*u*/,
                          PartialXRangeType& /*ret*/,
                          const Common::Parameter& /*mu*/ = Common::Parameter()) const
+  {
+    DUNE_THROW(NotImplemented, "");
+  }
+
+  virtual void partial_x_col(const size_t /*col*/,
+                             const DomainType& /*x*/,
+                             const StateRangeType& /*u*/,
+                             ColPartialXRangeType& /*ret*/,
+                             const Common::Parameter& /*mu*/ = Common::Parameter()) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -143,6 +152,17 @@ public:
   {
     PartialXRangeType ret(0);
     partial_x(x, u, ret, mu);
+    return ret;
+  }
+
+  ColPartialXRangeType partial_x_col(const size_t col,
+                                     const DomainType& x,
+                                     const StateRangeType& u,
+                                     const Common::Parameter& mu = Common::Parameter()) const
+  {
+    assert(col < dimRangeCols && "Column index is out of bounds!");
+    ColPartialXRangeType ret(0);
+    partial_x_col(col, x, u, ret, mu);
     return ret;
   }
 
