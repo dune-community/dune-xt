@@ -16,24 +16,9 @@
 #include <type_traits>
 #include <vector>
 
-#include <dune/common/dynvector.hh>
-#include <dune/common/fmatrix.hh>
-#include <dune/common/fvector.hh>
 #include <dune/common/parallel/mpihelper.hh>
-#include <dune/common/version.hh>
 
 #include <dune/grid/io/file/vtk.hh>
-
-#if HAVE_DUNE_FEM
-#include <dune/fem/function/common/function.hh>
-#include <dune/fem/space/common/functionspace.hh>
-#endif
-
-#if HAVE_DUNE_PDELAB
-#include <dune/pdelab/common/function.hh>
-
-#include <dune/typetree/nodetags.hh>
-#endif
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/filesystem.hh>
