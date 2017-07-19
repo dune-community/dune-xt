@@ -265,7 +265,8 @@ public:
   /**
    *  \brief  This is the constructor of interest which wrappes a raw array.
    */
-  EigenMappedDenseVector(ScalarType* data, size_t data_size)
+  EigenMappedDenseVector(ScalarType* data, size_t data_size, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(data, internal::boost_numeric_cast<EIGEN_size_t>(data_size));
   }
@@ -273,14 +274,18 @@ public:
   /**
    *  \brief  This constructor allows to create an instance of this type just like any other vector.
    */
-  explicit EigenMappedDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0))
+  explicit EigenMappedDenseVector(const size_t ss = 0,
+                                  const ScalarType value = ScalarType(0),
+                                  const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
     backend_->setOnes();
     backend_->operator*=(value);
   }
 
-  explicit EigenMappedDenseVector(const std::vector<ScalarType>& other)
+  explicit EigenMappedDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
                                              internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
@@ -288,7 +293,8 @@ public:
       backend_->operator[](ii) = other[ii];
   }
 
-  explicit EigenMappedDenseVector(const std::initializer_list<ScalarType>& other)
+  explicit EigenMappedDenseVector(const std::initializer_list<ScalarType>& other, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
                                              internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
@@ -300,14 +306,24 @@ public:
   /**
    *  \brief  This constructor does not do a deep copy.
    */
-  EigenMappedDenseVector(const ThisType& other) = default;
+  EigenMappedDenseVector(const ThisType& other)
+    : BaseType(other)
+  {
+    if (other.unshareable_) {
+      auto new_backend = std::make_shared<BackendType>(new ScalarType[other.backend_->size()], other.backend_->size());
+      new_backend->operator=(*(other.backend_));
+      backend_ = new_backend;
+    }
+  }
 
   /**
    * \brief This constructor does a deep copy.
    */
   explicit EigenMappedDenseVector(const BackendType& other,
                                   const bool /*prune*/ = false,
-                                  const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value())
+                                  const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
+                                  const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
                                              internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
@@ -317,17 +333,30 @@ public:
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
-  explicit EigenMappedDenseVector(BackendType* backend_ptr)
+  explicit EigenMappedDenseVector(BackendType* backend_ptr, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = std::shared_ptr<BackendType>(backend_ptr);
   }
 
-  explicit EigenMappedDenseVector(std::shared_ptr<BackendType> backend_ptr)
+  explicit EigenMappedDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
+    : BaseType(num_mutexes)
   {
     backend_ = backend_ptr;
   }
 
   using BaseType::operator=;
+
+  ThisType& operator=(const ThisType& other)
+  {
+    BaseType::operator=(other);
+    if (other.unshareable_) {
+      auto new_backend = std::make_shared<BackendType>(new ScalarType[other.backend_->size()], other.backend_->size());
+      new_backend->operator=(*(other.backend_));
+      backend_ = new_backend;
+    }
+    return *this;
+  }
 
   /**
    * \brief does a deep copy;
@@ -361,7 +390,7 @@ protected:
       if (!backend_.unique()) {
         mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
         auto new_backend = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
-        new_backend->operator=(*(backend_));
+        new_backend->operator=(*backend_);
         backend_ = new_backend;
       }
     }

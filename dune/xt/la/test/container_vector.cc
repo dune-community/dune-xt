@@ -191,10 +191,10 @@ struct VectorTest : public ::testing::Test
     const auto it_end = countingup.end();
     size_t count = 0;
     for (auto it = countingup.begin(); it != it_end; ++it)
-      EXPECT_DOUBLE_OR_COMPLEX_EQ(*it, ScalarType(count++));
+      EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(count++), *it);
     count = 0;
     for (const auto& entry : countingup)
-      EXPECT_DOUBLE_OR_COMPLEX_EQ(entry, ScalarType(count++));
+      EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(count++), entry);
 
     // test amax()
     std::pair<size_t, RealType> amax = zeros.amax();
