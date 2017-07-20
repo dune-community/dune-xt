@@ -24,6 +24,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_traits.hh>
 
 #include "container-interface.hh"
@@ -89,6 +90,12 @@ public:
   }
 
   inline ScalarType& get_entry_ref(const size_t ii, const size_t jj)
+  {
+    CHECK_CRTP(this->as_imp().get_entry_ref(ii, jj));
+    return this->as_imp().get_entry_ref(ii, jj);
+  }
+
+  inline const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
   {
     CHECK_CRTP(this->as_imp().get_entry_ref(ii, jj));
     return this->as_imp().get_entry_ref(ii, jj);
@@ -478,13 +485,13 @@ struct FieldMatrixToLaDenseMatrix
     return out;
   }
 
-  static FieldMatrixType convert_back(const LaMatrixType& in)
+  static std::unique_ptr<FieldMatrixType> convert_back(const LaMatrixType& in)
   {
-    FieldMatrixType out;
+    auto out = XT::Common::make_unique<FieldMatrixType>();
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
-        out[ii][jj] = in.get_entry(ii, jj);
-    return out;
+        (*out)[ii][jj] = in.get_entry(ii, jj);
+    return std::move(out);
   }
 };
 
