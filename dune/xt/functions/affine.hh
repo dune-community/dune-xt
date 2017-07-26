@@ -265,7 +265,7 @@ public:
     return BaseType::static_id() + ".affine";
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
   {
     return 1;
   }

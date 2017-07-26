@@ -112,7 +112,7 @@ public:
     return name_;
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override final
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override final
   {
     return order_;
   }
@@ -224,7 +224,7 @@ public:
     return name_;
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override final
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override final
   {
     return order_;
   }
@@ -334,7 +334,7 @@ class CutoffFunction<DiffusionType, void> : public LocalizableFunctionInterface<
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override final
+    virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override final
     {
       return 0;
     }
@@ -560,7 +560,7 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override final
+    virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override final
     {
       return 0;
     }

@@ -127,7 +127,7 @@ public:
     return name_;
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
   {
     return 3 * dimDomain;
   }

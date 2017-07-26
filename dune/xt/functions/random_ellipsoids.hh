@@ -104,7 +104,7 @@ public:
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override
+    virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
     {
       return 8;
     }

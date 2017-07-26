@@ -98,7 +98,7 @@ private:
     {
     }
 
-    size_t order() const override final
+    virtual size_t order(const Common::Parameter& mu = Common::Parameter()) const override final
     {
       return order_;
     }

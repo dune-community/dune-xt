@@ -170,9 +170,9 @@ template <class EntityImp,
           class LocalizableFunctionImp>
 class CheckerboardFunction : public internal::CheckerboardInterfaceChooser<LocalizableFunctionImp>::Type
 {
-  //  static_assert(is_localizable_function<LocalizableFunctionImp>::value
-  //                    || is_localizable_flux_function <LocalizableFunctionImp::value,
-  //                "LocalizableFunctionImp needs to be derived from XT::Localizable(Flux)FunctionInterface!");
+  static_assert(is_localizable_function<LocalizableFunctionImp>::value
+                    || is_localizable_flux_function<LocalizableFunctionImp>::value,
+                "LocalizableFunctionImp needs to be derived from XT::Localizable(Flux)FunctionInterface!");
   static_assert(domainDim <= 3, "Not implemented for dimDomain > 3 (see find_subdomain method)!");
   typedef typename internal::CheckerboardInterfaceChooser<LocalizableFunctionImp>::Type BaseType;
   typedef CheckerboardFunction<EntityImp,

@@ -67,7 +67,7 @@ struct GeneralLocalfunctionChooser
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override
+    virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
     {
       return 2;
     }
@@ -142,17 +142,19 @@ struct LocalfunctionForGlobalChooser
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const override
+    virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
     {
       return global_function_.order() * localizable_function_.local_function(entity_)->order();
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+    virtual void evaluate(const DomainType& xx, RangeType& ret, const XT::Common::Parameter& mu = {}) const override
     {
-      global_function_.evaluate(localizable_function_.local_function(entity_)->evaluate(xx), ret);
+      global_function_.evaluate(localizable_function_.local_function(entity_)->evaluate(xx, mu), ret, mu);
     }
 
-    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const override
+    virtual void jacobian(const DomainType& /*xx*/,
+                          JacobianRangeType& /*ret*/,
+                          const XT::Common::Parameter& /*mu*/ = {}) const override
     {
       DUNE_THROW(Dune::NotImplemented, "");
     }

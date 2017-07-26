@@ -48,7 +48,7 @@ public:
   {
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const = 0;
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const = 0;
 
   virtual void evaluate(const DomainType& /*xx*/,
                         RangeType& /*ret*/,
@@ -168,7 +168,7 @@ public:
   {
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = XT::Common::Parameter()) const
+  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const
   {
     return function_.order();
   }
