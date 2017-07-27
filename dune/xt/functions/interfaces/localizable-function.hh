@@ -149,7 +149,7 @@ public:
     return Functions::ProductFunction<ThisType, OtherType>(*this, other);
   }
 
-  DivergenceType DUNE_DEPRECATED_MSG("use make_divergence(func) instead of func.divergence() (09.05.2017)!")
+  void DUNE_DEPRECATED_MSG("use make_divergence(func) instead of func.divergence() (09.05.2017)!")
       divergence() const
   {
   }
