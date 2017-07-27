@@ -404,9 +404,9 @@ private:
   const std::array<std::vector<IndexType>, num_geometries>& new_indices_;
 }; // class PeriodicIndexSet<...>
 
-/** \brief Intersection for PeriodicGridView
+/** \brief Intersection implementation for PeriodicGridView
  *
- * PeriodicIntersection is derived from the Intersection of the underlying GridView. On the inside of the grid or if
+ * PeriodicIntersectionImp is derived from the Intersection of the underlying GridView. On the inside of the grid or if
  * periodic_ is false, the PeriodicIntersection will behave exactly like its BaseType. If periodic_ is true, the
  * PeriodicIntersection will return neighbor == true even if it actually is on the boundary. In this case, outside(),
  * geometryInOutside() and indexInOutside() are well-defined and give the information from the periodically adjacent
@@ -415,10 +415,9 @@ private:
  * \see PeriodicGridView
  */
 template <class RealGridViewImp>
-class PeriodicIntersection : public RealGridViewImp::Intersection
+class PeriodicIntersectionImp : public RealGridViewImp::Intersection
 {
   typedef RealGridViewImp RealGridViewType;
-  typedef PeriodicIntersection<RealGridViewType> ThisType;
   typedef typename RealGridViewType::Intersection BaseType;
 
 public:
@@ -428,19 +427,13 @@ public:
   static const size_t dimDomain = RealGridViewType::dimension;
 
   //! \brief Constructor from real intersection
-  PeriodicIntersection(const BaseType& real_intersection,
-                       const RealGridViewType& real_grid_view,
-                       const std::pair<bool, EntityType>& periodic_pair)
+  PeriodicIntersectionImp(const BaseType& real_intersection,
+                          const RealGridViewType& real_grid_view,
+                          const std::pair<bool, EntityType>& periodic_pair)
     : BaseType(real_intersection)
     , periodic_(periodic_pair.first)
     , outside_(periodic_pair.second)
     , real_grid_view_(&real_grid_view)
-  {
-  }
-
-  //! \brief Invalid default constructed intersection
-  PeriodicIntersection()
-    : BaseType()
   {
   }
 
@@ -510,7 +503,8 @@ protected:
   bool periodic_;
   EntityType outside_;
   const RealGridViewType* real_grid_view_;
-}; // ... class PeriodicIntersection ...
+}; // ... class PeriodicIntersectionImp ...
+
 
 /** \brief IntersectionIterator for PeriodicGridView
  *
@@ -526,11 +520,12 @@ class PeriodicIntersectionIterator : public RealGridViewImp::IntersectionIterato
   typedef RealGridViewImp RealGridViewType;
   typedef typename RealGridViewType::IntersectionIterator BaseType;
   typedef PeriodicIntersectionIterator<RealGridViewImp> ThisType;
+  typedef PeriodicIntersectionImp<RealGridViewType> IntersectionImp;
 
 public:
   typedef typename BaseType::Intersection RealIntersectionType;
   typedef int IntersectionIndexType;
-  typedef PeriodicIntersection<RealGridViewType> Intersection;
+  typedef Dune::Intersection<typename RealGridViewImp::Grid, IntersectionImp> Intersection;
   using EntityType = extract_entity_t<RealGridViewType>;
   typedef std::pair<bool, EntityType> PeriodicPairType;
   static const size_t dimDomain = RealGridViewType::dimension;
@@ -579,11 +574,11 @@ private:
   {
     assert(!has_boundary_intersections_
            || intersection_map_.size() > static_cast<size_t>((BaseType::operator*()).indexInInside()));
-    return Common::make_unique<Intersection>(BaseType::operator*(),
-                                             real_grid_view_,
-                                             has_boundary_intersections_
-                                                 ? intersection_map_[(BaseType::operator*()).indexInInside()]
-                                                 : (const PeriodicPairType&)nonperiodic_pair_);
+    return Common::make_unique<Intersection>(
+        IntersectionImp(BaseType::operator*(),
+                        real_grid_view_,
+                        has_boundary_intersections_ ? intersection_map_[(BaseType::operator*()).indexInInside()]
+                                                    : (const PeriodicPairType&)nonperiodic_pair_));
   } // ... create_current_intersection() const
 
   std::unique_ptr<Intersection> create_current_intersection_safely() const
@@ -592,11 +587,11 @@ private:
     const RealIntersectionType real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
     assert(is_iend || !has_boundary_intersections_
            || intersection_map_.size() > static_cast<size_t>(real_intersection.indexInInside()));
-    return Common::make_unique<Intersection>(real_intersection,
-                                             real_grid_view_,
-                                             has_boundary_intersections_ && !is_iend
-                                                 ? intersection_map_[real_intersection.indexInInside()]
-                                                 : (const PeriodicPairType&)nonperiodic_pair_);
+    return Common::make_unique<Intersection>(IntersectionImp(real_intersection,
+                                                             real_grid_view_,
+                                                             has_boundary_intersections_ && !is_iend
+                                                                 ? intersection_map_[real_intersection.indexInInside()]
+                                                                 : (const PeriodicPairType&)nonperiodic_pair_));
   } // ... create_current_intersection_safely() const
 
   const RealGridViewType& real_grid_view_;
@@ -749,7 +744,7 @@ public:
   typedef typename Grid::ctype ctype;
 
   // ...except for the Intersection and IntersectionIterator
-  typedef PeriodicIntersection<RealGridViewType> Intersection;
+  typedef Dune::Intersection<typename RealGridViewType::Grid, PeriodicIntersectionImp<RealGridViewType>> Intersection;
   typedef PeriodicIntersectionIterator<RealGridViewType> IntersectionIterator;
 }; // ... class PeriodicGridViewTraits ...
 
@@ -772,7 +767,7 @@ public:
   typedef typename Traits::IndexSet::IndexType IndexType;
   typedef int IntersectionIndexType;
   typedef typename RealIntersectionType::GlobalCoordinate DomainType;
-  typedef PeriodicIntersection<BaseType> Intersection;
+  typedef Dune::Intersection<Grid, PeriodicIntersectionImp<BaseType>> Intersection;
   typedef std::vector<std::pair<bool, EntityType>> IntersectionMapType;
   static const size_t dimDomain = BaseType::dimension;
   static const size_t num_geometries = GlobalGeometryTypeIndex::size(dimDomain);
@@ -841,7 +836,6 @@ public:
         }
       }
     }
-
 
     // reset
     std::fill(entity_counts_->begin(), entity_counts_->end(), IndexType(0));
