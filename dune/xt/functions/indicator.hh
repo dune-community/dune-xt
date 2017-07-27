@@ -58,22 +58,20 @@ class IndicatorFunction<E, D, d, R, 1> : public LocalizableFunctionInterface<E, 
     {
     }
 
-    virtual size_t order(const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+    virtual size_t order(const Common::Parameter& /*mu*/ = {}) const override final
     {
       return 0;
     }
 
-    virtual void evaluate(const DomainType& xx,
-                          RangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+    virtual void
+    evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret = value_;
     }
 
-    virtual void jacobian(const DomainType& xx,
-                          JacobianRangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+    virtual void
+    jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= 0.0;

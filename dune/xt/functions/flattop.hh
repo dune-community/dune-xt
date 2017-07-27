@@ -132,8 +132,7 @@ public:
     return 3 * dimDomain;
   }
 
-  virtual void
-  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = Common::Parameter()) const override
+  virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override
   {
     ret = value_;
     for (size_t dd = 0; dd < dimDomain; ++dd) {

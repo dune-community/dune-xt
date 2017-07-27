@@ -98,14 +98,12 @@ private:
     {
     }
 
-    virtual size_t order(const Common::Parameter& mu = Common::Parameter()) const override final
+    virtual size_t order(const Common::Parameter& mu = {}) const override final
     {
       return order_;
     }
 
-    void evaluate(const DomainType& xx,
-                  RangeType& ret,
-                  const Common::Parameter& mu = Common::Parameter()) const override final
+    void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
     {
       points_[0] = this->entity().geometry().global(xx);
       const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);
@@ -118,9 +116,7 @@ private:
       source_local_function->evaluate(source_entity.geometry().local(points_[0]), ret, mu);
     } // ... evaluate(...)
 
-    void jacobian(const DomainType& xx,
-                  JacobianRangeType& ret,
-                  const Common::Parameter& mu = Common::Parameter()) const override final
+    void jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
     {
       points_[0] = this->entity().geometry().global(xx);
       const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);

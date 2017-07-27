@@ -74,18 +74,18 @@ public:
     return entity_;
   }
 
-  virtual size_t order(const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+  virtual size_t order(const Common::Parameter& /*mu*/ = {}) const = 0;
 
   virtual void evaluate(const DomainType& /*x*/,
                         const StateRangeType& /*u*/,
                         RangeType& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+                        const Common::Parameter& /*mu*/ = {}) const = 0;
 
   virtual void evaluate_col(const size_t col,
                             const DomainType& /*x*/,
                             const StateRangeType& /*u*/,
                             ColRangeType& /*ret*/,
-                            const Common::Parameter& /*mu*/ = Common::Parameter()) const
+                            const Common::Parameter& /*mu*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -93,7 +93,7 @@ public:
   virtual void partial_x(const DomainType& /*x*/,
                          const StateRangeType& /*u*/,
                          PartialXRangeType& /*ret*/,
-                         const Common::Parameter& /*mu*/ = Common::Parameter()) const
+                         const Common::Parameter& /*mu*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -102,7 +102,7 @@ public:
                              const DomainType& /*x*/,
                              const StateRangeType& /*u*/,
                              ColPartialXRangeType& /*ret*/,
-                             const Common::Parameter& /*mu*/ = Common::Parameter()) const
+                             const Common::Parameter& /*mu*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -110,7 +110,7 @@ public:
   virtual void partial_u(const DomainType& /*x*/,
                          const StateRangeType& /*u*/,
                          PartialURangeType& /*ret*/,
-                         const Common::Parameter& /*mu*/ = Common::Parameter()) const
+                         const Common::Parameter& /*mu*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -119,7 +119,7 @@ public:
                              const DomainType& /*x*/,
                              const StateRangeType& /*u*/,
                              ColPartialURangeType& /*ret*/,
-                             const Common::Parameter& /*mu*/ = Common::Parameter()) const
+                             const Common::Parameter& /*mu*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "");
   }
@@ -129,36 +129,30 @@ public:
    * \name ´´These methods are provided by the interface.''
    * \{
    **/
-  RangeType
-  evaluate(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
+  RangeType evaluate(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = {}) const
   {
     RangeType ret(0);
     evaluate(x, u, ret, mu);
     return ret;
   }
 
-  ColRangeType evaluate_col(const size_t col,
-                            const DomainType& x,
-                            const StateRangeType& u,
-                            const Common::Parameter& mu = Common::Parameter()) const
+  ColRangeType
+  evaluate_col(const size_t col, const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = {}) const
   {
     ColRangeType ret(0);
     evaluate_col(col, x, u, ret, mu);
     return ret;
   }
 
-  PartialXRangeType
-  partial_x(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
+  PartialXRangeType partial_x(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = {}) const
   {
     PartialXRangeType ret(0);
     partial_x(x, u, ret, mu);
     return ret;
   }
 
-  ColPartialXRangeType partial_x_col(const size_t col,
-                                     const DomainType& x,
-                                     const StateRangeType& u,
-                                     const Common::Parameter& mu = Common::Parameter()) const
+  ColPartialXRangeType
+  partial_x_col(const size_t col, const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = {}) const
   {
     assert(col < dimRangeCols && "Column index is out of bounds!");
     ColPartialXRangeType ret(0);
@@ -166,18 +160,15 @@ public:
     return ret;
   }
 
-  PartialURangeType
-  partial_u(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = Common::Parameter()) const
+  PartialURangeType partial_u(const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = {}) const
   {
     PartialURangeType ret(0);
     partial_u(x, u, ret, mu);
     return ret;
   }
 
-  ColPartialURangeType partial_u_col(const size_t col,
-                                     const DomainType& x,
-                                     const StateRangeType& u,
-                                     const Common::Parameter& mu = Common::Parameter()) const
+  ColPartialURangeType
+  partial_u_col(const size_t col, const DomainType& x, const StateRangeType& u, const Common::Parameter& mu = {}) const
   {
     assert(col < dimRangeCols && "Column index is out of bounds!");
     ColPartialURangeType ret(0);
@@ -237,13 +228,13 @@ public:
                         const StateRangeType& /*u*/,
                         const StateJacobianRangeType& /*grad_u*/,
                         RangeType& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+                        const Common::Parameter& /*mu*/ = {}) const = 0;
 
   virtual void jacobian(const DomainType& /*x*/,
                         const StateRangeType& /*u*/,
                         const StateJacobianRangeType& /*grad_u*/,
                         JacobianRangeType& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+                        const Common::Parameter& /*mu*/ = {}) const = 0;
 
   /**
    * \name ´´These methods are provided by the interface.''
@@ -252,7 +243,7 @@ public:
   RangeType evaluate(const DomainType& x,
                      const StateType& u,
                      const StateJacobianRangeType& grad_u,
-                     const Common::Parameter& mu = Common::Parameter()) const
+                     const Common::Parameter& mu = {}) const
   {
     RangeType ret(0);
     evaluate(x, u, grad_u, ret, mu);
@@ -262,7 +253,7 @@ public:
   JacobianRangeType jacobian(const DomainType& x,
                              const StateType& u,
                              const StateJacobianRangeType& grad_u,
-                             const Common::Parameter& mu = Common::Parameter()) const
+                             const Common::Parameter& mu = {}) const
   {
     JacobianRangeType ret(0);
     jacobian(x, u, grad_u, ret, mu);

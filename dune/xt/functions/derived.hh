@@ -184,15 +184,13 @@ public:
     return Select::order(func_local_->order());
   }
 
-  virtual void
-  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = Common::Parameter()) const override final
+  virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
   {
     Select::evaluate(*func_local_, xx, ret, mu);
   }
 
-  virtual void jacobian(const DomainType& xx,
-                        JacobianRangeType& ret,
-                        const Common::Parameter& mu = Common::Parameter()) const override final
+  virtual void
+  jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
   {
     Select::jacobian(*func_local_, xx, ret, mu);
   }

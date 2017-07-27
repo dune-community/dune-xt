@@ -120,9 +120,7 @@ public:
   /**
    * \brief "0.5 * pi * pi * cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  virtual void evaluate(const DomainType& xx,
-                        RangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     ret[0] = M_PI_2l * M_PIl * cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]);
   }
@@ -131,9 +129,8 @@ public:
    * \brief ["-0.25 * pi * pi * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.25 * pi * pi * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  virtual void jacobian(const DomainType& xx,
-                        JacobianRangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void
+  jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     const DomainFieldType pre = -0.25 * M_PIl * M_PIl * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
@@ -232,9 +229,7 @@ public:
   /**
    * \brief "cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  virtual void evaluate(const DomainType& xx,
-                        RangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     ret[0] = cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]);
   }
@@ -243,9 +238,8 @@ public:
    * \brief ["-0.5 * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.5 * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  virtual void jacobian(const DomainType& xx,
-                        JacobianRangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void
+  jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     const DomainFieldType pre = -0.5 * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
@@ -341,7 +335,7 @@ class CutoffFunction<DiffusionType, void> : public LocalizableFunctionInterface<
 
     virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
                           RangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                          const Common::Parameter& /*mu*/ = {}) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
@@ -349,7 +343,7 @@ class CutoffFunction<DiffusionType, void> : public LocalizableFunctionInterface<
 
     virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
                           JacobianRangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                          const Common::Parameter& /*mu*/ = {}) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);
@@ -567,7 +561,7 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
 
     virtual void evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
                           RangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                          const Common::Parameter& /*mu*/ = {}) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret[0] = value_;
@@ -575,7 +569,7 @@ class CutoffFunction : public LocalizableFunctionInterface<typename DiffusionFac
 
     virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
                           JacobianRangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                          const Common::Parameter& /*mu*/ = {}) const override final
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);

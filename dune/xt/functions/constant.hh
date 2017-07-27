@@ -226,16 +226,14 @@ public:
     return 0;
   }
 
-  virtual void evaluate(const DomainType& /*x*/,
-                        RangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void
+  evaluate(const DomainType& /*x*/, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     ret = constant_;
   }
 
-  virtual void jacobian(const DomainType& /*x*/,
-                        JacobianRangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void
+  jacobian(const DomainType& /*x*/, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     clear_jacobian<rangeDim, rangeDimCols>()(ret);
   }

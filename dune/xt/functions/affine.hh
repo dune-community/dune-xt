@@ -322,18 +322,15 @@ public:
 
   using InterfaceType::evaluate;
 
-  virtual void evaluate(const DomainType& x,
-                        RangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     BaseType::template helper<>::evaluate(A_, b_, b_zero_, x, ret);
   }
 
   using InterfaceType::jacobian;
 
-  virtual void jacobian(const DomainType& /*x*/,
-                        JacobianRangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  virtual void
+  jacobian(const DomainType& /*x*/, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
     BaseType::template helper<>::jacobian(A_, ret);
   }
@@ -404,7 +401,7 @@ public:
     return BaseType::static_id() + ".affineflux";
   }
 
-  virtual size_t order(const Common::Parameter& /*param*/ = Common::Parameter()) const override
+  virtual size_t order(const Common::Parameter& /*param*/ = {}) const override
   {
     return 1;
   }
@@ -464,7 +461,7 @@ public:
   virtual void evaluate(const DomainType& /*x*/,
                         const StateRangeType& u,
                         RangeType& ret,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                        const Common::Parameter& /*mu*/ = {}) const override final
   {
     BaseType::template helper<>::evaluate(A_, b_, b_zero_, u, ret);
   }
@@ -473,7 +470,7 @@ public:
                             const DomainType& /*x*/,
                             const StateRangeType& u,
                             ColRangeType& ret,
-                            const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                            const Common::Parameter& /*mu*/ = {}) const override final
   {
     BaseType::template helper<>::evaluate_col(col, A_, b_, b_zero_, u, ret);
   }
@@ -483,7 +480,7 @@ public:
   virtual void partial_u(const DomainType& /*x*/,
                          const StateRangeType& /*u*/,
                          PartialURangeType& ret,
-                         const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                         const Common::Parameter& /*mu*/ = {}) const override final
   {
     BaseType::template helper<>::jacobian(A_, ret);
   }
@@ -492,7 +489,7 @@ public:
                              const DomainType& /*x*/,
                              const StateRangeType& /*u*/,
                              ColPartialURangeType& ret,
-                             const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                             const Common::Parameter& /*mu*/ = {}) const override final
   {
     BaseType::template helper<>::jacobian_col(col, A_, ret);
   }

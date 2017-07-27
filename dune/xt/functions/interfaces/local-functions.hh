@@ -103,29 +103,28 @@ public:
    **/
   virtual size_t size() const = 0;
 
-  virtual size_t order(const Common::Parameter& = Common::Parameter()) const = 0;
+  virtual size_t order(const Common::Parameter& = {}) const = 0;
 
-  virtual void evaluate(const DomainType& /*xx*/,
-                        std::vector<RangeType>& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+  virtual void
+  evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/, const Common::Parameter& /*mu*/ = {}) const = 0;
 
   virtual void jacobian(const DomainType& /*xx*/,
                         std::vector<JacobianRangeType>& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+                        const Common::Parameter& /*mu*/ = {}) const = 0;
   /* \} */
 
   /**
    * \name ´´These methods are provided by the interface.''
    * \{
    **/
-  std::vector<RangeType> evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
+  std::vector<RangeType> evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const
   {
     std::vector<RangeType> ret(size(), RangeType(0));
     evaluate(xx, ret, mu);
     return ret;
   }
 
-  std::vector<JacobianRangeType> jacobian(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
+  std::vector<JacobianRangeType> jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const
   {
     std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
     jacobian(xx, ret, mu);
@@ -191,13 +190,10 @@ public:
    * \name ´´These methods have to be implemented in addition to the ones required from the BaseType.''
    * \{
    **/
-  virtual void evaluate(const DomainType& /*xx*/,
-                        RangeType& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+  virtual void evaluate(const DomainType& /*xx*/, RangeType& /*ret*/, const Common::Parameter& /*mu*/ = {}) const = 0;
 
-  virtual void jacobian(const DomainType& /*xx*/,
-                        JacobianRangeType& /*ret*/,
-                        const Common::Parameter& /*mu*/ = Common::Parameter()) const = 0;
+  virtual void
+  jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/, const Common::Parameter& /*mu*/ = {}) const = 0;
   /* \} */
 
   /**
@@ -209,9 +205,8 @@ public:
     return 1;
   }
 
-  virtual void evaluate(const DomainType& xx,
-                        std::vector<RangeType>& ret,
-                        const Common::Parameter& mu = Common::Parameter()) const override final
+  virtual void
+  evaluate(const DomainType& xx, std::vector<RangeType>& ret, const Common::Parameter& mu = {}) const override final
   {
     assert(ret.size() >= 1);
     evaluate(xx, ret[0], mu);
@@ -219,7 +214,7 @@ public:
 
   virtual void jacobian(const DomainType& xx,
                         std::vector<JacobianRangeType>& ret,
-                        const Common::Parameter& mu = Common::Parameter()) const override final
+                        const Common::Parameter& mu = {}) const override final
   {
     assert(ret.size() >= 1);
     jacobian(xx, ret[0], mu);
@@ -230,14 +225,14 @@ public:
    * \name ´´These methods are provided by the interface.''
    * \{
    **/
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const
   {
     RangeType ret(0);
     evaluate(xx, ret, mu);
     return ret;
   }
 
-  JacobianRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const
+  JacobianRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const
   {
     JacobianRangeType ret(0);
     jacobian(xx, ret, mu);
@@ -247,7 +242,7 @@ public:
   //! evaluate at N quadrature points into vector of size >= N
   void evaluate(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature,
                 std::vector<RangeType>& ret,
-                const Common::Parameter& mu = Common::Parameter())
+                const Common::Parameter& mu = {})
   {
     assert(ret.size() >= quadrature.size());
     std::size_t i = 0;
@@ -258,7 +253,7 @@ public:
   //! jacobian at N quadrature points into vector of size >= N
   void jacobian(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature,
                 std::vector<JacobianRangeType>& ret,
-                const Common::Parameter& mu = Common::Parameter())
+                const Common::Parameter& mu = {})
   {
     assert(ret.size() >= quadrature.size());
     std::size_t i = 0;

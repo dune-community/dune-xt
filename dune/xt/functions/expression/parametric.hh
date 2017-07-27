@@ -111,8 +111,7 @@ public:
     return param_type_;
   }
 
-  void
-  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = Common::Parameter()) const override final
+  void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
   {
     Common::Parameter parsed_mu;
     if (!param_type_.empty()) {
@@ -180,7 +179,7 @@ public:
 
   void jacobian(const DomainType& /*xx*/,
                 JacobianRangeType& /*ret*/,
-                const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                const Common::Parameter& /*mu*/ = {}) const override final
   {
     DUNE_THROW(NotImplemented, "Not yet, at least...");
   }

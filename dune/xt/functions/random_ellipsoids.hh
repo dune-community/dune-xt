@@ -109,9 +109,8 @@ public:
       return 8;
     }
 
-    virtual void evaluate(const DomainType& xx_local,
-                          RangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override
+    virtual void
+    evaluate(const DomainType& xx_local, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override
     {
       assert(this->is_a_valid_point(xx_local));
       const auto xx_global = geometry_.global(xx_local);
@@ -127,7 +126,7 @@ public:
 
     virtual void jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
                           JacobianRangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override
+                          const Common::Parameter& /*mu*/ = {}) const override
     {
       assert(this->is_a_valid_point(xx));
       ret *= RangeFieldType(0);

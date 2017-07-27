@@ -78,15 +78,13 @@ class FemAdapterFunction
       return wrapped_localfunction_.order();
     }
 
-    virtual void
-    evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = Common::Parameter()) const override
+    virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override
     {
       wrapped_localfunction_.evaluate(xx, ret);
     }
 
-    virtual void jacobian(const DomainType& xx,
-                          JacobianRangeType& ret,
-                          const Common::Parameter& /*mu*/ = Common::Parameter()) const override
+    virtual void
+    jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override
     {
       wrapped_localfunction_.jacobian(xx, ret);
     }
