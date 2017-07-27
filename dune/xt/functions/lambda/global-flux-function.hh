@@ -85,7 +85,7 @@ public:
 
   virtual size_t order(const Common::Parameter& mu) const override final
   {
-    auto parsed_mu = parse_and_check(mu);
+    auto parsed_mu = this->parse_and_check(mu);
     return order_lambda_(parsed_mu);
   }
 
@@ -94,9 +94,9 @@ public:
   void evaluate(const DomainType& xx,
                 const StateRangeType& uu,
                 RangeType& ret,
-                const Common::Parameter& mu = Common::Parameter()) const override final
+                const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = parse_and_check(mu);
+    auto parsed_mu = this->parse_and_check(mu);
     ret = lambda_(xx, uu, parsed_mu);
   }
 
@@ -116,20 +116,6 @@ public:
   }
 
 private:
-  Common::Parameter parse_and_check(const Common::Parameter& mu) const
-  {
-    Common::Parameter parsed_mu;
-    if (!param_type_.empty()) {
-      parsed_mu = this->parse_parameter(mu);
-      if (parsed_mu.type() != param_type_)
-        DUNE_THROW(Common::Exceptions::parameter_error,
-                   "parameter_type(): " << param_type_ << "\n   "
-                                        << "mu.type(): "
-                                        << mu.type());
-    }
-    return parsed_mu;
-  }
-
   const LambdaType lambda_;
   const Common::ParameterType param_type_;
   const std::string name_;

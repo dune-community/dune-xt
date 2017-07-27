@@ -64,42 +64,34 @@ private:
     using typename BaseType::JacobianRangeType;
 
     typedef std::function<RangeType(const EntityType&, const DomainType&, const Common::Parameter&)> LambdaType;
+    typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
 
     LocalLambdaLocalFunction(const EntityType& ent,
                              const LambdaType& lambda,
-                             const size_t ord,
+                             const OrderLambdaType& order_lambda,
                              const Common::ParameterType& param_type)
       : BaseType(ent)
       , lambda_(lambda)
-      , order_(ord)
+      , order_lambda_(order_lambda)
       , param_type_(param_type)
     {
     }
 
-    size_t order() const override final
+    virtual size_t order(const XT::Common::Parameter& mu = {}) const override final
     {
-      return order_;
+      auto parsed_mu = this->parse_and_check(mu);
+      return order_lambda_(parsed_mu);
     }
 
-    void evaluate(const DomainType& x,
-                  RangeType& ret,
-                  const Common::Parameter& mu = Common::Parameter()) const override final
+    void evaluate(const DomainType& x, RangeType& ret, const Common::Parameter& mu = {}) const override final
     {
-      Common::Parameter parsed_mu;
-      if (!param_type_.empty()) {
-        parsed_mu = this->parse_parameter(mu);
-        if (parsed_mu.type() != param_type_)
-          DUNE_THROW(Common::Exceptions::parameter_error,
-                     "parameter_type(): " << param_type_ << "\n   "
-                                          << "mu.type(): "
-                                          << mu.type());
-      }
+      auto parsed_mu = this->parse_and_check(mu);
       ret = lambda_(this->entity(), x, parsed_mu);
     } // ... evaluate(...)
 
     void jacobian(const DomainType& /*x*/,
                   JacobianRangeType& /*ret*/,
-                  const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                  const Common::Parameter& /*mu*/ = {}) const override final
     {
       DUNE_THROW(NotImplemented, "");
     }
@@ -110,8 +102,8 @@ private:
     }
 
   private:
-    const LambdaType lambda_;
-    const size_t order_;
+    const LambdaType& lambda_;
+    const OrderLambdaType& order_lambda_;
     const Common::ParameterType param_type_;
   }; // class LocalLambdaLocalFunction
 
@@ -120,13 +112,25 @@ public:
   typedef typename LocalLambdaLocalFunction::RangeType RangeType;
   // we do not use the typedef from LocalLambdaLocalFunction here to document the type of the lambda
   typedef std::function<RangeType(const EntityType&, const DomainType&, const Common::Parameter&)> LambdaType;
+  typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
 
   LocalLambdaFunction(LambdaType lambda,
                       const size_t ord,
                       const Common::ParameterType& param_type = Common::ParameterType(),
                       const std::string nm = "locallambdafunction")
     : lambda_(lambda)
-    , order_(ord)
+    , order_lambda_([=](const Common::Parameter&) { return ord; })
+    , param_type_(param_type)
+    , name_(nm)
+  {
+  }
+
+  LocalLambdaFunction(LambdaType lambda,
+                      OrderLambdaType order_lambda,
+                      const Common::ParameterType& param_type = Common::ParameterType(),
+                      const std::string nm = "locallambdafunction")
+    : lambda_(lambda)
+    , order_lambda_(order_lambda)
     , param_type_(param_type)
     , name_(nm)
   {
@@ -154,7 +158,7 @@ public:
 
 private:
   const LambdaType lambda_;
-  const size_t order_;
+  const OrderLambdaType order_lambda_;
   const Common::ParameterType param_type_;
   const std::string name_;
 }; // class LocalLambdaFunction

@@ -86,7 +86,6 @@ private:
     typedef std::function<RangeType(
         const EntityType&, const DomainType&, const StateRangeType&, const Common::Parameter&)>
         LambdaType;
-
     typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
 
     LocalLambdaFluxLocalFunction(const EntityType& ent,
@@ -100,25 +99,25 @@ private:
     {
     }
 
-    virtual size_t order(const XT::Common::Parameter& mu = Common::Parameter()) const override
+    virtual size_t order(const XT::Common::Parameter& mu = {}) const override
     {
-      auto parsed_mu = parse_and_check(mu);
+      auto parsed_mu = this->parse_and_check(mu);
       return order_lambda_(parsed_mu);
     }
 
     void evaluate(const DomainType& x,
                   const StateRangeType& u,
                   RangeType& ret,
-                  const Common::Parameter& mu = Common::Parameter()) const override final
+                  const Common::Parameter& mu = {}) const override final
     {
-      auto parsed_mu = parse_and_check(mu);
+      auto parsed_mu = this->parse_and_check(mu);
       ret = lambda_(this->entity(), x, u, parsed_mu);
     } // ... evaluate(...)
 
     void partial_x(const DomainType& /*x*/,
                    const StateRangeType& /*u*/,
                    PartialXRangeType& /*ret*/,
-                   const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                   const Common::Parameter& /*mu*/ = {}) const override final
     {
       DUNE_THROW(NotImplemented, "");
     }
@@ -126,7 +125,7 @@ private:
     void partial_u(const DomainType& /*x*/,
                    const StateRangeType& /*u*/,
                    PartialURangeType& /*ret*/,
-                   const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+                   const Common::Parameter& /*mu*/ = {}) const override final
     {
       DUNE_THROW(NotImplemented, "");
     }
@@ -137,20 +136,6 @@ private:
     }
 
   private:
-    Common::Parameter parse_and_check(const Common::Parameter& mu) const
-    {
-      Common::Parameter parsed_mu;
-      if (!param_type_.empty()) {
-        parsed_mu = this->parse_parameter(mu);
-        if (parsed_mu.type() != param_type_)
-          DUNE_THROW(Common::Exceptions::parameter_error,
-                     "parameter_type(): " << param_type_ << "\n   "
-                                          << "mu.type(): "
-                                          << mu.type());
-      }
-      return parsed_mu;
-    }
-
     const LambdaType lambda_;
     const OrderLambdaType order_lambda_;
     const Common::ParameterType param_type_;
@@ -160,9 +145,10 @@ public:
   typedef typename LocalLambdaFluxLocalFunction::DomainType DomainType;
   typedef typename LocalLambdaFluxLocalFunction::StateRangeType StateRangeType;
   typedef typename LocalLambdaFluxLocalFunction::RangeType RangeType;
+  // we do not use the typedef from LocalLambdaFluxLocalFunction here to document the type of the lambda
   typedef std::function<RangeType(
       const EntityType&, const DomainType&, const StateRangeType&, const Common::Parameter&)>
-      LambdaType; // we do not use the typedef from LocalLambdaFluxLocalFunction here to document the type of the lambda
+      LambdaType;
   typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
 
   LocalLambdaFluxFunction(LambdaType lambda,

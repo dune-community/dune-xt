@@ -45,29 +45,46 @@ public:
 
 private:
   typedef std::function<RangeType(DomainType, XT::Common::Parameter)> LambdaType;
+  typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
 
 public:
-  GlobalLambdaFunction(LambdaType lambda, const size_t order_in, const std::string nm = "globallambdafunction")
+  GlobalLambdaFunction(LambdaType lambda,
+                       const size_t order_in,
+                       const Common::ParameterType& param_type = {},
+                       const std::string nm = "globallambdafunction")
     : lambda_(lambda)
-    , order_(order_in)
+    , order_lambda_([=](const Common::Parameter&) { return order_in; })
+    , param_type_(param_type)
     , name_(nm)
   {
   }
 
-  virtual size_t order(const Common::Parameter& /*mu*/ = Common::Parameter()) const override final
+  GlobalLambdaFunction(LambdaType lambda,
+                       OrderLambdaType order_lambda,
+                       const Common::ParameterType& param_type = {},
+                       const std::string nm = "globallambdafunction")
+    : lambda_(lambda)
+    , order_lambda_(order_lambda)
+    , param_type_(param_type)
+    , name_(nm)
   {
-    return order_;
   }
 
-  void
-  evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = Common::Parameter()) const override final
+  virtual size_t order(const Common::Parameter& mu = {}) const override final
   {
-    ret = lambda_(xx, mu);
+    return order_lambda_(mu);
   }
 
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = Common::Parameter()) const override final
+  void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
   {
-    return lambda_(xx, mu);
+    auto parsed_mu = this->parse_and_check(mu);
+    ret = lambda_(xx, parsed_mu);
+  }
+
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
+  {
+    auto parsed_mu = this->parse_and_check(mu);
+    return lambda_(xx, parsed_mu);
   }
 
   std::string type() const override final
@@ -82,7 +99,8 @@ public:
 
 private:
   LambdaType lambda_;
-  size_t order_;
+  OrderLambdaType order_lambda_;
+  Common::ParameterType param_type_;
   std::string name_;
 };
 
