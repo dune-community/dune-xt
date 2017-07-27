@@ -598,28 +598,6 @@ public:
       return ScalarType(0);
   } // ... get_entry(...)
 
-  ScalarType& get_entry_ref(const size_t ii, const size_t jj)
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    assert(ii < rows());
-    assert(jj < cols());
-    if (!these_are_valid_indices(ii, jj))
-      DUNE_THROW(Dune::RangeError, "Matrix entry not in pattern!");
-    return backend_->operator[](ii)[jj][0][0];
-  } // ... get_entry(...)
-
-  const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    assert(ii < rows());
-    assert(jj < cols());
-    if (!these_are_valid_indices(ii, jj))
-      DUNE_THROW(Dune::RangeError, "Matrix entry not in pattern!");
-    return backend_->operator[](ii)[jj][0][0];
-  } // ... get_entry(...)
-
   void clear_row(const size_t ii)
   {
     auto& backend_ref = backend();

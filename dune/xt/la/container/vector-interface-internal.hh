@@ -80,7 +80,7 @@ public:
   {
     if (end_)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "This is the end!");
-    return const_holder_->element.get_entry_ref(position_);
+    return const_holder_->element[position_];
   }
 
 private:
@@ -126,7 +126,7 @@ public:
   {
     if (this->end_)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "This is the end!");
-    return holder_->element.get_entry_ref(this->position_);
+    return holder_->element[this->position_];
   } // ... operator*()
 
 private:

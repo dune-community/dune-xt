@@ -155,22 +155,6 @@ public:
   }
 
   /**
-  * \brief Get writable reference to the iith entry.
-  */
-  inline ScalarType& get_entry_ref(const size_t ii)
-  {
-    return this->operator[](ii);
-  }
-
-  /**
-   * \brief Get read-only reference to the iith entry.
-   */
-  inline const ScalarType& get_entry_ref(const size_t ii) const
-  {
-    return this->operator[](ii);
-  }
-
-  /**
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    * \see     size()

@@ -168,11 +168,11 @@ struct VectorTest : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2), testvector_1.get_entry(2));
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), testvector_1.get_entry(3));
 
-    // test operator[] and get_entry_ref
+    // test operator[]
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), testvector_1[0]);
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(-2), testvector_1[1]);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2), testvector_1.get_entry_ref(2));
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), testvector_1.get_entry_ref(3));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2), testvector_1[2]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), testvector_1[3]);
     VectorImp testvector_1_copy = testvector_1;
     const ScalarType& entry0 = testvector_1_copy[0];
     ScalarType& entry3 = testvector_1_copy[3];

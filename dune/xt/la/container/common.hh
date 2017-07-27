@@ -608,24 +608,6 @@ public:
     return backend()[ii][jj];
   } // ... get_entry(...)
 
-  ScalarType& get_entry_ref(const size_t ii, const size_t jj)
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    assert(ii < rows());
-    assert(jj < cols());
-    return backend()[ii][jj];
-  } // ... get_entry_ref(...)
-
-  const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    assert(ii < rows());
-    assert(jj < cols());
-    return backend()[ii][jj];
-  } // ... get_entry_ref(...)
-
   void clear_row(const size_t ii)
   {
     auto& backend_ref = backend();
@@ -957,26 +939,6 @@ public:
   {
     const size_t index = get_entry_index(rr, cc, false);
     return index == size_t(-1) ? ScalarType(0) : entries_->operator[](index);
-  }
-
-  inline ScalarType& get_entry_ref(const size_t rr, const size_t cc)
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    const size_t index = get_entry_index(rr, cc, false);
-    if (index == size_t(-1))
-      DUNE_THROW(Dune::RangeError, "Entry not in matrix pattern!");
-    return entries_->operator[](index);
-  }
-
-  inline const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    const size_t index = get_entry_index(rr, cc, false);
-    if (index == size_t(-1))
-      DUNE_THROW(Dune::RangeError, "Entry not in matrix pattern!");
-    return entries_->operator[](index);
   }
 
   inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)

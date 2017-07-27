@@ -309,26 +309,6 @@ public:
                            internal::boost_numeric_cast<EIGEN_size_t>(jj));
   }
 
-  ScalarType& get_entry_ref(const size_t ii, const size_t jj)
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    assert(ii < rows());
-    assert(jj < cols());
-    return backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
-                              internal::boost_numeric_cast<EIGEN_size_t>(jj));
-  }
-
-  const ScalarType& get_entry_ref(const size_t ii, const size_t jj) const
-  {
-    ensure_uniqueness();
-    unshareable_ = true;
-    assert(ii < rows());
-    assert(jj < cols());
-    return backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
-                              internal::boost_numeric_cast<EIGEN_size_t>(jj));
-  }
-
   void clear_row(const size_t ii)
   {
     auto& backend_ref = backend();

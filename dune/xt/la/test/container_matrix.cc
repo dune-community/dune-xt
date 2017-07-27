@@ -187,23 +187,6 @@ struct MatrixTest : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), testmatrix_1.get_entry(0, 0));
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(3), testmatrix_1.get_entry(1, 2));
 
-    // test get_entry_ref
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), testmatrix_1.get_entry_ref(0, 0));
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(3), testmatrix_1.get_entry_ref(1, 2));
-    MatrixImp testmatrix_1_copy = testmatrix_1;
-    const ScalarType& entry00 = testmatrix_1_copy.get_entry_ref(0, 0);
-    ScalarType& entry12 = testmatrix_1_copy.get_entry_ref(1, 2);
-    testmatrix_1.scal(ScalarType(2));
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), entry00);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(3), entry12);
-    testmatrix_1.scal(ScalarType(0.5));
-    testmatrix_1_copy.scal(ScalarType(3));
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), entry00);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(9), entry12);
-    entry12 = ScalarType(42);
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(42), testmatrix_1_copy.get_entry(1, 2));
-    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(3), testmatrix_1.get_entry(1, 2));
-
     // test mv
     VectorImp result_mv_1(dim);
     matrix_zeros_dense.mv(vector_zeros, result_mv_1);
