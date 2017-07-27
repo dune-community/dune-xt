@@ -21,6 +21,7 @@
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
 
+#include <dune/xt/common/color.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/string.hh>
 
