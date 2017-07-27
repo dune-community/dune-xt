@@ -96,7 +96,7 @@ public:
     return name_;
   }
 
-  virtual size_t order(const Common::Parameter& mu = {}) const override final
+  virtual size_t order(const Common::Parameter& /*mu*/ = {}) const override final
   {
     return order_;
   }

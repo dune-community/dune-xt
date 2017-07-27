@@ -153,7 +153,7 @@ public:
 
   std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
   {
-    return std::make_unique<LocalLambdaLocalFunction>(entity, lambda_, order_, param_type_);
+    return std::make_unique<LocalLambdaLocalFunction>(entity, lambda_, order_lambda_, param_type_);
   }
 
 private:
