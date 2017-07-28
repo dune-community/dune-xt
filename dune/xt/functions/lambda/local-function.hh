@@ -115,6 +115,7 @@ private:
 public:
   typedef typename LocalLambdaLocalFunction::DomainType DomainType;
   typedef typename LocalLambdaLocalFunction::RangeType RangeType;
+  typedef typename LocalLambdaLocalFunction::JacobianRangeType RangeType;
   // we do not use the typedef from LocalLambdaLocalFunction here to document the type of the lambda
   typedef std::function<RangeType(const EntityType&, const DomainType&, const Common::Parameter&)> LambdaType;
   typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;

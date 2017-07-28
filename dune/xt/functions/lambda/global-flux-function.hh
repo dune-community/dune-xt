@@ -162,7 +162,8 @@ public:
                          PartialXRangeType& ret,
                          const Common::Parameter& mu = {}) const
   {
-    return partial_x_lambda_(xx, uu, ret, mu);
+    auto parsed_mu = this->parse_and_check(mu);
+    ret = partial_x_lambda_(xx, uu, parsed_mu);
   }
 
   virtual void partial_x_col(const size_t col,
@@ -171,7 +172,8 @@ public:
                              ColPartialXRangeType& ret,
                              const Common::Parameter& mu = {}) const
   {
-    return partial_x_col_lambdas_[col](xx, uu, ret, mu);
+    auto parsed_mu = this->parse_and_check(mu);
+    ret = partial_x_col_lambdas_[col](xx, uu, parsed_mu);
   }
 
   virtual void partial_u(const DomainType& xx,
@@ -179,7 +181,8 @@ public:
                          PartialURangeType& ret,
                          const Common::Parameter& mu = {}) const
   {
-    return partial_u_lambda_(xx, uu, ret, mu);
+    auto parsed_mu = this->parse_and_check(mu);
+    ret = partial_u_lambda_(xx, uu, parsed_mu);
   }
 
   virtual void partial_u_col(const size_t col,
@@ -188,7 +191,8 @@ public:
                              ColPartialURangeType& ret,
                              const Common::Parameter& mu = {}) const
   {
-    return partial_u_col_lambdas_[col](xx, uu, ret, mu);
+    auto parsed_mu = this->parse_and_check(mu);
+    ret = partial_u_col_lambdas_[col](xx, uu, parsed_mu);
   }
 
   std::string type() const override final
