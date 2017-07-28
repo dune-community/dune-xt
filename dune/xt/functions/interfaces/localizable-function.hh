@@ -99,8 +99,7 @@ public:
   typedef Functions::DifferenceFunction<ThisType, ThisType> DifferenceType;
   typedef Functions::SumFunction<ThisType, ThisType> SumType;
 
-  typedef void
-      DUNE_DEPRECATED_MSG("use make_divergence(func) instead of func.divergence() (09.05.2017)!") DivergenceType;
+  typedef void DivergenceType;
 
   virtual ~LocalizableFunctionInterface() = default;
 
@@ -149,8 +148,7 @@ public:
     return Functions::ProductFunction<ThisType, OtherType>(*this, other);
   }
 
-  void DUNE_DEPRECATED_MSG("use make_divergence(func) instead of func.divergence() (09.05.2017)!")
-      divergence() const
+  void DUNE_DEPRECATED_MSG("use make_divergence(func) instead of func.divergence() (09.05.2017)!") divergence() const
   {
   }
 

@@ -65,15 +65,19 @@ private:
 
     typedef std::function<RangeType(const EntityType&, const DomainType&, const Common::Parameter&)> LambdaType;
     typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
+    typedef std::function<JacobianRangeType(const EntityType&, const DomainType&, const XT::Common::Parameter&)>
+        JacobianLambdaType;
 
     LocalLambdaLocalFunction(const EntityType& ent,
                              const LambdaType& lambda,
                              const OrderLambdaType& order_lambda,
-                             const Common::ParameterType& param_type)
+                             const Common::ParameterType& param_type,
+                             const JacobianLambdaType& jacobian_lambda)
       : BaseType(ent)
       , lambda_(lambda)
       , order_lambda_(order_lambda)
       , param_type_(param_type)
+      , jacobian_lambda_(jacobian_lambda)
     {
     }
 
@@ -83,20 +87,20 @@ private:
       return order_lambda_(parsed_mu);
     }
 
-    void evaluate(const DomainType& x, RangeType& ret, const Common::Parameter& mu = {}) const override final
+    virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
     {
       auto parsed_mu = this->parse_and_check(mu);
-      ret = lambda_(this->entity(), x, parsed_mu);
+      ret = lambda_(this->entity(), xx, parsed_mu);
     } // ... evaluate(...)
 
-    void jacobian(const DomainType& /*x*/,
-                  JacobianRangeType& /*ret*/,
-                  const Common::Parameter& /*mu*/ = {}) const override final
+    virtual void
+    jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
     {
-      DUNE_THROW(NotImplemented, "");
+      auto parsed_mu = this->parse_and_check(mu);
+      ret = jacobian_lambda_(this->entity(), xx, parsed_mu);
     }
 
-    const Common::ParameterType& parameter_type() const override final
+    virtual const Common::ParameterType& parameter_type() const override final
     {
       return param_type_;
     }
@@ -105,6 +109,7 @@ private:
     const LambdaType& lambda_;
     const OrderLambdaType& order_lambda_;
     const Common::ParameterType param_type_;
+    const JacobianLambdaType& jacobian_lambda_;
   }; // class LocalLambdaLocalFunction
 
 public:
@@ -113,26 +118,42 @@ public:
   // we do not use the typedef from LocalLambdaLocalFunction here to document the type of the lambda
   typedef std::function<RangeType(const EntityType&, const DomainType&, const Common::Parameter&)> LambdaType;
   typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
+  typedef std::function<JacobianRangeType(const EntityType&, const DomainType&, const XT::Common::Parameter&)>
+      JacobianLambdaType;
 
   LocalLambdaFunction(LambdaType lambda,
                       const size_t ord,
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "locallambdafunction")
+                      const std::string nm = "locallambdafunction",
+                      JacobianLambdaType jacobian_lambda =
+                          [](const EntityType&, const DomainType&, const Common::Parameter&) {
+                            DUNE_THROW(NotImplemented,
+                                       "You need to provide a lambda for the jacobian if you want to use it!");
+                            return JacobianRangeType();
+                          })
     : lambda_(lambda)
     , order_lambda_([=](const Common::Parameter&) { return ord; })
     , param_type_(param_type)
     , name_(nm)
+    , jacobian_lambda_(jacobian_lambda)
   {
   }
 
   LocalLambdaFunction(LambdaType lambda,
                       OrderLambdaType order_lambda,
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "locallambdafunction")
+                      const std::string nm = "locallambdafunction",
+                      JacobianLambdaType jacobian_lambda =
+                          [](const EntityType&, const DomainType&, const Common::Parameter&) {
+                            DUNE_THROW(NotImplemented,
+                                       "You need to provide a lambda for the jacobian if you want to use it!");
+                            return JacobianRangeType();
+                          })
     : lambda_(lambda)
     , order_lambda_(order_lambda)
     , param_type_(param_type)
     , name_(nm)
+    , jacobian_lambda_(jacobian_lambda)
   {
   }
 
@@ -153,7 +174,7 @@ public:
 
   std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
   {
-    return std::make_unique<LocalLambdaLocalFunction>(entity, lambda_, order_lambda_, param_type_);
+    return std::make_unique<LocalLambdaLocalFunction>(entity, lambda_, order_lambda_, param_type_, jacobian_lambda_);
   }
 
 private:
@@ -161,6 +182,7 @@ private:
   const OrderLambdaType order_lambda_;
   const Common::ParameterType param_type_;
   const std::string name_;
+  JacobianLambdaType jacobian_lambda_;
 }; // class LocalLambdaFunction
 
 

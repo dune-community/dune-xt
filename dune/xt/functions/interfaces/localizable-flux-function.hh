@@ -54,6 +54,7 @@ public:
   typedef typename LocalfunctionType::PartialXRangeType PartialXRangeType;
   typedef typename LocalfunctionType::PartialURangeType PartialURangeType;
   typedef typename LocalfunctionType::ColRangeType ColRangeType;
+  typedef typename LocalfunctionType::ColPartialXRangeType ColPartialXRangeType;
   typedef typename LocalfunctionType::ColPartialURangeType ColPartialURangeType;
 
   static const bool available = false;

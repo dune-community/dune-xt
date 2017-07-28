@@ -51,6 +51,71 @@ struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
   typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> type;
 };
 
+template <size_t dimDomain, class RangeFieldImp, size_t dimRange, size_t dimRangeCols>
+struct RangeColumnHelper
+{
+  typedef typename RangeTypeSelector<RangeFieldImp, dimRange, dimRangeCols>::type RangeType;
+  typedef typename RangeTypeSelector<RangeFieldImp, dimRange, 1>::type ColRangeType;
+  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldImp, dimRange, dimRangeCols>::type JacobianRangeType;
+  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldImp, dimRange, 1>::type ColJacobianRangeType;
+
+  static void set_col(size_t col, RangeType& range, const ColRangeType& range_col)
+  {
+    for (size_t ii = 0; ii < dimRange; ++ii)
+      range[ii][col] = range_col[ii];
+  }
+
+  static ColRangeType get_col(size_t col, const RangeType& range)
+  {
+    ColRangeType range_col;
+    for (size_t ii = 0; ii < dimRange; ++ii)
+      range_col[ii] = range[ii][col];
+    return range_col;
+  }
+
+  static void set_col_jacobian(size_t col, JacobianRangeType& jacobian, const ColJacobianRangeType& jacobian_col)
+  {
+    jacobian[col] = jacobian_col;
+  }
+
+  static const ColJacobianRangeType& get_col_jacobian(size_t col, const JacobianRangeType& jacobian)
+  {
+    return jacobian[col];
+  }
+};
+
+template <size_t dimDomain, class RangeFieldImp, size_t dimRange>
+struct RangeColumnHelper<dimDomain, RangeFieldImp, dimRange, 1>
+{
+  typedef typename RangeTypeSelector<RangeFieldImp, dimRange, 1>::type RangeType;
+  typedef RangeType ColRangeType;
+  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldImp, dimRange, 1>::type JacobianRangeType;
+  typedef JacobianRangeType ColJacobianRangeType;
+
+  static void set_col(size_t col, RangeType& range, const ColRangeType& range_col)
+  {
+    assert(col == 0);
+    range = range_col;
+  }
+
+  static ColRangeType get_col(size_t col, RangeType& range)
+  {
+    assert(col == 0);
+    return range;
+  }
+
+  static void set_col_jacobian(size_t col, JacobianRangeType& jacobian, const ColJacobianRangeType& jacobian_col)
+  {
+    jacobian = jacobian_col;
+  }
+
+  static const ColJacobianRangeType& get_col_jacobian(size_t col, const JacobianRangeType& jacobian)
+  {
+    assert(col == 0);
+    return jacobian;
+  }
+};
+
 
 /**
  *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.

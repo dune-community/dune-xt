@@ -70,7 +70,7 @@ public:
   typedef typename LocalfunctionType::PartialXRangeType PartialXRangeType;
   typedef typename LocalfunctionType::PartialURangeType PartialURangeType;
   typedef typename BaseType::ColRangeType ColRangeType;
-  typedef typename LocalfunctionType::ColPartialURangeType ColPartialXRangeType;
+  typedef typename LocalfunctionType::ColPartialXRangeType ColPartialXRangeType;
   typedef typename LocalfunctionType::ColPartialURangeType ColPartialURangeType;
 
   virtual ~GlobalFluxFunctionInterface()
