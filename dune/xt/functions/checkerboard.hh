@@ -39,7 +39,7 @@ template <class EntityImp,
           size_t domainDim,
           class RangeFieldImp,
           size_t rangeDim,
-          size_t rangeDimCols,
+          size_t rangeDimCols = 1,
           class LocalizableFunctionImp =
               ConstantFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>>
 class CheckerboardFunction;
