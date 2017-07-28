@@ -113,12 +113,15 @@ public:
     create_col_lambdas(partial_x_lambda_, partial_u_lambda_);
   }
 
-  GlobalLambdaFluxFunction(LambdaType lambda,
-                           const Common::ParameterType& param_type,
-                           const std::string nm,
-                           OrderLambdaType order_lambda,
-                           FieldVector<ColPartialXLambdaType, dimRangeCols> partial_x_col_lambdas,
-                           FieldVector<ColPartialULambdaType, dimRangeCols> partial_u_col_lambdas)
+  template <size_t rangeDimCols = dimRangeCols>
+  GlobalLambdaFluxFunction(
+      LambdaType lambda,
+      const Common::ParameterType& param_type,
+      const std::string nm,
+      OrderLambdaType order_lambda,
+      typename std::enable_if_t<rangeDimCols == 1, FieldVector<ColPartialXLambdaType, dimRangeCols>>
+          partial_x_col_lambdas,
+      FieldVector<ColPartialULambdaType, dimRangeCols> partial_u_col_lambdas)
     : lambda_(lambda)
     , param_type_(param_type)
     , name_(nm)
