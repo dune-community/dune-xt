@@ -81,7 +81,7 @@ public:
                         RangeType& /*ret*/,
                         const Common::Parameter& /*mu*/ = {}) const = 0;
 
-  virtual void evaluate_col(const size_t col,
+  virtual void evaluate_col(const size_t /*col*/,
                             const DomainType& /*x*/,
                             const StateRangeType& /*u*/,
                             ColRangeType& /*ret*/,

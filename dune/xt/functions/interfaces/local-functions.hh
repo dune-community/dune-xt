@@ -98,7 +98,7 @@ struct RangeColumnHelper<dimDomain, RangeFieldImp, dimRange, 1>
     range = range_col;
   }
 
-  static ColRangeType get_col(size_t col, RangeType& range)
+  static ColRangeType get_col(size_t col, const RangeType& range)
   {
     assert(col == 0);
     return range;
