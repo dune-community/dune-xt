@@ -305,7 +305,7 @@ public:
                          << opts);
       }
     } catch (ISTLError& e) {
-      DUNE_THROW(Common::Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());
+      DUNE_THROW(Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());
     }
   } // ... apply(...)
 

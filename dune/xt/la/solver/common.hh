@@ -19,7 +19,6 @@
 #include <sstream>
 #include <cmath>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
 
 #include <dune/xt/la/container/common.hh>

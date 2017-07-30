@@ -15,34 +15,16 @@
 #include <string>
 #include <vector>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/parallel/helper.hh>
 
+#include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
-namespace Exceptions {
-
-
-class linear_solver_failed_bc_data_did_not_fulfill_requirements : public Common::Exceptions::linear_solver_failed
-{
-};
-class linear_solver_failed_bc_it_did_not_converge : public Common::Exceptions::linear_solver_failed
-{
-};
-class linear_solver_failed_bc_it_was_not_set_up_correctly : public Common::Exceptions::linear_solver_failed
-{
-};
-class linear_solver_failed_bc_the_solution_does_not_solve_the_system : public Common::Exceptions::linear_solver_failed
-{
-};
-
-
-} // namespace Exceptions
 namespace internal {
 
 static const constexpr size_t max_size_to_print = 5;
