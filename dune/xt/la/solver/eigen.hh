@@ -49,8 +49,9 @@ namespace LA {
 
 #if HAVE_EIGEN
 
+
 template <class S, class CommunicatorType>
-class Solver<EigenDenseMatrix<S>, CommunicatorType> : protected SolverUtils
+class Solver<EigenDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
   typedef EigenDenseMatrix<S> MatrixType;
@@ -80,7 +81,7 @@ public:
   static Common::Configuration options(const std::string type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
-    SolverUtils::check_given(tp, types());
+    internal::SolverUtils::check_given(tp, types());
     Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"}, {tp, "1e-5", "1"});
     // * for symmetric matrices
     if (tp == "ldlt" || tp == "llt") {
@@ -110,7 +111,7 @@ public:
                  "Given options (see below) need to have at least the key 'type' set!\n\n"
                      << opts);
     const auto type = opts.get<std::string>("type");
-    SolverUtils::check_given(type, types());
+    internal::SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
     // check for inf or nan
     const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
@@ -230,6 +231,7 @@ private:
   const MatrixType& matrix_;
 }; // class Solver
 
+
 /**
  *  \note lu.sparse will copy the matrix to column major
  *  \note qr.sparse will copy the matrix to column major
@@ -237,7 +239,7 @@ private:
  *  \note llt.simplicial will copy the matrix to column major
  */
 template <class S, class CommunicatorType>
-class Solver<EigenRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUtils
+class Solver<EigenRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
   typedef ::Eigen::SparseMatrix<S, ::Eigen::ColMajor> ColMajorBackendType;
 
@@ -296,7 +298,7 @@ public:
   {
     const std::string tp = !type.empty() ? type : types()[0];
     // check
-    SolverUtils::check_given(tp, types());
+    internal::SolverUtils::check_given(tp, types());
     // default config
     Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"}, {tp, "1e-5", "1"});
     Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
@@ -340,7 +342,7 @@ public:
                  "Given options (see below) need to have at least the key 'type' set!\n\n"
                      << opts);
     const auto type = opts.get<std::string>("type");
-    SolverUtils::check_given(type, types());
+    internal::SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
     // check for inf or nan
     const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
@@ -593,6 +595,7 @@ public:
 private:
   const MatrixType& matrix_;
 }; // class Solver
+
 
 #else // HAVE_EIGEN
 

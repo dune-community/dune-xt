@@ -39,6 +39,9 @@ namespace LA {
 
 #if HAVE_DUNE_ISTL
 
+namespace internal {
+
+
 /**
  * \not
  **/
@@ -70,6 +73,7 @@ struct IstlSolverTraits
   }
 };
 
+
 template <class S>
 struct IstlSolverTraits<S, SequentialCommunication>
 {
@@ -96,8 +100,11 @@ struct IstlSolverTraits<S, SequentialCommunication>
   }
 };
 
+
+} // namespace internal
+
 template <class S, class CommunicatorType>
-class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected SolverUtils
+class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
   typedef IstlRowMajorSparseMatrix<S> MatrixType;
@@ -139,7 +146,7 @@ public:
   static XT::Common::Configuration options(const std::string type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
-    SolverUtils::check_given(tp, types());
+    internal::SolverUtils::check_given(tp, types());
     Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp, "1e-5", "0"});
     Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += general_opts;
@@ -198,7 +205,7 @@ public:
    */
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::Configuration& opts) const
   {
-    typedef IstlSolverTraits<S, CommunicatorType> Traits;
+    typedef internal::IstlSolverTraits<S, CommunicatorType> Traits;
     typedef typename Traits::IstlVectorType IstlVectorType;
     typedef typename Traits::MatrixOperatorType MatrixOperatorType;
     typedef BiCGSTABSolver<IstlVectorType> BiCgSolverType;
@@ -211,7 +218,7 @@ public:
                    "Given options (see below) need to have at least the key 'type' set!\n\n"
                        << opts);
       const auto type = opts.get<std::string>("type");
-      SolverUtils::check_given(type, types());
+      internal::SolverUtils::check_given(type, types());
       const Common::Configuration default_opts = options(type);
       IstlDenseVector<S> writable_rhs = rhs.copy();
 
@@ -313,6 +320,7 @@ private:
   const MatrixType& matrix_;
   const Common::ConstStorageProvider<CommunicatorType> communicator_;
 }; // class Solver
+
 
 #else // HAVE_DUNE_ISTL
 

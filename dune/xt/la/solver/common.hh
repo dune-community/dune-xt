@@ -29,8 +29,9 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
 template <class S, class CommunicatorType>
-class Solver<CommonDenseMatrix<S>, CommunicatorType> : protected SolverUtils
+class Solver<CommonDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
   typedef CommonDenseMatrix<S> MatrixType;
@@ -54,7 +55,7 @@ public:
   static Common::Configuration options(const std::string type = "")
   {
     const std::string tp = !type.empty() ? type : types()[0];
-    SolverUtils::check_given(tp, types());
+    internal::SolverUtils::check_given(tp, types());
     return Common::Configuration({"type", "post_check_solves_system"}, {tp, "1e-5"});
   } // ... options(...)
 
@@ -75,7 +76,7 @@ public:
                  "Given options (see below) need to have at least the key 'type' set!\n\n"
                      << opts);
     const auto type = opts.get<std::string>("type");
-    SolverUtils::check_given(type, types());
+    internal::SolverUtils::check_given(type, types());
     const Common::Configuration default_opts = options(type);
     // solve
     try {
@@ -111,6 +112,7 @@ public:
 private:
   const MatrixType& matrix_;
 }; // class Solver< CommonDenseMatrix< ... > >
+
 
 } // namespace LA
 } // namespace XT

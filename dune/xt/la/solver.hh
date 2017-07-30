@@ -27,9 +27,9 @@ namespace XT {
 namespace LA {
 namespace internal {
 
+
 static const constexpr size_t max_size_to_print = 5;
 
-} // namespace internal
 
 class SolverUtils
 {
@@ -47,6 +47,10 @@ public:
     }
   }
 };
+
+
+} // namespace internal
+
 
 template <class MatrixImp, class CommunicatorType = SequentialCommunication>
 class Solver
