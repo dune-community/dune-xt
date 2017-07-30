@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2014 - 2017)
 //   Rene Milk       (2014 - 2016)
-//   Tobias Leibner  (2014 - 2016)
+//   Tobias Leibner  (2014 - 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_ESV2007_HH
 #define DUNE_XT_FUNCTIONS_ESV2007_HH

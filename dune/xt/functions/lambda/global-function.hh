@@ -8,7 +8,7 @@
 //   Felix Schindler (2013 - 2017)
 //   Rene Milk       (2013 - 2016)
 //   Sven Kaulmann   (2013)
-//   Tobias Leibner  (2014)
+//   Tobias Leibner  (2014, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FUNCTION_HH

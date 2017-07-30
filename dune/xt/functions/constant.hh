@@ -8,7 +8,7 @@
 //   Felix Schindler (2013 - 2017)
 //   Kirsten Weber   (2013)
 //   Rene Milk       (2013 - 2016)
-//   Tobias Leibner  (2014 - 2015)
+//   Tobias Leibner  (2014 - 2015, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_CONSTANT_HH
 #define DUNE_XT_FUNCTIONS_CONSTANT_HH

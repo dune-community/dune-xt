@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2015 - 2017)
 //   Rene Milk       (2015 - 2016)
+//   Tobias Leibner  (2017)
 
 #ifndef DUNE_XT_FUNCTIONS_INDICATOR_HH
 #define DUNE_XT_FUNCTIONS_INDICATOR_HH

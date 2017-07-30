@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2016 - 2017)
-//   Tobias Leibner  (2016)
+//   Tobias Leibner  (2016 - 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_COMPOSITION_HH
 #define DUNE_XT_FUNCTIONS_COMPOSITION_HH

@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2014 - 2017)
 //   Rene Milk       (2013 - 2016)
-//   Tobias Leibner  (2014)
+//   Tobias Leibner  (2014, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_FEMADAPTER
 #define DUNE_XT_FUNCTIONS_FEMADAPTER

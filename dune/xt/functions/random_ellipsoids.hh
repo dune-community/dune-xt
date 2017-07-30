@@ -8,7 +8,7 @@
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2017)
 //   Rene Milk       (2013 - 2016)
-//   Tobias Leibner  (2014 - 2015)
+//   Tobias Leibner  (2014 - 2015, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
 #define DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
