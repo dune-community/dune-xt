@@ -8,7 +8,7 @@
 //   Felix Schindler (2012 - 2017)
 //   Kirsten Weber   (2013)
 //   Rene Milk       (2013 - 2017)
-//   Tobias Leibner  (2014)
+//   Tobias Leibner  (2014, 2017)
 
 #ifndef DUNE_XT_GRID_PROVIDER_HH
 #define DUNE_XT_GRID_PROVIDER_HH
