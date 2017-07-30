@@ -6,6 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2016 - 2017)
+//   Tobias Leibner  (2017)
 
 #ifndef DUNE_XT_LA_TYPE_TRAITS_HH
 #define DUNE_XT_LA_TYPE_TRAITS_HH

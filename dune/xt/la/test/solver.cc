@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2013 - 2017)
 //   Rene Milk       (2014 - 2016)
-//   Tobias Leibner  (2014 - 2015)
+//   Tobias Leibner  (2014 - 2015, 2017)
 
 // This one has to come first (includes the config.h)!
 #include <dune/xt/common/test/main.hxx>

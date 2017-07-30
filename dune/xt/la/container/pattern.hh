@@ -8,6 +8,7 @@
 //   Felix Schindler (2012 - 2014, 2016 - 2017)
 //   Rene Milk       (2013 - 2016)
 //   Sven Kaulmann   (2014)
+//   Tobias Leibner  (2017)
 
 #ifndef DUNE_XT_LA_CONTAINER_PATTERN_HH
 #define DUNE_XT_LA_CONTAINER_PATTERN_HH

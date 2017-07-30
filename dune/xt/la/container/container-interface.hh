@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2014 - 2017)
 //   Rene Milk       (2014 - 2017)
-//   Tobias Leibner  (2014 - 2015)
+//   Tobias Leibner  (2014 - 2015, 2017)
 
 #ifndef DUNE_XT_LA_CONTAINER_CONTAINER_INTERFACE_HH
 #define DUNE_XT_LA_CONTAINER_CONTAINER_INTERFACE_HH
