@@ -10,24 +10,19 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_HH
 
+#include <complex>
+#include <limits>
+
 #include <dune/common/dynvector.hh>
 #include <dune/common/typetraits.hh>
 
-#include <dune/xt/common/exceptions.hh>
-#include <dune/xt/la/type_traits.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/la/exceptions.hh>
+#include <dune/xt/la/container.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
-namespace Exceptions {
-
-
-class eigen_solver_failed : public Dune::Exception
-{
-};
-
-
-} // namespace Exceptions
 
 
 template <class MatrixImp>
@@ -39,7 +34,8 @@ class EigenSolver
 
 public:
   typedef MatrixImp MatrixType;
-  typedef typename MatrixType::ScalarType ScalarType;
+  typedef typename MatrixType::RealType RealType;
+  typedef typename XT::LA::Container<std::complex<RealType>, MatrixType::vector_type>::VectorType VectorType;
 
   EigenSolver(const MatrixType& /*matrix*/)
   {
@@ -49,31 +45,134 @@ public:
                    << "'!");
   }
 
-  DynamicVector<ScalarType> all_eigenvalues() const
+  static std::vector<std::string> types()
   {
     DUNE_THROW(NotImplemented,
-               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+               "This is the unspecialized version of LA::EigenSolver< ... >. "
+               "Please include the correct header for your matrix implementation '"
                    << Common::Typename<MatrixType>::value()
                    << "'!");
-    return DenseVector<ScalarType>();
   }
 
-  ScalarType min_eigenvalue() const
+  static Common::Configuration options(const std::string /*type*/ = "")
   {
     DUNE_THROW(NotImplemented,
-               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
                    << Common::Typename<MatrixType>::value()
                    << "'!");
-    return ScalarType();
   }
 
-  ScalarType max_eigenvalue() const
+  std::vector<std::complex<RealType>> eigenvalues() const
   {
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
                    << Common::Typename<MatrixType>::value()
                    << "'!");
-    return ScalarType();
+    return std::vector<std::complex<RealType>>();
+  }
+
+  std::vector<std::complex<RealType>> eigenvalues(const std::string& /*type*/) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<std::complex<RealType>>();
+  }
+
+  std::vector<std::complex<RealType>> eigenvalues(const Common::Configuration& /*opts*/) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<std::complex<RealType>>();
+  }
+
+  std::vector<RealType> min_eigenvalues(const size_t /*num_evs*/ = std::numeric_limits<size_t>::max()) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return RealType();
+  }
+
+  std::vector<RealType> min_eigenvalues(const std::string& /*type*/,
+                                        const size_t /*num_evs*/ = std::numeric_limits<size_t>::max()) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealType>();
+  }
+
+  std::vector<RealType> min_eigenvalues(const Common::Configuration& /*opts*/,
+                                        const size_t /*num_evs*/ = std::numeric_limits<size_t>::max()) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealType>();
+  }
+
+  std::vector<RealType> max_eigenvalues(const size_t /*num_evs*/ = std::numeric_limits<size_t>::max()) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealType>();
+  }
+
+  std::vector<RealType> max_eigenvalues(const std::string& /*type*/,
+                                        const size_t /*num_evs*/ = std::numeric_limits<size_t>::max()) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealType>();
+  }
+
+  std::vector<RealType> max_eigenvalues(const Common::Configuration& /*opts*/,
+                                        const size_t /*num_evs*/ = std::numeric_limits<size_t>::max()) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealType>();
+  }
+
+  std::vector<VectorType> eigenvectors() const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<VectorType>();
+  }
+
+  std::vector<VectorType> eigenvectors(const std::string& /*type*/) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<VectorType>();
+  }
+
+  std::vector<VectorType> eigenvectors(const Common::Configuration& /*opts*/) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<VectorType>();
   }
 }; // class EigenSolver
 

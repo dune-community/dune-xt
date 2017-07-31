@@ -39,6 +39,23 @@ class linear_solver_failed_bc_the_solution_does_not_solve_the_system : public li
 };
 
 
+class eigen_solver_failed : public Dune::Exception
+{
+};
+
+class eigen_solver_failed_bc_data_did_not_fulfill_requirements : public eigen_solver_failed
+{
+};
+
+class eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested : public eigen_solver_failed
+{
+};
+
+class eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested : public eigen_solver_failed
+{
+};
+
+
 } // namespace Exceptions
 } // namespace LA
 } // namespace XT
