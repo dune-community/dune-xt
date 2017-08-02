@@ -332,8 +332,7 @@ struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::part, DdGridType
   {
     static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
                   "Only available for DD::SubdomainGrid!");
-    DUNE_THROW(NotImplemented, "Only usable to extract the layer type, not the actual layer!");
-    return dd_grid->couplingGridPart(0, 0);
+    return dd_grid->boundaryGridPart(subdomain);
   }
 }; // struct Layer<..., dd_subdomain_boundary, part>
 
