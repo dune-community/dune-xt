@@ -33,8 +33,21 @@
 
 #include "boundaryinfo.bindings.hh"
 #include "gridprovider.pbh"
-#include "walker.pbh"
+#include "walker.bindings.hh"
 #include "walker/apply-on.bindings.hh"
+
+
+template <class G, Dune::XT::Grid::Layers layer, Dune::XT::Grid::Backends backend>
+void bind_walker(pybind11::module& m)
+{
+  using namespace Dune::XT;
+  using namespace Dune::XT::Grid;
+
+  try {
+    bindings::Walker<G, layer, backend>::bind(m);
+  } catch (std::runtime_error&) {
+  }
+} // ... bind_walker(...)
 
 
 template <class G>
@@ -57,16 +70,17 @@ void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
   bind_DdSubdomainsGridProvider<G>(m, grid_id);
   bind_make_cube_dd_subdomains_grid<G>(m, grid_id);
 
-#define BIND(V, id) bind_Walker<V>(m, grid_id + "_" + id);
-
-  BIND(LevelView, "level_view");
-  BIND(LeafView, "leaf_view");
-#if HAVE_DUNE_FEM
-  BIND(LevelPart, "level_part");
-  BIND(LeafPart, "leaf_part");
-  BIND(DdSubdomainPart, "dd_subdomain_part");
-#endif
-#undef BIND
+  bind_walker<G, Layers::adaptive_leaf, Backends::part>(m);
+  bind_walker<G, Layers::dd_subdomain, Backends::part>(m);
+  bind_walker<G, Layers::dd_subdomain_boundary, Backends::part>(m);
+  bind_walker<G, Layers::dd_subdomain_coupling, Backends::part>(m);
+  bind_walker<G, Layers::dd_subdomain_oversampled, Backends::part>(m);
+  bind_walker<G, Layers::leaf, Backends::part>(m);
+  bind_walker<G, Layers::level, Backends::part>(m);
+  bind_walker<G, Layers::dd_subdomain, Backends::view>(m);
+  bind_walker<G, Layers::dd_subdomain_oversampled, Backends::view>(m);
+  bind_walker<G, Layers::leaf, Backends::view>(m);
+  bind_walker<G, Layers::level, Backends::view>(m);
 } // ... addbind_for_Grid(...)
 
 
