@@ -27,7 +27,11 @@ class TemporaryConstView
 {
   static_assert(is_layer<GridLayerType>::value, "");
 
-  template <bool view = is_view<GridLayerType>::value, bool part = is_part<GridLayerType>::value, bool anything = true>
+  template <bool view = is_view<GridLayerType>::value,
+            bool part = (is_part<GridLayerType>::value || is_dd_subdomain<GridLayerType>::value
+                         || is_dd_subdomain_boundary<GridLayerType>::value
+                         || is_dd_subdomain_coupling<GridLayerType>::value),
+            bool anything = true>
   struct const_storage
   {
     static_assert(AlwaysFalse<typename Common::dependent<bool>::_typename<view>::type>::value,
@@ -83,7 +87,11 @@ private:
 template <class GridLayerType>
 class TemporaryView : public TemporaryConstView<GridLayerType>
 {
-  template <bool view = is_view<GridLayerType>::value, bool part = is_part<GridLayerType>::value, bool anything = true>
+  template <bool view = is_view<GridLayerType>::value,
+            bool part = (is_part<GridLayerType>::value || is_dd_subdomain<GridLayerType>::value
+                         || is_dd_subdomain_boundary<GridLayerType>::value
+                         || is_dd_subdomain_coupling<GridLayerType>::value),
+            bool anything = true>
   struct storage
   {
     static_assert(AlwaysFalse<typename Common::dependent<bool>::_typename<view>::type>::value,
