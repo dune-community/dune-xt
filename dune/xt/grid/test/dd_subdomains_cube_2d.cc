@@ -9,6 +9,7 @@
 //   Rene Milk       (2017)
 
 #include <dune/xt/common/test/main.hxx> // <- this one has to come first (includes the config.h)!
+#if HAVE_DUNE_FEM
 
 #include <dune/xt/common/filesystem.hh>
 
@@ -250,3 +251,6 @@ TYPED_TEST(CubeProviderTest, subdomain_connections_are_exactly_covered_by_coupli
 {
   this->subdomain_connections_are_exactly_covered_by_couplings();
 }
+
+
+#endif // HAVE_DUNE_FEM
