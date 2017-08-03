@@ -393,6 +393,10 @@ private:
   template <class G, bool enable = has_boundary_id<G>::value>
   struct add_boundary_id_visualization
   {
+    add_boundary_id_visualization()
+    {
+    }
+
     template <class V>
     void operator()(V& vtk_writer, const std::vector<double>& boundary_id, const int lvl) const
     {
@@ -429,6 +433,10 @@ private:
   template <class G>
   struct add_boundary_id_visualization<G, false>
   {
+    add_boundary_id_visualization()
+    {
+    }
+
     template <class V>
     void operator()(V& /*vtk_writer*/, const std::vector<double>& /*boundary_id*/, const int /*lvl*/) const
     {
