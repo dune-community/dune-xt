@@ -216,7 +216,11 @@ public:
 
 private:
   template <bool is_dd_subdomain = std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value, bool anything = true>
-  struct visualize_dd_helper
+  struct visualize_dd_helper;
+
+#if HAVE_DUNE_FEM
+  template <anything>
+  struct visualize_dd_helper<true, anything>
   {
     void
     operator()(const std::shared_ptr<DdGridType>& dd_grid_ptr, const std::string filename, const bool with_coupling)
@@ -336,6 +340,7 @@ private:
       vtkwriter.write(filename, Dune::VTK::appendedraw);
     } // ... operator()(...)
   }; // struct visualize_dd_helper<true, ...>
+#endif // HAVE_DUNE_FEM
 
   template <bool anything>
   struct visualize_dd_helper<false, anything>
