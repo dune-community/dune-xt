@@ -82,7 +82,13 @@ public:
   }
 
   GridProvider(const ThisType& other) = default;
-  GridProvider(ThisType&& source) = default;
+
+  // Manual ctor required for clang 3.8.1-12~bpo8+1 (otherwise: undefined reference).
+  GridProvider(ThisType&& source)
+    : grid_ptr_(source.grid_ptr_)
+    , dd_grid_ptr_(source.dd_grid_ptr_)
+  {
+  }
 
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& source) = delete;
