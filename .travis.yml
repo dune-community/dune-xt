@@ -22,6 +22,7 @@ before_script:
     - printenv | \grep TRAVIS > ${ENV_FILE}
     - printenv | \grep encrypt >> ${ENV_FILE}
     - printenv | \grep TOKEN >> ${ENV_FILE}
+    - printenv | \grep TESTS >> ${ENV_FILE}
     - export DOCKER_RUN="docker run --env-file ${ENV_FILE} -v ${TRAVIS_BUILD_DIR}:/root/src/${MY_MODULE} ${IMAGE}"
 
 script:
@@ -51,7 +52,15 @@ env:
 
 matrix:
   include:
-    - env: DOCKER_TAG=gcc_full
-    - env: DOCKER_TAG=gcc_no_istl_no_disc
-    - env: DOCKER_TAG=gcc_no_disc
-    - env: DOCKER_TAG=clang_full
+        - env: DOCKER_TAG=gcc_full TESTS=0
+        - env: DOCKER_TAG=gcc_full TESTS=1
+    
+        - env: DOCKER_TAG=gcc_no_istl_no_disc TESTS=0
+        - env: DOCKER_TAG=gcc_no_istl_no_disc TESTS=1
+    
+        - env: DOCKER_TAG=gcc_no_disc TESTS=0
+        - env: DOCKER_TAG=gcc_no_disc TESTS=1
+    
+        - env: DOCKER_TAG=clang_full TESTS=0
+        - env: DOCKER_TAG=clang_full TESTS=1
+    

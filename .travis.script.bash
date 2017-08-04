@@ -7,13 +7,21 @@ set -x
 
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} configure
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD}
-${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} test_binaries
+if [ x"${TESTS}" == x ] ; then
+    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v test_binaries
+else
+    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v -j 1 test_binaries_builder_${TESTS}
+fi
 if [[ "${CC}" == "gcc"* ]] ; then
     lcov -q --gcov-tool ${GCOV} -b ${SUPERDIR}/${MY_MODULE} -d ${DUNE_BUILD_DIR}/${MY_MODULE} -c -o ${HOME}/baseline.lcov --no-external --initial
 fi
 
-${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} test
-${SUPERDIR}/.ci/init_sshkey.bash ${encrypted_862ca47045d1_key} ${encrypted_862ca47045d1_iv} keys/dune-community/dune-xt-functions-testlogs
+if [ x"${TESTS}" == x ] ; then
+    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ctest -V -j 2
+else
+    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ctest -V -j 2 -L "^builder_${TESTS}$"
+fi
+${SUPERDIR}/.ci/init_sshkey.bash ${encrypted_862ca47045d1_key} ${encrypted_862ca47045d1_iv} keys/${slug}-testlogs
 # retry this step becuase of the implicated race condition in cloning and pushing with multiple builder running in parallel
 ${SUPERDIR}/scripts/bash/travis_upload_test_logs.bash ${DUNE_BUILD_DIR}/${MY_MODULE}/dune/xt/*/test/
 
