@@ -923,9 +923,15 @@ public:
   inline std::enable_if_t<!LA::is_vector<XX>::value || !LA::is_vector<YY>::value, void> mv(const XX& xx, YY& yy) const
   {
     std::fill(yy.begin(), yy.end(), ScalarType(0));
-    for (size_t rr = 0; rr < num_rows_; ++rr)
-      for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
-        yy[rr] += entries_->operator[](kk) * xx[column_indices_->operator[](kk)];
+    const auto& entries = *entries_;
+    const auto& row_pointers = *row_pointers_;
+    const auto& column_indices = *column_indices_;
+    for (size_t rr = 0; rr < num_rows_; ++rr) {
+      auto& yy_rr = yy[rr];
+      const size_t end = row_pointers[rr + 1];
+      for (size_t kk = row_pointers[rr]; kk < end; ++kk)
+        yy_rr += entries[kk] * xx[column_indices[kk]];
+    }
   }
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)

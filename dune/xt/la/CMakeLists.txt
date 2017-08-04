@@ -10,7 +10,8 @@
 #   Tobias Leibner  (2016)
 
 set(lib_dune_xt_la_sources
-    container/pattern.cc)
+    container/pattern.cc
+    eigen-solver/internal/lapacke.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
   list(APPEND lib_dune_xt_la_sources
@@ -20,9 +21,11 @@ if(DUNE_XT_WITH_PYTHON_BINDINGS)
        container/istl.cc
        solver/common.cc
        solver/eigen.cc
-       solver/istl.cc)
+       solver/istl.cc
+       eigen-solver/internal/lapacke.cc)
 endif()
 
+find_package(LAPACKE)
 dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
 
 if(dune-pybindxi_FOUND)

@@ -51,6 +51,10 @@ class eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested : public eige
 {
 };
 
+class eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested : public eigen_solver_failed
+{
+};
+
 class eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested : public eigen_solver_failed
 {
 };

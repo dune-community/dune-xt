@@ -34,8 +34,9 @@ class EigenSolver
 
 public:
   typedef MatrixImp MatrixType;
-  typedef typename MatrixType::RealType RealType;
-  typedef typename XT::LA::Container<std::complex<RealType>, MatrixType::vector_type>::VectorType VectorType;
+  typedef int RealType;
+  typedef int ComplexVectorType;
+  typedef int RealVectorType;
 
   EigenSolver(const MatrixType& /*matrix*/)
   {
@@ -148,37 +149,66 @@ public:
     return std::vector<RealType>();
   }
 
-  std::vector<VectorType> eigenvectors() const
+  std::vector<ComplexVectorType> eigenvectors() const
   {
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
                    << Common::Typename<MatrixType>::value()
                    << "'!");
-    return std::vector<VectorType>();
+    return std::vector<ComplexVectorType>();
   }
 
-  std::vector<VectorType> eigenvectors(const std::string& /*type*/) const
+  std::vector<ComplexVectorType> eigenvectors(const std::string& /*type*/) const
   {
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
                    << Common::Typename<MatrixType>::value()
                    << "'!");
-    return std::vector<VectorType>();
+    return std::vector<ComplexVectorType>();
   }
 
-  std::vector<VectorType> eigenvectors(const Common::Configuration& /*opts*/) const
+  std::vector<ComplexVectorType> eigenvectors(const Common::Configuration& /*opts*/) const
   {
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
                    << Common::Typename<MatrixType>::value()
                    << "'!");
-    return std::vector<VectorType>();
+    return std::vector<ComplexVectorType>();
   }
+
+  std::vector<RealVectorType> real_eigenvectors() const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealVectorType>();
+  }
+
+  std::vector<RealVectorType> real_eigenvectors(const std::string& /*type*/) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealVectorType>();
+  }
+
+  std::vector<RealVectorType> real_eigenvectors(const Common::Configuration& /*opts*/) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+    return std::vector<RealVectorType>();
+  }
+
 }; // class EigenSolver
 
 
 template <class M>
-typename std::enable_if<XT::LA::is_matrix<M>::value, EigenSolver<M>>::type make_eigen_solver(const M& matrix)
+typename std::enable_if<XT::Common::MatrixAbstraction<M>::is_matrix, EigenSolver<M>>::type
+make_eigen_solver(const M& matrix)
 {
   return EigenSolver<M>(matrix);
 }
@@ -189,5 +219,6 @@ typename std::enable_if<XT::LA::is_matrix<M>::value, EigenSolver<M>>::type make_
 } // namespace Dune
 
 #include "eigen-solver/eigen.hh"
+#include "eigen-solver/fmatrix.hh"
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_HH

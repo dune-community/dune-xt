@@ -27,7 +27,8 @@ namespace XT {
 namespace LA {
 namespace internal {
 
-//#if HAVE_EIGEN
+
+#if HAVE_EIGEN
 
 
 template <class S>
@@ -63,18 +64,26 @@ compute_all_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, 
 } // ... compute_all_eigenvectors_using_eigen(...)
 
 
-//#else // HAVE_EIGEN
+#else // HAVE_EIGEN
 
 
-// template <class S>
-// std::vector<std::complex<S>>
-// compute_all_eigenvalues_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/)
-//{
-//  static_assert(AlwaysFalse<S>::value, "You are missing Eigen!");
-//}
+template <class S>
+std::vector<std::complex<S>>
+compute_all_eigenvalues_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/)
+{
+  static_assert(AlwaysFalse<S>::value, "You are missing Eigen!");
+}
+
+template <class S>
+std::vector<EigenDenseVector<std::complex<typename EigenDenseVector<S>::RealType>>>
+compute_all_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/)
+{
+  static_assert(AlwaysFalse<S>::value, "You are missing Eigen!");
+}
 
 
-//#endif // HAVE_EIGEN
+#endif // HAVE_EIGEN
+
 
 } // namespace internal
 } // namespace LA

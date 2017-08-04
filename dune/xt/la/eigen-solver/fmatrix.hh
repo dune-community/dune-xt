@@ -7,18 +7,16 @@
 // Authors:
 //   Felix Schindler (2017)
 
-#ifndef DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH
-#define DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH
+#ifndef DUNE_XT_LA_EIGEN_SOLVER_FMATRIX_HH
+#define DUNE_XT_LA_EIGEN_SOLVER_FMATRIX_HH
 
 #include <algorithm>
-#include <complex>
 #include <functional>
 
 #include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/solver.hh>
 
-#include "base.hh"
-#include "internal/eigen.hh"
+#include "../eigen-solver.hh"
 #include "internal/lapacke.hh"
 
 namespace Dune {
@@ -26,26 +24,25 @@ namespace XT {
 namespace LA {
 
 
-#if HAVE_EIGEN
-
-template <class S>
-class EigenDenseMatrixEigenSolverTraits
+template <class S, int dimRange>
+class FieldMatrixEigenSolverTraits
 {
 public:
-  typedef EigenDenseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType RealType;
+  typedef Dune::FieldMatrix<S, dimRange, dimRange> MatrixType;
+  typedef typename Dune::FieldTraits<S>::real_type RealType;
   typedef typename std::complex<RealType> ComplexType;
-  typedef typename XT::LA::Container<RealType, MatrixType::vector_type>::VectorType RealVectorType;
-  typedef typename XT::LA::Container<ComplexType, MatrixType::vector_type>::VectorType ComplexVectorType;
-  typedef EigenDenseMatrix<RealType> RealMatrixType;
-  typedef EigenDenseMatrix<ComplexType> ComplexMatrixType;
+  typedef typename Dune::FieldVector<RealType, dimRange> RealVectorType;
+  typedef typename Dune::FieldVector<ComplexType, dimRange> ComplexVectorType;
+  typedef typename Dune::FieldMatrix<RealType, dimRange, dimRange> RealMatrixType;
+  typedef typename Dune::FieldMatrix<ComplexType, dimRange, dimRange> ComplexMatrixType;
   typedef EigenSolver<MatrixType> derived_type;
 };
 
-template <class S>
-class EigenSolver<EigenDenseMatrix<S>> : public EigenSolverBase<EigenDenseMatrixEigenSolverTraits<S>>
+template <class S, int dimRange>
+class EigenSolver<Dune::FieldMatrix<S, dimRange, dimRange>>
+    : public EigenSolverBase<FieldMatrixEigenSolverTraits<S, dimRange>>
 {
-  typedef EigenSolverBase<EigenDenseMatrixEigenSolverTraits<S>> BaseType;
+  typedef EigenSolverBase<FieldMatrixEigenSolverTraits<S, dimRange>> BaseType;
 
 public:
   using typename BaseType::MatrixType;
@@ -56,9 +53,11 @@ public:
   {
     return
     {
-      "eigen",
 #if HAVE_LAPACKE
-          "lapacke",
+      "lapacke",
+#endif
+#if HAVE_EIGEN
+          "eigen",
 #endif
           "qrhouseholder"
     };
@@ -76,50 +75,54 @@ public:
 
   virtual void get_eigenvalues(std::vector<ComplexType>& evs, const std::string& type) const override final
   {
-    if (type == "eigen")
-      evs = internal::compute_all_eigenvalues_using_eigen(matrix_.backend());
 #if HAVE_LAPACKE
-    else if (type == "lapacke")
-      evs = internal::compute_all_eigenvalues_using_lapacke<MatrixType>(matrix_);
+    if (type == "lapacke")
+      evs = internal::compute_all_eigenvalues_using_lapacke<EigenDenseMatrix<S>>(matrix_);
+#endif
+#if HAVE_EIGEN
+    else if (type == "eigen") {
+      XT::LA::EigenDenseMatrix<S> eigenmatrix(dimRange, dimRange);
+      for (size_t rr = 0; rr < dimRange; ++rr)
+        for (size_t cc = 0; cc < dimRange; ++cc)
+          eigenmatrix.set_entry(rr, cc, matrix_[rr][cc]);
+      evs = internal::compute_all_eigenvalues_using_eigen(eigenmatrix);
+    }
 #endif
     else
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by types()!");
-  }
+  } // ... get_eigenvalues(...)
 
   virtual void get_eigenvectors(std::vector<ComplexVectorType>& evs, const std::string& type) const override final
   {
-    if (type == "eigen")
-      evs = internal::compute_all_eigenvectors_using_eigen(matrix_.backend());
 #if HAVE_LAPACKE
-    else if (type == "lapacke")
+    if (type == "lapacke")
       internal::compute_all_eigenvectors_using_lapacke(matrix_, evs);
+#endif
+#if HAVE_EIGEN
+    else if (type == "eigen") {
+      XT::LA::EigenDenseMatrix<S> eigenmatrix(dimRange, dimRange);
+      for (size_t rr = 0; rr < dimRange; ++rr)
+        for (size_t cc = 0; cc < dimRange; ++cc)
+          eigenmatrix.set_entry(rr, cc, matrix_[rr][cc]);
+      auto eigen_eigvecs = internal::compute_all_eigenvectors_using_eigen(eigenmatrix.backend());
+      for (size_t rr = 0; rr < dimRange; ++rr)
+        for (size_t cc = 0; cc < dimRange; ++cc)
+          evs[rr][cc] = eigen_eigvecs.get_entry(rr, cc);
+    }
 #endif
     else
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by types()!");
-  }
+  } // ... get_eigenvectors(...)
 
-protected:
-  using BaseType::matrix_;
-}; // class EigenSolver<EigenDenseMatrix<S>>
-
-
-#else // HAVE_EIGEN
-
-
-template <class S>
-class EigenSolver<EigenDenseMatrix<S>>
-{
-  static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
-};
-
-
-#endif // HAVE_EIGEN
+private:
+  const MatrixType& matrix_;
+}; // class EigenSolver<FieldMatrix<S>>
 
 
 } // namespace LA
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH
+#endif // DUNE_XT_LA_EIGEN_SOLVER_FMATRIX_HH
