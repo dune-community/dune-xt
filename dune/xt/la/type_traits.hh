@@ -29,6 +29,9 @@ class ProvidesDataAccess;
 template <class Traits, class ScalarImp>
 class ContainerInterface;
 
+template <class Traits, class ScalarImp>
+class MatrixInterface;
+
 
 namespace internal {
 
@@ -62,6 +65,16 @@ struct is_container_helper
 }; // class is_container_helper
 
 
+template <class M>
+struct is_matrix_helper
+{
+  DXTC_has_typedef_initialize_once(Traits);
+  DXTC_has_typedef_initialize_once(ScalarType);
+
+  static const bool is_candidate = DXTC_has_typedef(Traits)<M>::value && DXTC_has_typedef(ScalarType)<M>::value;
+}; // class is_matrix_helper
+
+
 } // namespace internal
 
 
@@ -72,6 +85,17 @@ struct is_container : public std::is_base_of<ContainerInterface<typename C::Trai
 
 template <class C>
 struct is_container<C, false> : public std::false_type
+{
+};
+
+
+template <class M, bool candidate = internal::is_matrix_helper<M>::is_candidate>
+struct is_matrix : public std::is_base_of<MatrixInterface<typename M::Traits, typename M::ScalarType>, M>
+{
+};
+
+template <class M>
+struct is_matrix<M, false> : public std::false_type
 {
 };
 
