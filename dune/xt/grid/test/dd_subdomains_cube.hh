@@ -17,10 +17,11 @@
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-using namespace Dune;
+namespace std {
+
 
 template <class T>
-std::ostream& operator<<(std::ostream& out, const std::vector<T>& results)
+ostream& operator<<(ostream& out, const vector<T>& results)
 {
   if (results.size() == 0)
     out << "{}";
@@ -39,7 +40,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& results)
 }
 
 template <class T>
-std::ostream& operator<<(std::ostream& out, const std::set<T>& results)
+ostream& operator<<(ostream& out, const set<T>& results)
 {
   if (results.size() == 0)
     out << "{}";
@@ -58,17 +59,17 @@ std::ostream& operator<<(std::ostream& out, const std::set<T>& results)
 }
 
 template <class L, class R>
-std::ostream& operator<<(std::ostream& out, const std::pair<L, R>& results)
+ostream& operator<<(ostream& out, const pair<L, R>& results)
 {
   out << "{" << results.first << ", " << results.second << "}";
   return out;
 }
 
 template <class F, class S>
-std::ostream& operator<<(std::ostream& out, const std::map<F, S>& results)
+ostream& operator<<(ostream& out, const map<F, S>& results)
 {
   if (results.size() == 0)
-    out << "{}" << std::endl;
+    out << "{}" << endl;
   else if (results.size() == 1)
     out << "{{" << results.begin()->first << ", " << results.begin()->second << "}}";
   else {
@@ -82,6 +83,12 @@ std::ostream& operator<<(std::ostream& out, const std::map<F, S>& results)
   }
   return out;
 }
+
+
+} // namespace std
+
+using namespace Dune;
+
 
 template <class G, bool anything = true>
 struct ExpectedResults
