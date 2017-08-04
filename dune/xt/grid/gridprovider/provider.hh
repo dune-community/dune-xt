@@ -219,7 +219,7 @@ private:
   struct visualize_dd_helper;
 
 #if HAVE_DUNE_FEM
-  template <anything>
+  template <bool anything>
   struct visualize_dd_helper<true, anything>
   {
     void
