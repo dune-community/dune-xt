@@ -199,14 +199,14 @@ void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits
 
 
 template <class S>
-std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const XT::LA::MatrixInterface& matrix)
+template <class Traits, class S>
+std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
 }
 
-template <class MatrixReturnType>
-MatrixReturnType
-compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<typename MatrixReturnTpe::RealType>& matrix)
+template <class Traits, class S, class MatrixReturnType>
+void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix, MatrixReturnType& ret)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
 }
