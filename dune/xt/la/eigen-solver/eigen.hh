@@ -52,6 +52,11 @@ public:
   using typename BaseType::ComplexType;
   using typename BaseType::ComplexVectorType;
 
+  EigenSolver(const MatrixType& matrix)
+    : BaseType(matrix)
+  {
+  }
+
   static std::vector<std::string> types()
   {
     return
@@ -93,7 +98,7 @@ public:
       evs = internal::compute_all_eigenvectors_using_eigen(matrix_.backend());
 #if HAVE_LAPACKE
     else if (type == "lapacke")
-      internal::compute_all_eigenvectors_using_lapacke(matrix_, evs);
+      internal::compute_all_eigenvectors_using_lapacke(matrix_, evs, evs[0][0]);
 #endif
     else
       DUNE_THROW(Common::Exceptions::internal_error,

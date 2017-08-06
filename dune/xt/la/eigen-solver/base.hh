@@ -181,7 +181,7 @@ public:
 
   virtual std::shared_ptr<RealMatrixType> real_eigenvectors_as_matrix(const std::string& type) const
   {
-    return eigenvectors_as_matrix(options(type));
+    return real_eigenvectors_as_matrix(options(type));
   }
 
   virtual std::shared_ptr<RealMatrixType> real_eigenvectors_as_matrix(const Common::Configuration& opts) const
@@ -228,9 +228,9 @@ protected:
                                  const Common::Configuration& opts,
                                  const Common::Configuration& default_opts) const
   {
-    const size_t rows = MatrixAbstractionType::rows(matrix_);
     const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
     if (check_for_inf_nan) {
+      const size_t rows = MatrixAbstractionType::rows(matrix_);
       for (const auto& ev : evs) {
         if (Common::isnan(ev) || Common::isinf(ev)) {
           std::stringstream msg;
@@ -270,7 +270,8 @@ protected:
                                   const Common::Configuration& default_opts) const
   {
     const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
-    if (check_for_inf_nan)
+    if (check_for_inf_nan) {
+      const size_t rows = MatrixAbstractionType::rows(matrix_);
       for (const auto& ev : evs) {
         for (const auto& element : ev) {
           if (Common::isnan(element) || Common::isinf(element)) {
@@ -280,15 +281,16 @@ protected:
                 << "If you want to disable this check, set 'check_for_inf_nan = 0' in the options.\n\n"
                 << "Those were the given options:\n\n"
                 << opts;
-            if (matrix_.rows() <= internal::max_size_to_print && matrix_.cols() <= internal::max_size_to_print)
+            if (rows <= internal::max_size_to_print)
               msg << "\nThis was the given matrix:\n\n" << matrix_ << "\n\nThese were the computed eigenvectors:";
             for (const auto& print_ev : evs)
               msg << "\n  " << print_ev;
             msg << "\n";
             DUNE_THROW(Exceptions::eigen_solver_failed, msg.str());
-          }
-        }
-      }
+          } // if (isnan || isinf)
+        } // element
+      } // ev
+    } // if (check_for_inf_nan)
     const double check_eigenvectors_are_real =
         opts.get("check_eigenvectors_are_real", default_opts.get<double>("check_eigenvectors_are_real"));
     if (check_eigenvectors_are_real > 0)

@@ -58,8 +58,8 @@ struct LapackeWrapper
 
 template <class MatrixType,
           class S,
-          bool is_la_matrix = XT::LA::is_matrix<MatrixType>::value,
-          bool is_complex = !std::is_arithmetic<typename MatrixType::ScalarType>::value>
+          bool real_eigvecs_requested,
+          bool is_la_matrix = XT::LA::is_matrix<MatrixType>::value>
 struct lapacke_helper
 {
   static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
@@ -86,7 +86,7 @@ struct lapacke_helper
 };
 
 template <class MatrixType, class S>
-struct lapacke_helper<MatrixType, S, true, false>
+struct lapacke_helper<MatrixType, S, true, true>
 {
   static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
   {
@@ -98,7 +98,7 @@ struct lapacke_helper<MatrixType, S, true, false>
 };
 
 template <class MatrixType, class S>
-struct lapacke_helper<MatrixType, S, false, true>
+struct lapacke_helper<MatrixType, S, true, false>
 {
   static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
   {
@@ -180,8 +180,23 @@ std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const XT::LA:
   return ret;
 }
 
-template <class Traits, class S, class MatrixReturnType>
-void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix, MatrixReturnType& ret)
+template <class S, int N>
+std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const Dune::FieldMatrix<S, N, N>& matrix)
+{
+  std::vector<std::complex<S>> ret(N);
+  std::vector<double> tmp_matrix(N * N);
+  size_t ii = 0;
+  for (size_t rr = 0; rr < N; ++rr)
+    for (size_t cc = 0; cc < N; ++cc)
+      tmp_matrix[ii++] = matrix[rr][cc];
+  compute_using_lapacke(tmp_matrix.data(), ret, nullptr);
+  return ret;
+}
+
+template <class Traits, class S, class ReturnType, class ReturnValueType>
+void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix,
+                                            ReturnType& ret,
+                                            ReturnValueType)
 {
   const size_t N = matrix.rows();
   std::vector<double> tmp_matrix(N * N), eigvecs(N * N);
@@ -191,7 +206,20 @@ void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits
     for (size_t cc = 0; cc < N; ++cc)
       tmp_matrix[ii++] = matrix.get_entry(rr, cc);
   compute_using_lapacke(tmp_matrix.data(), eigvals, eigvecs.data());
-  lapacke_helper<MatrixReturnType, S>::set_eigvecs(ret, eigvecs.data(), eigvals);
+  lapacke_helper<ReturnType, S, std::is_arithmetic<ReturnValueType>::value>::set_eigvecs(ret, eigvecs.data(), eigvals);
+}
+
+template <class S, int N, class ReturnType, class ReturnValueType>
+void compute_all_eigenvectors_using_lapacke(const Dune::FieldMatrix<S, N, N>& matrix, ReturnType& ret, ReturnValueType)
+{
+  std::vector<double> tmp_matrix(N * N), eigvecs(N * N);
+  std::vector<std::complex<S>> eigvals(N);
+  size_t ii = 0;
+  for (size_t rr = 0; rr < N; ++rr)
+    for (size_t cc = 0; cc < N; ++cc)
+      tmp_matrix[ii++] = matrix[rr][cc];
+  compute_using_lapacke(tmp_matrix.data(), eigvals, eigvecs.data());
+  lapacke_helper<ReturnType, S, std::is_arithmetic<ReturnValueType>::value>::set_eigvecs(ret, eigvecs.data(), eigvals);
 }
 
 

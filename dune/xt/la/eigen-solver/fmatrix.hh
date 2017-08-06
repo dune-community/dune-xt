@@ -49,6 +49,11 @@ public:
   using typename BaseType::ComplexType;
   using typename BaseType::ComplexVectorType;
 
+  EigenSolver(const MatrixType& matrix)
+    : BaseType(matrix)
+  {
+  }
+
   static std::vector<std::string> types()
   {
     return
@@ -77,7 +82,7 @@ public:
   {
 #if HAVE_LAPACKE
     if (type == "lapacke")
-      evs = internal::compute_all_eigenvalues_using_lapacke<EigenDenseMatrix<S>>(matrix_);
+      evs = internal::compute_all_eigenvalues_using_lapacke(matrix_);
 #endif
 #if HAVE_EIGEN
     else if (type == "eigen") {
@@ -85,7 +90,7 @@ public:
       for (size_t rr = 0; rr < dimRange; ++rr)
         for (size_t cc = 0; cc < dimRange; ++cc)
           eigenmatrix.set_entry(rr, cc, matrix_[rr][cc]);
-      evs = internal::compute_all_eigenvalues_using_eigen(eigenmatrix);
+      evs = internal::compute_all_eigenvalues_using_eigen(eigenmatrix.backend());
     }
 #endif
     else
@@ -95,9 +100,10 @@ public:
 
   virtual void get_eigenvectors(std::vector<ComplexVectorType>& evs, const std::string& type) const override final
   {
+    evs.resize(dimRange);
 #if HAVE_LAPACKE
     if (type == "lapacke")
-      internal::compute_all_eigenvectors_using_lapacke(matrix_, evs);
+      internal::compute_all_eigenvectors_using_lapacke(matrix_, evs, evs[0][0]);
 #endif
 #if HAVE_EIGEN
     else if (type == "eigen") {
@@ -108,7 +114,7 @@ public:
       auto eigen_eigvecs = internal::compute_all_eigenvectors_using_eigen(eigenmatrix.backend());
       for (size_t rr = 0; rr < dimRange; ++rr)
         for (size_t cc = 0; cc < dimRange; ++cc)
-          evs[rr][cc] = eigen_eigvecs.get_entry(rr, cc);
+          evs[rr][cc] = eigen_eigvecs[rr].get_entry(cc);
     }
 #endif
     else
@@ -117,7 +123,7 @@ public:
   } // ... get_eigenvectors(...)
 
 private:
-  const MatrixType& matrix_;
+  using BaseType::matrix_;
 }; // class EigenSolver<FieldMatrix<S>>
 
 
