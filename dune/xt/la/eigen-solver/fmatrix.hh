@@ -85,10 +85,12 @@ public:
 
   virtual void get_eigenvalues(std::vector<ComplexType>& evs, const std::string& type) const override final
   {
+    if (false)
+      ; // empty statement to be able to use else if
 #if HAVE_LAPACKE
-    if (type == "lapacke")
+    else if (type == "lapacke")
       evs = internal::compute_all_eigenvalues_using_lapacke(matrix_);
-#endif
+#endif // HAVE_LAPACKE
 #if HAVE_EIGEN
     else if (type == "eigen") {
       XT::LA::EigenDenseMatrix<S> eigenmatrix(dimRange, dimRange);
@@ -110,8 +112,10 @@ public:
   virtual void get_eigenvectors(std::vector<ComplexVectorType>& evs, const std::string& type) const override final
   {
     evs.resize(dimRange);
+    if (false)
+      ; // empty statement to be able to use else if
 #if HAVE_LAPACKE
-    if (type == "lapacke")
+    else if (type == "lapacke")
       internal::compute_all_eigenvectors_using_lapacke(matrix_, evs, evs[0][0]);
 #endif
 #if HAVE_EIGEN
