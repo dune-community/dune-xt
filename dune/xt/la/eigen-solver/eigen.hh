@@ -16,6 +16,7 @@
 
 #include <dune/xt/la/container.hh>
 #include <dune/xt/la/solver.hh>
+#include <dune/xt/la/eigen-solver.hh>
 
 #include "base.hh"
 #include "internal/eigen.hh"

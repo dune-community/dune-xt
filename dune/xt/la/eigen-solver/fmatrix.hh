@@ -15,11 +15,11 @@
 
 #include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/solver.hh>
+#include <dune/xt/la/eigen-solver.hh>
 
-#include "../eigen-solver.hh"
+#include "base.hh"
 #include "internal/eigen.hh"
 #include "internal/lapacke.hh"
-#include "internal/qrhouseholder.hh"
 
 namespace Dune {
 namespace XT {
