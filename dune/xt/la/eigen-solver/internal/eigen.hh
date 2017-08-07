@@ -15,7 +15,6 @@
 #include <Eigen/Eigenvalues>
 #endif
 
-#include <dune/common/dynvector.hh>
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/la/container/eigen.hh>
@@ -62,24 +61,6 @@ compute_all_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, 
     ret.emplace_back(eigenvectors.col(ii));
   return ret;
 } // ... compute_all_eigenvectors_using_eigen(...)
-
-
-#else // HAVE_EIGEN
-
-
-template <class S>
-std::vector<std::complex<S>>
-compute_all_eigenvalues_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/)
-{
-  static_assert(AlwaysFalse<S>::value, "You are missing Eigen!");
-}
-
-template <class S>
-std::vector<EigenDenseVector<std::complex<typename EigenDenseVector<S>::RealType>>>
-compute_all_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/)
-{
-  static_assert(AlwaysFalse<S>::value, "You are missing Eigen!");
-}
 
 
 #endif // HAVE_EIGEN
