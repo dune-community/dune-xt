@@ -97,7 +97,7 @@ public:
                "This is the unspecialized version of LA::EigenSolver< ... >, please add a specialization for '"
                    << Common::Typename<MatrixType>::value()
                    << "'!");
-    return RealType();
+    return std::vector<RealType>();
   }
 
   std::vector<RealType> min_eigenvalues(const std::string& /*type*/,
