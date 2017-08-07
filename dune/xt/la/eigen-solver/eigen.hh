@@ -14,7 +14,7 @@
 #include <complex>
 #include <functional>
 
-#include <dune/xt/la/container/eigen/dense.hh>
+#include <dune/xt/la/container.hh>
 #include <dune/xt/la/solver.hh>
 
 #include "base.hh"
