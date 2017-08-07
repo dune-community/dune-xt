@@ -62,9 +62,12 @@ public:
       "lapacke",
 #endif
 #if HAVE_EIGEN
-          "eigen",
+          "eigen"
 #endif
-          "qrhouseholder"
+#if 0
+      ,
+      "qrhouseholder"
+#endif
     };
   }
 

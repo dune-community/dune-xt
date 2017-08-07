@@ -56,12 +56,16 @@ struct LapackeWrapper
                    int ldvr);
 };
 
+// if MatrixType is actually not a matrix but a vector of column vectors, the indices are the other way around (columns
+// first, then rows)
 template <class MatrixType,
           class S,
           bool real_eigvecs_requested,
-          bool is_la_matrix = XT::LA::is_matrix<MatrixType>::value>
+          bool is_matrix = XT::Common::MatrixAbstraction<MatrixType>::is_matrix>
 struct lapacke_helper
 {
+  typedef XT::Common::MatrixAbstraction<MatrixType> MatrixAbstractionType;
+
   static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
   {
     // from lapacke documentation:
@@ -74,13 +78,15 @@ struct lapacke_helper
     for (size_t jj = 0; jj < N; ++jj)
       if (XT::Common::FloatCmp::ne(eigvals[jj].imag(), 0.)) {
         for (size_t ii = 0; ii < N; ++ii) {
-          eigvecs.set_entry(ii, jj, {*(eigvecs_double + (N * ii + jj)), *(eigvecs_double + (N * ii + jj + 1))});
-          eigvecs.set_entry(ii, jj + 1, {*(eigvecs_double + (N * ii + jj)), -*(eigvecs_double + (N * ii + jj + 1))});
+          MatrixAbstractionType::set_entry(
+              eigvecs, ii, jj, {*(eigvecs_double + (N * ii + jj)), *(eigvecs_double + (N * ii + jj + 1))});
+          MatrixAbstractionType::set_entry(
+              eigvecs, ii, jj + 1, {*(eigvecs_double + (N * ii + jj)), -*(eigvecs_double + (N * ii + jj + 1))});
         }
         ++jj;
       } else {
         for (size_t ii = 0; ii < N; ++ii)
-          eigvecs.set_entry(ii, jj, {*(eigvecs_double + (N * ii + jj)), 0.});
+          MatrixAbstractionType::set_entry(eigvecs, ii, jj, {*(eigvecs_double + (N * ii + jj)), 0.});
       }
   }
 };
@@ -88,38 +94,14 @@ struct lapacke_helper
 template <class MatrixType, class S>
 struct lapacke_helper<MatrixType, S, true, true>
 {
+  typedef XT::Common::MatrixAbstraction<MatrixType> MatrixAbstractionType;
+
   static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
   {
     const auto N = eigvals.size();
     for (size_t ii = 0; ii < N; ++ii)
       for (size_t jj = 0; jj < N; ++jj)
-        eigvecs.set_entry(ii, jj, *(eigvecs_double + (N * ii + jj)));
-  }
-};
-
-template <class MatrixType, class S>
-struct lapacke_helper<MatrixType, S, true, false>
-{
-  static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
-  {
-    // from lapacke documentation:
-    // the right eigenvectors v(j) are stored one after another in the columns of VR,
-    // in the same order as their eigenvalues. If the j-th eigenvalue is real, then
-    // v(j) = VR(:,j), the j-th column of VR. If the j-th and j+1)-th eigenvalues form
-    // a complex conjugate pair, then v(j) = VR(:,j)+i*VR(:,j+1) and
-    // v(j+1) = VR(:,j)-i*VR(:,j+1).
-    const auto N = eigvals.size();
-    for (size_t jj = 0; jj < N; ++jj)
-      if (XT::Common::FloatCmp::ne(eigvals[jj].imag(), 0.)) {
-        for (size_t ii = 0; ii < N; ++ii) {
-          eigvecs[ii][jj] = {*(eigvecs_double + (N * ii + jj)), *(eigvecs_double + (N * ii + jj + 1))};
-          eigvecs[ii][jj + 1] = {*(eigvecs_double + (N * ii + jj)), -*(eigvecs_double + (N * ii + jj + 1))};
-        }
-        ++jj;
-      } else {
-        for (size_t ii = 0; ii < N; ++ii)
-          eigvecs[ii][jj] = {*(eigvecs_double + (N * ii + jj)), 0.};
-      }
+        MatrixAbstractionType::set_entry(eigvecs, ii, jj, *(eigvecs_double + (N * ii + jj)));
   }
 };
 
@@ -128,22 +110,48 @@ struct lapacke_helper<MatrixType, S, false, false>
 {
   static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
   {
+    // from lapacke documentation:
+    // the right eigenvectors v(j) are stored one after another in the columns of VR,
+    // in the same order as their eigenvalues. If the j-th eigenvalue is real, then
+    // v(j) = VR(:,j), the j-th column of VR. If the j-th and j+1)-th eigenvalues form
+    // a complex conjugate pair, then v(j) = VR(:,j)+i*VR(:,j+1) and
+    // v(j+1) = VR(:,j)-i*VR(:,j+1).
+    const auto N = eigvals.size();
+    for (size_t jj = 0; jj < N; ++jj)
+      if (XT::Common::FloatCmp::ne(eigvals[jj].imag(), 0.)) {
+        for (size_t ii = 0; ii < N; ++ii) {
+          eigvecs[jj][ii] = {*(eigvecs_double + (N * ii + jj)), *(eigvecs_double + (N * ii + jj + 1))};
+          eigvecs[jj + 1][ii] = {*(eigvecs_double + (N * ii + jj)), -*(eigvecs_double + (N * ii + jj + 1))};
+        }
+        ++jj;
+      } else {
+        for (size_t ii = 0; ii < N; ++ii)
+          eigvecs[jj][ii] = {*(eigvecs_double + (N * ii + jj)), 0.};
+      }
+  }
+};
+
+template <class MatrixType, class S>
+struct lapacke_helper<MatrixType, S, true, false>
+{
+  static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
+  {
     const auto N = eigvals.size();
     for (size_t ii = 0; ii < N; ++ii)
       for (size_t jj = 0; jj < N; ++jj)
-        eigvecs[ii][jj] = *(eigvecs_double + (N * ii + jj));
+        eigvecs[jj][ii] = *(eigvecs_double + (N * ii + jj));
   }
 };
 
 template <class S>
-void compute_using_lapacke(double* matrix, std::vector<std::complex<S>>& eigvals, double* eigvecs_double)
+void compute_using_lapacke(double* matrix, std::vector<std::complex<S>>& eigvals, double* eigvecs)
 {
   int N = (int)eigvals.size();
   std::vector<double> alpha_real(N), alpha_imag(N), beta(N);
 
   static thread_local UnitMatrix unit_matrix(N);
   int info = LapackeWrapper::dggev('N',
-                                   eigvecs_double ? 'V' : 'N',
+                                   eigvecs ? 'V' : 'N',
                                    N,
                                    matrix,
                                    N,
@@ -154,7 +162,7 @@ void compute_using_lapacke(double* matrix, std::vector<std::complex<S>>& eigvals
                                    beta.data(),
                                    (double*)nullptr,
                                    N,
-                                   eigvecs_double,
+                                   eigvecs,
                                    N);
 
   if (info != 0)
@@ -233,8 +241,20 @@ std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const XT::LA:
   static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
 }
 
+template <class S, int N>
+std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const Dune::FieldMatrix<S, N, N>& matrix)
+{
+  static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
+}
+
 template <class Traits, class S, class MatrixReturnType>
 void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix, MatrixReturnType& ret)
+{
+  static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
+}
+
+template <class S, int N, class ReturnType, class ReturnValueType>
+void compute_all_eigenvectors_using_lapacke(const Dune::FieldMatrix<S, N, N>& matrix, ReturnType& ret, ReturnValueType)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
 }

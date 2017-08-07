@@ -119,7 +119,8 @@ public:
     const Common::Configuration default_opts = options(type);
     check_input(opts, default_opts);
     // solve
-    std::vector<ComplexVectorType> evs;
+    const size_t dim = RealMatrixAbstractionType::rows(matrix_);
+    std::vector<ComplexVectorType> evs(dim, XT::Common::VectorAbstraction<ComplexVectorType>::create(dim, 0.));
     get_eigenvectors(evs, type);
     // check
     check_eigenvectors(evs, opts, default_opts);
@@ -170,7 +171,7 @@ public:
     auto ret = std::make_shared<ComplexMatrixType>(ComplexMatrixAbstractionType::create(rows, cols));
     for (size_t ii = 0; ii < MatrixAbstractionType::rows(matrix_); ++ii)
       for (size_t jj = 0; jj < MatrixAbstractionType::cols(matrix_); ++jj)
-        ComplexMatrixAbstractionType::set_entry(*ret, ii, jj, evs[ii][jj]);
+        ComplexMatrixAbstractionType::set_entry(*ret, ii, jj, evs[jj][ii]);
     return ret;
   } // ... eigenvectors_as_matrix(...)
 
@@ -192,7 +193,7 @@ public:
     auto ret = std::make_shared<RealMatrixType>(RealMatrixAbstractionType::create(rows, cols));
     for (size_t ii = 0; ii < MatrixAbstractionType::rows(matrix_); ++ii)
       for (size_t jj = 0; jj < MatrixAbstractionType::cols(matrix_); ++jj)
-        RealMatrixAbstractionType::set_entry(*ret, ii, jj, evs[ii][jj]);
+        RealMatrixAbstractionType::set_entry(*ret, ii, jj, evs[jj][ii]);
     return ret;
   } // ... real_eigenvectors_as_matrix(...)
 
@@ -337,7 +338,7 @@ protected:
                      << "\n\nThese were the options:\n"
                      << options);
     }
-    std::sort(evs.begin(), evs.end(), ascending ? std::less<RealType>() : std::greater<RealType>());
+    std::sort(evs.begin(), evs.end(), [ascending](RealType a, RealType b) { return ascending ? a < b : b < a; });
     evs.resize(std::min(evs.size(), num_evs));
     return evs;
   } // ... sorted_eigenvalues(...)

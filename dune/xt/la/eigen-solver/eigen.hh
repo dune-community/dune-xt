@@ -65,7 +65,10 @@ public:
 #if HAVE_LAPACKE
           "lapacke",
 #endif
-          "qrhouseholder"
+#if 0
+      ,
+      "qrhouseholder"
+#endif
     };
   }
 
@@ -85,7 +88,7 @@ public:
       evs = internal::compute_all_eigenvalues_using_eigen(matrix_.backend());
 #if HAVE_LAPACKE
     else if (type == "lapacke")
-      evs = internal::compute_all_eigenvalues_using_lapacke<MatrixType>(matrix_);
+      evs = internal::compute_all_eigenvalues_using_lapacke(matrix_);
 #endif
     else
       DUNE_THROW(Common::Exceptions::internal_error,
