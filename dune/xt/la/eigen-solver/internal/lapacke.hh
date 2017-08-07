@@ -10,8 +10,6 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 
-#include "config.h"
-
 #include <dune/xt/common/string.hh>
 
 #include <dune/xt/la/exceptions.hh>
@@ -168,7 +166,7 @@ void compute_using_lapacke(double* matrix, std::vector<std::complex<S>>& eigvals
   if (info != 0)
     DUNE_THROW(Dune::MathError, "Lapack returned error " + XT::Common::to_string(info) + "!");
 
-  for (size_t rr = 0; rr < N; ++rr) {
+  for (size_t rr = 0; rr < size_t(N); ++rr) {
     assert(XT::Common::FloatCmp::ne(beta[rr], 0., 1e-6));
     eigvals[rr] = {alpha_real[rr] / beta[rr], alpha_imag[rr] / beta[rr]};
   }
@@ -234,7 +232,6 @@ void compute_all_eigenvectors_using_lapacke(const Dune::FieldMatrix<S, N, N>& ma
 #else // HAVE_LAPACKE
 
 
-template <class S>
 template <class Traits, class S>
 std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix)
 {
@@ -247,8 +244,10 @@ std::vector<std::complex<S>> compute_all_eigenvalues_using_lapacke(const Dune::F
   static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
 }
 
-template <class Traits, class S, class MatrixReturnType>
-void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix, MatrixReturnType& ret)
+template <class Traits, class S, class ReturnType, class ReturnValueType>
+void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix,
+                                            ReturnType& ret,
+                                            ReturnValueType)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing Lapacke!");
 }

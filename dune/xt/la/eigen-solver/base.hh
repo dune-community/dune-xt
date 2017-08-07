@@ -41,6 +41,10 @@ public:
   {
   }
 
+  virtual ~EigenSolverBase()
+  {
+  }
+
   static std::vector<std::string> types()
   {
     return derived_type::types();
@@ -48,7 +52,7 @@ public:
 
   static Common::Configuration options(const std::string type = "")
   {
-    return derived_type::options();
+    return derived_type::options(type);
   }
 
   virtual void get_eigenvalues(std::vector<ComplexType>& evs, const std::string& type) const = 0;

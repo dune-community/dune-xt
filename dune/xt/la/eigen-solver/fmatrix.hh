@@ -17,7 +17,9 @@
 #include <dune/xt/la/solver.hh>
 
 #include "../eigen-solver.hh"
+#include "internal/eigen.hh"
 #include "internal/lapacke.hh"
+#include "internal/qrhouseholder.hh"
 
 namespace Dune {
 namespace XT {
@@ -65,8 +67,8 @@ public:
           "eigen"
 #endif
 #if 0
-      ,
-      "qrhouseholder"
+          ,
+          "qrhouseholder"
 #endif
     };
   }
@@ -96,6 +98,10 @@ public:
       evs = internal::compute_all_eigenvalues_using_eigen(eigenmatrix.backend());
     }
 #endif
+#if 0
+    else if (type == "qrhouseholder")
+      evs = internal::compute_all_eigenvalues_using_qrhouseholder(matrix_);
+#endif
     else
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by types()!");
@@ -119,6 +125,10 @@ public:
         for (size_t cc = 0; cc < dimRange; ++cc)
           evs[rr][cc] = eigen_eigvecs[rr].get_entry(cc);
     }
+#endif
+#if 0
+    else if (type == "qrhouseholder")
+      internal::compute_all_eigenvectors_using_qrhouseholder(matrix_, evs, evs[0][0]);
 #endif
     else
       DUNE_THROW(Common::Exceptions::internal_error,

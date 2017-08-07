@@ -41,7 +41,7 @@ compute_all_eigenvalues_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, :
     DUNE_THROW(Exceptions::eigen_solver_failed, "The eigen backend reported '" << eigen_solver.info() << "'!");
   const auto evs = eigen_solver.eigenvalues(); // this should be an Eigen vector of std::complex<S>
   std::vector<std::complex<S>> ret(evs.size());
-  for (size_t ii = 0; ii < evs.size(); ++ii)
+  for (size_t ii = 0; ii < size_t(evs.size()); ++ii)
     ret[ii] = evs[ii];
   return ret;
 } // ... compute_all_eigenvalues_using_eigen(...)
@@ -58,7 +58,7 @@ compute_all_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, 
   const auto eigenvectors = eigen_solver.eigenvectors(); // This should be an Eigen Matrix of std::complex<S> which
   //                                                        contains the eigenvectors in the columns.
   std::vector<EigenDenseVector<std::complex<typename EigenDenseVector<S>::RealType>>> ret;
-  for (size_t ii = 0; ii < eigenvectors.cols(); ++ii)
+  for (size_t ii = 0; ii < size_t(eigenvectors.cols()); ++ii)
     ret.emplace_back(eigenvectors.col(ii));
   return ret;
 } // ... compute_all_eigenvectors_using_eigen(...)

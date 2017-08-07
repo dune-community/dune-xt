@@ -7,10 +7,9 @@
 // Authors:
 //   Felix Schindler  (2017)
 
-#ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
-#define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
+#ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
+#define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
 
-#if 0
 #include "config.h"
 
 #include <dune/xt/common/string.hh>
@@ -24,20 +23,21 @@ namespace LA {
 namespace internal {
 
 
-template <class FieldType, size_t dimRange, size_t dimRangeCols>
+#if 0
+template <class MatrixType>
 class QrHouseholderEigenSolver
 {
-  static const size_t rows = dimRange;
-  static const size_t cols = dimRange;
+  static const size_t rows = MatrixType::rows;
+  static const size_t cols = MatrixType::cols;
+  typedef typename MatrixType::value_type FieldType;
 
 public:
-  typedef FieldMatrix<FieldType, dimRange, dimRange> MatrixType;
-  typedef FieldVector<FieldType, dimRange> VectorType;
+  typedef FieldVector<FieldType, cols> VectorType;
   typedef VectorType EigenValuesType;
   typedef std::shared_ptr<MatrixType> EigenVectorsType;
 
 public:
-  QrHouseholderEigenSolver(MatrixType& A, bool calculate_eigenvectors = false)
+  QrHouseholderEigenSolver(const MatrixType& A, bool calculate_eigenvectors = false)
     : calculate_eigenvectors_(calculate_eigenvectors)
   {
     initialize(A, calculate_eigenvectors);
@@ -53,21 +53,17 @@ public:
     return eigenvectors_;
   }
 
-  const EigenVectorsType& eigenvectors_inverse() const
-  {
-    return eigenvectors_inverse_;
-  }
-
 private:
-  void initialize(MatrixType& A, const bool calculate_eigenvectors)
+  void initialize(const MatrixType& A_in, const bool calculate_eigenvectors)
   {
+    auto tmp_A = std::make_shared<MatrixType>(A_in);
+    auto& A = *tmp_A;
     static constexpr size_t max_counts = 10000;
     const FieldType tol = 1e-15;
     auto R_k = XT::Common::make_unique<MatrixType>(0.);
     auto Q_k = XT::Common::make_unique<MatrixType>(0.);
     auto Q = XT::Common::make_unique<MatrixType>(0.);
     eigenvectors_ = std::make_shared<MatrixType>();
-    eigenvectors_inverse_ = std::make_shared<MatrixType>();
     hessenberg_transformation(A, *Q);
     for (size_t jj = rows - 1; jj > 0; --jj) {
       size_t num_rows = jj + 1;
@@ -92,7 +88,7 @@ private:
           for (size_t cc = 0; cc < num_cols; ++cc) {
             A[rr][cc] = 0.;
             for (size_t ll = 0; ll < num_rows; ++ll)
-              A[rr][cc] += R_k[rr][ll] * Q_k[ll][cc];
+              A[rr][cc] += (*R_k)[rr][ll] * (*Q_k)[ll][cc];
           } // cc
         } // rr
 
@@ -245,17 +241,13 @@ private:
           Qx *= 1. / Qx.two_norm();
 
           for (size_t rr = 0; rr < rows; ++rr)
-            *eigenvectors_[rr][index] = Qx[rr];
+            (*eigenvectors_)[rr][index] = Qx[rr];
         } // index
 
         // orthonormalize eigenvectors in group
         gram_schmidt(group);
       } // groups of eigenvalues
     } // if (calculate_eigenvectors)
-
-
-    *eigenvectors_inverse_ = *eigenvectors_;
-    eigenvectors_inverse_->invert();
   }
 
   void gram_schmidt(const std::vector<size_t>& indices)
@@ -449,9 +441,93 @@ private:
 
   EigenValuesType eigenvalues_;
   EigenVectorsType eigenvectors_;
-  EigenVectorsType eigenvectors_inverse_;
   bool calculate_eigenvectors_;
 }; // class QrHouseholderEigenSolver<...>
+
+// if MatrixType is actually not a matrix but a vector of column vectors, the indices are the other way around (columns
+// first, then rows)
+template <class MatrixType,
+          class S,
+          bool real_eigvecs_requested,
+          bool is_matrix = XT::Common::MatrixAbstraction<MatrixType>::is_matrix>
+struct qrhouseholder_helper
+{
+  typedef XT::Common::MatrixAbstraction<MatrixType> MatrixAbstractionType;
+
+  template <class MatrixImp>
+  static void set_eigvecs(MatrixType& eigvecs, const Dune::DenseMatrix<MatrixImp>& eigvecs_real)
+  {
+    const size_t N = eigvecs_real.rows();
+    for (size_t ii = 0; ii < N; ++ii)
+      for (size_t jj = 0; jj < N; ++jj)
+        MatrixAbstractionType::set_entry(eigvecs, ii, jj, {eigvecs_real[ii][jj], 0.});
+  }
+};
+
+template <class MatrixType, class S>
+struct qrhouseholder_helper<MatrixType, S, true, true>
+{
+  typedef XT::Common::MatrixAbstraction<MatrixType> MatrixAbstractionType;
+
+  template <class MatrixImp>
+  static void set_eigvecs(MatrixType& eigvecs, const Dune::DenseMatrix<MatrixImp>& eigvecs_real)
+  {
+    const size_t N = eigvecs_real.rows();
+    for (size_t ii = 0; ii < N; ++ii)
+      for (size_t jj = 0; jj < N; ++jj)
+        MatrixAbstractionType::set_entry(eigvecs, ii, jj, eigvecs_real[ii][jj]);
+  }
+};
+
+template <class MatrixType, class S>
+struct qrhouseholder_helper<MatrixType, S, false, false>
+{
+  template <class MatrixImp>
+  static void set_eigvecs(MatrixType& eigvecs, const Dune::DenseMatrix<MatrixImp>& eigvecs_real)
+  {
+    const size_t N = eigvecs_real.rows();
+    for (size_t ii = 0; ii < N; ++ii)
+      for (size_t jj = 0; jj < N; ++jj)
+        eigvecs[jj][ii] = {eigvecs_real[ii][jj], 0.};
+  }
+};
+
+template <class MatrixType, class S>
+struct qrhouseholder_helper<MatrixType, S, true, false>
+{
+  template <class MatrixImp>
+  static void set_eigvecs(MatrixType& eigvecs, const Dune::DenseMatrix<MatrixImp>& eigvecs_real)
+  {
+    const size_t N = eigvecs_real.rows();
+    for (size_t ii = 0; ii < N; ++ii)
+      for (size_t jj = 0; jj < N; ++jj)
+        eigvecs[jj][ii] = eigvecs_real[ii][jj];
+  }
+};
+
+template <class S, int N>
+std::vector<std::complex<S>> compute_all_eigenvalues_using_qrhouseholder(const Dune::FieldMatrix<S, N, N>& matrix)
+{
+
+  QrHouseholderEigenSolver<Dune::FieldMatrix<S, N, N>> eigensolver(matrix, false);
+  auto eigvals_real = eigensolver.eigenvalues();
+  std::vector<std::complex<S>> ret(eigvals_real.size());
+  size_t ii = 0;
+  for (const auto& eigval : eigvals_real)
+    ret[ii++] = {eigval, 0.};
+  return ret;
+}
+
+template <class S, int N, class ReturnType, class ReturnValueType>
+void compute_all_eigenvectors_using_qrhouseholder(const Dune::FieldMatrix<S, N, N>& matrix,
+                                                  ReturnType& ret,
+                                                  ReturnValueType)
+{
+  QrHouseholderEigenSolver<Dune::FieldMatrix<S, N, N>> eigensolver(matrix, true);
+  auto eigvecs_real = eigensolver.eigenvectors();
+  qrhouseholder_helper<ReturnType, S, std::is_arithmetic<ReturnValueType>::value>::set_eigvecs(ret, *eigvecs_real);
+}
+#endif
 
 
 } // namespace internal
@@ -459,6 +535,4 @@ private:
 } // namespace XT
 } // namespace Dune
 
-#endif
-
-#endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
+#endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
