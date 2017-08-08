@@ -437,6 +437,12 @@ public:
   {
   }
 
+  //! \brief Default constructor
+  PeriodicIntersectionImp()
+    : BaseType()
+  {
+  }
+
   // methods that differ from BaseType
   bool neighbor() const
   {
