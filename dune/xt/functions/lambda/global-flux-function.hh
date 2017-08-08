@@ -119,7 +119,7 @@ public:
       const Common::ParameterType& param_type,
       const std::string nm,
       OrderLambdaType order_lambda,
-      typename std::enable_if_t<rangeDimCols == 1, FieldVector<ColPartialXLambdaType, dimRangeCols>>
+      typename std::enable_if_t<(rangeDimCols > 1), FieldVector<ColPartialXLambdaType, dimRangeCols>>
           partial_x_col_lambdas,
       FieldVector<ColPartialULambdaType, dimRangeCols> partial_u_col_lambdas)
     : lambda_(lambda)
