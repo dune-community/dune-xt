@@ -47,6 +47,7 @@ pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const s
         },
         "filename"_a = C::static_id(),
         "boundary_info_cfg"_a = Common::Configuration());
+  c.def_property_readonly("num_elements", [](const C& self) { return self.leaf_view().indexSet().size(0); });
   c.def_property_readonly("num_subdomains", [](const C& /*self*/) { return 1; });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
@@ -74,6 +75,7 @@ pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridPro
         },
         "filename"_a = C::static_id(),
         "with_coupling"_a = true);
+  c.def_property_readonly("num_elements", [](const C& self) { return self.leaf_view().indexSet().size(0); });
   c.def_property_readonly("num_subdomains", [](const C& self) { return self.dd_grid().size(); });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
