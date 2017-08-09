@@ -80,20 +80,8 @@ public:
     assert(A.size() >= rangeDimCols);
   }
 
-  explicit AffineFunctionBase(const FieldVector<FieldMatrixType, rangeDimCols>& A,
-                              const RangeType& b = RangeType(0),
-                              const bool prune = true,
-                              const std::string name_in = static_id())
-    : A_(A.size())
-    , b_(b)
-    , name_(name_in)
-    , b_zero_(Common::FloatCmp::eq(b_, RangeType(0)))
-  {
-    for (size_t cc = 0; cc < rangeDimCols; ++cc)
-      A_[cc] = MatrixType(A[cc], prune);
-  }
-
-  explicit AffineFunctionBase(const FieldVector<DynamicMatrix<RangeFieldImp>, rangeDimCols>& A,
+  template <class MatrixImp>
+  explicit AffineFunctionBase(const FieldVector<MatrixImp, rangeDimCols>& A,
                               const RangeType& b = RangeType(0),
                               const bool prune = true,
                               const std::string name_in = static_id())
@@ -125,6 +113,16 @@ public:
                               const RangeType& b = RangeType(0),
                               const std::string name_in = static_id())
     : AffineFunctionBase(std::vector<MatrixType>(1, A), b, name_in)
+  {
+    static_assert(rangeDimCols == 1, "Use constructor above for dimRangeCols > 1");
+  }
+
+  // constructor for dimRangeCols = 1.
+  explicit AffineFunctionBase(const DynamicMatrix<RangeFieldImp>& A,
+                              const RangeType& b = RangeType(0),
+                              const bool prune = true,
+                              const std::string name_in = static_id())
+    : AffineFunctionBase(std::vector<MatrixType>(1, MatrixType(A, prune)), b, name_in)
   {
     static_assert(rangeDimCols == 1, "Use constructor above for dimRangeCols > 1");
   }
@@ -445,15 +443,8 @@ public:
   {
   }
 
-  explicit AffineFluxFunction(const Dune::FieldVector<FieldMatrixType, dimRangeCols>& A,
-                              const RangeType& b = RangeType(0),
-                              const bool prune = true,
-                              const std::string name_in = static_id())
-    : BaseType(A, b, prune, name_in)
-  {
-  }
-
-  explicit AffineFluxFunction(const Dune::FieldVector<DynamicMatrix<RangeFieldType>, dimRangeCols>& A,
+  template <class MatrixImp>
+  explicit AffineFluxFunction(const Dune::FieldVector<MatrixImp, dimRangeCols>& A,
                               const RangeType& b = RangeType(0),
                               const bool prune = true,
                               const std::string name_in = static_id())
@@ -474,6 +465,14 @@ public:
                               const RangeType& b = RangeType(0),
                               const std::string name_in = static_id())
     : BaseType(A, b, name_in)
+  {
+  }
+
+  explicit AffineFluxFunction(const DynamicMatrix<RangeFieldType>& A,
+                              const RangeType& b = RangeType(0),
+                              const bool prune = true,
+                              const std::string name_in = static_id())
+    : BaseType(A, b, prune, name_in)
   {
   }
 
