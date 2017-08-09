@@ -93,6 +93,19 @@ public:
       A_[cc] = MatrixType(A[cc], prune);
   }
 
+  explicit AffineFunctionBase(const FieldVector<DynamicMatrix<RangeFieldImp>, rangeDimCols>& A,
+                              const RangeType& b = RangeType(0),
+                              const bool prune = true,
+                              const std::string name_in = static_id())
+    : A_(A.size())
+    , b_(b)
+    , name_(name_in)
+    , b_zero_(Common::FloatCmp::eq(b_, RangeType(0)))
+  {
+    for (size_t cc = 0; cc < rangeDimCols; ++cc)
+      A_[cc] = MatrixType(A[cc], prune);
+  }
+
   explicit AffineFunctionBase(const std::vector<FieldMatrixType>& A,
                               const RangeType& b = RangeType(0),
                               const bool prune = true,
@@ -376,7 +389,7 @@ class AffineFluxFunction
       InterfaceType;
   typedef internal::AffineFunctionBase<typename U_::RangeFieldType, U_::dimRange, RangeFieldImp, rangeDim, rangeDimCols>
       BaseType;
-  typedef AffineFluxFunction<EntityImp, DomainFieldImp, domainDim, U_, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
+  typedef AffineFluxFunction ThisType;
 
 public:
   typedef typename InterfaceType::DomainType DomainType;
@@ -433,6 +446,14 @@ public:
   }
 
   explicit AffineFluxFunction(const Dune::FieldVector<FieldMatrixType, dimRangeCols>& A,
+                              const RangeType& b = RangeType(0),
+                              const bool prune = true,
+                              const std::string name_in = static_id())
+    : BaseType(A, b, prune, name_in)
+  {
+  }
+
+  explicit AffineFluxFunction(const Dune::FieldVector<DynamicMatrix<RangeFieldType>, dimRangeCols>& A,
                               const RangeType& b = RangeType(0),
                               const bool prune = true,
                               const std::string name_in = static_id())
