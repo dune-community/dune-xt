@@ -137,7 +137,7 @@ struct is_entity<Dune::Entity<cd, dim, GridImp, EntityImp>, cd> : public std::tr
 };
 
 
-template <class T, bool candidate = internal::has_traits_helper<T>::is_candidate>
+template <class T, bool candidate = internal::has_traits_helper<std::remove_const_t<T>>::is_candidate>
 struct is_view : public std::false_type
 {
 };
@@ -152,15 +152,6 @@ struct is_view<const T> : public is_view<T>
 {
 };
 
-
-#if HAVE_DUNE_FEM
-
-template <class T>
-struct is_view<Dune::Fem::GridPart2GridView<T>> : public std::true_type
-{
-};
-
-#endif // HAVE_DUNE_FEM
 
 template <class T>
 struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_grid_view : public is_view<T>
