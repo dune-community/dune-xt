@@ -21,7 +21,7 @@ namespace LA {
 namespace internal {
 
 
-#if HAVE_LAPACK
+#if HAVE_LAPACKE
 
 
 class UnitMatrix
