@@ -143,12 +143,7 @@ struct is_view : public std::false_type
 };
 
 template <class T>
-struct is_view<T, true> : public std::is_base_of<Dune::GridView<typename T::Traits>, T>
-{
-};
-
-template <class T>
-struct is_view<const T> : public is_view<T>
+struct is_view<T, true> : public std::is_base_of<Dune::GridView<typename T::Traits>, std::remove_const_t<T>>
 {
 };
 
