@@ -11,7 +11,12 @@
   * This file is intended as a starting point for quick testing.
   */
 
-#include <dune/xt/common/test/main.hxx>
+#define DUNE_XT_COMMON_TEST_MAIN_CATCH_EXCEPTIONS 1
+#define DUNE_XT_COMMON_TEST_MAIN_ENABLE_DEBUG_LOGGING 1
+#define DUNE_XT_COMMON_TEST_MAIN_ENABLE_INFO_LOGGING 1
+#define DUNE_XT_COMMON_TEST_MAIN_ENABLE_TIMED_LOGGING 1
+
+#include <dune/xt/common/test/main.hxx> // <- Has to come first, includes the config.h!
 
 
 GTEST_TEST(empty, main)
