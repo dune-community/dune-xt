@@ -17,6 +17,7 @@
 // parts alike.
 
 // clang-format off
+#include <dune/xt/common/disable_warnings.hh>
 
 #include <iterator>
 #include <vector>
@@ -180,6 +181,7 @@ namespace Dune {
 
 } // namespace Dune
 
+#include <dune/xt/common/reenable_warnings.hh>
 // clang-format on
 
 #endif // DUNE_XT_GRID_PARALLEL_PARTITIONING_RANGED_INTERNAL_HH
