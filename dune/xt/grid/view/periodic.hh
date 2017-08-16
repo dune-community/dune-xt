@@ -1011,8 +1011,7 @@ class PeriodicGridView
     : XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, codim_iters_provided>>,
       public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp, codim_iters_provided>>
 {
-  //  static_assert(!is_alugrid<typename RealGridViewImp::Grid>::value,
-  //                "ALUGrid 1.52 and older cannot be used here due to missing entitity default ctor");
+  static_assert(is_layer<RealGridViewImp>::value, "");
   typedef RealGridViewImp RealGridViewType;
   typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType, codim_iters_provided>> BaseType;
   typedef
@@ -1060,12 +1059,6 @@ make_periodic_grid_view(const GV& real_grid_view,
 {
   return PeriodicGridView<GV>(real_grid_view, periodic_directions);
 }
-
-
-template <class T, bool bb>
-struct is_view<PeriodicGridView<T, bb>> : public std::true_type
-{
-};
 
 
 } // namespace Grid
