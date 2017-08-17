@@ -296,8 +296,11 @@ public:
           opts.get("post_check_solves_system", default_opts.get<R>("post_check_solves_system"));
       if (post_check_solves_system_threshold > 0) {
         matrix_.mv(solution, writable_rhs);
+        //! TODO the additional copy to make the original rhs consistent is only necessary in parallel setups
+        auto tmp_rhs = rhs;
         communicator_.access().copyOwnerToAll(writable_rhs.backend(), writable_rhs.backend());
-        writable_rhs -= rhs;
+        communicator_.access().copyOwnerToAll(tmp_rhs.backend(), tmp_rhs.backend());
+        writable_rhs -= tmp_rhs;
         const R sup_norm = writable_rhs.sup_norm();
         if (sup_norm > post_check_solves_system_threshold || Common::isnan(sup_norm) || Common::isinf(sup_norm))
           DUNE_THROW(Exceptions::linear_solver_failed_bc_the_solution_does_not_solve_the_system,
