@@ -10,4 +10,4 @@ with open(env_file, 'wt') as env:
     for k,v in os.environ.items():
         for pref in prefixes:
             if k.startswith(pref):
-                env.write('{}="{}"\n'.format(k,v))
+                env.write('{}={}\n'.format(k,v))
