@@ -14,8 +14,13 @@ include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 enable_testing()
 
 BEGIN_TESTCASES()
- 
+
 END_TESTCASES()
+
+# load binning setup from file
+if(DEFINED ENV{TRAVIS})
+    include("builder_definitions.cmake")
+endif(DEFINED ENV{TRAVIS})
 
 foreach (test ${dxt_test_binaries})
   if (${test} MATCHES alberta_1d)
@@ -26,4 +31,4 @@ foreach (test ${dxt_test_binaries})
     add_dune_alberta_flags(GRIDDIM 3 ${test})
   endif()
 endforeach()
- 
+

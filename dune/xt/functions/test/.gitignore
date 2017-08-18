@@ -37,3 +37,4 @@ functions_expression
 functions_checkerboard
 functions_functions
 perm_case1.dat
+!builder_definitions.cmake
