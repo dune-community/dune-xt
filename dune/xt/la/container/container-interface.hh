@@ -108,9 +108,9 @@ struct VectorLockGuard
 
 struct LockGuard
 {
-  LockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes, const size_t& ii)
+  LockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes, const size_t ii)
     : mutexes_(mutexes ? mutexes.get() : nullptr)
-    , index_(ii % mutexes_->size())
+    , index_(mutexes_ ? (ii % mutexes_->size()) : 0)
   {
     if (mutexes_)
       mutexes_->operator[](index_).lock();
