@@ -148,12 +148,10 @@ public:
     if (!options_to_ensure_real_evs.has_key("check_eigenvectors_are_real"))
       options_to_ensure_real_evs["check_eigenvectors_are_real"] = "1e-15";
     const auto evs = eigenvectors(options_to_ensure_real_evs);
-    std::vector<RealVectorType> ret;
-    for (size_t ii = 0; ii < evs.size(); ++ii) {
-      ret.emplace_back(RealVectorType(evs[ii].size()));
+    std::vector<RealVectorType> ret(evs.size(), RealVectorType(evs[0].size()));
+    for (size_t ii = 0; ii < evs.size(); ++ii)
       for (size_t jj = 0; jj < evs[ii].size(); ++jj)
-        ret.back()[jj] = evs[ii][jj].real();
-    }
+        ret[ii][jj] = evs[ii][jj].real();
     return ret;
   } // ... real_eigenvectors(...)
 

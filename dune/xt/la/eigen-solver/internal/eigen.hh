@@ -57,6 +57,7 @@ compute_all_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, 
   const auto eigenvectors = eigen_solver.eigenvectors(); // This should be an Eigen Matrix of std::complex<S> which
   //                                                        contains the eigenvectors in the columns.
   std::vector<EigenDenseVector<std::complex<typename EigenDenseVector<S>::RealType>>> ret;
+  ret.reserve(eigenvectors.cols());
   for (size_t ii = 0; ii < size_t(eigenvectors.cols()); ++ii)
     ret.emplace_back(eigenvectors.col(ii));
   return ret;
