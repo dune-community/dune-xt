@@ -557,6 +557,18 @@ public:
     return *this;
   }
 
+  template <int size>
+  ThisType& operator=(const Dune::FieldVector<ScalarType, size>& other)
+  {
+    clear();
+    size_ = size;
+    for (size_t kk = 0; kk < size; ++kk)
+      if (XT::Common::FloatCmp::ne(other[kk], 0.)) {
+        entries_->push_back(other[kk]);
+        indices_->push_back(kk);
+      }
+  }
+
   void deep_copy(const ThisType& other)
   {
     ensure_uniqueness();
@@ -629,11 +641,16 @@ public:
   }
 
   // set entry without checking if entry already exists
-  void set_new_entry(const size_t ii, const ScalarType& value)
+  void set_new_entry(const size_t ii, const ScalarType& value, bool front = false)
   {
     ensure_uniqueness();
-    indices_->push_back(ii);
-    entries_->push_back(value);
+    if (front) {
+      indices_->insert(indices_->begin(), ii);
+      entries_->insert(entries_->begin(), value);
+    } else {
+      indices_->push_back(ii);
+      entries_->push_back(value);
+    }
   }
 
   ScalarType get_entry(const size_t ii) const
@@ -765,17 +782,35 @@ public:
     auto it = std::max_element(entries_->begin(), entries_->end(), [](const ScalarType& a, const ScalarType& b) {
       return std::abs(a) < std::abs(b);
     });
-    return std::abs(*it);
+    return entries_->size() > 0 ? std::abs(*it) : 0.;
   }
+
+  virtual ThisType add(const ThisType& other) const override final
+  {
+    ThisType ret = this->copy();
+    ret.entries_->reserve(ret.entries_->size() + other.entries_->size());
+    for (size_t kk = 0; kk < other.indices_->size(); ++kk)
+      ret.add_to_entry(other.indices()[kk], other.entries()[kk]);
+    return ret;
+  } // ... add(...)
 
   virtual void add(const ThisType& other, ThisType& result) const override final
   {
-    result = *this + other;
+    result.deep_copy(add(other));
   } // ... add(...)
+
+  virtual ThisType sub(const ThisType& other) const override final
+  {
+    ThisType ret = this->copy();
+    ret.entries_->reserve(ret.entries_->size() + other.entries_->size());
+    for (size_t kk = 0; kk < other.indices_->size(); ++kk)
+      ret.add_to_entry(other.indices()[kk], -other.entries()[kk]);
+    return ret;
+  } // ... sub(...)
 
   virtual void sub(const ThisType& other, ThisType& result) const override final
   {
-    result = *this - other;
+    result.deep_copy(sub(other));
   } // ... add(...)
 
   virtual void iadd(const ThisType& other) override final
@@ -1001,10 +1036,11 @@ public:
     return backend().cols();
   }
 
-  inline void mv(const VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
-                 VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& yy) const
+  template <class FirstTraits, class SecondTraits>
+  inline void mv(const VectorInterface<FirstTraits, ScalarType>& xx,
+                 VectorInterface<SecondTraits, ScalarType>& yy) const
   {
-    mv(xx.as_imp(), yy.as_imp());
+    mv_helper<FirstTraits, SecondTraits>::mv(xx, yy, this);
   }
 
   inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
@@ -1121,6 +1157,33 @@ protected:
   } // ... ensure_uniqueness(...)
 
 private:
+  template <class FirstTraits, class SecondTraits, class anything = void>
+  struct mv_helper
+  {
+    static void mv(const VectorInterface<FirstTraits, ScalarType>& xx,
+                   VectorInterface<SecondTraits, ScalarType>& yy,
+                   const ThisType* this_ptr)
+    {
+      yy *= ScalarType(0.);
+      for (size_t rr = 0; rr < this_ptr->rows(); ++rr)
+        for (size_t cc = 0; cc < this_ptr->cols(); ++cc)
+          yy.add_to_entry(rr, this_ptr->get_entry(rr, cc) * xx.get_entry(cc));
+    }
+  };
+
+  template <class anything>
+  struct mv_helper<internal::CommonDenseVectorTraits<ScalarType>,
+                   internal::CommonDenseVectorTraits<ScalarType>,
+                   anything>
+  {
+    static void mv(const VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
+                   VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& yy,
+                   const ThisType* this_ptr)
+    {
+      this_ptr->mv(xx.as_imp(), yy.as_imp());
+    }
+  };
+
   mutable std::shared_ptr<BackendType> backend_;
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
   mutable bool unshareable_;
@@ -1616,14 +1679,14 @@ public:
                      const size_t num_mutexes = 1)
     : num_rows_(rr)
     , num_cols_(cc)
-    , entries_(
-          std::make_shared<EntriesVectorType>(XT::Common::FloatCmp::eq(value, 0.) ? 0 : num_rows_ * num_cols_, value))
+    , entries_(std::make_shared<EntriesVectorType>(
+          XT::Common::FloatCmp::eq(value, ScalarType(0.)) ? 0 : num_rows_ * num_cols_, value))
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
     , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
     , unshareable_(false)
   {
-    if (XT::Common::FloatCmp::ne(value, 0.)) {
+    if (XT::Common::FloatCmp::ne(value, ScalarType(0.))) {
       IndexVectorType column_row_indices(num_rows_);
       for (size_t row = 0; row < num_rows_; ++row)
         column_row_indices[row] = row;
@@ -1649,8 +1712,9 @@ public:
     : num_rows_(other.num_rows_)
     , num_cols_(other.num_cols_)
     , entries_(other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_)
-    , column_pointers_(other.column_pointers_)
-    , row_indices_(other.row_indices_)
+    , column_pointers_(other.unshareable_ ? std::make_shared<IndexVectorType>(*other.column_pointers_)
+                                          : other.column_pointers_)
+    , row_indices_(other.unshareable_ ? std::make_shared<IndexVectorType>(*other.row_indices_) : other.row_indices_)
     , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
     , unshareable_(false)
   {
@@ -1800,7 +1864,10 @@ public:
 
   //! TransposedMatrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
-  inline std::enable_if_t<XT::Common::VectorAbstraction<XX>::is_vector && XT::Common::VectorAbstraction<YY>::is_vector,
+  inline std::enable_if_t<!std::is_base_of<CommonSparseVector<ScalarType>, XX>::value
+                              && !std::is_base_of<CommonSparseVector<ScalarType>, YY>::value
+                              && XT::Common::VectorAbstraction<XX>::is_vector
+                              && XT::Common::VectorAbstraction<YY>::is_vector,
                           void>
   mtv(const XX& xx, YY& yy) const
   {
@@ -1953,12 +2020,13 @@ public:
     const auto& other_entries = other.entries();
     const auto& other_column_pointers = other.column_pointers();
     const auto& other_row_indices = other.row_indices();
-    ScalarType new_entry(0);
+    std::vector<ScalarType> new_entry(0);
     size_t index = 0;
     for (size_t cc = 0; cc < other.cols(); ++cc) {
       for (size_t rr = 0; rr < num_rows_; ++rr) {
         new_entry = 0;
-        for (size_t kk = other_column_pointers[cc]; kk < other_column_pointers[cc + 1]; ++kk)
+        size_t end = other_column_pointers[cc + 1];
+        for (size_t kk = other_column_pointers[cc]; kk < end; ++kk)
           new_entry += get_entry(rr, other_row_indices[kk]) * other_entries[kk];
         if (XT::Common::FloatCmp::ne(new_entry, 0.)) {
           new_entries.push_back(new_entry);

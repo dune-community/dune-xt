@@ -45,6 +45,16 @@ public:
 };
 
 template <class S>
+class ContainerFactory<Dune::XT::LA::CommonSparseVector<S>>
+{
+public:
+  static Dune::XT::LA::CommonSparseVector<S> create(const size_t size)
+  {
+    return Dune::XT::LA::CommonSparseVector<S>(size, S(1));
+  }
+};
+
+template <class S>
 class ContainerFactory<Dune::XT::LA::CommonDenseMatrix<S>>
 {
 public:
