@@ -115,9 +115,9 @@ private:
       global_function_.jacobian(xx_global, ret, mu);
     }
 
-    virtual size_t order(const Common::Parameter& /*mu*/ = {}) const override final
+    virtual size_t order(const Common::Parameter& mu = {}) const override final
     {
-      return global_function_.order();
+      return global_function_.order(mu);
     }
 
   private:
