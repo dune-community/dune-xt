@@ -6,7 +6,7 @@
 set -e
 set -x
 
-WAIT="travis_wait 50"
+WAIT="${SUPERDIR}/scripts/bash/travis_wait_new.bash 45"
 
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} configure
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD}
