@@ -19,7 +19,7 @@ before_script:
     # get image with fallback to master branch of the super repo
     - docker pull ${IMAGE} || export IMAGE="dunecommunity/${MY_MODULE}-testing_${DOCKER_TAG}:master" ; docker pull ${IMAGE}
     - export ENV_FILE=${HOME}/env
-    - python ./.travis.make_env_file.py
+    - python3 ./.travis.make_env_file.py
     - export DOCKER_RUN="docker run --env-file ${ENV_FILE} -v ${TRAVIS_BUILD_DIR}:/root/src/${MY_MODULE} ${IMAGE}"
 
 script:
