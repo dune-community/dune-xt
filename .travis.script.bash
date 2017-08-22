@@ -6,12 +6,14 @@
 set -e
 set -x
 
+WAIT="travis_wait 50"
+
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} configure
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD}
 if [ x"${TESTS}" == x ] ; then
-    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v test_binaries
+    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v test_binaries
 else
-    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v test_binaries_builder_${TESTS}
+    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v test_binaries_builder_${TESTS}
 fi
 if [[ "${CC}" == "gcc"* ]] ; then
     lcov -q --gcov-tool ${GCOV} -b ${SUPERDIR}/${MY_MODULE} -d ${DUNE_BUILD_DIR}/${MY_MODULE} -c -o ${HOME}/baseline.lcov --no-external --initial
