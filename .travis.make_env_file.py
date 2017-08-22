@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 from os.path import expanduser
+from shlex import quote
 home = expanduser("~")
 
 prefixes = os.environ.get('ENV_PREFIXES', 'TRAVIS CI encrypt TOKEN TESTS').split(' ')
@@ -10,4 +11,4 @@ with open(env_file, 'wt') as env:
     for k,v in os.environ.items():
         for pref in prefixes:
             if k.startswith(pref):
-                env.write('{}={}\n'.format(k,v))
+                env.write('{}={}\n'.format(k,quote(v)))
