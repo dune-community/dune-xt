@@ -402,7 +402,7 @@ private:
 #endif // HAVE_ALBERTA
 
 public:
-  void global_refine(int count)
+  void global_refine(const int count = 1)
   {
     global_refine_helper<GridType>()(grid(), count);
   }
