@@ -10,10 +10,10 @@
 //   Rene Milk        (2014 - 2016)
 //   Tobias Leibner   (2014, 2016 - 2017)
 
-#ifndef DUNE_XT_LA_CONTAINER_COMMON_HH
-#define DUNE_XT_LA_CONTAINER_COMMON_HH
+#ifndef DUNE_XT_LA_CONTAINER_COMMON_MATRIX_HH
+#define DUNE_XT_LA_CONTAINER_COMMON_MATRIX_HH
 
-#include "common/vector.hh"
-#include "common/matrix.hh"
+#include "matrix/dense.hh"
+#include "matrix/sparse.hh"
 
-#endif // DUNE_XT_LA_CONTAINER_COMMON_HH
+#endif // DUNE_XT_LA_CONTAINER_COMMON_MATRIX_HH
