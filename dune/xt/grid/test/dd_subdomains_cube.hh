@@ -90,15 +90,15 @@ ostream& operator<<(ostream& out, const map<F, S>& results)
 using namespace Dune;
 
 
-template <class G, bool anything = true>
+template <class G, bool anything>
 struct ExpectedResults
 {
   static_assert(AlwaysFalse<G>::value, "Please add me for this grid!");
 };
 
-template <class G>
 struct CubeProviderTest : public ::testing::Test
 {
+  using G = TESTGRIDTYPE;
   static const constexpr size_t d = G::dimension;
   typedef XT::Grid::GridProvider<G, XT::Grid::DD::SubdomainGrid<G>> ProviderType;
   typedef typename ProviderType::DdGridType DdGridType;

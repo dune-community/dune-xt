@@ -1,0 +1,17 @@
+__exec_suffix = {gridname}_{dimDomain}d
+
+dimDomain = 2
+
+__local.grid_alu = Dune::ALUGrid<{dimDomain}\,{dimDomain}\,Dune::cube\,Dune::nonconforming>, Dune::ALUGrid<{dimDomain}\,{dimDomain}\,Dune::simplex\,Dune::conforming>, Dune::ALUGrid<{dimDomain}\,{dimDomain}\,Dune::simplex\,Dune::nonconforming> | expand
+
+__local.grid_yasp = Dune::YaspGrid<{dimDomain},Dune::EquidistantOffsetCoordinates<double,{dimDomain}>>
+__local.grid_alberta = Dune::AlbertaGrid<{dimDomain},{dimDomain}>
+__local.grid_ug = Dune::UGGrid<{dimDomain}>
+
+grid = {__local.grid_yasp}, {__local.grid_alu}, {__local.grid_ug}, {__local.grid_alberta} | expand grid
+1, dune-alugrid_FOUND, dune-uggrid_FOUND, HAVE_ALBERTA,  | expand grid | cmake_guard
+
+gridname = yasp, alu, ug, alberta | expand grid
+
+[__static]
+TESTGRIDTYPE = {grid}
