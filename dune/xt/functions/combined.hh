@@ -299,9 +299,9 @@ public:
   {
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override final
+  virtual size_t order(const XT::Common::Parameter& mu = {}) const override final
   {
-    return Select::order(left_local_->order(), right_local_->order());
+    return Select::order(left_local_->order(mu), right_local_->order(mu));
   }
 
   virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final

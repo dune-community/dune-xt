@@ -162,9 +162,9 @@ public:
   {
   }
 
-  virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const
+  virtual size_t order(const XT::Common::Parameter& mu = {}) const
   {
-    return function_.order();
+    return function_.order(mu);
   }
 
   virtual void evaluate(const typename BaseType::DomainType& x,

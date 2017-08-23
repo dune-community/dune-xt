@@ -142,9 +142,9 @@ struct LocalfunctionForGlobalChooser
 
     Localfunction& operator=(const Localfunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
+    virtual size_t order(const XT::Common::Parameter& mu = {}) const override
     {
-      return global_function_.order() * localizable_function_.local_function(entity_)->order();
+      return global_function_.order(mu) * localizable_function_.local_function(entity_)->order(mu);
     }
 
     virtual void evaluate(const DomainType& xx, RangeType& ret, const XT::Common::Parameter& mu = {}) const override

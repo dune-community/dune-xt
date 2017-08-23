@@ -333,17 +333,17 @@ public:
 
   using InterfaceType::evaluate;
 
-  virtual void evaluate(const DomainType& x, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Common::Parameter& mu = {}) const override final
   {
-    BaseType::template helper<>::evaluate(A_, b_, b_zero_, x, ret);
+    BaseType::template helper<>::evaluate(A_, b_, b_zero_, x, ret, mu);
   }
 
   using InterfaceType::jacobian;
 
   virtual void
-  jacobian(const DomainType& /*x*/, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
+  jacobian(const DomainType& /*x*/, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
   {
-    BaseType::template helper<>::jacobian(A_, ret);
+    BaseType::template helper<>::jacobian(A_, ret, mu);
   }
 
 private:

@@ -75,6 +75,7 @@ class FemAdapterFunction
 
     virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
     {
+      // being a dune-fem datatype, the wrapped funcitons _really_ do not process the mu
       return wrapped_localfunction_.order();
     }
 
