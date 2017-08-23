@@ -235,6 +235,7 @@ public:
   virtual void
   jacobian(const DomainType& /*x*/, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
+    //! TODO: why not ```ret *=0```?
     clear_jacobian<rangeDim, rangeDimCols>()(ret);
   }
 

@@ -98,7 +98,6 @@ public:
   }
 }; // class CheckerboardFunctionFactory< ... >
 
-template <>
 template <class EntityImp,
           class DomainFieldImp,
           size_t domainDim,
