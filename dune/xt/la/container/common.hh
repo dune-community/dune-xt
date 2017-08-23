@@ -747,17 +747,22 @@ public:
 
   virtual ScalarType dot(const ThisType& other) const override final
   {
-    if (other.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    assert(other.size() == size());
+    const auto& indices = *indices_;
+    const auto& other_indices = *other.indices_;
+    const auto& entries = *entries_;
+    const auto& other_entries = *other.entries_;
     ScalarType ret(0);
-    if (indices_->size() < other.indices_->size()) {
-      for (size_t ii = 0; ii < indices_->size(); ++ii)
-        ret += (*entries_)[ii] * other.get_entry((*indices_)[ii]);
-    } else {
-      for (size_t ii = 0; ii < other.indices_->size(); ++ii)
-        ret += get_entry((*other.indices_)[ii]) * (*other.entries_)[ii];
-    }
+    size_t kk = 0;
+    size_t other_kk = 0;
+    while (kk < indices.size() && other_kk < other_indices.size()) {
+      if (indices[kk] < other_indices[other_kk])
+        ++kk;
+      else if (indices[kk] > other_indices[other_kk])
+        ++other_kk;
+      else
+        ret += entries[kk++] * other_entries[other_kk++];
+    } // kk
     return ret;
   } // ... dot(...)
 
@@ -1363,6 +1368,24 @@ public:
     return *this;
   }
 
+  template <int rows, int cols>
+  ThisType& operator=(const FieldMatrix<ScalarType, rows, cols>& other)
+  {
+    clear();
+    num_rows_ = rows;
+    num_cols_ = cols;
+    for (size_t rr = 0; rr < rows; ++rr) {
+      for (size_t cc = 0; cc < cols; ++cc) {
+        if (XT::Common::FloatCmp::ne(other[rr][cc], 0.)) {
+          entries_->push_back(other[rr][cc]);
+          column_indices_->push_back(cc);
+        }
+      } // cc
+      (*row_pointers_)[rr + 1] = column_indices_->size();
+    } // rr
+    return *this;
+  }
+
   void deep_copy(const ThisType& other)
   {
     ensure_uniqueness();
@@ -1371,6 +1394,14 @@ public:
     *entries_ = *other.entries_;
     *row_pointers_ = *other.row_pointers_;
     *column_indices_ = *other.column_indices_;
+  }
+
+  void clear()
+  {
+    ensure_uniqueness();
+    entries_->clear();
+    std::fill(row_pointers_->begin(), row_pointers_->end(), 0);
+    column_indices_->clear();
   }
 
   /// \}
@@ -1701,7 +1732,7 @@ public:
     : num_rows_(rr)
     , num_cols_(cc)
     , entries_(std::make_shared<EntriesVectorType>())
-    , column_pointers_(std::make_shared<IndexVectorType>())
+    , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1))
     , row_indices_(std::make_shared<IndexVectorType>())
     , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
     , unshareable_(false)
@@ -1774,6 +1805,24 @@ public:
                      : nullptr;
       unshareable_ = false;
     }
+    return *this;
+  }
+
+  template <int rows, int cols>
+  ThisType& operator=(const FieldMatrix<ScalarType, rows, cols>& other)
+  {
+    clear();
+    num_rows_ = rows;
+    num_cols_ = cols;
+    for (size_t cc = 0; cc < cols; ++cc) {
+      for (size_t rr = 0; rr < rows; ++rr) {
+        if (XT::Common::FloatCmp::ne(other[rr][cc], 0.)) {
+          entries_->push_back(other[rr][cc]);
+          row_indices_->push_back(rr);
+        }
+      } // rr
+      (*column_pointers_)[cc + 1] = row_indices_->size();
+    } // cc
     return *this;
   }
 
@@ -1889,10 +1938,9 @@ public:
     const auto& column_pointers = *column_pointers_;
     const auto& row_indices = *row_indices_;
     for (size_t cc = 0; cc < num_cols_; ++cc) {
-      const size_t begin = column_pointers[cc];
       const size_t end = column_pointers[cc + 1];
       ScalarType new_entry(0);
-      for (size_t kk = begin; kk < end; ++kk)
+      for (size_t kk = column_pointers[cc]; kk < end; ++kk)
         new_entry += entries[kk] * xx.get_entry(row_indices[kk]);
       if (XT::Common::FloatCmp::ne(new_entry, 0.))
         yy.set_new_entry(cc, new_entry);
@@ -2020,22 +2068,26 @@ public:
     const auto& other_entries = other.entries();
     const auto& other_column_pointers = other.column_pointers();
     const auto& other_row_indices = other.row_indices();
-    std::vector<ScalarType> new_entry(0);
-    size_t index = 0;
+    thread_local std::vector<ScalarType> dense_column(num_rows_, 0.);
+    dense_column.resize(num_rows_);
     for (size_t cc = 0; cc < other.cols(); ++cc) {
+      std::fill(dense_column.begin(), dense_column.end(), 0.);
+      size_t other_col_end = other_column_pointers[cc + 1];
+      for (size_t kk = other_column_pointers[cc]; kk < other_col_end; ++kk) {
+        size_t col = other_row_indices[kk];
+        size_t col_end = (*column_pointers_)[col + 1];
+        for (size_t ll = (*column_pointers_)[col]; ll < col_end; ++ll)
+          dense_column[(*row_indices_)[ll]] += (*entries_)[ll] * other_entries[kk];
+      } // kk
       for (size_t rr = 0; rr < num_rows_; ++rr) {
-        new_entry = 0;
-        size_t end = other_column_pointers[cc + 1];
-        for (size_t kk = other_column_pointers[cc]; kk < end; ++kk)
-          new_entry += get_entry(rr, other_row_indices[kk]) * other_entries[kk];
-        if (XT::Common::FloatCmp::ne(new_entry, 0.)) {
-          new_entries.push_back(new_entry);
+        if (XT::Common::FloatCmp::ne(dense_column[rr], 0.)) {
+          new_entries.push_back(dense_column[rr]);
           new_row_indices.push_back(rr);
-          ++index;
         }
-      } // rr
-      new_column_pointers[cc + 1] = index;
+      } // ii
+      new_column_pointers[cc + 1] = new_row_indices.size();
     } // cc
+
     *entries_ = new_entries;
     *column_pointers_ = new_column_pointers;
     *row_indices_ = new_row_indices;
