@@ -25,6 +25,10 @@
 #include <dune/grid/common/gridview.hh>
 #include <dune/grid/common/rangegenerators.hh>
 
+#if HAVE_DUNE_FEM
+#include <dune/fem/gridpart/common/gridview2gridpart.hh>
+#endif
+
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
@@ -35,15 +39,19 @@
 namespace Dune {
 namespace XT {
 namespace Grid {
-
 namespace internal {
+
+
+// forward, required in PeriodicGridLayerWrapperTraits
+template <class RealGridLayerImp, bool codim_iters_provided>
+class PeriodicGridLayerWrapper;
 
 
 template <bool codim_iters_provided,
           int codim,
           class DomainType,
           size_t dimDomain,
-          class RealGridViewType,
+          class RealGridLayerType,
           class IndexType,
           class Codim0EntityType>
 struct IndexMapCreatorBase
@@ -55,7 +63,7 @@ struct IndexMapCreatorBase
       const DomainType& lower_left,
       const DomainType& upper_right,
       const std::bitset<dimDomain>& periodic_directions,
-      const RealGridViewType& real_grid_view,
+      const RealGridLayerType& real_grid_layer,
       std::array<IndexType, dimDomain + 1>& entity_counts,
       std::array<IndexType, num_geometries>& type_counts,
       std::array<std::unordered_set<IndexType>, num_geometries>& entities_to_skip,
@@ -65,8 +73,8 @@ struct IndexMapCreatorBase
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , periodic_directions_(periodic_directions)
-    , real_grid_view_(real_grid_view)
-    , real_index_set_(real_grid_view_.indexSet())
+    , real_grid_layer_(real_grid_layer)
+    , real_index_set_(real_grid_layer_.indexSet())
     , entity_counts_(entity_counts)
     , type_counts_(type_counts)
     , entities_to_skip_(entities_to_skip)
@@ -120,8 +128,8 @@ struct IndexMapCreatorBase
   {
     if (entity.hasBoundaryIntersections()) {
       IntersectionMapType intersection_neighbor_map(entity.subEntities(1));
-      const auto i_it_end = real_grid_view_.iend(entity);
-      for (auto i_it = real_grid_view_.ibegin(entity); i_it != i_it_end; ++i_it) {
+      const auto i_it_end = real_grid_layer_.iend(entity);
+      for (auto i_it = real_grid_layer_.ibegin(entity); i_it != i_it_end; ++i_it) {
         const auto& intersection = *i_it;
         const int index_in_inside = intersection.indexInInside();
         if (intersection.boundary()) {
@@ -165,9 +173,9 @@ struct IndexMapCreatorBase
 
     // find periodic entities
     typename std::conditional<codim_iters_provided,
-                              EntityInlevelSearch<RealGridViewType, codim>,
-                              FallbackEntityInlevelSearch<RealGridViewType, codim>>::type
-        entity_search_codim(real_grid_view_);
+                              EntityInlevelSearch<RealGridLayerType, codim>,
+                              FallbackEntityInlevelSearch<RealGridLayerType, codim>>::type
+        entity_search_codim(real_grid_layer_);
     const auto periodic_entity_ptrs = entity_search_codim(periodic_coords_);
     // assign index of periodic equivalent entity to entities that are replaced
     for (size_t vector_index = 0; vector_index < periodic_entity_ptrs.size(); ++vector_index) {
@@ -203,8 +211,8 @@ struct IndexMapCreatorBase
   const DomainType& lower_left_;
   const DomainType& upper_right_;
   const std::bitset<dimDomain>& periodic_directions_;
-  const RealGridViewType& real_grid_view_;
-  const typename RealGridViewType::IndexSet& real_index_set_;
+  const RealGridLayerType& real_grid_layer_;
+  const extract_index_set_t<RealGridLayerType>& real_index_set_;
   std::array<IndexType, dimDomain + 1>& entity_counts_;
   std::array<IndexType, num_geometries>& type_counts_;
   std::array<std::unordered_set<IndexType>, num_geometries>& entities_to_skip_;
@@ -218,21 +226,22 @@ struct IndexMapCreatorBase
   std::array<std::unordered_map<IndexType, IntersectionMapType>, num_geometries>& entity_to_intersection_map_map_;
 };
 
+
 template <bool codim_iters_provided,
           int codim,
           class DomainType,
           size_t dimDomain,
-          class RealGridViewType,
+          class RealGridLayerType,
           class IndexType,
           class EntityType>
 struct IndexMapCreator
-    : IndexMapCreatorBase<codim_iters_provided, codim, DomainType, dimDomain, RealGridViewType, IndexType, EntityType>
+    : IndexMapCreatorBase<codim_iters_provided, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
 {
   typedef IndexMapCreatorBase<codim_iters_provided,
                               codim,
                               DomainType,
                               dimDomain,
-                              RealGridViewType,
+                              RealGridLayerType,
                               IndexType,
                               EntityType>
       BaseType;
@@ -245,10 +254,10 @@ struct IndexMapCreator
 
   void create_index_map()
   {
-    for (const auto& codim0_entity : elements(real_grid_view_)) {
+    for (const auto& codim0_entity : elements(real_grid_layer_)) {
       for (IndexType local_index = 0; local_index < codim0_entity.subEntities(codim); ++local_index) {
         const auto& entity = codim0_entity.template subEntity<codim>(local_index);
-        const auto old_index = real_grid_view_.indexSet().index(entity);
+        const auto old_index = real_grid_layer_.indexSet().index(entity);
         const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
         if (!visited_entities_[type_index].count(old_index)) {
           this->loop_body(entity, type_index, old_index);
@@ -259,15 +268,16 @@ struct IndexMapCreator
     this->after_loop();
   } // ... create_index_map(...)
 
-  using BaseType::real_grid_view_;
+  using BaseType::real_grid_layer_;
   std::array<std::unordered_set<IndexType>, GlobalGeometryTypeIndex::size(dimDomain)> visited_entities_;
 }; // struct IndexMapCreator< ... >
 
-template <int codim, class DomainType, size_t dimDomain, class RealGridViewType, class IndexType, class EntityType>
-struct IndexMapCreator<true, codim, DomainType, dimDomain, RealGridViewType, IndexType, EntityType>
-    : IndexMapCreatorBase<true, codim, DomainType, dimDomain, RealGridViewType, IndexType, EntityType>
+
+template <int codim, class DomainType, size_t dimDomain, class RealGridLayerType, class IndexType, class EntityType>
+struct IndexMapCreator<true, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
+    : IndexMapCreatorBase<true, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
 {
-  typedef IndexMapCreatorBase<true, codim, DomainType, dimDomain, RealGridViewType, IndexType, EntityType> BaseType;
+  typedef IndexMapCreatorBase<true, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType> BaseType;
 
   template <class... Args>
   IndexMapCreator(Args&&... args)
@@ -277,24 +287,21 @@ struct IndexMapCreator<true, codim, DomainType, dimDomain, RealGridViewType, Ind
 
   void create_index_map()
   {
-    for (const auto& entity : entities(real_grid_view_, Dune::Codim<codim>())) {
-      const auto old_index = real_grid_view_.indexSet().index(entity);
+    for (const auto& entity : entities(real_grid_layer_, Dune::Codim<codim>())) {
+      const auto old_index = real_grid_layer_.indexSet().index(entity);
       const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
       this->loop_body(entity, type_index, old_index);
     }
     this->after_loop();
   } // ... create_index_map(...)
 
-  using BaseType::real_grid_view_;
+  using BaseType::real_grid_layer_;
 }; // struct IndexMapCreator< ... >
 
-// forward
-template <class RealGridViewImp, bool codim_iters_provided>
-class PeriodicGridViewTraits;
 
-/** \brief IndexSet for PeriodicGridView
+/** \brief IndexSet for PeriodicGridLayerWrapper
  *
- * PeriodicIndexSet is derived from the IndexSet of the underlying GridView. Other than the IndexSet,
+ * PeriodicIndexSet is derived from the IndexSet of the underlying grid layer. Other than the IndexSet,
  * PeriodicIndexSet returns the same index for entities that are periodically equivalent, i.e. entities on periodic
  * boundaries that are regarded as the same entity in the periodic setting. Consequently, the PeriodicIndexSet is
  * usually smaller than the IndexSet and the size(...) methods return lower values than the corresponding methods of
@@ -302,25 +309,25 @@ class PeriodicGridViewTraits;
  *
  * \see PeriodicGridView
  */
-template <class RealGridViewImp>
-class PeriodicIndexSet : public Dune::IndexSet<typename RealGridViewImp::Grid,
-                                               PeriodicIndexSet<RealGridViewImp>,
-                                               typename RealGridViewImp::IndexSet::IndexType,
-                                               typename RealGridViewImp::IndexSet::Types>
+template <class RealGridLayerImp>
+class PeriodicIndexSet : public Dune::IndexSet<extract_grid_t<RealGridLayerImp>,
+                                               PeriodicIndexSet<RealGridLayerImp>,
+                                               typename extract_index_set_t<RealGridLayerImp>::IndexType,
+                                               typename extract_index_set_t<RealGridLayerImp>::Types>
 {
-  typedef RealGridViewImp RealGridViewType;
-  typedef PeriodicIndexSet<RealGridViewType> ThisType;
-  typedef typename RealGridViewType::IndexSet RealIndexSetType;
-  typedef typename Dune::IndexSet<typename RealGridViewType::Grid,
-                                  ThisType,
-                                  typename RealGridViewType::IndexSet::IndexType,
-                                  typename RealGridViewType::IndexSet::Types>
+  typedef RealGridLayerImp RealGridLayerType;
+  typedef PeriodicIndexSet<RealGridLayerType> ThisType;
+  using RealIndexSetType = extract_index_set_t<RealGridLayerImp>;
+  typedef typename Dune::IndexSet<extract_grid_t<RealGridLayerImp>,
+                                  PeriodicIndexSet<RealGridLayerImp>,
+                                  typename extract_index_set_t<RealGridLayerImp>::IndexType,
+                                  typename extract_index_set_t<RealGridLayerImp>::Types>
       BaseType;
 
 public:
   typedef typename RealIndexSetType::IndexType IndexType;
   typedef typename RealIndexSetType::Types Types;
-  static const int dimDomain = RealGridViewType::dimension;
+  static const int dimDomain = RealGridLayerType::dimension;
   static const size_t num_geometries = GlobalGeometryTypeIndex::size(dimDomain);
 
   PeriodicIndexSet(const RealIndexSetType& real_index_set,
@@ -336,8 +343,8 @@ public:
     assert(entity_counts_.size() >= dimDomain + 1);
   }
 
-  template <int cd>
-  IndexType index(const typename RealGridViewType::Traits::template Codim<cd>::Entity& entity) const
+  template <int cd, class CodimCdEntityType>
+  IndexType index(const CodimCdEntityType& entity) const
   {
     IndexType real_entity_index = real_index_set_.template index<cd>(entity);
     if (cd == 0)
@@ -354,9 +361,8 @@ public:
     return index<EntityType::codimension>(entity);
   }
 
-  template <int cd>
-  IndexType
-  subIndex(const typename RealGridViewType::Traits::template Codim<cd>::Entity& entity, int i, unsigned int codim) const
+  template <int cd, class CodimCdEntityType>
+  IndexType subIndex(const CodimCdEntityType& entity, int i, unsigned int codim) const
   {
     IndexType real_sub_index = real_index_set_.template subIndex<cd>(entity, i, codim);
     if (codim == 0)
@@ -404,36 +410,37 @@ private:
   const std::array<std::vector<IndexType>, num_geometries>& new_indices_;
 }; // class PeriodicIndexSet<...>
 
-/** \brief Intersection implementation for PeriodicGridView
+
+/** \brief Intersection implementation for PeriodicGridLayerWrapper
  *
- * PeriodicIntersectionImp is derived from the Intersection of the underlying GridView. On the inside of the grid or if
- * periodic_ is false, the PeriodicIntersection will behave exactly like its BaseType. If periodic_ is true, the
+ * PeriodicIntersectionImp is derived from the Intersection of the underlying grid layer. On the inside of the grid or
+ * if periodic_ is false, the PeriodicIntersection will behave exactly like its BaseType. If periodic_ is true, the
  * PeriodicIntersection will return neighbor == true even if it actually is on the boundary. In this case, outside(),
  * geometryInOutside() and indexInOutside() are well-defined and give the information from the periodically adjacent
  * entity.
  *
  * \see PeriodicGridView
  */
-template <class RealGridViewImp>
-class PeriodicIntersectionImp : public RealGridViewImp::Intersection
+template <class RealGridLayerImp>
+class PeriodicIntersectionImp : public extract_intersection_t<RealGridLayerImp>
 {
-  typedef RealGridViewImp RealGridViewType;
-  typedef typename RealGridViewType::Intersection BaseType;
+  typedef RealGridLayerImp RealGridLayerType;
+  using BaseType = extract_intersection_t<RealGridLayerType>;
 
 public:
   using typename BaseType::LocalGeometry;
   typedef typename BaseType::Entity EntityType;
-  typedef typename RealGridViewType::IntersectionIterator RealIntersectionIteratorType;
-  static const size_t dimDomain = RealGridViewType::dimension;
+  using RealIntersectionIteratorType = extract_intersection_iterator_t<RealGridLayerType>;
+  static const size_t dimDomain = RealGridLayerType::dimension;
 
   //! \brief Constructor from real intersection
   PeriodicIntersectionImp(const BaseType& real_intersection,
-                          const RealGridViewType& real_grid_view,
+                          const RealGridLayerType& real_grid_layer,
                           const std::pair<bool, EntityType>& periodic_pair)
     : BaseType(real_intersection)
     , periodic_(periodic_pair.first)
     , outside_(periodic_pair.second)
-    , real_grid_view_(&real_grid_view)
+    , real_grid_layer_(&real_grid_layer)
   {
   }
 
@@ -483,8 +490,8 @@ private:
   BaseType find_intersection_in_outside() const
   {
     const auto coords = this->geometry().center();
-    RealIntersectionIteratorType outside_i_it = real_grid_view_->ibegin(outside_);
-    const RealIntersectionIteratorType outside_i_it_end = real_grid_view_->iend(outside_);
+    RealIntersectionIteratorType outside_i_it = real_grid_layer_->ibegin(outside_);
+    const RealIntersectionIteratorType outside_i_it_end = real_grid_layer_->iend(outside_);
     // walk over outside intersections and find an intersection on the boundary that differs only in one coordinate
     for (; outside_i_it != outside_i_it_end; ++outside_i_it) {
       const BaseType& curr_outside_intersection = *outside_i_it;
@@ -502,47 +509,47 @@ private:
       }
     }
     DUNE_THROW(Dune::InvalidStateException, "Could not find outside intersection!");
-    return *(real_grid_view_->ibegin(outside_));
+    return *(real_grid_layer_->ibegin(outside_));
   } // ... find_intersection_in_outside() const
 
 protected:
   bool periodic_;
   EntityType outside_;
-  const RealGridViewType* real_grid_view_;
+  const RealGridLayerType* real_grid_layer_;
 }; // ... class PeriodicIntersectionImp ...
 
 
-/** \brief IntersectionIterator for PeriodicGridView
+/** \brief IntersectionIterator for PeriodicGridLayerWrapper
  *
- * PeriodicIntersectionIterator is derived from the IntersectionIterator of the underlying GridView and behaves exactly
- * like the underlying IntersectionIterator except that it returns a PeriodicIntersection in its operator* and
+ * PeriodicIntersectionIterator is derived from the IntersectionIterator of the underlying grid layer and behaves
+ * exactly like the underlying IntersectionIterator except that it returns a PeriodicIntersection in its operator* and
  * operator-> methods.
  *
  * \see PeriodicGridView
  */
-template <class RealGridViewImp>
-class PeriodicIntersectionIterator : public RealGridViewImp::IntersectionIterator
+template <class RealGridLayerImp>
+class PeriodicIntersectionIterator : public extract_intersection_iterator_t<RealGridLayerImp>
 {
-  typedef RealGridViewImp RealGridViewType;
-  typedef typename RealGridViewType::IntersectionIterator BaseType;
-  typedef PeriodicIntersectionIterator<RealGridViewImp> ThisType;
-  typedef PeriodicIntersectionImp<RealGridViewType> IntersectionImp;
+  typedef RealGridLayerImp RealGridLayerType;
+  using BaseType = extract_intersection_iterator_t<RealGridLayerImp>;
+  typedef PeriodicIntersectionIterator<RealGridLayerImp> ThisType;
+  typedef PeriodicIntersectionImp<RealGridLayerType> IntersectionImp;
 
 public:
   typedef typename BaseType::Intersection RealIntersectionType;
   typedef int IntersectionIndexType;
-  typedef Dune::Intersection<typename RealGridViewImp::Grid, IntersectionImp> Intersection;
-  using EntityType = extract_entity_t<RealGridViewType>;
+  typedef Dune::Intersection<extract_grid_t<RealGridLayerImp>, IntersectionImp> Intersection;
+  using EntityType = extract_entity_t<RealGridLayerType>;
   typedef std::pair<bool, EntityType> PeriodicPairType;
-  static const size_t dimDomain = RealGridViewType::dimension;
+  static const size_t dimDomain = RealGridLayerType::dimension;
 
   PeriodicIntersectionIterator(BaseType real_intersection_iterator,
-                               const RealGridViewType& real_grid_view,
+                               const RealGridLayerType& real_grid_layer,
                                const EntityType& entity,
                                const std::vector<PeriodicPairType>& intersection_map,
                                const PeriodicPairType& nonperiodic_pair)
     : BaseType(real_intersection_iterator)
-    , real_grid_view_(real_grid_view)
+    , real_grid_layer_(real_grid_layer)
     , entity_(entity)
     , has_boundary_intersections_(entity_.hasBoundaryIntersections())
     , intersection_map_(intersection_map)
@@ -553,7 +560,7 @@ public:
 
   PeriodicIntersectionIterator(const ThisType& other)
     : BaseType(BaseType(other))
-    , real_grid_view_(other.real_grid_view_)
+    , real_grid_layer_(other.real_grid_layer_)
     , entity_(other.entity_)
     , has_boundary_intersections_(other.has_boundary_intersections_)
     , intersection_map_(other.intersection_map_)
@@ -582,25 +589,25 @@ private:
            || intersection_map_.size() > static_cast<size_t>((BaseType::operator*()).indexInInside()));
     return Common::make_unique<Intersection>(
         IntersectionImp(BaseType::operator*(),
-                        real_grid_view_,
+                        real_grid_layer_,
                         has_boundary_intersections_ ? intersection_map_[(BaseType::operator*()).indexInInside()]
                                                     : (const PeriodicPairType&)nonperiodic_pair_));
   } // ... create_current_intersection() const
 
   std::unique_ptr<Intersection> create_current_intersection_safely() const
   {
-    const bool is_iend = (*this == real_grid_view_.iend(entity_));
-    const RealIntersectionType real_intersection = is_iend ? *real_grid_view_.ibegin(entity_) : BaseType::operator*();
+    const bool is_iend = (*this == real_grid_layer_.iend(entity_));
+    const RealIntersectionType real_intersection = is_iend ? *real_grid_layer_.ibegin(entity_) : BaseType::operator*();
     assert(is_iend || !has_boundary_intersections_
            || intersection_map_.size() > static_cast<size_t>(real_intersection.indexInInside()));
     return Common::make_unique<Intersection>(IntersectionImp(real_intersection,
-                                                             real_grid_view_,
+                                                             real_grid_layer_,
                                                              has_boundary_intersections_ && !is_iend
                                                                  ? intersection_map_[real_intersection.indexInInside()]
                                                                  : (const PeriodicPairType&)nonperiodic_pair_));
   } // ... create_current_intersection_safely() const
 
-  const RealGridViewType& real_grid_view_;
+  const RealGridLayerType& real_grid_layer_;
   const EntityType& entity_;
   const bool has_boundary_intersections_;
   const std::vector<PeriodicPairType>& intersection_map_;
@@ -608,39 +615,41 @@ private:
   mutable std::unique_ptr<Intersection> current_intersection_;
 }; // ... class PeriodicIntersectionIterator ...
 
-// forward
-template <class RealGridViewImp, bool codim_iters_provided>
-class PeriodicGridViewImp;
 
-//! Traits for PeriodicGridView
-template <class RealGridViewImp, bool codim_iters_provided>
-class PeriodicGridViewTraits : public RealGridViewImp::Traits
+//! Traits for PeriodicGridLayerWrapper
+template <class RealGridLayerImp, bool codim_iters_provided>
+class PeriodicGridLayerWrapperTraits : public RealGridLayerImp::Traits
 {
 public:
-  typedef RealGridViewImp RealGridViewType;
-  // use types from RealGridViewType...
-  typedef PeriodicGridViewImp<RealGridViewType, codim_iters_provided> GridViewImp;
-  typedef typename RealGridViewType::Grid Grid;
-  typedef PeriodicIndexSet<RealGridViewType> IndexSet;
-  typedef typename RealGridViewType::CollectiveCommunication CollectiveCommunication;
-  typedef typename RealGridViewType::Traits RealGridViewTraits;
-  static const size_t num_geometries = GlobalGeometryTypeIndex::size(RealGridViewImp::dimension);
+  typedef RealGridLayerImp RealGridLayerType;
+  // use types from RealGridLayerType...
+  typedef PeriodicGridLayerWrapper<RealGridLayerType, codim_iters_provided> GridViewImp;
+  using Grid = extract_grid_t<RealGridLayerType>;
+  typedef PeriodicIndexSet<RealGridLayerType> IndexSet;
+  using CollectiveCommunication = extract_collective_communication_t<RealGridLayerType>;
+  typedef typename RealGridLayerType::Traits RealGridLayerTraits;
+  static const size_t num_geometries = GlobalGeometryTypeIndex::size(RealGridLayerImp::dimension);
 
   template <int cd>
-  struct Codim : public RealGridViewTraits::template Codim<cd>
+  struct Codim : public RealGridLayerTraits::template Codim<cd>
   {
-    /* PeriodicIterator is the same as the Iterator of the RealGridViewType, except that it visits only one entity of
+    // We need to define these in case RealGridLayerImp is a grid part.
+    using Entity = extract_entity_t<RealGridLayerImp, cd>;
+    using Geometry = extract_geometry_t<RealGridLayerImp, cd>;
+    using LocalGeometry = extract_local_geometry_t<RealGridLayerImp, cd>;
+
+    /* PeriodicIterator is the same as the Iterator of the RealGridLayerType, except that it visits only one entity of
      * several periodically equivalent entities */
-    class PeriodicIterator : public RealGridViewTraits::template Codim<cd>::Iterator
+    class PeriodicIterator : public extract_iterator_t<RealGridLayerType, cd>
     {
-      typedef typename RealGridViewTraits::template Codim<cd>::Iterator BaseType;
+      using BaseType = extract_iterator_t<RealGridLayerType, cd>;
       typedef PeriodicIterator ThisType;
-      typedef typename RealGridViewType::IndexSet RealIndexSetType;
+      using RealIndexSetType = extract_index_set_t<RealGridLayerType>;
 
     public:
       typedef typename IndexSet::IndexType IndexType;
       typedef std::ptrdiff_t difference_type;
-      using value_type = const extract_entity_t<RealGridViewImp>;
+      using value_type = const extract_entity_t<RealGridLayerImp>;
       typedef value_type* pointer;
       typedef value_type& reference;
       typedef std::forward_iterator_tag iterator_category;
@@ -660,7 +669,7 @@ public:
       {
         BaseType::operator++();
         while (cd > 0 && *this != *real_it_end_
-               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->type())].count(
+               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index(this->type())].count(
                       real_index_set_->index(this->operator*())))
           BaseType::operator++();
         return *this;
@@ -680,20 +689,20 @@ public:
     typedef PeriodicIterator Iterator;
 
     template <PartitionIteratorType pit>
-    struct Partition : public RealGridViewTraits::template Codim<cd>::template Partition<pit>
+    struct Partition : public RealGridLayerTraits::template Codim<cd>::template Partition<pit>
     {
-      /* PeriodicIterator is the same as the Iterator of the RealGridViewType, except that it visits only one entity of
+      /* PeriodicIterator is the same as the Iterator of the RealGridLayerType, except that it visits only one entity of
        * several periodically equivalent entities */
-      class PeriodicIterator : public RealGridViewTraits::template Codim<cd>::template Partition<pit>::Iterator
+      class PeriodicIterator : public extract_partition_iterator_t<RealGridLayerType, pit, cd>
       {
-        typedef typename RealGridViewTraits::template Codim<cd>::template Partition<pit>::Iterator BaseType;
+        using BaseType = extract_partition_iterator_t<RealGridLayerType, pit, cd>;
         typedef PeriodicIterator ThisType;
-        typedef typename RealGridViewType::IndexSet RealIndexSetType;
+        using RealIndexSetType = extract_index_set_t<RealGridLayerType>;
 
       public:
         typedef typename IndexSet::IndexType IndexType;
         typedef std::ptrdiff_t difference_type;
-        using value_type = const extract_entity_t<RealGridViewImp>;
+        using value_type = const extract_entity_t<RealGridLayerImp>;
         typedef value_type* pointer;
         typedef value_type& reference;
         typedef std::forward_iterator_tag iterator_category;
@@ -714,7 +723,7 @@ public:
         {
           BaseType::operator++();
           while (cd > 0 && *this != *real_it_end_
-                 && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->type())].count(
+                 && (*entities_to_skip_)[GlobalGeometryTypeIndex::index(this->type())].count(
                         real_index_set_->index(this->operator*())))
             BaseType::operator++();
           return *this;
@@ -736,7 +745,7 @@ public:
 
   enum
   {
-    conforming = RealGridViewTraits::conforming
+    conforming = RealGridLayerTraits::conforming
   };
   enum
   {
@@ -750,22 +759,24 @@ public:
   typedef typename Grid::ctype ctype;
 
   // ...except for the Intersection and IntersectionIterator
-  typedef Dune::Intersection<typename RealGridViewType::Grid, PeriodicIntersectionImp<RealGridViewType>> Intersection;
-  typedef PeriodicIntersectionIterator<RealGridViewType> IntersectionIterator;
-}; // ... class PeriodicGridViewTraits ...
+  typedef Dune::Intersection<extract_grid_t<RealGridLayerType>, PeriodicIntersectionImp<RealGridLayerType>>
+      Intersection;
+  typedef PeriodicIntersectionIterator<RealGridLayerType> IntersectionIterator;
+}; // ... class PeriodicGridLayerWrapperTraits ...
 
-/** \brief Actual Implementation of PeriodicGridView
+
+/** \brief Actual Implementation of PeriodicGridView, PeriodicGridPart, PeriodicGridLayer
  *  \see PeriodicGridView
 */
-template <class RealGridViewImp, bool codim_iters_provided>
-class PeriodicGridViewImp : public RealGridViewImp
+template <class RealGridLayerImp, bool codim_iters_provided>
+class PeriodicGridLayerWrapper : public RealGridLayerImp
 {
-  typedef RealGridViewImp BaseType;
-  typedef PeriodicGridViewImp<BaseType, codim_iters_provided> ThisType;
-  typedef PeriodicGridViewTraits<BaseType, codim_iters_provided> Traits;
+  typedef RealGridLayerImp BaseType;
+  typedef PeriodicGridLayerWrapper<BaseType, codim_iters_provided> ThisType;
+  typedef PeriodicGridLayerWrapperTraits<BaseType, codim_iters_provided> Traits;
 
 public:
-  typedef typename BaseType::Grid Grid;
+  using Grid = extract_grid_t<BaseType>;
   typedef PeriodicIndexSet<BaseType> IndexSet;
   using EntityType = extract_entity_t<BaseType>;
   typedef PeriodicIntersectionIterator<BaseType> IntersectionIterator;
@@ -809,8 +820,8 @@ private:
   };
 
 public:
-  PeriodicGridViewImp(const BaseType& real_grid_view, const std::bitset<dimDomain> periodic_directions)
-    : BaseType(real_grid_view)
+  PeriodicGridLayerWrapper(const BaseType& real_grid_layer, const std::bitset<dimDomain> periodic_directions)
+    : BaseType(real_grid_layer)
     , entity_to_intersection_map_map_(
           std::make_shared<std::array<std::unordered_map<IndexType, IntersectionMapType>, num_geometries>>())
     , periodic_directions_(periodic_directions)
@@ -821,7 +832,17 @@ public:
     , real_index_set_(BaseType::indexSet())
   {
     this->update();
-  } // constructor PeriodicGridViewImp(...)
+  } // constructor PeriodicGridLayerWrapper(...)
+
+  const BaseType& as_real_grid_layer() const
+  {
+    return static_cast<const BaseType&>(*this);
+  }
+
+  BaseType& as_real_grid_layer()
+  {
+    return static_cast<BaseType&>(*this);
+  }
 
   void update()
   {
@@ -956,46 +977,49 @@ private:
   std::shared_ptr<std::array<IndexType, num_geometries>> type_counts_;
   std::shared_ptr<std::array<std::unordered_set<IndexType>, num_geometries>> entities_to_skip_;
   std::shared_ptr<std::array<std::vector<IndexType>, num_geometries>> new_indices_;
-  const typename BaseType::IndexSet& real_index_set_;
+  const extract_index_set_t<BaseType>& real_index_set_;
   static std::pair<bool, EntityType> nonperiodic_pair_;
-}; // ... class PeriodicGridViewImp ...
+}; // ... class PeriodicGridLayerWrapper ...
 
-template <class RealGridViewImp, bool codim_iters_provided>
-const typename PeriodicGridViewImp<RealGridViewImp, codim_iters_provided>::IntersectionMapType
-    PeriodicGridViewImp<RealGridViewImp, codim_iters_provided>::empty_intersection_map_;
+template <class RealGridLayerImp, bool codim_iters_provided>
+const typename PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>::IntersectionMapType
+    PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>::empty_intersection_map_;
 
-template <class RealGridViewImp, bool codim_iters_provided>
-std::pair<bool, typename PeriodicGridViewImp<RealGridViewImp, codim_iters_provided>::EntityType>
-    PeriodicGridViewImp<RealGridViewImp, codim_iters_provided>::nonperiodic_pair_;
+template <class RealGridLayerImp, bool codim_iters_provided>
+std::pair<bool, typename PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>::EntityType>
+    PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>::nonperiodic_pair_;
+
 
 } // namespace internal
 
-/** \brief GridView that takes an arbitrary Dune::GridView and adds periodic boundaries
+
+/** \brief GridView that takes an arbitrary Dune::GridView or Dune::Fem::GridPartInterface and adds periodic boundaries
  *
- * PeriodicGridView is templated by and derived from an arbitrary Dune::GridView. All methods are forwarded to the
- * underlying GridView except for begin, end, ibegin, iend, size and indexSet.
+ * PeriodicGridView is templated by and derived from an arbitrary Dune::GridView or Dune::Fem::GridPartInterface. All
+ * methods are forwarded to the underlying grid layer except for begin, end, ibegin, iend, size and indexSet.
  * The ibegin and iend methods return a PeriodicIntersectionIterator which behaves like the underlying
  * IntersectionIterator except that it returns a PeriodicIntersection in its operator*. The PeriodicIntersection behaves
- * like an Intersection of the underlying GridView, but may return neighbor() == true and an outside() entity even if it
- * is on the boundary. The outside() entity is the entity adjacent to the periodically equivalent intersection, i.e. the
- * intersection at the same position on the opposite side of the grid.
+ * like an Intersection of the underlying grid layer, but may return neighbor() == true and an outside() entity even if
+ * it is on the boundary. The outside() entity is the entity adjacent to the periodically equivalent intersection, i.e.
+ * the intersection at the same position on the opposite side of the grid.
  * The begin and end methods return a PeriodicIterator, which behaves exactly like the corresponding Iterator of the
- * underlying GridView except that visits only one entity of several periodically equivalent entities.
+ * underlying grid layer except that visits only one entity of several periodically equivalent entities.
  * The indexSet() method returns a PeriodicIndexSet which returns the same index for entities that are periodically
  * equivalent. Consequently, the PeriodicIndexSet is usually smaller than the IndexSet. The size(...) methods return
  * the corresponding sizes of the PeriodicIndexSet
- * In the constructor, PeriodicGridViewImp will build a map mapping intersections on a periodic boundary to the
+ * In the constructor, PeriodicGridLayerWrapper will build a map mapping intersections on a periodic boundary to the
  * corresponding outside entity. Further, periodically equivalent entities will be identified and given the same index.
  * Thus, the construction may take quite some time as several grid walks have to be done.
  * By default, new indices will be assigned for all entities. This may take a lot of memory for fine grids. If
  * use_less_memory is set to true, as few entities as possible will get new indices, which saves memory but may
  * degrade performance.
  * By default, all coordinate directions will be made periodic. By supplying a std::bitset< dimension > you can decide
- * for each direction whether it should be periodic (1 means periodic, 0 means 'behave like underlying GridView in that
+ * for each direction whether it should be periodic (1 means periodic, 0 means 'behave like underlying grid layer in
+ that
  * direction').
 
    \note
-      -  PeriodicGridView will only work with GridViews on axis-parallel hyperrectangle grids
+      -  PeriodicGridView will only work with grid layers on axis-parallel hyperrectangle grids
       -  Only cube and regular simplex grids have been tested so far. Other grids may not work properly. This is due to
       the heuristics for finding the periodic neighbor entity: Given an intersection on the boundary that shall be
       periodic, the coordinates intersection.geometry().center() are moved to the opposite side of the grid and then
@@ -1006,63 +1030,224 @@ std::pair<bool, typename PeriodicGridViewImp<RealGridViewImp, codim_iters_provid
       - Currently the indices are zero-starting and consecutive per codimension. By the DUNE
       documentation, it should rather be zero-starting and consecutive per codimension AND GeometryType.
  */
-template <class RealGridViewImp, bool codim_iters_provided = false>
+template <class RealGridLayerImp, bool codim_iters_provided = false>
 class PeriodicGridView
-    : XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, codim_iters_provided>>,
-      public Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewImp, codim_iters_provided>>
+    : XT::Common::ConstStorageProvider<internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>>,
+      public Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>
 {
-  static_assert(is_layer<RealGridViewImp>::value, "");
-  typedef RealGridViewImp RealGridViewType;
-  typedef typename Dune::GridView<internal::PeriodicGridViewTraits<RealGridViewType, codim_iters_provided>> BaseType;
-  typedef
-      typename XT::Common::ConstStorageProvider<internal::PeriodicGridViewImp<RealGridViewImp, codim_iters_provided>>
-          ConstStorProv;
-  typedef typename RealGridViewType::template Codim<0>::Geometry::GlobalCoordinate DomainType;
+  static_assert(is_layer<RealGridLayerImp>::value, "");
+  using Implementation = internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>;
+  using ImplementationStorage = typename XT::Common::ConstStorageProvider<Implementation>;
+  using BaseType = Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>;
 
 public:
-  static const size_t dimension = RealGridViewType::dimension;
+  using BaseType::dimension;
+  using RealGridLayerType = RealGridLayerImp;
 
-  PeriodicGridView(const RealGridViewType& real_grid_view,
+  PeriodicGridView(const RealGridLayerType& real_grid_layer,
                    const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
-    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType, codim_iters_provided>(real_grid_view,
-                                                                                              periodic_directions))
-    , BaseType(ConstStorProv::access())
+    : ImplementationStorage(new Implementation(real_grid_layer, periodic_directions))
+    , BaseType(ImplementationStorage::access())
   {
   }
 
   PeriodicGridView(const PeriodicGridView& other)
-    : ConstStorProv(new internal::PeriodicGridViewImp<RealGridViewType, codim_iters_provided>(other.access()))
-    , BaseType(ConstStorProv::access())
+    : ImplementationStorage(new Implementation(other.access()))
+    , BaseType(ImplementationStorage::access())
+  {
+  }
+
+  const RealGridLayerType& as_real_grid_layer() const
+  {
+    ImplementationStorage::access().as_real_grid_layer();
+  }
+
+  RealGridLayerType& as_real_grid_layer()
+  {
+    ImplementationStorage::access().as_real_grid_layer();
+  }
+
+  void update()
+  {
+    ImplementationStorage::access().update();
+  }
+}; // class PeriodicGridView
+
+
+template <bool use_less_memory, class GL>
+PeriodicGridView<GL, use_less_memory>
+make_periodic_grid_view(const GL& real_grid_layer,
+                        const std::bitset<GL::dimension> periodic_directions = std::bitset<GL::dimension>().set())
+{
+  return PeriodicGridView<GL, use_less_memory>(real_grid_layer, periodic_directions);
+}
+
+template <class GL>
+PeriodicGridView<GL>
+make_periodic_grid_view(const GL& real_grid_layer,
+                        const std::bitset<GL::dimension> periodic_directions = std::bitset<GL::dimension>().set())
+{
+  return PeriodicGridView<GL>(real_grid_layer, periodic_directions);
+}
+
+
+#if HAVE_DUNE_FEM
+
+
+/**
+ * \brief A grid part that takes an arbitrary Dune::Fem::GridPartInterface and adds periodic boundaries.
+ * \see PeriodicGridView
+ */
+template <class RealGridPartImp, bool codim_iters_provided = false>
+class PeriodicGridPart : XT::Common::ConstStorageProvider<PeriodicGridView<RealGridPartImp, codim_iters_provided>>,
+                         public Dune::Fem::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>,
+                                                             PeriodicGridPart<RealGridPartImp, codim_iters_provided>>
+{
+  static_assert(is_part<RealGridPartImp>::value || is_dd_subdomain<RealGridPartImp>::value, "");
+  using Implementation = PeriodicGridView<RealGridPartImp, codim_iters_provided>;
+  using ImplementationStorage = typename XT::Common::ConstStorageProvider<Implementation>;
+  using BaseType = Dune::Fem::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>,
+                                                PeriodicGridPart<RealGridPartImp, codim_iters_provided>>;
+
+public:
+  using BaseType::dimension;
+  using RealGridLayerType = RealGridPartImp;
+
+  PeriodicGridPart(const RealGridLayerType& real_grid_part,
+                   const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
+    : ImplementationStorage(new Implementation(real_grid_part, periodic_directions))
+    , BaseType(ImplementationStorage::access())
+  {
+  }
+
+  PeriodicGridPart(const PeriodicGridPart& other)
+    : ImplementationStorage(new Implementation(other.access()))
+    , BaseType(ImplementationStorage::access())
   {
   }
 
   void update()
   {
-    BaseType::impl().update();
+    ImplementationStorage::access().update();
   }
 
-}; // class PeriodicGridView
+  const RealGridLayerType& as_real_grid_layer() const
+  {
+    ImplementationStorage::access().as_real_grid_layer();
+  }
+
+  RealGridLayerType& as_real_grid_layer()
+  {
+    ImplementationStorage::access().as_real_grid_layer();
+  }
+}; // class PeriodicGridPart
 
 
-template <bool use_less_memory, class GV>
-PeriodicGridView<GV, use_less_memory>
-make_periodic_grid_view(const GV& real_grid_view,
-                        const std::bitset<GV::dimension> periodic_directions = std::bitset<GV::dimension>().set())
+#else // HAVE_DUNE_FEM
+
+
+template <class RealGridPartImp, bool codim_iters_provided = false>
+class PeriodicGridPart
 {
-  return PeriodicGridView<GV, use_less_memory>(real_grid_view, periodic_directions);
+  static_assert(AlwaysFalse<>::value, "You are missing dune-fem!");
+};
+
+
+#endif // HAVE_DUNE_FEM
+
+
+template <bool use_less_memory, class GP>
+PeriodicGridPart<GP, use_less_memory>
+make_periodic_grid_part(const GP& real_grid_part,
+                        const std::bitset<GP::dimension> periodic_directions = std::bitset<GP::dimension>().set())
+{
+  return PeriodicGridPart<GP, use_less_memory>(real_grid_part, periodic_directions);
 }
 
-template <class GV>
-PeriodicGridView<GV>
-make_periodic_grid_view(const GV& real_grid_view,
-                        const std::bitset<GV::dimension> periodic_directions = std::bitset<GV::dimension>().set())
+template <class GP>
+PeriodicGridPart<GP>
+make_periodic_grid_part(const GP& real_grid_layer,
+                        const std::bitset<GP::dimension> periodic_directions = std::bitset<GP::dimension>().set())
 {
-  return PeriodicGridView<GV>(real_grid_view, periodic_directions);
+  return PeriodicGridPart<GP>(real_grid_layer, periodic_directions);
+}
+
+
+/**
+ * \brief Either PeriodicGridView or PeriodicGridPart, depending on GL.
+ * \see PeriodicGridView
+ * \see PeriodicGridPart
+ */
+template <class GL, bool c = false>
+using PeriodicGridLayer = std::conditional_t<is_view<GL>::value, PeriodicGridView<GL, c>, PeriodicGridPart<GL, c>>;
+
+template <bool use_less_memory, class GP>
+PeriodicGridLayer<GP, use_less_memory>
+make_periodic_grid_layer(const GP& real_grid_layer,
+                         const std::bitset<GP::dimension> periodic_directions = std::bitset<GP::dimension>().set())
+{
+  return PeriodicGridLayer<GP, use_less_memory>(real_grid_layer, periodic_directions);
+}
+
+template <class GP>
+PeriodicGridLayer<GP>
+make_periodic_grid_layer(const GP& real_grid_layer,
+                         const std::bitset<GP::dimension> periodic_directions = std::bitset<GP::dimension>().set())
+{
+  return PeriodicGridLayer<GP>(real_grid_layer, periodic_directions);
 }
 
 
 } // namespace Grid
 } // namespace XT
+
+#if HAVE_DUNE_FEM
+
+namespace Fem {
+namespace GridPartCapabilities {
+
+
+template <class GP, bool c>
+struct hasGrid<XT::Grid::PeriodicGridPart<GP, c>>
+{
+  static const bool v = hasGrid<GP>::v;
+};
+
+template <class GP, bool c>
+struct hasSingleGeometryType<XT::Grid::PeriodicGridPart<GP, c>>
+{
+  static const bool v = hasSingleGeometryType<GP>::v;
+  static const unsigned int topologyId = hasSingleGeometryType<GP>::topologyId;
+};
+
+template <class GP, bool c>
+struct isCartesian<XT::Grid::PeriodicGridPart<GP, c>>
+{
+  static const bool v = isCartesian<GP>::v;
+};
+
+template <class GP, bool c, int codim>
+struct hasEntity<XT::Grid::PeriodicGridPart<GP, c>, codim>
+{
+  static const bool v = hasEntity<GP, codim>::v;
+};
+
+template <class GP, bool c, int codim>
+struct canCommunicate<XT::Grid::PeriodicGridPart<GP, c>, codim>
+{
+  static const bool v = canCommunicate<GP, codim>::v;
+};
+
+template <class GP, bool c>
+struct isConforming<XT::Grid::PeriodicGridPart<GP, c>>
+{
+  static const bool v = isConforming<GP>::v;
+};
+
+
+} // namespace GridPartCapabilities
+} // namespace Fem
 } // namespace Dune
 
+#endif // HAVE_DUNE_FEM
 #endif // DUNE_XT_GRID_VIEW_PERIODIC_HH
