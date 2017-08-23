@@ -47,6 +47,9 @@ make_dependent_modules_sys_included()
 add_subdirectory(dune)
 add_subdirectory(doc)
 
+# indicate that the python subdir is a package to install
+dune_install_python_package(PATH python)
+
 if(dune-pybindxi_FOUND)
   foreach(_file
           dune/__init__.py
