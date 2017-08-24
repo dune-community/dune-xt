@@ -29,7 +29,7 @@ namespace Grid
     // Internal forward declaration
     // ----------------------------
 
-    template< class GridView, class Implementation >
+    template< class GridView >
     class GridView2GridPart;
 
 
@@ -39,10 +39,10 @@ namespace Grid
     // GridView2GridPartTraits
     // -----------------------
 
-    template< class GridView, class Implementation >
+    template< class GridView >
     struct GridView2GridPartTraits
     {
-      typedef Implementation GridPartType;
+      typedef GridView2GridPart< GridView > GridPartType;
 
       typedef GridView GridViewType;
       static const bool conforming = GridView::conforming;
@@ -83,12 +83,12 @@ namespace Grid
     // GridView2GridPart
     // -----------------
 
-    template< class GridView, class Implementation >
+    template< class GridView >
     class GridView2GridPart
-      : public Fem::GridPartInterface< GridView2GridPartTraits< GridView, Implementation > >
+      : public Fem::GridPartInterface< GridView2GridPartTraits< GridView > >
     {
-      typedef GridView2GridPart< GridView, Implementation > ThisType;
-      typedef GridView2GridPartTraits< GridView, Implementation > TraitsType;
+      typedef GridView2GridPart< GridView > ThisType;
+      typedef GridView2GridPartTraits< GridView > TraitsType;
       typedef Fem::GridPartInterface< TraitsType > BaseType;
 
     public:
@@ -116,7 +116,6 @@ namespace Grid
       typedef Fem::DofManager< GridType > DofManagerType;
 
     public:
-      using BaseType::grid;
 
       /** \name Construction
        *  \{
@@ -266,7 +265,7 @@ namespace XT {
 namespace Grid {
 
 
-template <class GridView, class Implementation>
+template <class GridView>
 class GridView2GridPart
 {
   static_assert(AlwaysFalse<GridView>::value, "You are missing dune-fem!");
