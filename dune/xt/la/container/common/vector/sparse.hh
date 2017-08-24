@@ -44,7 +44,7 @@ namespace internal {
 
 
 template <class ScalarImp>
-class CommonSparseVectorTraits : public CommonDenseVectorTraits<ScalarImp>
+class CommonSparseVectorTraits
 {
 public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
@@ -500,7 +500,6 @@ protected:
 
 private:
   friend class VectorInterface<internal::CommonSparseVectorTraits<ScalarType>, ScalarType>;
-  friend class CommonDenseMatrix<ScalarType>;
 
   size_t size_;
   mutable std::shared_ptr<EntriesVectorType> entries_;
