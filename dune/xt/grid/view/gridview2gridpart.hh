@@ -3,8 +3,10 @@
 
 // clang-format off
 
-#ifndef DUNE_FEM_GRIDPART_COMMON_GRIDVIEW2GRIDPART_HH
-#define DUNE_FEM_GRIDPART_COMMON_GRIDVIEW2GRIDPART_HH
+#ifndef DUNE_XT_GRID_VIEW_GRIDVIEW2GRIDPART_HH
+#define DUNE_XT_GRID_VIEW_GRIDVIEW2GRIDPART_HH
+
+#if HAVE_DUNE_FEM
 
 #include <utility>
 
@@ -19,9 +21,10 @@
 
 namespace Dune
 {
-
-  namespace Fem
-  {
+namespace XT
+{
+namespace Grid
+{
 
     // Internal forward declaration
     // ----------------------------
@@ -47,7 +50,7 @@ namespace Dune
       typedef typename GridViewType::Grid GridType;
       typedef typename GridViewType::CollectiveCommunication CollectiveCommunicationType;
 
-      typedef NonAdaptiveIndexSet< typename GridView::IndexSet > IndexSetType;
+      typedef Fem::NonAdaptiveIndexSet< typename GridView::IndexSet > IndexSetType;
 
       template< int codim >
       struct Codim
@@ -67,7 +70,7 @@ namespace Dune
 
       typedef typename GridViewType::IntersectionIterator IntersectionIteratorType;
 
-      typedef TwistUtility< GridType > TwistUtilityType;
+      typedef Fem::TwistUtility< GridType > TwistUtilityType;
 
       static const PartitionIteratorType indexSetPartitionType = All_Partition;
       static const InterfaceType indexSetInterfaceType = All_All_Interface;
@@ -82,11 +85,11 @@ namespace Dune
 
     template< class GridView, class Implementation >
     class GridView2GridPart
-      : public GridPartInterface< GridView2GridPartTraits< GridView, Implementation > >
+      : public Fem::GridPartInterface< GridView2GridPartTraits< GridView, Implementation > >
     {
       typedef GridView2GridPart< GridView, Implementation > ThisType;
       typedef GridView2GridPartTraits< GridView, Implementation > TraitsType;
-      typedef GridPartInterface< TraitsType > BaseType;
+      typedef Fem::GridPartInterface< TraitsType > BaseType;
 
     public:
       /** \copydoc Dune::Fem::GridPartInterface::GridType */
@@ -110,7 +113,7 @@ namespace Dune
       typedef typename BaseType::CollectiveCommunicationType CollectiveCommunicationType;
 
     private:
-      typedef DofManager< GridType > DofManagerType;
+      typedef Fem::DofManager< GridType > DofManagerType;
 
     public:
       using BaseType::grid;
@@ -246,10 +249,36 @@ namespace Dune
       DofManagerType &dofManager_;
     };
 
-  } // namespace Fem
-
+} // namespace Grid
+} // namespace XT
 } // namespace Dune
 
-#endif // #ifndef DUNE_FEM_GRIDPART_COMMON_GRIDVIEW2GRIDPART_HH
+
+#else // HAVE_DUNE_FEM
+
+
+#include <type_traits>
+
+#include <dune/common/typetraits.hh>
+
+namespace Dune {
+namespace XT {
+namespace Grid {
+
+
+template <class GridView, class Implementation>
+class GridView2GridPart
+{
+  static_assert(AlwaysFalse<GridView>::value, "You are missing dune-fem!");
+};
+
+
+} // namespace Grid
+} // namespace XT
+} // namespace Dune
+
+
+#endif // HAVE_DUNE_FEM
+#endif // #ifndef DUNE_XT_GRID_VIEW_GRIDVIEW2GRIDPART_HH
 
 // clang-format on
