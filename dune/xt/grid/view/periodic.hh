@@ -25,16 +25,13 @@
 #include <dune/grid/common/gridview.hh>
 #include <dune/grid/common/rangegenerators.hh>
 
-#if HAVE_DUNE_FEM
-#include <dune/fem/gridpart/common/gridview2gridpart.hh>
-#endif
-
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/view/gridview2gridpart.hh>
 
 namespace Dune {
 namespace XT {
@@ -1099,15 +1096,14 @@ make_periodic_grid_view(const GL& real_grid_layer,
  * \see PeriodicGridView
  */
 template <class RealGridPartImp, bool codim_iters_provided = false>
-class PeriodicGridPart : XT::Common::ConstStorageProvider<PeriodicGridView<RealGridPartImp, codim_iters_provided>>,
-                         public Dune::Fem::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>,
-                                                             PeriodicGridPart<RealGridPartImp, codim_iters_provided>>
+class PeriodicGridPart
+    : XT::Common::ConstStorageProvider<PeriodicGridView<RealGridPartImp, codim_iters_provided>>,
+      public Dune::XT::Grid::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>>
 {
   static_assert(is_part<RealGridPartImp>::value || is_dd_subdomain<RealGridPartImp>::value, "");
   using Implementation = PeriodicGridView<RealGridPartImp, codim_iters_provided>;
   using ImplementationStorage = typename XT::Common::ConstStorageProvider<Implementation>;
-  using BaseType = Dune::Fem::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>,
-                                                PeriodicGridPart<RealGridPartImp, codim_iters_provided>>;
+  using BaseType = Dune::XT::Grid::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>>;
 
 public:
   using BaseType::dimension;
