@@ -115,18 +115,21 @@ public:
                      const size_t num_mutexes = 1)
     : num_rows_(rr)
     , num_cols_(cc)
-    , entries_(std::make_shared<EntriesVectorType>(num_rows_ * num_cols_, value))
+    , entries_(std::make_shared<EntriesVectorType>(
+          XT::Common::FloatCmp::eq(value, ScalarType(0.)) ? 0 : num_rows_ * num_cols_, value))
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1, 0))
     , column_indices_(std::make_shared<IndexVectorType>())
     , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
     , unshareable_(false)
   {
-    IndexVectorType row_column_indices(num_cols_);
-    for (size_t col = 0; col < num_cols_; ++col)
-      row_column_indices[col] = col;
-    for (size_t row = 0; row < num_rows_; ++row) {
-      row_pointers_->operator[](row + 1) = (row + 1) * num_cols_;
-      column_indices_->insert(column_indices_->end(), row_column_indices.begin(), row_column_indices.end());
+    if (XT::Common::FloatCmp::ne(value, ScalarType(0))) {
+      IndexVectorType row_column_indices(num_cols_);
+      for (size_t col = 0; col < num_cols_; ++col)
+        row_column_indices[col] = col;
+      for (size_t row = 0; row < num_rows_; ++row) {
+        row_pointers_->operator[](row + 1) = (row + 1) * num_cols_;
+        column_indices_->insert(column_indices_->end(), row_column_indices.begin(), row_column_indices.end());
+      }
     }
   }
 

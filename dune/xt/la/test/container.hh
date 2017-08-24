@@ -18,9 +18,10 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/la/container/interfaces.hh>
+#include <dune/xt/la/container/algorithms/unit_matrices.hh>
 #include <dune/xt/la/container/common.hh>
 #include <dune/xt/la/container/eigen.hh>
+#include <dune/xt/la/container/interfaces.hh>
 #include <dune/xt/la/container/istl.hh>
 #include <dune/xt/la/container.hh>
 
@@ -73,10 +74,8 @@ class ContainerFactory<Dune::XT::LA::CommonSparseMatrixCsr<S>>
 public:
   static Dune::XT::LA::CommonSparseMatrixCsr<S> create(const size_t size)
   {
-    Dune::XT::LA::CommonSparseMatrixCsr<S> matrix(size, size);
-    for (size_t ii = 0; ii < size; ++ii)
-      matrix.unit_row(ii);
-    return matrix;
+    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseMatrixCsr<S>>(size);
+    return ret;
   }
 };
 
@@ -86,10 +85,8 @@ class ContainerFactory<Dune::XT::LA::CommonSparseMatrixCsc<S>>
 public:
   static Dune::XT::LA::CommonSparseMatrixCsc<S> create(const size_t size)
   {
-    Dune::XT::LA::CommonSparseMatrixCsc<S> matrix(size, size);
-    for (size_t ii = 0; ii < size; ++ii)
-      matrix.unit_row(ii);
-    return matrix;
+    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseMatrixCsc<S>>(size);
+    return ret;
   }
 };
 
