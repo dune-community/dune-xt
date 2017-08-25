@@ -50,6 +50,7 @@ public:
   using typename BaseType::MatrixType;
   using typename BaseType::ComplexType;
   using typename BaseType::ComplexVectorType;
+  using typename BaseType::RealMatrixType;
 
   EigenSolver(const MatrixType& matrix)
     : BaseType(matrix)
@@ -138,6 +139,18 @@ public:
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is not supported, although it was reported by types()!");
   } // ... get_eigenvectors(...)
+
+  using BaseType::real_eigenvectors;
+
+  virtual std::shared_ptr<RealMatrixType> real_eigenvectors_as_matrix(const Common::Configuration& opts) const override
+  {
+    const auto evs = real_eigenvectors(opts);
+    auto ret = std::make_shared<RealMatrixType>();
+    for (size_t ii = 0; ii < dimRange; ++ii)
+      for (size_t jj = 0; jj < dimRange; ++jj)
+        (*ret)[ii][jj] = evs[jj][ii];
+    return ret;
+  } // ... real_eigenvectors_as_matrix(...)
 
 private:
   using BaseType::matrix_;
