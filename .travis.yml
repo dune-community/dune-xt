@@ -51,13 +51,17 @@ matrix:
   include:
         - env: DOCKER_TAG=gcc_full TESTS=0
         - env: DOCKER_TAG=gcc_full TESTS=1
+        - env: DOCKER_TAG=gcc_full TESTS=2
     
         - env: DOCKER_TAG=gcc_no_istl_no_disc TESTS=0
         - env: DOCKER_TAG=gcc_no_istl_no_disc TESTS=1
+        - env: DOCKER_TAG=gcc_no_istl_no_disc TESTS=2
     
         - env: DOCKER_TAG=gcc_no_disc TESTS=0
         - env: DOCKER_TAG=gcc_no_disc TESTS=1
+        - env: DOCKER_TAG=gcc_no_disc TESTS=2
     
         - env: DOCKER_TAG=clang_full TESTS=0
         - env: DOCKER_TAG=clang_full TESTS=1
+        - env: DOCKER_TAG=clang_full TESTS=2
     
