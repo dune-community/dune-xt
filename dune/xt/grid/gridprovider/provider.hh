@@ -34,8 +34,15 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
+#if HAVE_DUNE_FEM
+template <class T>
+using DefaultDDGridImp = DD::SubdomainGrid<T>;
+#else
+template <class T>
+using DefaultDDGridImp = AlwaysFalse<T>;
+#endif
 
-template <class GridImp, typename DdGridImp = int>
+template <class GridImp, typename DdGridImp = DefaultDDGridImp<GridImp>>
 class GridProvider
 {
   static_assert(is_grid<GridImp>::value, "");
