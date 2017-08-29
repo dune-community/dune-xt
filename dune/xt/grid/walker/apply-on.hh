@@ -15,6 +15,7 @@
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/grid/boundaryinfo.hh>
+#include <dune/grid/common/partitionset.hh>
 
 namespace Dune {
 namespace XT {
@@ -391,7 +392,28 @@ protected:
   using BaseType::boundary_info_;
 }; // class NeumannIntersections
 
+/**
+ *  \brief Selects entities in the compatible PartitionSet.
+ */
+template <class GridLayerImp, class PartitionSetType>
+class PartitionSetEntities : public WhichEntity<GridLayerImp>
+{
+  typedef WhichEntity<GridLayerImp> BaseType;
 
+public:
+  using typename BaseType::GridLayerType;
+  typedef typename BaseType::EntityType EntityType;
+
+  virtual WhichEntity<GridLayerImp>* copy() const override final
+  {
+    return new PartitionSetEntities<GridLayerImp, PartitionSetType>();
+  }
+
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
+  {
+    return PartitionSetType::contains(entity.partitionType());
+  }
+}; // class PartitionSetEntities
 } // namespace ApplyOn
 } // namespace Grid
 } // namespace XT

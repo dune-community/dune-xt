@@ -96,6 +96,32 @@ struct GridWalkerTest : public ::testing::Test
     walker.walk();
     EXPECT_EQ(filter_count, all_count);
   }
+
+  void check_partitionsets()
+  {
+    const auto gv = grid_prv.grid().leafGridView();
+    Walker<GridLayerType> walker(gv);
+
+    size_t filter_count = 0, all_count = 0, inner_count = 0, inner_set_count = 0;
+    auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
+    auto inner_filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) {
+      inner_set_count++;
+    };
+    auto all_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
+    auto inner_counter = [&](const IntersectionType&, const EntityType& e, const EntityType&) {
+      inner_count += e.partitionType == Dune::PartitionType::InteriorEntity;
+    };
+
+    auto on_interior_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
+    auto on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
+    auto on_all = new ApplyOn::AllEntities<GridLayerType>();
+    walker.append(filter_counter, on_all_partitionset);
+    walker.append(inner_filter_counter, on_interior_partitionset);
+    walker.append(all_counter, on_all);
+    walker.append(inner_count, on_all);
+    walker.walk();
+    EXPECT_EQ(filter_count, all_count);
+  }
 };
 
 TYPED_TEST_CASE(GridWalkerTest, GridDims);
