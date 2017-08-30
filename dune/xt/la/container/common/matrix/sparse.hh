@@ -231,14 +231,14 @@ public:
     return *this;
   }
 
-  template <int rows, int cols>
-  ThisType& operator=(const FieldMatrix<ScalarType, rows, cols>& other)
+  template <class MatrixImp>
+  ThisType& operator=(const DenseMatrix<MatrixImp>& other)
   {
     clear();
-    num_rows_ = rows;
-    num_cols_ = cols;
-    for (size_t rr = 0; rr < rows; ++rr) {
-      for (size_t cc = 0; cc < cols; ++cc) {
+    num_rows_ = other.rows();
+    num_cols_ = other.cols();
+    for (size_t rr = 0; rr < num_rows_; ++rr) {
+      for (size_t cc = 0; cc < num_cols_; ++cc) {
         if (XT::Common::FloatCmp::ne(other[rr][cc], 0.)) {
           entries_->push_back(other[rr][cc]);
           column_indices_->push_back(cc);
