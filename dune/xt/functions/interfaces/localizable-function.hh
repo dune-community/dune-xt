@@ -59,7 +59,15 @@ class VisualizationAdapter;
 
 
 /**
- * \brief Interface for functions which provide a LocalFunctionInterface for an entity.
+ * \brief Interface for functions which can be localized to an entity.
+ *
+ *        We follow one strong assumption in dune-xt-functions: after being localized to an entity, a local function
+ *        (or a set of local functions) has to provide the order which is required to integrate it _exactly_ on this
+ *        entity and _should_ be polynomial on an entity. While there exists non-polynomial data functions, we only have
+ *        quadratures of finite order and no way to detect discontinuities of functions (thus the order of the local
+ *        polynomial approximation must be provided). In addition, we demand that discontinuities may only lie on
+ *        intersections (which is not uncommen). This forces the user to really think about the data functions when
+ *        implementing/using them, but avoids situations which could not be handled generically later on.
  */
 template <class EntityImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class LocalizableFunctionInterface : public Common::ParametricInterface
