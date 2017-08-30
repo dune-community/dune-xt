@@ -28,79 +28,21 @@
 #include <dune/xt/grid/type_traits.hh>
 
 #include <dune/xt/functions/exceptions.hh>
+#include <dune/xt/functions/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace Functions {
-namespace internal {
-
-
-template <class R, size_t r, size_t rC>
-struct RangeTypeSelector
-{
-  using type = XT::Common::FieldMatrix<R, r, rC>;
-};
-
-template <class R, size_t r>
-struct RangeTypeSelector<R, r, 1>
-{
-  using type = XT::Common::FieldVector<R, r>;
-};
-
-
-template <size_t d, class R, size_t r, size_t rC>
-struct DerivativeRangeTypeSelector
-{
-  using single_type = XT::Common::FieldVector<R, d>;
-  using type = XT::Common::FieldVector<Dune::XT::Common::FieldMatrix<R, rC, d>, r>;
-};
-
-template <size_t d, class R, size_t r>
-struct DerivativeRangeTypeSelector<d, R, r, 1>
-{
-  using single_type = XT::Common::FieldVector<R, d>;
-  using type = XT::Common::FieldMatrix<R, r, d>;
-};
-
-
-} // namespace internal
 
 
 /**
- *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
+ * \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  *
- *         Given a function u: R^d -> R^{r x rC}, we interpret it as a r functions u_1, ..., u_r in the sense of
- *         u(x) = (u_1(x), ..., u_r(x))T, where each u_s: R^d -> R^rC for 1 \leq s \leq r, and thus ultimately
+ * \sa    RangeTypeSelector
+ * \sa    DerivativeRangeTypeSelector
  *
- *                | (u_1(x))_1, (u_1(x))_2, ..., (u_1(x))_rC |
- *                | (u_2(x))_1,    .        ...      .       |
- *         u(x) = |      .         .        ...      .       |
- *                |      .         .        ...      .       |
- *                | (u_r(x))_1, (u_r(x))_2, ..., (u_r(x))_rC |
- *
- *         Here, (u_s(x))_i can be interpreted as the evaluation of a scalar function u_s_i: R^d -> R
- *         for 1 \leq i \leq rC, and we can thus identify
- *
- *         u = ( u_s_i )_{s = 1, ..., r | i = 1, ..., rC }
- *
- *         This interpretation of u is used in RangeTypeSelector, with a special case if rC = 1, to simplify manners.
- *
- *         Regarding derivatives: since one is often interested in the derivatives of the individual functions u_s, it
- *         makes sense to iterate over r first, and we thus have jacobian u: R^d -> R^{r x {d x rC}}, where
- *
- *                             |  (d u_s_1 / d x_1)(x),  (d u_s_1 / d x_2)(x), ...,  (d u_s_1 / d x_d)(x) |
- *                             |  (d u_s_2 / d x_1)(x),           .             ...           .           |
- *         (jacobian u)_s(x) = |           .                      .             ...           .           |
- *                             |           .                      .             ...           .           |
- *                             | (d u_s_rC / d x_1)(x), (d u_s_rC / d x_2)(x), ..., (d u_s_rC / d x_d)(x) |
- *
- *         Again, (d u_s_i / d x_j)(x) can be interpreted as the evaluation of a scalar function
- *         (jacobian u)_s_i_j: R^d -> R, and we can thus identify
- *
- *         (jacobian u)_s = ( d u_s_i / d x_j )_{i = 1, ..., rC | j = 1, ..., d}
- *
- *         This interpretation of us jacobian is used in DerivativeRangeTypeSelector, with a special case if rC = 1, to
- *         simplify manners.
+ *        See in particular RangeTypeSelector and DerivativeRangeTypeSelector for the interpretation of a function and
+ *        its derivatives.
  **/
 template <class EntityImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class LocalFunctionSetInterface : public Common::ParametricInterface
@@ -124,9 +66,9 @@ public:
   static const constexpr size_t rC = dimRangeCols;
 
   using DomainType = Dune::FieldVector<D, d>;
-  using RangeType = typename internal::RangeTypeSelector<R, r, rC>::type;
-  using DerivativeRangeType = typename internal::DerivativeRangeTypeSelector<d, R, r, rC>::type;
-  using SingleDerivativeRangeType = typename internal::DerivativeRangeTypeSelector<d, R, r, rC>::single_type;
+  using RangeType = typename RangeTypeSelector<R, r, rC>::type;
+  using DerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::type;
+  using SingleDerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::single_type;
 
   LocalFunctionSetInterface()
     : entity_(nullptr)

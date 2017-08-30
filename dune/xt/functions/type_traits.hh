@@ -12,11 +12,84 @@
 #ifndef DUNE_XT_FUNCTIONS_TYPE_TRAITS_HH
 #define DUNE_XT_FUNCTIONS_TYPE_TRAITS_HH
 
+#include <dune/xt/common/fmatrix.hh>
+#include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace Functions {
+
+
+/**
+ * Given a function u: R^d -> R^{r x rC}, we interpret it as a r functions u_1, ..., u_r in the sense of
+ * u(x) = (u_1(x), ..., u_r(x))T, where each u_s: R^d -> R^rC for 1 \leq s \leq r, and thus ultimately
+ *
+ *        | (u_1(x))_1, (u_1(x))_2, ..., (u_1(x))_rC |
+ *        | (u_2(x))_1,    .        ...      .       |
+ * u(x) = |      .         .        ...      .       |
+ *        |      .         .        ...      .       |
+ *        | (u_r(x))_1, (u_r(x))_2, ..., (u_r(x))_rC |
+ *
+ * Here, (u_s(x))_i can be interpreted as the evaluation of a scalar function u_s_i: R^d -> R
+ * for 1 \leq i \leq rC, and we can thus identify
+ *
+ * u = ( u_s_i )_{s = 1, ..., r | i = 1, ..., rC }
+ *
+ * This interpretation of u is modeled by RangeTypeSelector, with a special case if rC = 1, to simplify manners.
+ **/
+template <class R, size_t r, size_t rC>
+struct RangeTypeSelector
+{
+  using type = XT::Common::FieldMatrix<R, r, rC>;
+};
+
+template <class R, size_t r>
+struct RangeTypeSelector<R, r, 1>
+{
+  using type = XT::Common::FieldVector<R, r>;
+};
+
+
+/**
+ * \sa RangeTypeSelector
+ *
+ *     Since one is often interested in the derivatives of the individual functions u_s, it makes sense to consider the
+ *     jacobian u: R^d -> R^{r x {d x rC}}, where
+ *
+ *                         |  (d u_s_1 / d x_1)(x),  (d u_s_1 / d x_2)(x), ...,  (d u_s_1 / d x_d)(x) |
+ *                         |  (d u_s_2 / d x_1)(x),           .             ...           .           |
+ *     (jacobian u)_s(x) = |           .                      .             ...           .           |
+ *                         |           .                      .             ...           .           |
+ *                         | (d u_s_rC / d x_1)(x), (d u_s_rC / d x_2)(x), ..., (d u_s_rC / d x_d)(x) |
+ *
+ *     Again, (d u_s_i / d x_j)(x) can be interpreted as the evaluation of a scalar function
+ *     (jacobian u)_s_i_j: R^d -> R, and we can thus identify
+ *
+ *     (jacobian u)_s = ( d u_s_i / d x_j )_{i = 1, ..., rC | j = 1, ..., d}
+ *
+ *     This interpretation of the jacobian of u is modeled by DerivativeRangeTypeSelector, with a special case if
+ *     rC = 1, to simplify manners. To access the jacobian of u_s, simply use
+ *     \code
+ *     u.jacobian(x)[s];
+ *     \endcode
+ *
+ *     In addition, one is sometimes interested in evaluating the jacobian of the scalar function u_s_i (see
+ *     RangeTypeSelector), jacobian u_s_i: R^d -> R^d. This is modeled by the single_type.
+ **/
+template <size_t d, class R, size_t r, size_t rC>
+struct DerivativeRangeTypeSelector
+{
+  using single_type = XT::Common::FieldVector<R, d>;
+  using type = XT::Common::FieldVector<Dune::XT::Common::FieldMatrix<R, rC, d>, r>;
+};
+
+template <size_t d, class R, size_t r>
+struct DerivativeRangeTypeSelector<d, R, r, 1>
+{
+  using single_type = XT::Common::FieldVector<R, d>;
+  using type = XT::Common::FieldMatrix<R, r, d>;
+};
 
 
 // forwards
