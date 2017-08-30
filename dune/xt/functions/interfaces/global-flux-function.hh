@@ -77,7 +77,7 @@ public:
   {
   }
 
-  virtual size_t order(const Common::Parameter& /*mu*/) const = 0;
+  virtual size_t order(const Common::Parameter& /*mu*/ = {}) const = 0;
 
   virtual void evaluate(const DomainType& /*x*/,
                         const StateRangeType& /*u*/,

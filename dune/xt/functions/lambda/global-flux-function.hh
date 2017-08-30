@@ -132,7 +132,7 @@ public:
     create_lambdas(partial_x_col_lambdas_, partial_u_col_lambdas_);
   }
 
-  virtual size_t order(const Common::Parameter& mu) const override final
+  virtual size_t order(const Common::Parameter& mu = {}) const override final
   {
     auto parsed_mu = this->parse_and_check(mu);
     return order_lambda_(parsed_mu);
@@ -178,6 +178,8 @@ public:
     auto parsed_mu = this->parse_and_check(mu);
     ret = partial_x_col_lambdas_[col](xx, uu, parsed_mu);
   }
+
+  using BaseType::partial_u;
 
   virtual void partial_u(const DomainType& xx,
                          const StateRangeType& uu,
