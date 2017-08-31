@@ -360,12 +360,55 @@ public:
 
   virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
-    return boundary_info_.access().type(intersection) == DirichletBoundary();
+    static constexpr const XT::Grid::DirichletBoundary dirichlet{};
+    return boundary_info_.access().type(intersection) == dirichlet;
   }
 
 protected:
   using BaseType::boundary_info_;
 }; // class DirichletIntersections
+
+template <class GridLayerImp>
+class DirichletAndProcessIntersections
+    : public internal::WhichIntersectionBase<GridLayerImp, DirichletAndProcessIntersections<GridLayerImp>, true>
+{
+  typedef internal::WhichIntersectionBase<GridLayerImp, DirichletAndProcessIntersections<GridLayerImp>, true> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  explicit DirichletAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
+    : BaseType(boundary_info)
+  {
+  }
+
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  {
+    static constexpr const XT::Grid::DirichletBoundary dirichlet{};
+    const bool process_boundary = (!intersection.neighbor() && !intersection.boundary());
+    return (boundary_info_.access().type(intersection) == dirichlet) || process_boundary;
+  }
+
+protected:
+  using BaseType::boundary_info_;
+}; // class DirichletAndProcessIntersections
+
+template <class GridLayerImp>
+class ProcessIntersections : public internal::WhichIntersectionBase<GridLayerImp, ProcessIntersections<GridLayerImp>>
+{
+  typedef internal::WhichIntersectionBase<GridLayerImp, ProcessIntersections<GridLayerImp>> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  {
+    return (!intersection.neighbor() && !intersection.boundary());
+  }
+
+}; // class ProcessIntersections
 
 
 template <class GridLayerImp>

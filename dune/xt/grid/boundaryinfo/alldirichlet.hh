@@ -75,6 +75,34 @@ make_alldirichlet_boundaryinfo(const Common::Configuration& /*cfg*/ = Common::Co
   return XT::Common::make_unique<AllDirichletBoundaryInfo<I>>();
 }
 
+template <class IntersectionImp>
+class ProcessBoundaryInfo : public BoundaryInfo<IntersectionImp>
+{
+  typedef BoundaryInfo<IntersectionImp> BaseType;
+
+public:
+  using typename BaseType::IntersectionType;
+
+  static std::string static_id()
+  {
+    return "xt.grid.boundaryinfo.process";
+  }
+
+  virtual const BoundaryType& type(const IntersectionType& intersection) const override final
+  {
+    if (!intersection.neighbor() && !intersection.boundary())
+      return dirichlet_boundary_;
+    return no_boundary_;
+  }
+
+protected:
+  static constexpr NoBoundary no_boundary_{};
+  static constexpr DirichletBoundary dirichlet_boundary_{};
+}; // class ProcessBoundaryInfo
+template <class I>
+constexpr NoBoundary ProcessBoundaryInfo<I>::no_boundary_;
+template <class I>
+constexpr DirichletBoundary ProcessBoundaryInfo<I>::dirichlet_boundary_;
 
 } // namespace Grid
 } // namespace XT
