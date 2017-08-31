@@ -55,7 +55,7 @@ struct RangeTypeSelector<R, r, 1>
  * \sa RangeTypeSelector
  *
  *     Since one is often interested in the derivatives of the individual functions u_s, it makes sense to consider the
- *     jacobian u: R^d -> R^{r x {d x rC}}, where
+ *     jacobian u: R^d -> R^{r x {rC x d}}, where
  *
  *                         |  (d u_s_1 / d x_1)(x),  (d u_s_1 / d x_2)(x), ...,  (d u_s_1 / d x_d)(x) |
  *                         |  (d u_s_2 / d x_1)(x),           .             ...           .           |
