@@ -412,7 +412,7 @@ public:
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      add_to_entry(ii, -other.get_unchecked_ref(ii));
+      add_to_entry(ii, -1 * other.get_unchecked_ref(ii));
   } // ... isub(...)
 
   using BaseType::operator*;
