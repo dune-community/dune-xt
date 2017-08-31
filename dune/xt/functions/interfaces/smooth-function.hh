@@ -169,6 +169,20 @@ public:
   }
 
   /**
+   * \copydoc LocalizableFunctionInterface::visualize
+   */
+  template <class GridLayerType>
+  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
+  visualize(const GridLayerType& grid_layer,
+            const std::string path,
+            const bool subsampling = true,
+            const VTK::OutputType vtk_output_type = VTK::appendedraw) const
+  {
+    this->as_localizable<XT::Grid::extract_entity_t<GridLayerType>>().visualize(
+        grid_layer, path, subsampling, vtk_output_type);
+  }
+
+  /**
    * \}
    **/
 
