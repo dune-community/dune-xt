@@ -11,6 +11,8 @@
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH
 
+#include <map>
+
 #include <dune/common/fvector.hh>
 
 #include <dune/xt/common/parameter.hh>
@@ -23,6 +25,11 @@ namespace XT {
 namespace Functions {
 
 
+// forward, required in SmoothFunctionInterface::as_localizable
+template <class E, size_t r, size_t rC, class R>
+class SmoothFunctionAsLocalizableWrapper;
+
+
 /**
  * \brief Interface for smooth functions (in the C^\infty sense) which can thus be evaluated in global coordinates.
  *
@@ -31,6 +38,16 @@ namespace Functions {
  *        its derivatives, and LocalizableFunctionInterface for functions which may have discontinuities between entites
  *        (as in: which are double-valued on intersections).
  *
+ *        To turn a smooth function into a function which is localizable w.r.t. a GridView of matching dimension (e.g.,
+ *        to visualize it or to use it in a discretization scheme), use as_localizable to obtain a const reference to
+ *        a wrapped version of this function:
+\code
+auto smooth_function = ...;
+auto grid_view = ...;
+using E = XT::Grid::extract_entity_t<decltype(grid_view)>;
+const auto& localizable_function = smooth_function.template as_localizable<E>();
+\endcode
+ *
  * \sa    RangeTypeSelector
  * \sa    DerivativeRangeTypeSelector
  * \sa    LocalizableFunctionInterface
@@ -38,6 +55,8 @@ namespace Functions {
 template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class SmoothFunctionInterface : public Common::ParametricInterface
 {
+  using ThisType = SmoothFunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
+
 public:
   using DomainFieldType = double;
   static const constexpr size_t dimDomain = domainDim;
@@ -127,6 +146,31 @@ public:
     ensure_correct_dims(row, col, "derivative");
     return single_helper<SingleDerivativeRangeType>::call(this->derivative(alpha, xx, mu), row, col);
   }
+
+  /**
+   * \}
+   * \name ´´These methods are provided.''
+   * \{
+   **/
+
+  /**
+   * \note This function kepps a map of all wrappers in a local static map, to avoid temporaries.
+   * \todo Check if this implementation is thread safe!
+   */
+  template <class E>
+  const typename std::enable_if<XT::Grid::is_entity<E>::value && E::dimension == d,
+                                SmoothFunctionAsLocalizableWrapper<E, r, rC, R>>::type&
+  as_localizable() const
+  {
+    static std::map<const ThisType*, std::unique_ptr<SmoothFunctionAsLocalizableWrapper<E, r, rC, R>>> wrappers;
+    if (wrappers.find(this) == wrappers.end())
+      wrappers[this] = std::make_unique<SmoothFunctionAsLocalizableWrapper<E, r, rC, R>>(*this);
+    return *(wrappers[this]);
+  }
+
+  /**
+   * \}
+   **/
 
 protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
