@@ -408,11 +408,12 @@ public:
    */
   virtual void isub(const derived_type& other)
   {
+    static const ScalarType neg_one(-1);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
     for (size_t ii = 0; ii < size(); ++ii)
-      add_to_entry(ii, -1 * other.get_unchecked_ref(ii));
+      add_to_entry(ii, neg_one * other.get_unchecked_ref(ii));
   } // ... isub(...)
 
   using BaseType::operator*;
