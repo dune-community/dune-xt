@@ -79,6 +79,7 @@ public:
 
   static GridProvider<GridType> create(const std::string& filename_prefix)
   {
+    using std::pow;
     std::ostream& out = Dune::XT::Common::Logger().devnull();
 
     // set up the grid factory
