@@ -31,3 +31,4 @@ foreach (test ${dxt_test_binaries})
   endif()
 endforeach()
 
+exclude_from_headercheck(dd_subdomains_cube.hh)
