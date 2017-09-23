@@ -45,7 +45,7 @@ public:
   typedef typename XT::Functions::RangeTypeSelector<RangeFieldImp, rangeDim, 1>::type ColRangeType;
   typedef typename XT::Functions::JacobianRangeTypeSelector<domainDim, RangeFieldImp, rangeDim, 1>::type
       ColJacobianRangeType;
-  typedef typename LA::CommonSparseMatrix<RangeFieldImp> MatrixType;
+  typedef typename LA::CommonSparseOrDenseMatrixCsr<RangeFieldImp> MatrixType;
   typedef FieldMatrix<RangeFieldImp, rangeDim, domainDim> FieldMatrixType;
 
   static std::string static_id()
