@@ -7,8 +7,8 @@
 // Authors:
 //   Tobias Leibner (2017)
 
-#ifndef DUNE_XT_LA_CONTAINER_ALGORITHMS_TRIANGULAR_HH
-#define DUNE_XT_LA_CONTAINER_ALGORITHMS_TRIANGULAR_HH
+#ifndef DUNE_XT_LA_ALGORITHMS_TRIANGULAR_HH
+#define DUNE_XT_LA_ALGORITHMS_TRIANGULAR_HH
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
@@ -387,4 +387,4 @@ void solve_lower_triangular_transposed(const CommonSparseOrDenseMatrix<DenseMatr
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_LA_CONTAINER_ALGORITHMS_TRIANGULAR_HH
+#endif // DUNE_XT_LA_ALGORITHMS_TRIANGULAR_HH

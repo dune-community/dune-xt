@@ -7,12 +7,11 @@
 // Authors:
 //   Tobias Leibner (2017)
 
-#ifndef DUNE_XT_LA_CONTAINER_ALGORITHMS_HH
-#define DUNE_XT_LA_CONTAINER_ALGORITHMS_HH
+#ifndef DUNE_XT_LA_ALGORITHMS_HH
+#define DUNE_XT_LA_ALGORITHMS_HH
 
 #include "algorithms/cholesky.hh"
 #include "algorithms/qr.hh"
 #include "algorithms/triangular_solves.hh"
-#include "algorithms/unit_matrices.hh"
 
-#endif // DUNE_XT_LA_CONTAINER_ALGORITHMS_HH
+#endif // DUNE_XT_LA_ALGORITHMS_HH

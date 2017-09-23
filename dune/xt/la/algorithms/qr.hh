@@ -5,13 +5,10 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Barbara Verfürth (2015)
-//   Felix Schindler  (2013 - 2017)
-//   Rene Milk        (2014 - 2016)
-//   Tobias Leibner   (2014, 2016 - 2017)
+//   Tobias Leibner   (2017)
 
-#ifndef DUNE_XT_LA_CONTAINER_ALGORITHMS_QR_HH
-#define DUNE_XT_LA_CONTAINER_ALGORITHMS_QR_HH
+#ifndef DUNE_XT_LA_ALGORITHMS_QR_HH
+#define DUNE_XT_LA_ALGORITHMS_QR_HH
 
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
@@ -205,4 +202,4 @@ void qr_decomposition(FieldMatrix<FieldType, rows, cols>& A,
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_LA_CONTAINER_ALGORITHMS_QR_HH
+#endif // DUNE_XT_LA_ALGORITHMS_QR_HH
