@@ -17,6 +17,7 @@
 #include <dune/xt/la/container/pattern.hh>
 
 #include "../vector/sparse.hh"
+#include "dense.hh"
 
 namespace Dune {
 namespace XT {
@@ -33,6 +34,10 @@ enum class SparseFormat
 template <class ScalarImp, SparseFormat sparse_format>
 class CommonSparseMatrix;
 
+// forwards
+template <class DenseMatrixImp, class SparseMatrixImp>
+class CommonSparseOrDenseMatrix;
+
 
 namespace internal {
 
@@ -48,6 +53,19 @@ public:
   typedef CommonSparseMatrix<ScalarImp, sparse_format> derived_type;
   typedef std::vector<ScalarImp> EntriesVectorType;
   typedef std::vector<size_t> IndexVectorType;
+};
+
+template <class DenseMatrixImp, class SparseMatrixImp>
+class CommonSparseOrDenseMatrixTraits
+{
+public:
+  typedef DenseMatrixImp DenseMatrixType;
+  typedef SparseMatrixImp SparseMatrixType;
+  typedef typename DenseMatrixType::ScalarType ScalarType;
+  typedef typename DenseMatrixType::RealType RealType;
+  static const Backends backend_type = Backends::common_dense;
+  static const Backends vector_type = Backends::common_dense;
+  typedef CommonSparseOrDenseMatrix<DenseMatrixType, SparseMatrixType> derived_type;
 };
 
 
@@ -183,35 +201,12 @@ public:
   {
   } // CommonSparseMatrix(...)
 
-  template <int ROWS, int COLS>
-  explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
+  template <class DenseMatrixImp>
+  void copy_to_densematrix(DenseMatrixImp& ret) const
   {
-    assert(ROWS == num_rows_ && COLS == num_cols_);
-    Dune::FieldMatrix<ScalarType, ROWS, COLS> ret(ScalarType(0));
-    for (size_t rr = 0; rr < ROWS; ++rr)
+    for (size_t rr = 0; rr < num_rows_; ++rr)
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
         ret[rr][column_indices_->operator[](kk)] = entries_->operator[](kk);
-    return ret;
-  }
-
-  template <int ROWS, int COLS>
-  explicit operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>() const
-  {
-    assert(ROWS == num_rows_ && COLS == num_cols_);
-    auto ret = XT::Common::make_unique<Dune::FieldMatrix<ScalarType, ROWS, COLS>>(ScalarType(0));
-    for (size_t rr = 0; rr < ROWS; ++rr)
-      for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
-        (*ret)[rr][column_indices_->operator[](kk)] = entries_->operator[](kk);
-    return ret;
-  }
-
-  explicit operator Dune::DynamicMatrix<ScalarType>() const
-  {
-    Dune::DynamicMatrix<ScalarType> ret(rows(), cols(), ScalarType(0));
-    for (size_t rr = 0; rr < rows(); ++rr)
-      for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk)
-        ret[rr][column_indices_->operator[](kk)] = entries_->operator[](kk);
-    return ret;
   }
 
   ThisType& operator=(const ThisType& other)
@@ -757,7 +752,10 @@ public:
 
   //! Matrix-Vector multiplication for arbitrary vectors that support operator[]
   template <class XX, class YY>
-  inline std::enable_if_t<XT::Common::VectorAbstraction<XX>::is_vector && XT::Common::VectorAbstraction<YY>::is_vector,
+  inline std::enable_if_t<!std::is_base_of<CommonSparseVector<ScalarType>, XX>::value
+                              && !std::is_base_of<CommonSparseVector<ScalarType>, YY>::value
+                              && XT::Common::VectorAbstraction<XX>::is_vector
+                              && XT::Common::VectorAbstraction<YY>::is_vector,
                           void>
   mv(const XX& xx, YY& yy) const
   {
@@ -770,6 +768,28 @@ public:
       for (size_t kk = column_pointers[cc]; kk < end; ++kk)
         yy[row_indices[kk]] += entries[kk] * xx[cc];
     }
+  }
+
+  void mv(const CommonSparseVector<ScalarType>& xx, CommonSparseVector<ScalarType>& yy) const
+  {
+    yy.clear();
+    const auto& entries = *entries_;
+    const auto& column_pointers = *column_pointers_;
+    const auto& row_indices = *row_indices_;
+    const auto& vec_entries = xx.entries();
+    const auto& vec_indices = xx.indices();
+    thread_local std::vector<ScalarType> tmp_vec;
+    tmp_vec.resize(num_rows_);
+    std::fill(tmp_vec.begin(), tmp_vec.end(), 0.);
+    for (size_t ii = 0; ii < vec_entries.size(); ++ii) {
+      const size_t cc = vec_indices[ii];
+      const size_t end = column_pointers[cc + 1];
+      for (size_t kk = column_pointers[cc]; kk < end; ++kk)
+        tmp_vec[row_indices[kk]] += entries[kk] * vec_entries[ii];
+    }
+    for (size_t cc = 0; cc < num_cols_; ++cc)
+      if (XT::Common::FloatCmp::ne(tmp_vec[cc], ScalarType(0.)))
+        yy.set_new_entry(cc, tmp_vec[cc]);
   }
 
   //! TransposedMatrix-Vector multiplication for arbitrary vectors that support operator[]
@@ -886,8 +906,11 @@ public:
 
   /// \}
 
-  template <class MatrixType>
-  void rightmultiply(const MatrixType& other)
+  template <class OtherMatrixImp>
+  typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix
+                                && !(std::is_base_of<ThisType, OtherMatrixImp>::value),
+                            void>
+  rightmultiply(const OtherMatrixImp& other)
   {
     ensure_uniqueness();
     EntriesVectorType new_entries;
@@ -903,7 +926,7 @@ public:
         for (size_t col = 0; col < num_cols_; ++col) {
           for (size_t kk = (*column_pointers_)[col]; kk < (*column_pointers_)[col + 1]; ++kk)
             if ((*row_indices_)[kk] == rr)
-              new_entry += (*entries_)[kk] * other[col][cc];
+              new_entry += (*entries_)[kk] * XT::Common::MatrixAbstraction<OtherMatrixImp>::get_entry(other, col, cc);
         } // col
         if (XT::Common::FloatCmp::ne(new_entry, 0.)) {
           new_entries.push_back(new_entry);
@@ -948,7 +971,6 @@ public:
       } // ii
       new_column_pointers[cc + 1] = new_row_indices.size();
     } // cc
-
     *entries_ = new_entries;
     *column_pointers_ = new_column_pointers;
     *row_indices_ = new_row_indices;
@@ -1027,11 +1049,350 @@ private:
   mutable bool unshareable_;
 }; // class CommonSparseMatrix<..., SparseFormat::csc>
 
+/**
+ * \brief A matrix implementation checking whether the matrix is sparse enough to use sparse matrix operations.
+ */
+template <class DenseMatrixImp, class SparseMatrixImp>
+class CommonSparseOrDenseMatrix
+    : public MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
+                             typename SparseMatrixImp::ScalarType>
+{
+  typedef CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp> ThisType;
+  typedef MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
+                          typename SparseMatrixImp::ScalarType>
+      MatrixInterfaceType;
+
+public:
+  typedef internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp> Traits;
+  typedef typename Traits::DenseMatrixType DenseMatrixType;
+  typedef typename Traits::SparseMatrixType SparseMatrixType;
+  typedef typename Traits::ScalarType ScalarType;
+  typedef typename Traits::RealType RealType;
+  static constexpr double sparsity_cutoff = 0.25;
+
+  /**
+  * \brief This is the constructor of interest which creates a sparse matrix.
+  */
+  CommonSparseOrDenseMatrix(const size_t rr,
+                            const size_t cc,
+                            const SparsityPatternDefault& patt,
+                            const size_t num_mutexes = 1)
+    : num_rows_(rr)
+    , num_cols_(cc)
+  {
+    size_t nnz = 0;
+    for (size_t row = 0; row < num_rows_; ++row)
+      nnz += patt.inner(row).size();
+    size_t num_entries = rr * cc;
+    double sparsity = double(nnz) / double(num_entries);
+    sparse_ = sparsity < sparsity_cutoff;
+    if (sparse_) {
+      sparse_matrix_ = SparseMatrixType(rr, cc, patt, num_mutexes);
+      dense_matrix_ = DenseMatrixType(0, 0, patt, num_mutexes);
+    } else {
+      sparse_matrix_ = SparseMatrixType(0, 0, patt, num_mutexes);
+      dense_matrix_ = DenseMatrixType(rr, cc, patt, num_mutexes);
+    }
+  } // CommonSparseOrDenseMatrix(rr, cc, patt, num_mutexes)
+
+  CommonSparseOrDenseMatrix(const size_t rr = 0,
+                            const size_t cc = 0,
+                            const ScalarType& value = ScalarType(0),
+                            const size_t num_mutexes = 1,
+                            bool use_sparse_if_zero = false)
+    : num_rows_(rr)
+    , num_cols_(cc)
+  {
+    if (XT::Common::FloatCmp::ne(value, ScalarType(0.)) || !use_sparse_if_zero) {
+      sparse_matrix_ = SparseMatrixType(0, 0, value, num_mutexes);
+      dense_matrix_ = DenseMatrixType(rr, cc, value, num_mutexes);
+    } else {
+      sparse_matrix_ = SparseMatrixType(rr, cc, value, num_mutexes);
+      dense_matrix_ = DenseMatrixType(0, 0, value, num_mutexes);
+    }
+  }
+
+  CommonSparseOrDenseMatrix(const size_t rr, const size_t cc, const size_t num_mutexes, bool use_sparse = false)
+    : CommonSparseOrDenseMatrix(rr, cc, ScalarType(0.), num_mutexes, use_sparse)
+  {
+  }
+
+  CommonSparseOrDenseMatrix(const ThisType& other)
+    : num_rows_(other.num_rows_)
+    , num_cols_(other.num_cols_)
+    , sparse_(other.sparse_)
+    , sparse_matrix_(other.sparse_matrix_)
+    , dense_matrix_(other.dense_matrix_)
+  {
+  }
+
+  template <class OtherMatrixType>
+  explicit CommonSparseOrDenseMatrix(
+      const OtherMatrixType& mat,
+      const typename std::enable_if<Common::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune = false,
+      const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+          Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
+      const size_t num_mutexes = 1)
+    : num_rows_(Common::MatrixAbstraction<OtherMatrixType>::rows(mat))
+    , num_cols_(Common::MatrixAbstraction<OtherMatrixType>::cols(mat))
+  {
+    // check sparsity (if prune = false, the sparsity may not be checked correctly)
+    size_t nnz = 0.;
+    for (size_t rr = 0; rr < num_rows_; ++rr)
+      for (size_t cc = 0; cc < num_cols_; ++cc) {
+        const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
+        nnz += XT::Common::FloatCmp::ne(value, ScalarType(0), eps);
+      }
+    double sparsity = double(nnz) / double(num_rows_ * num_cols_);
+    sparse_ = sparsity < sparsity_cutoff;
+    if (sparse_) {
+      sparse_matrix_ = SparseMatrixType(mat, prune, eps, num_mutexes);
+      dense_matrix_ = DenseMatrixType(0, 0, num_mutexes);
+    } else {
+      sparse_matrix_ = SparseMatrixType(0, 0, num_mutexes);
+      dense_matrix_ = DenseMatrixType(mat, prune, eps, num_mutexes);
+    } // else (sparse_)
+  } // CommonSparseOrDenseMatrix(...)
+
+  template <class OtherMatrixType>
+  explicit CommonSparseOrDenseMatrix(
+      const OtherMatrixType& mat,
+      const typename std::enable_if<Common::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune,
+      const size_t num_mutexes)
+    : CommonSparseOrDenseMatrix(mat, prune, Common::FloatCmp::DefaultEpsilon<ScalarType>::value(), num_mutexes)
+  {
+  } // CommonSparseOrDenseMatrix(...)
+
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      num_rows_ = other.num_rows_;
+      num_cols_ = other.num_cols_;
+      sparse_ = other.sparse_;
+      sparse_matrix_ = other.sparse_matrix_;
+      dense_matrix_ = other.dense_matrix_;
+    }
+    return *this;
+  }
+
+  //  ThisType& operator=(const DenseMatrixType& other)
+  //  {
+  //    clear();
+  //    num_rows_ = rows;
+  //    num_cols_ = cols;
+  //    for (size_t cc = 0; cc < cols; ++cc) {
+  //      for (size_t rr = 0; rr < rows; ++rr) {
+  //        if (XT::Common::FloatCmp::ne(other[rr][cc], 0.)) {
+  //          entries_->push_back(other[rr][cc]);
+  //          row_indices_->push_back(rr);
+  //        }
+  //      } // rr
+  //      (*column_pointers_)[cc + 1] = row_indices_->size();
+  //    } // cc
+  //    return *this;
+  //  }
+
+  void deep_copy(const ThisType& other)
+  {
+    num_rows_ = other.num_rows_;
+    num_cols_ = other.num_cols_;
+    sparse_ = other.sparse_;
+    sparse_matrix_.deep_copy(other.sparse_matrix_);
+    dense_matrix_.deep_copy(other.dense_matrix_);
+  }
+
+  //  void clear()
+  //  {
+  //    ensure_uniqueness();
+  //    entries_->clear();
+  //    std::fill(column_pointers_->begin(), column_pointers_->end(), 0);
+  //    row_indices_->clear();
+  //  }
+
+  /// \name Required by ContainerInterface.
+  /// \{
+  inline ThisType copy() const
+  {
+    ThisType ret(*this);
+    ret.sparse_matrix_ = sparse_matrix_.copy();
+    ret.dense_matrix_ = dense_matrix_.copy();
+    return ret;
+  }
+
+  inline void scal(const ScalarType& alpha)
+  {
+    sparse_ ? sparse_matrix_.scal(alpha) : dense_matrix_.scal(alpha);
+  }
+
+  inline void axpy(const ScalarType& alpha, const ThisType& xx)
+  {
+    assert(sparse_ == xx.sparse_);
+    sparse_ ? sparse_matrix_.axpy(alpha, xx.sparse_matrix_) : dense_matrix_.axpy(alpha, xx.dense_matrix_);
+  }
+
+  inline bool has_equal_shape(const ThisType& other) const
+  {
+    return (rows() == other.rows()) && (cols() == other.cols());
+  }
+
+  /// \}
+  /// \name Required by MatrixInterface.
+  /// \{
+
+  inline size_t rows() const
+  {
+    return num_rows_;
+  }
+
+  inline size_t cols() const
+  {
+    return num_cols_;
+  }
+
+  //! Matrix-Vector multiplication for arbitrary vectors that support operator[]
+  template <class XX, class YY>
+  inline std::enable_if_t<XT::Common::VectorAbstraction<XX>::is_vector && XT::Common::VectorAbstraction<YY>::is_vector,
+                          void>
+  mv(const XX& xx, YY& yy) const
+  {
+    sparse_ ? sparse_matrix_.mv(xx, yy) : dense_matrix_.mv(xx, yy);
+  }
+
+  //! TransposedMatrix-Vector multiplication for arbitrary vectors that support operator[]
+  template <class XX, class YY>
+  inline std::enable_if_t<XT::Common::VectorAbstraction<XX>::is_vector && XT::Common::VectorAbstraction<YY>::is_vector,
+                          void>
+  mtv(const XX& xx, YY& yy) const
+  {
+    sparse_ ? sparse_matrix_.mtv(xx, yy) : dense_matrix_.mtv(xx, yy);
+  }
+
+  inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
+  {
+    sparse_ ? sparse_matrix_.add_to_entry(rr, cc, value) : dense_matrix_.add_to_entry(rr, cc, value);
+  }
+
+  inline ScalarType get_entry(const size_t rr, const size_t cc) const
+  {
+    return sparse_ ? sparse_matrix_.get_entry(rr, cc) : dense_matrix_.get_entry(rr, cc);
+  }
+
+  inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)
+  {
+    sparse_ ? sparse_matrix_.set_entry(rr, cc, value) : dense_matrix_.set_entry(rr, cc, value);
+  }
+
+  inline void clear_row(const size_t rr)
+  {
+    sparse_ ? sparse_matrix_.clear_row(rr) : dense_matrix_.clear_row(rr);
+  }
+
+  inline void clear_col(const size_t cc)
+  {
+    sparse_ ? sparse_matrix_.clear_col(cc) : dense_matrix_.clear_col(cc);
+  }
+
+  inline void unit_row(const size_t rr)
+  {
+    clear_row(rr);
+    set_entry(rr, rr, ScalarType(1));
+  }
+
+  inline void unit_col(const size_t cc)
+  {
+    clear_col(cc);
+    set_entry(cc, cc, ScalarType(1));
+  }
+
+  bool valid() const
+  {
+    return sparse_ ? sparse_matrix_.valid() : dense_matrix_.valid();
+  }
+
+  virtual size_t non_zeros() const override final
+  {
+    return sparse_ ? sparse_matrix_.non_zeros() : dense_matrix_.non_zeros();
+  }
+
+  virtual SparsityPatternDefault pattern(const bool prune = false,
+                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                             Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
+  {
+    return sparse_ ? sparse_matrix_.pattern(prune, eps) : dense_matrix_.pattern(prune, eps);
+  } // ... pattern(...)
+
+  /// \}
+
+  template <class DuneDenseMatrixImp>
+  void copy_to_densematrix(DuneDenseMatrixImp& ret) const
+  {
+    sparse_ ? sparse_matrix_.copy_to_densematrix(ret) : dense_matrix_.copy_to_densematrix(ret);
+  }
+
+  bool sparse() const
+  {
+    return sparse_;
+  }
+
+  SparseMatrixType& sparse_matrix()
+  {
+    return sparse_matrix_;
+  }
+
+  const SparseMatrixType& sparse_matrix() const
+  {
+    return sparse_matrix_;
+  }
+
+  DenseMatrixType& dense_matrix()
+  {
+    return dense_matrix_;
+  }
+
+  const DenseMatrixType& dense_matrix() const
+  {
+    return dense_matrix_;
+  }
+
+  template <class MatrixType>
+  void rightmultiply(const MatrixType& other)
+  {
+    sparse_ ? sparse_matrix_.rightmultiply(other) : dense_matrix_.rightmultiply(other);
+  } // void rightmultiply(...)
+
+  void rightmultiply(const ThisType& other)
+  {
+    if (other.sparse())
+      sparse_ ? sparse_matrix_.rightmultiply(other.sparse_matrix())
+              : dense_matrix_.rightmultiply(other.sparse_matrix());
+    else
+      sparse_ ? sparse_matrix_.rightmultiply(other.dense_matrix()) : dense_matrix_.rightmultiply(other.dense_matrix());
+  } // void rightmultiply(...)
+
+  using MatrixInterfaceType::operator+;
+  using MatrixInterfaceType::operator-;
+  using MatrixInterfaceType::operator+=;
+  using MatrixInterfaceType::operator-=;
+
+  size_t num_rows_, num_cols_;
+  bool sparse_;
+  mutable SparseMatrixType sparse_matrix_;
+  mutable DenseMatrixType dense_matrix_;
+}; // class CommonSparseOrDenseMatrix<...>
+
 template <class ScalarType = double>
 using CommonSparseMatrixCsr = CommonSparseMatrix<ScalarType, SparseFormat::csr>;
 
 template <class ScalarType = double>
 using CommonSparseMatrixCsc = CommonSparseMatrix<ScalarType, SparseFormat::csc>;
+
+template <class ScalarType = double>
+using CommonSparseOrDenseMatrixCsr =
+    CommonSparseOrDenseMatrix<CommonDenseMatrix<ScalarType>, CommonSparseMatrixCsr<ScalarType>>;
+
+template <class ScalarType = double>
+using CommonSparseOrDenseMatrixCsc =
+    CommonSparseOrDenseMatrix<CommonDenseMatrix<ScalarType>, CommonSparseMatrixCsc<ScalarType>>;
 
 
 } // namespace LA
@@ -1047,6 +1408,12 @@ struct MatrixAbstraction<LA::CommonSparseMatrixCsr<T>>
 template <class T>
 struct MatrixAbstraction<LA::CommonSparseMatrixCsc<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsc<T>>
+{
+};
+
+template <class DenseMatrixImp, class SparseMatrixImp>
+struct MatrixAbstraction<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
+    : public LA::internal::MatrixAbstractionBase<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
 {
 };
 

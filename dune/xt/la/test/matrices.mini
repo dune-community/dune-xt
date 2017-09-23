@@ -1,4 +1,4 @@
-__local.matrix_common = CommonDenseMatrix, CommonSparseMatrixCsr, CommonSparseMatrixCsc | expand
+__local.matrix_common = CommonDenseMatrix, CommonSparseMatrixCsr, CommonSparseMatrixCsc, CommonSparseOrDenseMatrixCsr, CommonSparseOrDenseMatrixCsc | expand
 __local.matrix_eigen = EigenRowMajorSparseMatrix, EigenDenseMatrix | expand
 __local.matrix_istl = IstlRowMajorSparseMatrix
 matrix = {__local.matrix_common}, {__local.matrix_eigen}, {__local.matrix_istl} | expand types

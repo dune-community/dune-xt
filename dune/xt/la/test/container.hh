@@ -90,6 +90,28 @@ public:
   }
 };
 
+template <class S>
+class ContainerFactory<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>
+{
+public:
+  static Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S> create(const size_t size)
+  {
+    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>(size);
+    return ret;
+  }
+};
+
+template <class S>
+class ContainerFactory<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>
+{
+public:
+  static Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S> create(const size_t size)
+  {
+    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>(size);
+    return ret;
+  }
+};
+
 
 #if HAVE_DUNE_ISTL
 template <class S>
