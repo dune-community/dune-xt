@@ -32,7 +32,7 @@
 #include <dune/xt/la/container/interfaces.hh>
 #include <dune/xt/la/container/pattern.hh>
 
-#include "../vector/dense.hh"
+#include "../vector.hh"
 
 namespace Dune {
 namespace XT {
@@ -202,14 +202,14 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
-    backend_ref *= alpha;
+    *backend_ *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -218,7 +218,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend_ref.axpy(alpha, xx.backend());
+    backend_->axpy(alpha, xx.backend());
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -232,12 +232,12 @@ public:
 
   inline size_t rows() const
   {
-    return backend().rows();
+    return backend_->rows();
   }
 
   inline size_t cols() const
   {
-    return backend().cols();
+    return backend_->cols();
   }
 
   template <class FirstTraits, class SecondTraits>
@@ -249,62 +249,91 @@ public:
 
   inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
   {
-    backend().mv(xx.backend(), yy.backend());
+    backend_->mv(xx.backend(), yy.backend());
   }
+
+  template <class VectorImp>
+  inline void mv(const Dune::DenseVector<VectorImp>& xx, Dune::DenseVector<VectorImp>& yy) const
+  {
+    backend_->mv(xx, yy);
+  }
+
+  template <class VectorImp>
+  inline void mtv(const Dune::DenseVector<VectorImp>& xx, Dune::DenseVector<VectorImp>& yy) const
+  {
+    backend_->mtv(xx, yy);
+  }
+
+  void mtv(const CommonSparseVector<ScalarType>& xx, CommonSparseVector<ScalarType>& yy) const
+  {
+    yy.clear();
+    const auto& vec_entries = xx.entries();
+    const auto& vec_indices = xx.indices();
+    thread_local Dune::DynamicVector<ScalarType> tmp_vec;
+    tmp_vec.resize(cols(), 0.);
+    std::fill(tmp_vec.begin(), tmp_vec.end(), 0.);
+    for (size_t ii = 0; ii < vec_entries.size(); ++ii) {
+      const size_t cc = vec_indices[ii];
+      tmp_vec.axpy(vec_entries[ii], (*backend_)[cc]);
+    }
+    for (size_t cc = 0; cc < cols(); ++cc)
+      if (XT::Common::FloatCmp::ne(tmp_vec[cc], 0.))
+        yy.set_new_entry(cc, tmp_vec[cc]);
+  } // void mtv(...)
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
     assert(ii < rows());
     assert(jj < cols());
-    backend_ref[ii][jj] += value;
+    (*backend_)[ii][jj] += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     assert(ii < rows());
     assert(jj < cols());
-    backend_ref[ii][jj] = value;
+    (*backend_)[ii][jj] = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend()[ii][jj];
+    return (*backend_)[ii][jj];
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend_ref[ii] *= ScalarType(0);
+    std::fill((*backend_)[ii].begin(), (*backend_)[ii].end(), ScalarType(0));
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     for (size_t ii = 0; ii < rows(); ++ii)
-      backend_ref[ii][jj] = ScalarType(0);
+      (*backend_)[ii][jj] = ScalarType(0);
   } // ... clear_col(...)
 
   void unit_row(const size_t ii)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    auto& row = backend_ref[ii];
+    auto& row = (*backend_)[ii];
     for (size_t jj = 0; jj < cols(); ++jj)
       row[jj] = ScalarType(0);
     row[ii] = ScalarType(1);
@@ -312,7 +341,7 @@ public:
 
   void unit_col(const size_t jj)
   {
-    auto& backend_ref = backend();
+    ensure_uniqueness();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -320,14 +349,14 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
     for (size_t ii = 0; ii < rows(); ++ii)
-      backend_ref[ii][jj] = ScalarType(0);
-    backend_ref[jj][jj] = ScalarType(1);
+      (*backend_)[ii][jj] = ScalarType(0);
+    (*backend_)[jj][jj] = ScalarType(1);
   } // ... unit_col(...)
 
   bool valid() const
   {
     for (size_t ii = 0; ii < rows(); ++ii) {
-      const auto& row_vec = backend()[ii];
+      const auto& row_vec = (*backend_)[ii];
       for (size_t jj = 0; jj < cols(); ++jj) {
         const auto& entry = row_vec[jj];
         if (Common::isnan(entry) || Common::isinf(entry))
@@ -343,6 +372,42 @@ public:
   using MatrixInterfaceType::operator-;
   using MatrixInterfaceType::operator+=;
   using MatrixInterfaceType::operator-=;
+
+  void deep_copy(const ThisType& other)
+  {
+    ensure_uniqueness();
+    *backend_ = *other.backend_;
+  }
+
+  template <class OtherMatrixTraits>
+  void rightmultiply(const MatrixInterface<OtherMatrixTraits, ScalarType>& other)
+  {
+    ensure_uniqueness();
+    BackendType new_backend(rows(), other.cols(), ScalarType(0.));
+    if (other.rows() != cols())
+      DUNE_THROW(Dune::XT::Common::Exceptions::shapes_do_not_match,
+                 "For rightmultiply, the number of columns of this has to match the number of rows of other!");
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (size_t cc = 0; cc < cols(); ++cc)
+        for (size_t kk = 0; kk < cols(); ++kk)
+          new_backend[rr][cc] += get_entry(rr, kk) * other.get_entry(kk, cc);
+    *backend_ = new_backend;
+  }
+
+  template <class OtherMatrixImp>
+  void rightmultiply(const Dune::DenseMatrix<OtherMatrixImp>& other)
+  {
+    ensure_uniqueness();
+    BackendType new_backend(rows(), other.cols(), ScalarType(0.));
+    if (other.rows() != cols())
+      DUNE_THROW(Dune::XT::Common::Exceptions::shapes_do_not_match,
+                 "For rightmultiply, the number of columns of this has to match the number of rows of other!");
+    for (size_t rr = 0; rr < rows(); ++rr)
+      for (size_t cc = 0; cc < cols(); ++cc)
+        for (size_t kk = 0; kk < cols(); ++kk)
+          new_backend[rr][cc] += get_entry(rr, kk) * other.get_entry[kk][cc];
+    *backend_ = new_backend;
+  }
 
 protected:
   /**
