@@ -279,6 +279,41 @@ public:
   } // ... almost_equal(...)
   /// \}
 
+  template <class DuneDenseMatrixImp>
+  void copy_to_densematrix(DuneDenseMatrixImp& ret) const
+  {
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (size_t jj = 0; jj < cols(); ++jj)
+        ret[ii][jj] = get_entry(ii, jj);
+  }
+
+  template <int ROWS, int COLS>
+  explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
+  {
+    assert(ROWS == rows() && COLS == cols());
+    Dune::FieldMatrix<ScalarType, ROWS, COLS> ret(ScalarType(0));
+    CHECK_CRTP(this->as_imp().copy_to_densematrix(ret));
+    this->as_imp().copy_to_densematrix(ret);
+    return ret;
+  }
+
+  template <int ROWS, int COLS>
+  explicit operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>() const
+  {
+    auto ret = XT::Common::make_unique<Dune::FieldMatrix<ScalarType, ROWS, COLS>>(ScalarType(0));
+    CHECK_CRTP(this->as_imp().copy_to_densematrix(*ret));
+    this->as_imp().copy_to_densematrix(*ret);
+    return ret;
+  }
+
+  explicit operator Dune::DynamicMatrix<ScalarType>() const
+  {
+    Dune::DynamicMatrix<ScalarType> ret(rows(), cols(), ScalarType(0));
+    CHECK_CRTP(this->as_imp().copy_to_densematrix(ret));
+    this->as_imp().copy_to_densematrix(ret);
+    return ret;
+  }
+
 protected:
   template <class MM>
   derived_type multiply(const MatrixInterface<MM, ScalarType>& other) const
