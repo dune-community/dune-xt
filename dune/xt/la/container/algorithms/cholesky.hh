@@ -28,9 +28,11 @@ namespace LA {
 
 
 // copied and adapted from dune/geometry/affinegeometry.hh
-template <class FieldType, int size>
-static bool cholesky_L(const FieldMatrix<FieldType, size, size>& H, FieldMatrix<FieldType, size, size>& L)
+template <class FirstMatrixImp, class SecondMatrixImp>
+static bool cholesky_L(const Dune::DenseMatrix<FirstMatrixImp>& H, Dune::DenseMatrix<SecondMatrixImp>& L)
 {
+  typedef typename FirstMatrixImp::value_type FieldType;
+  size_t size = H.size();
   for (int ii = 0; ii < size; ++ii) {
     FieldType& rii = L[ii][ii];
 
@@ -38,7 +40,7 @@ static bool cholesky_L(const FieldMatrix<FieldType, size, size>& H, FieldMatrix<
     for (int jj = 0; jj < ii; ++jj)
       xDiag -= std::pow(L[ii][jj], 2);
 
-    if (XT::Common::FloatCmp::le(xDiag, FieldType(0)))
+    if (xDiag <= FieldType(0))
       return false;
 
     rii = std::sqrt(xDiag);
@@ -54,10 +56,41 @@ static bool cholesky_L(const FieldMatrix<FieldType, size, size>& H, FieldMatrix<
   return true;
 }
 
-template <class FieldType, int size>
-static bool cholesky_L(const FieldMatrix<FieldType, size, size>& H, CommonSparseMatrixCsc<FieldType>& L)
+template <class DuneDenseMatrixImp, class MatrixTraits>
+static bool cholesky_L(const Dune::DenseMatrix<DuneDenseMatrixImp>& H,
+                       MatrixInterface<MatrixTraits, typename DuneDenseMatrixImp::value_type>& L)
 {
-  thread_local FieldVector<CommonSparseVector<FieldType>, size> rows(CommonSparseVector<FieldType>(size, size_t(0)));
+  typedef typename DuneDenseMatrixImp::value_type FieldType;
+  size_t size = H.size();
+  for (int ii = 0; ii < size; ++ii) {
+    FieldType xDiag = H[ii][ii];
+    for (int jj = 0; jj < ii; ++jj)
+      xDiag -= std::pow(L.get_entry(ii, jj), 2);
+
+    if (xDiag <= FieldType(0))
+      return false;
+
+    L.set_entry(ii, ii, std::sqrt(xDiag));
+
+    FieldType invrii = FieldType(1) / L.get_entry(ii, ii);
+    for (int ll = ii + 1; ll < size; ++ll) {
+      FieldType x = H[ll][ii];
+      for (int jj = 0; jj < ii; ++jj)
+        x -= L.get_entry(ii, jj) * L.get_entry(ll, jj);
+      L.set_entry(ll, ii, invrii * x);
+    }
+  }
+  return true;
+}
+
+template <class DuneDenseMatrixImp>
+static bool cholesky_L(const Dune::DenseMatrix<DuneDenseMatrixImp>& H,
+                       CommonSparseMatrixCsc<typename DuneDenseMatrixImp::value_type>& L)
+{
+  typedef typename DuneDenseMatrixImp::value_type FieldType;
+  size_t size = H.size();
+  thread_local std::vector<CommonSparseVector<FieldType>> rows;
+  rows.resize(size, CommonSparseVector<FieldType>(size, size_t(0)));
   for (auto& vec : rows)
     vec.clear();
   L.clear();
@@ -85,6 +118,13 @@ static bool cholesky_L(const FieldMatrix<FieldType, size, size>& H, CommonSparse
     L.column_pointers()[ii + 1] = L.row_indices().size();
   } // ii
   return true;
+}
+
+template <class DenseMatrixImp, class SparseMatrixImp, class DuneDenseMatrixImp>
+static bool cholesky_L(const Dune::DenseMatrix<DuneDenseMatrixImp>& H,
+                       CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>& L)
+{
+  return L.sparse() ? cholesky_L(H, L.sparse_matrix()) : cholesky_L(H, L.dense_matrix());
 }
 
 
