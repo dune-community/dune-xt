@@ -18,7 +18,7 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/la/container/algorithms/unit_matrices.hh>
+#include <dune/xt/la/container/unit_matrices.hh>
 #include <dune/xt/la/container/common.hh>
 #include <dune/xt/la/container/eigen.hh>
 #include <dune/xt/la/container/interfaces.hh>
