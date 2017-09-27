@@ -20,6 +20,7 @@
 #include <vector>
 #include <complex>
 #include <mutex>
+#include <numeric>
 
 #include <dune/common/dynvector.hh>
 #include <dune/common/float_cmp.hh>
