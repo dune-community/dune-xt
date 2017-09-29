@@ -124,6 +124,34 @@ static bool cholesky_L(const Dune::DenseMatrix<DuneDenseMatrixImp>& H,
   return L.sparse() ? cholesky_L(H, L.sparse_matrix()) : cholesky_L(H, L.dense_matrix());
 }
 
+template <class FieldType, int dim, int size>
+static bool cholesky_L(const FieldVector<FieldMatrix<FieldType, dim, dim>, size>& H,
+                       FieldVector<FieldMatrix<FieldType, dim, dim>, size>& L)
+{
+  for (size_t jj = 0; jj < size; ++jj) {
+    bool chol_flag = cholesky_L(H[jj], L[jj]);
+    if (!chol_flag)
+      return false;
+  }
+  return true;
+}
+
+template <class FieldType, int size>
+static bool cholesky_L(const FieldVector<FieldMatrix<FieldType, 2, 2>, size>& H,
+                       FieldVector<FieldMatrix<FieldType, 2, 2>, size>& L)
+{
+  for (size_t jj = 0; jj < size; ++jj) {
+    if (H[jj][0][0] <= 0.)
+      return false;
+    L[jj][0][0] = std::sqrt(H[jj][0][0]);
+    L[jj][1][0] = H[jj][1][0] / L[jj][0][0];
+    const auto val = H[jj][1][1] - std::pow(L[jj][1][0], 2);
+    if (val <= 0.)
+      return false;
+    L[jj][1][1] = std::sqrt(val);
+  }
+  return true;
+}
 
 } // namespace LA
 } // namespace XT

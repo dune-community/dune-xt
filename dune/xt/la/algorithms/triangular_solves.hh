@@ -34,8 +34,10 @@ void solve_lower_triangular(const Dune::DenseMatrix<MatrixImp>& A,
                             const Dune::DenseVector<VectorImp>& b)
 {
   const size_t num_rows = A.rows();
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<VectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const VectorImp&>(b); // copy data
   // forward solve
   for (size_t ii = 0; ii < num_rows; ++ii) {
     for (size_t jj = 0; jj < ii; ++jj)
@@ -52,8 +54,7 @@ void solve_lower_triangular(const Dune::DenseMatrix<MatrixImp>& A,
   x.clear();
   const size_t num_rows = A.rows();
   // copy rhs to dense vector to speed up random access
-  static thread_local std::vector<ScalarType> rhs(b.size());
-  std::fill(rhs.begin(), rhs.end(), 0.);
+  std::vector<ScalarType> rhs(b.size(), 0.);
   for (size_t kk = 0; kk < b.entries().size(); ++kk)
     rhs[b.indices()[kk]] = b.entries()[kk];
   // forward solve
@@ -72,8 +73,10 @@ void solve_lower_triangular(const MatrixInterface<MatrixTraits, ScalarType>& A,
                             const Dune::DenseVector<VectorImp>& b)
 {
   const size_t num_rows = A.rows();
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<VectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const VectorImp&>(b); // copy data
   // forward solve
   for (size_t ii = 0; ii < num_rows; ++ii) {
     for (size_t jj = 0; jj < ii; ++jj)
@@ -104,8 +107,7 @@ void solve_lower_triangular(const MatrixInterface<MatrixTraits, ScalarType>& A,
                             const CommonSparseVector<ScalarType>& b)
 {
   // copy rhs to dense vector
-  static thread_local Dune::DynamicVector<ScalarType> rhs(b.size());
-  std::fill(rhs.begin(), rhs.end(), 0.);
+  Dune::DynamicVector<ScalarType> rhs(b.size(), 0.);
   for (size_t kk = 0; kk < b.entries().size(); ++kk)
     rhs[b.indices()[kk]] = b.entries()[kk];
   solve_lower_triangular(A, x, rhs);
@@ -116,8 +118,10 @@ void solve_lower_triangular(const CommonSparseMatrixCsr<ScalarType>& A,
                             Dune::DenseVector<VectorImp>& x,
                             const Dune::DenseVector<VectorImp>& b)
 {
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<VectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const VectorImp&>(b); // copy data
   const auto& entries = A.entries();
   const auto& row_pointers = A.row_pointers();
   const auto& column_indices = A.column_indices();
@@ -138,8 +142,7 @@ void solve_lower_triangular(const CommonSparseMatrixCsc<ScalarType>& A,
                             const CommonSparseVector<ScalarType>& b_in)
 {
   x.clear();
-  static thread_local std::vector<ScalarType> b(b_in.size());
-  std::fill(b.begin(), b.end(), 0.);
+  std::vector<ScalarType> b(b_in.size(), 0.);
   for (size_t kk = 0; kk < b_in.entries().size(); ++kk)
     b[b_in.indices()[kk]] = b_in.entries()[kk];
   const auto& entries = A.entries();
@@ -196,6 +199,16 @@ void solve_lower_triangular(const CommonSparseOrDenseMatrix<DenseMatrixImp, Spar
   A.sparse() ? solve_lower_triangular(A.sparse_matrix(), x, b) : solve_lower_triangular(A.dense_matrix(), x, b);
 } // void solve_lower_triangular(CommonSparseMatrixCsc, ...)
 
+template <class FieldType>
+void solve_lower_triangular(const Dune::FieldMatrix<FieldType, 2, 2>& A,
+                            Dune::FieldVector<FieldType, 2>& x,
+                            const Dune::FieldVector<FieldType, 2>& b)
+{
+  x[0] = b[0] / A[0][0];
+  x[1] = (b[1] - A[1][0] * x[0]) / A[1][1];
+} // void solve_lower_triangular
+
+
 /** Upper triangular solves
  * \brief solve A x = b, where A is upper triangular
  */
@@ -205,8 +218,10 @@ void solve_upper_triangular(const MatrixInterface<MatrixTraits, ScalarType>& A,
                             Dune::DenseVector<VectorImp>& x,
                             const Dune::DenseVector<VectorImp>& b)
 {
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<VectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const VectorImp&>(b); // copy data
   const size_t num_cols = A.cols();
   // backward solve
   for (int ii = b.size() - 1; ii >= 0.; --ii) {
@@ -214,6 +229,24 @@ void solve_upper_triangular(const MatrixInterface<MatrixTraits, ScalarType>& A,
       rhs[ii] -= A.get_entry(ii, jj) * x[jj];
     x[ii] = rhs[ii] / A.get_entry(ii, ii);
   }
+} // void solve_upper_triangular(CommonDenseMatrix, ...)
+
+template <class FieldType, int block_size, int num_intervals>
+void solve_upper_triangular(const FieldVector<FieldMatrix<FieldType, block_size, block_size>, num_intervals>& A,
+                            FieldVector<FieldType, block_size * num_intervals>& x,
+                            const FieldVector<FieldType, block_size * num_intervals>& b)
+{
+  auto& rhs = x; // use x to store rhs
+  rhs = b; // copy data
+  // backward solve
+  for (size_t jj = 0; jj < num_intervals; ++jj) {
+    const auto offset = block_size * jj;
+    for (int ll = block_size - 1; ll >= 0; --ll) {
+      for (size_t mm = ll + 1; mm < block_size; ++mm)
+        rhs[offset + ll] -= A[jj][ll][mm] * x[offset + mm];
+      x[offset + ll] = rhs[offset + ll] / A[jj][ll][ll];
+    } // ll
+  } // jj
 } // void solve_upper_triangular(CommonDenseMatrix, ...)
 
 template <class ScalarType, class VectorImp>
@@ -225,8 +258,10 @@ void solve_upper_triangular(const CommonSparseMatrixCsc<ScalarType>& A,
   const auto& entries = A.entries();
   const auto& column_pointers = A.column_pointers();
   const auto& row_indices = A.row_indices();
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<VectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const VectorImp&>(b); // copy data
   // backsolve
   for (int ii = A.rows() - 1; ii >= 0; ii--) {
     // column_pointers[ii+1]-1 is the diagonal entry as we assume an upper triangular matrix with non-zero entries
@@ -257,8 +292,10 @@ void solve_lower_triangular_transposed(const Dune::DenseMatrix<MatrixImp>& A,
                                        Dune::DenseVector<FirstVectorImp>& x,
                                        const Dune::DenseVector<SecondVectorImp>& b)
 {
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<FirstVectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const SecondVectorImp&>(b); // copy data
   // backsolve
   for (int ii = int(A.N()) - 1; ii >= 0; ii--) {
     for (size_t jj = ii + 1; jj < A.N(); jj++)
@@ -272,8 +309,10 @@ void solve_lower_triangular_transposed(const MatrixInterface<MatrixTraits, typen
                                        Dune::DenseVector<FirstVectorImp>& x,
                                        const Dune::DenseVector<SecondVectorImp>& b)
 {
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<FirstVectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const SecondVectorImp&>(b); // copy data
   // backsolve
   for (int ii = int(A.cols()) - 1; ii >= 0; ii--) {
     for (size_t jj = ii + 1; jj < A.rows(); jj++)
@@ -318,8 +357,10 @@ void solve_lower_triangular_transposed(const CommonSparseMatrixCsr<ScalarType>& 
                                        Dune::DenseVector<FirstVectorImp>& x,
                                        const Dune::DenseVector<SecondVectorImp>& b)
 {
-  auto& rhs = x; // use x to store rhs
-  rhs = b; // copy data
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<FirstVectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const SecondVectorImp&>(b); // copy data
   // backsolve
   for (int ii = int(A.rows()) - 1; ii >= 0; ii--) {
     for (size_t jj = ii + 1; jj < A.rows(); jj++)
@@ -381,6 +422,15 @@ void solve_lower_triangular_transposed(const CommonSparseOrDenseMatrix<DenseMatr
   A.sparse() ? solve_lower_triangular_transposed(A.sparse_matrix(), x, b)
              : solve_lower_triangular_transposed(A.dense_matrix(), x, b);
 } // void solve_lower_triangular_transposed(CommonSparseMatrixCsc, ...)
+
+template <class FieldType>
+void solve_lower_triangular_transposed(const Dune::FieldMatrix<FieldType, 2, 2>& A,
+                                       Dune::FieldVector<FieldType, 2>& x,
+                                       const Dune::FieldVector<FieldType, 2>& b)
+{
+  x[1] = b[1] / A[1][1];
+  x[0] = (b[0] - A[1][0] * x[1]) / A[0][0];
+} // void solve_lower_triangular
 
 
 } // namespace LA
