@@ -47,23 +47,23 @@ struct UnitMatrix<MatrixType,
   }
 };
 
-template <class MatrixType>
-struct UnitMatrix<MatrixType,
+template <class MatrixVectorType>
+struct UnitMatrix<MatrixVectorType,
                   std::enable_if_t<std::is_base_of<Dune::FieldVector<Dune::FieldMatrix<
-                                                                         typename MatrixType::value_type::value_type,
-                                                                         MatrixType::value_type::rows,
-                                                                         MatrixType::value_type::rows>,
-                                                                     MatrixType::dimension>,
-                                                   MatrixType>::value,
+                                                                         typename MatrixVectorType::value_type::
+                                                                             value_type,
+                                                                         MatrixVectorType::value_type::rows,
+                                                                         MatrixVectorType::value_type::rows>,
+                                                                     MatrixVectorType::dimension>,
+                                                   MatrixVectorType>::value,
                                    void>>
 {
-  static std::unique_ptr<MatrixType> get(const size_t size, const size_t num_mutexes = 1)
+  static std::unique_ptr<MatrixVectorType> get(const size_t size, const size_t num_mutexes = 1)
   {
-    auto ret = XT::Common::make_unique<MatrixType>(0.);
-    for (size_t jj = 0; jj < size; ++jj) {
-      (*ret)[jj][0][0] = 1.;
-      (*ret)[jj][1][1] = 1.;
-    }
+    auto ret = XT::Common::make_unique<MatrixVectorType>(0.);
+    for (size_t jj = 0; jj < size; ++jj)
+      for (size_t ii = 0; ii < MatrixVectorType::value_type::rows; ++ii)
+        (*ret)[jj][ii][ii] = 1.;
     return ret;
   }
 };
