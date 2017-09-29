@@ -74,7 +74,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseMatrixCsr<S>>
 public:
   static Dune::XT::LA::CommonSparseMatrixCsr<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseMatrixCsr<S>>(size);
+    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseMatrixCsr<S>>::get(size);
     return ret;
   }
 };
@@ -85,7 +85,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseMatrixCsc<S>>
 public:
   static Dune::XT::LA::CommonSparseMatrixCsc<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseMatrixCsc<S>>(size);
+    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseMatrixCsc<S>>::get(size);
     return ret;
   }
 };
@@ -96,7 +96,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>
 public:
   static Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>(size);
+    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>::get(size);
     return ret;
   }
 };
@@ -107,7 +107,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>
 public:
   static Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::get_unit_matrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>(size);
+    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>::get(size);
     return ret;
   }
 };
