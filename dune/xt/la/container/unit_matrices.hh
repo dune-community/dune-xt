@@ -27,31 +27,61 @@ namespace XT {
 namespace LA {
 
 
-template <class MatrixType>
-std::unique_ptr<MatrixType> get_unit_matrix();
-
-template <class FieldType, size_t size>
-std::unique_ptr<Dune::FieldMatrix<FieldType, size, size>> get_unit_matrix(const size_t /*size*/ = size,
-                                                                          const size_t /*num_mutexes*/ = 1)
-{
-  auto ret = XT::Common::make_unique<Dune::FieldMatrix<FieldType, size, size>>(0);
-  for (size_t ii = 0; ii < size; ++ii)
-    (*ret)[ii][ii] = 1.;
-  return ret;
-}
+template <class MatrixType, class Enable = void>
+struct UnitMatrix;
 
 template <class MatrixType>
-typename std::enable_if_t<XT::LA::is_matrix<MatrixType>::value, std::unique_ptr<MatrixType>>
-get_unit_matrix(const size_t size, const size_t num_mutexes = 1)
+struct UnitMatrix<MatrixType,
+                  std::enable_if_t<std::is_base_of<Dune::FieldMatrix<typename MatrixType::value_type,
+                                                                     MatrixType::rows,
+                                                                     MatrixType::rows>,
+                                                   MatrixType>::value,
+                                   void>>
 {
-  XT::LA::SparsityPatternDefault pattern(size);
-  for (size_t ii = 0; ii < size; ++ii)
-    pattern.insert(ii, ii);
-  auto ret = XT::Common::make_unique<MatrixType>(size, size, pattern, num_mutexes);
-  for (size_t ii = 0; ii < size; ++ii)
-    ret->set_entry(ii, ii, 1.);
-  return ret;
-}
+  static std::unique_ptr<MatrixType> get(const size_t /*size*/ = MatrixType::rows, const size_t /*num_mutexes*/ = 1)
+  {
+    auto ret = XT::Common::make_unique<MatrixType>(0.);
+    for (size_t ii = 0; ii < MatrixType::rows; ++ii)
+      (*ret)[ii][ii] = 1.;
+    return ret;
+  }
+};
+
+template <class MatrixType>
+struct UnitMatrix<MatrixType,
+                  std::enable_if_t<std::is_base_of<Dune::FieldVector<Dune::FieldMatrix<
+                                                                         typename MatrixType::value_type::value_type,
+                                                                         MatrixType::value_type::rows,
+                                                                         MatrixType::value_type::rows>,
+                                                                     MatrixType::dimension>,
+                                                   MatrixType>::value,
+                                   void>>
+{
+  static std::unique_ptr<MatrixType> get(const size_t size, const size_t num_mutexes = 1)
+  {
+    auto ret = XT::Common::make_unique<MatrixType>(0.);
+    for (size_t jj = 0; jj < size; ++jj) {
+      (*ret)[jj][0][0] = 1.;
+      (*ret)[jj][1][1] = 1.;
+    }
+    return ret;
+  }
+};
+
+template <class MatrixType>
+struct UnitMatrix<MatrixType, std::enable_if_t<XT::LA::is_matrix<MatrixType>::value, void>>
+{
+  static std::unique_ptr<MatrixType> get(const size_t size, const size_t num_mutexes = 1)
+  {
+    XT::LA::SparsityPatternDefault pattern(size);
+    for (size_t ii = 0; ii < size; ++ii)
+      pattern.insert(ii, ii);
+    auto ret = XT::Common::make_unique<MatrixType>(size, size, pattern, num_mutexes);
+    for (size_t ii = 0; ii < size; ++ii)
+      ret->set_entry(ii, ii, 1.);
+    return ret;
+  }
+};
 
 
 } // namespace LA
