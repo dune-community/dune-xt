@@ -1099,7 +1099,7 @@ public:
                             const size_t cc = 0,
                             const ScalarType& value = ScalarType(0),
                             const size_t num_mutexes = 1,
-                            bool use_sparse_if_zero = false)
+                            bool use_sparse_if_zero = true)
     : num_rows_(rr)
     , num_cols_(cc)
   {
@@ -1109,10 +1109,11 @@ public:
     } else {
       sparse_matrix_ = SparseMatrixType(rr, cc, value, num_mutexes);
       dense_matrix_ = DenseMatrixType(0, 0, value, num_mutexes);
+      sparse_ = true;
     }
   }
 
-  CommonSparseOrDenseMatrix(const size_t rr, const size_t cc, const size_t num_mutexes, bool use_sparse = false)
+  CommonSparseOrDenseMatrix(const size_t rr, const size_t cc, const size_t num_mutexes, bool use_sparse = true)
     : CommonSparseOrDenseMatrix(rr, cc, ScalarType(0.), num_mutexes, use_sparse)
   {
   }

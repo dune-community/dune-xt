@@ -243,8 +243,9 @@ public:
   {
     ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
-    for (size_t ii = 0; ii < entries_->size(); ++ii)
-      (*entries_)[ii] *= alpha;
+    auto& entries_ref = *entries_;
+    for (size_t ii = 0; ii < entries_ref.size(); ++ii)
+      entries_ref[ii] *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
@@ -529,8 +530,10 @@ template <class ScalarType, int size>
 FieldVector<ScalarType, size>& operator+=(FieldVector<ScalarType, size>& lhs,
                                           const XT::LA::CommonSparseVector<ScalarType>& rhs)
 {
-  for (size_t kk = 0; kk < rhs.indices().size(); ++kk)
-    lhs[rhs.indices()[kk]] += rhs.entries()[kk];
+  const auto& indices = rhs.indices();
+  const auto& entries = rhs.entries();
+  for (size_t kk = 0; kk < indices.size(); ++kk)
+    lhs[indices[kk]] += entries[kk];
   return lhs;
 }
 
