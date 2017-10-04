@@ -18,6 +18,11 @@ BEGIN_TESTCASES(dunextgrid)
 
 END_TESTCASES()
 
+# load binning setup from file
+if(DEFINED ENV{TRAVIS})
+    include("builder_definitions.cmake")
+endif(DEFINED ENV{TRAVIS})
+
 add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)
 add_dune_alberta_flags(GRIDDIM 3 test_dd_glued_3d)
 
