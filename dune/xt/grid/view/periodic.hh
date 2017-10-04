@@ -792,7 +792,7 @@ private:
     void operator()(Args&&... args)
     {
       IndexMapCreator<codim_iters_provided || codim == 0, codim, DomainType, dimDomain, BaseType, IndexType, EntityType>
-          index_map_creator(std::forward<Args>(args)...);
+      index_map_creator(std::forward<Args>(args)...);
       index_map_creator.create_index_map();
       static_for_loop_for_index_maps<codim + 1, to>()(std::forward<Args>(args)...);
     }
