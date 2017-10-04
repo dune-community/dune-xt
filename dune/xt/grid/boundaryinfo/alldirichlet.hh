@@ -25,7 +25,7 @@ namespace Grid {
 
 static inline Common::Configuration alldirichlet_boundaryinfo_default_config()
 {
-  return Common::Configuration("type", "xt.grid.boundaryinfo.alldirichlet");
+  return Common::Configuration({"type"}, {"xt.grid.boundaryinfo.alldirichlet"});
 }
 
 // We do not want to add a virtual destructor (to be able to use this as constexpr),

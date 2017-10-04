@@ -25,7 +25,7 @@ namespace Grid {
 
 static inline Common::Configuration allneumann_boundaryinfo_default_config()
 {
-  return Common::Configuration("type", "xt.grid.boundaryinfo.allneumann");
+  return Common::Configuration({"type"}, {"xt.grid.boundaryinfo.allneumann"});
 }
 
 // We do not want to add a virtual destructor (to be able to use this as constexpr),
