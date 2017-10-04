@@ -80,7 +80,7 @@ public:
     internal::SolverUtils::check_given(tp, types());
     Common::Configuration default_options(
         {"type", "check_for_inf_nan", "check_evs_are_real", "check_evs_are_positive", "check_eigenvectors_are_real"},
-        {tp, "1", "0", "0", "0"});
+        {tp.c_str(), "1", "0", "0", "0"});
     return default_options;
   }
 

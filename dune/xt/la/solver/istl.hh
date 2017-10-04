@@ -147,7 +147,7 @@ public:
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());
-    Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp, "1e-5", "0"});
+    Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp.c_str(), "1e-5", "0"});
     Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += general_opts;
     if (tp.substr(0, 13) == "bicgstab.amg." || tp == "bicgstab") {

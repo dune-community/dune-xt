@@ -300,7 +300,8 @@ public:
     // check
     internal::SolverUtils::check_given(tp, types());
     // default config
-    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"}, {tp, "1e-5", "1"});
+    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"},
+                                          {tp.c_str(), "1e-5", "1"});
     Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += default_options;
     // direct solvers
