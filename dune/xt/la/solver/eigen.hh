@@ -393,40 +393,36 @@ public:
     }
     ::Eigen::ComputationInfo info;
     if (type == "cg.diagonal.lower") {
-      typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
-                                         ::Eigen::Lower,
-                                         ::Eigen::DiagonalPreconditioner<S>>
-          SolverType;
+      typedef ::Eigen::
+          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::DiagonalPreconditioner<S>>
+              SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "cg.diagonal.upper") {
-      typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
-                                         ::Eigen::Upper,
-                                         ::Eigen::DiagonalPreconditioner<S>>
-          SolverType;
+      typedef ::Eigen::
+          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Upper, ::Eigen::DiagonalPreconditioner<S>>
+              SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "cg.identity.lower") {
-      typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
-                                         ::Eigen::Lower,
-                                         ::Eigen::IdentityPreconditioner>
-          SolverType;
+      typedef ::Eigen::
+          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::IdentityPreconditioner>
+              SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "cg.identity.upper") {
-      typedef ::Eigen::ConjugateGradient<typename MatrixType::BackendType,
-                                         ::Eigen::Lower,
-                                         ::Eigen::IdentityPreconditioner>
-          SolverType;
+      typedef ::Eigen::
+          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::IdentityPreconditioner>
+              SolverType;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
