@@ -36,11 +36,6 @@ dune_project()
 dune_enable_all_packages(MODULE_LIBRARIES dunextfunctions
                          VERBOSE)
 
-#disable most warnings from eigen
-if (EIGEN3_FOUND)
-  add_definitions("-isystem ${EIGEN3_INCLUDE_DIR}")
-endif (EIGEN3_FOUND)
-
 add_header_listing()
 make_dependent_modules_sys_included()
 
