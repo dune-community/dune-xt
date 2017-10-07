@@ -10,7 +10,9 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 
-#include <dune/xt/common/string.hh>
+#include <string>
+
+#include <dune/xt/common/matrix.hh>
 
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/type_traits.hh>
@@ -164,7 +166,7 @@ void compute_using_lapacke(double* matrix, std::vector<std::complex<S>>& eigvals
                                    N);
 
   if (info != 0)
-    DUNE_THROW(Dune::MathError, "Lapack returned error " + XT::Common::to_string(info) + "!");
+    DUNE_THROW(Dune::MathError, "Lapack returned error " + std::to_string(info) + "!");
 
   for (size_t rr = 0; rr < size_t(N); ++rr) {
     assert(XT::Common::FloatCmp::ne(beta[rr], 0., 1e-6));
