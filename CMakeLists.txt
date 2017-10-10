@@ -38,9 +38,6 @@ dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-la_SOURCE_DIR}/dune
 
 add_header_listing()
 make_dependent_modules_sys_included()
-if (EIGEN3_FOUND)
-  add_definitions("-isystem ${EIGEN3_INCLUDE_DIR}")
-endif (EIGEN3_FOUND)
 
 add_subdirectory(dune)
 add_subdirectory(doc)
