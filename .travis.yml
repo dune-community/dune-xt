@@ -28,6 +28,10 @@ script:
 # runs independent of 'script' failure/success
 after_script:
     - ${DOCKER_RUN} /root/src/${MY_MODULE}/.travis.after_script.bash
+    # output for simpler replicability
+    - docker images ${IMAGE}
+    - echo ${DOCKER_RUN}
+
 
 notifications:
   email:
