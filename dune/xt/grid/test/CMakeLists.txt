@@ -14,6 +14,8 @@ enable_testing()
 # link grid files
 dune_symlink_to_source_files(FILES gmsh_2d_simplices.msh dgf_1d_interval.dgf dgf_2d_interval.dgf dgf_3d_interval.dgf dgf_4d_interval.dgf)
 
+dxt_exclude_from_headercheck(dd_subdomains_cube.hh)
+
 BEGIN_TESTCASES(dunextgrid)
 
 END_TESTCASES()
@@ -36,4 +38,3 @@ foreach (test ${dxt_test_binaries})
   endif()
 endforeach()
 
-exclude_from_headercheck(dd_subdomains_cube.hh)
