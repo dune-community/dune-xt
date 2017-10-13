@@ -82,7 +82,8 @@ public:
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());
-    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"}, {tp, "1e-5", "1"});
+    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"},
+                                          {tp.c_str(), "1e-5", "1"});
     // * for symmetric matrices
     if (tp == "ldlt" || tp == "llt") {
       default_options.set("pre_check_symmetry", "1e-8");
