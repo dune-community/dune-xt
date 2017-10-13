@@ -20,6 +20,7 @@
 
 #include <dune/xt/common/test/gtest/gtest.h>
 
+#include <dune/xt/grid/grids.bindings.hh>
 
 template <class GridType>
 struct GridProviderBase : public testing::Test
@@ -49,7 +50,7 @@ struct GridProviderBase : public testing::Test
   {
     static void check_visualize(const G& grid_provider)
     {
-      auto type_str = Dune::XT::Common::Typename<G>::value();
+      const auto type_str = Dune::XT::Grid::bindings::grid_name<GridType>::value();
       grid_provider.visualize();
       grid_provider.visualize(type_str + "_a");
       grid_provider.visualize(Dune::XT::Grid::alldirichlet_boundaryinfo_default_config());
