@@ -29,12 +29,14 @@ struct ExpressionFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
     auto grid = XT::Grid::make_cube_grid<GRIDTYPE>();
     auto leaf_view = grid.leaf_view();
 
-    TESTFUNCTIONTYPE func("x", std::make_pair("_t", 1), {"x[0]+_t"});
+    TESTFUNCTIONTYPE func("x", std::make_pair("t_", 1), {"x[0]+t_"});
     for (auto&& entity : elements(leaf_view)) {
       auto local_function = func.local_function(entity);
       auto xx_global = entity.geometry().center();
       auto xx = entity.geometry().local(xx_global);
-      ASSERT_EQ(xx_global[0] + 1., local_function->evaluate(xx, /*_t=*/1.0)[0]);
+      for (auto t_ : {-17., 0., 42.}) {
+        ASSERT_EQ(xx_global[0] + t_, local_function->evaluate(xx, t_)[0]);
+      }
     }
   }
 };
