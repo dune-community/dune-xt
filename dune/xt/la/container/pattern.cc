@@ -66,10 +66,12 @@ bool SparsityPatternDefault::operator!=(const SparsityPatternDefault& other) con
 
 SparsityPatternDefault SparsityPatternDefault::operator+(const SparsityPatternDefault& other) const
 {
-  assert(other.size() == size() && "SparsityPatterns must have the same number of rows for addition!");
-  SparsityPatternDefault ret = *this;
-  for (size_t rr = 0; rr < size(); ++rr)
-    for (const auto& cc : vector_of_vectors_[rr])
+  SparsityPatternDefault ret(std::max(this->size(), other.size()));
+  for (size_t rr = 0; rr < this->size(); ++rr)
+    for (const auto& cc : this->inner(rr))
+      ret.insert(rr, cc);
+  for (size_t rr = 0; rr < other.size(); ++rr)
+    for (const auto& cc : other.inner(rr))
       ret.insert(rr, cc);
   ret.sort();
   return ret;
