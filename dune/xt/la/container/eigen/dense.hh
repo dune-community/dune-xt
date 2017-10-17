@@ -701,12 +701,34 @@ public:
 
   /**
    * \}
+   * \{
+   * \name Provided for improved performance.
    */
 
-  using MatrixInterfaceType::operator+;
   using MatrixInterfaceType::operator-;
-  using MatrixInterfaceType::operator+=;
-  using MatrixInterfaceType::operator-=;
+
+  ThisType operator-(const ThisType& other) const override final
+  {
+    return ThisType(this->backend() - other.backend());
+  }
+
+  using MatrixInterfaceType::operator+;
+
+  ThisType operator+(const ThisType& other) const override final
+  {
+    return ThisType(this->backend() + other.backend());
+  }
+
+  using MatrixInterfaceType::operator*;
+
+  ThisType operator*(const ThisType& other) const override final
+  {
+    return ThisType(this->backend() * other.backend());
+  }
+
+  /**
+   * \}
+   */
 
 protected:
   inline void ensure_uniqueness() const
