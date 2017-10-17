@@ -358,7 +358,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     static constexpr const XT::Grid::DirichletBoundary dirichlet{};
     return boundary_info_.access().type(intersection) == dirichlet;
@@ -426,7 +426,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return boundary_info_.access().type(intersection) == NeumannBoundary();
   }
