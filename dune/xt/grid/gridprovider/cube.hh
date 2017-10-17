@@ -145,10 +145,9 @@ public:
     for (unsigned int dd = 0; dd < GridType::dimension; ++dd) {
       if (!(lower_left[dd] < upper_right[dd]))
         DUNE_THROW(Common::Exceptions::wrong_input_given,
-                   "lower_left has to be elementwise smaller than upper_right!\n\n"
-                       << lower_left[dd]
-                       << " vs. "
-                       << upper_right[dd]);
+                   "lower_left has to be elementwise smaller than upper_right!\n\nlower_left = " << lower_left
+                                                                                                 << "\n\nupper_right = "
+                                                                                                 << upper_right);
     }
     std::shared_ptr<GridType> grd_ptr(nullptr);
     switch (variant) {
