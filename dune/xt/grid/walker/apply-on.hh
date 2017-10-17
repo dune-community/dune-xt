@@ -344,6 +344,47 @@ private:
 
 
 template <class GridLayerImp>
+class CustomBoundaryIntersections : public WhichIntersection<GridLayerImp>
+{
+  typedef WhichIntersection<GridLayerImp> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  /**
+   * \attention Takes ownership of boundary_type, do not delete manually!
+   */
+  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType* boundary_type)
+    : boundary_info_(boundary_info)
+    , boundary_type_(boundary_type)
+  {
+  }
+
+  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                       const std::shared_ptr<BoundaryType>& boundary_type)
+    : boundary_info_(boundary_info)
+    , boundary_type_(boundary_type)
+  {
+  }
+
+  WhichIntersection<GridLayerType>* copy() const override final
+  {
+    return new CustomBoundaryIntersections<GridLayerType>(boundary_info_, boundary_type_);
+  }
+
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  {
+    return boundary_info_.type(intersection) == *boundary_type_;
+  }
+
+protected:
+  const BoundaryInfo<IntersectionType>& boundary_info_;
+  const std::shared_ptr<BoundaryType> boundary_type_;
+}; // class CustomBoundaryIntersections
+
+
+template <class GridLayerImp>
 class DirichletIntersections
     : public internal::WhichIntersectionBase<GridLayerImp, DirichletIntersections<GridLayerImp>, true>
 {
