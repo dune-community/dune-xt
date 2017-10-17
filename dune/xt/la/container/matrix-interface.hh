@@ -111,36 +111,6 @@ public:
     CHECK_AND_CALL_CRTP(this->as_imp().unit_col(jj));
   }
 
-  template <class MM>
-  derived_type operator*(const MatrixInterface<MM, ScalarType>& other) const
-  {
-    return multiply(other);
-  }
-
-  template <class MM>
-  derived_type operator+(const MatrixInterface<MM, ScalarType>& other) const
-  {
-    return add(other);
-  }
-
-  template <class MM>
-  derived_type operator-(const MatrixInterface<MM, ScalarType>& other) const
-  {
-    return subtract(other);
-  }
-
-  template <class MM>
-  derived_type& operator+=(const MatrixInterface<MM, ScalarType>& other)
-  {
-    return add_assign(other);
-  }
-
-  template <class MM>
-  derived_type& operator-=(const MatrixInterface<MM, ScalarType>& other)
-  {
-    return subtract_assign(other);
-  }
-
   /**
    * \brief  Checks entries for inf or nan.
    * \return false if any entry is inf or nan, else true
@@ -164,6 +134,61 @@ public:
     typename XX::derived_type yy(rows());
     mv(xx.as_imp(xx), yy);
     return yy;
+  }
+
+  template <class MM>
+  derived_type operator*(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    return multiply(other);
+  }
+
+  virtual derived_type operator*(const derived_type& other) const
+  {
+    return multiply(other);
+  }
+
+  template <class MM>
+  derived_type operator+(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    return add(other);
+  }
+
+  virtual derived_type operator+(const derived_type& other) const
+  {
+    return add(other);
+  }
+
+  template <class MM>
+  derived_type operator-(const MatrixInterface<MM, ScalarType>& other) const
+  {
+    return subtract(other);
+  }
+
+  virtual derived_type operator-(const derived_type& other) const
+  {
+    return subtract(other);
+  }
+
+  template <class MM>
+  derived_type& operator+=(const MatrixInterface<MM, ScalarType>& other)
+  {
+    return add_assign(other);
+  }
+
+  virtual derived_type& operator+=(const derived_type& other)
+  {
+    return add_assign(other);
+  }
+
+  template <class MM>
+  derived_type& operator-=(const MatrixInterface<MM, ScalarType>& other)
+  {
+    return subtract_assign(other);
+  }
+
+  virtual derived_type& operator-=(const derived_type& other)
+  {
+    return subtract_assign(other);
   }
 
   virtual RealType sup_norm() const
@@ -336,7 +361,7 @@ protected:
     auto new_pattern = pattern() + other.pattern();
     derived_type yy(rows(), other.cols(), new_pattern);
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (const auto& cc : new_pattern[rr])
+      for (const auto& cc : new_pattern.inner(rr))
         yy.set_entry(rr, cc, get_entry(rr, cc) + other.get_entry(rr, cc));
     return yy;
   }
@@ -345,17 +370,17 @@ protected:
   derived_type subtract(const MatrixInterface<MM, ScalarType>& other) const
   {
     if (other.rows() != rows() || other.cols() != cols())
-      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be subtracted do not match!");
     auto new_pattern = pattern() + other.pattern();
     derived_type yy(rows(), other.cols(), new_pattern);
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (const auto& cc : new_pattern[rr])
+      for (const auto& cc : new_pattern.inner(rr))
         yy.set_entry(rr, cc, get_entry(rr, cc) - other.get_entry(rr, cc));
     return yy;
   }
 
   template <class MM>
-  derived_type& add_assign(const MatrixInterface<MM, ScalarType>& other) const
+  derived_type& add_assign(const MatrixInterface<MM, ScalarType>& other)
   {
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
@@ -365,13 +390,13 @@ protected:
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "The matrix to be added contains entries that are not in this' pattern!");
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (const auto& cc : this_pattern[rr])
+      for (const auto& cc : this_pattern.inner(rr))
         add_to_entry(rr, cc, other.get_entry(rr, cc));
     return this->as_imp();
   }
 
   template <class MM>
-  derived_type& subtract_assign(const MatrixInterface<MM, ScalarType>& other) const
+  derived_type& subtract_assign(const MatrixInterface<MM, ScalarType>& other)
   {
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
@@ -379,9 +404,9 @@ protected:
     auto new_pattern = this_pattern + other.pattern();
     if (new_pattern != this_pattern)
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
-                 "The matrix to be added contains entries that are not in this' pattern!");
+                 "The matrix to be subtracted contains entries that are not in this' pattern!");
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (const auto& cc : this_pattern[rr])
+      for (const auto& cc : this_pattern.inner(rr))
         add_to_entry(rr, cc, -other.get_entry(rr, cc));
     return this->as_imp();
   }
