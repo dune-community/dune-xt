@@ -44,6 +44,7 @@ protected:
   }
 };
 
+
 class DirichletBoundary : public BoundaryType
 {
 protected:
@@ -52,6 +53,7 @@ protected:
     return "dirichlet boundary";
   }
 };
+
 
 class NeumannBoundary : public BoundaryType
 {
@@ -62,6 +64,7 @@ protected:
   }
 };
 
+
 class RobinBoundary : public BoundaryType
 {
 protected:
@@ -71,6 +74,7 @@ protected:
   }
 };
 
+
 class ReflectingBoundary : public BoundaryType
 {
 protected:
@@ -79,6 +83,47 @@ protected:
     return "reflecting boundary";
   }
 };
+
+
+class InflowBoundary : public BoundaryType
+{
+protected:
+  virtual std::string id() const override final
+  {
+    return "inflow boundary";
+  }
+};
+
+
+class OutflowBoundary : public BoundaryType
+{
+protected:
+  virtual std::string id() const override final
+  {
+    return "outflow boundary";
+  }
+};
+
+
+class InflowOutflowBoundary : public BoundaryType
+{
+protected:
+  virtual std::string id() const override final
+  {
+    return "inflow/outflow boundary";
+  }
+};
+
+
+class ImpermeableBoundary : public BoundaryType
+{
+protected:
+  virtual std::string id() const override final
+  {
+    return "impermeable boundary";
+  }
+};
+
 
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #pragma GCC diagnostic pop
