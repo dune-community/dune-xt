@@ -36,8 +36,9 @@ public:
   typedef XT::Common::MatrixAbstraction<RealMatrixType> RealMatrixAbstractionType;
   typedef XT::Common::MatrixAbstraction<ComplexMatrixType> ComplexMatrixAbstractionType;
 
-  EigenSolverBase(const MatrixType& matrix)
+  EigenSolverBase(const MatrixType& matrix, bool disable_checks = false)
     : matrix_(matrix)
+    , disable_checks_(disable_checks)
   {
   }
 
@@ -83,13 +84,17 @@ public:
   {
     const auto type = parse_opts(opts);
     // check
-    const Common::Configuration default_opts = options(type);
-    check_input(opts, default_opts);
+    thread_local Common::Configuration default_opts;
+    if (!disable_checks_) {
+      default_opts = options(type);
+      check_input(opts, default_opts);
+    }
     // solve
     std::vector<ComplexType> evs;
     get_eigenvalues(evs, type);
     // check
-    check_eigenvalues(evs, opts, default_opts);
+    if (!disable_checks_)
+      check_eigenvalues(evs, opts, default_opts);
     // return
     return evs;
   } // ... eigenvalues(...)
@@ -120,14 +125,18 @@ public:
   {
     const auto type = parse_opts(opts);
     // check
-    const Common::Configuration default_opts = options(type);
-    check_input(opts, default_opts);
+    thread_local Common::Configuration default_opts;
+    if (!disable_checks_) {
+      default_opts = options(type);
+      check_input(opts, default_opts);
+    }
     // solve
     const size_t dim = RealMatrixAbstractionType::rows(matrix_);
     std::vector<ComplexVectorType> evs(dim, XT::Common::VectorAbstraction<ComplexVectorType>::create(dim, 0.));
     get_eigenvectors(evs, type);
     // check
-    check_eigenvectors(evs, opts, default_opts);
+    if (!disable_checks_)
+      check_eigenvectors(evs, opts, default_opts);
     // return
     return evs;
   } // ... eigenvectors(...)
@@ -144,7 +153,8 @@ public:
 
   virtual std::vector<RealVectorType> real_eigenvectors(const Common::Configuration& opts) const
   {
-    Common::Configuration options_to_ensure_real_evs = opts;
+    thread_local Common::Configuration options_to_ensure_real_evs;
+    options_to_ensure_real_evs = opts;
     if (!options_to_ensure_real_evs.has_key("check_eigenvectors_are_real"))
       options_to_ensure_real_evs["check_eigenvectors_are_real"] = "1e-15";
     const auto evs = eigenvectors(options_to_ensure_real_evs);
@@ -346,6 +356,7 @@ protected:
   } // ... sorted_eigenvalues(...)
 
   const MatrixType& matrix_;
+  const bool disable_checks_;
 }; // class EigenSolverBase<...>
 
 

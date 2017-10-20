@@ -52,8 +52,8 @@ public:
   using typename BaseType::ComplexVectorType;
   using typename BaseType::RealMatrixType;
 
-  EigenSolver(const MatrixType& matrix)
-    : BaseType(matrix)
+  EigenSolver(const MatrixType& matrix, const bool disable_checks = false)
+    : BaseType(matrix, disable_checks)
   {
   }
 
