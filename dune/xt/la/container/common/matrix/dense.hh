@@ -409,6 +409,17 @@ public:
     *backend_ = new_backend;
   }
 
+  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
+  {
+    auto ret = this->copy();
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (size_t jj = 0; jj < cols(); ++jj)
+        if (XT::Common::FloatCmp::eq<Common::FloatCmp::Style::absolute>(0., ret.get_entry(ii, jj), 0., eps))
+          ret.set_entry(ii, jj, 0.);
+    return ret;
+  } // ... pruned(...)
+
 protected:
   /**
    * \see ContainerInterface
