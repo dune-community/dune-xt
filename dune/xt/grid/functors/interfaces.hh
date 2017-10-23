@@ -8,28 +8,33 @@
 //   Felix Schindler (2014, 2016 - 2017)
 //   Rene Milk       (2014 - 2018)
 
-#ifndef DUNE_XT_GRID_WALKER_FUNCTORS_HH
-#define DUNE_XT_GRID_WALKER_FUNCTORS_HH
+#ifndef DUNE_XT_GRID_FUNCTORS_INTERFACES_HH
+#define DUNE_XT_GRID_FUNCTORS_INTERFACES_HH
 
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace Grid {
-namespace Functor {
 
-template <class GridLayerImp>
-class Codim0
+
+/**
+ * \brief Interface for functors which are applied to (codim 0) entities of a grid layer by the \sa GridWalker.
+ * \sa    EntityReturnFunctor
+ */
+template <class GL>
+class EntityFunctor
 {
+  static_assert(is_layer<GL>::value, "");
+
 public:
-  typedef GridLayerImp GridLayerType;
+  using GridLayerType = GL;
   using EntityType = extract_entity_t<GridLayerType>;
 
-  virtual ~Codim0()
-  {
-  }
+  virtual ~EntityFunctor() = default;
 
   virtual void prepare()
   {
@@ -40,62 +45,157 @@ public:
   virtual void finalize()
   {
   }
-}; // class Codim0
+}; // class EntityFunctor
 
-template <class GridLayerImp, class ReturnImp>
-class Codim0Return : public Codim0<GridLayerImp>
+
+/**
+ * \brief Interface for functors which are like \sa EntityFunctor but return results.
+ *
+ *        Think of computing the L^2 norm of a function f:
+\code
+const auto local_l2_norm = functor.compute_locally(entity);
+\endcode
+          would compute and return \int_entity f^2 \dx. On the other hand, apply_local(entity) would be implemented
+          to call compute_locally and store the result, i.e. an implementation might look like:
+\code
+void apply_local(const EntityType& entity) override final
 {
-  typedef Codim0<GridLayerImp> BaseType;
+  this->result_ += functor.compute_locally(entity);
+}
+\endcode
+          In that case, result_ would be a private member which is set to zero in prepare(). An implementation of
+          finalize() might then look like:
+\code
+void finalize() override final
+{
+  this->result_ = std::sqrt(this->result);
+}
+\endcode
+          The purpose of result() is then simply to return result_;
+ */
+template <class GL, class R>
+class EntityReturnFunctor : public EntityFunctor<GL>
+{
+  using BaseType = EntityFunctor<GL>;
 
 public:
-  typedef ReturnImp ReturnType;
+  using ResultType = R;
+  using typename BaseType::GridLayerType;
   using typename BaseType::EntityType;
 
-  virtual ~Codim0Return()
-  {
-  }
+  virtual ~EntityReturnFunctor() = default;
 
-  virtual ReturnType compute_locally(const EntityType& entity) = 0;
+  /**
+   * \note Calling this method should not alter the state of this functor, i.e. calling
+\code
+auto result = func.compute_locally(entity);
+func.apply_local(entity);
+\endcode
+   *       should give the same as:
+\code
+func.apply_local(entity);
+\endcode
+   */
+  virtual ResultType compute_locally(const EntityType& entity) = 0;
 
-  virtual ReturnType result() const = 0;
-}; // class Codim0ReturnFunctor
+  /**
+   * \brief Can be called to access the final result of the functor.
+   */
+  virtual ResultType result() const = 0;
+}; // class EntityReturnFunctor
 
-template <class GridLayerImp>
-class Codim1
+
+/**
+ * \brief Interface for functors which are applied to (codim 1) intersection of a grid layer by the \sa GridWalker.
+ * \sa    EntityFunctor
+ * \sa    EntityReturnFunctor
+ */
+template <class GL>
+class IntersectionFunctor
 {
+  static_assert(is_layer<GL>::value, "");
+
 public:
-  typedef GridLayerImp GridLayerType;
+  using GridLayerType = GL;
   using EntityType = extract_entity_t<GridLayerType>;
   using IntersectionType = extract_intersection_t<GridLayerType>;
 
-  virtual ~Codim1()
-  {
-  }
+  virtual ~IntersectionFunctor() = default;
 
   virtual void prepare()
   {
   }
 
-  virtual void apply_local(const IntersectionType& /*intersection*/,
-                           const EntityType& /*inside_entity*/,
-                           const EntityType& /*outside_entity*/) = 0;
+  /**
+   * \note The meaning of outside_intersection depends on the circumstances. In general, the result of
+   *       intersection.outside() is given, but this might differ on periodic or boundary intersections.
+   */
+  virtual void apply_local(const IntersectionType& intersection,
+                           const EntityType& inside_entity,
+                           const EntityType& outside_entity) = 0;
 
   virtual void finalize()
   {
   }
-}; // class Codim1
+}; // class IntersectionFunctor
 
-template <class GridLayerImp>
-class Codim0And1
+
+/**
+ * \brief Interface for functors which are like \sa IntersectionFunctor but return results.
+ * \sa    EntityFunctor
+ * \sa    EntityReturnFunctor
+ * \sa    IntersectionFunctor
+ */
+template <class GL, class R>
+class IntersectionReturnFunctor : public IntersectionFunctor<GL>
 {
+  using BaseType = IntersectionFunctor<GL>;
+
 public:
-  typedef GridLayerImp GridLayerType;
+  using ResultType = R;
+  using typename BaseType::GridLayerType;
+  using typename BaseType::EntityType;
+  using typename BaseType::IntersectionType;
+
+  virtual ~IntersectionReturnFunctor() = default;
+
+  /**
+   * \note Calling this method should not alter the state of this functor, i.e. calling
+\code
+auto result = func.compute_locally(intersection, inside_entity, outside_entity);
+func.apply_local(intersection, inside_entity, outside_entity);
+\endcode
+   *       should give the same as:
+\code
+func.apply_local(intersection, inside_entity, outside_entity);
+\endcode
+   */
+  virtual ResultType compute_locally(const IntersectionType& intersection,
+                                     const EntityType& inside_entity,
+                                     const EntityType& outside_entity) = 0;
+
+  virtual ResultType result() const = 0;
+}; // class IntersectionReturnFunctor
+
+
+/**
+ * \brief Interface for functors which are applied to entities and intersections of a grid layer by the \sa GridWalker.
+ * \sa    EntityFunctor
+ * \sa    IntersectionFunctor
+ * \sa    EntityReturnFunctor
+ * \sa    IntersectionReturnFunctor
+ */
+template <class GL>
+class EntityAndIntersectionFunctor
+{
+  static_assert(is_layer<GL>::value, "");
+
+public:
+  using GridLayerType = GL;
   using EntityType = extract_entity_t<GridLayerType>;
   using IntersectionType = extract_intersection_t<GridLayerType>;
 
-  virtual ~Codim0And1()
-  {
-  }
+  virtual ~EntityAndIntersectionFunctor() = default;
 
   virtual void prepare()
   {
@@ -103,56 +203,71 @@ public:
 
   virtual void apply_local(const EntityType& entity) = 0;
 
-  virtual void apply_local(const IntersectionType& /*intersection*/,
-                           const EntityType& /*inside_entity*/,
-                           const EntityType& /*outside_entity*/) = 0;
+  virtual void apply_local(const IntersectionType& intersection,
+                           const EntityType& inside_entity,
+                           const EntityType& outside_entity) = 0;
 
   virtual void finalize()
   {
   }
-}; // class Codim0And1
+}; // class EntityAndIntersectionFunctor
 
-template <class GridLayerImp>
-class DirichletDetector : public Codim1<GridLayerImp>
+
+/**
+ * \brief Interface for functors which are like \sa EntityAndIntersectionFunctor but return results.
+ * \sa    EntityFunctor
+ * \sa    EntityReturnFunctor
+ * \sa    IntersectionFunctor
+ * \sa    IntersectionReturnFunctor
+ * \sa    EntityAndIntersectionFunctor
+ */
+template <class GL, class R>
+class EntityAndIntersectionReturnFunctor : public EntityAndIntersectionFunctor<GL>
 {
-  typedef Codim1<GridLayerImp> BaseType;
+  using BaseType = EntityAndIntersectionFunctor<GL>;
 
 public:
-  typedef typename BaseType::GridLayerType GridLayerType;
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::IntersectionType IntersectionType;
+  using ResultType = R;
+  using typename BaseType::GridLayerType;
+  using typename BaseType::EntityType;
+  using typename BaseType::IntersectionType;
 
-  explicit DirichletDetector(const BoundaryInfo<IntersectionType>& boundary_info)
-    : boundary_info_(boundary_info)
-    , found_(0)
-  {
-  }
+  virtual ~EntityAndIntersectionReturnFunctor() = default;
 
-  virtual ~DirichletDetector()
-  {
-  }
+  /**
+   * \note Calling this method should not alter the state of this functor, i.e. calling
+\code
+auto result = func.compute_locally(entity);
+func.apply_local(entity);
+\endcode
+   *       should give the same as:
+\code
+func.apply_local(entity);
+\endcode
+   */
+  virtual ResultType compute_locally(const EntityType& entity) = 0;
 
-  virtual void apply_local(const IntersectionType& intersection,
-                           const EntityType& /*inside_entity*/,
-                           const EntityType& /*outside_entity*/) override
-  {
-    if (boundary_info_.type(intersection) == DirichletBoundary())
-      ++found_;
-  }
+  /**
+   * \note Calling this method should not alter the state of this functor, i.e. calling
+\code
+auto result = func.compute_locally(intersection, inside_entity, outside_entity);
+func.apply_local(intersection, inside_entity, outside_entity);
+\endcode
+   *       should give the same as:
+\code
+func.apply_local(intersection, inside_entity, outside_entity);
+\endcode
+   */
+  virtual ResultType compute_locally(const IntersectionType& intersection,
+                                     const EntityType& inside_entity,
+                                     const EntityType& outside_entity) = 0;
 
-  bool found() const
-  {
-    return found_ > 0;
-  }
+  virtual ResultType result() const = 0;
+}; // class EntityAndIntersectionReturnFunctor
 
-private:
-  const BoundaryInfo<IntersectionType>& boundary_info_;
-  size_t found_;
-}; // class DirichletDetector
 
-} // namespace Functor
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_WALKER_FUNCTORS_HH
+#endif // DUNE_XT_GRID_FUNCTORS_INTERFACES_HH
