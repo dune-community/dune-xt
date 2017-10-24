@@ -21,6 +21,7 @@
 #include <dune/common/array.hh>
 #include <dune/common/fvector.hh>
 
+#include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/functors/bounding-box.hh>
 #include <dune/xt/grid/walker.hh>
 
@@ -95,9 +96,9 @@ private:
  *  \see Pgf
  **/
 template <class GridViewType>
-class PgfEntityFunctorIntersections : public Functor::Codim0And1<GridViewType>
+class PgfEntityFunctorIntersections : public EntityAndIntersectionFunctor<GridViewType>
 {
-  typedef Functor::Codim0And1<GridViewType> BaseType;
+  typedef EntityAndIntersectionFunctor<GridViewType> BaseType;
 
 public:
   PgfEntityFunctorIntersections(const GridViewType& grid_view,

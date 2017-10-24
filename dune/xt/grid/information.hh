@@ -27,7 +27,7 @@
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/walker.hh>
-#include <dune/xt/grid/walker/functors.hh>
+#include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
@@ -114,7 +114,7 @@ struct Dimensions
   MinMaxAvgType entity_width;
 
   //! gridwalk functor that does the actual work for \ref GridDimensions
-  class GridDimensionsFunctor : public Functor::Codim0<GridLayerType>
+  class GridDimensionsFunctor : public EntityFunctor<GridLayerType>
   {
     CoordLimitsType& coord_limits_;
     MinMaxAvgType& entity_volume_;
