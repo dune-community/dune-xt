@@ -599,6 +599,13 @@ protected:
 }; // class Walker
 
 
+template <class GL>
+Walker<GL> make_walker(GL grid_layer)
+{
+  return Walker<GL>(grid_layer);
+}
+
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
