@@ -161,6 +161,8 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::EntityType;
 
+  explicit AllEntities() = default;
+
   EntityFilter<GridLayerType>* copy() const override final
   {
     return new AllEntities<GridLayerType>();
@@ -184,6 +186,8 @@ class BoundaryEntities : public EntityFilter<GL>
 public:
   using typename BaseType::GridLayerType;
   using typename BaseType::EntityType;
+
+  explicit BoundaryEntities() = default;
 
   EntityFilter<GridLayerType>* copy() const override final
   {
@@ -210,7 +214,7 @@ public:
   using typename BaseType::EntityType;
   using LambdaType = std::function<bool(const GridLayerType&, const EntityType&)>;
 
-  LambdaFilteredEntities(LambdaType lambda)
+  explicit LambdaFilteredEntities(LambdaType lambda)
     : lambda_(lambda)
   {
   }
@@ -268,6 +272,8 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
+  explicit AllIntersections() = default;
+
   IntersectionFilter<GridLayerType>* copy() const override final
   {
     return new AllIntersections<GridLayerType>();
@@ -297,6 +303,8 @@ class InnerIntersections : public IntersectionFilter<GL>
 public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
+
+  explicit InnerIntersections() = default;
 
   IntersectionFilter<GridLayerType>* copy() const override final
   {
@@ -329,6 +337,8 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
+  explicit InnerIntersectionsOnce() = default;
+
   IntersectionFilter<GridLayerType>* copy() const override final
   {
     return new InnerIntersectionsOnce<GridLayerType>();
@@ -358,6 +368,8 @@ class PartitionSetInnerIntersectionsOnce : public IntersectionFilter<GL>
 public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
+
+  explicit PartitionSetInnerIntersectionsOnce() = default;
 
   IntersectionFilter<GridLayerType>* copy() const override final
   {
@@ -392,6 +404,8 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
+  explicit BoundaryIntersections() = default;
+
   IntersectionFilter<GridLayerType>* copy() const override final
   {
     return new BoundaryIntersections<GridLayerType>();
@@ -416,6 +430,8 @@ class NonPeriodicBoundaryIntersections : public IntersectionFilter<GL>
 public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
+
+  explicit NonPeriodicBoundaryIntersections() = default;
 
   IntersectionFilter<GridLayerType>* copy() const override final
   {
@@ -447,6 +463,8 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
+  explicit PeriodicBoundaryIntersections() = default;
+
   IntersectionFilter<GridLayerType>* copy() const override final
   {
     return new PeriodicBoundaryIntersections<GridLayerType>();
@@ -477,6 +495,8 @@ class PeriodicBoundaryIntersectionsOnce : public IntersectionFilter<GL>
 public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
+
+  explicit PeriodicBoundaryIntersectionsOnce() = default;
 
   IntersectionFilter<GridLayerType>* copy() const override final
   {
@@ -510,7 +530,7 @@ public:
   using typename BaseType::IntersectionType;
   using LambdaType = std::function<bool(const GridLayerType&, const IntersectionType&)>;
 
-  LambdaFilteredIntersections(LambdaType lambda)
+  explicit LambdaFilteredIntersections(LambdaType lambda)
     : lambda_(lambda)
   {
   }
@@ -546,14 +566,15 @@ public:
   /**
    * \attention Takes ownership of boundary_type, do not delete manually!
    */
-  CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType*&& boundary_type)
+  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                       BoundaryType*&& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
   {
   }
 
-  CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                              const std::shared_ptr<BoundaryType>& boundary_type)
+  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                       const std::shared_ptr<BoundaryType>& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
   {
@@ -591,15 +612,15 @@ public:
   /**
    * \attention Takes ownership of boundary_type, do not delete manually!
    */
-  CustomBoundaryAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                        BoundaryType*&& boundary_type)
+  explicit CustomBoundaryAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                                 BoundaryType*&& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(std::move(boundary_type))
   {
   }
 
-  CustomBoundaryAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                        const std::shared_ptr<BoundaryType>& boundary_type)
+  explicit CustomBoundaryAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                                 const std::shared_ptr<BoundaryType>& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
   {
