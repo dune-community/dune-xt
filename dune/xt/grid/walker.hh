@@ -448,14 +448,14 @@ public:
    * \}
    */
 
-  void walk(const bool use_tbb = false)
+  void walk(const bool use_tbb = false, const bool clear_functors = true)
   {
 #if HAVE_TBB
     if (use_tbb) {
       const auto num_partitions =
           DXTC_CONFIG_GET("threading.partition_factor", 1u) * XT::Common::threadManager().current_threads();
       RangedPartitioning<GridLayerType, 0> partitioning(grid_layer_, num_partitions);
-      this->walk(partitioning);
+      this->walk(partitioning, clear_functors);
       return;
     }
 #else
@@ -473,7 +473,9 @@ public:
 
     // finalize functors
     finalize();
-    clear();
+
+    if (clear_functors)
+      clear();
   } // ... walk(...)
 
   void clear()
@@ -519,7 +521,7 @@ protected:
 
 public:
   template <class PartioningType>
-  void walk(PartioningType& partitioning)
+  void walk(PartioningType& partitioning, const bool clear_functors = true)
   {
     // prepare functors
     prepare();
@@ -535,7 +537,9 @@ public:
 
     // finalize functors
     finalize();
-    clear();
+
+    if (clear_functors)
+      clear();
   } // ... tbb_walk(...)
 #else
 public:
