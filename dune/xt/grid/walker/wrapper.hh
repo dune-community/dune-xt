@@ -12,272 +12,279 @@
 #ifndef DUNE_XT_GRID_WALKER_WRAPPER_HH
 #define DUNE_XT_GRID_WALKER_WRAPPER_HH
 
-#include "apply-on.hh"
-#include "functors.hh"
+#include <dune/xt/common/memory.hh>
+#include <dune/xt/grid/functors/interfaces.hh>
+#include <dune/xt/grid/type_traits.hh>
+
+#include "filters.hh"
 
 namespace Dune {
 namespace XT {
 namespace Grid {
+
+// forward
+template <class Gl>
+class Walker;
+
+
 namespace internal {
 
-template <class GridLayerType>
-class Codim0Object : public Functor::Codim0<GridLayerType>
+
+/**
+ * \brief To be used within the \sa Walker as internal storage type.
+ * \note  Most likely you do not want to use this class directly, but instead append() an \sa EntityFunctor to a
+ *        Walker.
+ */
+template <class GL>
+class EntityFunctorWrapper
 {
-  typedef Functor::Codim0<GridLayerType> BaseType;
+  static_assert(is_layer<GL>::value, "");
+  using ThisType = EntityFunctorWrapper<GL>;
 
 public:
-  typedef typename BaseType::EntityType EntityType;
+  using FunctorType = EntityFunctor<GL>;
+  using FilterType = EntityFilter<GL>;
 
-  virtual ~Codim0Object()
+  /**
+   * \attention Takes ownership of filtr_ptr, do not delete manually!
+   */
+  EntityFunctorWrapper(FunctorType& functr, const FilterType*&& filtr_ptr)
+    : functor_(functr)
+    , filter_(std::move(filtr_ptr))
   {
   }
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const EntityType& entity) const = 0;
-};
-
-template <class GridLayerImp, class ReturnType>
-class Codim0ReturnObject : public Functor::Codim0Return<GridLayerImp, ReturnType>
-{
-  typedef Functor::Codim0Return<GridLayerImp, ReturnType> BaseType;
-
-public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
-
-  virtual ~Codim0ReturnObject() = default;
-
-  virtual bool apply_on(const GridLayerType& grid_layer, const EntityType& entity) const = 0;
-};
-
-template <class GridLayerType, class Codim0FunctorType>
-class Codim0FunctorWrapper : public Codim0Object<GridLayerType>
-{
-  typedef Codim0Object<GridLayerType> BaseType;
-
-public:
-  typedef typename BaseType::EntityType EntityType;
-
-  Codim0FunctorWrapper(Codim0FunctorType& wrapped_functor, const ApplyOn::WhichEntity<GridLayerType>* where)
-    : wrapped_functor_(wrapped_functor)
-    , where_(where)
+  /**
+   * \attention Takes ownership of functr_ptr, do not delete manually!
+   * \attention Takes ownership of filtr_ptr, do not delete manually!
+   */
+  EntityFunctorWrapper(FunctorType*&& functr_ptr, const FilterType*&& filtr_ptr)
+    : functor_(std::move(functr_ptr))
+    , filter_(std::move(filtr_ptr))
   {
   }
 
-  virtual ~Codim0FunctorWrapper()
+  bool operator==(const ThisType& other) const
   {
+    return this == &other;
   }
 
-  virtual void prepare() override final
+  bool operator!=(const ThisType& other) const
   {
-    wrapped_functor_.prepare();
+    return this != other;
   }
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const EntityType& entity) const override final
+  virtual const FilterType& filter() const
   {
-    return where_->apply_on(grid_layer, entity);
+    return filter_.access();
   }
 
-  virtual void apply_local(const EntityType& entity) override final
+  virtual FunctorType& functor()
   {
-    wrapped_functor_.apply_local(entity);
-  }
-
-  virtual void finalize() override final
-  {
-    wrapped_functor_.finalize();
+    return functor_.access();
   }
 
 private:
-  Codim0FunctorType& wrapped_functor_;
-  std::unique_ptr<const ApplyOn::WhichEntity<GridLayerType>> where_;
-}; // class Codim0FunctorWrapper
+  Common::StorageProvider<FunctorType> functor_;
+  Common::ConstStorageProvider<FilterType> filter_;
+}; // class EntityFunctorWrapper
 
-template <class GridLayerType>
-class Codim1Object : public Functor::Codim1<GridLayerType>
+
+/**
+ * \brief To be used within the \sa Walker as internal storage type.
+ * \note  Most likely you do not want to use this class directly, but instead append() an \sa IntersectionFunctor to a
+ *        Walker.
+ */
+template <class GL>
+class IntersectionFunctorWrapper
 {
-  typedef Functor::Codim1<GridLayerType> BaseType;
+  static_assert(is_layer<GL>::value, "");
+  using ThisType = IntersectionFunctorWrapper<GL>;
 
 public:
-  typedef typename BaseType::IntersectionType IntersectionType;
+  using FunctorType = IntersectionFunctor<GL>;
+  using FilterType = IntersectionFilter<GL>;
 
-  virtual ~Codim1Object()
+  /**
+   * \attention Takes ownership of filtr_ptr, do not delete manually!
+   */
+  IntersectionFunctorWrapper(FunctorType& functr, const FilterType*&& filtr_ptr)
+    : functor_(functr)
+    , filter_(std::move(filtr_ptr))
   {
   }
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const = 0;
-};
-
-template <class GridLayerType, class Codim1FunctorType>
-class Codim1FunctorWrapper : public Codim1Object<GridLayerType>
-{
-  typedef Codim1Object<GridLayerType> BaseType;
-
-public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::IntersectionType IntersectionType;
-
-  Codim1FunctorWrapper(Codim1FunctorType& wrapped_functor, const ApplyOn::WhichIntersection<GridLayerType>* where)
-    : wrapped_functor_(wrapped_functor)
-    , where_(where)
+  /**
+   * \attention Takes ownership of functr_ptr, do not delete manually!
+   * \attention Takes ownership of filtr_ptr, do not delete manually!
+   */
+  IntersectionFunctorWrapper(FunctorType*&& functr_ptr, const FilterType*&& filtr_ptr)
+    : functor_(std::move(functr_ptr))
+    , filter_(std::move(filtr_ptr))
   {
   }
 
-  virtual void prepare() override final
+  bool operator==(const ThisType& other) const
   {
-    wrapped_functor_.prepare();
+    return this == &other;
   }
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool operator!=(const ThisType& other) const
   {
-    return where_->apply_on(grid_layer, intersection);
+    return this != other;
   }
 
-  virtual void apply_local(const IntersectionType& intersection,
-                           const EntityType& inside_entity,
-                           const EntityType& outside_entity) override final
+  virtual const FilterType& filter() const
   {
-    wrapped_functor_.apply_local(intersection, inside_entity, outside_entity);
+    return filter_.access();
   }
 
-  virtual void finalize() override final
+  virtual FunctorType& functor()
   {
-    wrapped_functor_.finalize();
+    return functor_.access();
   }
 
 private:
-  Codim1FunctorType& wrapped_functor_;
-  std::unique_ptr<const ApplyOn::WhichIntersection<GridLayerType>> where_;
-}; // class Codim1FunctorWrapper
+  Common::StorageProvider<FunctorType> functor_;
+  Common::ConstStorageProvider<FilterType> filter_;
+}; // class IntersectionFunctorWrapper
 
-template <class GridLayerType, class WalkerType>
-class WalkerWrapper : public Codim0Object<GridLayerType>, public Codim1Object<GridLayerType>
+
+/**
+ * \brief To be used within the \sa Walker as internal storage type.
+ * \note  Most likely you do not want to use this class directly, but instead append() an \sa
+ *        EntityAndIntersectionFunctor to a Walker.
+ */
+template <class GL>
+class EntityAndIntersectionFunctorWrapper
 {
+  static_assert(is_layer<GL>::value, "");
+  using ThisType = EntityAndIntersectionFunctorWrapper<GL>;
+
 public:
-  typedef typename Codim1Object<GridLayerType>::EntityType EntityType;
-  typedef typename Codim1Object<GridLayerType>::IntersectionType IntersectionType;
+  using FunctorType = EntityAndIntersectionFunctor<GL>;
+  using EntityFilterType = EntityFilter<GL>;
+  using IntersectionFilterType = IntersectionFilter<GL>;
 
-  WalkerWrapper(WalkerType& grid_walker, const ApplyOn::WhichEntity<GridLayerType>* which_entities)
-    : grid_walker_(grid_walker)
-    , which_entities_(which_entities)
-    , which_intersections_(new ApplyOn::AllIntersections<GridLayerType>())
+  /**
+   * \attention Takes ownership of entity_filtr_ptr, do not delete manually!
+   * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
+   */
+  EntityAndIntersectionFunctorWrapper(FunctorType& functr,
+                                      const EntityFilterType*&& entity_filtr_ptr,
+                                      const IntersectionFilterType*&& intersection_filtr_ptr)
+    : functor_(functr)
+    , entity_filter_(std::move(entity_filtr_ptr))
+    , intersection_filter_(std::move(intersection_filtr_ptr))
   {
   }
 
-  WalkerWrapper(WalkerType& grid_walker, const ApplyOn::WhichIntersection<GridLayerType>* which_intersections)
-    : grid_walker_(grid_walker)
-    , which_entities_(new ApplyOn::AllEntities<GridLayerType>())
-    , which_intersections_(which_intersections)
+  /**
+   * \attention Takes ownership of functr_ptr, do not delete manually!
+   * \attention Takes ownership of entity_filtr_ptr, do not delete manually!
+   * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
+   */
+  EntityAndIntersectionFunctorWrapper(FunctorType*&& functr_ptr,
+                                      const EntityFilterType*&& entity_filtr_ptr,
+                                      const IntersectionFilterType*&& intersection_filtr_ptr)
+    : functor_(std::move(functr_ptr))
+    , entity_filter_(std::move(entity_filtr_ptr))
+    , intersection_filter_(std::move(intersection_filtr_ptr))
   {
   }
 
-  virtual ~WalkerWrapper()
+  bool operator==(const ThisType& other) const
   {
+    return this == &other;
   }
 
-  virtual void prepare() override final
+  bool operator!=(const ThisType& other) const
   {
-    grid_walker_.prepare();
+    return this != other;
   }
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const EntityType& entity) const override final
+  virtual const EntityFilterType& entity_filter() const
   {
-    return which_entities_->apply_on(grid_layer, entity) && grid_walker_.apply_on(entity);
+    return entity_filter_.access();
   }
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  virtual const IntersectionFilterType& intersection_filter() const
   {
-    return which_intersections_->apply_on(grid_layer, intersection) && grid_walker_.apply_on(intersection);
+    return intersection_filter_.access();
   }
 
-  virtual void apply_local(const EntityType& entity) override final
+  virtual FunctorType& functor()
   {
-    grid_walker_.apply_local(entity);
-  }
-
-  virtual void apply_local(const IntersectionType& intersection,
-                           const EntityType& inside_entity,
-                           const EntityType& outside_entity) override final
-  {
-    grid_walker_.apply_local(intersection, inside_entity, outside_entity);
-  }
-
-  virtual void finalize() override final
-  {
-    grid_walker_.finalize();
+    return functor_.access();
   }
 
 private:
-  WalkerType& grid_walker_;
-  std::unique_ptr<const ApplyOn::WhichEntity<GridLayerType>> which_entities_;
-  std::unique_ptr<const ApplyOn::WhichIntersection<GridLayerType>> which_intersections_;
+  Common::StorageProvider<FunctorType> functor_;
+  Common::ConstStorageProvider<EntityFilterType> entity_filter_;
+  Common::ConstStorageProvider<IntersectionFilterType> intersection_filter_;
+}; // class EntityAndIntersectionFunctorWrapper
+
+
+/**
+ * \brief To be used within the \sa Walker as internal storage type.
+ * \note  Most likely you do not want to use this class directly, but instead append() a Walker to a Walker.
+ */
+template <class GL>
+class WalkerWrapper : public EntityAndIntersectionFunctorWrapper<GL>
+{
+  using BaseType = EntityAndIntersectionFunctorWrapper<GL>;
+  using ThisType = WalkerWrapper<GL>;
+
+public:
+  using typename BaseType::EntityFilterType;
+  using typename BaseType::IntersectionFilterType;
+
+  /**
+   * \attention Takes ownership of entity_filtr_ptr, do not delete manually!
+   * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
+   */
+  WalkerWrapper(Walker<GL>& walkr,
+                const EntityFilterType*&& entity_filtr_ptr,
+                const IntersectionFilterType*&& intersection_filtr_ptr)
+    : BaseType(walkr,
+               new ApplyOn::LambdaFilteredEntities<GL>([&](const auto& grid_layer, const auto& entity) {
+                 if (restriction_entity_filter_.access().contains(grid_layer, entity)) {
+                   for (const auto& wrapper : walkr.entity_functor_wrappers_) {
+                     if (wrapper->filter().contains(grid_layer, entity))
+                       return true;
+                   }
+                   for (const auto& wrapper : walkr.entity_and_intersection_functor_wrappers_) {
+                     if (wrapper->entity_filter().contains(grid_layer, entity))
+                       return true;
+                   }
+                   return false;
+                 } else
+                   return false;
+               }),
+               new ApplyOn::LambdaFilteredIntersections<GL>([&](const auto& grid_layer, const auto& intersection) {
+                 if (restriction_intersection_filter_.access().contains(grid_layer, intersection)) {
+                   for (const auto& wrapper : walkr.intersection_functor_wrappers_) {
+                     if (wrapper->filter().contains(grid_layer, intersection))
+                       return true;
+                   }
+                   for (const auto& wrapper : walkr.entity_and_intersection_functor_wrappers_) {
+                     if (wrapper->intersection_filter().contains(grid_layer, intersection))
+                       return true;
+                   }
+                   return false;
+                 } else
+                   return false;
+               }))
+    , restriction_entity_filter_(std::move(entity_filtr_ptr))
+    , restriction_intersection_filter_(std::move(intersection_filtr_ptr))
+  {
+  }
+
+private:
+  Common::ConstStorageProvider<EntityFilterType> restriction_entity_filter_;
+  Common::ConstStorageProvider<IntersectionFilterType> restriction_intersection_filter_;
 }; // class WalkerWrapper
 
-template <class GridLayerType>
-class Codim0LambdaWrapper : public Codim0Object<GridLayerType>
-{
-  typedef Codim0Object<GridLayerType> BaseType;
-
-public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef std::function<void(const EntityType&)> LambdaType;
-
-  Codim0LambdaWrapper(LambdaType lambda, const ApplyOn::WhichEntity<GridLayerType>* where)
-    : lambda_(lambda)
-    , where_(where)
-  {
-  }
-
-  virtual ~Codim0LambdaWrapper()
-  {
-  }
-
-  virtual bool apply_on(const GridLayerType& grid_layer, const EntityType& entity) const override final
-  {
-    return where_->apply_on(grid_layer, entity);
-  }
-
-  virtual void apply_local(const EntityType& entity) override final
-  {
-    lambda_(entity);
-  }
-
-private:
-  LambdaType lambda_;
-  std::unique_ptr<const ApplyOn::WhichEntity<GridLayerType>> where_;
-}; // class Codim0LambdaWrapper
-
-template <class GridLayerType>
-class Codim1LambdaWrapper : public Codim1Object<GridLayerType>
-{
-  typedef Codim1Object<GridLayerType> BaseType;
-
-public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::IntersectionType IntersectionType;
-  typedef std::function<void(const IntersectionType&, const EntityType&, const EntityType&)> LambdaType;
-
-  Codim1LambdaWrapper(LambdaType lambda, const ApplyOn::WhichIntersection<GridLayerType>* where)
-    : lambda_(lambda)
-    , where_(where)
-  {
-  }
-
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
-  {
-    return where_->apply_on(grid_layer, intersection);
-  }
-
-  virtual void apply_local(const IntersectionType& intersection,
-                           const EntityType& inside_entity,
-                           const EntityType& outside_entity) override final
-  {
-    lambda_(intersection, inside_entity, outside_entity);
-  }
-
-private:
-  LambdaType lambda_;
-  std::unique_ptr<const ApplyOn::WhichIntersection<GridLayerType>> where_;
-}; // class Codim1FunctorWrapper
 
 } // namespace internal
 } // namespace Grid
