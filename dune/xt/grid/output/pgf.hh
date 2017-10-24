@@ -21,7 +21,7 @@
 #include <dune/common/array.hh>
 #include <dune/common/fvector.hh>
 
-#include <dune/xt/grid/walk_functors.hh>
+#include <dune/xt/grid/functors/bounding-box.hh>
 #include <dune/xt/grid/walker.hh>
 
 namespace Dune {
