@@ -7,8 +7,8 @@
 // Authors:
 //   Felix Schindler (2017)
 
-#ifndef DUNE_XT_LA_MATRIX_INVERSE_HH
-#define DUNE_XT_LA_MATRIX_INVERSE_HH
+#ifndef DUNE_XT_LA_MATRIX_INVERTER_HH
+#define DUNE_XT_LA_MATRIX_INVERTER_HH
 
 #include <dune/common/typetraits.hh>
 
@@ -26,7 +26,7 @@ namespace LA {
  *        expected functionality.
  */
 template <class MatrixType>
-class InverseMatrixOptions
+class MatrixInverterOptions
 {
   static_assert(AlwaysFalse<MatrixType>::value,
                 "Please implement for given MatrixType and add the respective include below!");
@@ -42,7 +42,7 @@ class InverseMatrixOptions
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");
   }
-}; // class InverseMatrixOptions
+}; // class MatrixInverterOptions
 
 
 /**
@@ -51,18 +51,18 @@ class InverseMatrixOptions
  *        expected functionality.
  */
 template <class MatrixType>
-class InverseMatrix
+class MatrixInverter
 {
   static_assert(AlwaysFalse<MatrixType>::value,
                 "Please implement for given MatrixType and add the respective include below!");
 
-  InverseMatrix(const MatrixType& /*matrix*/, const std::string& /*type*/ = "")
+  MatrixInverter(const MatrixType& /*matrix*/, const std::string& /*type*/ = "")
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");
   }
 
-  InverseMatrix(const MatrixType& /*matrix*/, const Common::Configuration /*opts*/)
+  MatrixInverter(const MatrixType& /*matrix*/, const Common::Configuration /*opts*/)
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");
@@ -91,20 +91,36 @@ class InverseMatrix
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");
   }
-}; // class InverseMatrix
+}; // class MatrixInverter
 
 
 template <class M>
-InverseMatrix<M> make_inverse_matrix(const M& matrix, const std::string& type = "")
+MatrixInverter<M> make_matrix_inverter(const M& matrix, const std::string& type = "")
 {
-  return InverseMatrix<M>(matrix, type);
+  return MatrixInverter<M>(matrix, type);
 }
 
 
 template <class M>
-InverseMatrix<M> make_inverse_matrix(const M& matrix, const XT::Common::Configuration& options)
+MatrixInverter<M> make_matrix_inverter(const M& matrix, const XT::Common::Configuration& options)
 {
-  return InverseMatrix<M>(matrix, options);
+  return MatrixInverter<M>(matrix, options);
+}
+
+
+template <class M>
+typename std::enable_if<is_matrix<M>::value, M>::type invert_matrix(const M& matrix,
+                                                                    const std::string& inversion_type = "")
+{
+  return MatrixInverter<M>(matrix, inversion_type).inverse();
+}
+
+
+template <class M>
+typename std::enable_if<is_matrix<M>::value, M>::type invert_matrix(const M& matrix,
+                                                                    const XT::Common::Configuration& inversion_options)
+{
+  return MatrixInverter<M>(matrix, inversion_options).inverse();
 }
 
 
@@ -112,7 +128,7 @@ InverseMatrix<M> make_inverse_matrix(const M& matrix, const XT::Common::Configur
 } // namespace XT
 } // namespace LA
 
-#include "matrix-inverse/eigen.hh"
+#include "matrix-inverter/eigen.hh"
 
 
-#endif // DUNE_XT_LA_MATRIX_INVERSE_HH
+#endif // DUNE_XT_LA_MATRIX_INVERTER_HH

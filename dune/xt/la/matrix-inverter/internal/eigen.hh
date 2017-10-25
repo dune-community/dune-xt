@@ -7,8 +7,8 @@
 // Authors:
 //   Felix Schindler (2017)
 
-#ifndef DUNE_XT_LA_MATRIX_INVERSE_INTERNAL_EIGEN_HH
-#define DUNE_XT_LA_MATRIX_INVERSE_INTERNAL_EIGEN_HH
+#ifndef DUNE_XT_LA_MATRIX_INVERTER_INTERNAL_EIGEN_HH
+#define DUNE_XT_LA_MATRIX_INVERTER_INTERNAL_EIGEN_HH
 
 #include <limits>
 
@@ -68,4 +68,4 @@ M compute_moore_penrose_inverse_using_eigen(const M& matrix, const R& /*epsilon*
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_LA_MATRIX_INVERSE_INTERNAL_EIGEN_HH
+#endif // DUNE_XT_LA_MATRIX_INVERTER_INTERNAL_EIGEN_HH

@@ -7,8 +7,8 @@
 // Authors:
 //   Felix Schindler (2017)
 
-#ifndef DUNE_XT_LA_MATRIX_INVERSE_BASE_HH
-#define DUNE_XT_LA_MATRIX_INVERSE_BASE_HH
+#ifndef DUNE_XT_LA_MATRIX_INVERTER_BASE_HH
+#define DUNE_XT_LA_MATRIX_INVERTER_BASE_HH
 
 #include <dune/xt/common/configuration.hh>
 
@@ -22,13 +22,13 @@ namespace LA {
 
 // forward
 template <class MatrixType>
-class InverseMatrixOptions;
+class MatrixInverterOptions;
 
 
 namespace internal {
 
 
-static void ensure_inverse_matrix_type(const std::string& type, const std::vector<std::string>& available_types)
+static void ensure_matrix_inverter_type(const std::string& type, const std::vector<std::string>& available_types)
 {
   bool contained = false;
   for (const auto& tp : available_types)
@@ -40,7 +40,7 @@ static void ensure_inverse_matrix_type(const std::string& type, const std::vecto
 } // ... ensure_type(...)
 
 
-static Common::Configuration default_inverse_matrix_options()
+static Common::Configuration default_matrix_inverter_options()
 {
   Common::Configuration opts;
   opts["delay_computation"] = "false";
@@ -52,7 +52,7 @@ static Common::Configuration default_inverse_matrix_options()
 
 
 template <class M>
-class InverseMatrixBase
+class MatrixInverterBase
 {
   static_assert(is_matrix<M>::value, "");
 
@@ -63,9 +63,9 @@ public:
   /**
    * \attention The implementor has to call compute() in the ctor if (delay_computation == true).
    */
-  InverseMatrixBase(const MatrixType& matrix, const std::string& type = "")
+  MatrixInverterBase(const MatrixType& matrix, const std::string& type = "")
     : matrix_(matrix)
-    , options_(InverseMatrixOptions<MatrixType>::options(type))
+    , options_(MatrixInverterOptions<MatrixType>::options(type))
     , inverse_(nullptr)
   {
     pre_checks();
@@ -74,7 +74,7 @@ public:
   /**
    * \attention The implementor has to call compute() in the ctor if (delay_computation == true).
    */
-  InverseMatrixBase(const MatrixType& matrix, const Common::Configuration opts)
+  MatrixInverterBase(const MatrixType& matrix, const Common::Configuration opts)
     : matrix_(matrix)
     , options_(opts)
     , inverse_(nullptr)
@@ -127,9 +127,10 @@ protected:
                  "Missing 'type' in given options!"
                      << "\n\nThese were the given options:\n\n"
                      << options_);
-    internal::ensure_inverse_matrix_type(options_.get<std::string>("type"), InverseMatrixOptions<MatrixType>::types());
+    internal::ensure_matrix_inverter_type(options_.get<std::string>("type"),
+                                          MatrixInverterOptions<MatrixType>::types());
     const Common::Configuration default_opts =
-        InverseMatrixOptions<MatrixType>::options(options_.get<std::string>("type"));
+        MatrixInverterOptions<MatrixType>::options(options_.get<std::string>("type"));
     // check matrix
     if (options_.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"))) {
       if (!matrix_.valid())
@@ -148,7 +149,7 @@ protected:
     if (!inverse_)
       DUNE_THROW(Common::Exceptions::internal_error, "The inverse_ member is not filled after calling compute()!");
     const Common::Configuration default_opts =
-        InverseMatrixOptions<MatrixType>::options(options_.get<std::string>("type"));
+        MatrixInverterOptions<MatrixType>::options(options_.get<std::string>("type"));
     if (options_.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"))) {
       if (!inverse_->valid())
         DUNE_THROW(Exceptions::matrix_invert_failed_bc_result_contained_inf_or_nan,
@@ -204,7 +205,7 @@ protected:
   const MatrixType& matrix_;
   const Common::Configuration options_;
   mutable std::unique_ptr<MatrixType> inverse_;
-}; // class InverseMatrixBase
+}; // class MatrixInverterBase
 
 
 } // namespace internal
@@ -213,4 +214,4 @@ protected:
 } // namespace LA
 
 
-#endif // DUNE_XT_LA_MATRIX_INVERSE_BASE_HH
+#endif // DUNE_XT_LA_MATRIX_INVERTER_BASE_HH
