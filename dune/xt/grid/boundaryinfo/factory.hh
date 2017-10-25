@@ -69,7 +69,6 @@ public:
   {
     return create(config.get<std::string>("type"), config);
   }
-
 }; // class BoundaryInfoFactory
 
 

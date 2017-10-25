@@ -31,7 +31,7 @@ class NoBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "no boundary";
+    return "no_boundary";
   }
 };
 
@@ -40,7 +40,7 @@ class UnknownBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "unknown boundary";
+    return "unknown_boundary";
   }
 };
 
@@ -50,7 +50,7 @@ class DirichletBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "dirichlet boundary";
+    return "dirichlet_boundary";
   }
 };
 
@@ -60,7 +60,7 @@ class NeumannBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "neumann boundary";
+    return "neumann_boundary";
   }
 };
 
@@ -70,7 +70,7 @@ class RobinBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "robin boundary";
+    return "robin_boundary";
   }
 };
 
@@ -80,7 +80,7 @@ class ReflectingBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "reflecting boundary";
+    return "reflecting_boundary";
   }
 };
 
@@ -90,7 +90,7 @@ class InflowBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "inflow boundary";
+    return "inflow_boundary";
   }
 };
 
@@ -100,7 +100,7 @@ class OutflowBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "outflow boundary";
+    return "outflow_boundary";
   }
 };
 
@@ -110,7 +110,7 @@ class InflowOutflowBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "inflow/outflow boundary";
+    return "inflow_outflow_boundary";
   }
 };
 
@@ -120,7 +120,7 @@ class ImpermeableBoundary : public BoundaryType
 protected:
   virtual std::string id() const override final
   {
-    return "impermeable boundary";
+    return "impermeable_boundary";
   }
 };
 
