@@ -77,10 +77,11 @@ public:
   {
     const std::string tp = !type.empty() ? type : types()[0];
     internal::SolverUtils::check_given(tp, types());
-    Common::Configuration default_options(
-        {"type", "check_for_inf_nan", "check_evs_are_real", "check_evs_are_positive", "check_eigenvectors_are_real"},
-        {tp.c_str(), "1", "0", "0", "0"});
-    return default_options;
+    return {{"type", tp},
+            {"check_for_inf_nan", "1"},
+            {"check_evs_are_real", "0"},
+            {"check_evs_are_positive", "0"},
+            {"check_eigenvectors_are_real", "0"}};
   }
 
   virtual void get_eigenvalues(std::vector<ComplexType>& evs, const std::string& type) const override final
