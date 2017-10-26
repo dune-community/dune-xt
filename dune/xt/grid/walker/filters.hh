@@ -250,7 +250,7 @@ public:
 
   EntityFilter<GridLayerType>* copy() const override final
   {
-    return new PartitionSetEntities<GridLayerType>(lambda_);
+    return new PartitionSetEntities<GridLayerType, PartitionSetType>();
   }
 
   bool contains(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
