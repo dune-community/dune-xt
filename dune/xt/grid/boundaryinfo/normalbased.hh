@@ -12,6 +12,8 @@
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_NORMALBASED_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_NORMALBASED_HH
 
+#include <unordered_map>
+
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/memory.hh>
@@ -121,7 +123,7 @@ private:
   const DomainFieldType tol_;
   const std::unique_ptr<BoundaryType> default_boundary_type_;
   const NoBoundary no_boundary_;
-  std::map<WorldType, std::shared_ptr<BoundaryType>> normal_to_type_map_;
+  std::unordered_map<WorldType, std::shared_ptr<BoundaryType>> normal_to_type_map_;
 }; // class NormalBasedBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #pragma GCC diagnostic pop
