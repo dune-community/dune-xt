@@ -19,27 +19,36 @@ namespace LA {
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value && M::sparse, M>::type eye_matrix(const size_t rows, const size_t cols)
+typename std::enable_if<is_matrix<M>::value, M>::type eye_matrix(const size_t rows, const size_t cols)
 {
-  SparsityPatternDefault pattern(rows);
-  for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
-    pattern.insert(ii, ii);
-  // each row has to contain at least one non-zero entry
-  for (size_t ii = std::min(rows, cols); ii < std::max(rows, cols); ++ii)
-    pattern.insert(ii, 0);
-  M mat(rows, cols, pattern);
-  for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
-    mat.set_entry(ii, ii, 1);
-  return mat;
+  if (M::sparse) {
+    SparsityPatternDefault pattern(rows);
+    for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
+      pattern.insert(ii, ii);
+    // each row has to contain at least one non-zero entry
+    for (size_t ii = std::min(rows, cols); ii < std::max(rows, cols); ++ii)
+      pattern.insert(ii, 0);
+    M mat(rows, cols, pattern);
+    for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
+      mat.set_entry(ii, ii, 1);
+    return mat;
+  } else {
+    M mat(rows, cols, 0.);
+    for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
+      mat.set_entry(ii, ii, 1);
+    return mat;
+  }
 }
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value && !M::sparse, M>::type eye_matrix(const size_t rows, const size_t cols)
+typename std::enable_if<XT::Common::is_matrix<M>::value && !is_matrix<M>::value, M>::type eye_matrix(const size_t rows,
+                                                                                                     const size_t cols)
 {
-  M mat(rows, cols, 0.);
+  using Abstraction = XT::Common::MatrixAbstraction<M>;
+  auto mat = Abstraction::create(rows, cols, 0.);
   for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
-    mat.set_entry(ii, ii, 1);
+    Abstraction::set_entry(mat, ii, ii, 1);
   return mat;
 }
 
