@@ -355,9 +355,10 @@ public:
   /**
    * \attention Takes ownership of boundary_type, do not delete manually!
    */
-  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType* boundary_type)
+  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                       BoundaryType*&& boundary_type)
     : boundary_info_(boundary_info)
-    , boundary_type_(boundary_type)
+    , boundary_type_(std::move(boundary_type))
   {
   }
 
