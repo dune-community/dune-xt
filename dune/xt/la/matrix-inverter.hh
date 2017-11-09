@@ -14,6 +14,7 @@
 
 #include <dune/xt/common/configuration.hh>
 
+#include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {

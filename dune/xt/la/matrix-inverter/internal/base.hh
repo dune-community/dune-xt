@@ -14,6 +14,7 @@
 
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
+#include <dune/xt/la/exceptions.hh>
 
 namespace Dune {
 namespace XT {
