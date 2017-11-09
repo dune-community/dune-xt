@@ -56,6 +56,32 @@ struct grid_name<ALUGrid<dim, dim, simplex, conforming, Comm>>
   }
 };
 
+template <int dim, class Comm>
+struct grid_name<ALUGrid<dim, dim, cube, nonconforming, Comm>>
+{
+  static std::string value()
+  {
+    return Common::to_string(dim) + "d_cube_alunonconformgrid";
+  }
+};
+
+template <int dim, class Comm>
+struct grid_name<ALUGrid<dim, dim, simplex, nonconforming, Comm>>
+{
+  static std::string value()
+  {
+    return Common::to_string(dim) + "d_simplex_alunonconformgrid";
+  }
+};
+
+template <int dim, class Comm>
+struct grid_name<ALUGrid<dim, dim, cube, conforming, Comm>>
+{
+  static std::string value()
+  {
+    return Common::to_string(dim) + "d_cube_aluconformgrid";
+  }
+};
 
 #endif // HAVE_DUNE_ALUGRID
 #if HAVE_ALBERTA

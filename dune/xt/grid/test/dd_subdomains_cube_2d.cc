@@ -13,7 +13,11 @@
 
 #include <dune/xt/common/filesystem.hh>
 
-#include "dd_subdomains_cube.hh"
+
+using namespace Dune;
+
+template <class G, bool anything = true>
+struct ExpectedResults;
 
 
 struct Expected2dSimplexNonconformingResults
@@ -158,96 +162,80 @@ struct ExpectedResults<AlbertaGrid<2, 2>, anything> : public Expected2dSimplexNo
 
 #endif // HAVE_ALBERTA
 
+#include "dd_subdomains_cube.hh"
 
-// clang-format off
-typedef ::testing::Types< YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>
-#if HAVE_DUNE_ALUGRID
-                        , Dune::ALUGrid<2, 2, cube, nonconforming>
-                        , Dune::ALUGrid<2, 2, simplex, conforming>
-                        , Dune::ALUGrid<2, 2, simplex, nonconforming>
-#endif
-#if (HAVE_DUNE_UGGRID || HAVE_UG) and not HAVE_MPI
-                        , UGGrid<2>
-#endif
-#if HAVE_ALBERTA
-                        , AlbertaGrid<2, 2>
-#endif
-                        >
-    GridTypes; // clang-format on
-
-TYPED_TEST_CASE(CubeProviderTest, GridTypes);
-TYPED_TEST(CubeProviderTest, setup_works)
+TEST_F(CubeProviderTest, setup_works)
 {
   this->setup();
 }
-TYPED_TEST(CubeProviderTest, visualize_is_callable)
+TEST_F(CubeProviderTest, visualize_is_callable)
 {
   this->visualize_is_callable(XT::Common::filename_only(::testing::internal::GetInjectableArgvs().at(0)));
 }
-TYPED_TEST(CubeProviderTest, global_grid_part_entity_to_subdomain_mapping_is_correct)
+TEST_F(CubeProviderTest, global_grid_part_entity_to_subdomain_mapping_is_correct)
 {
   this->global_grid_part_entity_to_subdomain_mapping_is_correct();
 }
-TYPED_TEST(CubeProviderTest, global_grid_view_entity_to_subdomain_mapping_is_correct)
+TEST_F(CubeProviderTest, global_grid_view_entity_to_subdomain_mapping_is_correct)
 {
   this->global_grid_view_entity_to_subdomain_mapping_is_correct();
 }
 
-TYPED_TEST(CubeProviderTest, local_parts_are_of_correct_size)
+TEST_F(CubeProviderTest, local_parts_are_of_correct_size)
 {
   this->local_parts_are_of_correct_size();
 }
-TYPED_TEST(CubeProviderTest, local_views_are_of_correct_size)
+TEST_F(CubeProviderTest, local_views_are_of_correct_size)
 {
   this->local_views_are_of_correct_size();
 }
-TYPED_TEST(CubeProviderTest, local_parts_are_indexed_consecutively)
+TEST_F(CubeProviderTest, local_parts_are_indexed_consecutively)
 {
   this->local_parts_are_indexed_consecutively();
 }
-TYPED_TEST(CubeProviderTest, local_views_are_indexed_consecutively)
+TEST_F(CubeProviderTest, local_views_are_indexed_consecutively)
 {
   this->local_views_are_indexed_consecutively();
 }
-TYPED_TEST(CubeProviderTest, local_parts_report_correct_boundary_id)
+TEST_F(CubeProviderTest, local_parts_report_correct_boundary_id)
 {
   this->local_parts_report_correct_boundary_id();
 }
-TYPED_TEST(CubeProviderTest, local_views_report_correct_boundary_id)
+TEST_F(CubeProviderTest, local_views_report_correct_boundary_id)
 {
   this->local_views_report_correct_boundary_id();
 }
 
-TYPED_TEST(CubeProviderTest, boundary_parts_are_of_correct_size)
+TEST_F(CubeProviderTest, boundary_parts_are_of_correct_size)
 {
   this->boundary_parts_are_of_correct_size();
 }
-TYPED_TEST(CubeProviderTest, boundary_parts_are_indexed_consecutively)
+TEST_F(CubeProviderTest, boundary_parts_are_indexed_consecutively)
 {
   this->boundary_parts_are_indexed_consecutively();
 }
-TYPED_TEST(CubeProviderTest, boundary_parts_contain_only_boundary_entities_and_intersections)
+TEST_F(CubeProviderTest, boundary_parts_contain_only_boundary_entities_and_intersections)
 {
   this->boundary_parts_contain_only_boundary_entities_and_intersections();
 }
-TYPED_TEST(CubeProviderTest, domain_boundary_is_exactly_covered_by_the_sum_of_local_boundaries)
+TEST_F(CubeProviderTest, domain_boundary_is_exactly_covered_by_the_sum_of_local_boundaries)
 {
   this->domain_boundary_is_exactly_covered_by_the_sum_of_local_boundaries();
 }
 
-TYPED_TEST(CubeProviderTest, coupling_parts_are_of_correct_size)
+TEST_F(CubeProviderTest, coupling_parts_are_of_correct_size)
 {
   this->coupling_parts_are_of_correct_size();
 }
-TYPED_TEST(CubeProviderTest, coupling_parts_are_indexed_consecutively)
+TEST_F(CubeProviderTest, coupling_parts_are_indexed_consecutively)
 {
   this->coupling_parts_are_indexed_consecutively();
 }
-TYPED_TEST(CubeProviderTest, coupling_parts_contain_only_inner_entities_and_intersections)
+TEST_F(CubeProviderTest, coupling_parts_contain_only_inner_entities_and_intersections)
 {
   this->coupling_parts_contain_only_inner_entities_and_intersections();
 }
-TYPED_TEST(CubeProviderTest, subdomain_connections_are_exactly_covered_by_couplings)
+TEST_F(CubeProviderTest, subdomain_connections_are_exactly_covered_by_couplings)
 {
   this->subdomain_connections_are_exactly_covered_by_couplings();
 }

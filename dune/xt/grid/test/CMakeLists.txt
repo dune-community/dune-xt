@@ -14,15 +14,19 @@ enable_testing()
 # link grid files
 dune_symlink_to_source_files(FILES gmsh_2d_simplices.msh dgf_1d_interval.dgf dgf_2d_interval.dgf dgf_3d_interval.dgf dgf_4d_interval.dgf)
 
+dxt_exclude_from_headercheck(dd_subdomains_cube.hh)
+
 BEGIN_TESTCASES(dunextgrid)
 
 END_TESTCASES()
 
+# load binning setup from file
+if(DEFINED ENV{TRAVIS})
+    include("builder_definitions.cmake")
+endif(DEFINED ENV{TRAVIS})
+
 add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)
 add_dune_alberta_flags(GRIDDIM 3 test_dd_glued_3d)
-add_dune_alberta_flags(GRIDDIM 1 test_dd_subdomains_cube_1d)
-add_dune_alberta_flags(GRIDDIM 2 test_dd_subdomains_cube_2d)
-add_dune_alberta_flags(GRIDDIM 3 test_dd_subdomains_cube_3d)
 
 foreach (test ${dxt_test_binaries})
   if (${test} MATCHES alberta_1d)
@@ -33,4 +37,4 @@ foreach (test ${dxt_test_binaries})
     add_dune_alberta_flags(GRIDDIM 3 ${test})
   endif()
 endforeach()
- 
+

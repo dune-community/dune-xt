@@ -28,6 +28,10 @@ script:
 # runs independent of 'script' failure/success
 after_script:
     - ${DOCKER_RUN} /root/src/${MY_MODULE}/.travis.after_script.bash
+    # output for simpler replicability
+    - docker images ${IMAGE}
+    - echo ${DOCKER_RUN}
+
 
 notifications:
   email:
@@ -49,7 +53,15 @@ env:
 
 matrix:
   include:
-      - env: DOCKER_TAG=gcc_full
-      - env: DOCKER_TAG=gcc_no_istl_no_disc
-      - env: DOCKER_TAG=gcc_no_disc
-      - env: DOCKER_TAG=clang_full
+        - env: DOCKER_TAG=gcc_full TESTS=0
+        - env: DOCKER_TAG=gcc_full TESTS=1
+    
+        - env: DOCKER_TAG=gcc_no_istl_no_disc TESTS=0
+        - env: DOCKER_TAG=gcc_no_istl_no_disc TESTS=1
+    
+        - env: DOCKER_TAG=gcc_no_disc TESTS=0
+        - env: DOCKER_TAG=gcc_no_disc TESTS=1
+    
+        - env: DOCKER_TAG=clang_full TESTS=0
+        - env: DOCKER_TAG=clang_full TESTS=1
+    

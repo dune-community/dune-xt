@@ -90,15 +90,15 @@ ostream& operator<<(ostream& out, const map<F, S>& results)
 using namespace Dune;
 
 
-template <class G, bool anything = true>
+template <class G, bool anything>
 struct ExpectedResults
 {
   static_assert(AlwaysFalse<G>::value, "Please add me for this grid!");
 };
 
-template <class G>
 struct CubeProviderTest : public ::testing::Test
 {
+  using G = TESTGRIDTYPE;
   static const constexpr size_t d = G::dimension;
   typedef XT::Grid::GridProvider<G, XT::Grid::DD::SubdomainGrid<G>> ProviderType;
   typedef typename ProviderType::DdGridType DdGridType;
@@ -110,8 +110,7 @@ struct CubeProviderTest : public ::testing::Test
     // grid definition (see below)
     //   {"lower_left", "upper_right", "num_elements", "num_partitions"},
     //   {"[0 0 0]", "[1 1 1]", "[9 9 9]", "[3 3 3]"});
-    // should ensure at least one completely inner subdomain and in each
-    // subdomain at least one completely inner entity
+    // should ensure at least one completely inner subdomain and in each subdomain at least one completely inner entity
     if (!ms_grid_provider_)
       ms_grid_provider_ =
           std::make_shared<ProviderType>(XT::Grid::make_cube_dd_subdomains_grid<G>(lower_left(),
@@ -474,14 +473,12 @@ struct CubeProviderTest : public ::testing::Test
     if (d == 1)
       min_num_boundary_intersections = 2;
     else {
-      // we have at least 9 entities in each dimension
       for (size_t ii = 0; ii < d; ++ii)
-        min_num_boundary_intersections += 9;
+        min_num_boundary_intersections += num_elements()[ii];
     }
     ASSERT_GE(global_boundary_entities.size(), min_num_boundary_intersections);
 
-    // test that each local boundary entity and intersection is also a global
-    // one
+    // test that each local boundary entity and intersection is also a global one
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       if (ms_grid_provider_->dd_grid().boundary(ss)) {
         auto boundary_grid_part = ms_grid_provider_->dd_grid().boundaryGridPart(ss);
@@ -741,7 +738,13 @@ struct CubeProviderTest : public ::testing::Test
 
   static std::array<unsigned int, d> num_elements()
   {
-    return XT::Common::make_array<unsigned int, d>(9);
+    return XT::Common::make_array<unsigned int, d>(
+#if DXT_DISABLE_LARGE_TESTS
+        d == 3 ? 3 : 9
+#else
+        9
+#endif
+        );
   }
 
   template <class Grid, bool anything = true>

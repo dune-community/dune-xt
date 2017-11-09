@@ -47,7 +47,7 @@ class GridProviderFactory
     static Common::Configuration default_config()
     {
       DUNE_THROW(Common::Exceptions::internal_error, "This should not happen!");
-      return Common::Configuration(0);
+      return Common::Configuration();
     }
 
     static GridProvider<GridType> create(const Common::Configuration& /*cfg*/)
@@ -200,7 +200,7 @@ class DdSubdomainGridProviderFactory
     static Common::Configuration default_config()
     {
       DUNE_THROW(Common::Exceptions::internal_error, "This should not happen!");
-      return Common::Configuration(0);
+      return Common::Configuration();
     }
 
     static GridProvider<GridType, DD::SubdomainGrid<GridType>> create(const Common::Configuration& /*cfg*/)
