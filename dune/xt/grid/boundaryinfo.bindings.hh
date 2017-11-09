@@ -158,20 +158,31 @@ public:
                                                       Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
                    _G,                                                                                                 \
                    Dune::XT::Grid::Layers::_layer>
-
+#if HAVE_DUNE_FEM
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, part);                     \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view);                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, part);                     \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, part)
+#else // HAVE_DUNE_FEM
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view);                             \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view);
+#endif // HAVE_DUNE_FEM
 
 #if HAVE_DUNE_ALUGRID
+#if HAVE_DUNE_FEM
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view);                             \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part);                      \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, part)
-#else
+#else // HAVE_DUNE_FEM
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view);
+#endif // HAVE_DUNE_FEM
+#else // HAVE_DUNE_ALUGRID
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
 #endif
 
