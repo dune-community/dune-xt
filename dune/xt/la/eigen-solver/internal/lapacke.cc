@@ -7,8 +7,6 @@
 // Authors:
 //   Tobias Leibner  (2017)
 
-#include "config.h"
-
 #include "lapacke.hh"
 
 #if HAVE_LAPACKE
@@ -21,37 +19,19 @@ namespace LA {
 namespace internal {
 
 
-UnitMatrix::UnitMatrix(int N)
-  : unit_matrix_(new std::vector<double>(N, 0.))
-{
-}
-
-// need to reset unit_matrix every time because Lapack changes it
-double* UnitMatrix::get(int N)
-{
-  unit_matrix_->resize(N * N);
-  std::fill(unit_matrix_->begin(), unit_matrix_->end(), 0.);
-  for (int rr = 0; rr < N; ++rr)
-    (*unit_matrix_)[rr * (N + 1)] = 1.;
-  return unit_matrix_->data();
-}
-
-int LapackeWrapper::dggev(char jobvl,
+int LapackeWrapper::dgeev(char jobvl,
                           char jobvr,
                           int n,
                           double* a,
                           int lda,
-                          double* b,
-                          int ldb,
-                          double* alphar,
-                          double* alphai,
-                          double* beta,
+                          double* wr,
+                          double* wi,
                           double* vl,
                           int ldvl,
                           double* vr,
                           int ldvr)
 {
-  return LAPACKE_dggev(LAPACK_ROW_MAJOR, jobvl, jobvr, n, a, lda, b, ldb, alphar, alphai, beta, vl, ldvl, vr, ldvr);
+  return LAPACKE_dgeev(LAPACK_ROW_MAJOR, jobvl, jobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 }
 
 

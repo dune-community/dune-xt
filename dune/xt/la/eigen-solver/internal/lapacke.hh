@@ -10,6 +10,8 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 
+#include "config.h"
+
 #include <string>
 
 #include <dune/xt/common/matrix.hh>
@@ -26,30 +28,17 @@ namespace internal {
 #if HAVE_LAPACKE
 
 
-class UnitMatrix
-{
-public:
-  UnitMatrix(int N);
-  double* get(int N);
-
-private:
-  std::unique_ptr<std::vector<double>> unit_matrix_;
-}; // class UnitMatrix;
-
 // We do not call the Lapacke functions directly to avoid including the lapacke.h header in this
 // header. The lapacke header defines some macros which lead to conflicts with other includes.
 struct LapackeWrapper
 {
-  static int dggev(char jobvl,
+  static int dgeev(char jobvl,
                    char jobvr,
                    int n,
                    double* a,
                    int lda,
-                   double* b,
-                   int ldb,
-                   double* alphar,
-                   double* alphai,
-                   double* beta,
+                   double* wr,
+                   double* wi,
                    double* vl,
                    int ldvl,
                    double* vr,
@@ -147,31 +136,16 @@ template <class S>
 void compute_using_lapacke(double* matrix, std::vector<std::complex<S>>& eigvals, double* eigvecs)
 {
   int N = (int)eigvals.size();
-  std::vector<double> alpha_real(N), alpha_imag(N), beta(N);
+  std::vector<double> wr(N), wi(N);
 
-  static thread_local UnitMatrix unit_matrix(N);
-  int info = LapackeWrapper::dggev('N',
-                                   eigvecs ? 'V' : 'N',
-                                   N,
-                                   matrix,
-                                   N,
-                                   unit_matrix.get(N),
-                                   N,
-                                   alpha_real.data(),
-                                   alpha_imag.data(),
-                                   beta.data(),
-                                   (double*)nullptr,
-                                   N,
-                                   eigvecs,
-                                   N);
+  int info = LapackeWrapper::dgeev(
+      'N', eigvecs ? 'V' : 'N', N, matrix, N, wr.data(), wi.data(), (double*)nullptr, N, eigvecs, N);
 
   if (info != 0)
     DUNE_THROW(Dune::MathError, "Lapack returned error " + std::to_string(info) + "!");
 
-  for (size_t rr = 0; rr < size_t(N); ++rr) {
-    assert(XT::Common::FloatCmp::ne(beta[rr], 0., 1e-6));
-    eigvals[rr] = {alpha_real[rr] / beta[rr], alpha_imag[rr] / beta[rr]};
-  }
+  for (size_t rr = 0; rr < size_t(N); ++rr)
+    eigvals[rr] = {wr[rr], wi[rr]};
 } // ... compute_using_lapacke(...)
 
 template <class Traits, class S>
