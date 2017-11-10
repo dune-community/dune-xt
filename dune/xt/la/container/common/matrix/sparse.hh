@@ -1068,7 +1068,7 @@ public:
   typedef typename Traits::SparseMatrixType SparseMatrixType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
-  static constexpr double sparsity_cutoff = 0.1;
+  static constexpr double sparse_limit = 0.1;
 
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
@@ -1084,8 +1084,8 @@ public:
     for (size_t row = 0; row < num_rows_; ++row)
       nnz += patt.inner(row).size();
     size_t num_entries = rr * cc;
-    double sparsity = double(nnz) / double(num_entries);
-    sparse_ = sparsity < sparsity_cutoff;
+    double density = double(nnz) / double(num_entries);
+    sparse_ = density < sparse_limit;
     if (sparse_) {
       sparse_matrix_ = SparseMatrixType(rr, cc, patt, num_mutexes);
       dense_matrix_ = DenseMatrixType(0, 0, patt, num_mutexes);
@@ -1145,8 +1145,8 @@ public:
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
         nnz += XT::Common::FloatCmp::ne(value, ScalarType(0), eps);
       }
-    double sparsity = double(nnz) / double(num_rows_ * num_cols_);
-    sparse_ = sparsity < sparsity_cutoff;
+    double density = double(nnz) / double(num_rows_ * num_cols_);
+    sparse_ = density < sparse_limit;
     if (sparse_) {
       sparse_matrix_ = SparseMatrixType(mat, prune, eps, num_mutexes);
       dense_matrix_ = DenseMatrixType(0, 0, num_mutexes);
