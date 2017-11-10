@@ -1068,7 +1068,7 @@ public:
   typedef typename Traits::SparseMatrixType SparseMatrixType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
-  static constexpr double sparsity_cutoff = 0.25;
+  static constexpr double sparsity_cutoff = 0.1;
 
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
