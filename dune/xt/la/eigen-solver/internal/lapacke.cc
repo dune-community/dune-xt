@@ -13,7 +13,7 @@
 
 #if HAVE_LAPACKE
 
-#include <lapacke.h>
+#include <dune/xt/common/lapacke.hh>
 
 namespace Dune {
 namespace XT {
