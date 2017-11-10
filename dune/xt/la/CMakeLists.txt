@@ -11,7 +11,8 @@
 
 set(lib_dune_xt_la_sources
     container/pattern.cc
-    eigen-solver/internal/lapacke.cc)
+    eigen-solver/internal/lapacke.cc
+    algorithms/solve_sym_tridiag_posdef.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
   list(APPEND lib_dune_xt_la_sources
@@ -21,8 +22,7 @@ if(DUNE_XT_WITH_PYTHON_BINDINGS)
        container/istl.cc
        solver/common.cc
        solver/eigen.cc
-       solver/istl.cc
-       eigen-solver/internal/lapacke.cc)
+       solver/istl.cc)
 endif()
 
 find_package(LAPACKE)
