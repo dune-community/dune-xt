@@ -213,6 +213,26 @@ void solve_lower_triangular(const Dune::FieldMatrix<FieldType, 2, 2>& A,
  * \brief solve A x = b, where A is upper triangular
  */
 
+
+template <class MatrixImp, class VectorImp>
+void solve_upper_triangular(const Dune::DenseMatrix<MatrixImp>& A,
+                            Dune::DenseVector<VectorImp>& x,
+                            const Dune::DenseVector<VectorImp>& b)
+{
+  const size_t num_rows = A.rows();
+  // copy assignment operator does not work correctly for DenseVector,
+  // so we need to cast it to the derived type first
+  auto& rhs = static_cast<VectorImp&>(x); // use x to store rhs
+  rhs = static_cast<const VectorImp&>(b); // copy data
+  const size_t num_cols = A.cols();
+  // backward solve
+  for (int ii = b.size() - 1; ii >= 0.; --ii) {
+    for (size_t jj = ii + 1; jj < num_cols; ++jj)
+      rhs[ii] -= A[ii][jj] * x[jj];
+    x[ii] = rhs[ii] / A[ii][ii];
+  }
+} // void solve_upper_triangular(Dune::DenseMatrix, ...)
+
 template <class MatrixTraits, class ScalarType, class VectorImp>
 void solve_upper_triangular(const MatrixInterface<MatrixTraits, ScalarType>& A,
                             Dune::DenseVector<VectorImp>& x,
