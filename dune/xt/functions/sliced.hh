@@ -7,6 +7,9 @@
 // Authors:
 //   Felix Schindler (2017)
 
+#ifndef DUNE_XT_FUNCTIONS_SLICED_HH
+#define DUNE_XT_FUNCTIONS_SLICED_HH
+
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/functions/type_traits.hh>
@@ -140,3 +143,5 @@ make_sliced_function(const LocalizableFunctionInterface<E, D, d, R, r>& function
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
+
+#endif // DUNE_XT_FUNCTIONS_SLICED_HH

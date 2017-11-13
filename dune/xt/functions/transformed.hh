@@ -7,6 +7,9 @@
 // Authors:
 //   Felix Schindler (2017)
 
+#ifndef DUNE_XT_FUNCTIONS_TRANSFORMED_HH
+#define DUNE_XT_FUNCTIONS_TRANSFORMED_HH
+
 #include <dune/xt/functions/type_traits.hh>
 #include <dune/xt/functions/interfaces/localizable-function.hh>
 
@@ -146,3 +149,5 @@ make_transformed_function(
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
+
+#endif // DUNE_XT_FUNCTIONS_TRANSFORMED_HH
