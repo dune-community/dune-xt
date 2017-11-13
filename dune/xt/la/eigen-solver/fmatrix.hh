@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <functional>
 
+#include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/solver.hh>
 #include <dune/xt/la/eigen-solver.hh>
@@ -155,6 +156,17 @@ public:
 private:
   using BaseType::matrix_;
 }; // class EigenSolver<FieldMatrix<S>>
+
+template <class S, int dimRange>
+class EigenSolver<Dune::XT::Common::FieldMatrix<S, dimRange, dimRange>>
+    : public EigenSolver<Dune::FieldMatrix<S, dimRange, dimRange>>
+{
+  template <class... Args>
+  EigenSolver(Args&&... args)
+    : EigenSolver<Dune::FieldMatrix<S, dimRange, dimRange>>(std::forward<Args>(args)...)
+  {
+  }
+};
 
 
 } // namespace LA
