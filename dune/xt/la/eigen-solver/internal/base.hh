@@ -7,8 +7,8 @@
 // Authors:
 //   Felix Schindler (2017)
 
-#ifndef DUNE_XT_LA_EIGEN_SOLVER_BASE_HH
-#define DUNE_XT_LA_EIGEN_SOLVER_BASE_HH
+#ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_BASE_HH
+#define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_BASE_HH
 
 #include <algorithm>
 #include <functional>
@@ -364,4 +364,4 @@ protected:
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_LA_EIGEN_SOLVER_BASE_HH
+#endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_BASE_HH
