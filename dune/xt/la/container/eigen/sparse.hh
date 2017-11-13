@@ -68,6 +68,7 @@ public:
   typedef typename ::Eigen::SparseMatrix<ScalarType, ::Eigen::RowMajor> BackendType;
   static const constexpr Backends backend_type = Backends::eigen_sparse;
   static const constexpr Backends vector_type = Backends::eigen_dense;
+  static const constexpr bool sparse = true;
 }; // class RowMajorSparseMatrixTraits
 
 } // namespace internal

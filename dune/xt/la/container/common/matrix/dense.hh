@@ -56,6 +56,7 @@ public:
   typedef Dune::DynamicMatrix<ScalarType> BackendType;
   static const Backends backend_type = Backends::common_dense;
   static const Backends vector_type = Backends::common_dense;
+  static const constexpr bool sparse = false;
 };
 
 

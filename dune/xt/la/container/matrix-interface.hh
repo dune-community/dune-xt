@@ -48,11 +48,10 @@ public:
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   static const constexpr Backends vector_type = Traits::vector_type;
+  static const constexpr bool sparse = Traits::sparse;
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
-  virtual ~MatrixInterface()
-  {
-  }
+  virtual ~MatrixInterface() = default;
 
   /// \name Have to be implemented by a derived class in addition to the ones required by ContainerInterface!
   /// \{

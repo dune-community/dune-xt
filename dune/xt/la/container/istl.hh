@@ -81,6 +81,7 @@ public:
   typedef BCRSMatrix<FieldMatrix<ScalarType, 1, 1>> BackendType;
   static const constexpr Backends backend_type = Backends::istl_sparse;
   static const constexpr Backends vector_type = Backends::istl_dense;
+  static const constexpr bool sparse = true;
 }; // class RowMajorSparseMatrixTraits
 
 } // namespace internal

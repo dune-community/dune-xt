@@ -53,6 +53,7 @@ public:
   typedef CommonSparseMatrix<ScalarImp, sparse_format> derived_type;
   typedef std::vector<ScalarImp> EntriesVectorType;
   typedef std::vector<size_t> IndexVectorType;
+  static const constexpr bool sparse = true;
 };
 
 template <class DenseMatrixImp, class SparseMatrixImp>
@@ -66,6 +67,7 @@ public:
   static const Backends backend_type = Backends::common_dense;
   static const Backends vector_type = Backends::common_dense;
   typedef CommonSparseOrDenseMatrix<DenseMatrixType, SparseMatrixType> derived_type;
+  static const constexpr bool sparse = false;
 };
 
 

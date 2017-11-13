@@ -106,6 +106,7 @@ public:
   typedef typename ::Eigen::Matrix<ScalarType, ::Eigen::Dynamic, ::Eigen::Dynamic> BackendType;
   static const constexpr Backends backend_type = Backends::eigen_dense;
   static const constexpr Backends vector_type = Backends::eigen_dense;
+  static const constexpr bool sparse = false;
 }; // class EigenDenseMatrixTraits
 
 } // namespace internal
