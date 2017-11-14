@@ -55,7 +55,6 @@ class MatrixInverter<EigenDenseMatrix<S>> : public internal::MatrixInverterBase<
 
 public:
   using MatrixType = typename BaseType::MatrixType;
-  using typename BaseType::RealType;
 
   template <class... Args>
   explicit MatrixInverter(Args&&... args)
@@ -75,7 +74,7 @@ public:
       inverse_ = std::make_unique<MatrixType>(matrix_.backend().inverse());
     else if (type == "moore_penrose") {
       const auto eigenvalues_tolerance_factor =
-          options_.get("eigenvalues_tolerance_factor", default_opts.get<RealType>("eigenvalues_tolerance_factor"));
+          options_.get("eigenvalues_tolerance_factor", default_opts.get<double>("eigenvalues_tolerance_factor"));
       inverse_ = std::make_unique<MatrixType>(
           internal::compute_moore_penrose_inverse_using_eigen(matrix_.backend(), eigenvalues_tolerance_factor));
     } else

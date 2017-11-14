@@ -31,16 +31,16 @@ namespace internal {
  * \brief Computes the Moore-Penrose inverse.
  * \sa    https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
  *
- *        The implementation is taken from \sa http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257#c14
+ *        The implementation is inspired by \sa http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257#c14
  */
 template <class S>
 ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>
 compute_moore_penrose_inverse_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& matrix,
-                                          const S& epsilon = std::numeric_limits<S>::epsilon())
+                                          const double& epsilon = std::numeric_limits<double>::epsilon())
 {
   ::Eigen::JacobiSVD<::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>> svd(
       matrix, Eigen::ComputeThinU | Eigen::ComputeThinV);
-  const S tolerance = epsilon * std::max(matrix.cols(), matrix.rows()) * svd.singularValues().array().abs()(0);
+  const double tolerance = epsilon * std::max(matrix.cols(), matrix.rows()) * svd.singularValues().array().abs()(0);
   return svd.matrixV()
          * (svd.singularValues().array().abs() > tolerance)
                .select(svd.singularValues().array().inverse(), 0)
@@ -53,8 +53,9 @@ compute_moore_penrose_inverse_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dyna
 #else // HAVE_EIGEN
 
 
-template <class M, class R = double>
-M compute_moore_penrose_inverse_using_eigen(const M& matrix, const R& /*epsilon*/ = std::numeric_limits<R>::epsilon())
+template <class M>
+M compute_moore_penrose_inverse_using_eigen(const M& matrix,
+                                            const double& /*epsilon*/ = std::numeric_limits<double>::epsilon())
 {
   static_assert(AlwaysFalse<M>::value, "You are missing eigen!");
   return matrix;
