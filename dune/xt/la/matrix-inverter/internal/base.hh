@@ -11,6 +11,9 @@
 #define DUNE_XT_LA_MATRIX_INVERTER_BASE_HH
 
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/math.hh>
+#include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
@@ -52,14 +55,16 @@ static Common::Configuration default_matrix_inverter_options()
 }
 
 
-template <class M>
+/**
+ * \todo Refactor just like EigenSolverBase (no delay_computation)!
+ */
+template <class MatrixImp>
 class MatrixInverterBase
 {
-  static_assert(is_matrix<M>::value, "");
+  static_assert(is_matrix<MatrixImp>::value || XT::Common::is_matrix<MatrixImp>::value, "");
 
 public:
-  using MatrixType = M;
-  using RealType = typename MatrixType::RealType;
+  using MatrixType = MatrixImp;
 
   /**
    * \attention The implementor has to call compute() in the ctor if (delay_computation == true).
@@ -82,6 +87,8 @@ public:
   {
     pre_checks();
   }
+
+  virtual ~MatrixInverterBase() = default;
 
   const Common::Configuration& options() const
   {
@@ -134,7 +141,7 @@ protected:
         MatrixInverterOptions<MatrixType>::options(options_.get<std::string>("type"));
     // check matrix
     if (options_.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"))) {
-      if (!matrix_.valid())
+      if (contains_inf_or_nan(matrix_))
         DUNE_THROW(Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements,
                    "Given matrix contains inf or nan and you requested checking. To disable this check set "
                    "'check_for_inf_nan' to false in the options."
@@ -152,7 +159,7 @@ protected:
     const Common::Configuration default_opts =
         MatrixInverterOptions<MatrixType>::options(options_.get<std::string>("type"));
     if (options_.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"))) {
-      if (!inverse_->valid())
+      if (contains_inf_or_nan(*inverse_))
         DUNE_THROW(Exceptions::matrix_invert_failed_bc_result_contained_inf_or_nan,
                    "Computed inverse contains inf or nan and you requested checking. To disable this check set "
                    "'check_for_inf_nan' to false in the options."
@@ -164,15 +171,15 @@ protected:
                        << *inverse_);
     }
     const auto left_inverse_check =
-        options_.get("post_check_is_left_inverse", default_opts.get<RealType>("post_check_is_left_inverse"));
+        options_.get("post_check_is_left_inverse", default_opts.get<double>("post_check_is_left_inverse"));
     if (left_inverse_check > 0) {
-      const auto eye = eye_matrix<MatrixType>(matrix_.cols(), matrix_.cols());
-      if ((*inverse_ * matrix_ - eye).sup_norm() > left_inverse_check)
+      const auto eye = eye_matrix<MatrixType>(Common::get_matrix_cols(matrix_), Common::get_matrix_cols(matrix_));
+      if (sup_norm(*inverse_ * matrix_ - eye) > left_inverse_check)
         DUNE_THROW(Exceptions::matrix_invert_failed_bc_result_is_not_a_left_inverse,
                    "Computed inverse is not a left inverse and you requested checking. To disable this check set "
                    "'post_check_is_left_inverse' to 0 in the options."
                        << "\n\nThe error is ||M_inv * M - Identity||_L_\\infty = "
-                       << (*inverse_ * matrix_ - eye).sup_norm()
+                       << sup_norm(*inverse_ * matrix_ - eye)
                        << "\n\nThese were the given options:\n\n"
                        << options_
                        << "\nThis was the given matrix M:\n\n"
@@ -183,15 +190,15 @@ protected:
                        << *inverse_ * matrix_);
     }
     const auto right_inverse_check =
-        options_.get("post_check_is_right_inverse", default_opts.get<RealType>("post_check_is_right_inverse"));
+        options_.get("post_check_is_right_inverse", default_opts.get<double>("post_check_is_right_inverse"));
     if (right_inverse_check > 0) {
-      const auto eye = eye_matrix<MatrixType>(matrix_.rows(), matrix_.rows());
-      if ((matrix_ * *inverse_ - eye).sup_norm() > right_inverse_check)
+      const auto eye = eye_matrix<MatrixType>(Common::get_matrix_rows(matrix_), Common::get_matrix_rows(matrix_));
+      if (sup_norm(matrix_ * *inverse_ - eye) > right_inverse_check)
         DUNE_THROW(Exceptions::matrix_invert_failed_bc_result_is_not_a_right_inverse,
                    "Computed inverse is not a right inverse and you requested checking. To disable this check set "
                    "'post_check_is_right_inverse' to 0 in the options."
                        << "\n\nThe error is ||M_inv * M - Identity||_L_\\infty = "
-                       << (matrix_ * *inverse_ - eye).sup_norm()
+                       << sup_norm(matrix_ * *inverse_ - eye)
                        << "\n\nThese were the given options:\n\n"
                        << options_
                        << "\nThis was the given matrix M:\n\n"
@@ -202,6 +209,46 @@ protected:
                        << matrix_ * *inverse_);
     }
   } // ... post_checks(...)
+
+  template <class M>
+  bool contains_inf_or_nan(const MatrixInterface<M>& mat) const
+  {
+    return !mat.valid();
+  }
+
+  template <class M>
+  typename std::enable_if<XT::Common::is_matrix<M>::value && !is_matrix<M>::value, bool>::type
+  contains_inf_or_nan(const M& mat) const
+  {
+    using Mat = XT::Common::MatrixAbstraction<M>;
+    for (size_t ii = 0; ii < Mat::rows(mat); ++ii)
+      for (size_t jj = 0; jj < Mat::cols(mat); ++jj) {
+        const auto value = Mat::get_entry(mat, ii, jj);
+        if (XT::Common::isinf(value) || XT::Common::isnan(value))
+          return true;
+      }
+    return false;
+  } // ... contains_inf_or_nan(...)
+
+  template <class M>
+  double sup_norm(const MatrixInterface<M>& mat) const
+  {
+    return mat.sup_norm();
+  }
+
+  template <class M>
+  typename std::enable_if<XT::Common::is_matrix<M>::value && !is_matrix<M>::value, double>::type
+  sup_norm(const M& mat) const
+  {
+    using std::abs;
+    using std::max;
+    using Mat = XT::Common::MatrixAbstraction<M>;
+    auto norm = abs(Mat::get_entry(mat, 0, 0));
+    for (size_t ii = 0; ii < Mat::rows(mat); ++ii)
+      for (size_t jj = 0; jj < Mat::cols(mat); ++jj)
+        norm = std::max(norm, abs(Mat::get_entry(mat, ii, jj)));
+    return norm;
+  } // ... sup_norm(...)
 
   const MatrixType& matrix_;
   const Common::Configuration options_;
