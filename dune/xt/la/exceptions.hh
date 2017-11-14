@@ -71,6 +71,10 @@ class eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested : public eig
 {
 };
 
+class eigen_solver_failed_bc_result_is_not_an_eigendecomposition : public eigen_solver_failed
+{
+};
+
 
 class matrix_invert_failed : public Dune::Exception
 {
