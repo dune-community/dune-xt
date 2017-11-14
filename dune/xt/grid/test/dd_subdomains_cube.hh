@@ -13,79 +13,10 @@
 #include <dune/grid/common/rangegenerators.hh>
 
 #include <dune/xt/common/memory.hh>
+#include <dune/xt/common/test/common.hh>
 #include <dune/xt/common/test/gtest/gtest.h>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
-
-namespace std {
-
-
-template <class T>
-ostream& operator<<(ostream& out, const vector<T>& results)
-{
-  if (results.size() == 0)
-    out << "{}";
-  else if (results.size() == 1)
-    out << "{" << *results.begin() << "}";
-  else {
-    auto iterator = results.begin();
-    out << "{" << *iterator;
-    ++iterator;
-    for (; iterator != results.end(); ++iterator) {
-      out << ", " << *iterator;
-    }
-    out << "}";
-  }
-  return out;
-}
-
-template <class T>
-ostream& operator<<(ostream& out, const set<T>& results)
-{
-  if (results.size() == 0)
-    out << "{}";
-  else if (results.size() == 1)
-    out << "{" << *results.begin() << "}";
-  else {
-    auto iterator = results.begin();
-    out << "{" << *iterator;
-    ++iterator;
-    for (; iterator != results.end(); ++iterator) {
-      out << ", " << *iterator;
-    }
-    out << "}";
-  }
-  return out;
-}
-
-template <class L, class R>
-ostream& operator<<(ostream& out, const pair<L, R>& results)
-{
-  out << "{" << results.first << ", " << results.second << "}";
-  return out;
-}
-
-template <class F, class S>
-ostream& operator<<(ostream& out, const map<F, S>& results)
-{
-  if (results.size() == 0)
-    out << "{}" << endl;
-  else if (results.size() == 1)
-    out << "{{" << results.begin()->first << ", " << results.begin()->second << "}}";
-  else {
-    auto iterator = results.begin();
-    out << "{{" << iterator->first << ", " << iterator->second << "}";
-    ++iterator;
-    for (; iterator != results.end(); ++iterator) {
-      out << ",\n {" << iterator->first << ", " << iterator->second << "}";
-    }
-    out << "}";
-  }
-  return out;
-}
-
-
-} // namespace std
 
 using namespace Dune;
 
