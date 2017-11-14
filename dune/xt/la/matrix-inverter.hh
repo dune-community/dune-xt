@@ -57,6 +57,7 @@ class MatrixInverter
   static_assert(AlwaysFalse<MatrixType>::value,
                 "Please implement for given MatrixType and add the respective include below!");
 
+public:
   MatrixInverter(const MatrixType& /*matrix*/, const std::string& /*type*/ = "")
   {
     static_assert(AlwaysFalse<MatrixType>::value,
@@ -69,29 +70,11 @@ class MatrixInverter
                   "Please implement for given MatrixType and add the respective include below!");
   }
 
-  const Common::Configuration& options() const
-  {
-    static_assert(AlwaysFalse<MatrixType>::value,
-                  "Please implement for given MatrixType and add the respective include below!");
-  }
+  const Common::Configuration& options() const;
 
-  const MatrixType& matrix() const
-  {
-    static_assert(AlwaysFalse<MatrixType>::value,
-                  "Please implement for given MatrixType and add the respective include below!");
-  }
+  const MatrixType& matrix() const;
 
-  const MatrixType& inverse() const
-  {
-    static_assert(AlwaysFalse<MatrixType>::value,
-                  "Please implement for given MatrixType and add the respective include below!");
-  }
-
-  MatrixType inverse()
-  {
-    static_assert(AlwaysFalse<MatrixType>::value,
-                  "Please implement for given MatrixType and add the respective include below!");
-  }
+  const MatrixType& inverse() const;
 }; // class MatrixInverter
 
 
