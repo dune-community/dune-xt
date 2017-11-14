@@ -26,96 +26,108 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
-
 #if HAVE_EIGEN
 
-template <class S>
-class EigenDenseMatrixEigenSolverTraits
-{
-public:
-  typedef EigenDenseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType RealType;
-  typedef typename std::complex<RealType> ComplexType;
-  typedef typename XT::LA::Container<RealType, MatrixType::vector_type>::VectorType RealVectorType;
-  typedef typename XT::LA::Container<ComplexType, MatrixType::vector_type>::VectorType ComplexVectorType;
-  typedef EigenDenseMatrix<RealType> RealMatrixType;
-  typedef EigenDenseMatrix<ComplexType> ComplexMatrixType;
-  typedef EigenSolver<MatrixType> derived_type;
-};
 
 template <class S>
-class EigenSolver<EigenDenseMatrix<S>> : public EigenSolverBase<EigenDenseMatrixEigenSolverTraits<S>>
+class EigenSolverOptions<EigenDenseMatrix<S>>
 {
-  typedef EigenSolverBase<EigenDenseMatrixEigenSolverTraits<S>> BaseType;
-
 public:
-  using typename BaseType::MatrixType;
-  using typename BaseType::ComplexType;
-  using typename BaseType::ComplexVectorType;
-
-  EigenSolver(const MatrixType& matrix)
-    : BaseType(matrix)
-  {
-  }
-
   static std::vector<std::string> types()
   {
     return
     {
-      "eigen",
+      "eigen"
 #if HAVE_LAPACKE
-          "lapacke",
-#endif
-#if 0
-      ,
-      "qrhouseholder"
+          ,
+          "lapacke"
 #endif
     };
   }
 
   static Common::Configuration options(const std::string type = "")
   {
-    const std::string tp = !type.empty() ? type : types()[0];
-    internal::SolverUtils::check_given(tp, types());
-    return {{"type", tp},
-            {"check_for_inf_nan", "1"},
-            {"check_evs_are_real", "0"},
-            {"check_evs_are_positive", "0"},
-            {"check_eigenvectors_are_real", "0"}};
+    const std::string actual_type = type.empty() ? types()[0] : type;
+    internal::ensure_eigen_solver_type(actual_type, types());
+    Common::Configuration opts = internal::default_eigen_solver_options();
+    opts["type"] = actual_type;
+    return opts;
   }
+}; // class EigenSolverOptions<EigenDenseMatrix<S>>
 
-  virtual void get_eigenvalues(std::vector<ComplexType>& evs, const std::string& type) const override final
-  {
-    if (type == "eigen")
-      evs = internal::compute_all_eigenvalues_using_eigen(matrix_.backend());
-#if HAVE_LAPACKE
-    else if (type == "lapacke")
-      evs = internal::compute_all_eigenvalues_using_lapacke(matrix_);
-#endif
-    else
-      DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type << "' is not supported, although it was reported by types()!");
-  }
 
-  virtual void get_eigenvectors(std::vector<ComplexVectorType>& evs, const std::string& type) const override final
+template <class S>
+class EigenSolver<EigenDenseMatrix<S>> : public internal::EigenSolverBase<EigenDenseMatrix<S>,
+                                                                          S,
+                                                                          EigenDenseMatrix<XT::Common::real_t<S>>,
+                                                                          EigenDenseMatrix<XT::Common::complex_t<S>>>
+{
+  using BaseType = internal::EigenSolverBase<EigenDenseMatrix<S>,
+                                             S,
+                                             EigenDenseMatrix<XT::Common::real_t<S>>,
+                                             EigenDenseMatrix<XT::Common::complex_t<S>>>;
+
+public:
+  using typename BaseType::RealType;
+
+  template <class... Args>
+  explicit EigenSolver(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
   {
-    if (type == "eigen")
-      evs = internal::compute_all_eigenvectors_using_eigen(matrix_.backend());
-#if HAVE_LAPACKE
-    else if (type == "lapacke")
-      internal::compute_all_eigenvectors_using_lapacke(matrix_, evs, evs[0][0]);
-#endif
-    else
-      DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type << "' is not supported, although it was reported by types()!");
   }
 
 protected:
+  void compute() const override final
+  {
+    const auto type = options_.template get<std::string>("type");
+    const size_t N = matrix_.rows();
+    if (type == "eigen") {
+      if (options_.template get<bool>("compute_eigenvalues") && options_.template get<bool>("compute_eigenvectors")) {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
+        eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
+        internal::compute_all_eigenvalues_and_vectors_using_eigen(
+            matrix_.backend(), *eigenvalues_, eigenvectors_->backend());
+      } else {
+        if (options_.template get<bool>("compute_eigenvalues"))
+          eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
+              internal::compute_all_eigenvalues_using_eigen(matrix_.backend()));
+        if (options_.template get<bool>("compute_eigenvectors"))
+          eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(
+              internal::compute_all_eigenvectors_using_eigen(matrix_.backend()));
+      }
+#if HAVE_LAPACKE
+    } else if (type == "lapacke") {
+      if (options_.template get<bool>("compute_eigenvalues"))
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
+            internal::compute_all_eigenvalues_using_lapacke(matrix_));
+      if (options_.template get<bool>("compute_eigenvectors")) {
+        eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
+        internal::compute_all_eigenvectors_using_lapacke(matrix_, *eigenvectors_);
+      }
+#endif // HAVE_LAPACKE
+    } else
+      DUNE_THROW(Common::Exceptions::internal_error,
+                 "Given type '" << type << "' is none of EigenSolverOptions<EigenDenseMatrix<S>>::types(), and "
+                                           "internal::EigenSolverBase promised to check this!"
+                                << "\n\nThese are the available types:\n\n"
+                                << EigenSolverOptions<EigenDenseMatrix<S>>::types());
+  } // ... compute(...)
+
   using BaseType::matrix_;
-}; // class EigenSolver<EigenDenseMatrix<S>>
+  using BaseType::options_;
+  using BaseType::eigenvalues_;
+  using BaseType::eigenvectors_;
+}; // class EigenSolver<EigenDenseMatrix<...>>
 
 
 #else // HAVE_EIGEN
+
+
+template <class S>
+class EigenSolverOptions<EigenDenseMatrix<S>>
+{
+  static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
+};
 
 
 template <class S>
