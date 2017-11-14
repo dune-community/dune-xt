@@ -113,6 +113,7 @@ invert_matrix(const M& matrix, const XT::Common::Configuration& inversion_option
 } // namespace LA
 
 #include "matrix-inverter/eigen.hh"
+#include "matrix-inverter/fmatrix.hh"
 
 
 #endif // DUNE_XT_LA_MATRIX_INVERTER_HH
