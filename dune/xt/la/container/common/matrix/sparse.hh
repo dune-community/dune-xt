@@ -1213,8 +1213,8 @@ public:
       const size_t num_mutexes)
     : CommonSparseOrDenseMatrix(mat,
                                 prune,
-                                Common::FloatCmp::DefaultEpsilon<ScalarType>::value
-                                    / (10. * Common::MatrixAbstraction<OtherMatrixType>::cols(mat)),
+                                Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
+                                    / (1000. * Common::MatrixAbstraction<OtherMatrixType>::cols(mat)),
                                 num_mutexes)
   {
   } // CommonSparseOrDenseMatrix(...)
