@@ -10,6 +10,7 @@
 #include "config.h"
 
 #include <iostream>
+#include <cmath>
 
 #include <dune/common/exceptions.hh>
 

@@ -699,7 +699,7 @@ public:
                      ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
                                            : other.mutexes_)
                      : nullptr;
-      eps_(other.eps_);
+      eps_ = other.eps_;
       unshareable_ = false;
     }
     return *this;
