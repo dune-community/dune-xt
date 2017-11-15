@@ -14,8 +14,8 @@
 
 #include <string>
 
+#include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/matrix.hh>
-
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/type_traits.hh>
 
