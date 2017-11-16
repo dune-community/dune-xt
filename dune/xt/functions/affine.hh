@@ -13,6 +13,8 @@
 #ifndef DUNE_XT_FUNCTIONS_AFFINE_HH
 #define DUNE_XT_FUNCTIONS_AFFINE_HH
 
+#include "config.h"
+
 #if HAVE_DUNE_XT_LA
 
 #include <memory>

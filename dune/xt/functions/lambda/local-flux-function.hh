@@ -129,7 +129,7 @@ private:
 
     virtual size_t order(const XT::Common::Parameter& mu = {}) const override
     {
-      auto parsed_mu = this->parse_and_check(mu);
+      auto parsed_mu = this->parse_parameter(mu);
       return order_lambda_(parsed_mu);
     }
 
@@ -138,7 +138,7 @@ private:
                   RangeType& ret,
                   const Common::Parameter& mu = {}) const override final
     {
-      auto parsed_mu = this->parse_and_check(mu);
+      auto parsed_mu = this->parse_parameter(mu);
       ret = lambda_(this->entity(), x, u, parsed_mu);
     } // ... evaluate(...)
 
@@ -329,6 +329,7 @@ private:
   {
     static void set_col_jacobian(size_t col, JacobianRangeType& jacobian, const ColJacobianRangeType& jacobian_col)
     {
+      assert(col == 0);
       jacobian = jacobian_col;
     }
 

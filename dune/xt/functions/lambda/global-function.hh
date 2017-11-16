@@ -93,20 +93,20 @@ public:
 
   virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret = lambda_(xx, parsed_mu);
   }
 
   virtual RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     return lambda_(xx, parsed_mu);
   }
 
   virtual void
   jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret = jacobian_lambda_(xx, parsed_mu);
   }
 
