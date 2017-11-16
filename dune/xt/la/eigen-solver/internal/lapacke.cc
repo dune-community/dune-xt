@@ -7,6 +7,8 @@
 // Authors:
 //   Tobias Leibner  (2017)
 
+#include "config.h"
+
 #include "lapacke.hh"
 
 #if HAVE_LAPACKE

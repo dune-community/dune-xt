@@ -10,8 +10,6 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 
-#include "config.h"
-
 #include <string>
 
 #include <dune/xt/common/float_cmp.hh>

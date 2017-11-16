@@ -10,8 +10,6 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
 
-#include "config.h"
-
 #include <dune/xt/common/string.hh>
 
 #include <dune/xt/la/exceptions.hh>
