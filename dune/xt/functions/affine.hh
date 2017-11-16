@@ -179,8 +179,7 @@ protected:
 
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
-      DUNE_THROW(NotImplemented, "implementation did not compile");
-      //      ret = *(A[0].operator std::unique_ptr<FieldMatrixType>());
+      ret = *(A[0].operator std::unique_ptr<FieldMatrixType>());
     }
 
     static void jacobian_col(const size_t col, const std::vector<MatrixType>& A, JacobianRangeType& ret)
@@ -221,15 +220,13 @@ protected:
 
     static void jacobian(const std::vector<MatrixType>& A, JacobianRangeType& ret)
     {
-      DUNE_THROW(NotImplemented, "implementation did not compile");
-      //      for (size_t cc = 0; cc < rangeDimCols; ++cc)
-      //        ret[cc] = *(A[cc].operator std::unique_ptr<FieldMatrixType>());
+      for (size_t cc = 0; cc < rangeDimCols; ++cc)
+        ret[cc] = *(A[cc].operator std::unique_ptr<FieldMatrixType>());
     }
 
     static void jacobian_col(const size_t col, const std::vector<MatrixType>& A, ColJacobianRangeType& ret)
     {
-      DUNE_THROW(NotImplemented, "implementation did not compile");
-      //      ret = *(A[col].operator std::unique_ptr<FieldMatrixType>());
+      ret = *(A[col].operator std::unique_ptr<FieldMatrixType>());
     }
   }; // struct helper<false, ...>
 
