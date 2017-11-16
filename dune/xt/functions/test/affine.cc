@@ -15,10 +15,10 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/grid/grids.hh>
-#include <dune/xt/functions.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/grid/gridprovider/cube.hh>
+#include <dune/xt/functions/affine.hh>
 
-#include "functions.hh"
+#include <dune/xt/functions/test/functions.hh>
 
 using namespace Dune;
 using namespace Dune::XT;
@@ -26,25 +26,17 @@ using namespace Dune::XT::Functions;
 
 /* we just take the constant function as a container for the types we need */
 /* since this one always exists for all combinations */
-struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
+struct FunctionsTest //: public FunctionTest<TESTFUNCTIONTYPE>
 {
-  typedef FunctionsFactory<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
-      FunctionsProviderType;
-  typedef typename FunctionsProviderType::InterfaceType InterfaceType;
-
   virtual void check() const
   {
-    for (const auto& type : FunctionsProviderType::available()) {
-      const Common::Configuration config = FunctionsProviderType::default_config(type);
-      try {
-        const std::unique_ptr<InterfaceType> function = FunctionsProviderType::create(type, config);
-      } catch (Exceptions::spe10_data_file_missing&) {
-      }
+    auto grid = XT::Grid::make_cube_grid<GRIDTYPE>();
+    const auto testfunction = TESTFUNCTIONTYPE::create();
+    for (auto&& entity : elements(grid.leaf_view())) {
+      auto xx_global = entity.geometry().center();
+      auto xx_local = entity.geometry().local(xx_global);
+      TESTFUNCTIONTYPE::JacobianRangeType jacobian;
+      testfunction->local_function(entity)->jacobian(xx_local);
     }
   }
 };
-
-TEST_F(FunctionsTest, creation_and_evalution)
-{
-  this->check();
-}
