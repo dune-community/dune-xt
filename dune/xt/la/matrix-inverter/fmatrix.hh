@@ -44,6 +44,13 @@ public:
 
 
 template <class K, int ROWS, int COLS>
+class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>>
+    : public MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
+{
+};
+
+
+template <class K, int ROWS, int COLS>
 class MatrixInverter<FieldMatrix<K, ROWS, COLS>> : public internal::MatrixInverterBase<FieldMatrix<K, ROWS, COLS>>
 {
   using BaseType = internal::MatrixInverterBase<FieldMatrix<K, ROWS, COLS>>;
@@ -82,7 +89,19 @@ protected:
   using BaseType::matrix_;
   using BaseType::options_;
   using BaseType::inverse_;
-}; // class MatrixInverter<EigenDenseMatrix<...>>
+}; // class MatrixInverter<FieldMatrix<...>>
+
+
+template <class K, int ROWS, int COLS>
+class MatrixInverter<Common::FieldMatrix<K, ROWS, COLS>> : public MatrixInverter<FieldMatrix<K, ROWS, COLS>>
+{
+public:
+  template <class... Args>
+  explicit MatrixInverter(Args&&... args)
+    : MatrixInverter<FieldMatrix<K, ROWS, COLS>>(std::forward<Args>(args)...)
+  {
+  }
+};
 
 
 } // namespace Dune
