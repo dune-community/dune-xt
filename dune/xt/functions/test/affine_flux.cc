@@ -33,8 +33,9 @@ struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
     for (auto&& entity : elements(grid.leaf_view())) {
       auto xx_global = entity.geometry().center();
       auto xx_local = entity.geometry().local(xx_global);
-      TESTFUNCTIONTYPE::JacobianRangeType jacobian;
-      testfunction->local_function(entity)->jacobian(xx_local);
+      TESTFUNCTIONTYPE::PartialURangeType partial_u;
+      TESTFUNCTIONTYPE::StateRangeType u(0.);
+      testfunction->local_function(entity)->partial_u(xx_local, u);
     }
   }
 };

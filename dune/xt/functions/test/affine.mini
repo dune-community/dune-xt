@@ -1,4 +1,4 @@
-__name = functions
+__name = affine
 __exec_suffix = {gridname}_{dimDomain}d_r{dimRange}_rc{dimRangeCols}
 
 dimRange = 1, 3 | expand
