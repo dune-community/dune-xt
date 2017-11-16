@@ -253,14 +253,14 @@ public:
     backend_->mv(xx.backend(), yy.backend());
   }
 
-  template <class VectorImp>
-  inline void mv(const Dune::DenseVector<VectorImp>& xx, Dune::DenseVector<VectorImp>& yy) const
+  template <class FirstVectorImp, class SecondVectorImp>
+  inline void mv(const Dune::DenseVector<FirstVectorImp>& xx, Dune::DenseVector<SecondVectorImp>& yy) const
   {
     backend_->mv(xx, yy);
   }
 
-  template <class VectorImp>
-  inline void mtv(const Dune::DenseVector<VectorImp>& xx, Dune::DenseVector<VectorImp>& yy) const
+  template <class FirstVectorImp, class SecondVectorImp>
+  inline void mtv(const Dune::DenseVector<FirstVectorImp>& xx, Dune::DenseVector<SecondVectorImp>& yy) const
   {
     backend_->mtv(xx, yy);
   }
