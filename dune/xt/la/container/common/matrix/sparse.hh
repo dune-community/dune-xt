@@ -1436,18 +1436,18 @@ public:
   template <int ROWS, int COLS>
   explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
   {
-    return this->operator Dune::FieldMatrix<ScalarType, ROWS, COLS>();
+    return MatrixInterfaceType::operator Dune::FieldMatrix<ScalarType, ROWS, COLS>();
   }
 
   template <int ROWS, int COLS>
   explicit operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>() const
   {
-    return this->operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>();
+    return MatrixInterfaceType::operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>();
   }
 
   explicit operator Dune::DynamicMatrix<ScalarType>() const
   {
-    return this->operator Dune::DynamicMatrix<ScalarType>();
+    return MatrixInterfaceType::operator Dune::DynamicMatrix<ScalarType>();
   }
 
 private:
