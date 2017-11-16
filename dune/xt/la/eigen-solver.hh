@@ -44,6 +44,20 @@ class EigenSolverOptions
 }; // class EigenSolverOptions
 
 
+template <class MatrixType>
+std::vector<std::string> eigen_solver_types(const MatrixType& /*matrix*/)
+{
+  return EigenSolverOptions<MatrixType>::types();
+}
+
+
+template <class MatrixType>
+Common::Configuration eigen_solver_options(const MatrixType& /*matrix*/, const std::string type = "")
+{
+  return EigenSolverOptions<MatrixType>::options(type);
+}
+
+
 template <class MatrixImp>
 class EigenSolver
 {
@@ -84,7 +98,11 @@ public:
 
   const ComplexMatrixType& eigenvectors() const;
 
+  const ComplexMatrixType& eigenvectors_inverse() const;
+
   const RealMatrixType& real_eigenvectors() const;
+
+  const RealMatrixType& real_eigenvectors_inverse() const;
 }; // class EigenSolver
 
 
