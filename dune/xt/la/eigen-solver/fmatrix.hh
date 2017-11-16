@@ -144,12 +144,13 @@ protected:
   using BaseType::options_;
   using BaseType::eigenvalues_;
   using BaseType::eigenvectors_;
-}; // class EigenSolver<EigenDenseMatrix<...>>
+}; // class EigenSolver<FieldMatrix<...>>
 
 
 template <class K, int SIZE>
 class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>> : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
 {
+public:
   template <class... Args>
   EigenSolver(Args&&... args)
     : EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>(std::forward<Args>(args)...)
