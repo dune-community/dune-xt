@@ -1432,6 +1432,25 @@ public:
   using MatrixInterfaceType::operator+=;
   using MatrixInterfaceType::operator-=;
 
+  // clang does not find the conversion operators from the interface if they are not redefined here
+  template <int ROWS, int COLS>
+  explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
+  {
+    return this->operator Dune::FieldMatrix<ScalarType, ROWS, COLS>();
+  }
+
+  template <int ROWS, int COLS>
+  explicit operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>() const
+  {
+    return this->operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>();
+  }
+
+  explicit operator Dune::DynamicMatrix<ScalarType>() const
+  {
+    return this->operator Dune::DynamicMatrix<ScalarType>();
+  }
+
+private:
   size_t num_rows_, num_cols_;
   bool sparse_;
   mutable SparseMatrixType sparse_matrix_;
