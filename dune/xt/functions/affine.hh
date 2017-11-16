@@ -13,8 +13,6 @@
 #ifndef DUNE_XT_FUNCTIONS_AFFINE_HH
 #define DUNE_XT_FUNCTIONS_AFFINE_HH
 
-#include "config.h"
-
 #if HAVE_DUNE_XT_LA
 
 #include <memory>
@@ -138,8 +136,8 @@ public:
   {
     A_ = other.A_;
     b_ = other.b_;
-    b_zero_ = other.b_zero_;
     name_ = other.name_;
+    b_zero_ = other.b_zero_;
     return *this;
   }
 #endif
@@ -233,8 +231,8 @@ protected:
 protected:
   std::vector<MatrixType> A_;
   RangeType b_;
-  bool b_zero_;
   std::string name_;
+  bool b_zero_;
 }; // class AffineFunctionBase<...>
 
 
@@ -261,10 +259,10 @@ class AffineFunction
   typedef AffineFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> ThisType;
 
 public:
-  using typename InterfaceType::DomainType;
-  using typename InterfaceType::RangeFieldType;
-  using typename InterfaceType::RangeType;
-  using typename InterfaceType::JacobianRangeType;
+  typedef typename InterfaceType::DomainType DomainType;
+  typedef typename InterfaceType::RangeFieldType RangeFieldType;
+  typedef typename InterfaceType::RangeType RangeType;
+  typedef typename InterfaceType::JacobianRangeType JacobianRangeType;
   using InterfaceType::dimDomain;
   using InterfaceType::dimRange;
   using InterfaceType::dimRangeCols;
@@ -335,17 +333,17 @@ public:
 
   using InterfaceType::evaluate;
 
-  virtual void evaluate(const DomainType& x, RangeType& ret, const Common::Parameter& mu = {}) const override final
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
-    BaseType::template helper<>::evaluate(A_, b_, b_zero_, x, ret, mu);
+    BaseType::template helper<>::evaluate(A_, b_, b_zero_, x, ret);
   }
 
   using InterfaceType::jacobian;
 
   virtual void
-  jacobian(const DomainType& /*x*/, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
+  jacobian(const DomainType& /*x*/, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
   {
-    BaseType::template helper<>::jacobian(A_, ret, mu);
+    BaseType::template helper<>::jacobian(A_, ret);
   }
 
 private:

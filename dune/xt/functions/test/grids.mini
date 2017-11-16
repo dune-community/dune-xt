@@ -9,7 +9,7 @@ __local.grid_ug = Dune::UGGrid<{dimDomain}>
 __local.grid_alberta = Dune::AlbertaGrid<{dimDomain},{dimDomain}>
 
 grid = {__local.grid_yasp}, {__local.grid_alu}, {__local.grid_ug}, {__local.grid_alberta} | expand grid
-1, dune-alugrid_FOUND, dune-uggrid_FOUND, HAVE_ALBERTA | expand grid | cmake_guard
+1, dune-alugrid_FOUND, dune-uggrid_FOUND, ALBERTA_FOUND | expand grid | cmake_guard
 
 gridname = yasp, alu, ug, alberta | expand grid
 

@@ -26,9 +26,9 @@ using namespace Dune::XT::Functions;
 
 /* we just take the constant function as a container for the types we need */
 /* since this one always exists for all combinations */
-struct FunctionsTest //: public FunctionTest<TESTFUNCTIONTYPE>
+struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
-  virtual void check() const
+  void check()
   {
     auto grid = XT::Grid::make_cube_grid<GRIDTYPE>();
     const auto testfunction = TESTFUNCTIONTYPE::create();
