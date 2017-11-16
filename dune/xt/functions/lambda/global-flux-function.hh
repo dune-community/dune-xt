@@ -134,18 +134,18 @@ public:
 
   virtual size_t order(const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     return order_lambda_(parsed_mu);
   }
 
   using BaseType::evaluate;
 
-  void evaluate(const DomainType& xx,
-                const StateRangeType& uu,
-                RangeType& ret,
-                const Common::Parameter& mu = {}) const override final
+  virtual void evaluate(const DomainType& xx,
+                        const StateRangeType& uu,
+                        RangeType& ret,
+                        const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret = lambda_(xx, uu, parsed_mu);
   }
 
@@ -153,9 +153,9 @@ public:
                             const DomainType& xx,
                             const StateRangeType& uu,
                             ColRangeType& ret,
-                            const Common::Parameter& mu = {}) const
+                            const Common::Parameter& mu = {}) const override
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret =
         RangeColumnHelper<dimDomain, RangeFieldType, dimRange, dimRangeCols>::get_col(col, lambda_(xx, uu, parsed_mu));
   }
@@ -163,9 +163,9 @@ public:
   virtual void partial_x(const DomainType& xx,
                          const StateRangeType& uu,
                          PartialXRangeType& ret,
-                         const Common::Parameter& mu = {}) const
+                         const Common::Parameter& mu = {}) const override
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret = partial_x_lambda_(xx, uu, parsed_mu);
   }
 
@@ -173,9 +173,9 @@ public:
                              const DomainType& xx,
                              const StateRangeType& uu,
                              ColPartialXRangeType& ret,
-                             const Common::Parameter& mu = {}) const
+                             const Common::Parameter& mu = {}) const override
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret = partial_x_col_lambdas_[col](xx, uu, parsed_mu);
   }
 
@@ -184,9 +184,9 @@ public:
   virtual void partial_u(const DomainType& xx,
                          const StateRangeType& uu,
                          PartialURangeType& ret,
-                         const Common::Parameter& mu = {}) const
+                         const Common::Parameter& mu = {}) const override
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret = partial_u_lambda_(xx, uu, parsed_mu);
   }
 
@@ -194,9 +194,9 @@ public:
                              const DomainType& xx,
                              const StateRangeType& uu,
                              ColPartialURangeType& ret,
-                             const Common::Parameter& mu = {}) const
+                             const Common::Parameter& mu = {}) const override
   {
-    auto parsed_mu = this->parse_and_check(mu);
+    auto parsed_mu = this->parse_parameter(mu);
     ret = partial_u_col_lambdas_[col](xx, uu, parsed_mu);
   }
 

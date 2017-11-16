@@ -106,6 +106,7 @@ struct RangeColumnHelper<dimDomain, RangeFieldImp, dimRange, 1>
 
   static void set_col_jacobian(size_t col, JacobianRangeType& jacobian, const ColJacobianRangeType& jacobian_col)
   {
+    assert(col == 0);
     jacobian = jacobian_col;
   }
 
