@@ -1145,7 +1145,7 @@ public:
 template <class RealGridPartImp, bool codim_iters_provided = false>
 class PeriodicGridPart
 {
-  static_assert(AlwaysFalse<>::value, "You are missing dune-fem!");
+  static_assert(AlwaysFalse<RealGridPartImp>::value, "You are missing dune-fem!");
 };
 
 
