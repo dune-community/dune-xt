@@ -1243,7 +1243,9 @@ struct isConforming<XT::Grid::PeriodicGridPart<GP, c>>
 
 } // namespace GridPartCapabilities
 } // namespace Fem
-} // namespace Dune
 
 #endif // HAVE_DUNE_FEM
+
+} // namespace Dune
+
 #endif // DUNE_XT_GRID_VIEW_PERIODIC_HH
