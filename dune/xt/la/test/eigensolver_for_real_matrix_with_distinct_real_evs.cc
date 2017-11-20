@@ -126,3 +126,8 @@ TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_eigendecomposition)
 {
   gives_correct_eigendecomposition();
 }
+
+TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_real_eigendecomposition)
+{
+  gives_correct_real_eigendecomposition();
+}

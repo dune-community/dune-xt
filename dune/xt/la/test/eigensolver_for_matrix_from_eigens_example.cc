@@ -100,7 +100,7 @@ struct EigenSolverForMatrixFromEigensExample : public EigenSolverTest
                                                   "  0.597  0.108   0.832  -0.514  -0.782 -0.408;"
                                                   "  0.823 -0.0452  0.271  -0.726   0.998  0.275;"
                                                   " -0.605  0.258   0.435   0.608  -0.563  0.0486]");
-    // these values were recorded using lapacke
+    // these values were recorded using lapack
     expected_eigenvalues_ = XT::Common::from_string<EigenValuesType>("[0.048829697485156004+1.0596562712819182i "
                                                                      " 0.048829697485156004-1.0596562712819182i "
                                                                      " 0.96873863535292992 "
@@ -164,12 +164,12 @@ TEST_F(EigenSolverForMatrixFromEigensExample, is_constructible)
 
 TEST_F(EigenSolverForMatrixFromEigensExample, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({{"lapacke", "1e-15"}, {"eigen", "1e-14"}});
+  gives_correct_eigenvalues({{"lapack", "1e-15"}, {"eigen", "1e-14"}});
 }
 
 TEST_F(EigenSolverForMatrixFromEigensExample, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order({{"lapacke", "1e-15"}, {"eigen", "1e-14"}});
+  gives_correct_eigenvalues_in_correct_order({{"lapack", "1e-15"}, {"eigen", "1e-14"}});
 }
 
 TEST_F(EigenSolverForMatrixFromEigensExample, gives_correct_eigendecomposition)

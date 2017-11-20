@@ -122,3 +122,8 @@ TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_eigendecomposition)
 {
   gives_correct_eigendecomposition();
 }
+
+TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_real_eigendecomposition)
+{
+  gives_correct_real_eigendecomposition();
+}
