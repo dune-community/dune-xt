@@ -37,11 +37,10 @@ public:
   {
     return
     {
-      "eigen"
 #if HAVE_LAPACKE
-          ,
-          "lapack"
+      "lapack",
 #endif
+          "eigen"
     };
   }
 

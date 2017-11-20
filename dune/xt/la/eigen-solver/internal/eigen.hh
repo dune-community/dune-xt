@@ -17,6 +17,9 @@
 
 #include <dune/common/typetraits.hh>
 
+#ifndef DUNE_XT_LA_DISABLE_WARNINGS
+#include <dune/xt/common/timedlogging.hh>
+#endif
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/la/exceptions.hh>
 
@@ -36,6 +39,13 @@ void compute_all_eigenvalues_and_vectors_using_eigen(
     std::vector<XT::Common::complex_t<S>>& eigenvalues,
     ::Eigen::Matrix<XT::Common::complex_t<S>, ::Eigen::Dynamic, ::Eigen::Dynamic>& eigenvectors)
 {
+#ifndef DUNE_XT_LA_DISABLE_WARNINGS
+  // Drop this warning once http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1488 is solved!
+  Common::TimedLogger().get("dune.xt.la.eigen-solver.eigen").warn()
+      << "Using eigen is known to fail in at least one case (#define DUNE_XT_LA_DISABLE_WARNINGS to disable this "
+         "warning, or disable the corresponding Common::TimedLogger)!"
+      << std::endl;
+#endif
   ::Eigen::EigenSolver<::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>> eigen_solver(
       matrix, /*computeEigenvectors=*/true);
   if (eigen_solver.info() != ::Eigen::Success)
@@ -69,6 +79,13 @@ template <class S>
 ::Eigen::Matrix<XT::Common::complex_t<S>, ::Eigen::Dynamic, ::Eigen::Dynamic>
 compute_all_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& matrix)
 {
+#ifndef DUNE_XT_LA_DISABLE_WARNINGS
+  // Drop this warning once http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1488 is solved!
+  Common::TimedLogger().get("dune.xt.la.eigen-solver.eigen").warn()
+      << "Using eigen is known to fail in at least one case (#define DUNE_XT_LA_DISABLE_WARNINGS to disable this "
+         "warning, or disable the corresponding Common::TimedLogger)!"
+      << std::endl;
+#endif
   ::Eigen::EigenSolver<::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>> eigen_solver(
       matrix, /*computeEigenvectors=*/true);
   if (eigen_solver.info() != ::Eigen::Success)
