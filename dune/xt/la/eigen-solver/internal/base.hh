@@ -443,7 +443,11 @@ protected:
             DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
                        "These were the given options:\n\n"
                            << self.options_
+                           << "\n\nThis was the given matrix: "
+                           << std::setprecision(17)
+                           << self.matrix_
                            << "\nThese are the computed eigenvectors:\n\n"
+                           << std::setprecision(17)
                            << *self.eigenvectors_);
           RM::set_entry(*self.real_eigenvectors_, ii, jj, complex_value.real());
         }
@@ -468,6 +472,7 @@ protected:
                          "These were the given options:\n\n"
                              << self.options_
                              << "\nThese are the computed eigenvectors:\n\n"
+                             << std::setprecision(17)
                              << *self.eigenvectors_);
             self.real_eigenvectors_->set_entry(ii, jj, complex_value.real());
           }
@@ -483,6 +488,7 @@ protected:
                          "These were the given options:\n\n"
                              << self.options_
                              << "\nThese are the computed eigenvectors:\n\n"
+                             << std::setprecision(17)
                              << *self.eigenvectors_);
             self.real_eigenvectors_->set_entry(ii, jj, complex_value.real());
           }
@@ -510,10 +516,12 @@ protected:
       DUNE_THROW(Exceptions::eigen_solver_failed,
                  "The computed matrix of eigenvectors is not invertible!"
                      << "\n\nmatrix = "
+                     << std::setprecision(17)
                      << matrix_
                      << "\n\noptions: "
                      << options_
                      << "\n\neigenvectors = "
+                     << std::setprecision(17)
                      << *eigenvectors_
                      << "\n\nThis was the original error: "
                      << ee.what());
@@ -529,10 +537,12 @@ protected:
       DUNE_THROW(Exceptions::eigen_solver_failed,
                  "The computed matrix of eigenvectors is not invertible!"
                      << "\n\nmatrix = "
+                     << std::setprecision(17)
                      << matrix_
                      << "\n\noptions: "
                      << options_
                      << "\n\neigenvectors = "
+                     << std::setprecision(17)
                      << *eigenvectors_
                      << "\n\nThis was the original error: "
                      << ee.what());
@@ -556,9 +566,12 @@ protected:
       for (size_t jj = 0; jj < cols; ++jj)
         if (std::abs(Common::get_matrix_entry(decomposition_error, ii, jj)) > tolerance)
           DUNE_THROW(Exceptions::eigen_solver_failed_bc_result_is_not_an_eigendecomposition,
-                     "\n\nmatrix = " << matrix_ << "\n\noptions: " << options_ << "\n\neigenvalues (lambda)= "
+                     "\n\nmatrix = " << std::setprecision(17) << matrix_ << "\n\noptions: " << options_
+                                     << "\n\neigenvalues (lambda)= "
+                                     << std::setprecision(17)
                                      << eigenvalues
                                      << "\n\neigenvectors (T) = "
+                                     << std::setprecision(17)
                                      << eigenvectors
                                      << "\n\n(T * (lambda * T^-1)) - matrix = "
                                      << (eigenvectors * (eigenvalue_matrix * eigenvectors_inverse)) - mat);
