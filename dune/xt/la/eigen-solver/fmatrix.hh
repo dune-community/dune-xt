@@ -101,12 +101,13 @@ protected:
     const auto type = options_.template get<std::string>("type");
 #if HAVE_LAPACKE
     if (type == "lapack") {
-      if (options_.template get<bool>("compute_eigenvalues"))
+      if (!options_.template get<bool>("compute_eigenvectors"))
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
-            internal::compute_all_eigenvalues_using_lapacke(matrix_));
-      if (options_.template get<bool>("compute_eigenvectors")) {
+            internal::compute_eigenvalues_using_lapack(matrix_));
+      else {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(SIZE);
         eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
-        internal::compute_all_eigenvectors_using_lapacke(matrix_, *eigenvectors_);
+        internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
       }
     } else
 #endif // HAVE_LAPACKE

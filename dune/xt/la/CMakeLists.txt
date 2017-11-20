@@ -11,7 +11,6 @@
 
 set(lib_dune_xt_la_sources
     container/pattern.cc
-    eigen-solver/internal/lapacke.cc
     algorithms/solve_sym_tridiag_posdef.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)

@@ -10,12 +10,15 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_LAPACKE_HH
 
+#include <complex>
+#include <vector>
 #include <string>
 
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/lapacke.hh>
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/type_traits.hh>
@@ -28,250 +31,254 @@ namespace internal {
 #if HAVE_LAPACKE
 
 
-// We do not call the Lapacke functions directly to avoid including the lapacke.h header in this
-// header. The lapacke header defines some macros which lead to conflicts with other includes.
-struct LapackeWrapper
+/**
+ * \sa https://software.intel.com/en-us/mkl-developer-reference-c-geev
+ * \note Most likely, you do not want to use this function directly, but compute_eigenvalues_using_lapack.
+ */
+template <class SerializableRealMatrixType>
+typename std::enable_if<Common::is_matrix<SerializableRealMatrixType>::value, std::vector<std::complex<double>>>::type
+compute_eigenvalues_of_a_real_matrix_using_lapack(const SerializableRealMatrixType& serializable_matrix)
 {
-  static int dgeev(char jobvl,
-                   char jobvr,
-                   int n,
-                   double* a,
-                   int lda,
-                   double* wr,
-                   double* wi,
-                   double* vl,
-                   int ldvl,
-                   double* vr,
-                   int ldvr);
-};
-
-
-// if MatrixType is actually not a matrix but a vector of column vectors, the indices are the other way around (columns
-// first, then rows)
-template <class MatrixType,
-          class S,
-          bool real_eigvecs_requested,
-          bool is_matrix = Common::MatrixAbstraction<MatrixType>::is_matrix>
-struct lapacke_helper
-{
-  typedef Common::MatrixAbstraction<MatrixType> MatrixAbstractionType;
-
-  static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
-  {
-    // from lapacke documentation:
-    // the right eigenvectors v(j) are stored one after another in the columns of VR,
-    // in the same order as their eigenvalues. If the j-th eigenvalue is real, then
-    // v(j) = VR(:,j), the j-th column of VR. If the j-th and j+1)-th eigenvalues form
-    // a complex conjugate pair, then v(j) = VR(:,j)+i*VR(:,j+1) and
-    // v(j+1) = VR(:,j)-i*VR(:,j+1).
-    const auto N = eigvals.size();
-    for (size_t jj = 0; jj < N; ++jj)
-      if (Common::FloatCmp::ne(eigvals[jj].imag(), 0.)) {
-        for (size_t ii = 0; ii < N; ++ii) {
-          MatrixAbstractionType::set_entry(
-              eigvecs, ii, jj, {*(eigvecs_double + (N * ii + jj)), *(eigvecs_double + (N * ii + jj + 1))});
-          MatrixAbstractionType::set_entry(
-              eigvecs, ii, jj + 1, {*(eigvecs_double + (N * ii + jj)), -*(eigvecs_double + (N * ii + jj + 1))});
-        }
-        ++jj;
-      } else {
-        for (size_t ii = 0; ii < N; ++ii)
-          MatrixAbstractionType::set_entry(eigvecs, ii, jj, {*(eigvecs_double + (N * ii + jj)), 0.});
-      }
-  }
-};
-
-template <class MatrixType, class S>
-struct lapacke_helper<MatrixType, S, true, true>
-{
-  typedef Common::MatrixAbstraction<MatrixType> MatrixAbstractionType;
-
-  static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
-  {
-    const auto N = eigvals.size();
-    for (size_t ii = 0; ii < N; ++ii)
-      for (size_t jj = 0; jj < N; ++jj)
-        MatrixAbstractionType::set_entry(eigvecs, ii, jj, *(eigvecs_double + (N * ii + jj)));
-  }
-};
-
-template <class MatrixType, class S>
-struct lapacke_helper<MatrixType, S, false, false>
-{
-  static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
-  {
-    // from lapacke documentation:
-    // the right eigenvectors v(j) are stored one after another in the columns of VR,
-    // in the same order as their eigenvalues. If the j-th eigenvalue is real, then
-    // v(j) = VR(:,j), the j-th column of VR. If the j-th and j+1)-th eigenvalues form
-    // a complex conjugate pair, then v(j) = VR(:,j)+i*VR(:,j+1) and
-    // v(j+1) = VR(:,j)-i*VR(:,j+1).
-    const auto N = eigvals.size();
-    for (size_t jj = 0; jj < N; ++jj)
-      if (Common::FloatCmp::ne(eigvals[jj].imag(), 0.)) {
-        for (size_t ii = 0; ii < N; ++ii) {
-          eigvecs[jj][ii] = {*(eigvecs_double + (N * ii + jj)), *(eigvecs_double + (N * ii + jj + 1))};
-          eigvecs[jj + 1][ii] = {*(eigvecs_double + (N * ii + jj)), -*(eigvecs_double + (N * ii + jj + 1))};
-        }
-        ++jj;
-      } else {
-        for (size_t ii = 0; ii < N; ++ii)
-          eigvecs[jj][ii] = {*(eigvecs_double + (N * ii + jj)), 0.};
-      }
-  }
-};
-
-template <class MatrixType, class S>
-struct lapacke_helper<MatrixType, S, true, false>
-{
-  static void set_eigvecs(MatrixType& eigvecs, double* eigvecs_double, std::vector<std::complex<S>>& eigvals)
-  {
-    const auto N = eigvals.size();
-    for (size_t ii = 0; ii < N; ++ii)
-      for (size_t jj = 0; jj < N; ++jj)
-        eigvecs[jj][ii] = *(eigvecs_double + (N * ii + jj));
-  }
-};
-
-
-template <class S>
-void compute_using_lapacke(double* matrix, std::vector<std::complex<S>>& eigvals, double* eigvecs)
-{
-  int N = (int)eigvals.size();
-  std::vector<double> wr(N), wi(N);
-
-  int info = LapackeWrapper::dgeev(
-      'N', eigvecs ? 'V' : 'N', N, matrix, N, wr.data(), wi.data(), (double*)nullptr, N, eigvecs, N);
-
+  using real_type = typename Dune::XT::Common::MatrixAbstraction<SerializableRealMatrixType>::S;
+  static_assert(Dune::XT::Common::is_arithmetic<real_type>::value && !Dune::XT::Common::is_complex<real_type>::value,
+                "Not implemented for complex matrices (yet)!");
+  const size_t size = Dune::XT::Common::get_matrix_rows(serializable_matrix);
+#ifdef DUNE_XT_LA_DISABLE_ALL_CHECKS
+  assert(Dune::XT::Common::get_matrix_cols(serializable_matrix) == size);
+#else
+  if (Dune::XT::Common::get_matrix_cols(serializable_matrix) != size)
+    DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
+               "Given matrix has to be square, is " << size << "x"
+                                                    << Dune::XT::Common::get_matrix_cols(serializable_matrix)
+                                                    << "!");
+#endif // DUNE_XT_LA_DISABLE_ALL_CHECKS
+  std::vector<double> real_part_of_eigenvalues(size, 0.);
+  std::vector<double> imag_part_of_eigenvalues(size, 0.);
+  std::vector<double> dummy_left_eigenvalues(1, 0.);
+  std::vector<double> dummy_right_eigenvalues(1, 0.);
+  // lapacks favorite storage format is column-major, otherwise the matrix would be copied from row-major to col-major
+  const int info = LAPACKE_dgeev(LAPACK_COL_MAJOR,
+                                 /*do_not_compute_left_egenvectors: */ 'N',
+                                 /*do_not_compute_right_egenvectors: */ 'N',
+                                 size,
+                                 Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
+                                 size,
+                                 real_part_of_eigenvalues.data(),
+                                 imag_part_of_eigenvalues.data(),
+                                 dummy_left_eigenvalues.data(),
+                                 size,
+                                 dummy_right_eigenvalues.data(),
+                                 size);
   if (info != 0)
-    DUNE_THROW(Exceptions::eigen_solver_failed, "Lapack returned error " + std::to_string(info) + "!");
+    DUNE_THROW(Dune::XT::LA::Exceptions::eigen_solver_failed, "The lapack backend reported '" << info << "'!");
+  std::vector<std::complex<double>> eigenvalues(size);
+  for (size_t ii = 0; ii < size; ++ii)
+    eigenvalues[ii] = {real_part_of_eigenvalues[ii], imag_part_of_eigenvalues[ii]};
+  return eigenvalues;
+} // ... compute_eigenvalues_of_a_real_matrix_using_lapack(...)
 
-  for (size_t rr = 0; rr < size_t(N); ++rr)
-    eigvals[rr] = {wr[rr], wi[rr]};
-} // ... compute_using_lapacke(...)
 
-
-template <class Traits, class S>
-typename std::enable_if<Common::is_arithmetic<S>::value, std::vector<Common::complex_t<S>>>::type
-compute_all_eigenvalues_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix)
+/**
+ * \sa https://software.intel.com/en-us/mkl-developer-reference-c-geev
+ * \note Most likely, you do not want to use this function directly, but
+ *       compute_eigenvalues_and_right_eigenvectors_using_lapack.
+ */
+template <class SerializableRealMatrixType, class ComplexMatrixType>
+typename std::enable_if<Common::is_matrix<SerializableRealMatrixType>::value
+                            && Common::is_matrix<ComplexMatrixType>::value,
+                        void>::type
+compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
+    const SerializableRealMatrixType& serializable_matrix,
+    std::vector<std::complex<double>>& eigenvalues,
+    ComplexMatrixType& right_eigenvectors)
 {
-  const size_t N = matrix.rows();
-  if (matrix.cols() != N)
+  using real_type = typename Dune::XT::Common::MatrixAbstraction<SerializableRealMatrixType>::S;
+  static_assert(Dune::XT::Common::is_arithmetic<real_type>::value && !Dune::XT::Common::is_complex<real_type>::value,
+                "Not implemented for complex matrices (yet)!");
+  using complex_type = typename Dune::XT::Common::MatrixAbstraction<ComplexMatrixType>::S;
+  static_assert(Dune::XT::Common::is_complex<complex_type>::value,
+                "You have to manually convert the eigenvaluematrix to something else outside!");
+  static_assert(std::is_same<Dune::XT::Common::real_t<complex_type>, double>::value,
+                "You have to manually convert the eigenvaluematrix to something else outside!");
+  const size_t size = Dune::XT::Common::get_matrix_rows(serializable_matrix);
+#if DUNE_XT_LA_DISABLE_ALL_CHECKS
+  assert(Dune::XT::Common::get_matrix_cols(serializable_matrix) == size);
+  assert(Dune::XT::Common::get_matrix_rows(right_eigenvectors) == size);
+  assert(Dune::XT::Common::get_matrix_cols(right_eigenvectors) == size);
+#else
+  if (Dune::XT::Common::get_matrix_cols(serializable_matrix) != size)
     DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
-               "Matrix has to be square, is " << N << "x" << matrix.cols() << "!");
-  std::vector<Common::complex_t<S>> ret(N);
-  compute_using_lapacke(Common::serialize_rowwise<double>(matrix.as_imp()).get(), ret, nullptr);
-  return ret;
-} // ... compute_all_eigenvalues_using_lapacke(...)
+               "Given matrix has to be square, is " << size << "x"
+                                                    << Dune::XT::Common::get_matrix_cols(serializable_matrix)
+                                                    << "!");
+  if (Dune::XT::Common::get_matrix_rows(right_eigenvectors) != size)
+    DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
+               "Given matrix of right eigenvectors has to be of same size as given matrix, is "
+                   << Dune::XT::Common::get_matrix_rows(right_eigenvectors)
+                   << "x"
+                   << Dune::XT::Common::get_matrix_cols(right_eigenvectors)
+                   << "!");
+  if (Dune::XT::Common::get_matrix_cols(right_eigenvectors) != size)
+    DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
+               "Given matrix of right eigenvectors has to be of same size as given matrix, is "
+                   << Dune::XT::Common::get_matrix_rows(right_eigenvectors)
+                   << "x"
+                   << Dune::XT::Common::get_matrix_cols(right_eigenvectors)
+                   << "!");
+#endif // DUNE_XT_LA_DISABLE_ALL_CHECKS
+  std::vector<double> real_part_of_eigenvalues(size, 0.);
+  std::vector<double> imag_part_of_eigenvalues(size, 0.);
+  std::vector<double> dummy_left_eigenvalues(1, 0.);
+  std::vector<double> right_eigenvalues(size * size, 0.);
+  // lapacks favorite storage format is column-major, otherwise the matrix would be copied from row-major to col-major
+  const int info = LAPACKE_dgeev(LAPACK_COL_MAJOR,
+                                 /*do_not_compute_left_egenvectors: */ 'N',
+                                 /*compute_right_egenvectors: */ 'V',
+                                 size,
+                                 Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
+                                 size,
+                                 real_part_of_eigenvalues.data(),
+                                 imag_part_of_eigenvalues.data(),
+                                 dummy_left_eigenvalues.data(),
+                                 size,
+                                 right_eigenvalues.data(),
+                                 size);
+  if (info != 0)
+    DUNE_THROW(Dune::XT::LA::Exceptions::eigen_solver_failed, "The lapack backend reported '" << info << "'!");
+  // set eigenvalues
+  if (eigenvalues.size() != size)
+    eigenvalues.resize(size);
+  for (size_t ii = 0; ii < size; ++ii)
+    eigenvalues[ii] = {real_part_of_eigenvalues[ii], imag_part_of_eigenvalues[ii]};
+  // set eigenvectors, these are in column-major format, hence the jj/kk switch on assignment
+  size_t jj = 0;
+  while (jj < size) {
+    const auto& imag_part_of_jth_eigenvalue = imag_part_of_eigenvalues[jj];
+    if (!(imag_part_of_jth_eigenvalue < 0. || imag_part_of_jth_eigenvalue > 0.)) {
+      // this is a real eigenvalue with corresponding real eigenvector
+      for (size_t kk = 0; kk < size; ++kk) {
+        const double kth_component_of_jth_eigenvector = right_eigenvalues[kk + jj * size];
+        Dune::XT::Common::set_matrix_entry(
+            right_eigenvectors, kk, jj, complex_type({kth_component_of_jth_eigenvector, 0.}));
+      }
+      jj += 1;
+    } else {
+      // this eigenvalue and the next form a complex conjugate pair
+      assert(jj + 1 < size && "This must not happen, the lapack documentation promised otherwise!");
+      for (size_t kk = 0; kk < size; ++kk) {
+        const double real_part_of_kth_component_of_jth_eigenvector = right_eigenvalues[kk + jj * size];
+        const double imag_part_of_kth_component_of_jth_eigenvector = right_eigenvalues[kk + (jj + 1) * size];
+        Dune::XT::Common::set_matrix_entry(right_eigenvectors,
+                                           kk,
+                                           jj,
+                                           complex_type({real_part_of_kth_component_of_jth_eigenvector,
+                                                         imag_part_of_kth_component_of_jth_eigenvector}));
+        const double real_part_of_kth_component_of_jplusoneth_eigenvector = right_eigenvalues[kk + jj * size];
+        const double imag_part_of_kth_component_of_jplusoneth_eigenvector =
+            -1 * right_eigenvalues[kk + (jj + 1) * size];
+        Dune::XT::Common::set_matrix_entry(right_eigenvectors,
+                                           kk,
+                                           jj + 1,
+                                           complex_type({real_part_of_kth_component_of_jplusoneth_eigenvector,
+                                                         imag_part_of_kth_component_of_jplusoneth_eigenvector}));
+      }
+      jj += 2;
+    }
+  }
+} // ... compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(...)
 
-template <class M>
-typename std::enable_if<Common::is_matrix<M>::value && !is_matrix<M>::value,
-                        std::vector<Common::complex_t<typename Common::MatrixAbstraction<M>::RealType>>>::type
-compute_all_eigenvalues_using_lapacke(const M& matrix)
+
+/**
+ * \note Most likely, you do not want to use this function directly, but compute_eigenvalues_using_lapack or
+ *       compute_eigenvalues_and_right_eigenvectors_using_lapack.
+ */
+template <class MatrixType>
+struct lapack_helper
 {
-  const size_t N = Common::get_matrix_rows(matrix);
-  if (Common::get_matrix_cols(matrix) != N)
-    DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
-               "Matrix has to be square, is " << N << "x" << Common::get_matrix_cols(matrix) << "!");
-  std::vector<Common::complex_t<typename Common::MatrixAbstraction<M>::RealType>> ret(N);
-  compute_using_lapacke(Common::serialize_rowwise<double>(matrix).get(), ret, nullptr);
-  return ret;
-} // ... compute_all_eigenvalues_using_lapacke(...)
+  static_assert(Common::is_matrix<MatrixType>::value, "");
+
+  template <bool is_complex = Common::is_complex<typename Common::MatrixAbstraction<MatrixType>::S>::value,
+            bool anything = true>
+  struct dtype_switch;
+
+  template <bool anything>
+  struct dtype_switch<true, anything>
+  {
+    static inline std::vector<std::complex<double>> eigenvalues(const MatrixType& /*matrix*/)
+    {
+      static_assert(AlwaysFalse<MatrixType>::value,
+                    "Not yet implemented for complex matrices, take a look at "
+                    "https://software.intel.com/en-us/mkl-developer-reference-c-geev "
+                    "and add a corresponding free function like "
+                    "compute_eigenvalues_of_a_real_matrix_using_lapack(...)!");
+    }
+
+    template <class V, class E>
+    static inline void eigenvectors(const MatrixType& /*matrix*/, V& /*eigenvalues*/, E& /*eigenvectors*/)
+    {
+      static_assert(AlwaysFalse<MatrixType>::value,
+                    "Not yet implemented for complex matrices, take a look at "
+                    "https://software.intel.com/en-us/mkl-developer-reference-c-geev and add a corresponding free "
+                    "function like compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(...)!");
+    }
+  };
+
+  template <bool anything>
+  struct dtype_switch<false, anything>
+  {
+    static inline std::vector<std::complex<double>> eigenvalues(const MatrixType& matrix)
+    {
+      return compute_eigenvalues_of_a_real_matrix_using_lapack(matrix);
+    }
+
+    template <class V, class E>
+    static inline void eigenvectors(const MatrixType& matrix, V& eigenvalues, E& eigenvectors)
+    {
+      compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(matrix, eigenvalues, eigenvectors);
+    }
+  };
+}; // class lapack_helper
 
 
-template <class Traits, class S, class EV_Traits>
-void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& matrix,
-                                            XT::LA::MatrixInterface<EV_Traits, Common::complex_t<S>>& eigenvectors)
+template <class SerializableMatrixType>
+typename std::enable_if<Common::is_matrix<SerializableMatrixType>::value, std::vector<std::complex<double>>>::type
+compute_eigenvalues_using_lapack(const SerializableMatrixType& serializable_matrix)
 {
-  const size_t N = matrix.rows();
-  if (matrix.cols() != N)
-    DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
-               "Matrix has to be square, is " << N << "x" << matrix.cols() << "!");
-  std::vector<Common::complex_t<S>> tmp_eigenvalues(N);
-  std::vector<double> tmp_eigenvectors(N * N);
-  compute_using_lapacke(
-      Common::serialize_rowwise<double>(matrix.as_imp()).get(), tmp_eigenvalues, tmp_eigenvectors.data());
-  lapacke_helper<typename XT::LA::MatrixInterface<EV_Traits, Common::complex_t<S>>::derived_type, S, false>::
-      set_eigvecs(eigenvectors.as_imp(), tmp_eigenvectors.data(), tmp_eigenvalues);
+  return lapack_helper<SerializableMatrixType>::template dtype_switch<>::eigenvalues(serializable_matrix);
 }
 
-template <class MatrixType, class EigenValueMatrixType>
-typename std::enable_if<Common::is_matrix<MatrixType>::value && !is_matrix<MatrixType>::value
-                            && (Common::is_matrix<EigenValueMatrixType>::value
-                                && !is_matrix<EigenValueMatrixType>::value),
+
+template <class SerializableMatrixType, class ComplexMatrixType>
+typename std::enable_if<Common::is_matrix<SerializableMatrixType>::value && Common::is_matrix<ComplexMatrixType>::value,
                         void>::type
-compute_all_eigenvectors_using_lapacke(const MatrixType& matrix, EigenValueMatrixType& eigenvectors)
+compute_eigenvalues_and_right_eigenvectors_using_lapack(const SerializableMatrixType& serializable_matrix,
+                                                        std::vector<std::complex<double>>& eigenvalues,
+                                                        ComplexMatrixType& right_eigenvectors)
 {
-  const size_t N = Common::get_matrix_rows(matrix);
-  if (Common::get_matrix_cols(matrix) != N)
-    DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
-               "Matrix has to be square, is " << N << "x" << Common::get_matrix_cols(matrix) << "!");
-  if (Common::get_matrix_rows(eigenvectors) != N || Common::get_matrix_cols(eigenvectors) != N)
-    DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
-               "Eigenvalue matrix should be " << N << "x" << Common::get_matrix_cols(eigenvectors) << ", is "
-                                              << Common::get_matrix_rows(eigenvectors)
-                                              << "x"
-                                              << Common::get_matrix_cols(eigenvectors)
-                                              << "!");
-  using S = typename Common::MatrixAbstraction<EigenValueMatrixType>::S;
-  std::vector<std::complex<Common::real_t<S>>> tmp_eigenvalues(N);
-  std::vector<double> tmp_eigenvectors(N * N);
-  compute_using_lapacke(Common::serialize_rowwise<double>(matrix).get(), tmp_eigenvalues, tmp_eigenvectors.data());
-  lapacke_helper<EigenValueMatrixType, Common::real_t<S>, Common::is_arithmetic<S>::value>::set_eigvecs(
-      eigenvectors, tmp_eigenvectors.data(), tmp_eigenvalues);
-} // ... compute_all_eigenvalues_using_lapacke(...)
-
-
-// template <class S, int N, class ReturnType, class ReturnValueType>
-// void compute_all_eigenvectors_using_lapacke(const Dune::FieldMatrix<S, N, N>& matrix, ReturnType& ret,
-// ReturnValueType)
-//{
-//  std::vector<double> tmp_matrix(N * N), eigvecs(N * N);
-//  std::vector<std::complex<S>> eigvals(N);
-//  size_t ii = 0;
-//  for (size_t rr = 0; rr < N; ++rr)
-//    for (size_t cc = 0; cc < N; ++cc)
-//      tmp_matrix[ii++] = matrix[rr][cc];
-//  compute_using_lapacke(tmp_matrix.data(), eigvals, eigvecs.data());
-//  lapacke_helper<ReturnType, S, std::is_arithmetic<ReturnValueType>::value>::set_eigvecs(ret, eigvecs.data(),
-//  eigvals);
-//}
-
+  lapack_helper<SerializableMatrixType>::template dtype_switch<>::eigenvectors(
+      serializable_matrix, eigenvalues, right_eigenvectors);
+}
 
 #else // HAVE_LAPACKE
 
 
-template <class Traits, class S>
-typename std::enable_if<Common::is_arithmetic<S>::value, std::vector<Common::complex_t<S>>>::type
-compute_all_eigenvalues_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& /*matrix*/)
+template <class SerializableMatrixType>
+typename std::enable_if<Common::is_matrix<SerializableMatrixType>::value, std::vector<std::complex<double>>>::type
+compute_eigenvalues_using_lapack(const SerializableMatrixType& serializable_matrix)
 {
-  static_assert(AlwaysFalse<Traits>::value, "You are missing lapacke!");
+  static_assert(AlwaysFalse<SerializableRealMatrixType>::value, "You are missing lapack!");
 }
 
 
-template <class M>
-typename std::enable_if<Common::is_matrix<M>::value && !is_matrix<M>::value,
-                        std::vector<Common::complex_t<typename Common::MatrixAbstraction<M>::RealType>>>::type
-compute_all_eigenvalues_using_lapacke(const M& /*matrix*/)
-{
-  static_assert(AlwaysFalse<M>::value, "You are missing lapacke!");
-}
-
-template <class Traits, class S, class EV_Traits>
-void compute_all_eigenvectors_using_lapacke(const XT::LA::MatrixInterface<Traits, S>& /*matrix*/,
-                                            XT::LA::MatrixInterface<EV_Traits, Common::complex_t<S>>& /*eigenvectors*/)
-{
-  static_assert(AlwaysFalse<Traits>::value, "You are missing lapacke!");
-}
-
-template <class MatrixType, class EigenValueMatrixType>
-typename std::enable_if<Common::is_matrix<MatrixType>::value && !is_matrix<MatrixType>::value
-                            && (Common::is_matrix<EigenValueMatrixType>::value
-                                && !is_matrix<EigenValueMatrixType>::value),
+template <class SerializableMatrixType, class ComplexMatrixType>
+typename std::enable_if<Common::is_matrix<SerializableMatrixType>::value && Common::is_matrix<ComplexMatrixType>::value,
                         void>::type
-compute_all_eigenvectors_using_lapacke(const MatrixType& /*matrix*/, EigenValueMatrixType& /*eigenvectors*/)
+compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
+    const SerializableMatrixType& serializable_matrix,
+    std::vector<std::complex<double>>& eigenvalues,
+    ComplexMatrixType& right_eigenvectors)
 {
-  static_assert(AlwaysFalse<MatrixType>::value, "You are missing lapacke!");
+  static_assert(AlwaysFalse<SerializableRealMatrixType>::value, "You are missing lapack!");
 }
 
 
