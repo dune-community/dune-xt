@@ -246,9 +246,8 @@ template <class T,
           bool view = is_view<T>::value,
           bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool intersection = is_intersection<T>::value>
-struct extract_grid
+struct extract_grid : public std::false_type
 {
-  static_assert(Dune::AlwaysFalse<T>::value, "type T is not something we can extract a gridtype from");
 };
 
 template <class T>
@@ -269,9 +268,54 @@ struct extract_grid<T, false, false, true>
   typedef typename is_intersection<T>::GridType type;
 };
 
-
 template <class T>
 using extract_grid_t = typename extract_grid<T>::type;
+
+
+template <class T,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
+struct extract_collective_communication : public std::false_type
+{
+};
+
+template <class T>
+struct extract_collective_communication<T, true, false>
+{
+  typedef typename T::CollectiveCommunication type;
+};
+
+template <class T>
+struct extract_collective_communication<T, false, true>
+{
+  typedef typename T::CollectiveCommunicationType type;
+};
+
+template <class T>
+using extract_collective_communication_t = typename extract_collective_communication<T>::type;
+
+
+template <class T,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
+struct extract_index_set : public std::false_type
+{
+};
+
+template <class T>
+struct extract_index_set<T, true, false>
+{
+  typedef typename T::IndexSet type;
+};
+
+template <class T>
+struct extract_index_set<T, false, true>
+{
+  typedef typename T::IndexSetType type;
+};
+
+template <class T>
+using extract_index_set_t = typename extract_index_set<T>::type;
 
 
 template <class T,
@@ -293,9 +337,31 @@ struct extract_intersection<T, false, true>
   typedef typename T::IntersectionType type;
 };
 
-
 template <class T>
 using extract_intersection_t = typename extract_intersection<T>::type;
+
+
+template <class T,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
+struct extract_intersection_iterator : public std::false_type
+{
+};
+
+template <class T>
+struct extract_intersection_iterator<T, true, false>
+{
+  typedef typename T::IntersectionIterator type;
+};
+
+template <class T>
+struct extract_intersection_iterator<T, false, true>
+{
+  typedef typename T::IntersectionIteratorType type;
+};
+
+template <class T>
+using extract_intersection_iterator_t = typename extract_intersection_iterator<T>::type;
 
 
 template <class T,
@@ -318,9 +384,56 @@ struct extract_entity<T, codim, false, true>
   typedef typename T::template Codim<codim>::EntityType type;
 };
 
-
 template <class T, size_t codim = 0>
 using extract_entity_t = typename extract_entity<T, codim>::type;
+
+
+template <class T,
+          size_t codim = 0,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
+struct extract_local_geometry : public std::false_type
+{
+};
+
+template <class T, size_t codim>
+struct extract_local_geometry<T, codim, true, false>
+{
+  typedef typename T::template Codim<codim>::LocalGeometry type;
+};
+
+template <class T, size_t codim>
+struct extract_local_geometry<T, codim, false, true>
+{
+  typedef typename T::template Codim<codim>::LocalGeometryType type;
+};
+
+template <class T, size_t codim = 0>
+using extract_local_geometry_t = typename extract_local_geometry<T, codim>::type;
+
+
+template <class T,
+          size_t codim = 0,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
+struct extract_geometry : public std::false_type
+{
+};
+
+template <class T, size_t codim>
+struct extract_geometry<T, codim, true, false>
+{
+  typedef typename T::template Codim<codim>::Geometry type;
+};
+
+template <class T, size_t codim>
+struct extract_geometry<T, codim, false, true>
+{
+  typedef typename T::template Codim<codim>::GeometryType type;
+};
+
+template <class T, size_t codim = 0>
+using extract_geometry_t = typename extract_geometry<T, codim>::type;
 
 
 template <class T,
@@ -343,9 +456,33 @@ struct extract_iterator<T, c, false, true>
   typedef typename T::template Codim<c>::IteratorType type;
 };
 
-
 template <class T, int c = 0>
 using extract_iterator_t = typename extract_iterator<T, c>::type;
+
+
+template <class T,
+          PartitionIteratorType pit,
+          int c = 0,
+          bool view = is_view<T>::value,
+          bool part = is_part<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value>
+struct extract_partition_iterator : public std::false_type
+{
+};
+
+template <class T, PartitionIteratorType pit, int c>
+struct extract_partition_iterator<T, pit, c, true, false>
+{
+  typedef typename T::template Codim<c>::template Partition<pit>::Iterator type;
+};
+
+template <class T, PartitionIteratorType pit, int c>
+struct extract_partition_iterator<T, pit, c, false, true>
+{
+  typedef typename T::template Codim<c>::template Partition<pit>::IteratorType type;
+};
+
+template <class T, PartitionIteratorType pit, int c = 0>
+using extract_partition_iterator_t = typename extract_partition_iterator<T, pit, c>::type;
 
 
 } // namespace Grid
