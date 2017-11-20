@@ -44,7 +44,7 @@ public:
     return
     {
 #if HAVE_LAPACKE
-      "lapacke"
+      "lapack"
 #if HAVE_EIGEN
           ,
 #endif
@@ -100,7 +100,7 @@ protected:
   {
     const auto type = options_.template get<std::string>("type");
 #if HAVE_LAPACKE
-    if (type == "lapacke") {
+    if (type == "lapack") {
       if (options_.template get<bool>("compute_eigenvalues"))
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
             internal::compute_all_eigenvalues_using_lapacke(matrix_));

@@ -40,7 +40,7 @@ public:
       "eigen"
 #if HAVE_LAPACKE
           ,
-          "lapacke"
+          "lapack"
 #endif
     };
   }
@@ -96,7 +96,7 @@ protected:
               internal::compute_all_eigenvectors_using_eigen(matrix_.backend()));
       }
 #if HAVE_LAPACKE
-    } else if (type == "lapacke") {
+    } else if (type == "lapack") {
       if (options_.template get<bool>("compute_eigenvalues"))
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
             internal::compute_all_eigenvalues_using_lapacke(matrix_));
