@@ -3,7 +3,7 @@
 # The copyright lies with the authors of this file (see below).
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 # Authors:
-#   Felix Schindler (2016)
+#   Felix Schindler (2016 - 2017)
 #
 ################################
 # Dune module information file #
@@ -11,7 +11,7 @@
 
 #Name of the module
 Module: dune-pybindxi
-Version: 2.0.1
+Version: 2.2.1
 Maintainer: felix.schindler@wwu.de
 #depending on
 Depends: dune-common (>= 2.4) dune-python (>= 2.4)
