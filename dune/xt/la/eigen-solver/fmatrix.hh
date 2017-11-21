@@ -117,19 +117,19 @@ protected:
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(SIZE);
         EigenDenseMatrix<K> tmp_matrix(matrix_);
         EigenDenseMatrix<Common::complex_t<K>> tmp_eigenvectors(matrix_);
-        internal::compute_all_eigenvalues_and_vectors_using_eigen(
+        internal::compute_eigenvalues_and_right_eigenvectors_using_eigen(
             tmp_matrix.backend(), *eigenvalues_, tmp_eigenvectors.backend());
         eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(
             convert_to<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(tmp_eigenvectors));
       } else {
         if (options_.template get<bool>("compute_eigenvalues"))
           eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
-              internal::compute_all_eigenvalues_using_eigen(EigenDenseMatrix<K>(matrix_).backend()));
+              internal::compute_eigenvalues_using_eigen(EigenDenseMatrix<K>(matrix_).backend()));
         if (options_.template get<bool>("compute_eigenvectors")) {
           eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(
               convert_to<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(
                   EigenDenseMatrix<XT::Common::complex_t<K>>(
-                      internal::compute_all_eigenvectors_using_eigen(EigenDenseMatrix<K>(matrix_).backend()))));
+                      internal::compute_right_eigenvectors_using_eigen(EigenDenseMatrix<K>(matrix_).backend()))));
         }
       }
     } else

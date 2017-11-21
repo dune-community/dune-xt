@@ -84,15 +84,15 @@ protected:
       if (options_.template get<bool>("compute_eigenvalues") && options_.template get<bool>("compute_eigenvectors")) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
         eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
-        internal::compute_all_eigenvalues_and_vectors_using_eigen(
+        internal::compute_eigenvalues_and_right_eigenvectors_using_eigen(
             matrix_.backend(), *eigenvalues_, eigenvectors_->backend());
       } else {
         if (options_.template get<bool>("compute_eigenvalues"))
           eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
-              internal::compute_all_eigenvalues_using_eigen(matrix_.backend()));
+              internal::compute_eigenvalues_using_eigen(matrix_.backend()));
         if (options_.template get<bool>("compute_eigenvectors"))
           eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(
-              internal::compute_all_eigenvectors_using_eigen(matrix_.backend()));
+              internal::compute_right_eigenvectors_using_eigen(matrix_.backend()));
       }
 #if HAVE_LAPACKE
     } else if (type == "lapack") {
