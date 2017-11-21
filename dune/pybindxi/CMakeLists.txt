@@ -4,24 +4,25 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 # Authors:
 #   Felix Schindler (2016)
-#
-#install headers
 
 install(FILES
         attr.h
+        buffer_info.h
         cast.h
         chrono.h
         common.h
         complex.h
-        descr.h
         eigen.h
+        embed.h
         eval.h
         functional.h
+        iostream.h
         numpy.h
         operators.h
+        options.h
         pybind11.h
         pytypes.h
-        stl_bind.h
         stl.h
-        typeid.h
+        stl_bind.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/pybindxi)
+

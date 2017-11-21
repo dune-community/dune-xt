@@ -24,7 +24,35 @@ include(DuneMacros)
 
 # start a dune project with information from dune.module
 dune_project()
-dune_enable_all_packages()
+
+if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-pybindxi_SOURCE_DIR}/dune
+                           MODULE_LIBRARIES dunepybindxi dunepybindxiinterface dunepybindximodule dunepybindxiembed)
+  # Build an interface library target:
+  add_library(pybind11::pybind11 ALIAS dunepybindxiinterface)  # to match exported target
+  target_include_directories(dunepybindxiinterface INTERFACE $<BUILD_INTERFACE:${PYBIND11_INCLUDE_DIR}>
+                                                $<BUILD_INTERFACE:${PYTHON_INCLUDE_DIRS}>
+                                                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+  target_compile_options(dunepybindxiinterface INTERFACE $<BUILD_INTERFACE:${PYBIND11_CPP_STANDARD}>)
+
+  add_library(pybind11::module ALIAS dunepybindximodule)
+  if(NOT MSVC)
+    target_compile_options(dunepybindximodule INTERFACE -fvisibility=hidden)
+  endif()
+  target_link_libraries(dunepybindximodule INTERFACE pybind11::pybind11)
+  if(WIN32 OR CYGWIN)
+    target_link_libraries(dunepybindximodule INTERFACE $<BUILD_INTERFACE:${PYTHON_LIBRARIES}>)
+  elseif(APPLE)
+    target_link_libraries(dunepybindximodule INTERFACE "-undefined dynamic_lookup")
+  endif()
+
+  target_link_libraries(dunepybindxiembed INTERFACE pybind11::pybind11 $<BUILD_INTERFACE:${PYTHON_LIBRARIES}>)
+  add_library(pybind11::embed ALIAS dunepybindxiembed)
+  target_link_libraries(dunepybindxi dunepybindxiembed)
+else()
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-pybindxi_SOURCE_DIR}/dune)
+endif()
+
 add_subdirectory(dune)
 add_subdirectory(doc)
 add_subdirectory(cmake/modules)

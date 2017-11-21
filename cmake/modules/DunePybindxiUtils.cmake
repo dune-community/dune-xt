@@ -8,22 +8,115 @@
 # The code below is a renamed copy of parts of ../../pybind11/CMakeLists.txt,
 # see ../../pybind11/LICENSE for license information.
 
+# Checks whether the given CXX/linker flags can compile and link a cxx file.  cxxflags and
+# linkerflags are lists of flags to use.  The result variable is a unique variable name for each set
+# of flags: the compilation result will be cached base on the result variable.  If the flags work,
+# sets them in cxxflags_out/linkerflags_out internal cache variables (in addition to ${result}).
+function(_dune_pybind11_return_if_cxx_and_linker_flags_work result cxxflags linkerflags cxxflags_out linkerflags_out)
+  set(CMAKE_REQUIRED_LIBRARIES ${linkerflags})
+  check_cxx_compiler_flag("${cxxflags}" ${result})
+  if (${result})
+    set(${cxxflags_out} "${cxxflags}" CACHE INTERNAL "" FORCE)
+    set(${linkerflags_out} "${linkerflags}" CACHE INTERNAL "" FORCE)
+  endif()
+endfunction()
+
+# Internal: find the appropriate link time optimization flags for this compiler
+function(_dune_pybind11_add_lto_flags target_name prefer_thin_lto)
+  if (NOT DEFINED PYBIND11_LTO_CXX_FLAGS)
+    set(PYBIND11_LTO_CXX_FLAGS "" CACHE INTERNAL "")
+    set(PYBIND11_LTO_LINKER_FLAGS "" CACHE INTERNAL "")
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+      set(cxx_append "")
+      set(linker_append "")
+      if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT APPLE)
+        # Clang Gold plugin does not support -Os; append -O3 to MinSizeRel builds to override it
+        set(linker_append ";$<$<CONFIG:MinSizeRel>:-O3>")
+      elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        set(cxx_append ";-fno-fat-lto-objects")
+      endif()
+
+      if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND prefer_thin_lto)
+        _dune_pybind11_return_if_cxx_and_linker_flags_work(HAS_FLTO_THIN
+          "-flto=thin${cxx_append}" "-flto=thin${linker_append}"
+          PYBIND11_LTO_CXX_FLAGS PYBIND11_LTO_LINKER_FLAGS)
+      endif()
+
+      if (NOT HAS_FLTO_THIN)
+        _dune_pybind11_return_if_cxx_and_linker_flags_work(HAS_FLTO
+          "-flto${cxx_append}" "-flto${linker_append}"
+          PYBIND11_LTO_CXX_FLAGS PYBIND11_LTO_LINKER_FLAGS)
+      endif()
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+      # Intel equivalent to LTO is called IPO
+      _dune_pybind11_return_if_cxx_and_linker_flags_work(HAS_INTEL_IPO
+      "-ipo" "-ipo" PYBIND11_LTO_CXX_FLAGS PYBIND11_LTO_LINKER_FLAGS)
+    elseif(MSVC)
+      # cmake only interprets libraries as linker flags when they start with a - (otherwise it
+      # converts /LTCG to \LTCG as if it was a Windows path).  Luckily MSVC supports passing flags
+      # with - instead of /, even if it is a bit non-standard:
+      _dune_pybind11_return_if_cxx_and_linker_flags_work(HAS_MSVC_GL_LTCG
+        "/GL" "-LTCG" PYBIND11_LTO_CXX_FLAGS PYBIND11_LTO_LINKER_FLAGS)
+    endif()
+
+    if (PYBIND11_LTO_CXX_FLAGS)
+      message(STATUS "LTO enabled")
+    else()
+      message(STATUS "LTO disabled (not supported by the compiler and/or linker)")
+    endif()
+  endif()
+
+  # Enable LTO flags if found, except for Debug builds
+  if (PYBIND11_LTO_CXX_FLAGS)
+    target_compile_options(${target_name} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:${PYBIND11_LTO_CXX_FLAGS}>")
+  endif()
+  if (PYBIND11_LTO_LINKER_FLAGS)
+    target_link_libraries(${target_name} "$<$<NOT:$<CONFIG:Debug>>:${PYBIND11_LTO_LINKER_FLAGS}>")
+  endif()
+endfunction()
+
 # Build a Python extension module:
-# dune_pybindxi_add_module(<name> source1 [source2 ...])
+# dune_pybind11_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL]
+     #                     [NO_EXTRAS] [THIN_LTO] source1 [source2 ...])
 #
 function(dune_pybindxi_add_module target_name)
-  add_library(${target_name} MODULE EXCLUDE_FROM_ALL ${ARGN})
+  set(options MODULE SHARED EXCLUDE_FROM_ALL NO_EXTRAS THIN_LTO)
+  cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
+
+  if(ARG_MODULE AND ARG_SHARED)
+    message(FATAL_ERROR "Can't be both MODULE and SHARED")
+  elseif(ARG_SHARED)
+    set(lib_type SHARED)
+  else()
+    set(lib_type MODULE)
+  endif()
+
+  if(ARG_EXCLUDE_FROM_ALL)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  endif()
+
+  add_library(${target_name} ${lib_type} ${exclude_from_all} ${ARG_UNPARSED_ARGUMENTS})
+
   target_include_directories(${target_name}
-    PRIVATE ${PYBIND11_INCLUDE_DIR}
+    PRIVATE ${PYBIND11_INCLUDE_DIR}  # from project CMakeLists.txt
+    PRIVATE ${pybind11_INCLUDE_DIR}  # from pybind11Config
     PRIVATE ${PYTHON_INCLUDE_DIRS})
 
   # The prefix and extension are provided by FindPythonLibsNew.cmake
   set_target_properties(${target_name} PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}")
   set_target_properties(${target_name} PROPERTIES SUFFIX "${PYTHON_MODULE_EXTENSION}")
 
+  # -fvisibility=hidden is required to allow multiple modules compiled against
+  # different pybind versions to work properly, and for some features (e.g.
+  # py::module_local).  We force it on everything inside the `pybind11`
+  # namespace; also turning it on for a pybind module compilation here avoids
+  # potential warnings or issues from having mixed hidden/non-hidden types.
+  set_target_properties(${target_name} PROPERTIES CXX_VISIBILITY_PRESET "hidden")
+
   if(WIN32 OR CYGWIN)
     # Link against the Python shared library on Windows
-    target_link_libraries(${target_name} PRIVATE ${PYTHON_LIBRARIES})
+    target_link_libraries(${target_name} ${PYTHON_LIBRARIES})
   elseif(APPLE)
     # It's quite common to have multiple copies of the same Python version
     # installed on one's system. E.g.: one copy from the OS and another copy
@@ -39,79 +132,39 @@ function(dune_pybindxi_add_module target_name)
     # missing symbols, but that's perfectly fine -- they will be resolved at
     # import time.
 
-    target_link_libraries(${target_name} PRIVATE "-undefined dynamic_lookup")
+    target_link_libraries(${target_name} "-undefined dynamic_lookup")
+
+    if(ARG_SHARED)
+      # Suppress CMake >= 3.0 warning for shared libraries
+      set_target_properties(${target_name} PROPERTIES MACOSX_RPATH ON)
+    endif()
   endif()
 
-  if(NOT MSVC)
-    # Make sure C++11/14 are enabled
-    target_compile_options(${target_name} PUBLIC ${PYBIND11_CPP_STANDARD})
+  # Make sure C++11/14 are enabled
+  target_compile_options(${target_name} PUBLIC ${PYBIND11_CPP_STANDARD})
 
-    # Enable link time optimization and set the default symbol
-    # visibility to hidden (very important to obtain small binaries)
-    string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
-    if (NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEBUG)
-      # Check for Link Time Optimization support (GCC/Clang)
-      check_cxx_compiler_flag("-flto" HAS_LTO_FLAG)
-      if(HAS_LTO_FLAG AND NOT CYGWIN)
-        target_compile_options(${target_name} PRIVATE -flto)
-      endif()
+  if(ARG_NO_EXTRAS)
+    return()
+  endif()
 
-      # Intel equivalent to LTO is called IPO
-      if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-        check_cxx_compiler_flag("-ipo" HAS_IPO_FLAG)
-        if(HAS_IPO_FLAG)
-          target_compile_options(${target_name} PRIVATE -ipo)
-        endif()
-      endif()
+  _dune_pybind11_add_lto_flags(${target_name} ${ARG_THIN_LTO})
 
-      # Default symbol visibility
-      target_compile_options(${target_name} PRIVATE "-fvisibility=hidden")
-
-      # Strip unnecessary sections of the binary on Linux/Mac OS
-      if(CMAKE_STRIP)
-        if(APPLE)
-          add_custom_command(TARGET ${target_name} POST_BUILD
-                             COMMAND ${CMAKE_STRIP} -u -r $<TARGET_FILE:${target_name}>)
-        else()
-          add_custom_command(TARGET ${target_name} POST_BUILD
-                             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${target_name}>)
-        endif()
+  if (NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug)
+    # Strip unnecessary sections of the binary on Linux/Mac OS
+    if(CMAKE_STRIP)
+      if(APPLE)
+        add_custom_command(TARGET ${target_name} POST_BUILD
+                           COMMAND ${CMAKE_STRIP} -x $<TARGET_FILE:${target_name}>)
+      else()
+        add_custom_command(TARGET ${target_name} POST_BUILD
+                           COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${target_name}>)
       endif()
     endif()
-  elseif(MSVC)
+  endif()
+
+  if(MSVC)
     # /MP enables multithreaded builds (relevant when there are many files), /bigobj is
     # needed for bigger binding projects due to the limit to 64k addressable sections
     target_compile_options(${target_name} PRIVATE /MP /bigobj)
-
-    # Enforce link time code generation on MSVC, except in debug mode
-    target_compile_options(${target_name} PRIVATE $<$<NOT:$<CONFIG:Debug>>:/GL>)
-
-    # Fancy generator expressions don't work with linker flags, for reasons unknown
-    set_property(TARGET ${target_name} APPEND_STRING PROPERTY LINK_FLAGS_RELEASE /LTCG)
-    set_property(TARGET ${target_name} APPEND_STRING PROPERTY LINK_FLAGS_MINSIZEREL /LTCG)
-    set_property(TARGET ${target_name} APPEND_STRING PROPERTY LINK_FLAGS_RELWITHDEBINFO /LTCG)
   endif()
 endfunction()
-
-
-#set(PYBIND11_HEADERS
-#  include/pybind11/attr.h
-#  include/pybind11/cast.h
-#  include/pybind11/chrono.h
-#  include/pybind11/common.h
-#  include/pybind11/complex.h
-#  include/pybind11/descr.h
-#  include/pybind11/eigen.h
-#  include/pybind11/eval.h
-#  include/pybind11/functional.h
-#  include/pybind11/numpy.h
-#  include/pybind11/operators.h
-#  include/pybind11/pybind11.h
-#  include/pybind11/pytypes.h
-#  include/pybind11/stl.h
-#  include/pybind11/stl_bind.h
-#  include/pybind11/typeid.h
-#)
-#string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-#       PYBIND11_HEADERS "${PYBIND11_HEADERS}")
-
