@@ -50,7 +50,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #=============================================================================
 
-if(PYTHONLIBS_FOUND)
+# Checking for the extension makes sure that `LibsNew` was found and not just `Libs`.
+if(PYTHONLIBS_FOUND AND PYTHON_MODULE_EXTENSION)
     return()
 endif()
 
@@ -186,11 +187,6 @@ MARK_AS_ADVANCED(
 SET(PYTHON_INCLUDE_DIRS "${PYTHON_INCLUDE_DIR}")
 SET(PYTHON_LIBRARIES "${PYTHON_LIBRARY}")
 SET(PYTHON_DEBUG_LIBRARIES "${PYTHON_DEBUG_LIBRARY}")
-
-dune_register_package_flags(
-    INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS}
-    LIBRARIES ${PYTHON_LIBRARIES}
-)
 
 find_package_message(PYTHON
     "Found PythonLibs: ${PYTHON_LIBRARY}"
