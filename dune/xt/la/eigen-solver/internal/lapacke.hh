@@ -266,7 +266,7 @@ template <class SerializableMatrixType>
 typename std::enable_if<Common::is_matrix<SerializableMatrixType>::value, std::vector<std::complex<double>>>::type
 compute_eigenvalues_using_lapack(const SerializableMatrixType& serializable_matrix)
 {
-  static_assert(AlwaysFalse<SerializableRealMatrixType>::value, "You are missing lapack!");
+  static_assert(AlwaysFalse<SerializableMatrixType>::value, "You are missing lapack!");
 }
 
 
@@ -278,7 +278,7 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
     std::vector<std::complex<double>>& eigenvalues,
     ComplexMatrixType& right_eigenvectors)
 {
-  static_assert(AlwaysFalse<SerializableRealMatrixType>::value, "You are missing lapack!");
+  static_assert(AlwaysFalse<SerializableMatrixType>::value, "You are missing lapack!");
 }
 
 
