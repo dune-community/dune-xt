@@ -18,6 +18,7 @@
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/numeric_cast.hh>
+#include <dune/xt/common/vector.hh>
 #include <dune/xt/la/container/conversion.hh>
 #include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/solver.hh>
@@ -26,6 +27,7 @@
 #include "internal/base.hh"
 #include "internal/eigen.hh"
 #include "internal/lapacke.hh"
+#include "internal/numpy.hh"
 
 namespace Dune {
 namespace XT {
@@ -41,18 +43,22 @@ class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
 public:
   static std::vector<std::string> types()
   {
-    return
-    {
+    std::vector<std::string> tps = {
 #if HAVE_LAPACKE
       "lapack"
 #if HAVE_EIGEN
-          ,
+      ,
 #endif
 #endif // HAVE_LAPACKE
 #if HAVE_EIGEN
-          "eigen"
+      "eigen"
 #endif
     };
+#if HAVE_DUNE_PYBINDXI
+    if (internal::numpy_eigensolver_available())
+      tps.push_back("numpy");
+#endif
+    return tps;
   }
 
   static Common::Configuration options(const std::string type = "")
@@ -87,7 +93,6 @@ class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
 
 public:
   using typename BaseType::MatrixType;
-  using typename BaseType::RealType;
 
   template <class... Args>
   explicit EigenSolver(Args&&... args)
@@ -102,10 +107,10 @@ protected:
 #if HAVE_LAPACKE
     if (type == "lapack") {
       if (!options_.template get<bool>("compute_eigenvectors"))
-        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(
             internal::compute_eigenvalues_using_lapack(matrix_));
       else {
-        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(SIZE);
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
         eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
         internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
       }
@@ -114,7 +119,7 @@ protected:
 #if HAVE_EIGEN
         if (type == "eigen") {
       if (options_.template get<bool>("compute_eigenvalues") && options_.template get<bool>("compute_eigenvectors")) {
-        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(SIZE);
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
         EigenDenseMatrix<K> tmp_matrix(matrix_);
         EigenDenseMatrix<Common::complex_t<K>> tmp_eigenvectors(matrix_);
         internal::compute_eigenvalues_and_right_eigenvectors_using_eigen(
@@ -123,7 +128,7 @@ protected:
             convert_to<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(tmp_eigenvectors));
       } else {
         if (options_.template get<bool>("compute_eigenvalues"))
-          eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
+          eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(
               internal::compute_eigenvalues_using_eigen(EigenDenseMatrix<K>(matrix_).backend()));
         if (options_.template get<bool>("compute_eigenvectors")) {
           eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(
@@ -134,6 +139,16 @@ protected:
       }
     } else
 #endif // HAVE_EIGEN
+#if HAVE_DUNE_PYBINDXI
+        if (type == "numpy") {
+      if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
+        eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
+        internal::compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
+            matrix_, *eigenvalues_, *eigenvectors_);
+      }
+    } else
+#endif
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is none of EigenSolverOptions<Dune::FieldMatrix<K, ROWS, "
                                            "COLS>>::types(), and  internal::EigenSolverBase promised to check this!"
