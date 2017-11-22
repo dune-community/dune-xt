@@ -83,7 +83,15 @@ public:
     const auto type = options_.template get<std::string>("type");
     if (type == "direct") {
       inverse_ = std::make_unique<MatrixType>(matrix_);
-      inverse_->invert();
+      try {
+        inverse_->invert();
+      } catch (const FMatrixError& ee) {
+        if (ee.what() == "matrix is singular")
+          DUNE_THROW(Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements,
+                     "This was the original error:\n\n"
+                         << ee.what());
+        DUNE_THROW(Exceptions::matrix_invert_failed, "This was the original error:\n\n" << ee.what());
+      }
     } else
 #if HAVE_EIGEN
         if (type == "moore_penrose") {
