@@ -14,9 +14,12 @@
 
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/la/exceptions.hh>
+#include <dune/xt/la/container/conversion.hh>
+#include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/matrix-inverter.hh>
 
 #include "internal/base.hh"
+#include "internal/eigen.hh"
 
 namespace Dune {
 namespace XT {
@@ -29,7 +32,14 @@ class MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
 public:
   static std::vector<std::string> types()
   {
-    return {"direct"};
+    return
+    {
+      "direct"
+#if HAVE_EIGEN
+          ,
+          "moore_penrose"
+#endif
+    };
   }
 
   static Common::Configuration options(const std::string type = "")
@@ -75,6 +85,12 @@ public:
       inverse_ = std::make_unique<MatrixType>(matrix_);
       inverse_->invert();
     } else
+#if HAVE_EIGEN
+        if (type == "moore_penrose") {
+      inverse_ = std::make_unique<MatrixType>(convert_to<MatrixType>(EigenDenseMatrix<K>(
+          internal::compute_moore_penrose_inverse_using_eigen(convert_to<EigenDenseMatrix<K>>(matrix_).backend()))));
+    } else
+#endif
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type
                                 << "' is none of MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>::types(), and "
