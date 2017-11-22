@@ -5,6 +5,8 @@
 # Authors:
 #   Felix Schindler (2016)
 
+dune_library_add_sources(dunepybindxi SOURCES interpreter.cc)
+
 install(FILES
         attr.h
         buffer_info.h
@@ -16,6 +18,7 @@ install(FILES
         embed.h
         eval.h
         functional.h
+        interpreter.hh
         iostream.h
         numpy.h
         operators.h
