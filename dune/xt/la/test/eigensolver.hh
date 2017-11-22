@@ -116,8 +116,8 @@ struct EigenSolverTest : public ::testing::Test
   {
     for (const auto& tp : EigenSolverOpts::types()) {
       Common::Configuration inconsistent_opts = EigenSolverOpts::options(tp);
-      inconsistent_opts["ensure_positive_eigenvalues"] = "1e-15";
-      inconsistent_opts["ensure_negative_eigenvalues"] = "1e-15";
+      inconsistent_opts["assert_positive_eigenvalues"] = "1e-15";
+      inconsistent_opts["assert_negative_eigenvalues"] = "1e-15";
       try {
         EigenSolverType DXTC_UNUSED(solver)(unit_matrix_, inconsistent_opts);
         FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly";
