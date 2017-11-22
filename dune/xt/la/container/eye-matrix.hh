@@ -42,14 +42,21 @@ typename std::enable_if<is_matrix<M>::value, M>::type eye_matrix(const size_t ro
 
 
 template <class M>
-typename std::enable_if<XT::Common::is_matrix<M>::value && !is_matrix<M>::value, M>::type eye_matrix(const size_t rows,
-                                                                                                     const size_t cols)
+typename std::enable_if<Common::is_matrix<M>::value && !is_matrix<M>::value, M>::type eye_matrix(const size_t rows,
+                                                                                                 const size_t cols)
 {
-  using Abstraction = XT::Common::MatrixAbstraction<M>;
+  using Abstraction = Common::MatrixAbstraction<M>;
   auto mat = Abstraction::create(rows, cols, 0.);
   for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
     Abstraction::set_entry(mat, ii, ii, 1);
   return mat;
+}
+
+
+template <class M>
+typename std::enable_if<Common::is_matrix<M>::value, M>::type eye_matrix(const size_t size)
+{
+  return eye_matrix<M>(size, size);
 }
 
 
