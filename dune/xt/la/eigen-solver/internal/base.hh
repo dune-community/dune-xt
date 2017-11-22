@@ -53,13 +53,13 @@ static Common::Configuration default_eigen_solver_options()
   opts["compute_eigenvalues"] = "true";
   opts["compute_eigenvectors"] = "true";
   opts["check_for_inf_nan"] = "true";
-  opts["real_tolerance"] = "1e-15"; // is only used if the respective ensure_... is negative
-  opts["ensure_real_eigenvalues"] = "-1"; // if positive, this is the check tolerance
-  opts["ensure_positive_eigenvalues"] = "-1"; // if positive, this is the check tolerance
-  opts["ensure_negative_eigenvalues"] = "-1"; // if positive, this is the check tolerance
-  opts["ensure_real_eigenvectors"] = "-1"; // if positive, this is the check tolerance
-  opts["ensure_eigendecomposition"] = "1e-10"; // disabled, if negative
-  opts["ensure_real_eigendecomposition"] = "-1"; // if positive, this is the check tolerance
+  opts["real_tolerance"] = "1e-15"; // is only used if the respective assert_... is negative
+  opts["assert_real_eigenvalues"] = "-1"; // if positive, this is the check tolerance
+  opts["assert_positive_eigenvalues"] = "-1"; // if positive, this is the check tolerance
+  opts["assert_negative_eigenvalues"] = "-1"; // if positive, this is the check tolerance
+  opts["assert_real_eigenvectors"] = "-1"; // if positive, this is the check tolerance
+  opts["assert_eigendecomposition"] = "1e-10"; // if positive, this is the check tolerance
+  opts["assert_real_eigendecomposition"] = "-1"; // if positive, this is the check tolerance
   return opts;
 } // ... default_eigen_solver_options(...)
 
@@ -236,9 +236,10 @@ public:
     }
     invert_eigenvectors();
     assert(eigenvectors_inverse_ && "This must not happen after calling invert_eigenvectors()!");
-    const double check_eigendecomposition = options_.get<double>("ensure_eigendecomposition");
-    complex_eigendecomposition_helper<>::check(
-        *this, check_eigendecomposition > 0 ? check_eigendecomposition : options_.get<double>("real_tolerance"));
+    const double check_eigendecomposition = options_.get<double>("assert_eigendecomposition");
+    if (check_eigendecomposition > 0)
+      complex_eigendecomposition_helper<>::check(
+          *this, check_eigendecomposition > 0 ? check_eigendecomposition : options_.get<double>("real_tolerance"));
     return *eigenvectors_inverse_;
   } // ... eigenvectors(...)
 
@@ -263,8 +264,8 @@ public:
   {
     compute_and_check();
     if (!real_eigenvectors_) {
-      if (options_.get<double>("ensure_real_eigendecomposition") > 0
-          || options_.get<double>("ensure_real_eigenvectors") > 0)
+      if (options_.get<double>("assert_real_eigendecomposition") > 0
+          || options_.get<double>("assert_real_eigenvectors") > 0)
         DUNE_THROW(Common::Exceptions::internal_error,
                    "The real_eigenvectors_ member is not filled after calling compute()!");
       else
@@ -274,7 +275,7 @@ public:
     }
     invert_real_eigenvectors();
     assert(real_eigenvectors_inverse_ && "This must not happen after calling invert_real_eigenvectors()!");
-    const double check_eigendecomposition = options_.get<double>("ensure_real_eigendecomposition");
+    const double check_eigendecomposition = options_.get<double>("assert_real_eigendecomposition");
     assert_eigendecomposition(matrix_,
                               *real_eigenvalues_,
                               *real_eigenvectors_,
@@ -311,21 +312,21 @@ protected:
     if (options_.get<double>("real_tolerance") <= 0)
       DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
                  "It does not make sense to enforce a non-positive tolerance!");
-    if (options_.get<double>("ensure_positive_eigenvalues") > 0
-        && options_.get<double>("ensure_negative_eigenvalues") > 0)
+    if (options_.get<double>("assert_positive_eigenvalues") > 0
+        && options_.get<double>("assert_negative_eigenvalues") > 0)
       DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
-                 "It does not make sense to ensure positive and negative eigenvalues!");
-    if (!options_.get<bool>("compute_eigenvalues") && (options_.get<double>("ensure_real_eigenvalues") > 0
-                                                       || options_.get<double>("ensure_positive_eigenvalues") > 0
-                                                       || options_.get<double>("ensure_negative_eigenvalues") > 0
-                                                       || options_.get<double>("ensure_eigendecomposition") > 0
-                                                       || options_.get<double>("ensure_real_eigendecomposition") > 0))
+                 "It does not make sense to assert positive and negative eigenvalues!");
+    if (!options_.get<bool>("compute_eigenvalues") && (options_.get<double>("assert_real_eigenvalues") > 0
+                                                       || options_.get<double>("assert_positive_eigenvalues") > 0
+                                                       || options_.get<double>("assert_negative_eigenvalues") > 0
+                                                       || options_.get<double>("assert_eigendecomposition") > 0
+                                                       || options_.get<double>("assert_real_eigendecomposition") > 0))
       options_["compute_eigenvalues"] = "true";
-    if (options_.get<double>("ensure_real_eigenvalues") <= 0
-        && (options_.get<double>("ensure_positive_eigenvalues") > 0
-            || options_.get<double>("ensure_negative_eigenvalues") > 0
-            || options_.get<double>("ensure_real_eigendecomposition") > 0))
-      options_["ensure_real_eigenvalues"] = options_["real_tolerance"];
+    if (options_.get<double>("assert_real_eigenvalues") <= 0
+        && (options_.get<double>("assert_positive_eigenvalues") > 0
+            || options_.get<double>("assert_negative_eigenvalues") > 0
+            || options_.get<double>("assert_real_eigendecomposition") > 0))
+      options_["assert_real_eigenvalues"] = options_["real_tolerance"];
     // check matrix
     check_size(matrix_);
     if (options_.get<bool>("check_for_inf_nan") && contains_inf_or_nan(matrix_)) {
@@ -363,17 +364,17 @@ protected:
                        << "\nThese are the computed eigenvectors:\n\n"
                        << *eigenvectors_);
     }
-    const double ensure_real_eigenvalues = options_.get<double>("ensure_real_eigenvalues");
-    const double ensure_positive_eigenvalues = options_.get<double>("ensure_positive_eigenvalues");
-    const double ensure_negative_eigenvalues = options_.get<double>("ensure_negative_eigenvalues");
-    const double check_real_eigendecomposition = options_.get<double>("ensure_real_eigendecomposition");
-    if (ensure_real_eigenvalues > 0 || ensure_positive_eigenvalues > 0 || ensure_negative_eigenvalues > 0
+    const double assert_real_eigenvalues = options_.get<double>("assert_real_eigenvalues");
+    const double assert_positive_eigenvalues = options_.get<double>("assert_positive_eigenvalues");
+    const double assert_negative_eigenvalues = options_.get<double>("assert_negative_eigenvalues");
+    const double check_real_eigendecomposition = options_.get<double>("assert_real_eigendecomposition");
+    if (assert_real_eigenvalues > 0 || assert_positive_eigenvalues > 0 || assert_negative_eigenvalues > 0
         || check_real_eigendecomposition > 0)
       compute_real_eigenvalues();
-    if (ensure_positive_eigenvalues > 0) {
+    if (assert_positive_eigenvalues > 0) {
       assert(real_eigenvalues_ && "This must not happen after compute_real_eigenvalues()!");
       for (const auto& ev : *real_eigenvalues_) {
-        if (ev < ensure_positive_eigenvalues)
+        if (ev < assert_positive_eigenvalues)
           DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested,
                      "These were the given options:\n\n"
                          << options_
@@ -381,10 +382,10 @@ protected:
                          << *eigenvectors_);
       }
     }
-    if (ensure_negative_eigenvalues > 0) {
+    if (assert_negative_eigenvalues > 0) {
       assert(real_eigenvalues_ && "This must not happen after compute_real_eigenvalues()!");
       for (const auto& ev : *real_eigenvalues_) {
-        if (ev > -1 * ensure_negative_eigenvalues)
+        if (ev > -1 * assert_negative_eigenvalues)
           DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_negative_as_requested,
                      "These were the given options:\n\n"
                          << options_
@@ -392,9 +393,9 @@ protected:
                          << *eigenvectors_);
       }
     }
-    if (options_.get<double>("ensure_real_eigenvectors") > 0 || check_real_eigendecomposition > 0)
+    if (options_.get<double>("assert_real_eigenvectors") > 0 || check_real_eigendecomposition > 0)
       compute_real_eigenvectors();
-    const double check_eigendecomposition = options_.get<double>("ensure_eigendecomposition");
+    const double check_eigendecomposition = options_.get<double>("assert_eigendecomposition");
     if (check_eigendecomposition > 0)
       complex_eigendecomposition_helper<>::check(*this, check_eigendecomposition);
     if (check_real_eigendecomposition > 0) {
@@ -408,9 +409,9 @@ protected:
   {
     assert(eigenvalues_ && "This should not happen!");
     if (!real_eigenvalues_) {
-      const double ensure_real_eigenvalues = options_.get<double>("ensure_real_eigenvalues");
+      const double assert_real_eigenvalues = options_.get<double>("assert_real_eigenvalues");
       const double tolerance =
-          (ensure_real_eigenvalues > 0) ? ensure_real_eigenvalues : options_.get<double>("real_tolerance");
+          (assert_real_eigenvalues > 0) ? assert_real_eigenvalues : options_.get<double>("real_tolerance");
       real_eigenvalues_ = std::make_unique<std::vector<RealType>>(eigenvalues_->size());
       for (size_t ii = 0; ii < eigenvalues_->size(); ++ii) {
         const auto& complex_ev = (*eigenvalues_)[ii];
@@ -504,9 +505,9 @@ protected:
   {
     assert(eigenvectors_ && "This should not happen!");
     if (!real_eigenvectors_) {
-      const double ensure_real_eigenvectors = options_.get<double>("ensure_real_eigenvectors");
+      const double assert_real_eigenvectors = options_.get<double>("assert_real_eigenvectors");
       const double tolerance =
-          (ensure_real_eigenvectors > 0) ? ensure_real_eigenvectors : options_.get<double>("real_tolerance");
+          (assert_real_eigenvectors > 0) ? assert_real_eigenvectors : options_.get<double>("real_tolerance");
       real_eigenvectors_helper<>::compute(*this, tolerance);
     }
   }
