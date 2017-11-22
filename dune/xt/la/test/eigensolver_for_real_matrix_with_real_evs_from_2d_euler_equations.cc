@@ -167,12 +167,13 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_real_eigenvectors_
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({{"lapack", "1e-12"}, {"eigen", "1e-13"}});
+  gives_correct_eigendecomposition({{"lapack", "1e-12"}, {"eigen", "1e-13"}, {"numpy", "1e-12"}});
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_real_eigendecomposition)
 {
-  gives_correct_real_eigendecomposition({{"lapack", "1e-12"}, {"eigen", /*we_expect_a_failure: */ "-1"}});
+  gives_correct_real_eigendecomposition(
+      {{"lapack", "1e-12"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-12"}});
 }
 
 
@@ -249,52 +250,55 @@ TEST_F(EigenSolverForMatrix2From2dEulerExample, is_constructible)
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({{"lapack", "1e-6"}, {"eigen", "1e-6"}});
+  gives_correct_eigenvalues({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order({{"lapack", "1e-6"}, {"eigen", "1e-6"}});
+  gives_correct_eigenvalues_in_correct_order({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigenvalues)
 {
-  gives_correct_real_eigenvalues({{"lapack", "1e-6"}, {"eigen", "1e-6"}});
+  gives_correct_real_eigenvalues({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigenvalues_in_correct_order)
 {
-  gives_correct_real_eigenvalues_in_correct_order({{"lapack", "1e-6"}, {"eigen", "1e-6"}});
+  gives_correct_real_eigenvalues_in_correct_order({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_max_eigenvalue)
 {
-  gives_correct_max_eigenvalue({{"lapack", "1e-6"}, {"eigen", "1e-6"}});
+  gives_correct_max_eigenvalue({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_min_eigenvalue)
 {
-  gives_correct_min_eigenvalue({{"lapack", "1e-6"}, {"eigen", "1e-6"}});
+  gives_correct_min_eigenvalue({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigenvectors_in_correct_order)
 {
-  gives_correct_eigenvectors_in_correct_order(
-      {{"lapack", /*we_expect_a_failure: */ "-1"}, {"eigen", /*we_expect_a_failure: */ "-1"}});
+  gives_correct_eigenvectors_in_correct_order({{"lapack", /*we_expect_a_failure: */ "-1"},
+                                               {"eigen", /*we_expect_a_failure: */ "-1"},
+                                               {"numpy", /*we_expect_a_failure: */ "-1"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigenvectors_in_correct_order)
 {
-  gives_correct_real_eigenvectors_in_correct_order(
-      {{"lapack", /*we_expect_a_failure: */ "-1"}, {"eigen", /*we_expect_a_failure: */ "-1"}});
+  gives_correct_real_eigenvectors_in_correct_order({{"lapack", /*we_expect_a_failure: */ "-1"},
+                                                    {"eigen", /*we_expect_a_failure: */ "-1"},
+                                                    {"numpy", /*we_expect_a_failure: */ "-1"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({{"lapack", "1e-13"}, {"eigen", "1e-14"}});
+  gives_correct_eigendecomposition({{"lapack", "1e-13"}, {"eigen", "1e-13"}, {"numpy", "1e-13"}});
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigendecomposition)
 {
-  gives_correct_real_eigendecomposition({{"lapack", /*we_expect_a_failure: */ "-1"}, {"eigen", "1e-14"}});
+  gives_correct_real_eigendecomposition(
+      {{"lapack", /*we_expect_a_failure: */ "-1"}, {"eigen", "1e-13"}, {"numpy", /*we_expect_a_failure: */ "-1"}});
 }
