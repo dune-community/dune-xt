@@ -64,6 +64,10 @@ static Common::Configuration default_eigen_solver_options()
 } // ... default_eigen_solver_options(...)
 
 
+/**
+ * \sa default_eigen_solver_options()
+ * \note If the provided options contain a subtree "matrix-inverter" that one is forwarded on eigenvector inversion.
+ */
 template <class MatrixImp, class FieldImp, class RealMatrixImp, class ComplexMatrixImp>
 class EigenSolverBase
 {
@@ -511,7 +515,11 @@ protected:
   {
     assert(eigenvectors_ && "This must not happen when you call this function!");
     try {
-      eigenvectors_inverse_ = std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_));
+      if (options_.has_sub("matrix-inverter")) {
+        eigenvectors_inverse_ =
+            std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_, options_.sub("matrix-inverter")));
+      } else
+        eigenvectors_inverse_ = std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_));
     } catch (const Exceptions::matrix_invert_failed& ee) {
       DUNE_THROW(Exceptions::eigen_solver_failed,
                  "The computed matrix of eigenvectors is not invertible!"
@@ -532,7 +540,11 @@ protected:
   {
     assert(real_eigenvectors_ && "This must not happen when you call this function!");
     try {
-      real_eigenvectors_inverse_ = std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_));
+      if (options_.has_sub("matrix-inverter")) {
+        real_eigenvectors_inverse_ =
+            std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_, options_.sub("matrix-inverter")));
+      } else
+        real_eigenvectors_inverse_ = std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_));
     } catch (const Exceptions::matrix_invert_failed& ee) {
       DUNE_THROW(Exceptions::eigen_solver_failed,
                  "The computed matrix of eigenvectors is not invertible!"
