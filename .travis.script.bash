@@ -7,6 +7,7 @@ set -e
 set -x
 
 WAIT="${SUPERDIR}/scripts/bash/travis_wait_new.bash 45"
+source ${SUPERDIR}/scripts/bash/retry_command.bash
 
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} configure
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD}
@@ -29,7 +30,7 @@ else
 fi
 ${SUPERDIR}/.ci/init_sshkey.bash ${encrypted_862ca47045d1_key} ${encrypted_862ca47045d1_iv} keys/dune-community/dune-xt-functions-testlogs
 # retry this step because of the implicated race condition in cloning and pushing with multiple builder running in parallel
-travis_retry ${SUPERDIR}/scripts/bash/travis_upload_test_logs.bash ${DUNE_BUILD_DIR}/${MY_MODULE}/dune/xt/*/test/
+retry_command ${SUPERDIR}/scripts/bash/travis_upload_test_logs.bash ${DUNE_BUILD_DIR}/${MY_MODULE}/dune/xt/*/test/
 
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} headercheck
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} install | grep -v "Installing"
