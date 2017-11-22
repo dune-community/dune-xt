@@ -16,6 +16,8 @@
 template class Dune::XT::LA::CommonDenseVector<double>;
 template class Dune::XT::LA::CommonDenseMatrix<double>;
 template class Dune::XT::LA::CommonSparseVector<double>;
-template class Dune::XT::LA::CommonSparseMatrix<double>;
+template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::SparseFormat::csr>;
+template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::SparseFormat::csc>;
+
 // template void Dune::XT::LA::CommonSparseMatrix<double>::mv(const Dune::XT::LA::CommonDenseVector<double>&,
 //                                                           Dune::XT::LA::CommonDenseVector<double>) const;
