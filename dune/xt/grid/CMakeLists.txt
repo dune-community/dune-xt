@@ -36,7 +36,7 @@ if(dune-pybindxi_FOUND)
   dune_pybindxi_add_helper_lib(_grid_bindings_helper
                                boundaryinfo.bindings.cc
                                )
-  dune_pybindxi_add_module(_grid bindings.cc)
+  dune_pybindxi_add_module(_grid EXCLUDE_FROM_ALL bindings.cc)
   target_link_dune_default_libraries(_grid)
   target_link_libraries(_grid _grid_bindings_helper)
   add_dune_alberta_flags(GRIDDIM 2 _grid)
