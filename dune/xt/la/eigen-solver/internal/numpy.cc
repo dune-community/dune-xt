@@ -27,8 +27,10 @@ bool numpy_eigensolver_available()
   } catch (...) {
     return false;
   }
-#endif // HAVE_DUNE_PYBINDXI
   return true;
+#else // HAVE_DUNE_PYBINDXI
+  return false;
+#endif
 } // ... numpy_eigensolver_available(...)
 
 
