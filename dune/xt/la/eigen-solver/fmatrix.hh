@@ -43,21 +43,14 @@ class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
 public:
   static std::vector<std::string> types()
   {
-    std::vector<std::string> tps = {
-#if HAVE_LAPACKE
-      "lapack"
+    std::vector<std::string> tps;
+    if (Common::Lapacke::available())
+      tps.push_back("lapack");
 #if HAVE_EIGEN
-      ,
+    tps.push_back("eigen");
 #endif
-#endif // HAVE_LAPACKE
-#if HAVE_EIGEN
-      "eigen"
-#endif
-    };
-#if HAVE_DUNE_PYBINDXI
     if (internal::numpy_eigensolver_available())
       tps.push_back("numpy");
-#endif
     return tps;
   }
 

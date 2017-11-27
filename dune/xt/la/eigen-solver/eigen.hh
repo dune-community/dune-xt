@@ -35,13 +35,10 @@ class EigenSolverOptions<EigenDenseMatrix<S>>
 public:
   static std::vector<std::string> types()
   {
-    return
-    {
-#if HAVE_LAPACKE
-      "lapack",
-#endif
-          "eigen"
-    };
+    std::vector<std::string> tps = {"eigen"};
+    if (Common::Lapacke::available())
+      tps.push_back("lapack");
+    return tps;
   }
 
   static Common::Configuration options(const std::string type = "")

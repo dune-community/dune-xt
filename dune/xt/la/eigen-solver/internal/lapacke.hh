@@ -28,8 +28,6 @@ namespace XT {
 namespace LA {
 namespace internal {
 
-#if HAVE_LAPACKE
-
 
 /**
  * \sa https://software.intel.com/en-us/mkl-developer-reference-c-geev
@@ -39,6 +37,9 @@ template <class SerializableRealMatrixType>
 typename std::enable_if<Common::is_matrix<SerializableRealMatrixType>::value, std::vector<std::complex<double>>>::type
 compute_eigenvalues_of_a_real_matrix_using_lapack(const SerializableRealMatrixType& serializable_matrix)
 {
+  if (!Common::Lapacke::available())
+    DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
+               "Do not call any lapack related method if Common::Lapacke::available() is false!");
   using real_type = typename Dune::XT::Common::MatrixAbstraction<SerializableRealMatrixType>::S;
   static_assert(Dune::XT::Common::is_arithmetic<real_type>::value && !Dune::XT::Common::is_complex<real_type>::value,
                 "Not implemented for complex matrices (yet)!");
@@ -57,18 +58,18 @@ compute_eigenvalues_of_a_real_matrix_using_lapack(const SerializableRealMatrixTy
   std::vector<double> dummy_left_eigenvalues(1, 0.);
   std::vector<double> dummy_right_eigenvalues(1, 0.);
   // lapacks favorite storage format is column-major, otherwise the matrix would be copied from row-major to col-major
-  const int info = LAPACKE_dgeev(LAPACK_COL_MAJOR,
-                                 /*do_not_compute_left_egenvectors: */ 'N',
-                                 /*do_not_compute_right_egenvectors: */ 'N',
-                                 size,
-                                 Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
-                                 size,
-                                 real_part_of_eigenvalues.data(),
-                                 imag_part_of_eigenvalues.data(),
-                                 dummy_left_eigenvalues.data(),
-                                 size,
-                                 dummy_right_eigenvalues.data(),
-                                 size);
+  const int info = Common::Lapacke::dgeev(Common::Lapacke::col_major(),
+                                          /*do_not_compute_left_egenvectors: */ 'N',
+                                          /*do_not_compute_right_egenvectors: */ 'N',
+                                          size,
+                                          Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
+                                          size,
+                                          real_part_of_eigenvalues.data(),
+                                          imag_part_of_eigenvalues.data(),
+                                          dummy_left_eigenvalues.data(),
+                                          size,
+                                          dummy_right_eigenvalues.data(),
+                                          size);
   if (info != 0)
     DUNE_THROW(Dune::XT::LA::Exceptions::eigen_solver_failed, "The lapack backend reported '" << info << "'!");
   std::vector<std::complex<double>> eigenvalues(size);
@@ -92,6 +93,9 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
     std::vector<std::complex<double>>& eigenvalues,
     ComplexMatrixType& right_eigenvectors)
 {
+  if (!Common::Lapacke::available())
+    DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
+               "Do not call any lapack related method if Common::Lapacke::available() is false!");
   using real_type = typename Dune::XT::Common::MatrixAbstraction<SerializableRealMatrixType>::S;
   static_assert(Dune::XT::Common::is_arithmetic<real_type>::value && !Dune::XT::Common::is_complex<real_type>::value,
                 "Not implemented for complex matrices (yet)!");
@@ -131,18 +135,18 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
   std::vector<double> dummy_left_eigenvalues(1, 0.);
   std::vector<double> right_eigenvalues(size * size, 0.);
   // lapacks favorite storage format is column-major, otherwise the matrix would be copied from row-major to col-major
-  const int info = LAPACKE_dgeev(LAPACK_COL_MAJOR,
-                                 /*do_not_compute_left_egenvectors: */ 'N',
-                                 /*compute_right_egenvectors: */ 'V',
-                                 size,
-                                 Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
-                                 size,
-                                 real_part_of_eigenvalues.data(),
-                                 imag_part_of_eigenvalues.data(),
-                                 dummy_left_eigenvalues.data(),
-                                 size,
-                                 right_eigenvalues.data(),
-                                 size);
+  const int info = Common::Lapacke::dgeev(Common::Lapacke::col_major(),
+                                          /*do_not_compute_left_egenvectors: */ 'N',
+                                          /*compute_right_egenvectors: */ 'V',
+                                          size,
+                                          Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
+                                          size,
+                                          real_part_of_eigenvalues.data(),
+                                          imag_part_of_eigenvalues.data(),
+                                          dummy_left_eigenvalues.data(),
+                                          size,
+                                          right_eigenvalues.data(),
+                                          size);
   if (info != 0)
     DUNE_THROW(Dune::XT::LA::Exceptions::eigen_solver_failed, "The lapack backend reported '" << info << "'!");
   // set eigenvalues
@@ -258,31 +262,6 @@ compute_eigenvalues_and_right_eigenvectors_using_lapack(const SerializableMatrix
   lapack_helper<SerializableMatrixType>::template dtype_switch<>::eigenvectors(
       serializable_matrix, eigenvalues, right_eigenvectors);
 }
-
-#else // HAVE_LAPACKE
-
-
-template <class SerializableMatrixType>
-typename std::enable_if<Common::is_matrix<SerializableMatrixType>::value, std::vector<std::complex<double>>>::type
-compute_eigenvalues_using_lapack(const SerializableMatrixType& serializable_matrix)
-{
-  static_assert(AlwaysFalse<SerializableMatrixType>::value, "You are missing lapack!");
-}
-
-
-template <class SerializableMatrixType, class ComplexMatrixType>
-typename std::enable_if<Common::is_matrix<SerializableMatrixType>::value && Common::is_matrix<ComplexMatrixType>::value,
-                        void>::type
-compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
-    const SerializableMatrixType& serializable_matrix,
-    std::vector<std::complex<double>>& eigenvalues,
-    ComplexMatrixType& right_eigenvectors)
-{
-  static_assert(AlwaysFalse<SerializableMatrixType>::value, "You are missing lapack!");
-}
-
-
-#endif // HAVE_LAPACKE
 
 
 } // namespace internal
