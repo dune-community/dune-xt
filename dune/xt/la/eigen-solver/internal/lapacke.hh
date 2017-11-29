@@ -163,7 +163,7 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
       for (size_t kk = 0; kk < size; ++kk) {
         const double kth_component_of_jth_eigenvector = right_eigenvalues[kk + jj * size];
         Dune::XT::Common::set_matrix_entry(
-            right_eigenvectors, kk, jj, complex_type({kth_component_of_jth_eigenvector, 0.}));
+            right_eigenvectors, kk, jj, complex_type(kth_component_of_jth_eigenvector, 0.));
       }
       jj += 1;
     } else {
@@ -172,19 +172,19 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
       for (size_t kk = 0; kk < size; ++kk) {
         const double real_part_of_kth_component_of_jth_eigenvector = right_eigenvalues[kk + jj * size];
         const double imag_part_of_kth_component_of_jth_eigenvector = right_eigenvalues[kk + (jj + 1) * size];
-        Dune::XT::Common::set_matrix_entry(right_eigenvectors,
-                                           kk,
-                                           jj,
-                                           complex_type({real_part_of_kth_component_of_jth_eigenvector,
-                                                         imag_part_of_kth_component_of_jth_eigenvector}));
+        Dune::XT::Common::set_matrix_entry(
+            right_eigenvectors,
+            kk,
+            jj,
+            complex_type(real_part_of_kth_component_of_jth_eigenvector, imag_part_of_kth_component_of_jth_eigenvector));
         const double real_part_of_kth_component_of_jplusoneth_eigenvector = right_eigenvalues[kk + jj * size];
         const double imag_part_of_kth_component_of_jplusoneth_eigenvector =
             -1 * right_eigenvalues[kk + (jj + 1) * size];
         Dune::XT::Common::set_matrix_entry(right_eigenvectors,
                                            kk,
                                            jj + 1,
-                                           complex_type({real_part_of_kth_component_of_jplusoneth_eigenvector,
-                                                         imag_part_of_kth_component_of_jplusoneth_eigenvector}));
+                                           complex_type(real_part_of_kth_component_of_jplusoneth_eigenvector,
+                                                        imag_part_of_kth_component_of_jplusoneth_eigenvector));
       }
       jj += 2;
     }
