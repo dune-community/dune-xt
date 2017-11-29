@@ -10,6 +10,8 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_EIGEN_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_EIGEN_HH
 
+#include <vector>
+
 #if HAVE_EIGEN
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
