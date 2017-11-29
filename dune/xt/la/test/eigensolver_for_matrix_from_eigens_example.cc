@@ -83,7 +83,8 @@ Finally, V * D * V^(-1) =
 (-0.605,-1.39e-16)   (0.258,4.16e-17)   (0.435,8.33e-17)   (0.608,7.29e-17)  (-0.563,5.83e-16)  (0.0486,2.29e-16)
 \endcode
  */
-struct EigenSolverForMatrixFromEigensExample : public EigenSolverTest
+struct EigenSolverForMatrixFromEigensExample
+    : public EigenSolverTest<TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE>
 {
   using BaseType = EigenSolverTest;
   using typename BaseType::MatrixType;

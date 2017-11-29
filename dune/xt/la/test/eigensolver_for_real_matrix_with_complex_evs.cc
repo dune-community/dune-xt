@@ -14,7 +14,8 @@
 #include "eigensolver.hh"
 
 
-struct EigenSolverForRealMatrixWithComplexEvs : public EigenSolverTest
+struct EigenSolverForRealMatrixWithComplexEvs
+    : public EigenSolverTest<TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE>
 {
   using BaseType = EigenSolverTest;
   using typename BaseType::MatrixType;

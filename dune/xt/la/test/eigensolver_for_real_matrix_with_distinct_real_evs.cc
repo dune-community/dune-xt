@@ -14,7 +14,11 @@
 #include "eigensolver.hh"
 
 
-struct EigenSolverForRowWiseScaledUniMatrix : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors
+struct EigenSolverForRowWiseScaledUniMatrix
+    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<TESTMATRIXTYPE,
+                                                                     TESTFIELDTYPE,
+                                                                     TESTCOMPLEXMATRIXTYPE,
+                                                                     TESTREALMATRIXTYPE>
 {
   using BaseType = EigenSolverTestForMatricesWithRealEigenvaluesAndVectors;
   using typename BaseType::MatrixType;

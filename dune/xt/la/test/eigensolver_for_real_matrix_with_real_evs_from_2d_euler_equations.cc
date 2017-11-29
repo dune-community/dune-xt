@@ -14,7 +14,11 @@
 #include "eigensolver.hh"
 
 
-struct EigenSolverForMatrix1From2dEulerExample : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors
+struct EigenSolverForMatrix1From2dEulerExample
+    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<TESTMATRIXTYPE,
+                                                                     TESTFIELDTYPE,
+                                                                     TESTCOMPLEXMATRIXTYPE,
+                                                                     TESTREALMATRIXTYPE>
 {
   using BaseType = EigenSolverTestForMatricesWithRealEigenvaluesAndVectors;
   using typename BaseType::MatrixType;
@@ -177,7 +181,11 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_real_eigendecompos
 }
 
 
-struct EigenSolverForMatrix2From2dEulerExample : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors
+struct EigenSolverForMatrix2From2dEulerExample
+    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<TESTMATRIXTYPE,
+                                                                     TESTFIELDTYPE,
+                                                                     TESTCOMPLEXMATRIXTYPE,
+                                                                     TESTREALMATRIXTYPE>
 {
   using BaseType = EigenSolverTestForMatricesWithRealEigenvaluesAndVectors;
   using typename BaseType::MatrixType;

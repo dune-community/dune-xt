@@ -15,6 +15,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/logging.hh>
+#include <dune/xt/common/test/gtest/gtest.h>
 #include <dune/xt/la/container/conversion.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
 #include <dune/xt/la/eigen-solver.hh>
@@ -25,12 +26,13 @@ using namespace Dune::XT;
 using namespace Dune::XT::LA;
 
 
+template <class MatrixImp, class F, class C, class R>
 struct EigenSolverTest : public ::testing::Test
 {
-  using MatrixType = TESTMATRIXTYPE;
-  using FieldType = Common::real_t<TESTFIELDTYPE>;
-  using ComplexMatrixType = TESTCOMPLEXMATRIXTYPE;
-  using RealMatrixType = TESTREALMATRIXTYPE;
+  using MatrixType = MatrixImp;
+  using FieldType = Common::real_t<F>;
+  using ComplexMatrixType = C;
+  using RealMatrixType = R;
   using RealType = Common::real_t<FieldType>;
   using EigenValuesType = std::vector<Common::complex_t<FieldType>>;
   using RealEigenValuesType = std::vector<Common::real_t<FieldType>>;
@@ -256,9 +258,10 @@ struct EigenSolverTest : public ::testing::Test
 }; // ... struct EigenSolverTest
 
 
-struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSolverTest
+template <class M, class F, class C, class R>
+struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSolverTest<M, F, C, R>
 {
-  using BaseType = EigenSolverTest;
+  using BaseType = EigenSolverTest<M, F, C, R>;
   using typename BaseType::MatrixType;
   using typename BaseType::FieldType;
   using typename BaseType::RealType;
@@ -268,6 +271,7 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
   using typename BaseType::RealEigenValuesType;
   using typename BaseType::EigenSolverType;
   using typename BaseType::EigenSolverOpts;
+  using BaseType::find_ev;
 
   void gives_correct_real_eigenvalues(const Common::Configuration& tolerances = {}) const
   {
