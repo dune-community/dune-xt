@@ -17,11 +17,12 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/configuration.pbh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.pbh>
+#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
+#include <dune/xt/grid/entity.hh>
 
 #include "gridprovider.hh"
 
@@ -50,6 +51,14 @@ pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const s
         "boundary_info_cfg"_a = Common::Configuration());
   c.def_property_readonly("num_elements", [](const C& self) { return self.leaf_view().indexSet().size(0); });
   c.def_property_readonly("num_subdomains", [](const C& /*self*/) { return 1; });
+  c.def("max_entity_diameter", [](const C& self) {
+    double max_h = std::numeric_limits<double>::min();
+    auto view = self.leaf_view();
+    Walker<decltype(view)> walker(view);
+    walker.append([&](const auto& entity) { max_h = std::max(max_h, entity_diameter(entity)); });
+    walker.walk();
+    return max_h;
+  });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
 
@@ -77,6 +86,14 @@ pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridPro
         "filename"_a = C::static_id(),
         "with_coupling"_a = true);
   c.def_property_readonly("num_elements", [](const C& self) { return self.leaf_view().indexSet().size(0); });
+  c.def("max_entity_diameter", [](const C& self) {
+    double max_h = std::numeric_limits<double>::min();
+    auto view = self.leaf_view();
+    Walker<decltype(view)> walker(view);
+    walker.append([&](const auto& entity) { max_h = std::max(max_h, entity_diameter(entity)); });
+    walker.walk();
+    return max_h;
+  });
   c.def_property_readonly("num_subdomains", [](const C& self) { return self.dd_grid().size(); });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
