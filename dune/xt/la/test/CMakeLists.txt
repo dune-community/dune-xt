@@ -16,3 +16,8 @@ enable_testing()
 BEGIN_TESTCASES(dunextla)
 
 END_TESTCASES()
+
+# load binning setup from file
+if(DEFINED ENV{TRAVIS})
+    include("builder_definitions.cmake")
+endif(DEFINED ENV{TRAVIS})
