@@ -41,29 +41,19 @@
 template <class G, Dune::XT::Grid::Layers layer, Dune::XT::Grid::Backends backend>
 void bind_walker(pybind11::module& m)
 {
-  using namespace Dune::XT;
-  using namespace Dune::XT::Grid;
-
   try {
-    bindings::Walker<G, layer, backend>::bind(m);
+    Dune::XT::Grid::bindings::Walker<G, layer, backend>::bind(m);
   } catch (std::runtime_error&) {
   }
 } // ... bind_walker(...)
 
 
 template <class G>
-void addbind_for_Grid(pybind11::module& m, const std::string& grid_id)
+void addbind_for_Grid(pybind11::module& m)
 {
-  using namespace Dune::XT;
   using namespace Dune::XT::Grid;
 
-  typedef typename Layer<G, Layers::level, Backends::view>::type LevelView;
-  typedef typename Layer<G, Layers::leaf, Backends::view>::type LeafView;
-#if HAVE_DUNE_FEM
-  typedef typename Layer<G, Layers::level, Backends::part>::type LevelPart;
-  typedef typename Layer<G, Layers::leaf, Backends::part>::type LeafPart;
-  typedef typename Layer<G, Layers::dd_subdomain, Backends::part, DD::SubdomainGrid<G>>::type DdSubdomainPart;
-#endif
+  const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
 
   bind_GridProvider<G>(m, grid_id);
   bind_make_cube_grid<G>(m, grid_id);
@@ -96,17 +86,17 @@ PYBIND11_PLUGIN(_grid)
 
   py::module::import("dune.xt.common");
 
-  addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m, "2d_cube_yaspgrid");
-  addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m, "1d_yaspgrid");
+  addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m);
+  addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m);
 #if HAVE_DUNE_ALUGRID
-  addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m, "2d_simplex_aluconform");
+  addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m);
 #endif
-  //#if HAVE_DUNE_UGGRID || HAVE_UG
-  //  addbind_for_Grid<Dune::UGGrid<2>>(m, "2d_simplex_uggrid");
-  //#endif
-  //#if HAVE_ALBERTA
-  //  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, "2d_simplex_albertagrid");
-  //#endif
+#if HAVE_DUNE_UGGRID || HAVE_UG
+  addbind_for_Grid<Dune::UGGrid<2>>(m);
+#endif
+#if HAVE_ALBERTA
+  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m);
+#endif
 
   DUNE_XT_GRID_BOUNDARYINFO_BIND(m);
   DUNE_XT_GRID_WALKER_APPLYON_BIND(m);
