@@ -17,7 +17,7 @@ using namespace Dune;
 using namespace Dune::XT;
 
 static const size_t dim = 4;
-{% for NAME,CIMP in container %}
+{% for NAME,CIMP in config.container %}
 struct ContainerTest{{NAME}} : public ::testing::Test
 {
   void fulfills_interface() const
@@ -65,7 +65,7 @@ struct ContainerTest{{NAME}} : public ::testing::Test
   } // void fulfills_interface() const
 }; // struct ContainerTest
 
-TEST_F(ContainerTest, fulfills_interface)
+TEST_F(ContainerTest{{NAME}}, fulfills_interface)
 {
   this->fulfills_interface();
 }

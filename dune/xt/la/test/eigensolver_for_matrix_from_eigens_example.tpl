@@ -11,7 +11,7 @@
 
 #include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include "eigensolver.hh"
+#include <dune/xt/la/test/eigensolver.hh>
 
 
 /**
@@ -83,15 +83,20 @@ Finally, V * D * V^(-1) =
 (-0.605,-1.39e-16)   (0.258,4.16e-17)   (0.435,8.33e-17)   (0.608,7.29e-17)  (-0.563,5.83e-16)  (0.0486,2.29e-16)
 \endcode
  */
-struct EigenSolverForMatrixFromEigensExample
-    : public EigenSolverTest<TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE>
+
+{% for T_NAME, TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE in config.testtypes %}
+struct EigenSolverForMatrixFromEigensExample_{{T_NAME}}
+: public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<{{TESTMATRIXTYPE}},
+        {{TESTFIELDTYPE}},
+        {{TESTCOMPLEXMATRIXTYPE}},
+        {{TESTREALMATRIXTYPE}}>
 {
   using BaseType = EigenSolverTest;
   using typename BaseType::MatrixType;
   using typename BaseType::ComplexMatrixType;
   using typename BaseType::EigenValuesType;
 
-  EigenSolverForMatrixFromEigensExample()
+  EigenSolverForMatrixFromEigensExample_{{T_NAME}}()
   {
     // these are the numbers in std::setprecision(17) from the above example
     matrix_ = XT::Common::from_string<MatrixType>( // clang-format off
@@ -121,56 +126,58 @@ struct EigenSolverForMatrixFromEigensExample
   using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
   using BaseType::expected_eigenvectors_;
-}; // struct EigenSolverForMatrixFromEigensExample
+}; // struct EigenSolverForMatrixFromEigensExample_{{T_NAME}}
 
 
-TEST_F(EigenSolverForMatrixFromEigensExample, exports_correct_types)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, exports_correct_types)
 {
   exports_correct_types();
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, has_types_and_options)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, has_types_and_options)
 {
   has_types_and_options();
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, throws_on_broken_matrix_construction)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, throws_on_broken_matrix_construction)
 {
   throws_on_broken_matrix_construction();
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, allows_broken_matrix_construction_when_checks_disabled)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, allows_broken_matrix_construction_when_checks_disabled)
 {
   allows_broken_matrix_construction_when_checks_disabled();
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, throws_on_inconsistent_given_options)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, throws_on_inconsistent_given_options)
 {
   throws_on_inconsistent_given_options();
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, is_constructible)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, is_constructible)
 {
   is_constructible();
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, gives_correct_eigenvalues)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({{"lapack", "1e-14"}, {"numpy", "1e-14"}});
+  gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"numpy", "1e-14"} });
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, gives_correct_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order({{"lapack", "1e-14"}, {"numpy", "1e-14"}});
+  gives_correct_eigenvalues_in_correct_order({ {"lapack", "1e-14"}, {"numpy", "1e-14"} });
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, gives_correct_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
   gives_correct_eigenvectors_in_correct_order(
-      {{"lapack", /*we expect a failure: */ "-1"}, {"numpy", /*we expect a failure: */ "-1"}});
+      { {"lapack", /*we expect a failure: */ "-1"}, {"numpy", /*we expect a failure: */ "-1"} });
 }
 
-TEST_F(EigenSolverForMatrixFromEigensExample, gives_correct_eigendecomposition)
+TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({{"lapack", "1e-14"}, {"eigen", "1e-14"}, {"numpy", "1e-14"}});
+  gives_correct_eigendecomposition({ {"lapack", "1e-14"}, {"eigen", "1e-14"}, {"numpy", "1e-14"} });
 }
+
+{% endfor %}

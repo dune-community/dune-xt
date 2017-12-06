@@ -11,17 +11,18 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include "container.hh"
+#include <dune/xt/la/test/container.hh>
 
 using namespace Dune;
 using namespace Dune::XT;
 
 static const size_t dim = 4;
 
-struct MatrixTest : public ::testing::Test
+{% for T_NAME, M_TYPE, V_TYPE in config.testtypes %}
+struct MatrixTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef TESTMATRIXTYPE MatrixImp;
-  typedef TESTVECTORTYPE VectorImp;
+  typedef {{M_TYPE}} MatrixImp;
+  typedef {{V_TYPE}} VectorImp;
   typedef typename Dune::XT::LA::SparsityPatternDefault PatternType;
 
   void fulfills_interface() const
@@ -325,11 +326,13 @@ struct MatrixTest : public ::testing::Test
   } // void produces_correct_results() const
 }; // struct MatrixTest
 
-TEST_F(MatrixTest, fulfills_interface)
+TEST_F(MatrixTest_{{T_NAME}}, fulfills_interface)
 {
   this->fulfills_interface();
 }
-TEST_F(MatrixTest, produces_correct_results)
+TEST_F(MatrixTest_{{T_NAME}}, produces_correct_results)
 {
   this->produces_correct_results();
 }
+
+{% endfor %}

@@ -11,14 +11,14 @@
 
 #include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include "eigensolver.hh"
+#include <dune/xt/la/test/eigensolver.hh>
 
-
-struct EigenSolverForMatrixFullOfOnes
-    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<TESTMATRIXTYPE,
-                                                                     TESTFIELDTYPE,
-                                                                     TESTCOMPLEXMATRIXTYPE,
-                                                                     TESTREALMATRIXTYPE>
+{% for T_NAME, TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE in config.testtypes %}
+struct EigenSolverForMatrixFullOfOnes_{{T_NAME}}
+    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<{{TESTMATRIXTYPE}},
+                                                                     {{TESTFIELDTYPE}},
+                                                                     {{TESTCOMPLEXMATRIXTYPE}},
+                                                                     {{TESTREALMATRIXTYPE}}>
 {
   using BaseType = EigenSolverTestForMatricesWithRealEigenvaluesAndVectors;
   using typename BaseType::MatrixType;
@@ -27,7 +27,7 @@ struct EigenSolverForMatrixFullOfOnes
   using typename BaseType::EigenValuesType;
   using typename BaseType::RealEigenValuesType;
 
-  EigenSolverForMatrixFullOfOnes()
+  EigenSolverForMatrixFullOfOnes_{{T_NAME}}()
   {
     matrix_ = XT::Common::from_string<MatrixType>("[1 1; 1 1]");
     expected_eigenvalues_ = XT::Common::from_string<EigenValuesType>("[2 0]");
@@ -49,85 +49,86 @@ struct EigenSolverForMatrixFullOfOnes
   using BaseType::expected_max_ev_;
   using BaseType::expected_min_ev_;
   using BaseType::expected_real_eigenvectors_;
-}; // struct EigenSolverForMatrixFullOfOnes
+}; // struct EigenSolverForMatrixFullOfOnes_{{T_NAME}}
 
 
-TEST_F(EigenSolverForMatrixFullOfOnes, exports_correct_types)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, exports_correct_types)
 {
   exports_correct_types();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, has_types_and_options)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, has_types_and_options)
 {
   has_types_and_options();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, throws_on_broken_matrix_construction)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, throws_on_broken_matrix_construction)
 {
   throws_on_broken_matrix_construction();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, allows_broken_matrix_construction_when_checks_disabled)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, allows_broken_matrix_construction_when_checks_disabled)
 {
   allows_broken_matrix_construction_when_checks_disabled();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, throws_on_inconsistent_given_options)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, throws_on_inconsistent_given_options)
 {
   throws_on_inconsistent_given_options();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, is_constructible)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, is_constructible)
 {
   is_constructible();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_eigenvalues)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_eigenvalues)
 {
   gives_correct_eigenvalues();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
   gives_correct_eigenvalues_in_correct_order();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_real_eigenvalues)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
   gives_correct_real_eigenvalues();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_real_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
   gives_correct_real_eigenvalues_in_correct_order();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_max_eigenvalue)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_max_eigenvalue)
 {
   gives_correct_max_eigenvalue();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_min_eigenvalue)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_min_eigenvalue)
 {
   gives_correct_min_eigenvalue();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
   gives_correct_eigenvectors_in_correct_order();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_real_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
 {
   gives_correct_real_eigenvectors_in_correct_order();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_eigendecomposition)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_eigendecomposition)
 {
   gives_correct_eigendecomposition();
 }
 
-TEST_F(EigenSolverForMatrixFullOfOnes, gives_correct_real_eigendecomposition)
+TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition();
 }
+{% endfor %}

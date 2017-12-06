@@ -1,16 +1,15 @@
-__name = la_eigensolver
-__exec_suffix = {matrix_short}
 
-matrix = EigenDenseMatrix<double>, FieldMatrix<double\, 4\, 4> | expand types
-matrix_short = eigendense_double, fieldmatrix_double | expand types
-complex_matrix = EigenDenseMatrix<std::complex<double>>, FieldMatrix<std::complex<double>\, 4\, 4> | expand types
-real_matrix = EigenDenseMatrix<double>, FieldMatrix<double\, 4\, 4> | expand types
-field = double, double | expand types
+from dune.xt.codegen import typeid_to_typedef_name as safe_name, have_eigen
 
-EIGEN3_FOUND, 1 | expand types | cmake_guard
+matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 4, 4>']
+field = ['double', 'double']
+complex_matrix = ['EigenDenseMatrix<std::complex<double>>', 'FieldMatrix<std::complex<double>, 4, 4>']
+real_matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 4, 4>']
 
-[__static]
-TESTMATRIXTYPE = {matrix}
-TESTFIELDTYPE = {field}
-TESTCOMPLEXMATRIXTYPE = {complex_matrix}
-TESTREALMATRIXTYPE = {real_matrix}
+
+def _ok(ft):
+    if 'Eigen' in ft[0]:
+        return have_eigen(cache)
+    return True
+
+testtypes = [(safe_name('_'.join(ft)), *ft) for ft in zip(matrix, field, complex_matrix, real_matrix) if _ok(ft)]

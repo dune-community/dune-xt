@@ -11,18 +11,21 @@
 
 #include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include "eigensolver.hh"
+#include <dune/xt/la/test/eigensolver.hh>
 
-
-struct EigenSolverForRealMatrixWithComplexEvs
-    : public EigenSolverTest<TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE>
+{% for T_NAME, TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE in config.testtypes %}
+struct EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}
+: public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<{{TESTMATRIXTYPE}},
+        {{TESTFIELDTYPE}},
+        {{TESTCOMPLEXMATRIXTYPE}},
+        {{TESTREALMATRIXTYPE}}>
 {
   using BaseType = EigenSolverTest;
   using typename BaseType::MatrixType;
   using typename BaseType::ComplexMatrixType;
   using typename BaseType::EigenValuesType;
 
-  EigenSolverForRealMatrixWithComplexEvs()
+  EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}()
   {
     matrix_ = XT::Common::from_string<MatrixType>("[1 1; -1 1]");
     expected_eigenvalues_ = XT::Common::from_string<EigenValuesType>("[1+1i 1-1i]");
@@ -35,50 +38,51 @@ struct EigenSolverForRealMatrixWithComplexEvs
   using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
   using BaseType::expected_eigenvectors_;
-}; // struct EigenSolverForRealMatrixWithComplexEvs
+}; // struct EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}
 
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, exports_correct_types)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, exports_correct_types)
 {
   exports_correct_types();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, has_types_and_options)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, has_types_and_options)
 {
   has_types_and_options();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, throws_on_broken_matrix_construction)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, throws_on_broken_matrix_construction)
 {
   throws_on_broken_matrix_construction();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, allows_broken_matrix_construction_when_checks_disabled)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, allows_broken_matrix_construction_when_checks_disabled)
 {
   allows_broken_matrix_construction_when_checks_disabled();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, throws_on_inconsistent_given_options)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, throws_on_inconsistent_given_options)
 {
   throws_on_inconsistent_given_options();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, is_constructible)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, is_constructible)
 {
   is_constructible();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, gives_correct_eigenvalues)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigenvalues)
 {
   gives_correct_eigenvalues();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, gives_correct_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
   gives_correct_eigenvalues_in_correct_order();
 }
 
-TEST_F(EigenSolverForRealMatrixWithComplexEvs, gives_correct_eigendecomposition)
+TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigendecomposition)
 {
   gives_correct_eigendecomposition();
 }
+{% endfor %}

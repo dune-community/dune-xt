@@ -11,14 +11,16 @@
 
 #include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include "eigensolver.hh"
+#include <dune/xt/la/test/eigensolver.hh>
 
+constexpr int TESTMATRIXSIZE = 5;
 
-struct EigenSolverForRowWiseScaledUniMatrix
-    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<TESTMATRIXTYPE,
-                                                                     TESTFIELDTYPE,
-                                                                     TESTCOMPLEXMATRIXTYPE,
-                                                                     TESTREALMATRIXTYPE>
+{% for T_NAME, TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE in config.testtypes %}
+struct EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}
+: public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<{{TESTMATRIXTYPE}},
+        {{TESTFIELDTYPE}},
+        {{TESTCOMPLEXMATRIXTYPE}},
+        {{TESTREALMATRIXTYPE}}>
 {
   using BaseType = EigenSolverTestForMatricesWithRealEigenvaluesAndVectors;
   using typename BaseType::MatrixType;
@@ -27,7 +29,7 @@ struct EigenSolverForRowWiseScaledUniMatrix
   using typename BaseType::EigenValuesType;
   using typename BaseType::RealEigenValuesType;
 
-  EigenSolverForRowWiseScaledUniMatrix()
+  EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}()
   {
     matrix_ = XT::LA::eye_matrix<MatrixType>(TESTMATRIXSIZE, TESTMATRIXSIZE);
     for (size_t ii = 0; ii < TESTMATRIXSIZE; ++ii)
@@ -53,85 +55,86 @@ struct EigenSolverForRowWiseScaledUniMatrix
   using BaseType::expected_max_ev_;
   using BaseType::expected_min_ev_;
   using BaseType::expected_real_eigenvectors_;
-}; // struct EigenSolverForRowWiseScaledUniMatrix
+}; // struct EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}
 
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, exports_correct_types)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, exports_correct_types)
 {
   exports_correct_types();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, has_types_and_options)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, has_types_and_options)
 {
   has_types_and_options();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, throws_on_broken_matrix_construction)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, throws_on_broken_matrix_construction)
 {
   throws_on_broken_matrix_construction();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, allows_broken_matrix_construction_when_checks_disabled)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, allows_broken_matrix_construction_when_checks_disabled)
 {
   allows_broken_matrix_construction_when_checks_disabled();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, throws_on_inconsistent_given_options)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, throws_on_inconsistent_given_options)
 {
   throws_on_inconsistent_given_options();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, is_constructible)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, is_constructible)
 {
   is_constructible();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_eigenvalues)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigenvalues)
 {
   gives_correct_eigenvalues();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
   gives_correct_eigenvalues_in_correct_order();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_real_eigenvalues)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
   gives_correct_real_eigenvalues();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_real_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
   gives_correct_real_eigenvalues_in_correct_order();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_max_eigenvalue)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_max_eigenvalue)
 {
   gives_correct_max_eigenvalue();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_min_eigenvalue)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_min_eigenvalue)
 {
   gives_correct_min_eigenvalue();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
   gives_correct_eigenvectors_in_correct_order();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_real_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
 {
   gives_correct_real_eigenvectors_in_correct_order();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_eigendecomposition)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigendecomposition)
 {
   gives_correct_eigendecomposition();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix, gives_correct_real_eigendecomposition)
+TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition();
 }
+{% endfor %}

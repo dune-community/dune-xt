@@ -1,7 +1,7 @@
-__name = la_container_vector
-__exec_suffix = {vector}_{fieldtype_short}
+from itertools import product
+from matrices import matrices, latype, vectors, fieldtypes, vector_filter
+from dune.xt.codegen import typeid_to_typedef_name as safe_name
 
-include vectors.mini
-
-[__static]
-TESTVECTORTYPE = Dune::XT::LA::{vector}<{fieldtype}>
+testtypes = [(safe_name('{}_{}'.format(mv,f)), latype(mv,f))
+             for mv,f in product(vectors(cache), fieldtypes(cache))
+             if vector_filter(mv, f)]

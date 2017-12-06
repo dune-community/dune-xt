@@ -11,14 +11,14 @@
 
 #include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include "eigensolver.hh"
+#include <dune/xt/la/test/eigensolver.hh>
 
-
-struct EigenSolverForMatrix1From2dEulerExample
-    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<TESTMATRIXTYPE,
-                                                                     TESTFIELDTYPE,
-                                                                     TESTCOMPLEXMATRIXTYPE,
-                                                                     TESTREALMATRIXTYPE>
+{% for T_NAME, TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE in config.testtypes %}
+struct EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}
+: public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<{{TESTMATRIXTYPE}},
+        {{TESTFIELDTYPE}},
+        {{TESTCOMPLEXMATRIXTYPE}},
+        {{TESTREALMATRIXTYPE}}>
 {
   using BaseType = EigenSolverTestForMatricesWithRealEigenvaluesAndVectors;
   using typename BaseType::MatrixType;
@@ -67,7 +67,7 @@ struct EigenSolverForMatrix1From2dEulerExample
 
    * \sa http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1488
    */
-  EigenSolverForMatrix1From2dEulerExample()
+  EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}()
   {
     matrix_ = XT::Common::from_string<MatrixType>(
         "[                      0                       0                       1                       0;"
@@ -96,96 +96,96 @@ struct EigenSolverForMatrix1From2dEulerExample
   using BaseType::expected_max_ev_;
   using BaseType::expected_min_ev_;
   using BaseType::expected_real_eigenvectors_;
-}; // struct EigenSolverForMatrix1From2dEulerExample
+}; // struct EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}
 
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, exports_correct_types)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, exports_correct_types)
 {
   exports_correct_types();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, has_types_and_options)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, has_types_and_options)
 {
   has_types_and_options();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, throws_on_broken_matrix_construction)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, throws_on_broken_matrix_construction)
 {
   throws_on_broken_matrix_construction();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, allows_broken_matrix_construction_when_checks_disabled)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, allows_broken_matrix_construction_when_checks_disabled)
 {
   allows_broken_matrix_construction_when_checks_disabled();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, throws_on_inconsistent_given_options)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, throws_on_inconsistent_given_options)
 {
   throws_on_inconsistent_given_options();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, is_constructible)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, is_constructible)
 {
   is_constructible();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_eigenvalues)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues)
 {
   gives_correct_eigenvalues();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
   gives_correct_eigenvalues_in_correct_order();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_real_eigenvalues)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
   gives_correct_real_eigenvalues();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_real_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
   gives_correct_real_eigenvalues_in_correct_order();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_max_eigenvalue)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_max_eigenvalue)
 {
   gives_correct_max_eigenvalue();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_min_eigenvalue)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_min_eigenvalue)
 {
   gives_correct_min_eigenvalue();
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
-  gives_correct_eigenvectors_in_correct_order({{"eigen", /*we_expect_a_failure: */ "-1"}});
+  gives_correct_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"} });
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_real_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
 {
-  gives_correct_real_eigenvectors_in_correct_order({{"eigen", /*we_expect_a_failure: */ "-1"}});
+  gives_correct_real_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"} });
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_eigendecomposition)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({{"lapack", "1e-12"}, {"eigen", "1e-13"}, {"numpy", "1e-12"}});
+  gives_correct_eigendecomposition({ {"lapack", "1e-12"}, {"eigen", "1e-13"}, {"numpy", "1e-12"} });
 }
 
-TEST_F(EigenSolverForMatrix1From2dEulerExample, gives_correct_real_eigendecomposition)
+TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition(
-      {{"lapack", "1e-12"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-12"}});
+      { {"lapack", "1e-12"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-12"} });
 }
 
 
-struct EigenSolverForMatrix2From2dEulerExample
-    : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<TESTMATRIXTYPE,
-                                                                     TESTFIELDTYPE,
-                                                                     TESTCOMPLEXMATRIXTYPE,
-                                                                     TESTREALMATRIXTYPE>
+struct EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}
+        : public EigenSolverTestForMatricesWithRealEigenvaluesAndVectors<{{TESTMATRIXTYPE}},
+                {{TESTFIELDTYPE}},
+                {{TESTCOMPLEXMATRIXTYPE}},
+                {{TESTREALMATRIXTYPE}}>
 {
   using BaseType = EigenSolverTestForMatricesWithRealEigenvaluesAndVectors;
   using typename BaseType::MatrixType;
@@ -194,7 +194,7 @@ struct EigenSolverForMatrix2From2dEulerExample
   using typename BaseType::EigenValuesType;
   using typename BaseType::RealEigenValuesType;
 
-  EigenSolverForMatrix2From2dEulerExample()
+  EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}()
   {
     matrix_ = XT::Common::from_string<MatrixType>(
         "[ 0                       0                      -1                       0; "
@@ -223,90 +223,92 @@ struct EigenSolverForMatrix2From2dEulerExample
   using BaseType::expected_max_ev_;
   using BaseType::expected_min_ev_;
   using BaseType::expected_real_eigenvectors_;
-}; // struct EigenSolverForMatrix2From2dEulerExample
+}; // struct EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}
 
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, exports_correct_types)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, exports_correct_types)
 {
   exports_correct_types();
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, has_types_and_options)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, has_types_and_options)
 {
   has_types_and_options();
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, throws_on_broken_matrix_construction)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, throws_on_broken_matrix_construction)
 {
   throws_on_broken_matrix_construction();
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, allows_broken_matrix_construction_when_checks_disabled)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, allows_broken_matrix_construction_when_checks_disabled)
 {
   allows_broken_matrix_construction_when_checks_disabled();
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, throws_on_inconsistent_given_options)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, throws_on_inconsistent_given_options)
 {
   throws_on_inconsistent_given_options();
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, is_constructible)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, is_constructible)
 {
   is_constructible();
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigenvalues)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
+  gives_correct_eigenvalues({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
+  gives_correct_eigenvalues_in_correct_order({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigenvalues)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
-  gives_correct_real_eigenvalues({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
+  gives_correct_real_eigenvalues({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigenvalues_in_correct_order)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
-  gives_correct_real_eigenvalues_in_correct_order({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
+  gives_correct_real_eigenvalues_in_correct_order({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_max_eigenvalue)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_max_eigenvalue)
 {
-  gives_correct_max_eigenvalue({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
+  gives_correct_max_eigenvalue({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_min_eigenvalue)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_min_eigenvalue)
 {
-  gives_correct_min_eigenvalue({{"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}});
+  gives_correct_min_eigenvalue({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
-  gives_correct_eigenvectors_in_correct_order({{"lapack", /*we_expect_a_failure: */ "-1"},
+  gives_correct_eigenvectors_in_correct_order({ {"lapack", /*we_expect_a_failure: */ "-1"},
                                                {"eigen", /*we_expect_a_failure: */ "-1"},
-                                               {"numpy", /*we_expect_a_failure: */ "-1"}});
+                                               {"numpy", /*we_expect_a_failure: */ "-1"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigenvectors_in_correct_order)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
 {
-  gives_correct_real_eigenvectors_in_correct_order({{"lapack", /*we_expect_a_failure: */ "-1"},
+  gives_correct_real_eigenvectors_in_correct_order({ {"lapack", /*we_expect_a_failure: */ "-1"},
                                                     {"eigen", /*we_expect_a_failure: */ "-1"},
-                                                    {"numpy", /*we_expect_a_failure: */ "-1"}});
+                                                    {"numpy", /*we_expect_a_failure: */ "-1"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_eigendecomposition)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({{"lapack", "1e-13"}, {"eigen", "1e-13"}, {"numpy", "1e-13"}});
+  gives_correct_eigendecomposition({ {"lapack", "1e-13"}, {"eigen", "1e-13"}, {"numpy", "1e-13"} });
 }
 
-TEST_F(EigenSolverForMatrix2From2dEulerExample, gives_correct_real_eigendecomposition)
+TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition(
-      {{"lapack", /*we_expect_a_failure: */ "-1"}, {"eigen", "1e-13"}, {"numpy", /*we_expect_a_failure: */ "-1"}});
+      { {"lapack", /*we_expect_a_failure: */ "-1"}, {"eigen", "1e-13"}, {"numpy", /*we_expect_a_failure: */ "-1"} });
 }
+
+{% endfor %}
