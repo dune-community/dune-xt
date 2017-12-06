@@ -86,7 +86,7 @@ public:
       try {
         inverse_->invert();
       } catch (const FMatrixError& ee) {
-        if (ee.what() == "matrix is singular")
+        if (std::strcmp(ee.what(), "matrix is singular") != 0)
           DUNE_THROW(Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements,
                      "This was the original error:\n\n"
                          << ee.what());
