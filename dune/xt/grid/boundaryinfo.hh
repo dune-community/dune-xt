@@ -15,6 +15,7 @@
 
 #include "boundaryinfo/alldirichlet.hh"
 #include "boundaryinfo/allneumann.hh"
+#include "boundaryinfo/allreflecting.hh"
 #include "boundaryinfo/boundarysegment.hh"
 #include "boundaryinfo/interfaces.hh"
 #include "boundaryinfo/normalbased.hh"

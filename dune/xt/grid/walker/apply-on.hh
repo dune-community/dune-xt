@@ -435,6 +435,30 @@ protected:
   using BaseType::boundary_info_;
 }; // class NeumannIntersections
 
+template <class GridLayerImp>
+class ReflectingIntersections
+    : public internal::WhichIntersectionBase<GridLayerImp, ReflectingIntersections<GridLayerImp>, true>
+{
+  typedef internal::WhichIntersectionBase<GridLayerImp, ReflectingIntersections<GridLayerImp>, true> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  explicit ReflectingIntersections(const BoundaryInfo<IntersectionType>& boundary_info)
+    : BaseType(boundary_info)
+  {
+  }
+
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  {
+    return boundary_info_.access().type(intersection) == ReflectingBoundary();
+  }
+
+protected:
+  using BaseType::boundary_info_;
+}; // class ReflectingIntersections
+
 /**
  *  \brief Selects entities in the compatible PartitionSet.
  */
