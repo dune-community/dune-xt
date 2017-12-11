@@ -6,6 +6,8 @@
 set -e
 set -x
 
+${DUNE_VENV_ACTIVATE}
+
 WAIT="${SUPERDIR}/scripts/bash/travis_wait_new.bash 45"
 source ${SUPERDIR}/scripts/bash/retry_command.bash
 
