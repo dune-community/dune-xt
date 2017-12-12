@@ -1,6 +1,6 @@
 
 from matrices import latype
-from dune.xt.codegen import typeid_to_typedef_name as safe_name
+from dune.xt.codegen import have_eigen, have_istl, typeid_to_typedef_name as safe_name
 
 
 types = [f.split('_') for f in ['CommonDenseMatrix_CommonDenseVector_CommonDenseVector_complex',
@@ -21,4 +21,13 @@ def test_tuple(args):
         f = 'std::complex<double>'
     return (safe_name('{}_{}_{}_{}'.format(o, r, s, f)), latype(o,f), latype(r,f), latype(s,f))
 
-testtypes = [test_tuple(item) for item in types]
+
+def type_ok(t):
+    if sum(['Eigen' in x for x in t]):
+        return have_eigen(cache)
+    if sum(['Istl' in x for x in t]):
+        return have_istl(cache)
+    return True
+
+
+testtypes = [test_tuple(item) for item in types if type_ok(item)]

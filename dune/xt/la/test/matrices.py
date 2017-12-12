@@ -7,7 +7,7 @@ def matrices(cache):
 
   if codegen.have_eigen(cache):
       mat.extend(['EigenRowMajorSparseMatrix', 'EigenDenseMatrix'])
-  if codegen.have_eigen(cache):
+  if codegen.have_istl(cache):
       mat.append('IstlRowMajorSparseMatrix')
   return mat
 
