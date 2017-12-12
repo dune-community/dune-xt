@@ -98,6 +98,30 @@ public:
     }
   } // NormalBased(...)
 
+  NormalBasedBoundaryInfo(const std::vector<WorldType> dirichlet_normals,
+                          const std::vector<WorldType> neumann_normals,
+                          const std::vector<WorldType> reflecting_normals,
+                          const DomainFieldType tol = 1e-10)
+    : NormalBasedBoundaryInfo(true, dirichlet_normals, neumann_normals, tol)
+  {
+    reflecting_normals_ = reflecting_normals;
+    // normalize
+    for (auto& normal : reflecting_normals_)
+      normal /= normal.two_norm();
+    // sanity checks
+    for (auto& dirichletNormal : dirichlet_normals_) {
+      if (contains(dirichletNormal, reflecting_normals_))
+        DUNE_THROW(Common::Exceptions::wrong_input_given,
+                   "Given normals are too close for given tolerance '" << tol << "'!");
+    }
+    for (auto& neumannNormal : neumann_normals_) {
+      if (contains(neumannNormal, reflecting_normals_))
+        DUNE_THROW(Common::Exceptions::wrong_input_given,
+                   "Given normals are too close for given tolerance '" << tol << "'!");
+    }
+  } // NormalBased(...)
+
+
   virtual const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (!intersection.boundary())
@@ -107,6 +131,8 @@ public:
       return dirichlet_boundary_;
     else if (contains(outerNormal, neumann_normals_))
       return neumann_boundary_;
+    else if (contains(outerNormal, reflecting_normals_))
+      return reflecting_boundary_;
     else
       return dirichlet_boundary_;
   } // ... type(...)
@@ -142,10 +168,12 @@ protected:
   const bool default_to_dirichlet_;
   std::vector<WorldType> dirichlet_normals_;
   std::vector<WorldType> neumann_normals_;
+  std::vector<WorldType> reflecting_normals_;
   const DomainFieldType tol_;
   static constexpr NoBoundary no_boundary_{};
   static constexpr DirichletBoundary dirichlet_boundary_{};
   static constexpr NeumannBoundary neumann_boundary_{};
+  static constexpr ReflectingBoundary reflecting_boundary_{};
 }; // class NormalBasedBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #pragma GCC diagnostic pop
@@ -157,6 +185,8 @@ template <class I>
 constexpr DirichletBoundary NormalBasedBoundaryInfo<I>::dirichlet_boundary_;
 template <class I>
 constexpr NeumannBoundary NormalBasedBoundaryInfo<I>::neumann_boundary_;
+template <class I>
+constexpr ReflectingBoundary NormalBasedBoundaryInfo<I>::reflecting_boundary_;
 
 
 template <class I>
