@@ -46,12 +46,10 @@ void prepare_sym_tridiag_posdef(
 } // void prepare_sym_triadiag_posdef(...)
 
 
-#if HAVE_LAPACKE
-
 double solve_sym_tridiag_posdef(
     size_t dimRange, double* diagonal_elements, double* sub_diagonal_elements, double anorm, double* b)
 {
-  auto info = LAPACKE_dpttrf(dimRange, diagonal_elements, sub_diagonal_elements);
+  auto info = Common::Lapacke::dpttrf(dimRange, diagonal_elements, sub_diagonal_elements);
   if (info) {
     std::cout << "factorization failed" << std::endl;
     DUNE_THROW(Dune::MathError, "factorization failed");
@@ -59,7 +57,7 @@ double solve_sym_tridiag_posdef(
 
   // estimate condition of H_k
   double inverse_condition;
-  info = LAPACKE_dptcon(dimRange, diagonal_elements, sub_diagonal_elements, anorm, &inverse_condition);
+  info = Common::Lapacke::dptcon(dimRange, diagonal_elements, sub_diagonal_elements, anorm, &inverse_condition);
   if (info)
     DUNE_THROW(Dune::MathError, "condition estimation failed");
   if (inverse_condition < 1e-20) {
@@ -68,27 +66,14 @@ double solve_sym_tridiag_posdef(
   }
 
   // solve system
-  info = LAPACKE_dpttrs(LAPACK_ROW_MAJOR, dimRange, 1, diagonal_elements, sub_diagonal_elements, b, 1);
+  info = Common::Lapacke::dpttrs(
+      Common::Lapacke::row_major(), dimRange, 1, diagonal_elements, sub_diagonal_elements, b, 1);
   if (info) {
     std::cout << "solving system failed" << std::endl;
     DUNE_THROW(Dune::MathError, "solving system failed");
   }
   return inverse_condition;
 }
-
-#else // HAVE_LAPACKE
-
-double solve_sym_tridiag_posdef(size_t /*dimRange*/,
-                                double* /*diagonal_elements*/,
-                                double* /*sub_diagonal_elements*/,
-                                double /*anorm*/,
-                                double* /*d_k*/)
-{
-  DUNE_THROW(Dune::NotImplemented, "This function requires LAPACKE which has not been found on your system.");
-  return 1.;
-}
-
-#endif // HAVE_LAPACKE
 
 
 } // namespace LA

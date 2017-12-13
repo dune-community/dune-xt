@@ -14,9 +14,12 @@
 
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/la/exceptions.hh>
+#include <dune/xt/la/container/conversion.hh>
+#include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/matrix-inverter.hh>
 
 #include "internal/base.hh"
+#include "internal/eigen.hh"
 
 namespace Dune {
 namespace XT {
@@ -29,7 +32,14 @@ class MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
 public:
   static std::vector<std::string> types()
   {
-    return {"direct"};
+    return
+    {
+      "direct"
+#if HAVE_EIGEN
+          ,
+          "moore_penrose"
+#endif
+    };
   }
 
   static Common::Configuration options(const std::string type = "")
@@ -41,6 +51,13 @@ public:
     return opts;
   }
 }; // class MatrixInverterOptions<EigenDenseMatrix<S>>
+
+
+template <class K, int ROWS, int COLS>
+class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>>
+    : public MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
+{
+};
 
 
 template <class K, int ROWS, int COLS>
@@ -66,8 +83,22 @@ public:
     const auto type = options_.template get<std::string>("type");
     if (type == "direct") {
       inverse_ = std::make_unique<MatrixType>(matrix_);
-      inverse_->invert();
+      try {
+        inverse_->invert();
+      } catch (const FMatrixError& ee) {
+        if (std::strcmp(ee.what(), "matrix is singular") != 0)
+          DUNE_THROW(Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements,
+                     "This was the original error:\n\n"
+                         << ee.what());
+        DUNE_THROW(Exceptions::matrix_invert_failed, "This was the original error:\n\n" << ee.what());
+      }
     } else
+#if HAVE_EIGEN
+        if (type == "moore_penrose") {
+      inverse_ = std::make_unique<MatrixType>(convert_to<MatrixType>(EigenDenseMatrix<K>(
+          internal::compute_moore_penrose_inverse_using_eigen(convert_to<EigenDenseMatrix<K>>(matrix_).backend()))));
+    } else
+#endif
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type
                                 << "' is none of MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>::types(), and "
@@ -82,7 +113,19 @@ protected:
   using BaseType::matrix_;
   using BaseType::options_;
   using BaseType::inverse_;
-}; // class MatrixInverter<EigenDenseMatrix<...>>
+}; // class MatrixInverter<FieldMatrix<...>>
+
+
+template <class K, int ROWS, int COLS>
+class MatrixInverter<Common::FieldMatrix<K, ROWS, COLS>> : public MatrixInverter<FieldMatrix<K, ROWS, COLS>>
+{
+public:
+  template <class... Args>
+  explicit MatrixInverter(Args&&... args)
+    : MatrixInverter<FieldMatrix<K, ROWS, COLS>>(std::forward<Args>(args)...)
+  {
+  }
+};
 
 
 } // namespace Dune

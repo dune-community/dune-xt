@@ -10,9 +10,9 @@
 #   Tobias Leibner  (2016)
 
 set(lib_dune_xt_la_sources
+    algorithms/solve_sym_tridiag_posdef.cc
     container/pattern.cc
-    eigen-solver/internal/lapacke.cc
-    algorithms/solve_sym_tridiag_posdef.cc)
+    eigen-solver/internal/numpy.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
   list(APPEND lib_dune_xt_la_sources

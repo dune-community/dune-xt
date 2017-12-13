@@ -11,19 +11,19 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include "container.hh"
+#include <dune/xt/la/test/container.hh>
 
 using namespace Dune;
 using namespace Dune::XT;
 
 static const size_t dim = 4;
-
-struct ContainerTest : public ::testing::Test
+{% for NAME,CIMP in config.container %}
+struct ContainerTest{{NAME}} : public ::testing::Test
 {
   void fulfills_interface() const
   {
-    typedef TESTCONTAINERTYPE ContainerImp;
     // static tests
+    using ContainerImp = {{CIMP}};
     typedef typename ContainerImp::Traits Traits;
     // * of the traits
     typedef typename Traits::derived_type T_derived_type;
@@ -65,7 +65,8 @@ struct ContainerTest : public ::testing::Test
   } // void fulfills_interface() const
 }; // struct ContainerTest
 
-TEST_F(ContainerTest, fulfills_interface)
+TEST_F(ContainerTest{{NAME}}, fulfills_interface)
 {
   this->fulfills_interface();
 }
+{% endfor %}

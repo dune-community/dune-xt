@@ -23,7 +23,7 @@ namespace LA {
 
 /**
  * \brief A means to obtain available options at compile time.
- * \note  This class needs to bespecialized for each MatrixType, the purpose of this class is merely to document the
+ * \note  This class needs to be specialized for each MatrixType, the purpose of this variant is merely to document the
  *        expected functionality.
  */
 template <class MatrixType>
@@ -44,6 +44,20 @@ class MatrixInverterOptions
                   "Please implement for given MatrixType and add the respective include below!");
   }
 }; // class MatrixInverterOptions
+
+
+template <class MatrixType>
+std::vector<std::string> matrix_inverter_types(const MatrixType& /*matrix*/)
+{
+  return MatrixInverterOptions<MatrixType>::types();
+}
+
+
+template <class MatrixType>
+Common::Configuration matrix_inverter_options(const MatrixType& /*matrix*/, const std::string type = "")
+{
+  return MatrixInverterOptions<MatrixType>::options(type);
+}
 
 
 /**

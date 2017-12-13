@@ -1506,8 +1506,8 @@ struct MatrixAbstraction<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMat
 #if DUNE_XT_WITH_PYTHON_BINDINGS
 
 
-extern template class Dune::XT::LA::CommonSparseMatrix<double, SparseFormat::csr>;
-extern template class Dune::XT::LA::CommonSparseMatrix<double, SparseFormat::csc>;
+extern template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::SparseFormat::csr>;
+extern template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::SparseFormat::csc>;
 
 
 #endif // DUNE_XT_WITH_PYTHON_BINDINGS

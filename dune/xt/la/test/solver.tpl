@@ -19,7 +19,7 @@
 #include <dune/xt/la/container.hh>
 #include <dune/xt/la/solver.hh>
 
-#include "container.hh"
+#include <dune/xt/la/test/container.hh>
 
 // toggle output
 // std::ostream& out = std::cout;
@@ -29,11 +29,12 @@ using namespace Dune;
 using namespace Dune::XT;
 using namespace Dune::XT::LA;
 
-struct SolverTest : public ::testing::Test
+{% for T_NAME, O_TYPE, R_TYPE, S_TYPE in config.testtypes %}
+struct SolverTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef TESTMATRIXTYPE MatrixType;
-  typedef TESTRHSVECTORTYPE RhsType;
-  typedef TESTSOLUTIONVECTORTYPE SolutionType;
+  typedef {{O_TYPE}} MatrixType;
+  typedef {{R_TYPE}} RhsType;
+  typedef {{S_TYPE}} SolutionType;
 
   typedef Solver<MatrixType> SolverType;
 
@@ -71,7 +72,9 @@ struct SolverTest : public ::testing::Test
   } // ... produces_correct_results(...)
 }; // struct SolverTest
 
-TEST_F(SolverTest, behaves_correctly)
+TEST_F(SolverTest_{{T_NAME}}, behaves_correctly)
 {
   this->produces_correct_results();
 }
+
+{% endfor %}

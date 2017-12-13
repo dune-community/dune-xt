@@ -11,16 +11,17 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include "container.hh"
+#include <dune/xt/la/test/container.hh>
 
 using namespace Dune;
 using namespace Dune::XT;
 
 static const size_t dim = 4;
 
-struct VectorTest : public ::testing::Test
+{% for T_NAME, V_TYPE in config.testtypes %}
+struct VectorTest_{{T_NAME}} : public ::testing::Test
 {
-  typedef TESTVECTORTYPE VectorImp;
+  typedef {{V_TYPE}} VectorImp;
 
   void fulfills_interface() const
   {
@@ -599,11 +600,12 @@ struct VectorTest : public ::testing::Test
 }; // struct VectorTest
 
 
-TEST_F(VectorTest, fulfills_interface)
+TEST_F(VectorTest_{{T_NAME}}, fulfills_interface)
 {
   this->fulfills_interface();
 }
-TEST_F(VectorTest, produces_correct_results)
+TEST_F(VectorTest_{{T_NAME}}, produces_correct_results)
 {
   this->produces_correct_results();
 }
+{% endfor %}

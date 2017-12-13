@@ -13,161 +13,193 @@
 #include <algorithm>
 #include <functional>
 
+#include <dune/common/typetraits.hh>
+
 #include <dune/xt/common/fmatrix.hh>
+#include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/numeric_cast.hh>
+#include <dune/xt/common/vector.hh>
+#include <dune/xt/la/container/conversion.hh>
 #include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/solver.hh>
 #include <dune/xt/la/eigen-solver.hh>
 
-#include "base.hh"
+#include "internal/base.hh"
 #include "internal/eigen.hh"
 #include "internal/lapacke.hh"
+#include "internal/numpy.hh"
 
 namespace Dune {
 namespace XT {
 namespace LA {
 
 
-template <class S, int dimRange>
-class FieldMatrixEigenSolverTraits
+#if HAVE_LAPACKE || HAVE_EIGEN
+
+
+template <class K, int SIZE>
+class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
 {
 public:
-  typedef Dune::FieldMatrix<S, dimRange, dimRange> MatrixType;
-  typedef typename Dune::FieldTraits<S>::real_type RealType;
-  typedef typename std::complex<RealType> ComplexType;
-  typedef typename Dune::FieldVector<RealType, dimRange> RealVectorType;
-  typedef typename Dune::FieldVector<ComplexType, dimRange> ComplexVectorType;
-  typedef typename Dune::FieldMatrix<RealType, dimRange, dimRange> RealMatrixType;
-  typedef typename Dune::FieldMatrix<ComplexType, dimRange, dimRange> ComplexMatrixType;
-  typedef EigenSolver<MatrixType> derived_type;
-};
-
-template <class S, int dimRange>
-class EigenSolver<Dune::FieldMatrix<S, dimRange, dimRange>>
-    : public EigenSolverBase<FieldMatrixEigenSolverTraits<S, dimRange>>
-{
-  typedef EigenSolverBase<FieldMatrixEigenSolverTraits<S, dimRange>> BaseType;
-
-public:
-  using typename BaseType::MatrixType;
-  using typename BaseType::ComplexType;
-  using typename BaseType::ComplexVectorType;
-  using typename BaseType::RealMatrixType;
-
-  EigenSolver(const MatrixType& matrix, const bool disable_checks = false)
-    : BaseType(matrix, disable_checks)
-  {
-  }
-
   static std::vector<std::string> types()
   {
-    return
-    {
-#if HAVE_LAPACKE
-      "lapacke",
-#endif
+    std::vector<std::string> tps;
+    if (Common::Lapacke::available())
+      tps.push_back("lapack");
 #if HAVE_EIGEN
-          "eigen"
+    tps.push_back("eigen");
 #endif
-#if 0
-          ,
-          "qrhouseholder"
-#endif
-    };
+    if (internal::numpy_eigensolver_available())
+      tps.push_back("numpy");
+    return tps;
   }
 
   static Common::Configuration options(const std::string type = "")
   {
-    const std::string tp = !type.empty() ? type : types()[0];
-    internal::SolverUtils::check_given(tp, types());
-    Common::Configuration default_options(
-        {"type", "check_for_inf_nan", "check_evs_are_real", "check_evs_are_positive", "check_eigenvectors_are_real"},
-        {tp.c_str(), "1", "0", "0", "0"});
-    return default_options;
+    const std::string actual_type = type.empty() ? types()[0] : type;
+    internal::ensure_eigen_solver_type(actual_type, types());
+    Common::Configuration opts = internal::default_eigen_solver_options();
+    opts["type"] = actual_type;
+    return opts;
+  }
+}; // class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
+
+
+template <class K, int SIZE>
+class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>>
+    : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
+{
+};
+
+
+template <class K, int SIZE>
+class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
+    : public internal::EigenSolverBase<Dune::FieldMatrix<K, SIZE, SIZE>,
+                                       K,
+                                       Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>,
+                                       Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>
+{
+  using BaseType = internal::EigenSolverBase<Dune::FieldMatrix<K, SIZE, SIZE>,
+                                             K,
+                                             Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>,
+                                             Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>;
+
+public:
+  using typename BaseType::MatrixType;
+
+  template <class... Args>
+  explicit EigenSolver(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {
   }
 
-  virtual void get_eigenvalues(std::vector<ComplexType>& evs, const std::string& type) const override final
+protected:
+  void compute() const override final
   {
-    if (false)
-      ; // empty statement to be able to use else if
+    const auto type = options_.template get<std::string>("type");
 #if HAVE_LAPACKE
-    else if (type == "lapacke")
-      evs = internal::compute_all_eigenvalues_using_lapacke(matrix_);
+    if (type == "lapack") {
+      if (!options_.template get<bool>("compute_eigenvectors"))
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(
+            internal::compute_eigenvalues_using_lapack(matrix_));
+      else {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
+        eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
+        internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
+      }
+    } else
 #endif // HAVE_LAPACKE
 #if HAVE_EIGEN
-    else if (type == "eigen") {
-      XT::LA::EigenDenseMatrix<S> eigenmatrix(dimRange, dimRange);
-      for (size_t rr = 0; rr < dimRange; ++rr)
-        for (size_t cc = 0; cc < dimRange; ++cc)
-          eigenmatrix.set_entry(rr, cc, matrix_[rr][cc]);
-      evs = internal::compute_all_eigenvalues_using_eigen(eigenmatrix.backend());
-    }
+        if (type == "eigen") {
+      if (options_.template get<bool>("compute_eigenvalues") && options_.template get<bool>("compute_eigenvectors")) {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
+        EigenDenseMatrix<K> tmp_matrix(matrix_);
+        EigenDenseMatrix<Common::complex_t<K>> tmp_eigenvectors(matrix_);
+        internal::compute_eigenvalues_and_right_eigenvectors_using_eigen(
+            tmp_matrix.backend(), *eigenvalues_, tmp_eigenvectors.backend());
+        eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(
+            convert_to<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(tmp_eigenvectors));
+      } else {
+        if (options_.template get<bool>("compute_eigenvalues"))
+          eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(
+              internal::compute_eigenvalues_using_eigen(EigenDenseMatrix<K>(matrix_).backend()));
+        if (options_.template get<bool>("compute_eigenvectors")) {
+          eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(
+              convert_to<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>(
+                  EigenDenseMatrix<XT::Common::complex_t<K>>(
+                      internal::compute_right_eigenvectors_using_eigen(EigenDenseMatrix<K>(matrix_).backend()))));
+        }
+      }
+    } else
+#endif // HAVE_EIGEN
+#if HAVE_DUNE_PYBINDXI
+        if (type == "numpy") {
+      if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
+        eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
+        internal::compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
+            matrix_, *eigenvalues_, *eigenvectors_);
+      }
+    } else
 #endif
-#if 0
-    else if (type == "qrhouseholder")
-      evs = internal::compute_all_eigenvalues_using_qrhouseholder(matrix_);
-#endif
-    else
       DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type << "' is not supported, although it was reported by types()!");
-  } // ... get_eigenvalues(...)
+                 "Given type '" << type << "' is none of EigenSolverOptions<Dune::FieldMatrix<K, ROWS, "
+                                           "COLS>>::types(), and  internal::EigenSolverBase promised to check this!"
+                                << "\n\nThese are the available types:\n\n"
+                                << EigenSolverOptions<MatrixType>::types());
+  } //... compute(...)
 
-  virtual void get_eigenvectors(std::vector<ComplexVectorType>& evs, const std::string& type) const override final
-  {
-    evs.resize(dimRange);
-    if (false)
-      ; // empty statement to be able to use else if
-#if HAVE_LAPACKE
-    else if (type == "lapacke")
-      internal::compute_all_eigenvectors_using_lapacke(matrix_, evs, evs[0][0]);
-#endif
-#if HAVE_EIGEN
-    else if (type == "eigen") {
-      XT::LA::EigenDenseMatrix<S> eigenmatrix(dimRange, dimRange);
-      for (size_t rr = 0; rr < dimRange; ++rr)
-        for (size_t cc = 0; cc < dimRange; ++cc)
-          eigenmatrix.set_entry(rr, cc, matrix_[rr][cc]);
-      auto eigen_eigvecs = internal::compute_all_eigenvectors_using_eigen(eigenmatrix.backend());
-      for (size_t rr = 0; rr < dimRange; ++rr)
-        for (size_t cc = 0; cc < dimRange; ++cc)
-          evs[rr][cc] = eigen_eigvecs[rr].get_entry(cc);
-    }
-#endif
-#if 0
-    else if (type == "qrhouseholder")
-      internal::compute_all_eigenvectors_using_qrhouseholder(matrix_, evs, evs[0][0]);
-#endif
-    else
-      DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type << "' is not supported, although it was reported by types()!");
-  } // ... get_eigenvectors(...)
-
-  using BaseType::real_eigenvectors;
-
-  virtual std::shared_ptr<RealMatrixType> real_eigenvectors_as_matrix(const Common::Configuration& opts) const override
-  {
-    const auto evs = real_eigenvectors(opts);
-    auto ret = std::make_shared<RealMatrixType>();
-    for (size_t ii = 0; ii < dimRange; ++ii)
-      for (size_t jj = 0; jj < dimRange; ++jj)
-        (*ret)[ii][jj] = evs[jj][ii];
-    return ret;
-  } // ... real_eigenvectors_as_matrix(...)
-
-private:
   using BaseType::matrix_;
-}; // class EigenSolver<FieldMatrix<S>>
+  using BaseType::options_;
+  using BaseType::eigenvalues_;
+  using BaseType::eigenvectors_;
+}; // class EigenSolver<FieldMatrix<...>>
 
-template <class S, int dimRange>
-class EigenSolver<Dune::XT::Common::FieldMatrix<S, dimRange, dimRange>>
-    : public EigenSolver<Dune::FieldMatrix<S, dimRange, dimRange>>
+
+template <class K, int SIZE>
+class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>> : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
 {
+public:
   template <class... Args>
   EigenSolver(Args&&... args)
-    : EigenSolver<Dune::FieldMatrix<S, dimRange, dimRange>>(std::forward<Args>(args)...)
+    : EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>(std::forward<Args>(args)...)
   {
   }
 };
 
+
+#else // HAVE_LAPACKE || HAVE_EIGEN
+
+
+template <class K, int SIZE>
+class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
+{
+  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
+};
+
+
+template <class K, int SIZE>
+class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>>
+{
+  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
+};
+
+
+template <class K, int SIZE>
+class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
+{
+  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
+};
+
+
+template <class K, int SIZE>
+class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>>
+{
+  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
+};
+
+
+#endif // HAVE_LAPACKE || HAVE_EIGEN
 
 } // namespace LA
 } // namespace XT

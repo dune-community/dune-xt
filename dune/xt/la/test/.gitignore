@@ -12,3 +12,4 @@ test_validation
 *.o
 *.gcda
 *.gcno
+!builder_definitions.cmake
