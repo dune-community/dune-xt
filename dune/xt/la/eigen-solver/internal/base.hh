@@ -455,104 +455,98 @@ protected:
       } // ii
 
       if (is_complex) {
-        try {
-          // try to get real eigenvectors from the complex ones. If both the matrix and the eigenvalues are real, the
-          // eigenvectors can also be chosen real. If there is a imaginary eigenvector, both real and imaginary part are
-          // eigenvectors (if non-zero) to the same eigenvalue. So to get real eigenvectors, sort the eigenvectors by
-          // eigenvalues and, separately for each eigenvalue, perform a Gram-Schmidt process with all real and imaginary
-          // parts of the eigenvectors
-          auto eigenvalues = self.real_eigenvalues();
+        // try to get real eigenvectors from the complex ones. If both the matrix and the eigenvalues are real, the
+        // eigenvectors can also be chosen real. If there is a imaginary eigenvector, both real and imaginary part are
+        // eigenvectors (if non-zero) to the same eigenvalue. So to get real eigenvectors, sort the eigenvectors by
+        // eigenvalues and, separately for each eigenvalue, perform a Gram-Schmidt process with all real and imaginary
+        // parts of the eigenvectors
+        self.compute_real_eigenvalues();
 
-          // form groups of equal eigenvalues
-          struct Cmp
+        // form groups of equal eigenvalues
+        struct Cmp
+        {
+          bool operator()(const RealType& a, const RealType& b) const
           {
-            bool operator()(const RealType& a, const RealType& b) const
-            {
-              return XT::Common::FloatCmp::lt(a, b);
+            return XT::Common::FloatCmp::lt(a, b);
+          }
+        };
+        std::vector<std::vector<size_t>> eigenvalue_groups;
+        std::vector<size_t> eigenvalue_multiplicity;
+        std::set<RealType, Cmp> eigenvalues_done;
+        for (size_t jj = 0; jj < rows; ++jj) {
+          const auto curr_eigenvalue = (*self.real_eigenvalues_)[jj];
+          if (!eigenvalues_done.count(curr_eigenvalue)) {
+            std::vector<size_t> curr_group;
+            curr_group.push_back(jj);
+            eigenvalue_multiplicity.push_back(1);
+            for (size_t kk = jj + 1; kk < rows; ++kk) {
+              if (XT::Common::FloatCmp::eq(curr_eigenvalue, (*self.real_eigenvalues_)[kk])) {
+                curr_group.push_back(kk);
+                ++(eigenvalue_multiplicity.back());
+              }
+            } // kk
+            eigenvalue_groups.push_back(curr_group);
+            eigenvalues_done.insert(curr_eigenvalue);
+          }
+        } // jj
+
+        // For each eigenvalue, calculate a orthogonal basis of the n-dim real eigenspace from the 2n real
+        // and imaginary parts of the complex eigenvectors
+        for (size_t kk = 0; kk < eigenvalue_groups.size(); ++kk) {
+          const auto& group = eigenvalue_groups[kk];
+          typedef typename XT::LA::CommonDenseVector<RealType> RealVectorType;
+          std::vector<RealVectorType> input_vectors(2 * eigenvalue_multiplicity[kk], RealVectorType(rows, 0.));
+          size_t index = 0;
+          for (const auto& jj : group) {
+            for (size_t ll = 0; ll < cols; ++ll) {
+              input_vectors[index][ll] = CM::get_entry(*self.eigenvectors_, ll, jj).real();
+              input_vectors[index + 1][ll] = CM::get_entry(*self.eigenvectors_, ll, jj).imag();
             }
-          };
-          std::vector<std::vector<size_t>> eigenvalue_groups;
-          std::vector<size_t> eigenvalue_multiplicity;
-          std::set<RealType, Cmp> eigenvalues_done;
-          for (size_t jj = 0; jj < rows; ++jj) {
-            const auto curr_eigenvalue = eigenvalues[jj];
-            if (!eigenvalues_done.count(curr_eigenvalue)) {
-              std::vector<size_t> curr_group;
-              curr_group.push_back(jj);
-              eigenvalue_multiplicity.push_back(1);
-              for (size_t kk = jj + 1; kk < rows; ++kk) {
-                if (XT::Common::FloatCmp::eq(curr_eigenvalue, eigenvalues[kk])) {
-                  curr_group.push_back(kk);
-                  ++(eigenvalue_multiplicity.back());
-                }
-              } // kk
-              eigenvalue_groups.push_back(curr_group);
-              eigenvalues_done.insert(curr_eigenvalue);
-            }
+            index += 2;
           } // jj
 
-          // For each eigenvalue, calculate a orthogonal basis of the n-dim real eigenspace from the 2n real
-          // and imaginary parts of the complex eigenvectors
-          for (size_t kk = 0; kk < eigenvalue_groups.size(); ++kk) {
-            const auto& group = eigenvalue_groups[kk];
-            typedef typename XT::LA::CommonDenseVector<RealType> RealVectorType;
-            std::vector<RealVectorType> input_vectors(2 * eigenvalue_multiplicity[kk], RealVectorType(rows, 0.));
-            size_t index = 0;
-            for (const auto& jj : group) {
-              for (size_t ll = 0; ll < cols; ++ll) {
-                input_vectors[index][ll] = CM::get_entry(*self.eigenvectors_, ll, jj).real();
-                input_vectors[index + 1][ll] = CM::get_entry(*self.eigenvectors_, ll, jj).imag();
-              }
-              index += 2;
+          // orthonormalize
+          for (size_t ii = 0; ii < input_vectors.size(); ++ii) {
+            auto& v_i = input_vectors[ii];
+            for (size_t jj = 0; jj < ii; ++jj) {
+              const auto& v_j = input_vectors[jj];
+              const auto vj_vj = v_j.dot(v_j);
+              if (XT::Common::FloatCmp::eq(vj_vj, 0.))
+                continue;
+              const auto vj_vi = v_j.dot(v_i);
+              for (size_t rr = 0; rr < rows; ++rr)
+                v_i[rr] -= vj_vi / vj_vj * v_j[rr];
             } // jj
-
-            // orthonormalize
-            for (size_t ii = 0; ii < input_vectors.size(); ++ii) {
-              auto& v_i = input_vectors[ii];
-              for (size_t jj = 0; jj < ii; ++jj) {
-                const auto& v_j = input_vectors[jj];
-                const auto vj_vj = v_j.dot(v_j);
-                if (XT::Common::FloatCmp::eq(vj_vj, 0.))
-                  continue;
-                const auto vj_vi = v_j.dot(v_i);
-                for (size_t rr = 0; rr < rows; ++rr)
-                  v_i[rr] -= vj_vi / vj_vj * v_j[rr];
-              } // jj
-              RealType l2_norm = std::sqrt(std::accumulate(
-                  v_i.begin(), v_i.end(), 0., [](const RealType& a, const RealType& b) { return a + b * b; }));
-              if (XT::Common::FloatCmp::ne(l2_norm, 0.))
-                v_i *= 1. / l2_norm;
-            } // ii
-            // copy eigenvectors back to eigenvectors matrix
-            index = 0;
-            for (size_t ii = 0; ii < input_vectors.size(); ++ii) {
-              if (XT::Common::FloatCmp::ne(input_vectors[ii], RealVectorType(rows, 0.))) {
-                if (index >= eigenvalue_multiplicity[kk]) {
-                  std::cout << XT::Common::to_string(input_vectors, 15) << std::endl;
-                  DUNE_THROW(
-                      Dune::
-                          NotImplemented, // Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
-                      "Eigenvectors are complex and calculating real eigenvectors failed!");
-                }
-                for (size_t rr = 0; rr < rows; ++rr)
-                  RM::set_entry(*self.real_eigenvectors_, rr, group[index], input_vectors[ii].get_entry(rr));
-                index++;
-              } // if (input_vectors[ii] != 0)
-            } // ii
-            if (index < eigenvalue_multiplicity[kk])
-              DUNE_THROW(Dune::NotImplemented, "");
-          } // kk
-        } catch (const Dune::Exception& e) {
-          DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
-                     "These were the given options:\n\n"
-                         << self.options_
-                         << "\n\nThis was the given matrix: "
-                         << std::setprecision(17)
-                         << self.matrix_
-                         << "\nThese are the computed eigenvectors:\n\n"
-                         << std::setprecision(17)
-                         << *self.eigenvectors_);
-        } // try/catch
+            RealType l2_norm = std::sqrt(std::accumulate(
+                v_i.begin(), v_i.end(), 0., [](const RealType& a, const RealType& b) { return a + b * b; }));
+            if (XT::Common::FloatCmp::ne(l2_norm, 0.))
+              v_i *= 1. / l2_norm;
+          } // ii
+          // copy eigenvectors back to eigenvectors matrix
+          index = 0;
+          for (size_t ii = 0; ii < input_vectors.size(); ++ii) {
+            if (XT::Common::FloatCmp::ne(input_vectors[ii], RealVectorType(rows, 0.))) {
+              if (index >= eigenvalue_multiplicity[kk]) {
+                std::cout << XT::Common::to_string(input_vectors, 15) << std::endl;
+                DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
+                           "Eigenvectors are complex and calculating real eigenvectors failed!"
+                               << "These were the given options:\n\n"
+                               << self.options_
+                               << "\n\nThis was the given matrix: "
+                               << std::setprecision(17)
+                               << self.matrix_
+                               << "\nThese are the computed eigenvectors:\n\n"
+                               << std::setprecision(17)
+                               << *self.eigenvectors_);
+              }
+              for (size_t rr = 0; rr < rows; ++rr)
+                RM::set_entry(*self.real_eigenvectors_, rr, group[index], input_vectors[ii].get_entry(rr));
+              index++;
+            } // if (input_vectors[ii] != 0)
+          } // ii
+          if (index < eigenvalue_multiplicity[kk])
+            DUNE_THROW(Dune::NotImplemented, "");
+        } // kk
       } // if(is_complex)
     } // static void compute(...)
   }; // real_eigenvectors_helper<true, ...>
@@ -646,15 +640,15 @@ protected:
         real_eigenvectors_inverse_ = std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_));
     } catch (const Exceptions::matrix_invert_failed& ee) {
       DUNE_THROW(Exceptions::eigen_solver_failed,
-                 "The computed matrix of eigenvectors is not invertible!"
+                 "The computed matrix of real eigenvectors is not invertible!"
                      << "\n\nmatrix = "
                      << std::setprecision(17)
                      << matrix_
                      << "\n\noptions: "
                      << options_
-                     << "\n\neigenvectors = "
+                     << "\n\nreal_eigenvectors = "
                      << std::setprecision(17)
-                     << *eigenvectors_
+                     << *real_eigenvectors_
                      << "\n\nThis was the original error: "
                      << ee.what());
     }
