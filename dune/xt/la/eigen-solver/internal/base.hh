@@ -507,7 +507,7 @@ protected:
             } // jj
 
             // orthonormalize
-            for (size_t ii = 1; ii < input_vectors.size(); ++ii) {
+            for (size_t ii = 0; ii < input_vectors.size(); ++ii) {
               auto& v_i = input_vectors[ii];
               for (size_t jj = 0; jj < ii; ++jj) {
                 const auto& v_j = input_vectors[jj];
@@ -518,22 +518,29 @@ protected:
                 for (size_t rr = 0; rr < rows; ++rr)
                   v_i[rr] -= vj_vi / vj_vj * v_j[rr];
               } // jj
-              auto l2_norm = std::accumulate(v_i.begin(), v_i.end(), 0.);
+              RealType l2_norm = std::sqrt(std::accumulate(
+                  v_i.begin(), v_i.end(), 0., [](const RealType& a, const RealType& b) { return a + b * b; }));
               if (XT::Common::FloatCmp::ne(l2_norm, 0.))
-                v_i *= 1. / std::sqrt(l2_norm);
+                v_i *= 1. / l2_norm;
             } // ii
             // copy eigenvectors back to eigenvectors matrix
             index = 0;
             for (size_t ii = 0; ii < input_vectors.size(); ++ii) {
               if (XT::Common::FloatCmp::ne(input_vectors[ii], RealVectorType(rows, 0.))) {
-                index++;
-                if (index >= eigenvalue_multiplicity[ii])
-                  DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
-                             "Eigenvectors are complex and calculating real eigenvectors failed!");
+                if (index >= eigenvalue_multiplicity[kk]) {
+                  std::cout << XT::Common::to_string(input_vectors, 15) << std::endl;
+                  DUNE_THROW(
+                      Dune::
+                          NotImplemented, // Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
+                      "Eigenvectors are complex and calculating real eigenvectors failed!");
+                }
                 for (size_t rr = 0; rr < rows; ++rr)
                   RM::set_entry(*self.real_eigenvectors_, rr, group[index], input_vectors[ii].get_entry(rr));
+                index++;
               } // if (input_vectors[ii] != 0)
             } // ii
+            if (index < eigenvalue_multiplicity[kk])
+              DUNE_THROW(Dune::NotImplemented, "");
           } // kk
         } catch (const Dune::Exception& e) {
           DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
