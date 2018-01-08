@@ -130,17 +130,18 @@ public:
 
   static std::vector<std::string> types()
   {
-    return
-    {
+    std::vector<std::string> ret{
+        "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor", "bicgstab"};
+
+    if (std::is_same<CommunicatorType, XT::SequentialCommunication>::value) {
 #if HAVE_SUPERLU
-      "superlu",
+      ret.insert(ret.begin(), "superlu");
 #endif
-          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor", "bicgstab"
 #if HAVE_UMFPACK
-          ,
-          "umfpack"
+      ret.push_back("umfpack");
 #endif
-    };
+    }
+    return ret;
   } // ... types()
 
   static XT::Common::Configuration options(const std::string type = "")
