@@ -36,14 +36,21 @@
 
 
 // this is used by other headers
+typedef Dune::OneDGrid ONED_1D;
 typedef Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>> YASP_1D_EQUIDISTANT_OFFSET;
 typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>> YASP_2D_EQUIDISTANT_OFFSET;
 typedef Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>> YASP_3D_EQUIDISTANT_OFFSET;
 #if HAVE_DUNE_ALUGRID
 typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> ALU_2D_SIMPLEX_CONFORMING;
+typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming> ALU_2D_SIMPLEX_NONCONFORMING;
+typedef Dune::ALUGrid<2, 2, Dune::cube, Dune::nonconforming> ALU_2D_CUBE;
+typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::conforming> ALU_3D_SIMPLEX_CONFORMING;
+typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming> ALU_3D_SIMPLEX_NONCONFORMING;
+typedef Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming> ALU_3D_CUBE;
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
 typedef Dune::UGGrid<2> UG_2D;
+typedef Dune::UGGrid<3> UG_3D;
 #endif
 #if HAVE_ALBERTA
 typedef Dune::AlbertaGrid<2, 2> ALBERTA_2D;
