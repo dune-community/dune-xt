@@ -76,9 +76,9 @@ public:
   /**
    * \attention Do not delete grd_ptr manually afterwards!
    */
-  GridProvider(GridType* grd_ptr, DdGridType* dd_grd_ptr = nullptr)
-    : grid_ptr_(grd_ptr)
-    , dd_grid_ptr_(dd_grd_ptr)
+  GridProvider(GridType*&& grd_ptr, DdGridType*&& dd_grd_ptr = nullptr)
+    : grid_ptr_(std::move(grd_ptr))
+    , dd_grid_ptr_(std::move(dd_grd_ptr))
   {
   }
 
