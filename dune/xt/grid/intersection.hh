@@ -58,10 +58,12 @@ public:
   **/
 template <class IntersectionType>
 void print_intersection(const IntersectionType& intersection,
+                        const std::string name = Common::Typename<IntersectionType>::value(),
                         std::ostream& out = std::cout,
                         const std::string prefix = "")
 {
-  out << prefix << Common::Typename<IntersectionType>::value() << std::endl;
+  if (!name.empty())
+    out << prefix << name << ":\n";
   const auto& geometry = intersection.geometry();
   for (auto ii : Common::value_range(geometry.corners()))
     out << prefix << "  corner " + Common::to_string(ii) << " = " << geometry.corner(ii)
@@ -70,9 +72,24 @@ void print_intersection(const IntersectionType& intersection,
 
 
 /**
+ * \brief Checks if intersection contains the given global_point (1d variant).
+ *
+ *        Returns true, if global_point and intersection coincide.
+ */
+template <class G, class I, class D>
+typename std::enable_if<G::dimension == 1, bool>::type
+contains(const Dune::Intersection<G, I>& intersection,
+         const Dune::FieldVector<D, 1>& global_point,
+         const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
+{
+  return Common::FloatCmp::eq(intersection.geometry().center(), global_point, tolerance);
+}
+
+
+/**
  * \brief Checks if intersection contains the given global_point (2d variant).
  *
- *        Returns true, if global_point lies on the line between the corners of intersection.
+ *        Returns true if global_point lies on the line between the corners of intersection.
  */
 template <class G, class I, class D>
 typename std::enable_if<G::dimension == 2, bool>::type
@@ -108,7 +125,7 @@ contains(const Dune::Intersection<G, I>& intersection,
 /**
  * \brief Checks if intersection contains the given global_point (3d variant).
  *
- *        Checks if global_point lies within the plane spanned by the first three corners of intersection.
+ *        Returns true if global_point lies within the plane spanned by the first three corners of intersection.
  *
  * \sa
  * http://math.stackexchange.com/questions/684141/check-if-a-point-is-on-a-plane-minimize-the-use-of-multiplications-and-divisio
