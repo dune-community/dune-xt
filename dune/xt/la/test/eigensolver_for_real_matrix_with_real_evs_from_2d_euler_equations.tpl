@@ -171,13 +171,13 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_ei
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({ {"lapack", "1e-12"}, {"eigen", "1e-13"}, {"numpy", "1e-12"} });
+  gives_correct_eigendecomposition({ {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"} });
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition(
-      { {"lapack", "1e-12"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-12"} });
+      { {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"} });
 }
 
 
@@ -308,7 +308,7 @@ TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigende
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition(
-      { {"lapack", /*we_expect_a_failure: */ "-1"}, {"eigen", "1e-13"}, {"numpy", /*we_expect_a_failure: */ "-1"} });
+      { {"lapack", "1e-12"}, {"eigen", "1e-13"}, {"numpy", "1e-12"} });
 }
 
 {% endfor %}
