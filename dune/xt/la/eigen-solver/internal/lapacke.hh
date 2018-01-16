@@ -215,6 +215,7 @@ struct lapack_helper
                     "https://software.intel.com/en-us/mkl-developer-reference-c-geev "
                     "and add a corresponding free function like "
                     "compute_eigenvalues_of_a_real_matrix_using_lapack(...)!");
+      return std::vector<std::complex<double>>();
     }
 
     template <class V, class E>
