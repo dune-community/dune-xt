@@ -136,7 +136,7 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenva
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order({"qr_fallback", /*we_expect_a_failure: */ "-1"} );
+  gives_correct_eigenvalues_in_correct_order({ {"qr_fallback", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues)
@@ -146,7 +146,7 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_ei
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
-  gives_correct_real_eigenvalues_in_correct_order({"qr_fallback", /*we_expect_a_failure: */ "-1"} );
+  gives_correct_real_eigenvalues_in_correct_order({ {"qr_fallback", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_max_eigenvalue)
