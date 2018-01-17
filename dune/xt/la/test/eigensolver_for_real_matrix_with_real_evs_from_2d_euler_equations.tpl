@@ -136,7 +136,7 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenva
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order();
+  gives_correct_eigenvalues_in_correct_order({"qr_fallback", /*we_expect_a_failure: */ "-1"} );
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues)
@@ -146,7 +146,7 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_ei
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
-  gives_correct_real_eigenvalues_in_correct_order();
+  gives_correct_real_eigenvalues_in_correct_order({"qr_fallback", /*we_expect_a_failure: */ "-1"} );
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_max_eigenvalue)
@@ -161,23 +161,23 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_min_eig
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
-  gives_correct_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"}, {"qr_fallback", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
 {
-  gives_correct_real_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_real_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"}, {"qr_fallback", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({ {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"} });
+  gives_correct_eigendecomposition({ {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"}, {"qr_fallback", "-1e-12"} });
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition(
-      { {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"} });
+      { {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"}, {"qr_fallback", "1e-12"} });
 }
 
 
@@ -258,57 +258,59 @@ TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, is_constructible)
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
+    gives_correct_eigenvalues({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"qr_fallback", "1e-6"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
+  gives_correct_eigenvalues_in_correct_order({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"qr_fallback", "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
-  gives_correct_real_eigenvalues({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
+  gives_correct_real_eigenvalues({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"qr_fallback", "1e-6"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
-  gives_correct_real_eigenvalues_in_correct_order({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
+  gives_correct_real_eigenvalues_in_correct_order({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"qr_fallback", "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_max_eigenvalue)
 {
-  gives_correct_max_eigenvalue({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
+    gives_correct_max_eigenvalue({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"qr_fallback", "1e-6"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_min_eigenvalue)
 {
-  gives_correct_min_eigenvalue({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"} });
+    gives_correct_min_eigenvalue({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"qr_fallback", "1e-6"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
   gives_correct_eigenvectors_in_correct_order({ {"lapack", /*we_expect_a_failure: */ "-1"},
                                                {"eigen", /*we_expect_a_failure: */ "-1"},
-                                               {"numpy", /*we_expect_a_failure: */ "-1"} });
+                                               {"numpy", /*we_expect_a_failure: */ "-1"},
+                                               {"qr_fallback", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
 {
   gives_correct_real_eigenvectors_in_correct_order({ {"lapack", /*we_expect_a_failure: */ "-1"},
                                                     {"eigen", /*we_expect_a_failure: */ "-1"},
-                                                    {"numpy", /*we_expect_a_failure: */ "-1"} });
+                                                    {"numpy", /*we_expect_a_failure: */ "-1"},
+                                                    {"qr_fallback", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({ {"lapack", "1e-13"}, {"eigen", "1e-13"}, {"numpy", "1e-13"} });
+    gives_correct_eigendecomposition({ {"lapack", "1e-13"}, {"eigen", "1e-13"}, {"numpy", "1e-13"}, {"qr_fallback", "1e-13"} });
 }
 
 TEST_F(EigenSolverForMatrix2From2dEulerExample_{{T_NAME}}, gives_correct_real_eigendecomposition)
 {
   gives_correct_real_eigendecomposition(
-      { {"lapack", "1e-12"}, {"eigen", "1e-13"}, {"numpy", "1e-12"} });
+  { {"lapack", "1e-12"}, {"eigen", "1e-13"}, {"numpy", "1e-12"}, {"qr_fallback", "1e-12"} });
 }
 
 {% endfor %}
