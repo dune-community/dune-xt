@@ -171,7 +171,7 @@ TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_ei
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({ {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"}, {"qr_fallback", "-1e-12"} });
+  gives_correct_eigendecomposition({ {"lapack", "1e-12"}, {"eigen", "1e-12"}, {"numpy", "1e-12"}, {"qr_fallback", "1e-12"} });
 }
 
 TEST_F(EigenSolverForMatrix1From2dEulerExample_{{T_NAME}}, gives_correct_real_eigendecomposition)
