@@ -5,10 +5,10 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler  (2017)
+//   Tobias Leibner  (2017-2018)
 
-#ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
-#define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
+#ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_SHIFTEDQR_HH
+#define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_SHIFTEDQR_HH
 
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
@@ -421,4 +421,4 @@ compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(const MatrixType& 
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
+#endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_SHIFTEDQR_HH

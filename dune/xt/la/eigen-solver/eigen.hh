@@ -21,7 +21,7 @@
 #include "internal/base.hh"
 #include "internal/eigen.hh"
 #include "internal/lapacke.hh"
-#include "internal/qrhouseholder.hh"
+#include "internal/shifted-qr.hh"
 
 namespace Dune {
 namespace XT {
