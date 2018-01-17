@@ -492,10 +492,12 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
         } catch (...) {
           exception_occured = true;
           FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested or "
-                    "LA::Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested!";
+                    "LA::Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested!"
+                 << "\n\ntype: " << tp << "\n\ntolerance: " << tolerance;
         }
         if (!exception_occured)
-          FAIL() << "THIS IS A GOOD THING! CHECK THE EIGENDECOMPOSITION AND ALTER THE EXPECTATIONS IN tolerances!";
+          FAIL() << "THIS IS A GOOD THING! CHECK THE EIGENDECOMPOSITION AND ALTER THE EXPECTATIONS IN tolerances!"
+                 << "\n\ntype: " << tp << "\n\ntolerance: " << tolerance;
       }
     }
   } // ... gives_correct_real_eigendecomposition(...)
