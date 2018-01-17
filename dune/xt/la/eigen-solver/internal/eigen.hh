@@ -43,7 +43,8 @@ void compute_eigenvalues_and_right_eigenvectors_using_eigen(
   if (eigen_solver.info() != ::Eigen::Success)
     DUNE_THROW(Exceptions::eigen_solver_failed, "The eigen backend reported '" << eigen_solver.info() << "'!");
   const auto& evs = eigen_solver.eigenvalues(); // this should be an Eigen vector of std::complex<S>
-  if (eigenvalues.size() != evs.size())
+  assert(evs.size() >= 0);
+  if (eigenvalues.size() != size_t(evs.size()))
     eigenvalues.resize(evs.size());
   for (size_t ii = 0; ii < size_t(evs.size()); ++ii)
     eigenvalues[ii] = evs[ii];
