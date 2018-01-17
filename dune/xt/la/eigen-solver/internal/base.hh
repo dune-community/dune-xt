@@ -17,6 +17,8 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
+
+#include <dune/xt/la/container/common/vector/dense.hh>
 #include <dune/xt/la/container/conversion.hh>
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/exceptions.hh>

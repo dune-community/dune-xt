@@ -10,6 +10,8 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_QRHOUSEHOLDER_HH
 
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/string.hh>
 
 #include <dune/xt/la/exceptions.hh>
@@ -398,11 +400,11 @@ compute_eigenvalues_using_qr(const MatrixType& matrix)
   return RealQrEigenSolver<typename MatrixType::FieldType>::get_eigenvalues(tmp_matrix);
 }
 
-template <class MatrixType>
-typename std::enable_if<Common::is_matrix<MatrixType>::value, void>::type
+template <class MatrixType, class EigenVectorType>
+typename std::enable_if<Common::is_matrix<MatrixType>::value && Common::is_matrix<EigenVectorType>::value, void>::type
 compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(const MatrixType& matrix,
                                                               std::vector<double>& eigenvalues,
-                                                              MatrixType& right_eigenvectors)
+                                                              EigenVectorType& right_eigenvectors)
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
   eigenvalues =

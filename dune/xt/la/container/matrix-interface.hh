@@ -456,7 +456,9 @@ struct MatrixAbstractionBase
 
   typedef typename std::conditional<is_matrix, MatrixImp, void>::type MatrixType;
   typedef typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type ScalarType;
+  typedef typename std::conditional<is_matrix, typename MatrixImp::RealType, void>::type RealType;
   typedef ScalarType S;
+  typedef RealType R;
 
   static inline typename std::enable_if<is_matrix, MatrixType>::type create(const size_t rows, const size_t cols)
   {
