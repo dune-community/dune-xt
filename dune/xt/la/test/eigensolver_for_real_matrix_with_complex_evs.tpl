@@ -73,16 +73,16 @@ TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, is_constructible)
 
 TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues();
+  gives_correct_eigenvalues( { {"shifted_qr", /*we_expect_a_failure: */ "-1"} } );
 }
 
 TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order();
+  gives_correct_eigenvalues_in_correct_order( { {"shifted_qr", /*we_expect_a_failure: */ "-1"} } );
 }
 
 TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition();
+  gives_correct_eigendecomposition( { {"shifted_qr", /*we_expect_a_failure: */ "-1"} } );
 }
 {% endfor %}

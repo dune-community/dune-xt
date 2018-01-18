@@ -7,6 +7,9 @@
 // Authors:
 //   Tobias Leibner   (2017)
 
+#ifndef DUNE_XT_LA_ALGORITHMS_SOLVE_SYM_TRIDIAG_POSDEF_HH
+#define DUNE_XT_LA_ALGORITHMS_SOLVE_SYM_TRIDIAG_POSDEF_HH
+
 #include <cstddef>
 
 namespace Dune {
@@ -36,3 +39,5 @@ double solve_sym_tridiag_posdef(
 } // namespace LA
 } // namespace XT
 } // namespace Dune
+
+#endif // DUNE_XT_LA_ALGORITHMS_SOLVE_SYM_TRIDIAG_POSDEF_HH

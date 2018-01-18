@@ -21,6 +21,7 @@
 #include "internal/base.hh"
 #include "internal/eigen.hh"
 #include "internal/lapacke.hh"
+#include "internal/shifted-qr.hh"
 
 namespace Dune {
 namespace XT {
@@ -38,6 +39,7 @@ public:
     std::vector<std::string> tps = {"eigen"};
     if (Common::Lapacke::available())
       tps.push_back("lapack");
+    tps.push_back("shifted_qr");
     return tps;
   }
 
@@ -102,6 +104,20 @@ protected:
         internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
       }
 #endif // HAVE_LAPACKE
+    } else if (type == "shifted_qr") {
+      if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
+        eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
+        std::vector<XT::Common::real_t<RealType>> real_eigenvalues(N);
+        auto real_eigenvectors = std::make_unique<Dune::DynamicMatrix<XT::Common::real_t<RealType>>>(N, N);
+        internal::compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(
+            matrix_, real_eigenvalues, *real_eigenvectors);
+        for (size_t ii = 0; ii < N; ++ii) {
+          (*eigenvalues_)[ii] = real_eigenvalues[ii];
+          for (size_t jj = 0; jj < N; ++jj)
+            (*eigenvectors_).set_entry(ii, jj, (*real_eigenvectors)[ii][jj]);
+        }
+      }
     } else
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is none of EigenSolverOptions<EigenDenseMatrix<S>>::types(), and "

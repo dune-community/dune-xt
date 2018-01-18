@@ -36,12 +36,14 @@ class MatrixInverterOptions
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");
+    return std::vector<std::string>();
   }
 
   static Common::Configuration options(const std::string /*type*/ = "")
   {
     static_assert(AlwaysFalse<MatrixType>::value,
                   "Please implement for given MatrixType and add the respective include below!");
+    return Common::Configuration();
   }
 }; // class MatrixInverterOptions
 

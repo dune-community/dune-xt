@@ -21,6 +21,7 @@
 #include <complex>
 
 #if HAVE_EIGEN
+#include <dune/xt/common/disable_warnings.hh>
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 #include <Eigen/IterativeLinearSolvers>
@@ -35,6 +36,7 @@
 //#   if HAVE_SUPERLU
 //#     include <Eigen/SuperLUSupport>
 //#   endif
+#include <dune/xt/common/reenable_warnings.hh>
 #endif // HAVE_EIGEN
 
 #include <dune/xt/common/exceptions.hh>

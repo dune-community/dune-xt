@@ -28,13 +28,11 @@
 #include "internal/eigen.hh"
 #include "internal/lapacke.hh"
 #include "internal/numpy.hh"
+#include "internal/shifted-qr.hh"
 
 namespace Dune {
 namespace XT {
 namespace LA {
-
-
-#if HAVE_LAPACKE || HAVE_EIGEN
 
 
 template <class K, int SIZE>
@@ -51,6 +49,7 @@ public:
 #endif
     if (internal::numpy_eigensolver_available())
       tps.push_back("numpy");
+    tps.push_back("shifted_qr");
     return tps;
   }
 
@@ -142,6 +141,21 @@ protected:
       }
     } else
 #endif
+        if (type == "shifted_qr") {
+      if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
+        eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
+        std::vector<XT::Common::real_t<K>> real_eigenvalues(SIZE);
+        auto real_eigenvectors = std::make_unique<Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>>();
+        internal::compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(
+            matrix_, real_eigenvalues, *real_eigenvectors);
+        for (size_t ii = 0; ii < SIZE; ++ii) {
+          (*eigenvalues_)[ii] = real_eigenvalues[ii];
+          for (size_t jj = 0; jj < SIZE; ++jj)
+            (*eigenvectors_)[ii][jj] = (*real_eigenvectors)[ii][jj];
+        }
+      }
+    } else
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is none of EigenSolverOptions<Dune::FieldMatrix<K, ROWS, "
                                            "COLS>>::types(), and  internal::EigenSolverBase promised to check this!"
@@ -167,39 +181,6 @@ public:
   }
 };
 
-
-#else // HAVE_LAPACKE || HAVE_EIGEN
-
-
-template <class K, int SIZE>
-class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
-{
-  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
-};
-
-
-template <class K, int SIZE>
-class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>>
-{
-  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
-};
-
-
-template <class K, int SIZE>
-class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
-{
-  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
-};
-
-
-template <class K, int SIZE>
-class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>>
-{
-  static_assert(AlwaysFalse<K>::value, "You are missing the required backends!");
-};
-
-
-#endif // HAVE_LAPACKE || HAVE_EIGEN
 
 } // namespace LA
 } // namespace XT

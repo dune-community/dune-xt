@@ -22,7 +22,9 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #if HAVE_EIGEN
+#include <dune/xt/common/disable_warnings.hh>
 #include <Eigen/SparseCore>
+#include <dune/xt/common/reenable_warnings.hh>
 #endif
 
 #include <dune/common/typetraits.hh>

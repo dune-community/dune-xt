@@ -161,23 +161,23 @@ TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, is_constructible)
 
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"numpy", "1e-14"} });
+  gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-15"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order({ {"lapack", "1e-14"}, {"numpy", "1e-14"} });
+  gives_correct_eigenvalues_in_correct_order({ {"lapack", "1e-14"}, {"eigen", "1e-15"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
   gives_correct_eigenvectors_in_correct_order(
-      { {"lapack", /*we expect a failure: */ "-1"}, {"numpy", /*we expect a failure: */ "-1"} });
+      { {"lapack", /*we expect a failure: */ "-1"}, {"eigen", "1e-15"}, {"numpy", /*we expect a failure: */ "-1"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({ {"lapack", "1e-14"}, {"eigen", "1e-14"}, {"numpy", "1e-14"} });
+  gives_correct_eigendecomposition({ {"lapack", "1e-14"}, {"eigen", "1e-14"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 {% endfor %}

@@ -105,7 +105,7 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
   static_assert(std::is_same<Dune::XT::Common::real_t<complex_type>, double>::value,
                 "You have to manually convert the eigenvaluematrix to something else outside!");
   const size_t size = Dune::XT::Common::get_matrix_rows(serializable_matrix);
-#if DUNE_XT_LA_DISABLE_ALL_CHECKS
+#ifdef DUNE_XT_LA_DISABLE_ALL_CHECKS
   assert(Dune::XT::Common::get_matrix_cols(serializable_matrix) == size);
   assert(Dune::XT::Common::get_matrix_rows(right_eigenvectors) == size);
   assert(Dune::XT::Common::get_matrix_cols(right_eigenvectors) == size);
@@ -215,6 +215,7 @@ struct lapack_helper
                     "https://software.intel.com/en-us/mkl-developer-reference-c-geev "
                     "and add a corresponding free function like "
                     "compute_eigenvalues_of_a_real_matrix_using_lapack(...)!");
+      return std::vector<std::complex<double>>();
     }
 
     template <class V, class E>
