@@ -140,6 +140,21 @@ solve(const M& A, const V& b, V& x, Args&&... args)
 }
 
 
+template <class M, class C>
+typename std::enable_if<XT::LA::is_matrix<M>::value, Solver<M, C>>::type make_solver(const M& matrix, const C& dof_comm)
+{
+  return Solver<M, C>(matrix, dof_comm);
+}
+
+
+template <class M, class V, class C, class... Args>
+typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, void>::type
+solve(const M& A, const V& b, V& x, const C& dof_comm, Args&&... args)
+{
+  make_solver(A, dof_comm).apply(b, x, std::forward<Args>(args)...);
+}
+
+
 template <class M, class V, class... Args>
 typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, V>::type
 solve(const M& A, const V& b, Args&&... args)
