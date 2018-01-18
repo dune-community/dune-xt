@@ -31,6 +31,7 @@ namespace Functions {
  *        |      .         .        ...      .       |
  *        | (u_r(x))_1, (u_r(x))_2, ..., (u_r(x))_rC |
  *
+ * (thus u_s corresponds to one row of u, for s = 1, ..., r).
  * Here, (u_s(x))_i can be interpreted as the evaluation of a scalar function u_s_i: R^d -> R
  * for 1 \leq i \leq rC, and we can thus identify
  *
@@ -54,15 +55,21 @@ struct RangeTypeSelector<R, r, 1>
 /**
  * \sa RangeTypeSelector
  *
- *     Since one is often interested in the derivatives of the individual functions u_s, it makes sense to consider the
- *     jacobian u: R^d -> R^{r x {rC x d}}, where
+ *     Since one is often interested in the derivatives of the individual functions u_s (see RangeTypeSelector),
+ *     it makes sense to consider the jacobian u: R^d -> R^{r x {rC x d}} as a vector of the jacobians of the
+ *     u_s (for s = 1, ..., r) in the sense of
  *
- *                         |  (d u_s_1 / d x_1)(x),  (d u_s_1 / d x_2)(x), ...,  (d u_s_1 / d x_d)(x) |
- *                         |  (d u_s_2 / d x_1)(x),           .             ...           .           |
- *     (jacobian u)_s(x) = |           .                      .             ...           .           |
- *                         |           .                      .             ...           .           |
- *                         | (d u_s_rC / d x_1)(x), (d u_s_rC / d x_2)(x), ..., (d u_s_rC / d x_d)(x) |
+ *     jacobian u = (jacobian u_1, ..., jacobian u_r)
  *
+ *     where
+ *
+ *                       |  (d u_s_1 / d x_1)(x),  (d u_s_1 / d x_2)(x), ...,  (d u_s_1 / d x_d)(x) |
+ *                       |  (d u_s_2 / d x_1)(x),           .            ...            .           |
+ *     jacobian u_s(x) = |           .                      .            ...            .           |
+ *                       |           .                      .            ...            .           |
+ *                       | (d u_s_rC / d x_1)(x), (d u_s_rC / d x_2)(x), ..., (d u_s_rC / d x_d)(x) |
+ *
+ *     for s = 1, ..., r.
  *     Again, (d u_s_i / d x_j)(x) can be interpreted as the evaluation of a scalar function
  *     (jacobian u)_s_i_j: R^d -> R, and we can thus identify
  *
