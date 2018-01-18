@@ -62,6 +62,15 @@ class Solver
 public:
   typedef MatrixImp MatrixType;
 
+  Solver(const MatrixType& /*matrix*/, const CommunicatorType&)
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+  }
+
   Solver(const MatrixType& /*matrix*/)
   {
     DUNE_THROW(NotImplemented,
