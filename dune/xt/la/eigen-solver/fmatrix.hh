@@ -49,7 +49,7 @@ public:
 #endif
     if (internal::numpy_eigensolver_available())
       tps.push_back("numpy");
-    tps.push_back("qr_fallback");
+    tps.push_back("shifted_qr");
     return tps;
   }
 
@@ -141,7 +141,7 @@ protected:
       }
     } else
 #endif
-        if (type == "qr_fallback") {
+        if (type == "shifted_qr") {
       if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
         eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();

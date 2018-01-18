@@ -39,7 +39,7 @@ public:
     std::vector<std::string> tps = {"eigen"};
     if (Common::Lapacke::available())
       tps.push_back("lapack");
-    tps.push_back("qr_fallback");
+    tps.push_back("shifted_qr");
     return tps;
   }
 
@@ -104,7 +104,7 @@ protected:
         internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
       }
 #endif // HAVE_LAPACKE
-    } else if (type == "qr_fallback") {
+    } else if (type == "shifted_qr") {
       if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
         eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
