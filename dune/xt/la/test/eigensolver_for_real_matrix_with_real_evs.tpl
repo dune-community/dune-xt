@@ -89,7 +89,7 @@ TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_eigenvalues)
 
 TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
 {
-  gives_correct_eigenvalues_in_correct_order( { {"shifted_qr", /*we_expect_a_failure: */ "-1"} } );
+  gives_correct_eigenvalues_in_correct_order();
 }
 
 TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_real_eigenvalues)
@@ -99,7 +99,7 @@ TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_real_eigenvalues
 
 TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
 {
-    gives_correct_real_eigenvalues_in_correct_order( { {"shifted_qr", /*we_expect_a_failure: */ "-1"} } );
+    gives_correct_real_eigenvalues_in_correct_order();
 }
 
 TEST_F(EigenSolverForMatrixFullOfOnes_{{T_NAME}}, gives_correct_max_eigenvalue)
