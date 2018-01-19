@@ -21,6 +21,7 @@
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/numeric_cast.hh>
 
 #include <dune/xt/functions/interfaces.hh>
 
@@ -28,67 +29,81 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
-template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class IndicatorFunction : public LocalizableFunctionInterface<E, D, d, R, r, rC>
-{
-  IndicatorFunction()
-  {
-    static_assert(AlwaysFalse<E>::value, "Not available for these dimensions!");
-  }
-};
 
-template <class E, class D, size_t d, class R>
-class IndicatorFunction<E, D, d, R, 1> : public LocalizableFunctionInterface<E, D, d, R, 1>
+template <class E, size_t r, size_t rC = 1, class R = double>
+class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
 {
-  typedef LocalizableFunctionInterface<E, D, d, R, 1> BaseType;
-  typedef IndicatorFunction<E, D, d, R, 1> ThisType;
+  using BaseType = LocalizableFunctionInterface<E, r, rC, R>;
+  using ThisType = IndicatorFunction<E, r, rC, R>;
 
-  class Localfunction : public LocalfunctionInterface<E, D, d, R, 1>
+  class LocalIndicatorFunction : public LocalFunctionInterface<E, r, rC, R>
   {
-    typedef LocalfunctionInterface<E, D, d, R, 1> InterfaceType;
+    typedef LocalFunctionInterface<E, r, rC, R> InterfaceType;
 
   public:
     using typename InterfaceType::EntityType;
     using typename InterfaceType::DomainType;
     using typename InterfaceType::RangeType;
-    using typename InterfaceType::JacobianRangeType;
+    using typename InterfaceType::DerivativeRangeType;
+    using GeometryType = typename EntityType::Geometry;
 
-    Localfunction(const EntityType& entity, const RangeType& value)
+    LocalIndicatorFunction(const EntityType& entity,
+                           const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
       : InterfaceType(entity)
-      , value_(value)
+      , subdomain_and_value_tuples_(subdomain_and_value_tuples)
+    {
+      post_bind(entity);
+    }
+
+    LocalIndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
+      : InterfaceType()
+      , subdomain_and_value_tuples_(subdomain_and_value_tuples)
     {
     }
 
-    virtual size_t order(const Common::Parameter& /*mu*/ = {}) const override final
+    void post_bind(const EntityType& entity) override final
+    {
+      current_value_ = 0.;
+      const auto center = entity.geometry().center();
+      for (const auto& subdomain_and_value_tuple : subdomain_and_value_tuples_) {
+        const auto& subdomain_ll = std::get<0>(subdomain_and_value_tuple);
+        const auto& subdomain_ur = std::get<1>(subdomain_and_value_tuple);
+        if (Common::FloatCmp::le(subdomain_ll, center) && Common::FloatCmp::lt(center, subdomain_ur))
+          current_value_ += std::get<2>(subdomain_and_value_tuple);
+      }
+    } // ... post_bind(...)
+
+    int order(const Common::Parameter& /*mu*/ = {}) const override final
     {
       return 0;
     }
 
-    virtual void
-    evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
+    RangeType evaluate(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
     {
-      assert(this->is_a_valid_point(xx));
-      ret = value_;
+      this->ensure_this_is_a_valid_point(xx);
+      return current_value_;
     }
 
-    virtual void
-    jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& /*mu*/ = {}) const override final
+    DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
     {
-      assert(this->is_a_valid_point(xx));
-      ret *= 0.0;
+      this->ensure_this_is_a_valid_point(xx);
+      return 0.0;
     }
 
   private:
-    const RangeType value_;
-  }; // class Localfunction
+    const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples_;
+    RangeType current_value_;
+  }; // class LocalIndicatorFunction
+
+  using DomainType = typename LocalIndicatorFunction::DomainType;
+  using RangeType = typename LocalIndicatorFunction::RangeType;
 
 public:
   using typename BaseType::EntityType;
-  using typename BaseType::DomainFieldType;
-  using typename BaseType::DomainType;
-  using typename BaseType::RangeType;
+  using typename BaseType::LocalFunctionType;
   using typename BaseType::RangeFieldType;
-  using typename BaseType::LocalfunctionType;
+  using BaseType::d;
+  using typename BaseType::D;
 
   static const bool available = true;
 
@@ -99,44 +114,40 @@ public:
 
   static Common::Configuration default_config(const std::string sub_name = "")
   {
-    Common::Configuration cfg;
-    cfg["name"] = static_id();
-    if (d == 1)
-      cfg["0.domain"] = "[0.25 0.75]";
-    else if (d == 2)
-      cfg["0.domain"] = "[0.25 0.75; 0.25 0.75]";
-    else if (d == 3)
-      cfg["0.domain"] = "[0.25 0.75; 0.25 0.75; 0.25 0.75]";
-    else
-      DUNE_THROW(NotImplemented, "Indeed!");
-    cfg["0.value"] = "1";
+    Common::Configuration config;
+    config["type"] = static_id();
+    config["0.domain"] = "[0 1; 0 1; 0 1]";
+    config["0.value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
+    config["1.domain"] = "[-1 0; -1 0; -1 0]";
+    config["1.value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
+    config["name"] = static_id();
     if (sub_name.empty())
-      return cfg;
+      return config;
     else {
       Common::Configuration tmp;
-      tmp.add(cfg, sub_name);
+      tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
   static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
+                                          const std::string sub_name = "")
   {
     const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration def_cfg = default_config();
-    std::vector<std::tuple<DomainType, DomainType, RangeFieldType>> values;
+    std::vector<std::tuple<DomainType, DomainType, RangeType>> values;
     DomainType tmp_lower;
     DomainType tmp_upper;
     size_t cc = 0;
     while (cfg.has_sub(Common::to_string(cc))) {
       const Common::Configuration local_cfg = cfg.sub(Common::to_string(cc));
       if (local_cfg.has_key("domain") && local_cfg.has_key("value")) {
-        auto domains = local_cfg.get<FieldMatrix<DomainFieldType, d, 2>>("domain");
+        auto domains = local_cfg.get<FieldMatrix<D, d, 2>>("domain");
         for (size_t dd = 0; dd < d; ++dd) {
           tmp_lower[dd] = domains[dd][0];
           tmp_upper[dd] = domains[dd][1];
         }
-        auto val = local_cfg.get<RangeFieldType>("value");
+        auto val = local_cfg.get<RangeType>("value");
         values.emplace_back(tmp_lower, tmp_upper, val);
       } else
         break;
@@ -145,52 +156,74 @@ public:
     return Common::make_unique<ThisType>(values, cfg.get("name", def_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, R>>& values,
+  /**
+   * \brief Convernience ctor.
+   *
+   *        Can be used for declaration of lower left corner and upper right corner of the desired domains.
+\code
+FunctionType function({{lowerleft_1, upperright_1, value_1}, {{lowerleft_2, upperright_2, value_2}});
+\endcode
+   */
+
+  IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& values,
                     const std::string name_in = "indicator")
-    : values_(values)
+    : subdomain_and_value_tuples_(values)
     , name_(name_in)
   {
   }
 
-  IndicatorFunction(
-      const std::vector<std::pair<std::pair<Common::FieldVector<D, d>, Common::FieldVector<D, d>>, R>>& values,
-      const std::string name_in = "indicator")
-    : values_(convert(values))
+  /**
+   * \brief Convernience ctor.
+   *
+   *        Can be used as in
+\code
+FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9}});
+\endcode
+   * if you want to set indicator intervals [0,1] x [0,1] with value 0.7 and [6,10] x [8,10] with value 0.9.
+   */
+  IndicatorFunction(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeType>>& values,
+                    const std::string name_in = "indicator")
+    : subdomain_and_value_tuples_(convert_from_domains(values))
     , name_(name_in)
   {
   }
 
-  virtual ~IndicatorFunction()
-  {
-  }
-
-  virtual std::string name() const override final
+  std::string name() const override final
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
+  std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    const auto center = entity.geometry().center();
-    for (const auto& element : values_)
-      if (Common::FloatCmp::le(std::get<0>(element), center) && Common::FloatCmp::lt(center, std::get<1>(element)))
-        return Common::make_unique<Localfunction>(entity, std::get<2>(element));
-    return Common::make_unique<Localfunction>(entity, 0.0);
-  } // ... local_function(...)
+    return std::make_unique<LocalIndicatorFunction>(subdomain_and_value_tuples_);
+  }
+
+  std::unique_ptr<LocalFunctionType> local_function(const EntityType& entity) const override final
+  {
+    return std::make_unique<LocalIndicatorFunction>(entity, subdomain_and_value_tuples_);
+  }
 
 private:
-  static std::vector<std::tuple<DomainType, DomainType, R>>
-  convert(const std::vector<std::pair<std::pair<Common::FieldVector<D, d>, Common::FieldVector<D, d>>, R>>& values)
+  static std::vector<std::tuple<DomainType, DomainType, RangeType>>
+  convert_from_domains(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeType>>& values)
   {
-    std::vector<std::tuple<DomainType, DomainType, R>> ret;
-    for (const auto& element : values)
-      ret.emplace_back(element.first.first, element.first.second, element.second);
+    std::vector<std::tuple<DomainType, DomainType, RangeType>> ret;
+    for (const auto& element : values) {
+      DomainType tmp_coordinates_ll(0.);
+      DomainType tmp_coordinates_ur(0.);
+      for (size_t dd = 0; dd < d; ++dd) {
+        tmp_coordinates_ll[dd] = element.first[dd][0];
+        tmp_coordinates_ur[dd] = element.first[dd][1];
+      }
+      ret.emplace_back(tmp_coordinates_ll, tmp_coordinates_ur, element.second);
+    }
     return ret;
-  } // convert(...)
+  } // convert_from_tuples(...)
 
-  const std::vector<std::tuple<DomainType, DomainType, R>> values_;
+  const std::vector<std::tuple<DomainType, DomainType, RangeType>> subdomain_and_value_tuples_;
   const std::string name_;
 }; // class IndicatorFunction
+
 
 } // namespace Functions
 } // namespace XT
