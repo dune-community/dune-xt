@@ -113,9 +113,13 @@ struct RealQrEigenSolver
     return eigenvalues;
   } // .. calculate_eigenvalues_by_shifted_qr(...)
 
-  static void reduced_row_echelon_form(MatrixType& A, std::vector<size_t>& pivot_variables)
+  static void reduced_row_echelon_form(MatrixType& A,
+                                       std::vector<std::pair<size_t, size_t>>& pivot_variables,
+                                       std::vector<size_t>& free_variables,
+                                       double tol)
   {
     pivot_variables.clear();
+    free_variables.clear();
     size_t col = 0;
     for (size_t row = 0; row < A.rows(); ++row) {
       while (col < A.cols()) {
@@ -125,7 +129,8 @@ struct RealQrEigenSolver
           if (std::abs(A[rr][col]) > std::abs(A[pivot][col]))
             pivot = rr;
         // if all entries in column are zero, continue with next column
-        if (XT::Common::FloatCmp::eq(A[pivot][col], 0.)) {
+        if (XT::Common::FloatCmp::eq<XT::Common::FloatCmp::Style::absolute>(A[pivot][col], 0., tol)) {
+          free_variables.push_back(col);
           ++col;
           continue;
         } else {
@@ -139,14 +144,14 @@ struct RealQrEigenSolver
           // add row to all other rows to zero out other entries in column
           for (size_t rr = 0; rr < A.rows(); ++rr) {
             auto factor = A[rr][col];
-            if (rr != row && XT::Common::FloatCmp::ne(factor, 0.)) {
+            if (rr != row) {
               for (size_t cc = col + 1; cc < A.cols(); ++cc)
                 A[rr][cc] -= A[row][cc] * factor;
               A[rr][col] = 0.;
             }
           } // rr
-          // store column as pivot variable
-          pivot_variables.push_back(col);
+          // store (col, row) as pivot variable
+          pivot_variables.push_back(std::make_pair(col, row));
           // continue with next row and col
           ++col;
           break;
@@ -155,27 +160,34 @@ struct RealQrEigenSolver
     } // row
   } // void reduced_row_echelon_form(...)
 
-  static std::vector<double> get_eigenvalues(const MatrixType& A_in)
+  static std::vector<double> get_eigenvalues(const MatrixType& A_in, MatrixType* Q = nullptr)
   {
     auto A_ptr = std::make_unique<MatrixType>(A_in);
     auto& A = *A_ptr;
-    hessenberg_transformation(A);
-    auto eigenvalues = calculate_eigenvalues_by_shifted_qr(A);
+    hessenberg_transformation(A, Q);
+    auto eigenvalues = calculate_eigenvalues_by_shifted_qr(A, Q);
     std::sort(eigenvalues.begin(), eigenvalues.end());
     return eigenvalues;
   } // ... get_eigenvalues(...)
 
-  static std::unique_ptr<MatrixType> get_eigenvectors(const MatrixType& A_in, const std::vector<double>& eigenvalues)
+  static std::unique_ptr<MatrixType>
+  get_eigenvectors(const MatrixType& A_in, const std::vector<double>& eigenvalues, const MatrixType& Q)
   {
+    std::cout << "A = " << XT::Common::to_string(A_in, 17) << std::endl;
+    std::cout << "eigenvalues = " << XT::Common::to_string(eigenvalues, 15) << std::endl;
     auto A_ptr = std::make_unique<MatrixType>(A_in);
     auto& A = *A_ptr;
+    // use the same tolerance max(size(A)) * eps * norm(A,inf) as matlab for rref
+    double tol = std::numeric_limits<double>::epsilon() * std::max(A.rows(), A.cols()) * A.infinity_norm();
     auto ret = std::make_unique<MatrixType>(A_in);
+    *ret *= 0.;
     // Calculate eigenvectors by solving (A - \lambda I) x = 0.
     for (size_t ii = 0; ii < eigenvalues.size(); ++ii) {
       // get eigenvalue, calculate multiplicity
       double lambda = eigenvalues[ii];
       size_t multiplicity = 1;
-      while (XT::Common::FloatCmp::eq(eigenvalues[ii], eigenvalues[ii + 1])) {
+      while (
+          XT::Common::FloatCmp::eq<XT::Common::FloatCmp::Style::absolute>(eigenvalues[ii], eigenvalues[ii + 1], tol)) {
         ++multiplicity;
         ++ii;
       }
@@ -185,25 +197,42 @@ struct RealQrEigenSolver
         A[rr][rr] -= lambda;
 
       // transform B to reduced row echelon form
-      // in the process, keep track of pivot variables
-      std::vector<size_t> pivot_variables;
-      reduced_row_echelon_form(A, pivot_variables);
+      // in the process, keep track of variables
+      // pivot_variables contains pairs of (col, row), where col is the pivot column and row is the row where the 1 is
+      // located
+      std::vector<std::pair<size_t, size_t>> pivot_variables;
+      // free_variables contains the columns of the free variables
+      std::vector<size_t> free_variables;
+      // This loop is a hack to avoid problems with the reduced row echelon form being wrong due to too small tolerances
+      // TODO: Do something more sophisticated/replace rref by a more stable algorithm to get eigenvectors?
+      size_t max_power = 4;
+      for (size_t jj = 0; jj <= max_power; ++jj) {
+        tol = std::numeric_limits<double>::epsilon() * std::max(A.rows(), A.cols()) * A.infinity_norm()
+              * std::pow(10., jj);
+        std::cout << "tol: " << XT::Common::to_string(tol, 15) << std::endl;
+        reduced_row_echelon_form(A, pivot_variables, free_variables, tol);
+        std::cout << "Arref = " << XT::Common::to_string(A, 15) << std::endl;
+        std::cout << "lambda = " << XT::Common::to_string(lambda, 15) << std::endl;
+        std::cout << "free_variables" << XT::Common::to_string(free_variables) << std::endl;
+        if (free_variables.size() == multiplicity)
+          break;
+        if (jj == max_power && free_variables.size() != multiplicity)
+          DUNE_THROW(Dune::MathError, "Failed to compute eigenvectors!");
+        A = A_in;
+        for (size_t rr = 0; rr < A.rows(); ++rr)
+          A[rr][rr] -= lambda;
+      } // jj
 
       // Now get the eigenvectors from the reduced row echelon form. To get an eigenvector, set one of the free
       // variables to 1 and the other free variables to 0 and calculate the pivot variables.
-      std::vector<size_t> free_variables;
-      for (size_t jj = 0; jj < A.cols(); ++jj)
-        if (std::find(pivot_variables.begin(), pivot_variables.end(), jj) == pivot_variables.end())
-          free_variables.push_back(jj);
-      if (free_variables.size() != multiplicity)
-        DUNE_THROW(Dune::MathError, "Failed to compute eigenvectors!");
       size_t eigenvector_index = ii - multiplicity + 1;
-      for (const auto& cc : free_variables) {
-        for (size_t rr = 0; rr < A.rows(); ++rr)
-          (*ret)[rr][eigenvector_index] = -A[rr][cc];
-        (*ret)[cc][eigenvector_index] = 1.;
+      for (const auto& free_var : free_variables) {
+        for (const auto& pivot_var : pivot_variables) {
+          (*ret)[pivot_var.first][eigenvector_index] = -A[pivot_var.second][free_var];
+        }
+        (*ret)[free_var][eigenvector_index] = 1.;
         ++eigenvector_index;
-      } // cc
+      } // free_var
     } // ii
     // normalize eigenvectors
     for (size_t col = 0; col < ret->cols(); ++col) {
@@ -214,6 +243,7 @@ struct RealQrEigenSolver
       for (size_t row = 0; row < ret->rows(); ++row)
         (*ret)[row][col] *= inv_norm;
     }
+    std::cout << "ret = " << XT::Common::to_string(*ret, 15) << std::endl;
     return ret;
   } // ... get_eigenvectors(...)
 
@@ -339,7 +369,7 @@ struct RealQrEigenSolver
 
   //! \brief Transform A to Hessenberg form by transformation P^T A P
   //! \see https://lp.uni-goettingen.de/get/text/2137
-  static void hessenberg_transformation(MatrixType& A)
+  static void hessenberg_transformation(MatrixType& A, MatrixType* Q)
   {
     assert(A.rows() == A.cols() && "Hessenberg transformation needs a square matrix!");
     VectorType u(A.rows(), 0.);
@@ -359,6 +389,8 @@ struct RealQrEigenSolver
         multiply_householder_from_left(A, beta, u, jj + 1, A.rows());
         // now calculate (PA) P  = PA - (PA u) (beta u^T)
         multiply_householder_from_right(A, beta, u, jj + 1, A.cols());
+        if (Q)
+          multiply_householder_from_right(*Q, beta, u, jj + 1, A.cols());
       } // if (gamma != 0)
     } // jj
   } // void hessenberg_transformation(...)
