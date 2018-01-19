@@ -26,7 +26,7 @@ namespace Functions {
 template <class GridViewType, size_t dimRange, size_t dimRangeCols, class RangeFieldImp>
 class VisualizationAdapter : public VTKFunction<GridViewType>
 {
-  static_assert(XT::Grid::is_grid_view<GridViewType>::value, "");
+  static_assert(XT::Grid::is_view<GridViewType>::value, "");
 
 public:
   using EntityType = XT::Grid::extract_entity_t<GridViewType>;
@@ -91,7 +91,7 @@ private:
     static double evaluate(const int& comp, const RangeType& val)
     {
       assert(comp >= 0);
-      assert(comp < r_);
+      assert(comp < Common::numeric_cast<int>(r_));
       return val[comp];
     }
   }; // class helper<..., 1>

@@ -134,7 +134,7 @@ private:
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-      assert(this->ensure_this_is_a_valid_point(xx));
+      this->ensure_this_is_a_valid_point(xx);
       return smooth_function_.evaluate(geometry_->global(xx), mu);
     }
 
@@ -142,7 +142,7 @@ private:
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-      assert(this->ensure_this_is_a_valid_point(xx));
+      this->ensure_this_is_a_valid_point(xx);
       return smooth_function_.jacobian(geometry_->global(xx), mu);
     }
 
@@ -152,7 +152,7 @@ private:
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-      assert(this->ensure_this_is_a_valid_point(xx));
+      this->ensure_this_is_a_valid_point(xx);
       return smooth_function_.derivative(alpha, geometry_->global(xx), mu);
     }
 
