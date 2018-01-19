@@ -47,6 +47,21 @@ struct UnitMatrix<MatrixType,
   }
 };
 
+template <class MatrixType>
+struct UnitMatrix<MatrixType,
+                  std::enable_if_t<std::is_base_of<Dune::DynamicMatrix<typename MatrixType::value_type>,
+                                                   MatrixType>::value,
+                                   void>>
+{
+  static std::unique_ptr<MatrixType> get(const size_t size, const size_t /*num_mutexes*/ = 1)
+  {
+    auto ret = XT::Common::make_unique<MatrixType>(size, size, 0.);
+    for (size_t ii = 0; ii < size; ++ii)
+      (*ret)[ii][ii] = 1.;
+    return ret;
+  }
+};
+
 template <class MatrixVectorType>
 struct UnitMatrix<MatrixVectorType,
                   std::enable_if_t<std::is_base_of<Dune::FieldVector<Dune::FieldMatrix<
