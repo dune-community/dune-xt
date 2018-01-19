@@ -57,6 +57,7 @@ endif()
 add_definitions("-DENABLE_HEADERCHECK=1")
 add_format(${CMAKE_CURRENT_SOURCE_DIR})
 add_tidy(${CMAKE_CURRENT_SOURCE_DIR})
+add_pylicense()
 
 # finalize the dune project, e.g. generating config.h etc.
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
