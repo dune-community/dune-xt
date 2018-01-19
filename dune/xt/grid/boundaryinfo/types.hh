@@ -12,33 +12,34 @@
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_TYPES_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_TYPES_HH
 
+#include <dune/xt/grid/exceptions.hh>
 #include "interfaces.hh"
 
 namespace Dune {
 namespace XT {
 namespace Grid {
 
-
-// We do not want to add a virtual destructor (to be able to use this as constexpr),
-// so just silence the warning.
+// We do not want to add a virtual destructor (to be able to use this as constexpr), so just silence the warning.
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #endif
 
+
 class NoBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "no_boundary";
   }
 };
 
+
 class UnknownBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "unknown_boundary";
   }
@@ -47,8 +48,8 @@ protected:
 
 class DirichletBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "dirichlet_boundary";
   }
@@ -57,8 +58,8 @@ protected:
 
 class NeumannBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "neumann_boundary";
   }
@@ -67,8 +68,8 @@ protected:
 
 class RobinBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "robin_boundary";
   }
@@ -77,7 +78,7 @@ protected:
 
 class ReflectingBoundary : public BoundaryType
 {
-protected:
+public:
   virtual std::string id() const override final
   {
     return "reflecting_boundary";
@@ -87,8 +88,8 @@ protected:
 
 class InflowBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "inflow_boundary";
   }
@@ -97,8 +98,8 @@ protected:
 
 class OutflowBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "outflow_boundary";
   }
@@ -107,8 +108,8 @@ protected:
 
 class InflowOutflowBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "inflow_outflow_boundary";
   }
@@ -117,8 +118,8 @@ protected:
 
 class ImpermeableBoundary : public BoundaryType
 {
-protected:
-  virtual std::string id() const override final
+public:
+  std::string id() const override final
   {
     return "impermeable_boundary";
   }
