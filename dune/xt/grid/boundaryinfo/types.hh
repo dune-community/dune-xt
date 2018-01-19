@@ -131,6 +131,37 @@ public:
 #endif
 
 
+BoundaryType* make_boundary_type(const std::string& id)
+{
+  if (id == NoBoundary().id())
+    return new NoBoundary();
+  else if (id == UnknownBoundary().id())
+    return new UnknownBoundary();
+  else if (id == DirichletBoundary().id())
+    return new DirichletBoundary();
+  else if (id == NeumannBoundary().id())
+    return new NeumannBoundary();
+  else if (id == RobinBoundary().id())
+    return new RobinBoundary();
+  else if (id == ReflectingBoundary().id())
+    return new ReflectingBoundary();
+  else if (id == InflowBoundary().id())
+    return new InflowBoundary();
+  else if (id == OutflowBoundary().id())
+    return new OutflowBoundary();
+  else if (id == InflowBoundary().id())
+    return new InflowBoundary();
+  else if (id == InflowOutflowBoundary().id())
+    return new InflowOutflowBoundary();
+  else if (id == ImpermeableBoundary().id())
+    return new ImpermeableBoundary();
+  else {
+    DUNE_THROW(Exceptions::boundary_type_error, "id: " << id);
+    return new UnknownBoundary();
+  }
+} // ... make_boundary_type(...)
+
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
