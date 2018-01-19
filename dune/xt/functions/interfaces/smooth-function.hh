@@ -110,12 +110,17 @@ public:
 
   virtual std::string type() const
   {
-    return "smooth_function";
+    return "dune.xt.functions.smooth";
+  }
+
+  static std::string static_id()
+  {
+    return "dune.xt.functions.smooth";
   }
 
   virtual std::string name() const
   {
-    return "smooth_function";
+    return "dune.xt.functions.smooth";
   }
 
   /**
@@ -127,14 +132,14 @@ public:
   virtual R evaluate(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "evaluate");
-    return single_helper<R>::call(this->evaluate(xx, mu), row, col);
+    return single_evaluate_helper<R>::call(this->evaluate(xx, mu), row, col);
   }
 
   virtual SingleDerivativeRangeType
   jacobian(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "jacobian");
-    return single_helper<SingleDerivativeRangeType>::call(this->jacobian(xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(this->jacobian(xx, mu), row, col);
   }
 
   virtual SingleDerivativeRangeType derivative(const std::array<size_t, d>& alpha,
@@ -144,7 +149,7 @@ public:
                                                const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "derivative");
-    return single_helper<SingleDerivativeRangeType>::call(this->derivative(alpha, xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(this->derivative(alpha, xx, mu), row, col);
   }
 
   /**
@@ -207,7 +212,27 @@ protected:
 
 private:
   template <class SingleType, size_t _r = r, size_t _rC = rC, bool anything = true>
-  struct single_helper
+  struct single_evaluate_helper
+  {
+    template <class FullType>
+    static SingleType call(const FullType& val, const size_t row, const size_t col)
+    {
+      return val[row][col];
+    }
+  }; // struct single_evaluate_helper<r, rC, ...>
+
+  template <class SingleType, size_t _r, bool anything>
+  struct single_evaluate_helper<SingleType, _r, 1, anything>
+  {
+    template <class FullType>
+    static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
+    {
+      return val[row];
+    }
+  }; // struct single_evaluate_helper<r, 1, ...>
+
+  template <class SingleType, size_t _r = r, size_t _rC = rC, bool anything = true>
+  struct single_derivative_helper
   {
     template <class FullType>
     static SingleType call(const FullType& val, const size_t row, const size_t col)
@@ -217,17 +242,17 @@ private:
         ret[dd] = val[row][col][dd];
       return ret;
     }
-  }; // struct single_helper<r, rC, ...>
+  }; // struct single_derivative_helper<r, rC, ...>
 
   template <class SingleType, size_t _r, bool anything>
-  struct single_helper<SingleType, _r, 1, anything>
+  struct single_derivative_helper<SingleType, _r, 1, anything>
   {
     template <class FullType>
     static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
     {
       return val[row];
     }
-  }; // struct single_helper<r, 1, ...>
+  }; // struct single_derivative_helper<r, 1, ...>
 }; // class SmoothFunctionInterface
 
 

@@ -186,14 +186,14 @@ public:
   evaluate_set(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "evaluate_set");
-    return single_helper<R>::call(this->evaluate_set(xx, mu), row, col);
+    return single_evaluate_helper<R>::call(this->evaluate_set(xx, mu), row, col);
   }
 
   virtual std::vector<SingleDerivativeRangeType>
   jacobians_of_set(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "jacobians_of_set");
-    return single_helper<SingleDerivativeRangeType>::call(this->jacobians_of_set(xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(this->jacobians_of_set(xx, mu), row, col);
   }
 
   virtual std::vector<SingleDerivativeRangeType> derivatives_of_set(const std::array<size_t, d>& alpha,
@@ -203,7 +203,7 @@ public:
                                                                     const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "derivatives_of_set");
-    return single_helper<SingleDerivativeRangeType>::call(this->derivatives_of_set(alpha, xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(this->derivatives_of_set(alpha, xx, mu), row, col);
   }
 
   /**
@@ -249,7 +249,33 @@ protected:
 
 private:
   template <class SingleType, size_t _r = r, size_t _rC = rC, bool anything = true>
-  struct single_helper
+  struct single_evaluate_helper
+  {
+    template <class FullType>
+    static std::vector<SingleType> call(const std::vector<FullType>& val, const size_t row, const size_t col)
+    {
+      std::vector<SingleType> ret(val.size());
+      for (size_t ii = 0; ii < val.size(); ++ii)
+        ret[ii] = val[ii][row][col];
+      return ret;
+    }
+  }; // struct single_evaluate_helper<r, rC, ...>
+
+  template <class SingleType, size_t _r, bool anything>
+  struct single_evaluate_helper<SingleType, _r, 1, anything>
+  {
+    template <class FullType>
+    static std::vector<SingleType> call(const std::vector<FullType>& val, const size_t row, const size_t /*col*/)
+    {
+      std::vector<SingleType> ret(val.size());
+      for (size_t ii = 0; ii < val.size(); ++ii)
+        ret[ii] = val[ii][row];
+      return ret;
+    }
+  }; // struct single_evaluate_helper<r, 1, ...>
+
+  template <class SingleType, size_t _r = r, size_t _rC = rC, bool anything = true>
+  struct single_derivative_helper
   {
     template <class FullType>
     static std::vector<SingleType> call(const std::vector<FullType>& val, const size_t row, const size_t col)
@@ -260,10 +286,10 @@ private:
           ret[ii][dd] = val[ii][row][col][dd];
       return ret;
     }
-  }; // struct single_helper<r, rC, ...>
+  }; // struct single_derivative_helper<r, rC, ...>
 
   template <class SingleType, size_t _r, bool anything>
-  struct single_helper<SingleType, _r, 1, anything>
+  struct single_derivative_helper<SingleType, _r, 1, anything>
   {
     template <class FullType>
     static std::vector<SingleType> call(const std::vector<FullType>& val, const size_t row, const size_t /*col*/)
@@ -273,7 +299,7 @@ private:
         ret[ii] = val[ii][row];
       return ret;
     }
-  }; // struct single_helper<r, 1, ...>
+  }; // struct single_derivative_helper<r, 1, ...>
 
   std::unique_ptr<EntityType> entity_;
 }; // class LocalFunctionSetInterface
@@ -357,14 +383,14 @@ public:
   virtual R evaluate(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "evaluate");
-    return single_helper<R>::call(this->evaluate(xx, mu), row, col);
+    return single_evaluate_helper<R>::call(this->evaluate(xx, mu), row, col);
   }
 
   virtual SingleDerivativeRangeType
   jacobian(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "jacobian");
-    return single_helper<SingleDerivativeRangeType>::call(this->jacobian(xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(this->jacobian(xx, mu), row, col);
   }
 
   virtual SingleDerivativeRangeType derivative(const std::array<size_t, d>& alpha,
@@ -374,7 +400,7 @@ public:
                                                const Common::Parameter& mu = {}) const
   {
     ensure_correct_dims(row, col, "derivative");
-    return single_helper<SingleDerivativeRangeType>::call(this->derivative(alpha, xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(this->derivative(alpha, xx, mu), row, col);
   }
 
   /**
@@ -413,24 +439,47 @@ private:
   using BaseType::ensure_correct_dims;
 
   template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
-  struct single_helper
+  struct single_evaluate_helper
   {
     template <class FullType>
     static SingleType call(const FullType& val, const size_t row, const size_t col)
     {
       return val[row][col];
     }
-  }; // struct single_helper<r, rC, ...>
+  }; // struct single_evaluate_helper<r, rC, ...>
 
   template <class SingleType, size_t _r, bool anything>
-  struct single_helper<SingleType, _r, 1, anything>
+  struct single_evaluate_helper<SingleType, _r, 1, anything>
   {
     template <class FullType>
     static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
     {
       return val[row];
     }
-  }; // struct single_helper<r, 1, ...>
+  }; // struct single_evaluate_helper<r, 1, ...>
+
+  template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
+  struct single_derivative_helper
+  {
+    template <class FullType>
+    static SingleType call(const FullType& val, const size_t row, const size_t col)
+    {
+      SingleType ret = 0;
+      for (size_t dd = 0; dd < d; ++dd)
+        ret[dd] = val[row][col][dd];
+      return ret;
+    }
+  }; // struct single_derivative_helper<r, rC, ...>
+
+  template <class SingleType, size_t _r, bool anything>
+  struct single_derivative_helper<SingleType, _r, 1, anything>
+  {
+    template <class FullType>
+    static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
+    {
+      return val[row];
+    }
+  }; // struct single_derivative_helper<r, 1, ...>
 }; // class LocalFunctionInterface
 
 
