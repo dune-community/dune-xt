@@ -19,7 +19,7 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/parameter.hh>
-#include <dune/xt/functions/interfaces/global-function.hh>
+#include "../interfaces.hh"
 
 #include "base.hh"
 
@@ -28,24 +28,29 @@ namespace XT {
 namespace Functions {
 
 
-template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class ParametricExpressionFunction
+template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
+class ParametricExpressionFunction : public SmoothFunctionInterface<d, r, rC, R>
 {
-  static_assert(AlwaysFalse<E>::value, "Not available for these dimension!");
+public:
+  ParametricExpressionFunction()
+  {
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimension!");
+  }
 };
 
 
-template <class E, class D, size_t d, class R, size_t r>
-class ParametricExpressionFunction<E, D, d, R, r, 1> : public GlobalFunctionInterface<E, D, d, R, r, 1>
+template <size_t d, size_t r, class R>
+class ParametricExpressionFunction<d, r, 1, R> : public SmoothFunctionInterface<d, r, 1, R>
 {
-  typedef GlobalFunctionInterface<E, D, d, R, r, 1> BaseType;
-  typedef DynamicMathExpressionBase<D, R, r> ActualFunctionType;
+  using BaseType = SmoothFunctionInterface<d, r, 1, R>;
+  using typename BaseType::D;
+  using ActualFunctionType = DynamicMathExpressionBase<D, R, r>;
 
 public:
   using typename BaseType::DomainType;
   using BaseType::dimDomain;
   using typename BaseType::RangeType;
-  using typename BaseType::JacobianRangeType;
+  using typename BaseType::DerivativeRangeType;
   using BaseType::dimRange;
 
   static std::string static_id()
@@ -98,7 +103,7 @@ public:
     return name_;
   }
 
-  virtual size_t order(const Common::Parameter& /*mu*/ = {}) const override final
+  virtual int order(const Common::Parameter& /*mu*/ = {}) const override final
   {
     return order_;
   }
@@ -113,8 +118,9 @@ public:
     return param_type_;
   }
 
-  void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
   {
+    RangeType ret(0.);
     Common::Parameter parsed_mu;
     if (!param_type_.empty()) {
       parsed_mu = this->parse_parameter(mu);
@@ -143,10 +149,10 @@ public:
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < dimRange; ++rr) {
-      if (Dune::XT::Common::isnan(ret[rr])) {
+      if (Common::isnan(ret[rr])) {
         failure = true;
         error_type = "NaN";
-      } else if (Dune::XT::Common::isinf(ret[rr])) {
+      } else if (Common::isinf(ret[rr])) {
         failure = true;
         error_type = "inf";
       } else if (std::abs(ret[rr]) > (0.9 * std::numeric_limits<R>::max())) {
@@ -177,11 +183,10 @@ public:
     }
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
+    return ret;
   } // ... evaluate(...)
 
-  void jacobian(const DomainType& /*xx*/,
-                JacobianRangeType& /*ret*/,
-                const Common::Parameter& /*mu*/ = {}) const override final
+  DerivativeRangeType jacobian(const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) const override final
   {
     DUNE_THROW(NotImplemented, "Not yet, at least...");
   }
