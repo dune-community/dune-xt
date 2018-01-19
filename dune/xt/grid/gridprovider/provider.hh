@@ -16,6 +16,8 @@
 #define DUNE_XT_GRID_PROVIDER_PROVIDER_HH
 
 #include <memory>
+#include <set>
+#include <string>
 
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/common/rangegenerators.hh>
