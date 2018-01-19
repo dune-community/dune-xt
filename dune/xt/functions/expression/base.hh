@@ -44,6 +44,9 @@ namespace Functions {
 template <class DomainFieldImp, size_t domainDim, class RangeFieldImp, size_t rangeDim>
 class MathExpressionBase
 {
+  static_assert((domainDim > 0), "Really?");
+  static_assert((rangeDim > 0), "Really?");
+
 public:
   typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
 
@@ -53,30 +56,32 @@ public:
   typedef RangeFieldImp RangeFieldType;
   static const size_t dimRange = rangeDim;
 
-  MathExpressionBase(const std::string _variable, const std::string _expression)
+  //  MathExpressionBase(const std::string var, const std::string expr)
+  //  {
+  //    const std::vector<std::string> expressions(1, expr);
+  //    setup(var, expressions);
+  //  }
+
+  MathExpressionBase(const std::string& var, const Common::FieldVector<std::string, dimRange>& exprs)
+    : variable_(var)
+    , expressions_(exprs)
   {
-    const std::vector<std::string> expressions(1, _expression);
-    setup(_variable, expressions);
+    setup();
   }
 
-  MathExpressionBase(const std::string _variable, const std::vector<std::string> _expressions)
+  MathExpressionBase(const ThisType& other)
   {
-    setup(_variable, _expressions);
+    setup(other.variable(), other.expression());
   }
 
-  MathExpressionBase(const ThisType& _other)
+  ThisType& operator=(const ThisType& other)
   {
-    setup(_other.variable(), _other.expression());
-  }
-
-  ThisType& operator=(const ThisType& _other)
-  {
-    if (this != &_other) {
+    if (this != &other) {
       cleanup();
-      variable_ = "";
-      variables_ = std::vector<std::string>();
-      expressions_ = std::vector<std::string>();
-      setup(_other.variable(), _other.expression());
+      variable_ = std::string("");
+      variables_ = Common::FieldVector<std::string, dimDomain>(std::string(""));
+      expressions_ = Common::FieldVector<std::string, dimRange>(std::string(""));
+      setup();
     }
     return this;
   }
@@ -91,7 +96,7 @@ public:
     return variable_;
   }
 
-  const std::vector<std::string>& expression() const
+  const Common::FieldVector<std::string, dimRange>& expression() const
   {
     return expressions_;
   }
@@ -174,27 +179,11 @@ public:
   } // void report(const std::string, std::ostream&, const std::string&) const
 
 private:
-  void setup(const std::string& _variable, const std::vector<std::string>& _expression)
+  void setup()
   {
-    static_assert((dimDomain > 0), "Really?");
-    static_assert((dimRange > 0), "Really?");
-    // set expressions
-    if (_expression.size() < dimRange)
-      DUNE_THROW(Dune::InvalidStateException,
-                 "\n" << Common::color_string_red("ERROR:") << " '_expression' too short (is " << _expression.size()
-                      << ", should be "
-                      << dimRange
-                      << ")!");
-    for (size_t ii = 0; ii < dimRange; ++ii)
-      expressions_.push_back(_expression[ii]);
-    // set variable (i.e. "x")
-    variable_ = _variable;
     // fill variables (i.e. "x[0]", "x[1]", ...)
-    for (size_t ii = 0; ii < dimDomain; ++ii) {
-      std::stringstream variableStream;
-      variableStream << variable_ << "[" << ii << "]";
-      variables_.push_back(variableStream.str());
-    }
+    for (size_t ii = 0; ii < dimDomain; ++ii)
+      variables_[ii] = variable_ + "[" + Common::to_string(ii) + "]";
     // create expressions
     for (size_t ii = 0; ii < dimDomain; ++ii) {
       arg_[ii] = new DomainFieldType(0.0);
@@ -204,7 +193,7 @@ private:
     for (size_t ii = 0; ii < dimRange; ++ii) {
       op_[ii] = new ROperation(expressions_[ii].c_str(), dimDomain, vararray_);
     }
-  } // void setup(const std::string& _variable, const std::vector< std::string >& expressions)
+  } // ... setup(...)
 
   void cleanup()
   {
@@ -218,8 +207,8 @@ private:
   } // void cleanup()
 
   std::string variable_;
-  std::vector<std::string> variables_;
-  std::vector<std::string> expressions_;
+  Common::FieldVector<std::string, dimDomain> variables_;
+  Common::FieldVector<std::string, dimRange> expressions_;
   size_t actualDimRange_;
   mutable DomainFieldType* arg_[dimDomain];
   RVar* var_arg_[dimDomain];
@@ -259,10 +248,10 @@ public:
   {
     if (this != &other) {
       cleanup();
-      original_variables_ = other.original_variables_;
+      originalvars_ = other.originalvars_;
       variables_ = std::vector<std::string>();
       expressions_ = std::vector<std::string>();
-      setup(other.original_variables_, other.expressions_);
+      setup(other.originalvars_, other.expressions_);
     }
     return this;
   }
@@ -274,7 +263,7 @@ public:
 
   const std::vector<std::string>& variables() const
   {
-    return original_variables_;
+    return originalvars_;
   }
 
   const std::vector<std::string>& expressions() const
@@ -286,13 +275,13 @@ public:
   {
     std::lock_guard<std::mutex> guard(mutex_);
     // check for sizes
-    if (arg.size() != original_variables_.size())
+    if (arg.size() != originalvars_.size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "arg.size(): " << arg.size() << "\n   "
                                 << "variables.size(): "
-                                << original_variables_.size());
+                                << originalvars_.size());
     // copy arg
-    for (size_t ii = 0; ii < original_variables_.size(); ++ii)
+    for (size_t ii = 0; ii < originalvars_.size(); ++ii)
       *(arg_[ii]) = arg[ii];
     // copy ret
     for (size_t ii = 0; ii < dimRange; ++ii)
@@ -323,11 +312,11 @@ private:
               << vars.size()
               << "!\n\n"
               << "Configure dune-xt-functions with a larger DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE!");
-    original_variables_ = vars;
-    for (const auto& var : original_variables_)
+    originalvars_ = vars;
+    for (const auto& var : originalvars_)
       if (var.empty())
         DUNE_THROW(Common::Exceptions::wrong_input_given, "Given variables must not be empty!");
-    variables_ = original_variables_;
+    variables_ = originalvars_;
     for (size_t ii = variables_.size(); ii < maxDimDomain; ++ii)
       variables_.push_back("this_is_a_long_dummy_name_to_make_sure_it_is_not_used_" + Common::to_string(ii));
     assert(variables_.size() == maxDimDomain);
@@ -340,7 +329,7 @@ private:
     for (size_t ii = 0; ii < dimRange; ++ii) {
       op_[ii] = new ROperation(expressions_[ii].c_str(), maxDimDomain, vararray_);
     }
-  } // void setup(const std::string& _variable, const std::vector< std::string >& expressions)
+  } // void setup(const std::string& var, const std::vector< std::string >& expressions)
 
   void cleanup()
   {
@@ -353,7 +342,7 @@ private:
     }
   } // void cleanup()
 
-  std::vector<std::string> original_variables_;
+  std::vector<std::string> originalvars_;
   std::vector<std::string> variables_;
   std::vector<std::string> expressions_;
   size_t actualDimRange_;
