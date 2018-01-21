@@ -1,3 +1,11 @@
+# This file is part of the dune-xt-la project:
+#   https://github.com/dune-community/dune-xt-la
+# Copyright 2009-2018 dune-xt-la developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+# Authors:
+#   Rene Milk      (2017 - 2018)
+#   Tobias Leibner (2018)
+
 set(DXT_BIN_COUNT "13" CACHE STRING "number of bins for test targets" )
 add_custom_target(test_binaries_builder_0 DEPENDS test_solver)
 set_tests_properties(test_solver PROPERTIES LABELS "builder_0")
