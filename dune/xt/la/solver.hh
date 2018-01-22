@@ -1,12 +1,12 @@
 // This file is part of the dune-xt-la project:
 //   https://github.com/dune-community/dune-xt-la
-// Copyright 2009-2017 dune-xt-la developers and contributors. All rights reserved.
+// Copyright 2009-2018 dune-xt-la developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2013 - 2014, 2016 - 2017)
-//   Rene Milk       (2013, 2015 - 2016)
+//   Rene Milk       (2013, 2015 - 2016, 2018)
 //   Tobias Leibner  (2014)
 
 #ifndef DUNE_XT_LA_SOLVER_HH
@@ -61,6 +61,15 @@ class Solver
 
 public:
   typedef MatrixImp MatrixType;
+
+  Solver(const MatrixType& /*matrix*/, const CommunicatorType&)
+  {
+    DUNE_THROW(NotImplemented,
+               "This is the unspecialized version of LA::Solver< ... >. "
+               "Please include the correct header for your matrix implementation '"
+                   << Common::Typename<MatrixType>::value()
+                   << "'!");
+  }
 
   Solver(const MatrixType& /*matrix*/)
   {
@@ -137,6 +146,21 @@ typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::val
 solve(const M& A, const V& b, V& x, Args&&... args)
 {
   make_solver(A).apply(b, x, std::forward<Args>(args)...);
+}
+
+
+template <class M, class C>
+typename std::enable_if<XT::LA::is_matrix<M>::value, Solver<M, C>>::type make_solver(const M& matrix, const C& dof_comm)
+{
+  return Solver<M, C>(matrix, dof_comm);
+}
+
+
+template <class M, class V, class C, class... Args>
+typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, void>::type
+solve(const M& A, const V& b, V& x, const C& dof_comm, Args&&... args)
+{
+  make_solver(A, dof_comm).apply(b, x, std::forward<Args>(args)...);
 }
 
 

@@ -1,13 +1,13 @@
 // This file is part of the dune-xt-la project:
 //   https://github.com/dune-community/dune-xt-la
-// Copyright 2009-2017 dune-xt-la developers and contributors. All rights reserved.
+// Copyright 2009-2018 dune-xt-la developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Barbara Verfürth (2015)
 //   Felix Schindler  (2013 - 2017)
-//   Rene Milk        (2014 - 2016)
+//   Rene Milk        (2014 - 2018)
 //   Tobias Leibner   (2014 - 2015)
 
 #ifndef DUNE_XT_LA_SOLVER_ISTL_HH
@@ -130,17 +130,18 @@ public:
 
   static std::vector<std::string> types()
   {
-    return
-    {
+    std::vector<std::string> ret{
+        "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor", "bicgstab"};
+
+    if (std::is_same<CommunicatorType, XT::SequentialCommunication>::value) {
 #if HAVE_SUPERLU
-      "superlu",
+      ret.insert(ret.begin(), "superlu");
 #endif
-          "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor", "bicgstab"
 #if HAVE_UMFPACK
-          ,
-          "umfpack"
+      ret.push_back("umfpack");
 #endif
-    };
+    }
+    return ret;
   } // ... types()
 
   static XT::Common::Configuration options(const std::string type = "")
