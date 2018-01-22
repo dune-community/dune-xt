@@ -531,7 +531,6 @@ protected:
           for (size_t ii = 0; ii < input_vectors.size(); ++ii) {
             if (XT::Common::FloatCmp::ne(input_vectors[ii], RealVectorType(rows, 0.))) {
               if (index >= eigenvalue_multiplicity[kk]) {
-                std::cout << XT::Common::to_string(input_vectors, 15) << std::endl;
                 DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
                            "Eigenvectors are complex and calculating real eigenvectors failed!"
                                << "These were the given options:\n\n"
@@ -548,8 +547,18 @@ protected:
               index++;
             } // if (input_vectors[ii] != 0)
           } // ii
-          if (index < eigenvalue_multiplicity[kk])
-            DUNE_THROW(Dune::NotImplemented, "");
+          if (index < eigenvalue_multiplicity[kk]) {
+            DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
+                       "Eigenvectors are complex and calculating real eigenvectors failed!"
+                           << "These were the given options:\n\n"
+                           << self.options_
+                           << "\n\nThis was the given matrix: "
+                           << std::setprecision(17)
+                           << self.matrix_
+                           << "\nThese are the computed eigenvectors:\n\n"
+                           << std::setprecision(17)
+                           << *self.eigenvectors_);
+          }
         } // kk
       } // if(is_complex)
     } // static void compute(...)

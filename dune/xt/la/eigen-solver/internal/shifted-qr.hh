@@ -17,6 +17,7 @@
 
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/type_traits.hh>
+#include <dune/xt/la/container/unit_matrices.hh>
 
 namespace Dune {
 namespace XT {
@@ -32,7 +33,7 @@ struct RealQrEigenSolver
   typedef Dune::DynamicVector<FieldType> VectorType;
   typedef Dune::DynamicMatrix<FieldType> MatrixType;
 
-  static std::vector<double> calculate_eigenvalues_by_shifted_qr(MatrixType& A)
+  static std::vector<double> calculate_eigenvalues_by_shifted_qr(MatrixType& A, std::unique_ptr<MatrixType>& Q)
   {
     const size_t num_rows = A.rows();
     const size_t num_cols = A.cols();
@@ -68,26 +69,26 @@ struct RealQrEigenSolver
         for (size_t rr = 0; rr < num_remaining_rows; ++rr)
           A[rr][rr] -= shift;
 
-        // calculate QR decomp. If jj < num_rows-1, A has the form [A1 A2; 0 A3],
+        // Calculate QR decomp. If jj < num_rows-1, A_k-shift*I has the form [A1 A2; 0 A3-shift*I],
         // so we are only calculating the QR decomposition Q1*R1 of A1.
-        // Then Q = [Q1 0; 0 I], R = [R1 Q1^T*A2; 0 A3] is a QR decomp. of A.
+        // Then Q_k = [Q1 0; 0 I], R_k = [R1 Q1^T*A2; 0 A3] is a QR decomp. of A_k.
         QR_decomp(A, *Q_k, *R_k, num_remaining_rows, num_remaining_cols);
 
-        // calculate A_{k+1} = R_k Q_k + shift I. We are only interested in the diagonal
-        // elements of A, and we do not reuse the other parts of A, so we are only
-        // updating the upper left part.
+        // Calculate A_{k+1} = R_k Q_k + shift I. With the QR decomposition above, this
+        // is calculated as A_{k+1} = [R1*Q1+shift*I Q1^T*A2; 0 A3]
+        // calculate upper left part
         for (size_t rr = 0; rr < num_remaining_rows; ++rr) {
           for (size_t cc = 0; cc < num_remaining_cols; ++cc) {
             A[rr][cc] = 0.;
             for (size_t ll = 0; ll < num_remaining_rows; ++ll)
               A[rr][cc] += (*R_k)[rr][ll] * (*Q_k)[ll][cc];
           } // cc
+          A[rr][rr] += shift;
         } // rr
-
+        // update upper right part
         // we do not need R_k anymore in this step, so use it as temporary storage
         auto& A_copy = *R_k;
         A_copy = A;
-        // update upper right part
         for (size_t rr = 0; rr < num_remaining_rows; ++rr) {
           for (size_t cc = num_remaining_cols; cc < num_cols; ++cc) {
             A[rr][cc] = 0.;
@@ -96,8 +97,19 @@ struct RealQrEigenSolver
           } // cc
         } // rr
 
-        for (size_t rr = 0; rr < num_remaining_rows; ++rr)
-          A[rr][rr] += shift;
+        if (Q) {
+          // Update Q by multiplicating Q_k from the right
+          auto& Q_copy = *R_k;
+          Q_copy = *Q;
+          for (size_t rr = 0; rr < num_rows; ++rr) {
+            for (size_t cc = 0; cc < num_remaining_cols; ++cc) {
+              (*Q)[rr][cc] = 0.;
+              for (size_t ll = 0; ll < num_remaining_rows; ++ll)
+                (*Q)[rr][cc] += Q_copy[rr][ll] * (*Q_k)[ll][cc];
+            } // cc
+          } // rr
+        } // if (Q)
+
         ++kk;
         residual = std::abs(A[jj][jj - 1]);
       } // while(residual != 0)
@@ -114,107 +126,44 @@ struct RealQrEigenSolver
     return eigenvalues;
   } // .. calculate_eigenvalues_by_shifted_qr(...)
 
-  static void reduced_row_echelon_form(MatrixType& A, std::vector<size_t>& pivot_variables)
+  // if Q is provided, Q is expected to be the unit matrix initially
+  static std::vector<double> get_eigenvalues(MatrixType& A, std::unique_ptr<MatrixType>& Q = nullptr)
   {
-    pivot_variables.clear();
-    size_t col = 0;
-    for (size_t row = 0; row < A.rows(); ++row) {
-      while (col < A.cols()) {
-        // find pivot
-        size_t pivot = row;
-        for (size_t rr = row + 1; rr < A.rows(); ++rr)
-          if (std::abs(A[rr][col]) > std::abs(A[pivot][col]))
-            pivot = rr;
-        // if all entries in column are zero, continue with next column
-        if (XT::Common::FloatCmp::eq(A[pivot][col], 0.)) {
-          ++col;
-          continue;
-        } else {
-          if (pivot != row) // swap rows
-            for (size_t cc = col; cc < A.cols(); ++cc)
-              std::swap(A[row][cc], A[pivot][cc]);
-          // divide row by pivot element to make pivot element 1
-          for (size_t cc = col + 1; cc < A.cols(); ++cc)
-            A[row][cc] /= A[row][col];
-          A[row][col] = 1.;
-          // add row to all other rows to zero out other entries in column
-          for (size_t rr = 0; rr < A.rows(); ++rr) {
-            auto factor = A[rr][col];
-            if (rr != row && XT::Common::FloatCmp::ne(factor, 0.)) {
-              for (size_t cc = col + 1; cc < A.cols(); ++cc)
-                A[rr][cc] -= A[row][cc] * factor;
-              A[rr][col] = 0.;
-            }
-          } // rr
-          // store column as pivot variable
-          pivot_variables.push_back(col);
-          // continue with next row and col
-          ++col;
-          break;
-        }
-      } // col
-    } // row
-  } // void reduced_row_echelon_form(...)
-
-  static std::vector<double> get_eigenvalues(const MatrixType& A_in)
-  {
-    auto A_ptr = std::make_unique<MatrixType>(A_in);
-    auto& A = *A_ptr;
-    hessenberg_transformation(A);
-    auto eigenvalues = calculate_eigenvalues_by_shifted_qr(A);
-    std::sort(eigenvalues.begin(), eigenvalues.end());
-    return eigenvalues;
+    hessenberg_transformation(A, Q);
+    return calculate_eigenvalues_by_shifted_qr(A, Q);
   } // ... get_eigenvalues(...)
 
-  static std::unique_ptr<MatrixType> get_eigenvectors(const MatrixType& A_in, const std::vector<double>& eigenvalues)
+  static std::unique_ptr<MatrixType> get_eigenvectors(const MatrixType& A_triangular, const MatrixType& Q)
   {
-    auto A_ptr = std::make_unique<MatrixType>(A_in);
-    auto& A = *A_ptr;
-    auto ret = std::make_unique<MatrixType>(A_in);
-    // Calculate eigenvectors by solving (A - \lambda I) x = 0.
-    for (size_t ii = 0; ii < eigenvalues.size(); ++ii) {
-      // get eigenvalue, calculate multiplicity
-      double lambda = eigenvalues[ii];
-      size_t multiplicity = 1;
-      while (XT::Common::FloatCmp::eq(eigenvalues[ii], eigenvalues[ii + 1])) {
-        ++multiplicity;
-        ++ii;
+    const MatrixType& A = A_triangular;
+    auto ret = std::make_unique<MatrixType>(A);
+    *ret *= 0.;
+    // Calculate eigenvectors by calculating eigenvectors of triangular matrix T blockwise by backward substitution,
+    // see Handbook Series Linear Algebra, Eigenvectors of Real and Complex Matrices by LR and QR triangularizations,
+    // contributed by G. Peters and J. H. Wilkinsons,
+    // https://link.springer.com/content/pdf/10.1007/BF02219772.pdf, equation (3)
+    VectorType eigvec(A.rows());
+    for (size_t kk = 0; kk < A.rows(); ++kk) {
+      eigvec *= 0.; // TODO: should be unnecessary, remove
+      // Compute k-th eigenvector by backsubstitution. For that purpose, set k-th component to 1 and then
+      // do the usual backsubstitution. If we encounter a zero on the diagonal in the process, we just assign
+      // zero to that component.
+      eigvec[kk] = 1.;
+      for (int rr = kk - 1; rr >= 0; --rr) {
+        eigvec[rr] = 0.;
+        if (XT::Common::FloatCmp::ne(A[rr][rr], A[kk][kk])) {
+          for (size_t cc = rr + 1; cc <= kk; ++cc)
+            eigvec[rr] -= A[rr][cc] * eigvec[cc];
+          eigvec[rr] /= A[rr][rr] - A[kk][kk];
+        }
+      } // rr
+      // apply matrix Q
+      for (size_t rr = 0; rr < A.rows(); ++rr) {
+        (*ret)[rr][kk] = 0.;
+        for (size_t cc = 0; cc <= kk; ++cc)
+          (*ret)[rr][kk] += Q[rr][cc] * eigvec[cc];
       }
-      // get matrix B = A - \lambda I
-      A = A_in;
-      for (size_t rr = 0; rr < A.rows(); ++rr)
-        A[rr][rr] -= lambda;
-
-      // transform B to reduced row echelon form
-      // in the process, keep track of pivot variables
-      std::vector<size_t> pivot_variables;
-      reduced_row_echelon_form(A, pivot_variables);
-
-      // Now get the eigenvectors from the reduced row echelon form. To get an eigenvector, set one of the free
-      // variables to 1 and the other free variables to 0 and calculate the pivot variables.
-      std::vector<size_t> free_variables;
-      for (size_t jj = 0; jj < A.cols(); ++jj)
-        if (std::find(pivot_variables.begin(), pivot_variables.end(), jj) == pivot_variables.end())
-          free_variables.push_back(jj);
-      if (free_variables.size() != multiplicity)
-        DUNE_THROW(Dune::MathError, "Failed to compute eigenvectors!");
-      size_t eigenvector_index = ii - multiplicity + 1;
-      for (const auto& cc : free_variables) {
-        for (size_t rr = 0; rr < A.rows(); ++rr)
-          (*ret)[rr][eigenvector_index] = -A[rr][cc];
-        (*ret)[cc][eigenvector_index] = 1.;
-        ++eigenvector_index;
-      } // cc
-    } // ii
-    // normalize eigenvectors
-    for (size_t col = 0; col < ret->cols(); ++col) {
-      double norm = 0.;
-      for (size_t row = 0; row < ret->rows(); ++row)
-        norm += std::pow((*ret)[row][col], 2);
-      auto inv_norm = 1. / std::sqrt(norm);
-      for (size_t row = 0; row < ret->rows(); ++row)
-        (*ret)[row][col] *= inv_norm;
-    }
+    } // kk (eigenvectors)
     return ret;
   } // ... get_eigenvectors(...)
 
@@ -340,7 +289,7 @@ struct RealQrEigenSolver
 
   //! \brief Transform A to Hessenberg form by transformation P^T A P
   //! \see https://lp.uni-goettingen.de/get/text/2137
-  static void hessenberg_transformation(MatrixType& A)
+  static void hessenberg_transformation(MatrixType& A, std::unique_ptr<MatrixType>& Q)
   {
     assert(A.rows() == A.cols() && "Hessenberg transformation needs a square matrix!");
     VectorType u(A.rows(), 0.);
@@ -360,6 +309,8 @@ struct RealQrEigenSolver
         multiply_householder_from_left(A, beta, u, jj + 1, A.rows());
         // now calculate (PA) P  = PA - (PA u) (beta u^T)
         multiply_householder_from_right(A, beta, u, jj + 1, A.cols());
+        if (Q)
+          multiply_householder_from_right(*Q, beta, u, jj + 1, A.cols());
       } // if (gamma != 0)
     } // jj
   } // void hessenberg_transformation(...)
@@ -408,11 +359,12 @@ compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(const MatrixType& 
                                                               EigenVectorType& right_eigenvectors)
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
+  auto Q = XT::LA::UnitMatrix<Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>>::get(
+      tmp_matrix.rows());
   eigenvalues =
-      RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix);
+      RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix, Q);
   auto tmp_eigenvectors =
-      RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvectors(tmp_matrix,
-                                                                                                        eigenvalues);
+      RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvectors(tmp_matrix, *Q);
   copy_from_dynamic_matrix(*tmp_eigenvectors, right_eigenvectors);
 }
 
