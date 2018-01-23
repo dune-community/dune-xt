@@ -222,7 +222,8 @@ struct EigenSolverTest : public ::testing::Test
         EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_rows(actual_eigenvectors));
         EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_cols(actual_eigenvectors));
         if (tolerance > 0) {
-          EXPECT_TRUE(Common::FloatCmp::eq(actual_eigenvectors, expected_eigenvectors_, {tolerance, tolerance}))
+          EXPECT_TRUE(Common::FloatCmp::eq(
+              actual_eigenvectors, expected_eigenvectors_, {tolerance, tolerance}, {tolerance, tolerance}))
               << "\n\nactual eigenvectors: " << actual_eigenvectors
               << "\n\nexpected eigenvectors: " << expected_eigenvectors_ << "\n\ntolerance: " << tolerance
               << "\n\ntype: " << tp;
@@ -449,12 +450,14 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
           Common::set_matrix_entry(actual_eigenvectors_as_real, ii, jj, complex_entry.real());
         }
       if (tolerance > 0) {
-        EXPECT_TRUE(Common::FloatCmp::eq(actual_eigenvectors_as_real, expected_real_eigenvectors_, tolerance))
+        EXPECT_TRUE(
+            Common::FloatCmp::eq(actual_eigenvectors_as_real, expected_real_eigenvectors_, tolerance, tolerance))
             << "\n\nactual eigenvectors: " << actual_eigenvectors_as_real
             << "\n\nexpected eigenvectors: " << expected_real_eigenvectors_ << "\n\ntolerance: " << tolerance
             << "\n\ntype: " << tp;
       } else {
-        EXPECT_FALSE(Common::FloatCmp::eq(actual_eigenvectors_as_real, expected_real_eigenvectors_, tolerance))
+        EXPECT_FALSE(
+            Common::FloatCmp::eq(actual_eigenvectors_as_real, expected_real_eigenvectors_, tolerance, tolerance))
             << "\n\nTHIS IS A GOOD THING! UPDATE THE EXPECTATIONS IN tolerances!\n\n"
             << "\n\nactual eigenvectors: " << actual_eigenvectors_as_real
             << "\n\nexpected eigenvectors: " << expected_real_eigenvectors_ << "\n\ntype: " << tp;
@@ -463,7 +466,7 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
         const auto actual_real_eigenvectors = solver.real_eigenvectors();
         EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_rows(actual_real_eigenvectors));
         EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_cols(actual_real_eigenvectors));
-        EXPECT_TRUE(Common::FloatCmp::eq(actual_real_eigenvectors, expected_real_eigenvectors_, tolerance))
+        EXPECT_TRUE(Common::FloatCmp::eq(actual_real_eigenvectors, expected_real_eigenvectors_, tolerance, tolerance))
             << "\n\nactual eigenvectors: " << actual_real_eigenvectors
             << "\n\nexpected eigenvectors: " << expected_real_eigenvectors_ << "\n\ntolerance: " << tolerance
             << "\n\ntype: " << tp;
