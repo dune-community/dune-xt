@@ -225,12 +225,12 @@ TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_min_eigen
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
 {
-  gives_correct_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_eigenvectors_in_correct_order({ {"lapack", "1e-14"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
 {
-  gives_correct_real_eigenvectors_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_real_eigenvectors_in_correct_order({ {"lapack", "1e-14"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_eigendecomposition)
