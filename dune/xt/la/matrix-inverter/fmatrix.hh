@@ -53,7 +53,6 @@ public:
   }
 }; // class MatrixInverterOptions<EigenDenseMatrix<S>>
 
-
 template <class K, int ROWS, int COLS>
 class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>>
     : public MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
