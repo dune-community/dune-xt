@@ -53,13 +53,11 @@ public:
   }
 }; // class MatrixInverterOptions<EigenDenseMatrix<S>>
 
-
 template <class K, int ROWS, int COLS>
 class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>>
     : public MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
 {
 };
-
 
 template <class K, int ROWS, int COLS>
 class MatrixInverter<FieldMatrix<K, ROWS, COLS>> : public internal::MatrixInverterBase<FieldMatrix<K, ROWS, COLS>>
@@ -84,8 +82,10 @@ public:
     const auto type = options_.template get<std::string>("type");
     if (type == "direct") {
       inverse_ = std::make_unique<MatrixType>(matrix_);
+      auto inverse_xt = std::make_unique<XT::Common::FieldMatrix<K, ROWS, COLS>>(*inverse_);
       try {
-        inverse_->invert();
+        inverse_xt->invert();
+        *inverse_ = *inverse_xt;
       } catch (const FMatrixError& ee) {
         if (std::strcmp(ee.what(), "matrix is singular") != 0)
           DUNE_THROW(Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements,
