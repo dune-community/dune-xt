@@ -18,6 +18,8 @@
 #include <dune/xt/common/disable_warnings.hh>
 #include <Eigen/Core>
 #include <Eigen/SVD>
+// needed for the inverse method of Eigen::Matrix, see http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1089
+#include <Eigen/LU>
 #include <dune/xt/common/reenable_warnings.hh>
 #endif
 
