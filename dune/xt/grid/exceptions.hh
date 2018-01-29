@@ -23,6 +23,11 @@ class boundary_type_error : public Dune::Exception
 };
 
 
+class boundary_info_error : public Dune::Exception
+{
+};
+
+
 } // namespace Exceptions
 } // namespace Grid
 } // namespace XT

@@ -17,6 +17,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/memory.hh>
+#include <dune/xt/grid/exceptions.hh>
 
 #include "interfaces.hh"
 #include "types.hh"
@@ -30,11 +31,13 @@ static inline Common::Configuration normalbased_boundaryinfo_default_config()
 {
   Common::Configuration config;
   config["type"] = "xt.grid.boundaryinfo.normalbased";
-  config["default"] = "dirichlet";
+  config["default"] = NoBoundary().id();
   config["compare_tolerance"] = "1e-10";
-  config["neumann.0"] = "[1 0 0 0]";
+  config["0." + DirichletBoundary().id()] = "[1 0 0 0]";
+  config["1." + NeumannBoundary().id()] = "[0 1 0 0]";
   return config;
 }
+
 
 // We do not want to add a virtual destructor (to be able to use this as constexpr),
 // so just silence the warning.
@@ -72,12 +75,70 @@ public:
     DUNE_THROW(NotImplemented, "Until we have a factory for BoundaryTypes!");
     const Common::Configuration default_cfg = normalbased_boundaryinfo_default_config();
     // get tolerance and default
-    const DomainFieldType tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
-    // ...
+    const auto tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
+    const auto default_type = cfg.get("default", default_cfg.get<std::string>("default"));
     // create
-    auto ret = std::make_unique<ThisType>(tol /*, default=*/);
+    auto ret = std::make_unique<ThisType>(tol, make_boundary_type(default_type));
     // get other normals and boundary types and register
-    // ...
+    bool search_for_types = true;
+    size_t counter = 0;
+    std::unique_ptr<BoundaryType> boundary_type(nullptr);
+    WorldType normal;
+    while (search_for_types) {
+      if (cfg.has_sub(Common::to_string(counter))) {
+        const Common::Configuration sub_cfg = cfg.sub(Common::to_string(counter));
+        if (sub_cfg.getValueKeys().size() != 1)
+          DUNE_THROW(Exceptions::boundary_info_error,
+                     "while processing sub config "
+                         << counter
+                         << " of cfg (see below): could not parse give config."
+                         << "For each normal, you have to provide a sub config with exactly "
+                            "one key/value pair, where the key determines the BoundaryType "
+                            "and the value determines the normal (see below for a valid default config)."
+                         << "\n\n   This was the given config:\n"
+                         << cfg
+                         << "\n\n   This is a suitable default config:\n"
+                         << default_cfg);
+        const auto boundary_type_key = sub_cfg.getValueKeys()[0];
+        try {
+          boundary_type = std::unique_ptr<BoundaryType>(make_boundary_type(boundary_type_key));
+        } catch (const Exceptions::boundary_type_error& ee) {
+          DUNE_THROW(
+              Exceptions::boundary_info_error,
+              "while processing sub config "
+                  << counter
+                  << " of cfg (see below): given key is not a valid BoundaryType (see below for the original error)."
+                  << "For each normal, you have to provide a sub config with exactly "
+                     "one key/value pair, where the key determines the BoundaryType "
+                     "and the value determines the normal (see below for a valid default config)."
+                  << "\n\n   This was the given config:\n"
+                  << cfg
+                  << "\n\n   This is a suitable default config:\n"
+                  << default_cfg
+                  << "\nn   This was the original error:\n"
+                  << ee.what());
+        }
+        try {
+          normal = sub_cfg.get<WorldType>(boundary_type_key);
+        } catch (const Common::Exceptions::configuration_error& ee) {
+          DUNE_THROW(Exceptions::boundary_info_error,
+                     "while processing sub config "
+                         << counter
+                         << " of cfg (see below): given value is not a valid normal (see below for the original error)."
+                         << "For each normal, you have to provide a sub config with exactly "
+                            "one key/value pair, where the key determines the BoundaryType "
+                            "and the value determines the normal (see below for a valid default config)."
+                         << "\n\n   This was the given config:\n"
+                         << cfg
+                         << "\n\n   This is a suitable default config:\n"
+                         << default_cfg
+                         << "\nn   This was the original error:\n"
+                         << ee.what());
+        }
+        ret->register_new_normal(normal, boundary_type->copy());
+      }
+      ++counter;
+    }
     // return
     return ret;
   } // ... create(...)
