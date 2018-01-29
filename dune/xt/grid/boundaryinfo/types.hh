@@ -33,6 +33,11 @@ public:
   {
     return "no_boundary";
   }
+
+  BoundaryType* copy() const override final
+  {
+    return new NoBoundary();
+  }
 };
 
 
@@ -42,6 +47,11 @@ public:
   std::string id() const override final
   {
     return "unknown_boundary";
+  }
+
+  BoundaryType* copy() const override final
+  {
+    return new UnknownBoundary();
   }
 };
 
@@ -53,6 +63,11 @@ public:
   {
     return "dirichlet_boundary";
   }
+
+  BoundaryType* copy() const override final
+  {
+    return new DirichletBoundary();
+  }
 };
 
 
@@ -62,6 +77,11 @@ public:
   std::string id() const override final
   {
     return "neumann_boundary";
+  }
+
+  BoundaryType* copy() const override final
+  {
+    return new NeumannBoundary();
   }
 };
 
@@ -73,6 +93,11 @@ public:
   {
     return "robin_boundary";
   }
+
+  BoundaryType* copy() const override final
+  {
+    return new RobinBoundary();
+  }
 };
 
 
@@ -82,6 +107,11 @@ public:
   virtual std::string id() const override final
   {
     return "reflecting_boundary";
+  }
+
+  BoundaryType* copy() const override final
+  {
+    return new ReflectingBoundary();
   }
 };
 
@@ -93,6 +123,11 @@ public:
   {
     return "inflow_boundary";
   }
+
+  BoundaryType* copy() const override final
+  {
+    return new InflowBoundary();
+  }
 };
 
 
@@ -102,6 +137,11 @@ public:
   std::string id() const override final
   {
     return "outflow_boundary";
+  }
+
+  BoundaryType* copy() const override final
+  {
+    return new OutflowBoundary();
   }
 };
 
@@ -113,6 +153,11 @@ public:
   {
     return "inflow_outflow_boundary";
   }
+
+  BoundaryType* copy() const override final
+  {
+    return new InflowOutflowBoundary();
+  }
 };
 
 
@@ -122,6 +167,11 @@ public:
   std::string id() const override final
   {
     return "impermeable_boundary";
+  }
+
+  BoundaryType* copy() const override final
+  {
+    return new ImpermeableBoundary();
   }
 };
 

@@ -34,6 +34,8 @@ class BoundaryType
 public:
   virtual std::string id() const = 0;
 
+  virtual BoundaryType* copy() const = 0;
+
   virtual bool operator==(const BoundaryType& other) const
   {
     return id() == other.id();
