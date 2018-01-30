@@ -70,7 +70,7 @@ public:
     return normalbased_boundaryinfo_default_config().template get<std::string>("type");
   }
 
-  static std::unique_ptr<ThisType> create(const Common::Configuration cfg = normalbased_boundaryinfo_default_config())
+  static std::unique_ptr<ThisType> create(const Common::Configuration& cfg = normalbased_boundaryinfo_default_config())
   {
     const Common::Configuration default_cfg = normalbased_boundaryinfo_default_config();
     // get tolerance and default
@@ -135,8 +135,9 @@ public:
                          << ee.what());
         }
         ret->register_new_normal(normal, boundary_type->copy());
-      }
-      ++counter;
+        ++counter;
+      } else
+        search_for_types = false;
     }
     // return
     return ret;
