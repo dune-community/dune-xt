@@ -72,7 +72,6 @@ public:
 
   static std::unique_ptr<ThisType> create(const Common::Configuration cfg = normalbased_boundaryinfo_default_config())
   {
-    DUNE_THROW(NotImplemented, "Until we have a factory for BoundaryTypes!");
     const Common::Configuration default_cfg = normalbased_boundaryinfo_default_config();
     // get tolerance and default
     const auto tol = cfg.get("compare_tolerance", default_cfg.get<DomainFieldType>("compare_tolerance"));
