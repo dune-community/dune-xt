@@ -251,7 +251,7 @@ struct Layer<GridType, Layers::adaptive_leaf, Backends::part, DdGridType>
 template <class GridType, class DdGridType>
 struct Layer<GridType, Layers::dd_subdomain, Backends::part, DdGridType>
 {
-  typedef SubdomainGridPart<Fem::LeafGridPart<GridType>> type;
+  typedef SubdomainGridView<Fem::LeafGridPart<GridType>> type;
 
   static type create(const GridType& /*grid*/,
                      const int /*subdomain*/ = 0,
@@ -273,7 +273,7 @@ struct Layer<GridType, Layers::dd_subdomain, Backends::part, DdGridType>
 template <class GridType, class DdGridType>
 struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::part, DdGridType>
 {
-  typedef SubdomainGridPart<Fem::LeafGridPart<GridType>> type;
+  typedef SubdomainGridView<Fem::LeafGridPart<GridType>> type;
 
   static type create(const GridType& /*grid*/,
                      const int /*subdomain*/ = 0,
@@ -295,7 +295,7 @@ struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::part, DdGridT
 template <class GridType, class DdGridType>
 struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::part, DdGridType>
 {
-  typedef SubdomainCouplingGridPart<Fem::LeafGridPart<GridType>> type;
+  typedef SubdomainCouplingGridView<Fem::LeafGridPart<GridType>> type;
 
   static type create(const GridType& /*grid*/,
                      const int /*subdomain*/ = 0,
@@ -318,7 +318,7 @@ struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::part, DdGridType
 template <class GridType, class DdGridType>
 struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::part, DdGridType>
 {
-  typedef SubdomainBoundaryGridPart<Fem::LeafGridPart<GridType>> type;
+  typedef SubdomainBoundaryGridView<Fem::LeafGridPart<GridType>> type;
 
   static type create(const GridType& /*grid*/,
                      const int /*subdomain*/ = 0,

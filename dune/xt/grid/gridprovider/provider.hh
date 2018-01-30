@@ -233,7 +233,6 @@ private:
   template <bool is_dd_subdomain = std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value, bool anything = true>
   struct visualize_dd_helper;
 
-#if HAVE_DUNE_FEM
   template <bool anything>
   struct visualize_dd_helper<true, anything>
   {
@@ -244,11 +243,9 @@ private:
         DUNE_THROW(InvalidStateException, "No DD grid provided on construction!");
       const auto& dd_grid = *dd_grid_ptr;
       // vtk writer
-      typedef typename DdGridType::GlobalGridPartType GlobalGridPartType;
-      const auto& globalGridPart = dd_grid.globalGridPart();
-      typedef Dune::Fem::GridPart2GridView<GlobalGridPartType> GVT;
-      GVT globalGridView(globalGridPart);
-      Dune::VTKWriter<GVT> vtkwriter(globalGridView);
+      typedef typename DdGridType::GlobalGridViewType GlobalGridViewType;
+      const auto& globalGridView = dd_grid.globalGridView();
+      Dune::VTKWriter<GlobalGridViewType> vtkwriter(globalGridView);
       // data
       std::map<std::string, std::vector<double>> data;
       data["subdomain"] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
@@ -280,7 +277,7 @@ private:
       // walk the subdomains
       for (unsigned int s = 0; s < dd_grid.size(); ++s) {
         // walk the local grid view
-        const auto localGridView = dd_grid.localGridPart(s);
+        const auto localGridView = dd_grid.local_grid_view(s);
         for (auto it = localGridView.template begin<0>(); it != localGridView.template end<0>(); ++it) {
           const auto& entity = *it;
           const unsigned int index = globalGridView.indexSet().index(entity);
@@ -298,7 +295,7 @@ private:
           // visualize coupling
           if (with_coupling) {
             for (auto nn : dd_grid.neighborsOf(s)) {
-              const auto coupling_grid_view = dd_grid.couplingGridPart(s, nn);
+              const auto coupling_grid_view = dd_grid.coupling_grid_view(s, nn);
               const std::string coupling_str = "coupling (" + Common::to_string(s) + ", " + Common::to_string(nn) + ")";
               data[coupling_str] = std::vector<double>(globalGridView.indexSet().size(0), 0.0);
               const auto entity_it_end = coupling_grid_view.template end<0>();
@@ -326,8 +323,8 @@ private:
         for (size_t ss = 0; ss < dd_grid.size(); ++ss) {
           const std::string string_id = "oversampled subdomain " + Common::to_string(ss);
           data[string_id] = std::vector<double>(globalGridView.indexSet().size(0), -1.0);
-          typedef typename DdGridType::LocalGridPartType LocalGridPartType;
-          const LocalGridPartType oversampledGridPart = dd_grid.localGridPart(ss, true);
+          typedef typename DdGridType::LocalGridViewType LocalGridViewType;
+          const LocalGridViewType oversampledGridPart = dd_grid.local_grid_view(ss, true);
           for (auto it = oversampledGridPart.template begin<0>(); it != oversampledGridPart.template end<0>(); ++it) {
             const auto& entity = *it;
             const auto index = globalGridView.indexSet().index(entity);
@@ -355,7 +352,7 @@ private:
       vtkwriter.write(filename, Dune::VTK::appendedraw);
     } // ... operator()(...)
   }; // struct visualize_dd_helper<true, ...>
-#endif // HAVE_DUNE_FEM
+
 
   template <bool anything>
   struct visualize_dd_helper<false, anything>

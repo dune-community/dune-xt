@@ -33,14 +33,14 @@ namespace Grid {
 
 
 // forwards
-template <class GlobalGridPartImp>
-class SubdomainGridPart;
+template <class GlobalGridViewImp>
+class SubdomainGridView;
 
-template <class GlobalGridPartImp>
-class SubdomainBoundaryGridPart;
+template <class GlobalGridViewImp>
+class SubdomainBoundaryGridView;
 
-template <class GlobalGridPartImp>
-class SubdomainCouplingGridPart;
+template <class GlobalGridViewImp>
+class SubdomainCouplingGridView;
 
 
 namespace internal {
@@ -49,8 +49,8 @@ namespace internal {
 template <class T>
 struct is_dd_subdomain_helper
 {
-  DXTC_has_typedef_initialize_once(GlobalGridPartType);
-  static const bool value = DXTC_has_typedef(GlobalGridPartType)<T>::value;
+  DXTC_has_typedef_initialize_once(GlobalGridViewType);
+  static const bool value = DXTC_has_typedef(GlobalGridViewType)<T>::value;
 };
 
 
@@ -160,7 +160,7 @@ struct is_dd_subdomain : public std::false_type
 };
 
 template <class T>
-struct is_dd_subdomain<T, true> : public std::is_base_of<SubdomainGridPart<typename T::GlobalGridPartType>, T>
+struct is_dd_subdomain<T, true> : public std::is_base_of<SubdomainGridView<typename T::GlobalGridViewType>, T>
 {
 };
 
@@ -172,7 +172,7 @@ struct is_dd_subdomain_boundary : public std::false_type
 
 template <class T>
 struct is_dd_subdomain_boundary<T, true>
-    : public std::is_base_of<SubdomainBoundaryGridPart<typename T::GlobalGridPartType>, T>
+    : public std::is_base_of<SubdomainBoundaryGridView<typename T::GlobalGridViewType>, T>
 {
 };
 
@@ -184,7 +184,7 @@ struct is_dd_subdomain_coupling : public std::false_type
 
 template <class T>
 struct is_dd_subdomain_coupling<T, true>
-    : public std::is_base_of<SubdomainCouplingGridPart<typename T::GlobalGridPartType>, T>
+    : public std::is_base_of<SubdomainCouplingGridView<typename T::GlobalGridViewType>, T>
 {
 };
 

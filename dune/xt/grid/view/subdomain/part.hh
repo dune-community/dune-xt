@@ -20,10 +20,8 @@
 #include <dune/geometry/type.hh>
 
 #include <dune/grid/common/capabilities.hh>
+#include <dune/grid/common/gridview.hh>
 
-#if HAVE_DUNE_FEM
-#include <dune/fem/gridpart/common/gridpart.hh>
-#endif
 
 #include "entity-iterator.hh"
 #include "indexset.hh"
@@ -36,115 +34,92 @@ namespace Grid {
 
 
 // forwards, needed for the traits below
-template <class GlobalGridPartImp>
-class SubdomainGridPart;
+template <class GlobalGridViewImp>
+class SubdomainGridView;
 
-template <class GlobalGridPartImp>
-class SubdomainCouplingGridPart;
+template <class GlobalGridViewImp>
+class SubdomainCouplingGridView;
 
-template <class GlobalGridPartImp>
-class SubdomainBoundaryGridPart;
+template <class GlobalGridViewImp>
+class SubdomainBoundaryGridView;
 
 
 namespace internal {
 
 
-template <class GlobalGridPartImp>
-class SubdomainGridPartTraits
+template <class GlobalGridViewImp>
+class SubdomainGridViewTraits
 {
 public:
-  typedef GlobalGridPartImp GlobalGridPartType;
+  typedef GlobalGridViewImp GlobalGridViewType;
 
-  typedef SubdomainGridPart<GlobalGridPartImp> GridPartType;
-  typedef typename GlobalGridPartType::GridType GridType;
-  typedef typename internal::IndexBasedIndexSet<GlobalGridPartType> IndexSetType;
-  typedef typename GlobalGridPartType::CollectiveCommunicationType CollectiveCommunicationType;
-  typedef typename GlobalGridPartType::TwistUtilityType TwistUtilityType;
+  typedef SubdomainGridView<GlobalGridViewImp> GridViewType;
+  using GridViewImp = GridViewType;
+  typedef typename GlobalGridViewType::Grid GridType;
+  using Grid = GridType;
+  typedef typename internal::IndexBasedIndexSet<GlobalGridViewType> IndexSetType;
+  using IndexSet = IndexSetType;
+  typedef typename GlobalGridViewType::CollectiveCommunication CollectiveCommunicationType;
+  using CollectiveCommunication = CollectiveCommunicationType;
 
-  static const PartitionIteratorType indexSetPartitionType = GlobalGridPartType::indexSetPartitionType;
-  static const InterfaceType indexSetInterfaceType = GlobalGridPartType::indexSetInterfaceType;
+  //  static const PartitionIteratorType indexSetPartitionType = GlobalGridViewType::indexSetPartitionType;
+  //  static const InterfaceType indexSetInterfaceType = GlobalGridViewType::indexSetInterfaceType;
 
-  typedef internal::FakeDomainBoundaryIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
+  typedef internal::FakeDomainBoundaryIntersectionIterator<GlobalGridViewType> IntersectionIteratorType;
+  using IntersectionIterator = IntersectionIteratorType;
+  using Intersection = typename IntersectionIterator::Intersection;
 
   template <int codim>
-  struct Codim : public GlobalGridPartType::template Codim<codim>
+  struct Codim : public GlobalGridViewType::template Codim<codim>
   {
     template <PartitionIteratorType pitype>
     struct Partition
     {
-      typedef typename internal::IndexBasedEntityIterator<GlobalGridPartType, codim, pitype> IteratorType;
+      typedef typename internal::IndexBasedEntityIterator<GlobalGridViewType, codim, pitype> IteratorType;
+      using Iterator = IteratorType;
     };
+
+    using Iterator = typename Partition<All_Partition>::Iterator;
   };
 
-  static const bool conforming = GlobalGridPartType::Traits::conforming;
-}; // class SubdomainGridPartTraits
+  static const bool conforming = GlobalGridViewType::Traits::conforming;
+}; // class SubdomainGridViewTraits
 
 
-template <class GlobalGridPartImp>
-struct SubdomainCouplingGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
+template <class GlobalGridViewImp>
+struct SubdomainCouplingGridViewTraits : public SubdomainGridViewTraits<GlobalGridViewImp>
 {
-  typedef GlobalGridPartImp GlobalGridPartType;
-  typedef SubdomainCouplingGridPart<GlobalGridPartImp> GridPartType;
-  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
+  typedef GlobalGridViewImp GlobalGridViewType;
+  typedef SubdomainCouplingGridView<GlobalGridViewImp> GridViewType;
+  using GridViewImp = GridViewType;
+  typedef internal::LocalIntersectionIterator<GlobalGridViewType> IntersectionIteratorType;
+  using IntersectionIterator = IntersectionIteratorType;
+  using Intersection = typename IntersectionIterator::Intersection;
 };
 
 
-template <class GlobalGridPartImp>
-struct SubdomainBoundaryGridPartTraits : public SubdomainGridPartTraits<GlobalGridPartImp>
+template <class GlobalGridViewImp>
+struct SubdomainBoundaryGridViewTraits : public SubdomainGridViewTraits<GlobalGridViewImp>
 {
-  typedef GlobalGridPartImp GlobalGridPartType;
-  typedef SubdomainBoundaryGridPart<GlobalGridPartImp> GridPartType;
-  typedef internal::LocalIntersectionIterator<GlobalGridPartType> IntersectionIteratorType;
-}; // class SubdomainBoundaryGridPartTraits
+  typedef GlobalGridViewImp GlobalGridViewType;
+  typedef SubdomainBoundaryGridView<GlobalGridViewImp> GridViewType;
+  using GridViewImp = GridViewType;
+  typedef internal::LocalIntersectionIterator<GlobalGridViewType> IntersectionIteratorType;
+  using IntersectionIterator = IntersectionIteratorType;
+  using Intersection = typename IntersectionIterator::Intersection;
+}; // class SubdomainBoundaryGridViewTraits
 
-
-template <class SubdomainGridPartImp>
-class SubdomainGridPartIntersectionRange
-{
-  typedef typename SubdomainGridPartImp::EntityType EntityType;
-  typedef typename SubdomainGridPartImp::IntersectionIteratorType IntersectionIteratorType;
-
-public:
-  SubdomainGridPartIntersectionRange(const SubdomainGridPartImp& layer, const EntityType& entity)
-    : layer_(layer)
-    , entity_(entity)
-  {
-  }
-
-  IntersectionIteratorType begin() const
-  {
-    return layer_.ibegin(entity_);
-  }
-
-  IntersectionIteratorType end() const
-  {
-    return layer_.iend(entity_);
-  }
-
-  const SubdomainGridPartImp& layer_;
-  const EntityType& entity_;
-}; // class SubdomainGridPartIntersectionRange
 
 template <class Traits>
-class SubdomainGridPartCommon
-#if HAVE_DUNE_FEM
-    : public Fem::GridPartInterface<Traits>
-#endif
+class SubdomainGridViewCommon
 {
-  using ThisType = SubdomainGridPartCommon<Traits>;
+  using ThisType = SubdomainGridViewCommon<Traits>;
+  using BaseType = GridView<Traits>;
 
-protected:
-#if HAVE_DUNE_FEM
-  typedef Fem::GridPartInterface<Traits> BaseType;
-  typedef BaseType BaseTraits;
-#else
-  typedef Traits BaseTraits;
-  typedef ThisType BaseType;
-#endif
 public:
   typedef typename Traits::GridType GridType;
   typedef typename Traits::CollectiveCommunicationType CollectiveCommunicationType;
-  typedef typename Traits::GlobalGridPartType GlobalGridPartType;
+  typedef typename Traits::GlobalGridViewType GlobalGridViewType;
   typedef typename Traits::IndexSetType IndexSetType;
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
   typedef typename IntersectionIteratorType::Intersection IntersectionType;
@@ -159,58 +134,58 @@ public:
   typedef std::map<IndexType, std::map<int, size_t>> BoundaryInfoContainerType;
 
 public:
-  SubdomainGridPartCommon(const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
+  SubdomainGridViewCommon(const std::shared_ptr<const GlobalGridViewType> globalGrdPrt,
                           const std::shared_ptr<const IndexContainerType> indexContainer,
                           const std::shared_ptr<const BoundaryInfoContainerType> boundaryInfoContainer)
-    : globalGridPart_(globalGrdPrt)
+    : globalGridView_(globalGrdPrt)
     , indexContainer_(indexContainer)
     , boundaryInfoContainer_(boundaryInfoContainer)
-    , indexSet_(*globalGridPart_, indexContainer_)
+    , indexSet_(std::make_shared<IndexSetType>(*globalGridView_, indexContainer_))
   {
   }
 
-  SubdomainGridPartCommon(const ThisType& other) = default;
-  SubdomainGridPartCommon(ThisType&& source) = default;
+  SubdomainGridViewCommon(const ThisType& other) = default;
+  SubdomainGridViewCommon(ThisType&& source) = default;
 
   const IndexSetType& indexSet() const
   {
-    return indexSet_;
+    return *indexSet_;
   }
 
   const GridType& grid() const
   {
-    return globalGridPart_->grid();
+    return globalGridView_->grid();
   }
 
-  const GlobalGridPartType& globalGridPart() const
+  const GlobalGridViewType& globalGridView() const
   {
-    return *globalGridPart_;
-  }
-
-  template <int codim>
-  typename BaseTraits::template Codim<codim>::IteratorType begin() const
-  {
-    return typename BaseTraits::template Codim<codim>::IteratorType(*globalGridPart_, indexContainer_);
-  }
-
-  template <int codim, PartitionIteratorType pitype>
-  typename BaseTraits::template Codim<codim>::template Partition<pitype>::IteratorType begin() const
-  {
-    return typename BaseTraits::template Codim<codim>::template Partition<pitype>::IteratorType(*globalGridPart_,
-                                                                                                indexContainer_);
+    return *globalGridView_;
   }
 
   template <int codim>
-  typename BaseTraits::template Codim<codim>::IteratorType end() const
+  typename Traits::template Codim<codim>::Iterator begin() const
   {
-    return typename BaseTraits::template Codim<codim>::IteratorType(*globalGridPart_, indexContainer_, true);
+    return typename Traits::template Codim<codim>::Iterator(*globalGridView_, indexContainer_);
   }
 
   template <int codim, PartitionIteratorType pitype>
-  typename BaseTraits::template Codim<codim>::template Partition<pitype>::IteratorType end() const
+  typename Traits::template Codim<codim>::template Partition<pitype>::Iterator begin() const
   {
-    return typename BaseTraits::template Codim<codim>::template Partition<pitype>::IteratorType(
-        *globalGridPart_, indexContainer_, true);
+    return
+        typename Traits::template Codim<codim>::template Partition<pitype>::Iterator(*globalGridView_, indexContainer_);
+  }
+
+  template <int codim>
+  typename Traits::template Codim<codim>::Iterator end() const
+  {
+    return typename Traits::template Codim<codim>::Iterator(*globalGridView_, indexContainer_, true);
+  }
+
+  template <int codim, PartitionIteratorType pitype>
+  typename Traits::template Codim<codim>::template Partition<pitype>::Iterator end() const
+  {
+    return typename Traits::template Codim<codim>::template Partition<pitype>::Iterator(
+        *globalGridView_, indexContainer_, true);
   }
 
   int boundaryId(const IntersectionType& intersection) const
@@ -221,7 +196,7 @@ public:
 
   int level() const
   {
-    return globalGridPart_->level();
+    return globalGridView_->level();
   }
 
   template <class DataHandleImp, class DataType>
@@ -231,7 +206,7 @@ public:
   {
     DUNE_THROW(Dune::NotImplemented,
                "As long as I am not sure what this does or is used for I will not implement this!");
-    //    globalGridPart_->communicate(data,iftype,dir);
+    //    globalGridView_->communicate(data,iftype,dir);
   }
 
   const CollectiveCommunicationType& comm() const
@@ -240,44 +215,50 @@ public:
   }
 
 protected:
-  const std::shared_ptr<const GlobalGridPartType> globalGridPart_;
+  const std::shared_ptr<const GlobalGridViewType> globalGridView_;
   const std::shared_ptr<const IndexContainerType> indexContainer_;
   const std::shared_ptr<const BoundaryInfoContainerType> boundaryInfoContainer_;
-  const IndexSetType indexSet_;
+  const std::shared_ptr<const IndexSetType> indexSet_;
 };
 } // namespace internal
 
 
-template <class GlobalGridPartImp>
-class SubdomainGridPart : public internal::SubdomainGridPartCommon<internal::SubdomainGridPartTraits<GlobalGridPartImp>>
+template <class GlobalGridViewImp>
+class SubdomainGridView : public internal::SubdomainGridViewCommon<internal::SubdomainGridViewTraits<GlobalGridViewImp>>
 {
-  using BaseType = internal::SubdomainGridPartCommon<internal::SubdomainGridPartTraits<GlobalGridPartImp>>;
-  using ThisType = SubdomainGridPart<GlobalGridPartImp>;
+  using BaseType = internal::SubdomainGridViewCommon<internal::SubdomainGridViewTraits<GlobalGridViewImp>>;
+  using ThisType = SubdomainGridView<GlobalGridViewImp>;
 
 public:
-  typedef internal::SubdomainGridPartTraits<GlobalGridPartImp> Traits;
+  typedef internal::SubdomainGridViewTraits<GlobalGridViewImp> Traits;
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
   typedef typename IntersectionIteratorType::Intersection IntersectionType;
   typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::GlobalGridPartType GlobalGridPartType;
+  typedef typename BaseType::GlobalGridViewType GlobalGridViewType;
   typedef typename BaseType::IndexType IndexType;
   typedef typename BaseType::IndexContainerType IndexContainerType;
   typedef typename BaseType::BoundaryInfoContainerType BoundaryInfoContainerType;
 
-  SubdomainGridPart(const std::shared_ptr<const GlobalGridPartType> globalGrdPrt,
+  SubdomainGridView(const std::shared_ptr<const GlobalGridViewType> globalGrdPrt,
                     const std::shared_ptr<const IndexContainerType> indexContainer,
                     const std::shared_ptr<const BoundaryInfoContainerType> boundaryInfoContainer)
     : BaseType(globalGrdPrt, indexContainer, boundaryInfoContainer)
   {
   }
 
-  SubdomainGridPart(const ThisType& other) = default;
+  SubdomainGridView(const ThisType& other)
+    : BaseType(other)
+  {
+  }
 
-  SubdomainGridPart(ThisType&& source) = default;
+  SubdomainGridView(ThisType&& source)
+    : BaseType(source)
+  {
+  }
 
   IntersectionIteratorType ibegin(const EntityType& ent) const
   {
-    const IndexType& globalIndex = BaseType::globalGridPart_->indexSet().index(ent);
+    const IndexType& globalIndex = BaseType::globalGridView_->indexSet().index(ent);
     const typename BoundaryInfoContainerType::const_iterator result =
         BaseType::boundaryInfoContainer_->find(globalIndex);
     // if this is an entity at the boundary
@@ -285,16 +266,16 @@ public:
       // get the information for this entity
       const std::map<int, size_t>& info = result->second;
       // return wrapped iterator
-      return IntersectionIteratorType(*BaseType::globalGridPart_, ent, info);
+      return IntersectionIteratorType(*BaseType::globalGridView_, ent, info);
     } else {
       // return iterator which just passes everything thrugh
-      return IntersectionIteratorType(*BaseType::globalGridPart_, ent);
+      return IntersectionIteratorType(*BaseType::globalGridView_, ent);
     } // if this is an entity at the boundary
   } // IntersectionIteratorType ibegin(const EntityType& entity) const
 
   IntersectionIteratorType iend(const EntityType& ent) const
   {
-    const IndexType& globalIndex = BaseType::globalGridPart_->indexSet().index(ent);
+    const IndexType& globalIndex = BaseType::globalGridView_->indexSet().index(ent);
     const typename BoundaryInfoContainerType::const_iterator result =
         BaseType::boundaryInfoContainer_->find(globalIndex);
     // if this is an entity at the boundary
@@ -302,37 +283,37 @@ public:
       // get the information for this entity
       const std::map<int, size_t>& info = result->second;
       // return wrapped iterator
-      return IntersectionIteratorType(*BaseType::globalGridPart_, ent, info, true);
+      return IntersectionIteratorType(*BaseType::globalGridView_, ent, info, true);
     } else {
       // return iterator which just passes everything thrugh
-      return IntersectionIteratorType(*BaseType::globalGridPart_, ent, true);
+      return IntersectionIteratorType(*BaseType::globalGridView_, ent, true);
     } // if this is an entity at the boundary
   }
-}; // class SubdomainGridPart
+}; // class SubdomainGridView
 
 
-template <class GlobalGridPartImp>
-class SubdomainCouplingGridPart
-    : public internal::SubdomainGridPartCommon<internal::SubdomainCouplingGridPartTraits<GlobalGridPartImp>>
+template <class GlobalGridViewImp>
+class SubdomainCouplingGridView
+    : public internal::SubdomainGridViewCommon<internal::SubdomainCouplingGridViewTraits<GlobalGridViewImp>>
 {
-  using BaseType = internal::SubdomainGridPartCommon<internal::SubdomainCouplingGridPartTraits<GlobalGridPartImp>>;
+  using BaseType = internal::SubdomainGridViewCommon<internal::SubdomainCouplingGridViewTraits<GlobalGridViewImp>>;
 
 public:
-  typedef SubdomainCouplingGridPart<GlobalGridPartImp> ThisType;
-  typedef internal::SubdomainCouplingGridPartTraits<GlobalGridPartImp> Traits;
+  typedef SubdomainCouplingGridView<GlobalGridViewImp> ThisType;
+  typedef internal::SubdomainCouplingGridViewTraits<GlobalGridViewImp> Traits;
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
   typedef typename IntersectionIteratorType::Intersection IntersectionType;
   typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::GlobalGridPartType GlobalGridPartType;
+  typedef typename BaseType::GlobalGridViewType GlobalGridViewType;
   typedef typename BaseType::IndexType IndexType;
   typedef typename BaseType::IndexContainerType IndexContainerType;
   typedef typename BaseType::BoundaryInfoContainerType BoundaryInfoContainerType;
-  typedef SubdomainGridPart<GlobalGridPartType> InsideType;
-  typedef SubdomainGridPart<GlobalGridPartType> OutsideType;
+  typedef SubdomainGridView<GlobalGridViewType> InsideType;
+  typedef SubdomainGridView<GlobalGridViewType> OutsideType;
   //! container type for the intersection information
   typedef std::map<IndexType, std::vector<int>> IntersectionInfoContainerType;
 
-  SubdomainCouplingGridPart(const std::shared_ptr<const GlobalGridPartType> globalGrdPart,
+  SubdomainCouplingGridView(const std::shared_ptr<const GlobalGridViewType> globalGrdPart,
                             const std::shared_ptr<const IndexContainerType> indexContainer,
                             const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer,
                             const std::shared_ptr<const InsideType> insd,
@@ -344,32 +325,51 @@ public:
     , inside_(insd)
     , outside_(outsd)
   {
+    assert(intersectionContainer_);
+    assert(inside_);
+    assert(outside_);
   }
 
-  SubdomainCouplingGridPart(const ThisType& other) = default;
+  SubdomainCouplingGridView(const ThisType& other)
+    : BaseType(other)
+    , intersectionContainer_(other.intersectionContainer_)
+    , inside_(other.inside_)
+    , outside_(other.outside_)
+  {
+    assert(intersectionContainer_);
+    assert(inside_);
+    assert(outside_);
+  }
 
-  SubdomainCouplingGridPart(ThisType&& source) = default;
+  SubdomainCouplingGridView(ThisType&& source)
+    : BaseType(source)
+    , intersectionContainer_(std::move(source.intersectionContainer_))
+    , inside_(std::move(source.inside_))
+    , outside_(std::move(source.outside_))
+  {
+  }
 
   IntersectionIteratorType ibegin(const EntityType& ent) const
   {
-    const IndexType& globalIndex = BaseType::globalGridPart().indexSet().index(ent);
+    assert(intersectionContainer_);
+    const IndexType& globalIndex = BaseType::globalGridView().indexSet().index(ent);
     const typename IntersectionInfoContainerType::const_iterator result = intersectionContainer_->find(globalIndex);
     assert(result != intersectionContainer_->end());
     // get the information for this entity
     const auto& info = result->second;
     // return localized iterator
-    return IntersectionIteratorType(BaseType::globalGridPart(), ent, info);
+    return IntersectionIteratorType(BaseType::globalGridView(), ent, info);
   } // IntersectionIteratorType ibegin(const EntityType& entity) const
 
   IntersectionIteratorType iend(const EntityType& ent) const
   {
-    const IndexType& globalIndex = BaseType::globalGridPart().indexSet().index(ent);
+    const IndexType& globalIndex = BaseType::globalGridView().indexSet().index(ent);
     const typename IntersectionInfoContainerType::const_iterator result = intersectionContainer_->find(globalIndex);
     assert(result != intersectionContainer_->end());
     // get the information for this entity
     const auto& info = result->second;
     // return localized iterator
-    return IntersectionIteratorType(BaseType::globalGridPart(), ent, info, true);
+    return IntersectionIteratorType(BaseType::globalGridView(), ent, info, true);
   } // IntersectionIteratorType iend(const EntityType& entity) const
 
   std::shared_ptr<const InsideType> inside() const
@@ -386,31 +386,31 @@ private:
   const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer_;
   const std::shared_ptr<const InsideType> inside_;
   const std::shared_ptr<const OutsideType> outside_;
-}; // class SubdomainCouplingGridPart
+}; // class SubdomainCouplingGridView
 
 
-template <class GlobalGridPartImp>
-class SubdomainBoundaryGridPart
-    : public internal::SubdomainGridPartCommon<internal::SubdomainBoundaryGridPartTraits<GlobalGridPartImp>>
+template <class GlobalGridViewImp>
+class SubdomainBoundaryGridView
+    : public internal::SubdomainGridViewCommon<internal::SubdomainBoundaryGridViewTraits<GlobalGridViewImp>>
 {
-  using BaseType = internal::SubdomainGridPartCommon<internal::SubdomainBoundaryGridPartTraits<GlobalGridPartImp>>;
+  using BaseType = internal::SubdomainGridViewCommon<internal::SubdomainBoundaryGridViewTraits<GlobalGridViewImp>>;
 
 public:
-  typedef SubdomainBoundaryGridPart<GlobalGridPartImp> ThisType;
-  typedef internal::SubdomainBoundaryGridPartTraits<GlobalGridPartImp> Traits;
+  typedef SubdomainBoundaryGridView<GlobalGridViewImp> ThisType;
+  typedef internal::SubdomainBoundaryGridViewTraits<GlobalGridViewImp> Traits;
   typedef typename Traits::IntersectionIteratorType IntersectionIteratorType;
   typedef typename IntersectionIteratorType::Intersection IntersectionType;
   typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::GlobalGridPartType GlobalGridPartType;
+  typedef typename BaseType::GlobalGridViewType GlobalGridViewType;
   typedef typename BaseType::IndexType IndexType;
   typedef typename BaseType::IndexContainerType IndexContainerType;
   typedef typename BaseType::BoundaryInfoContainerType BoundaryInfoContainerType;
-  typedef SubdomainGridPart<GlobalGridPartType> InsideType;
-  typedef SubdomainGridPart<GlobalGridPartType> OutsideType;
+  typedef SubdomainGridView<GlobalGridViewType> InsideType;
+  typedef SubdomainGridView<GlobalGridViewType> OutsideType;
   //! container type for the intersection information
   typedef std::map<IndexType, std::vector<int>> IntersectionInfoContainerType;
 
-  SubdomainBoundaryGridPart(const std::shared_ptr<const GlobalGridPartType> globalGrdPart,
+  SubdomainBoundaryGridView(const std::shared_ptr<const GlobalGridViewType> globalGrdPart,
                             const std::shared_ptr<const IndexContainerType> indexContainer,
                             const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer,
                             const std::shared_ptr<const InsideType> insd)
@@ -422,30 +422,40 @@ public:
   {
   }
 
-  SubdomainBoundaryGridPart(const ThisType& other) = default;
+  SubdomainBoundaryGridView(const ThisType& other)
+    : BaseType(other)
+    , intersectionContainer_(other.intersectionContainer_)
+    , inside_(other.inside_)
+  {
+  }
 
-  SubdomainBoundaryGridPart(ThisType&& source) = default;
+  SubdomainBoundaryGridView(ThisType&& source)
+    : BaseType(source)
+    , intersectionContainer_(std::move(source.intersectionContainer_))
+    , inside_(std::move(source.inside_))
+  {
+  }
 
   IntersectionIteratorType ibegin(const EntityType& ent) const
   {
-    const IndexType& globalIndex = BaseType::globalGridPart().indexSet().index(ent);
+    const IndexType& globalIndex = BaseType::globalGridView().indexSet().index(ent);
     const typename IntersectionInfoContainerType::const_iterator result = intersectionContainer_->find(globalIndex);
     assert(result != intersectionContainer_->end());
     // get the information for this entity
     const auto& info = result->second;
     // return localized iterator
-    return IntersectionIteratorType(BaseType::globalGridPart(), ent, info);
+    return IntersectionIteratorType(BaseType::globalGridView(), ent, info);
   } // IntersectionIteratorType ibegin(const EntityType& entity) const
 
   IntersectionIteratorType iend(const EntityType& ent) const
   {
-    const IndexType& globalIndex = BaseType::globalGridPart().indexSet().index(ent);
+    const IndexType& globalIndex = BaseType::globalGridView().indexSet().index(ent);
     const typename IntersectionInfoContainerType::const_iterator result = intersectionContainer_->find(globalIndex);
     assert(result != intersectionContainer_->end());
     // get the information for this entity
     const auto& info = result->second;
     // return localized iterator
-    return IntersectionIteratorType(BaseType::globalGridPart(), ent, info, true);
+    return IntersectionIteratorType(BaseType::globalGridView(), ent, info, true);
   } // IntersectionIteratorType iend(const EntityType& entity) const
 
   std::shared_ptr<const InsideType> inside() const
@@ -456,161 +466,10 @@ public:
 private:
   const std::shared_ptr<const IntersectionInfoContainerType> intersectionContainer_;
   const std::shared_ptr<const InsideType> inside_;
-}; // class SubdomainBoundaryGridPart
+}; // class SubdomainBoundaryGridView
 
 } // namespace Grid
 } // namespace XT
-
-#if HAVE_DUNE_FEM
-
-namespace Fem {
-namespace GridPartCapabilities {
-
-
-template <class GridPartType>
-struct hasGrid<XT::Grid::SubdomainGridPart<GridPartType>>
-{
-  static const bool v = hasGrid<GridPartType>::v;
-};
-
-template <class GridPartType>
-struct hasSingleGeometryType<XT::Grid::SubdomainGridPart<GridPartType>>
-{
-  static const bool v = hasSingleGeometryType<GridPartType>::v;
-  static const unsigned int topologyId = hasSingleGeometryType<GridPartType>::topologyId;
-};
-
-template <class GridPartType>
-struct isCartesian<XT::Grid::SubdomainGridPart<GridPartType>>
-{
-  static const bool v = isCartesian<GridPartType>::v;
-};
-
-template <class GridPartType, int codim>
-struct hasEntity<XT::Grid::SubdomainGridPart<GridPartType>, codim>
-{
-  static const bool v = hasEntity<GridPartType, codim>::v;
-};
-
-template <class GridPartType, int codim>
-struct canCommunicate<XT::Grid::SubdomainGridPart<GridPartType>, codim>
-{
-  static const bool v = false;
-};
-
-template <class GridPartType>
-struct isConforming<XT::Grid::SubdomainGridPart<GridPartType>>
-{
-  static const bool v = false;
-};
-
-
-template <class GridPartType>
-struct hasGrid<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
-{
-  static const bool v = hasGrid<GridPartType>::v;
-};
-
-template <class GridPartType>
-struct hasSingleGeometryType<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
-{
-  static const bool v = hasSingleGeometryType<GridPartType>::v;
-  static const unsigned int topologyId = hasSingleGeometryType<GridPartType>::topologyId;
-};
-
-template <class GridPartType>
-struct isCartesian<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
-{
-  static const bool v = isCartesian<GridPartType>::v;
-};
-
-template <class GridPartType, int codim>
-struct hasEntity<XT::Grid::SubdomainCouplingGridPart<GridPartType>, codim>
-{
-  static const bool v = hasEntity<GridPartType, codim>::v;
-};
-
-template <class GridPartType, int codim>
-struct canCommunicate<XT::Grid::SubdomainCouplingGridPart<GridPartType>, codim>
-{
-  static const bool v = false;
-};
-
-template <class GridPartType>
-struct isConforming<XT::Grid::SubdomainCouplingGridPart<GridPartType>>
-{
-  static const bool v = false;
-};
-
-
-template <class GridPartType>
-struct hasGrid<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
-{
-  static const bool v = hasGrid<GridPartType>::v;
-};
-
-template <class GridPartType>
-struct hasSingleGeometryType<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
-{
-  static const bool v = hasSingleGeometryType<GridPartType>::v;
-  static const unsigned int topologyId = hasSingleGeometryType<GridPartType>::topologyId;
-};
-
-template <class GridPartType>
-struct isCartesian<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
-{
-  static const bool v = isCartesian<GridPartType>::v;
-};
-
-template <class GridPartType, int codim>
-struct hasEntity<XT::Grid::SubdomainBoundaryGridPart<GridPartType>, codim>
-{
-  static const bool v = hasEntity<GridPartType, codim>::v;
-};
-
-template <class GridPartType, int codim>
-struct canCommunicate<XT::Grid::SubdomainBoundaryGridPart<GridPartType>, codim>
-{
-  static const bool v = false;
-};
-
-template <class GridPartType>
-struct isConforming<XT::Grid::SubdomainBoundaryGridPart<GridPartType>>
-{
-  static const bool v = false;
-};
-
-
-} // namespace GridPartCapabilities
-} // namespace Fem
-
-#endif // HAVE_DUNE_FEM
-
-
-template <typename GP, class Entity>
-inline auto intersections(const XT::Grid::SubdomainGridPart<GP>& gv, const Entity& e)
-    -> XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainGridPart<GP>>
-{
-  return XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainGridPart<GP>>(gv, e);
-}
-
-
-template <typename GP, class Entity>
-inline auto intersections(const XT::Grid::SubdomainBoundaryGridPart<GP>& gv, const Entity& e)
-    -> XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainBoundaryGridPart<GP>>
-{
-  return XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainBoundaryGridPart<GP>>(gv, e);
-}
-
-
-template <typename GP, class Entity>
-inline auto intersections(const XT::Grid::SubdomainCouplingGridPart<GP>& gv, const Entity& e)
-    -> XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainCouplingGridPart<GP>>
-{
-  return XT::Grid::internal::SubdomainGridPartIntersectionRange<XT::Grid::SubdomainCouplingGridPart<GP>>(gv, e);
-}
-
-
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_PART_HH

@@ -94,7 +94,7 @@ struct CubeProviderTest : public ::testing::Test
     ASSERT_NE(nullptr, ms_grid_provider_);
     ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
 
-    const auto& global_grid_part = ms_grid_provider_->dd_grid().globalGridPart();
+    const auto& global_grid_part = ms_grid_provider_->dd_grid().globalGridView();
     const auto& entity_to_subdomain_map = *ms_grid_provider_->dd_grid().entityToSubdomainMap();
     ASSERT_EQ(global_grid_part.indexSet().size(0), entity_to_subdomain_map.size());
     for (auto&& entity : elements(global_grid_part)) {
@@ -142,13 +142,13 @@ struct CubeProviderTest : public ::testing::Test
 
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       total_size += expected_local_sizes[ss];
-      auto local_grid_part = ms_grid_provider_->dd_grid().localGridPart(ss, false);
+      auto local_grid_part = ms_grid_provider_->dd_grid().local_grid_view(ss, false);
       EXPECT_EQ(expected_local_sizes[ss], local_grid_part.indexSet().size(0))
           << "ss: " << ss << "\n"
           << "expected_local_sizes: " << expected_local_sizes << "\n"
           << "actual local sizes:   " << compute_local_sizes(*ms_grid_provider_);
     }
-    EXPECT_EQ(ms_grid_provider_->dd_grid().globalGridPart().indexSet().size(0), total_size);
+    EXPECT_EQ(ms_grid_provider_->dd_grid().globalGridView().indexSet().size(0), total_size);
   } // ... local_parts_are_of_correct_size(...)
 
   void local_views_are_of_correct_size()
@@ -183,7 +183,7 @@ struct CubeProviderTest : public ::testing::Test
     ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
 
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
-      auto local_grid_part = ms_grid_provider_->dd_grid().localGridPart(ss, false);
+      auto local_grid_part = ms_grid_provider_->dd_grid().local_grid_view(ss, false);
       auto local_indices = compute_local_indices(local_grid_part);
       EXPECT_EQ(1, local_indices.count(0)) << "local indices have to start with 0!\n"
                                            << "ss: " << ss << "\n"
@@ -220,9 +220,9 @@ struct CubeProviderTest : public ::testing::Test
     ASSERT_NE(nullptr, ms_grid_provider_);
     ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
 
-    auto global_grid_part = ms_grid_provider_->dd_grid().globalGridPart();
+    auto global_grid_part = ms_grid_provider_->dd_grid().globalGridView();
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
-      auto local_grid_part = ms_grid_provider_->dd_grid().localGridPart(ss, false);
+      auto local_grid_part = ms_grid_provider_->dd_grid().local_grid_view(ss, false);
       for (auto&& entity : elements(local_grid_part)) {
         // we cannot use entity.hasBoundaryIntersections() here!
         for (auto&& local_intersection : intersections(local_grid_part, entity)) {
@@ -327,7 +327,7 @@ struct CubeProviderTest : public ::testing::Test
             << "Please record the expected results!\n"
             << "expected_boundary_sizes: " << expected_boundary_sizes << "\n"
             << "actual boundary sizes: " << compute_boundary_sizes(*ms_grid_provider_);
-        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundaryGridPart(ss);
+        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundary_grid_view(ss);
         EXPECT_EQ(expected_boundary_sizes[ss], boundary_grid_part.indexSet().size(0))
             << "ss: " << ss << "\n"
             << "expected_boundary_sizes: " << expected_boundary_sizes << "\n"
@@ -356,7 +356,7 @@ struct CubeProviderTest : public ::testing::Test
 
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       if (ms_grid_provider_->dd_grid().boundary(ss)) {
-        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundaryGridPart(ss);
+        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundary_grid_view(ss);
         auto boundary_indices = compute_local_indices(boundary_grid_part);
         EXPECT_EQ(1, boundary_indices.count(0)) << "boundary indices have to start with 0!\n"
                                                 << "ss: " << ss << "\n"
@@ -377,7 +377,7 @@ struct CubeProviderTest : public ::testing::Test
 
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       if (ms_grid_provider_->dd_grid().boundary(ss)) {
-        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundaryGridPart(ss);
+        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundary_grid_view(ss);
         for (auto&& entity : elements(boundary_grid_part)) {
           EXPECT_TRUE(entity.hasBoundaryIntersections()) << "ss: " << ss;
           for (auto&& intersection : intersections(boundary_grid_part, entity)) {
@@ -397,7 +397,7 @@ struct CubeProviderTest : public ::testing::Test
     ASSERT_NE(nullptr, ms_grid_provider_);
     ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
 
-    auto global_grid_part = ms_grid_provider_->dd_grid().globalGridPart();
+    auto global_grid_part = ms_grid_provider_->dd_grid().globalGridView();
     auto global_boundary_entities = compute_boundary_indices(global_grid_part);
     std::map<size_t, std::set<size_t>> sum_of_local_boundary_entities;
 
@@ -413,7 +413,7 @@ struct CubeProviderTest : public ::testing::Test
     // test that each local boundary entity and intersection is also a global one
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       if (ms_grid_provider_->dd_grid().boundary(ss)) {
-        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundaryGridPart(ss);
+        auto boundary_grid_part = ms_grid_provider_->dd_grid().boundary_grid_view(ss);
         auto boundary_entities = compute_boundary_indices(boundary_grid_part);
         for (auto&& entity : elements(boundary_grid_part)) {
           auto boundary_entity_index = boundary_grid_part.indexSet().index(entity);
@@ -459,7 +459,7 @@ struct CubeProviderTest : public ::testing::Test
       ASSERT_EQ(expected_neighbors, actual_neighbors) << "ss: " << ss;
       for (const auto& nn : actual_neighbors) {
         EXPECT_EQ(expected_coupling_sizes[ss][nn],
-                  ms_grid_provider_->dd_grid().couplingGridPart(ss, nn).indexSet().size(0))
+                  ms_grid_provider_->dd_grid().coupling_grid_view(ss, nn).indexSet().size(0))
             << "ss: " << ss << "\n"
             << "nn: " << nn << "\n"
             << "expected_coupling_sizes: " << expected_coupling_sizes << "\n"
@@ -476,7 +476,7 @@ struct CubeProviderTest : public ::testing::Test
 
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       for (const auto& nn : ms_grid_provider_->dd_grid().neighborsOf(ss)) {
-        auto coupling_indices = compute_local_indices(ms_grid_provider_->dd_grid().couplingGridPart(ss, nn));
+        auto coupling_indices = compute_local_indices(ms_grid_provider_->dd_grid().coupling_grid_view(ss, nn));
         EXPECT_EQ(1, coupling_indices.count(0)) << "coupling indices have to start with 0!\n"
                                                 << "ss: " << ss << "\n"
                                                 << "nn: " << nn << "\n"
@@ -498,7 +498,7 @@ struct CubeProviderTest : public ::testing::Test
 
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       for (const auto& nn : ms_grid_provider_->dd_grid().neighborsOf(ss)) {
-        auto coupling_grid_part = ms_grid_provider_->dd_grid().couplingGridPart(ss, nn);
+        auto coupling_grid_part = ms_grid_provider_->dd_grid().coupling_grid_view(ss, nn);
         for (auto&& entity : elements(coupling_grid_part)) {
           for (auto&& intersection : intersections(coupling_grid_part, entity)) {
             EXPECT_TRUE(!intersection.boundary() && intersection.neighbor())
@@ -517,7 +517,7 @@ struct CubeProviderTest : public ::testing::Test
     ASSERT_NE(nullptr, ms_grid_provider_);
     ASSERT_NE(nullptr, ms_grid_provider_w_oversampling_);
 
-    auto global_grid_part = ms_grid_provider_->dd_grid().globalGridPart();
+    auto global_grid_part = ms_grid_provider_->dd_grid().globalGridView();
 
     // compute expectations using geometrical information
     auto expected_coupling_indices = compute_coupling_indices(global_grid_part);
@@ -527,7 +527,7 @@ struct CubeProviderTest : public ::testing::Test
         ms_grid_provider_->dd_grid().size());
     for (size_t ss = 0; ss < ms_grid_provider_->dd_grid().size(); ++ss) {
       for (const auto& nn : ms_grid_provider_->dd_grid().neighborsOf(ss)) {
-        auto coupling_grid_part = ms_grid_provider_->dd_grid().couplingGridPart(ss, nn);
+        auto coupling_grid_part = ms_grid_provider_->dd_grid().coupling_grid_view(ss, nn);
         for (auto&& entity : elements(coupling_grid_part)) {
           EXPECT_EQ(compute_subdomain(entity), ss);
           size_t num_coupling_intersections = 0;
@@ -586,7 +586,7 @@ struct CubeProviderTest : public ::testing::Test
     std::vector<size_t> ret;
 
     for (size_t ss = 0; ss < provider.dd_grid().size(); ++ss) {
-      auto local_grid_part = provider.dd_grid().localGridPart(ss, false);
+      auto local_grid_part = provider.dd_grid().local_grid_view(ss, false);
       ret.push_back(local_grid_part.indexSet().size(0));
     }
 
@@ -599,7 +599,7 @@ struct CubeProviderTest : public ::testing::Test
 
     for (size_t ss = 0; ss < provider.dd_grid().size(); ++ss) {
       if (provider.dd_grid().boundary(ss)) {
-        auto boundary_grid_part = provider.dd_grid().boundaryGridPart(ss);
+        auto boundary_grid_part = provider.dd_grid().boundary_grid_view(ss);
         ret[ss] = boundary_grid_part.indexSet().size(0);
       }
     }
@@ -627,7 +627,7 @@ struct CubeProviderTest : public ::testing::Test
     std::vector<std::map<size_t, size_t>> ret(ms_grid.size());
     for (size_t ss = 0; ss < ms_grid.size(); ++ss)
       for (const auto& nn : ms_grid.neighborsOf(ss))
-        ret[ss][nn] = ms_grid.couplingGridPart(ss, nn).indexSet().size(0);
+        ret[ss][nn] = ms_grid.coupling_grid_view(ss, nn).indexSet().size(0);
     return ret;
   } // ... compute_coupling_sizes(...)
 

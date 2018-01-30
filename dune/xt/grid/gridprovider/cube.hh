@@ -335,7 +335,7 @@ public:
     DdGridFactoryType factory(*grid, inner_boundary_segment_index);
     factory.prepare();
     // global grid part
-    const auto global_grid_part = factory.globalGridPart();
+    const auto global_grid_part = factory.globalGridView();
     // walk the grid
     const auto entity_it_end = global_grid_part->template end<0, All_Partition>();
     for (auto entity_it = global_grid_part->template begin<0, All_Partition>(); entity_it != entity_it_end;

@@ -27,24 +27,24 @@ namespace Grid {
 namespace internal {
 
 
-template <class GlobalGridPartImp>
-class LocalIntersectionIterator : public GlobalGridPartImp::IntersectionIteratorType
+template <class GlobalGridViewImp>
+class LocalIntersectionIterator : public GlobalGridViewImp::IntersectionIterator
 {
 public:
-  typedef GlobalGridPartImp GlobalGridPartType;
-  typedef LocalIntersectionIterator<GlobalGridPartType> ThisType;
-  typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
+  typedef GlobalGridViewImp GlobalGridViewType;
+  typedef LocalIntersectionIterator<GlobalGridViewType> ThisType;
+  typedef typename GlobalGridViewType::IntersectionIterator BaseType;
   typedef typename BaseType::Intersection Intersection;
-  using EntityType = extract_entity_t<GlobalGridPartType>;
-  typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
+  using EntityType = extract_entity_t<GlobalGridViewType>;
+  typedef typename GlobalGridViewType::IndexSet::IndexType IndexType;
   typedef std::vector<int> IndexContainerType;
 
-  LocalIntersectionIterator(const GlobalGridPartType& globalGridPart,
+  LocalIntersectionIterator(const GlobalGridViewType& GlobalGridView,
                             const EntityType& entity,
                             const IndexContainerType& indexContainer,
                             const bool end = false)
-    : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
-    , globalGridPart_(globalGridPart)
+    : BaseType(end ? GlobalGridView.iend(entity) : GlobalGridView.ibegin(entity))
+    , globalGridView_(GlobalGridView)
     , entity_(entity)
     , indexContainer_(indexContainer)
     , workAtAll_(0)
@@ -65,7 +65,7 @@ public:
       BaseType::operator++();
       forward();
     } else
-      BaseType::operator=(globalGridPart_.iend(entity_));
+      BaseType::operator=(globalGridView_.iend(entity_));
     return *this;
   } // ThisType& operator++()
 
@@ -87,7 +87,7 @@ private:
     } // while (!found && (workAtAll_ > 0))
   } // void forward()
 
-  const GlobalGridPartType& globalGridPart_;
+  const GlobalGridViewType& globalGridView_;
   const EntityType& entity_;
   const IndexContainerType& indexContainer_;
   unsigned int workAtAll_;
@@ -96,14 +96,14 @@ private:
 }; // class LocalIntersectionIterator
 
 
-template <class GlobalGridPartImp>
-class FakeDomainBoundaryIntersectionIterator : public GlobalGridPartImp::IntersectionIteratorType
+template <class GlobalGridViewImp>
+class FakeDomainBoundaryIntersectionIterator : public GlobalGridViewImp::IntersectionIterator
 {
 public:
-  typedef GlobalGridPartImp GlobalGridPartType;
-  typedef FakeDomainBoundaryIntersectionIterator<GlobalGridPartType> ThisType;
-  typedef typename GlobalGridPartType::IntersectionIteratorType BaseType;
-  using EntityType = extract_entity_t<GlobalGridPartType>;
+  typedef GlobalGridViewImp GlobalGridViewType;
+  typedef FakeDomainBoundaryIntersectionIterator<GlobalGridViewType> ThisType;
+  typedef typename GlobalGridViewType::IntersectionIterator BaseType;
+  using EntityType = extract_entity_t<GlobalGridViewType>;
   typedef std::map<int, size_t> InfoContainerType;
 
 private:
@@ -111,22 +111,22 @@ private:
 
 public:
   typedef FakeDomainBoundaryIntersection<ThisType, BaseIntersectionType> IntersectionImp;
-  typedef Dune::Intersection<typename GlobalGridPartImp::GridType, IntersectionImp> Intersection;
+  typedef Dune::Intersection<typename GlobalGridViewImp::Grid, IntersectionImp> Intersection;
 
-  FakeDomainBoundaryIntersectionIterator(const GlobalGridPartType& globalGridPart,
+  FakeDomainBoundaryIntersectionIterator(const GlobalGridViewType& GlobalGridView,
                                          const EntityType& entity,
                                          bool end = false)
-    : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
+    : BaseType(end ? GlobalGridView.iend(entity) : GlobalGridView.ibegin(entity))
     , passThrough_(true)
     , intersection_(IntersectionImp(*this))
   {
   }
 
-  FakeDomainBoundaryIntersectionIterator(const GlobalGridPartType& globalGridPart,
+  FakeDomainBoundaryIntersectionIterator(const GlobalGridViewType& GlobalGridView,
                                          const EntityType& entity,
                                          const InfoContainerType infoContainer,
                                          bool end = false)
-    : BaseType(end ? globalGridPart.iend(entity) : globalGridPart.ibegin(entity))
+    : BaseType(end ? GlobalGridView.iend(entity) : GlobalGridView.ibegin(entity))
     , passThrough_(false)
     , intersection_(IntersectionImp(*this))
     , infoContainer_(infoContainer)

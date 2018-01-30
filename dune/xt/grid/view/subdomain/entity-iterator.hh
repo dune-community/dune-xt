@@ -28,18 +28,17 @@ namespace internal {
 
 /**
  *  \brief  Iterates over those entities of a grid part, the indices of which match predefined ones.
- *  \todo   Replace GlobalGridPartImp with Interface< GlobalGridPartTraitsImp >!
+ *  \todo   Replace GlobalGridViewImp with Interface< GlobalGridViewTraitsImp >!
  *  \todo   Document!
  */
-template <class GlobalGridPartImp, int codim, Dune::PartitionIteratorType pitype>
-class IndexBasedEntityIterator
-    : public GlobalGridPartImp::template Codim<codim>::template Partition<pitype>::IteratorType
+template <class GlobalGridViewImp, int codim, Dune::PartitionIteratorType pitype>
+class IndexBasedEntityIterator : public GlobalGridViewImp::template Codim<codim>::template Partition<pitype>::Iterator
 {
 public:
-  typedef GlobalGridPartImp GlobalGridPartType;
-  typedef IndexBasedEntityIterator<GlobalGridPartType, codim, pitype> ThisType;
-  typedef typename GlobalGridPartImp::template Codim<codim>::template Partition<pitype>::IteratorType BaseType;
-  typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
+  typedef GlobalGridViewImp GlobalGridViewType;
+  typedef IndexBasedEntityIterator<GlobalGridViewType, codim, pitype> ThisType;
+  typedef typename GlobalGridViewImp::template Codim<codim>::template Partition<pitype>::Iterator BaseType;
+  typedef typename GlobalGridViewType::IndexSet::IndexType IndexType;
   typedef Dune::GeometryType GeometryType;
 
 private:
@@ -49,11 +48,11 @@ public:
   typedef std::map<GeometryType, std::map<IndexType, IndexType>> IndexContainerType;
   typedef typename BaseType::Entity Entity;
 
-  IndexBasedEntityIterator(const GlobalGridPartType& globalGridPart,
+  IndexBasedEntityIterator(const GlobalGridViewType& GlobalGridView,
                            const std::shared_ptr<const IndexContainerType> indexContainer,
                            const bool end = false)
-    : BaseType(end ? globalGridPart.template end<codim, pitype>() : globalGridPart.template begin<codim, pitype>())
-    , globalGridPart_(globalGridPart)
+    : BaseType(end ? GlobalGridView.template end<codim, pitype>() : GlobalGridView.template begin<codim, pitype>())
+    , globalGridView_(GlobalGridView)
     , indexContainer_(indexContainer)
     , workAtAll_(0)
   {
@@ -63,7 +62,7 @@ public:
            iterator != indexContainer_->end();
            ++iterator) {
         // treat only the codim 0 ones
-        if (iterator->first.dim() == (GlobalGridPartType::GridType::dimension - codim)) {
+        if (iterator->first.dim() == (GlobalGridViewType::Grid::dimension - codim)) {
           ++workAtAll_;
           last_.insert(std::make_pair(iterator->first, iterator->second.rbegin()->first));
           end_.insert(std::make_pair(iterator->first, iterator->second.end()));
@@ -79,7 +78,7 @@ public:
       BaseType::operator++();
       forward();
     } else
-      BaseType::operator=(globalGridPart_.template end<codim, pitype>());
+      BaseType::operator=(globalGridView_.template end<codim, pitype>());
     return *this;
   } // ThisType& operator++()
 
@@ -90,7 +89,7 @@ private:
     bool found = false;
     while (!found && (workAtAll_ > 0)) {
       const Entity& entity = BaseType::operator*();
-      const IndexType& index = globalGridPart_.indexSet().index(entity);
+      const IndexType& index = globalGridView_.indexSet().index(entity);
       const GeometryType& geometryType = entity.type();
       typename IndexContainerType::const_iterator indexMap = indexContainer_->find(geometryType);
       if (indexMap != indexContainer_->end()) {
@@ -106,7 +105,7 @@ private:
     }
   } // void forward()
 
-  const GlobalGridPartType& globalGridPart_;
+  const GlobalGridViewType& globalGridView_;
   const std::shared_ptr<const IndexContainerType> indexContainer_;
   unsigned int workAtAll_;
   std::map<GeometryType, IndexType> last_;
@@ -121,11 +120,11 @@ private:
 namespace std {
 
 
-template <class GlobalGridPartImp, int codim, Dune::PartitionIteratorType pitype>
-struct iterator_traits<Dune::XT::Grid::internal::IndexBasedEntityIterator<GlobalGridPartImp, codim, pitype>>
+template <class GlobalGridViewImp, int codim, Dune::PartitionIteratorType pitype>
+struct iterator_traits<Dune::XT::Grid::internal::IndexBasedEntityIterator<GlobalGridViewImp, codim, pitype>>
 {
   typedef ptrdiff_t difference_type;
-  typedef const typename Dune::XT::Grid::internal::IndexBasedEntityIterator<GlobalGridPartImp, codim, pitype>::Entity
+  typedef const typename Dune::XT::Grid::internal::IndexBasedEntityIterator<GlobalGridViewImp, codim, pitype>::Entity
       value_type;
   typedef value_type* pointer;
   typedef value_type& reference;
