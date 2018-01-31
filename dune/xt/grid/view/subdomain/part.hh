@@ -470,6 +470,34 @@ private:
 
 } // namespace Grid
 } // namespace XT
+
+//! these are only necessary because iterators get fubared in copying into the default iterator range,
+template <class GlobalGridViewImp, class Entity>
+inline auto intersections(const GridView<XT::Grid::internal::SubdomainGridViewTraits<GlobalGridViewImp>>& gv,
+                          const Entity& e)
+    -> XT::Grid::SubdomainGridViewIntersectionRange<XT::Grid::SubdomainGridView<GlobalGridViewImp>>
+{
+  return XT::Grid::SubdomainGridViewIntersectionRange<XT::Grid::SubdomainGridView<GlobalGridViewImp>>(gv.impl(), e);
+}
+
+template <class GlobalGridViewImp, class Entity>
+inline auto intersections(const GridView<XT::Grid::internal::SubdomainCouplingGridViewTraits<GlobalGridViewImp>>& gv,
+                          const Entity& e)
+    -> XT::Grid::SubdomainGridViewIntersectionRange<XT::Grid::SubdomainCouplingGridView<GlobalGridViewImp>>
+{
+  return XT::Grid::SubdomainGridViewIntersectionRange<XT::Grid::SubdomainCouplingGridView<GlobalGridViewImp>>(gv.impl(),
+                                                                                                              e);
+}
+
+template <class GlobalGridViewImp, class Entity>
+inline auto intersections(const GridView<XT::Grid::internal::SubdomainBoundaryGridViewTraits<GlobalGridViewImp>>& gv,
+                          const Entity& e)
+    -> XT::Grid::SubdomainGridViewIntersectionRange<XT::Grid::SubdomainBoundaryGridView<GlobalGridViewImp>>
+{
+  return XT::Grid::SubdomainGridViewIntersectionRange<XT::Grid::SubdomainBoundaryGridView<GlobalGridViewImp>>(gv.impl(),
+                                                                                                              e);
+}
+
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_VIEW_SUBDOMAIN_PART_HH

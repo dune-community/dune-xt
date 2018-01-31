@@ -178,6 +178,38 @@ private:
 
 
 } // namespace internal
+
+/** this is only necessary because iterators get fubared in copying into the default iterator range,
+ *  same goes for the intersections(...) functions at the bottom of xt/grid/view/subdomain/view.hh
+ *
+ */
+template <class SubdomainGridViewImp>
+class SubdomainGridViewIntersectionRange
+{
+  typedef typename SubdomainGridViewImp::EntityType EntityType;
+  typedef typename SubdomainGridViewImp::IntersectionIteratorType IntersectionIteratorType;
+
+public:
+  SubdomainGridViewIntersectionRange(const SubdomainGridViewImp& layer, const EntityType& entity)
+    : layer_(layer)
+    , entity_(entity)
+  {
+  }
+
+  IntersectionIteratorType begin() const
+  {
+    return layer_.ibegin(entity_);
+  }
+
+  IntersectionIteratorType end() const
+  {
+    return layer_.iend(entity_);
+  }
+
+  const SubdomainGridViewImp& layer_;
+  const EntityType& entity_;
+}; // class SubdomainGridViewIntersectionRange
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
