@@ -12,6 +12,8 @@
 #ifndef DUNE_XT_GRID_WALKER_APPLY_ON_HH
 #define DUNE_XT_GRID_WALKER_APPLY_ON_HH
 
+#include <functional>
+
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/grid/boundaryinfo.hh>
@@ -21,6 +23,18 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 namespace ApplyOn {
+namespace internal {
+
+
+// forwards
+template <class GL>
+class CombinedIntersectionFilters;
+
+template <class GL>
+class NegatedIntersectionFilter;
+
+
+} // namespace internal
 
 
 /**
@@ -114,10 +128,117 @@ public:
   virtual WhichIntersection<GridLayerImp>* copy() const = 0; // required for redirect lambdas, i.e., in python bindings
 
   virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& /*intersection*/) const = 0;
-};
+
+  WhichIntersection<GridLayerType>* operator!() const
+  {
+    return new internal::NegatedIntersectionFilter<GridLayerType>(*this);
+  }
+
+  WhichIntersection<GridLayerType>* operator&&(const WhichIntersection<GridLayerType>& other) const
+  {
+    return new internal::CombinedIntersectionFilters<GridLayerType>(
+        *this, other, [](const auto& left, const auto& right) { return left && right; });
+  }
+
+  WhichIntersection<GridLayerType>* operator&&(WhichIntersection<GridLayerType>*&& other) const
+  {
+    return new internal::CombinedIntersectionFilters<GridLayerType>(
+        *this, std::move(other), [](const auto& left, const auto& right) { return left && right; });
+  }
+
+  WhichIntersection<GridLayerType>* operator||(const WhichIntersection<GridLayerType>& other) const
+  {
+    return new internal::CombinedIntersectionFilters<GridLayerType>(
+        *this, other, [](const auto& left, const auto& right) { return left || right; });
+  }
+
+  WhichIntersection<GridLayerType>* operator||(WhichIntersection<GridLayerType>*&& other) const
+  {
+    return new internal::CombinedIntersectionFilters<GridLayerType>(
+        *this, std::move(other), [](const auto& left, const auto& right) { return left || right; });
+  }
+}; // class WhichIntersection
 
 
 namespace internal {
+
+
+template <class GL>
+class CombinedIntersectionFilters : public WhichIntersection<GL>
+{
+  using BaseType = WhichIntersection<GL>;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  CombinedIntersectionFilters(const BaseType& left,
+                              const BaseType& right,
+                              std::function<bool(const bool&, const bool&)> combine_lambda)
+    : left_(left.copy())
+    , right_(right.copy())
+    , combine_lambda_(combine_lambda)
+  {
+  }
+
+  CombinedIntersectionFilters(const BaseType& left,
+                              BaseType*&& right,
+                              std::function<bool(const bool&, const bool&)> combine_lambda)
+    : left_(left.copy())
+    , right_(std::move(right))
+    , combine_lambda_(combine_lambda)
+  {
+  }
+
+  WhichIntersection<GridLayerType>* copy() const override final
+  {
+    return new CombinedIntersectionFilters<GL>(*left_, *right_, combine_lambda_);
+  }
+
+  bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  {
+    return combine_lambda_(left_->apply_on(grid_layer, intersection), right_->apply_on(grid_layer, intersection));
+  }
+
+private:
+  const std::unique_ptr<BaseType> left_;
+  const std::unique_ptr<BaseType> right_;
+  const std::function<bool(const bool&, const bool&)> combine_lambda_;
+}; // class CombinedIntersectionFilters
+
+
+template <class GL>
+class NegatedIntersectionFilter : public WhichIntersection<GL>
+{
+  using BaseType = WhichIntersection<GL>;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  NegatedIntersectionFilter(const BaseType& filter)
+    : filter_(filter.copy())
+  {
+  }
+
+  NegatedIntersectionFilter(BaseType*&& filter)
+    : filter_(std::move(filter))
+  {
+  }
+
+  WhichIntersection<GridLayerType>* copy() const override final
+  {
+    return new NegatedIntersectionFilter<GL>(*filter_);
+  }
+
+  bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  {
+    return !filter_->apply_on(grid_layer, intersection);
+  }
+
+private:
+  const std::unique_ptr<BaseType> filter_;
+}; // class NegatedIntersectionFilter
 
 
 template <class GV, class Imp, bool ctor_with_boundary_info = false>
@@ -172,6 +293,26 @@ public:
     return true;
   }
 }; // class AllIntersections
+
+
+/**
+ *  \brief Selects all intersections.
+ */
+template <class GridLayerImp>
+class NoIntersections : public internal::WhichIntersectionBase<GridLayerImp, NoIntersections<GridLayerImp>>
+{
+  typedef WhichIntersection<GridLayerImp> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/,
+                        const IntersectionType& /*intersection*/) const override final
+  {
+    return false;
+  }
+}; // class NoIntersections
 
 
 /**
@@ -344,6 +485,48 @@ private:
 
 
 template <class GridLayerImp>
+class CustomBoundaryIntersections : public WhichIntersection<GridLayerImp>
+{
+  typedef WhichIntersection<GridLayerImp> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  /**
+   * \attention Takes ownership of boundary_type, do not delete manually!
+   */
+  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                       BoundaryType*&& boundary_type)
+    : boundary_info_(boundary_info)
+    , boundary_type_(std::move(boundary_type))
+  {
+  }
+
+  explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
+                                       const std::shared_ptr<BoundaryType>& boundary_type)
+    : boundary_info_(boundary_info)
+    , boundary_type_(boundary_type)
+  {
+  }
+
+  WhichIntersection<GridLayerType>* copy() const override final
+  {
+    return new CustomBoundaryIntersections<GridLayerType>(boundary_info_, boundary_type_);
+  }
+
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  {
+    return boundary_info_.type(intersection) == *boundary_type_;
+  }
+
+protected:
+  const BoundaryInfo<IntersectionType>& boundary_info_;
+  const std::shared_ptr<BoundaryType> boundary_type_;
+}; // class CustomBoundaryIntersections
+
+
+template <class GridLayerImp>
 class DirichletIntersections
     : public internal::WhichIntersectionBase<GridLayerImp, DirichletIntersections<GridLayerImp>, true>
 {
@@ -358,7 +541,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     static constexpr const XT::Grid::DirichletBoundary dirichlet{};
     return boundary_info_.access().type(intersection) == dirichlet;
@@ -426,7 +609,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return boundary_info_.access().type(intersection) == NeumannBoundary();
   }

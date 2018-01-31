@@ -25,6 +25,36 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 namespace bindings {
+namespace internal {
+
+
+template <class GL>
+class Walker
+{
+  static_assert(is_layer<GL>::value, "");
+
+public:
+  typedef XT::Grid::Walker<GL> type;
+  typedef pybind11::class_<type> bound_type;
+
+  static bound_type bind(pybind11::module& m, const std::string& grid_and_layer_name)
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+
+    bound_type c(m, Common::to_camel_case(std::string("walker_") + grid_and_layer_name).c_str());
+    c.def("clear", &type::clear);
+    c.def("append", [](type& self, type& other) { self.append(other); }, "other"_a, py::keep_alive<1, 2>());
+    c.def("prepare", &type::prepare);
+    c.def("finalize", &type::finalize);
+    c.def("walk", [](type& self, const bool use_tbb) { self.walk(use_tbb); }, "use_tbb"_a = false);
+
+    return c;
+  } // ... bind(...)
+}; // class Walker
+
+
+} // namespace internal
 
 
 template <class G, Layers layer, Backends backend>
@@ -32,10 +62,11 @@ class Walker
 {
   static_assert(is_grid<G>::value, "");
   typedef typename Layer<G, layer, backend>::type GL;
+  using binder = internal::Walker<GL>;
 
 public:
-  typedef XT::Grid::Walker<GL> type;
-  typedef pybind11::class_<type> bound_type;
+  using type = typename binder::type;
+  using bound_type = typename binder::bound_type;
 
 private:
   template <bool is_dd = (layer == Layers::dd_subdomain || layer == Layers::dd_subdomain_boundary
@@ -78,25 +109,14 @@ private:
 public:
   static bound_type bind(pybind11::module& m)
   {
-    namespace py = pybind11;
-    using namespace pybind11::literals;
-
     // we need to add the factory methods first, since adding the class below might fail (if someone added it before)
     factory_method<>::addbind(m);
 
-    const auto ClassName = Common::to_camel_case(
-        "walker_" + grid_name<G>::value() + "_" + layer_name<layer>::value() + "_" + backend_name<backend>::value());
-
-    bound_type c(m, ClassName.c_str());
-    c.def("clear", &type::clear);
-    c.def("append", [](type& self, type& other) { self.append(other); }, "other"_a, py::keep_alive<1, 2>());
-    c.def("prepare", &type::prepare);
-    c.def("finalize", &type::finalize);
-    c.def("walk", [](type& self, const bool use_tbb) { self.walk(use_tbb); }, "use_tbb"_a = false);
-
-    return c;
-  } // ... bind(...)
+    return binder::bind(
+        m, grid_name<G>::value() + "_" + layer_name<layer>::value() + "_" + backend_name<backend>::value());
+  }
 }; // class Walker
+
 
 } // namespace bindings
 } // namespace Grid

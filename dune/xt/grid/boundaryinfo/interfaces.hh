@@ -22,18 +22,20 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-// We do not want to add a virtual destructor (to be able to use this as constexpr),
-// so just silence the warning.
+// We do not want to add a virtual destructor (to be able to use this as constexpr), so just silence the warning.
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #endif
+
+
 class BoundaryType
 {
-protected:
+public:
   virtual std::string id() const = 0;
 
-public:
+  virtual BoundaryType* copy() const = 0;
+
   virtual bool operator==(const BoundaryType& other) const
   {
     return id() == other.id();
@@ -47,6 +49,11 @@ public:
 private:
   friend std::ostream& operator<<(std::ostream&, const BoundaryType&);
 }; // class BoundaryType
+
+
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 
 std::ostream& operator<<(std::ostream& out, const BoundaryType& type);
@@ -72,9 +79,6 @@ public:
     return "xt.grid.boundaryinfo";
   }
 }; // class BoundaryInfo
-#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
-#pragma GCC diagnostic pop
-#endif
 
 
 } // namespace Grid

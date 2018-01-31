@@ -1102,7 +1102,7 @@ class PeriodicGridPart
 {
   static_assert(is_part<RealGridPartImp>::value || is_dd_subdomain<RealGridPartImp>::value, "");
   using Implementation = PeriodicGridView<RealGridPartImp, codim_iters_provided>;
-  using ImplementationStorage = typename XT::Common::ConstStorageProvider<Implementation>;
+  using ImplementationStorage = XT::Common::ConstStorageProvider<Implementation>;
   using BaseType = Dune::XT::Grid::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>>;
 
 public:
@@ -1112,12 +1112,6 @@ public:
   PeriodicGridPart(const RealGridLayerType& real_grid_part,
                    const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
     : ImplementationStorage(new Implementation(real_grid_part, periodic_directions))
-    , BaseType(ImplementationStorage::access())
-  {
-  }
-
-  PeriodicGridPart(const PeriodicGridPart& other)
-    : ImplementationStorage(new Implementation(other.access()))
     , BaseType(ImplementationStorage::access())
   {
   }

@@ -49,27 +49,26 @@ public:
                  "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
   } // ... default_config(...)
 
-  static std::unique_ptr<BoundaryInfo<I>> create(const std::string& type = available()[0],
-                                                 const Common::Configuration config = Common::Configuration())
+  static std::unique_ptr<BoundaryInfo<I>> create(const Common::Configuration& config)
   {
+    const auto type = config.get<std::string>("type");
     if (type == AllDirichletBoundaryInfo<I>::static_id())
-      return make_alldirichlet_boundaryinfo<I>(config);
+      return make_alldirichlet_boundaryinfo<I>();
     else if (type == AllNeumannBoundaryInfo<I>::static_id())
-      return make_allneumann_boundaryinfo<I>(config);
+      return make_allneumann_boundaryinfo<I>();
     else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
-      return make_boundarysegment_boundaryinfo<I>(config);
+      return make_boundarysegment_boundaryinfo<I>();
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
-      return make_normalbased_boundaryinfo<I>(config);
+      return make_normalbased_boundaryinfo<I>();
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
   } // ... create(...)
 
-  static std::unique_ptr<BoundaryInfo<I>> create(const Common::Configuration& config)
+  static std::unique_ptr<BoundaryInfo<I>> create(const std::string& type = available().at(0))
   {
-    return create(config.get<std::string>("type"), config);
+    return create(default_config(type));
   }
-
 }; // class BoundaryInfoFactory
 
 
