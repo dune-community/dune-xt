@@ -32,7 +32,13 @@ struct CubeProviderTest : public ::testing::Test
 {
   using G = TESTGRIDTYPE;
   static const constexpr size_t d = G::dimension;
-  typedef XT::Grid::GridProvider<G, XT::Grid::DD::SubdomainGrid<G>> ProviderType;
+  using SDG = XT::Grid::DD::SubdomainGrid<G>;
+  typedef XT::Grid::GridProvider<G, SDG> ProviderType;
+
+  static_assert(XT::Grid::is_dd_subdomain<typename SDG::LocalGridViewType>::value, "");
+  static_assert(XT::Grid::is_dd_subdomain_boundary<typename SDG::BoundaryGridViewType>::value, "");
+  static_assert(XT::Grid::is_dd_subdomain_coupling<typename SDG::CouplingGridViewType>::value, "");
+
   typedef typename ProviderType::DdGridType DdGridType;
 
   typedef ExpectedResults<G> Expected;

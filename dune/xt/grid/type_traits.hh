@@ -32,26 +32,16 @@ namespace XT {
 namespace Grid {
 
 
-// forwards
-template <class GlobalGridViewImp>
-class SubdomainGridView;
-
-template <class GlobalGridViewImp>
-class SubdomainBoundaryGridView;
-
-template <class GlobalGridViewImp>
-class SubdomainCouplingGridView;
-
-
 namespace internal {
 
+template <class GlobalGridViewImp>
+class SubdomainGridViewTraits;
 
-template <class T>
-struct is_dd_subdomain_helper
-{
-  DXTC_has_typedef_initialize_once(GlobalGridViewType);
-  static const bool value = DXTC_has_typedef(GlobalGridViewType)<T>::value;
-};
+template <class GlobalGridViewImp>
+struct SubdomainCouplingGridViewTraits;
+
+template <class GlobalGridViewImp>
+struct SubdomainBoundaryGridViewTraits;
 
 
 template <class T>
@@ -154,37 +144,36 @@ struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_grid_view : p
 };
 
 
-template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
+template <class T>
 struct is_dd_subdomain : public std::false_type
 {
 };
 
 template <class T>
-struct is_dd_subdomain<T, true> : public std::is_base_of<SubdomainGridView<typename T::GlobalGridViewType>, T>
+struct is_dd_subdomain<Dune::GridView<XT::Grid::internal::SubdomainGridViewTraits<T>>> : public is_view<T>
 {
 };
 
 
-template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
+template <class T>
 struct is_dd_subdomain_boundary : public std::false_type
 {
 };
 
 template <class T>
-struct is_dd_subdomain_boundary<T, true>
-    : public std::is_base_of<SubdomainBoundaryGridView<typename T::GlobalGridViewType>, T>
+struct is_dd_subdomain_boundary<Dune::GridView<XT::Grid::internal::SubdomainBoundaryGridViewTraits<T>>>
+    : public is_view<T>
 {
 };
 
-
-template <class T, bool is_candidate = internal::is_dd_subdomain_helper<T>::value>
+template <class T>
 struct is_dd_subdomain_coupling : public std::false_type
 {
 };
 
 template <class T>
-struct is_dd_subdomain_coupling<T, true>
-    : public std::is_base_of<SubdomainCouplingGridView<typename T::GlobalGridViewType>, T>
+struct is_dd_subdomain_coupling<Dune::GridView<XT::Grid::internal::SubdomainCouplingGridViewTraits<T>>>
+    : public is_view<T>
 {
 };
 
