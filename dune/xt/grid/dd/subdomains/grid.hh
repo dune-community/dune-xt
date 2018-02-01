@@ -22,6 +22,7 @@
 #include <dune/grid/common/gridview.hh>
 
 #include <dune/xt/common/color.hh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/view/subdomain/view.hh>
@@ -105,8 +106,7 @@ public:
           << size_ << ")!" << std::endl;
       error = true;
     }
-    if (error)
-      DUNE_THROW(InvalidStateException, msg.str());
+    DUNE_THROW_IF(error, InvalidStateException, msg.str())
   } // SubdomainGrid()
 
   SubdomainGrid(
@@ -156,8 +156,7 @@ public:
           << size_ << ")!" << std::endl;
       error = true;
     }
-    if (error)
-      DUNE_THROW(InvalidStateException, msg.str());
+    DUNE_THROW_IF(error, InvalidStateException, msg.str());
   } // SubdomainGrid()
 
   SubdomainGrid(const ThisType& other) = default;
@@ -193,13 +192,12 @@ public:
     assert(subdomain < size_);
     if (!ovrsmplng)
       return *((*localGridViews_)[subdomain]);
-    else {
-      if (!oversampling_)
-        DUNE_THROW(InvalidStateException,
-                   "\n" << Common::color_string_red("ERROR:")
-                        << " oversampled local grid part requested from a grid without oversampling!");
-      return *((*oversampledLocalGridViews_)[subdomain]);
-    }
+
+    DUNE_THROW_IF(!oversampling_,
+                  InvalidStateException,
+                  "\n" << Common::color_string_red("ERROR:")
+                       << " oversampled local grid part requested from a grid without oversampling!")
+    return *((*oversampledLocalGridViews_)[subdomain]);
   } // ... local_grid_view(...)
 
   bool boundary(const size_t subdomain) const
@@ -228,10 +226,9 @@ public:
     assert(neighbor < size_);
     const auto& couplingGridViews = (*couplingGridViewsMaps_)[subdomain];
     const auto result = couplingGridViews.find(neighbor);
-    if (result == couplingGridViews.end()) {
-      DUNE_THROW(InvalidStateException,
-                 "subdomain " << neighbor << " is not a neighbor of subdomain " << subdomain << "!");
-    }
+    DUNE_THROW_IF(result == couplingGridViews.end(),
+                  InvalidStateException,
+                  "subdomain " << neighbor << " is not a neighbor of subdomain " << subdomain << "!");
     assert(result->second);
     return *(result->second);
   }
@@ -251,11 +248,9 @@ public:
   size_t subdomainOf(const IndexType& globalIndex) const
   {
     const typename EntityToSubdomainMapType::const_iterator result = entityToSubdomainMap_->find(globalIndex);
-    if (result == entityToSubdomainMap_->end()) {
-      std::stringstream msg;
-      msg << "missing information for entity " << globalIndex << "in entityToSubdomainMap_!";
-      DUNE_THROW(InvalidStateException, msg.str());
-    }
+    DUNE_THROW_IF(result == entityToSubdomainMap_->end(),
+                  InvalidStateException,
+                  "missing information for entity " << globalIndex << "in entityToSubdomainMap_!");
     return result->second;
   } // ... getSubdomainOf(...)
 
