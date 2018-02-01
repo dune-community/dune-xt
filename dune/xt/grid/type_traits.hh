@@ -235,7 +235,7 @@ template <class T,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value,
           bool intersection = is_intersection<T>::value>
-struct extract_grid : public std::false_type
+struct extract_grid : public AlwaysFalse<T>
 {
 };
 
@@ -264,7 +264,7 @@ using extract_grid_t = typename extract_grid<T>::type;
 template <class T,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_collective_communication : public std::false_type
+struct extract_collective_communication : public AlwaysFalse<T>
 {
 };
 
@@ -287,7 +287,7 @@ using extract_collective_communication_t = typename extract_collective_communica
 template <class T,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_index_set : public std::false_type
+struct extract_index_set : public AlwaysFalse<T>
 {
 };
 
@@ -310,7 +310,7 @@ using extract_index_set_t = typename extract_index_set<T>::type;
 template <class T,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_intersection : public std::false_type
+struct extract_intersection : public AlwaysFalse<T>
 {
 };
 
@@ -333,7 +333,7 @@ using extract_intersection_t = typename extract_intersection<T>::type;
 template <class T,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_intersection_iterator : public std::false_type
+struct extract_intersection_iterator : public AlwaysFalse<T>
 {
 };
 
@@ -357,7 +357,7 @@ template <class T,
           size_t codim = 0,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_entity : public std::false_type
+struct extract_entity : public AlwaysFalse<T>
 {
 };
 
@@ -381,7 +381,7 @@ template <class T,
           size_t codim = 0,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_local_geometry : public std::false_type
+struct extract_local_geometry : public AlwaysFalse<T>
 {
 };
 
@@ -405,7 +405,7 @@ template <class T,
           size_t codim = 0,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_geometry : public std::false_type
+struct extract_geometry : public AlwaysFalse<T>
 {
 };
 
@@ -429,7 +429,7 @@ template <class T,
           int c = 0,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_iterator : public std::false_type
+struct extract_iterator : public AlwaysFalse<T>
 {
 };
 
@@ -454,7 +454,7 @@ template <class T,
           int c = 0,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_partition_iterator : public std::false_type
+struct extract_partition_iterator : public AlwaysFalse<T>
 {
 };
 
