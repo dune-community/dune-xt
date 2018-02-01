@@ -187,7 +187,7 @@ template <class SubdomainGridViewImp>
 class SubdomainGridViewIntersectionRange
 {
   typedef typename SubdomainGridViewImp::EntityType EntityType;
-  typedef typename SubdomainGridViewImp::IntersectionIteratorType IntersectionIteratorType;
+  typedef typename SubdomainGridViewImp::IntersectionIterator IntersectionIterator;
 
 public:
   SubdomainGridViewIntersectionRange(const SubdomainGridViewImp& layer, const EntityType& entity)
@@ -196,12 +196,12 @@ public:
   {
   }
 
-  IntersectionIteratorType begin() const
+  IntersectionIterator begin() const
   {
     return layer_.ibegin(entity_);
   }
 
-  IntersectionIteratorType end() const
+  IntersectionIterator end() const
   {
     return layer_.iend(entity_);
   }

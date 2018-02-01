@@ -27,7 +27,7 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 
-#include <dune/xt/grid/view/subdomain/part.hh>
+#include <dune/xt/grid/view/subdomain/view.hh>
 
 #include "grid.hh"
 

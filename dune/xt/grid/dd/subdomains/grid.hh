@@ -24,7 +24,7 @@
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/grid/view/subdomain/part.hh>
+#include <dune/xt/grid/view/subdomain/view.hh>
 
 namespace Dune {
 namespace XT {
