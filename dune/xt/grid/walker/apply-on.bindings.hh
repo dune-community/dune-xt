@@ -85,13 +85,13 @@ public:
 
     // bind interface, guard since we might not be the first to do so for this intersection
     try {
-      py::class_<InterfaceType>(m, InterfaceName.c_str(), InterfaceName.c_str(), py::metaclass());
+      py::class_<InterfaceType>(m, InterfaceName.c_str(), InterfaceName.c_str());
     } catch (std::runtime_error&) {
     }
 
     // bind class
     const auto ClassName = Common::to_camel_case("apply_on_" + class_name + "_" + grid_name + "_" + layer_name);
-    bound_type c(m, ClassName.c_str(), ClassName.c_str(), py::metaclass());
+    bound_type c(m, ClassName.c_str(), ClassName.c_str());
     addbind<>()(m, c, class_name, layer_name);
 
     return c;

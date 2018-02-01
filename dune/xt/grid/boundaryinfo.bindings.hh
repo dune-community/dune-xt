@@ -122,7 +122,7 @@ public:
 
     // bind interface, guard since we might not be the first to do so for this intersection
     try {
-      py::class_<InterfaceType>(m, InterfaceName.c_str(), InterfaceName.c_str(), py::metaclass());
+      py::class_<InterfaceType>(m, InterfaceName.c_str(), InterfaceName.c_str());
     } catch (std::runtime_error&) {
     }
 
@@ -133,7 +133,7 @@ public:
     // bind class, guard since we might not be the first to do so for this intersection
     try {
       const auto ClassName = Common::to_camel_case(class_name + "_" + layer_name + "_" + grid_name);
-      bound_type c(m, ClassName.c_str(), ClassName.c_str(), py::metaclass());
+      bound_type c(m, ClassName.c_str(), ClassName.c_str());
       c.def_property_readonly_static("static_id", [](const type& /*self*/) { return type::static_id(); });
       c.def("__repr__", [ClassName](const type& /*self*/) { return ClassName; });
     } catch (std::runtime_error&) {
