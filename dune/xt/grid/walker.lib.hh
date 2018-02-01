@@ -30,9 +30,9 @@
   _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, part);                                                               \
   _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, leaf, part);                                                                \
   _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, adaptive_leaf, part);                                                       \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain, part);                                                        \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_coupling, part);                                               \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_boundary, part)
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain, view);                                                        \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_coupling, view);                                               \
+  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_boundary, view)
 #else
 #define _DUNE_XT_GRID_WALKER_LIB_PART(_prefix, _GRID)
 #endif

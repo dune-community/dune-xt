@@ -54,6 +54,7 @@ void addbind_for_Grid(pybind11::module& m)
   using namespace Dune::XT::Grid;
 
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
+  typedef typename Layer<G, Layers::dd_subdomain, Backends::view, DD::SubdomainGrid<G>>::type DdSubdomainPart;
 
   bind_GridProvider<G>(m, grid_id);
   bind_make_cube_grid<G>(m, grid_id);
@@ -62,13 +63,11 @@ void addbind_for_Grid(pybind11::module& m)
   bind_make_cube_dd_subdomains_grid<G>(m, grid_id);
 
   bind_walker<G, Layers::adaptive_leaf, Backends::part>(m);
-  bind_walker<G, Layers::dd_subdomain, Backends::part>(m);
-  bind_walker<G, Layers::dd_subdomain_boundary, Backends::part>(m);
-  bind_walker<G, Layers::dd_subdomain_coupling, Backends::part>(m);
-  bind_walker<G, Layers::dd_subdomain_oversampled, Backends::part>(m);
   bind_walker<G, Layers::leaf, Backends::part>(m);
   bind_walker<G, Layers::level, Backends::part>(m);
   bind_walker<G, Layers::dd_subdomain, Backends::view>(m);
+  bind_walker<G, Layers::dd_subdomain_boundary, Backends::view>(m);
+  bind_walker<G, Layers::dd_subdomain_coupling, Backends::view>(m);
   bind_walker<G, Layers::dd_subdomain_oversampled, Backends::view>(m);
   bind_walker<G, Layers::leaf, Backends::view>(m);
   bind_walker<G, Layers::level, Backends::view>(m);
