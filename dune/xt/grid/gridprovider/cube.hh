@@ -273,9 +273,6 @@ make_cube_grid(const Common::Configuration& cfg = cube_gridprovider_default_conf
 }
 
 
-#if HAVE_DUNE_FEM
-
-
 template <class GridType>
 class CubeDdSubdomainsGridProviderFactory
 {
@@ -370,17 +367,6 @@ public:
     return GridProvider<GridType, DdGridType>(grid, factory.createMsGrid());
   } // ... create(...)
 }; // class CubeDdSubdomainsGridProviderFactory
-
-#else // HAVE_DUNE_FEM
-
-template <class GridType>
-class CubeDdSubdomainsGridProviderFactory
-{
-  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
-};
-
-
-#endif // HAVE_DUNE_FEM
 
 
 template <class GridType>
