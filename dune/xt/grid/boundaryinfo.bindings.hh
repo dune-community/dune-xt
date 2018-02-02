@@ -54,13 +54,6 @@ public:
             "grid_provider"_a,
             "type"_a);
       m.def(std::string("make_boundary_info_on_" + layer_name<layer>::value() + "_layer").c_str(),
-            [](const GP& /*grid_provider*/, const std::string& type, const Common::Configuration& cfg) {
-              return XT::Grid::BoundaryInfoFactory<I>::create(type, cfg).release();
-            },
-            "grid_provider"_a,
-            "type"_a,
-            "cfg"_a = Common::Configuration());
-      m.def(std::string("make_boundary_info_on_" + layer_name<layer>::value() + "_layer").c_str(),
             [](const GP& /*grid_provider*/, const Common::Configuration& cfg) {
               return XT::Grid::BoundaryInfoFactory<I>::create(cfg).release();
             },
