@@ -37,7 +37,7 @@ pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const s
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef GridProvider<G> C;
+  typedef GridProvider<G, int> C;
 
   py::class_<C> c(m, std::string("GridProvider__" + grid_id).c_str(), std::string("GridProvider__" + grid_id).c_str());
 
@@ -121,7 +121,7 @@ pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridPro
           std::set<size_t> neighborhood;
           neighborhood.insert(ss);
           if (self.dd_grid().oversampling())
-            for (auto&& entity : elements(self.dd_grid().localGridPart(ss, /*oversampling=*/true)))
+            for (auto&& entity : elements(self.dd_grid().local_grid_view(ss, /*oversampling=*/true)))
               neighborhood.insert(self.dd_grid().subdomainOf(entity));
           std::vector<size_t> result(neighborhood.begin(), neighborhood.end());
           std::sort(result.begin(), result.end());

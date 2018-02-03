@@ -20,6 +20,12 @@
 namespace Dune {
 namespace XT {
 namespace Grid {
+
+namespace DD {
+template <class G>
+class SubdomainGrid;
+}
+
 namespace bindings {
 
 
@@ -44,6 +50,14 @@ struct grid_name<YaspGrid<dim, EquidistantOffsetCoordinates<double, dim>>>
   }
 };
 
+template <class G>
+struct grid_name<DD::SubdomainGrid<G>>
+{
+  static std::string value()
+  {
+    return std::string("SubdomainGrid_") + grid_name<G>::value();
+  }
+};
 
 #if HAVE_DUNE_ALUGRID
 

@@ -34,14 +34,14 @@ public:
   typedef IntersectionIteratorImp IntersectionIteratorType;
   typedef WrappedIntersectionImp WrappedIntersectionType;
   typedef FakeDomainBoundaryIntersection<IntersectionIteratorType, WrappedIntersectionType> ThisType;
-  static const int dimension = WrappedIntersectionType::dimension;
-  static const int dimensionworld = WrappedIntersectionType::dimensionworld;
   typedef typename WrappedIntersectionType::Entity Entity;
   typedef typename WrappedIntersectionType::Geometry Geometry;
   typedef typename WrappedIntersectionType::LocalCoordinate LocalCoordinate;
   typedef typename WrappedIntersectionType::GlobalCoordinate GlobalCoordinate;
   typedef typename WrappedIntersectionType::LocalGeometry LocalGeometry;
   typedef typename WrappedIntersectionType::ctype ctype;
+  static const int dimension = Entity::dimension;
+  static const int dimensionworld = WrappedIntersectionType::dimensionworld;
 
   FakeDomainBoundaryIntersection(const IntersectionIteratorType& intersectionIterator)
     : intersectionIterator_(intersectionIterator)

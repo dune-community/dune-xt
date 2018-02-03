@@ -27,7 +27,7 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 
-#include <dune/xt/grid/view/subdomain/part.hh>
+#include <dune/xt/grid/view/subdomain/view.hh>
 
 #include "grid.hh"
 
@@ -218,11 +218,11 @@ public:
   typedef typename GridType::template Codim<0>::Entity EntityType;
 
 private:
-  typedef typename DdGridType::GlobalGridPartType GlobalGridPartType;
-  typedef typename DdGridType::LocalGridPartType LocalGridPartType;
-  typedef typename DdGridType::BoundaryGridPartType BoundaryGridPartType;
-  typedef typename DdGridType::CouplingGridPartType CouplingGridPartType;
-  typedef typename GlobalGridPartType::IndexSetType::IndexType IndexType;
+  typedef typename DdGridType::GlobalGridViewType GlobalGridViewType;
+  typedef typename DdGridType::LocalGridViewType LocalGridViewType;
+  typedef typename DdGridType::BoundaryGridViewType BoundaryGridViewType;
+  typedef typename DdGridType::CouplingGridViewType CouplingGridViewType;
+  typedef typename GlobalGridViewType::IndexSet::IndexType IndexType;
   typedef Dune::GeometryType GeometryType;
   // i.e. maps a local to a globl index
   typedef std::map<IndexType, IndexType> IndexMapType;
@@ -248,7 +248,7 @@ private:
       for (size_t i = 0; i < entity.subEntities(c); ++i) {
         const auto codimCentity = entity.template subEntity<c>(i);
         const GeometryType& geometryType = codimCentity.type();
-        const IndexType globalIndex = factory.globalGridPart_->indexSet().index(codimCentity);
+        const IndexType globalIndex = factory.globalGridView_->indexSet().index(codimCentity);
         factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex);
       }
       // add all codim c + 1 subentities
@@ -282,16 +282,16 @@ public:
   void prepare()
   {
     if (!prepared_) {
-      globalGridPart_ = std::make_shared<const GlobalGridPartType>(const_cast<GridType&>(*grid_));
+      globalGridView_ = std::make_shared<const GlobalGridViewType>(const_cast<GridType&>(*grid_));
       entityToSubdomainMap_ = std::shared_ptr<EntityToSubdomainMapType>(new EntityToSubdomainMapType());
       prepared_ = true;
     }
   } // ... prepare()
 
-  const std::shared_ptr<const GlobalGridPartType> globalGridPart() const
+  const std::shared_ptr<const GlobalGridViewType> globalGridView() const
   {
-    assert(prepared_ && "Please call prepare() before calling globalGridPart()!");
-    return globalGridPart_;
+    assert(prepared_ && "Please call prepare() before calling globalGridView()!");
+    return globalGridView_;
   }
 
   void add(const EntityType& entity, const size_t subdomain)
@@ -299,7 +299,7 @@ public:
     // prepare
     assert(prepared_ && "Please call prepare() before calling add()!");
     assert(!finalized_ && "Do not call add() after calling finalized()!");
-    const IndexType globalIndex = globalGridPart_->indexSet().index(entity);
+    const IndexType globalIndex = globalGridView_->indexSet().index(entity);
     // add subdomain to this entity index
     typename EntityToSubdomainMapType::iterator indexIt = entityToSubdomainMap_->find(globalIndex);
     if (indexIt == entityToSubdomainMap_->end()) {
@@ -402,11 +402,11 @@ public:
     } // loop over all subdomains
     // walk the global grid part
     //   * to generate the information which sudomains neighbor each other
-    for (auto entityIt = globalGridPart_->template begin<0>(); entityIt != globalGridPart_->template end<0>();
+    for (auto entityIt = globalGridView_->template begin<0>(); entityIt != globalGridView_->template end<0>();
          ++entityIt) {
       // find the subdomains this entity lives in
       const EntityType& entity = *entityIt;
-      const IndexType entityGlobalIndex = globalGridPart_->indexSet().index(entity);
+      const IndexType entityGlobalIndex = globalGridView_->indexSet().index(entity);
       const size_t entitySubdomain = getSubdomainOf(entityGlobalIndex);
       // get the set of this subdomains neighbors
       NeighboringSubdomainsSetType& neighborsOfSubdomain = neighboringSubdomainSets[entitySubdomain];
@@ -414,11 +414,9 @@ public:
       EntityToIntersectionInfoMapType& subdomainInnerBoundaryInfo = *(subdomainInnerBoundaryInfos[entitySubdomain]);
       // walk the neighbors
       bool subdomainsEntitiesAreConnected = false;
-      for (typename GlobalGridPartType::IntersectionIteratorType intersectionIt = globalGridPart_->ibegin(entity);
-           intersectionIt != globalGridPart_->iend(entity);
+      for (auto&& intersectionIt = globalGridView_->ibegin(entity); intersectionIt != globalGridView_->iend(entity);
            ++intersectionIt) {
-        typedef typename GlobalGridPartType::IntersectionIteratorType::Intersection IntersectionType;
-        const IntersectionType& intersection = *intersectionIt;
+        const auto& intersection = *intersectionIt;
         // check the type of this intersection
         if (intersection.boundary() && !intersection.neighbor()) {
           // get local index of the intersection
@@ -452,7 +450,7 @@ public:
           // then this entity lies inside the domain
           // and has a neighbor
           const auto neighbor = intersection.outside();
-          const IndexType& neighborGlobalIndex = globalGridPart_->indexSet().index(neighbor);
+          const IndexType& neighborGlobalIndex = globalGridView_->indexSet().index(neighbor);
           const size_t neighborSubdomain = getSubdomainOf(neighborGlobalIndex);
           // check if neighbor is in another or in the same subdomain
           if (neighborSubdomain != entitySubdomain) {
@@ -515,9 +513,9 @@ public:
     } // walk the global grid part
     // walk the subdomains
     //   * to create the local grid parts
-    localGridParts_ = std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>>(
-        new std::vector<std::shared_ptr<const LocalGridPartType>>(size_));
-    std::vector<std::shared_ptr<const LocalGridPartType>>& localGridParts = *localGridParts_;
+    localGridParts_ =
+        std::make_shared<std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>(size_);
+    auto& localGridParts = *localGridParts_;
     for (typename SubdomainMapType::const_iterator subdomainIterator = subdomainToEntityMap_.begin();
          subdomainIterator != subdomainToEntityMap_.end();
          ++subdomainIterator) {
@@ -529,15 +527,15 @@ public:
       const std::shared_ptr<const EntityToIntersectionInfoMapType> localBoundaryInfo =
           subdomainInnerBoundaryInfos[subdomain];
       //   * and create the local grid part
-      localGridParts[subdomain] = std::shared_ptr<const LocalGridPartType>(
-          new LocalGridPartType(globalGridPart_, localGeometryMap, localBoundaryInfo));
+      localGridParts[subdomain] = std::make_shared<const typename LocalGridViewType::Implementation>(
+          globalGridView_, localGeometryMap, localBoundaryInfo);
     } // walk the subdomains
 
     // walk those subdomains which have a boundary grid part
     //   * to create the boundary grid parts
-    boundaryGridParts_ = std::shared_ptr<std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>>(
-        new std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>());
-    std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>& boundaryGridParts = *boundaryGridParts_;
+    boundaryGridParts_ =
+        std::make_shared<std::map<size_t, std::shared_ptr<const typename BoundaryGridViewType::Implementation>>>();
+    auto& boundaryGridParts = *boundaryGridParts_;
     typename std::map<size_t, CodimSizesType>::const_iterator boundaryCodimSizesMapIt = boundaryCodimSizesMap.begin();
     typename std::map<size_t, std::shared_ptr<EntityToIntersectionSetMapType>>::const_iterator boundaryInfoMapIt =
         boundaryInfoMap.begin();
@@ -556,26 +554,25 @@ public:
       //   * get the boundary info map
       const std::shared_ptr<const EntityToIntersectionSetMapType> boundaryBoundaryInfo = boundaryInfoMapIt->second;
       //   * and create the boundary grid part
-      boundaryGridParts.insert(std::pair<size_t, std::shared_ptr<const BoundaryGridPartType>>(
+      boundaryGridParts.emplace(
           boundarySubdomain,
-          std::shared_ptr<const BoundaryGridPartType>(new BoundaryGridPartType(
-              globalGridPart_, boundaryGeometryMap, boundaryBoundaryInfo, localGridParts[boundarySubdomain]))));
+          std::make_shared<const typename BoundaryGridViewType::Implementation>(
+              globalGridView_, boundaryGeometryMap, boundaryBoundaryInfo, localGridParts[boundarySubdomain]));
     } // walk those subdomains which have a boundary grid part
     // walk the subdomains
     //   * to create the coupling grid parts
     couplingGridPartsMaps_ =
-        std::shared_ptr<std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>>(
-            new std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>(size_));
-    std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>& couplingGridPartsMaps =
-        *couplingGridPartsMaps_;
+        std::make_shared<std::vector<std::map<size_t,
+                                              std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>(
+            size_);
+    auto& couplingGridPartsMaps = *couplingGridPartsMaps_;
     for (size_t subdomain = 0; subdomain < couplingMaps.size(); ++subdomain) {
       // get the coupling map for this subdomain
       const SubdomainMapType& couplingMap = couplingMaps[subdomain];
       // get the intersection information map for this subdomain
       const CouplingIntersectionMapType& couplingBoundaryInfo = couplingBoundaryInfos[subdomain];
       // get the target map for this subdomain
-      std::map<size_t, std::shared_ptr<const CouplingGridPartType>>& couplingGridPartsMap =
-          couplingGridPartsMaps[subdomain];
+      auto& couplingGridPartsMap = couplingGridPartsMaps[subdomain];
       // loop over all neighbors
       for (typename SubdomainMapType::const_iterator neighborIt = couplingMap.begin(); neighborIt != couplingMap.end();
            ++neighborIt) {
@@ -587,13 +584,13 @@ public:
         assert(result != couplingBoundaryInfo.end() && "This should not happen (see above)!");
         const std::shared_ptr<const EntityToIntersectionSetMapType> coupling_boundary_info = result->second;
         // and create the coupling grid part
-        couplingGridPartsMap.insert(std::pair<size_t, std::shared_ptr<const CouplingGridPartType>>(
+        couplingGridPartsMap.emplace(
             neighbor,
-            std::shared_ptr<const CouplingGridPartType>(new CouplingGridPartType(globalGridPart_,
-                                                                                 couplingGeometryMap,
-                                                                                 coupling_boundary_info,
-                                                                                 localGridParts[subdomain],
-                                                                                 localGridParts[neighbor]))));
+            std::make_shared<const typename CouplingGridViewType::Implementation>(globalGridView_,
+                                                                                  couplingGeometryMap,
+                                                                                  coupling_boundary_info,
+                                                                                  localGridParts[subdomain],
+                                                                                  localGridParts[neighbor]));
       } // loop over all neighbors
     } // walk the subdomains
 
@@ -605,10 +602,9 @@ public:
     }
     // and the rest
     for (size_t ii = 1; ii < oversamplingLayers; ++ii) {
-      std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>> tmpOversapledGridParts =
-          oversampledLocalGridParts_;
-      oversampledLocalGridParts_ = std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>>(
-          new std::vector<std::shared_ptr<const LocalGridPartType>>(size_));
+      auto tmpOversapledGridParts = oversampledLocalGridParts_;
+      oversampledLocalGridParts_ =
+          std::make_shared<std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>(size_);
       SubdomainMapType tmpSubdomainToOversamplingEntitiesMap = subdomainToOversamplingEntitiesMap_;
       subdomainToOversamplingEntitiesMap_ = SubdomainMapType();
       oversampledLocalGridParts_ = addOneLayerOfOverSampling(tmpSubdomainToOversamplingEntitiesMap,
@@ -626,7 +622,7 @@ public:
     assert(finalized_ && "Please call finalize() before calling createMsGrid()!");
     if (oversampled_)
       return std::make_shared<DdGridType>(grid_,
-                                          globalGridPart_,
+                                          globalGridView_,
                                           size_,
                                           neighboringSubdomainSets_,
                                           entityToSubdomainMap_,
@@ -636,7 +632,7 @@ public:
                                           oversampledLocalGridParts_);
     else
       return std::make_shared<DdGridType>(grid_,
-                                          globalGridPart_,
+                                          globalGridView_,
                                           size_,
                                           neighboringSubdomainSets_,
                                           entityToSubdomainMap_,
@@ -671,11 +667,12 @@ private:
     return result->second;
   } // ... getSubdomainOf(...)
 
-  std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>>
-  addOneLayerOfOverSampling(const SubdomainMapType& subdomainToEntityMap,
-                            const std::vector<std::shared_ptr<const LocalGridPartType>>& localGridParts,
-                            const size_t neighbor_recursion_level,
-                            SubdomainMapType& subdomainToOversamplingEntitiesMap)
+  std::shared_ptr<std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>
+  addOneLayerOfOverSampling(
+      const SubdomainMapType& subdomainToEntityMap,
+      const std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>& localGridParts,
+      const size_t neighbor_recursion_level,
+      SubdomainMapType& subdomainToOversamplingEntitiesMap)
   {
     // init data structures
     // for the subdomains inner boundaries
@@ -694,11 +691,11 @@ private:
       // * and create an empty local boundary info map for later use
       oversamplingSubdomainInnerBoundaryInfos[subdomain] = std::make_shared<EntityToIntersectionInfoMapType>();
       // * then walk the local grid part to find the local boundary entities
-      const LocalGridPartType& localGridPart = *(localGridParts[subdomain]);
+      const LocalGridViewType& localGridPart = *(localGridParts[subdomain]);
       for (auto entityIt = localGridPart.template begin<0>(); entityIt != localGridPart.template end<0>(); ++entityIt) {
         // get the entity index
         const EntityType& entity = *entityIt;
-        //        const IndexType entityGlobalIndex = globalGridPart_->indexSet().index(entity);
+        //        const IndexType entityGlobalIndex = globalGridView_->indexSet().index(entity);
         // lets see if this is a boundary entity of the local grid part
         bool isOnLocalBoundary = false;
         for (auto intersectionIt = localGridPart.ibegin(entity); intersectionIt != localGridPart.iend(entity);
@@ -710,14 +707,14 @@ private:
         if (isOnLocalBoundary) {
           // add all the "neighbors"
           // * therefore, iterate over the intersections in the global grid part
-          for (auto intersectionIt = globalGridPart_->ibegin(entity); intersectionIt != globalGridPart_->iend(entity);
+          for (auto intersectionIt = globalGridView_->ibegin(entity); intersectionIt != globalGridView_->iend(entity);
                ++intersectionIt) {
             const auto& intersection = *intersectionIt;
             // if this intersection is not on the domain boundary
             if (intersection.neighbor()) {
               // get the neighbor
               const auto neighbor = intersection.outside();
-              const IndexType& neighborGlobalIndex = globalGridPart_->indexSet().index(neighbor);
+              const IndexType& neighborGlobalIndex = globalGridView_->indexSet().index(neighbor);
               //              const size_t neighborSubdomain = getSubdomainOf(neighborGlobalIndex);
               // if the neighbor is not in the subdomain
               bool neighborIsNotInThisSubdomain = true;
@@ -748,10 +745,10 @@ private:
     } // walk the subdomains to create the oversampling
 
     // now we need to create the local boundary info for the oversampling, so walk the global grid part
-    for (auto entityIt = globalGridPart_->template begin<0>(); entityIt != globalGridPart_->template end<0>();
+    for (auto entityIt = globalGridView_->template begin<0>(); entityIt != globalGridView_->template end<0>();
          ++entityIt) {
       const auto& entity = *entityIt;
-      const IndexType entityIndex = globalGridPart_->indexSet().index(entity);
+      const IndexType entityIndex = globalGridView_->indexSet().index(entity);
       // now we find all the oversampled subdomains this entity is a part of
       for (auto subdomainToOversamplingEntitiesMapIt : subdomainToOversamplingEntitiesMap) {
         const auto geometryMapIt = subdomainToOversamplingEntitiesMapIt.second->find(entity.type());
@@ -761,12 +758,12 @@ private:
             // this entity is a part of this subdomain!
             const size_t entitySubdomain = subdomainToOversamplingEntitiesMapIt.first;
             // then walk the neighbors
-            for (auto intersectionIt = globalGridPart_->ibegin(entity); intersectionIt != globalGridPart_->iend(entity);
+            for (auto intersectionIt = globalGridView_->ibegin(entity); intersectionIt != globalGridView_->iend(entity);
                  ++intersectionIt) {
               const auto& intersection = *intersectionIt;
               if (intersection.neighbor()) {
                 const auto neighbor = intersection.outside();
-                const IndexType neighborIndex = globalGridPart_->indexSet().index(neighbor);
+                const IndexType neighborIndex = globalGridView_->indexSet().index(neighbor);
                 // and check, if the neighbor is in the same subdomain
                 bool isInSame = false;
                 const auto neighborGeometryMapIt = subdomainToOversamplingEntitiesMapIt.second->find(neighbor.type());
@@ -794,11 +791,10 @@ private:
     } // walk the global grid part
 
     // and create the oversampled local grid parts
-    std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>> oversampledLocalGridPartsRet =
-        std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>>(
-            new std::vector<std::shared_ptr<const LocalGridPartType>>(size_));
-    std::vector<std::shared_ptr<const LocalGridPartType>>& oversampledLocalGridParts = *oversampledLocalGridPartsRet;
-    for (typename SubdomainMapType::const_iterator subdomainIterator = subdomainToOversamplingEntitiesMap.begin();
+    auto oversampledLocalGridPartsRet =
+        std::make_shared<std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>(size_);
+    auto& oversampledLocalGridParts = *oversampledLocalGridPartsRet;
+    for (auto subdomainIterator = subdomainToOversamplingEntitiesMap.begin();
          subdomainIterator != subdomainToOversamplingEntitiesMap.end();
          ++subdomainIterator) {
       // report
@@ -810,8 +806,8 @@ private:
       const std::shared_ptr<const EntityToIntersectionInfoMapType> localBoundaryInfo =
           oversamplingSubdomainInnerBoundaryInfos[subdomain];
       //   * and create the local grid part
-      oversampledLocalGridParts[subdomain] = std::shared_ptr<const LocalGridPartType>(
-          new LocalGridPartType(globalGridPart_, localGeometryMap, localBoundaryInfo));
+      oversampledLocalGridParts[subdomain] = std::make_shared<const typename LocalGridViewType::Implementation>(
+          globalGridView_, localGeometryMap, localBoundaryInfo);
     } // and crete the oversampled local grid parts
     return oversampledLocalGridPartsRet;
   } // ... addOneLayerOfOverSampling(...)
@@ -825,14 +821,14 @@ private:
                                            GeometryMapType& geometryMapCopy)
   {
     // loop over all the neighbors of the neighbor
-    for (auto neighborIntersectionIt = globalGridPart_->ibegin(neighbor);
-         neighborIntersectionIt != globalGridPart_->iend(neighbor);
+    for (auto neighborIntersectionIt = globalGridView_->ibegin(neighbor);
+         neighborIntersectionIt != globalGridView_->iend(neighbor);
          ++neighborIntersectionIt) {
       const auto& neighborIntersection = *neighborIntersectionIt;
       if (neighborIntersection.neighbor()) {
         // get the neighbors neighbor
         const auto neighborsNeighbor = neighborIntersection.outside();
-        const IndexType neighborsNeighborGlobalIndex = globalGridPart_->indexSet().index(neighborsNeighbor);
+        const IndexType neighborsNeighborGlobalIndex = globalGridView_->indexSet().index(neighborsNeighbor);
         bool neighborsNeighborIsNotInThisSubdomain = true;
         if (geometryMap.find(neighborsNeighbor.type()) != geometryMap.end()) {
           if (geometryMap.find(neighborsNeighbor.type())->second.find(neighborsNeighborGlobalIndex)
@@ -879,7 +875,7 @@ private:
   bool prepared_;
   bool finalized_;
   size_t size_;
-  std::shared_ptr<const GlobalGridPartType> globalGridPart_;
+  std::shared_ptr<const GlobalGridViewType> globalGridView_;
   // for the entity <-> subdomain relations
   std::shared_ptr<EntityToSubdomainMapType> entityToSubdomainMap_;
   SubdomainMapType subdomainToEntityMap_;
@@ -888,12 +884,15 @@ private:
   std::shared_ptr<std::vector<NeighboringSubdomainsSetType>> neighboringSubdomainSets_;
   // for the local grid parts
   std::map<size_t, CodimSizesType> localCodimSizes_;
-  std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>> localGridParts_;
-  std::shared_ptr<std::vector<std::shared_ptr<const LocalGridPartType>>> oversampledLocalGridParts_;
+  std::shared_ptr<std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>> localGridParts_;
+  std::shared_ptr<std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>
+      oversampledLocalGridParts_;
   // for the boundary grid parts
-  std::shared_ptr<std::map<size_t, std::shared_ptr<const BoundaryGridPartType>>> boundaryGridParts_;
+  std::shared_ptr<std::map<size_t, std::shared_ptr<const typename BoundaryGridViewType::Implementation>>>
+      boundaryGridParts_;
   // for the coupling grid parts
-  std::shared_ptr<std::vector<std::map<size_t, std::shared_ptr<const CouplingGridPartType>>>> couplingGridPartsMaps_;
+  std::shared_ptr<std::vector<std::map<size_t, std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>
+      couplingGridPartsMaps_;
   bool oversampled_;
 }; // class SubdomainGridFactory
 
@@ -913,7 +912,7 @@ struct SubdomainGridFactory<GridType>::Add<c, c>
       const auto codimCentity = entity.template subEntity<c>(i);
       const SubdomainGridFactory<GridType>::GeometryType& geometryType = codimCentity.type();
       const typename SubdomainGridFactory<GridType>::IndexType globalIndex =
-          factory.globalGridPart_->indexSet().index(codimCentity);
+          factory.globalGridView_->indexSet().index(codimCentity);
       factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex);
     } // loop over all codim c subentities of this entity
   } // static void subEntities()

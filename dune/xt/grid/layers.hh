@@ -22,7 +22,7 @@
 #endif
 
 #include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/grid/view/subdomain/part.hh>
+#include <dune/xt/grid/view/subdomain/view.hh>
 
 namespace Dune {
 namespace XT {
@@ -177,6 +177,51 @@ struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::view, DdGridT
 }; // struct Layer<..., dd_subdomain_oversampled, view>
 
 
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType>
+{
+  typedef typename DD::SubdomainGrid<GridType>::CouplingGridViewType type;
+
+  static type create(const GridType& /*grid*/,
+                     const int /*subdomain*/ = 0,
+                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
+  {
+    static_assert(AlwaysFalse<GridType>::value,
+                  "dune-fem does not allow the creation of grid parts from a const grid!");
+  }
+
+  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  {
+    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
+                  "Only available for DD::SubdomainGrid!");
+    DUNE_THROW(NotImplemented, "Only usable to extract the layer type, not the actual layer!");
+    return dd_grid->coupling_grid_view(0, 0);
+  }
+}; // struct Layer<..., dd_subdomain_coupling, view>
+
+
+template <class GridType, class DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::view, DdGridType>
+{
+  typedef typename DD::SubdomainGrid<GridType>::BoundaryGridViewType type;
+
+  static type create(const GridType& /*grid*/,
+                     const int /*subdomain*/ = 0,
+                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
+  {
+    static_assert(AlwaysFalse<GridType>::value,
+                  "dune-fem does not allow the creation of grid parts from a const grid!");
+  }
+
+  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  {
+    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
+                  "Only available for DD::SubdomainGrid!");
+    return dd_grid->boundary_grid_view(subdomain);
+  }
+}; // struct Layer<..., dd_subdomain_boundary, view>
+
+
 #if HAVE_DUNE_FEM
 
 
@@ -248,97 +293,7 @@ struct Layer<GridType, Layers::adaptive_leaf, Backends::part, DdGridType>
 }; // struct Layer<..., leaf, part>
 
 
-template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain, Backends::part, DdGridType>
-{
-  typedef SubdomainGridPart<Fem::LeafGridPart<GridType>> type;
-
-  static type create(const GridType& /*grid*/,
-                     const int /*subdomain*/ = 0,
-                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
-  {
-    static_assert(AlwaysFalse<GridType>::value,
-                  "dune-fem does not allow the creation of grid parts from a const grid!");
-  }
-
-  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
-  {
-    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
-                  "Only available for DD::SubdomainGrid!");
-    return dd_grid->localGridPart(subdomain, /*oversampling=*/false);
-  }
-}; // struct Layer<..., dd_subdomain, part>
-
-
-template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::part, DdGridType>
-{
-  typedef SubdomainGridPart<Fem::LeafGridPart<GridType>> type;
-
-  static type create(const GridType& /*grid*/,
-                     const int /*subdomain*/ = 0,
-                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
-  {
-    static_assert(AlwaysFalse<GridType>::value,
-                  "dune-fem does not allow the creation of grid parts from a const grid!");
-  }
-
-  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
-  {
-    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
-                  "Only available for DD::SubdomainGrid!");
-    return dd_grid->localGridPart(subdomain, /*oversampling=*/true);
-  }
-}; // struct Layer<..., dd_subdomain_oversampled, part>
-
-
-template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::part, DdGridType>
-{
-  typedef SubdomainCouplingGridPart<Fem::LeafGridPart<GridType>> type;
-
-  static type create(const GridType& /*grid*/,
-                     const int /*subdomain*/ = 0,
-                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
-  {
-    static_assert(AlwaysFalse<GridType>::value,
-                  "dune-fem does not allow the creation of grid parts from a const grid!");
-  }
-
-  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
-  {
-    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
-                  "Only available for DD::SubdomainGrid!");
-    DUNE_THROW(NotImplemented, "Only usable to extract the layer type, not the actual layer!");
-    return dd_grid->couplingGridPart(0, 0);
-  }
-}; // struct Layer<..., dd_subdomain_coupling, part>
-
-
-template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::part, DdGridType>
-{
-  typedef SubdomainBoundaryGridPart<Fem::LeafGridPart<GridType>> type;
-
-  static type create(const GridType& /*grid*/,
-                     const int /*subdomain*/ = 0,
-                     const std::shared_ptr<DD::SubdomainGrid<GridType>> /*dd_grid*/ = nullptr)
-  {
-    static_assert(AlwaysFalse<GridType>::value,
-                  "dune-fem does not allow the creation of grid parts from a const grid!");
-  }
-
-  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
-  {
-    static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
-                  "Only available for DD::SubdomainGrid!");
-    return dd_grid->boundaryGridPart(subdomain);
-  }
-}; // struct Layer<..., dd_subdomain_boundary, part>
-
-
 #else // HAVE_DUNE_FEM
-
 
 template <class GridType, class DdGridType>
 struct Layer<GridType, Layers::leaf, Backends::part, DdGridType>
@@ -356,13 +311,6 @@ struct Layer<GridType, Layers::level, Backends::part, DdGridType>
 
 template <class GridType, class DdGridType>
 struct Layer<GridType, Layers::adaptive_leaf, Backends::part, DdGridType>
-{
-  static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
-};
-
-
-template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain, Backends::part, DdGridType>
 {
   static_assert(AlwaysFalse<GridType>::value, "You are missing dune-fem!");
 };
@@ -398,7 +346,7 @@ struct extract_layer_backend_helper<GL, false, true, false>
 template <class GL>
 struct extract_layer_backend_helper<GL, false, false, true>
 {
-  static const constexpr Backends value = Backends::part;
+  static const constexpr Backends value = Backends::view;
 };
 
 

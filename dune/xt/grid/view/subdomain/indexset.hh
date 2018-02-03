@@ -23,6 +23,7 @@
 #include <dune/common/shared_ptr.hh>
 
 #include <dune/geometry/type.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
 namespace XT {
@@ -32,17 +33,23 @@ namespace internal {
 
 /**
  *  \brief      Given a Dune::IndexSet and a set of entity indices, provides an index set on those entities only.
- *  \todo       Replace GlobalGridPartImp by Interface!
+ *  \todo       Replace GlobalGridViewImp by Interface!
  *  \todo       Document!
  */
-template <class GlobalGridPartImp>
-class IndexBasedIndexSet : public GlobalGridPartImp::IndexSetType
+template <class GlobalGridViewImp>
+class IndexBasedIndexSet : public Dune::IndexSet<GlobalGridViewImp,
+                                                 IndexBasedIndexSet<GlobalGridViewImp>,
+                                                 typename extract_index_set_t<GlobalGridViewImp>::IndexType,
+                                                 typename extract_index_set_t<GlobalGridViewImp>::Types>
 {
 public:
-  typedef GlobalGridPartImp GlobalGridPartType;
-  typedef IndexBasedIndexSet<GlobalGridPartType> ThisType;
-  typedef typename GlobalGridPartImp::IndexSetType BaseType;
-  typedef typename GlobalGridPartType::GridType GridType;
+  typedef GlobalGridViewImp GlobalGridViewType;
+  typedef IndexBasedIndexSet<GlobalGridViewType> ThisType;
+  using BaseType = Dune::IndexSet<GlobalGridViewImp,
+                                  IndexBasedIndexSet<GlobalGridViewImp>,
+                                  typename extract_index_set_t<GlobalGridViewImp>::IndexType,
+                                  typename extract_index_set_t<GlobalGridViewImp>::Types>;
+  typedef typename GlobalGridViewType::Grid GridType;
   typedef Dune::GeometryType GeometryType;
   typedef typename BaseType::IndexType IndexType;
   static const unsigned int dimension = GridType::dimension;
@@ -52,12 +59,13 @@ private:
   typedef std::map<IndexType, IndexType> Indices_MapType;
 
 public:
-  IndexBasedIndexSet(const GlobalGridPartType& globalGridPart,
+  IndexBasedIndexSet(const GlobalGridViewType& globalGridView,
                      const std::shared_ptr<const IndexContainerType> indexContainer)
-    : BaseType(globalGridPart.indexSet())
+    : BaseType()
     , indexContainer_(indexContainer)
     , sizeByCodim_(dimension + 1, IndexType(0))
     , geometryTypesByCodim_(dimension + 1)
+    , globalGridView_(globalGridView)
   {
     // get geometry types and compute sizes
     for (typename IndexContainerType::const_iterator iterator = indexContainer_->begin();
@@ -89,7 +97,7 @@ public:
   IndexType subIndex(const typename GridType::template Codim<cc>::Entity& entity, int i, unsigned int codim) const
   {
     // get the global subindex
-    const IndexType& globalSubIndex = BaseType::template subIndex<cc>(entity, i, codim);
+    const IndexType& globalSubIndex = globalGridView_.indexSet().template subIndex<cc>(entity, i, codim);
     const int subCodim = cc + codim;
     assert(0 <= subCodim && subCodim <= int(dimension) && "This should not happen, we have a bad codimension");
     const unsigned int subDim = dimension - subCodim;
@@ -124,7 +132,7 @@ public:
   IndexType subIndex(const EntityType& entity, int i, unsigned int codim) const
   {
     // get the global subindex
-    const IndexType& globalSubIndex = BaseType::subIndex(entity, i, codim);
+    const IndexType& globalSubIndex = globalGridView_.indexSet().subIndex(entity, i, codim);
     const int subCodim = EntityType::codimension + codim;
     assert(0 <= subCodim && subCodim <= int(dimension) && "This should not happen, we have a bad codimension");
     const unsigned int subDim = dimension - subCodim;
@@ -180,7 +188,7 @@ public:
     const typename IndexContainerType::const_iterator indexMap = indexContainer_->find(geometryType);
     if (indexMap != indexContainer_->end()) {
       // check if this entity is listen in the map
-      const IndexType globalIndex = BaseType::index(entity);
+      const IndexType globalIndex = globalGridView_.indexSet().index(entity);
       if (indexMap->second.find(globalIndex) != indexMap->second.end())
         return true;
       else
@@ -199,7 +207,7 @@ private:
     const typename IndexContainerType::const_iterator indexMap = indexContainer_->find(geometryType);
     if (indexMap != indexContainer_->end()) {
       // check if this entity is listen in the map
-      const IndexType globalIndex = BaseType::index(entity);
+      const IndexType globalIndex = globalGridView_.indexSet().index(entity);
       const typename Indices_MapType::const_iterator indexPair = indexMap->second.find(globalIndex);
       if (indexPair != indexMap->second.end())
         return indexPair->second;
@@ -238,6 +246,7 @@ private:
   std::vector<IndexType> sizeByCodim_;
   std::vector<std::vector<GeometryType>> geometryTypesByCodim_;
   std::map<GeometryType, IndexType> sizeByGeometryType_;
+  const GlobalGridViewType globalGridView_;
 }; // class IndexBasedIndexSet
 
 

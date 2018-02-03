@@ -54,13 +54,6 @@ public:
             "grid_provider"_a,
             "type"_a);
       m.def(std::string("make_boundary_info_on_" + layer_name<layer>::value() + "_layer").c_str(),
-            [](const GP& /*grid_provider*/, const std::string& type, const Common::Configuration& cfg) {
-              return XT::Grid::BoundaryInfoFactory<I>::create(type, cfg).release();
-            },
-            "grid_provider"_a,
-            "type"_a,
-            "cfg"_a = Common::Configuration());
-      m.def(std::string("make_boundary_info_on_" + layer_name<layer>::value() + "_layer").c_str(),
             [](const GP& /*grid_provider*/, const Common::Configuration& cfg) {
               return XT::Grid::BoundaryInfoFactory<I>::create(cfg).release();
             },
@@ -122,7 +115,7 @@ public:
 
     // bind interface, guard since we might not be the first to do so for this intersection
     try {
-      py::class_<InterfaceType>(m, InterfaceName.c_str(), InterfaceName.c_str(), py::metaclass());
+      py::class_<InterfaceType>(m, InterfaceName.c_str(), InterfaceName.c_str());
     } catch (std::runtime_error&) {
     }
 
@@ -133,7 +126,7 @@ public:
     // bind class, guard since we might not be the first to do so for this intersection
     try {
       const auto ClassName = Common::to_camel_case(class_name + "_" + layer_name + "_" + grid_name);
-      bound_type c(m, ClassName.c_str(), ClassName.c_str(), py::metaclass());
+      bound_type c(m, ClassName.c_str(), ClassName.c_str());
       c.def_property_readonly_static("static_id", [](const type& /*self*/) { return type::static_id(); });
       c.def("__repr__", [ClassName](const type& /*self*/) { return ClassName; });
     } catch (std::runtime_error&) {
@@ -159,30 +152,20 @@ public:
                                                       Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
                    _G,                                                                                                 \
                    Dune::XT::Grid::Layers::_layer>
-#if HAVE_DUNE_FEM
+
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view);                             \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, part);                     \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, part)
-#else // HAVE_DUNE_FEM
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view);
-#endif // HAVE_DUNE_FEM
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, view);                     \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, view)
 
 #if HAVE_DUNE_ALUGRID
-#if HAVE_DUNE_FEM
+
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part);                      \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, part)
-#else // HAVE_DUNE_FEM
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view);
-#endif // HAVE_DUNE_FEM
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view)
+//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, view);                      \
+//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, view)
 #else // HAVE_DUNE_ALUGRID
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
 #endif
@@ -191,7 +174,7 @@ public:
 //#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)                                                           \
 //  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, leaf, view);                                                \
 //  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, level, view);                                               \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, dd_subdomain, part)
+//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, dd_subdomain, view)
 //#else
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)
 //#endif
@@ -199,7 +182,7 @@ public:
 //#if HAVE_ALBERTA
 //#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)                                                      \
 //  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, leaf, view);                                           \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, dd_subdomain, part)
+//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, dd_subdomain, view)
 //#else
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)
 //#endif
@@ -236,28 +219,28 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, _B, _class_name)                                                      \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, part, _class_name, "dd_subdomain");                            \
+      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, view, _class_name, "dd_subdomain");                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain_boundary, part, _class_name, "dd_subdomain_boundary");          \
+      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain_boundary, view, _class_name, "dd_subdomain_boundary");          \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain_coupling, part, _class_name, "dd_subdomain_coupling");          \
+      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain_coupling, view, _class_name, "dd_subdomain_coupling");          \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, part, _class_name, "dd_subdomain");                            \
+      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, view, _class_name, "dd_subdomain");                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain_boundary, part, _class_name, "dd_subdomain_boundary");          \
+      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain_boundary, view, _class_name, "dd_subdomain_boundary");          \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain_coupling, part, _class_name, "dd_subdomain_coupling")
+      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain_coupling, view, _class_name, "dd_subdomain_coupling")
 
 #if HAVE_DUNE_ALUGRID
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)                                                       \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view, _class_name, "leaf");                 \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, level, view, _class_name, "level");               \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, part, _class_name, "dd_subdomain"); \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, view, _class_name, "dd_subdomain"); \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, part, _class_name, "dd_subdomain_boundary");           \
+      _m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, view, _class_name, "dd_subdomain_boundary");           \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_coupling, part, _class_name, "dd_subdomain_coupling")
+      _m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_coupling, view, _class_name, "dd_subdomain_coupling")
 #else
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)
 #endif
@@ -266,7 +249,7 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
 //#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)                                                      \
 //  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, leaf, view, _class_name, "leaf");                                   \
 //  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, level, view, _class_name, "level");                                 \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, dd_subdomain, part, _class_name, "dd_subdomain")
+//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, dd_subdomain, view, _class_name, "dd_subdomain")
 //#else
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)
 //#endif
@@ -274,7 +257,7 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
 //#if HAVE_ALBERTA
 //#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, _B, _class_name)                                                 \
 //  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, leaf, view, _class_name, "");                                  \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, dd_subdomain, part, _class_name, "dd_subdomain")
+//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, dd_subdomain, view, _class_name, "dd_subdomain")
 //#else
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, _B, _class_name)
 //#endif

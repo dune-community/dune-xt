@@ -53,7 +53,7 @@
   _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, level, part);                                              \
   _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, leaf, part);                                               \
   _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER(_prefix, _GRID, adaptive_leaf, part);                                      \
-  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_DD_SUBDOMAIN(_prefix, _GRID, dd_subdomain, part);                          \
+  _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_DD_SUBDOMAIN(_prefix, _GRID, dd_subdomain, view);                          \
   _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART(_prefix, _GRID, level);                                               \
   _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART(_prefix, _GRID, leaf);                                                \
   _DUNE_XT_GRID_PROVIDER_PROVIDER_LIB_LAYER_PART(_prefix, _GRID, adaptive_leaf);                                       \
