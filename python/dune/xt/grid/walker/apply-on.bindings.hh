@@ -19,11 +19,11 @@
 #include <dune/pybindxi/operators.h>
 
 #include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/grid/grids.bindings.hh>
-#include <dune/xt/grid/layers.bindings.hh>
+#include <grids.bindings.hh>
+#include <layers.bindings.hh>
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
 
-#include "apply-on.hh"
+#include <dune/xt/grid/walker/apply-on.hh>
 
 namespace Dune {
 namespace XT {

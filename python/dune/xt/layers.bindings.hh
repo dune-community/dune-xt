@@ -11,7 +11,7 @@
 #ifndef DUNE_XT_GRID_LAYERS_BINDINGS_HH
 #define DUNE_XT_GRID_LAYERS_BINDINGS_HH
 
-#include "layers.hh"
+#include <dune/xt/grid/layers.hh>
 
 namespace Dune {
 namespace XT {

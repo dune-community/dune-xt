@@ -14,12 +14,12 @@
 
 #include <dune/pybindxi/pybind11.h>
 
-#include "dd/subdomains/grid.hh"
-#include "gridprovider/provider.hh"
+#include <dune/xt/grid/dd/subdomains/grid.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 #include "grids.bindings.hh"
 #include "layers.bindings.hh"
-#include "type_traits.hh"
-#include "walker.hh"
+#include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/walker.hh>
 
 namespace Dune {
 namespace XT {
