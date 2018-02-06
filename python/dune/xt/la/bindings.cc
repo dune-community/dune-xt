@@ -35,13 +35,11 @@
 #include <dune/xt/la/container.hh>
 
 
-PYBIND11_PLUGIN(_la)
+PYBIND11_MODULE(_la, m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
   namespace LA = Dune::XT::LA;
-
-  py::module m("_la", "dune-xt-la");
 
   Dune::XT::Common::bindings::addbind_exceptions(m);
 
