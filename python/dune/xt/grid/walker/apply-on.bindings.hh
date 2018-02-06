@@ -19,8 +19,8 @@
 #include <dune/pybindxi/operators.h>
 
 #include <dune/xt/grid/type_traits.hh>
-#include <grids.bindings.hh>
-#include <layers.bindings.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
+#include <python/dune/xt/grid/layers.bindings.hh>
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
 
 #include <dune/xt/grid/walker/apply-on.hh>

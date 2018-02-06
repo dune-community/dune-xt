@@ -24,7 +24,7 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-// #include <dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/exceptions.bindings.hh>
 
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
@@ -32,10 +32,10 @@
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "boundaryinfo.bindings.hh"
-#include "gridprovider.pbh"
-#include "walker.bindings.hh"
-#include <grid/walker/apply-on.bindings.hh>
+#include <python/dune/xt/grid/boundaryinfo.bindings.hh>
+#include <python/dune/xt/grid/gridprovider.pbh>
+#include <python/dune/xt/grid/walker.bindings.hh>
+#include <python/dune/xt/grid/walker/apply-on.bindings.hh>
 
 
 template <class G, Dune::XT::Grid::Layers layer, Dune::XT::Grid::Backends backend>

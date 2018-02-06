@@ -1,10 +1,3 @@
 
 dune_pybindxi_add_module(_grid EXCLUDE_FROM_ALL bindings.cc boundaryinfo.bindings.cc)
-target_link_dune_default_libraries(_grid)
-target_include_directories(_grid PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-add_dune_alberta_flags(GRIDDIM 2 _grid)
-if(DUNE_XT_WITH_PYTHON_BINDINGS)
-  add_custom_target(bindings ALL DEPENDS _grid)
-else()
-  add_custom_target(bindings DEPENDS _grid)
-endif()
+#add_dune_alberta_flags(GRIDDIM 2 _grid)

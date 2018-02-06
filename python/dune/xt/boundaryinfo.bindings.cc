@@ -12,7 +12,7 @@
 
 #if HAVE_DUNE_PYBINDXI
 
-#include "boundaryinfo.bindings.hh"
+#include <python/dune/xt/grid/boundaryinfo.bindings.hh>
 
 
 DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(template);
