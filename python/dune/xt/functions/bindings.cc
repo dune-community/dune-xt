@@ -24,8 +24,8 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/common/bindings.hh>
-#include <dune/xt/grid/grids.bindings.hh>
+#include <python/dune/xt/common/bindings.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 #include "interfaces.pbh"
 #include "constant.pbh"

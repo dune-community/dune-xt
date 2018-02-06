@@ -19,7 +19,7 @@
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

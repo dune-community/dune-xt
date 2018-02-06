@@ -19,8 +19,8 @@
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "interfaces.hh"
-#include "expression.hh"
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/expression.hh>
 
 namespace Dune {
 namespace XT {

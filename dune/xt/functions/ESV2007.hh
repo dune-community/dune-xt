@@ -28,7 +28,7 @@
 #include <dune/xt/la/container/eigen.hh>
 #endif
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

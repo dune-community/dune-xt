@@ -26,7 +26,7 @@
 #include <dune/xt/functions/constant.hh>
 #include <dune/xt/functions/expression.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

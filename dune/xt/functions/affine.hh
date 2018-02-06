@@ -24,7 +24,7 @@
 
 #include <dune/xt/la/container/common.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

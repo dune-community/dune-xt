@@ -15,13 +15,13 @@
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <dune/xt/common/fvector.pbh>
-#include <dune/xt/common/fmatrix.pbh>
+#include <python/dune/xt/common/fvector.pbh>
+#include <python/dune/xt/common/fmatrix.pbh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "interfaces.hh"
-#include "checkerboard.hh"
+#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/checkerboard.hh>
 
 namespace Dune {
 namespace XT {

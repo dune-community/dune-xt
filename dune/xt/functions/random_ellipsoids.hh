@@ -23,7 +23,7 @@
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/random.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {
