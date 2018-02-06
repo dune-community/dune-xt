@@ -40,3 +40,6 @@ endif()
 
 include(DunePybindxiUtils)
 include(DunePybindxiHelper)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
