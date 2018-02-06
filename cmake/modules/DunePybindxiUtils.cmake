@@ -167,4 +167,11 @@ function(dune_pybindxi_add_module target_name)
     # needed for bigger binding projects due to the limit to 64k addressable sections
     target_compile_options(${target_name} PRIVATE /MP /bigobj)
   endif()
+
+  add_dune_all_flags(${target_name})
+  if(DUNE_XT_WITH_PYTHON_BINDINGS)
+    add_custom_target(bindings ALL DEPENDS ${target_name})
+  else()
+    add_custom_target(bindings DEPENDS ${target_name})
+  endif()
 endfunction()
