@@ -23,9 +23,9 @@
 #include <dune/xt/la/type_traits.hh>
 #include <dune/xt/la/container.bindings.hh>
 
-#include "io.hh"
-#include "vector-interface.hh"
-#include "container-interface.pbh"
+#include <dune/xt/la/container/io.hh>
+#include <dune/xt/la/container/vector-interface.hh>
+#include <python/dune/xt/la/container/container-interface.pbh>
 
 
 namespace Dune {

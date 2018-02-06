@@ -29,16 +29,6 @@ endif()
 find_package(LAPACKE)
 dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
 
-if(dune-pybindxi_FOUND)
-  dune_pybindxi_add_module(_la EXCLUDE_FROM_ALL bindings.cc)
-  target_link_dune_default_libraries(_la)
-  if(DUNE_XT_WITH_PYTHON_BINDINGS)
-    add_custom_target(bindings ALL DEPENDS _la)
-  else()
-    add_custom_target(bindings DEPENDS _la)
-  endif()
-endif()
-
 add_subdirectory(test EXCLUDE_FROM_ALL)
 
 

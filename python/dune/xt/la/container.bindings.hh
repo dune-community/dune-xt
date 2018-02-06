@@ -11,7 +11,7 @@
 #ifndef DUNE_XT_LA_CONTAINER_BINDINGS_HH
 #define DUNE_XT_LA_CONTAINER_BINDINGS_HH
 
-#include "container.hh"
+#include <dune/xt/la/container.hh>
 
 
 // this is used in other headers

@@ -1,0 +1,1 @@
+dune_pybindxi_add_module(_la EXCLUDE_FROM_ALL bindings.cc)

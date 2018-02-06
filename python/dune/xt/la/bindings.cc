@@ -24,15 +24,15 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/bindings.hh>
 
-#include "container/container-interface.pbh"
-#include "container/vector-interface.pbh"
-#include "container/pattern.pbh"
-#include "container/matrix-interface.pbh"
-#include "solver.pbh"
+#include <python/dune/xt/la/container/container-interface.pbh>
+#include <python/dune/xt/la/container/vector-interface.pbh>
+#include <python/dune/xt/la/container/pattern.pbh>
+#include <python/dune/xt/la/container/matrix-interface.pbh>
+#include <python/dune/xt/la/solver.pbh>
 
-#include "container.hh"
+#include <dune/xt/la/container.hh>
 
 
 PYBIND11_PLUGIN(_la)

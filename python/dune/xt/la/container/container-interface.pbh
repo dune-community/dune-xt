@@ -17,7 +17,7 @@
 
 #include <dune/xt/la/type_traits.hh>
 
-#include "container-interface.hh"
+#include <dune/xt/la/container/container-interface.hh>
 
 namespace Dune {
 namespace XT {
