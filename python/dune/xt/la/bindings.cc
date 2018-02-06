@@ -133,7 +133,6 @@ PYBIND11_MODULE(_la, m)
         "debug"_a = true,
         "warning"_a = true);
 
-  return m.ptr();
 } // PYBIND11_PLUGIN(la)
 
 #endif // HAVE_DUNE_PYBINDXI
