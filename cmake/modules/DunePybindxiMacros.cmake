@@ -8,6 +8,9 @@
 # The code below is a renamed copy of parts of ../../pybind11/CMakeLists.txt,
 # see ../../pybind11/LICENSE for license information.
 
+# dune-python's way of forcing a version
+dune_force_python_version(3)
+
 # Add a CMake parameter for choosing a desired Python version
 set(DUNE_PYBINDXI_PYTHON_VERSION "" CACHE STRING "Python version to use for dune-pybindxi")
 
