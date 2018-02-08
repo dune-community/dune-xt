@@ -116,6 +116,21 @@ public:
 };
 
 
+class AbsorbingBoundary : public BoundaryType
+{
+public:
+  virtual std::string id() const override final
+  {
+    return "absorbing_boundary";
+  }
+
+  BoundaryType* copy() const override final
+  {
+    return new AbsorbingBoundary();
+  }
+};
+
+
 class InflowBoundary : public BoundaryType
 {
 public:
