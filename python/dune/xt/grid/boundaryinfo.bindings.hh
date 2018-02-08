@@ -18,15 +18,15 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/common/configuration.pbh>
+#include <dune/xt/common/configuration.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
-#include <dune/xt/grid/grids.bindings.hh>
-#include <dune/xt/grid/layers.bindings.hh>
+#include "grids.bindings.hh"
+#include "layers.bindings.hh"
 
-#include "boundaryinfo.hh"
+#include <dune/xt/grid/boundaryinfo.hh>
 
 namespace Dune {
 namespace XT {

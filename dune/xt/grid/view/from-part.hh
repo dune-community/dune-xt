@@ -28,10 +28,10 @@ class TemporaryConstView
 {
   static_assert(is_layer<GridLayerType>::value, "");
 
-  template <bool view = is_view<GridLayerType>::value,
-            bool part = (is_part<GridLayerType>::value || is_dd_subdomain<GridLayerType>::value
-                         || is_dd_subdomain_boundary<GridLayerType>::value
-                         || is_dd_subdomain_coupling<GridLayerType>::value),
+  template <bool view = is_view<GridLayerType>::value || is_dd_subdomain<GridLayerType>::value
+                        || is_dd_subdomain_boundary<GridLayerType>::value
+                        || is_dd_subdomain_coupling<GridLayerType>::value,
+            bool part = is_part<GridLayerType>::value,
             bool anything = true>
   struct const_storage
   {

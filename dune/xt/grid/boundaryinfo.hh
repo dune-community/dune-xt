@@ -13,13 +13,13 @@
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_HH
 
-#include "boundaryinfo/alldirichlet.hh"
-#include "boundaryinfo/allneumann.hh"
-#include "boundaryinfo/allreflecting.hh"
-#include "boundaryinfo/boundarysegment.hh"
-#include "boundaryinfo/interfaces.hh"
-#include "boundaryinfo/normalbased.hh"
-#include "boundaryinfo/factory.hh"
-#include "boundaryinfo/types.hh"
+#include <dune/xt/grid/boundaryinfo/alldirichlet.hh>
+#include <dune/xt/grid/boundaryinfo/allneumann.hh>
+#include <dune/xt/grid/boundaryinfo/allreflecting.hh>
+#include <dune/xt/grid/boundaryinfo/boundarysegment.hh>
+#include <dune/xt/grid/boundaryinfo/interfaces.hh>
+#include <dune/xt/grid/boundaryinfo/normalbased.hh>
+#include <dune/xt/grid/boundaryinfo/factory.hh>
+#include <dune/xt/grid/boundaryinfo/types.hh>
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_HH

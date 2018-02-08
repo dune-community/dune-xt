@@ -13,3 +13,4 @@
 
 set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
 
+dune_register_package_flags(INCLUDE_DIRS ${PROJECT_BINARY_DIR}/python)

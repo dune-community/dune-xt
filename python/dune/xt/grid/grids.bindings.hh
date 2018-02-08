@@ -14,7 +14,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/layers.hh>
 
-#include "grids.hh"
+#include <dune/xt/grid/grids.hh>
 
 
 namespace Dune {

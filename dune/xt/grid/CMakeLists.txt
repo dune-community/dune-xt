@@ -32,19 +32,3 @@ add_dune_alberta_flags(GRIDDIM 1 SOURCE_ONLY dunextgrid)
 
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 add_subdirectory(test EXCLUDE_FROM_ALL )
-
-if(dune-pybindxi_FOUND)
-  dune_pybindxi_add_helper_lib(_grid_bindings_helper
-                               boundaryinfo.bindings.cc
-                               )
-  dune_pybindxi_add_module(_grid EXCLUDE_FROM_ALL bindings.cc)
-  target_link_dune_default_libraries(_grid)
-  target_link_libraries(_grid _grid_bindings_helper)
-  add_dune_alberta_flags(GRIDDIM 2 _grid)
-  if(DUNE_XT_WITH_PYTHON_BINDINGS)
-    add_custom_target(bindings ALL DEPENDS _grid)
-  else()
-    add_custom_target(bindings DEPENDS _grid)
-  endif()
-endif()
-

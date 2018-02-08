@@ -11,10 +11,10 @@
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_HH
 #define DUNE_XT_GRID_GRIDPROVIDER_HH
 
-#include "gridprovider/cube.hh"
-#include "gridprovider/dgf.hh"
-#include "gridprovider/factory.hh"
-#include "gridprovider/gmsh.hh"
-#include "gridprovider/provider.hh"
+#include <dune/xt/grid/gridprovider/cube.hh>
+#include <dune/xt/grid/gridprovider/dgf.hh>
+#include <dune/xt/grid/gridprovider/factory.hh>
+#include <dune/xt/grid/gridprovider/gmsh.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 
 #endif // DUNE_XT_GRID_GRIDPROVIDER_HH

@@ -40,9 +40,9 @@
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "walker/apply-on.hh"
-#include "walker/functors.hh"
-#include "walker/wrapper.hh"
+#include <dune/xt/grid/walker/apply-on.hh>
+#include <dune/xt/grid/walker/functors.hh>
+#include <dune/xt/grid/walker/wrapper.hh>
 
 namespace Dune {
 namespace XT {
