@@ -36,16 +36,5 @@ if(DUNE_XT_WITH_PYTHON_BINDINGS)
 endif()
 dune_library_add_sources(dunextfunctions SOURCES ${lib_dune_xt_functions_sources})
 
-if(dune-pybindxi_FOUND)
-  dune_pybindxi_add_module(_functions EXCLUDE_FROM_ALL bindings.cc)
-  target_link_dune_default_libraries(_functions)
-  add_dune_alberta_flags(GRIDDIM 2 _functions)
-  if (DUNE_XT_WITH_PYTHON_BINDINGS)
-    add_custom_target(bindings ALL DEPENDS _functions)
-  else()
-    add_custom_target(bindings DEPENDS _functions)
-  endif()
-endif()
-
 add_subdirectory(test EXCLUDE_FROM_ALL)
 

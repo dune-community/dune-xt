@@ -17,7 +17,7 @@
 
 #include <dune/xt/common/configuration.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

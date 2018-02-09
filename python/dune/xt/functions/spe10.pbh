@@ -15,11 +15,11 @@
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <dune/xt/common/fvector.pbh>
+#include <python/dune/xt/common/fvector.pbh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "spe10/model1.hh"
+#include <dune/xt/functions/spe10/model1.hh>
 
 namespace Dune {
 namespace XT {

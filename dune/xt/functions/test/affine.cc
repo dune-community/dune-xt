@@ -24,6 +24,7 @@ using namespace Dune;
 using namespace Dune::XT;
 using namespace Dune::XT::Functions;
 
+#if HAVE_DUNE_XT_LA
 struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   void check()
@@ -38,3 +39,4 @@ struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
     }
   }
 };
+#endif // HAVE_DUNE_XT_LA

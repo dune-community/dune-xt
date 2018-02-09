@@ -11,7 +11,7 @@
 #ifndef DUNE_XT_FUNCTIONS_INTERFACE_LIB_HH
 #define DUNE_XT_FUNCTIONS_INTERFACE_LIB_HH
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 #if DUNE_XT_WITH_PYTHON_BINDINGS
 

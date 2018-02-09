@@ -15,12 +15,12 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
 
-#include <dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/bindings.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
-#include <dune/xt/grid/grids.bindings.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {
@@ -239,13 +239,13 @@ bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_i
                 path,
                 subsampling);
           else if (layer == "dd_subdomain")
-            self.visualize(dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain, XT::Grid::Backends::part>(
+            self.visualize(dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain, XT::Grid::Backends::view>(
                                level_or_subdomain),
                            path,
                            subsampling);
           else if (layer == "dd_subdomain_oversampled")
             self.visualize(
-                dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain_oversampled, XT::Grid::Backends::part>(
+                dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain_oversampled, XT::Grid::Backends::view>(
                     level_or_subdomain),
                 path,
                 subsampling);

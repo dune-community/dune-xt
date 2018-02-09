@@ -19,7 +19,7 @@
 
 #include <dune/xt/common/memory.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

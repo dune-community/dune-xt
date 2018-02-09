@@ -22,7 +22,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include "interfaces.hh"
+#include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {

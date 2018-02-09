@@ -17,10 +17,10 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
-#include <dune/xt/grid/grids.bindings.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "ESV2007.hh"
+#include <dune/xt/functions/ESV2007.hh>
 
 namespace Dune {
 namespace XT {
