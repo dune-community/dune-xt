@@ -10,12 +10,12 @@
 
 # dune-python's way of forcing a version
 dune_require_python_version(3.4)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Add a CMake parameter for choosing a desired Python version
 set(DUNE_PYBINDXI_PYTHON_VERSION "" CACHE STRING "Python version to use for dune-pybindxi")
 
-set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7)
-include(FindPythonLibsNew)
+set(PYTHON_EXECUTABLE ${DUNE_PYTHON_VIRTUALENV_INTERPRETER})
 find_package(PythonLibsNew ${PYBIND11_PYTHON_VERSION} REQUIRED)
 
 set(PYTHON_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS} CACHE INTERNAL "")
@@ -25,24 +25,21 @@ set(PYTHON_MODULE_EXTENSION ${PYTHON_MODULE_EXTENSION} CACHE INTERNAL "")
 
 include(CheckCXXCompilerFlag)
 if(NOT MSVC AND NOT DUNE_PYBINDXI_CPP_STANDARD)
-  #check_cxx_compiler_flag("-std=c++14" HAS_CPP14_FLAG)
-  check_cxx_compiler_flag("-std=c++11" HAS_CPP11_FLAG)
+    check_cxx_compiler_flag("-std=c++14" HAS_CPP14_FLAG)
+    check_cxx_compiler_flag("-std=c++11" HAS_CPP11_FLAG)
 
-  #if (HAS_CPP14_FLAG)
-  #  set(DUNE_PYBINDXI_CPP_STANDARD -std=c++14)
-  #elseif (HAS_CPP11_FLAG)
-  if (HAS_CPP11_FLAG)
-    set(DUNE_PYBINDXI_CPP_STANDARD -std=c++11)
-  else()
-    message(FATAL_ERROR "Unsupported compiler -- pybind11 requires C++11 support!")
-  endif()
+    if (HAS_CPP14_FLAG)
+        set(DUNE_PYBINDXI_CPP_STANDARD -std=c++14)
+    elseif (HAS_CPP11_FLAG)
+        set(DUNE_PYBINDXI_CPP_STANDARD -std=c++11)
+    else()
+        message(FATAL_ERROR "Unsupported compiler -- pybind11 requires C++11 support!")
+    endif()
 
-  set(DUNE_PYBINDXI_CPP_STANDARD ${DUNE_PYBINDXI_CPP_STANDARD} CACHE STRING
+    set(DUNE_PYBINDXI_CPP_STANDARD ${DUNE_PYBINDXI_CPP_STANDARD} CACHE STRING
           "C++ standard flag, e.g. -std=c++11 or -std=c++14. Defaults to C++11." FORCE)
 endif()
 
 include(DunePybindxiUtils)
 include(DunePybindxiHelper)
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
