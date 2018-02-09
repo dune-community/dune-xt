@@ -21,6 +21,7 @@ setup(name='dune.xt.la',
       author='The dune-xt devs',
       author_email='dune-xt-dev@listserv.uni-muenster.de',
       url='https://github.com/dune-community/dune-xt-la',
+      install_requires=['numpy', 'scipy'],
       packages = find_packages(),
       zip_safe = 0,
       package_data = {'': ['*.so']},)
