@@ -369,7 +369,36 @@ public:
     } else
       return false;
   }
-}; // class InnerIntersections
+}; // class InnerIntersectionsPrimally
+
+/**
+ *  \brief Selects each inner intersection in given partition only once.
+ *  \see InnerIntersectionsPrimally
+ */
+template <class GridLayerImp, class PartitionSetType>
+class PartitionSetInnerIntersectionsPrimally
+    : public internal::WhichIntersectionBase<GridLayerImp,
+                                             PartitionSetInnerIntersectionsPrimally<GridLayerImp, PartitionSetType>>
+{
+  typedef WhichIntersection<GridLayerImp> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  {
+    if (intersection.neighbor() && !intersection.boundary()
+        && PartitionSetType::contains(intersection.inside().partitionType())) {
+      const auto insideEntity = intersection.inside();
+      const auto outsideNeighbor = intersection.outside();
+      if (!PartitionSetType::contains(intersection.outside().partitionType()))
+        return true;
+      return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
+    } else
+      return false;
+  }
+}; // class PartitionSetInnerIntersectionsPrimally
 
 
 template <class GridLayerImp>
