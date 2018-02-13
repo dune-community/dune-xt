@@ -50,18 +50,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #=============================================================================
 
-# Checking for the extension makes sure that `LibsNew` was found and not just `Libs`.
-if(PYTHONLIBS_FOUND AND PYTHON_MODULE_EXTENSION)
-    return()
-endif()
-
-# Use the Python interpreter to find the libs.
-if(PythonLibsNew_FIND_REQUIRED)
-    find_package(PythonInterp ${PythonLibsNew_FIND_VERSION} REQUIRED)
-else()
-    find_package(PythonInterp ${PythonLibsNew_FIND_VERSION})
-endif()
-
 if(NOT PYTHONINTERP_FOUND)
     set(PYTHONLIBS_FOUND FALSE)
     return()
@@ -116,13 +104,11 @@ list(GET _PYTHON_VALUES 9 PYTHON_MULTIARCH)
 # Make sure the Python has the same pointer-size as the chosen compiler
 # Skip if CMAKE_SIZEOF_VOID_P is not defined
 if(CMAKE_SIZEOF_VOID_P AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZEOF_VOID_P}"))
-    if(PythonLibsNew_FIND_REQUIRED)
-        math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
-        math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
-        message(FATAL_ERROR
-            "Python config failure: Python is ${_PYTHON_BITS}-bit, "
-            "chosen compiler is  ${_CMAKE_BITS}-bit")
-    endif()
+    math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
+    math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
+    message(FATAL_ERROR
+        "Python config failure: Python is ${_PYTHON_BITS}-bit, "
+        "chosen compiler is  ${_CMAKE_BITS}-bit")
     set(PYTHONLIBS_FOUND FALSE)
     return()
 endif()
