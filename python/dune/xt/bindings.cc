@@ -62,9 +62,6 @@ void addbind_for_Grid(pybind11::module& m)
   bind_DdSubdomainsGridProvider<G>(m, grid_id);
   bind_make_cube_dd_subdomains_grid<G>(m, grid_id);
 
-  bind_walker<G, Layers::adaptive_leaf, Backends::part>(m);
-  bind_walker<G, Layers::leaf, Backends::part>(m);
-  bind_walker<G, Layers::level, Backends::part>(m);
   bind_walker<G, Layers::dd_subdomain, Backends::view>(m);
   bind_walker<G, Layers::dd_subdomain_boundary, Backends::view>(m);
   bind_walker<G, Layers::dd_subdomain_coupling, Backends::view>(m);
