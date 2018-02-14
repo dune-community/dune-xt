@@ -6,17 +6,15 @@
 set -e
 set -x
 
-${DUNE_VENV_ACTIVATE}
-
 WAIT="${SUPERDIR}/scripts/bash/travis_wait_new.bash 45"
 source ${SUPERDIR}/scripts/bash/retry_command.bash
 
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} configure
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD}
 if [ x"${TESTS}" == x ] ; then
-    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v test_binaries
+    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} test_binaries
 else
-    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -v test_binaries_builder_${TESTS}
+    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} test_binaries_builder_${TESTS}
 fi
 
 source ${OPTS}
@@ -26,6 +24,7 @@ if [ x"${TESTS}" == x ] ; then
     ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${CTEST}
     ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} headercheck
 else
+    # with binning headercheck is included in building tests
     ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${CTEST} -L "^builder_${TESTS}$"
 fi
 
