@@ -193,7 +193,10 @@ public:
   static GridProvider<GridType> create(const Common::Configuration& cfg = cube_gridprovider_default_config())
   {
     static const size_t d = GridType::dimension;
-    auto overlap_size = cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size");
+    auto overlap_size =
+        cfg.has_key("overlap_size")
+            ? cfg.template get<std::vector<unsigned int>>("overlap_size")
+            : cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size");
     std::array<unsigned int, d> overlap_size_array;
     if (overlap_size.size() >= d) {
       overlap_size_array = Common::make_array<unsigned int, d>(overlap_size);
