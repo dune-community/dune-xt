@@ -22,7 +22,6 @@
 
 #include <dune/grid/io/file/vtk.hh>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_traits.hh>
@@ -32,6 +31,7 @@
 #include <dune/xt/grid/view/from-part.hh>
 #include <dune/xt/grid/type_traits.hh>
 
+#include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
 #include "local-functions.hh"
@@ -41,9 +41,9 @@ namespace XT {
 namespace Functions {
 
 
-// template <class GridViewType, size_t dimRange, size_t dimRangeCols = 1>
-// class VisualizationAdapterFunction;
-
+// forward, required in LocalizableFunctionInterface::visualize
+template <class GridViewType, size_t dimRange, size_t dimRangeCols, class RangeFieldImp>
+class VisualizationAdapter;
 
 // template <class MinuendType, class SubtrahendType>
 // class DifferenceFunction;
@@ -137,36 +137,36 @@ public:
   //    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
   //  }
 
-  //  /**
-  //   * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default. The grid you see in the
-  //   *  visualization may thus be a refinement of the actual grid!
-  //   */
-  //  template <class GridLayerType>
-  //  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
-  //  visualize(const GridLayerType& grid_layer,
-  //            const std::string path,
-  //            const bool subsampling = true,
-  //            const VTK::OutputType vtk_output_type = VTK::appendedraw,
-  //            const XT::Common::Parameter& param = {}) const
-  //  {
-  //    if (path.empty())
-  //      DUNE_THROW(RangeError, "Empty path given!");
-  //    const auto directory = Common::directory_only(path);
-  //    const auto tmp_grid_view = Grid::make_tmp_view(grid_layer);
-  //    const auto& grid_view = tmp_grid_view.access();
-  //    using GridViewType = std::decay_t<decltype(grid_view)>;
-  //    const auto adapter =
-  //        std::make_shared<VisualizationAdapterFunction<GridViewType, dimRange, dimRangeCols>>(*this, "", param);
-  //    std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
-  //        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
-  //                    : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
-  //    vtk_writer->addVertexData(adapter);
-  //    Common::test_create_directory(directory);
-  //    if (MPIHelper::getCollectiveCommunication().size() == 1)
-  //      vtk_writer->write(path, vtk_output_type);
-  //    else
-  //      vtk_writer->pwrite(Common::filename_only(path), directory, "", vtk_output_type);
-  //  } // ... visualize(...)
+  /**
+   * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default: the grid you see in the
+   *        visualization may thus be a refinement of the actual grid!
+   */
+  template <class GridLayerType>
+  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
+  visualize(const GridLayerType& grid_layer,
+            const std::string path,
+            const bool subsampling = true,
+            const VTK::OutputType vtk_output_type = VTK::appendedraw,
+            const XT::Common::Parameter& param = {}) const
+  {
+    if (path.empty())
+      DUNE_THROW(wrong_input_given, "Empty path given!");
+    const auto directory = Common::directory_only(path);
+    const auto tmp_grid_view = Grid::make_tmp_view(grid_layer);
+    const auto& grid_view = tmp_grid_view.access();
+    using GridViewType = std::decay_t<decltype(grid_view)>;
+    const auto adapter =
+        std::make_shared<VisualizationAdapter<GridViewType, dimRange, dimRangeCols, RangeFieldType>>(*this, "", param);
+    std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
+        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
+                    : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
+    vtk_writer->addVertexData(adapter);
+    Common::test_create_directory(directory);
+    if (MPIHelper::getCollectiveCommunication().size() == 1)
+      vtk_writer->write(path, vtk_output_type);
+    else
+      vtk_writer->pwrite(Common::filename_only(path), directory, "", vtk_output_type);
+  } // ... visualize(...)
 
   //  virtual void report(std::ostream& out, const std::string prefix = "") const
   //  {
@@ -192,7 +192,7 @@ private:
 } // namespace Dune
 
 //#include "../combined.hh"
-//#include "../default.hh"
+#include <dune/xt/functions/base/visualization.hh>
 //#include "../derived.hh"
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FUNCTION_HH
