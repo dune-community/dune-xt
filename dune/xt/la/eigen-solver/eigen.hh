@@ -12,6 +12,8 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH
 
+#include "config.h"
+
 #include <algorithm>
 #include <complex>
 #include <functional>
@@ -79,25 +81,25 @@ public:
 protected:
   void compute() const override final
   {
-    const auto type = options_.template get<std::string>("type");
+    const auto type = options_.template get<std::string>("type", EigenSolverOptions<EigenDenseMatrix<S>>::types()[0]);
     const size_t N = matrix_.rows();
+    const bool compute_eigenvalues = options_.template get<bool>("compute_eigenvalues", true);
+    const bool compute_eigenvectors = options_.template get<bool>("compute_eigenvectors", false);
     if (type == "eigen") {
-      if (options_.template get<bool>("compute_eigenvalues") && options_.template get<bool>("compute_eigenvectors")) {
+      if (compute_eigenvalues && compute_eigenvectors) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
         eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
         internal::compute_eigenvalues_and_right_eigenvectors_using_eigen(
             matrix_.backend(), *eigenvalues_, eigenvectors_->backend());
-      } else {
-        if (options_.template get<bool>("compute_eigenvalues"))
-          eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
-              internal::compute_eigenvalues_using_eigen(matrix_.backend()));
-        if (options_.template get<bool>("compute_eigenvectors"))
-          eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(
-              internal::compute_right_eigenvectors_using_eigen(matrix_.backend()));
-      }
+      } else if (compute_eigenvalues)
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
+            internal::compute_eigenvalues_using_eigen(matrix_.backend()));
+      else if (compute_eigenvectors)
+        eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(
+            internal::compute_right_eigenvectors_using_eigen(matrix_.backend()));
 #if HAVE_LAPACKE
     } else if (type == "lapack") {
-      if (!options_.template get<bool>("compute_eigenvectors"))
+      if (!compute_eigenvectors)
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
             internal::compute_eigenvalues_using_lapack(matrix_));
       else {
@@ -107,7 +109,13 @@ protected:
       }
 #endif // HAVE_LAPACKE
     } else if (type == "shifted_qr") {
-      if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
+      if (!compute_eigenvectors) {
+        eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
+        std::vector<XT::Common::real_t<RealType>> real_eigenvalues(N);
+        real_eigenvalues = internal::compute_eigenvalues_using_qr(matrix_);
+        for (size_t ii = 0; ii < N; ++ii)
+          (*eigenvalues_)[ii] = real_eigenvalues[ii];
+      } else {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
         eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
         std::vector<XT::Common::real_t<RealType>> real_eigenvalues(N);
