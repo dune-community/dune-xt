@@ -39,10 +39,13 @@ public:
   typedef LocalizableFunctionInterface<EntityType, DomainFieldType, dimDomain, double, dimRange, dimRangeCols>
       FunctionType;
 
-  VisualizationAdapterFunction(const FunctionType& function, const std::string nm = "")
+  VisualizationAdapterFunction(const FunctionType& function,
+                               const std::string nm = "",
+                               const XT::Common::Parameter& param = {})
     : function_(function)
     , tmp_value_(0)
     , name_(nm)
+    , param_(param)
   {
   }
 
@@ -96,7 +99,7 @@ public:
     assert(comp >= 0);
     assert(comp < boost::numeric_cast<int>(dimRange));
     const auto local_func = function_.local_function(en);
-    local_func->evaluate(xx, tmp_value_);
+    local_func->evaluate(xx, tmp_value_, param_);
     return Call<dimRange, dimRangeCols>::evaluate(comp, tmp_value_);
   }
 
@@ -104,6 +107,7 @@ private:
   const FunctionType& function_;
   mutable typename FunctionType::RangeType tmp_value_;
   const std::string name_;
+  const XT::Common::Parameter& param_;
 }; // class VisualizationAdapterFunction
 
 

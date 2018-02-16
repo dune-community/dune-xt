@@ -146,7 +146,8 @@ public:
   //  visualize(const GridLayerType& grid_layer,
   //            const std::string path,
   //            const bool subsampling = true,
-  //            const VTK::OutputType vtk_output_type = VTK::appendedraw) const
+  //            const VTK::OutputType vtk_output_type = VTK::appendedraw,
+  //            const XT::Common::Parameter& param = {}) const
   //  {
   //    if (path.empty())
   //      DUNE_THROW(RangeError, "Empty path given!");
@@ -154,8 +155,8 @@ public:
   //    const auto tmp_grid_view = Grid::make_tmp_view(grid_layer);
   //    const auto& grid_view = tmp_grid_view.access();
   //    using GridViewType = std::decay_t<decltype(grid_view)>;
-  //    const auto adapter = std::make_shared<VisualizationAdapterFunction<GridViewType, dimRange,
-  //    dimRangeCols>>(*this);
+  //    const auto adapter =
+  //        std::make_shared<VisualizationAdapterFunction<GridViewType, dimRange, dimRangeCols>>(*this, "", param);
   //    std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
   //        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
   //                    : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
