@@ -1,334 +1,495 @@
 // This file is part of the dune-xt-functions project:
 //   https://github.com/dune-community/dune-xt-functions
-// Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
+// Copyright 2009-2017 dune-xt-functions developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017)
-//   Rene Milk       (2018)
 //   Tobias Leibner  (2017)
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_LOCAL_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_LOCAL_FUNCTIONS_HH
 
-#include <type_traits>
+#include <array>
+#include <sstream>
 #include <vector>
+#include <type_traits>
 
-#include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 
-#include <dune/geometry/quadraturerules.hh>
 #include <dune/geometry/referenceelements.hh>
 
+#include <dune/xt/common/fmatrix.hh>
+#include <dune/xt/common/fvector.hh>
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/parameter.hh>
+#include <dune/xt/grid/entity.hh>
+#include <dune/xt/grid/type_traits.hh>
+
+#include <dune/xt/functions/exceptions.hh>
 
 namespace Dune {
 namespace XT {
 namespace Functions {
+namespace internal {
 
 
-template <class RangeFieldType, size_t dimRange, size_t dimRangeCols>
+template <class R, size_t r, size_t rC>
 struct RangeTypeSelector
 {
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimRangeCols> type;
+  using type = XT::Common::FieldMatrix<R, r, rC>;
 };
 
-template <class RangeFieldType, size_t dimRange>
-struct RangeTypeSelector<RangeFieldType, dimRange, 1>
+template <class R, size_t r>
+struct RangeTypeSelector<R, r, 1>
 {
-  typedef Dune::FieldVector<RangeFieldType, dimRange> type;
+  using type = XT::Common::FieldVector<R, r>;
 };
 
-template <size_t dimDomain, class RangeFieldType, size_t dimRange, size_t dimRangeCols>
-struct JacobianRangeTypeSelector
+
+template <size_t d, class R, size_t r, size_t rC>
+struct DerivativeRangeTypeSelector
 {
-  typedef Dune::FieldVector<Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain>, dimRangeCols> type;
+  using single_type = XT::Common::FieldVector<R, d>;
+  using type = XT::Common::FieldVector<Dune::XT::Common::FieldMatrix<R, rC, d>, r>;
 };
 
-template <size_t dimDomain, class RangeFieldType, size_t dimRange>
-struct JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, 1>
+template <size_t d, class R, size_t r>
+struct DerivativeRangeTypeSelector<d, R, r, 1>
 {
-  typedef Dune::FieldMatrix<RangeFieldType, dimRange, dimDomain> type;
+  using single_type = XT::Common::FieldVector<R, d>;
+  using type = XT::Common::FieldMatrix<R, r, d>;
 };
 
-template <size_t dimDomain, class RangeFieldImp, size_t dimRange, size_t dimRangeCols>
-struct RangeColumnHelper
-{
-  typedef typename RangeTypeSelector<RangeFieldImp, dimRange, dimRangeCols>::type RangeType;
-  typedef typename RangeTypeSelector<RangeFieldImp, dimRange, 1>::type ColRangeType;
-  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldImp, dimRange, dimRangeCols>::type JacobianRangeType;
-  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldImp, dimRange, 1>::type ColJacobianRangeType;
 
-  static void set_col(size_t col, RangeType& range, const ColRangeType& range_col)
-  {
-    for (size_t ii = 0; ii < dimRange; ++ii)
-      range[ii][col] = range_col[ii];
-  }
-
-  static ColRangeType get_col(size_t col, const RangeType& range)
-  {
-    ColRangeType range_col;
-    for (size_t ii = 0; ii < dimRange; ++ii)
-      range_col[ii] = range[ii][col];
-    return range_col;
-  }
-
-  static void set_col_jacobian(size_t col, JacobianRangeType& jacobian, const ColJacobianRangeType& jacobian_col)
-  {
-    jacobian[col] = jacobian_col;
-  }
-
-  static const ColJacobianRangeType& get_col_jacobian(size_t col, const JacobianRangeType& jacobian)
-  {
-    return jacobian[col];
-  }
-};
-
-template <size_t dimDomain, class RangeFieldImp, size_t dimRange>
-struct RangeColumnHelper<dimDomain, RangeFieldImp, dimRange, 1>
-{
-  typedef typename RangeTypeSelector<RangeFieldImp, dimRange, 1>::type RangeType;
-  typedef RangeType ColRangeType;
-  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldImp, dimRange, 1>::type JacobianRangeType;
-  typedef JacobianRangeType ColJacobianRangeType;
-
-  static void set_col(size_t col, RangeType& range, const ColRangeType& range_col)
-  {
-    assert(col == 0);
-    range = range_col;
-  }
-
-  static ColRangeType get_col(size_t col, const RangeType& range)
-  {
-    assert(col == 0);
-    return range;
-  }
-
-  static void set_col_jacobian(size_t col, JacobianRangeType& jacobian, const ColJacobianRangeType& jacobian_col)
-  {
-    assert(col == 0);
-    jacobian = jacobian_col;
-  }
-
-  static const ColJacobianRangeType& get_col_jacobian(size_t col, const JacobianRangeType& jacobian)
-  {
-    assert(col == 0);
-    return jacobian;
-  }
-};
+} // namespace internal
 
 
 /**
  *  \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
- */
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols = 1>
-class LocalfunctionSetInterface : public Common::ParametricInterface
+ *
+ *         Given a function u: R^d -> R^{r x rC}, we interpret it as a r functions u_1, ..., u_r in the sense of
+ *         u(x) = (u_1(x), ..., u_r(x))T, where each u_s: R^d -> R^rC for 1 \leq s \leq r, and thus ultimately
+ *
+ *                | (u_1(x))_1, (u_1(x))_2, ..., (u_1(x))_rC |
+ *                | (u_2(x))_1,    .        ...      .       |
+ *         u(x) = |      .         .        ...      .       |
+ *                |      .         .        ...      .       |
+ *                | (u_r(x))_1, (u_r(x))_2, ..., (u_r(x))_rC |
+ *
+ *         Here, (u_s(x))_i can be interpreted as the evaluation of a scalar function u_s_i: R^d -> R
+ *         for 1 \leq i \leq rC, and we can thus identify
+ *
+ *         u = ( u_s_i )_{s = 1, ..., r | i = 1, ..., rC }
+ *
+ *         This interpretation of u is used in RangeTypeSelector, with a special case if rC = 1, to simplify manners.
+ *
+ *         Regarding derivatives: since one is often interested in the derivatives of the individual functions u_s, it
+ *         makes sense to iterate over r first, and we thus have jacobian u: R^d -> R^{r x {d x rC}}, where
+ *
+ *                             |  (d u_s_1 / d x_1)(x),  (d u_s_1 / d x_2)(x), ...,  (d u_s_1 / d x_d)(x) |
+ *                             |  (d u_s_2 / d x_1)(x),           .             ...           .           |
+ *         (jacobian u)_s(x) = |           .                      .             ...           .           |
+ *                             |           .                      .             ...           .           |
+ *                             | (d u_s_rC / d x_1)(x), (d u_s_rC / d x_2)(x), ..., (d u_s_rC / d x_d)(x) |
+ *
+ *         Again, (d u_s_i / d x_j)(x) can be interpreted as the evaluation of a scalar function
+ *         (jacobian u)_s_i_j: R^d -> R, and we can thus identify
+ *
+ *         (jacobian u)_s = ( d u_s_i / d x_j )_{i = 1, ..., rC | j = 1, ..., d}
+ *
+ *         This interpretation of us jacobian is used in DerivativeRangeTypeSelector, with a special case if rC = 1, to
+ *         simplify manners.
+ **/
+template <class EntityImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+class LocalFunctionSetInterface : public Common::ParametricInterface
 {
-  static_assert(EntityImp::dimension == domainDim, "Dimensions do not match!");
+  static_assert(XT::Grid::is_entity<EntityImp>::value, "");
+  using ThisType = LocalFunctionSetInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
-  typedef EntityImp EntityType;
-
-  typedef DomainFieldImp DomainFieldType;
-  static const constexpr size_t dimDomain = domainDim;
-  typedef Dune::FieldVector<DomainFieldType, dimDomain> DomainType;
-
-  typedef RangeFieldImp RangeFieldType;
+  using EntityType = EntityImp;
+  using DomainFieldType = double;
+  static const constexpr size_t dimDomain = EntityType::dimension;
+  using RangeFieldType = RangeFieldImp;
   static const constexpr size_t dimRange = rangeDim;
   static const constexpr size_t dimRangeCols = rangeDimCols;
-  typedef typename RangeTypeSelector<RangeFieldType, dimRange, dimRangeCols>::type RangeType;
-  typedef typename JacobianRangeTypeSelector<dimDomain, RangeFieldType, dimRange, dimRangeCols>::type JacobianRangeType;
 
-  typedef EntityType E;
-  typedef DomainFieldType D;
+  using E = EntityType;
+  using D = DomainFieldType;
   static const constexpr size_t d = dimDomain;
-  typedef RangeFieldType R;
+  using R = RangeFieldType;
   static const constexpr size_t r = dimRange;
   static const constexpr size_t rC = dimRangeCols;
 
-  LocalfunctionSetInterface(const EntityType& ent)
-    : entity_(ent)
+  using DomainType = Dune::FieldVector<D, d>;
+  using RangeType = typename internal::RangeTypeSelector<R, r, rC>::type;
+  using DerivativeRangeType = typename internal::DerivativeRangeTypeSelector<d, R, r, rC>::type;
+  using SingleDerivativeRangeType = typename internal::DerivativeRangeTypeSelector<d, R, r, rC>::single_type;
+
+  LocalFunctionSetInterface()
+    : entity_(nullptr)
   {
   }
 
-  virtual ~LocalfunctionSetInterface() = default;
-
-  virtual const EntityType& entity() const
+  LocalFunctionSetInterface(const EntityType& ent)
+    : entity_(new EntityType(ent))
   {
-    return entity_;
   }
 
+  LocalFunctionSetInterface(EntityType&& ent)
+    : entity_(new EntityType(ent))
+  {
+  }
+
+  LocalFunctionSetInterface(const ThisType& other)
+    : entity_(nullptr)
+  {
+    if (other.entity_)
+      entity_ = std::make_unique<EntityType>(*other.entity_);
+  }
+
+  LocalFunctionSetInterface(ThisType&& source)
+    : entity_(std::move(source.entity_))
+  {
+  }
+
+  virtual ~LocalFunctionSetInterface() = default;
+
+  ThisType& operator=(const ThisType& other)
+  {
+    if (&other != this && other.entity_)
+      entity_ = std::make_unique<EntityType>(other.entity_);
+  }
+
+  ThisType& operator=(ThisType&& source)
+  {
+    if (&source != this)
+      entity_ = source.entity_;
+  }
+
+  /**
+   * \attention The returned reference will change as soon as the funtion is bound to another entity!
+   */
+  const EntityType& entity() const
+  {
+    if (!entity_)
+      DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
+    return *entity_;
+  }
+
+  ThisType& bind(const EntityType& ent)
+  {
+    if (entity_ && ent == *entity_)
+      return *this;
+    entity_ = std::make_unique<EntityType>(ent);
+    post_bind(*entity_);
+    return *this;
+  }
+
+protected:
+  /**
+   * \note Override this function if you need/want to do preparatory work on an entity.
+   */
+  virtual void post_bind(const EntityType& /*ent*/)
+  {
+  }
+
+public:
   /**
    * \name ´´These methods have to be implemented.''
    * \{
    **/
-  virtual size_t size() const = 0;
 
-  virtual size_t order(const Common::Parameter& = {}) const = 0;
+  virtual size_t size(const Common::Parameter& /*mu*/ = {}) const = 0;
 
-  virtual void
-  evaluate(const DomainType& /*xx*/, std::vector<RangeType>& /*ret*/, const Common::Parameter& /*mu*/ = {}) const = 0;
-
-  virtual void jacobian(const DomainType& /*xx*/,
-                        std::vector<JacobianRangeType>& /*ret*/,
-                        const Common::Parameter& /*mu*/ = {}) const = 0;
-  /* \} */
+  virtual int order(const Common::Parameter& /*mu*/ = {}) const = 0;
 
   /**
-   * \name ´´These methods are provided by the interface.''
+   * \}
+   * \name ´´These methods should be implemented to define the functionality of the set of functions.''
    * \{
    **/
-  std::vector<RangeType> evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const
+
+  virtual std::vector<RangeType> evaluate_set(const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) const
   {
-    std::vector<RangeType> ret(size(), RangeType(0));
-    evaluate(xx, ret, mu);
-    return ret;
+    DUNE_THROW(NotImplemented,
+               "This set of local functions does not provide evaluations, override the 'evaluate_set' method!");
   }
 
-  std::vector<JacobianRangeType> jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const
+  virtual std::vector<DerivativeRangeType> jacobians_of_set(const DomainType& /*xx*/,
+                                                            const Common::Parameter& /*mu*/ = {}) const
   {
-    std::vector<JacobianRangeType> ret(size(), JacobianRangeType(0));
-    jacobian(xx, ret, mu);
-    return ret;
+    DUNE_THROW(NotImplemented,
+               "This set of local functions does not provide jacobians, override the 'jacobians_of_set' method!");
   }
-  /* \} */
 
+  virtual std::vector<DerivativeRangeType> derivatives_of_set(const std::array<size_t, d>& /*alpha*/,
+                                                              const DomainType& /*xx*/,
+                                                              const Common::Parameter& /*mu*/ = {}) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This set of local functions does not provide arbitrary derivatives, override the "
+               "'derivatives_of_set' method!");
+  }
+
+  /**
+   * \{
+   * \name ´´These methods can be overridden to improve their performance.''
+   * \{
+   **/
+
+  virtual std::vector<R>
+  evaluate_set(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
+  {
+    ensure_correct_dims(row, col, "evaluate_set");
+    return single_helper<R>::call(this->evaluate_set(xx, mu), row, col);
+  }
+
+  virtual std::vector<SingleDerivativeRangeType>
+  jacobians_of_set(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
+  {
+    ensure_correct_dims(row, col, "jacobians_of_set");
+    return single_helper<SingleDerivativeRangeType>::call(this->jacobians_of_set(xx, mu), row, col);
+  }
+
+  virtual std::vector<SingleDerivativeRangeType> derivatives_of_set(const std::array<size_t, d>& alpha,
+                                                                    const DomainType& xx,
+                                                                    const size_t row,
+                                                                    const size_t col,
+                                                                    const Common::Parameter& mu = {}) const
+  {
+    ensure_correct_dims(row, col, "derivatives_of_set");
+    return single_helper<SingleDerivativeRangeType>::call(this->derivatives_of_set(alpha, xx, mu), row, col);
+  }
+
+  /**
+   * \}
+   **/
 protected:
-  bool is_a_valid_point(const DomainType&
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-                            xx
-#else
-/*xx*/
-#endif
-                        ) const
+  void ensure_this_is_a_valid_point(const DomainType& xx) const
   {
-#ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-    const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
-    return reference_element.checkInside(xx);
-#else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-    return true;
-#endif
+    if (!ReferenceElements<D, d>::general(entity().type()).checkInside(xx)) {
+      std::stringstream error_message;
+      error_message << "This given point xx is not inside the current entity!"
+                    << "\n\n";
+      XT::Grid::print_entity(entity(), XT::Common::Typename<E>::value(), error_message, "   ");
+      error_message << "\n   "
+                    << "xx = " << xx << std::endl;
+      DUNE_THROW(XT::Functions::Exceptions::wrong_input_given, error_message.str());
+    }
   }
+#else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
+  void ensure_this_is_a_valid_point(const DomainType& /*xx*/) const
+  {
+  }
+#endif
 
-  const EntityType& entity_;
-}; // class LocalfunctionSetInterface
+#ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
+  static void ensure_correct_dims(const size_t row, const size_t col, const std::string& caller)
+  {
+    if (row >= r || col >= rC)
+      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
+                 "in " << caller << ": this function maps from " << d << " -> " << r << "x" << rC << "\n   "
+                       << "and you are trying to access the entry in row "
+                       << row
+                       << " and column "
+                       << col
+                       << " of its range!");
+  }
+#else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
+  static void ensure_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/)
+  {
+  }
+#endif
+
+private:
+  template <class SingleType, size_t _r = r, size_t _rC = rC, bool anything = true>
+  struct single_helper
+  {
+    template <class FullType>
+    static std::vector<SingleType> call(const std::vector<FullType>& val, const size_t row, const size_t col)
+    {
+      std::vector<SingleType> ret(val.size());
+      for (size_t ii = 0; ii < val.size(); ++ii)
+        for (size_t dd = 0; dd < d; ++dd)
+          ret[ii][dd] = val[ii][row][col][dd];
+      return ret;
+    }
+  }; // struct single_helper<r, rC, ...>
+
+  template <class SingleType, size_t _r, bool anything>
+  struct single_helper<SingleType, _r, 1, anything>
+  {
+    template <class FullType>
+    static std::vector<SingleType> call(const std::vector<FullType>& val, const size_t row, const size_t /*col*/)
+    {
+      std::vector<SingleType> ret(val.size());
+      for (size_t ii = 0; ii < val.size(); ++ii)
+        ret[ii] = val[ii][row];
+      return ret;
+    }
+  }; // struct single_helper<r, 1, ...>
+
+  std::unique_ptr<EntityType> entity_;
+}; // class LocalFunctionSetInterface
 
 
 /**
- *  \brief  Interface for functions, which can be evaluated locally on one Entity.
+ *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Entity.
  */
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols = 1>
-class LocalfunctionInterface
-    : public LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+template <class EntityImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+class LocalFunctionInterface : public LocalFunctionSetInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>
 {
-  typedef LocalfunctionSetInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-      BaseType;
+  using BaseType = LocalFunctionSetInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = LocalFunctionInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
-  typedef EntityImp EntityType;
+  using BaseType::d;
+  using typename BaseType::R;
+  using typename BaseType::DomainType;
+  using typename BaseType::RangeType;
+  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::SingleDerivativeRangeType;
+  using typename BaseType::EntityType;
 
-  typedef typename BaseType::DomainFieldType DomainFieldType;
-  static const constexpr size_t dimDomain = BaseType::dimDomain;
-  typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeType RangeType;
-  typedef typename BaseType::JacobianRangeType JacobianRangeType;
+  LocalFunctionInterface()
+    : BaseType()
+  {
+  }
 
-  LocalfunctionInterface(const EntityType& ent)
+  LocalFunctionInterface(const EntityType& ent)
     : BaseType(ent)
   {
   }
 
-  virtual ~LocalfunctionInterface()
+  LocalFunctionInterface(EntityType&& ent)
+    : BaseType(ent)
   {
   }
 
+  LocalFunctionInterface(const ThisType& other) = default;
+  LocalFunctionInterface(ThisType&& source) = default;
+
+  virtual ~LocalFunctionInterface() = default;
+
+  ThisType& operator=(const ThisType& other) = default;
+  ThisType& operator=(ThisType&& source) = default;
+
+  using BaseType::evaluate_set;
+  using BaseType::jacobians_of_set;
+  using BaseType::derivatives_of_set;
+
   /**
-   * \name ´´These methods have to be implemented in addition to the ones required from the BaseType.''
+   * \}
+   * \name ´´These methods should be implemented to define the functionality of the function.''
    * \{
    **/
-  virtual void evaluate(const DomainType& /*xx*/, RangeType& /*ret*/, const Common::Parameter& /*mu*/ = {}) const = 0;
 
-  virtual void
-  jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/, const Common::Parameter& /*mu*/ = {}) const = 0;
-  /* \} */
+  virtual RangeType evaluate(const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) const
+  {
+    DUNE_THROW(NotImplemented, "This local function does not provide evaluations, override the 'evaluate' method!");
+  }
+
+  virtual DerivativeRangeType jacobian(const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) const
+  {
+    DUNE_THROW(NotImplemented, "This local function does not provide a jacobian, override the 'jacobian' method!");
+  }
+
+  virtual DerivativeRangeType derivative(const std::array<size_t, d>& /*alpha*/,
+                                         const DomainType& /*xx*/,
+                                         const Common::Parameter& /*mu*/ = {}) const
+  {
+    DUNE_THROW(NotImplemented,
+               "This local function does not provide arbitrary derivatives, override the 'derivative' method!");
+  }
 
   /**
-   * \name ´´These methods are provided by the interface to please LocalfunctionSetInterface.''
+   * \{
+   * \name ´´These methods can be overridden to improve their performance.''
    * \{
    **/
-  virtual size_t size() const override final
+
+  virtual R evaluate(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
+  {
+    ensure_correct_dims(row, col, "evaluate");
+    return single_helper<R>::call(this->evaluate(xx, mu), row, col);
+  }
+
+  virtual SingleDerivativeRangeType
+  jacobian(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
+  {
+    ensure_correct_dims(row, col, "jacobian");
+    return single_helper<SingleDerivativeRangeType>::call(this->jacobian(xx, mu), row, col);
+  }
+
+  virtual SingleDerivativeRangeType derivative(const std::array<size_t, d>& alpha,
+                                               const DomainType& xx,
+                                               const size_t row,
+                                               const size_t col = 0,
+                                               const Common::Parameter& mu = {}) const
+  {
+    ensure_correct_dims(row, col, "derivative");
+    return single_helper<SingleDerivativeRangeType>::call(this->derivative(alpha, xx, mu), row, col);
+  }
+
+  /**
+   * \{
+   * \name ´´These methods are required by LocalFunctionSetInterface and are provided by this interface.''
+   * \{
+   **/
+
+  size_t size(const Common::Parameter& /*mu*/ = {}) const override final
   {
     return 1;
   }
 
-  virtual void
-  evaluate(const DomainType& xx, std::vector<RangeType>& ret, const Common::Parameter& mu = {}) const override final
+  std::vector<RangeType> evaluate_set(const DomainType& xx, const Common::Parameter& mu = {}) const override final
   {
-    assert(ret.size() >= 1);
-    evaluate(xx, ret[0], mu);
+    return std::vector<RangeType>(1, evaluate(xx, mu));
   }
 
-  virtual void jacobian(const DomainType& xx,
-                        std::vector<JacobianRangeType>& ret,
-                        const Common::Parameter& mu = {}) const override final
+  std::vector<DerivativeRangeType> jacobians_of_set(const DomainType& xx,
+                                                    const Common::Parameter& mu = {}) const override final
   {
-    assert(ret.size() >= 1);
-    jacobian(xx, ret[0], mu);
+    return std::vector<DerivativeRangeType>(1, jacobian(xx, mu));
   }
-  /* \} */
+
+  std::vector<DerivativeRangeType> derivatives_of_set(const std::array<size_t, d>& alpha,
+                                                      const DomainType& xx,
+                                                      const Common::Parameter& mu = {}) const override final
+  {
+    return std::vector<DerivativeRangeType>(1, derivative(alpha, xx, mu));
+  }
 
   /**
-   * \name ´´These methods are provided by the interface.''
-   * \{
+   * \}
    **/
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const
-  {
-    RangeType ret(0);
-    evaluate(xx, ret, mu);
-    return ret;
-  }
+private:
+  using BaseType::ensure_correct_dims;
 
-  JacobianRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const
+  template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
+  struct single_helper
   {
-    JacobianRangeType ret(0);
-    jacobian(xx, ret, mu);
-    return ret;
-  }
+    template <class FullType>
+    static SingleType call(const FullType& val, const size_t row, const size_t col)
+    {
+      return val[row][col];
+    }
+  }; // struct single_helper<r, rC, ...>
 
-  //! evaluate at N quadrature points into vector of size >= N
-  void evaluate(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature,
-                std::vector<RangeType>& ret,
-                const Common::Parameter& mu = {})
+  template <class SingleType, size_t _r, bool anything>
+  struct single_helper<SingleType, _r, 1, anything>
   {
-    assert(ret.size() >= quadrature.size());
-    std::size_t i = 0;
-    for (const auto& point : quadrature)
-      evaluate(point.position(), ret[i++], mu);
-  }
-
-  //! jacobian at N quadrature points into vector of size >= N
-  void jacobian(const Dune::QuadratureRule<DomainFieldType, dimDomain>& quadrature,
-                std::vector<JacobianRangeType>& ret,
-                const Common::Parameter& mu = {})
-  {
-    assert(ret.size() >= quadrature.size());
-    std::size_t i = 0;
-    for (const auto& point : quadrature)
-      jacobian(point.position(), ret[i++], mu);
-  }
-  /* \} */
-}; // class LocalfunctionInterface
+    template <class FullType>
+    static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
+    {
+      return val[row];
+    }
+  }; // struct single_helper<r, 1, ...>
+}; // class LocalFunctionInterface
 
 
 } // namespace Functions
