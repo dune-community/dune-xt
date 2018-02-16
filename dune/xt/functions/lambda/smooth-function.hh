@@ -10,14 +10,14 @@
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014, 2017)
 
-#ifndef DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FUNCTION_HH
-#define DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FUNCTION_HH
+#ifndef DUNE_XT_FUNCTIONS_LAMBDA_SMOOTH_FUNCTION_HH
+#define DUNE_XT_FUNCTIONS_LAMBDA_SMOOTH_FUNCTION_HH
 
 #include <functional>
 
 #include <dune/xt/common/memory.hh>
 
-#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/interfaces/smooth-function.hh>
 
 namespace Dune {
 namespace XT {
@@ -25,112 +25,165 @@ namespace Functions {
 
 
 /**
- * Global-valued function you can pass a lambda expression to that gets evaluated
- * \example LambdaType lambda([](DomainType x) { return x;}, 1 );
+ * Smooth function you can pass lambda expressions to that gets evaluated.
+ *
+ * \example LambdaType lambda(1, [](const auto& x, const auto& mu = {}) { return x;});
  */
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols = 1>
-class GlobalLambdaFunction
-    : public GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
+template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+class SmoothLambdaFunction : public SmoothFunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>
 {
-  typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols> BaseType;
+  using BaseType = SmoothFunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
-  typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeType RangeType;
-  typedef typename BaseType::JacobianRangeType JacobianRangeType;
+  using BaseType::d;
+  using typename BaseType::DomainType;
+  using typename BaseType::RangeType;
+  using typename BaseType::DerivativeRangeType;
 
-private:
-  typedef std::function<RangeType(DomainType, XT::Common::Parameter)> LambdaType;
-  typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
-  typedef std::function<JacobianRangeType(DomainType, XT::Common::Parameter)> JacobianLambdaType;
+  using OrderLambdaType = std::function<int(const Common::Parameter&)>;
+  using EvaluateLambdaType = std::function<RangeType(const DomainType&, const Common::Parameter&)>;
+  using JacobianLambdaType = std::function<DerivativeRangeType(const DomainType&, const Common::Parameter&)>;
+  using DerivativeLambdaType =
+      std::function<DerivativeRangeType(const std::array<size_t, d>&, const DomainType&, const Common::Parameter&)>;
 
-public:
-  GlobalLambdaFunction(LambdaType lambda,
-                       const size_t order_in,
+  SmoothLambdaFunction(OrderLambdaType order_lambda,
+                       EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
+                       const std::string nm = "smooth_lambda_function",
                        const Common::ParameterType& param_type = {},
-                       const std::string nm = "globallambdafunction",
-                       JacobianLambdaType jacobian_lambda =
-                           [](const DomainType&, const Common::Parameter&) {
-                             DUNE_THROW(NotImplemented,
-                                        "You need to provide a lambda for the jacobian if you want to use it!");
-                             return JacobianRangeType();
-                           })
-    : lambda_(lambda)
-    , order_lambda_([=](const Common::Parameter&) { return order_in; })
-    , param_type_(param_type)
-    , name_(nm)
+                       JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
+                       DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+    : order_lambda_(order_lambda)
+    , evaluate_lambda_(evaluate_lambda)
     , jacobian_lambda_(jacobian_lambda)
+    , derivative_lambda_(derivative_lambda)
+    , parameter_type_(param_type)
+    , name_(nm)
   {
   }
 
-  GlobalLambdaFunction(LambdaType lambda,
-                       OrderLambdaType order_lambda,
+  SmoothLambdaFunction(int ord,
+                       EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
+                       const std::string nm = "smooth_lambda_function",
                        const Common::ParameterType& param_type = {},
-                       const std::string nm = "globallambdafunction",
-                       JacobianLambdaType jacobian_lambda =
-                           [](const DomainType&, const Common::Parameter&) {
-                             DUNE_THROW(NotImplemented,
-                                        "You need to provide a lambda for the jacobian if you want to use it!");
-                             return JacobianRangeType();
-                           })
-    : lambda_(lambda)
-    , order_lambda_(order_lambda)
-    , param_type_(param_type)
-    , name_(nm)
+                       JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
+                       DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+    : order_lambda_(default_order_lambda(ord))
+    , evaluate_lambda_(evaluate_lambda)
     , jacobian_lambda_(jacobian_lambda)
+    , derivative_lambda_(derivative_lambda)
+    , parameter_type_(param_type)
+    , name_(nm)
   {
   }
 
-  virtual size_t order(const Common::Parameter& mu = {}) const override final
+  /**
+   * \name ´´These methods are required by XT::Common::ParametricInterface.''
+   * \{
+   */
+
+  bool is_parametric() const override final
   {
-    return order_lambda_(mu);
+    return !parameter_type_.empty();
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
+  const Common::ParameterType& parameter_type() const override final
   {
-    auto parsed_mu = this->parse_parameter(mu);
-    ret = lambda_(xx, parsed_mu);
+    return parameter_type_;
   }
 
-  virtual RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
+  /**
+   * \}
+   * \name ´´These methods are required by SmoothFunctionInterface.''
+   * \{
+   */
+
+  int order(const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = this->parse_parameter(mu);
-    return lambda_(xx, parsed_mu);
+    return order_lambda_(this->parse_and_check(mu));
   }
 
-  virtual void
-  jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
   {
-    auto parsed_mu = this->parse_parameter(mu);
-    ret = jacobian_lambda_(xx, parsed_mu);
+    return evaluate_lambda_(xx, this->parse_and_check(mu));
   }
 
-  virtual std::string type() const override final
+  DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const override final
   {
-    return "globallambdafunction";
+    return jacobian_lambda_(xx, this->parse_and_check(mu));
   }
 
-  virtual std::string name() const override final
+  virtual DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
+                                         const DomainType& xx,
+                                         const Common::Parameter& mu = {}) const override final
+  {
+    return derivative_lambda_(alpha, xx, this->parse_and_check(mu));
+  }
+
+  std::string type() const override final
+  {
+    return "smooth_lambda_function";
+  }
+
+  std::string name() const override final
   {
     return name_;
   }
 
-private:
-  LambdaType lambda_;
-  OrderLambdaType order_lambda_;
-  Common::ParameterType param_type_;
-  std::string name_;
-  JacobianLambdaType jacobian_lambda_;
-};
+  /**
+   * \}
+   * \name ´´These methods may be used to provide defaults on construction.''
+   * \{
+   */
+
+  static OrderLambdaType default_order_lambda(const int ord)
+  {
+    return [=](const Common::Parameter& /*mu*/ = {}) { return ord; };
+  }
+
+  static EvaluateLambdaType default_evaluate_lambda()
+  {
+    return [](const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) {
+      DUNE_THROW(NotImplemented,
+                 "This SmoothLambdaFunction does not provide evaluations, provide an evaluate_lambda on construction!");
+      return RangeType();
+    };
+  }
+
+  static JacobianLambdaType default_jacobian_lambda()
+  {
+    return [](const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) {
+      DUNE_THROW(NotImplemented,
+                 "This SmoothLambdaFunction does not provide jacobian evaluations, provide a "
+                 "jacobian_lambda on construction!");
+      return DerivativeRangeType();
+    };
+  }
+
+  static DerivativeLambdaType default_derivative_lambda()
+  {
+    return [](const std::array<size_t, d>& /*alpha*/, const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) {
+      DUNE_THROW(NotImplemented,
+                 "This SmoothLambdaFunction does not provide derivative evaluations, provide a "
+                 "derivative_lambda on construction!");
+      return DerivativeRangeType();
+    };
+  }
+
+  /**
+   * \}
+   */
+
+  const OrderLambdaType order_lambda_;
+  const EvaluateLambdaType evaluate_lambda_;
+  const JacobianLambdaType jacobian_lambda_;
+  const DerivativeLambdaType derivative_lambda_;
+  const Common::ParameterType parameter_type_;
+  const std::string name_;
+}; // class SmoothLambdaFunction
 
 
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FUNCTION_HH
+#endif // DUNE_XT_FUNCTIONS_LAMBDA_SMOOTH_FUNCTION_HH
