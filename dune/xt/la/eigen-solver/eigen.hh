@@ -12,8 +12,6 @@
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH
 
-#include "config.h"
-
 #include <algorithm>
 #include <complex>
 #include <functional>
