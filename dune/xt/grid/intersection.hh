@@ -16,7 +16,6 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/common/deprecated.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/geometry/referenceelements.hh>

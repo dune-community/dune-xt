@@ -133,7 +133,6 @@ struct is_view<T, true> : public std::is_base_of<Dune::GridView<typename T::Trai
 {
 };
 
-template <class T>
 struct is_dd_subdomain : public std::false_type
 {
 };

@@ -13,8 +13,6 @@
 #ifndef DUNE_XT_GRID_ENTITY_HH
 #define DUNE_XT_GRID_ENTITY_HH
 
-#include <dune/common/deprecated.hh>
-
 #include <dune/geometry/referenceelements.hh>
 
 #include <dune/grid/common/entity.hh>

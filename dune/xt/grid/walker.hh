@@ -24,7 +24,6 @@
 #endif
 
 #include <dune/common/version.hh>
-#include <dune/common/deprecated.hh>
 
 #include <dune/grid/common/rangegenerators.hh>
 

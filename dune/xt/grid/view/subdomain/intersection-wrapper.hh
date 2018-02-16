@@ -13,8 +13,6 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/common/deprecated.hh>
-
 #include <dune/geometry/type.hh>
 
 #include <dune/grid/common/intersection.hh>
