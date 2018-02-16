@@ -69,12 +69,12 @@ public:
   using typename BaseType::GridLayerType;
   typedef typename BaseType::EntityType EntityType;
 
-  virtual WhichEntity<GridLayerImp>* copy() const override final
+  WhichEntity<GridLayerImp>* copy() const override final
   {
     return new AllEntities<GridLayerImp>();
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& /*entity*/) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& /*entity*/) const override final
   {
     return true;
   }
@@ -93,12 +93,12 @@ public:
   using typename BaseType::GridLayerType;
   typedef typename BaseType::EntityType EntityType;
 
-  virtual WhichEntity<GridLayerImp>* copy() const override final
+  WhichEntity<GridLayerImp>* copy() const override final
   {
     return new BoundaryEntities<GridLayerImp>();
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
   {
     return entity.hasBoundaryIntersections();
   }
@@ -245,7 +245,7 @@ template <class GV, class Imp, bool ctor_with_boundary_info = false>
 class WhichIntersectionBase : public WhichIntersection<GV>
 {
 public:
-  virtual WhichIntersection<GV>* copy() const override final
+  WhichIntersection<GV>* copy() const override final
   {
     return new Imp();
   }
@@ -262,7 +262,7 @@ public:
   {
   }
 
-  virtual WhichIntersection<GV>* copy() const override final
+  WhichIntersection<GV>* copy() const override final
   {
     return new Imp(boundary_info_.access());
   }
@@ -287,8 +287,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/,
-                        const IntersectionType& /*intersection*/) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& /*intersection*/) const override final
   {
     return true;
   }
@@ -307,8 +306,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/,
-                        const IntersectionType& /*intersection*/) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& /*intersection*/) const override final
   {
     return false;
   }
@@ -333,7 +331,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.neighbor() && !intersection.boundary();
   }
@@ -360,7 +358,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && !intersection.boundary()) {
       const auto insideEntity = intersection.inside();
@@ -386,7 +384,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && !intersection.boundary()
         && PartitionSetType::contains(intersection.inside().partitionType())) {
@@ -410,7 +408,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.boundary();
   }
@@ -427,7 +425,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.boundary() && !intersection.neighbor();
   }
@@ -452,7 +450,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.neighbor() && intersection.boundary();
   }
@@ -469,7 +467,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && intersection.boundary()) {
       const auto insideEntity = intersection.inside();
@@ -498,12 +496,12 @@ public:
   {
   }
 
-  virtual WhichIntersection<GridLayerImp>* copy() const override final
+  WhichIntersection<GridLayerImp>* copy() const override final
   {
     return new FilteredIntersections<GridLayerImp>(filter_);
   }
 
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
     return filter_(grid_layer, intersection);
   }
@@ -595,7 +593,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     static constexpr const XT::Grid::DirichletBoundary dirichlet{};
     const bool process_boundary = (!intersection.neighbor() && !intersection.boundary());
@@ -615,7 +613,7 @@ public:
   using typename BaseType::GridLayerType;
   using typename BaseType::IntersectionType;
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return (!intersection.neighbor() && !intersection.boundary());
   }
@@ -662,7 +660,7 @@ public:
   {
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return boundary_info_.access().type(intersection) == ReflectingBoundary();
   }
@@ -683,12 +681,12 @@ public:
   using typename BaseType::GridLayerType;
   typedef typename BaseType::EntityType EntityType;
 
-  virtual WhichEntity<GridLayerImp>* copy() const override final
+  WhichEntity<GridLayerImp>* copy() const override final
   {
     return new PartitionSetEntities<GridLayerImp, PartitionSetType>();
   }
 
-  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
+  bool apply_on(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
   {
     return PartitionSetType::contains(entity.partitionType());
   }
