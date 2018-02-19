@@ -82,7 +82,7 @@ public:
    * \{
    **/
 
-  virtual int order(const XT::Common::Parameter& /*mu*/ = {}) const = 0;
+  virtual int order(const XT::Common::Parameter& /*param*/ = {}) const = 0;
 
   /**
    * \}
@@ -90,19 +90,21 @@ public:
    * \{
    **/
 
-  virtual RangeType evaluate(const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) const
+  virtual RangeType evaluate(const DomainType& /*point_in_global_coordinates*/,
+                             const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "This smooth function does not provide evaluations, override the 'evaluate' method!");
   }
 
-  virtual DerivativeRangeType jacobian(const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) const
+  virtual DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                                       const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "This smooth function does not provide a jacobian, override the 'jacobian' method!");
   }
 
   virtual DerivativeRangeType derivative(const std::array<size_t, d>& /*alpha*/,
-                                         const DomainType& /*xx*/,
-                                         const Common::Parameter& /*mu*/ = {}) const
+                                         const DomainType& /*point_in_global_coordinates*/,
+                                         const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
                "This smooth function does not provide arbitrary derivatives, override the 'derivative' method!");
@@ -125,31 +127,38 @@ public:
 
   /**
    * \}
-   * \name ´´These methods can be overridden to improve their performance.''
+   * \name ´´These methods are default implemented and should be overridden to improve their performance.''
    * \{
    **/
 
-  virtual R evaluate(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
+  virtual R evaluate(const DomainType& point_in_global_coordinates,
+                     const size_t row,
+                     const size_t col,
+                     const Common::Parameter& param = {}) const
   {
     ensure_correct_dims(row, col, "evaluate");
-    return single_evaluate_helper<R>::call(this->evaluate(xx, mu), row, col);
+    return single_evaluate_helper<R>::call(this->evaluate(point_in_global_coordinates, param), row, col);
   }
 
-  virtual SingleDerivativeRangeType
-  jacobian(const DomainType& xx, const size_t row, const size_t col, const Common::Parameter& mu = {}) const
+  virtual SingleDerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
+                                             const size_t row,
+                                             const size_t col,
+                                             const Common::Parameter& param = {}) const
   {
     ensure_correct_dims(row, col, "jacobian");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(this->jacobian(xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(
+        this->jacobian(point_in_global_coordinates, param), row, col);
   }
 
   virtual SingleDerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                               const DomainType& xx,
+                                               const DomainType& point_in_global_coordinates,
                                                const size_t row,
                                                const size_t col,
-                                               const Common::Parameter& mu = {}) const
+                                               const Common::Parameter& param = {}) const
   {
     ensure_correct_dims(row, col, "derivative");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(this->derivative(alpha, xx, mu), row, col);
+    return single_derivative_helper<SingleDerivativeRangeType>::call(
+        this->derivative(alpha, point_in_global_coordinates, param), row, col);
   }
 
   /**
