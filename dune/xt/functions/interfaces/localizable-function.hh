@@ -158,8 +158,9 @@ public:
             const XT::Common::Parameter& param = {}) const
   {
     if (path.empty())
-      DUNE_THROW(wrong_input_given, "Empty path given!");
+      DUNE_THROW(Exceptions::wrong_input_given, "path must not be empty!");
     const auto directory = Common::directory_only(path);
+    Common::test_create_directory(directory);
     const auto tmp_grid_view = Grid::make_tmp_view(grid_layer);
     const auto& grid_view = tmp_grid_view.access();
     using GridViewType = std::decay_t<decltype(grid_view)>;
@@ -169,7 +170,6 @@ public:
         subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
                     : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
     vtk_writer->addVertexData(adapter);
-    Common::test_create_directory(directory);
     if (MPIHelper::getCollectiveCommunication().size() == 1)
       vtk_writer->write(path, vtk_output_type);
     else
