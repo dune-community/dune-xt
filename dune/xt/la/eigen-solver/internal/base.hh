@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <numeric>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/type_traits.hh>

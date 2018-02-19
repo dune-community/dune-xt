@@ -20,7 +20,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include "pattern.hh"
+#include <dune/xt/la/container/pattern.hh>
 
 namespace Dune {
 namespace XT {

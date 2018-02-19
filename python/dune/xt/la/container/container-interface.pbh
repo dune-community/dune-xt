@@ -17,7 +17,7 @@
 
 #include <dune/xt/la/type_traits.hh>
 
-#include "container-interface.hh"
+#include <dune/xt/la/container/container-interface.hh>
 
 namespace Dune {
 namespace XT {
@@ -98,7 +98,7 @@ bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const 
   namespace py = pybind11;
   typedef typename C::DataType D;
 
-  py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::metaclass(), py::buffer_protocol());
+  py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::buffer_protocol());
 
   c.def_buffer([](C& vec) -> py::buffer_info {
     return py::buffer_info(
@@ -113,7 +113,7 @@ typename std::enable_if<!provides_data_access<C>::value, pybind11::class_<C>>::t
 bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const std::string& help_id)
 {
   namespace py = pybind11;
-  return py::class_<C>(m, class_id.c_str(), help_id.c_str(), py::metaclass());
+  return py::class_<C>(m, class_id.c_str(), help_id.c_str());
 }
 
 

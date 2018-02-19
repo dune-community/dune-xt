@@ -15,6 +15,7 @@
 #include <complex>
 #include <vector>
 #include <string>
+#include <numeric>
 
 #include <dune/common/typetraits.hh>
 

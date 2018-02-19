@@ -23,8 +23,8 @@
 #include <dune/xt/la/container/io.hh>
 #include <dune/xt/la/type_traits.hh>
 
-#include "matrix-interface.hh"
-#include "container-interface.pbh"
+#include <dune/xt/la/container/matrix-interface.hh>
+#include <python/dune/xt/la/container/container-interface.pbh>
 
 namespace Dune {
 namespace XT {
@@ -94,7 +94,7 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
 
   const auto ClassName = Common::to_camel_case(bindings::container_name<C>::value());
 
-  py::class_<C> c(m, ClassName.c_str(), ClassName.c_str(), py::metaclass());
+  py::class_<C> c(m, ClassName.c_str(), ClassName.c_str());
 
   addbind_ProvidesBackend(c);
 

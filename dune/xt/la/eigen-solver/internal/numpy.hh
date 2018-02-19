@@ -20,9 +20,12 @@
 #endif
 
 #include <dune/xt/common/vector.hh>
-#include <dune/xt/common/fmatrix.pbh>
+#include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/la/exceptions.hh>
+
+#include <python/dune/xt/common/fvector.pbh>
+#include <python/dune/xt/common/fmatrix.pbh>
 
 namespace Dune {
 namespace XT {

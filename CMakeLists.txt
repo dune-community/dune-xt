@@ -43,14 +43,14 @@ make_dependent_modules_sys_included()
 add_subdirectory(dune)
 add_subdirectory(doc)
 
+include(DuneXTInstallPythonPackage)
+# this symlinks all files in python/ to the binary dir and install into the virtualenv from there
+# thereby making the compiled extensions directly usable from the venv
+dune_xt_install_python_package(PATH python)
+include_dependent_binary_python_dirs()
+# do not change order here
 if(dune-pybindxi_FOUND)
-  foreach(_file
-          dune/__init__.py
-          dune/xt/__init__.py
-          dune/xt/la/__init__.py
-         )
-  execute_process(COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/python/${_file} ${CMAKE_CURRENT_BINARY_DIR}/${_file})
-  endforeach()
+  add_subdirectory(python)
 endif()
 
 # enable headercheck

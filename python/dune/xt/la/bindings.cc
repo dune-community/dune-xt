@@ -24,24 +24,22 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/bindings.hh>
 
-#include "container/container-interface.pbh"
-#include "container/vector-interface.pbh"
-#include "container/pattern.pbh"
-#include "container/matrix-interface.pbh"
-#include "solver.pbh"
+#include <python/dune/xt/la/container/container-interface.pbh>
+#include <python/dune/xt/la/container/vector-interface.pbh>
+#include <python/dune/xt/la/container/pattern.pbh>
+#include <python/dune/xt/la/container/matrix-interface.pbh>
+#include <python/dune/xt/la/solver.pbh>
 
-#include "container.hh"
+#include <dune/xt/la/container.hh>
 
 
-PYBIND11_PLUGIN(_la)
+PYBIND11_MODULE(_la, m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
   namespace LA = Dune::XT::LA;
-
-  py::module m("_la", "dune-xt-la");
 
   Dune::XT::Common::bindings::addbind_exceptions(m);
 
@@ -135,7 +133,6 @@ PYBIND11_PLUGIN(_la)
         "debug"_a = true,
         "warning"_a = true);
 
-  return m.ptr();
 } // PYBIND11_PLUGIN(la)
 
 #endif // HAVE_DUNE_PYBINDXI
