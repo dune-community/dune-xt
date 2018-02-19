@@ -12,6 +12,8 @@
 #ifndef DUNE_XT_FUNCTIONS_TYPE_TRAITS_HH
 #define DUNE_XT_FUNCTIONS_TYPE_TRAITS_HH
 
+#include <dune/common/dynmatrix.hh>
+#include <dune/common/dynvector.hh>
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/type_traits.hh>
@@ -43,13 +45,45 @@ template <class R, size_t r, size_t rC>
 struct RangeTypeSelector
 {
   using type = XT::Common::FieldMatrix<R, r, rC>;
-};
+
+  using dynamic_type = DynamicMatrix<R>;
+
+  static void ensure_size(dynamic_type& arg)
+  {
+    if (arg.rows() < r || arg.cols() < rC)
+      arg.resize(r, rC);
+  }
+
+  static void convert(const type& in, dynamic_type& out)
+  {
+    assert(out.rows() >= r);
+    assert(out.cols() >= rC);
+    for (size_t ii = 0; ii < r; ++ii)
+      for (size_t jj = 0; jj < rC; ++jj)
+        out[ii][jj] = in[ii][jj];
+  }
+}; // struct RangeTypeSelector<...>
 
 template <class R, size_t r>
 struct RangeTypeSelector<R, r, 1>
 {
   using type = XT::Common::FieldVector<R, r>;
-};
+
+  using dynamic_type = DynamicVector<R>;
+
+  static void ensure_size(dynamic_type& arg)
+  {
+    if (arg.size() < r)
+      arg.resize(r);
+  }
+
+  static void convert(const type& in, dynamic_type& out)
+  {
+    assert(out.size() >= r);
+    for (size_t ii = 0; ii < r; ++ii)
+      out[ii] = in[ii];
+  }
+}; // struct RangeTypeSelector<..., 1>
 
 
 /**
@@ -89,14 +123,56 @@ struct DerivativeRangeTypeSelector
 {
   using single_type = XT::Common::FieldVector<R, d>;
   using type = XT::Common::FieldVector<Dune::XT::Common::FieldMatrix<R, rC, d>, r>;
-};
+
+  using dynamic_single_type = DynamicVector<R>;
+  using dynamic_type = DynamicVector<DynamicMatrix<R>>;
+
+  static void ensure_size(dynamic_type& arg)
+  {
+    if (arg.size() < r)
+      arg.resize(r);
+    for (size_t ii = 0; ii < r; ++ii)
+      if (arg[ii].rows() < rC || arg.cols() < d)
+        arg[ii].resize(rC, d);
+  }
+
+  static void convert(const type& in, dynamic_type& out)
+  {
+    assert(out.size() >= r);
+    for (size_t ii = 0; ii < r; ++ii) {
+      assert(out[ii].rows() >= rC);
+      assert(out[ii].cols() >= d);
+      for (size_t jj = 0; jj < rC; ++jj)
+        for (size_t kk = 0; kk < d; ++kk)
+          out[ii][jj][kk] = in[ii][jj][kk];
+    }
+  } // ... convert(...)
+}; // struct DerivativeRangeTypeSelector<...>
 
 template <size_t d, class R, size_t r>
 struct DerivativeRangeTypeSelector<d, R, r, 1>
 {
   using single_type = XT::Common::FieldVector<R, d>;
   using type = XT::Common::FieldMatrix<R, r, d>;
-};
+
+  using dynamic_single_type = DynamicVector<R>;
+  using dynamic_type = DynamicMatrix<R>;
+
+  static void ensure_size(dynamic_type& arg)
+  {
+    if (arg.rows() < r || arg.cols() < d)
+      arg.resize(r, d);
+  }
+
+  static void convert(const type& in, dynamic_type& out)
+  {
+    assert(out.rows() >= r);
+    assert(out.cols() >= d);
+    for (size_t ii = 0; ii < r; ++ii)
+      for (size_t jj = 0; jj < d; ++jj)
+        out[ii][jj] = in[ii][jj];
+  }
+}; // struct DerivativeRangeTypeSelector<..., 1>
 
 
 //// forwards
