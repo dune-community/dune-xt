@@ -86,7 +86,7 @@ public:
 
 private:
   Common::StorageProvider<FunctorType> functor_;
-  Common::ConstStorageProvider<FilterType> filter_;
+  const Common::ConstStorageProvider<FilterType> filter_;
 }; // class EntityFunctorWrapper
 
 
@@ -146,7 +146,7 @@ public:
 
 private:
   Common::StorageProvider<FunctorType> functor_;
-  Common::ConstStorageProvider<FilterType> filter_;
+  const Common::ConstStorageProvider<FilterType> filter_;
 }; // class IntersectionFunctorWrapper
 
 
@@ -221,7 +221,7 @@ public:
 private:
   Common::StorageProvider<FunctorType> functor_;
   Common::ConstStorageProvider<EntityFilterType> entity_filter_;
-  Common::ConstStorageProvider<IntersectionFilterType> intersection_filter_;
+  const Common::ConstStorageProvider<IntersectionFilterType> intersection_filter_;
 }; // class EntityAndIntersectionFunctorWrapper
 
 
@@ -281,8 +281,8 @@ public:
   }
 
 private:
-  Common::ConstStorageProvider<EntityFilterType> restriction_entity_filter_;
-  Common::ConstStorageProvider<IntersectionFilterType> restriction_intersection_filter_;
+  const Common::ConstStorageProvider<EntityFilterType> restriction_entity_filter_;
+  const Common::ConstStorageProvider<IntersectionFilterType> restriction_intersection_filter_;
 }; // class WalkerWrapper
 
 
