@@ -110,7 +110,7 @@ private:
     LocalFunction(const SmoothFunctionType& smooth_function)
       : BaseType()
       , smooth_function_(smooth_function)
-      , geometry_(nullptr)
+      , geometry_(nullptr) // <- happens in post_bind
     {
     }
 
@@ -123,37 +123,39 @@ private:
       geometry_ = std::make_unique<GeometryType>(en.geometry());
     }
 
-    int order(const Common::Parameter& mu = {}) const override final
+    int order(const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-      return smooth_function_.order(mu);
+      return smooth_function_.order(param);
     }
 
-    RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
+    RangeType evaluate(const DomainType& point_in_reference_element,
+                       const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-      this->ensure_this_is_a_valid_point(xx);
-      return smooth_function_.evaluate(geometry_->global(xx), mu);
+      this->assert_inside_reference_element(point_in_reference_element);
+      return smooth_function_.evaluate(geometry_->global(point_in_reference_element), param);
     }
 
-    DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const override final
+    DerivativeRangeType jacobian(const DomainType& point_in_reference_element,
+                                 const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-      this->ensure_this_is_a_valid_point(xx);
-      return smooth_function_.jacobian(geometry_->global(xx), mu);
+      this->assert_inside_reference_element(point_in_reference_element);
+      return smooth_function_.jacobian(geometry_->global(point_in_reference_element), param);
     }
 
     DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                   const DomainType& xx,
-                                   const Common::Parameter& mu = {}) const override final
+                                   const DomainType& point_in_reference_element,
+                                   const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-      this->ensure_this_is_a_valid_point(xx);
-      return smooth_function_.derivative(alpha, geometry_->global(xx), mu);
+      this->assert_inside_reference_element(point_in_reference_element);
+      return smooth_function_.derivative(alpha, geometry_->global(point_in_reference_element), param);
     }
 
   private:
