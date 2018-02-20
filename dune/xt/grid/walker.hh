@@ -62,11 +62,30 @@ public:
 
   explicit Walker(GridViewType grd_vw)
     : grid_view_(grd_vw)
+    , user_decided_agains_clearing_of_functors_(false)
   {
   }
 
   Walker(const Walker& other) = delete;
   Walker(Walker&& source) = default;
+
+  ~Walker()
+  {
+#ifndef DXT_DISABLE_WARNINGS
+    // Warn if there are functors left, since we assume someone forgot to walk()!
+    if (!user_decided_agains_clearing_of_functors_
+        && element_functor_wrappers_.size() + intersection_functor_wrappers_.size()
+                   + element_and_intersection_functor_wrappers_.size()
+               > 0) {
+      Common::TimedLogger().get("dune.xt.grid.walker").warn()
+          << "[warning when descructing Walker] there are still uncleared functors, which indicates that you forgot to "
+             "call walk()!"
+          << "\n"
+          << "(To disable this warning, #define DXT_DISABLE_WARNINGS at compile time or configure the TimedLogger at "
+             "runtime.)";
+    }
+#endif // DXT_DISABLE_WARNINGS
+  } // ~Walker(...)
 
   const GridViewType& grid_view() const
   {
@@ -450,6 +469,7 @@ public:
 
   void walk(const bool use_tbb = false, const bool clear_functors = true)
   {
+    user_decided_agains_clearing_of_functors_ = !clear_functors;
 #if HAVE_TBB
     if (use_tbb) {
       const auto num_partitions =
@@ -523,6 +543,7 @@ public:
   template <class PartioningType>
   void walk(PartioningType& partitioning, const bool clear_functors = true)
   {
+    user_decided_agains_clearing_of_functors_ = !clear_functors;
     // prepare functors
     prepare();
 
@@ -596,6 +617,7 @@ protected:
   friend class internal::WalkerWrapper<GridViewType>;
 
   GridViewType grid_view_;
+  bool user_decided_agains_clearing_of_functors_;
   std::list<std::shared_ptr<internal::ElementFunctorWrapper<GridViewType>>> element_functor_wrappers_;
   std::list<std::shared_ptr<internal::IntersectionFunctorWrapper<GridViewType>>> intersection_functor_wrappers_;
   std::list<std::shared_ptr<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>>
