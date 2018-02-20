@@ -24,10 +24,10 @@ namespace Grid {
 /** \brief Functor for a \ref GridWalk calculating minima and maxima of entities' coordinates
  **/
 template <class GridViewType>
-struct MinMaxCoordinateFunctor : public EntityFunctor<GridViewType>
+struct MinMaxCoordinateFunctor : public ElementFunctor<GridViewType>
 {
-  typedef EntityFunctor<GridViewType> BaseType;
-  typedef typename BaseType::EntityType::Geometry EntityGeometryType;
+  typedef ElementFunctor<GridViewType> BaseType;
+  typedef typename BaseType::ElementType::Geometry EntityGeometryType;
   typedef typename EntityGeometryType::ctype ctype;
   typedef FieldVector<ctype, EntityGeometryType::coorddimension> VectorType;
 
@@ -37,9 +37,9 @@ struct MinMaxCoordinateFunctor : public EntityFunctor<GridViewType>
   {
   }
 
-  void apply_local(const typename BaseType::EntityType& ent) override final
+  void apply_local(const typename BaseType::ElementType& element) override final
   {
-    const auto& geo = ent.geometry();
+    const auto& geo = element.geometry();
     for (auto i : Common::value_range(geo.corners())) {
       for (auto k : Common::value_range(EntityGeometryType::coorddimension)) {
         minima_[k] = std::min(minima_[k], geo.corner(i)[k]);

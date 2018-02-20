@@ -23,9 +23,9 @@ namespace Grid {
 
 //! GridWalk functor that refines all entitites above given volume
 template <class GridViewType>
-struct MaximumEntityVolumeRefineFunctor : public EntityFunctor<GridViewType>
+struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
 {
-  typedef EntityFunctor<GridViewType> BaseType;
+  typedef ElementFunctor<GridViewType> BaseType;
   typedef typename GridViewType::GridType GridType;
 
   MaximumEntityVolumeRefineFunctor(GridType& grid, double volume, double factor)
@@ -34,11 +34,11 @@ struct MaximumEntityVolumeRefineFunctor : public EntityFunctor<GridViewType>
   {
   }
 
-  void apply_local(const typename BaseType::EntityType& ent) override final
+  void apply_local(const typename BaseType::ElementType& element) override final
   {
-    const double volume = ent.geometry().volume();
+    const double volume = element.geometry().volume();
     if (volume > threshold_volume_)
-      grid_.mark(1, ent);
+      grid_.mark(1, element);
   }
 
   const double threshold_volume_;
@@ -48,7 +48,7 @@ struct MaximumEntityVolumeRefineFunctor : public EntityFunctor<GridViewType>
 
 //! refine entities until all have volume < size_factor * unrefined_minimum_volume
 template <class GridType>
-void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
+void enforce_maximum_entity_volume(GridType& grid, const double size_factor)
 {
   using namespace Dune::XT;
   const typename Grid::Dimensions<GridType> unrefined_dimensions(grid);
@@ -66,7 +66,7 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
     grid.postAdapt();
     std::cout << Grid::Dimensions<GridType>()(grid);
   }
-} // EnforceMaximumEntityVolume
+} // enforce_maximum_entity_volume
 
 
 } // namespace Grid

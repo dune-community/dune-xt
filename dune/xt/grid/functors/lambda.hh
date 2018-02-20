@@ -20,20 +20,20 @@ namespace Grid {
 
 
 template <class GL>
-class EntityLambdaFunctor : public EntityFunctor<GL>
+class ElementLambdaFunctor : public ElementFunctor<GL>
 {
-  using BaseType = EntityFunctor<GL>;
+  using BaseType = ElementFunctor<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
-  using ApplyLambdaType = std::function<void(const EntityType&)>;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
+  using ApplyLambdaType = std::function<void(const ElementType&)>;
   using PrepareLambdaType = std::function<void()>;
   using FinalizeLambdaType = PrepareLambdaType;
 
-  EntityLambdaFunctor(ApplyLambdaType apply_lambda,
-                      PrepareLambdaType prepare_lambda = []() {},
-                      FinalizeLambdaType finalize_lambda = []() {})
+  ElementLambdaFunctor(ApplyLambdaType apply_lambda,
+                       PrepareLambdaType prepare_lambda = []() {},
+                       FinalizeLambdaType finalize_lambda = []() {})
     : apply_lambda_(apply_lambda)
     , prepare_lambda_(prepare_lambda)
     , finalize_lambda_(finalize_lambda)
@@ -45,9 +45,9 @@ public:
     prepare_lambda_();
   }
 
-  void apply_local(const EntityType& entity) override final
+  void apply_local(const ElementType& element) override final
   {
-    apply_lambda_(entity);
+    apply_lambda_(element);
   }
 
   void finalize() override final
@@ -59,25 +59,25 @@ private:
   const ApplyLambdaType apply_lambda_;
   const PrepareLambdaType prepare_lambda_;
   const FinalizeLambdaType finalize_lambda_;
-}; // class EntityLambdaFunctor
+}; // class ElementLambdaFunctor
 
 
 template <class GL, class R>
-class EntityReturnLambdaFunctor : public EntityReturnFunctor<GL, R>
+class ElementReturnLambdaFunctor : public ElementReturnFunctor<GL, R>
 {
-  using BaseType = EntityReturnFunctor<GL, R>;
+  using BaseType = ElementReturnFunctor<GL, R>;
 
 public:
   using typename BaseType::ResultType;
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
-  using ComputeLambdaType = std::function<ResultType(const EntityType&)>;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
+  using ComputeLambdaType = std::function<ResultType(const ElementType&)>;
   using PrepareLambdaType = std::function<void()>;
   using FinalizeLambdaType = PrepareLambdaType;
 
-  EntityReturnLambdaFunctor(ComputeLambdaType compute_lambda,
-                            PrepareLambdaType prepare_lambda = []() {},
-                            FinalizeLambdaType finalize_lambda = []() {})
+  ElementReturnLambdaFunctor(ComputeLambdaType compute_lambda,
+                             PrepareLambdaType prepare_lambda = []() {},
+                             FinalizeLambdaType finalize_lambda = []() {})
     : compute_lambda_(compute_lambda)
     , prepare_lambda_(prepare_lambda)
     , finalize_lambda_(finalize_lambda)
@@ -85,9 +85,9 @@ public:
   {
   }
 
-  EntityReturnFunctor<GridLayerType, ResultType>* copy() const override final
+  ElementReturnFunctor<GridViewType, ResultType>* copy() const override final
   {
-    return new EntityReturnLambdaFunctor<GridLayerType, ResultType>(compute_lambda_, prepare_lambda_, finalize_lambda_);
+    return new ElementReturnLambdaFunctor<GridViewType, ResultType>(compute_lambda_, prepare_lambda_, finalize_lambda_);
   }
 
   void prepare() override final
@@ -95,14 +95,14 @@ public:
     prepare_lambda_();
   }
 
-  void apply_local(const EntityType& entity) override final
+  void apply_local(const ElementType& element) override final
   {
-    result_ += compute_locally(entity);
+    result_ += compute_locally(element);
   }
 
-  ResultType compute_locally(const EntityType& entity) override final
+  ResultType compute_locally(const ElementType& element) override final
   {
-    return compute_lambda_(entity);
+    return compute_lambda_(element);
   }
 
   void finalize() override final
@@ -120,7 +120,7 @@ private:
   const PrepareLambdaType prepare_lambda_;
   const FinalizeLambdaType finalize_lambda_;
   ResultType result_;
-}; // class EntityReturnLambdaFunctor
+}; // class ElementReturnLambdaFunctor
 
 
 template <class GL>
@@ -129,11 +129,11 @@ class IntersectionLambdaFunctor : public IntersectionFunctor<GL>
   using BaseType = IntersectionFunctor<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
   using typename BaseType::IntersectionType;
   using ApplyLambdaType =
-      std::function<void(const IntersectionType& intersection, const EntityType&, const EntityType&)>;
+      std::function<void(const IntersectionType& intersection, const ElementType&, const ElementType&)>;
   using PrepareLambdaType = std::function<void()>;
   using FinalizeLambdaType = PrepareLambdaType;
 
@@ -152,10 +152,10 @@ public:
   }
 
   void apply_local(const IntersectionType& intersection,
-                   const EntityType& inside_entity,
-                   const EntityType& outside_entity) override final
+                   const ElementType& inside_element,
+                   const ElementType& outside_element) override final
   {
-    apply_lambda_(intersection, inside_entity, outside_entity);
+    apply_lambda_(intersection, inside_element, outside_element);
   }
 
   void finalize() override final
@@ -171,25 +171,25 @@ private:
 
 
 template <class GL>
-class EntityAndIntersectionLambdaFunctor : public EntityAndIntersectionFunctor<GL>
+class ElementAndIntersectionLambdaFunctor : public ElementAndIntersectionFunctor<GL>
 {
-  using BaseType = EntityAndIntersectionFunctor<GL>;
+  using BaseType = ElementAndIntersectionFunctor<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
   using typename BaseType::IntersectionType;
-  using EntityApplyLambdaType = std::function<void(const EntityType&)>;
+  using ElementApplyLambdaType = std::function<void(const ElementType&)>;
   using IntersectionApplyLambdaType =
-      std::function<void(const IntersectionType& intersection, const EntityType&, const EntityType&)>;
+      std::function<void(const IntersectionType& intersection, const ElementType&, const ElementType&)>;
   using PrepareLambdaType = std::function<void()>;
   using FinalizeLambdaType = PrepareLambdaType;
 
-  EntityAndIntersectionLambdaFunctor(EntityApplyLambdaType entity_apply_lambda,
-                                     IntersectionApplyLambdaType intersection_apply_lambda,
-                                     PrepareLambdaType prepare_lambda = []() {},
-                                     FinalizeLambdaType finalize_lambda = []() {})
-    : entity_apply_lambda_(entity_apply_lambda)
+  ElementAndIntersectionLambdaFunctor(ElementApplyLambdaType element_apply_lambda,
+                                      IntersectionApplyLambdaType intersection_apply_lambda,
+                                      PrepareLambdaType prepare_lambda = []() {},
+                                      FinalizeLambdaType finalize_lambda = []() {})
+    : element_apply_lambda_(element_apply_lambda)
     , intersection_apply_lambda_(intersection_apply_lambda)
     , prepare_lambda_(prepare_lambda)
     , finalize_lambda_(finalize_lambda)
@@ -201,16 +201,16 @@ public:
     prepare_lambda_();
   }
 
-  void apply_local(const EntityType& entity) override final
+  void apply_local(const ElementType& element) override final
   {
-    entity_apply_lambda_(entity);
+    element_apply_lambda_(element);
   }
 
   void apply_local(const IntersectionType& intersection,
-                   const EntityType& inside_entity,
-                   const EntityType& outside_entity) override final
+                   const ElementType& inside_element,
+                   const ElementType& outside_element) override final
   {
-    intersection_apply_lambda_(intersection, inside_entity, outside_entity);
+    intersection_apply_lambda_(intersection, inside_element, outside_element);
   }
 
   void finalize() override final
@@ -219,11 +219,11 @@ public:
   }
 
 private:
-  const EntityApplyLambdaType entity_apply_lambda_;
+  const ElementApplyLambdaType element_apply_lambda_;
   const IntersectionApplyLambdaType intersection_apply_lambda_;
   const PrepareLambdaType prepare_lambda_;
   const FinalizeLambdaType finalize_lambda_;
-}; // class EntityAndIntersectionLambdaFunctor
+}; // class ElementAndIntersectionLambdaFunctor
 
 
 ///\todo Implement lambda variants of all other functor types from functors/interfaces.hh!

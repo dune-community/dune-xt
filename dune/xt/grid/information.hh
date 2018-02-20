@@ -107,14 +107,14 @@ struct Dimensions
   //! automatic running min/max
   typedef Dune::XT::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
   typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
-  typedef typename GridType::template Codim<0>::Entity EntityType;
+  typedef typename GridType::template Codim<0>::Entity ElementType;
   using BoundingBoxType = std::array<FieldVector<typename GridType::ctype, GridType::dimensionworld>, 2>;
   CoordLimitsType coord_limits;
   MinMaxAvgType entity_volume;
   MinMaxAvgType entity_width;
 
   //! gridwalk functor that does the actual work for \ref GridDimensions
-  class GridDimensionsFunctor : public EntityFunctor<GridLayerType>
+  class GridDimensionsFunctor : public ElementFunctor<GridLayerType>
   {
     CoordLimitsType& coord_limits_;
     MinMaxAvgType& entity_volume_;
@@ -128,11 +128,11 @@ struct Dimensions
     {
     }
 
-    virtual void apply_local(const EntityType& ent)
+    virtual void apply_local(const ElementType& element)
     {
-      const auto& geo = ent.geometry();
+      const auto& geo = element.geometry();
       entity_volume_(geo.volume());
-      entity_width_(entity_diameter(ent));
+      entity_width_(entity_diameter(element));
       for (auto i : Common::value_range(geo.corners())) {
         const auto& corner(geo.corner(i));
         for (size_t k = 0; k < GridType::dimensionworld; ++k)
@@ -154,7 +154,7 @@ struct Dimensions
     gw.walk();
   }
 
-  Dimensions(const EntityType& entity)
+  Dimensions(const ElementType& entity)
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
     f.apply_local(entity);

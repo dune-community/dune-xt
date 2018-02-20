@@ -28,13 +28,13 @@ namespace internal {
 
 // forwards
 template <class GL>
-class CombinedEntityFilters;
+class CombinedElementFilters;
 
 template <class GL>
 class CombinedIntersectionFilters;
 
 template <class GL>
-class NegatedEntityFilter;
+class NegatedElementFilter;
 
 template <class GL>
 class NegatedIntersectionFilter;
@@ -44,54 +44,54 @@ class NegatedIntersectionFilter;
 
 
 /**
- *  \brief Interface for entity filters to restrict the range of entities a functor is applied on by the grid walker.
+ *  \brief Interface for element filters to restrict the range of elements a functor is applied on by the grid walker.
  *  \note  Filters are provided within the ApplyOn namespace.
  *  \note  See also the \sa GridWalker for typical use cases.
  */
 template <class GL>
-class EntityFilter
+class ElementFilter
 {
   static_assert(is_layer<GL>::value, "");
 
 public:
-  using GridLayerType = GL;
-  using EntityType = extract_entity_t<GridLayerType>;
+  using GridViewType = GL;
+  using ElementType = extract_entity_t<GridViewType>;
 
-  virtual ~EntityFilter() = default;
+  virtual ~ElementFilter() = default;
 
-  virtual EntityFilter<GridLayerType>* copy() const = 0;
+  virtual ElementFilter<GridViewType>* copy() const = 0;
 
-  virtual bool contains(const GridLayerType& /*grid_layer*/, const EntityType& /*entity*/) const = 0;
+  virtual bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const = 0;
 
-  EntityFilter<GridLayerType>* operator!() const
+  ElementFilter<GridViewType>* operator!() const
   {
-    return new internal::NegatedEntityFilter<GridLayerType>(*this);
+    return new internal::NegatedElementFilter<GridViewType>(*this);
   }
 
-  EntityFilter<GridLayerType>* operator&&(const EntityFilter<GridLayerType>& other) const
+  ElementFilter<GridViewType>* operator&&(const ElementFilter<GridViewType>& other) const
   {
-    return new internal::CombinedEntityFilters<GridLayerType>(
+    return new internal::CombinedElementFilters<GridViewType>(
         *this, other, [](const auto& left, const auto& right) { return left && right; });
   }
 
-  EntityFilter<GridLayerType>* operator&&(EntityFilter<GridLayerType>*&& other) const
+  ElementFilter<GridViewType>* operator&&(ElementFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedEntityFilters<GridLayerType>(
+    return new internal::CombinedElementFilters<GridViewType>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left && right; });
   }
 
-  EntityFilter<GridLayerType>* operator||(const EntityFilter<GridLayerType>& other) const
+  ElementFilter<GridViewType>* operator||(const ElementFilter<GridViewType>& other) const
   {
-    return new internal::CombinedEntityFilters<GridLayerType>(
+    return new internal::CombinedElementFilters<GridViewType>(
         *this, other, [](const auto& left, const auto& right) { return left || right; });
   }
 
-  EntityFilter<GridLayerType>* operator||(EntityFilter<GridLayerType>*&& other) const
+  ElementFilter<GridViewType>* operator||(ElementFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedEntityFilters<GridLayerType>(
+    return new internal::CombinedElementFilters<GridViewType>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left || right; });
   }
-}; // class EntityFilter
+}; // class ElementFilter
 
 
 /**
@@ -106,41 +106,41 @@ class IntersectionFilter
   static_assert(is_layer<GL>::value, "");
 
 public:
-  using GridLayerType = GL;
-  using IntersectionType = extract_intersection_t<GridLayerType>;
+  using GridViewType = GL;
+  using IntersectionType = extract_intersection_t<GridViewType>;
 
-  virtual ~IntersectionFilter<GridLayerType>() = default;
+  virtual ~IntersectionFilter<GridViewType>() = default;
 
-  virtual IntersectionFilter<GridLayerType>* copy() const = 0;
+  virtual IntersectionFilter<GridViewType>* copy() const = 0;
 
-  virtual bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& /*intersection*/) const = 0;
+  virtual bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const = 0;
 
-  IntersectionFilter<GridLayerType>* operator!() const
+  IntersectionFilter<GridViewType>* operator!() const
   {
-    return new internal::NegatedIntersectionFilter<GridLayerType>(*this);
+    return new internal::NegatedIntersectionFilter<GridViewType>(*this);
   }
 
-  IntersectionFilter<GridLayerType>* operator&&(const IntersectionFilter<GridLayerType>& other) const
+  IntersectionFilter<GridViewType>* operator&&(const IntersectionFilter<GridViewType>& other) const
   {
-    return new internal::CombinedIntersectionFilters<GridLayerType>(
+    return new internal::CombinedIntersectionFilters<GridViewType>(
         *this, other, [](const auto& left, const auto& right) { return left && right; });
   }
 
-  IntersectionFilter<GridLayerType>* operator&&(IntersectionFilter<GridLayerType>*&& other) const
+  IntersectionFilter<GridViewType>* operator&&(IntersectionFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedIntersectionFilters<GridLayerType>(
+    return new internal::CombinedIntersectionFilters<GridViewType>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left && right; });
   }
 
-  IntersectionFilter<GridLayerType>* operator||(const IntersectionFilter<GridLayerType>& other) const
+  IntersectionFilter<GridViewType>* operator||(const IntersectionFilter<GridViewType>& other) const
   {
-    return new internal::CombinedIntersectionFilters<GridLayerType>(
+    return new internal::CombinedIntersectionFilters<GridViewType>(
         *this, other, [](const auto& left, const auto& right) { return left || right; });
   }
 
-  IntersectionFilter<GridLayerType>* operator||(IntersectionFilter<GridLayerType>*&& other) const
+  IntersectionFilter<GridViewType>* operator||(IntersectionFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedIntersectionFilters<GridLayerType>(
+    return new internal::CombinedIntersectionFilters<GridViewType>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left || right; });
   }
 }; // class IntersectionFilter
@@ -150,53 +150,53 @@ namespace ApplyOn {
 
 
 /**
- *  \brief A filter which selects all entities.
+ *  \brief A filter which selects all elements.
  */
 template <class GL>
-class AllEntities : public EntityFilter<GL>
+class AllElements : public ElementFilter<GL>
 {
-  using BaseType = EntityFilter<GL>;
+  using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
 
-  explicit AllEntities() = default;
+  explicit AllElements() = default;
 
-  EntityFilter<GridLayerType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const override final
   {
-    return new AllEntities<GridLayerType>();
+    return new AllElements<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const EntityType& /*entity*/) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const override final
   {
     return true;
   }
-}; // class AllEntities
+}; // class AllElements
 
 
 /**
  *  \brief A filter which selects entities which have a boundary intersection.
  */
 template <class GL>
-class BoundaryEntities : public EntityFilter<GL>
+class BoundaryEntities : public ElementFilter<GL>
 {
-  using BaseType = EntityFilter<GL>;
+  using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
 
   explicit BoundaryEntities() = default;
 
-  EntityFilter<GridLayerType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const override final
   {
-    return new BoundaryEntities<GridLayerType>();
+    return new BoundaryEntities<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& element) const override final
   {
-    return entity.hasBoundaryIntersections();
+    return element.hasBoundaryIntersections();
   }
 }; // class BoundaryEntities
 
@@ -205,57 +205,57 @@ public:
  *  \brief A filter which selects entities based on a lambda expression.
  */
 template <class GL>
-class LambdaFilteredEntities : public EntityFilter<GL>
+class LambdaFilteredElements : public ElementFilter<GL>
 {
-  using BaseType = EntityFilter<GL>;
+  using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
-  using LambdaType = std::function<bool(const GridLayerType&, const EntityType&)>;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
+  using LambdaType = std::function<bool(const GridViewType&, const ElementType&)>;
 
-  explicit LambdaFilteredEntities(LambdaType lambda)
+  explicit LambdaFilteredElements(LambdaType lambda)
     : lambda_(lambda)
   {
   }
 
-  EntityFilter<GridLayerType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const override final
   {
-    return new LambdaFilteredEntities<GridLayerType>(lambda_);
+    return new LambdaFilteredElements<GridViewType>(lambda_);
   }
 
-  bool contains(const GridLayerType& grid_layer, const EntityType& entity) const override final
+  bool contains(const GridViewType& grid_layer, const ElementType& element) const override final
   {
-    return lambda_(grid_layer, entity);
+    return lambda_(grid_layer, element);
   }
 
 private:
   const LambdaType lambda_;
-}; // class LambdaFilteredEntities
+}; // class LambdaFilteredElements
 
 
 /**
  *  \brief A filter which selects entities in a compatible PartitionSet.
  */
 template <class GL, class PartitionSetType>
-class PartitionSetEntities : public EntityFilter<GL>
+class PartitionSetEntities : public ElementFilter<GL>
 {
-  using BaseType = EntityFilter<GL>;
+  using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  typedef typename BaseType::EntityType EntityType;
+  using typename BaseType::GridViewType;
+  typedef typename BaseType::ElementType ElementType;
 
   explicit PartitionSetEntities() = default;
 
-  EntityFilter<GridLayerType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const override final
   {
-    return new PartitionSetEntities<GridLayerType, PartitionSetType>();
+    return new PartitionSetEntities<GridViewType, PartitionSetType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const EntityType& entity) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& element) const override final
   {
-    return PartitionSetType::contains(entity.partitionType());
+    return PartitionSetType::contains(element.partitionType());
   }
 }; // class PartitionSetEntities
 
@@ -269,17 +269,17 @@ class AllIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit AllIntersections() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new AllIntersections<GridLayerType>();
+    return new AllIntersections<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& /*intersection*/) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const override final
   {
     return true;
   }
@@ -301,17 +301,17 @@ class InnerIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit InnerIntersections() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new InnerIntersections<GridLayerType>();
+    return new InnerIntersections<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.neighbor() && !intersection.boundary();
   }
@@ -325,8 +325,8 @@ public:
 \code
 intersection.neighbor() && !intersection.boundary()
 \endcode
- *         is used, and true is returned, if the index of the inside() entity is smaller than the index of the outside()
- *         entity.
+ *         is used, and true is returned, if the index of the inside() element is smaller than the index of the
+ *         outside() element.
  */
 template <class GL>
 class InnerIntersectionsOnce : public IntersectionFilter<GL>
@@ -334,22 +334,22 @@ class InnerIntersectionsOnce : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit InnerIntersectionsOnce() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new InnerIntersectionsOnce<GridLayerType>();
+    return new InnerIntersectionsOnce<GridViewType>();
   }
 
-  bool contains(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && !intersection.boundary()) {
-      const auto insideEntity = intersection.inside();
-      const auto outsideNeighbor = intersection.outside();
-      return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
+      const auto inside_element = intersection.inside();
+      const auto outside_element = intersection.outside();
+      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
     } else
       return false;
   }
@@ -366,25 +366,25 @@ class PartitionSetInnerIntersectionsOnce : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit PartitionSetInnerIntersectionsOnce() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new PartitionSetInnerIntersectionsOnce<GridLayerType, PartitionSetType>();
+    return new PartitionSetInnerIntersectionsOnce<GridViewType, PartitionSetType>();
   }
 
-  bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool apply_on(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && !intersection.boundary()
         && PartitionSetType::contains(intersection.inside().partitionType())) {
-      const auto insideEntity = intersection.inside();
-      const auto outsideNeighbor = intersection.outside();
+      const auto inside_element = intersection.inside();
+      const auto outside_element = intersection.outside();
       if (!PartitionSetType::contains(intersection.outside().partitionType()))
         return true;
-      return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
+      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
     } else
       return false;
   }
@@ -393,7 +393,6 @@ public:
 
 /**
  *  \brief A filter which selects boundary intersections.
- *
  */
 template <class GL>
 class BoundaryIntersections : public IntersectionFilter<GL>
@@ -401,17 +400,17 @@ class BoundaryIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit BoundaryIntersections() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new BoundaryIntersections<GridLayerType>();
+    return new BoundaryIntersections<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.boundary();
   }
@@ -420,7 +419,6 @@ public:
 
 /**
  *  \brief A filter which selects intersections on a non-periodic boundary.
- *
  */
 template <class GL>
 class NonPeriodicBoundaryIntersections : public IntersectionFilter<GL>
@@ -428,17 +426,17 @@ class NonPeriodicBoundaryIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit NonPeriodicBoundaryIntersections() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new NonPeriodicBoundaryIntersections<GridLayerType>();
+    return new NonPeriodicBoundaryIntersections<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.boundary() && !intersection.neighbor();
   }
@@ -460,17 +458,17 @@ class PeriodicBoundaryIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit PeriodicBoundaryIntersections() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new PeriodicBoundaryIntersections<GridLayerType>();
+    return new PeriodicBoundaryIntersections<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return intersection.neighbor() && intersection.boundary();
   }
@@ -484,8 +482,8 @@ public:
 \code
 intersection.neighbor() && intersection.boundary()
 \endcode
- *         is used, and true is returned, if the index of the inside() entity is smaller than the index of the outside()
- *         entity.
+ *         is used, and true is returned, if the index of the inside() element is smaller than the index of the
+ *         outside() element.
  */
 template <class GL>
 class PeriodicBoundaryIntersectionsOnce : public IntersectionFilter<GL>
@@ -493,22 +491,22 @@ class PeriodicBoundaryIntersectionsOnce : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit PeriodicBoundaryIntersectionsOnce() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new PeriodicBoundaryIntersectionsOnce<GridLayerType>();
+    return new PeriodicBoundaryIntersectionsOnce<GridViewType>();
   }
 
-  bool contains(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && intersection.boundary()) {
-      const auto insideEntity = intersection.inside();
-      const auto outsideNeighbor = intersection.outside();
-      return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
+      const auto inside_element = intersection.inside();
+      const auto outside_element = intersection.outside();
+      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
     } else {
       return false;
     }
@@ -518,7 +516,6 @@ public:
 
 /**
  *  \brief A filter which selects intersections based on a lambda expression.
- *
  */
 template <class GL>
 class LambdaFilteredIntersections : public IntersectionFilter<GL>
@@ -526,21 +523,21 @@ class LambdaFilteredIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
-  using LambdaType = std::function<bool(const GridLayerType&, const IntersectionType&)>;
+  using LambdaType = std::function<bool(const GridViewType&, const IntersectionType&)>;
 
   explicit LambdaFilteredIntersections(LambdaType lambda)
     : lambda_(lambda)
   {
   }
 
-  virtual IntersectionFilter<GridLayerType>* copy() const override final
+  virtual IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new LambdaFilteredIntersections<GridLayerType>(lambda_);
+    return new LambdaFilteredIntersections<GridViewType>(lambda_);
   }
 
-  bool contains(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
   {
     return lambda_(grid_layer, intersection);
   }
@@ -552,7 +549,6 @@ private:
 
 /**
  *  \brief A filter which selects intersections on a given part of the boundary.
- *
  */
 template <class GL>
 class CustomBoundaryIntersections : public IntersectionFilter<GL>
@@ -560,7 +556,7 @@ class CustomBoundaryIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   /**
@@ -580,12 +576,12 @@ public:
   {
   }
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new CustomBoundaryIntersections<GridLayerType>(boundary_info_, boundary_type_);
+    return new CustomBoundaryIntersections<GridViewType>(boundary_info_, boundary_type_);
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return boundary_info_.type(intersection) == *boundary_type_;
   }
@@ -598,7 +594,6 @@ protected:
 
 /**
  *  \brief A filter which selects intersections on a given part of the physical boundary and the process boundary.
- *
  */
 template <class GL>
 class CustomBoundaryAndProcessIntersections : public IntersectionFilter<GL>
@@ -606,7 +601,7 @@ class CustomBoundaryAndProcessIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   /**
@@ -626,12 +621,12 @@ public:
   {
   }
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new CustomBoundaryAndProcessIntersections<GridLayerType>(boundary_info_, boundary_type_);
+    return new CustomBoundaryAndProcessIntersections<GridViewType>(boundary_info_, boundary_type_);
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     const bool process_boundary = !intersection.neighbor() && !intersection.boundary();
     const bool physical_boundary = boundary_info_.type(intersection) == *boundary_type_;
@@ -646,7 +641,6 @@ protected:
 
 /**
  *  \brief A filter which selects intersections on a the process boundary.
- *
  */
 template <class GL>
 class ProcessIntersections : public IntersectionFilter<GL>
@@ -654,17 +648,17 @@ class ProcessIntersections : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   explicit ProcessIntersections() = default;
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new ProcessIntersections<GridLayerType>();
+    return new ProcessIntersections<GridViewType>();
   }
 
-  bool contains(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
     return (!intersection.neighbor() && !intersection.boundary());
   }
@@ -681,7 +675,7 @@ class CombinedIntersectionFilters : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   CombinedIntersectionFilters(const BaseType& left,
@@ -702,12 +696,12 @@ public:
   {
   }
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new CombinedIntersectionFilters<GridLayerType>(*left_, *right_, combine_lambda_);
+    return new CombinedIntersectionFilters<GridViewType>(*left_, *right_, combine_lambda_);
   }
 
-  bool contains(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
   {
     return combine_lambda_(left_->contains(grid_layer, intersection), right_->contains(grid_layer, intersection));
   }
@@ -720,47 +714,47 @@ private:
 
 
 template <class GL>
-class CombinedEntityFilters : public EntityFilter<GL>
+class CombinedElementFilters : public ElementFilter<GL>
 {
-  using BaseType = EntityFilter<GL>;
+  using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
 
-  CombinedEntityFilters(const BaseType& left,
-                        const BaseType& right,
-                        std::function<bool(const bool&, const bool&)> combine_lambda)
+  CombinedElementFilters(const BaseType& left,
+                         const BaseType& right,
+                         std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(right.copy())
     , combine_lambda_(combine_lambda)
   {
   }
 
-  CombinedEntityFilters(const BaseType& left,
-                        BaseType*&& right,
-                        std::function<bool(const bool&, const bool&)> combine_lambda)
+  CombinedElementFilters(const BaseType& left,
+                         BaseType*&& right,
+                         std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(std::move(right))
     , combine_lambda_(combine_lambda)
   {
   }
 
-  EntityFilter<GridLayerType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const override final
   {
-    return new CombinedEntityFilters<GridLayerType>(*left_, *right_, combine_lambda_);
+    return new CombinedElementFilters<GridViewType>(*left_, *right_, combine_lambda_);
   }
 
-  bool contains(const GridLayerType& grid_layer, const EntityType& entity) const override final
+  bool contains(const GridViewType& grid_layer, const ElementType& element) const override final
   {
-    return combine_lambda_(left_->contains(grid_layer, entity), right_->contains(grid_layer, entity));
+    return combine_lambda_(left_->contains(grid_layer, element), right_->contains(grid_layer, element));
   }
 
 private:
   const std::unique_ptr<BaseType> left_;
   const std::unique_ptr<BaseType> right_;
   const std::function<bool(const bool&, const bool&)> combine_lambda_;
-}; // class CombinedEntityFilters
+}; // class CombinedElementFilters
 
 
 template <class GL>
@@ -769,7 +763,7 @@ class NegatedIntersectionFilter : public IntersectionFilter<GL>
   using BaseType = IntersectionFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   NegatedIntersectionFilter(const BaseType& filter)
@@ -782,12 +776,12 @@ public:
   {
   }
 
-  IntersectionFilter<GridLayerType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new NegatedIntersectionFilter<GridLayerType>(*filter_);
+    return new NegatedIntersectionFilter<GridViewType>(*filter_);
   }
 
-  bool contains(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
   {
     return !filter_->contains(grid_layer, intersection);
   }
@@ -798,37 +792,37 @@ private:
 
 
 template <class GL>
-class NegatedEntityFilter : public EntityFilter<GL>
+class NegatedElementFilter : public ElementFilter<GL>
 {
-  using BaseType = EntityFilter<GL>;
+  using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
 
-  NegatedEntityFilter(const BaseType& filter)
+  NegatedElementFilter(const BaseType& filter)
     : filter_(filter.copy())
   {
   }
 
-  NegatedEntityFilter(BaseType*&& filter)
+  NegatedElementFilter(BaseType*&& filter)
     : filter_(std::move(filter))
   {
   }
 
-  EntityFilter<GridLayerType>* copy() const override final
+  ElementFilter<GridViewType>* copy() const override final
   {
-    return new NegatedEntityFilter<GridLayerType>(*filter_);
+    return new NegatedElementFilter<GridViewType>(*filter_);
   }
 
-  bool contains(const GridLayerType& grid_layer, const EntityType& entity) const override final
+  bool contains(const GridViewType& grid_layer, const ElementType& element) const override final
   {
-    return !filter_->contains(grid_layer, entity);
+    return !filter_->contains(grid_layer, element);
   }
 
 private:
   const std::unique_ptr<BaseType> filter_;
-}; // class NegatedEntityFilter
+}; // class NegatedElementFilter
 
 
 } // namespace internal

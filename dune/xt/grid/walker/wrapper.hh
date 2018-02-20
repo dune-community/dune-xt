@@ -32,23 +32,23 @@ namespace internal {
 
 /**
  * \brief To be used within the \sa Walker as internal storage type.
- * \note  Most likely you do not want to use this class directly, but instead append() an \sa EntityFunctor to a
+ * \note  Most likely you do not want to use this class directly, but instead append() an \sa ElementFunctor to a
  *        Walker.
  */
 template <class GL>
-class EntityFunctorWrapper
+class ElementFunctorWrapper
 {
   static_assert(is_layer<GL>::value, "");
-  using ThisType = EntityFunctorWrapper<GL>;
+  using ThisType = ElementFunctorWrapper<GL>;
 
 public:
-  using FunctorType = EntityFunctor<GL>;
-  using FilterType = EntityFilter<GL>;
+  using FunctorType = ElementFunctor<GL>;
+  using FilterType = ElementFilter<GL>;
 
   /**
    * \attention Takes ownership of filtr_ptr, do not delete manually!
    */
-  EntityFunctorWrapper(FunctorType& functr, const FilterType*&& filtr_ptr)
+  ElementFunctorWrapper(FunctorType& functr, const FilterType*&& filtr_ptr)
     : functor_(functr)
     , filter_(std::move(filtr_ptr))
   {
@@ -58,7 +58,7 @@ public:
    * \attention Takes ownership of functr_ptr, do not delete manually!
    * \attention Takes ownership of filtr_ptr, do not delete manually!
    */
-  EntityFunctorWrapper(FunctorType*&& functr_ptr, const FilterType*&& filtr_ptr)
+  ElementFunctorWrapper(FunctorType*&& functr_ptr, const FilterType*&& filtr_ptr)
     : functor_(std::move(functr_ptr))
     , filter_(std::move(filtr_ptr))
   {
@@ -87,7 +87,7 @@ public:
 private:
   Common::StorageProvider<FunctorType> functor_;
   const Common::ConstStorageProvider<FilterType> filter_;
-}; // class EntityFunctorWrapper
+}; // class ElementFunctorWrapper
 
 
 /**
@@ -153,42 +153,42 @@ private:
 /**
  * \brief To be used within the \sa Walker as internal storage type.
  * \note  Most likely you do not want to use this class directly, but instead append() an \sa
- *        EntityAndIntersectionFunctor to a Walker.
+ *        ElementAndIntersectionFunctor to a Walker.
  */
 template <class GL>
-class EntityAndIntersectionFunctorWrapper
+class ElementAndIntersectionFunctorWrapper
 {
   static_assert(is_layer<GL>::value, "");
-  using ThisType = EntityAndIntersectionFunctorWrapper<GL>;
+  using ThisType = ElementAndIntersectionFunctorWrapper<GL>;
 
 public:
-  using FunctorType = EntityAndIntersectionFunctor<GL>;
-  using EntityFilterType = EntityFilter<GL>;
+  using FunctorType = ElementAndIntersectionFunctor<GL>;
+  using ElementFilterType = ElementFilter<GL>;
   using IntersectionFilterType = IntersectionFilter<GL>;
 
   /**
-   * \attention Takes ownership of entity_filtr_ptr, do not delete manually!
+   * \attention Takes ownership of element_filtr_ptr, do not delete manually!
    * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
    */
-  EntityAndIntersectionFunctorWrapper(FunctorType& functr,
-                                      const EntityFilterType*&& entity_filtr_ptr,
-                                      const IntersectionFilterType*&& intersection_filtr_ptr)
+  ElementAndIntersectionFunctorWrapper(FunctorType& functr,
+                                       const ElementFilterType*&& element_filtr_ptr,
+                                       const IntersectionFilterType*&& intersection_filtr_ptr)
     : functor_(functr)
-    , entity_filter_(std::move(entity_filtr_ptr))
+    , element_filter_(std::move(element_filtr_ptr))
     , intersection_filter_(std::move(intersection_filtr_ptr))
   {
   }
 
   /**
    * \attention Takes ownership of functr_ptr, do not delete manually!
-   * \attention Takes ownership of entity_filtr_ptr, do not delete manually!
+   * \attention Takes ownership of element_filtr_ptr, do not delete manually!
    * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
    */
-  EntityAndIntersectionFunctorWrapper(FunctorType*&& functr_ptr,
-                                      const EntityFilterType*&& entity_filtr_ptr,
-                                      const IntersectionFilterType*&& intersection_filtr_ptr)
+  ElementAndIntersectionFunctorWrapper(FunctorType*&& functr_ptr,
+                                       const ElementFilterType*&& element_filtr_ptr,
+                                       const IntersectionFilterType*&& intersection_filtr_ptr)
     : functor_(std::move(functr_ptr))
-    , entity_filter_(std::move(entity_filtr_ptr))
+    , element_filter_(std::move(element_filtr_ptr))
     , intersection_filter_(std::move(intersection_filtr_ptr))
   {
   }
@@ -203,9 +203,9 @@ public:
     return this != other;
   }
 
-  virtual const EntityFilterType& entity_filter() const
+  virtual const ElementFilterType& element_filter() const
   {
-    return entity_filter_.access();
+    return element_filter_.access();
   }
 
   virtual const IntersectionFilterType& intersection_filter() const
@@ -220,9 +220,9 @@ public:
 
 private:
   Common::StorageProvider<FunctorType> functor_;
-  Common::ConstStorageProvider<EntityFilterType> entity_filter_;
+  Common::ConstStorageProvider<ElementFilterType> element_filter_;
   const Common::ConstStorageProvider<IntersectionFilterType> intersection_filter_;
-}; // class EntityAndIntersectionFunctorWrapper
+}; // class ElementAndIntersectionFunctorWrapper
 
 
 /**
@@ -230,31 +230,31 @@ private:
  * \note  Most likely you do not want to use this class directly, but instead append() a Walker to a Walker.
  */
 template <class GL>
-class WalkerWrapper : public EntityAndIntersectionFunctorWrapper<GL>
+class WalkerWrapper : public ElementAndIntersectionFunctorWrapper<GL>
 {
-  using BaseType = EntityAndIntersectionFunctorWrapper<GL>;
+  using BaseType = ElementAndIntersectionFunctorWrapper<GL>;
   using ThisType = WalkerWrapper<GL>;
 
 public:
-  using typename BaseType::EntityFilterType;
+  using typename BaseType::ElementFilterType;
   using typename BaseType::IntersectionFilterType;
 
   /**
-   * \attention Takes ownership of entity_filtr_ptr, do not delete manually!
+   * \attention Takes ownership of element_filtr_ptr, do not delete manually!
    * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
    */
   WalkerWrapper(Walker<GL>& walkr,
-                const EntityFilterType*&& entity_filtr_ptr,
+                const ElementFilterType*&& element_filtr_ptr,
                 const IntersectionFilterType*&& intersection_filtr_ptr)
     : BaseType(walkr,
-               new ApplyOn::LambdaFilteredEntities<GL>([&](const auto& grid_layer, const auto& entity) {
-                 if (restriction_entity_filter_.access().contains(grid_layer, entity)) {
-                   for (const auto& wrapper : walkr.entity_functor_wrappers_) {
-                     if (wrapper->filter().contains(grid_layer, entity))
+               new ApplyOn::LambdaFilteredElements<GL>([&](const auto& grid_layer, const auto& element) {
+                 if (restriction_element_filter_.access().contains(grid_layer, element)) {
+                   for (const auto& wrapper : walkr.element_functor_wrappers_) {
+                     if (wrapper->filter().contains(grid_layer, element))
                        return true;
                    }
-                   for (const auto& wrapper : walkr.entity_and_intersection_functor_wrappers_) {
-                     if (wrapper->entity_filter().contains(grid_layer, entity))
+                   for (const auto& wrapper : walkr.element_and_intersection_functor_wrappers_) {
+                     if (wrapper->element_filter().contains(grid_layer, element))
                        return true;
                    }
                    return false;
@@ -267,7 +267,7 @@ public:
                      if (wrapper->filter().contains(grid_layer, intersection))
                        return true;
                    }
-                   for (const auto& wrapper : walkr.entity_and_intersection_functor_wrappers_) {
+                   for (const auto& wrapper : walkr.element_and_intersection_functor_wrappers_) {
                      if (wrapper->intersection_filter().contains(grid_layer, intersection))
                        return true;
                    }
@@ -275,13 +275,13 @@ public:
                  } else
                    return false;
                }))
-    , restriction_entity_filter_(std::move(entity_filtr_ptr))
+    , restriction_element_filter_(std::move(element_filtr_ptr))
     , restriction_intersection_filter_(std::move(intersection_filtr_ptr))
   {
   }
 
 private:
-  const Common::ConstStorageProvider<EntityFilterType> restriction_entity_filter_;
+  const Common::ConstStorageProvider<ElementFilterType> restriction_element_filter_;
   const Common::ConstStorageProvider<IntersectionFilterType> restriction_intersection_filter_;
 }; // class WalkerWrapper
 

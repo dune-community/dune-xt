@@ -26,8 +26,8 @@ class BoundaryDetectorFunctor : public IntersectionReturnFunctor<GL, size_t>
 
 public:
   using typename BaseType::ResultType;
-  using typename BaseType::GridLayerType;
-  using typename BaseType::EntityType;
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
   using typename BaseType::IntersectionType;
 
   /**
@@ -54,17 +54,17 @@ public:
   }
 
   ResultType compute_locally(const IntersectionType& intersection,
-                             const EntityType& /*inside_entity*/,
-                             const EntityType& /*outside_entity*/) override final
+                             const ElementType& /*inside_element*/,
+                             const ElementType& /*outside_element*/) override final
   {
     return boundary_info_.type(intersection) == *boundary_type_;
   }
 
   void apply_local(const IntersectionType& intersection,
-                   const EntityType& inside_entity,
-                   const EntityType& outside_entity) override final
+                   const ElementType& inside_element,
+                   const ElementType& outside_element) override final
   {
-    found_ += compute_locally(intersection, inside_entity, outside_entity);
+    found_ += compute_locally(intersection, inside_element, outside_element);
   }
 
   ResultType result() const override final
