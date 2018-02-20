@@ -96,9 +96,9 @@ private:
  *  \see Pgf
  **/
 template <class GridViewType>
-class PgfEntityFunctorIntersections : public EntityAndIntersectionFunctor<GridViewType>
+class PgfEntityFunctorIntersections : public ElementAndIntersectionFunctor<GridViewType>
 {
-  typedef EntityAndIntersectionFunctor<GridViewType> BaseType;
+  typedef ElementAndIntersectionFunctor<GridViewType> BaseType;
 
 public:
   PgfEntityFunctorIntersections(const GridViewType& grid_view,
@@ -112,15 +112,15 @@ public:
   {
   }
 
-  virtual void apply_local(const typename BaseType::EntityType& entity)
+  virtual void apply_local(const typename BaseType::ElementType& entity)
   {
     const auto ent_idx = grid_view_.indexSet().index(entity);
     maybePrintEntityIndex(entity, ent_idx);
   }
 
   virtual void apply_local(const typename BaseType::IntersectionType& intersection,
-                           const typename BaseType::EntityType& /*inside_entity*/,
-                           const typename BaseType::EntityType& /*outside_entity*/)
+                           const typename BaseType::ElementType& /*inside_entity*/,
+                           const typename BaseType::ElementType& /*outside_entity*/)
   {
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
@@ -137,7 +137,7 @@ public:
     file_.flush();
   }
 
-  void maybePrintEntityIndex(const typename BaseType::EntityType& entity, const int idx)
+  void maybePrintEntityIndex(const typename BaseType::ElementType& entity, const int idx)
   {
     if (!print_entityIndex_)
       return;
@@ -180,8 +180,8 @@ public:
   }
 
   virtual void apply_local(const typename BaseType::IntersectionType& intersection,
-                           const typename BaseType::EntityType& inside_entity,
-                           const typename BaseType::EntityType& /*outside_entity*/)
+                           const typename BaseType::ElementType& inside_entity,
+                           const typename BaseType::ElementType& /*outside_entity*/)
   {
     const PgfCoordWrapper center(inside_entity.geometry().center());
     const float fac = 0.16 * level_;

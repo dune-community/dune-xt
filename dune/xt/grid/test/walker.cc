@@ -89,7 +89,7 @@ struct GridWalkerTest : public ::testing::Test
     auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
     auto all_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
 
-    auto on_filter_boundaries = new ApplyOn::FilteredIntersections<GridLayerType>(boundaries);
+    auto on_filter_boundaries = new ApplyOn::LambdaFilteredIntersections<GridLayerType>(boundaries);
     auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridLayerType>();
     walker.append(filter_counter, on_filter_boundaries);
     walker.append(all_counter, on_all_boundaries);
@@ -114,7 +114,7 @@ struct GridWalkerTest : public ::testing::Test
 
     auto on_interior_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
     auto on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
-    auto on_all = new ApplyOn::AllEntities<GridLayerType>();
+    auto on_all = new ApplyOn::AllElements<GridLayerType>();
     walker.append(filter_counter, on_all_partitionset);
     walker.append(inner_filter_counter, on_interior_partitionset);
     walker.append(all_counter, on_all);
