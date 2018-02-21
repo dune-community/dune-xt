@@ -44,8 +44,8 @@ namespace Functions {
 template <class R, size_t r, size_t rC>
 struct RangeTypeSelector
 {
-  using type = XT::Common::FieldMatrix<R, r, rC>;
-
+  using type = FieldMatrix<R, r, rC>;
+  using return_type = XT::Common::FieldMatrix<R, r, rC>;
   using dynamic_type = DynamicMatrix<R>;
 
   static void ensure_size(dynamic_type& arg)
@@ -67,8 +67,8 @@ struct RangeTypeSelector
 template <class R, size_t r>
 struct RangeTypeSelector<R, r, 1>
 {
-  using type = XT::Common::FieldVector<R, r>;
-
+  using type = FieldVector<R, r>;
+  using return_type = XT::Common::FieldVector<R, r>;
   using dynamic_type = DynamicVector<R>;
 
   static void ensure_size(dynamic_type& arg)
@@ -122,9 +122,11 @@ template <size_t d, class R, size_t r, size_t rC>
 struct DerivativeRangeTypeSelector
 {
   using single_type = XT::Common::FieldVector<R, d>;
-  using type = XT::Common::FieldVector<Dune::XT::Common::FieldMatrix<R, rC, d>, r>;
-
+  using return_single_type = FieldVector<R, d>;
   using dynamic_single_type = DynamicVector<R>;
+
+  using type = FieldVector<FieldMatrix<R, rC, d>, r>;
+  using return_type = XT::Common::FieldVector<XT::Common::FieldMatrix<R, rC, d>, r>;
   using dynamic_type = DynamicVector<DynamicMatrix<R>>;
 
   static void ensure_size(dynamic_type& arg)
@@ -152,10 +154,12 @@ struct DerivativeRangeTypeSelector
 template <size_t d, class R, size_t r>
 struct DerivativeRangeTypeSelector<d, R, r, 1>
 {
-  using single_type = XT::Common::FieldVector<R, d>;
-  using type = XT::Common::FieldMatrix<R, r, d>;
-
+  using single_type = FieldVector<R, d>;
+  using return_single_type = XT::Common::FieldVector<R, d>;
   using dynamic_single_type = DynamicVector<R>;
+
+  using type = FieldMatrix<R, r, d>;
+  using return_type = XT::Common::FieldMatrix<R, r, d>;
   using dynamic_type = DynamicMatrix<R>;
 
   static void ensure_size(dynamic_type& arg)
