@@ -20,12 +20,12 @@ namespace Grid {
 
 
 template <class GL>
-class BoundaryDetectorFunctor : public IntersectionReturnFunctor<GL, size_t>
+class BoundaryDetectorFunctor : public IntersectionFunctor<GL>
 {
-  using BaseType = IntersectionReturnFunctor<GL, size_t>;
+  using BaseType = IntersectionFunctor<GL>;
 
 public:
-  using typename BaseType::ResultType;
+  using ResultType = size_t;
   using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
   using typename BaseType::IntersectionType;
@@ -55,7 +55,7 @@ public:
 
   ResultType compute_locally(const IntersectionType& intersection,
                              const ElementType& /*inside_element*/,
-                             const ElementType& /*outside_element*/) override final
+                             const ElementType& /*outside_element*/)
   {
     return boundary_info_.type(intersection) == *boundary_type_;
   }
@@ -67,7 +67,7 @@ public:
     found_ += compute_locally(intersection, inside_element, outside_element);
   }
 
-  ResultType result() const override final
+  ResultType result() const
   {
     return found_;
   }

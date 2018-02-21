@@ -49,66 +49,8 @@ public:
 
 
 /**
- * \brief Interface for functors which are like \sa ElementFunctor but return results.
- *
- *        Think of computing the L^2 norm of a function f:
-\code
-const auto local_l2_norm = functor.compute_locally(entity);
-\endcode
-          would compute and return \int_entity f^2 \dx. On the other hand, apply_local(entity) would be implemented
-          to call compute_locally and store the result, i.e. an implementation might look like:
-\code
-void apply_local(const ElementType& element) override final
-{
-  this->result_ += functor.compute_locally(entity);
-}
-\endcode
-          In that case, result_ would be a private member which is set to zero in prepare(). An implementation of
-          finalize() might then look like:
-\code
-void finalize() override final
-{
-  this->result_ = std::sqrt(this->result);
-}
-\endcode
-          The purpose of result() is then simply to return result_;
- */
-template <class GL, class R>
-class ElementReturnFunctor : public ElementFunctor<GL>
-{
-  using BaseType = ElementFunctor<GL>;
-
-public:
-  using ResultType = R;
-  using typename BaseType::GridViewType;
-  using typename BaseType::ElementType;
-
-  virtual ~ElementReturnFunctor() = default;
-
-  /**
-   * \note Calling this method should not alter the state of this functor, i.e. calling
-\code
-auto result = func.compute_locally(entity);
-func.apply_local(entity);
-\endcode
-   *       should give the same as:
-\code
-func.apply_local(entity);
-\endcode
-   */
-  virtual ResultType compute_locally(const ElementType& element) = 0;
-
-  /**
-   * \brief Can be called to access the final result of the functor.
-   */
-  virtual ResultType result() const = 0;
-}; // class ElementReturnFunctor
-
-
-/**
  * \brief Interface for functors which are applied to (codim 1) intersection of a grid layer by the \sa GridWalker.
  * \sa    ElementFunctor
- * \sa    ElementReturnFunctor
  */
 template <class GL>
 class IntersectionFunctor
@@ -139,51 +81,10 @@ public:
   }
 }; // class IntersectionFunctor
 
-
-/**
- * \brief Interface for functors which are like \sa IntersectionFunctor but return results.
- * \sa    ElementFunctor
- * \sa    ElementReturnFunctor
- * \sa    IntersectionFunctor
- */
-template <class GL, class R>
-class IntersectionReturnFunctor : public IntersectionFunctor<GL>
-{
-  using BaseType = IntersectionFunctor<GL>;
-
-public:
-  using ResultType = R;
-  using typename BaseType::GridViewType;
-  using typename BaseType::ElementType;
-  using typename BaseType::IntersectionType;
-
-  virtual ~IntersectionReturnFunctor() = default;
-
-  /**
-   * \note Calling this method should not alter the state of this functor, i.e. calling
-\code
-auto result = func.compute_locally(intersection, inside_element, outside_element);
-func.apply_local(intersection, inside_element, outside_element);
-\endcode
-   *       should give the same as:
-\code
-func.apply_local(intersection, inside_element, outside_element);
-\endcode
-   */
-  virtual ResultType compute_locally(const IntersectionType& intersection,
-                                     const ElementType& inside_element,
-                                     const ElementType& outside_element) = 0;
-
-  virtual ResultType result() const = 0;
-}; // class IntersectionReturnFunctor
-
-
 /**
  * \brief Interface for functors which are applied to entities and intersections of a grid layer by the \sa GridWalker.
  * \sa    ElementFunctor
  * \sa    IntersectionFunctor
- * \sa    ElementReturnFunctor
- * \sa    IntersectionReturnFunctor
  */
 template <class GL>
 class ElementAndIntersectionFunctor
@@ -211,59 +112,6 @@ public:
   {
   }
 }; // class ElementAndIntersectionFunctor
-
-
-/**
- * \brief Interface for functors which are like \sa ElementAndIntersectionFunctor but return results.
- * \sa    ElementFunctor
- * \sa    ElementReturnFunctor
- * \sa    IntersectionFunctor
- * \sa    IntersectionReturnFunctor
- * \sa    ElementAndIntersectionFunctor
- */
-template <class GL, class R>
-class ElementAndIntersectionReturnFunctor : public ElementAndIntersectionFunctor<GL>
-{
-  using BaseType = ElementAndIntersectionFunctor<GL>;
-
-public:
-  using ResultType = R;
-  using typename BaseType::GridViewType;
-  using typename BaseType::ElementType;
-  using typename BaseType::IntersectionType;
-
-  virtual ~ElementAndIntersectionReturnFunctor() = default;
-
-  /**
-   * \note Calling this method should not alter the state of this functor, i.e. calling
-\code
-auto result = func.compute_locally(entity);
-func.apply_local(entity);
-\endcode
-   *       should give the same as:
-\code
-func.apply_local(entity);
-\endcode
-   */
-  virtual ResultType compute_locally(const ElementType& element) = 0;
-
-  /**
-   * \note Calling this method should not alter the state of this functor, i.e. calling
-\code
-auto result = func.compute_locally(intersection, inside_element, outside_element);
-func.apply_local(intersection, inside_element, outside_element);
-\endcode
-   *       should give the same as:
-\code
-func.apply_local(intersection, inside_element, outside_element);
-\endcode
-   */
-  virtual ResultType compute_locally(const IntersectionType& intersection,
-                                     const ElementType& inside_element,
-                                     const ElementType& outside_element) = 0;
-
-  virtual ResultType result() const = 0;
-}; // class ElementAndIntersectionReturnFunctor
 
 
 } // namespace Grid

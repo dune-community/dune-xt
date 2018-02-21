@@ -62,67 +62,6 @@ private:
 }; // class ElementLambdaFunctor
 
 
-template <class GL, class R>
-class ElementReturnLambdaFunctor : public ElementReturnFunctor<GL, R>
-{
-  using BaseType = ElementReturnFunctor<GL, R>;
-
-public:
-  using typename BaseType::ResultType;
-  using typename BaseType::GridViewType;
-  using typename BaseType::ElementType;
-  using ComputeLambdaType = std::function<ResultType(const ElementType&)>;
-  using PrepareLambdaType = std::function<void()>;
-  using FinalizeLambdaType = PrepareLambdaType;
-
-  ElementReturnLambdaFunctor(ComputeLambdaType compute_lambda,
-                             PrepareLambdaType prepare_lambda = []() {},
-                             FinalizeLambdaType finalize_lambda = []() {})
-    : compute_lambda_(compute_lambda)
-    , prepare_lambda_(prepare_lambda)
-    , finalize_lambda_(finalize_lambda)
-    , result_(0)
-  {
-  }
-
-  ElementReturnFunctor<GridViewType, ResultType>* copy() const override final
-  {
-    return new ElementReturnLambdaFunctor<GridViewType, ResultType>(compute_lambda_, prepare_lambda_, finalize_lambda_);
-  }
-
-  void prepare() override final
-  {
-    prepare_lambda_();
-  }
-
-  void apply_local(const ElementType& element) override final
-  {
-    result_ += compute_locally(element);
-  }
-
-  ResultType compute_locally(const ElementType& element) override final
-  {
-    return compute_lambda_(element);
-  }
-
-  void finalize() override final
-  {
-    finalize_lambda_();
-  }
-
-  ResultType result() const override final
-  {
-    return result_;
-  }
-
-private:
-  const ComputeLambdaType compute_lambda_;
-  const PrepareLambdaType prepare_lambda_;
-  const FinalizeLambdaType finalize_lambda_;
-  ResultType result_;
-}; // class ElementReturnLambdaFunctor
-
-
 template <class GL>
 class IntersectionLambdaFunctor : public IntersectionFunctor<GL>
 {
