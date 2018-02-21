@@ -48,19 +48,9 @@ public:
   /**
    * \attention Takes ownership of filtr_ptr, do not delete manually!
    */
-  ElementFunctorWrapper(FunctorType& functr, const FilterType*&& filtr_ptr)
-    : functor_(functr)
-    , filter_(std::move(filtr_ptr))
-  {
-  }
-
-  /**
-   * \attention Takes ownership of functr_ptr, do not delete manually!
-   * \attention Takes ownership of filtr_ptr, do not delete manually!
-   */
-  ElementFunctorWrapper(FunctorType*&& functr_ptr, const FilterType*&& filtr_ptr)
-    : functor_(std::move(functr_ptr))
-    , filter_(std::move(filtr_ptr))
+  ElementFunctorWrapper(FunctorType& functr, const FilterType& filtr_ptr)
+    : functor_(functr.copy())
+    , filter_(filtr_ptr.copy())
   {
   }
 
@@ -76,17 +66,17 @@ public:
 
   virtual const FilterType& filter() const
   {
-    return filter_.access();
+    return *filter_;
   }
 
   virtual FunctorType& functor()
   {
-    return functor_.access();
+    return *functor_;
   }
 
 private:
-  Common::StorageProvider<FunctorType> functor_;
-  const Common::ConstStorageProvider<FilterType> filter_;
+  std::unique_ptr<FunctorType> functor_;
+  const std::unique_ptr<const FilterType> filter_;
 }; // class ElementFunctorWrapper
 
 
@@ -108,19 +98,9 @@ public:
   /**
    * \attention Takes ownership of filtr_ptr, do not delete manually!
    */
-  IntersectionFunctorWrapper(FunctorType& functr, const FilterType*&& filtr_ptr)
-    : functor_(functr)
-    , filter_(std::move(filtr_ptr))
-  {
-  }
-
-  /**
-   * \attention Takes ownership of functr_ptr, do not delete manually!
-   * \attention Takes ownership of filtr_ptr, do not delete manually!
-   */
-  IntersectionFunctorWrapper(FunctorType*&& functr_ptr, const FilterType*&& filtr_ptr)
-    : functor_(std::move(functr_ptr))
-    , filter_(std::move(filtr_ptr))
+  IntersectionFunctorWrapper(FunctorType& functr, const FilterType& filtr_ptr)
+    : functor_(functr.copy())
+    , filter_(filtr_ptr.copy())
   {
   }
 
@@ -136,17 +116,17 @@ public:
 
   virtual const FilterType& filter() const
   {
-    return filter_.access();
+    return *filter_;
   }
 
   virtual FunctorType& functor()
   {
-    return functor_.access();
+    return *functor_;
   }
 
 private:
-  Common::StorageProvider<FunctorType> functor_;
-  const Common::ConstStorageProvider<FilterType> filter_;
+  std::unique_ptr<FunctorType> functor_;
+  const std::unique_ptr<const FilterType> filter_;
 }; // class IntersectionFunctorWrapper
 
 
@@ -171,27 +151,14 @@ public:
    * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
    */
   ElementAndIntersectionFunctorWrapper(FunctorType& functr,
-                                       const ElementFilterType*&& element_filtr_ptr,
-                                       const IntersectionFilterType*&& intersection_filtr_ptr)
-    : functor_(functr)
-    , element_filter_(std::move(element_filtr_ptr))
-    , intersection_filter_(std::move(intersection_filtr_ptr))
+                                       const ElementFilterType& element_filtr_ptr,
+                                       const IntersectionFilterType& intersection_filtr_ptr)
+    : functor_(functr.copy())
+    , element_filter_(element_filtr_ptr.copy())
+    , intersection_filter_(intersection_filtr_ptr.copy())
   {
   }
 
-  /**
-   * \attention Takes ownership of functr_ptr, do not delete manually!
-   * \attention Takes ownership of element_filtr_ptr, do not delete manually!
-   * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
-   */
-  ElementAndIntersectionFunctorWrapper(FunctorType*&& functr_ptr,
-                                       const ElementFilterType*&& element_filtr_ptr,
-                                       const IntersectionFilterType*&& intersection_filtr_ptr)
-    : functor_(std::move(functr_ptr))
-    , element_filter_(std::move(element_filtr_ptr))
-    , intersection_filter_(std::move(intersection_filtr_ptr))
-  {
-  }
 
   bool operator==(const ThisType& other) const
   {
@@ -205,23 +172,23 @@ public:
 
   virtual const ElementFilterType& element_filter() const
   {
-    return element_filter_.access();
+    return *element_filter_;
   }
 
   virtual const IntersectionFilterType& intersection_filter() const
   {
-    return intersection_filter_.access();
+    return *intersection_filter_;
   }
 
   virtual FunctorType& functor()
   {
-    return functor_.access();
+    return *functor_;
   }
 
 private:
-  Common::StorageProvider<FunctorType> functor_;
-  Common::ConstStorageProvider<ElementFilterType> element_filter_;
-  const Common::ConstStorageProvider<IntersectionFilterType> intersection_filter_;
+  std::unique_ptr<FunctorType> functor_;
+  std::unique_ptr<const ElementFilterType> element_filter_;
+  const std::unique_ptr<const IntersectionFilterType> intersection_filter_;
 }; // class ElementAndIntersectionFunctorWrapper
 
 

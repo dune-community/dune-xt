@@ -47,6 +47,9 @@
 
 namespace Dune {
 namespace XT {
+
+static const std::function<void()> dxt_void_noop{};
+
 namespace Grid {
 
 
@@ -103,7 +106,7 @@ public:
    * \{
    */
 
-  ThisType& append(ElementFunctor<GL>& functor, ElementFilter<GL>*&& filter = new ApplyOn::AllElements<GL>())
+  ThisType& append(ElementFunctor<GL>& functor, const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>())
   {
     element_functor_wrappers_->emplace_back(new internal::ElementFunctorWrapper<GL>(functor, std::move(filter)));
     return *this;
@@ -112,50 +115,34 @@ public:
   ThisType& append(ElementFunctor<GL>& functor, std::function<bool(const GL&, const ElementType&)> element_filter)
   {
     element_functor_wrappers_->emplace_back(
-        new internal::ElementFunctorWrapper<GL>(functor, new ApplyOn::LambdaFilteredElements<GL>(element_filter)));
+        new internal::ElementFunctorWrapper<GL>(functor, ApplyOn::LambdaFilteredElements<GL>(element_filter)));
     return *this;
   }
 
-  ThisType& append(ElementFunctor<GL>*&& functor, ElementFilter<GL>*&& filter)
-  {
-    element_functor_wrappers_->emplace_back(
-        new internal::ElementFunctorWrapper<GL>(std::move(functor), std::move(filter)));
-    return *this;
-  }
 
   /**
    * \}
    * \name These methods can be used to append an element lambda expression.
    * \{
    */
-
   ThisType& append(std::function<void(const ElementType&)> apply_lambda,
-                   ElementFilter<GL>*&& filter = new ApplyOn::AllElements<GL>())
+                   std::function<void()> prepare_lambda = dxt_void_noop,
+                   std::function<void()> finalize_lambda = dxt_void_noop,
+                   const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>())
   {
-    return this->append(new ElementLambdaFunctor<GL>(apply_lambda), std::move(filter));
+    ElementLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
+    return this->append(f, filter);
   }
 
   ThisType& append(std::function<void(const ElementType&)> apply_lambda,
-                   std::function<bool(const GL&, const ElementType&)> filter)
+                   std::function<void()> prepare_lambda = dxt_void_noop,
+                   std::function<void()> finalize_lambda = dxt_void_noop,
+                   std::function<bool(const GL&, const ElementType&)> filter = [](const GL&, const ElementType&) {
+                     return true;
+                   })
   {
-    return this->append(new ElementLambdaFunctor<GL>(apply_lambda), new ApplyOn::LambdaFilteredElements<GL>(filter));
-  }
-
-  ThisType& append(std::function<void(const ElementType&)> apply_lambda,
-                   std::function<void()> prepare_lambda,
-                   std::function<void()> finalize_lambda,
-                   ElementFilter<GL>*&& filter = new ApplyOn::AllElements<GL>())
-  {
-    return this->append(new ElementLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda), std::move(filter));
-  }
-
-  ThisType& append(std::function<void(const ElementType&)> apply_lambda,
-                   std::function<void()> prepare_lambda,
-                   std::function<void()> finalize_lambda,
-                   std::function<bool(const GL&, const ElementType&)> filter)
-  {
-    return this->append(new ElementLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda),
-                        new ApplyOn::LambdaFilteredElements<GL>(filter));
+    ElementLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
+    return this->append(f, ApplyOn::LambdaFilteredElements<GL>(filter));
   }
 
   /**
@@ -165,24 +152,16 @@ public:
    */
 
   ThisType& append(IntersectionFunctor<GL>& functor,
-                   IntersectionFilter<GL>*&& filter = new ApplyOn::AllIntersections<GL>())
+                   const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>())
   {
-    intersection_functor_wrappers_->emplace_back(
-        new internal::IntersectionFunctorWrapper<GL>(functor, std::move(filter)));
+    intersection_functor_wrappers_->emplace_back(new internal::IntersectionFunctorWrapper<GL>(functor, filter));
     return *this;
   }
 
   ThisType& append(IntersectionFunctor<GL>& functor, std::function<bool(const GL&, const IntersectionType&)> filter)
   {
     intersection_functor_wrappers_->emplace_back(
-        new internal::IntersectionFunctorWrapper<GL>(functor, new ApplyOn::LambdaFilteredIntersections<GL>(filter)));
-    return *this;
-  }
-
-  ThisType& append(IntersectionFunctor<GL>*&& functor, IntersectionFilter<GL>*&& filter)
-  {
-    intersection_functor_wrappers_->emplace_back(
-        new internal::IntersectionFunctorWrapper<GL>(std::move(functor), std::move(filter)));
+        new internal::IntersectionFunctorWrapper<GL>(functor, ApplyOn::LambdaFilteredIntersections<GL>(filter)));
     return *this;
   }
 
@@ -193,25 +172,26 @@ public:
    */
 
   ThisType& append(std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> apply_lambda,
-                   IntersectionFilter<GL>*&& filter = new ApplyOn::AllIntersections<GL>())
+                   const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>())
   {
-    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda), std::move(filter));
+    IntersectionLambdaFunctor<GL> f(apply_lambda);
+    return this->append(f, filter);
   }
 
   ThisType& append(std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> apply_lambda,
                    std::function<bool(const GL&, const IntersectionType&)> filter)
   {
-    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda),
-                        new ApplyOn::LambdaFilteredIntersections<GL>(filter));
+    IntersectionLambdaFunctor<GL> f(apply_lambda);
+    return this->append(f, ApplyOn::LambdaFilteredIntersections<GL>(filter));
   }
 
   ThisType& append(std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> apply_lambda,
                    std::function<void()> prepare_lambda,
                    std::function<void()> finalize_lambda,
-                   IntersectionFilter<GL>*&& filter = new ApplyOn::AllIntersections<GL>())
+                   const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>())
   {
-    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda),
-                        std::move(filter));
+    IntersectionLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
+    return this->append(f, filter);
   }
 
   ThisType& append(std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> apply_lambda,
@@ -219,8 +199,8 @@ public:
                    std::function<void()> finalize_lambda,
                    std::function<bool(const GL&, const IntersectionType&)> filter)
   {
-    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda),
-                        new ApplyOn::LambdaFilteredIntersections<GL>(filter));
+    IntersectionLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
+    return this->append(f, ApplyOn::LambdaFilteredIntersections<GL>(filter));
   }
 
   /**
@@ -228,26 +208,14 @@ public:
    * \name These methods can be used to append an \sa ElementAndIntersectionFunctor.
    * \{
    */
-
   ThisType& append(ElementAndIntersectionFunctor<GL>& functor,
-                   ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>(),
-                   IntersectionFilter<GL>*&& intersection_filter = new ApplyOn::AllIntersections<GL>())
+                   const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>(),
+                   const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>())
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
-        functor, std::move(element_filter), std::move(intersection_filter)));
-    return *this;
-  }
-
-  ThisType& append(ElementAndIntersectionFunctor<GL>& functor,
-                   IntersectionFilter<GL>*&& intersection_filter,
-                   ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>())
-  {
-    if (&functor == this)
-      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
-        functor, std::move(element_filter), std::move(intersection_filter)));
+    element_and_intersection_functor_wrappers_->emplace_back(
+        new internal::ElementAndIntersectionFunctorWrapper<GL>(functor, element_filter, intersection_filter));
     return *this;
   }
 
@@ -259,21 +227,11 @@ public:
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
     element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
         functor,
-        new ApplyOn::LambdaFilteredElements<GL>(element_filter),
-        new ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
+        ApplyOn::LambdaFilteredElements<GL>(element_filter),
+        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
     return *this;
   }
 
-  ThisType& append(ElementAndIntersectionFunctor<GL>*&& functor,
-                   ElementFilter<GL>*&& element_filter,
-                   IntersectionFilter<GL>*&& intersection_filter)
-  {
-    if (functor == this)
-      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
-        std::move(functor), std::move(element_filter), std::move(intersection_filter)));
-    return *this;
-  }
 
   /**
    * \}
@@ -284,23 +242,21 @@ public:
   ThisType&
   append(std::function<void(const ElementType&)> element_apply_on,
          std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> intersection_apply_on,
-         ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>(),
-         IntersectionFilter<GL>*&& intersection_filter = new ApplyOn::AllIntersections<GL>())
+         const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>(),
+         const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>())
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(element_apply_on, intersection_apply_on),
-                        std::move(element_filter),
-                        std::move(intersection_filter));
+    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on);
+    return this->append(f, element_filter, intersection_filter);
   }
 
   ThisType&
   append(std::function<void(const ElementType&)> element_apply_on,
          std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> intersection_apply_on,
-         IntersectionFilter<GL>*&& intersection_filter,
-         ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>())
+         const IntersectionFilter<GL>& intersection_filter,
+         const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>())
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(element_apply_on, intersection_apply_on),
-                        std::move(element_filter),
-                        std::move(intersection_filter));
+    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on);
+    return this->append(f, element_filter, intersection_filter);
   }
 
   ThisType&
@@ -309,9 +265,10 @@ public:
          std::function<bool(const GL&, const ElementType&)> element_filter,
          std::function<bool(const GL&, const IntersectionType&)> intersection_filter)
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(element_apply_on, intersection_apply_on),
-                        new ApplyOn::LambdaFilteredElements<GL>(element_filter),
-                        new ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
+    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on);
+    return this->append(f,
+                        ApplyOn::LambdaFilteredElements<GL>(element_filter),
+                        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
   }
 
   ThisType&
@@ -319,13 +276,11 @@ public:
          std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> intersection_apply_on,
          std::function<void()> prepare_lambda,
          std::function<void()> finalize_lambda,
-         ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>(),
-         IntersectionFilter<GL>*&& intersection_filter = new ApplyOn::AllIntersections<GL>())
+         const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>(),
+         const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>())
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(
-                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
-                        std::move(element_filter),
-                        std::move(intersection_filter));
+    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda);
+    return this->append(f, element_filter, intersection_filter);
   }
 
   ThisType&
@@ -333,13 +288,11 @@ public:
          std::function<void(const IntersectionType&, const ElementType&, const ElementType&)> intersection_apply_on,
          std::function<void()> prepare_lambda,
          std::function<void()> finalize_lambda,
-         IntersectionFilter<GL>*&& intersection_filter,
-         ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>())
+         const IntersectionFilter<GL>& intersection_filter,
+         const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>())
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(
-                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
-                        std::move(element_filter),
-                        std::move(intersection_filter));
+    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda);
+    return this->append(f, element_filter, intersection_filter);
   }
 
   ThisType&
@@ -350,10 +303,10 @@ public:
          std::function<bool(const GL&, const ElementType&)> element_filter,
          std::function<bool(const GL&, const IntersectionType&)> intersection_filter)
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(
-                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
-                        new ApplyOn::LambdaFilteredElements<GL>(element_filter),
-                        new ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
+    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda);
+    return this->append(f,
+                        ApplyOn::LambdaFilteredElements<GL>(element_filter),
+                        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
   }
 
   /**
@@ -368,13 +321,13 @@ public:
    * \sa   WalkerWrapper
    */
   ThisType& append(Walker<GL>& other_walker,
-                   ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>(),
-                   IntersectionFilter<GL>*&& intersection_filter = new ApplyOn::AllIntersections<GL>())
+                   const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>(),
+                   const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>())
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
     element_and_intersection_functor_wrappers_->emplace_back(
-        new internal::WalkerWrapper<GL>(other_walker, std::move(element_filter), std::move(intersection_filter)));
+        new internal::WalkerWrapper<GL>(other_walker, element_filter, intersection_filter));
     return *this;
   }
 
@@ -384,13 +337,13 @@ public:
    * \sa   WalkerWrapper
    */
   ThisType& append(Walker<GL>& other_walker,
-                   IntersectionFilter<GL>*&& intersection_filter,
-                   ElementFilter<GL>*&& element_filter = new ApplyOn::AllElements<GL>())
+                   const IntersectionFilter<GL>& intersection_filter,
+                   const ElementFilter<GL>& element_filter = new ApplyOn::AllElements<GL>())
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
     element_and_intersection_functor_wrappers_->emplace_back(
-        new internal::WalkerWrapper<GL>(other_walker, std::move(element_filter), std::move(intersection_filter)));
+        new internal::WalkerWrapper<GL>(other_walker, element_filter, intersection_filter));
     return *this;
   }
 
@@ -407,8 +360,8 @@ public:
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
     element_and_intersection_functor_wrappers_->emplace_back(
         new internal::WalkerWrapper<GL>(other_walker,
-                                        new ApplyOn::LambdaFilteredElements<GL>(element_filter),
-                                        new ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
+                                        ApplyOn::LambdaFilteredElements<GL>(element_filter),
+                                        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
     return *this;
   }
 
@@ -505,6 +458,13 @@ public:
     intersection_functor_wrappers_->clear();
     element_and_intersection_functor_wrappers_->clear();
   }
+
+  BaseType* copy() override
+  {
+    DUNE_THROW(NotImplemented, "");
+    return nullptr;
+  }
+
 
 #if HAVE_TBB
 protected:

@@ -91,8 +91,8 @@ struct GridWalkerTest : public ::testing::Test
     auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
     auto all_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
 
-    auto on_filter_boundaries = new ApplyOn::LambdaFilteredIntersections<GridLayerType>(boundaries);
-    auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridLayerType>();
+    ApplyOn::LambdaFilteredIntersections<GridLayerType> on_filter_boundaries{boundaries};
+    ApplyOn::BoundaryIntersections<GridLayerType> on_all_boundaries{};
     walker.append(filter_counter, on_filter_boundaries);
     walker.append(all_counter, on_all_boundaries);
     walker.walk();
@@ -114,9 +114,9 @@ struct GridWalkerTest : public ::testing::Test
       inner_count += e.partitionType == Dune::PartitionType::InteriorEntity;
     };
 
-    auto on_interior_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
-    auto on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
-    auto on_all = new ApplyOn::AllElements<GridLayerType>();
+    ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior> on_interior_partitionset{};
+    ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All> on_all_partitionset{};
+    ApplyOn::AllElements<GridLayerType> on_all{};
     walker.append(filter_counter, on_all_partitionset);
     walker.append(inner_filter_counter, on_interior_partitionset);
     walker.append(all_counter, on_all);
@@ -154,8 +154,8 @@ struct GridWalkerTest : public ::testing::Test
     const auto info = make_alldirichlet_boundaryinfo(gv);
     BoundaryDetectorFunctor<GridLayerType> detector(*info, new DirichletBoundary());
 
-    auto on_filter_boundaries = new ApplyOn::LambdaFilteredIntersections<GridLayerType>(boundaries);
-    auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridLayerType>();
+    ApplyOn::LambdaFilteredIntersections<GridLayerType> on_filter_boundaries(boundaries);
+    ApplyOn::BoundaryIntersections<GridLayerType> on_all_boundaries;
     walker.append(filter_counter, on_filter_boundaries);
     walker.walk(false);
     walker.clear();
