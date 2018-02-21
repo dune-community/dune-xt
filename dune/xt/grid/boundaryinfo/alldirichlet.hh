@@ -75,6 +75,13 @@ make_alldirichlet_boundaryinfo(const Common::Configuration& /*cfg*/ = Common::Co
   return XT::Common::make_unique<AllDirichletBoundaryInfo<I>>();
 }
 
+template <class GV>
+std::unique_ptr<AllDirichletBoundaryInfo<extract_intersection_t<GV>>>
+make_alldirichlet_boundaryinfo(GV, const Common::Configuration& /*cfg*/ = Common::Configuration())
+{
+  return XT::Common::make_unique<AllDirichletBoundaryInfo<extract_intersection_t<GV>>>();
+}
+
 template <class IntersectionImp>
 class ProcessBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
