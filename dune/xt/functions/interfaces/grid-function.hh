@@ -124,7 +124,7 @@ public:
     return "localizable_function";
   }
 
-  virtual std::string name() const
+  virtual const std::string& name() const
   {
     return "localizable_function";
   }
