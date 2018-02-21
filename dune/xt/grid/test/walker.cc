@@ -61,6 +61,7 @@ struct GridWalkerTest : public ::testing::Test
     auto test3 = [&] { walker.append(counter).walk(true); };
     list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
+    // exadune guard for SeedListPartitioning
     auto test0 = [&] {
       const auto& set = gv.grid().leafIndexSet();
       IndexSetPartitioner<GridLayerType> partitioner(set);
@@ -75,7 +76,7 @@ struct GridWalkerTest : public ::testing::Test
     for (const auto& test : tests) {
       count = 0;
       test();
-      EXPECT_EQ(count, correct_size);
+      EXPECT_EQ(correct_size, count);
     }
   }
 
