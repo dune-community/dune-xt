@@ -55,6 +55,11 @@ public:
     finalize_lambda_();
   }
 
+  BaseType* copy() override
+  {
+    return new ElementLambdaFunctor<GL>(*this);
+  }
+
 private:
   const ApplyLambdaType apply_lambda_;
   const PrepareLambdaType prepare_lambda_;
@@ -100,6 +105,11 @@ public:
   void finalize() override final
   {
     finalize_lambda_();
+  }
+
+  BaseType* copy() override
+  {
+    return new IntersectionLambdaFunctor(*this);
   }
 
 private:
@@ -155,6 +165,11 @@ public:
   void finalize() override final
   {
     finalize_lambda_();
+  }
+
+  BaseType* copy() override
+  {
+    return new ElementAndIntersectionLambdaFunctor<GL>(*this);
   }
 
 private:

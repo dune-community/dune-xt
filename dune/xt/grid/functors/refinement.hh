@@ -41,6 +41,11 @@ struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
       grid_.mark(1, element);
   }
 
+  ElementFunctor<GridViewType>* copy() override
+  {
+    return new MaximumEntityVolumeRefineFunctor<GridViewType>(*this);
+  }
+
   const double threshold_volume_;
   GridType& grid_;
 };

@@ -137,6 +137,11 @@ public:
     file_.flush();
   }
 
+  BaseType* copy() override
+  {
+    return new PgfEntityFunctorIntersections<GridViewType>(*this);
+  }
+
   void maybePrintEntityIndex(const typename BaseType::ElementType& entity, const int idx)
   {
     if (!print_entityIndex_)
@@ -205,6 +210,12 @@ public:
     this->file_ << buffer;
     this->file_.flush();
   }
+
+  ElementAndIntersectionFunctor<GridViewType>* copy() override
+  {
+    return new PgfEntityFunctorIntersectionsWithShift<GridViewType>(*this);
+  }
+
 
 private:
   const int level_;

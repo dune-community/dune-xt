@@ -139,6 +139,11 @@ struct Dimensions
           coord_limits_[k](corner[k]);
       }
     } // ()
+
+    ElementFunctor<GridLayerType>* copy() override
+    {
+      return new GridDimensionsFunctor(*this);
+    }
   };
 
   double volume_relation() const

@@ -72,6 +72,11 @@ public:
     return found_;
   }
 
+  BaseType* copy() override
+  {
+    return new BoundaryDetectorFunctor<GL>(*this);
+  }
+
 private:
   const BoundaryInfo<IntersectionType>& boundary_info_;
   const std::shared_ptr<BoundaryType> boundary_type_;

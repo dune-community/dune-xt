@@ -48,6 +48,11 @@ struct MinMaxCoordinateFunctor : public ElementFunctor<GridViewType>
     }
   }
 
+  ElementFunctor<GridViewType>* copy() override
+  {
+    return new MinMaxCoordinateFunctor<GridViewType>(*this);
+  }
+
   VectorType minima_;
   VectorType maxima_;
 };
