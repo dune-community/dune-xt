@@ -31,6 +31,7 @@
 #include <dune/xt/grid/parallel/partitioning/ranged.hh>
 #endif
 #include <dune/xt/common/parallel/threadmanager.hh>
+#include <dune/xt/common/parallel/threadstorage.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/timedlogging.hh>
@@ -74,8 +75,8 @@ public:
 #ifndef DXT_DISABLE_WARNINGS
     // Warn if there are functors left, since we assume someone forgot to walk()!
     if (!user_decided_agains_clearing_of_functors_
-        && element_functor_wrappers_.size() + intersection_functor_wrappers_.size()
-                   + element_and_intersection_functor_wrappers_.size()
+        && element_functor_wrappers_->size() + intersection_functor_wrappers_->size()
+                   + element_and_intersection_functor_wrappers_->size()
                > 0) {
       Common::TimedLogger().get("dune.xt.grid.walker").warn()
           << "[warning when descructing Walker] there are still uncleared functors, which indicates that you forgot to "
@@ -104,20 +105,20 @@ public:
 
   ThisType& append(ElementFunctor<GL>& functor, ElementFilter<GL>*&& filter = new ApplyOn::AllElements<GL>())
   {
-    element_functor_wrappers_.emplace_back(new internal::ElementFunctorWrapper<GL>(functor, std::move(filter)));
+    element_functor_wrappers_->emplace_back(new internal::ElementFunctorWrapper<GL>(functor, std::move(filter)));
     return *this;
   }
 
   ThisType& append(ElementFunctor<GL>& functor, std::function<bool(const GL&, const ElementType&)> element_filter)
   {
-    element_functor_wrappers_.emplace_back(
+    element_functor_wrappers_->emplace_back(
         new internal::ElementFunctorWrapper<GL>(functor, new ApplyOn::LambdaFilteredElements<GL>(element_filter)));
     return *this;
   }
 
   ThisType& append(ElementFunctor<GL>*&& functor, ElementFilter<GL>*&& filter)
   {
-    element_functor_wrappers_.emplace_back(
+    element_functor_wrappers_->emplace_back(
         new internal::ElementFunctorWrapper<GL>(std::move(functor), std::move(filter)));
     return *this;
   }
@@ -166,21 +167,21 @@ public:
   ThisType& append(IntersectionFunctor<GL>& functor,
                    IntersectionFilter<GL>*&& filter = new ApplyOn::AllIntersections<GL>())
   {
-    intersection_functor_wrappers_.emplace_back(
+    intersection_functor_wrappers_->emplace_back(
         new internal::IntersectionFunctorWrapper<GL>(functor, std::move(filter)));
     return *this;
   }
 
   ThisType& append(IntersectionFunctor<GL>& functor, std::function<bool(const GL&, const IntersectionType&)> filter)
   {
-    intersection_functor_wrappers_.emplace_back(
+    intersection_functor_wrappers_->emplace_back(
         new internal::IntersectionFunctorWrapper<GL>(functor, new ApplyOn::LambdaFilteredIntersections<GL>(filter)));
     return *this;
   }
 
   ThisType& append(IntersectionFunctor<GL>*&& functor, IntersectionFilter<GL>*&& filter)
   {
-    intersection_functor_wrappers_.emplace_back(
+    intersection_functor_wrappers_->emplace_back(
         new internal::IntersectionFunctorWrapper<GL>(std::move(functor), std::move(filter)));
     return *this;
   }
@@ -234,7 +235,7 @@ public:
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_.emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
+    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
         functor, std::move(element_filter), std::move(intersection_filter)));
     return *this;
   }
@@ -245,7 +246,7 @@ public:
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_.emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
+    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
         functor, std::move(element_filter), std::move(intersection_filter)));
     return *this;
   }
@@ -256,7 +257,7 @@ public:
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_.emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
+    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
         functor,
         new ApplyOn::LambdaFilteredElements<GL>(element_filter),
         new ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
@@ -269,7 +270,7 @@ public:
   {
     if (functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_.emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
+    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
         std::move(functor), std::move(element_filter), std::move(intersection_filter)));
     return *this;
   }
@@ -372,7 +373,7 @@ public:
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_.emplace_back(
+    element_and_intersection_functor_wrappers_->emplace_back(
         new internal::WalkerWrapper<GL>(other_walker, std::move(element_filter), std::move(intersection_filter)));
     return *this;
   }
@@ -388,7 +389,7 @@ public:
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_.emplace_back(
+    element_and_intersection_functor_wrappers_->emplace_back(
         new internal::WalkerWrapper<GL>(other_walker, std::move(element_filter), std::move(intersection_filter)));
     return *this;
   }
@@ -404,7 +405,7 @@ public:
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_.emplace_back(
+    element_and_intersection_functor_wrappers_->emplace_back(
         new internal::WalkerWrapper<GL>(other_walker,
                                         new ApplyOn::LambdaFilteredElements<GL>(element_filter),
                                         new ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
@@ -419,21 +420,21 @@ public:
 
   virtual void prepare() override
   {
-    for (auto& wraper : element_functor_wrappers_)
+    for (auto& wraper : *element_functor_wrappers_)
       wraper->functor().prepare();
-    for (auto& wraper : intersection_functor_wrappers_)
+    for (auto& wraper : *intersection_functor_wrappers_)
       wraper->functor().prepare();
-    for (auto& wraper : element_and_intersection_functor_wrappers_)
+    for (auto& wraper : *element_and_intersection_functor_wrappers_)
       wraper->functor().prepare();
   } // ... prepare()
 
   virtual void apply_local(const ElementType& element) override
   {
-    for (auto& wraper : element_functor_wrappers_) {
+    for (auto& wraper : *element_functor_wrappers_) {
       if (wraper->filter().contains(grid_view_, element))
         wraper->functor().apply_local(element);
     }
-    for (auto& wraper : element_and_intersection_functor_wrappers_) {
+    for (auto& wraper : *element_and_intersection_functor_wrappers_) {
       if (wraper->element_filter().contains(grid_view_, element))
         wraper->functor().apply_local(element);
     }
@@ -443,11 +444,11 @@ public:
                            const ElementType& inside_element,
                            const ElementType& outside_element) override
   {
-    for (auto& wraper : intersection_functor_wrappers_) {
+    for (auto& wraper : *intersection_functor_wrappers_) {
       if (wraper->filter().contains(grid_view_, intersection))
         wraper->functor().apply_local(intersection, inside_element, outside_element);
     }
-    for (auto& wraper : element_and_intersection_functor_wrappers_) {
+    for (auto& wraper : *element_and_intersection_functor_wrappers_) {
       if (wraper->intersection_filter().contains(grid_view_, intersection))
         wraper->functor().apply_local(intersection, inside_element, outside_element);
     }
@@ -455,11 +456,11 @@ public:
 
   virtual void finalize() override
   {
-    for (auto& wraper : element_functor_wrappers_)
+    for (auto& wraper : *element_functor_wrappers_)
       wraper->functor().finalize();
-    for (auto& wraper : intersection_functor_wrappers_)
+    for (auto& wraper : *intersection_functor_wrappers_)
       wraper->functor().finalize();
-    for (auto& wraper : element_and_intersection_functor_wrappers_)
+    for (auto& wraper : *element_and_intersection_functor_wrappers_)
       wraper->functor().finalize();
   } // ... finalize()
 
@@ -485,8 +486,8 @@ public:
     prepare();
 
     // only do something, if we have to
-    if ((element_functor_wrappers_.size() + intersection_functor_wrappers_.size()
-         + element_and_intersection_functor_wrappers_.size())
+    if ((element_functor_wrappers_->size() + intersection_functor_wrappers_->size()
+         + element_and_intersection_functor_wrappers_->size())
         > 0) {
       walk_range(elements(grid_view_));
     } // only do something, if we have to
@@ -500,9 +501,9 @@ public:
 
   void clear()
   {
-    element_functor_wrappers_.clear();
-    intersection_functor_wrappers_.clear();
-    element_and_intersection_functor_wrappers_.clear();
+    element_functor_wrappers_->clear();
+    intersection_functor_wrappers_->clear();
+    element_and_intersection_functor_wrappers_->clear();
   }
 
 #if HAVE_TBB
@@ -548,8 +549,8 @@ public:
     prepare();
 
     // only do something, if we have to
-    if ((element_functor_wrappers_.size() + intersection_functor_wrappers_.size()
-         + element_and_intersection_functor_wrappers_.size())
+    if ((element_functor_wrappers_->size() + intersection_functor_wrappers_->size()
+         + element_and_intersection_functor_wrappers_->size())
         > 0) {
       tbb::blocked_range<std::size_t> range(0, partitioning.partitions());
       Body<PartioningType, ThisType> body(*this, partitioning);
@@ -597,7 +598,7 @@ protected:
       apply_local(element);
 
       // only walk the intersections, if there are codim1 functors present
-      if ((intersection_functor_wrappers_.size() + element_and_intersection_functor_wrappers_.size()) > 0) {
+      if ((intersection_functor_wrappers_->size() + element_and_intersection_functor_wrappers_->size()) > 0) {
         // Do not use intersections(...) here, since that does not work for a SubdomainGridPart which is based on
         // alugrid and then wrapped as a grid view (see also https://github.com/dune-community/dune-xt-grid/issues/26)
         const auto intersection_it_end = grid_view_.iend(element);
@@ -618,9 +619,11 @@ protected:
 
   GridViewType grid_view_;
   bool user_decided_agains_clearing_of_functors_;
-  std::list<std::shared_ptr<internal::ElementFunctorWrapper<GridViewType>>> element_functor_wrappers_;
-  std::list<std::shared_ptr<internal::IntersectionFunctorWrapper<GridViewType>>> intersection_functor_wrappers_;
-  std::list<std::shared_ptr<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>>
+  Common::PerThreadValue<std::list<std::shared_ptr<internal::ElementFunctorWrapper<GridViewType>>>>
+      element_functor_wrappers_;
+  Common::PerThreadValue<std::list<std::shared_ptr<internal::IntersectionFunctorWrapper<GridViewType>>>>
+      intersection_functor_wrappers_;
+  Common::PerThreadValue<std::list<std::shared_ptr<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>>>
       element_and_intersection_functor_wrappers_;
 }; // class Walker
 
