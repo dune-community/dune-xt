@@ -19,6 +19,7 @@
 #include <dune/xt/common/parallel/partitioner.hh>
 
 #include <dune/xt/grid/gridprovider/cube.hh>
+#include <dune/xt/grid/functors/boundary-detector.hh>
 #include <dune/xt/grid/walker.hh>
 
 
@@ -126,14 +127,12 @@ struct GridWalkerTest : public ::testing::Test
 
   void check_partitioning()
   {
-      const auto gv = grid_prv.grid().leafGridView();
+    const auto gv = grid_prv.grid().leafGridView();
     Walker<GridLayerType> walker(gv);
 
     size_t all_count = 0, inner_count = 0;
     auto all_set_counter = [&](...) { all_count++; };
-    auto inner_set_counter = [&](...) {
-      inner_count++;
-    };
+    auto inner_set_counter = [&](...) { inner_count++; };
     auto on_interior_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
     auto on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
     walker.append(inner_set_counter, on_interior_partitionset);
@@ -142,15 +141,35 @@ struct GridWalkerTest : public ::testing::Test
 
     Dune::XT::Grid::RangedPartitioning<GridLayerType, 0, Dune::Interior_Partition> interior_part(gv, 1);
     Dune::XT::Grid::RangedPartitioning<GridLayerType, 0, Dune::All_Partition> all_part(gv, 1);
+  }
 
+  void check_boundaries()
+  {
+    const auto gv = grid_prv.grid().leafGridView();
+    Walker<GridLayerType> walker(gv);
 
+    size_t filter_count = 0;
+    auto boundaries = [=](const GridLayerType&, const IntersectionType& inter) { return inter.boundary(); };
+    auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
+    const auto info = make_alldirichlet_boundaryinfo(gv);
+    BoundaryDetectorFunctor<GridLayerType> detector(*info, new DirichletBoundary());
+
+    auto on_filter_boundaries = new ApplyOn::LambdaFilteredIntersections<GridLayerType>(boundaries);
+    auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridLayerType>();
+    walker.append(filter_counter, on_filter_boundaries);
+    walker.walk(false);
+    walker.clear();
+    walker.append(detector, on_all_boundaries);
+    walker.walk(true);
+    EXPECT_EQ(detector.result(), filter_count);
   }
 };
 
 TYPED_TEST_CASE(GridWalkerTest, GridDims);
 TYPED_TEST(GridWalkerTest, Misc)
 {
-  this->check_count();
+  //  this->check_count();
   this->check_apply_on();
+  this->check_boundaries();
   this->check_partitioning();
 }

@@ -133,6 +133,7 @@ struct is_view<T, true> : public std::is_base_of<Dune::GridView<typename T::Trai
 {
 };
 
+template <class T>
 struct is_dd_subdomain : public std::false_type
 {
 };
@@ -401,20 +402,20 @@ using extract_geometry_t = typename extract_geometry<T, codim>::type;
 
 template <class T,
           int c = 0,
-    PartitionIteratorType pit = All_Partition,
+          PartitionIteratorType pit = All_Partition,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
 struct extract_iterator : public AlwaysFalse<T>
 {
 };
 
-template <class T, int c, PartitionIteratorType pit >
+template <class T, int c, PartitionIteratorType pit>
 struct extract_iterator<T, c, pit, true, false>
 {
   typedef typename T::template Codim<c>::template Partition<pit>::Iterator type;
 };
 
-template <class T, int c, PartitionIteratorType pit >
+template <class T, int c, PartitionIteratorType pit>
 struct extract_iterator<T, c, pit, false, true>
 {
   typedef typename T::template Codim<c>::template Partition<pit>::IteratorType type;
