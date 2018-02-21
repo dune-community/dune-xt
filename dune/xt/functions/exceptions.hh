@@ -12,6 +12,7 @@
 #define DUNE_XT_FUNCTIONS_EXCEPTIONS_HH
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/grid/exceptions.hh>
 
 namespace Dune {
 namespace XT {
@@ -23,7 +24,7 @@ class wrong_input_given : public Common::Exceptions::wrong_input_given
 {
 };
 
-class this_function_is_not_bound_to_an_element_yet : public Dune::InvalidStateException
+class this_function_is_not_bound_to_an_element_yet : public Grid::Exceptions::not_bound_to_an_element_error
 {
 };
 
