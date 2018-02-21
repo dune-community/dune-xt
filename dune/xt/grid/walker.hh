@@ -420,23 +420,23 @@ public:
 
   virtual void prepare() override
   {
-    for (auto& wraper : *element_functor_wrappers_)
-      wraper->functor().prepare();
-    for (auto& wraper : *intersection_functor_wrappers_)
-      wraper->functor().prepare();
-    for (auto& wraper : *element_and_intersection_functor_wrappers_)
-      wraper->functor().prepare();
+    for (auto&& wrapper : *element_functor_wrappers_)
+      wrapper->functor().prepare();
+    for (auto&& wrapper : *intersection_functor_wrappers_)
+      wrapper->functor().prepare();
+    for (auto&& wrapper : *element_and_intersection_functor_wrappers_)
+      wrapper->functor().prepare();
   } // ... prepare()
 
   virtual void apply_local(const ElementType& element) override
   {
-    for (auto& wraper : *element_functor_wrappers_) {
-      if (wraper->filter().contains(grid_view_, element))
-        wraper->functor().apply_local(element);
+    for (auto&& wrapper : *element_functor_wrappers_) {
+      if (wrapper->filter().contains(grid_view_, element))
+        wrapper->functor().apply_local(element);
     }
-    for (auto& wraper : *element_and_intersection_functor_wrappers_) {
-      if (wraper->element_filter().contains(grid_view_, element))
-        wraper->functor().apply_local(element);
+    for (auto&& wrapper : *element_and_intersection_functor_wrappers_) {
+      if (wrapper->element_filter().contains(grid_view_, element))
+        wrapper->functor().apply_local(element);
     }
   } // ... apply_local(...)
 
@@ -444,24 +444,24 @@ public:
                            const ElementType& inside_element,
                            const ElementType& outside_element) override
   {
-    for (auto& wraper : *intersection_functor_wrappers_) {
-      if (wraper->filter().contains(grid_view_, intersection))
-        wraper->functor().apply_local(intersection, inside_element, outside_element);
+    for (auto&& wrapper : *intersection_functor_wrappers_) {
+      if (wrapper->filter().contains(grid_view_, intersection))
+        wrapper->functor().apply_local(intersection, inside_element, outside_element);
     }
-    for (auto& wraper : *element_and_intersection_functor_wrappers_) {
-      if (wraper->intersection_filter().contains(grid_view_, intersection))
-        wraper->functor().apply_local(intersection, inside_element, outside_element);
+    for (auto&& wrapper : *element_and_intersection_functor_wrappers_) {
+      if (wrapper->intersection_filter().contains(grid_view_, intersection))
+        wrapper->functor().apply_local(intersection, inside_element, outside_element);
     }
   } // ... apply_local(...)
 
   virtual void finalize() override
   {
-    for (auto& wraper : *element_functor_wrappers_)
-      wraper->functor().finalize();
-    for (auto& wraper : *intersection_functor_wrappers_)
-      wraper->functor().finalize();
-    for (auto& wraper : *element_and_intersection_functor_wrappers_)
-      wraper->functor().finalize();
+    for (auto&& wrapper : *element_functor_wrappers_)
+      wrapper->functor().finalize();
+    for (auto&& wrapper : *intersection_functor_wrappers_)
+      wrapper->functor().finalize();
+    for (auto&& wrapper : *element_and_intersection_functor_wrappers_)
+      wrapper->functor().finalize();
   } // ... finalize()
 
   /**
