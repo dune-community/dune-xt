@@ -16,6 +16,7 @@
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/type_traits.hh>
 
+
 namespace Dune {
 namespace XT {
 namespace Grid {
@@ -30,10 +31,15 @@ class ElementFunctor
 {
   static_assert(is_layer<GL>::value, "");
 
+protected:
+  //! force implementors to use copy() method
+  ElementFunctor(const ElementFunctor<GL>&) = default;
+
 public:
   using GridViewType = GL;
   using ElementType = extract_entity_t<GridViewType>;
 
+  ElementFunctor() = default;
   virtual ~ElementFunctor() = default;
 
   virtual void prepare()
@@ -45,6 +51,8 @@ public:
   virtual void finalize()
   {
   }
+
+  virtual ElementFunctor<GridViewType>* copy() = 0;
 }; // class ElementFunctor
 
 
@@ -57,11 +65,16 @@ class IntersectionFunctor
 {
   static_assert(is_layer<GL>::value, "");
 
+protected:
+  //! force implementors to use copy() method
+  IntersectionFunctor(const IntersectionFunctor<GL>&) = default;
+
 public:
   using GridViewType = GL;
   using ElementType = extract_entity_t<GridViewType>;
   using IntersectionType = extract_intersection_t<GridViewType>;
 
+  IntersectionFunctor() = default;
   virtual ~IntersectionFunctor() = default;
 
   virtual void prepare()
@@ -79,6 +92,8 @@ public:
   virtual void finalize()
   {
   }
+
+  virtual IntersectionFunctor<GridViewType>* copy() = 0;
 }; // class IntersectionFunctor
 
 /**
@@ -91,11 +106,16 @@ class ElementAndIntersectionFunctor
 {
   static_assert(is_layer<GL>::value, "");
 
+protected:
+  //! force implementors to use copy() method
+  ElementAndIntersectionFunctor(const ElementAndIntersectionFunctor<GL>&) = default;
+
 public:
   using GridViewType = GL;
   using ElementType = extract_entity_t<GridViewType>;
   using IntersectionType = extract_intersection_t<GridViewType>;
 
+  ElementAndIntersectionFunctor() = default;
   virtual ~ElementAndIntersectionFunctor() = default;
 
   virtual void prepare()
@@ -111,6 +131,8 @@ public:
   virtual void finalize()
   {
   }
+
+  virtual ElementAndIntersectionFunctor<GL>* copy() = 0;
 }; // class ElementAndIntersectionFunctor
 
 
