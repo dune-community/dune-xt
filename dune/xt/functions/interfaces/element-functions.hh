@@ -35,6 +35,7 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+
 /**
  * \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Element.
  *
@@ -66,25 +67,46 @@ public:
   static const constexpr size_t rC = dimRangeCols;
 
   using DomainType = Dune::FieldVector<D, d>;
-  using RangeType = typename RangeTypeSelector<R, r, rC>::type;
-  using DerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::type;
-  using SingleDerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::single_type;
 
-  using DynamicRangeType = typename RangeTypeSelector<R, r, rC>::dynamic_type;
-  using DynamicDerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::dynamic_type;
+  using RangeSelector = RangeTypeSelector<R, r, rC>;
+  using DerivativeRangeSelector = DerivativeRangeTypeSelector<d, R, r, rC>;
 
-  ElementFunctionSetInterface()
-    : element_(nullptr)
+  /**
+   * \name ``These types are the _standard_ types to be used.''
+   * \{
+   */
+
+  using RangeType = typename RangeSelector::type;
+  using DerivativeRangeType = typename DerivativeRangeSelector::type;
+  using SingleDerivativeRangeType = typename DerivativeRangeSelector::single_type;
+
+  /**
+   * \}
+   * \name ``These types are used for large dimensions.''
+   * \{
+   */
+
+  using DynamicRangeType = typename RangeSelector::dynamic_type;
+  using DynamicDerivativeRangeType = typename DerivativeRangeSelector::dynamic_type;
+
+  /// \}
+
+
+  ElementFunctionSetInterface(const XT::Common::ParameterType& param_type = {})
+    : Common::ParametricInterface(param_type)
+    , element_(nullptr)
   {
   }
 
-  ElementFunctionSetInterface(const ElementType& ele)
-    : element_(new ElementType(ele))
+  ElementFunctionSetInterface(const ElementType& ele, const XT::Common::ParameterType& param_type = {})
+    : Common::ParametricInterface(param_type)
+    , element_(new ElementType(ele))
   {
   }
 
-  ElementFunctionSetInterface(ElementType&& ele)
-    : element_(new ElementType(ele))
+  ElementFunctionSetInterface(ElementType&& ele, const XT::Common::ParameterType& param_type = {})
+    : Common::ParametricInterface(param_type)
+    , element_(new ElementType(ele))
   {
   }
 
@@ -225,9 +247,9 @@ public:
    **/
 
   virtual void evaluate(const DomainType& point_in_reference_element,
-                        const size_t row,
-                        const size_t col,
                         std::vector<R>& result,
+                        const size_t row,
+                        const size_t col = 0,
                         const Common::Parameter& param = {}) const
   {
     assert_correct_dims(row, col, "evaluate");
@@ -238,9 +260,9 @@ public:
   }
 
   virtual void jacobians(const DomainType& point_in_reference_element,
-                         const size_t row,
-                         const size_t col,
                          std::vector<SingleDerivativeRangeType>& result,
+                         const size_t row,
+                         const size_t col = 0,
                          const Common::Parameter& param = {}) const
   {
     assert_correct_dims(row, col, "jacobians");
@@ -252,9 +274,9 @@ public:
 
   virtual void derivatives(const std::array<size_t, d>& alpha,
                            const DomainType& point_in_reference_element,
-                           const size_t row,
-                           const size_t col,
                            std::vector<SingleDerivativeRangeType>& result,
+                           const size_t row,
+                           const size_t col = 0,
                            const Common::Parameter& param = {}) const
   {
     assert_correct_dims(row, col, "derivatives");
@@ -280,13 +302,13 @@ public:
     if (result.size() < sz)
       result.resize(sz);
     for (size_t ii = 0; ii < sz; ++ii)
-      RangeTypeSelector<R, r, rC>::ensure_size(result[ii]);
+      RangeSelector::ensure_size(result[ii]);
     // call actual evaluate
     auto tmp_result = std::make_unique<std::vector<RangeType>>(sz);
     this->evaluate(point_in_reference_element, *tmp_result, param);
     // convert
     for (size_t ii = 0; ii < sz; ++ii)
-      RangeTypeSelector<R, r, rC>::convert((*tmp_result)[ii], result[ii]);
+      RangeSelector::convert((*tmp_result)[ii], result[ii]);
   } // ... evaluate(...)
 
   virtual void jacobians(const DomainType& point_in_reference_element,
@@ -298,13 +320,13 @@ public:
     if (result.size() < sz)
       result.resize(sz);
     for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeTypeSelector<d, R, r, rC>::ensure_size(result[ii]);
+      DerivativeRangeSelector::ensure_size(result[ii]);
     // call actual jacobians
     auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(sz);
     this->jacobians(point_in_reference_element, *tmp_result, param);
     // convert
     for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeTypeSelector<d, R, r, rC>::convert((*tmp_result)[ii], result[ii]);
+      DerivativeRangeSelector::convert((*tmp_result)[ii], result[ii]);
   } // ... jacobians(...)
 
   virtual void derivatives(const std::array<size_t, d>& alpha,
@@ -317,13 +339,13 @@ public:
     if (result.size() < sz)
       result.resize(sz);
     for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeTypeSelector<d, R, r, rC>::ensure_size(result[ii]);
+      DerivativeRangeSelector::ensure_size(result[ii]);
     // call actual derivatives
     auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(sz);
     this->derivatives(alpha, point_in_reference_element, *tmp_result, param);
     // convert
     for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeTypeSelector<d, R, r, rC>::convert((*tmp_result)[ii], result[ii]);
+      DerivativeRangeSelector::convert((*tmp_result)[ii], result[ii]);
   } // ... derivatives(...)
 
   /**
@@ -372,7 +394,7 @@ private:
   struct single_evaluate_helper
   {
     template <class FullType, class SingleType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<SingleType>& ret)
+    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<R>& ret)
     {
       for (size_t ii = 0; ii < val.size(); ++ii)
         ret[ii] = val[ii][row][col];
@@ -432,25 +454,52 @@ public:
   using BaseType::rC;
   using typename BaseType::R;
   using typename BaseType::DomainType;
+  using typename BaseType::ElementType;
+
+  using typename BaseType::RangeSelector;
+  using typename BaseType::DerivativeRangeSelector;
+
+  /**
+   * \name ``These types are the _standard_ types used by the LocalFunctionSetInterface.''
+   * \{
+   */
+
   using typename BaseType::RangeType;
   using typename BaseType::DerivativeRangeType;
   using typename BaseType::SingleDerivativeRangeType;
+
+  /**
+   * \}
+   * \name ``These types are used by the LocalFunctionSetInterface for large dimensions.''
+   * \{
+   */
+
   using typename BaseType::DynamicRangeType;
   using typename BaseType::DynamicDerivativeRangeType;
-  using typename BaseType::ElementType;
 
-  ElementFunctionInterface()
-    : BaseType()
+  /**
+   * \name ``These types are the _standard_ types to be used for LocalFunctionInterface.''
+   * \{
+   */
+
+  using RangeReturnType = typename RangeSelector::return_type;
+  using DerivativeRangeReturnType = typename DerivativeRangeSelector::return_type;
+  using SingleDerivativeRangeReturnType = typename DerivativeRangeSelector::return_single_type;
+
+  /// \}
+
+  ElementFunctionInterface(const XT::Common::ParameterType& param_type = {})
+    : BaseType(param_type)
   {
   }
 
-  ElementFunctionInterface(const ElementType& ele)
-    : BaseType(ele)
+  ElementFunctionInterface(const ElementType& ele, const XT::Common::ParameterType& param_type = {})
+    : BaseType(ele, param_type)
   {
   }
 
-  ElementFunctionInterface(ElementType&& ele)
-    : BaseType(ele)
+  ElementFunctionInterface(ElementType&& ele, const XT::Common::ParameterType& param_type = {})
+    : BaseType(ele, param_type)
   {
   }
 
@@ -470,21 +519,21 @@ public:
    * \{
    **/
 
-  virtual RangeType evaluate(const DomainType& /*point_in_reference_element*/,
-                             const Common::Parameter& /*param*/ = {}) const
+  virtual RangeReturnType evaluate(const DomainType& /*point_in_reference_element*/,
+                                   const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "This local function does not provide evaluations, override the 'evaluate' method!");
   }
 
-  virtual DerivativeRangeType jacobian(const DomainType& /*point_in_reference_element*/,
-                                       const Common::Parameter& /*param*/ = {}) const
+  virtual DerivativeRangeReturnType jacobian(const DomainType& /*point_in_reference_element*/,
+                                             const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "This local function does not provide a jacobian, override the 'jacobian' method!");
   }
 
-  virtual DerivativeRangeType derivative(const std::array<size_t, d>& /*alpha*/,
-                                         const DomainType& /*point_in_reference_element*/,
-                                         const Common::Parameter& /*param*/ = {}) const
+  virtual DerivativeRangeReturnType derivative(const std::array<size_t, d>& /*alpha*/,
+                                               const DomainType& /*point_in_reference_element*/,
+                                               const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
                "This local function does not provide arbitrary derivatives, override the 'derivative' method!");
@@ -499,36 +548,36 @@ public:
 
   virtual R evaluate(const DomainType& point_in_reference_element,
                      const size_t row,
-                     const size_t col,
+                     const size_t col = 0,
                      const Common::Parameter& param = {}) const
   {
-    assert_correct_dims(row, col, "evaluate");
+    this->assert_correct_dims(row, col, "evaluate");
     return single_evaluate_helper<R>::call(this->evaluate(point_in_reference_element, param), row, col);
   }
 
-  virtual SingleDerivativeRangeType jacobian(const DomainType& point_in_reference_element,
-                                             const size_t row,
-                                             const size_t col,
-                                             const Common::Parameter& param = {}) const
+  virtual SingleDerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
+                                                   const size_t row,
+                                                   const size_t col = 0,
+                                                   const Common::Parameter& param = {}) const
   {
-    assert_correct_dims(row, col, "jacobian");
+    this->assert_correct_dims(row, col, "jacobian");
     return single_derivative_helper<SingleDerivativeRangeType>::call(
         this->jacobian(point_in_reference_element, param), row, col);
   }
 
-  virtual SingleDerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                               const DomainType& point_in_reference_element,
-                                               const size_t row,
-                                               const size_t col = 0,
-                                               const Common::Parameter& param = {}) const
+  virtual SingleDerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
+                                                     const DomainType& point_in_reference_element,
+                                                     const size_t row,
+                                                     const size_t col = 0,
+                                                     const Common::Parameter& param = {}) const
   {
-    assert_correct_dims(row, col, "derivative");
+    this->assert_correct_dims(row, col, "derivative");
     return single_derivative_helper<SingleDerivativeRangeType>::call(
         this->derivative(alpha, point_in_reference_element, param), row, col);
   }
 
   /**
-   * \{
+   * \}
    * \name ´´These methods are provided for large dimensions (when RangeType or DerivativeRangeType do not fit on the
    *         stack) and should be overridden to improve their performance.''
    * \{
@@ -539,39 +588,39 @@ public:
                         const Common::Parameter& param = {}) const
   {
     // prepare result
-    RangeTypeSelector<R, r, rC>::ensure_size(result);
+    RangeSelector::ensure_size(result);
     // call actual evaluate
     auto tmp_result = std::make_unique<std::vector<RangeType>>(1);
     this->evaluate(point_in_reference_element, *tmp_result, param);
     // convert
-    RangeTypeSelector<R, r, rC>::convert((*tmp_result)[0], result);
+    RangeSelector::convert((*tmp_result)[0], result);
   } // ... evaluate(...)
 
-  virtual void jacobians(const DomainType& point_in_reference_element,
-                         DynamicDerivativeRangeType& result,
-                         const Common::Parameter& param = {}) const
+  virtual void jacobian(const DomainType& point_in_reference_element,
+                        DynamicDerivativeRangeType& result,
+                        const Common::Parameter& param = {}) const
   {
     // prepare result
-    DerivativeRangeTypeSelector<d, R, r, rC>::ensure_size(result);
+    DerivativeRangeSelector::ensure_size(result);
     // call actual jacobians
     auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(1);
     this->jacobians(point_in_reference_element, *tmp_result, param);
     // convert
-    DerivativeRangeTypeSelector<d, R, r, rC>::convert((*tmp_result)[0], result);
+    DerivativeRangeSelector::convert((*tmp_result)[0], result);
   } // ... jacobians(...)
 
-  virtual void derivatives(const std::array<size_t, d>& alpha,
-                           const DomainType& point_in_reference_element,
-                           DynamicDerivativeRangeType& result,
-                           const Common::Parameter& param = {}) const
+  virtual void derivative(const std::array<size_t, d>& alpha,
+                          const DomainType& point_in_reference_element,
+                          DynamicDerivativeRangeType& result,
+                          const Common::Parameter& param = {}) const
   {
     // prepare result
-    DerivativeRangeTypeSelector<d, R, r, rC>::ensure_size(result);
+    DerivativeRangeSelector::ensure_size(result);
     // call actual derivatives
     auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(1);
     this->derivatives(alpha, point_in_reference_element, *tmp_result, param);
     // convert
-    DerivativeRangeTypeSelector<d, R, r, rC>::convert((*tmp_result)[0], result);
+    DerivativeRangeSelector::convert((*tmp_result)[0], result);
   } // ... derivatives(...)
 
   /**
@@ -580,14 +629,14 @@ public:
    * \{
    **/
 
-  size_t size(const Common::Parameter& /*param*/ = {}) const override final
+  size_t size(const Common::Parameter& /*param*/ = {}) const override
   {
     return 1;
   }
 
   void evaluate(const DomainType& point_in_reference_element,
                 std::vector<RangeType>& result,
-                const Common::Parameter& param = {}) const override final
+                const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);
@@ -596,29 +645,27 @@ public:
 
   void jacobians(const DomainType& point_in_reference_element,
                  std::vector<DerivativeRangeType>& result,
-                 const Common::Parameter& param = {}) const override final
+                 const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);
-    result[0] = jacobian(point_in_reference_element, param);
+    result[0] = this->jacobian(point_in_reference_element, param);
   }
 
   void derivatives(const std::array<size_t, d>& alpha,
                    const DomainType& point_in_reference_element,
                    std::vector<DerivativeRangeType>& result,
-                   const Common::Parameter& param = {}) const override final
+                   const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);
-    result[0] = derivative(alpha, point_in_reference_element, param);
+    result[0] = this->derivative(alpha, point_in_reference_element, param);
   }
 
   /**
    * \}
    **/
 private:
-  using BaseType::assert_correct_dims;
-
   template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
   struct single_evaluate_helper
   {
