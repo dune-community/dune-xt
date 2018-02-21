@@ -11,6 +11,7 @@
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH
 
+#include <memory>
 #include <map>
 
 #include <dune/common/fvector.hh>
@@ -71,10 +72,30 @@ public:
   static const constexpr size_t r = dimRange;
   static const constexpr size_t rC = dimRangeCols;
 
-  using DomainType = FieldVector<D, d>;
-  using RangeType = typename RangeTypeSelector<R, r, rC>::type;
-  using DerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::type;
-  using SingleDerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::single_type;
+  using DomainType = Dune::FieldVector<D, d>;
+
+  using RangeSelector = RangeTypeSelector<R, r, rC>;
+  using DerivativeRangeSelector = DerivativeRangeTypeSelector<d, R, r, rC>;
+
+  /**
+   * \name ``These types are the _standard_ types to be used.''
+   * \{
+   */
+
+  using RangeType = typename RangeSelector::return_type;
+  using DerivativeRangeType = typename DerivativeRangeSelector::return_type;
+  using SingleDerivativeRangeType = typename DerivativeRangeSelector::return_single_type;
+
+  /**
+   * \}
+   * \name ``These types are used for large dimensions.''
+   * \{
+   */
+
+  using DynamicRangeType = typename RangeSelector::dynamic_type;
+  using DynamicDerivativeRangeType = typename DerivativeRangeSelector::dynamic_type;
+
+  /// \}
 
   virtual ~FunctionInterface() = default;
 
@@ -134,19 +155,19 @@ public:
 
   virtual R evaluate(const DomainType& point_in_global_coordinates,
                      const size_t row,
-                     const size_t col,
+                     const size_t col = 0,
                      const Common::Parameter& param = {}) const
   {
-    ensure_correct_dims(row, col, "evaluate");
+    assert_correct_dims(row, col, "evaluate");
     return single_evaluate_helper<R>::call(this->evaluate(point_in_global_coordinates, param), row, col);
   }
 
   virtual SingleDerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
                                              const size_t row,
-                                             const size_t col,
+                                             const size_t col = 0,
                                              const Common::Parameter& param = {}) const
   {
-    ensure_correct_dims(row, col, "jacobian");
+    assert_correct_dims(row, col, "jacobian");
     return single_derivative_helper<SingleDerivativeRangeType>::call(
         this->jacobian(point_in_global_coordinates, param), row, col);
   }
@@ -154,12 +175,44 @@ public:
   virtual SingleDerivativeRangeType derivative(const std::array<size_t, d>& alpha,
                                                const DomainType& point_in_global_coordinates,
                                                const size_t row,
-                                               const size_t col,
+                                               const size_t col = 0,
                                                const Common::Parameter& param = {}) const
   {
-    ensure_correct_dims(row, col, "derivative");
+    assert_correct_dims(row, col, "derivative");
     return single_derivative_helper<SingleDerivativeRangeType>::call(
         this->derivative(alpha, point_in_global_coordinates, param), row, col);
+  }
+
+  /**
+   * \}
+   * \name ´´These methods are provided for large dimensions (when RangeType or DerivativeRangeType do not fit on the
+   *         stack) and should be overridden to improve their performance.''
+   * \{
+   **/
+
+  virtual void evaluate(const DomainType& point_in_reference_element,
+                        DynamicRangeType& result,
+                        const Common::Parameter& param = {}) const
+  {
+    RangeSelector::ensure_size(result);
+    RangeSelector::convert(this->evaluate(point_in_reference_element, param), result);
+  }
+
+  virtual void jacobian(const DomainType& point_in_reference_element,
+                        DynamicDerivativeRangeType& result,
+                        const Common::Parameter& param = {}) const
+  {
+    DerivativeRangeSelector::ensure_size(result);
+    DerivativeRangeSelector::convert(this->jacobian(point_in_reference_element, param), result);
+  }
+
+  virtual void derivative(const std::array<size_t, d>& alpha,
+                          const DomainType& point_in_reference_element,
+                          DynamicDerivativeRangeType& result,
+                          const Common::Parameter& param = {}) const
+  {
+    DerivativeRangeSelector::ensure_size(result);
+    DerivativeRangeSelector::convert(this->derivative(alpha, point_in_reference_element, param), result);
   }
 
   /**
@@ -169,7 +222,7 @@ public:
    **/
 
   /**
-   * \note This function kepps a map of all wrappers in a local static map, to avoid temporaries.
+   * \note This function keeps a map of all wrappers in a local static map, to avoid temporaries.
    * \todo Check if this implementation is thread safe!
    */
   template <class E>
@@ -203,7 +256,7 @@ public:
 
 protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-  static void ensure_correct_dims(const size_t row, const size_t col, const std::string& caller)
+  static void assert_correct_dims(const size_t row, const size_t col, const std::string& caller)
   {
     if (row >= r || col >= rC)
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
@@ -215,7 +268,7 @@ protected:
                        << "!");
   }
 #else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-  static void ensure_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/)
+  static void assert_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/)
   {
   }
 #endif

@@ -79,7 +79,7 @@ public:
     return function_storage_.access().type();
   }
 
-  std::string name() const override final
+  const std::string& name() const override final
   {
     return function_storage_.access().name();
   }
@@ -96,8 +96,8 @@ private:
 
   public:
     using typename BaseType::DomainType;
-    using typename BaseType::RangeType;
-    using typename BaseType::DerivativeRangeType;
+    using typename BaseType::RangeReturnType;
+    using typename BaseType::DerivativeRangeReturnType;
 
     LocalFunction(const FunctionType& function, const ElementType& el)
       : BaseType(el)
@@ -130,8 +130,8 @@ private:
       return function_.order(param);
     }
 
-    RangeType evaluate(const DomainType& point_in_reference_element,
-                       const Common::Parameter& param = {}) const override final
+    RangeReturnType evaluate(const DomainType& point_in_reference_element,
+                             const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
@@ -139,8 +139,8 @@ private:
       return function_.evaluate(geometry_->global(point_in_reference_element), param);
     }
 
-    DerivativeRangeType jacobian(const DomainType& point_in_reference_element,
-                                 const Common::Parameter& param = {}) const override final
+    DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
+                                       const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
@@ -148,9 +148,9 @@ private:
       return function_.jacobian(geometry_->global(point_in_reference_element), param);
     }
 
-    DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                   const DomainType& point_in_reference_element,
-                                   const Common::Parameter& param = {}) const override final
+    DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
+                                         const DomainType& point_in_reference_element,
+                                         const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
         DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
