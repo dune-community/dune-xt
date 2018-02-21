@@ -48,7 +48,7 @@ struct GridWalkerTest : public ::testing::Test
     const auto gv = grid_prv.grid().leafGridView();
     Walker<GridLayerType> walker(gv);
     const auto correct_size = gv.size(0);
-    atomic<size_t> count(0);
+    size_t count(0);
     auto counter = [&](const EntityType&) { count++; };
     auto test1 = [&] {
       walker.append(counter);
