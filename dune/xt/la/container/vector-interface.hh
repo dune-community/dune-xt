@@ -209,6 +209,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    // If you get an error here, you might be missing the VectorAbstraction for you type!
     return Common::FloatCmp::eq(this->as_imp(), other, epsilon);
   } // ... almost_equal(...)
 
@@ -227,6 +228,7 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    // If you get an error here, you might be missing the VectorAbstraction for you type!
     return Common::FloatCmp::eq(this->as_imp(), other.as_imp(), epsilon);
   } // ... almost_equal(...)
 
@@ -639,11 +641,10 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
   out << "[";
   const size_t sz = vector.size();
   if (sz > 0) {
-    out << vector.get_entry(0);
+    out << vector[0];
     for (size_t ii = 1; ii < sz; ++ii)
-      out << "\n " << vector.get_entry(ii);
-  } else
-    out << " ";
+      out << " " << vector[ii];
+  }
   out << "]";
   return out;
 } // ... operator<<(...)
