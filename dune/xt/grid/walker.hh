@@ -328,12 +328,15 @@ public:
 
   virtual void prepare() override
   {
-    for (auto&& wrapper : *element_functor_wrappers_)
-      wrapper->functor().prepare();
-    for (auto&& wrapper : *intersection_functor_wrappers_)
-      wrapper->functor().prepare();
-    for (auto&& wrapper : *element_and_intersection_functor_wrappers_)
-      wrapper->functor().prepare();
+    auto prep = [](auto& pt) {
+      for (auto&& list_ptr : pt) {
+        for (auto&& wrapper : *list_ptr)
+          wrapper->functor().prepare();
+      }
+    };
+    prep(element_functor_wrappers_);
+    prep(intersection_functor_wrappers_);
+    prep(element_and_intersection_functor_wrappers_);
   } // ... prepare()
 
   virtual void apply_local(const ElementType& element) override
@@ -364,12 +367,15 @@ public:
 
   virtual void finalize() override
   {
-    for (auto&& wrapper : *element_functor_wrappers_)
-      wrapper->functor().finalize();
-    for (auto&& wrapper : *intersection_functor_wrappers_)
-      wrapper->functor().finalize();
-    for (auto&& wrapper : *element_and_intersection_functor_wrappers_)
-      wrapper->functor().finalize();
+    auto fin = [](auto& pt) {
+      for (auto&& list_ptr : pt) {
+        for (auto&& wrapper : *list_ptr)
+          wrapper->functor().finalize();
+      }
+    };
+    fin(element_and_intersection_functor_wrappers_);
+    fin(element_functor_wrappers_);
+    fin(intersection_functor_wrappers_);
   } // ... finalize()
 
   /**
@@ -409,9 +415,14 @@ public:
 
   void clear()
   {
-    element_functor_wrappers_->clear();
-    intersection_functor_wrappers_->clear();
-    element_and_intersection_functor_wrappers_->clear();
+    auto clr = [](auto& pt) {
+      for (auto&& list_ptr : pt) {
+        list_ptr->clear();
+      }
+    };
+    clr(element_functor_wrappers_);
+    clr(intersection_functor_wrappers_);
+    clr(element_and_intersection_functor_wrappers_);
   }
 
   BaseType* copy() override
