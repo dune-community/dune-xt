@@ -72,6 +72,14 @@ private:
   using ViewIntersectionFunction = std::function<bool(const GL&, const IntersectionType&)>;
   using VoidFunction = std::function<void()>;
 
+  template <typename WrapperType, class... Args>
+  void emplace_all(Common::PerThreadValue<std::list<std::shared_ptr<WrapperType>>>& thread_storage, Args&&... args)
+  {
+    for (auto&& local_list : thread_storage) {
+      local_list->emplace_back(new WrapperType(std::forward<Args>(args)...));
+    }
+  }
+
 public:
   explicit Walker(GridViewType grd_vw)
     : grid_view_(grd_vw)
@@ -117,14 +125,13 @@ public:
 
   ThisType& append(ElementFunctor<GL>& functor, const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>())
   {
-    element_functor_wrappers_->emplace_back(new internal::ElementFunctorWrapper<GL>(functor, filter));
+    emplace_all(element_functor_wrappers_, functor, filter);
     return *this;
   }
 
   ThisType& append(ElementFunctor<GL>& functor, ViewElementFunction element_filter)
   {
-    element_functor_wrappers_->emplace_back(
-        new internal::ElementFunctorWrapper<GL>(functor, ApplyOn::LambdaFilteredElements<GL>(element_filter)));
+    emplace_all(element_functor_wrappers_, functor, ApplyOn::LambdaFilteredElements<GL>(element_filter));
     return *this;
   }
 
@@ -161,14 +168,13 @@ public:
   ThisType& append(IntersectionFunctor<GL>& functor,
                    const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>())
   {
-    intersection_functor_wrappers_->emplace_back(new internal::IntersectionFunctorWrapper<GL>(functor, filter));
+    emplace_all(intersection_functor_wrappers_, functor, filter);
     return *this;
   }
 
   ThisType& append(IntersectionFunctor<GL>& functor, ViewIntersectionFunction filter)
   {
-    intersection_functor_wrappers_->emplace_back(
-        new internal::IntersectionFunctorWrapper<GL>(functor, ApplyOn::LambdaFilteredIntersections<GL>(filter)));
+    emplace_all(intersection_functor_wrappers_, functor, ApplyOn::LambdaFilteredIntersections<GL>(filter));
     return *this;
   }
 
@@ -206,8 +212,7 @@ public:
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(
-        new internal::ElementAndIntersectionFunctorWrapper<GL>(functor, element_filter, intersection_filter));
+    emplace_all(element_and_intersection_functor_wrappers_, functor, element_filter, intersection_filter);
     return *this;
   }
 
@@ -217,10 +222,10 @@ public:
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(new internal::ElementAndIntersectionFunctorWrapper<GL>(
-        functor,
-        ApplyOn::LambdaFilteredElements<GL>(element_filter),
-        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
+    emplace_all(element_and_intersection_functor_wrappers_,
+                functor,
+                ApplyOn::LambdaFilteredElements<GL>(element_filter),
+                ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
     return *this;
   }
 
@@ -282,8 +287,7 @@ public:
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(
-        new internal::WalkerWrapper<GL>(other_walker, element_filter, intersection_filter));
+    emplace_all(element_and_intersection_functor_wrappers_, other_walker, element_filter, intersection_filter);
     return *this;
   }
 
@@ -298,8 +302,7 @@ public:
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(
-        new internal::WalkerWrapper<GL>(other_walker, element_filter, intersection_filter));
+    emplace_all(element_and_intersection_functor_wrappers_, other_walker, element_filter, intersection_filter);
     return *this;
   }
 
@@ -313,10 +316,10 @@ public:
   {
     if (&other_walker == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    element_and_intersection_functor_wrappers_->emplace_back(
-        new internal::WalkerWrapper<GL>(other_walker,
-                                        ApplyOn::LambdaFilteredElements<GL>(element_filter),
-                                        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter)));
+    emplace_all(element_and_intersection_functor_wrappers_,
+                other_walker,
+                ApplyOn::LambdaFilteredElements<GL>(element_filter),
+                ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
     return *this;
   }
 
