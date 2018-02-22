@@ -11,8 +11,6 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 
 set(lib_dune_xt_la_sources
-    algorithms/solve_sym_tridiag_posdef.cc
-    container/pattern.cc
     eigen-solver/internal/numpy.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
