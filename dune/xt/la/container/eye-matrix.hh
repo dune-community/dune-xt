@@ -17,34 +17,32 @@
 namespace Dune {
 namespace XT {
 namespace LA {
+namespace internal {
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value, M>::type eye_matrix(const size_t rows, const size_t cols)
+typename std::enable_if<is_matrix<M>::value, void>::type set_diagonal_to_one(M& mat)
 {
-  if (M::sparse) {
-    SparsityPatternDefault pattern(rows);
-    for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
-      pattern.insert(ii, ii);
-    // each row has to contain at least one non-zero entry
-    for (size_t ii = std::min(rows, cols); ii < std::max(rows, cols); ++ii)
-      pattern.insert(ii, 0);
-    M mat(rows, cols, pattern);
-    for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
-      mat.set_entry(ii, ii, 1);
-    return mat;
-  } else {
-    M mat(rows, cols, 0.);
-    for (size_t ii = 0; ii < std::min(rows, cols); ++ii)
-      mat.set_entry(ii, ii, 1);
-    return mat;
-  }
+  for (size_t ii = 0; ii < std::min(mat.rows(), mat.cols()); ++ii)
+    mat.set_entry(ii, ii, 1.);
 }
 
 
+} // namespace internal
+
+
 template <class M>
-typename std::enable_if<Common::is_matrix<M>::value && !is_matrix<M>::value, M>::type eye_matrix(const size_t rows,
-                                                                                                 const size_t cols)
+typename std::enable_if<is_matrix<M>::value, M>::type
+eye_matrix(const size_t rows, const size_t cols, const SparsityPatternDefault& pattern = SparsityPatternDefault())
+{
+  M mat = M(rows, cols, pattern.size() == 0 ? Common::diagonal_pattern(rows, cols) : pattern);
+  internal::set_diagonal_to_one(mat);
+  return mat;
+}
+
+template <class M>
+typename std::enable_if<Common::is_matrix<M>::value && !is_matrix<M>::value, M>::type
+eye_matrix(const size_t rows, const size_t cols, const SparsityPatternDefault& /*pattern*/ = SparsityPatternDefault())
 {
   using Abstraction = Common::MatrixAbstraction<M>;
   auto mat = Abstraction::create(rows, cols, 0.);
@@ -55,7 +53,11 @@ typename std::enable_if<Common::is_matrix<M>::value && !is_matrix<M>::value, M>:
 
 
 template <class M>
-typename std::enable_if<Common::is_matrix<M>::value, M>::type eye_matrix(const size_t size)
+typename std::enable_if<Common::is_matrix<M>::value, M>::type
+eye_matrix(const size_t size, const SparsityPatternDefault& pattern = SparsityPatternDefault())
+{
+  return eye_matrix<M>(size, size, pattern);
+}
 {
   return eye_matrix<M>(size, size);
 }

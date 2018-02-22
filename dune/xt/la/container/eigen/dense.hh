@@ -793,6 +793,17 @@ struct VectorAbstraction<LA::EigenMappedDenseVector<T>>
 template <class T>
 struct MatrixAbstraction<LA::EigenDenseMatrix<T>> : public LA::internal::MatrixAbstractionBase<LA::EigenDenseMatrix<T>>
 {
+  static const constexpr XT::Common::StorageLayout storage_layout = XT::Common::StorageLayout::dense_column_major;
+
+  static inline T* data(LA::EigenDenseMatrix<T>& mat)
+  {
+    return &(mat.backend()(0, 0));
+  }
+
+  static inline const T* data(const LA::EigenDenseMatrix<T>& mat)
+  {
+    return &(mat.backend()(0, 0));
+  }
 };
 
 #endif // HAVE_EIGEN

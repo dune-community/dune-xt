@@ -344,7 +344,8 @@ protected:
   {
     if (other.rows() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be multiplied do not match!");
-    derived_type yy(rows(), other.cols(), 0.);
+    const auto new_pattern = Common::multiplication_pattern(pattern(), other.pattern(), other.cols());
+    derived_type yy(rows(), other.cols(), new_pattern);
     for (size_t rr = 0; rr < rows(); ++rr)
       for (size_t cc = 0; cc < other.cols(); ++cc)
         for (size_t kk = 0; kk < cols(); ++kk)
@@ -357,7 +358,7 @@ protected:
   {
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
-    auto new_pattern = pattern() + other.pattern();
+    const auto new_pattern = pattern() + other.pattern();
     derived_type yy(rows(), other.cols(), new_pattern);
     for (size_t rr = 0; rr < rows(); ++rr)
       for (const auto& cc : new_pattern.inner(rr))
@@ -370,7 +371,7 @@ protected:
   {
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be subtracted do not match!");
-    auto new_pattern = pattern() + other.pattern();
+    const auto new_pattern = pattern() + other.pattern();
     derived_type yy(rows(), other.cols(), new_pattern);
     for (size_t rr = 0; rr < rows(); ++rr)
       for (const auto& cc : new_pattern.inner(rr))
@@ -440,6 +441,49 @@ std::ostream& operator<<(std::ostream& out, const MatrixInterface<T, S>& matrix)
 } // ... operator<<(...)
 
 
+template <class MatrixType>
+typename std::enable_if<is_matrix<MatrixType>::value, MatrixType>::type
+create(const std::initializer_list<std::initializer_list<typename Common::MatrixAbstraction<MatrixType>::ScalarType>>&
+           initializer_list,
+       const Common::SparsityPatternDefault& pattern = Common::SparsityPatternDefault())
+{
+  const size_t num_rows = initializer_list.size();
+  const size_t num_cols = initializer_list.begin()->size();
+  MatrixType ret(num_rows, num_cols, pattern.size() == 0 ? Common::dense_pattern(num_rows, num_cols) : pattern);
+  size_t ii = 0;
+  for (const auto& row : initializer_list) {
+    size_t jj = 0;
+    for (const auto& entry : row) {
+      if (entry != 0.)
+        ret.set_entry(ii, jj, entry);
+      ++jj;
+    } // jj
+    ++ii;
+  } // ii
+  return ret;
+}
+
+template <class MatrixType>
+typename std::enable_if<Common::is_matrix<MatrixType>::value && !is_matrix<MatrixType>::value, MatrixType>::type
+create(const std::initializer_list<std::initializer_list<typename Common::MatrixAbstraction<MatrixType>::ScalarType>>&
+           initializer_list,
+       const Common::SparsityPatternDefault& /*pattern*/ = Common::dense_pattern(0, 0))
+{
+  typedef Common::MatrixAbstraction<MatrixType> Mat;
+  auto ret = Mat::create(initializer_list.size(), initializer_list.begin()->size());
+  size_t ii = 0;
+  for (const auto& row : initializer_list) {
+    size_t jj = 0;
+    for (const auto& entry : row) {
+      Mat::set_entry(ret, ii, jj, entry);
+      ++jj;
+    } // jj
+    ++ii;
+  } // ii
+  return ret;
+}
+
+
 namespace internal {
 
 
@@ -454,19 +498,38 @@ struct MatrixAbstractionBase
 
   static const size_t static_cols = std::numeric_limits<size_t>::max();
 
+  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
+
   typedef typename std::conditional<is_matrix, MatrixImp, void>::type MatrixType;
   typedef typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type ScalarType;
   typedef typename std::conditional<is_matrix, typename MatrixImp::RealType, void>::type RealType;
   typedef ScalarType S;
   typedef RealType R;
 
-  static inline typename std::enable_if<is_matrix, MatrixType>::type create(const size_t rows, const size_t cols)
+  template <size_t rows = static_rows, size_t cols = static_cols, class Field = S>
+  using MatrixTypeTemplate = MatrixType;
+
+  template <size_t ROWS = static_rows, size_t COLS = static_cols, class Field = ScalarType>
+  static inline typename std::enable_if<is_matrix, MatrixType>::type
+  create(const size_t rows, const size_t cols, const Common::SparsityPatternDefault& pattern = SparsityPatternDefault())
   {
-    return MatrixType(rows, cols);
+    return MatrixType(rows, cols, pattern.size() == 0 ? Common::dense_pattern(rows, cols) : pattern);
   }
 
+  template <size_t ROWS = static_rows, size_t COLS = static_cols, class Field = ScalarType>
   static inline typename std::enable_if<is_matrix, MatrixType>::type
-  create(const size_t rows, const size_t cols, const ScalarType& val)
+  create(const size_t rows,
+         const size_t cols,
+         const ScalarType& val,
+         const Common::SparsityPatternDefault& pattern = SparsityPatternDefault())
+  {
+    auto actual_pattern = pattern.size() == 0 ? Common::dense_pattern(rows, cols) : pattern;
+    MatrixType ret(rows, cols, actual_pattern);
+    for (size_t ii = 0; ii < rows; ++ii)
+      for (const auto& jj : actual_pattern.inner(ii))
+        ret.set_entry(ii, jj, val);
+    return ret;
+  }
   {
     return MatrixType(rows, cols, val);
   }
@@ -491,8 +554,11 @@ struct MatrixAbstractionBase
   {
     return mat.get_entry(row, col);
   }
-}; // struct MatrixAbstractionBase
 
+  static void add_to_entry(MatrixType& mat, const size_t row, const size_t col, const ScalarType& val)
+  {
+    mat.add_to_entry(row, col, val);
+  }
 
 template <class XtLaMatrixImp, size_t rows, size_t cols>
 struct FieldMatrixToLaDenseMatrix
@@ -500,24 +566,18 @@ struct FieldMatrixToLaDenseMatrix
   typedef XtLaMatrixImp LaMatrixType;
   typedef Dune::FieldMatrix<typename LaMatrixType::ScalarType, rows, cols> FieldMatrixType;
 
-  static LaMatrixType convert(const FieldMatrixType& in)
+  static inline ScalarType* data(MatrixType& /*mat*/)
   {
-    LaMatrixType out(rows, cols);
-    for (size_t ii = 0; ii < rows; ++ii)
-      for (size_t jj = 0; jj < cols; ++jj)
-        out.set_entry(ii, jj, in[ii][jj]);
-    return out;
+    DUNE_THROW(NotImplemented, "You need to specialize this in your implementation if you need it!");
+    return nullptr;
   }
 
-  static std::unique_ptr<FieldMatrixType> convert_back(const LaMatrixType& in)
+  static inline const ScalarType* data(const MatrixType& /*mat*/)
   {
-    auto out = XT::Common::make_unique<FieldMatrixType>();
-    for (size_t ii = 0; ii < rows; ++ii)
-      for (size_t jj = 0; jj < cols; ++jj)
-        (*out)[ii][jj] = in.get_entry(ii, jj);
-    return std::move(out);
+    DUNE_THROW(NotImplemented, "You need to specialize this in your implementation if you need it!");
+    return nullptr;
   }
-};
+}; // struct MatrixAbstractionBase
 
 
 } // namespace internal

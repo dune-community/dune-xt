@@ -191,6 +191,16 @@ public:
     return *backend_;
   }
 
+  ScalarType* data()
+  {
+    return &(backend()[0][0]);
+  }
+
+  const ScalarType* data() const
+  {
+    return &(backend()[0][0]);
+  }
+
   /// \}
   /// \name Required by ContainerInterface.
   /// \{
@@ -478,6 +488,17 @@ template <class T>
 struct MatrixAbstraction<LA::CommonDenseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T>>
 {
+  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
+
+  static inline T* data(LA::CommonDenseMatrix<T>& mat)
+  {
+    return mat.data();
+  }
+
+  static inline const T* data(const LA::CommonDenseMatrix<T>& mat)
+  {
+    return mat.data();
+  }
 };
 
 

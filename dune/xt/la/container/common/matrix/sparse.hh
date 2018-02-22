@@ -13,6 +13,8 @@
 #ifndef DUNE_XT_LA_CONTAINER_COMMON_MATRIX_SPARSE_HH
 #define DUNE_XT_LA_CONTAINER_COMMON_MATRIX_SPARSE_HH
 
+#include <dune/xt/common/matrix.hh>
+
 #include <dune/xt/la/container/interfaces.hh>
 #include <dune/xt/la/container/pattern.hh>
 
@@ -24,14 +26,8 @@ namespace XT {
 namespace LA {
 
 
-enum class SparseFormat
-{
-  csr,
-  csc
-};
-
 // forwards
-template <class ScalarImp, SparseFormat sparse_format>
+template <class ScalarImp, Common::StorageLayout layout>
 class CommonSparseMatrix;
 
 // forwards
@@ -42,7 +38,7 @@ class CommonSparseOrDenseMatrix;
 namespace internal {
 
 
-template <class ScalarImp, SparseFormat sparse_format>
+template <class ScalarImp, Common::StorageLayout layout>
 class CommonSparseMatrixTraits
 {
 public:
@@ -53,7 +49,7 @@ public:
   typedef std::vector<ScalarImp> EntriesVectorType;
   typedef std::vector<size_t> IndexVectorType;
   typedef typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type EpsType;
-  typedef CommonSparseMatrix<ScalarImp, sparse_format> derived_type;
+  typedef CommonSparseMatrix<ScalarImp, layout> derived_type;
   static const constexpr bool sparse = true;
 };
 
@@ -79,15 +75,14 @@ public:
 /**
  * \brief A sparse matrix implementation of the MatrixInterface with row major memory layout.
  */
-template <class ScalarImp = double, SparseFormat sparse_format = SparseFormat::csr>
-class CommonSparseMatrix
-    : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, sparse_format>, ScalarImp>
+template <class ScalarImp = double, Common::StorageLayout layout = Common::StorageLayout::csr>
+class CommonSparseMatrix : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp>
 {
-  typedef CommonSparseMatrix<ScalarImp, sparse_format> ThisType;
-  typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, sparse_format>, ScalarImp> MatrixInterfaceType;
+  typedef CommonSparseMatrix<ScalarImp, layout> ThisType;
+  typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp> MatrixInterfaceType;
 
 public:
-  typedef internal::CommonSparseMatrixTraits<ScalarImp, sparse_format> Traits;
+  typedef internal::CommonSparseMatrixTraits<ScalarImp, layout> Traits;
   typedef typename Traits::EntriesVectorType EntriesVectorType;
   typedef typename Traits::IndexVectorType IndexVectorType;
   typedef typename Traits::ScalarType ScalarType;
@@ -481,19 +476,46 @@ public:
   using MatrixInterfaceType::operator+=;
   using MatrixInterfaceType::operator-=;
 
-  const EntriesVectorType& entries() const
+  ScalarType* entries()
   {
-    return *entries_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return entries_->data();
   }
 
-  const IndexVectorType& row_pointers() const
+  const ScalarType* entries() const
   {
-    return *row_pointers_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return entries_->data();
   }
 
-  const IndexVectorType& column_indices() const
+  size_t* outer_index_ptr()
   {
-    return *column_indices_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return row_pointers_->data();
+  }
+
+  const size_t* outer_index_ptr() const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    return row_pointers_->data();
+  }
+
+  size_t* inner_index_ptr()
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    return column_indices_->data();
+  }
+
+  const size_t* inner_index_ptr() const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    return column_indices_->data();
   }
 
   const EpsType& eps()
@@ -544,15 +566,15 @@ private:
  * \brief A sparse matrix implementation of the MatrixInterface with column major memory layout.
  */
 template <class ScalarImp>
-class CommonSparseMatrix<ScalarImp, SparseFormat::csc>
-    : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, SparseFormat::csc>, ScalarImp>
+class CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>
+    : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
 {
-  typedef CommonSparseMatrix<ScalarImp, SparseFormat::csc> ThisType;
-  typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, SparseFormat::csc>, ScalarImp>
+  typedef CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc> ThisType;
+  typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
       MatrixInterfaceType;
 
 public:
-  typedef internal::CommonSparseMatrixTraits<ScalarImp, SparseFormat::csc> Traits;
+  typedef internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc> Traits;
   typedef typename Traits::EntriesVectorType EntriesVectorType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -1024,34 +1046,46 @@ public:
   using MatrixInterfaceType::operator+=;
   using MatrixInterfaceType::operator-=;
 
-  EntriesVectorType& entries()
+  ScalarType* entries()
   {
-    return *entries_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return entries_->data();
   }
 
-  const EntriesVectorType& entries() const
+  const ScalarType* entries() const
   {
-    return *entries_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return entries_->data();
   }
 
-  const IndexVectorType& column_pointers() const
+  size_t* outer_index_ptr()
   {
-    return *column_pointers_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return column_pointers_->data();
   }
 
-  IndexVectorType& column_pointers()
+  const size_t* outer_index_ptr() const
   {
-    return *column_pointers_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return column_pointers_->data();
   }
 
-  IndexVectorType& row_indices()
+  size_t* inner_index_ptr()
   {
-    return *row_indices_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return row_indices_->data();
   }
 
-  const IndexVectorType& row_indices() const
+  const size_t* inner_index_ptr() const
   {
-    return *row_indices_;
+    ensure_uniqueness();
+    unshareable_ = true;
+    return row_indices_->data();
   }
 
   const EpsType& eps()
@@ -1096,7 +1130,7 @@ private:
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
   mutable EpsType eps_;
   mutable bool unshareable_;
-}; // class CommonSparseMatrix<..., SparseFormat::csc>
+}; // class CommonSparseMatrix<..., Common::StorageLayout::csc>
 
 /**
  * \brief A matrix implementation checking whether the matrix is sparse enough to use sparse matrix operations.
@@ -1447,6 +1481,12 @@ public:
     return MatrixInterfaceType::operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>();
   }
 
+  template <int ROWS, int COLS>
+  explicit operator std::unique_ptr<XT::Common::FieldMatrix<ScalarType, ROWS, COLS>>() const
+  {
+    return MatrixInterfaceType::operator std::unique_ptr<XT::Common::FieldMatrix<ScalarType, ROWS, COLS>>();
+  }
+
   explicit operator Dune::DynamicMatrix<ScalarType>() const
   {
     return MatrixInterfaceType::operator Dune::DynamicMatrix<ScalarType>();
@@ -1460,10 +1500,10 @@ private:
 }; // class CommonSparseOrDenseMatrix<...>
 
 template <class ScalarType = double>
-using CommonSparseMatrixCsr = CommonSparseMatrix<ScalarType, SparseFormat::csr>;
+using CommonSparseMatrixCsr = CommonSparseMatrix<ScalarType, Common::StorageLayout::csr>;
 
 template <class ScalarType = double>
-using CommonSparseMatrixCsc = CommonSparseMatrix<ScalarType, SparseFormat::csc>;
+using CommonSparseMatrixCsc = CommonSparseMatrix<ScalarType, Common::StorageLayout::csc>;
 
 template <class ScalarType = double>
 using CommonSparseOrDenseMatrixCsr =
@@ -1482,18 +1522,21 @@ template <class T>
 struct MatrixAbstraction<LA::CommonSparseMatrixCsr<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsr<T>>
 {
+  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::csr;
 };
 
 template <class T>
 struct MatrixAbstraction<LA::CommonSparseMatrixCsc<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsc<T>>
 {
+  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::csc;
 };
 
 template <class DenseMatrixImp, class SparseMatrixImp>
 struct MatrixAbstraction<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
 {
+  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
 };
 
 
@@ -1506,8 +1549,8 @@ struct MatrixAbstraction<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMat
 #if DUNE_XT_WITH_PYTHON_BINDINGS
 
 
-extern template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::SparseFormat::csr>;
-extern template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::SparseFormat::csc>;
+extern template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::Common::StorageLayout::csr>;
+extern template class Dune::XT::LA::CommonSparseMatrix<double, Dune::XT::LA::Common::StorageLayout::csc>;
 
 
 #endif // DUNE_XT_WITH_PYTHON_BINDINGS
