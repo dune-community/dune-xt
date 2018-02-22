@@ -626,9 +626,9 @@ protected:
   {
     assert(eigenvectors_ && "This must not happen when you call this function!");
     try {
-      if (options_.has_sub("matrix-inverter")) {
+      if (options_->has_sub("matrix-inverter")) {
         eigenvectors_inverse_ =
-            std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_, options_.sub("matrix-inverter")));
+            std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_, options_->sub("matrix-inverter")));
       } else
         eigenvectors_inverse_ = std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_));
     } catch (const Exceptions::matrix_invert_failed& ee) {
@@ -651,9 +651,9 @@ protected:
   {
     assert(real_eigenvectors_ && "This must not happen when you call this function!");
     try {
-      if (options_.has_sub("matrix-inverter")) {
+      if (options_->has_sub("matrix-inverter")) {
         real_eigenvectors_inverse_ =
-            std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_, options_.sub("matrix-inverter")));
+            std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_, options_->sub("matrix-inverter")));
       } else
         real_eigenvectors_inverse_ = std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_));
     } catch (const Exceptions::matrix_invert_failed& ee) {
@@ -689,13 +689,12 @@ protected:
                                  const D& eigenvectors_inverse,
                                  const double& tolerance) const
   {
-    typedef Common::MatrixAbstraction<C> Mat;
     const size_t rows = Common::get_matrix_rows(mat);
     const size_t cols = Common::get_matrix_cols(mat);
-    auto eigenvalue_matrix = XT::Common::make_unique<C>(Common::MatrixAbstraction<C>::create(rows, cols, 0.));
+    auto eigenvalue_matrix = Common::MatrixAbstraction<C>::create(rows, cols, 0.);
     for (size_t ii = 0; ii < rows; ++ii)
-      Common::set_matrix_entry(*eigenvalue_matrix, ii, ii, eigenvalues[ii]);
-    const auto decomposition_error = (eigenvectors * (*eigenvalue_matrix * eigenvectors_inverse)) - mat;
+      Common::set_matrix_entry(eigenvalue_matrix, ii, ii, eigenvalues[ii]);
+    const auto decomposition_error = eigenvectors * eigenvalue_matrix * eigenvectors_inverse - mat;
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
         if (std::abs(Common::get_matrix_entry(decomposition_error, ii, jj)) > tolerance)
@@ -708,7 +707,7 @@ protected:
                                      << std::setprecision(17)
                                      << eigenvectors
                                      << "\n\n(T * (lambda * T^-1)) - matrix = "
-                                     << (eigenvectors * (*eigenvalue_matrix * eigenvectors_inverse)) - mat);
+                                     << decomposition_error);
   } // ... assert_eigendecomposition(...)
 
   template <bool upcast_required = !std::is_same<MatrixType, ComplexMatrixType>::value, bool anything = true>

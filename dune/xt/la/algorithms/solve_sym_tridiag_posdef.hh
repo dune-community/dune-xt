@@ -27,22 +27,18 @@ namespace LA {
 
 
 /**  \brief Solves linear equation for tridiagonal symmetric positive definite matrix.
-  * \param[in] dimRange number of rows and columns of matrix
-  * \param[in] diag array containing the diagonal elements of the matrix (length dimRange)
-  * \param[in] sub_diag array containing the sub-diagonal elements of the matrix (length dimRange-1)
-  * \param[in] anorm operator norm of the matrix (1-norm)
-  * \param[in/out] b array containing the rhs (length dimRange). Is overwritten by the solution of the equation.
-  * \returns estimate of inverse of the condition of the matrix
-  * \attention This function depends on LAPACKE. If LAPACKE is not found an error is thrown.
+  * \param[in] diag vector containing the diagonal elements of the matrix (length dimRange)
+  * \param[in] subdiag vector containing the sub-diagonal elements of the matrix (length dimRange-1)
+  * \param[in/out] b vector containing the rhs (length dimRange). Is overwritten by the solution of the equation.
   */
 template <class VectorType, class SecondVectorType, class RhsVectorType>
 std::enable_if_t<Common::is_vector<VectorType>::value && Common::is_vector<SecondVectorType>::value
                      && Common::is_vector<RhsVectorType>::value,
                  void>
-solve_sym_tridiag_posdef(VectorType& diag, SecondVectorType& sub_diag, RhsVectorType& b)
+solve_sym_tridiag_posdef(VectorType& diag, SecondVectorType& subdiag, RhsVectorType& b)
 {
-  tridiagonal_cholesky(diag, subdiag);
-  solve_tridiagonal_cholesky_factorized(diag, subdiag, b);
+  tridiagonal_ldlt(diag, subdiag);
+  solve_tridiagonal_ldlt_factorized(diag, subdiag, b);
 }
 
 template <class MatrixType, class VectorType, class RhsVectorType>
@@ -52,8 +48,6 @@ std::enable_if_t<Common::is_matrix<MatrixType>::value && Common::is_vector<Vecto
 solve_sym_tridiag_posdef(const MatrixType& A, VectorType& x, const RhsVectorType& y)
 {
   typedef Common::MatrixAbstraction<MatrixType> Mat;
-  typedef Common::VectorAbstraction<VectorType> Vec;
-  typedef Common::VectorAbstraction<RhsVectorType> RhsVec;
   typedef typename Mat::ScalarType ScalarType;
   const size_t num_rows = Mat::rows(A);
   std::vector<ScalarType> diag(num_rows, 0.);

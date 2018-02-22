@@ -58,9 +58,6 @@ eye_matrix(const size_t size, const SparsityPatternDefault& pattern = SparsityPa
 {
   return eye_matrix<M>(size, size, pattern);
 }
-{
-  return eye_matrix<M>(size, size);
-}
 
 
 } // namespace LA

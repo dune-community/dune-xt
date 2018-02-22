@@ -33,7 +33,7 @@ using namespace Dune::XT;
 using namespace Dune::XT::LA;
 
 {% for T_NAME, O_TYPE, R_TYPE, S_TYPE in config.testtypes %}
-struct TriangularSolverTest_{{T_NAME}} : public ::testing::Test
+struct CholeskyTest_{{T_NAME}} : public ::testing::Test
 {
   typedef {{O_TYPE}} MatrixType;
   typedef {{R_TYPE}} RhsType;
@@ -74,16 +74,21 @@ struct TriangularSolverTest_{{T_NAME}} : public ::testing::Test
     for (size_t ii = 0; ii < dim-1; ++ii)
       EXPECT_TRUE(Common::FloatCmp::eq(SubV::get_entry(subdiag, ii), expected_subdiag[ii]));
 
-//    const RhsType rhs = RhsV::create(dim, 1.);
-//    SolutionType solution = SolV::create(dim, 0.);
-
-//    XT::LA::solve_sym_tridiag_posdef(matrix, solution, rhs);
-//    SolutionType expected_result{2.5, 4., 4.5, 4, 2.5};
-//    EXPECT_TRUE(Common::FloatCmp::eq(solution, expected_result));
+    RhsType rhs = RhsV::create(dim, 1.);
+    MatrixType matrix_rhs = M::create(dim, dim, 1.);
+    XT::LA::solve_tridiagonal_ldlt_factorized(diag, subdiag, rhs);
+    RhsType expected_result{2.5, 4., 4.5, 4, 2.5};
+    EXPECT_TRUE(Common::FloatCmp::eq(rhs, expected_result));
+    XT::LA::solve_tridiagonal_ldlt_factorized(diag, subdiag, matrix_rhs);
+    for (size_t jj = 0; jj < dim; ++jj) {
+      for (size_t ii = 0; ii < dim; ++ii)
+        RhsV::set_entry(rhs, ii, M::get_entry(matrix_rhs, ii, jj));
+      EXPECT_TRUE(Common::FloatCmp::eq(rhs, expected_result));
+    }
   } // ... produces_correct_results(...)
-}; // struct TriangularSolverTest
+}; // struct CholeskyTest
 
-TEST_F(TriangularSolverTest_{{T_NAME}}, behaves_correctly)
+TEST_F(CholeskyTest_{{T_NAME}}, behaves_correctly)
 {
   this->produces_correct_results();
 }

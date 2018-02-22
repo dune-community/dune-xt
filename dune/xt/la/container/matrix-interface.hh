@@ -530,9 +530,6 @@ struct MatrixAbstractionBase
         ret.set_entry(ii, jj, val);
     return ret;
   }
-  {
-    return MatrixType(rows, cols, val);
-  }
 
   static inline typename std::enable_if<is_matrix, size_t>::type rows(const MatrixType& mat)
   {
@@ -560,21 +557,15 @@ struct MatrixAbstractionBase
     mat.add_to_entry(row, col, val);
   }
 
-template <class XtLaMatrixImp, size_t rows, size_t cols>
-struct FieldMatrixToLaDenseMatrix
-{
-  typedef XtLaMatrixImp LaMatrixType;
-  typedef Dune::FieldMatrix<typename LaMatrixType::ScalarType, rows, cols> FieldMatrixType;
-
   static inline ScalarType* data(MatrixType& /*mat*/)
   {
-    DUNE_THROW(NotImplemented, "You need to specialize this in your implementation if you need it!");
+    DUNE_THROW(InvalidStateException, "Do not call me if storage layout is not dense!");
     return nullptr;
   }
 
   static inline const ScalarType* data(const MatrixType& /*mat*/)
   {
-    DUNE_THROW(NotImplemented, "You need to specialize this in your implementation if you need it!");
+    DUNE_THROW(InvalidStateException, "Do not call me if storage_layout is not dense!");
     return nullptr;
   }
 }; // struct MatrixAbstractionBase

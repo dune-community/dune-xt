@@ -15,6 +15,7 @@
 
 #include <dune/xt/common/lapacke.hh>
 #include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
 
 #include <dune/xt/la/container/common/matrix/sparse.hh>
@@ -222,7 +223,7 @@ struct TriangularSolver
                                           ? Common::Blas::row_major()
                                           : Common::Blas::col_major();
       const int blas_triangular =
-          (triangular_type == Common::MatrixLayout::upper_triangular) ? Common::Blas::upper() : Common::Blas::lower();
+          (triangular_type == Common::MatrixPattern::upper_triangular) ? Common::Blas::upper() : Common::Blas::lower();
       const int blas_trans = (transpose == Common::Transpose::yes) ? Common::Blas::trans() : Common::Blas::no_trans();
       Common::Blas::dtrsm(blas_storage_layout,
                           Common::Blas::left(),
@@ -311,7 +312,7 @@ template <class MatrixType,
 struct triangular_helper
 {
   static_assert(triangular_type == Common::MatrixPattern::lower_triangular
-                    || triangular_type == Common::MatrixLayout::upper_triangular,
+                    || triangular_type == Common::MatrixPattern::upper_triangular,
                 "The matrix has to be either upper or lower triangular!");
 
   static void solve(const MatrixType& A, FirstVectorType& x, const SecondVectorType& b)
@@ -329,7 +330,7 @@ template <class MatrixType,
 struct triangular_helper<MatrixType, FirstVectorType, SecondVectorType, triangular_type, transpose, true>
 {
   static_assert(triangular_type == Common::MatrixPattern::lower_triangular
-                    || triangular_type == Common::MatrixLayout::upper_triangular,
+                    || triangular_type == Common::MatrixPattern::upper_triangular,
                 "The matrix has to be either upper or lower triangular!");
 
   typedef Common::VectorAbstraction<FirstVectorType> V1;
@@ -402,7 +403,7 @@ solve_upper_triangular(const MatrixType& A, FirstVectorType& x, const SecondVect
   internal::triangular_helper<MatrixType,
                               FirstVectorType,
                               SecondVectorType,
-                              Common::MatrixLayout::upper_triangular,
+                              Common::MatrixPattern::upper_triangular,
                               Common::Transpose::no>::solve(A, x, b);
 } // void solve_upper_triangular(...)
 
@@ -418,7 +419,7 @@ solve_upper_triangular_transposed(const MatrixType& A, FirstVectorType& x, const
   internal::triangular_helper<MatrixType,
                               FirstVectorType,
                               SecondVectorType,
-                              Common::MatrixLayout::upper_triangular,
+                              Common::MatrixPattern::upper_triangular,
                               Common::Transpose::yes>::solve(A, x, b);
 } // void solve_upper_triangular_transposed(...)
 

@@ -359,8 +359,9 @@ compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(const MatrixType& 
                                                               EigenVectorType& right_eigenvectors)
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
-  auto Q = XT::LA::eye_matrix_ptr<Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>>(
-      tmp_matrix.rows(), tmp_matrix.cols());
+  typedef typename Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType> DynamicMatrixType;
+  auto Q =
+      std::make_unique<DynamicMatrixType>(XT::LA::eye_matrix<DynamicMatrixType>(tmp_matrix.rows(), tmp_matrix.cols()));
   eigenvalues =
       RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix, Q);
   auto tmp_eigenvectors =

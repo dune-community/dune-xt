@@ -19,6 +19,8 @@
 #include <dune/xt/common/lapacke.hh>
 
 #include <dune/xt/la/container.hh>
+#include <dune/xt/la/container/eye-matrix.hh>
+#include <dune/xt/la/algorithms/triangular_solves.hh>
 
 namespace Dune {
 namespace XT {
@@ -39,6 +41,46 @@ void tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
     V2::set_entry(subdiag, ii, V2::get_entry(subdiag, ii) / V1::get_entry(diag, ii));
     V1::set_entry(
         diag, ii + 1, V1::get_entry(diag, ii + 1) - V1::get_entry(diag, ii) * std::pow(V2::get_entry(subdiag, ii), 2));
+  }
+}
+
+template <class FirstVectorType, class SecondVectorType, class VectorType>
+std::enable_if_t<Common::is_vector<VectorType>::value, void>
+solve_tridiag_ldlt(const FirstVectorType& diag, const SecondVectorType& subdiag, VectorType& vec)
+{
+  typedef Common::VectorAbstraction<FirstVectorType> V1;
+  typedef Common::VectorAbstraction<SecondVectorType> V2;
+  typedef Common::VectorAbstraction<VectorType> V;
+  typedef typename V::ScalarType ScalarType;
+  size_t size = vec.size();
+  auto L = eye_matrix<CommonSparseMatrix<ScalarType>>(
+      size, Common::diagonal_pattern(size, size) + Common::diagonal_pattern(size, size, -1));
+  for (size_t ii = 0; ii < size - 1; ++ii)
+    L.set_entry(ii + 1, ii, V2::get_entry(subdiag, ii));
+  // solve LDL^T x = rhs;
+  // first, solve L z = rhs;
+  auto z = vec;
+  solve_lower_triangular(L, z, vec);
+  // solve D z = z
+  for (size_t ii = 0; ii < size; ++ii)
+    V::set_entry(z, ii, V::get_entry(z, ii) / V1::get_entry(diag, ii));
+  // Now solve L^T x = z;
+  solve_lower_triangular_transposed(L, vec, z);
+}
+
+template <class FirstVectorType, class SecondVectorType, class MatrixType>
+std::enable_if_t<Common::is_matrix<MatrixType>::value, void>
+solve_tridiag_ldlt(const FirstVectorType& diag, const SecondVectorType& subdiag, MatrixType& mat)
+{
+  typedef Common::VectorAbstraction<FirstVectorType> V1;
+  typedef Common::MatrixAbstraction<MatrixType> M;
+  auto rhs_jj = diag;
+  for (size_t jj = 0; jj < M::cols(mat); ++jj) {
+    for (size_t ii = 0; ii < M::rows(mat); ++ii)
+      V1::set_entry(rhs_jj, ii, M::get_entry(mat, ii, jj));
+    solve_tridiag_ldlt(diag, subdiag, rhs_jj);
+    for (size_t ii = 0; ii < M::rows(mat); ++ii)
+      M::set_entry(mat, ii, jj, V1::get_entry(rhs_jj, ii));
   }
 }
 
@@ -183,7 +225,66 @@ struct CholeskySolver
     else
       cholesky_rowwise<only_set_nonzero>(A);
   } // static void cholesky(...)
-};
+}; // struct CholeskySolver<...>
+
+
+template <class FirstVectorType, class SecondVectorType, class RhsType>
+struct LDLTSolver
+{
+  typedef Common::MatrixAbstraction<RhsType> M;
+  typedef Common::VectorAbstraction<RhsType> V;
+  typedef Common::VectorAbstraction<FirstVectorType> V1;
+  typedef Common::VectorAbstraction<SecondVectorType> V2;
+  static constexpr bool is_row_major = M::is_matrix && M::storage_layout == Common::StorageLayout::dense_row_major;
+  static constexpr bool is_col_major = (M::is_matrix && M::storage_layout == Common::StorageLayout::dense_column_major)
+                                       || (V::is_vector && V::is_contiguous);
+  static constexpr bool is_contiguous = is_row_major || is_col_major;
+  typedef typename std::conditional<M::is_matrix, typename M::ScalarType, typename V::ScalarType>::type ScalarType;
+  static constexpr bool only_set_nonzero =
+      M::is_matrix
+      && (M::storage_layout == Common::StorageLayout::csr || M::storage_layout == Common::StorageLayout::csc
+          || std::is_base_of<IstlRowMajorSparseMatrix<ScalarType>, RhsType>::value);
+
+  static void tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
+  {
+    const size_t size = diag.size();
+    if (subdiag.size() != size - 1)
+      DUNE_THROW(InvalidStateException, "Wrong size of diag and subdiag!");
+#if HAVE_MKL || HAVE_LAPACKE
+    auto info = Common::Lapacke::dpttrf(size, Common::data(diag), Common::data(subdiag));
+    if (info)
+      DUNE_THROW(Dune::MathError, "Lapacke_dpptrf returned an error code!");
+#else // HAVE_MKL || HAVE_LAPACKE
+    internal::tridiagonal_ldlt(diag, subdiag);
+#endif
+  } // static void tridiagonal_ldlt(...)
+
+  static void
+  solve_tridiagonal_ldlt_factorized(const FirstVectorType& diag, const SecondVectorType& subdiag, RhsType& rhs)
+  {
+    const size_t size = diag.size();
+    assert(subdiag.size() == size - 1);
+    if (false) {
+      ;
+#if HAVE_MKL || HAVE_LAPACKE
+    } else if (is_contiguous) {
+      int rhs_cols = V::is_vector ? 1 : M::cols(rhs);
+      int info = Common::Lapacke::dpttrs(is_row_major ? Common::Lapacke::row_major() : Common::Lapacke::col_major(),
+                                         size,
+                                         rhs_cols,
+                                         Common::data(diag),
+                                         Common::data(subdiag),
+                                         Common::data(rhs),
+                                         is_row_major ? rhs_cols : size);
+      if (info)
+        DUNE_THROW(Dune::MathError, "Lapack dpttrs failed!");
+#endif // HAVE_MKL || HAVE_LAPACKE
+    } else {
+      internal::solve_tridiag_ldlt(diag, subdiag, rhs);
+    }
+
+  } // static void solve_tridiagonal_ldlt_factorized(...)
+}; // struct CholeskySolver<...>
 
 
 } // namespace internal
@@ -197,21 +298,24 @@ typename std::enable_if_t<Common::is_matrix<MatrixType>::value, void> cholesky(M
 
 
 template <class FirstVectorType, class SecondVectorType>
-void tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
+typename std::enable_if_t<Common::is_vector<FirstVectorType>::value && Common::is_vector<SecondVectorType>::value, void>
+tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
 {
-  const size_t size = diag.size();
-  if (subdiag.size() != size - 1)
-    DUNE_THROW(InvalidStateException, "Wrong size of diag and subdiag!");
-#if HAVE_MKL || HAVE_LAPACKE
-  typedef Common::VectorAbstraction<FirstVectorType> V1;
-  typedef Common::VectorAbstraction<SecondVectorType> V2;
-  auto info = Common::Lapacke::dpttrf(size, V1::data(diag), V2::data(subdiag));
-  if (info)
-    DUNE_THROW(Dune::MathError, "Lapacke_dpptrf returned an error code!");
-#else // HAVE_MKL || HAVE_LAPACKE
-  internal::tridiagonal_ldlt(diag, subdiag);
-#endif
+  internal::LDLTSolver<FirstVectorType, SecondVectorType, SecondVectorType>::tridiagonal_ldlt(diag, subdiag);
+
 } // void tridiagonal_ldlt(...)
+
+
+template <class FirstVectorType, class SecondVectorType, class RhsType>
+typename std::enable_if_t<Common::is_vector<FirstVectorType>::value && Common::is_vector<SecondVectorType>::value
+                              && (Common::is_vector<RhsType>::value || Common::is_matrix<RhsType>::value),
+                          void>
+solve_tridiagonal_ldlt_factorized(const FirstVectorType& diag, const SecondVectorType& subdiag, RhsType& rhs)
+{
+  internal::LDLTSolver<FirstVectorType, SecondVectorType, RhsType>::solve_tridiagonal_ldlt_factorized(
+      diag, subdiag, rhs);
+} // void tridiagonal_ldlt(...)
+
 
 } // namespace LA
 } // namespace XT
