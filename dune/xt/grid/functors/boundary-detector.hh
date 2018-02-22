@@ -10,7 +10,9 @@
 #ifndef DUNE_XT_GRID_FUNCTORS_BOUNDARY_DETECTOR_HH
 #define DUNE_XT_GRID_FUNCTORS_BOUNDARY_DETECTOR_HH
 
+
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
+#include <dune/xt/common/parallel/threadstorage.hh>
 
 #include "interfaces.hh"
 
@@ -20,9 +22,12 @@ namespace Grid {
 
 
 template <class GL>
-class BoundaryDetectorFunctor : public IntersectionFunctor<GL>
+class BoundaryDetectorFunctor : public IntersectionFunctor<GL>,
+                                public Common::ThreadResultPropagator<BoundaryDetectorFunctor<GL>, size_t>
 {
   using BaseType = IntersectionFunctor<GL>;
+  using Propagator = Common::ThreadResultPropagator<BoundaryDetectorFunctor<GL>, size_t>;
+  friend Propagator;
 
 public:
   using ResultType = size_t;
@@ -34,7 +39,8 @@ public:
    * \attention Takes ownership of boundary_type, do not delete manually!
    */
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType* boundary_type)
-    : boundary_info_(boundary_info)
+    : Propagator(this)
+    , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
     , found_(0)
   {
@@ -42,7 +48,8 @@ public:
 
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
                           const std::shared_ptr<BoundaryType>& boundary_type)
-    : boundary_info_(boundary_info)
+    : Propagator(this)
+    , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
     , found_(0)
   {
@@ -72,15 +79,28 @@ public:
     return found_;
   }
 
+  void finalize() override
+  {
+    Propagator::finalize_imp();
+  }
+
   BaseType* copy() override
   {
-    return new BoundaryDetectorFunctor<GL>(*this);
+    return Propagator::copy_imp();
+  }
+
+protected:
+  void set_result(ResultType res)
+  {
+    found_ = res;
   }
 
 private:
   const BoundaryInfo<IntersectionType>& boundary_info_;
   const std::shared_ptr<BoundaryType> boundary_type_;
   size_t found_;
+
+
 }; // class BoundaryDetectorFunctor
 
 
