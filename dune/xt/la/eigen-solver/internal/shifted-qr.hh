@@ -17,7 +17,7 @@
 
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/type_traits.hh>
-#include <dune/xt/la/container/unit_matrices.hh>
+#include <dune/xt/la/container/eye-matrix.hh>
 
 namespace Dune {
 namespace XT {
@@ -32,12 +32,12 @@ struct RealQrEigenSolver
 {
   typedef Dune::DynamicVector<FieldType> VectorType;
   typedef Dune::DynamicMatrix<FieldType> MatrixType;
+  static const size_t max_iterations = 10000;
 
-  static std::vector<double> calculate_eigenvalues_by_shifted_qr(MatrixType& A, std::unique_ptr<MatrixType>& Q)
+  static std::vector<double> calculate_eigenvalues_by_shifted_qr(MatrixType& A, const std::unique_ptr<MatrixType>& Q)
   {
     const size_t num_rows = A.rows();
     const size_t num_cols = A.cols();
-    static constexpr size_t max_iterations = 10000;
     const FieldType tol = 1e-15;
     auto R_k = XT::Common::make_unique<MatrixType>(num_rows, num_cols, 0.);
     auto Q_k = XT::Common::make_unique<MatrixType>(num_rows, num_cols, 0.);
@@ -127,7 +127,7 @@ struct RealQrEigenSolver
   } // .. calculate_eigenvalues_by_shifted_qr(...)
 
   // if Q is provided, Q is expected to be the unit matrix initially
-  static std::vector<double> get_eigenvalues(MatrixType& A, std::unique_ptr<MatrixType>& Q = nullptr)
+  static std::vector<double> get_eigenvalues(MatrixType& A, const std::unique_ptr<MatrixType>& Q = nullptr)
   {
     hessenberg_transformation(A, Q);
     return calculate_eigenvalues_by_shifted_qr(A, Q);
@@ -289,7 +289,7 @@ struct RealQrEigenSolver
 
   //! \brief Transform A to Hessenberg form by transformation P^T A P
   //! \see https://lp.uni-goettingen.de/get/text/2137
-  static void hessenberg_transformation(MatrixType& A, std::unique_ptr<MatrixType>& Q)
+  static void hessenberg_transformation(MatrixType& A, const std::unique_ptr<MatrixType>& Q)
   {
     assert(A.rows() == A.cols() && "Hessenberg transformation needs a square matrix!");
     VectorType u(A.rows(), 0.);
@@ -349,7 +349,7 @@ typename std::enable_if<Common::is_matrix<MatrixType>::value, std::vector<double
 compute_eigenvalues_using_qr(const MatrixType& matrix)
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
-  return RealQrEigenSolver<typename MatrixType::FieldType>::get_eigenvalues(tmp_matrix);
+  return RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix);
 }
 
 template <class MatrixType, class EigenVectorType>
@@ -359,8 +359,8 @@ compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(const MatrixType& 
                                                               EigenVectorType& right_eigenvectors)
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
-  auto Q = XT::LA::UnitMatrix<Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>>::get(
-      tmp_matrix.rows());
+  auto Q = XT::LA::eye_matrix_ptr<Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>>(
+      tmp_matrix.rows(), tmp_matrix.cols());
   eigenvalues =
       RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix, Q);
   auto tmp_eigenvectors =

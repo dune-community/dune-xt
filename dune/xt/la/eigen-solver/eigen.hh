@@ -81,10 +81,10 @@ public:
 protected:
   void compute() const override final
   {
-    const auto type = options_.template get<std::string>("type", EigenSolverOptions<EigenDenseMatrix<S>>::types()[0]);
+    const auto type = options_->template get<std::string>("type", EigenSolverOptions<EigenDenseMatrix<S>>::types()[0]);
     const size_t N = matrix_.rows();
-    const bool compute_eigenvalues = options_.template get<bool>("compute_eigenvalues", true);
-    const bool compute_eigenvectors = options_.template get<bool>("compute_eigenvectors", false);
+    const bool compute_eigenvalues = options_->template get<bool>("compute_eigenvalues", true);
+    const bool compute_eigenvectors = options_->template get<bool>("compute_eigenvectors", false);
     if (type == "eigen") {
       if (compute_eigenvalues && compute_eigenvectors) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);
