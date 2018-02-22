@@ -12,9 +12,9 @@ source ${SUPERDIR}/scripts/bash/retry_command.bash
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} configure
 ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD}
 if [ x"${TESTS}" == x ] ; then
-    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -j1 -v test_binaries
+    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} test_binaries
 else
-    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -j1 -v test_binaries_builder_${TESTS}
+    ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} test_binaries_builder_${TESTS}
 fi
 
 source ${OPTS}
@@ -22,7 +22,7 @@ CTEST="ctest -V --timeout ${DXT_TEST_TIMEOUT:-300} -j ${DXT_TEST_PROCS:-2}"
 
 if [ x"${TESTS}" == x ] ; then
     ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${CTEST}
-    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ninja -j1 headercheck
+    ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} headercheck
 else
     # with binning headercheck is included in building tests
     ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${CTEST} -L "^builder_${TESTS}$"
