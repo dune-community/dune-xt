@@ -33,7 +33,7 @@ template <class T>
 struct GridWalkerTest : public ::testing::Test
 {
   static const size_t griddim = T::value;
-  static const size_t level = 4;
+  static const size_t level = 128;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridLayerType;
   using EntityType = extract_entity_t<GridLayerType>;
@@ -49,8 +49,8 @@ struct GridWalkerTest : public ::testing::Test
     const auto gv = grid_prv.grid().leafGridView();
     Walker<GridLayerType> walker(gv);
     const auto correct_size = gv.size(0);
-    size_t count(0);
-    auto counter = [&](const EntityType&) { count++; };
+    std::atomic<size_t> count(0);
+    auto counter = [&count](const EntityType&) { count++; };
     auto test1 = [&] {
       walker.append(counter);
       walker.walk(false);
@@ -60,6 +60,7 @@ struct GridWalkerTest : public ::testing::Test
       walker.walk(true);
     };
     auto test3 = [&] { walker.append(counter).walk(true); };
+
     list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     // exadune guard for SeedListPartitioning
@@ -148,28 +149,27 @@ struct GridWalkerTest : public ::testing::Test
     const auto gv = grid_prv.grid().leafGridView();
     Walker<GridLayerType> walker(gv);
 
-    size_t filter_count = 0;
-    auto boundaries = [=](const GridLayerType&, const IntersectionType& inter) { return inter.boundary(); };
+    std::atomic<size_t> filter_count{0};
     auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
     const auto info = make_alldirichlet_boundaryinfo(gv);
     BoundaryDetectorFunctor<GridLayerType> detector(*info, new DirichletBoundary());
 
-    ApplyOn::LambdaFilteredIntersections<GridLayerType> on_filter_boundaries(boundaries);
     ApplyOn::BoundaryIntersections<GridLayerType> on_all_boundaries;
-    walker.append(filter_counter, on_filter_boundaries);
+    walker.append(filter_counter, ApplyOn::BoundaryIntersections<GridLayerType>());
     walker.walk(false);
     walker.clear();
     walker.append(detector, on_all_boundaries);
     walker.walk(true);
-    EXPECT_EQ(detector.result(), filter_count);
+    EXPECT_EQ(filter_count, detector.result());
   }
 };
 
 TYPED_TEST_CASE(GridWalkerTest, GridDims);
 TYPED_TEST(GridWalkerTest, Misc)
 {
-  //  this->check_count();
+  this->check_count();
   this->check_apply_on();
+  //  this->check_partitionsets();
   this->check_boundaries();
   this->check_partitioning();
 }
