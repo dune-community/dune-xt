@@ -37,6 +37,14 @@ def latype(c, f):
     return 'Dune::XT::LA::{}<{}>'.format(c, f)
 
 
+def commontype(c, f):
+    return 'Dune::XT::Common::{}<{}>'.format(c, f)
+
+
+def dunetype(c, f):
+    return 'Dune::{}<{}>'.format(c, f)
+
+
 def fieldtypes(cache):
     return ['double', 'std::complex<double>']
 
