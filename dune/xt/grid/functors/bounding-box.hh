@@ -48,9 +48,9 @@ struct MinMaxCoordinateFunctor : public ElementFunctor<GridViewType>
     }
   }
 
-  ElementFunctor<GridViewType>* copy() override
+  std::shared_ptr<BaseType> copy() override
   {
-    return new MinMaxCoordinateFunctor<GridViewType>(*this);
+    return std::make_shared<MinMaxCoordinateFunctor<GridViewType>>(*this);
   }
 
   VectorType minima_;

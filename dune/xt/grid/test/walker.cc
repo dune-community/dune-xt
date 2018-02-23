@@ -33,7 +33,7 @@ template <class T>
 struct GridWalkerTest : public ::testing::Test
 {
   static const size_t griddim = T::value;
-  static const size_t level = 128;
+  static const size_t level = 64;
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef typename GridType::LeafGridView GridLayerType;
   using EntityType = extract_entity_t<GridLayerType>;
@@ -152,7 +152,7 @@ struct GridWalkerTest : public ::testing::Test
     std::atomic<size_t> filter_count{0};
     auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
     const auto info = make_alldirichlet_boundaryinfo(gv);
-    BoundaryDetectorFunctor<GridLayerType> detector(*info, new DirichletBoundary());
+    auto detector = std::make_shared<BoundaryDetectorFunctor<GridLayerType>>(*info, new DirichletBoundary());
 
     ApplyOn::BoundaryIntersections<GridLayerType> on_all_boundaries;
     walker.append(filter_counter, ApplyOn::BoundaryIntersections<GridLayerType>());
@@ -161,9 +161,9 @@ struct GridWalkerTest : public ::testing::Test
     walker.append(detector, on_all_boundaries);
     Walker<GridLayerType> walker_copy(walker);
     walker.walk(true);
-    EXPECT_EQ(filter_count, detector.result());
+    EXPECT_EQ(filter_count, detector->result());
     walker_copy.walk(true);
-    EXPECT_EQ(2 * filter_count, detector.result());
+    EXPECT_EQ(filter_count, detector->result());
   }
 };
 

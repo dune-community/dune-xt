@@ -52,7 +52,7 @@ public:
   {
   }
 
-  virtual ElementFunctor<GridViewType>* copy() = 0;
+  virtual std::shared_ptr<ElementFunctor<GridViewType>> copy() = 0;
 }; // class ElementFunctor
 
 
@@ -93,7 +93,7 @@ public:
   {
   }
 
-  virtual IntersectionFunctor<GridViewType>* copy() = 0;
+  virtual std::shared_ptr<IntersectionFunctor<GridViewType>> copy() = 0;
 }; // class IntersectionFunctor
 
 /**
@@ -132,7 +132,7 @@ public:
   {
   }
 
-  virtual ElementAndIntersectionFunctor<GL>* copy() = 0;
+  virtual std::shared_ptr<ElementAndIntersectionFunctor<GL>> copy() = 0;
 }; // class ElementAndIntersectionFunctor
 
 

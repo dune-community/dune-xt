@@ -137,9 +137,9 @@ public:
     file_.flush();
   }
 
-  BaseType* copy() override
+  std::shared_ptr<BaseType> copy() override
   {
-    return new PgfEntityFunctorIntersections<GridViewType>(*this);
+    return std::make_shared<PgfEntityFunctorIntersections<GridViewType>>(*this);
   }
 
   void maybePrintEntityIndex(const typename BaseType::ElementType& entity, const int idx)
@@ -211,9 +211,9 @@ public:
     this->file_.flush();
   }
 
-  ElementAndIntersectionFunctor<GridViewType>* copy() override
+  std::shared_ptr<ElementAndIntersectionFunctor<GridViewType>> copy() override
   {
-    return new PgfEntityFunctorIntersectionsWithShift<GridViewType>(*this);
+    return std::make_shared<PgfEntityFunctorIntersectionsWithShift<GridViewType>>(*this);
   }
 
 
@@ -248,7 +248,8 @@ public:
     } else
       file << "\\begin{tikzpicture}\n";
     Walker<typename GridType::LeafGridView> gridWalk(grid_.leafGridView());
-    PgfEntityFunctorIntersections<typename GridType::LeafGridView> pgf(grid_.leafGridView(), file);
+    auto pgf =
+        std::make_shared<PgfEntityFunctorIntersections<typename GridType::LeafGridView>>(grid_.leafGridView(), file);
     gridWalk.append(pgf);
     gridWalk.walk();
 
@@ -281,7 +282,7 @@ public:
       typedef typename GridType::LevelGridView ViewType;
       const ViewType& view = grid_.levelGridView(i);
       Walker<ViewType> gridWalk(view);
-      PgfEntityFunctorIntersectionsWithShift<ViewType> pgf(
+      auto pgf = std::make_shared<PgfEntityFunctorIntersectionsWithShift<ViewType>>(
           view, file, texcolors_[std::min(i, int(texcolors_.size()))], i, true);
       gridWalk.append(pgf);
       gridWalk.walk();
@@ -323,13 +324,12 @@ public:
         std::snprintf(buffer, 80, "\\subfloat[Level %d]{\n\\begin{tikzpicture}[scale=\\gridplotscale]\n", i);
         file << buffer;
         Walker<ViewType> gridWalk(view);
-        PgfEntityFunctorIntersections<ViewType> thisLevel(view, file, "black", true);
-        gridWalk.append(thisLevel);
+        gridWalk.append(std::make_shared<PgfEntityFunctorIntersections<ViewType>>(view, file, "black", true));
         gridWalk.walk();
       }
       typedef typename GridType::LeafGridView LeafView;
       Walker<LeafView> leafWalk(grid_.leafGridView());
-      MinMaxCoordinateFunctor<LeafView> minMaxCoord;
+      auto minMaxCoord = std::make_shared<MinMaxCoordinateFunctor<LeafView>>();
       leafWalk.append(minMaxCoord);
       leafWalk.walk();
 
@@ -338,9 +338,9 @@ public:
           char buffer[80] = {'\0'};
           const double offset = 0.2;
           const char* format = "\\node[scale=\\gridcoordscale] at (%f,0) {(%d)};\n";
-          std::snprintf(buffer, 80, format, minMaxCoord.minima_[0] - offset, minMaxCoord.minima_[0]);
+          std::snprintf(buffer, 80, format, minMaxCoord->minima_[0] - offset, minMaxCoord->minima_[0]);
           file << buffer;
-          std::snprintf(buffer, 80, format, minMaxCoord.maxima_[0] - offset, minMaxCoord.maxima_[0]);
+          std::snprintf(buffer, 80, format, minMaxCoord->maxima_[0] - offset, minMaxCoord->maxima_[0]);
           file << buffer;
           break;
         }
@@ -352,18 +352,18 @@ public:
           std::snprintf(buffer,
                         100,
                         format,
-                        minMaxCoord.minima_[0] - offset,
-                        minMaxCoord.minima_[1] - offset,
-                        minMaxCoord.minima_[0],
-                        minMaxCoord.minima_[1]);
+                        minMaxCoord->minima_[0] - offset,
+                        minMaxCoord->minima_[1] - offset,
+                        minMaxCoord->minima_[0],
+                        minMaxCoord->minima_[1]);
           file << buffer;
           std::snprintf(buffer,
                         100,
                         format,
-                        minMaxCoord.maxima_[0] - offset,
-                        minMaxCoord.maxima_[1] - offset,
-                        minMaxCoord.maxima_[0],
-                        minMaxCoord.maxima_[1]);
+                        minMaxCoord->maxima_[0] - offset,
+                        minMaxCoord->maxima_[1] - offset,
+                        minMaxCoord->maxima_[0],
+                        minMaxCoord->maxima_[1]);
           file << buffer;
           break;
         }

@@ -55,9 +55,9 @@ public:
     finalize_lambda_();
   }
 
-  BaseType* copy() override
+  std::shared_ptr<BaseType> copy() override
   {
-    return new ElementLambdaFunctor<GL>(*this);
+    return std::make_shared<ElementLambdaFunctor<GL>>(*this);
   }
 
 private:
@@ -107,9 +107,9 @@ public:
     finalize_lambda_();
   }
 
-  BaseType* copy() override
+  std::shared_ptr<BaseType> copy() override
   {
-    return new IntersectionLambdaFunctor(*this);
+    return std::make_shared<IntersectionLambdaFunctor>(*this);
   }
 
 private:
@@ -167,9 +167,9 @@ public:
     finalize_lambda_();
   }
 
-  BaseType* copy() override
+  std::shared_ptr<BaseType> copy() override
   {
-    return new ElementAndIntersectionLambdaFunctor<GL>(*this);
+    return std::make_shared<ElementAndIntersectionLambdaFunctor<GL>>(*this);
   }
 
 private:

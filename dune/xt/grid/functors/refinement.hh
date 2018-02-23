@@ -41,9 +41,9 @@ struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
       grid_.mark(1, element);
   }
 
-  ElementFunctor<GridViewType>* copy() override
+  std::shared_ptr<BaseType> copy() override
   {
-    return new MaximumEntityVolumeRefineFunctor<GridViewType>(*this);
+    return std::make_shared<MaximumEntityVolumeRefineFunctor<GridViewType>>(*this);
   }
 
   const double threshold_volume_;

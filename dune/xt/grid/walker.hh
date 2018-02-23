@@ -177,13 +177,14 @@ public:
    * \{
    */
 
-  ThisType& append(ElementFunctor<GL>& functor, const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>())
+  ThisType& append(const std::shared_ptr<ElementFunctor<GL>>& functor,
+                   const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>())
   {
     emplace_all(element_functor_wrappers_, functor, filter);
     return *this;
   }
 
-  ThisType& append(ElementFunctor<GL>& functor, ViewElementFunction element_filter)
+  ThisType& append(const std::shared_ptr<ElementFunctor<GL>>& functor, ViewElementFunction element_filter)
   {
     emplace_all(element_functor_wrappers_, functor, ApplyOn::LambdaFilteredElements<GL>(element_filter));
     return *this;
@@ -200,8 +201,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, filter);
+    return this->append(std::make_shared<ElementLambdaFunctor<GL>>(apply_lambda, prepare_lambda, finalize_lambda),
+                        filter);
   }
 
   ThisType& append(ElementFunction apply_lambda,
@@ -209,8 +210,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, ApplyOn::LambdaFilteredElements<GL>(filter));
+    return this->append(std::make_shared<ElementLambdaFunctor<GL>>(apply_lambda, prepare_lambda, finalize_lambda),
+                        ApplyOn::LambdaFilteredElements<GL>(filter));
   }
 
   /**
@@ -219,14 +220,14 @@ public:
    * \{
    */
 
-  ThisType& append(IntersectionFunctor<GL>& functor,
+  ThisType& append(const std::shared_ptr<IntersectionFunctor<GL>>& functor,
                    const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>())
   {
     emplace_all(intersection_functor_wrappers_, functor, filter);
     return *this;
   }
 
-  ThisType& append(IntersectionFunctor<GL>& functor, ViewIntersectionFunction filter)
+  ThisType& append(const std::shared_ptr<IntersectionFunctor<GL>>& functor, ViewIntersectionFunction filter)
   {
     emplace_all(intersection_functor_wrappers_, functor, ApplyOn::LambdaFilteredIntersections<GL>(filter));
     return *this;
@@ -243,8 +244,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    IntersectionLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, filter);
+    return this->append(std::make_shared<IntersectionLambdaFunctor<GL>>(apply_lambda, prepare_lambda, finalize_lambda),
+                        filter);
   }
 
   ThisType& append(IntersectionElementElementFunction apply_lambda,
@@ -252,8 +253,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    IntersectionLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, ApplyOn::LambdaFilteredIntersections<GL>(filter));
+    return this->append(std::make_shared<IntersectionLambdaFunctor<GL>>(apply_lambda, prepare_lambda, finalize_lambda),
+                        ApplyOn::LambdaFilteredIntersections<GL>(filter));
   }
 
   /**
@@ -262,21 +263,21 @@ public:
    * \{
    */
 
-  ThisType& append(ElementAndIntersectionFunctor<GL>& functor,
+  ThisType& append(const std::shared_ptr<ElementAndIntersectionFunctor<GL>>& functor,
                    const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>(),
                    const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>())
   {
-    if (&functor == this)
+    if (functor.get() == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
     emplace_all(element_and_intersection_functor_wrappers_, functor, element_filter, intersection_filter);
     return *this;
   }
 
-  ThisType& append(ElementAndIntersectionFunctor<GL>& functor,
+  ThisType& append(const std::shared_ptr<ElementAndIntersectionFunctor<GL>>& functor,
                    ViewElementFunction element_filter,
                    ViewIntersectionFunction intersection_filter)
   {
-    if (&functor == this)
+    if (functor.get() == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
     emplace_all(element_and_intersection_functor_wrappers_,
                 functor,
@@ -296,10 +297,10 @@ public:
                    ViewElementFunction element_filter,
                    ViewIntersectionFunction intersection_filter)
   {
-    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on);
-    return this->append(f,
-                        ApplyOn::LambdaFilteredElements<GL>(element_filter),
-                        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
+    return this->append(
+        std::make_shared<ElementAndIntersectionLambdaFunctor<GL>>(element_apply_on, intersection_apply_on),
+        ApplyOn::LambdaFilteredElements<GL>(element_filter),
+        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
   }
 
   ThisType& append(ElementFunction element_apply_on,
@@ -309,8 +310,10 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda);
-    return this->append(f, element_filter, intersection_filter);
+    return this->append(std::make_shared<ElementAndIntersectionLambdaFunctor<GL>>(
+                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
+                        element_filter,
+                        intersection_filter);
   }
 
   ThisType& append(ElementFunction element_apply_on,
@@ -320,8 +323,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda);
-    return this->append(f,
+    return this->append(std::make_shared<ElementAndIntersectionLambdaFunctor<GL>>(
+                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
                         ApplyOn::LambdaFilteredElements<GL>(element_filter),
                         ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
   }
@@ -390,7 +393,7 @@ public:
     auto prep = [](auto& pt) {
       for (auto&& list_ptr : pt) {
         for (auto&& wrapper : *list_ptr)
-          wrapper->functor().prepare();
+          wrapper->functor()->prepare();
       }
     };
     prep(element_functor_wrappers_);
@@ -402,11 +405,11 @@ public:
   {
     for (auto&& wrapper : *element_functor_wrappers_) {
       if (wrapper->filter().contains(grid_view_, element))
-        wrapper->functor().apply_local(element);
+        wrapper->functor()->apply_local(element);
     }
     for (auto&& wrapper : *element_and_intersection_functor_wrappers_) {
       if (wrapper->element_filter().contains(grid_view_, element))
-        wrapper->functor().apply_local(element);
+        wrapper->functor()->apply_local(element);
     }
   } // ... apply_local(...)
 
@@ -416,11 +419,11 @@ public:
   {
     for (auto&& wrapper : *intersection_functor_wrappers_) {
       if (wrapper->filter().contains(grid_view_, intersection))
-        wrapper->functor().apply_local(intersection, inside_element, outside_element);
+        wrapper->functor()->apply_local(intersection, inside_element, outside_element);
     }
     for (auto&& wrapper : *element_and_intersection_functor_wrappers_) {
       if (wrapper->intersection_filter().contains(grid_view_, intersection))
-        wrapper->functor().apply_local(intersection, inside_element, outside_element);
+        wrapper->functor()->apply_local(intersection, inside_element, outside_element);
     }
   } // ... apply_local(...)
 
@@ -429,7 +432,7 @@ public:
     auto fin = [](auto& pt) {
       for (auto&& list_ptr : pt) {
         for (auto&& wrapper : *list_ptr)
-          wrapper->functor().finalize();
+          wrapper->functor()->finalize();
       }
     };
     fin(element_and_intersection_functor_wrappers_);
@@ -484,9 +487,9 @@ public:
     clr(element_and_intersection_functor_wrappers_);
   }
 
-  BaseType* copy() override
+  std::shared_ptr<BaseType> copy() override
   {
-    return new ThisType(*this);
+    return std::make_shared<ThisType>(*this);
   }
 
 
