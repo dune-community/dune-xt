@@ -87,8 +87,62 @@ public:
   {
   }
 
-  Walker(const Walker& other) = delete;
-  Walker(Walker&& source) = default;
+  Walker(const ThisType& other)
+    : grid_view_(other.grid_view_)
+    , user_decided_agains_clearing_of_functors_(other.user_decided_agains_clearing_of_functors_)
+  {
+    // Since all Common::PerThreadValue are created with the same size given by the global singleton threadManage(),
+    // we just assume they are of the same size!
+    // Copy the element functors ...
+    auto this_element_functor_wrappers_it = element_functor_wrappers_.begin();
+    auto other_element_functor_wrappers_it = other.element_functor_wrappers_.begin();
+    for (; this_element_functor_wrappers_it != element_functor_wrappers_.end()
+           && other_element_functor_wrappers_it != other.element_functor_wrappers_.end();
+         ++this_element_functor_wrappers_it) {
+      auto& this_element_functor_wrappers = *(*this_element_functor_wrappers_it);
+      const auto& other_element_functor_wrappers = *other_element_functor_wrappers_it;
+      for (const auto& other_element_functor_wrapper : *other_element_functor_wrappers) {
+        this_element_functor_wrappers.emplace_back(new internal::ElementFunctorWrapper<GridViewType>(
+            other_element_functor_wrapper->functor(), other_element_functor_wrapper->filter()));
+      }
+      ++other_element_functor_wrappers_it;
+    }
+    // ... the intersection functors ...
+    auto this_intersection_functor_wrappers_it = intersection_functor_wrappers_.begin();
+    auto other_intersection_functor_wrappers_it = other.intersection_functor_wrappers_.begin();
+    for (; this_intersection_functor_wrappers_it != intersection_functor_wrappers_.end()
+           && other_intersection_functor_wrappers_it != other.intersection_functor_wrappers_.end();
+         ++this_intersection_functor_wrappers_it) {
+      auto& this_intersection_functor_wrappers = *(*this_intersection_functor_wrappers_it);
+      const auto& other_intersection_functor_wrappers = *other_intersection_functor_wrappers_it;
+      for (const auto& other_intersection_functor_wrapper : *other_intersection_functor_wrappers) {
+        this_intersection_functor_wrappers.emplace_back(new internal::IntersectionFunctorWrapper<GridViewType>(
+            other_intersection_functor_wrapper->functor(), other_intersection_functor_wrapper->filter()));
+      }
+      ++other_intersection_functor_wrappers_it;
+    }
+    // ... and the element-and-intersection functors ...
+    auto this_element_and_intersection_functor_wrappers_it = element_and_intersection_functor_wrappers_.begin();
+    auto other_element_and_intersection_functor_wrappers_it = other.element_and_intersection_functor_wrappers_.begin();
+    for (; this_element_and_intersection_functor_wrappers_it != element_and_intersection_functor_wrappers_.end()
+           && other_element_and_intersection_functor_wrappers_it
+                  != other.element_and_intersection_functor_wrappers_.end();
+         ++this_element_and_intersection_functor_wrappers_it) {
+      auto& this_element_and_intersection_functor_wrappers = *(*this_element_and_intersection_functor_wrappers_it);
+      const auto& other_element_and_intersection_functor_wrappers = *other_element_and_intersection_functor_wrappers_it;
+      for (const auto& other_element_and_intersection_functor_wrapper :
+           *other_element_and_intersection_functor_wrappers) {
+        this_element_and_intersection_functor_wrappers.emplace_back(
+            new internal::ElementAndIntersectionFunctorWrapper<GridViewType>(
+                other_element_and_intersection_functor_wrapper->functor(),
+                other_element_and_intersection_functor_wrapper->element_filter(),
+                other_element_and_intersection_functor_wrapper->intersection_filter()));
+      }
+      ++other_element_and_intersection_functor_wrappers_it;
+    }
+  } // Walker(...)
+
+  Walker(ThisType&& source) = default;
 
   ~Walker()
   {
@@ -135,12 +189,12 @@ public:
     return *this;
   }
 
-
   /**
    * \}
    * \name These methods can be used to append an element lambda expression.
    * \{
    */
+
   ThisType& append(ElementFunction apply_lambda,
                    const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>(),
                    VoidFunction prepare_lambda = dxt_void_noop,
@@ -183,6 +237,7 @@ public:
    * \name These methods can be used to append an intersection lambda expression.
    * \{
    */
+
   ThisType& append(IntersectionElementElementFunction apply_lambda,
                    const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>(),
                    VoidFunction prepare_lambda = dxt_void_noop,
@@ -206,6 +261,7 @@ public:
    * \name These methods can be used to append an \sa ElementAndIntersectionFunctor.
    * \{
    */
+
   ThisType& append(ElementAndIntersectionFunctor<GL>& functor,
                    const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>(),
                    const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>())
@@ -229,12 +285,12 @@ public:
     return *this;
   }
 
-
   /**
    * \}
    * \name These methods can be used to append element and intersection lambda expressions.
    * \{
    */
+
   ThisType& append(ElementFunction element_apply_on,
                    IntersectionElementElementFunction intersection_apply_on,
                    ViewElementFunction element_filter,
@@ -430,8 +486,7 @@ public:
 
   BaseType* copy() override
   {
-    DUNE_THROW(NotImplemented, "");
-    return nullptr;
+    return new ThisType(*this);
   }
 
 
