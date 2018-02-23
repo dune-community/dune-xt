@@ -45,12 +45,9 @@ public:
   using FunctorType = ElementFunctor<GL>;
   using FilterType = ElementFilter<GL>;
 
-  /**
-   * \attention Takes ownership of filtr_ptr, do not delete manually!
-   */
-  ElementFunctorWrapper(FunctorType& functr, const FilterType& filtr_ptr)
+  ElementFunctorWrapper(FunctorType& functr, const FilterType& filtr)
     : functor_(functr.copy())
-    , filter_(filtr_ptr.copy())
+    , filter_(filtr.copy())
   {
   }
 
@@ -151,11 +148,11 @@ public:
    * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
    */
   ElementAndIntersectionFunctorWrapper(FunctorType& functr,
-                                       const ElementFilterType& element_filtr_ptr,
-                                       const IntersectionFilterType& intersection_filtr_ptr)
+                                       const ElementFilterType& element_filtr,
+                                       const IntersectionFilterType& intersection_filtr)
     : functor_(functr.copy())
-    , element_filter_(element_filtr_ptr.copy())
-    , intersection_filter_(intersection_filtr_ptr.copy())
+    , element_filter_(element_filtr.copy())
+    , intersection_filter_(intersection_filtr.copy())
   {
   }
 
