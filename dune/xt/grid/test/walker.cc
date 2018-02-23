@@ -159,8 +159,11 @@ struct GridWalkerTest : public ::testing::Test
     walker.walk(false);
     walker.clear();
     walker.append(detector, on_all_boundaries);
+    Walker<GridLayerType> walker_copy(walker);
     walker.walk(true);
     EXPECT_EQ(filter_count, detector.result());
+    walker_copy.walk(true);
+    EXPECT_EQ(2 * filter_count, detector.result());
   }
 };
 
