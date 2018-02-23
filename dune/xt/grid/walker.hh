@@ -94,52 +94,28 @@ public:
     // Since all Common::PerThreadValue are created with the same size given by the global singleton threadManage(),
     // we just assume they are of the same size!
     // Copy the element functors ...
-    auto this_element_functor_wrappers_it = element_functor_wrappers_.begin();
-    auto other_element_functor_wrappers_it = other.element_functor_wrappers_.begin();
-    for (; this_element_functor_wrappers_it != element_functor_wrappers_.end()
-           && other_element_functor_wrappers_it != other.element_functor_wrappers_.end();
-         ++this_element_functor_wrappers_it) {
-      auto& this_element_functor_wrappers = *(*this_element_functor_wrappers_it);
-      const auto& other_element_functor_wrappers = *other_element_functor_wrappers_it;
-      for (const auto& other_element_functor_wrapper : *other_element_functor_wrappers) {
-        this_element_functor_wrappers.emplace_back(new internal::ElementFunctorWrapper<GridViewType>(
-            other_element_functor_wrapper->functor(), other_element_functor_wrapper->filter()));
+    auto zip_emplace = [](auto& target_thread_ctr, const auto& source_thread_ctr, auto& gen_function) {
+      auto target_wrappers_it = target_thread_ctr.begin(), source_wrappers_it = source_thread_ctr.begin();
+      for (; target_wrappers_it != target_thread_ctr.end() && source_wrappers_it != source_thread_ctr.end();
+           ++target_wrappers_it, ++source_wrappers_it) {
+        auto& target__wrappers = *(*target_wrappers_it);
+        for (auto&& source_wrapper : **source_wrappers_it) {
+          target__wrappers.emplace_back(gen_function(*source_wrapper));
+        }
       }
-      ++other_element_functor_wrappers_it;
-    }
-    // ... the intersection functors ...
-    auto this_intersection_functor_wrappers_it = intersection_functor_wrappers_.begin();
-    auto other_intersection_functor_wrappers_it = other.intersection_functor_wrappers_.begin();
-    for (; this_intersection_functor_wrappers_it != intersection_functor_wrappers_.end()
-           && other_intersection_functor_wrappers_it != other.intersection_functor_wrappers_.end();
-         ++this_intersection_functor_wrappers_it) {
-      auto& this_intersection_functor_wrappers = *(*this_intersection_functor_wrappers_it);
-      const auto& other_intersection_functor_wrappers = *other_intersection_functor_wrappers_it;
-      for (const auto& other_intersection_functor_wrapper : *other_intersection_functor_wrappers) {
-        this_intersection_functor_wrappers.emplace_back(new internal::IntersectionFunctorWrapper<GridViewType>(
-            other_intersection_functor_wrapper->functor(), other_intersection_functor_wrapper->filter()));
-      }
-      ++other_intersection_functor_wrappers_it;
-    }
-    // ... and the element-and-intersection functors ...
-    auto this_element_and_intersection_functor_wrappers_it = element_and_intersection_functor_wrappers_.begin();
-    auto other_element_and_intersection_functor_wrappers_it = other.element_and_intersection_functor_wrappers_.begin();
-    for (; this_element_and_intersection_functor_wrappers_it != element_and_intersection_functor_wrappers_.end()
-           && other_element_and_intersection_functor_wrappers_it
-                  != other.element_and_intersection_functor_wrappers_.end();
-         ++this_element_and_intersection_functor_wrappers_it) {
-      auto& this_element_and_intersection_functor_wrappers = *(*this_element_and_intersection_functor_wrappers_it);
-      const auto& other_element_and_intersection_functor_wrappers = *other_element_and_intersection_functor_wrappers_it;
-      for (const auto& other_element_and_intersection_functor_wrapper :
-           *other_element_and_intersection_functor_wrappers) {
-        this_element_and_intersection_functor_wrappers.emplace_back(
-            new internal::ElementAndIntersectionFunctorWrapper<GridViewType>(
-                other_element_and_intersection_functor_wrapper->functor(),
-                other_element_and_intersection_functor_wrapper->element_filter(),
-                other_element_and_intersection_functor_wrapper->intersection_filter()));
-      }
-      ++other_element_and_intersection_functor_wrappers_it;
-    }
+    };
+    auto el_wrapper = [](auto&& wrapper) {
+      return new typename std::decay<decltype(wrapper)>::type(wrapper.functor(), wrapper.filter());
+    };
+    zip_emplace(element_functor_wrappers_, other.element_functor_wrappers_, el_wrapper);
+    zip_emplace(intersection_functor_wrappers_, other.intersection_functor_wrappers_, el_wrapper);
+
+    auto elint_wrapper = [](auto&& wrapper) {
+      return new typename std::decay<decltype(wrapper)>::type(
+          wrapper.functor(), wrapper.element_filter(), wrapper.intersection_filter());
+    };
+    zip_emplace(
+        element_and_intersection_functor_wrappers_, other.element_and_intersection_functor_wrappers_, elint_wrapper);
   } // Walker(...)
 
   Walker(ThisType&& source) = default;
