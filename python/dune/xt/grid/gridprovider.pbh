@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_PBH
 #define DUNE_XT_GRID_GRIDPROVIDER_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <algorithm>
 
@@ -205,5 +204,4 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_GRID_GRIDPROVIDER_PBH
