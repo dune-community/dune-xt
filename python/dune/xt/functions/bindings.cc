@@ -10,8 +10,6 @@
 
 #include "config.h"
 
-#if HAVE_DUNE_PYBINDXI
-
 #include <string>
 #include <vector>
 
@@ -343,6 +341,3 @@ PYBIND11_PLUGIN(_functions)
 
   return m.ptr();
 }
-
-
-#endif // HAVE_DUNE_PYBINDXI

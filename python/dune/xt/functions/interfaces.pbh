@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACE_PBH
 #define DUNE_XT_FUNCTIONS_INTERFACE_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
@@ -347,5 +346,4 @@ void addbind_LocalizableFunctionInterface_combined_op(C& c)
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_INTERFACE_PBH
