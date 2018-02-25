@@ -19,10 +19,6 @@
 #include <dune/grid/common/gridview.hh>
 
 
-#if HAVE_DUNE_FEM
-#include <dune/fem/gridpart/common/gridpart.hh>
-#endif
-
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/grids.hh>
@@ -183,14 +179,6 @@ struct is_part : public std::false_type
 {
 };
 
-#if HAVE_DUNE_FEM
-
-template <class T>
-struct is_part<T, true> : public std::is_base_of<Dune::Fem::GridPartInterface<typename T::Traits>, T>
-{
-};
-
-#endif // HAVE_DUNE_FEM
 
 template <class T>
 struct DUNE_DEPRECATED_MSG("Use is_part instead (03.04.2017)!") is_grid_part : public is_part<T>

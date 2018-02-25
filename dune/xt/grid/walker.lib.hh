@@ -25,20 +25,7 @@
                                                                       Dune::XT::Grid::Backends::_backend,              \
                                                                       Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::type>
 
-#if HAVE_DUNE_FEM
-#define _DUNE_XT_GRID_WALKER_LIB_PART(_prefix, _GRID)                                                                  \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, part);                                                               \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, leaf, part);                                                                \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, adaptive_leaf, part);                                                       \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain, view);                                                        \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_coupling, view);                                               \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, dd_subdomain_boundary, view)
-#else
-#define _DUNE_XT_GRID_WALKER_LIB_PART(_prefix, _GRID)
-#endif
-
 #define DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID)                                                                        \
-  _DUNE_XT_GRID_WALKER_LIB_PART(_prefix, _GRID);                                                                       \
   _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, view);                                                               \
   _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, leaf, view)
 
