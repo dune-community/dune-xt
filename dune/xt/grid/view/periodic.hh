@@ -1093,7 +1093,7 @@ make_periodic_grid_view(const GL& real_grid_layer,
  * \see PeriodicGridPart
  */
 template <class GL, bool c = false>
-using PeriodicGridLayer = std::conditional_t<is_view<GL>::value, PeriodicGridView<GL, c>, PeriodicGridPart<GL, c>>;
+using PeriodicGridLayer = PeriodicGridView<GL, c>;
 
 template <bool use_less_memory, class GP>
 PeriodicGridLayer<GP, use_less_memory>
