@@ -12,5 +12,4 @@
 Module: dune-xt-la
 Version: 2.5.0-dev
 Maintainer: dune-xt-dev@listserv.uni-muenster.de
-Depends: dune-common (>= 2.5) dune-testtools (>= 2.5) dune-xt-common (>=2.5)
-Suggests: dune-istl (>= 2.5)
+Depends: dune-common (>= 2.5) dune-testtools (>= 2.5) dune-xt-common (>=2.5) dune-istl (>= 2.5)
