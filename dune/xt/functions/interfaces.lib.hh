@@ -16,7 +16,6 @@
 #if DUNE_XT_WITH_PYTHON_BINDINGS
 
 
-#if HAVE_DUNE_FEM
 #define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_DD_SUBDOMAIN(_p, _G, _t, _b, _R, _r, _rC)                           \
   _p void Dune::XT::Functions::LocalizableFunctionInterface<                                                           \
       typename _G::template Codim<0>::Entity,                                                                          \
@@ -31,9 +30,6 @@
                       const std::string,                                                                               \
                       const bool,                                                                                      \
                       const VTK::OutputType) const
-#else
-#define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_DD_SUBDOMAIN(_p, _G, _t, _b, _R, _r, _rC)
-#endif
 
 #define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, _t, _b, _R, _r, _rC)                                        \
   _p void Dune::XT::Functions::LocalizableFunctionInterface<typename _G::template Codim<0>::Entity,                    \
@@ -50,10 +46,10 @@
 
 #if HAVE_DUNE_FEM
 #define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_PART(_p, _G, _R, _r, _rC)                                           \
-  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, adaptive_leaf, part, _R, _r, _rC);                                \
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, adaptive_leaf, view, _R, _r, _rC);                                \
   _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, leaf, part, _R, _r, _rC);                                         \
   _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE(_p, _G, level, part, _R, _r, _rC);                                        \
-  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_DD_SUBDOMAIN(_p, _G, dd_subdomain, part, _R, _r, _rC)
+  _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_DD_SUBDOMAIN(_p, _G, dd_subdomain, view, _R, _r, _rC)
 #else
 #define _DUNE_XT_FUNCTIONS_INTERFACE_LIB_VISUALIZE_PART(_p, _G, _R, _r, _rC)
 #endif
