@@ -31,14 +31,6 @@ struct backend_name
   }
 };
 
-template <>
-struct backend_name<Backends::part>
-{
-  static std::string value()
-  {
-    return "part";
-  }
-};
 
 template <>
 struct backend_name<Backends::view>

@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_GRID_WALKER_APPLYON_BINDGINS_HH
 #define DUNE_XT_GRID_WALKER_APPLYON_BINDGINS_HH
-#if HAVE_DUNE_PYBINDXI
 
 #include <sstream>
 #include <type_traits>
@@ -173,5 +172,4 @@ public:
 // end: this is what we need for the .so
 
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_GRID_WALKER_APPLYON_BINDGINS_HH

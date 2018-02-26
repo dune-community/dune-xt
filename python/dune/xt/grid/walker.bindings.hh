@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_GRID_WALKER_BINDINGS_HH
 #define DUNE_XT_GRID_WALKER_BINDINGS_HH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 
@@ -123,5 +122,4 @@ public:
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_GRID_WALKER_BINDINGS_HH

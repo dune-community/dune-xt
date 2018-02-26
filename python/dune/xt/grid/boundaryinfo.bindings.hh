@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH
-#if HAVE_DUNE_PYBINDXI
 
 #include <sstream>
 #include <type_traits>
@@ -279,5 +278,4 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
 // end: this is what we need for the .so
 
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH

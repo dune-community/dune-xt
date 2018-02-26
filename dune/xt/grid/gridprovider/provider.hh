@@ -36,13 +36,8 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-#if HAVE_DUNE_FEM
 template <class T>
 using DefaultDDGridImp = DD::SubdomainGrid<T>;
-#else
-template <class T>
-using DefaultDDGridImp = AlwaysFalse<T>;
-#endif
 
 template <class GridImp, typename DdGridImp = DefaultDDGridImp<GridImp>>
 class GridProvider
@@ -58,17 +53,9 @@ public:
   typedef typename GridType::ctype DomainFieldType;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef typename GridType::template Codim<0>::Entity EntityType;
-
   typedef typename Layer<GridType, Layers::level, Backends::view>::type LevelGridViewType;
-#if HAVE_DUNE_FEM
-  typedef typename Layer<GridType, Layers::level, Backends::part>::type LevelGridPartType;
-#endif
-
   typedef typename Layer<GridType, Layers::leaf, Backends::view>::type LeafGridViewType;
-#if HAVE_DUNE_FEM
-  typedef typename Layer<GridType, Layers::leaf, Backends::part>::type LeafGridPartType;
-  typedef typename Layer<GridType, Layers::adaptive_leaf, Backends::part>::type AdaptiveLeafGridPartType;
-#endif
+
 
   static const std::string static_id()
   {
@@ -175,12 +162,6 @@ public:
     return Layer<GridType, lr, backend, DdGridType>::create(*grid_ptr_, lvl, dd_grid_ptr_);
   }
 
-  template <Layers lr>
-  typename Layer<GridType, lr, Backends::part, DdGridType>::type layer(const int lvl = 0)
-  {
-    return Layer<GridType, lr, Backends::part, DdGridType>::create(*grid_ptr_, lvl, dd_grid_ptr_);
-  }
-
   LevelGridViewType level_view(const int lvl) const
   {
     return Layer<GridType, Layers::level, Backends::view>::create(*grid_ptr_, lvl);
@@ -190,25 +171,6 @@ public:
   {
     return Layer<GridType, Layers::leaf, Backends::view>::create(*grid_ptr_);
   }
-
-#if HAVE_DUNE_FEM
-
-  LevelGridPartType level_part(const int lvl)
-  {
-    return Layer<GridType, Layers::level, Backends::part>::create(*grid_ptr_, lvl);
-  }
-
-  LeafGridPartType leaf_part()
-  {
-    return Layer<GridType, Layers::leaf, Backends::part>::create(*grid_ptr_);
-  }
-
-  AdaptiveLeafGridPartType adaptive_leaf_part()
-  {
-    return Layer<GridType, Layers::adaptive_leaf, Backends::part>::create(*grid_ptr_);
-  }
-
-#endif // HAVE_DUNE_FEM
 
   void visualize(const std::string filename = static_id(),
                  const Common::Configuration& boundary_info_cfg = Common::Configuration()) const

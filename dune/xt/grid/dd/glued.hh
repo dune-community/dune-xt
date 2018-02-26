@@ -152,10 +152,6 @@ public:
 
   typedef LocalGridImp LocalGridType;
   typedef XT::Grid::GridProvider<LocalGridType> LocalGridProviderType;
-
-#if HAVE_DUNE_FEM
-  typedef typename LocalGridProviderType::LevelGridPartType MicroGridPartType;
-#endif
   typedef typename LocalGridType::LevelGridView MicroGridViewType;
   using MicroEntityType = XT::Grid::extract_entity_t<MicroGridViewType>;
 
@@ -264,16 +260,6 @@ public:
     return global_grid_->level_view(global_grid_->grid().maxLevel());
   }
 
-#if HAVE_DUNE_FEM
-  MicroGridPartType global_grid_part()
-  {
-    auto logger = XT::Common::TimedLogger().get("grid-multiscale.glued.global_grid_part");
-    logger.warn() << "Requiring inefficient access to global micro grid!" << std::endl;
-    assert_macro_grid_state();
-    prepare_global_grid();
-    return MicroGridPartType(global_grid_->grid(), global_grid_->grid().maxLevel());
-  }
-#endif // HAVE_DUNE_FEM
 
   const std::vector<std::vector<size_t>>& local_to_global_indices()
   {

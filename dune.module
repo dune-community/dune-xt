@@ -13,4 +13,4 @@ Module: dune-xt-grid
 Version: 2.5.0-dev
 Maintainer: dune-xt-dev@listserv.uni-muenster.de
 Depends: dune-common (>= 2.5) dune-testtools (>= 2.5) dune-geometry (>= 2.5) dune-grid (>= 2.5) dune-xt-common (>=2.5)
-Suggests: dune-alugrid (>= 2.5) dune-grid-glue dune-fem dune-pdelab (>= 2.5) dune-uggrid (>= 2.5)
+Suggests: dune-alugrid (>= 2.5) dune-grid-glue dune-fem dune-uggrid (>= 2.5)

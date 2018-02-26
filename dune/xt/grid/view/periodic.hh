@@ -31,7 +31,6 @@
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/grid/view/gridview2gridpart.hh>
 
 namespace Dune {
 namespace XT {
@@ -1088,88 +1087,13 @@ make_periodic_grid_view(const GL& real_grid_layer,
 }
 
 
-#if HAVE_DUNE_FEM
-
-
-/**
- * \brief A grid part that takes an arbitrary Dune::Fem::GridPartInterface and adds periodic boundaries.
- * \see PeriodicGridView
- */
-template <class RealGridPartImp, bool codim_iters_provided = false>
-class PeriodicGridPart
-    : XT::Common::ConstStorageProvider<PeriodicGridView<RealGridPartImp, codim_iters_provided>>,
-      public Dune::XT::Grid::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>>
-{
-  static_assert(is_part<RealGridPartImp>::value || is_dd_subdomain<RealGridPartImp>::value, "");
-  using Implementation = PeriodicGridView<RealGridPartImp, codim_iters_provided>;
-  using ImplementationStorage = XT::Common::ConstStorageProvider<Implementation>;
-  using BaseType = Dune::XT::Grid::GridView2GridPart<PeriodicGridView<RealGridPartImp, codim_iters_provided>>;
-
-public:
-  using BaseType::dimension;
-  using RealGridLayerType = RealGridPartImp;
-
-  PeriodicGridPart(const RealGridLayerType& real_grid_part,
-                   const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
-    : ImplementationStorage(new Implementation(real_grid_part, periodic_directions))
-    , BaseType(ImplementationStorage::access())
-  {
-  }
-
-  void update()
-  {
-    ImplementationStorage::access().update();
-  }
-
-  const RealGridLayerType& as_real_grid_layer() const
-  {
-    ImplementationStorage::access().as_real_grid_layer();
-  }
-
-  RealGridLayerType& as_real_grid_layer()
-  {
-    ImplementationStorage::access().as_real_grid_layer();
-  }
-}; // class PeriodicGridPart
-
-
-#else // HAVE_DUNE_FEM
-
-
-template <class RealGridPartImp, bool codim_iters_provided = false>
-class PeriodicGridPart
-{
-  static_assert(AlwaysFalse<RealGridPartImp>::value, "You are missing dune-fem!");
-};
-
-
-#endif // HAVE_DUNE_FEM
-
-
-template <bool use_less_memory, class GP>
-PeriodicGridPart<GP, use_less_memory>
-make_periodic_grid_part(const GP& real_grid_part,
-                        const std::bitset<GP::dimension> periodic_directions = std::bitset<GP::dimension>().set())
-{
-  return PeriodicGridPart<GP, use_less_memory>(real_grid_part, periodic_directions);
-}
-
-template <class GP>
-PeriodicGridPart<GP>
-make_periodic_grid_part(const GP& real_grid_layer,
-                        const std::bitset<GP::dimension> periodic_directions = std::bitset<GP::dimension>().set())
-{
-  return PeriodicGridPart<GP>(real_grid_layer, periodic_directions);
-}
-
-
 /**
  * \brief Either PeriodicGridView or PeriodicGridPart, depending on GL.
  * \see PeriodicGridView
  * \see PeriodicGridPart
  */
 template <class GL, bool c = false>
-using PeriodicGridLayer = std::conditional_t<is_view<GL>::value, PeriodicGridView<GL, c>, PeriodicGridPart<GL, c>>;
+using PeriodicGridLayer = PeriodicGridView<GL, c>;
 
 template <bool use_less_memory, class GP>
 PeriodicGridLayer<GP, use_less_memory>
@@ -1190,56 +1114,6 @@ make_periodic_grid_layer(const GP& real_grid_layer,
 
 } // namespace Grid
 } // namespace XT
-
-#if HAVE_DUNE_FEM
-
-namespace Fem {
-namespace GridPartCapabilities {
-
-
-template <class GP, bool c>
-struct hasGrid<XT::Grid::PeriodicGridPart<GP, c>>
-{
-  static const bool v = hasGrid<GP>::v;
-};
-
-template <class GP, bool c>
-struct hasSingleGeometryType<XT::Grid::PeriodicGridPart<GP, c>>
-{
-  static const bool v = hasSingleGeometryType<GP>::v;
-  static const unsigned int topologyId = hasSingleGeometryType<GP>::topologyId;
-};
-
-template <class GP, bool c>
-struct isCartesian<XT::Grid::PeriodicGridPart<GP, c>>
-{
-  static const bool v = isCartesian<GP>::v;
-};
-
-template <class GP, bool c, int codim>
-struct hasEntity<XT::Grid::PeriodicGridPart<GP, c>, codim>
-{
-  static const bool v = hasEntity<GP, codim>::v;
-};
-
-template <class GP, bool c, int codim>
-struct canCommunicate<XT::Grid::PeriodicGridPart<GP, c>, codim>
-{
-  static const bool v = canCommunicate<GP, codim>::v;
-};
-
-template <class GP, bool c>
-struct isConforming<XT::Grid::PeriodicGridPart<GP, c>>
-{
-  static const bool v = isConforming<GP>::v;
-};
-
-
-} // namespace GridPartCapabilities
-} // namespace Fem
-
-#endif // HAVE_DUNE_FEM
-
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_VIEW_PERIODIC_HH
