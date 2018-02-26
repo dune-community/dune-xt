@@ -304,59 +304,6 @@ public:
 
   /**
    * \}
-   * \name These methods can be used to append another Walker.
-   * \{
-   */
-
-  /**
-   * \note The other_walker will be applied on the intersection of the given element_filter (intersection_filter) and
-   *       the filters of its ElementFunctors (IntersectionFunctors).
-   * \sa   WalkerWrapper
-   */
-  ThisType& append(Walker<GL>& other_walker,
-                   const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>(),
-                   const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>())
-  {
-    if (&other_walker == this)
-      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    emplace_all(element_and_intersection_functor_wrappers_, other_walker, element_filter, intersection_filter);
-    return *this;
-  }
-
-  /**
-   * \note The other_walker will be applied on the intersection of the given element_filter (intersection_filter) and
-   *       the filters of its ElementFunctors (IntersectionFunctors).
-   * \sa   WalkerWrapper
-   */
-  ThisType& append(Walker<GL>& other_walker,
-                   const IntersectionFilter<GL>& intersection_filter,
-                   const ElementFilter<GL>& element_filter = new ApplyOn::AllElements<GL>())
-  {
-    if (&other_walker == this)
-      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    emplace_all(element_and_intersection_functor_wrappers_, other_walker, element_filter, intersection_filter);
-    return *this;
-  }
-
-  /**
-   * \note The other_walker will be applied on the intersection of the given element_filter (intersection_filter) and
-   *       the filters of its ElementFunctors (IntersectionFunctors).
-   * \sa   WalkerWrapper
-   */
-  ThisType&
-  append(Walker<GL>& other_walker, ViewElementFunction element_filter, ViewIntersectionFunction intersection_filter)
-  {
-    if (&other_walker == this)
-      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    emplace_all(element_and_intersection_functor_wrappers_,
-                other_walker,
-                ApplyOn::LambdaFilteredElements<GL>(element_filter),
-                ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
-    return *this;
-  }
-
-  /**
-   * \}
    * \name These methods are required by ElementAndIntersectionFunctor.
    * \{
    */
@@ -574,8 +521,6 @@ private:
       } // only walk the intersections, if there are codim1 functors present
     } // .. walk elements
   } // ... walk_range(...)
-
-  friend class internal::WalkerWrapper<GridViewType>;
 
   GridViewType grid_view_;
   bool user_decided_agains_clearing_of_functors_;

@@ -189,67 +189,6 @@ private:
 }; // class ElementAndIntersectionFunctorWrapper
 
 
-/**
- * \brief To be used within the \sa Walker as internal storage type.
- * \note  Most likely you do not want to use this class directly, but instead append() a Walker to a Walker.
- */
-template <class GL>
-class WalkerWrapper : public ElementAndIntersectionFunctorWrapper<GL>
-{
-  using BaseType = ElementAndIntersectionFunctorWrapper<GL>;
-  using ThisType = WalkerWrapper<GL>;
-
-public:
-  using typename BaseType::ElementFilterType;
-  using typename BaseType::IntersectionFilterType;
-
-  /**
-   * \attention Takes ownership of element_filtr_ptr, do not delete manually!
-   * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
-   */
-  WalkerWrapper(Walker<GL>& walkr,
-                const ElementFilterType*&& element_filtr_ptr,
-                const IntersectionFilterType*&& intersection_filtr_ptr)
-    : BaseType(walkr,
-               new ApplyOn::LambdaFilteredElements<GL>([&](const auto& grid_layer, const auto& element) {
-                 if (restriction_element_filter_.access().contains(grid_layer, element)) {
-                   for (const auto& wrapper : walkr.element_functor_wrappers_) {
-                     if (wrapper->filter().contains(grid_layer, element))
-                       return true;
-                   }
-                   for (const auto& wrapper : walkr.element_and_intersection_functor_wrappers_) {
-                     if (wrapper->element_filter().contains(grid_layer, element))
-                       return true;
-                   }
-                   return false;
-                 } else
-                   return false;
-               }),
-               new ApplyOn::LambdaFilteredIntersections<GL>([&](const auto& grid_layer, const auto& intersection) {
-                 if (restriction_intersection_filter_.access().contains(grid_layer, intersection)) {
-                   for (const auto& wrapper : walkr.intersection_functor_wrappers_) {
-                     if (wrapper->filter().contains(grid_layer, intersection))
-                       return true;
-                   }
-                   for (const auto& wrapper : walkr.element_and_intersection_functor_wrappers_) {
-                     if (wrapper->intersection_filter().contains(grid_layer, intersection))
-                       return true;
-                   }
-                   return false;
-                 } else
-                   return false;
-               }))
-    , restriction_element_filter_(std::move(element_filtr_ptr))
-    , restriction_intersection_filter_(std::move(intersection_filtr_ptr))
-  {
-  }
-
-private:
-  const Common::ConstStorageProvider<ElementFilterType> restriction_element_filter_;
-  const Common::ConstStorageProvider<IntersectionFilterType> restriction_intersection_filter_;
-}; // class WalkerWrapper
-
-
 } // namespace internal
 } // namespace Grid
 } // namespace XT
