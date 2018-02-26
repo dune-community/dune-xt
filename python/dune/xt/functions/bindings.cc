@@ -43,7 +43,9 @@ void addbind_for_Grid(pybind11::module& m)
   auto i_2_1 = bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
   auto i_3_1 = bind_LocalizableFunctionInterface<G, 3, 1>(m, grid_id);
   auto i_4_1 = bind_LocalizableFunctionInterface<G, 4, 1>(m, grid_id);
-  auto i_d_d = bind_LocalizableFunctionInterface<G, g_dim, g_dim>(m, grid_id);
+  //! this generates multiple binds for the same type
+  //! auto i_d_d = bind_LocalizableFunctionInterface<G, g_dim, g_dim>(m, grid_id);
+  auto i_d_d = bind_LocalizableFunctionInterface<G, 2, 2>(m, grid_id);
 
   bind_combined_LocalizableFunction<G, g_dim, diff, 1, 1, 1, 1>(m, grid_id);
   addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 1, 1, 1, 1>(i_1_1);
@@ -58,7 +60,7 @@ void addbind_for_Grid(pybind11::module& m)
   addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 4, 1, 4, 1>(i_4_1);
 
   bind_combined_LocalizableFunction<G, g_dim, diff, 2, 2, 2, 2>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, g_dim, g_dim, g_dim, g_dim>(i_d_d);
+  //  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
 
   bind_combined_LocalizableFunction<G, g_dim, sum, 1, 1, 1, 1>(m, grid_id);
@@ -74,7 +76,7 @@ void addbind_for_Grid(pybind11::module& m)
   addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 4, 1, 4, 1>(i_4_1);
 
   bind_combined_LocalizableFunction<G, g_dim, sum, 2, 2, 2, 2>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, g_dim, g_dim, g_dim, g_dim>(i_d_d);
+  //  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
 
   bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 1, 1>(m, grid_id);
