@@ -160,9 +160,23 @@ public:
     return *this;
   }
 
+  ThisType& append(ElementFunctor<GL>*&& functor, const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>())
+  {
+    emplace_all(element_functor_wrappers_, *functor, filter);
+    delete functor;
+    return *this;
+  }
+
   ThisType& append(ElementFunctor<GL>& functor, ViewElementFunction element_filter)
   {
     emplace_all(element_functor_wrappers_, functor, ApplyOn::LambdaFilteredElements<GL>(element_filter));
+    return *this;
+  }
+
+  ThisType& append(ElementFunctor<GL>*&& functor, ViewElementFunction element_filter)
+  {
+    emplace_all(element_functor_wrappers_, *functor, ApplyOn::LambdaFilteredElements<GL>(element_filter));
+    delete functor;
     return *this;
   }
 
@@ -177,8 +191,7 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, filter);
+    return this->append(new ElementLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda), filter);
   }
 
   ThisType& append(ElementFunction apply_lambda,
@@ -186,8 +199,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, ApplyOn::LambdaFilteredElements<GL>(filter));
+    return this->append(new ElementLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda),
+                        ApplyOn::LambdaFilteredElements<GL>(filter));
   }
 
   /**
@@ -203,9 +216,24 @@ public:
     return *this;
   }
 
+  ThisType& append(IntersectionFunctor<GL>*&& functor,
+                   const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>())
+  {
+    emplace_all(intersection_functor_wrappers_, *functor, filter);
+    delete functor;
+    return *this;
+  }
+
   ThisType& append(IntersectionFunctor<GL>& functor, ViewIntersectionFunction filter)
   {
     emplace_all(intersection_functor_wrappers_, functor, ApplyOn::LambdaFilteredIntersections<GL>(filter));
+    return *this;
+  }
+
+  ThisType& append(IntersectionFunctor<GL>*&& functor, ViewIntersectionFunction filter)
+  {
+    emplace_all(intersection_functor_wrappers_, *functor, ApplyOn::LambdaFilteredIntersections<GL>(filter));
+    delete functor;
     return *this;
   }
 
@@ -220,8 +248,7 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    IntersectionLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, filter);
+    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda), filter);
   }
 
   ThisType& append(IntersectionElementElementFunction apply_lambda,
@@ -229,8 +256,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    IntersectionLambdaFunctor<GL> f(apply_lambda, prepare_lambda, finalize_lambda);
-    return this->append(f, ApplyOn::LambdaFilteredIntersections<GL>(filter));
+    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda),
+                        ApplyOn::LambdaFilteredIntersections<GL>(filter));
   }
 
   /**
@@ -249,6 +276,17 @@ public:
     return *this;
   }
 
+  ThisType& append(ElementAndIntersectionFunctor<GL>*&& functor,
+                   const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>(),
+                   const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>())
+  {
+    if (functor == this)
+      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
+    emplace_all(element_and_intersection_functor_wrappers_, *functor, element_filter, intersection_filter);
+    delete functor;
+    return *this;
+  }
+
   ThisType& append(ElementAndIntersectionFunctor<GL>& functor,
                    ViewElementFunction element_filter,
                    ViewIntersectionFunction intersection_filter)
@@ -259,6 +297,20 @@ public:
                 functor,
                 ApplyOn::LambdaFilteredElements<GL>(element_filter),
                 ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
+    return *this;
+  }
+
+  ThisType& append(ElementAndIntersectionFunctor<GL>*&& functor,
+                   ViewElementFunction element_filter,
+                   ViewIntersectionFunction intersection_filter)
+  {
+    if (functor == this)
+      DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
+    emplace_all(element_and_intersection_functor_wrappers_,
+                *functor,
+                ApplyOn::LambdaFilteredElements<GL>(element_filter),
+                ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
+    delete functor;
     return *this;
   }
 
@@ -273,8 +325,7 @@ public:
                    ViewElementFunction element_filter,
                    ViewIntersectionFunction intersection_filter)
   {
-    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on);
-    return this->append(f,
+    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(element_apply_on, intersection_apply_on),
                         ApplyOn::LambdaFilteredElements<GL>(element_filter),
                         ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
   }
@@ -286,8 +337,10 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda);
-    return this->append(f, element_filter, intersection_filter);
+    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(
+                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
+                        element_filter,
+                        intersection_filter);
   }
 
   ThisType& append(ElementFunction element_apply_on,
@@ -297,8 +350,8 @@ public:
                    VoidFunction prepare_lambda = dxt_void_noop,
                    VoidFunction finalize_lambda = dxt_void_noop)
   {
-    ElementAndIntersectionLambdaFunctor<GL> f(element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda);
-    return this->append(f,
+    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(
+                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
                         ApplyOn::LambdaFilteredElements<GL>(element_filter),
                         ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
   }
