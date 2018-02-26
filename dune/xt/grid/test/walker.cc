@@ -168,11 +168,16 @@ struct GridWalkerTest : public ::testing::Test
 };
 
 TYPED_TEST_CASE(GridWalkerTest, GridDims);
-TYPED_TEST(GridWalkerTest, Misc)
+TYPED_TEST(GridWalkerTest, count)
 {
   this->check_count();
+}
+TYPED_TEST(GridWalkerTest, apply_on)
+{
   this->check_apply_on();
-  //  this->check_partitionsets();
+}
+TYPED_TEST(GridWalkerTest, boundaries)
+{
   this->check_boundaries();
   this->check_partitioning();
 }
