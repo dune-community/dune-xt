@@ -119,9 +119,7 @@ public:
 
   Walker(ThisType&& source) = default;
 
-  ~Walker()
-  {
-  } // ~Walker(...)
+  virtual ~Walker() = default;
 
   const GridViewType& grid_view() const
   {
