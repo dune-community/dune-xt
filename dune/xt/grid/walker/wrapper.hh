@@ -51,22 +51,12 @@ public:
   {
   }
 
-  bool operator==(const ThisType& other) const
-  {
-    return this == &other;
-  }
-
-  bool operator!=(const ThisType& other) const
-  {
-    return this != other;
-  }
-
-  virtual const FilterType& filter() const
+  const FilterType& filter() const
   {
     return *filter_;
   }
 
-  virtual FunctorType& functor()
+  FunctorType& functor()
   {
     return *functor_;
   }
@@ -92,31 +82,18 @@ public:
   using FunctorType = IntersectionFunctor<GL>;
   using FilterType = IntersectionFilter<GL>;
 
-  /**
-   * \attention Takes ownership of filtr_ptr, do not delete manually!
-   */
-  IntersectionFunctorWrapper(FunctorType& functr, const FilterType& filtr_ptr)
+  IntersectionFunctorWrapper(FunctorType& functr, const FilterType& filtr)
     : functor_(functr.copy())
-    , filter_(filtr_ptr.copy())
+    , filter_(filtr.copy())
   {
   }
 
-  bool operator==(const ThisType& other) const
-  {
-    return this == &other;
-  }
-
-  bool operator!=(const ThisType& other) const
-  {
-    return this != other;
-  }
-
-  virtual const FilterType& filter() const
+  const FilterType& filter() const
   {
     return *filter_;
   }
 
-  virtual FunctorType& functor()
+  FunctorType& functor()
   {
     return *functor_;
   }
@@ -143,10 +120,6 @@ public:
   using ElementFilterType = ElementFilter<GL>;
   using IntersectionFilterType = IntersectionFilter<GL>;
 
-  /**
-   * \attention Takes ownership of element_filtr_ptr, do not delete manually!
-   * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
-   */
   ElementAndIntersectionFunctorWrapper(FunctorType& functr,
                                        const ElementFilterType& element_filtr,
                                        const IntersectionFilterType& intersection_filtr)
@@ -156,35 +129,24 @@ public:
   {
   }
 
-
-  bool operator==(const ThisType& other) const
-  {
-    return this == &other;
-  }
-
-  bool operator!=(const ThisType& other) const
-  {
-    return this != other;
-  }
-
-  virtual const ElementFilterType& element_filter() const
+  const ElementFilterType& element_filter() const
   {
     return *element_filter_;
   }
 
-  virtual const IntersectionFilterType& intersection_filter() const
+  const IntersectionFilterType& intersection_filter() const
   {
     return *intersection_filter_;
   }
 
-  virtual FunctorType& functor()
+  FunctorType& functor()
   {
     return *functor_;
   }
 
 private:
   std::unique_ptr<FunctorType> functor_;
-  std::unique_ptr<const ElementFilterType> element_filter_;
+  const std::unique_ptr<const ElementFilterType> element_filter_;
   const std::unique_ptr<const IntersectionFilterType> intersection_filter_;
 }; // class ElementAndIntersectionFunctorWrapper
 
