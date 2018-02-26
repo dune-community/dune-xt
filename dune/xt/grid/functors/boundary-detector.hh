@@ -30,27 +30,25 @@ class BoundaryDetectorFunctor : public IntersectionFunctor<GL>,
   friend Propagator;
 
 public:
-  using ResultType = size_t;
   using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
   using typename BaseType::IntersectionType;
 
   /**
-   * \attention Takes ownership of boundary_type, do not delete manually!
+   * \attention Takes ownership of boundary_type_ptr, do not delete manually!
    */
-  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType* boundary_type)
+  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType*&& boundary_type_ptr)
     : Propagator(this)
     , boundary_info_(boundary_info)
-    , boundary_type_(boundary_type)
+    , boundary_type_(boundary_type_ptr)
     , found_(0)
   {
   }
 
-  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
-                          const std::shared_ptr<BoundaryType>& boundary_type)
+  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, const BoundaryType& boundary_type)
     : Propagator(this)
     , boundary_info_(boundary_info)
-    , boundary_type_(boundary_type)
+    , boundary_type_(boundary_type.copy())
     , found_(0)
   {
   }
@@ -60,9 +58,9 @@ public:
     found_ = 0;
   }
 
-  ResultType compute_locally(const IntersectionType& intersection,
-                             const ElementType& /*inside_element*/,
-                             const ElementType& /*outside_element*/)
+  size_t compute_locally(const IntersectionType& intersection,
+                         const ElementType& /*inside_element*/,
+                         const ElementType& /*outside_element*/)
   {
     return boundary_info_.type(intersection) == *boundary_type_;
   }
@@ -74,7 +72,7 @@ public:
     found_ += compute_locally(intersection, inside_element, outside_element);
   }
 
-  ResultType result() const
+  size_t result() const
   {
     return found_;
   }
@@ -90,7 +88,7 @@ public:
   }
 
 protected:
-  void set_result(ResultType res)
+  void set_result(size_t res)
   {
     found_ = res;
   }
@@ -99,8 +97,6 @@ private:
   const BoundaryInfo<IntersectionType>& boundary_info_;
   const std::shared_ptr<BoundaryType> boundary_type_;
   size_t found_;
-
-
 }; // class BoundaryDetectorFunctor
 
 
