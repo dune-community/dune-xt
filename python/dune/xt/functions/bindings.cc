@@ -32,238 +32,86 @@
 template <class G>
 void addbind_for_Grid(pybind11::module& m)
 {
+  using namespace Dune::XT::Functions;
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
+  const auto diff = internal::Combination::difference;
+  const auto sum = internal::Combination::sum;
+  const auto prod = internal::Combination::product;
+  const auto g_dim = G::dimension;
 
-  auto i_1_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
-  auto i_2_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
-  auto i_3_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 3, 1>(m, grid_id);
-  auto i_4_1 = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, 4, 1>(m, grid_id);
+  auto i_1_1 = bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
+  auto i_2_1 = bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
+  auto i_3_1 = bind_LocalizableFunctionInterface<G, 3, 1>(m, grid_id);
+  auto i_4_1 = bind_LocalizableFunctionInterface<G, 4, 1>(m, grid_id);
+  auto i_d_d = bind_LocalizableFunctionInterface<G, g_dim, g_dim>(m, grid_id);
 
-  auto i_d_d = Dune::XT::Functions::bind_LocalizableFunctionInterface<G, G::dimension, G::dimension>(m, grid_id);
+  bind_combined_LocalizableFunction<G, g_dim, diff, 1, 1, 1, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 1, 1, 1, 1>(i_1_1);
 
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         1,
-                                                         1,
-                                                         1,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::difference,
-                                                       1,
-                                                       1,
-                                                       1,
-                                                       1>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         2,
-                                                         1,
-                                                         2,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::difference,
-                                                       2,
-                                                       1,
-                                                       2,
-                                                       1>(i_2_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         3,
-                                                         1,
-                                                         3,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::difference,
-                                                       3,
-                                                       1,
-                                                       3,
-                                                       1>(i_3_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         4,
-                                                         1,
-                                                         4,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::difference,
-                                                       4,
-                                                       1,
-                                                       4,
-                                                       1>(i_4_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::difference,
-                                                         2,
-                                                         2,
-                                                         2,
-                                                         2>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::difference,
-                                                       G::dimension,
-                                                       G::dimension,
-                                                       G::dimension,
-                                                       G::dimension>(i_d_d);
+  bind_combined_LocalizableFunction<G, g_dim, diff, 2, 1, 2, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 2, 1, 2, 1>(i_2_1);
+
+  bind_combined_LocalizableFunction<G, g_dim, diff, 3, 1, 3, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 3, 1, 3, 1>(i_3_1);
+
+  bind_combined_LocalizableFunction<G, g_dim, diff, 4, 1, 4, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 4, 1, 4, 1>(i_4_1);
+
+  bind_combined_LocalizableFunction<G, g_dim, diff, 2, 2, 2, 2>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
 
-  Dune::XT::Functions::
-      bind_combined_LocalizableFunction<G, G::dimension, Dune::XT::Functions::internal::Combination::sum, 1, 1, 1, 1>(
-          m, grid_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<G,
-                                                                        G::dimension,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        1,
-                                                                        1,
-                                                                        1,
-                                                                        1>(i_1_1);
-  Dune::XT::Functions::
-      bind_combined_LocalizableFunction<G, G::dimension, Dune::XT::Functions::internal::Combination::sum, 2, 1, 2, 1>(
-          m, grid_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<G,
-                                                                        G::dimension,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        2,
-                                                                        1,
-                                                                        2,
-                                                                        1>(i_2_1);
-  Dune::XT::Functions::
-      bind_combined_LocalizableFunction<G, G::dimension, Dune::XT::Functions::internal::Combination::sum, 3, 1, 3, 1>(
-          m, grid_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<G,
-                                                                        G::dimension,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        3,
-                                                                        1,
-                                                                        3,
-                                                                        1>(i_3_1);
-  Dune::XT::Functions::
-      bind_combined_LocalizableFunction<G, G::dimension, Dune::XT::Functions::internal::Combination::sum, 4, 1, 4, 1>(
-          m, grid_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<G,
-                                                                        G::dimension,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        4,
-                                                                        1,
-                                                                        4,
-                                                                        1>(i_4_1);
-  Dune::XT::Functions::
-      bind_combined_LocalizableFunction<G, G::dimension, Dune::XT::Functions::internal::Combination::sum, 2, 2, 2, 2>(
-          m, grid_id);
-  Dune::XT::Functions::addbind_LocalizableFunctionInterface_combined_op<G,
-                                                                        G::dimension,
-                                                                        Dune::XT::Functions::internal::Combination::sum,
-                                                                        G::dimension,
-                                                                        G::dimension,
-                                                                        G::dimension,
-                                                                        G::dimension>(i_d_d);
+  bind_combined_LocalizableFunction<G, g_dim, sum, 1, 1, 1, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 1, 1, 1, 1>(i_1_1);
 
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         1,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::product,
-                                                       1,
-                                                       1,
-                                                       1,
-                                                       1>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         2,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::product,
-                                                       1,
-                                                       1,
-                                                       2,
-                                                       1>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         3,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::product,
-                                                       1,
-                                                       1,
-                                                       3,
-                                                       1>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         4,
-                                                         1>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::product,
-                                                       1,
-                                                       1,
-                                                       4,
-                                                       1>(i_1_1);
-  Dune::XT::Functions::bind_combined_LocalizableFunction<G,
-                                                         G::dimension,
-                                                         Dune::XT::Functions::internal::Combination::product,
-                                                         1,
-                                                         1,
-                                                         2,
-                                                         2>(m, grid_id);
-  Dune::XT::Functions::
-      addbind_LocalizableFunctionInterface_combined_op<G,
-                                                       G::dimension,
-                                                       Dune::XT::Functions::internal::Combination::product,
-                                                       1,
-                                                       1,
-                                                       2,
-                                                       2>(i_1_1);
+  bind_combined_LocalizableFunction<G, g_dim, sum, 2, 1, 2, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 2, 1, 2, 1>(i_2_1);
 
-  Dune::XT::Functions::bind_ConstantFunction<G, G::dimension, 1, 1>(m, grid_id);
-  Dune::XT::Functions::bind_ConstantFunction<G, G::dimension, 2, 1>(m, grid_id);
-  Dune::XT::Functions::bind_ConstantFunction<G, G::dimension, 3, 1>(m, grid_id);
-  Dune::XT::Functions::bind_ConstantFunction<G, G::dimension, 4, 1>(m, grid_id);
-  Dune::XT::Functions::bind_ConstantFunction<G, G::dimension, 2, 2>(m, grid_id);
+  bind_combined_LocalizableFunction<G, g_dim, sum, 3, 1, 3, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 3, 1, 3, 1>(i_3_1);
 
-  Dune::XT::Functions::bind_CheckerboardFunction<G, G::dimension, 1, 1>(m, grid_id);
-  //  Dune::XT::Functions::bind_CheckerboardFunction<G, G::dimension, 2, 1>(m, grid_id);
-  //  Dune::XT::Functions::bind_CheckerboardFunction<G, G::dimension, 3, 1>(m, grid_id);
-  //  Dune::XT::Functions::bind_CheckerboardFunction<G, G::dimension, 4, 1>(m, grid_id);
+  bind_combined_LocalizableFunction<G, g_dim, sum, 4, 1, 4, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 4, 1, 4, 1>(i_4_1);
 
-  Dune::XT::Functions::bindings::ESV2007::CutoffFunction<G>::bind(m);
+  bind_combined_LocalizableFunction<G, g_dim, sum, 2, 2, 2, 2>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
-  Dune::XT::Functions::bind_ExpressionFunction<G, G::dimension, 1, 1>(m, grid_id);
-  Dune::XT::Functions::bind_ExpressionFunction<G, G::dimension, 2, 1>(m, grid_id);
-  Dune::XT::Functions::bind_ExpressionFunction<G, G::dimension, 3, 1>(m, grid_id);
-  Dune::XT::Functions::bind_ExpressionFunction<G, G::dimension, 4, 1>(m, grid_id);
 
-  Dune::XT::Functions::bind_Spe10Model1Function<G, G::dimension, 1, 1>(m, grid_id);
+  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 1, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 1, 1>(i_1_1);
+
+  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 2, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 1>(i_1_1);
+
+  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 3, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 3, 1>(i_1_1);
+
+  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 4, 1>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 4, 1>(i_1_1);
+
+  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 2, 2>(m, grid_id);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 2>(i_1_1);
+
+
+  bind_ConstantFunction<G, g_dim, 1, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 2, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 3, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 2, 2>(m, grid_id);
+
+  bind_CheckerboardFunction<G, g_dim, 1, 1>(m, grid_id);
+  //  bind_CheckerboardFunction<G, g_dim, 2, 1>(m, grid_id);
+  //  bind_CheckerboardFunction<G, g_dim, 3, 1>(m, grid_id);
+  //  bind_CheckerboardFunction<G, g_dim, 4, 1>(m, grid_id);
+
+  bindings::ESV2007::CutoffFunction<G>::bind(m);
+
+  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
+
+  bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
 } // ... addbind_for_Grid(...)
 
 
