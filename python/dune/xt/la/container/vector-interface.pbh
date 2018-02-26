@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH
 #define DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <sstream>
 
@@ -186,5 +185,4 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH

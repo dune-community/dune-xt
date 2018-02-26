@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_PBH
 #define DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <sstream>
 
@@ -222,5 +221,4 @@ void addbind_Matrix_Vector_interaction(pybind11::class_<M>& mat, pybind11::class
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_PBH

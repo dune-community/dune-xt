@@ -113,7 +113,6 @@ public:
 };
 
 
-#if HAVE_DUNE_ISTL
 template <class S>
 class ContainerFactory<Dune::XT::LA::IstlDenseVector<S>>
 {
@@ -139,7 +138,7 @@ public:
     return matrix;
   }
 };
-#endif // HAVE_DUNE_ISTL
+
 
 #if HAVE_EIGEN
 template <class S>

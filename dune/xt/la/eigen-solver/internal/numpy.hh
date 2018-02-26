@@ -15,9 +15,7 @@
 
 #include <dune/common/typetraits.hh>
 
-#if HAVE_DUNE_PYBINDXI
 #include <dune/pybindxi/interpreter.hh>
-#endif
 
 #include <dune/xt/common/vector.hh>
 #include <dune/xt/common/fmatrix.hh>
@@ -34,9 +32,6 @@ namespace internal {
 
 
 bool numpy_eigensolver_available();
-
-
-#if HAVE_DUNE_PYBINDXI
 
 
 /**
@@ -73,21 +68,6 @@ void compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
   }
 } // ... compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(...)
 
-
-#else // HAVE_DUNE_PYBINDXI
-
-
-template <class K, int SIZE>
-void compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
-    const FieldMatrix<K, SIZE, SIZE>& /*matrix*/,
-    std::vector<Common::complex_t<K>>& /*eigenvalues*/,
-    FieldMatrix<Common::complex_t<K>, SIZE, SIZE>& /*right_eigenvectors*/)
-{
-  static_assert(AlwaysFalse<K>::value, "You are missing dune-pybindxi!");
-}
-
-
-#endif // HAVE_DUNE_PYBINDXI
 
 } // namespace internal
 } // namespace LA

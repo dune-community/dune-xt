@@ -10,9 +10,7 @@
 
 #include "config.h"
 
-#if HAVE_DUNE_PYBINDXI
 #include <dune/pybindxi/interpreter.hh>
-#endif
 
 namespace Dune {
 namespace XT {
@@ -22,16 +20,12 @@ namespace internal {
 
 bool numpy_eigensolver_available()
 {
-#if HAVE_DUNE_PYBINDXI
   try {
     PybindXI::GlobalInterpreter().import_module("numpy.linalg");
   } catch (...) {
     return false;
   }
   return true;
-#else // HAVE_DUNE_PYBINDXI
-  return false;
-#endif
 } // ... numpy_eigensolver_available(...)
 
 

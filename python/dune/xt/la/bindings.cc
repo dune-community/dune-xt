@@ -10,8 +10,6 @@
 
 #include "config.h"
 
-#if HAVE_DUNE_PYBINDXI
-
 #include <string>
 #include <vector>
 
@@ -134,5 +132,3 @@ PYBIND11_MODULE(_la, m)
         "warning"_a = true);
 
 } // PYBIND11_PLUGIN(la)
-
-#endif // HAVE_DUNE_PYBINDXI

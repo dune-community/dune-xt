@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_LA_SOLVER_PBH
 #define DUNE_XT_LA_SOLVER_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
@@ -68,5 +67,4 @@ typename std::enable_if<is_matrix<M>::value, pybind11::class_<Solver<M>>>::type 
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_LA_SOLVER_PBH

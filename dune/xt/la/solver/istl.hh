@@ -16,13 +16,11 @@
 #include <type_traits>
 #include <cmath>
 
-#if HAVE_DUNE_ISTL
 #include <dune/istl/operators.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
 #include <dune/istl/umfpack.hh>
 #include <dune/istl/superlu.hh>
-#endif // HAVE_DUNE_ISTL
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
@@ -36,9 +34,6 @@
 namespace Dune {
 namespace XT {
 namespace LA {
-
-#if HAVE_DUNE_ISTL
-
 namespace internal {
 
 
@@ -325,30 +320,19 @@ private:
   const Common::ConstStorageProvider<CommunicatorType> communicator_;
 }; // class Solver
 
-
-#else // HAVE_DUNE_ISTL
-
-template <class S, class CommunicatorType>
-class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType>
-{
-  static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
-};
-
-#endif // HAVE_DUNE_ISTL
-
 } // namespace LA
 } // namespace XT
 } // namespace Dune
 
 
 // begin: this is what we need for the lib
-#if DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+#if DUNE_XT_WITH_PYTHON_BINDINGS
 
 
 extern template class Dune::XT::LA::Solver<Dune::XT::LA::IstlRowMajorSparseMatrix<double>>;
 
 
-#endif // DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 // end: this is what we need for the lib
 
 

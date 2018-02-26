@@ -44,19 +44,15 @@ enum class Backends
 static constexpr Backends default_backend =
 #if HAVE_EIGEN
     Backends::eigen_sparse;
-#elif HAVE_DUNE_ISTL
-    Backends::istl_sparse;
 #else
-    Backends::common_sparse;
+    Backends::istl_sparse;
 #endif
 
 static constexpr Backends default_sparse_backend =
 #if HAVE_EIGEN
     Backends::eigen_sparse;
-#elif HAVE_DUNE_ISTL
-    Backends::istl_sparse;
 #else
-    Backends::common_sparse;
+    Backends::istl_sparse;
 #endif
 
 static constexpr Backends default_dense_backend =
