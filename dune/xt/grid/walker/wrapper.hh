@@ -45,8 +45,8 @@ public:
   using FunctorType = ElementFunctor<GL>;
   using FilterType = ElementFilter<GL>;
 
-  ElementFunctorWrapper(const std::shared_ptr<FunctorType>& functr, const FilterType& filtr)
-    : functor_(functr->copy())
+  ElementFunctorWrapper(FunctorType& functr, const FilterType& filtr)
+    : functor_(functr.copy())
     , filter_(filtr.copy())
   {
   }
@@ -66,13 +66,13 @@ public:
     return *filter_;
   }
 
-  virtual std::shared_ptr<FunctorType> functor()
+  virtual FunctorType& functor()
   {
-    return functor_;
+    return *functor_;
   }
 
 private:
-  std::shared_ptr<FunctorType> functor_;
+  std::unique_ptr<FunctorType> functor_;
   const std::unique_ptr<const FilterType> filter_;
 }; // class ElementFunctorWrapper
 
@@ -95,8 +95,8 @@ public:
   /**
    * \attention Takes ownership of filtr_ptr, do not delete manually!
    */
-  IntersectionFunctorWrapper(const std::shared_ptr<FunctorType>& functr, const FilterType& filtr_ptr)
-    : functor_(functr->copy())
+  IntersectionFunctorWrapper(FunctorType& functr, const FilterType& filtr_ptr)
+    : functor_(functr.copy())
     , filter_(filtr_ptr.copy())
   {
   }
@@ -116,13 +116,13 @@ public:
     return *filter_;
   }
 
-  virtual std::shared_ptr<FunctorType> functor()
+  virtual FunctorType& functor()
   {
-    return functor_;
+    return *functor_;
   }
 
 private:
-  std::shared_ptr<FunctorType> functor_;
+  std::unique_ptr<FunctorType> functor_;
   const std::unique_ptr<const FilterType> filter_;
 }; // class IntersectionFunctorWrapper
 
@@ -147,10 +147,10 @@ public:
    * \attention Takes ownership of element_filtr_ptr, do not delete manually!
    * \attention Takes ownership of intersection_filtr_ptr, do not delete manually!
    */
-  ElementAndIntersectionFunctorWrapper(const std::shared_ptr<FunctorType>& functr,
+  ElementAndIntersectionFunctorWrapper(FunctorType& functr,
                                        const ElementFilterType& element_filtr,
                                        const IntersectionFilterType& intersection_filtr)
-    : functor_(functr->copy())
+    : functor_(functr.copy())
     , element_filter_(element_filtr.copy())
     , intersection_filter_(intersection_filtr.copy())
   {
@@ -177,13 +177,13 @@ public:
     return *intersection_filter_;
   }
 
-  virtual std::shared_ptr<FunctorType> functor()
+  virtual FunctorType& functor()
   {
-    return functor_;
+    return *functor_;
   }
 
 private:
-  std::shared_ptr<FunctorType> functor_;
+  std::unique_ptr<FunctorType> functor_;
   std::unique_ptr<const ElementFilterType> element_filter_;
   const std::unique_ptr<const IntersectionFilterType> intersection_filter_;
 }; // class ElementAndIntersectionFunctorWrapper

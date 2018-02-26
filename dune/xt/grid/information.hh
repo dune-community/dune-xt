@@ -140,9 +140,9 @@ struct Dimensions
       }
     } // ()
 
-    std::shared_ptr<ElementFunctor<GridLayerType>> copy() override
+    ElementFunctor<GridLayerType>* copy() override
     {
-      return std::make_shared<GridDimensionsFunctor>(*this);
+      return new GridDimensionsFunctor(*this);
     }
   };
 
@@ -153,7 +153,7 @@ struct Dimensions
 
   Dimensions(const GridLayerType& grid_layer)
   {
-    auto f = make_shared<GridDimensionsFunctor>(coord_limits, entity_volume, entity_width);
+    GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
     Walker<GridLayerType> gw(grid_layer);
     gw.append(f);
     gw.walk();

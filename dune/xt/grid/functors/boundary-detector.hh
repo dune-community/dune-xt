@@ -39,7 +39,8 @@ public:
    * \attention Takes ownership of boundary_type, do not delete manually!
    */
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType* boundary_type)
-    : boundary_info_(boundary_info)
+    : Propagator(this)
+    , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
     , found_(0)
   {
@@ -47,7 +48,8 @@ public:
 
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
                           const std::shared_ptr<BoundaryType>& boundary_type)
-    : boundary_info_(boundary_info)
+    : Propagator(this)
+    , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
     , found_(0)
   {
@@ -82,7 +84,7 @@ public:
     Propagator::finalize_imp();
   }
 
-  std::shared_ptr<BaseType> copy() override
+  BaseType* copy() override
   {
     return Propagator::copy_imp();
   }
