@@ -88,7 +88,8 @@ public:
   }
 
   Walker(const ThisType& other)
-    : grid_view_(other.grid_view_)
+    : BaseType()
+    , grid_view_(other.grid_view_)
     , user_decided_agains_clearing_of_functors_(other.user_decided_agains_clearing_of_functors_)
   {
     // Since all Common::PerThreadValue are created with the same size given by the global singleton threadManage(),
