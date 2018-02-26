@@ -165,6 +165,31 @@ struct GridWalkerTest : public ::testing::Test
     walker_copy.walk(true);
     EXPECT_EQ(2 * filter_count, detector.result());
   }
+
+  void check_walker_to_walker()
+  {
+    const auto gv = grid_prv.grid().leafGridView();
+
+    Walker<GridLayerType> inner_walker(gv);
+    // This functor is restricted to some elements of the grid view.
+    size_t num_elements_applied = 0;
+    inner_walker.append([&](const auto& /*element*/) { ++num_elements_applied; },
+                        [](const auto& grid_view, const auto& element) {
+                          return grid_view.indexSet().index(element) < grid_view.indexSet().size(0) / 2;
+                        });
+    inner_walker.walk(false, /*clear_functors=*/false); // We want to keep the functor.
+    ASSERT_LT(num_elements_applied, gv.indexSet().size(0));
+    auto num_half_elements = num_elements_applied;
+    num_elements_applied = 0;
+
+    // When we add this walker to another walker without a restricting filter ...
+    Walker<GridLayerType> walker(gv);
+    walker.append(inner_walker);
+    walker.walk();
+    // ... we also expect the functor of inner_walker to be applied only to some elements of the grid view, according to
+    // its original filter.
+    EXPECT_EQ(num_elements_applied, num_half_elements);
+  }
 };
 
 TYPED_TEST_CASE(GridWalkerTest, GridDims);
@@ -180,4 +205,8 @@ TYPED_TEST(GridWalkerTest, boundaries)
 {
   this->check_boundaries();
   this->check_partitioning();
+}
+TYPED_TEST(GridWalkerTest, walker_to_walker)
+{
+  this->check_walker_to_walker();
 }
