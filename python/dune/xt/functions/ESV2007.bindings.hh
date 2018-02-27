@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH
 #define DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 
@@ -92,7 +91,6 @@ class CutoffFunction
             "poincare_constant"_a = 1.0 / (M_PIl * M_PIl),
             "name"_a = type_single_diffusion::static_id(),
             py::keep_alive<0, 2>());
-#if HAVE_DUNE_FEM
       m.def(std::string(make_name + "_single_diffusion_to_1x1").c_str(),
             [](const Grid::GridProvider<G, XT::Grid::DD::SubdomainGrid<G>>& /*grid*/,
                const ScalarFunction& diffusion,
@@ -103,8 +101,6 @@ class CutoffFunction
             "poincare_constant"_a = 1.0 / (M_PIl * M_PIl),
             "name"_a = type_single_diffusion::static_id(),
             py::keep_alive<0, 2>());
-#endif // HAVE_DUNE_FEM
-
       m.def(std::string(make_name + "_diffusion_factor_and_tensor_to_1x1").c_str(),
             [](const Grid::GridProvider<G>& /*grid*/,
                const ScalarFunction& diffusion_factor,
@@ -118,7 +114,6 @@ class CutoffFunction
             "name"_a = type::static_id(),
             py::keep_alive<0, 2>(),
             py::keep_alive<0, 3>());
-#if HAVE_DUNE_FEM
       m.def(std::string(make_name + "_diffusion_factor_and_tensor_to_1x1").c_str(),
             [](const Grid::GridProvider<G, XT::Grid::DD::SubdomainGrid<G>>& /*grid*/,
                const ScalarFunction& diffusion_factor,
@@ -132,7 +127,6 @@ class CutoffFunction
             "name"_a = type::static_id(),
             py::keep_alive<0, 2>(),
             py::keep_alive<0, 3>());
-#endif // HAVE_DUNE_FEM
     }
   }; // struct helper<true, ...>
 
@@ -158,5 +152,4 @@ public:
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH

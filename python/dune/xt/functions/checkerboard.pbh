@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
 #define DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 
@@ -112,5 +111,4 @@ bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH

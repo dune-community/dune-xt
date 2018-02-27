@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACE_PBH
 #define DUNE_XT_FUNCTIONS_INTERFACE_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
@@ -222,7 +221,6 @@ bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_i
         "level"_a = -1,
         "path"_a,
         "subsampling"_a = true);
-#if HAVE_DUNE_FEM
   c.def("visualize",
         [](const C& self,
            const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& dd_grid_provider,
@@ -261,7 +259,6 @@ bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_i
         "level_or_subdomain"_a = -1,
         "path"_a,
         "subsampling"_a = true);
-#endif // HAVE_DUNE_FEM
 
   internal::Divergence<G>::addbind(m, c);
 
@@ -347,5 +344,4 @@ void addbind_LocalizableFunctionInterface_combined_op(C& c)
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_INTERFACE_PBH

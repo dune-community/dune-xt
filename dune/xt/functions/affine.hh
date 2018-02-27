@@ -129,19 +129,6 @@ public:
 
   AffineFunctionBase(const ThisType& other) = default;
 
-// if HAVE_DUNE_FEM is true, GlobalFunctionInterface is derived from Fem::Function which has a deleted copy assignment
-// operator
-#if HAVE_DUNE_FEM
-  ThisType& operator=(const ThisType& other)
-  {
-    A_ = other.A_;
-    b_ = other.b_;
-    name_ = other.name_;
-    b_zero_ = other.b_zero_;
-    return *this;
-  }
-#endif
-
   const std::vector<MatrixType>& A() const
   {
     return A_;
