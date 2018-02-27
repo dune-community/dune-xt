@@ -166,6 +166,24 @@ public:
     return size();
   }
 
+  virtual ScalarType min() const
+  {
+    using std::min;
+    ScalarType ret = 0;
+    for (const auto& element : *this)
+      ret = min(ret, element);
+    return ret;
+  }
+
+  virtual ScalarType max() const
+  {
+    using std::max;
+    ScalarType ret = 0;
+    for (const auto& element : *this)
+      ret = max(ret, element);
+    return ret;
+  }
+
   virtual ScalarType mean() const
   {
     ScalarType ret = 0.0;
@@ -177,7 +195,7 @@ public:
 
   /**
    *  \brief  The maximum absolute value of the vector.
-   *  \return A pair of the lowest index at which the maximum is attained and the absolute maximum value.
+   *  \return A pair of the highest index at which the maximum is attained and the absolute maximum value.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
   virtual std::pair<size_t, RealType> amax() const
