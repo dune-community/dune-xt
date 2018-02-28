@@ -39,6 +39,9 @@ public:
   using GridViewType = GL;
   using ElementType = extract_entity_t<GridViewType>;
 
+  using GV = GridViewType;
+  using E = ElementType;
+
   ElementFunctor() = default;
   virtual ~ElementFunctor() = default;
 
@@ -73,6 +76,10 @@ public:
   using GridViewType = GL;
   using ElementType = extract_entity_t<GridViewType>;
   using IntersectionType = extract_intersection_t<GridViewType>;
+
+  using GV = GridViewType;
+  using E = ElementType;
+  using I = IntersectionType;
 
   IntersectionFunctor() = default;
   virtual ~IntersectionFunctor() = default;
@@ -114,6 +121,10 @@ public:
   using GridViewType = GL;
   using ElementType = extract_entity_t<GridViewType>;
   using IntersectionType = extract_intersection_t<GridViewType>;
+
+  using GV = GridViewType;
+  using E = ElementType;
+  using I = IntersectionType;
 
   ElementAndIntersectionFunctor() = default;
   virtual ~ElementAndIntersectionFunctor() = default;
