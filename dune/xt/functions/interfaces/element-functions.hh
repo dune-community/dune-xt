@@ -171,7 +171,22 @@ public:
    * \{
    **/
 
+  /**
+   * The number of functions in this set, after being bound to an element.
+   **/
   virtual size_t size(const Common::Parameter& /*param*/ = {}) const = 0;
+
+  /**
+   * The maximum number of functions in this set over all elements. The following has to hold true:
+\code
+auto local_function_set = ...;
+size_t max_set_size = 0;
+for (auto&& element : grid_view)
+  max_set_size = std::max(max_set_size, local_function_set.bind(element).size());
+assert(max_set_size <= local_function_set.max_size());
+\endcode
+   **/
+  virtual size_t max_size(const Common::Parameter& /*param*/ = {}) const = 0;
 
   virtual int order(const Common::Parameter& /*param*/ = {}) const = 0;
 
@@ -632,6 +647,11 @@ public:
    **/
 
   size_t size(const Common::Parameter& /*param*/ = {}) const override
+  {
+    return 1;
+  }
+
+  size_t max_size(const Common::Parameter& /*param*/ = {}) const override
   {
     return 1;
   }
