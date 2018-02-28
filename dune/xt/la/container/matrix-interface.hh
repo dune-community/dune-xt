@@ -44,7 +44,7 @@ class MatrixInterface : public ContainerInterface<Traits, ScalarImp>
   typedef ContainerInterface<Traits, ScalarImp> BaseType;
 
 public:
-  typedef typename Traits::derived_type derived_type;
+  using typename BaseType::derived_type;
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   static const constexpr Backends vector_type = Traits::vector_type;
