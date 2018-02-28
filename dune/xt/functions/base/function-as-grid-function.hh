@@ -126,7 +126,7 @@ private:
     int order(const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
+        DUNE_THROW(Exceptions::not_bound_to_an_element_yet, "");
       return function_.order(param);
     }
 
@@ -134,7 +134,7 @@ private:
                              const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
+        DUNE_THROW(Exceptions::not_bound_to_an_element_yet, "");
       this->assert_inside_reference_element(point_in_reference_element);
       return function_.evaluate(geometry_->global(point_in_reference_element), param);
     }
@@ -143,7 +143,7 @@ private:
                                        const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
+        DUNE_THROW(Exceptions::not_bound_to_an_element_yet, "");
       this->assert_inside_reference_element(point_in_reference_element);
       return function_.jacobian(geometry_->global(point_in_reference_element), param);
     }
@@ -153,7 +153,7 @@ private:
                                          const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
+        DUNE_THROW(Exceptions::not_bound_to_an_element_yet, "");
       this->assert_inside_reference_element(point_in_reference_element);
       return function_.derivative(alpha, geometry_->global(point_in_reference_element), param);
     }

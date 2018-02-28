@@ -13,8 +13,8 @@
 
 #include <array>
 #include <sstream>
-#include <type_traits>
 #include <vector>
+#include <type_traits>
 
 #include <dune/common/fvector.hh>
 
@@ -111,14 +111,16 @@ public:
   }
 
   ElementFunctionSetInterface(const ThisType& other)
-    : element_(nullptr)
+    : Common::ParametricInterface(other.parameter_type())
+    , element_(nullptr)
   {
     if (other.element_)
       element_ = std::make_unique<ElementType>(*other.element_);
   }
 
   ElementFunctionSetInterface(ThisType&& source)
-    : element_(std::move(source.element_))
+    : Common::ParametricInterface(source.parameter_type())
+    , element_(std::move(source.element_))
   {
   }
 
@@ -142,7 +144,7 @@ public:
   const ElementType& element() const
   {
     if (!element_)
-      DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
+      DUNE_THROW(Exceptions::not_bound_to_an_element_yet, "");
     return *element_;
   }
 
