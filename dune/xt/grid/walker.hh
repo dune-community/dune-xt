@@ -94,7 +94,8 @@ public:
     // we just assume they are of the same size!
     // Copy the element functors ...
     auto zip_emplace = [](auto& target_thread_ctr, const auto& source_thread_ctr, auto& gen_function) {
-      auto target_wrappers_it = target_thread_ctr.begin(), source_wrappers_it = source_thread_ctr.begin();
+      auto target_wrappers_it = target_thread_ctr.begin();
+      auto source_wrappers_it = source_thread_ctr.begin();
       for (; target_wrappers_it != target_thread_ctr.end() && source_wrappers_it != source_thread_ctr.end();
            ++target_wrappers_it, ++source_wrappers_it) {
         auto& target__wrappers = *(*target_wrappers_it);
