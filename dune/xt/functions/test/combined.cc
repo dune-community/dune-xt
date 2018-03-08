@@ -22,7 +22,7 @@
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
-#include <dune/xt/functions/combined.hh>
+#include <dune/xt/functions/base/combined.hh>
 #include <dune/xt/functions/constant.hh>
 
 #include "functions.hh"

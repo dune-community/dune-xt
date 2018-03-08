@@ -9,8 +9,8 @@
 //   Rene Milk       (2014 - 2018)
 //   Tobias Leibner  (2014, 2017)
 
-#ifndef DUNE_XT_FUNCTIONS_COMBINED_HH
-#define DUNE_XT_FUNCTIONS_COMBINED_HH
+#ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
+#define DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
 
 #include <memory>
 #include <type_traits>
@@ -537,4 +537,4 @@ make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_COMBINED_HH
+#endif // DUNE_XT_FUNCTIONS_BASE_COMBINED_HH

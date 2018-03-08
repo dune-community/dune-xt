@@ -186,7 +186,7 @@ public:
 } // namespace XT
 } // namespace Dune
 
-#include "../combined.hh"
+#include <dune/xt/functions/base/combined.hh>
 #include <dune/xt/functions/base/visualization.hh>
 //#include "../derived.hh"
 
