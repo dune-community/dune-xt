@@ -26,6 +26,10 @@ class this_function_is_not_bound_to_an_element_yet : public Dune::InvalidStateEx
 {
 };
 
+class spe10_data_file_missing : public Dune::IOError
+{
+};
+
 
 } // namespace Exceptions
 } // namespace Functions

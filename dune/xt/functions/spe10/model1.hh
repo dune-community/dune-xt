@@ -21,21 +21,16 @@
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/functions/exceptions.hh>
 
 #include "../checkerboard.hh"
 
 namespace Dune {
 namespace XT {
-namespace Exceptions {
-
-class spe10_data_file_missing : public Dune::IOError
-{
-};
-
-} // namespace Exceptions
 namespace Functions {
 namespace Spe10 {
 namespace internal {
+
 
 static const std::string model1_filename = "perm_case1.dat";
 static const size_t model1_x_elements = 100;
@@ -43,29 +38,30 @@ static const size_t model1_y_elements = 1;
 static const size_t model1_z_elements = 20;
 static const double model_1_length_x = 762.0;
 static const double model_1_length_y = 7.62;
-static const double model_1_length_z = 15.24;
+static const double model_1_length_z = 152.4;
 static const double model1_min_value = 0.001;
 static const double model1_max_value = 998.915;
 
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r, size_t rC>
-class Model1Base : public CheckerboardFunction<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC>
+
+template <class E, size_t r, size_t rC, class R>
+class Model1Base : public CheckerboardFunction<E, r, rC, R>
 {
-  typedef CheckerboardFunction<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, rC> BaseType;
+  using BaseType = CheckerboardFunction<E, r, rC, R>;
 
 public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::LocalfunctionType LocalfunctionType;
+  using typename BaseType::ElementType;
+  using typename BaseType::LocalFunctionType;
 
-  typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeFieldType RangeFieldType;
-  typedef typename BaseType::RangeType RangeType;
+  using RangeType = typename LocalFunctionType::RangeType;
+  using DomainType = typename LocalFunctionType::DomainType;
+  using RangeFieldType = typename LocalFunctionType::RangeFieldType;
+  using DomainFieldType = typename LocalFunctionType::DomainFieldType;
 
   static const bool available = true;
 
   static std::string static_id()
   {
-    return LocalizableFunctionInterface<EntityImp, DomainFieldImp, 2, RangeFieldImp, 1, 1>::static_id()
-           + ".spe10.model1";
+    return LocalizableFunctionInterface<E, 1, 1, R>::static_id() + ".spe10.model1";
   } // ... static_id(...)
 
 private:
@@ -81,28 +77,28 @@ private:
     const RangeFieldType shift = min - scale * internal::model1_min_value;
     // read all the data from the file
     std::ifstream datafile(filename);
-    if (datafile.is_open()) {
-      static const size_t entriesPerDim = model1_x_elements * model1_y_elements * model1_z_elements;
-      // create storage (there should be exactly 6000 values in the file, but we onyl read the first 2000)
-      std::vector<RangeType> data(entriesPerDim, unit_range);
-      double tmp = 0;
-      size_t counter = 0;
-      while (datafile >> tmp && counter < entriesPerDim)
-        data[counter++] *= (tmp * scale) + shift;
-      datafile.close();
-      if (counter != entriesPerDim)
-        DUNE_THROW(Dune::IOError,
-                   "wrong number of entries in '" << filename << "' (are " << counter << ", should be " << entriesPerDim
-                                                  << ")!");
-      return data;
-    } else
+    if (!datafile.is_open())
       DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
+    static const size_t entriesPerDim = model1_x_elements * model1_y_elements * model1_z_elements;
+    // create storage (there should be exactly 6000 values in the file, but we only read the first 2000)
+    std::vector<RangeType> data(entriesPerDim, unit_range);
+    double tmp = 0;
+    size_t counter = 0;
+    while (datafile >> tmp && counter < entriesPerDim)
+      data[counter++] *= (tmp * scale) + shift;
+    datafile.close();
+    if (counter != entriesPerDim)
+      DUNE_THROW(Dune::IOError,
+                 "wrong number of entries in '" << filename << "' (are " << counter << ", should be " << entriesPerDim
+                                                << ")!");
+    return data;
   } // ... read_values_from_file(...)
 
 public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
+    config["type"] = static_id();
     config["filename"] = internal::model1_filename;
     config["lower_left"] = "[0.0 0.0]";
     config["upper_right"] =
@@ -155,11 +151,13 @@ public:
   }
 }; // class Model1Base
 
+
 } // namespace internal
 
+
 // default, to allow for specialization
-template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class Model1Function : public LocalizableFunctionInterface<E, D, d, R, r, rC>
+template <class E, size_t r, size_t rC = 1, class R = double>
+class Model1Function : public LocalizableFunctionInterface<E, r, rC, R>
 {
   Model1Function()
   {
@@ -167,21 +165,21 @@ class Model1Function : public LocalizableFunctionInterface<E, D, d, R, r, rC>
   }
 };
 
+
 /**
  * We read only the Kx values from file and scale the unit matrix atm.
  */
-template <class EntityImp, class DomainFieldImp, class RangeFieldImp, size_t r>
-class Model1Function<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r>
-    : public internal::Model1Base<EntityImp, DomainFieldImp, RangeFieldImp, r, r>
+template <class E, size_t r, class R>
+class Model1Function<E, r, r, R> : public internal::Model1Base<E, r, r, R>
 {
-  typedef internal::Model1Base<EntityImp, DomainFieldImp, RangeFieldImp, r, r> BaseType;
-  typedef Model1Function<EntityImp, DomainFieldImp, 2, RangeFieldImp, r, r> ThisType;
+  using BaseType = internal::Model1Base<E, r, r, R>;
+  using ThisType = Model1Function<E, r, r, R>;
 
 public:
-  using typename BaseType::DomainFieldType;
-  using BaseType::dimDomain;
-  using typename BaseType::RangeFieldType;
-  using typename BaseType::RangeType;
+  using DomainFieldType = typename BaseType::DomainFieldType;
+  static const constexpr size_t dimDomain = E::dimension;
+  using RangeFieldType = typename BaseType::RangeFieldType;
+  using RangeType = typename BaseType::RangeType;
 
   static std::unique_ptr<ThisType> create(const Common::Configuration config = BaseType::default_config(),
                                           const std::string sub_name = BaseType::static_id())
@@ -226,6 +224,7 @@ private:
     return Call<r>::unit_matrix();
   }
 }; // class Model1< ..., 2, ..., r, r >
+
 
 } // namespace Spe10
 } // namespace Functions
