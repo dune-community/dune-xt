@@ -54,6 +54,7 @@ typedef Dune::UGGrid<3> UG_3D;
 #endif
 #if HAVE_ALBERTA
 typedef Dune::AlbertaGrid<2, 2> ALBERTA_2D;
+typedef Dune::AlbertaGrid<3, 3> ALBERTA_3D;
 #endif
 
 
