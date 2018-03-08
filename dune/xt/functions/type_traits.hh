@@ -132,7 +132,7 @@ struct DerivativeRangeTypeSelector
     if (arg.size() < r)
       arg.resize(r);
     for (size_t ii = 0; ii < r; ++ii)
-      if (arg[ii].rows() < rC || arg.cols() < d)
+      if (arg[ii].rows() < rC || arg[ii].cols() < d)
         arg[ii].resize(rC, d);
   }
 
@@ -175,58 +175,53 @@ struct DerivativeRangeTypeSelector<d, R, r, 1>
 }; // struct DerivativeRangeTypeSelector<..., 1>
 
 
-//// forwards
-// template <class E, class D, size_t d, class R, size_t r, size_t rC>
-// class LocalfunctionSetInterface;
+// forwards
+template <class E, size_t r, size_t rC, class R>
+class LocalFunctionSetInterface;
 
-// template <class E, class D, size_t d, class R, size_t r, size_t rC>
-// class LocalfunctionInterface;
+template <class E, size_t r, size_t rC, class R>
+class LocalFunctionInterface;
 
-// template <class E, class D, size_t d, class R, size_t r, size_t rC>
-// class LocalizableFunctionInterface;
+template <class E, size_t r, size_t rC, class R>
+class LocalizableFunctionInterface;
+
+// smooth
 
 // template <class E, class D, size_t d, class U_, size_t s_, class R, size_t r, size_t rC>
 // class LocalizableFluxFunctionInterface;
 
 
-// namespace internal {
+namespace internal {
 
 
-// template <class Tt>
-// struct is_localfunction_set_helper
-//{
-//  DXTC_has_typedef_initialize_once(EntityType);
-//  DXTC_has_typedef_initialize_once(DomainFieldType);
-//  DXTC_has_typedef_initialize_once(RangeFieldType);
-//  DXTC_has_static_member_initialize_once(dimDomain);
-//  DXTC_has_static_member_initialize_once(dimRange);
-//  DXTC_has_static_member_initialize_once(dimRangeCols);
-//  static const bool is_candidate =
-//      DXTC_has_typedef(EntityType)<Tt>::value && DXTC_has_typedef(DomainFieldType)<Tt>::value
-//      && DXTC_has_typedef(RangeFieldType)<Tt>::value && DXTC_has_static_member(dimDomain)<Tt>::value
-//      && DXTC_has_static_member(dimRange)<Tt>::value && DXTC_has_static_member(dimRangeCols)<Tt>::value;
-//}; // struct is_localfunction_set_helper
-
-// template <class Tt>
-// struct is_localizable_flux_function_helper
-//{
-//  DXTC_has_typedef_initialize_once(EntityType);
-//  DXTC_has_typedef_initialize_once(DomainFieldType);
-//  DXTC_has_typedef_initialize_once(StateType);
-//  DXTC_has_typedef_initialize_once(RangeFieldType);
-//  DXTC_has_static_member_initialize_once(dimDomain);
-//  DXTC_has_static_member_initialize_once(dimRange);
-//  DXTC_has_static_member_initialize_once(dimRangeCols);
-//  DXTC_has_static_member_initialize_once(stateDerivativeOrder);
-//  static const bool is_candidate =
-//      DXTC_has_typedef(EntityType)<Tt>::value && DXTC_has_typedef(DomainFieldType)<Tt>::value
-//      && DXTC_has_typedef(StateType)<Tt>::value && DXTC_has_typedef(RangeFieldType)<Tt>::value
-//      && DXTC_has_static_member(dimDomain)<Tt>::value && DXTC_has_static_member(dimRange)<Tt>::value
-//      && DXTC_has_static_member(dimRangeCols)<Tt>::value && DXTC_has_static_member(stateDerivativeOrder)<Tt>::value;
-//}; // struct is_localfunction_set_helper
+template <class Tt>
+struct is_localizable_function_helper
+{
+  DXTC_has_typedef_initialize_once(E);
+  DXTC_has_typedef_initialize_once(R);
+  DXTC_has_static_member_initialize_once(r);
+  DXTC_has_static_member_initialize_once(rC);
+  static const bool is_candidate = DXTC_has_typedef(E)<Tt>::value && DXTC_has_typedef(R)<Tt>::value
+                                   && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
+}; // struct is_localizable_function_helper
 
 
-//} // namespace internal
+} // namespace internal
+
+
+template <class T, bool is_candidate = internal::is_localizable_function_helper<T>::is_candidate>
+struct is_localizable_function;
+
+template <class T>
+struct is_localizable_function<T, false> : public std::false_type
+{
+};
+
+template <class T>
+struct is_localizable_function<T, true>
+    : std::is_base_of<LocalizableFunctionInterface<typename T::E, T::r, T::rC, typename T::R>, T>
+{
+};
 
 
 // template <class T, bool candidate = internal::is_localfunction_set_helper<T>::is_candidate>
