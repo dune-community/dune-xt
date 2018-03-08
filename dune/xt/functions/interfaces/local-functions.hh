@@ -36,7 +36,7 @@ namespace XT {
 namespace Functions {
 
 /**
- * \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
+ * \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Element.
  *
  * \sa    RangeTypeSelector
  * \sa    DerivativeRangeTypeSelector
@@ -115,7 +115,7 @@ public:
   }
 
   /**
-   * \attention The returned reference will change as soon as the funtion is bound to another entity!
+   * \attention The returned reference will change as soon as the funtion is bound to another element!
    */
   const ElementType& element() const
   {
@@ -135,7 +135,7 @@ public:
 
 protected:
   /**
-   * \note Override this function if you need/want to do preparatory work on an entity.
+   * \note Override this function if you need/want to do preparatory work on an element.
    */
   virtual void post_bind(const ElementType& /*ele*/)
   {
@@ -335,7 +335,7 @@ protected:
   {
     if (!ReferenceElements<D, d>::general(element().type()).checkInside(point_in_reference_element)) {
       std::stringstream error_message;
-      error_message << "This given point point_in_reference_element is not inside the current entity!"
+      error_message << "This given point point_in_reference_element is not inside the current element!"
                     << "\n\n";
       XT::Grid::print_entity(element(), XT::Common::Typename<E>::value(), error_message, "   ");
       error_message << "\n   "
@@ -418,7 +418,7 @@ private:
 }; // class LocalFunctionSetInterface
 
 /**
- *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Entity.
+ *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Element.
  */
 template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class LocalFunctionInterface : public LocalFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>
