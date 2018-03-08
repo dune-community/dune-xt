@@ -164,7 +164,7 @@ public:
   DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
                                const Common::Parameter& /*param*/ = {}) const override final
   {
-    return DerivativeRangeType(0.);
+    return DerivativeRangeType(); // defaults to 0
   }
 
   std::string name() const override final
