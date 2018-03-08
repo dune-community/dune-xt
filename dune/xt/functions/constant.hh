@@ -150,17 +150,19 @@ public:
   ConstantFunction(const ThisType& other) = default;
 #endif
 
-  int order(const XT::Common::Parameter& /*mu*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
   {
     return 0;
   }
 
-  RangeType evaluate(const DomainType& /*x*/, const Common::Parameter& /*mu*/ = {}) const override final
+  RangeType evaluate(const DomainType& /*point_in_global_coordinates*/,
+                     const Common::Parameter& /*param*/ = {}) const override final
   {
     return constant_;
   }
 
-  DerivativeRangeType jacobian(const DomainType& /*x*/, const Common::Parameter& /*mu*/ = {}) const override final
+  DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                               const Common::Parameter& /*param*/ = {}) const override final
   {
     return DerivativeRangeType(0.);
   }
