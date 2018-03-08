@@ -41,18 +41,18 @@ class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
     typedef LocalFunctionInterface<E, r, rC, R> InterfaceType;
 
   public:
-    using typename InterfaceType::EntityType;
+    using typename InterfaceType::ElementType;
     using typename InterfaceType::DomainType;
     using typename InterfaceType::RangeType;
     using typename InterfaceType::DerivativeRangeType;
-    using GeometryType = typename EntityType::Geometry;
+    using GeometryType = typename ElementType::Geometry;
 
-    LocalIndicatorFunction(const EntityType& entity,
+    LocalIndicatorFunction(const ElementType& element,
                            const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
-      : InterfaceType(entity)
+      : InterfaceType(element)
       , subdomain_and_value_tuples_(subdomain_and_value_tuples)
     {
-      post_bind(entity);
+      post_bind(element);
     }
 
     LocalIndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
@@ -61,10 +61,10 @@ class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
     {
     }
 
-    void post_bind(const EntityType& entity) override final
+    void post_bind(const ElementType& element) override final
     {
       current_value_ = 0.;
-      const auto center = entity.geometry().center();
+      const auto center = element.geometry().center();
       for (const auto& subdomain_and_value_tuple : subdomain_and_value_tuples_) {
         const auto& subdomain_ll = std::get<0>(subdomain_and_value_tuple);
         const auto& subdomain_ur = std::get<1>(subdomain_and_value_tuple);
@@ -73,20 +73,21 @@ class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
       }
     } // ... post_bind(...)
 
-    int order(const Common::Parameter& /*mu*/ = {}) const override final
+    int order(const Common::Parameter& /*param*/ = {}) const override final
     {
       return 0;
     }
 
-    RangeType evaluate(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
+    RangeType evaluate(const DomainType& point_in_reference_element,
+                       const Common::Parameter& /*param*/ = {}) const override final
     {
-      this->ensure_this_is_a_valid_point(xx);
+      this->assert_inside_reference_element(point_in_reference_element);
       return current_value_;
     }
 
-    DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
+    DerivativeRangeType jacobian(const DomainType& point_in_reference_element,
+                                 const Common::Parameter& /*param*/ = {}) const override final
     {
-      this->ensure_this_is_a_valid_point(xx);
       return 0.0;
     }
 
@@ -99,7 +100,7 @@ class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
   using RangeType = typename LocalIndicatorFunction::RangeType;
 
 public:
-  using typename BaseType::EntityType;
+  using typename BaseType::ElementType;
   using typename BaseType::LocalFunctionType;
   using typename BaseType::RangeFieldType;
   using BaseType::d;
@@ -198,9 +199,9 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
     return std::make_unique<LocalIndicatorFunction>(subdomain_and_value_tuples_);
   }
 
-  std::unique_ptr<LocalFunctionType> local_function(const EntityType& entity) const override final
+  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
   {
-    return std::make_unique<LocalIndicatorFunction>(entity, subdomain_and_value_tuples_);
+    return std::make_unique<LocalIndicatorFunction>(element, subdomain_and_value_tuples_);
   }
 
 private:
