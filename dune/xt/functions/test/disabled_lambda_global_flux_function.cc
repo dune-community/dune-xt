@@ -9,33 +9,23 @@
 //   Rene Milk       (2018)
 //   Tobias Leibner  (2017)
 
-#include <cmath>
-
 #include <dune/xt/common/test/main.hxx>
 
-#include <dune/grid/common/rangegenerators.hh>
-
-#include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/gridprovider/cube.hh>
-#include <dune/xt/functions/lambda/global-function.hh>
-#include <dune/xt/functions/lambda/local-flux-function.hh>
-
-#include "functions.hh"
-
-using namespace Dune;
-using namespace Dune::XT;
+GTEST_TEST(DISABLED_GlobalLambdaFluxFunction, function_is_not_yet_up_to_date_with_new_interface)
+{
+}
 
 
-struct LocalLambdaFluxFunctionTest : public ::testing::Test
+#if 0
+struct GlobalLambdaFluxFunctionTest : public ::testing::Test
 {
   void check() const
   {
     typedef TESTFUNCTIONTYPE U;
     U u([](typename U::DomainType xx, const XT::Common::Parameter&) { return xx[0]; }, 1);
 
-    typedef XT::Functions::LocalLambdaFluxFunction<U> FluxType;
-    FluxType F([](const typename FluxType::EntityType& /*entity*/,
-                  const typename FluxType::DomainType& /*xx*/,
+    typedef XT::Functions::GlobalLambdaFluxFunction<U> FluxType;
+    FluxType F([](const typename FluxType::DomainType& /*xx*/,
                   const typename FluxType::StateRangeType& uu,
                   const XT::Common::Parameter& mu) { return std::pow(uu[0], mu.get("power").at(0)); },
                XT::Common::ParameterType("power", 1),
@@ -49,13 +39,10 @@ struct LocalLambdaFluxFunctionTest : public ::testing::Test
       auto xx_local = entity.geometry().local(xx_global);
       auto u_value = u.local_function(entity)->evaluate(xx_local)[0];
       ASSERT_EQ(std::pow(u_value, 2.), F.local_function(entity)->evaluate(xx_local, u_value, {"power", 2.}));
+      ASSERT_EQ(std::pow(u_value, 2.), F.evaluate(xx_global, u_value, {"power", 2.}));
       ASSERT_EQ(2, F.local_function(entity)->order({"power", 2.}));
+      ASSERT_EQ(2, F.order({"power", 2.}));
     }
   }
 };
-
-
-TEST_F(LocalLambdaFluxFunctionTest, creation_and_evalution)
-{
-  this->check();
-}
+#endif // 0
