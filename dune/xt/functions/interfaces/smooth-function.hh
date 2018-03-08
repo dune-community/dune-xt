@@ -246,7 +246,7 @@ private:
     template <class FullType>
     static SingleType call(const FullType& val, const size_t row, const size_t col)
     {
-      SingleType ret = 0;
+      SingleType ret;
       for (size_t dd = 0; dd < d; ++dd)
         ret[dd] = val[row][col][dd];
       return ret;
