@@ -208,23 +208,24 @@ public:
     return name_;
   }
 
-  int order(const Common::Parameter& /*mu*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const override final
   {
     return order_;
   }
 
   using BaseType::evaluate;
 
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
+  RangeType evaluate(const DomainType& point_in_global_coordinates,
+                     const Common::Parameter& /*param*/ = {}) const override final
   {
     RangeType ret(0.);
     Common::FieldVector<RangeFieldType, r * rC> tmp_vector_;
-    function_->evaluate(xx, tmp_vector_);
+    function_->evaluate(point_in_global_coordinates, tmp_vector_);
     for (size_t rr = 0; rr < r; ++rr) {
       auto& retRow = ret[rr];
       for (size_t cc = 0; cc < rC; ++cc) {
         retRow[cc] = tmp_vector_[rr * rC + cc];
-        check_value(xx, retRow);
+        check_value(point_in_global_coordinates, retRow);
       }
     }
     return ret;
@@ -232,7 +233,8 @@ public:
 
   using BaseType::jacobian;
 
-  DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
+  DerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
+                               const Common::Parameter& /*param*/ = {}) const override final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");
@@ -241,8 +243,8 @@ public:
     for (size_t cc = 0; cc < r; ++cc) {
       assert(gradients_[cc].size() == rC);
       for (size_t rr = 0; rr < rC; ++rr) {
-        gradients_[cc][rr]->evaluate(xx, ret[cc][rr]);
-        check_value(xx, ret[cc][rr]);
+        gradients_[cc][rr]->evaluate(point_in_global_coordinates, ret[cc][rr]);
+        check_value(point_in_global_coordinates, ret[cc][rr]);
       }
     }
     return ret;
@@ -250,7 +252,7 @@ public:
 
 
   template <class V>
-  void check_value(const DomainType& xx, const V& value) const
+  void check_value(const DomainType& point_in_global_coordinates, const V& value) const
   {
     size_t range = value.size();
 #ifndef NDEBUG
@@ -279,8 +281,8 @@ public:
                        << "The expression of this function is: "
                        << function_->expression() // at
                        << "\n"
-                       << "You tried to evaluate it with:   xx = "
-                       << xx
+                       << "You tried to evaluate it with:   point_in_global_coordinates = "
+                       << point_in_global_coordinates
                        << "\n"
                        << "The result was:                       "
                        << value[rr]
@@ -321,7 +323,6 @@ class ExpressionFunction<d, r, 1, RangeFieldImp> : public SmoothFunctionInterfac
   using typename BaseType::DomainFieldType;
   using typename BaseType::RangeType;
   using typename BaseType::DerivativeRangeType;
-
   using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, r>;
   using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, d>;
 
@@ -453,38 +454,40 @@ public:
     return name_;
   }
 
-  int order(const Common::Parameter& /*mu*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const override final
   {
     return order_;
   }
 
   using BaseType::evaluate;
 
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
+  RangeType evaluate(const DomainType& point_in_global_coordinates,
+                     const Common::Parameter& /*param*/ = {}) const override final
   {
     RangeType ret(0.);
-    function_->evaluate(xx, ret);
-    check_value(xx, ret);
+    function_->evaluate(point_in_global_coordinates, ret);
+    check_value(point_in_global_coordinates, ret);
     return ret;
   } // ... evaluate(...)
 
   using BaseType::jacobian;
 
-  DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& /*mu*/ = {}) const override final
+  DerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
+                               const Common::Parameter& /*param*/ = {}) const override final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");
     DerivativeRangeType ret(0.);
     for (size_t rr = 0; rr < r; ++rr) {
-      gradients_[rr]->evaluate(xx, ret[rr]);
-      check_value(xx, ret[rr]);
+      gradients_[rr]->evaluate(point_in_global_coordinates, ret[rr]);
+      check_value(point_in_global_coordinates, ret[rr]);
     }
     return ret;
   }
 
 private:
   template <class V>
-  void check_value(const DomainType& xx, const V& value) const
+  void check_value(const DomainType& point_in_global_coordinates, const V& value) const
   {
     size_t range = value.size();
 #ifndef NDEBUG
@@ -513,8 +516,8 @@ private:
                        << "The expression of this function is: "
                        << function_->expression() // at
                        << "\n"
-                       << "You tried to evaluate it with:   xx = "
-                       << xx
+                       << "You tried to evaluate it with:   point_in_global_coordinates = "
+                       << point_in_global_coordinates
                        << "\n"
                        << "The result was:                       "
                        << value[rr]
