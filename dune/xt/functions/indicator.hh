@@ -38,7 +38,7 @@ class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
 
   class LocalIndicatorFunction : public LocalFunctionInterface<E, r, rC, R>
   {
-    typedef LocalFunctionInterface<E, r, rC, R> InterfaceType;
+    using InterfaceType = LocalFunctionInterface<E, r, rC, R>;
 
   public:
     using typename InterfaceType::ElementType;
@@ -88,7 +88,8 @@ class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
     DerivativeRangeType jacobian(const DomainType& point_in_reference_element,
                                  const Common::Parameter& /*param*/ = {}) const override final
     {
-      return 0.0;
+      this->assert_inside_reference_element(point_in_reference_element);
+      return DerivativeRangeType();
     }
 
   private:
@@ -96,13 +97,13 @@ class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
     RangeType current_value_;
   }; // class LocalIndicatorFunction
 
+
+public:
   using DomainType = typename LocalIndicatorFunction::DomainType;
   using RangeType = typename LocalIndicatorFunction::RangeType;
 
-public:
   using typename BaseType::ElementType;
   using typename BaseType::LocalFunctionType;
-  using typename BaseType::RangeFieldType;
   using BaseType::d;
   using typename BaseType::D;
 
@@ -119,7 +120,7 @@ public:
     config["type"] = static_id();
     config["0.domain"] = "[0 1; 0 1; 0 1]";
     config["0.value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
-    config["1.domain"] = "[-1 0; -1 0; -1 0]";
+    config["1.domain"] = "[-1 0.5; -1 0.5; -1 0.5]";
     config["1.value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
     config["name"] = static_id();
     if (sub_name.empty())
@@ -158,11 +159,9 @@ public:
   } // ... create(...)
 
   /**
-   * \brief Convernience ctor.
-   *
    *        Can be used for declaration of lower left corner and upper right corner of the desired domains.
 \code
-FunctionType function({{lowerleft_1, upperright_1, value_1}, {{lowerleft_2, upperright_2, value_2}});
+FunctionType function({{lowerleft_1, upperright_1, value_1}, {lowerleft_2, upperright_2, value_2}});
 \endcode
    */
 
@@ -174,7 +173,7 @@ FunctionType function({{lowerleft_1, upperright_1, value_1}, {{lowerleft_2, uppe
   }
 
   /**
-   * \brief Convernience ctor.
+   * \brief Convenience ctor.
    *
    *        Can be used as in
 \code
