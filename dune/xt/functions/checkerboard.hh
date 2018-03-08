@@ -22,178 +22,138 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fvector.hh>
 
-#include <dune/xt/functions/affine.hh>
-#include <dune/xt/functions/constant.hh>
-#include <dune/xt/functions/expression.hh>
-
 #include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
 namespace XT {
 namespace Functions {
 
-
-// forward
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols = 1,
-          class LocalizableFunctionImp =
-              ConstantFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>>
-class CheckerboardFunction;
-
-
-namespace internal {
-
-
-template <class FunctionImp,
-          bool is_localizable = std::is_base_of<LocalizableFunctionInterface<typename FunctionImp::EntityType,
-                                                                             typename FunctionImp::DomainFieldType,
-                                                                             FunctionImp::dimDomain,
-                                                                             typename FunctionImp::RangeFieldType,
-                                                                             FunctionImp::dimRange,
-                                                                             FunctionImp::dimRangeCols>,
-                                                FunctionImp>::value>
-struct CheckerboardInterfaceChooser;
-
-template <class FunctionImp>
-struct CheckerboardInterfaceChooser<FunctionImp, true>
+/**
+ * Note: This function does not allow for functions on the subdomains anymore. Only constant values are possible.
+ */
+template <class E, size_t r = 1, size_t rC = 1, class R = double>
+class CheckerboardFunction : public LocalizableFunctionInterface<E, r, rC, R>
 {
-  typedef LocalizableFunctionInterface<typename FunctionImp::EntityType,
-                                       typename FunctionImp::DomainFieldType,
-                                       FunctionImp::dimDomain,
-                                       typename FunctionImp::RangeFieldType,
-                                       FunctionImp::dimRange,
-                                       FunctionImp::dimRangeCols>
-      Type;
-};
-
-template <class FunctionImp>
-struct CheckerboardInterfaceChooser<FunctionImp, false>
-{
-
-  typedef LocalizableFluxFunctionInterface<typename FunctionImp::EntityType,
-                                           typename FunctionImp::DomainFieldType,
-                                           FunctionImp::dimDomain,
-                                           typename FunctionImp::StateType,
-                                           0,
-                                           typename FunctionImp::RangeFieldType,
-                                           FunctionImp::dimRange,
-                                           FunctionImp::dimRangeCols>
-      Type;
-};
-
-template <class CheckerboardFunctionType>
-class CheckerboardFunctionFactory
-{
-public:
-  static std::unique_ptr<CheckerboardFunctionType> create(const Common::Configuration /*config*/,
-                                                          const std::string /*sub_name*/)
-  {
-    DUNE_THROW(Dune::NotImplemented,
-               "CheckerboardFunctionFactory is not implemented for this LocalizableFunctionType!");
-    return std::unique_ptr<CheckerboardFunctionType>();
-  }
-}; // class CheckerboardFunctionFactory< ... >
-
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols>
-class CheckerboardFunctionFactory<CheckerboardFunction<EntityImp,
-                                                       DomainFieldImp,
-                                                       domainDim,
-                                                       RangeFieldImp,
-                                                       rangeDim,
-                                                       rangeDimCols,
-                                                       ConstantFunction<EntityImp,
-                                                                        DomainFieldImp,
-                                                                        domainDim,
-                                                                        RangeFieldImp,
-                                                                        rangeDim,
-                                                                        rangeDimCols>>>
-{
-  typedef ConstantFunction<EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols>
-      ConstantFunctionType;
-  typedef CheckerboardFunction<EntityImp,
-                               DomainFieldImp,
-                               domainDim,
-                               RangeFieldImp,
-                               rangeDim,
-                               rangeDimCols,
-                               ConstantFunctionType>
-      CheckerboardFunctionType;
-
-public:
-  static std::unique_ptr<CheckerboardFunctionType> create(const Common::Configuration config,
-                                                          const std::string sub_name)
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = CheckerboardFunctionType::default_config();
-    // calculate number of values and get values
-    auto num_elements =
-        cfg.get("num_elements", default_cfg.get<Common::FieldVector<size_t, domainDim>>("num_elements"), domainDim);
-    size_t num_values = 1;
-    for (size_t ii = 0; ii < num_elements.size(); ++ii)
-      num_values *= num_elements[ii];
-    std::vector<ConstantFunctionType> values;
-    auto values_range = cfg.get(
-        "values", default_cfg.get<std::vector<typename CheckerboardFunctionType::RangeType>>("values"), num_values);
-    for (size_t ii = 0; ii < values_range.size(); ++ii)
-      values.emplace_back(ConstantFunctionType(values_range[ii], "constant in tile " + Common::to_string(ii)));
-    // create
-    return Common::make_unique<CheckerboardFunctionType>(
-        cfg.get("lower_left", default_cfg.get<FieldVector<DomainFieldImp, domainDim>>("lower_left"), domainDim),
-        cfg.get("upper_right", default_cfg.get<FieldVector<DomainFieldImp, domainDim>>("upper_right"), domainDim),
-        std::move(num_elements),
-        std::move(values),
-        cfg.get("name", default_cfg.get<std::string>("name")));
-  } // ... create(...)
-}; // class CheckerboardFunctionFactory< ... >
-
-
-} // namespace internal
-
-
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols,
-          class LocalizableFunctionImp>
-class CheckerboardFunction : public internal::CheckerboardInterfaceChooser<LocalizableFunctionImp>::Type
-{
-  static_assert(is_localizable_function<LocalizableFunctionImp>::value
-                    || is_localizable_flux_function<LocalizableFunctionImp>::value,
-                "LocalizableFunctionImp needs to be derived from XT::Localizable(Flux)FunctionInterface!");
-  static_assert(domainDim <= 3, "Not implemented for dimDomain > 3 (see find_subdomain method)!");
-  typedef typename internal::CheckerboardInterfaceChooser<LocalizableFunctionImp>::Type BaseType;
-  typedef CheckerboardFunction<EntityImp,
-                               DomainFieldImp,
-                               domainDim,
-                               RangeFieldImp,
-                               rangeDim,
-                               rangeDimCols,
-                               LocalizableFunctionImp>
-      ThisType;
-
-public:
-  using typename BaseType::EntityType;
-  using typename BaseType::DomainType;
-  using typename BaseType::RangeType;
-  using typename BaseType::LocalfunctionType;
-
+  using BaseType = LocalizableFunctionInterface<E, r, rC, R>;
+  using ThisType = CheckerboardFunction<E, r, rC, R>;
   using BaseType::dimDomain;
+  static_assert(dimDomain <= 3, "Not implemented for dimDomain > 3 (see find_subdomain method)!");
+
+  class LocalCheckerboardFunction : public LocalFunctionInterface<E, r, rC, R>
+  {
+    typedef LocalFunctionInterface<E, r, rC, R> InterfaceType;
+
+  public:
+    using typename InterfaceType::ElementType;
+    using typename InterfaceType::DomainType;
+    using typename InterfaceType::RangeType;
+    using typename InterfaceType::DerivativeRangeType;
+    using GeometryType = typename ElementType::Geometry;
+
+    LocalCheckerboardFunction(const ElementType& element,
+                              const DomainType& lower_left,
+                              const DomainType& upper_right,
+                              const FieldVector<size_t, dimDomain>& num_elements,
+                              const std::vector<RangeType>& values)
+      : InterfaceType(element)
+      , lower_left_(lower_left)
+      , upper_right_(upper_right)
+      , num_elements_(num_elements)
+      , values_(values)
+    {
+      post_bind(element);
+    }
+
+    LocalCheckerboardFunction(const DomainType& lower_left,
+                              const DomainType& upper_right,
+                              const FieldVector<size_t, dimDomain>& num_elements,
+                              std::vector<RangeType>& values)
+      : InterfaceType()
+      , lower_left_(lower_left)
+      , upper_right_(upper_right)
+      , num_elements_(num_elements)
+      , values_(values)
+    {
+    }
+
+    void post_bind(const ElementType& element) override final
+    {
+      current_value_ = 0;
+      if (is_in_checkerboard(element)) {
+        const size_t subdomain = find_subdomain(element);
+        current_value_ = values_[subdomain];
+      }
+    } // ... post_bind(...)
+
+    int order(const Common::Parameter& /*param*/ = {}) const override final
+    {
+      return 0;
+    }
+
+    RangeType evaluate(const DomainType& point_in_reference_element,
+                       const Common::Parameter& /*param*/ = {}) const override final
+    {
+      this->assert_inside_reference_element(point_in_reference_element);
+      return current_value_;
+    }
+
+    DerivativeRangeType jacobian(const DomainType& point_in_reference_element,
+                                 const Common::Parameter& /*param*/ = {}) const override final
+    {
+      this->assert_inside_reference_element(point_in_reference_element);
+      return DerivativeRangeType();
+    }
+
+  private:
+    bool is_in_checkerboard(const ElementType& element) const
+    {
+      const auto center = element.geometry().center();
+      if (Common::FloatCmp::le(lower_left_, center) && Common::FloatCmp::lt(center, upper_right_))
+        return 1;
+      else
+        return 0;
+    }
+
+    size_t find_subdomain(const ElementType& element) const
+    {
+      // decide to which subdomain the center of the element belongs to
+      const auto center = element.geometry().center();
+      std::vector<size_t> which_partition(dimDomain, 0);
+      const auto& ll = lower_left_;
+      const auto& ur = upper_right_;
+      const auto& ne = num_elements_;
+      for (size_t dd = 0; dd < dimDomain; ++dd) {
+        // for points that are on upper_right_[d], this selects one partition too much
+        // so we need to cap this
+        which_partition[dd] =
+            std::min(size_t(std::floor(ne[dd] * ((center[dd] - ll[dd]) / (ur[dd] - ll[dd])))), ne[dd] - 1);
+      }
+      size_t subdomain = 0;
+      if (dimDomain == 1)
+        subdomain = which_partition[0];
+      else if (dimDomain == 2)
+        subdomain = which_partition[0] + which_partition[1] * ne[0];
+      else
+        subdomain = which_partition[0] + which_partition[1] * ne[0] + which_partition[2] * ne[1] * ne[0];
+      return subdomain;
+    } // ... find_subdomain(...)
+
+
+    const DomainType lower_left_;
+    const DomainType upper_right_;
+    const FieldVector<size_t, dimDomain> num_elements_;
+    const std::vector<RangeType>& values_;
+    RangeType current_value_;
+  }; // class LocalCheckerboardFunction
+
+public:
+  using typename BaseType::ElementType;
+  using typename BaseType::LocalFunctionType;
+
+  using RangeType = typename LocalFunctionType::RangeType;
+  using DomainType = typename LocalFunctionType::DomainType;
 
   static const bool available = true;
-
-  typedef LocalizableFunctionImp LocalizableFunctionType;
 
   static std::string static_id()
   {
@@ -203,6 +163,7 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
+    config["type"] = static_id();
     config["lower_left"] = "[0.0 0.0 0.0]";
     config["upper_right"] = "[1.0 1.0 1.0]";
     config["num_elements"] = "[2 2 2]";
@@ -218,113 +179,107 @@ public:
   }
 
   static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
+                                          const std::string sub_name = "")
   {
-    return internal::CheckerboardFunctionFactory<ThisType>::create(config, sub_name);
+    // get correct config
+    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Common::Configuration def_cfg = default_config();
+    // calculate number of values and get values
+    auto num_elements =
+        cfg.get("num_elements", def_cfg.get<Common::FieldVector<size_t, dimDomain>>("num_elements"), dimDomain);
+    size_t num_values = 1;
+    for (size_t ii = 0; ii < num_elements.size(); ++ii)
+      num_values *= num_elements[ii];
+    std::vector<RangeType> values;
+    auto values_range = cfg.get("values", def_cfg.get<std::vector<R>>("values"), num_values);
+    for (size_t ii = 0; ii < values_range.size(); ++ii)
+      values.emplace_back(values_range[ii]);
+    // create
+    return Common::make_unique<ThisType>(cfg.get("lower_left", def_cfg.get<DomainType>("lower_left"), dimDomain),
+                                         cfg.get("upper_right", def_cfg.get<DomainType>("upper_right"), dimDomain),
+                                         std::move(num_elements),
+                                         std::move(values),
+                                         cfg.get("name", def_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  // constructor for constant function
-  template <class L = LocalizableFunctionType,
-            typename std::enable_if<std::is_base_of<ConstantFunction<EntityImp,
-                                                                     DomainFieldImp,
-                                                                     domainDim,
-                                                                     RangeFieldImp,
-                                                                     rangeDim,
-                                                                     rangeDimCols>,
-                                                    L>::value>::type...>
   CheckerboardFunction(const DomainType& lower_left,
                        const DomainType& upper_right,
                        const FieldVector<size_t, dimDomain>& num_elements,
                        const std::vector<RangeType>& values,
-                       const std::string nm = static_id())
-    : CheckerboardFunction(lower_left, upper_right, num_elements, make_constant_functions<L>(values), nm)
-  {
-  }
-
-  CheckerboardFunction(const DomainType& lower_left,
-                       const DomainType& upper_right,
-                       const FieldVector<size_t, dimDomain>& num_elements,
-                       const std::vector<LocalizableFunctionType>& values,
-                       const std::string nm = static_id())
-    : lower_left_(new DomainType(lower_left))
-    , upper_right_(new DomainType(upper_right))
-    , num_elements_(new FieldVector<size_t, dimDomain>(num_elements))
+                       const std::string nm = "checkerboard")
+    : lower_left_(lower_left)
+    , upper_right_(upper_right)
+    , num_elements_(num_elements)
+    , values_(new std::vector<RangeType>(values))
     , name_(nm)
   {
-    for (size_t ii = 0; ii < values.size(); ++ii)
-      values_.emplace_back(new LocalizableFunctionType(values[ii]));
 #ifndef NDEBUG
     // checks
     size_t total_subdomains = 1;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
-      const auto& ll = (*lower_left_)[dd];
-      const auto& ur = (*upper_right_)[dd];
-      const auto& ne = (*num_elements_)[dd];
+      const auto& ll = (lower_left_)[dd];
+      const auto& ur = (upper_right_)[dd];
+      const auto& ne = (num_elements_)[dd];
       if (!(ll < ur))
         DUNE_THROW(Dune::RangeError, "lower_left has to be elementwise smaller than upper_right!");
       total_subdomains *= ne;
     }
-    if (values_.size() < total_subdomains)
+    if (values_->size() < total_subdomains)
       DUNE_THROW(Dune::RangeError,
-                 "values too small (is " << values_.size() << ", should be " << total_subdomains << ")");
+                 "values too small (is " << values_->size() << ", should be " << total_subdomains << ")");
 #endif
   } // CheckerboardFunction(...)
 
   CheckerboardFunction(const ThisType& other) = default;
+  CheckerboardFunction(ThisType&& source) = default;
 
   ThisType& operator=(const ThisType& other) = delete;
-
   ThisType& operator=(ThisType&& source) = delete;
 
-  virtual std::string type() const override
+  std::string type() const override
   {
     return BaseType::static_id() + ".checkerboard";
   }
 
-  virtual std::string name() const override
+  std::string name() const override
   {
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
+  std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    const size_t subdomain = find_subdomain(entity);
-    return values_[subdomain]->local_function(entity);
+    return std::make_unique<LocalCheckerboardFunction>(lower_left_, upper_right_, num_elements_, *values_);
   }
 
-  size_t subdomain(const EntityType& entity) const
+  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
   {
-    return find_subdomain(entity);
+    return std::make_unique<LocalCheckerboardFunction>(element, lower_left_, upper_right_, num_elements_, *values_);
+  }
+
+  size_t subdomain(const ElementType& element) const
+  {
+    return find_subdomain(element);
   }
 
   size_t subdomains() const
   {
-    return values_.size();
+    return values_->size();
   }
 
-  const std::vector<std::shared_ptr<const LocalizableFunctionType>>& values() const
+  const std::vector<std::shared_ptr<const RangeType>>& values() const
   {
     return values_;
   }
 
 private:
-  template <class L>
-  std::vector<L> make_constant_functions(const std::vector<RangeType>& values)
+  size_t find_subdomain(const ElementType& element) const
   {
-    std::vector<L> functions;
-    for (size_t ii = 0; ii < values.size(); ++ii)
-      functions.emplace_back(values[ii], "constant value " + Common::to_string(ii));
-    return functions;
-  }
-
-  size_t find_subdomain(const EntityType& entity) const
-  {
-    // decide on the subdomain the center of the entity belongs to
-    const auto center = entity.geometry().center();
+    // decide on the subdomain the center of the element belongs to
+    const auto center = element.geometry().center();
     std::vector<size_t> which_partition(dimDomain, 0);
-    const auto& ll = *lower_left_;
-    const auto& ur = *upper_right_;
-    const auto& ne = *num_elements_;
+    const auto& ll = lower_left_;
+    const auto& ur = upper_right_;
+    const auto& ne = num_elements_;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
       // for points that are on upper_right_[d], this selects one partition too much
       // so we need to cap this
@@ -341,13 +296,12 @@ private:
     return subdomain;
   } // ... find_subdomain(...)
 
-  std::shared_ptr<const DomainType> lower_left_;
-  std::shared_ptr<const DomainType> upper_right_;
-  std::shared_ptr<const FieldVector<size_t, dimDomain>> num_elements_;
-  std::vector<std::shared_ptr<const LocalizableFunctionType>> values_;
+  const DomainType lower_left_;
+  const DomainType upper_right_;
+  const FieldVector<size_t, dimDomain> num_elements_;
+  std::shared_ptr<std::vector<RangeType>> values_;
   std::string name_;
 }; // class CheckerboardFunction
-
 
 } // namespace Functions
 } // namespace XT
