@@ -34,7 +34,7 @@ public:
   using BaseType::r;
   using BaseType::rC;
   using typename BaseType::R;
-  using typename BaseType::EntityType;
+  using typename BaseType::ElementType;
   using typename BaseType::LocalFunctionType;
   using SmoothFunctionType = SmoothFunctionInterface<d, r, rC, R>;
 
@@ -58,9 +58,9 @@ public:
    * \{
    **/
 
-  std::unique_ptr<LocalFunctionType> local_function(const EntityType& entity) const override final
+  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
   {
-    return std::make_unique<LocalFunction>(smooth_function_storage_.access(), entity);
+    return std::make_unique<LocalFunction>(smooth_function_storage_.access(), element);
   }
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
@@ -92,19 +92,19 @@ private:
   class LocalFunction : public LocalFunctionType
   {
     using BaseType = LocalFunctionType;
-    using GeometryType = typename EntityType::Geometry;
+    using GeometryType = typename ElementType::Geometry;
 
   public:
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
     using typename BaseType::DerivativeRangeType;
 
-    LocalFunction(const SmoothFunctionType& smooth_function, const EntityType& en)
-      : BaseType(en)
+    LocalFunction(const SmoothFunctionType& smooth_function, const ElementType& el)
+      : BaseType(el)
       , smooth_function_(smooth_function)
       , geometry_(nullptr) // <- happens in post_bind
     {
-      post_bind(en);
+      post_bind(el);
     }
 
     LocalFunction(const SmoothFunctionType& smooth_function)
@@ -118,15 +118,15 @@ private:
     using BaseType::jacobian;
     using BaseType::derivative;
 
-    void post_bind(const EntityType& en) override final
+    void post_bind(const ElementType& el) override final
     {
-      geometry_ = std::make_unique<GeometryType>(en.geometry());
+      geometry_ = std::make_unique<GeometryType>(el.geometry());
     }
 
     int order(const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
+        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
       return smooth_function_.order(param);
     }
 
@@ -134,7 +134,7 @@ private:
                        const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
+        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
       this->assert_inside_reference_element(point_in_reference_element);
       return smooth_function_.evaluate(geometry_->global(point_in_reference_element), param);
     }
@@ -143,7 +143,7 @@ private:
                                  const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
+        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
       this->assert_inside_reference_element(point_in_reference_element);
       return smooth_function_.jacobian(geometry_->global(point_in_reference_element), param);
     }
@@ -153,7 +153,7 @@ private:
                                    const Common::Parameter& param = {}) const override final
     {
       if (!geometry_)
-        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
+        DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
       this->assert_inside_reference_element(point_in_reference_element);
       return smooth_function_.derivative(alpha, geometry_->global(point_in_reference_element), param);
     }
