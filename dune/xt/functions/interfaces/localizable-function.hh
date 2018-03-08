@@ -45,14 +45,14 @@ namespace Functions {
 template <class GridViewType, size_t dimRange, size_t dimRangeCols, class RangeFieldImp>
 class VisualizationAdapter;
 
-// template <class MinuendType, class SubtrahendType>
-// class DifferenceFunction;
+template <class MinuendType, class SubtrahendType>
+class DifferenceFunction;
 
-// template <class LeftSummandType, class RightSummandType>
-// class SumFunction;
+template <class LeftSummandType, class RightSummandType>
+class SumFunction;
 
-// template <class LeftSummandType, class RightSummandType>
-// class ProductFunction;
+template <class LeftSummandType, class RightSummandType>
+class ProductFunction;
 
 // template <class FunctionImp>
 // class DivergenceFunction;
@@ -128,25 +128,26 @@ public:
   {
     return "localizable_function";
   }
-  /* \} */
 
-  //  DifferenceType operator-(const ThisType& other) const
-  //  {
-  //    return DifferenceType(*this, other);
-  //  }
+  /// \}
 
-  //  SumType operator+(const ThisType& other) const
-  //  {
-  //    return SumType(*this, other);
-  //  }
+  DifferenceType operator-(const ThisType& other) const
+  {
+    return DifferenceType(*this, other);
+  }
 
-  //  template <class OtherType>
-  //  typename std::enable_if<is_localizable_function<OtherType>::value,
-  //                          Functions::ProductFunction<ThisType, OtherType>>::type
-  //  operator*(const OtherType& other) const
-  //  {
-  //    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
-  //  }
+  SumType operator+(const ThisType& other) const
+  {
+    return SumType(*this, other);
+  }
+
+  template <class OtherType>
+  typename std::enable_if<is_localizable_function<OtherType>::value,
+                          Functions::ProductFunction<ThisType, OtherType>>::type
+  operator*(const OtherType& other) const
+  {
+    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
+  }
 
   /**
    * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default: the grid you see in the
@@ -178,31 +179,14 @@ public:
     else
       vtk_writer->pwrite(Common::filename_only(path), directory, "", vtk_output_type);
   } // ... visualize(...)
-
-  //  virtual void report(std::ostream& out, const std::string prefix = "") const
-  //  {
-  //    out << prefix << "function '" << name() << "' (of type " << type() << ")";
-  //  }
-
-private:
-  //  template <class T>
-  //  friend std::ostream& operator<<(std::ostream& /*out*/, const ThisType& /*function*/);
 }; // class LocalizableFunctionInterface
-
-
-// template <class E, class D, size_t d, class R, size_t r, size_t rC>
-// std::ostream& operator<<(std::ostream& out, const LocalizableFunctionInterface<E, D, d, R, r, rC>& function)
-//{
-//  function.report(out);
-//  return out;
-//} // ... operator<<(...)
 
 
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
 
-//#include "../combined.hh"
+#include "../combined.hh"
 #include <dune/xt/functions/base/visualization.hh>
 //#include "../derived.hh"
 
