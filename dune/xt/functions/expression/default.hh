@@ -32,7 +32,7 @@ namespace Functions {
 
 
 /**
- * \note This is the matrix value dversion, see below for scalar- and vectorvalued case.
+ * \note This is the matrix valued version, see below for scalar- and vectorvalued case.
  * \note We have a specialization for the other case on purpose, disabling all ctors and using helpers got too
  * complicated!
  */
@@ -44,13 +44,13 @@ class ExpressionFunction : public SmoothFunctionInterface<d, r, rC, RangeFieldIm
   using ThisType = ExpressionFunction<d, r, rC, RangeFieldImp>;
 
   using typename BaseType::DomainFieldType;
-  using typename BaseType::RangeType;
-  using DerivativeRangeType = typename BaseType::DerivativeRangeType;
-
   using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, r * rC>;
   using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, d>;
 
 public:
+  using typename BaseType::RangeType;
+  using DerivativeRangeType = typename BaseType::DerivativeRangeType;
+
   using DomainType = typename BaseType::DomainType;
   using RangeFieldType = typename BaseType::RangeFieldType;
   using SingleDerivativeRangeType = typename BaseType::SingleDerivativeRangeType;
@@ -321,12 +321,12 @@ class ExpressionFunction<d, r, 1, RangeFieldImp> : public SmoothFunctionInterfac
   using ThisType = ExpressionFunction<d, r, 1, RangeFieldImp>;
 
   using typename BaseType::DomainFieldType;
-  using typename BaseType::RangeType;
-  using typename BaseType::DerivativeRangeType;
   using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, r>;
   using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, d>;
 
 public:
+  using typename BaseType::RangeType;
+  using typename BaseType::DerivativeRangeType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeFieldType;
   using typename BaseType::SingleDerivativeRangeType;
