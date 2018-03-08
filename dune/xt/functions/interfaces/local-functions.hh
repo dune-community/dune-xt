@@ -13,8 +13,8 @@
 
 #include <array>
 #include <sstream>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 #include <dune/common/fvector.hh>
 
@@ -35,7 +35,6 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
-
 /**
  * \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Entity.
  *
@@ -45,21 +44,21 @@ namespace Functions {
  *        See in particular RangeTypeSelector and DerivativeRangeTypeSelector for the interpretation of a function and
  *        its derivatives.
  **/
-template <class EntityImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class LocalFunctionSetInterface : public Common::ParametricInterface
 {
-  static_assert(XT::Grid::is_entity<EntityImp>::value, "");
-  using ThisType = LocalFunctionSetInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  static_assert(XT::Grid::is_entity<ElementImp>::value, "");
+  using ThisType = LocalFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
-  using EntityType = EntityImp;
+  using ElementType = ElementImp;
   using DomainFieldType = double;
-  static const constexpr size_t dimDomain = EntityType::dimension;
+  static const constexpr size_t dimDomain = ElementType::dimension;
   using RangeFieldType = RangeFieldImp;
   static const constexpr size_t dimRange = rangeDim;
   static const constexpr size_t dimRangeCols = rangeDimCols;
 
-  using E = EntityType;
+  using E = ElementType;
   using D = DomainFieldType;
   static const constexpr size_t d = dimDomain;
   using R = RangeFieldType;
@@ -75,29 +74,29 @@ public:
   using DynamicDerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::dynamic_type;
 
   LocalFunctionSetInterface()
-    : entity_(nullptr)
+    : element_(nullptr)
   {
   }
 
-  LocalFunctionSetInterface(const EntityType& ent)
-    : entity_(new EntityType(ent))
+  LocalFunctionSetInterface(const ElementType& ele)
+    : element_(new ElementType(ele))
   {
   }
 
-  LocalFunctionSetInterface(EntityType&& ent)
-    : entity_(new EntityType(ent))
+  LocalFunctionSetInterface(ElementType&& ele)
+    : element_(new ElementType(ele))
   {
   }
 
   LocalFunctionSetInterface(const ThisType& other)
-    : entity_(nullptr)
+    : element_(nullptr)
   {
-    if (other.entity_)
-      entity_ = std::make_unique<EntityType>(*other.entity_);
+    if (other.element_)
+      element_ = std::make_unique<ElementType>(*other.element_);
   }
 
   LocalFunctionSetInterface(ThisType&& source)
-    : entity_(std::move(source.entity_))
+    : element_(std::move(source.element_))
   {
   }
 
@@ -105,32 +104,32 @@ public:
 
   ThisType& operator=(const ThisType& other)
   {
-    if (&other != this && other.entity_)
-      entity_ = std::make_unique<EntityType>(other.entity_);
+    if (&other != this && other.element_)
+      element_ = std::make_unique<ElementType>(other.element_);
   }
 
   ThisType& operator=(ThisType&& source)
   {
     if (&source != this)
-      entity_ = source.entity_;
+      element_ = source.element_;
   }
 
   /**
    * \attention The returned reference will change as soon as the funtion is bound to another entity!
    */
-  const EntityType& entity() const
+  const ElementType& element() const
   {
-    if (!entity_)
-      DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_entity_yet, "");
-    return *entity_;
+    if (!element_)
+      DUNE_THROW(Exceptions::this_function_is_not_bound_to_an_element_yet, "");
+    return *element_;
   }
 
-  ThisType& bind(const EntityType& ent)
+  ThisType& bind(const ElementType& ele)
   {
-    if (entity_ && ent == *entity_)
+    if (element_ && ele == *element_)
       return *this;
-    entity_ = std::make_unique<EntityType>(ent);
-    post_bind(*entity_);
+    element_ = std::make_unique<ElementType>(ele);
+    post_bind(*element_);
     return *this;
   }
 
@@ -138,7 +137,7 @@ protected:
   /**
    * \note Override this function if you need/want to do preparatory work on an entity.
    */
-  virtual void post_bind(const EntityType& /*ent*/)
+  virtual void post_bind(const ElementType& /*ele*/)
   {
   }
 
@@ -334,11 +333,11 @@ protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
   void assert_inside_reference_element(const DomainType& point_in_reference_element) const
   {
-    if (!ReferenceElements<D, d>::general(entity().type()).checkInside(point_in_reference_element)) {
+    if (!ReferenceElements<D, d>::general(element().type()).checkInside(point_in_reference_element)) {
       std::stringstream error_message;
       error_message << "This given point point_in_reference_element is not inside the current entity!"
                     << "\n\n";
-      XT::Grid::print_entity(entity(), XT::Common::Typename<E>::value(), error_message, "   ");
+      XT::Grid::print_entity(element(), XT::Common::Typename<E>::value(), error_message, "   ");
       error_message << "\n   "
                     << "point_in_reference_element = " << point_in_reference_element << std::endl;
       DUNE_THROW(XT::Functions::Exceptions::wrong_input_given, error_message.str());
@@ -373,7 +372,7 @@ private:
   struct single_evaluate_helper
   {
     template <class FullType, class SingleType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<R>& ret)
+    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<SingleType>& ret)
     {
       for (size_t ii = 0; ii < val.size(); ++ii)
         ret[ii] = val[ii][row][col];
@@ -415,18 +414,17 @@ private:
     }
   }; // struct single_derivative_helper<..., 1, ...>
 
-  std::unique_ptr<EntityType> entity_;
+  std::unique_ptr<ElementType> element_;
 }; // class LocalFunctionSetInterface
-
 
 /**
  *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Entity.
  */
-template <class EntityImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class LocalFunctionInterface : public LocalFunctionSetInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>
+template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+class LocalFunctionInterface : public LocalFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>
 {
-  using BaseType = LocalFunctionSetInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
-  using ThisType = LocalFunctionInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using BaseType = LocalFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = LocalFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
   using BaseType::d;
@@ -439,20 +437,20 @@ public:
   using typename BaseType::SingleDerivativeRangeType;
   using typename BaseType::DynamicRangeType;
   using typename BaseType::DynamicDerivativeRangeType;
-  using typename BaseType::EntityType;
+  using typename BaseType::ElementType;
 
   LocalFunctionInterface()
     : BaseType()
   {
   }
 
-  LocalFunctionInterface(const EntityType& ent)
-    : BaseType(ent)
+  LocalFunctionInterface(const ElementType& ele)
+    : BaseType(ele)
   {
   }
 
-  LocalFunctionInterface(EntityType&& ent)
-    : BaseType(ent)
+  LocalFunctionInterface(ElementType&& ele)
+    : BaseType(ele)
   {
   }
 
@@ -664,7 +662,6 @@ private:
     }
   }; // struct single_derivative_helper<..., 1, ...>
 }; // class LocalFunctionInterface
-
 
 } // namespace Functions
 } // namespace XT
