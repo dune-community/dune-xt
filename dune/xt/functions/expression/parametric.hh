@@ -103,7 +103,7 @@ public:
     return name_;
   }
 
-  virtual int order(const Common::Parameter& /*mu*/ = {}) const override final
+  virtual int order(const Common::Parameter& /*param*/ = {}) const override final
   {
     return order_;
   }
@@ -118,28 +118,29 @@ public:
     return param_type_;
   }
 
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
+  RangeType evaluate(const DomainType& point_in_global_coordinates,
+                     const Common::Parameter& param = {}) const override final
   {
     RangeType ret(0.);
-    Common::Parameter parsed_mu;
+    Common::Parameter parsed_param;
     if (!param_type_.empty()) {
-      parsed_mu = this->parse_parameter(mu);
-      if (parsed_mu.type() != param_type_)
+      parsed_param = this->parse_parameter(param);
+      if (parsed_param.type() != param_type_)
         DUNE_THROW(Common::Exceptions::parameter_error,
                    "parameter_type(): " << param_type_ << "\n   "
-                                        << "mu.type(): "
-                                        << mu.type());
+                                        << "param.type(): "
+                                        << param.type());
     }
     DynamicVector<D> args(num_parameter_variables_ + dimDomain);
     size_t II = 0;
     for (const auto& key : param_type_.keys()) {
-      for (const auto& value : parsed_mu.get(key)) {
+      for (const auto& value : parsed_param.get(key)) {
         args[II] = value;
         ++II;
       }
     }
     for (size_t ii = 0; ii < dimDomain; ++ii) {
-      args[II] = xx[ii];
+      args[II] = point_in_global_coordinates[ii];
       ++II;
     }
     function_->evaluate(args, ret);
@@ -170,11 +171,11 @@ public:
                        << "The expressions of this function are: "
                        << function_->expressions()
                        << "\n   "
-                       << "You evaluated it with            xx : "
-                       << xx
+                       << "You evaluated it with            point_in_global_coordinates : "
+                       << point_in_global_coordinates
                        << "\n   "
-                       << "                                 mu : "
-                       << mu
+                       << "                                 param : "
+                       << param
                        << "\n   "
                        << "The result was:                       "
                        << ret[rr]
@@ -186,7 +187,8 @@ public:
     return ret;
   } // ... evaluate(...)
 
-  DerivativeRangeType jacobian(const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) const override final
+  DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                               const Common::Parameter& /*param*/ = {}) const override final
   {
     DUNE_THROW(NotImplemented, "Not yet, at least...");
   }
