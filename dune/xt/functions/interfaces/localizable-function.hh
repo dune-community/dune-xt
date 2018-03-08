@@ -59,25 +59,26 @@ class VisualizationAdapter;
 
 
 /**
- * \brief Interface for functions which can be localized to an entity.
+ * \brief Interface for functions which can be localized to an element.
  *
- *        We follow one strong assumption in dune-xt-functions: after being localized to an entity, a local function
+ *        We follow one strong assumption in dune-xt-functions: after being localized to an element, a local function
  *        (or a set of local functions) has to provide the order which is required to integrate it _exactly_ on this
- *        entity and _should_ be polynomial on an entity. While there exists non-polynomial data functions, we only have
+ *        element and _should_ be polynomial on an element. While there exists non-polynomial data functions, we only
+ * have
  *        quadratures of finite order and no way to detect discontinuities of functions (thus the order of the local
  *        polynomial approximation must be provided). In addition, we demand that discontinuities may only lie on
  *        intersections (which is not uncommen). This forces the user to really think about the data functions when
  *        implementing/using them, but avoids situations which could not be handled generically later on.
  */
-template <class EntityImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class LocalizableFunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = LocalizableFunctionInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = LocalizableFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
-  using LocalFunctionType = LocalFunctionInterface<EntityImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using LocalFunctionType = LocalFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
-  using EntityType = typename LocalFunctionType::EntityType;
+  using ElementType = typename LocalFunctionType::ElementType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
   static const constexpr size_t dimDomain = LocalFunctionType::dimDomain;
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;
@@ -93,8 +94,8 @@ public:
 
   static const constexpr bool available = false;
 
-  //  typedef Functions::DifferenceFunction<ThisType, ThisType> DifferenceType;
-  //  typedef Functions::SumFunction<ThisType, ThisType> SumType;
+  typedef Functions::DifferenceFunction<ThisType, ThisType> DifferenceType;
+  typedef Functions::SumFunction<ThisType, ThisType> SumType;
 
   virtual ~LocalizableFunctionInterface() = default;
 
@@ -107,15 +108,17 @@ public:
    * \name ´´These methods have to be implemented.''
    * \{
    **/
+
   virtual std::unique_ptr<LocalFunctionType> local_function() const = 0;
 
-  virtual std::unique_ptr<LocalFunctionType> local_function(const EntityType& /*entity*/) const = 0;
+  virtual std::unique_ptr<LocalFunctionType> local_function(const ElementType& /*element*/) const = 0;
 
   /**
    * \}
    * \name ´´These methods should be implemented in order to identify the function.''
    * \{
    */
+
   virtual std::string type() const
   {
     return "localizable_function";
