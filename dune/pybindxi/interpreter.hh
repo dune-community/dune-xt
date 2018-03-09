@@ -15,6 +15,8 @@
 #include <map>
 #include <string>
 
+#include <dune/common/visibility.hh>
+
 #include "embed.h"
 
 namespace Dune {
@@ -33,7 +35,7 @@ private:
   std::map<std::string, pybind11::module> modules_;
 }; // class ScopedInterpreter
 
-ScopedInterpreter &GlobalInterpreter();
+DUNE_EXPORT ScopedInterpreter &GlobalInterpreter();
 
 } // namespace PybindXI
 } // namespace Dune

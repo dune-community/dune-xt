@@ -113,6 +113,8 @@ function(dune_pybindxi_add_module target_name)
   # namespace; also turning it on for a pybind module compilation here avoids
   # potential warnings or issues from having mixed hidden/non-hidden types.
   set_target_properties(${target_name} PROPERTIES CXX_VISIBILITY_PRESET "hidden")
+  set_target_properties(${target_name} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
+
 
   if(WIN32 OR CYGWIN)
     # Link against the Python shared library on Windows
@@ -179,3 +181,21 @@ function(dune_pybindxi_add_module target_name)
     endif()
   endif()
 endfunction()
+
+macro(dxt_add_make_dependent_bindings)
+    add_custom_target(dependent_bindings)
+    if(TARGET bindings AND NOT DXT_NO_AUTO_BINDINGS_DEPENDS)
+      add_dependencies(bindings dependent_bindings)
+    endif()
+    foreach(_mod ${ARGN} )
+      dune_module_path(MODULE ${_mod}
+                     RESULT ${_mod}_binary_dir
+                     BUILD_DIR)
+      set(tdir ${${_mod}_binary_dir})
+      if(IS_DIRECTORY ${tdir})
+        add_custom_target( ${_mod}_bindings
+                            COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings)
+        add_dependencies(dependent_bindings ${_mod}_bindings)
+      endif()
+    endforeach()
+endmacro()
