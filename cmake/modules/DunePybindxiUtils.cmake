@@ -179,3 +179,21 @@ function(dune_pybindxi_add_module target_name)
     endif()
   endif()
 endfunction()
+
+macro(dxt_add_make_dependent_bindings)
+    add_custom_target(dependent_bindings)
+    if(TARGET bindings AND NOT DXT_NO_AUTO_BINDINGS_DEPENDS)
+      add_dependencies(bindings dependent_bindings)
+    endif()
+    foreach(_mod ${ARGN} )
+      dune_module_path(MODULE ${_mod}
+                     RESULT ${_mod}_binary_dir
+                     BUILD_DIR)
+      set(tdir ${${_mod}_binary_dir})
+      if(IS_DIRECTORY ${tdir})
+        add_custom_target( ${_mod}_bindings
+                            COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings)
+        add_dependencies(dependent_bindings ${_mod}_bindings)
+      endif()
+    endforeach()
+endmacro()
