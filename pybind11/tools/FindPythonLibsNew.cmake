@@ -177,6 +177,7 @@ SET(PYTHON_DEBUG_LIBRARIES "${PYTHON_DEBUG_LIBRARY}")
 dune_register_package_flags(
     INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS}
     LIBRARIES ${PYTHON_LIBRARIES}
+    COMPILE_OPTIONS -fvisibility-inlines-hidden -fvisibility=hidden
 )
 
 find_package_message(PYTHON

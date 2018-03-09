@@ -113,6 +113,8 @@ function(dune_pybindxi_add_module target_name)
   # namespace; also turning it on for a pybind module compilation here avoids
   # potential warnings or issues from having mixed hidden/non-hidden types.
   set_target_properties(${target_name} PROPERTIES CXX_VISIBILITY_PRESET "hidden")
+  set_target_properties(${target_name} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
+
 
   if(WIN32 OR CYGWIN)
     # Link against the Python shared library on Windows
