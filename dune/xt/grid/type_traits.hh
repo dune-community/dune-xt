@@ -133,13 +133,6 @@ struct is_view<T, true> : public std::is_base_of<Dune::GridView<typename T::Trai
 {
 };
 
-
-template <class T>
-struct DUNE_DEPRECATED_MSG("Use is_view instead (03.04.2017)!") is_grid_view : public is_view<T>
-{
-};
-
-
 template <class T>
 struct is_dd_subdomain : public std::false_type
 {
@@ -176,12 +169,6 @@ struct is_dd_subdomain_coupling<Dune::GridView<XT::Grid::internal::SubdomainCoup
 
 template <class T, bool is_candidate = internal::has_traits_helper<T>::is_candidate>
 struct is_part : public std::false_type
-{
-};
-
-
-template <class T>
-struct DUNE_DEPRECATED_MSG("Use is_part instead (03.04.2017)!") is_grid_part : public is_part<T>
 {
 };
 

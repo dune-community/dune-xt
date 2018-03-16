@@ -142,20 +142,6 @@ public:
     return grid_ptr_->maxLevel();
   }
 
-  template <Backends backend>
-  typename Layer<GridType, Layers::level, backend>::type DUNE_DEPRECATED_MSG("Use level_view() instead (09.05.2017)!")
-      level(const int lvl = 0) const
-  {
-    return Layer<GridType, Layers::level, backend>::create(*grid_ptr_, lvl);
-  }
-
-  template <Backends backend>
-  typename Layer<GridType, Layers::leaf, backend>::type DUNE_DEPRECATED_MSG("Use leaf_view() instead (09.05.2017)!")
-      leaf() const
-  {
-    return Layer<GridType, Layers::leaf, backend>::create(*grid_ptr_);
-  }
-
   template <Layers lr, Backends backend>
   typename Layer<GridType, lr, backend, DdGridType>::type layer(const int lvl = 0) const
   {

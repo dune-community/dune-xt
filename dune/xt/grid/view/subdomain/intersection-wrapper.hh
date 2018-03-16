@@ -55,11 +55,6 @@ public:
     passThrough_ = passThrough;
   }
 
-  void DUNE_DEPRECATED_MSG("Use setBoundarySegmentIndex(id) instead (07.03.2017)!") setBoundaryId(const int /*id*/)
-  {
-    DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "Use setBoundarySegmentIndex(id) instead!");
-  }
-
   void setBoundarySegmentIndex(const size_t index)
   {
     boundary_segment_index_ = index;
@@ -79,11 +74,6 @@ public:
       return intersectionIterator_.getBaseIntersection().boundary();
     else
       return true;
-  }
-
-  int DUNE_DEPRECATED_MSG("Use boundarySegmentIndex(id) instead (07.03.2017)!") boundaryId() const
-  {
-    return boost::numeric_cast<int>(boundarySegmentIndex());
   }
 
   size_t boundarySegmentIndex() const

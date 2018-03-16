@@ -56,7 +56,6 @@ class Walker : public Functor::Codim0And1<GridLayerImp>
   typedef Walker<GridLayerImp> ThisType;
 
 public:
-  typedef GridLayerImp GridViewType DUNE_DEPRECATED_MSG("Use GridLayerType instead (02.04.2017)!");
   typedef GridLayerImp GridLayerType;
   using EntityType = extract_entity_t<GridLayerType>;
   using IntersectionType = extract_intersection_t<GridLayerType>;
@@ -70,11 +69,6 @@ public:
   Walker(const Walker& other) = delete; // <- b.c. of the functors: type-erasue = no copy!
 
   Walker(Walker&& source) = default;
-
-  const GridLayerType& grid_view() const DUNE_DEPRECATED_MSG("Use grid_layer() instead (02.04.2017)!")
-  {
-    return grid_layer_;
-  }
 
   const GridLayerType& grid_layer() const
   {
@@ -167,13 +161,6 @@ public:
     codim1_functors_.emplace_back(new internal::WalkerWrapper<GridLayerType, ThisType>(other, which_intersections));
     return *this;
   } // ... append(...)
-
-  template <class... Args>
-  DUNE_DEPRECATED_MSG("Use append() instead (since 11.01.2017)!")
-  ThisType& add(Args&&... args)
-  {
-    return append(std::forward<Args>(args)...);
-  }
 
   void clear()
   {

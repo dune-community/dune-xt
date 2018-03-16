@@ -37,15 +37,6 @@ namespace XT {
 namespace Grid {
 
 
-template <class GridPartOrViewType>
-class DUNE_DEPRECATED_MSG("Use extract_intersection_t<> instead (21.03.2017)!") Intersection
-{
-public:
-  typedef extract_intersection_t<GridPartOrViewType> Type;
-  typedef extract_intersection_t<GridPartOrViewType> type;
-};
-
-
 /**
   \brief      prints some basic information about a Dune::Intersection, namely the number of its corners and the
               coordinates of those corners.
