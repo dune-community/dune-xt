@@ -17,6 +17,10 @@
 #include <dune/grid/utility/partitioning/ranged.hh>
 #else
 #include <dune/xt/grid/parallel/partitioning/ranged-internal.hh>
+namespace Dune {
+  template<class GridView, int codim>
+  using RangedPartitioning = Dune::XT::Grid::RangedPartitioning<GridView, codim, All_Partition>;
+}
 #endif
 
 #endif // DUNE_XT_GRID_PARALLEL_PARTITIONING_RANGED_HH
