@@ -402,26 +402,27 @@ using extract_geometry_t = typename extract_geometry<T, codim>::type;
 
 template <class T,
           int c = 0,
+    PartitionIteratorType pit = All_Partition,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
 struct extract_iterator : public AlwaysFalse<T>
 {
 };
 
-template <class T, int c>
-struct extract_iterator<T, c, true, false>
+template <class T, int c, PartitionIteratorType pit >
+struct extract_iterator<T, c, pit, true, false>
 {
-  typedef typename T::template Codim<c>::Iterator type;
+  typedef typename T::template Codim<c>::template Partition<pit>::Iterator type;
 };
 
-template <class T, int c>
-struct extract_iterator<T, c, false, true>
+template <class T, int c, PartitionIteratorType pit >
+struct extract_iterator<T, c, pit, false, true>
 {
-  typedef typename T::template Codim<c>::IteratorType type;
+  typedef typename T::template Codim<c>::template Partition<pit>::IteratorType type;
 };
 
-template <class T, int c = 0>
-using extract_iterator_t = typename extract_iterator<T, c>::type;
+template <class T, int c = 0, PartitionIteratorType pit = All_Partition>
+using extract_iterator_t = typename extract_iterator<T, c, pit>::type;
 
 
 template <class T,
