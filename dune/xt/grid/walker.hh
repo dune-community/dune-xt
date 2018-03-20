@@ -242,7 +242,6 @@ public:
   } // ... walk(...)
 
 #if HAVE_TBB
-
 protected:
   template <class PartioningType, class WalkerType>
   struct Body
@@ -294,7 +293,24 @@ public:
     finalize();
     clear();
   } // ... tbb_walk(...)
+#else
+public:
+  template <class PartioningType>
+  void walk(PartioningType& partitioning)
+  {
+    // prepare functors
+    prepare();
 
+    // only do something, if we have to
+    if ((codim0_functors_.size() + codim1_functors_.size()) > 0) {
+      // no actual SMP walk, use range as is
+      walk_range(partitioning.everything());
+    }
+
+    // finalize functors
+    finalize();
+    clear();
+  } // ... tbb_walk(...)
 #endif // HAVE_TBB
 
 protected:
