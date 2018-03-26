@@ -14,6 +14,7 @@
 #define DUNE_XT_LA_CONTAINER_COMMON_MATRIX_SPARSE_HH
 
 #include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/pattern.hh>
 
 #include <dune/xt/la/container/interfaces.hh>
 #include <dune/xt/la/container/pattern.hh>
@@ -242,14 +243,14 @@ public:
 
   template <class OtherMatrixImp>
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
-  operator=(const OtherMatrixImp& other)
+  assign(const OtherMatrixImp& other, const XT::Common::SparsityPatternDefault& pattern)
   {
     clear();
     typedef XT::Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
     num_rows_ = MatAbstrType::rows(other);
     num_cols_ = MatAbstrType::cols(other);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
-      for (size_t cc = 0; cc < num_cols_; ++cc) {
+      for (const auto& cc : pattern.inner(rr)) {
         if (XT::Common::FloatCmp::ne(MatAbstrType::get_entry(other, rr, cc), 0., 0., eps_ / num_cols_)) {
           entries_->push_back(MatAbstrType::get_entry(other, rr, cc));
           column_indices_->push_back(cc);
@@ -258,6 +259,13 @@ public:
       (*row_pointers_)[rr + 1] = column_indices_->size();
     } // rr
     return *this;
+  }
+
+  template <class OtherMatrixImp>
+  typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
+  operator=(const OtherMatrixImp& other)
+  {
+    assign(other, XT::Common::dense_pattern(num_rows_, num_cols_));
   }
 
   void deep_copy(const ThisType& other)
@@ -379,6 +387,24 @@ public:
   {
     ensure_uniqueness();
     entries_->operator[](get_entry_index(rr, cc)) = value;
+  }
+
+  inline void start_row()
+  {
+    if (row_pointers_->empty())
+      row_pointers_->push_back(0);
+  }
+
+  inline void end_row()
+  {
+    row_pointers_->push_back(column_indices_->size());
+  }
+
+  inline void push_entry(const size_t cc, const ScalarType value)
+  {
+    ensure_uniqueness();
+    entries_->push_back(value);
+    column_indices_->push_back(cc);
   }
 
   inline void clear_row(const size_t rr)
@@ -730,15 +756,18 @@ public:
   }
 
   template <class OtherMatrixImp>
-  ThisType& operator=(const OtherMatrixImp& other)
+  typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
+  assign(const OtherMatrixImp& other, const XT::Common::SparsityPatternDefault& pattern)
   {
+
     typedef Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
     clear();
     num_rows_ = MatAbstrType::rows(other);
     num_cols_ = MatAbstrType::cols(other);
     for (size_t cc = 0; cc < num_cols_; ++cc) {
       for (size_t rr = 0; rr < num_rows_; ++rr) {
-        if (XT::Common::FloatCmp::ne(MatAbstrType::get_entry(other, rr, cc), ScalarType(0), 0., eps_ / num_cols_)) {
+        if (XT::Common::FloatCmp::ne(MatAbstrType::get_entry(other, rr, cc), ScalarType(0), 0., eps_ / num_cols_)
+            && std::find(pattern.inner(rr).begin(), pattern.inner(rr).end(), cc) != pattern.inner(rr).end()) {
           entries_->push_back(MatAbstrType::get_entry(other, rr, cc));
           row_indices_->push_back(rr);
         }
@@ -747,6 +776,14 @@ public:
     } // cc
     return *this;
   }
+
+  template <class OtherMatrixImp>
+  typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
+  operator=(const OtherMatrixImp& other)
+  {
+    assign(other, XT::Common::dense_pattern(num_rows_, num_cols_));
+  }
+
 
   void deep_copy(const ThisType& other)
   {
@@ -912,6 +949,26 @@ public:
     entries_->operator[](get_entry_index(rr, cc)) = value;
   }
 
+  inline void start_column()
+  {
+    ensure_uniqueness();
+    if (column_pointers_->empty())
+      column_pointers_->push_back(0);
+  }
+
+  inline void end_column()
+  {
+    ensure_uniqueness();
+    column_pointers_->push_back(row_indices_->size());
+  }
+
+  inline void push_entry(const size_t cc, const ScalarType value)
+  {
+    ensure_uniqueness();
+    entries_->push_back(value);
+    row_indices_->push_back(cc);
+  }
+
   inline void clear_row(const size_t rr)
   {
     ensure_uniqueness();
@@ -1014,9 +1071,9 @@ public:
     thread_local IndexVectorType new_row_indices;
     new_entries.clear();
     new_row_indices.clear();
-    const auto& other_entries = other.entries();
-    const auto& other_column_pointers = other.column_pointers();
-    const auto& other_row_indices = other.row_indices();
+    const auto& other_entries = *other.entries_;
+    const auto& other_column_pointers = *other.column_pointers_;
+    const auto& other_row_indices = *other.row_indices_;
     thread_local std::vector<ScalarType> dense_column(num_rows_, 0.);
     dense_column.resize(num_rows_);
     for (size_t cc = 0; cc < other.cols(); ++cc) {
@@ -1294,14 +1351,6 @@ public:
     sparse_matrix_.deep_copy(other.sparse_matrix_);
     dense_matrix_.deep_copy(other.dense_matrix_);
   }
-
-  //  void clear()
-  //  {
-  //    ensure_uniqueness();
-  //    entries_->clear();
-  //    std::fill(column_pointers_->begin(), column_pointers_->end(), 0);
-  //    row_indices_->clear();
-  //  }
 
   /// \name Required by ContainerInterface.
   /// \{

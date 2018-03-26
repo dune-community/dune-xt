@@ -32,7 +32,7 @@ struct RealQrEigenSolver
 {
   typedef Dune::DynamicVector<FieldType> VectorType;
   typedef Dune::DynamicMatrix<FieldType> MatrixType;
-  static const size_t max_iterations = 10000;
+  static constexpr size_t max_iterations = 10000;
 
   static std::vector<double> calculate_eigenvalues_by_shifted_qr(MatrixType& A, const std::unique_ptr<MatrixType>& Q)
   {
@@ -315,6 +315,9 @@ struct RealQrEigenSolver
     } // jj
   } // void hessenberg_transformation(...)
 }; // class RealQrEigenSolver<...>
+
+template <class FieldType>
+constexpr size_t RealQrEigenSolver<FieldType>::max_iterations;
 
 template <class MatrixType>
 Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>
