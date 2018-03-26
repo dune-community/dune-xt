@@ -141,7 +141,7 @@ protected:
             matrix_, *eigenvalues_, *eigenvectors_);
       }
     } else if (type == "shifted_qr") {
-      if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
+      if (options_->template get<bool>("compute_eigenvalues") || options_->template get<bool>("compute_eigenvectors")) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
         eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
         std::vector<XT::Common::real_t<K>> real_eigenvalues(SIZE);
