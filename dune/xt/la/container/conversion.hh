@@ -23,7 +23,9 @@ namespace LA {
 
 
 template <class RangeType, class SourceType>
-typename std::enable_if<Common::is_matrix<SourceType>::value && Common::is_matrix<RangeType>::value, RangeType>::type
+typename std::enable_if<Common::is_matrix<SourceType>::value && Common::is_matrix<RangeType>::value
+                            && !is_matrix<SourceType>::value,
+                        RangeType>::type
 convert_to(const SourceType& source)
 {
   return Common::convert_to<RangeType>(source);
