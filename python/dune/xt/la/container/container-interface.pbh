@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_LA_CONTAINER_INTERFACE_PBH
 #define DUNE_XT_LA_CONTAINER_INTERFACE_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
@@ -121,5 +120,4 @@ bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const 
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_LA_CONTAINER_INTERFACE_PBH

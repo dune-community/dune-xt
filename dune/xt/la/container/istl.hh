@@ -25,10 +25,8 @@
 #include <dune/common/ftraits.hh>
 #include <dune/common/unused.hh>
 
-#if HAVE_DUNE_ISTL
 #include <dune/istl/bvector.hh>
 #include <dune/istl/bcrsmatrix.hh>
-#endif
 
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/math.hh>
@@ -46,8 +44,6 @@ class IstlDenseVector;
 
 template <class ScalarImp>
 class IstlRowMajorSparseMatrix;
-
-#if HAVE_DUNE_ISTL
 
 namespace internal {
 
@@ -813,26 +809,10 @@ std::ostream& operator<<(std::ostream& out, const IstlRowMajorSparseMatrix<S>& m
   return out;
 } // ... operator<<(...)
 
-#else // HAVE_DUNE_ISTL
-
-template <class ScalarImp>
-class IstlDenseVector
-{
-  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing dune-istl!");
-};
-
-template <class ScalarImp>
-class IstlRowMajorSparseMatrix
-{
-  static_assert(Dune::AlwaysFalse<ScalarImp>::value, "You are missing dune-istl!");
-};
-
-#endif // HAVE_DUNE_ISTL
 
 } // namespace LA
 namespace Common {
 
-#if HAVE_DUNE_ISTL
 
 template <class T>
 struct VectorAbstraction<LA::IstlDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::IstlDenseVector<T>>
@@ -846,15 +826,13 @@ struct MatrixAbstraction<LA::IstlRowMajorSparseMatrix<T>>
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
 };
 
-#endif // HAVE_DUNE_ISTL
-
 } // namespace Common
 } // namespace XT
 } // namespace Dune
 
 
 // begin: this is what we need for the lib
-#if DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+#if DUNE_XT_WITH_PYTHON_BINDINGS
 
 
 extern template class Dune::XT::LA::IstlDenseVector<double>;
@@ -862,7 +840,7 @@ extern template class Dune::XT::LA::IstlRowMajorSparseMatrix<double>;
 // extern template std::ostream& operator<<(std::ostream&, const Dune::XT::LA::IstlRowMajorSparseMatrix<double>&);
 
 
-#endif // DUNE_XT_WITH_PYTHON_BINDINGS && HAVE_DUNE_ISTL
+#endif // DUNE_XT_WITH_PYTHON_BINDINGS
 // end: this is what we need for the lib
 
 

@@ -133,7 +133,6 @@ protected:
       }
     } else
 #endif // HAVE_EIGEN
-#if HAVE_DUNE_PYBINDXI
         if (type == "numpy") {
       if (options_->template get<bool>("compute_eigenvalues") || options_->template get<bool>("compute_eigenvectors")) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
@@ -141,10 +140,8 @@ protected:
         internal::compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
             matrix_, *eigenvalues_, *eigenvectors_);
       }
-    } else
-#endif
-        if (type == "shifted_qr") {
-      if (options_->template get<bool>("compute_eigenvalues") || options_->template get<bool>("compute_eigenvectors")) {
+    } else if (type == "shifted_qr") {
+      if (options_.template get<bool>("compute_eigenvalues") || options_.template get<bool>("compute_eigenvectors")) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
         eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
         std::vector<XT::Common::real_t<K>> real_eigenvalues(SIZE);
