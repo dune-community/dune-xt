@@ -14,8 +14,8 @@
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <python/dune/xt/common/fvector.pbh>
-#include <python/dune/xt/common/fmatrix.pbh>
+#include <python/dune/xt/common/fvector.hh>
+#include <python/dune/xt/common/fmatrix.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
 
