@@ -24,7 +24,7 @@
 
 #include <dune/xt/la/container/io.hh>
 #include <dune/xt/la/container/vector-interface.hh>
-#include <python/dune/xt/la/container/container-interface.pbh>
+#include <python/dune/xt/la/container/container-interface.hh>
 
 
 namespace Dune {

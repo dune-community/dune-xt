@@ -14,7 +14,7 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/operators.h>
 
-#include <python/dune/xt/common/configuration.pbh>
+#include <python/dune/xt/common/configuration.hh>
 
 #include <dune/xt/la/container.hh>
 #include <dune/xt/la/type_traits.hh>

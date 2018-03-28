@@ -23,7 +23,7 @@
 #include <dune/xt/la/type_traits.hh>
 
 #include <dune/xt/la/container/matrix-interface.hh>
-#include <python/dune/xt/la/container/container-interface.pbh>
+#include <python/dune/xt/la/container/container-interface.hh>
 
 namespace Dune {
 namespace XT {
