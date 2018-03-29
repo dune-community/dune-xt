@@ -196,7 +196,7 @@ public:
 #endif
 
 
-static BoundaryType* make_boundary_type(const std::string& id)
+static inline BoundaryType* make_boundary_type(const std::string& id)
 {
   if (id == NoBoundary().id())
     return new NoBoundary();
@@ -225,6 +225,12 @@ static BoundaryType* make_boundary_type(const std::string& id)
     return new UnknownBoundary();
   }
 } // ... make_boundary_type(...)
+
+
+static constexpr AbsorbingBoundary absorbing_boundary{};
+static constexpr DirichletBoundary dirichlet_boundary{};
+static constexpr NoBoundary no_boundary{};
+static constexpr ReflectingBoundary reflecting_boundary{};
 
 
 } // namespace Grid
