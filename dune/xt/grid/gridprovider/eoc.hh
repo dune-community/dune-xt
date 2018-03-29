@@ -127,7 +127,7 @@ public:
     return level_grids_.size() - 1;
   }
 
-  int level_of(const size_t refinement) const
+  int level_of(const size_t /*refinement*/) const
   {
     return -1;
   }
@@ -199,7 +199,7 @@ public:
     return level_grids_.size() - 1;
   }
 
-  int level_of(const size_t refinement) const
+  int level_of(const size_t /*refinement*/) const
   {
     return -1;
   }
