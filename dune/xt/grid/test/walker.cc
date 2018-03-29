@@ -125,14 +125,12 @@ struct GridWalkerTest : public ::testing::Test
 
   void check_partitioning()
   {
-      const auto gv = grid_prv.grid().leafGridView();
+    const auto gv = grid_prv.grid().leafGridView();
     Walker<GridLayerType> walker(gv);
 
     size_t all_count = 0, inner_count = 0;
     auto all_set_counter = [&](...) { all_count++; };
-    auto inner_set_counter = [&](...) {
-      inner_count++;
-    };
+    auto inner_set_counter = [&](...) { inner_count++; };
     auto on_interior_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
     auto on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
     walker.append(inner_set_counter, on_interior_partitionset);
@@ -141,8 +139,6 @@ struct GridWalkerTest : public ::testing::Test
 
     Dune::XT::Grid::RangedPartitioning<GridLayerType, 0, Dune::Interior_Partition> interior_part(gv, 1);
     Dune::XT::Grid::RangedPartitioning<GridLayerType, 0, Dune::All_Partition> all_part(gv, 1);
-
-
   }
 };
 
