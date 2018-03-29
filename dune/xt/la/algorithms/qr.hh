@@ -116,14 +116,16 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
   typedef Common::MatrixAbstraction<MatrixType> M;
   typedef Common::VectorAbstraction<VectorType> V;
   typedef Common::VectorAbstraction<IndexVectorType> VI;
+  typedef typename VI::ScalarType IndexType;
   typedef typename M::RealType RealType;
 
   const size_t num_rows = M::rows(A);
   const size_t num_cols = M::cols(A);
   assert(tau.size() == num_cols && permutations.size() == num_cols);
   std::fill(tau.begin(), tau.end(), 0.);
+  assert(num_cols < std::numeric_limits<IndexType>::max());
   for (size_t ii = 0; ii < num_cols; ++ii)
-    VI::set_entry(permutations, ii, ii);
+    VI::set_entry(permutations, ii, static_cast<IndexType>(ii));
 
   // compute (squared) column norms
   std::vector<RealType> col_norms(num_cols);
@@ -206,11 +208,14 @@ struct QrHelper
       ;
 #if HAVE_LAPACKE || HAVE_MKL
     } else if (has_contiguous_storage) {
+      assert(std::max(M::rows(A), M::cols(A)) < std::numeric_limits<int>::max());
+      auto num_rows = static_cast<int>(M::rows(A));
+      auto num_cols = static_cast<int>(M::cols(A));
       auto info = Common::Lapacke::dgeqp3(lapacke_storage_layout(),
-                                          M::rows(A),
-                                          M::cols(A),
+                                          num_rows,
+                                          num_cols,
                                           M::data(A),
-                                          is_row_major ? M::cols(A) : M::rows(A),
+                                          is_row_major ? num_cols : num_rows,
                                           VI::data(permutations),
                                           V::data(tau));
       if (info)
@@ -241,8 +246,14 @@ struct QrHelper
       for (size_t ii = 0; ii < num_rows; ++ii)
         for (size_t jj = 0; jj < num_cols; ++jj)
           Mret::set_entry(ret, ii, jj, M::get_entry(QR, ii, jj));
-      auto info = Common::Lapacke::dorgqr(
-          lapacke_storage_layout(), num_rows, num_rows, num_cols, Mret::data(ret), num_rows, V::data(tau));
+      assert(std::max(M::rows(QR), M::cols(QR)) < std::numeric_limits<int>::max());
+      auto info = Common::Lapacke::dorgqr(lapacke_storage_layout(),
+                                          static_cast<int>(num_rows),
+                                          static_cast<int>(num_rows),
+                                          static_cast<int>(num_cols),
+                                          Mret::data(ret),
+                                          static_cast<int>(num_rows),
+                                          V::data(tau));
       if (info)
         DUNE_THROW(Dune::MathError, "Calculating Q explicitly failed!");
       return ret;
@@ -268,8 +279,9 @@ struct QrHelper
     } else if (has_contiguous_storage) {
       // These are the number of rows and columns of the matrix C in the documentation of dormqr.
       // As we only have a vector, i.e. C = x, the number of columns is 1.
-      const size_t num_rows = x.size();
-      const size_t num_cols = 1;
+      assert(x.size() < std::numeric_limits<int>::max());
+      const int num_rows = static_cast<int>(x.size());
+      const int num_cols = 1;
       auto info = Common::Lapacke::dormqr(lapacke_storage_layout(),
                                           'L',
                                           transpose == XT::Common::Transpose::yes ? 'T' : 'N',
@@ -285,8 +297,9 @@ struct QrHelper
         DUNE_THROW(Dune::MathError, "Multiplication by Q^T failed");
 #endif // HAVE_LAPACKE || HAVE_MKL
     } else {
-      const size_t num_rows = M::rows(QR);
-      const size_t num_cols = M::cols(QR);
+      assert(M::cols(QR) < std::numeric_limits<int>::max());
+      const auto num_rows = M::rows(QR);
+      const auto num_cols = static_cast<int>(M::cols(QR));
       VectorType w = V::create(num_rows, 0.);
       if (transpose == XT::Common::Transpose::no)
         for (int jj = num_cols - 1; jj >= 0; --jj) {
@@ -294,7 +307,7 @@ struct QrHelper
           multiply_householder_from_left(y, tau[jj], w, jj, num_rows);
         }
       else
-        for (int jj = 0; jj < int(num_cols); ++jj) {
+        for (int jj = 0; jj < num_cols; ++jj) {
           set_w_vector(QR, jj, w);
           multiply_householder_from_left(y, tau[jj], w, jj, num_rows);
         }
@@ -395,7 +408,7 @@ void solve_qr_factorized(const MatrixType& QR,
 
   std::unique_ptr<SecondVectorType> work_ptr;
   if (!work) {
-    work_ptr = std::make_unique<VectorType>(x);
+    work_ptr = std::make_unique<SecondVectorType>(x);
     work = work_ptr.get();
   }
   *work = x;

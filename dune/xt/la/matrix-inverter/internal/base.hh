@@ -33,7 +33,7 @@ class MatrixInverterOptions;
 namespace internal {
 
 
-static void ensure_matrix_inverter_type(const std::string& type, const std::vector<std::string>& available_types)
+static inline void ensure_matrix_inverter_type(const std::string& type, const std::vector<std::string>& available_types)
 {
   bool contained = false;
   for (const auto& tp : available_types)
@@ -45,7 +45,7 @@ static void ensure_matrix_inverter_type(const std::string& type, const std::vect
 } // ... ensure_type(...)
 
 
-static Common::Configuration default_matrix_inverter_options()
+static inline Common::Configuration default_matrix_inverter_options()
 {
   Common::Configuration opts;
   opts["delay_computation"] = "false";

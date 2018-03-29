@@ -216,7 +216,8 @@ struct CholeskySolver
       const int lapacke_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();
-      Common::Lapacke::dpotrf(lapacke_storage_layout, 'L', size, M::data(A), size);
+      assert(size <= std::numeric_limits<int>::max());
+      Common::Lapacke::dpotrf(lapacke_storage_layout, 'L', static_cast<int>(size), M::data(A), static_cast<int>(size));
 #endif // HAVE_MKL || HAVE_LAPACKE
     } else if (storage_layout == Common::StorageLayout::csr)
       cholesky_csr(A);
@@ -251,7 +252,8 @@ struct LDLTSolver
     if (subdiag.size() != size - 1)
       DUNE_THROW(InvalidStateException, "Wrong size of diag and subdiag!");
 #if HAVE_MKL || HAVE_LAPACKE
-    auto info = Common::Lapacke::dpttrf(size, Common::data(diag), Common::data(subdiag));
+    assert(size <= std::numeric_limits<int>::max());
+    auto info = Common::Lapacke::dpttrf(static_cast<int>(size), Common::data(diag), Common::data(subdiag));
     if (info)
       DUNE_THROW(Dune::MathError, "Lapacke_dpptrf returned an error code!");
 #else // HAVE_MKL || HAVE_LAPACKE
@@ -268,14 +270,15 @@ struct LDLTSolver
       ;
 #if HAVE_MKL || HAVE_LAPACKE
     } else if (is_contiguous) {
-      int rhs_cols = V::is_vector ? 1 : M::cols(rhs);
+      assert(std::max(M::cols(rhs), size) <= std::numeric_limits<int>::max());
+      int rhs_cols = V::is_vector ? 1 : int(M::cols(rhs));
       int info = Common::Lapacke::dpttrs(is_row_major ? Common::Lapacke::row_major() : Common::Lapacke::col_major(),
-                                         size,
+                                         static_cast<int>(size),
                                          rhs_cols,
                                          Common::data(diag),
                                          Common::data(subdiag),
                                          Common::data(rhs),
-                                         is_row_major ? rhs_cols : size);
+                                         is_row_major ? rhs_cols : static_cast<int>(size));
       if (info)
         DUNE_THROW(Dune::MathError, "Lapack dpttrs failed!");
 #endif // HAVE_MKL || HAVE_LAPACKE

@@ -36,7 +36,8 @@ void forward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
   for (size_t ii = 0; ii < M::rows(A); ++ii) {
     for (size_t jj = 0; jj < ii; ++jj)
       rhs[ii] -= M::get_entry(A, transposed ? jj : ii, transposed ? ii : jj) * x[jj];
-    if (M::get_entry(A, ii, ii) == 0)
+    // We could simply use ==, but that gives a warning with -Wfloat-equal
+    if (M::get_entry(A, ii, ii) == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / M::get_entry(A, ii, ii);
   } // ii
@@ -51,10 +52,10 @@ void backward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
   typedef Common::MatrixAbstraction<MatrixType> M;
   const size_t num_rows = M::rows(A);
   const size_t num_cols = num_rows;
-  for (int ii = num_rows - 1; ii >= 0.; --ii) {
+  for (int ii = static_cast<int>(num_rows) - 1; ii >= 0.; --ii) {
     for (size_t jj = ii + 1; jj < num_cols; ++jj)
       rhs[ii] -= M::get_entry(A, transposed ? jj : ii, transposed ? ii : jj) * x[jj];
-    if (M::get_entry(A, ii, ii) == 0)
+    if (M::get_entry(A, ii, ii) == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / M::get_entry(A, ii, ii);
   } // ii
@@ -81,7 +82,7 @@ forward_solve_csr(const MatrixType& A, VectorType& x, VectorType& rhs)
     auto kk = row_pointers[ii];
     for (; kk < row_pointers[ii + 1] - 1; ++kk)
       rhs[ii] -= entries[kk] * x[column_indices[kk]];
-    if (entries[kk] == 0)
+    if (entries[kk] == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / entries[kk];
   } // ii
@@ -100,7 +101,7 @@ forward_solve_csc(const MatrixType& A, VectorType& x, VectorType& rhs)
     // column_pointers[ii] is the diagonal entry as we assume a lower triangular matrix with non-zero entries on the
     // diagonal
     auto kk = column_pointers[ii];
-    if (entries[kk] == 0)
+    if (entries[kk] == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / entries[kk];
     ++kk;
@@ -117,14 +118,14 @@ backward_solve_csr(const MatrixType& A, VectorType& x, VectorType& rhs)
   const auto* entries = A.entries();
   const auto* row_pointers = A.outer_index_ptr();
   const auto* column_indices = A.inner_index_ptr();
-  int num_rows = A.rows();
-  for (int ii = num_rows - 1; ii >= 0; --ii) {
+  assert(A.rows() <= std::numeric_limits<int>::max());
+  for (int ii = static_cast<int>(A.rows()) - 1; ii >= 0; ii--) {
     // row_pointers[ii] is the diagonal entry as we assume a upper triangular matrix with non-zero entries on the
     // diagonal
     const auto ll = row_pointers[ii];
     for (auto kk = ll + 1; kk < row_pointers[ii + 1]; ++kk)
       rhs[ii] -= entries[kk] * x[column_indices[kk]];
-    if (entries[ll] == 0)
+    if (entries[ll] == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / entries[ll];
   } // ii
@@ -138,12 +139,12 @@ backward_solve_csc(const MatrixType& A, VectorType& x, VectorType& rhs)
   const auto* entries = A.entries();
   const auto* column_pointers = A.outer_index_ptr();
   const auto* row_indices = A.inner_index_ptr();
-  int num_rows = A.rows();
-  for (int ii = num_rows - 1; ii >= 0; ii--) {
+  assert(A.rows() <= std::numeric_limits<int>::max());
+  for (int ii = static_cast<int>(A.rows()) - 1; ii >= 0; ii--) {
     // column_pointers[ii+1]-1 is the diagonal entry as we assume an upper triangular matrix with non-zero entries
     // on the diagonal
     int kk = int(column_pointers[ii + 1]) - 1;
-    if (entries[kk] == 0)
+    if (entries[kk] == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / entries[kk];
     --kk;
@@ -200,8 +201,9 @@ struct TriangularSolver
   {
     auto* xp = V::data(x); // get pointer to x
     auto* rhs = xp; // use x to store rhs
-    const size_t num_rows = M::rows(A);
-    const size_t num_cols = M::cols(A);
+    assert(std::max(M::rows(A), M::cols(A)) <= std::numeric_limits<int>::max());
+    const int num_rows = static_cast<int>(M::rows(A));
+    const int num_cols = static_cast<int>(M::cols(A));
     const bool trans = (transpose == Common::Transpose::yes);
     const bool lower = (triangular_type == Common::MatrixPattern::lower_triangular);
     const bool upper = !lower;

@@ -18,9 +18,9 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/la/container/unit_matrices.hh>
 #include <dune/xt/la/container/common.hh>
 #include <dune/xt/la/container/eigen.hh>
+#include <dune/xt/la/container/eye-matrix.hh>
 #include <dune/xt/la/container/interfaces.hh>
 #include <dune/xt/la/container/istl.hh>
 #include <dune/xt/la/container.hh>
@@ -74,7 +74,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseMatrixCsr<S>>
 public:
   static Dune::XT::LA::CommonSparseMatrixCsr<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseMatrixCsr<S>>::get(size);
+    auto ret = Dune::XT::LA::eye_matrix<Dune::XT::LA::CommonSparseMatrixCsr<S>>(size, size);
     return ret;
   }
 };
@@ -85,7 +85,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseMatrixCsc<S>>
 public:
   static Dune::XT::LA::CommonSparseMatrixCsc<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseMatrixCsc<S>>::get(size);
+    auto ret = Dune::XT::LA::eye_matrix<Dune::XT::LA::CommonSparseMatrixCsc<S>>(size, size);
     return ret;
   }
 };
@@ -96,7 +96,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>
 public:
   static Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>::get(size);
+    auto ret = Dune::XT::LA::eye_matrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsr<S>>(size, size);
     return ret;
   }
 };
@@ -107,7 +107,7 @@ class ContainerFactory<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>
 public:
   static Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S> create(const size_t size)
   {
-    auto ret = *Dune::XT::LA::UnitMatrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>::get(size);
+    auto ret = Dune::XT::LA::eye_matrix<Dune::XT::LA::CommonSparseOrDenseMatrixCsc<S>>(size, size);
     return ret;
   }
 };
