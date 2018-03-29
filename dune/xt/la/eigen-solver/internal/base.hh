@@ -40,7 +40,7 @@ class EigenSolverOptions;
 namespace internal {
 
 
-static void ensure_eigen_solver_type(const std::string& type, const std::vector<std::string>& available_types)
+static inline void ensure_eigen_solver_type(const std::string& type, const std::vector<std::string>& available_types)
 {
   bool contained = false;
   for (const auto& tp : available_types)
@@ -52,7 +52,7 @@ static void ensure_eigen_solver_type(const std::string& type, const std::vector<
 } // ... ensure_type(...)
 
 
-static Common::Configuration default_eigen_solver_options()
+static inline Common::Configuration default_eigen_solver_options()
 {
   Common::Configuration opts;
   opts["compute_eigenvalues"] = "true";
@@ -100,6 +100,15 @@ public:
     : matrix_(matrix)
     , stored_options_(opts)
     , options_(&stored_options_)
+    , computed_(false)
+    , disable_checks_(options_->get<bool>("disable_checks", false))
+  {
+    pre_checks();
+  }
+
+  EigenSolverBase(const MatrixType& matrix, Common::Configuration* opts)
+    : matrix_(matrix)
+    , options_(opts)
     , computed_(false)
     , disable_checks_(options_->get<bool>("disable_checks", false))
   {
