@@ -245,7 +245,7 @@ private:
                             CodimSizesType& localCodimSizes)
     {
       // loop over all codim c subentities of the entity
-      for (size_t i = 0; i < entity.subEntities(c); ++i) {
+      for (unsigned int i = 0; i < entity.subEntities(c); ++i) {
         const auto codimCentity = entity.template subEntity<c>(i);
         const GeometryType& geometryType = codimCentity.type();
         const IndexType globalIndex = factory.globalGridView_->indexSet().index(codimCentity);
@@ -908,7 +908,7 @@ struct SubdomainGridFactory<GridType>::Add<c, c>
                           typename SubdomainGridFactory<GridType>::CodimSizesType& localCodimSizes)
   {
     // loop over all codim c subentities of this entity
-    for (size_t i = 0; i < entity.subEntities(c); ++i) {
+    for (unsigned int i = 0; i < entity.subEntities(c); ++i) {
       const auto codimCentity = entity.template subEntity<c>(i);
       const SubdomainGridFactory<GridType>::GeometryType& geometryType = codimCentity.type();
       const typename SubdomainGridFactory<GridType>::IndexType globalIndex =
