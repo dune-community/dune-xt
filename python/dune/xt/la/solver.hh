@@ -15,10 +15,10 @@
 #include <dune/pybindxi/operators.h>
 
 #include <python/dune/xt/common/configuration.hh>
+#include <python/dune/xt/la/container.bindings.hh>
 
 #include <dune/xt/la/container.hh>
 #include <dune/xt/la/type_traits.hh>
-
 #include <dune/xt/la/solver.hh>
 
 namespace Dune {
