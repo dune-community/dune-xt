@@ -125,6 +125,8 @@ class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits
   typedef EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> BaseType;
 
 public:
+  //! derived_type is ambiguous due to multiple parent classes otherwise
+  using derived_type = typename VectorInterfaceType::derived_type;
   typedef internal::EigenDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -416,6 +418,8 @@ class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits
   typedef MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
 
 public:
+  //! derived_type is ambiguous due to multiple parent classes otherwise
+  using derived_type = typename MatrixInterfaceType::derived_type;
   typedef internal::EigenDenseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
