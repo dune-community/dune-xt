@@ -127,7 +127,7 @@ struct LockGuard
 
 
 template <class Traits>
-class ProvidesBackend : public CRTPInterface<ProvidesBackend<Traits>, Traits>
+class ProvidesBackend : public Common::CRTPInterface<ProvidesBackend<Traits>, Traits>
 {
 public:
   typedef typename Traits::BackendType BackendType;
@@ -163,9 +163,9 @@ public:
 \endcode
  */
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
-class ContainerInterface : public CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
+class ContainerInterface : public Common::CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
 {
-  typedef CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits> CRTP;
+  typedef Common::CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits> CRTP;
   static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value, "");
 
 public:
@@ -259,7 +259,7 @@ public:
 
 
 template <class Traits>
-class ProvidesConstContainer : public CRTPInterface<ProvidesConstContainer<Traits>, Traits>
+class ProvidesConstContainer : public Common::CRTPInterface<ProvidesConstContainer<Traits>, Traits>
 {
 public:
   typedef typename Traits::ContainerType ContainerType;
@@ -291,7 +291,7 @@ public:
 
 
 template <class Traits>
-class ProvidesDataAccess : public CRTPInterface<ProvidesDataAccess<Traits>, Traits>
+class ProvidesDataAccess : public Common::CRTPInterface<ProvidesDataAccess<Traits>, Traits>
 {
 public:
   typedef typename Traits::DataType DataType;
