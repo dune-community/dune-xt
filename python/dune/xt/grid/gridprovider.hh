@@ -16,9 +16,9 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <python/dune/xt/common/configuration.pbh>
+#include <python/dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
-#include <python/dune/xt/common/fvector.pbh>
+#include <python/dune/xt/common/fvector.hh>
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/entity.hh>

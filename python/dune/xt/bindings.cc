@@ -28,7 +28,7 @@
 
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/boundaryinfo.bindings.hh>
-#include <python/dune/xt/grid/gridprovider.pbh>
+#include <python/dune/xt/grid/gridprovider.hh>
 #include <python/dune/xt/grid/walker.bindings.hh>
 #include <python/dune/xt/grid/walker/apply-on.bindings.hh>
 

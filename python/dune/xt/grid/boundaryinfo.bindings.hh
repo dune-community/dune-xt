@@ -22,7 +22,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
-#include <python/dune/xt/common/configuration.pbh>
+#include <python/dune/xt/common/configuration.hh>
 #include "grids.bindings.hh"
 #include "layers.bindings.hh"
 
