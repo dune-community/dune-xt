@@ -51,11 +51,6 @@ private:
 }; // class BoundaryType
 
 
-#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
-#pragma GCC diagnostic pop
-#endif
-
-
 std::ostream& operator<<(std::ostream& out, const BoundaryType& type);
 
 
@@ -80,6 +75,10 @@ public:
   }
 }; // class BoundaryInfo
 
+
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 } // namespace Grid
 } // namespace XT

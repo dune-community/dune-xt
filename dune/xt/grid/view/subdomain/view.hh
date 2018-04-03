@@ -184,7 +184,7 @@ public:
         *globalGridView_, indexContainer_, true);
   }
 
-  int boundaryId(const Intersection& intersection) const
+  int boundaryId(const Intersection& /*intersection*/) const
   {
     DUNE_THROW(Dune::NotImplemented, "Call intersection.boundaryId() instead!");
     return -1;

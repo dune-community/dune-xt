@@ -178,7 +178,7 @@ struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType
   typedef typename DD::SubdomainGrid<GridType>::CouplingGridViewType type;
 
   static type create(const GridType& /*grid*/,
-                     const int subdomain = 0,
+                     const int /*subdomain */ = 0,
                      const std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid = nullptr)
   {
     static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
@@ -187,7 +187,7 @@ struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType
     return dd_grid->coupling_grid_view(0, 0);
   }
 
-  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  static type create(GridType& /*grid*/, const int /*subdomain*/, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
   {
     static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
                   "Only available for DD::SubdomainGrid!");
