@@ -26,7 +26,7 @@ namespace LA {
  |----------------|----------------|------------|
  | Common, not LA | Common or LA   | 1st        |
  | LA, not Common | Common, not LA | 2nd        |
- | LA, not Common | Common or LA   | 3rd        |
+ | LA, not Common | LA, not Common | 3rd        |
  */
 
 //! 1st convert_to
