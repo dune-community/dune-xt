@@ -25,8 +25,30 @@ GTEST_TEST(invert, main)
 {
   using K = double;
   constexpr int ROWS = 2, COLS = 2;
-
-  using ToType = Dune::FieldMatrix<K, ROWS, COLS>;
-  using FromType = Dune::XT::LA::EigenDenseMatrix<K>;
-  Dune::XT::LA::convert_to<ToType, FromType>(FromType());
+#if HAVE_EIGEN
+  {
+    using ToType = Dune::FieldMatrix<K, ROWS, COLS>;
+    using FromType = Dune::XT::LA::EigenDenseMatrix<K>;
+    Dune::XT::LA::convert_to<ToType>(FromType{ROWS, COLS});
+    Dune::XT::LA::convert_to<ToType>(ToType{});
+  }
+  {
+    using FromType = Dune::FieldMatrix<K, ROWS, COLS>;
+    using ToType = Dune::XT::LA::EigenDenseMatrix<K>;
+    Dune::XT::LA::convert_to<ToType>(FromType{});
+    Dune::XT::LA::convert_to<ToType>(ToType{ROWS, COLS});
+  }
+  {
+    using FromType = Dune::XT::LA::EigenDenseMatrix<K>;
+    using ToType = FromType;
+    Dune::XT::LA::convert_to<ToType>(FromType{ROWS, COLS});
+    Dune::XT::LA::convert_to<ToType>(ToType{ROWS, COLS});
+  }
+#endif // #if HAVE_EIGEN
+  {
+    using ToType = Dune::FieldMatrix<K, ROWS, COLS>;
+    using FromType = ToType;
+    Dune::XT::LA::convert_to<ToType>(FromType{});
+    Dune::XT::LA::convert_to<ToType>(ToType{});
+  }
 }
