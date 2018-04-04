@@ -68,6 +68,11 @@ public:
 
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
 
+  virtual bool is_affine() const
+  {
+    return false;
+  }
+
   /**
    * \name ´´These methods should be implemented in order to identify the function.''
    * \{
