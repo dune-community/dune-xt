@@ -21,9 +21,9 @@ before_script:
     - export IMAGE="dunecommunity/dune-xt-la-testing_${DOCKER_TAG}:${TRAVIS_BRANCH}"
     # get image with fallback to master branch of the super repo
     - docker pull ${IMAGE} || export IMAGE="dunecommunity/dune-xt-la-testing_${DOCKER_TAG}:master" ; docker pull ${IMAGE}
+    - export MY_MODULE=dune-xt-la
     - export ENV_FILE=${HOME}/env
     - python3 ./.travis.make_env_file.py
-    - export MY_MODULE=dune-xt-la
     - export DOCKER_RUN="docker run --env-file ${ENV_FILE} -v ${TRAVIS_BUILD_DIR}:/root/src/dune-xt-la ${IMAGE}"
 
 script:
@@ -58,22 +58,32 @@ stages:
 jobs:
   include:
   - stage: test_cpp
-    env: DOCKER_TAG=gcc_full TESTS=0
+    env: DOCKER_TAG=debian_gcc_full TESTS=0
   - stage: test_cpp
-    env: DOCKER_TAG=gcc_full TESTS=1
+    env: DOCKER_TAG=debian_gcc_full TESTS=1
     
   - stage: test_cpp
-    env: DOCKER_TAG=clang_full TESTS=0
+    env: DOCKER_TAG=debian_clang_full TESTS=0
   - stage: test_cpp
-    env: DOCKER_TAG=clang_full TESTS=1
+    env: DOCKER_TAG=debian_clang_full TESTS=1
+    
+  - stage: test_cpp
+    env: DOCKER_TAG=arch_gcc_full TESTS=0
+  - stage: test_cpp
+    env: DOCKER_TAG=arch_gcc_full TESTS=1
     
   - stage: test_python
-    env: DOCKER_TAG=gcc_full
+    env: DOCKER_TAG=debian_gcc_full
     script: ${DOCKER_RUN} /root/src/dune-xt-la/.travis.test_python.bash
     # overwrite other global/matrix settings
     after_script: true
   - stage: test_python
-    env: DOCKER_TAG=clang_full
+    env: DOCKER_TAG=debian_clang_full
+    script: ${DOCKER_RUN} /root/src/dune-xt-la/.travis.test_python.bash
+    # overwrite other global/matrix settings
+    after_script: true
+  - stage: test_python
+    env: DOCKER_TAG=arch_gcc_full
     script: ${DOCKER_RUN} /root/src/dune-xt-la/.travis.test_python.bash
     # overwrite other global/matrix settings
     after_script: true
