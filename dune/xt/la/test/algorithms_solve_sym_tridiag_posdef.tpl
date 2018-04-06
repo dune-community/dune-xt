@@ -45,7 +45,7 @@ struct TriangularSolverTest_{{T_NAME}} : public ::testing::Test
   static void produces_correct_results()
   {
     const size_t dim = 5;
-    const MatrixType matrix = create<MatrixType>({ {2, -1, 0, 0, 0}, {-1, 2, -1, 0, 0}, {0, -1, 2, -1, 0}, {0, 0, -1, 2, -1}, {0, 0, 0, -1, 2} }, Common::tridiagonal_pattern(dim, dim));
+    const MatrixType matrix = create<MatrixType>({ {2, -1, 0, 0, 0}, {-1, 2, -1, 0, 0}, {0, -1, 2, -1, 0}, {0, 0, -1, 2, -1}, {0, 0, 0, -1, 2} }, tridiagonal_pattern(dim, dim));
     const RhsType rhs = RhsV::create(dim, 1.);
     SolutionType solution = SolV::create(dim, 0.);
 

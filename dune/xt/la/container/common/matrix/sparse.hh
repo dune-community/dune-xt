@@ -14,7 +14,6 @@
 #define DUNE_XT_LA_CONTAINER_COMMON_MATRIX_SPARSE_HH
 
 #include <dune/xt/common/matrix.hh>
-#include <dune/xt/common/pattern.hh>
 
 #include <dune/xt/la/container/interfaces.hh>
 #include <dune/xt/la/container/pattern.hh>
@@ -243,7 +242,7 @@ public:
 
   template <class OtherMatrixImp>
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
-  assign(const OtherMatrixImp& other, const XT::Common::SparsityPatternDefault& pattern)
+  assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
   {
     clear();
     typedef XT::Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
@@ -265,7 +264,7 @@ public:
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
   operator=(const OtherMatrixImp& other)
   {
-    assign(other, XT::Common::dense_pattern(num_rows_, num_cols_));
+    assign(other, dense_pattern(num_rows_, num_cols_));
   }
 
   void deep_copy(const ThisType& other)
@@ -757,7 +756,7 @@ public:
 
   template <class OtherMatrixImp>
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
-  assign(const OtherMatrixImp& other, const XT::Common::SparsityPatternDefault& pattern)
+  assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
   {
 
     typedef Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
@@ -781,7 +780,7 @@ public:
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
   operator=(const OtherMatrixImp& other)
   {
-    assign(other, XT::Common::dense_pattern(num_rows_, num_cols_));
+    assign(other, dense_pattern(num_rows_, num_cols_));
   }
 
 

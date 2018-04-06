@@ -63,7 +63,7 @@ struct QrTest_5x3_{{T_NAME}} : public ::testing::Test
       for (size_t jj = 0; jj < std::min(ii, num_cols); ++jj)
         M::set_entry(R, ii, jj, 0.);
     auto Q = calculate_q_from_qr(QR, tau);
-    auto P = eye_matrix<typename M::MatrixTypeTemplate<M::static_cols, M::static_cols>>(num_cols, num_cols, Common::dense_pattern(num_cols, num_cols));
+    auto P = eye_matrix<typename M::MatrixTypeTemplate<M::static_cols, M::static_cols>>(num_cols, num_cols, dense_pattern(num_cols, num_cols));
     get_permutation_matrix(permutations, P);
     EXPECT_TRUE(XT::Common::FloatCmp::eq(Q * R - matrix_ * P, Common::zeros_like(matrix_), 1e-13, 1e-13));
     EXPECT_TRUE(XT::Common::FloatCmp::eq(Q * Common::transposed(Q) - eye_matrix<decltype(Q)>(num_rows, num_rows), Common::zeros_like(Q)));

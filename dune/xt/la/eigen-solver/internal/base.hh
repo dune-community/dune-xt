@@ -698,9 +698,10 @@ protected:
                                  const D& eigenvectors_inverse,
                                  const double& tolerance) const
   {
+    using M = Common::MatrixAbstraction<C>;
     const size_t rows = Common::get_matrix_rows(mat);
     const size_t cols = Common::get_matrix_cols(mat);
-    auto eigenvalue_matrix = Common::MatrixAbstraction<C>::create(rows, cols, 0.);
+    auto eigenvalue_matrix = M::create(rows, cols, typename M::ScalarType(0.));
     for (size_t ii = 0; ii < rows; ++ii)
       Common::set_matrix_entry(eigenvalue_matrix, ii, ii, eigenvalues[ii]);
     const auto decomposition_error = eigenvectors * eigenvalue_matrix * eigenvectors_inverse - mat;

@@ -245,23 +245,22 @@ struct EigenSolverTest : public ::testing::Test
 
   void gives_correct_eigendecomposition(const Common::Configuration& tolerances = {}) const
   {
+    using MC = Common::MatrixAbstraction<ComplexMatrixType>;
     ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
     const auto matrix_as_complex = convert_to<ComplexMatrixType>(matrix_);
     for (const auto& tp : EigenSolverOpts::types()) {
       const double tolerance = tolerances.get(tp, 1e-15);
       EigenSolverType solver(matrix_, tp);
       try {
-        const auto eigenvalues = solver.eigenvalues();
-        const ComplexMatrixType T = solver.eigenvectors();
-        ComplexMatrixType T_inv = Common::MatrixAbstraction<ComplexMatrixType>::create(Common::get_matrix_cols(T),
-                                                                                       Common::get_matrix_rows(T));
+        const auto& eigenvalues = solver.eigenvalues();
+        const auto& T = solver.eigenvectors();
+        ComplexMatrixType T_inv = MC::create(MC::cols(T), MC::rows(T));
         try {
           T_inv = invert_matrix(T);
         } catch (...) {
           FAIL() << "Matrix inversion has to work for this test, else add this matrix to the matrix inversion tests!";
         }
-        ComplexMatrixType lambda = Common::MatrixAbstraction<ComplexMatrixType>::create(
-            Common::get_matrix_rows(T), Common::get_matrix_cols(T), 0.);
+        ComplexMatrixType lambda = MC::create(MC::rows(T), MC::cols(T), 0.);
         for (size_t ii = 0; ii < Common::get_matrix_rows(matrix_); ++ii)
           Common::set_matrix_entry(lambda, ii, ii, eigenvalues[ii]);
         const auto matrix_decomposition_error = (T * (lambda * T_inv)) - matrix_as_complex;

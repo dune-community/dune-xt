@@ -47,13 +47,13 @@ struct CholeskyTest_{{T_NAME}} : public ::testing::Test
   static void produces_correct_results()
   {
     const size_t dim = 5;
-    const MatrixType matrix = create<MatrixType>({ {2, -1, 0, 0, 0}, {-1, 2, -1, 0, 0}, {0, -1, 2, -1, 0}, {0, 0, -1, 2, -1}, {0, 0, 0, -1, 2} }, Common::tridiagonal_pattern(dim, dim));
+    const MatrixType matrix = create<MatrixType>({ {2, -1, 0, 0, 0}, {-1, 2, -1, 0, 0}, {0, -1, 2, -1, 0}, {0, 0, -1, 2, -1}, {0, 0, 0, -1, 2} }, tridiagonal_pattern(dim, dim));
     const MatrixType expected_L = create<MatrixType>({ { 1.414213562373095,                  0,                  0,                  0,                 0},
                                                        {-0.707106781186547,  1.224744871391589,                  0,                  0,                 0},
                                                        {                 0, -0.816496580927726,  1.154700538379251,                  0,                 0},
                                                        {                 0,                  0, -0.866025403784439,  1.118033988749895,                 0},
                                                        {                 0,                  0,                  0, -0.894427190999916, 1.095445115010332} },
-                                                     Common::diagonal_pattern(dim, dim) + Common::diagonal_pattern(dim, dim, -1));
+                                                     diagonal_pattern(dim, dim) + diagonal_pattern(dim, dim, -1));
     auto L = matrix;
     cholesky(L);
     for (size_t ii = 0; ii < dim-1; ++ii)

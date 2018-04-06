@@ -26,6 +26,7 @@
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/unused.hh>
 
 #include <dune/xt/la/type_traits.hh>
 
@@ -344,7 +345,7 @@ protected:
   {
     if (other.rows() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be multiplied do not match!");
-    const auto new_pattern = Common::multiplication_pattern(pattern(), other.pattern(), other.cols());
+    const auto new_pattern = multiplication_pattern(pattern(), other.pattern(), other.cols());
     derived_type yy(rows(), other.cols(), new_pattern);
     for (size_t rr = 0; rr < rows(); ++rr)
       for (size_t cc = 0; cc < other.cols(); ++cc)
@@ -445,11 +446,11 @@ template <class MatrixType>
 typename std::enable_if<is_matrix<MatrixType>::value, MatrixType>::type
 create(const std::initializer_list<std::initializer_list<typename Common::MatrixAbstraction<MatrixType>::ScalarType>>&
            initializer_list,
-       const Common::SparsityPatternDefault& pattern = Common::SparsityPatternDefault())
+       const SparsityPatternDefault& pattern = SparsityPatternDefault())
 {
   const size_t num_rows = initializer_list.size();
   const size_t num_cols = initializer_list.begin()->size();
-  MatrixType ret(num_rows, num_cols, pattern.size() == 0 ? Common::dense_pattern(num_rows, num_cols) : pattern);
+  MatrixType ret(num_rows, num_cols, pattern.size() == 0 ? dense_pattern(num_rows, num_cols) : pattern);
   size_t ii = 0;
   for (const auto& row : initializer_list) {
     size_t jj = 0;
@@ -463,11 +464,12 @@ create(const std::initializer_list<std::initializer_list<typename Common::Matrix
   return ret;
 }
 
+
 template <class MatrixType>
 typename std::enable_if<Common::is_matrix<MatrixType>::value && !is_matrix<MatrixType>::value, MatrixType>::type
 create(const std::initializer_list<std::initializer_list<typename Common::MatrixAbstraction<MatrixType>::ScalarType>>&
            initializer_list,
-       const Common::SparsityPatternDefault& /*pattern*/ = Common::dense_pattern(0, 0))
+       const SparsityPatternDefault& /*pattern*/ = SparsityPatternDefault())
 {
   typedef Common::MatrixAbstraction<MatrixType> Mat;
   auto ret = Mat::create(initializer_list.size(), initializer_list.begin()->size());
@@ -506,24 +508,17 @@ struct MatrixAbstractionBase
   typedef ScalarType S;
   typedef RealType R;
 
-  template <size_t rows = static_rows, size_t cols = static_cols, class Field = S>
+  template <size_t rows = static_rows, size_t cols = static_cols, class FieldType = S>
   using MatrixTypeTemplate = MatrixType;
 
-  template <size_t ROWS = static_rows, size_t COLS = static_cols, class Field = ScalarType>
-  static inline typename std::enable_if<is_matrix, MatrixType>::type
-  create(const size_t rows, const size_t cols, const Common::SparsityPatternDefault& pattern = SparsityPatternDefault())
-  {
-    return MatrixType(rows, cols, pattern.size() == 0 ? Common::dense_pattern(rows, cols) : pattern);
-  }
-
-  template <size_t ROWS = static_rows, size_t COLS = static_cols, class Field = ScalarType>
+  template <size_t ROWS = static_rows, size_t COLS = static_cols, class SparsityPatternType = XT::Common::FullPattern>
   static inline typename std::enable_if<is_matrix, MatrixType>::type
   create(const size_t rows,
          const size_t cols,
-         const ScalarType& val,
-         const Common::SparsityPatternDefault& pattern = SparsityPatternDefault())
+         const ScalarType& val = ScalarType(0),
+         const SparsityPatternType& pattern = SparsityPatternType())
   {
-    auto actual_pattern = pattern.size() == 0 ? Common::dense_pattern(rows, cols) : pattern;
+    SparsityPatternDefault actual_pattern = get_actual_pattern(pattern, rows, cols);
     MatrixType ret(rows, cols, actual_pattern);
     for (size_t ii = 0; ii < rows; ++ii)
       for (const auto& jj : actual_pattern.inner(ii))
@@ -567,6 +562,20 @@ struct MatrixAbstractionBase
   {
     DUNE_THROW(InvalidStateException, "Do not call me if storage_layout is not dense!");
     return nullptr;
+  }
+
+private:
+  template <class SparsityPatternType>
+  static SparsityPatternDefault
+  get_actual_pattern(SparsityPatternType&& pattern, size_t DXTC_DEBUG_ONLY(rows), size_t /*cols*/)
+  {
+    assert(rows == pattern.size());
+    return std::forward<SparsityPatternType>(pattern);
+  }
+
+  static SparsityPatternDefault get_actual_pattern(const XT::Common::FullPattern& /*pattern*/, size_t rows, size_t cols)
+  {
+    return dense_pattern(rows, cols);
   }
 }; // struct MatrixAbstractionBase
 

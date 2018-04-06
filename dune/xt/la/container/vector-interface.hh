@@ -592,17 +592,11 @@ struct VectorAbstractionBase
   template <size_t SIZE = static_size, class Field = ScalarType>
   using VectorTypeTemplate = typename std::conditional<is_vector, VectorImp, void>::type;
 
-  template <size_t SIZE = static_size, class Field = ScalarType>
-  static inline typename std::enable_if<is_vector, VectorTypeTemplate<SIZE, Field>>::type create(const size_t sz)
+  template <size_t SIZE = static_size>
+  static inline typename std::enable_if<is_vector, VectorType>::type create(const size_t sz,
+                                                                            const ScalarType& val = ScalarType(0))
   {
-    return VectorTypeTemplate<SIZE, Field>(sz);
-  }
-
-  template <size_t SIZE = static_size, class Field = ScalarType>
-  static inline typename std::enable_if<is_vector, VectorTypeTemplate<SIZE, Field>>::type create(const size_t sz,
-                                                                                                 const Field& val)
-  {
-    return VectorTypeTemplate<SIZE, Field>(sz, val);
+    return VectorType(sz, val);
   }
 
   static inline ScalarType get_entry(const VectorType& vector, const size_t ii)
