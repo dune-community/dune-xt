@@ -11,7 +11,8 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 
 set(lib_dune_xt_la_sources
-    eigen-solver/internal/numpy.cc)
+    eigen-solver/internal/numpy.cc
+    container/pattern.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
   list(APPEND lib_dune_xt_la_sources
