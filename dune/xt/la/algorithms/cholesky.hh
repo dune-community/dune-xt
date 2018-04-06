@@ -53,8 +53,8 @@ solve_tridiag_ldlt(const FirstVectorType& diag, const SecondVectorType& subdiag,
   typedef Common::VectorAbstraction<VectorType> V;
   typedef typename V::ScalarType ScalarType;
   size_t size = vec.size();
-  auto L = eye_matrix<CommonSparseMatrix<ScalarType>>(
-      size, Common::diagonal_pattern(size, size) + Common::diagonal_pattern(size, size, -1));
+  auto L =
+      eye_matrix<CommonSparseMatrix<ScalarType>>(size, diagonal_pattern(size, size) + diagonal_pattern(size, size, -1));
   for (size_t ii = 0; ii < size - 1; ++ii)
     L.set_entry(ii + 1, ii, V2::get_entry(subdiag, ii));
   // solve LDL^T x = rhs;
@@ -270,7 +270,7 @@ struct LDLTSolver
       ;
 #if HAVE_MKL || HAVE_LAPACKE
     } else if (is_contiguous) {
-      assert(std::max(M::cols(rhs), size) <= std::numeric_limits<int>::max());
+      assert(V::is_vector || std::max(M::cols(rhs), size) <= std::numeric_limits<int>::max());
       int rhs_cols = V::is_vector ? 1 : int(M::cols(rhs));
       int info = Common::Lapacke::dpttrs(is_row_major ? Common::Lapacke::row_major() : Common::Lapacke::col_major(),
                                          static_cast<int>(size),
