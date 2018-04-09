@@ -98,7 +98,7 @@ private:
 
   mutable std::unique_ptr<LocalFunctionType> local_function_;
   const std::string name_;
-  const XT::Common::Parameter& param_;
+  const XT::Common::Parameter param_;
 }; // class VisualizationAdapter
 
 
