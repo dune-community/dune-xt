@@ -23,18 +23,15 @@ namespace XT {
 namespace Functions {
 
 
-template <class E_, size_t r_, size_t rC_, class R_>
+template <class E, size_t r, size_t rC, class R>
 class FunctionAsGridFunctionWrapper : public GridFunctionInterface<E_, r_, rC_, R_>
 {
-  using BaseType = GridFunctionInterface<E_, r_, rC_, R_>;
-  using ThisType = FunctionAsGridFunctionWrapper<E_, r_, rC_, R_>;
+  using BaseType = GridFunctionInterface<E, r, rC, R>;
+  using ThisType = FunctionAsGridFunctionWrapper<E, r, rC, R>;
 
 public:
   using BaseType::d;
-  using BaseType::r;
-  using BaseType::rC;
-  using typename BaseType::R;
-  using typename BaseType::ElementType;
+  using typename BaseType::EntityType;
   using typename BaseType::LocalFunctionType;
   using FunctionType = FunctionInterface<d, r, rC, R>;
 
