@@ -158,12 +158,7 @@ public:
     return this->as_imp()[ii];
   }
 
-  /**
-   * \brief   The dimension of the vector.
-   * \return  The dimension of the vector.
-   * \see     size()
-   */
-  inline size_t dim() const
+  inline size_t DUNE_DEPRECATED_MSG("Use size() instead (09.04.2018)!") dim() const
   {
     return size();
   }
@@ -209,10 +204,10 @@ public:
   /**
    *  \brief  Check vectors for equality.
    *          Equality of two vectors is defined as in Dune::FloatCmp componentwise.
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::XT::Common::FloatCmp
+   *  \see    Dune::Common::FloatCmp
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
   virtual bool almost_equal(const derived_type& other,
@@ -228,10 +223,10 @@ public:
   /**
    *  \brief  Check vectors for equality (variant for arbitrary derived combinations).
    *          Equality of two vectors is defined as in Dune::FloatCmp componentwise.
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::XT::Common::FloatCmp
+   *  \see    Dune::Common::FloatCmp
    */
   template <class T>
   bool almost_equal(const VectorInterface<T>& other,
@@ -475,7 +470,7 @@ public:
 
   /**
    *  \brief  Check vectors for equality (componentwise) using almost_equal()
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \return Truth value of the comparison.
    *  \see    almost_equal()
    */
@@ -486,7 +481,7 @@ public:
 
   /**
    *  \brief  Check vectors for inequality using !almost_equal()
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \return Truth value of the comparison.
    */
   virtual bool operator!=(const derived_type& other) const
@@ -517,8 +512,8 @@ public:
 
   operator std::vector<ScalarType>() const
   {
-    std::vector<ScalarType> ret(dim());
-    for (size_t ii = 0; ii < dim(); ++ii)
+    std::vector<ScalarType> ret(this->size());
+    for (size_t ii = 0; ii < this->size(); ++ii)
       ret[ii] = this->operator[](ii);
     return ret;
   }
