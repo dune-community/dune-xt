@@ -67,7 +67,7 @@ public:
                        const Common::ParameterType& param_type = {},
                        JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
                        DerivativeLambdaType derivative_lambda = default_derivative_lambda())
-    : order_lambda_(default_order_lambda(ord))
+    : order_lambda_([=](const auto& /*param*/) { return ord; })
     , evaluate_lambda_(evaluate_lambda)
     , jacobian_lambda_(jacobian_lambda)
     , derivative_lambda_(derivative_lambda)
@@ -99,30 +99,26 @@ public:
 
   int order(const Common::Parameter& param = {}) const override final
   {
-    auto parsed_param = this->parse_parameter(param);
-    return order_lambda_(parsed_param);
+    return order_lambda_(this->parse_parameter(param));
   }
 
   RangeType evaluate(const DomainType& point_in_global_coordinates,
                      const Common::Parameter& param = {}) const override final
   {
-    auto parsed_param = this->parse_parameter(param);
-    return evaluate_lambda_(point_in_global_coordinates, parsed_param);
+    return evaluate_lambda_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   DerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
                                const Common::Parameter& param = {}) const override final
   {
-    auto parsed_param = this->parse_parameter(param);
-    return jacobian_lambda_(point_in_global_coordinates, parsed_param);
+    return jacobian_lambda_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
                                  const DomainType& point_in_global_coordinates,
                                  const Common::Parameter& param = {}) const override final
   {
-    auto parsed_param = this->parse_parameter(param);
-    return derivative_lambda_(alpha, point_in_global_coordinates, parsed_param);
+    return derivative_lambda_(alpha, point_in_global_coordinates, this->parse_parameter(param));
   }
 
   std::string type() const override final
@@ -140,11 +136,6 @@ public:
    * \name ´´These methods may be used to provide defaults on construction.''
    * \{
    */
-
-  static OrderLambdaType default_order_lambda(const int ord)
-  {
-    return [=](const Common::Parameter& /*param*/ = {}) { return ord; };
-  }
 
   static EvaluateLambdaType default_evaluate_lambda()
   {
