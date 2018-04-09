@@ -63,12 +63,11 @@ class ProductFunction;
  *
  *        We follow one strong assumption in dune-xt-functions: after being localized to an element, a local function
  *        (or a set of local functions) has to provide the order which is required to integrate it _exactly_ on this
- *        element and _should_ be polynomial on an element. While there exists non-polynomial data functions, we only
- * have
- *        quadratures of finite order and no way to detect discontinuities of functions (thus the order of the local
- *        polynomial approximation must be provided). In addition, we demand that discontinuities may only lie on
- *        intersections (which is not uncommen). This forces the user to really think about the data functions when
- *        implementing/using them, but avoids situations which could not be handled generically later on.
+ *        element, and it _should_ thus coincide with polynomial of respective on an element. While there exists
+ *        non-polynomial data functions, we only have quadratures of finite order and no way to detect
+ *        discontinuities of functions (thus the order of the local polynomial approximation must be provided). This
+ *        encourages the user to really think about the data functions when implementing/using them, but avoids
+ *        situations which could not be handled generically later on.
  */
 template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class GridFunctionInterface : public Common::ParametricInterface
@@ -101,7 +100,7 @@ public:
 
   static std::string static_id()
   {
-    return "localizable_function";
+    return "dune.xt.functions.gridfunction";
   }
 
   /**
@@ -121,12 +120,12 @@ public:
 
   virtual std::string type() const
   {
-    return "localizable_function";
+    return "dune.xt.functions.gridfunction";
   }
 
   virtual const std::string& name() const
   {
-    return "localizable_function";
+    return "dune.xt.functions.gridfunction";
   }
 
   /// \}
