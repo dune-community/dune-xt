@@ -25,9 +25,9 @@
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/math.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
-#include <dune/xt/common/math.hh>
 
 #include <dune/xt/la/type_traits.hh>
 
@@ -574,8 +574,8 @@ struct VectorAbstractionBase
   using VectorTypeTemplate = typename std::conditional<is_vector, VectorImp, void>::type;
 
   template <size_t SIZE = static_size>
-  static inline typename std::enable_if<is_vector, VectorType>::type create(const size_t sz,
-                                                                            const ScalarType& val = ScalarType(0))
+  static inline typename std::enable_if<is_vector, VectorType>::type
+  create(const size_t sz, const ScalarType& val = Common::suitable_default<ScalarType>::value())
   {
     return VectorType(sz, val);
   }

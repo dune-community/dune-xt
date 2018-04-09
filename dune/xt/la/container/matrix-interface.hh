@@ -515,7 +515,7 @@ struct MatrixAbstractionBase
   static inline typename std::enable_if<is_matrix, MatrixType>::type
   create(const size_t rows,
          const size_t cols,
-         const ScalarType& val = ScalarType(0),
+         const ScalarType& val = XT::Common::suitable_default<ScalarType>::value(),
          const SparsityPatternType& pattern = SparsityPatternType())
   {
     SparsityPatternDefault actual_pattern = get_actual_pattern(pattern, rows, cols);
