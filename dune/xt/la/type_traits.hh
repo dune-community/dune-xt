@@ -33,6 +33,9 @@ class ContainerInterface;
 template <class Traits, class ScalarImp>
 class MatrixInterface;
 
+template <class Traits, class ScalarImp>
+class VectorInterface;
+
 
 namespace internal {
 
@@ -76,6 +79,16 @@ struct is_matrix_helper
 }; // class is_matrix_helper
 
 
+template <class V>
+struct is_vector_helper
+{
+  DXTC_has_typedef_initialize_once(Traits);
+  DXTC_has_typedef_initialize_once(ScalarType);
+
+  static const bool is_candidate = DXTC_has_typedef(Traits)<V>::value && DXTC_has_typedef(ScalarType)<V>::value;
+}; // class is_vector_helper
+
+
 } // namespace internal
 
 
@@ -97,6 +110,17 @@ struct is_matrix : public std::is_base_of<MatrixInterface<typename M::Traits, ty
 
 template <class M>
 struct is_matrix<M, false> : public std::false_type
+{
+};
+
+
+template <class V, bool candidate = internal::is_vector_helper<V>::is_candidate>
+struct is_vector : public std::is_base_of<VectorInterface<typename V::Traits, typename V::ScalarType>, V>
+{
+};
+
+template <class V>
+struct is_vector<V, false> : public std::false_type
 {
 };
 

@@ -12,12 +12,12 @@
 #define DUNE_XT_LA_MATRIX_INVERTER_BASE_HH
 
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/math.hh>
+#include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
+#include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/exceptions.hh>
 
 namespace Dune {

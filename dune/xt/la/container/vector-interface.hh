@@ -29,6 +29,8 @@
 #include <dune/xt/common/vector.hh>
 #include <dune/xt/common/math.hh>
 
+#include <dune/xt/la/type_traits.hh>
+
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
 
@@ -547,30 +549,9 @@ private:
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
 }; // class VectorInterface
 
-namespace internal {
-
-template <class V>
-struct is_vector_helper
-{
-  DXTC_has_typedef_initialize_once(Traits);
-  DXTC_has_typedef_initialize_once(ScalarType);
-
-  static const bool is_candidate = DXTC_has_typedef(Traits)<V>::value && DXTC_has_typedef(ScalarType)<V>::value;
-}; // class is_vector_helper
-
-} // namespace internal
-
-template <class V, bool candidate = internal::is_vector_helper<V>::is_candidate>
-struct is_vector : public std::is_base_of<VectorInterface<typename V::Traits, typename V::ScalarType>, V>
-{
-};
-
-template <class V>
-struct is_vector<V, false> : public std::false_type
-{
-};
 
 namespace internal {
+
 
 template <class VectorImp>
 struct VectorAbstractionBase

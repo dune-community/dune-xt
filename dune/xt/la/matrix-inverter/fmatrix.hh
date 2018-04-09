@@ -14,6 +14,7 @@
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/fmatrix.hh>
+
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/container/conversion.hh>
 #include <dune/xt/la/container/eigen/dense.hh>
@@ -51,7 +52,7 @@ public:
     opts["type"] = actual_type;
     return opts;
   }
-}; // class MatrixInverterOptions<EigenDenseMatrix<S>>
+}; // class MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
 
 template <class K, int ROWS, int COLS>
 class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>>

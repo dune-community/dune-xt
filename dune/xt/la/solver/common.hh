@@ -22,8 +22,8 @@
 #include <dune/xt/common/configuration.hh>
 
 #include <dune/xt/la/algorithms/qr.hh>
-
-#include <dune/xt/la/container/common.hh>
+#include <dune/xt/la/container/common/matrix/dense.hh>
+#include <dune/xt/la/container/common/vector/dense.hh>
 
 #include "../solver.hh"
 

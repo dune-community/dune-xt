@@ -11,11 +11,12 @@
 #ifndef DUNE_XT_LA_EIGEN_CONTAINER_CONVERSION_HH
 #define DUNE_XT_LA_EIGEN_CONTAINER_CONVERSION_HH
 
-#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/type_traits.hh>
-#include <dune/xt/la/type_traits.hh>
+
 #include <dune/xt/la/container/matrix-interface.hh>
+#include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {
