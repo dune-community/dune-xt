@@ -96,7 +96,8 @@ class CommonDenseMatrix : public MatrixInterface<internal::CommonDenseMatrixTrai
   using MatrixInterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp>;
 
 public:
-  using Traits = typename internal::CommonDenseMatrixTraits<ScalarImp>;
+  using Traits = typename MatrixInterfaceType::Traits;
+  using derived_type = typename MatrixInterfaceType::derived_type;
   using BackendType = typename Traits::BackendType;
   using ScalarType = typename Traits::ScalarType;
   using RealType = typename Traits::RealType;

@@ -83,7 +83,8 @@ class CommonSparseMatrix : public MatrixInterface<internal::CommonSparseMatrixTr
   typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp> MatrixInterfaceType;
 
 public:
-  typedef internal::CommonSparseMatrixTraits<ScalarImp, layout> Traits;
+  using Traits = typename MatrixInterfaceType::Traits;
+  using derived_type = typename MatrixInterfaceType::derived_type;
   typedef typename Traits::EntriesVectorType EntriesVectorType;
   typedef typename Traits::IndexVectorType IndexVectorType;
   typedef typename Traits::ScalarType ScalarType;
@@ -600,7 +601,8 @@ class CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>
       MatrixInterfaceType;
 
 public:
-  typedef internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc> Traits;
+  using Traits = typename MatrixInterfaceType::Traits;
+  using derived_type = typename MatrixInterfaceType::derived_type;
   typedef typename Traits::EntriesVectorType EntriesVectorType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -1203,7 +1205,8 @@ class CommonSparseOrDenseMatrix
       MatrixInterfaceType;
 
 public:
-  typedef internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp> Traits;
+  using Traits = typename MatrixInterfaceType::Traits;
+  using derived_type = typename MatrixInterfaceType::derived_type;
   typedef typename Traits::DenseMatrixType DenseMatrixType;
   typedef typename Traits::SparseMatrixType SparseMatrixType;
   typedef typename Traits::ScalarType ScalarType;

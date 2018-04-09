@@ -45,6 +45,7 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
 // forwards
 template <class ScalarType>
 class EigenRowMajorSparseMatrix;
@@ -53,9 +54,11 @@ class EigenMatrixInterfaceDynamic
 {
 };
 
+
 #if HAVE_EIGEN
 
 namespace internal {
+
 
 /**
  * \brief Traits for EigenRowMajorSparseMatrix.
@@ -73,7 +76,9 @@ public:
   static const constexpr bool sparse = true;
 }; // class RowMajorSparseMatrixTraits
 
+
 } // namespace internal
+
 
 /**
  * \brief A sparse matrix implementation of the MatrixInterface with row major memory layout.
@@ -87,7 +92,8 @@ class EigenRowMajorSparseMatrix
   typedef MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
 
 public:
-  typedef internal::EigenRowMajorSparseMatrixTraits<ScalarImp> Traits;
+  using Traits = typename MatrixInterfaceType::Traits;
+  using derived_type = typename MatrixInterfaceType::derived_type;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -547,6 +553,7 @@ private:
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
   mutable bool unshareable_;
 }; // class EigenRowMajorSparseMatrix
+
 
 #else // HAVE_EIGEN
 

@@ -71,7 +71,8 @@ class CommonSparseVector : public VectorInterface<internal::CommonSparseVectorTr
   typedef VectorInterface<internal::CommonSparseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
 
 public:
-  typedef internal::CommonSparseVectorTraits<ScalarImp> Traits;
+  using Traits = typename VectorInterfaceType::Traits;
+  using derived_type = typename VectorInterfaceType::derived_type;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
   typedef typename Traits::DataType DataType;

@@ -38,6 +38,7 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
 // forward
 template <class ScalarImp>
 class IstlDenseVector;
@@ -45,7 +46,9 @@ class IstlDenseVector;
 template <class ScalarImp>
 class IstlRowMajorSparseMatrix;
 
+
 namespace internal {
+
 
 /**
  * \brief Traits for IstlDenseVector.
@@ -64,6 +67,7 @@ public:
   static const constexpr Backends sparse_matrix_type = Backends::istl_sparse;
 }; // class IstlDenseVectorTraits
 
+
 /**
  * \brief Traits for IstlRowMajorSparseMatrix.
  */
@@ -80,7 +84,9 @@ public:
   static const constexpr bool sparse = true;
 }; // class RowMajorSparseMatrixTraits
 
+
 } // namespace internal
+
 
 /**
  *  \brief A dense vector implementation of VectorInterface using the Dune::BlockVector from dune-istl.
@@ -94,7 +100,8 @@ class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<S
   typedef VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
 
 public:
-  typedef internal::IstlDenseVectorTraits<ScalarImp> Traits;
+  using Traits = typename VectorInterfaceType::Traits;
+  using derived_type = typename VectorInterfaceType::derived_type;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
   typedef typename Traits::DataType DataType;
@@ -386,6 +393,7 @@ private:
   mutable bool unshareable_;
 }; // class IstlDenseVector
 
+
 /**
  * \brief A sparse matrix implementation of the MatrixInterface using the Dune::BCRSMatrix from dune-istl.
  */
@@ -397,7 +405,8 @@ class IstlRowMajorSparseMatrix : public MatrixInterface<internal::IstlRowMajorSp
   typedef MatrixInterface<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
 
 public:
-  typedef internal::IstlRowMajorSparseMatrixTraits<ScalarImp> Traits;
+  using Traits = typename MatrixInterfaceType::Traits;
+  using derived_type = typename MatrixInterfaceType::derived_type;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -776,6 +785,7 @@ private:
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
   mutable bool unshareable_;
 }; // class IstlRowMajorSparseMatrix
+
 
 template <class S>
 std::ostream& operator<<(std::ostream& out, const IstlRowMajorSparseMatrix<S>& matrix)
