@@ -31,6 +31,8 @@
 
 #include <dune/xt/la/type_traits.hh>
 
+#include <dune/xt/la/exceptions.hh>
+
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
 
@@ -168,20 +170,12 @@ public:
 
   virtual ScalarType min() const
   {
-    using std::min;
-    ScalarType ret = 0;
-    for (const auto& element : *this)
-      ret = min(ret, element);
-    return ret;
+    return complex_switch<>::min(this->as_imp());
   }
 
   virtual ScalarType max() const
   {
-    using std::max;
-    ScalarType ret = 0;
-    for (const auto& element : *this)
-      ret = max(ret, element);
-    return ret;
+    return complex_switch<>::min(this->as_imp());
   }
 
   virtual ScalarType mean() const
@@ -250,41 +244,6 @@ public:
     return Common::FloatCmp::eq(this->as_imp(), other.as_imp(), epsilon);
   } // ... almost_equal(...)
 
-private:
-  template <bool is_complex = XT::Common::is_complex<ScalarType>::value, bool anything = true>
-  struct dot_helper
-  {
-    static ScalarType compute(const derived_type& ths, const derived_type& other)
-    {
-      using std::conj;
-      if (other.size() != ths.size())
-        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                   "The size of other (" << other.size() << ") does not match the size of this (" << ths.size()
-                                         << ")!");
-      ScalarType result = 0;
-      for (size_t ii = 0; ii < ths.size(); ++ii)
-        result += conj(ths.get_unchecked_ref(ii)) * other.get_unchecked_ref(ii);
-      return result;
-    }
-  }; // struct dot_helper<true, ...>
-
-  template <bool anything>
-  struct dot_helper<false, anything>
-  {
-    static ScalarType compute(const derived_type& ths, const derived_type& other)
-    {
-      if (other.size() != ths.size())
-        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                   "The size of other (" << other.size() << ") does not match the size of this (" << ths.size()
-                                         << ")!");
-      ScalarType result = 0;
-      for (size_t ii = 0; ii < ths.size(); ++ii)
-        result += ths.get_unchecked_ref(ii) * other.get_unchecked_ref(ii);
-      return result;
-    }
-  }; // struct dot_helper<false, ...>
-
-public:
   /**
    *  \brief  Computes the scalar products between two vectors.
    *  \param  other The second factor.
@@ -293,7 +252,7 @@ public:
    */
   virtual ScalarType dot(const derived_type& other) const
   {
-    return dot_helper<>::compute(this->as_imp(), other);
+    return complex_switch<>::dot(this->as_imp(), other);
   }
 
   /**
@@ -565,6 +524,69 @@ public:
   }
 
 private:
+  template <bool is_complex = Common::is_complex<ScalarType>::value, bool anything = true>
+  struct complex_switch
+  {
+    static ScalarType min(const derived_type& /*self*/)
+    {
+      DUNE_THROW(Exceptions::not_available, "For complex data types (implement this if you think otherwise)!");
+      return ScalarType();
+    }
+
+    static ScalarType max(const derived_type& /*self*/)
+    {
+      DUNE_THROW(Exceptions::not_available, "For complex data types (implement this if you think otherwise)!");
+      return ScalarType();
+    }
+
+    static ScalarType dot(const derived_type& self, const derived_type& other)
+    {
+      using std::conj;
+      if (other.size() != self.size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << self.size()
+                                         << ")!");
+      ScalarType result = 0;
+      for (size_t ii = 0; ii < self.size(); ++ii)
+        result += conj(self.get_unchecked_ref(ii)) * other.get_unchecked_ref(ii);
+      return result;
+    }
+  }; // struct complex_switch<true, ...>
+
+  template <bool anything>
+  struct complex_switch<false, anything>
+  {
+    static ScalarType min(const derived_type& self)
+    {
+      using std::min;
+      ScalarType ret = 0;
+      for (const auto& element : self)
+        ret = min(ret, element);
+      return ret;
+    }
+
+    static ScalarType max(const derived_type& self)
+    {
+      using std::max;
+      ScalarType ret = 0;
+      for (const auto& element : self)
+        ret = max(ret, element);
+      return ret;
+    }
+
+    static ScalarType dot(const derived_type& self, const derived_type& other)
+    {
+      if (other.size() != self.size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << self.size()
+                                         << ")!");
+      ScalarType result = 0;
+      for (size_t ii = 0; ii < self.size(); ++ii)
+        result += self.get_unchecked_ref(ii) * other.get_unchecked_ref(ii);
+      return result;
+    }
+  }; // struct complex_switch<false, ...>
+
   template <class T, class S>
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
 }; // class VectorInterface
