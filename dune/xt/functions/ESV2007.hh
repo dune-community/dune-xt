@@ -16,7 +16,9 @@
 #include <type_traits>
 
 #if HAVE_EIGEN
+#include <dune/xt/common/disable_warnings.hh>
 #include <Eigen/Eigenvalues>
+#include <dune/xt/common/reenable_warnings.hh>
 #endif
 
 #include <dune/geometry/referenceelements.hh>
