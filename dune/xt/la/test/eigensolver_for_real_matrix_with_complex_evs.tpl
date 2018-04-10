@@ -29,15 +29,12 @@ struct EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}
   {
     matrix_ = XT::Common::from_string<MatrixType>("[1 1; -1 1]");
     expected_eigenvalues_ = XT::Common::from_string<EigenValuesType>("[1+1i 1-1i]");
-    expected_eigenvectors_ = XT::Common::from_string<ComplexMatrixType>(
-        "[0.70710678118654746 0.70710678118654746; 0+0.70710678118654746i 0-0.70710678118654746i]");
     all_matrices_and_expected_eigenvalues_and_vectors_are_computed_ = true;
   }
 
   using BaseType::all_matrices_and_expected_eigenvalues_and_vectors_are_computed_;
   using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
-  using BaseType::expected_eigenvectors_;
 }; // struct EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}
 
 
@@ -74,11 +71,6 @@ TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, is_constructible)
 TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigenvalues)
 {
   gives_correct_eigenvalues( { {"shifted_qr", /*we_expect_a_failure: */ "-1"} } );
-}
-
-TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
-{
-  gives_correct_eigenvalues_in_correct_order( { {"shifted_qr", /*we_expect_a_failure: */ "-1"} } );
 }
 
 TEST_F(EigenSolverForRealMatrixWithComplexEvs_{{T_NAME}}, gives_correct_eigendecomposition)
