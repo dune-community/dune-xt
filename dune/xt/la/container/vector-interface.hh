@@ -23,6 +23,7 @@
 #include <dune/common/unused.hh>
 
 #include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/math.hh>
@@ -158,7 +159,7 @@ public:
     return this->as_imp()[ii];
   }
 
-  inline size_t DUNE_DEPRECATED_MSG("Use size() instead (09.04.2018)!") dim() const
+  inline size_t DXT_DEPRECATED_MSG("Use size() instead (09.04.2018)!") dim() const
   {
     return size();
   }
