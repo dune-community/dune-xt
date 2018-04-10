@@ -25,8 +25,7 @@ namespace Functions {
 
 
 /**
- * \brief Allows to reinterpret a given GridFunctionInterface, associated with a given grid layer, on a different
- *        grid layer.
+ * \brief Reinterprets a given localizable function (associated with a given grid layer), on a different grid layer.
  *
  *        Therefore, we search for the correct element in the original grid layer and use the corresponding
  *        local_function to provide an evaluation for a point on the new grid layer. The physical domain covered by the
@@ -240,6 +239,17 @@ private:
 }; // class ReinterpretLocalizableFunction
 
 
+/**
+ * \brief Reinterprets a given localizable function (associated with a given grid layer), on a different grid layer
+ *        [TargetElement has to be provided].
+ *
+ * Use as in
+\code
+auto reinterpreted_source = reinterpret<TargetElement>(source, source_grid_view);
+\endcode
+ *
+ * \sa ReinterpretLocalizableFunction
+ */
 template <class TargetElement, class SourceGridView, size_t r, size_t rC, class R>
 std::enable_if_t<XT::Grid::is_layer<SourceGridView>::value,
                  ReinterpretLocalizableFunction<SourceGridView, TargetElement, r, rC, R>>
@@ -250,6 +260,12 @@ reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridVie
 }
 
 
+/**
+ * \brief Reinterprets a given localizable function (associated with a given grid layer), on a different grid layer
+ *        [TargetElement is automatically deduced].
+ *
+ * \sa ReinterpretLocalizableFunction
+ */
 template <class SourceGridView, size_t r, size_t rC, class R, class TargetGridView>
 std::enable_if_t<XT::Grid::is_layer<SourceGridView>::value && XT::Grid::is_layer<TargetGridView>::value,
                  ReinterpretLocalizableFunction<SourceGridView, XT::Grid::extract_entity_t<TargetGridView>, r, rC, R>>
