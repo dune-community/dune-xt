@@ -21,12 +21,12 @@
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-#include "interfaces.pbh"
-#include "constant.pbh"
-#include "checkerboard.pbh"
-#include "ESV2007.bindings.hh"
-#include "expression.pbh"
-#include "spe10.pbh"
+#include <python/dune/xt/functions/interfaces.hh>
+#include <python/dune/xt/functions/constant.hh>
+#include <python/dune/xt/functions/checkerboard.hh>
+#include <python/dune/xt/functions/ESV2007.bindings.hh>
+#include <python/dune/xt/functions/expression.hh>
+#include <python/dune/xt/functions/spe10.hh>
 
 
 template <class G>

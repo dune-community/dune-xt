@@ -17,6 +17,8 @@
 #include <memory>
 #include <vector>
 
+#include <dune/common/unused.hh>
+
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/debug.hh>
 #include <dune/xt/common/exceptions.hh>
@@ -207,6 +209,7 @@ public:
       if (current_level > max_depth)
         return;
       for (const auto unused_counter : Common::value_range(children)) {
+        DUNE_UNUSED_PARAMETER(unused_counter);
         EllipsoidType child = parent;
         const double scale = std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
         const auto displace = [&](DomainFieldType& coord) {

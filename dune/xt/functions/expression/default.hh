@@ -16,11 +16,11 @@
 #include <limits>
 #include <vector>
 
-#include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 
 #include "base.hh"
@@ -29,17 +29,6 @@
 namespace Dune {
 namespace XT {
 namespace Functions {
-
-
-// forward, needed for friendliness
-template <class EntityImp,
-          class DomainFieldImp,
-          size_t domainDim,
-          class RangeFieldImp,
-          size_t rangeDim,
-          size_t rangeDimCols,
-          class TimeFieldImp>
-class TimeDependentExpressionFunction;
 
 
 template <class EntityImp,
@@ -387,7 +376,7 @@ private:
   {
     static void get_expression(const Common::Configuration& cfg, ExpressionStringVectorType& expression_as_vectors)
     {
-      typedef typename Dune::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
+      typedef typename XT::Common::FieldMatrix<std::string, dimRange, dimRangeCols> ExpressionMatrixType;
       const ExpressionMatrixType expression_as_matrix =
           cfg.get<ExpressionMatrixType>("expression", dimRange, dimRangeCols);
       // convert FieldMatrix to ExpressionStringVectorType
@@ -426,7 +415,7 @@ private:
     // get gradient as FieldMatrix for every key
     for (std::string key : gradient_keys) {
       ExpressionStringVectorType gradient_as_vectors_component;
-      typedef typename Dune::FieldMatrix<std::string, dimRange, dimDomain> JacobianMatrixType;
+      typedef typename XT::Common::FieldMatrix<std::string, dimRange, dimDomain> JacobianMatrixType;
       const JacobianMatrixType gradient_as_matrix = cfg.get<JacobianMatrixType>(key);
       // convert FieldMatrix to ExpressionStringVectorType
       for (size_t rr = 0; rr < dimRange; ++rr) {
@@ -438,9 +427,6 @@ private:
       gradient_as_vectors.emplace_back(gradient_as_vectors_component);
     }
   } // ... get_gradient(...)
-
-  template <class _E, class _D, size_t _d, class _R, size_t _r, size_t _rC, class _T>
-  friend class TimeDependentExpressionFunction;
 
   std::shared_ptr<const MathExpressionFunctionType> function_;
   size_t order_;

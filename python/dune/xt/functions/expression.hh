@@ -17,7 +17,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
-
+#include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/expression.hh>
 
