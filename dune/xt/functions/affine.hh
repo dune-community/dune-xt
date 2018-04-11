@@ -501,6 +501,11 @@ public:
     BaseType::template helper<>::jacobian_col(col, A_, ret);
   }
 
+  virtual bool is_affine() const override
+  {
+    return true;
+  }
+
 private:
   using BaseType::A_;
   using BaseType::b_;
