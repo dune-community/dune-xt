@@ -159,12 +159,12 @@ TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, is_constructible)
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-13"}, {"shifted_qr", "1e-14"}});
+  gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-13"}, {"numpy", "1e-14"}, {"shifted_qr", "1e-14"}});
 }
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
-  gives_correct_real_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-13"}, {"shifted_qr", "1e-14"} });
+  gives_correct_real_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-13"}, {"numpy", "1e-14"}, {"shifted_qr", "1e-14"} });
 }
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_max_eigenvalue)
