@@ -219,7 +219,7 @@ struct TriangularSolver
         x[1] /= M::get_entry(A, 1, 1);
         x[0] = (x[0] - M::get_entry(A, trans ? 1 : 0, trans ? 0 : 1) * x[1]) / M::get_entry(A, 0, 0);
       } // if (solve_forward)
-#if HAVE_MKL || HAVE_LAPACKE
+#if HAVE_MKL || HAVE_CBLAS
     } else if (storage_layout == Common::StorageLayout::dense_row_major
                || storage_layout == Common::StorageLayout::dense_column_major) {
       const int blas_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
@@ -240,7 +240,7 @@ struct TriangularSolver
            num_rows,
            rhs,
            storage_layout == Common::StorageLayout::dense_row_major ? 1 : num_rows);
-#endif // HAVE_MKL || HAVE_LAPACKE
+#endif // HAVE_MKL || HAVE_CBLAS
     } else if (storage_layout == Common::StorageLayout::csr) {
       if (lower && !trans) {
         forward_solve_csr(A, xp, rhs);
@@ -277,7 +277,7 @@ struct TriangularSolver
     }
   } // static void solve(...)
 
-#if HAVE_LAPACKE || HAVE_MKL
+#if HAVE_CBLAS || HAVE_MKL
 private:
   template <class ScalarType>
   static std::enable_if_t<Common::is_arithmetic<ScalarType>::value, void> trsm(const int layout,
@@ -323,7 +323,7 @@ private:
                                static_cast<void*>(b),
                                ldb);
   }
-#endif // HAVE_LAPACKE || HAVE_MKL
+#endif // HAVE_CBLAS || HAVE_MKL
 };
 
 // specialization for CommonSparseOrDenseMatrix

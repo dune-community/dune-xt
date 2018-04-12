@@ -98,7 +98,7 @@ protected:
   void compute() const override final
   {
     const auto type = options_->template get<std::string>("type");
-#if HAVE_LAPACKE
+#if HAVE_LAPACKE || HAVE_MKL
     if (type == "lapack") {
       if (!options_->template get<bool>("compute_eigenvectors"))
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(
@@ -109,7 +109,7 @@ protected:
         internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
       }
     } else
-#endif // HAVE_LAPACKE
+#endif // HAVE_LAPACKE || HAVE_MKL
 #if HAVE_EIGEN
         if (type == "eigen") {
       if (options_->template get<bool>("compute_eigenvalues") && options_->template get<bool>("compute_eigenvectors")) {
