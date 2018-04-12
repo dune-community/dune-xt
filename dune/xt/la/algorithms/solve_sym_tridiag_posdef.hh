@@ -13,28 +13,53 @@
 
 #include <cstddef>
 
+#include <dune/common/exceptions.hh>
+
+#include <dune/xt/common/lapacke.hh>
+#include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/vector.hh>
+
+#include <dune/xt/la/algorithms/cholesky.hh>
+
 namespace Dune {
 namespace XT {
 namespace LA {
 
 
-/**
- * \brief Extracts input needed for solve_sym_tridiag_posdef from matrix A
- */
-void prepare_sym_tridiag_posdef(
-    const double* A, size_t dimRange, double* diagonal_elements, double* sub_diagonal_elements, double* anorm);
-
 /**  \brief Solves linear equation for tridiagonal symmetric positive definite matrix.
-  * \param[in] dimRange number of rows and columns of matrix
-  * \param[in] diagonal_elements array containing the diagonal elements of the matrix (length dimRange)
-  * \param[in] sub_diagonal_elements array containing the sub-diagonal elements of the matrix (length dimRange-1)
-  * \param[in] anorm operator norm of the matrix (1-norm)
-  * \param[in/out] b array containing the rhs (length dimRange). Is overwritten by the solution of the equation.
-  * \returns estimate of inverse of the condition of the matrix
-  * \attention This function depends on LAPACKE. If LAPACKE is not found an error is thrown.
+  * \param[in] diag vector containing the diagonal elements of the matrix (length dimRange)
+  * \param[in] subdiag vector containing the sub-diagonal elements of the matrix (length dimRange-1)
+  * \param[in/out] b vector containing the rhs (length dimRange). Is overwritten by the solution of the equation.
   */
-double solve_sym_tridiag_posdef(
-    size_t dimRange, double* diagonal_elements, double* sub_diagonal_elements, double anorm, double* b);
+template <class VectorType, class SecondVectorType, class RhsVectorType>
+std::enable_if_t<Common::is_vector<VectorType>::value && Common::is_vector<SecondVectorType>::value
+                     && Common::is_vector<RhsVectorType>::value,
+                 void>
+solve_sym_tridiag_posdef(VectorType& diag, SecondVectorType& subdiag, RhsVectorType& b)
+{
+  tridiagonal_ldlt(diag, subdiag);
+  solve_tridiagonal_ldlt_factorized(diag, subdiag, b);
+}
+
+template <class MatrixType, class VectorType, class RhsVectorType>
+std::enable_if_t<Common::is_matrix<MatrixType>::value && Common::is_vector<VectorType>::value
+                     && Common::is_vector<RhsVectorType>::value,
+                 void>
+solve_sym_tridiag_posdef(const MatrixType& A, VectorType& x, const RhsVectorType& y)
+{
+  typedef Common::MatrixAbstraction<MatrixType> Mat;
+  typedef typename Mat::ScalarType ScalarType;
+  const size_t num_rows = Mat::rows(A);
+  std::vector<ScalarType> diag(num_rows, 0.);
+  std::vector<ScalarType> sub_diag(num_rows - 1, 0.);
+  for (size_t rr = 0; rr < num_rows; ++rr)
+    diag[rr] = Mat::get_entry(A, rr, rr);
+  for (size_t rr = 0; rr < num_rows - 1; ++rr)
+    sub_diag[rr] = Mat::get_entry(A, rr + 1, rr);
+  // copy y to x
+  x = Common::convert_to<VectorType>(y);
+  solve_sym_tridiag_posdef(diag, sub_diag, x);
+}
 
 
 } // namespace LA

@@ -11,25 +11,37 @@
 #ifndef DUNE_XT_LA_EIGEN_CONTAINER_CONVERSION_HH
 #define DUNE_XT_LA_EIGEN_CONTAINER_CONVERSION_HH
 
-#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/matrix.hh>
+#include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/type_traits.hh>
-#include <dune/xt/la/type_traits.hh>
+
 #include <dune/xt/la/container/matrix-interface.hh>
+#include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
 
+/**
+ |     Source     |     Range      | convert_to |
+ |----------------|----------------|------------|
+ | Common, not LA | Common or LA   | 1st        |
+ | LA, not Common | Common, not LA | 2nd        |
+ | LA, not Common | LA, not Common | 3rd        |
+ */
 
+//! 1st convert_to
 template <class RangeType, class SourceType>
-typename std::enable_if<Common::is_matrix<SourceType>::value && Common::is_matrix<RangeType>::value, RangeType>::type
+typename std::enable_if<Common::is_matrix<SourceType>::value && !is_matrix<SourceType>::value
+                            && Common::is_matrix<RangeType>::value,
+                        RangeType>::type
 convert_to(const SourceType& source)
 {
   return Common::convert_to<RangeType>(source);
 }
 
 
+//! 2nd convert_to
 template <class RangeType, class S>
 typename std::enable_if<Common::is_matrix<RangeType>::value && !is_matrix<RangeType>::value, RangeType>::type
 convert_to(const MatrixInterface<S>& source)
@@ -71,6 +83,7 @@ convert_to(const MatrixInterface<S>& source)
 } // ... convert_to(...)
 
 
+//! 3rd convert_to
 template <class RangeType, class S>
 typename std::enable_if<is_matrix<RangeType>::value, RangeType>::type convert_to(const MatrixInterface<S>& source)
 {

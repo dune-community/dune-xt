@@ -183,85 +183,25 @@ struct EigenSolverTest : public ::testing::Test
     }
   } // ... gives_correct_eigenvalues(...)
 
-  void gives_correct_eigenvalues_in_correct_order(const Common::Configuration& tolerances = {}) const
-  {
-    ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
-    for (const auto& tp : EigenSolverOpts::types()) {
-      const double tolerance = tolerances.get(tp, 1e-15);
-      EigenSolverType solver(matrix_, tp);
-      try {
-        const auto eigenvalues = solver.eigenvalues();
-        if (tolerance > 0) {
-          EXPECT_TRUE(Common::FloatCmp::eq(eigenvalues, expected_eigenvalues_, {tolerance, tolerance}))
-              << "\n\nactual eigenvalues: " << eigenvalues << "\n\nexpected eigenvalues: " << expected_eigenvalues_
-              << "\n\ntype: " << tp << "\n\ntolerance: " << tolerance;
-        } else {
-          // negative tolerance: we expect a failure
-          EXPECT_FALSE(Common::FloatCmp::eq(eigenvalues, expected_eigenvalues_, {tolerance, tolerance}))
-              << "\n\nTHIS IS A GOOD THING! UPDATE THE EXPECTATIONS IN tolerances!\n\n"
-              << "\n\nactual eigenvalues: " << eigenvalues << "\n\nexpected eigenvalues: " << expected_eigenvalues_
-              << "\n\ntype: " << tp << "\n\ntolerance: " << tolerance;
-        }
-      } catch (const Dune::MathError&) {
-        if (tolerance > 0) {
-          FAIL() << "Dune::MathError thrown when trying to get eigenvalues!"
-                 << "\n\ntype: " << tp << "\n\ntolerance: " << tolerance;
-        }
-      }
-    }
-  } // ... gives_correct_eigenvalues_in_correct_order(...)
-
-  void gives_correct_eigenvectors_in_correct_order(const Common::Configuration& tolerances = {}) const
-  {
-    ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
-    for (const auto& tp : EigenSolverOpts::types()) {
-      const double tolerance = tolerances.get(tp, 1e-15);
-      try {
-        EigenSolverType solver(matrix_, tp);
-        const auto& actual_eigenvectors = solver.eigenvectors();
-        EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_rows(actual_eigenvectors));
-        EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_cols(actual_eigenvectors));
-        if (tolerance > 0) {
-          EXPECT_TRUE(Common::FloatCmp::eq(
-              actual_eigenvectors, expected_eigenvectors_, {tolerance, tolerance}, {tolerance, tolerance}))
-              << "\n\nactual eigenvectors: " << actual_eigenvectors
-              << "\n\nexpected eigenvectors: " << expected_eigenvectors_ << "\n\ntolerance: " << tolerance
-              << "\n\ntype: " << tp;
-        } else {
-          // negative tolerance: we expect a failure
-          EXPECT_FALSE(Common::FloatCmp::eq(actual_eigenvectors, expected_eigenvectors_))
-              << "\n\nTHIS IS A GOOD THING! UPDATE THE EXPECTATIONS IN tolerances!\n\n"
-              << "\n\nactual eigenvectors: " << actual_eigenvectors
-              << "\n\nexpected eigenvectors: " << expected_eigenvectors_ << "\n\ntype: " << tp;
-        }
-      } catch (const Dune::MathError&) {
-        if (tolerance > 0) {
-          FAIL() << "Dune::MathError thrown when trying to get eigenvalues!"
-                 << "\n\ntype: " << tp << "\n\ntolerance: " << tolerance;
-        }
-      }
-    }
-  } // ... gives_correct_eigenvectors_in_correct_order(...)
 
   void gives_correct_eigendecomposition(const Common::Configuration& tolerances = {}) const
   {
+    using MC = Common::MatrixAbstraction<ComplexMatrixType>;
     ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
     const auto matrix_as_complex = convert_to<ComplexMatrixType>(matrix_);
     for (const auto& tp : EigenSolverOpts::types()) {
       const double tolerance = tolerances.get(tp, 1e-15);
       EigenSolverType solver(matrix_, tp);
       try {
-        const auto eigenvalues = solver.eigenvalues();
-        const ComplexMatrixType T = solver.eigenvectors();
-        ComplexMatrixType T_inv = Common::MatrixAbstraction<ComplexMatrixType>::create(Common::get_matrix_cols(T),
-                                                                                       Common::get_matrix_rows(T));
+        const auto& eigenvalues = solver.eigenvalues();
+        const auto& T = solver.eigenvectors();
+        ComplexMatrixType T_inv = MC::create(MC::cols(T), MC::rows(T));
         try {
           T_inv = invert_matrix(T);
         } catch (...) {
           FAIL() << "Matrix inversion has to work for this test, else add this matrix to the matrix inversion tests!";
         }
-        ComplexMatrixType lambda = Common::MatrixAbstraction<ComplexMatrixType>::create(
-            Common::get_matrix_rows(T), Common::get_matrix_cols(T), 0.);
+        ComplexMatrixType lambda = MC::create(MC::rows(T), MC::cols(T), 0.);
         for (size_t ii = 0; ii < Common::get_matrix_rows(matrix_); ++ii)
           Common::set_matrix_entry(lambda, ii, ii, eigenvalues[ii]);
         const auto matrix_decomposition_error = (T * (lambda * T_inv)) - matrix_as_complex;
@@ -291,7 +231,6 @@ struct EigenSolverTest : public ::testing::Test
   MatrixType unit_matrix_;
   MatrixType matrix_;
   EigenValuesType expected_eigenvalues_;
-  ComplexMatrixType expected_eigenvectors_;
 }; // ... struct EigenSolverTest
 
 
@@ -363,29 +302,6 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
     }
   } // ... gives_correct_real_eigenvalues(...)
 
-  void gives_correct_real_eigenvalues_in_correct_order(const Common::Configuration& tolerances = {}) const
-  {
-    ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
-    for (const auto& tp : EigenSolverOpts::types()) {
-      const double tolerance = tolerances.get(tp, 1e-15);
-      EigenSolverType solver(matrix_, tp);
-      if (tolerance > 0) {
-        const auto real_eigenvalues = solver.real_eigenvalues();
-        EXPECT_TRUE(Common::FloatCmp::eq(real_eigenvalues, expected_real_eigenvalues_, tolerance))
-            << "\n\nactual eigenvalues: " << real_eigenvalues
-            << "\n\nexpected (real) eigenvalues: " << expected_real_eigenvalues_ << "\n\ntolerance: " << tolerance
-            << "\n\ntype: " << tp;
-      } else {
-        // negative tolerance: we expect a failure
-        const auto real_eigenvalues = solver.real_eigenvalues(); /// \todo: Add try/catch around this, too!
-        EXPECT_FALSE(Common::FloatCmp::eq(real_eigenvalues, expected_real_eigenvalues_))
-            << "\n\nTHIS IS A GOOD THING! UPDATE THE EXPECTATIONS IN tolerances!\n\n"
-            << "\n\nactual eigenvalues: " << real_eigenvalues
-            << "\n\nexpected (real) eigenvalues: " << expected_real_eigenvalues_ << "\n\ntype: " << tp;
-      }
-    }
-  } // ... gives_correct_real_eigenvalues_in_correct_order(...)
-
   void gives_correct_max_eigenvalue(const Common::Configuration& tolerances = {}) const
   {
     ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
@@ -432,67 +348,6 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
     }
   }
 
-  void gives_correct_real_eigenvectors_in_correct_order(const Common::Configuration& tolerances = {}) const
-  {
-    ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
-    for (const auto& tp : EigenSolverOpts::types()) {
-      const double tolerance = tolerances.get(tp, 1e-15);
-      EigenSolverType solver(matrix_, tp);
-      const auto actual_eigenvectors = solver.eigenvectors();
-      const size_t rows = Common::get_matrix_rows(actual_eigenvectors);
-      const size_t cols = Common::get_matrix_cols(actual_eigenvectors);
-      auto actual_eigenvectors_as_real = Common::create<RealMatrixType>(rows, cols);
-      for (size_t ii = 0; ii < rows; ++ii)
-        for (size_t jj = 0; jj < cols; ++jj) {
-          const auto complex_entry = Common::get_matrix_entry(actual_eigenvectors, ii, jj);
-          if (tolerance > 0)
-            EXPECT_DOUBLE_EQ(0, complex_entry.imag());
-          Common::set_matrix_entry(actual_eigenvectors_as_real, ii, jj, complex_entry.real());
-        }
-      if (tolerance > 0) {
-        EXPECT_TRUE(
-            Common::FloatCmp::eq(actual_eigenvectors_as_real, expected_real_eigenvectors_, tolerance, tolerance))
-            << "\n\nactual eigenvectors: " << actual_eigenvectors_as_real
-            << "\n\nexpected eigenvectors: " << expected_real_eigenvectors_ << "\n\ntolerance: " << tolerance
-            << "\n\ntype: " << tp;
-      } else {
-        EXPECT_FALSE(
-            Common::FloatCmp::eq(actual_eigenvectors_as_real, expected_real_eigenvectors_, tolerance, tolerance))
-            << "\n\nTHIS IS A GOOD THING! UPDATE THE EXPECTATIONS IN tolerances!\n\n"
-            << "\n\nactual eigenvectors: " << actual_eigenvectors_as_real
-            << "\n\nexpected eigenvectors: " << expected_real_eigenvectors_ << "\n\ntype: " << tp;
-      }
-      if (tolerance > 0) {
-        const auto actual_real_eigenvectors = solver.real_eigenvectors();
-        EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_rows(actual_real_eigenvectors));
-        EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_cols(actual_real_eigenvectors));
-        EXPECT_TRUE(Common::FloatCmp::eq(actual_real_eigenvectors, expected_real_eigenvectors_, tolerance, tolerance))
-            << "\n\nactual eigenvectors: " << actual_real_eigenvectors
-            << "\n\nexpected eigenvectors: " << expected_real_eigenvectors_ << "\n\ntolerance: " << tolerance
-            << "\n\ntype: " << tp;
-      } else {
-        // negative tolerance: we expect a failure
-        bool all_is_as_expected = false;
-        try {
-          const auto actual_real_eigenvectors = solver.real_eigenvectors();
-          EXPECT_FALSE(Common::FloatCmp::eq(actual_real_eigenvectors, expected_real_eigenvectors_))
-              << "\n\nactual eigenvectors: " << actual_real_eigenvectors
-              << "\n\nexpected eigenvectors: " << expected_real_eigenvectors_ << "\n\ntype: " << tp;
-          all_is_as_expected = true;
-        } catch (const Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested&) {
-          all_is_as_expected = true;
-        } catch (const Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested&) {
-          all_is_as_expected = true;
-        } catch (...) {
-          all_is_as_expected = true;
-          FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested or "
-                    "LA::Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested!";
-        }
-        if (!all_is_as_expected)
-          FAIL() << "THIS IS A GOOD THING! CHECK THE EIGENVECTORS AND ALTER THE EXPECTATIONS IN tolerances!";
-      }
-    }
-  } // ... gives_correct_real_eigenvectors_in_correct_order(...)
 
   void gives_correct_real_eigendecomposition(const Common::Configuration& tolerances = {}) const
   {
@@ -544,11 +399,9 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
   using BaseType::all_matrices_and_expected_eigenvalues_and_vectors_are_computed_;
   using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
-  using BaseType::expected_eigenvectors_;
   RealEigenValuesType expected_real_eigenvalues_;
   RealType expected_max_ev_;
   RealType expected_min_ev_;
-  RealMatrixType expected_real_eigenvectors_;
 }; // struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors
 
 

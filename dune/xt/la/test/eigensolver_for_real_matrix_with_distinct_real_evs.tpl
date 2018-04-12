@@ -37,24 +37,20 @@ struct EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}
     expected_eigenvalues_ = XT::Common::create<EigenValuesType>(TESTMATRIXSIZE);
     for (size_t ii = 0; ii < TESTMATRIXSIZE; ++ii)
       expected_eigenvalues_[ii] = ii + 1;
-    expected_eigenvectors_ = XT::LA::eye_matrix<ComplexMatrixType>(TESTMATRIXSIZE, TESTMATRIXSIZE);
     expected_real_eigenvalues_ = XT::Common::create<RealEigenValuesType>(TESTMATRIXSIZE);
     for (size_t ii = 0; ii < TESTMATRIXSIZE; ++ii)
       expected_real_eigenvalues_[ii] = ii + 1;
     expected_max_ev_ = TESTMATRIXSIZE;
     expected_min_ev_ = 1;
-    expected_real_eigenvectors_ = XT::LA::eye_matrix<RealMatrixType>(TESTMATRIXSIZE, TESTMATRIXSIZE);
     all_matrices_and_expected_eigenvalues_and_vectors_are_computed_ = true;
   }
 
   using BaseType::all_matrices_and_expected_eigenvalues_and_vectors_are_computed_;
   using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
-  using BaseType::expected_eigenvectors_;
   using BaseType::expected_real_eigenvalues_;
   using BaseType::expected_max_ev_;
   using BaseType::expected_min_ev_;
-  using BaseType::expected_real_eigenvectors_;
 }; // struct EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}
 
 
@@ -93,19 +89,9 @@ TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigenvalue
   gives_correct_eigenvalues();
 }
 
-TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
-{
-  gives_correct_eigenvalues_in_correct_order();
-}
-
 TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
   gives_correct_real_eigenvalues();
-}
-
-TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
-{
-  gives_correct_real_eigenvalues_in_correct_order();
 }
 
 TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_max_eigenvalue)
@@ -116,16 +102,6 @@ TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_max_eigenv
 TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_min_eigenvalue)
 {
   gives_correct_min_eigenvalue();
-}
-
-TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
-{
-  gives_correct_eigenvectors_in_correct_order();
-}
-
-TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
-{
-  gives_correct_real_eigenvectors_in_correct_order();
 }
 
 TEST_F(EigenSolverForRowWiseScaledUniMatrix_{{T_NAME}}, gives_correct_eigendecomposition)

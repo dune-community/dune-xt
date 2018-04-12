@@ -15,11 +15,13 @@
 
 #include <cstddef>
 #include <vector>
-#include <set>
+
+#include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
+
 
 class SparsityPatternDefault
 {
@@ -28,6 +30,7 @@ private:
 
 public:
   typedef BaseType::value_type InnerType;
+  typedef typename BaseType::iterator OuterIteratorType;
   typedef typename BaseType::const_iterator ConstOuterIteratorType;
 
   explicit SparsityPatternDefault(const size_t _size = 0);
@@ -38,7 +41,11 @@ public:
 
   const InnerType& inner(const size_t ii) const;
 
+  OuterIteratorType begin();
+
   ConstOuterIteratorType begin() const;
+
+  OuterIteratorType end();
 
   ConstOuterIteratorType end() const;
 
@@ -57,6 +64,21 @@ public:
 private:
   BaseType vector_of_vectors_;
 }; // class SparsityPatternDefault
+
+SparsityPatternDefault dense_pattern(const size_t rows, const size_t cols);
+
+SparsityPatternDefault tridiagonal_pattern(const size_t rows, const size_t cols);
+
+SparsityPatternDefault triangular_pattern(const size_t rows,
+                                          const size_t cols,
+                                          const Common::MatrixPattern& uplo = Common::MatrixPattern::lower_triangular);
+
+SparsityPatternDefault diagonal_pattern(const size_t rows, const size_t cols, int offset = 0);
+
+SparsityPatternDefault multiplication_pattern(const SparsityPatternDefault& lhs_pattern,
+                                              const SparsityPatternDefault& rhs_pattern,
+                                              const size_t rhs_cols);
+
 
 } // namespace LA
 } // namespace XT

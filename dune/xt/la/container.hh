@@ -17,8 +17,6 @@
 #include "container/eigen.hh"
 #include "container/istl.hh"
 
-#include <dune/xt/common/logging.hh>
-
 namespace Dune {
 namespace XT {
 namespace LA {

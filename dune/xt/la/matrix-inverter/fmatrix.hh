@@ -14,6 +14,7 @@
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/fmatrix.hh>
+
 #include <dune/xt/la/exceptions.hh>
 #include <dune/xt/la/container/conversion.hh>
 #include <dune/xt/la/container/eigen/dense.hh>
@@ -51,7 +52,7 @@ public:
     opts["type"] = actual_type;
     return opts;
   }
-}; // class MatrixInverterOptions<EigenDenseMatrix<S>>
+}; // class MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
 
 template <class K, int ROWS, int COLS>
 class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>>
@@ -93,13 +94,14 @@ public:
                          << ee.what());
         DUNE_THROW(Exceptions::matrix_invert_failed, "This was the original error:\n\n" << ee.what());
       }
-    } else
+    }
 #if HAVE_EIGEN
-        if (type == "moore_penrose") {
+    else if (type == "moore_penrose") {
       inverse_ = std::make_unique<MatrixType>(convert_to<MatrixType>(EigenDenseMatrix<K>(
           internal::compute_moore_penrose_inverse_using_eigen(convert_to<EigenDenseMatrix<K>>(matrix_).backend()))));
-    } else
+    }
 #endif
+    else
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type
                                 << "' is none of MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>::types(), and "

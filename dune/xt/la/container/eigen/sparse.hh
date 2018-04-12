@@ -144,6 +144,23 @@ public:
   {
   }
 
+  explicit EigenRowMajorSparseMatrix(const size_t rr,
+                                     const size_t cc,
+                                     const ScalarType& val,
+                                     const size_t num_mutexes = 1)
+    : backend_(std::make_shared<BackendType>(rr, cc))
+    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , unshareable_(false)
+  {
+    if (val != 0.) {
+      for (size_t ii = 0; ii < rows(); ++ii)
+        for (size_t jj = 0; jj < cols(); ++jj) {
+          backend_->insert(ii, jj);
+          set_entry(ii, jj, val);
+        }
+    }
+  }
+
   EigenRowMajorSparseMatrix(const ThisType& other)
     : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
     , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
@@ -438,6 +455,54 @@ public:
 
   /// \}
 
+  ScalarType* entries()
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    backend_->makeCompressed();
+    return backend().valuePtr();
+  }
+
+  const ScalarType* entries() const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    backend_->makeCompressed();
+    return backend().valuePtr();
+  }
+
+  int* outer_index_ptr()
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    backend_->makeCompressed();
+    return backend().outerIndexPtr();
+  }
+
+  const int* outer_index_ptr() const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    return backend().outerIndexPtr();
+    backend_->makeCompressed();
+  }
+
+  int* inner_index_ptr()
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    backend_->makeCompressed();
+    return backend().innerIndexPtr();
+  }
+
+  const int* inner_index_ptr() const
+  {
+    ensure_uniqueness();
+    unshareable_ = true;
+    backend_->makeCompressed();
+    return backend().innerIndexPtr();
+  }
+
   using MatrixInterfaceType::operator+;
   using MatrixInterfaceType::operator-;
   using MatrixInterfaceType::operator+=;
@@ -493,8 +558,10 @@ class EigenRowMajorSparseMatrix
 
 #endif // HAVE_EIGEN
 
+
 } // namespace LA
 namespace Common {
+
 
 #if HAVE_EIGEN
 
@@ -502,6 +569,7 @@ template <class T>
 struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::EigenRowMajorSparseMatrix<T>>
 {
+  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::csr;
 };
 
 #endif // HAVE_EIGEN

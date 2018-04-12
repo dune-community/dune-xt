@@ -87,27 +87,28 @@ compute_right_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic
 #else // HAVE_EIGEN
 
 
-template <class S>
+template <class S, class MatrixType, class ComplexMatrixType>
 void compute_eigenvalues_and_right_eigenvectors_using_eigen(
-    const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/,
+    const MatrixType& /*::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& matrix*/,
     std::vector<XT::Common::complex_t<S>>& /*eigenvalues*/,
-    ::Eigen::Matrix<XT::Common::complex_t<S>, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*eigenvectors*/)
+    ComplexMatrixType& /*::Eigen::Matrix<XT::Common::complex_t<S>, ::Eigen::Dynamic, ::Eigen::Dynamic>& eigenvectors*/)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 }
 
 
-template <class S>
+template <class S, class MatrixType>
 std::vector<XT::Common::complex_t<S>>
-compute_eigenvalues_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/)
+compute_eigenvalues_using_eigen(const MatrixType& /*::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& matrix*/)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 }
 
 
-template <class S>
-::Eigen::Matrix<XT::Common::complex_t<S>, ::Eigen::Dynamic, ::Eigen::Dynamic>
-compute_right_eigenvectors_using_eigen(const ::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& /*matrix*/)
+template <class S, class MatrixType, class ComplexMatrixType>
+ComplexMatrixType /*::Eigen::Matrix<XT::Common::complex_t<S>, ::Eigen::Dynamic, ::Eigen::Dynamic>*/
+    compute_right_eigenvectors_using_eigen(
+        const MatrixType& /*::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& matrix*/)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 }

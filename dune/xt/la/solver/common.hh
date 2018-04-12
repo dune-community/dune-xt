@@ -21,7 +21,9 @@
 
 #include <dune/xt/common/configuration.hh>
 
-#include <dune/xt/la/container/common.hh>
+#include <dune/xt/la/algorithms/qr.hh>
+#include <dune/xt/la/container/common/matrix/dense.hh>
+#include <dune/xt/la/container/common/vector/dense.hh>
 
 #include "../solver.hh"
 
@@ -80,7 +82,8 @@ public:
     const Common::Configuration default_opts = options(type);
     // solve
     try {
-      matrix_.backend().solve(solution.backend(), rhs.backend());
+      auto QR = matrix_;
+      solve_by_qr_decomposition(QR, solution, rhs);
     } catch (FMatrixError&) {
       DUNE_THROW(Exceptions::linear_solver_failed_bc_data_did_not_fulfill_requirements,
                  "The dune-common backend reported 'FMatrixError'!\n"

@@ -112,20 +112,12 @@ struct EigenSolverForMatrixFromEigensExample_{{T_NAME}}
                                                                      " 0.35304325510300372 "
                                                                      " 0.61781064692153476+0.12941286410485134i "
                                                                      " 0.61781064692153476-0.12941286410485134i]");
-    expected_eigenvectors_ = XT::Common::from_string<ComplexMatrixType>(
-        "[-0.2916493853334598-0.45353428327568535i   -0.2916493853334598+0.45353428327568535i   -0.060739856420097799 -0.732892086787302      0.58989693747516225-0.12134050155506512i   0.58989693747516225+0.12134050155506512i; "
-        "  0.13427786119296695-0.10415042620914604i   0.13427786119296695+0.10415042620914604i  -0.79936618427058692   0.13588801812778584    0.33446578429890217+0.36779173930086734i   0.33446578429890217-0.36779173930086734i; "
-        " -0.4224933428958097-0.17959111262899077i   -0.4224933428958097+0.17959111262899077i    0.19181897363210443   0.056319404917871921  -0.33512506847695012-0.1433533445630015i   -0.33512506847695012+0.1433533445630015i; "
-        " -0.58861043190958418+0.027350002433760786i -0.58861043190958418-0.027350002433760786i -0.078824737066622547 -0.62743714713230025    0.32187174947115971-0.1554720757387448i    0.32187174947115971+0.1554720757387448i; "
-        " -0.24767280752759105+0.13196040251638746i  -0.24767280752759105-0.13196040251638746i   0.40098186135709829   0.21799673455433938   -0.33488773557308854-0.076133571019896026i -0.33488773557308854+0.076133571019896026i; "
-        "  0.10538083226488951+0.18040258229827225i   0.10538083226488951-0.18040258229827225i  -0.39182912389260799  -0.0056400714249183401 -0.032444861799488058+0.10261186083116479i -0.032444861799488058-0.10261186083116479i]"); // clang-format on
     all_matrices_and_expected_eigenvalues_and_vectors_are_computed_ = true;
   }
 
   using BaseType::all_matrices_and_expected_eigenvalues_and_vectors_are_computed_;
   using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
-  using BaseType::expected_eigenvectors_;
 }; // struct EigenSolverForMatrixFromEigensExample_{{T_NAME}}
 
 
@@ -162,17 +154,6 @@ TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, is_constructible)
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvalues)
 {
   gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-15"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
-}
-
-TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
-{
-  gives_correct_eigenvalues_in_correct_order({ {"lapack", "1e-14"}, {"eigen", "1e-15"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
-}
-
-TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
-{
-  gives_correct_eigenvectors_in_correct_order(
-      { {"lapack", /*we expect a failure: */ "-1"}, {"eigen", "1e-15"}, {"numpy", /*we expect a failure: */ "-1"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigendecomposition)

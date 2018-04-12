@@ -12,12 +12,12 @@
 #define DUNE_XT_LA_MATRIX_INVERTER_BASE_HH
 
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/math.hh>
+#include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
+#include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/exceptions.hh>
 
 namespace Dune {
@@ -33,7 +33,7 @@ class MatrixInverterOptions;
 namespace internal {
 
 
-static void ensure_matrix_inverter_type(const std::string& type, const std::vector<std::string>& available_types)
+static inline void ensure_matrix_inverter_type(const std::string& type, const std::vector<std::string>& available_types)
 {
   bool contained = false;
   for (const auto& tp : available_types)
@@ -45,7 +45,7 @@ static void ensure_matrix_inverter_type(const std::string& type, const std::vect
 } // ... ensure_type(...)
 
 
-static Common::Configuration default_matrix_inverter_options()
+static inline Common::Configuration default_matrix_inverter_options()
 {
   Common::Configuration opts;
   opts["delay_computation"] = "false";

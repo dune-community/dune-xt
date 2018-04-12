@@ -13,25 +13,19 @@
 #define DUNE_XT_LA_CONTAINER_COMMON_MATRIX_DENSE_HH
 
 #include <cmath>
-#include <initializer_list>
 #include <memory>
-#include <type_traits>
-#include <vector>
-#include <complex>
 #include <mutex>
+#include <vector>
 
-#include <dune/common/dynmatrix.hh>
-#include <dune/common/densematrix.hh>
-#include <dune/common/float_cmp.hh>
 #include <dune/common/ftraits.hh>
 #include <dune/common/unused.hh>
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/vector.hh>
 
-#include <dune/xt/la/container/interfaces.hh>
+#include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/container/pattern.hh>
-
-#include "../vector.hh"
 
 namespace Dune {
 namespace XT {
@@ -41,18 +35,47 @@ namespace LA {
 template <class ScalarImp>
 class CommonDenseMatrix;
 
+template <class ScalarImp>
+class CommonSparseVector;
+
 
 namespace internal {
+
+
+template <class ScalarType>
+struct RowMajorMatrixBackend
+{
+  RowMajorMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+    : num_rows_(num_rows)
+    , num_cols_(num_cols)
+    , entries_(num_rows_ * num_cols_, value)
+  {
+  }
+
+  ScalarType& get_entry_ref(size_t rr, size_t cc)
+  {
+    return entries_[rr * num_cols_ + cc];
+  }
+
+  const ScalarType& get_entry_ref(size_t rr, size_t cc) const
+  {
+    return entries_[rr * num_cols_ + cc];
+  }
+
+  size_t num_rows_;
+  size_t num_cols_;
+  std::vector<ScalarType> entries_;
+};
 
 
 template <class ScalarImp>
 class CommonDenseMatrixTraits
 {
 public:
-  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
-  typedef CommonDenseMatrix<ScalarType> derived_type;
-  typedef Dune::DynamicMatrix<ScalarType> BackendType;
+  using ScalarType = typename Dune::FieldTraits<ScalarImp>::field_type;
+  using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
+  using BackendType = RowMajorMatrixBackend<ScalarType>;
+  using derived_type = CommonDenseMatrix<ScalarType>;
   static const Backends backend_type = Backends::common_dense;
   static const Backends vector_type = Backends::common_dense;
   static const constexpr bool sparse = false;
@@ -63,26 +86,26 @@ public:
 
 
 /**
- *  \brief  A dense matrix implementation of MatrixInterface using the Dune::DynamicMatrix.
+ *  \brief  A dense matrix implementation of MatrixInterface using the a std::vector backend.
  */
 template <class ScalarImp = double>
 class CommonDenseMatrix : public MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp>,
                           public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp>>
 {
-  typedef CommonDenseMatrix<ScalarImp> ThisType;
-  typedef MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
+  using ThisType = CommonDenseMatrix;
+  using MatrixInterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp>;
 
 public:
-  typedef internal::CommonDenseMatrixTraits<ScalarImp> Traits;
-  typedef typename Traits::BackendType BackendType;
-  typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealType RealType;
+  using Traits = typename internal::CommonDenseMatrixTraits<ScalarImp>;
+  using BackendType = typename Traits::BackendType;
+  using ScalarType = typename Traits::ScalarType;
+  using RealType = typename Traits::RealType;
 
   explicit CommonDenseMatrix(const size_t rr = 0,
                              const size_t cc = 0,
                              const ScalarType value = ScalarType(0),
                              const size_t num_mutexes = 1)
-    : backend_(new BackendType(rr, cc, value))
+    : backend_(std::make_shared<BackendType>(rr, cc, value))
     , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
     , unshareable_(false)
   {
@@ -93,7 +116,7 @@ public:
                     const size_t cc,
                     const SparsityPatternDefault& /*pattern*/,
                     const size_t num_mutexes = 1)
-    : backend_(new BackendType(rr, cc, ScalarType(0)))
+    : backend_(std::make_shared<BackendType>(rr, cc, ScalarType(0)))
     , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
     , unshareable_(false)
   {
@@ -125,7 +148,7 @@ public:
 
   template <class T>
   CommonDenseMatrix(const DenseMatrix<T>& other, const size_t num_mutexes = 1)
-    : backend_(new BackendType(other.rows(), other.cols()))
+    : backend_(std::make_shared<BackendType>(other.rows(), other.cols()))
     , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
     , unshareable_(false)
   {
@@ -191,6 +214,16 @@ public:
     return *backend_;
   }
 
+  ScalarType* data()
+  {
+    return backend().entries_.data();
+  }
+
+  const ScalarType* data() const
+  {
+    return backend().entries_.data();
+  }
+
   /// \}
   /// \name Required by ContainerInterface.
   /// \{
@@ -204,7 +237,8 @@ public:
   {
     ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
-    *backend_ *= alpha;
+    for (auto& entry : backend_->entries_)
+      entry *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
@@ -218,7 +252,8 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend_->axpy(alpha, xx.backend());
+    for (size_t ii = 0; ii < backend_->entries_.size(); ++ii)
+      backend_->entries_[ii] += alpha * xx.backend_->entries_[ii];
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -232,36 +267,42 @@ public:
 
   inline size_t rows() const
   {
-    return backend_->rows();
+    return backend_->num_rows_;
   }
 
   inline size_t cols() const
   {
-    return backend_->cols();
+    return backend_->num_cols_;
   }
 
-  template <class FirstTraits, class SecondTraits>
-  inline void mv(const VectorInterface<FirstTraits, ScalarType>& xx,
-                 VectorInterface<SecondTraits, ScalarType>& yy) const
+  template <class FirstVectorType, class SecondVectorType>
+  inline void mv(const FirstVectorType& xx, SecondVectorType& yy) const
   {
-    mv_helper<FirstTraits, SecondTraits>::mv(xx, yy, this);
+    using V1 = typename Common::VectorAbstraction<FirstVectorType>;
+    using V2 = typename Common::VectorAbstraction<SecondVectorType>;
+    static_assert(V1::is_vector && V2::is_vector, "");
+    assert(xx.size() == cols() && yy.size() == rows());
+    yy *= ScalarType(0.);
+    for (size_t rr = 0; rr < rows(); ++rr) {
+      V2::set_entry(yy, rr, 0.);
+      for (size_t cc = 0; cc < cols(); ++cc)
+        V2::add_to_entry(yy, rr, get_entry(rr, cc) * V1::get_entry(xx, cc));
+    }
   }
 
-  inline void mv(const CommonDenseVector<ScalarType>& xx, CommonDenseVector<ScalarType>& yy) const
+  template <class FirstVectorType, class SecondVectorType>
+  inline void mtv(const FirstVectorType& xx, SecondVectorType& yy) const
   {
-    backend_->mv(xx.backend(), yy.backend());
-  }
-
-  template <class FirstVectorImp, class SecondVectorImp>
-  inline void mv(const Dune::DenseVector<FirstVectorImp>& xx, Dune::DenseVector<SecondVectorImp>& yy) const
-  {
-    backend_->mv(xx, yy);
-  }
-
-  template <class FirstVectorImp, class SecondVectorImp>
-  inline void mtv(const Dune::DenseVector<FirstVectorImp>& xx, Dune::DenseVector<SecondVectorImp>& yy) const
-  {
-    backend_->mtv(xx, yy);
+    using V1 = typename Common::VectorAbstraction<FirstVectorType>;
+    using V2 = typename Common::VectorAbstraction<SecondVectorType>;
+    static_assert(V1::is_vector && V2::is_vector, "");
+    assert(V1::size(xx) == rows() && V1::size(yy) == cols());
+    yy *= ScalarType(0.);
+    for (size_t cc = 0; cc < cols(); ++cc) {
+      V2::set_entry(yy, cc, 0.);
+      for (size_t rr = 0; rr < rows(); ++rr)
+        V2::add_to_entry(yy, cc, get_entry(cc, rr) * V1::get_entry(xx, rr));
+    }
   }
 
   void mtv(const CommonSparseVector<ScalarType>& xx, CommonSparseVector<ScalarType>& yy) const
@@ -269,12 +310,13 @@ public:
     yy.clear();
     const auto& vec_entries = xx.entries();
     const auto& vec_indices = xx.indices();
-    thread_local Dune::DynamicVector<ScalarType> tmp_vec;
+    thread_local std::vector<ScalarType> tmp_vec;
     tmp_vec.resize(cols(), 0.);
     std::fill(tmp_vec.begin(), tmp_vec.end(), 0.);
     for (size_t ii = 0; ii < vec_entries.size(); ++ii) {
-      const size_t cc = vec_indices[ii];
-      tmp_vec.axpy(vec_entries[ii], (*backend_)[cc]);
+      const size_t rr = vec_indices[ii];
+      for (size_t cc = 0; cc < cols(); ++cc)
+        tmp_vec[cc] += vec_entries[ii] * backend_->get_entry_ref(rr, cc);
     }
     for (size_t cc = 0; cc < cols(); ++cc)
       if (XT::Common::FloatCmp::ne(tmp_vec[cc], 0.))
@@ -287,7 +329,7 @@ public:
     internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
     assert(ii < rows());
     assert(jj < cols());
-    (*backend_)[ii][jj] += value;
+    backend_->get_entry_ref(ii, jj) += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
@@ -295,14 +337,14 @@ public:
     ensure_uniqueness();
     assert(ii < rows());
     assert(jj < cols());
-    (*backend_)[ii][jj] = value;
+    backend_->get_entry_ref(ii, jj) = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
-    return (*backend_)[ii][jj];
+    return backend_->get_entry_ref(ii, jj);
   } // ... get_entry(...)
 
   void clear_row(const size_t ii)
@@ -311,7 +353,7 @@ public:
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    std::fill((*backend_)[ii].begin(), (*backend_)[ii].end(), ScalarType(0));
+    std::fill_n(&(backend_->get_entry_ref(ii, 0)), cols(), ScalarType(0));
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
@@ -321,7 +363,7 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     for (size_t ii = 0; ii < rows(); ++ii)
-      (*backend_)[ii][jj] = ScalarType(0);
+      backend_->get_entry_ref(ii, jj) = ScalarType(0);
   } // ... clear_col(...)
 
   void unit_row(const size_t ii)
@@ -333,10 +375,8 @@ public:
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    auto& row = (*backend_)[ii];
-    for (size_t jj = 0; jj < cols(); ++jj)
-      row[jj] = ScalarType(0);
-    row[ii] = ScalarType(1);
+    clear_row(ii);
+    set_entry(ii, ii, ScalarType(1));
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
@@ -348,21 +388,15 @@ public:
     if (jj >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
-    for (size_t ii = 0; ii < rows(); ++ii)
-      (*backend_)[ii][jj] = ScalarType(0);
-    (*backend_)[jj][jj] = ScalarType(1);
+    clear_col(jj);
+    set_entry(jj, jj, ScalarType(1));
   } // ... unit_col(...)
 
   bool valid() const
   {
-    for (size_t ii = 0; ii < rows(); ++ii) {
-      const auto& row_vec = (*backend_)[ii];
-      for (size_t jj = 0; jj < cols(); ++jj) {
-        const auto& entry = row_vec[jj];
-        if (Common::isnan(entry) || Common::isinf(entry))
-          return false;
-      }
-    }
+    for (const auto& entry : backend_->entries_)
+      if (Common::isnan(entry) || Common::isinf(entry))
+        return false;
     return true;
   } // ... valid(...)
 
@@ -379,33 +413,20 @@ public:
     *backend_ = *other.backend_;
   }
 
-  template <class OtherMatrixTraits>
-  void rightmultiply(const MatrixInterface<OtherMatrixTraits, ScalarType>& other)
+  template <class OtherMatrixType>
+  void rightmultiply(const OtherMatrixType& other)
   {
+    using M = typename Common::MatrixAbstraction<OtherMatrixType>;
+    static_assert(M::is_matrix, "");
     ensure_uniqueness();
-    BackendType new_backend(rows(), other.cols(), ScalarType(0.));
-    if (other.rows() != cols())
+    BackendType new_backend(rows(), M::cols(other), ScalarType(0.));
+    if (M::rows(other) != cols())
       DUNE_THROW(Dune::XT::Common::Exceptions::shapes_do_not_match,
                  "For rightmultiply, the number of columns of this has to match the number of rows of other!");
     for (size_t rr = 0; rr < rows(); ++rr)
       for (size_t cc = 0; cc < cols(); ++cc)
         for (size_t kk = 0; kk < cols(); ++kk)
-          new_backend[rr][cc] += get_entry(rr, kk) * other.get_entry(kk, cc);
-    *backend_ = new_backend;
-  }
-
-  template <class OtherMatrixImp>
-  void rightmultiply(const Dune::DenseMatrix<OtherMatrixImp>& other)
-  {
-    ensure_uniqueness();
-    BackendType new_backend(rows(), other.cols(), ScalarType(0.));
-    if (other.rows() != cols())
-      DUNE_THROW(Dune::XT::Common::Exceptions::shapes_do_not_match,
-                 "For rightmultiply, the number of columns of this has to match the number of rows of other!");
-    for (size_t rr = 0; rr < rows(); ++rr)
-      for (size_t cc = 0; cc < cols(); ++cc)
-        for (size_t kk = 0; kk < cols(); ++kk)
-          new_backend[rr][cc] += get_entry(rr, kk) * other.get_entry[kk][cc];
+          new_backend->get_entry_ref(rr, cc) += get_entry(rr, kk) * M::get_entry(other, kk, cc);
     *backend_ = new_backend;
   }
 
@@ -413,10 +434,9 @@ public:
                               Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
     auto ret = this->copy();
-    for (size_t ii = 0; ii < rows(); ++ii)
-      for (size_t jj = 0; jj < cols(); ++jj)
-        if (XT::Common::FloatCmp::eq<Common::FloatCmp::Style::absolute>(ScalarType(0.), ret.get_entry(ii, jj), 0., eps))
-          ret.set_entry(ii, jj, 0.);
+    for (auto& entry : ret.backend_->entries_)
+      if (XT::Common::FloatCmp::eq<Common::FloatCmp::Style::absolute>(ScalarType(0.), entry, 0., eps))
+        entry = ScalarType(0);
     return ret;
   } // ... pruned(...)
 
@@ -437,33 +457,6 @@ protected:
   } // ... ensure_uniqueness(...)
 
 private:
-  template <class FirstTraits, class SecondTraits, class anything = void>
-  struct mv_helper
-  {
-    static void mv(const VectorInterface<FirstTraits, ScalarType>& xx,
-                   VectorInterface<SecondTraits, ScalarType>& yy,
-                   const ThisType* this_ptr)
-    {
-      yy *= ScalarType(0.);
-      for (size_t rr = 0; rr < this_ptr->rows(); ++rr)
-        for (size_t cc = 0; cc < this_ptr->cols(); ++cc)
-          yy.add_to_entry(rr, this_ptr->get_entry(rr, cc) * xx.get_entry(cc));
-    }
-  };
-
-  template <class anything>
-  struct mv_helper<internal::CommonDenseVectorTraits<ScalarType>,
-                   internal::CommonDenseVectorTraits<ScalarType>,
-                   anything>
-  {
-    static void mv(const VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& xx,
-                   VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>& yy,
-                   const ThisType* this_ptr)
-    {
-      this_ptr->mv(xx.as_imp(), yy.as_imp());
-    }
-  };
-
   mutable std::shared_ptr<BackendType> backend_;
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
   mutable bool unshareable_;
@@ -478,6 +471,17 @@ template <class T>
 struct MatrixAbstraction<LA::CommonDenseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T>>
 {
+  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::dense_row_major;
+
+  static inline T* data(LA::CommonDenseMatrix<T>& mat)
+  {
+    return mat.data();
+  }
+
+  static inline const T* data(const LA::CommonDenseMatrix<T>& mat)
+  {
+    return mat.data();
+  }
 };
 
 

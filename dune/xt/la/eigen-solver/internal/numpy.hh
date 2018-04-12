@@ -22,8 +22,8 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/la/exceptions.hh>
 
-#include <python/dune/xt/common/fvector.pbh>
-#include <python/dune/xt/common/fmatrix.pbh>
+#include <python/dune/xt/common/fvector.hh>
+#include <python/dune/xt/common/fmatrix.hh>
 
 namespace Dune {
 namespace XT {

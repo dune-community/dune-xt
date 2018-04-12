@@ -25,9 +25,11 @@
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/math.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
-#include <dune/xt/common/math.hh>
+
+#include <dune/xt/la/type_traits.hh>
 
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
@@ -43,7 +45,7 @@ class VectorInterface : public ContainerInterface<Traits, ScalarImp>
   typedef ContainerInterface<Traits, ScalarImp> BaseType;
 
 public:
-  typedef typename Traits::derived_type derived_type;
+  using typename BaseType::derived_type;
   typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
   typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
   static const constexpr Backends dense_matrix_type = Traits::dense_matrix_type;
@@ -547,30 +549,9 @@ private:
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
 }; // class VectorInterface
 
-namespace internal {
-
-template <class V>
-struct is_vector_helper
-{
-  DXTC_has_typedef_initialize_once(Traits);
-  DXTC_has_typedef_initialize_once(ScalarType);
-
-  static const bool is_candidate = DXTC_has_typedef(Traits)<V>::value && DXTC_has_typedef(ScalarType)<V>::value;
-}; // class is_vector_helper
-
-} // namespace internal
-
-template <class V, bool candidate = internal::is_vector_helper<V>::is_candidate>
-struct is_vector : public std::is_base_of<VectorInterface<typename V::Traits, typename V::ScalarType>, V>
-{
-};
-
-template <class V>
-struct is_vector<V, false> : public std::false_type
-{
-};
 
 namespace internal {
+
 
 template <class VectorImp>
 struct VectorAbstractionBase
@@ -581,18 +562,20 @@ struct VectorAbstractionBase
 
   static const size_t static_size = std::numeric_limits<size_t>::max();
 
+  static const bool is_contiguous = true;
+
   typedef typename std::conditional<is_vector, VectorImp, void>::type VectorType;
   typedef typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type ScalarType;
   typedef typename std::conditional<is_vector, typename VectorImp::RealType, void>::type RealType;
   typedef ScalarType S;
   typedef RealType R;
 
-  static inline typename std::enable_if<is_vector, VectorType>::type create(const size_t sz)
-  {
-    return VectorType(sz);
-  }
+  template <size_t SIZE = static_size, class Field = ScalarType>
+  using VectorTypeTemplate = typename std::conditional<is_vector, VectorImp, void>::type;
 
-  static inline typename std::enable_if<is_vector, VectorType>::type create(const size_t sz, const ScalarType& val)
+  template <size_t SIZE = static_size>
+  static inline typename std::enable_if<is_vector, VectorType>::type
+  create(const size_t sz, const ScalarType& val = Common::suitable_default<ScalarType>::value())
   {
     return VectorType(sz, val);
   }
@@ -605,6 +588,21 @@ struct VectorAbstractionBase
   static inline void set_entry(VectorType& vector, const size_t ii, const ScalarType& val)
   {
     vector.set_entry(ii, val);
+  }
+
+  static inline void add_to_entry(VectorType& vector, const size_t ii, const ScalarType& val)
+  {
+    vector.add_to_entry(ii, val);
+  }
+
+  static inline ScalarType* data(VectorType& vec)
+  {
+    return &(vec[0]);
+  }
+
+  static inline const ScalarType* data(const VectorType& vec)
+  {
+    return &(vec[0]);
   }
 }; // struct VectorAbstractionBase
 

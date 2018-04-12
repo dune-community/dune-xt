@@ -13,6 +13,7 @@
 #define DUNE_XT_LA_ALGORITHMS_HH
 
 #include "algorithms/cholesky.hh"
+#include "algorithms/solve_sym_tridiag_posdef.hh"
 #include "algorithms/qr.hh"
 #include "algorithms/triangular_solves.hh"
 

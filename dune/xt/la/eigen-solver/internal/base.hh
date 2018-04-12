@@ -40,7 +40,7 @@ class EigenSolverOptions;
 namespace internal {
 
 
-static void ensure_eigen_solver_type(const std::string& type, const std::vector<std::string>& available_types)
+static inline void ensure_eigen_solver_type(const std::string& type, const std::vector<std::string>& available_types)
 {
   bool contained = false;
   for (const auto& tp : available_types)
@@ -52,7 +52,7 @@ static void ensure_eigen_solver_type(const std::string& type, const std::vector<
 } // ... ensure_type(...)
 
 
-static Common::Configuration default_eigen_solver_options()
+static inline Common::Configuration default_eigen_solver_options()
 {
   Common::Configuration opts;
   opts["compute_eigenvalues"] = "true";
@@ -92,29 +92,25 @@ public:
   using ComplexMatrixType = ComplexMatrixImp;
 
   EigenSolverBase(const MatrixType& matrix, const std::string& type = "")
-    : matrix_(matrix)
-    , options_(EigenSolverOptions<MatrixType>::options(type))
-    , computed_(false)
-    , eigenvalues_(nullptr)
-    , real_eigenvalues_(nullptr)
-    , eigenvectors_(nullptr)
-    , real_eigenvectors_(nullptr)
-    , eigenvectors_inverse_(nullptr)
-    , real_eigenvectors_inverse_(nullptr)
+    : EigenSolverBase(matrix, EigenSolverOptions<MatrixType>::options(type))
   {
-    pre_checks();
   }
 
   EigenSolverBase(const MatrixType& matrix, const Common::Configuration opts)
     : matrix_(matrix)
+    , stored_options_(opts)
+    , options_(&stored_options_)
+    , computed_(false)
+    , disable_checks_(options_->get<bool>("disable_checks", false))
+  {
+    pre_checks();
+  }
+
+  EigenSolverBase(const MatrixType& matrix, Common::Configuration* opts)
+    : matrix_(matrix)
     , options_(opts)
     , computed_(false)
-    , eigenvalues_(nullptr)
-    , real_eigenvalues_(nullptr)
-    , eigenvectors_(nullptr)
-    , real_eigenvectors_(nullptr)
-    , eigenvectors_inverse_(nullptr)
-    , real_eigenvectors_inverse_(nullptr)
+    , disable_checks_(options_->get<bool>("disable_checks", false))
   {
     pre_checks();
   }
@@ -127,7 +123,7 @@ public:
 
   const Common::Configuration& options() const
   {
-    return options_;
+    return *options_;
   }
 
   const MatrixType& matrix() const
@@ -150,7 +146,7 @@ public:
     compute_and_check();
     if (eigenvalues_)
       return *eigenvalues_;
-    else if (options_.get<bool>("compute_eigenvalues"))
+    else if (options_->get<bool>("compute_eigenvalues"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvalues_ member is not filled after calling compute()!");
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
@@ -164,7 +160,7 @@ public:
     if (eigenvalues_) {
       if (!real_eigenvalues_)
         compute_real_eigenvalues();
-    } else if (options_.get<bool>("compute_eigenvalues"))
+    } else if (options_->get<bool>("compute_eigenvalues"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvalues_ member is not filled after calling compute()!");
     else
       DUNE_THROW(
@@ -181,7 +177,7 @@ public:
     if (eigenvalues_) {
       if (!real_eigenvalues_)
         compute_real_eigenvalues();
-    } else if (options_.get<bool>("compute_eigenvalues"))
+    } else if (options_->get<bool>("compute_eigenvalues"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvalues_ member is not filled after calling compute()!");
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
@@ -200,7 +196,7 @@ public:
     if (eigenvalues_) {
       if (!real_eigenvalues_)
         compute_real_eigenvalues();
-    } else if (options_.get<bool>("compute_eigenvalues"))
+    } else if (options_->get<bool>("compute_eigenvalues"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvalues_ member is not filled after calling compute()!");
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
@@ -218,7 +214,7 @@ public:
     compute_and_check();
     if (eigenvectors_)
       return *eigenvectors_;
-    else if (options_.get<bool>("compute_eigenvectors"))
+    else if (options_->get<bool>("compute_eigenvectors"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvectors_ member is not filled after calling compute()!");
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
@@ -230,7 +226,7 @@ public:
   {
     compute_and_check();
     if (!eigenvectors_) {
-      if (options_.get<bool>("compute_eigenvectors"))
+      if (options_->get<bool>("compute_eigenvectors"))
         DUNE_THROW(Common::Exceptions::internal_error,
                    "The eigenvectors_ member is not filled after calling compute()!");
       else
@@ -241,10 +237,12 @@ public:
     }
     invert_eigenvectors();
     assert(eigenvectors_inverse_ && "This must not happen after calling invert_eigenvectors()!");
-    const double check_eigendecomposition = options_.get<double>("assert_eigendecomposition");
-    if (check_eigendecomposition > 0)
-      complex_eigendecomposition_helper<>::check(
-          *this, check_eigendecomposition > 0 ? check_eigendecomposition : options_.get<double>("real_tolerance"));
+    if (!disable_checks_) {
+      const double check_eigendecomposition = options_->get<double>("assert_eigendecomposition");
+      if (check_eigendecomposition > 0)
+        complex_eigendecomposition_helper<>::check(
+            *this, check_eigendecomposition > 0 ? check_eigendecomposition : options_->get<double>("real_tolerance"));
+    }
     return *eigenvectors_inverse_;
   } // ... eigenvectors(...)
 
@@ -254,7 +252,7 @@ public:
     if (eigenvectors_) {
       if (!real_eigenvectors_)
         compute_real_eigenvectors();
-    } else if (options_.get<bool>("compute_eigenvectors"))
+    } else if (options_->get<bool>("compute_eigenvectors"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvectors_ member is not filled after calling compute()!");
     else
       DUNE_THROW(
@@ -269,8 +267,8 @@ public:
   {
     compute_and_check();
     if (!real_eigenvectors_) {
-      if (options_.get<double>("assert_real_eigendecomposition") > 0
-          || options_.get<double>("assert_real_eigenvectors") > 0)
+      if (options_->get<double>("assert_real_eigendecomposition") > 0
+          || options_->get<double>("assert_real_eigenvectors") > 0)
         DUNE_THROW(Common::Exceptions::internal_error,
                    "The real_eigenvectors_ member is not filled after calling compute()!");
       else
@@ -280,13 +278,15 @@ public:
     }
     invert_real_eigenvectors();
     assert(real_eigenvectors_inverse_ && "This must not happen after calling invert_real_eigenvectors()!");
-    const double check_eigendecomposition = options_.get<double>("assert_real_eigendecomposition");
-    assert_eigendecomposition(matrix_,
-                              *real_eigenvalues_,
-                              *real_eigenvectors_,
-                              *real_eigenvectors_inverse_,
-                              check_eigendecomposition > 0 ? check_eigendecomposition
-                                                           : options_.get<double>("real_tolerance"));
+    if (!disable_checks_) {
+      const double assert_real_eigendecomposition = options_->get<double>("assert_real_eigendecomposition");
+      if (assert_real_eigendecomposition > 0.)
+        assert_eigendecomposition(matrix_,
+                                  *real_eigenvalues_,
+                                  *real_eigenvectors_,
+                                  *real_eigenvectors_inverse_,
+                                  assert_real_eigendecomposition);
+    }
     return *real_eigenvectors_inverse_;
   } // ... eigenvectors(...)
 
@@ -302,111 +302,121 @@ protected:
 
   void pre_checks()
   {
-    // check options
-    if (!options_.has_key("type"))
-      DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
-                 "Missing 'type' in given options:\n\n"
-                     << options_);
-    internal::ensure_eigen_solver_type(options_.get<std::string>("type"), EigenSolverOptions<MatrixType>::types());
-    const Common::Configuration default_opts =
-        EigenSolverOptions<MatrixType>::options(options_.get<std::string>("type"));
-    for (const std::string& default_key : default_opts.getValueKeys()) {
-      if (!options_.has_key(default_key))
-        options_[default_key] = default_opts.get<std::string>(default_key);
-    }
-    if (options_.get<double>("real_tolerance") <= 0)
-      DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
-                 "It does not make sense to enforce a non-positive tolerance!");
-    if (options_.get<double>("assert_positive_eigenvalues") > 0
-        && options_.get<double>("assert_negative_eigenvalues") > 0)
-      DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
-                 "It does not make sense to assert positive and negative eigenvalues!");
-    if (!options_.get<bool>("compute_eigenvalues") && (options_.get<double>("assert_real_eigenvalues") > 0
-                                                       || options_.get<double>("assert_positive_eigenvalues") > 0
-                                                       || options_.get<double>("assert_negative_eigenvalues") > 0
-                                                       || options_.get<double>("assert_eigendecomposition") > 0
-                                                       || options_.get<double>("assert_real_eigendecomposition") > 0))
-      options_["compute_eigenvalues"] = "true";
-    if (options_.get<double>("assert_real_eigenvalues") <= 0
-        && (options_.get<double>("assert_positive_eigenvalues") > 0
-            || options_.get<double>("assert_negative_eigenvalues") > 0
-            || options_.get<double>("assert_real_eigendecomposition") > 0))
-      options_["assert_real_eigenvalues"] = options_["real_tolerance"];
-    // check matrix
-    check_size(matrix_);
-    if (options_.get<bool>("check_for_inf_nan") && contains_inf_or_nan(matrix_)) {
-      DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
-                 "Given matrix contains inf or nan and you requested checking. To disable this check set "
-                 "'check_for_inf_nan' to false in the options."
-                     << "\n\nThese were the given options:\n\n"
-                     << options_
-                     << "\nThis was the given matrix:\n\n"
-                     << matrix_);
+    if (!disable_checks_) {
+      // check options
+      if (!options_->has_key("type"))
+        DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
+                   "Missing 'type' in given options:\n\n"
+                       << options_);
+      internal::ensure_eigen_solver_type(options_->get<std::string>("type"), EigenSolverOptions<MatrixType>::types());
+      const Common::Configuration default_opts =
+          EigenSolverOptions<MatrixType>::options(options_->get<std::string>("type"));
+      for (const std::string& default_key : default_opts.getValueKeys()) {
+        if (!options_->has_key(default_key))
+          (*options_)[default_key] = default_opts.get<std::string>(default_key);
+      }
+      if (options_->get<double>("real_tolerance") <= 0)
+        DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
+                   "It does not make sense to enforce a non-positive tolerance!");
+      if (options_->get<double>("assert_positive_eigenvalues") > 0
+          && options_->get<double>("assert_negative_eigenvalues") > 0)
+        DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
+                   "It does not make sense to assert positive and negative eigenvalues!");
+      if (!options_->get<bool>("compute_eigenvalues")
+          && (options_->get<double>("assert_real_eigenvalues") > 0
+              || options_->get<double>("assert_positive_eigenvalues") > 0
+              || options_->get<double>("assert_negative_eigenvalues") > 0
+              || options_->get<double>("assert_eigendecomposition") > 0
+              || options_->get<double>("assert_real_eigendecomposition") > 0))
+        (*options_)["compute_eigenvalues"] = "true";
+      if (options_->get<double>("assert_real_eigenvalues") <= 0
+          && (options_->get<double>("assert_positive_eigenvalues") > 0
+              || options_->get<double>("assert_negative_eigenvalues") > 0
+              || options_->get<double>("assert_real_eigendecomposition") > 0))
+        (*options_)["assert_real_eigenvalues"] = (*options_)["real_tolerance"];
+      // check matrix
+      check_size(matrix_);
+      if (options_->get<bool>("check_for_inf_nan") && contains_inf_or_nan(matrix_)) {
+        DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
+                   "Given matrix contains inf or nan and you requested checking. To disable this check set "
+                   "'check_for_inf_nan' to false in the options."
+                       << "\n\nThese were the given options:\n\n"
+                       << options_
+                       << "\nThis was the given matrix:\n\n"
+                       << matrix_);
+      }
     }
   } // ... pre_checks(...)
 
   void post_checks() const
   {
-    if (options_.get<bool>("compute_eigenvalues") && !eigenvalues_)
-      DUNE_THROW(Common::Exceptions::internal_error, "The eigenvalues_ member is not filled after calling compute()!");
-    if (options_.get<bool>("compute_eigenvectors") && !eigenvectors_)
-      DUNE_THROW(Common::Exceptions::internal_error, "The eigenvectors_ member is not filled after calling compute()!");
-    if (options_.get<bool>("check_for_inf_nan")) {
-      if (eigenvalues_ && contains_inf_or_nan(*eigenvalues_))
-        DUNE_THROW(Exceptions::eigen_solver_failed_bc_result_contained_inf_or_nan,
-                   "Computed eigenvalues contain inf or nan and you requested checking. To disable this check set "
-                   "'check_for_inf_nan' to false in the options."
-                       << "\n\nThese were the given options:\n\n"
-                       << options_
-                       << "\nThese are the computed eigenvalues:\n\n"
-                       << *eigenvalues_);
-      if (eigenvectors_ && contains_inf_or_nan(*eigenvectors_))
-        DUNE_THROW(Exceptions::eigen_solver_failed_bc_result_contained_inf_or_nan,
-                   "Computed eigenvectors contain inf or nan and you requested checking. To disable this check set "
-                   "'check_for_inf_nan' to false in the options."
-                       << "\n\nThese were the given options:\n\n"
-                       << options_
-                       << "\nThese are the computed eigenvectors:\n\n"
-                       << *eigenvectors_);
-    }
-    const double assert_real_eigenvalues = options_.get<double>("assert_real_eigenvalues");
-    const double assert_positive_eigenvalues = options_.get<double>("assert_positive_eigenvalues");
-    const double assert_negative_eigenvalues = options_.get<double>("assert_negative_eigenvalues");
-    const double check_real_eigendecomposition = options_.get<double>("assert_real_eigendecomposition");
-    if (assert_real_eigenvalues > 0 || assert_positive_eigenvalues > 0 || assert_negative_eigenvalues > 0
-        || check_real_eigendecomposition > 0)
-      compute_real_eigenvalues();
-    if (assert_positive_eigenvalues > 0) {
-      assert(real_eigenvalues_ && "This must not happen after compute_real_eigenvalues()!");
-      for (const auto& ev : *real_eigenvalues_) {
-        if (ev < assert_positive_eigenvalues)
-          DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested,
-                     "These were the given options:\n\n"
+    if (!disable_checks_) {
+      if (options_->get<bool>("compute_eigenvalues") && !eigenvalues_)
+        DUNE_THROW(Common::Exceptions::internal_error,
+                   "The eigenvalues_ member is not filled after calling compute()!");
+      if (options_->get<bool>("compute_eigenvectors") && !eigenvectors_)
+        DUNE_THROW(Common::Exceptions::internal_error,
+                   "The eigenvectors_ member is not filled after calling compute()!");
+      if (options_->get<bool>("check_for_inf_nan")) {
+        if (eigenvalues_ && contains_inf_or_nan(*eigenvalues_))
+          DUNE_THROW(Exceptions::eigen_solver_failed_bc_result_contained_inf_or_nan,
+                     "Computed eigenvalues contain inf or nan and you requested checking. To disable this check set "
+                     "'check_for_inf_nan' to false in the options."
+                         << "\n\nThese were the given options:\n\n"
+                         << options_
+                         << "\nThese are the computed eigenvalues:\n\n"
+                         << *eigenvalues_);
+        if (eigenvectors_ && contains_inf_or_nan(*eigenvectors_))
+          DUNE_THROW(Exceptions::eigen_solver_failed_bc_result_contained_inf_or_nan,
+                     "Computed eigenvectors contain inf or nan and you requested checking. To disable this check set "
+                     "'check_for_inf_nan' to false in the options."
+                         << "\n\nThese were the given options:\n\n"
                          << options_
                          << "\nThese are the computed eigenvectors:\n\n"
                          << *eigenvectors_);
       }
-    }
-    if (assert_negative_eigenvalues > 0) {
-      assert(real_eigenvalues_ && "This must not happen after compute_real_eigenvalues()!");
-      for (const auto& ev : *real_eigenvalues_) {
-        if (ev > -1 * assert_negative_eigenvalues)
-          DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_negative_as_requested,
-                     "These were the given options:\n\n"
-                         << options_
-                         << "\nThese are the computed eigenvectors:\n\n"
-                         << *eigenvectors_);
+      const double assert_real_eigenvalues = options_->get<double>("assert_real_eigenvalues");
+      const double assert_positive_eigenvalues = options_->get<double>("assert_positive_eigenvalues");
+      const double assert_negative_eigenvalues = options_->get<double>("assert_negative_eigenvalues");
+      const double check_real_eigendecomposition = options_->get<double>("assert_real_eigendecomposition");
+      if (assert_real_eigenvalues > 0 || assert_positive_eigenvalues > 0 || assert_negative_eigenvalues > 0
+          || check_real_eigendecomposition > 0)
+        compute_real_eigenvalues();
+      if (assert_positive_eigenvalues > 0) {
+        assert(real_eigenvalues_ && "This must not happen after compute_real_eigenvalues()!");
+        for (const auto& ev : *real_eigenvalues_) {
+          if (ev < assert_positive_eigenvalues)
+            DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested,
+                       "These were the given options:\n\n"
+                           << options_
+                           << "\nThese are the computed eigenvectors:\n\n"
+                           << *eigenvectors_);
+        }
       }
-    }
-    if (options_.get<double>("assert_real_eigenvectors") > 0 || check_real_eigendecomposition > 0)
-      compute_real_eigenvectors();
-    const double check_eigendecomposition = options_.get<double>("assert_eigendecomposition");
-    if (check_eigendecomposition > 0)
-      complex_eigendecomposition_helper<>::check(*this, check_eigendecomposition);
-    if (check_real_eigendecomposition > 0) {
-      invert_real_eigenvectors();
-      assert_eigendecomposition(
-          matrix_, *real_eigenvalues_, *real_eigenvectors_, *real_eigenvectors_inverse_, check_real_eigendecomposition);
+      if (assert_negative_eigenvalues > 0) {
+        assert(real_eigenvalues_ && "This must not happen after compute_real_eigenvalues()!");
+        for (const auto& ev : *real_eigenvalues_) {
+          if (ev > -1 * assert_negative_eigenvalues)
+            DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_negative_as_requested,
+                       "These were the given options:\n\n"
+                           << options_
+                           << "\nThese are the computed eigenvectors:\n\n"
+                           << *eigenvectors_);
+        }
+      }
+      if (options_->get<double>("assert_real_eigenvectors") > 0 || check_real_eigendecomposition > 0)
+        compute_real_eigenvectors();
+      const double check_eigendecomposition = options_->get<double>("assert_eigendecomposition");
+      if (check_eigendecomposition > 0)
+        complex_eigendecomposition_helper<>::check(*this, check_eigendecomposition);
+      if (check_real_eigendecomposition > 0) {
+        invert_real_eigenvectors();
+        assert_eigendecomposition(matrix_,
+                                  *real_eigenvalues_,
+                                  *real_eigenvectors_,
+                                  *real_eigenvectors_inverse_,
+                                  check_real_eigendecomposition);
+      }
     }
   } // ... post_checks(...)
 
@@ -414,21 +424,24 @@ protected:
   {
     assert(eigenvalues_ && "This should not happen!");
     if (!real_eigenvalues_) {
-      const double assert_real_eigenvalues = options_.get<double>("assert_real_eigenvalues");
-      const double tolerance =
-          (assert_real_eigenvalues > 0) ? assert_real_eigenvalues : options_.get<double>("real_tolerance");
       real_eigenvalues_ = std::make_unique<std::vector<RealType>>(eigenvalues_->size());
-      for (size_t ii = 0; ii < eigenvalues_->size(); ++ii) {
-        const auto& complex_ev = (*eigenvalues_)[ii];
-        if (std::abs(complex_ev.imag()) > tolerance)
-          DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested,
-                     "These were the given options:\n\n"
-                         << options_
-                         << "\nThese are the computed eigenvalues:\n\n"
-                         << *eigenvalues_);
-        (*real_eigenvalues_)[ii] = complex_ev.real();
-      }
-    }
+      for (size_t ii = 0; ii < eigenvalues_->size(); ++ii)
+        (*real_eigenvalues_)[ii] = (*eigenvalues_)[ii].real();
+
+      if (!disable_checks_) {
+        const double assert_real_eigenvalues = options_->get<double>("assert_real_eigenvalues");
+        const double tolerance =
+            (assert_real_eigenvalues > 0) ? assert_real_eigenvalues : options_->get<double>("real_tolerance");
+        for (size_t ii = 0; ii < eigenvalues_->size(); ++ii) {
+          if (std::abs((*eigenvalues_)[ii].imag()) > tolerance)
+            DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested,
+                       "These were the given options:\n\n"
+                           << options_
+                           << "\nThese are the computed eigenvalues:\n\n"
+                           << *eigenvalues_);
+        } // ii
+      } // if (!disable_checks_)
+    } // if (!real_eigenvalues_)
   } // ... compute_real_eigenvalues(...)
 
   template <bool is_common_matrix = XT::Common::is_matrix<MatrixType>::value, class T = MatrixType>
@@ -611,9 +624,9 @@ protected:
   {
     assert(eigenvectors_ && "This should not happen!");
     if (!real_eigenvectors_) {
-      const double assert_real_eigenvectors = options_.get<double>("assert_real_eigenvectors");
+      const double assert_real_eigenvectors = options_->get<double>("assert_real_eigenvectors");
       const double tolerance =
-          (assert_real_eigenvectors > 0) ? assert_real_eigenvectors : options_.get<double>("real_tolerance");
+          (assert_real_eigenvectors > 0) ? assert_real_eigenvectors : options_->get<double>("real_tolerance");
       real_eigenvectors_helper<>::compute(*this, tolerance);
     }
   }
@@ -622,9 +635,9 @@ protected:
   {
     assert(eigenvectors_ && "This must not happen when you call this function!");
     try {
-      if (options_.has_sub("matrix-inverter")) {
+      if (options_->has_sub("matrix-inverter")) {
         eigenvectors_inverse_ =
-            std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_, options_.sub("matrix-inverter")));
+            std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_, options_->sub("matrix-inverter")));
       } else
         eigenvectors_inverse_ = std::make_unique<ComplexMatrixType>(invert_matrix(*eigenvectors_));
     } catch (const Exceptions::matrix_invert_failed& ee) {
@@ -647,9 +660,9 @@ protected:
   {
     assert(real_eigenvectors_ && "This must not happen when you call this function!");
     try {
-      if (options_.has_sub("matrix-inverter")) {
+      if (options_->has_sub("matrix-inverter")) {
         real_eigenvectors_inverse_ =
-            std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_, options_.sub("matrix-inverter")));
+            std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_, options_->sub("matrix-inverter")));
       } else
         real_eigenvectors_inverse_ = std::make_unique<MatrixType>(invert_matrix(*real_eigenvectors_));
     } catch (const Exceptions::matrix_invert_failed& ee) {
@@ -669,18 +682,29 @@ protected:
   } // ... invert_real_eigenvectors(...)
 
   template <class A, class B, class C, class D>
+  void assert_eigendecomposition(const std::unique_ptr<A>& mat,
+                                 const B& eigenvalues,
+                                 const C& eigenvectors,
+                                 const D& eigenvectors_inverse,
+                                 const double& tolerance) const
+  {
+    assert_eigendecomposition(*mat, eigenvalues, eigenvectors, eigenvectors_inverse, tolerance);
+  }
+
+  template <class A, class B, class C, class D>
   void assert_eigendecomposition(const A& mat,
                                  const B& eigenvalues,
                                  const C& eigenvectors,
                                  const D& eigenvectors_inverse,
                                  const double& tolerance) const
   {
+    using M = Common::MatrixAbstraction<C>;
     const size_t rows = Common::get_matrix_rows(mat);
     const size_t cols = Common::get_matrix_cols(mat);
-    auto eigenvalue_matrix = XT::Common::make_unique<C>(Common::MatrixAbstraction<C>::create(rows, cols, 0.));
+    auto eigenvalue_matrix = M::create(rows, cols, typename M::ScalarType(0.));
     for (size_t ii = 0; ii < rows; ++ii)
-      Common::set_matrix_entry(*eigenvalue_matrix, ii, ii, eigenvalues[ii]);
-    const auto decomposition_error = (eigenvectors * (*eigenvalue_matrix * eigenvectors_inverse)) - mat;
+      Common::set_matrix_entry(eigenvalue_matrix, ii, ii, eigenvalues[ii]);
+    const auto decomposition_error = eigenvectors * eigenvalue_matrix * eigenvectors_inverse - mat;
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
         if (std::abs(Common::get_matrix_entry(decomposition_error, ii, jj)) > tolerance)
@@ -693,7 +717,7 @@ protected:
                                      << std::setprecision(17)
                                      << eigenvectors
                                      << "\n\n(T * (lambda * T^-1)) - matrix = "
-                                     << (eigenvectors * (*eigenvalue_matrix * eigenvectors_inverse)) - mat);
+                                     << decomposition_error);
   } // ... assert_eigendecomposition(...)
 
   template <bool upcast_required = !std::is_same<MatrixType, ComplexMatrixType>::value, bool anything = true>
@@ -772,7 +796,8 @@ protected:
   } // ... contains_inf_or_nan(...)
 
   const MatrixType& matrix_;
-  mutable Common::Configuration options_;
+  mutable Common::Configuration stored_options_;
+  mutable Common::Configuration* options_;
   mutable bool computed_;
   mutable std::unique_ptr<std::vector<XT::Common::complex_t<RealType>>> eigenvalues_;
   mutable std::unique_ptr<std::vector<RealType>> real_eigenvalues_;
@@ -780,6 +805,7 @@ protected:
   mutable std::unique_ptr<RealMatrixType> real_eigenvectors_;
   mutable std::unique_ptr<ComplexMatrixType> eigenvectors_inverse_;
   mutable std::unique_ptr<RealMatrixType> real_eigenvectors_inverse_;
+  const bool disable_checks_;
 }; // class EigenSolverBase
 
 

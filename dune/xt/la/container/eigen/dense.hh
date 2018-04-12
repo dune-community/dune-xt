@@ -125,6 +125,8 @@ class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits
   typedef EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> BaseType;
 
 public:
+  //! derived_type is ambiguous due to multiple parent classes otherwise
+  using derived_type = typename VectorInterfaceType::derived_type;
   typedef internal::EigenDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -416,6 +418,8 @@ class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits
   typedef MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
 
 public:
+  //! derived_type is ambiguous due to multiple parent classes otherwise
+  using derived_type = typename MatrixInterfaceType::derived_type;
   typedef internal::EigenDenseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
@@ -793,6 +797,17 @@ struct VectorAbstraction<LA::EigenMappedDenseVector<T>>
 template <class T>
 struct MatrixAbstraction<LA::EigenDenseMatrix<T>> : public LA::internal::MatrixAbstractionBase<LA::EigenDenseMatrix<T>>
 {
+  static const constexpr XT::Common::StorageLayout storage_layout = XT::Common::StorageLayout::dense_column_major;
+
+  static inline T* data(LA::EigenDenseMatrix<T>& mat)
+  {
+    return &(mat.backend()(0, 0));
+  }
+
+  static inline const T* data(const LA::EigenDenseMatrix<T>& mat)
+  {
+    return &(mat.backend()(0, 0));
+  }
 };
 
 #endif // HAVE_EIGEN

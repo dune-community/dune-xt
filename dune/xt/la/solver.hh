@@ -19,7 +19,6 @@
 #include <dune/xt/common/parallel/helper.hh>
 
 #include <dune/xt/la/exceptions.hh>
-#include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/type_traits.hh>
 
 namespace Dune {

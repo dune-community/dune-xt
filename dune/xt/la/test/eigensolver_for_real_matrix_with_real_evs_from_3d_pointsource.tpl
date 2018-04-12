@@ -112,41 +112,7 @@ struct EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}
                 "-0.52355966495856965 -0.3749646631039919 0.84448641064133279 0.16463824774430375 0.52355966495857331 0.37496466310399207 0.84448641064133512 "
                 "0.16463824774430211 0.5235596649585601 0.37496466310399174 0.84448641064133367 0.16463824774430696 0.52355966495857875 0.37496466310399201 "
                 "0.84448641064133279 0.16463824774430375 0.52355966495857331 0.37496466310399207]");
-    expected_real_eigenvectors_ = XT::Common::from_string<RealMatrixType>(
-               "[0.72851570713827452 -0.75150769244905291 -0.70404766916105233 2.3603637290901763e-12 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0.21303430399934711 -0.45821820130732605 -0.42921022728015484 -0.70710678118540637 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " -0.21303430399900891 0.45821820130670016 0.42921022728032016 -0.70710678118768866 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " -0.61522161461703495 0.1237269096511793 0.36861096178082275 -8.8499747932994974e-13 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0.72851570713827474 0.75150769244905291 -0.70404766916105321 -2.3698156325820086e-12 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 -0.21303430399900955 -0.45821820130670016 0.42921022728031616 0.70710678118769443 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 -0.21303430399934783 -0.45821820130732616 0.42921022728015107 -0.70710678118540071 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 -0.61522161461703428 -0.12372690965117891 0.36861096178083003 8.8862487586530301e-13 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0.72851570713827507 -0.75150769244905435 0.70404766916105277 -2.3649038194164953e-12 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0.21303430399900977 -0.45821820130669944 0.42921022728032243 -0.70710678118769144 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0.21303430399934783 -0.45821820130732493 0.42921022728015823 0.7071067811854036 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 -0.61522161461703384 0.1237269096511758 -0.36861096178081504 8.8683863064769226e-13 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0.72851570713827452 0.75150769244905291 0.70404766916105233 2.3603637290901763e-12 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 -0.21303430399934711 -0.45821820130732605 -0.42921022728015484 0.70710678118540637 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0.21303430399900891 0.45821820130670016 0.42921022728032016 0.70710678118768866 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 -0.61522161461703495 -0.1237269096511793 -0.36861096178082275 -8.8499747932994974e-13 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.72851570713827452 0.75150769244905347 -0.70404766916105233 2.366771891906538e-12 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.21303430399900972 0.45821820130670071 -0.4292102272803171 0.70710678118769266 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.21303430399934914 -0.45821820130732488 0.42921022728015545 0.70710678118540227 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.61522161461703395 0.12372690965117754 -0.36861096178082531 8.875113362439653e-13 0 0 0 0 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.72851570713827463 -0.75150769244905402 -0.7040476691610521 -2.363623581019006e-12 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.21303430399934772 0.45821820130732566 0.42921022728015851 -0.70710678118540471 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.21303430399900958 0.4582182013066996 0.42921022728032365 0.70710678118769033 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.6152216146170344 -0.12372690965117575 -0.36861096178081476 -8.8641409763951754e-13 0 0 0 0 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.72851570713827496 0.75150769244905291 0.70404766916105321 -2.3669577533262699e-12 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.21303430399934656 0.45821820130732605 0.42921022728015146 0.70710678118540204 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.21303430399900863 0.45821820130669999 0.42921022728031671 -0.70710678118769288 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.61522161461703473 0.12372690965117926 0.36861096178082908 -8.873867386792893e-13 0 0 0 0;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.72851570713827452 -0.75150769244905347 0.70404766916105233 2.366771891906538e-12;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.21303430399900972 0.45821820130670071 -0.4292102272803171 -0.70710678118769266;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.21303430399934914 -0.45821820130732488 0.42921022728015545 -0.70710678118540227;"
-               " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.61522161461703395 -0.12372690965117754 0.36861096178082531 8.875113362439653e-13]");
     expected_eigenvalues_ = XT::Common::convert_to<EigenValuesType>(expected_real_eigenvalues_);
-    expected_eigenvectors_ = XT::Common::convert_to<ComplexMatrixType>(expected_real_eigenvectors_);
     expected_max_ev_ = 0.84448641064133512;
     expected_min_ev_ = -0.84448641064133412;
     all_matrices_and_expected_eigenvalues_and_vectors_are_computed_ = true;
@@ -155,11 +121,9 @@ struct EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}
   using BaseType::all_matrices_and_expected_eigenvalues_and_vectors_are_computed_;
   using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
-  using BaseType::expected_eigenvectors_;
   using BaseType::expected_real_eigenvalues_;
   using BaseType::expected_max_ev_;
   using BaseType::expected_min_ev_;
-  using BaseType::expected_real_eigenvectors_;
 }; // struct EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}
 
 
@@ -195,22 +159,12 @@ TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, is_constructible)
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({ {"eigen", "1e-13"}, {"shifted_qr", "1e-14"} });
-}
-
-TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_eigenvalues_in_correct_order)
-{
-  gives_correct_eigenvalues_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-13"}, {"numpy", "1e-14"}, {"shifted_qr", "1e-14"}});
 }
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_real_eigenvalues)
 {
-  gives_correct_real_eigenvalues({ {"eigen", "1e-13"}, {"shifted_qr", "1e-14"} });
-}
-
-TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_real_eigenvalues_in_correct_order)
-{
-  gives_correct_real_eigenvalues_in_correct_order({ {"eigen", /*we_expect_a_failure: */ "-1"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_real_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-13"}, {"numpy", "1e-14"}, {"shifted_qr", "1e-14"} });
 }
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_max_eigenvalue)
@@ -221,16 +175,6 @@ TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_max_eigen
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_min_eigenvalue)
 {
   gives_correct_min_eigenvalue({ {"shifted_qr", "1e-14"} });
-}
-
-TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_eigenvectors_in_correct_order)
-{
-  gives_correct_eigenvectors_in_correct_order({ {"lapack", "1e-14"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
-}
-
-TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_real_eigenvectors_in_correct_order)
-{
-  gives_correct_real_eigenvectors_in_correct_order({ {"lapack", "1e-14"}, {"eigen", /*we_expect_a_failure: */ "-1"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFrom3dPointsource_{{T_NAME}}, gives_correct_eigendecomposition)
