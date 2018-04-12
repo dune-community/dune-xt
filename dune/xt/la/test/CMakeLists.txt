@@ -16,11 +16,11 @@ include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 
 enable_testing()
 
-BEGIN_TESTCASES(dunextla)
+begin_testcases(dunextla)
 
-END_TESTCASES()
+end_testcases()
 
 # load binning setup from file
 if(DEFINED ENV{TRAVIS})
-    include("builder_definitions.cmake")
+  include("builder_definitions.cmake")
 endif(DEFINED ENV{TRAVIS})

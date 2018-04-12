@@ -12,24 +12,21 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # ~~~
 
-set(lib_dune_xt_la_sources
-    container/pattern.cc
-    eigen-solver/internal/numpy.cc)
+set(lib_dune_xt_la_sources container/pattern.cc eigen-solver/internal/numpy.cc)
 
 if(DUNE_XT_WITH_PYTHON_BINDINGS)
   list(APPEND lib_dune_xt_la_sources
-       container/common.cc
-       container/eigen/dense.cc
-       container/eigen/sparse.cc
-       container/istl.cc
-       solver/common.cc
-       solver/eigen.cc
-       solver/istl.cc)
+              container/common.cc
+              container/eigen/dense.cc
+              container/eigen/sparse.cc
+              container/istl.cc
+              solver/common.cc
+              solver/eigen.cc
+              solver/istl.cc)
 endif()
 
 find_package(LAPACKE)
 dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
 
 add_subdirectory(test EXCLUDE_FROM_ALL)
-
 
