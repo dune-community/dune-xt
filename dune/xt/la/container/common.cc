@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2018)
+//   TiKeil          (2018)
 //   Tobias Leibner  (2017)
 
 #include <config.h>

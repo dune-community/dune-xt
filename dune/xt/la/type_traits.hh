@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2016 - 2017)
 //   Rene Milk       (2018)
-//   Tobias Leibner  (2017)
+//   Tobias Leibner  (2017 - 2018)
 
 #ifndef DUNE_XT_LA_TYPE_TRAITS_HH
 #define DUNE_XT_LA_TYPE_TRAITS_HH

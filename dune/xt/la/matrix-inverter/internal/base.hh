@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2017 - 2018)
+//   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_LA_MATRIX_INVERTER_BASE_HH
 #define DUNE_XT_LA_MATRIX_INVERTER_BASE_HH

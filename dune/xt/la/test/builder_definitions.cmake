@@ -1,3 +1,14 @@
+# ~~~
+# This file is part of the dune-xt-la project:
+#   https://github.com/dune-community/dune-xt-la
+# Copyright 2009-2018 dune-xt-la developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+# Authors:
+#   Rene Milk      (2017 - 2018)
+#   TiKeil         (2018)
+#   Tobias Leibner (2018)
+# ~~~
+
 set(DXT_BIN_COUNT "2" CACHE STRING "number of bins for test targets" )
 add_custom_target(test_binaries_builder_0 DEPENDS headercheck__dune_xt_la_algorithms_cholesky.hh headercheck__dune_xt_la_algorithms_triangular_solves.hh headercheck__dune_xt_la_container_common_matrix_sparse.hh headercheck__dune_xt_la_container_common_vector.hh headercheck__dune_xt_la_container_common_vector_sparse.hh headercheck__dune_xt_la_container_container-interface.hh headercheck__dune_xt_la_container_eigen.hh headercheck__dune_xt_la_container_eigen_sparse.hh headercheck__dune_xt_la_container_interfaces.hh headercheck__dune_xt_la_container_io.hh headercheck__dune_xt_la_container_istl.hh headercheck__dune_xt_la_container_pattern.hh headercheck__dune_xt_la_container_vector-interface.hh headercheck__dune_xt_la_eigen-solver_internal_lapacke.hh headercheck__dune_xt_la_eigen-solver_internal_numpy.hh headercheck__dune_xt_la_eigen-solver_internal_shifted-qr.hh headercheck__dune_xt_la_matrix-inverter_eigen.hh headercheck__dune_xt_la_solver_eigen.hh headercheck__dune_xt_la_solver_istl.hh headercheck__dune_xt_la_solver_istl_amg.hh headercheck__dune_xt_la_test_container.hh headercheck__dune_xt_la_test_eigensolver.hh headercheck__python_dune_xt_la_container.bindings.hh headercheck__python_dune_xt_la_container_container-interface.hh test_algorithms_cholesky test_algorithms_qr_5x3 test_algorithms_solve_sym_tridiag_posdef test_algorithms_triangular_solves_2x2 test_container test_container_matrix test_container_vector test_eigensolver_for_real_matrix_with_distinct_real_evs test_eigensolver_for_real_matrix_with_real_evs_from_2d_euler_equations test_eigensolver_for_real_matrix_with_real_evs_from_3d_pointsource test_empty)
 set_tests_properties(test_algorithms_cholesky PROPERTIES LABELS "builder_0")

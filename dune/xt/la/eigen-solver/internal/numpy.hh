@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2018)
+//   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_NUMPY_HH
 #define DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_NUMPY_HH

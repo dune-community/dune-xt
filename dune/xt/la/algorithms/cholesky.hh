@@ -6,7 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Rene Milk      (2018)
-//   Tobias Leibner (2017)
+//   Tobias Leibner (2017 - 2018)
 
 #ifndef DUNE_XT_LA_ALGORITHMS_CHOLESKY_HH
 #define DUNE_XT_LA_ALGORITHMS_CHOLESKY_HH

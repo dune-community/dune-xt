@@ -8,7 +8,7 @@
 //   Barbara Verfürth (2015)
 //   Felix Schindler  (2014 - 2017)
 //   Rene Milk        (2015 - 2018)
-//   Tobias Leibner   (2014)
+//   Tobias Leibner   (2014, 2018)
 
 #ifndef DUNE_XT_LA_SOLVER_COMMON_HH
 #define DUNE_XT_LA_SOLVER_COMMON_HH

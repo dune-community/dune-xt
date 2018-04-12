@@ -1,3 +1,4 @@
+# ~~~
 # This file is part of the dune-xt-la project:
 #   https://github.com/dune-community/dune-xt-la
 # Copyright 2009-2018 dune-xt-la developers and contributors. All rights reserved.
@@ -11,6 +12,7 @@
 #
 # This file contains local changes to the doxygen configuration
 # please us '+=' to add file/directories to the lists
+# ~~~
 
 # The INPUT tag can be used to specify the files and/or directories that contain
 # documented source files. You may enter file names like "myfile.cpp" or

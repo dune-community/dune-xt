@@ -8,7 +8,8 @@
 //   Barbara Verfürth (2015)
 //   Felix Schindler  (2013 - 2017)
 //   Rene Milk        (2014 - 2016, 2018)
-//   Tobias Leibner   (2014, 2016 - 2017)
+//   TiKeil           (2018)
+//   Tobias Leibner   (2014, 2016 - 2018)
 
 #ifndef DUNE_XT_LA_CONTAINER_COMMON_MATRIX_SPARSE_HH
 #define DUNE_XT_LA_CONTAINER_COMMON_MATRIX_SPARSE_HH
