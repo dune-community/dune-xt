@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2016, 2018)
+//   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_GRID_PROVIDER_EOC_HH
 #define DUNE_XT_GRID_PROVIDER_EOC_HH

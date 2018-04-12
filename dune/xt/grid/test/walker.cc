@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2015 - 2017)
 //   Rene Milk       (2014 - 2018)
-//   Tobias Leibner  (2015 - 2016)
+//   Tobias Leibner  (2015 - 2016, 2018)
 
 #include <dune/xt/common/test/main.hxx>
 

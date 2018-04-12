@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2017 - 2018)
-//   Tobias Leibner  (2017)
+//   Tobias Leibner  (2017 - 2018)
 
 #ifndef DUNE_XT_GRID_PARALLEL_PARTITIONING_RANGED_HH
 #define DUNE_XT_GRID_PARALLEL_PARTITIONING_RANGED_HH
