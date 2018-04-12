@@ -1,3 +1,13 @@
+# ~~~
+# This file is part of the dune-xt-functions project:
+#   https://github.com/dune-community/dune-xt-functions
+# Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+# Authors:
+#   Rene Milk      (2017 - 2018)
+#   Tobias Leibner (2018)
+# ~~~
+
 set(DXT_BIN_COUNT "13" CACHE STRING "number of bins for test targets" )
 add_custom_target(test_binaries_builder_0 DEPENDS headercheck__dune_xt_functions_expression.lib.hh headercheck__dune_xt_functions_interfaces_localizable-function.hh headercheck__dune_xt_functions_lambda_global-function.hh test_ESV2007_alu_2d_r1_rc1_0005 test_ESV2007_yasp_2d_r3_rc1_0001 test_affine_flux_alu_3d_r1_rc1_0001 test_affine_flux_alu_3d_r1_rc3_0001 test_affine_flux_yasp_3d_r1_rc3 test_affine_yasp_3d_r1_rc1 test_affine_yasp_3d_r1_rc3 test_checkerboard_alu_3d_r3_rc3_0002 test_constant_alu_3d_r3_rc1_0002 test_functions_alu_3d_r1_rc3_0000 test_functions_yasp_3d_r3_rc1 test_indicator_alu_3d_r1_rc1_0002 test_lambda_global_function_alu_3d_r1_rc1_0001 test_lambda_global_function_yasp_3d_r1_rc1 test_lambda_local_function_alu_3d_r3_rc3_0000 test_lambda_local_function_yasp_1d_r1_rc1 test_lambda_local_function_yasp_1d_r3_rc3)
 set_tests_properties( PROPERTIES LABELS "builder_0")
