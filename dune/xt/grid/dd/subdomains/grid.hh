@@ -106,7 +106,7 @@ public:
           << size_ << ")!" << std::endl;
       error = true;
     }
-    DUNE_THROW_IF(error, InvalidStateException, msg.str())
+    DUNE_THROW_IF(error, InvalidStateException, msg.str());
   } // SubdomainGrid()
 
   SubdomainGrid(
@@ -196,7 +196,7 @@ public:
     DUNE_THROW_IF(!oversampling_,
                   InvalidStateException,
                   "\n" << Common::color_string_red("ERROR:")
-                       << " oversampled local grid part requested from a grid without oversampling!")
+                       << " oversampled local grid part requested from a grid without oversampling!");
     return *((*oversampledLocalGridViews_)[subdomain]);
   } // ... local_grid_view(...)
 
