@@ -42,10 +42,9 @@ struct addbind_Matrix
     namespace py = pybind11;
     using namespace pybind11::literals;
 
-    c.def("__init__",
-          [](T& self, const ssize_t rows, const ssize_t cols, const S& value) {
-            new (&self) T(Common::numeric_cast<size_t>(rows), Common::numeric_cast<size_t>(cols), value);
-          },
+    c.def(py::init([](const ssize_t rows, const ssize_t cols, const S& value) {
+            return new T(Common::numeric_cast<size_t>(rows), Common::numeric_cast<size_t>(cols), value);
+          }),
           "rows"_a = 0,
           "cols"_a = 0,
           "value"_a = 0.0);
@@ -100,10 +99,9 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
   addbind_ProvidesBackend(c);
 
   internal::addbind_Matrix<C, sparse>::template ctor<S>(c);
-  c.def("__init__",
-        [](C& self, const ssize_t rows, const ssize_t cols, const SparsityPatternDefault& pattern) {
-          new (&self) C(Common::numeric_cast<size_t>(rows), Common::numeric_cast<size_t>(cols), pattern);
-        },
+  c.def(py::init([](const ssize_t rows, const ssize_t cols, const SparsityPatternDefault& pattern) {
+          return new C(Common::numeric_cast<size_t>(rows), Common::numeric_cast<size_t>(cols), pattern);
+        }),
         "rows"_a,
         "cols"_a,
         "pattern"_a);

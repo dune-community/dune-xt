@@ -46,22 +46,15 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
   py::class_<C> c = bind_ProvidesDataAccess<C>(m, ClassName, ClassName);
   addbind_ProvidesBackend(c);
 
-  c.def("__init__",
-        [](C& vec, const ssize_t size, const S& value) { new (&vec) C(Common::numeric_cast<size_t>(size), value); },
+  c.def(py::init([](const ssize_t size, const S& value) { return new C(Common::numeric_cast<size_t>(size), value); }),
         "size"_a = 0,
         "value"_a = 0.0);
-  c.def("__init__",
-        [](C& vec, py::iterable it) {
+  c.def(py::init([](py::iterable it) {
           std::vector<S> tmp;
-          try {
-            for (py::handle h : it)
-              tmp.push_back(h.cast<S>());
-            new (&vec) C(tmp);
-          } catch (...) {
-            vec.~C();
-            throw;
-          }
-        },
+          for (py::handle h : it)
+            tmp.push_back(h.cast<S>());
+          return new C(tmp);
+        }),
         "Assigns the elements of the iterable to the vector.");
 
   c.def("__repr__",
