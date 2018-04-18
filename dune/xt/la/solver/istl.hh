@@ -125,7 +125,7 @@ public:
   static std::vector<std::string> types()
   {
     std::vector<std::string> ret{
-        "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab.ssor", "bicgstab"};
+        "bicgstab.ssor", "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab"};
 
     if (std::is_same<CommunicatorType, XT::SequentialCommunication>::value) {
 #if HAVE_SUPERLU
