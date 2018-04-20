@@ -26,81 +26,122 @@ namespace Functions {
 
 
 /**
- * \brief A function given by a lambda expression which is evaluated locally on each entity.
+ * \brief A function given by a lambda expression which is evaluated locally on each element.
  *
  *        To model the function f(x) = x^p with a variable exponent p, use as
  * \code
 LocalLambdaFunction<...> f(
-                           [](const typename F::EntityType& entity,
-                              const typename F::DomainType& xx,
-                              const XT::Common::Parameter& mu) {
-                             typename F::RangeType ret(std::pow(xx[0], mu.get("power").at(0)));
+                           [](const typename F::ElementType& element,
+                              const typename F::DomainType& point_in_local_coordinates,
+                              const XT::Common::Parameter&  param) {
+                             typename F::RangeType ret(std::pow(point_in_local_coordinates[0],
+param.get("power").at(0)));
                              return ret;
                            },
                            integration_order,
                            XT::Common::ParameterType("power", 1),
                            "x_power_p");
 \endcode
- *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter mu which is
+ *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter  param which is
  *        passed on to the lambda is of correct type.
- * \note  The Localfunction does not implement jacobian.
+ * \note  The Localfunction does not implement derivative.
  */
-template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class LocalLambdaFunction : public LocalizableFunctionInterface<E, D, d, R, r, rC>
+template <class E, size_t r, size_t rC = 1, class R = double>
+class LocalLambdaFunction : public LocalizableFunctionInterface<E, r, rC, R>
 {
-  typedef LocalizableFunctionInterface<E, D, d, R, r, rC> BaseType;
+  using BaseType = LocalizableFunctionInterface<E, r, rC, R>;
 
 public:
-  using typename BaseType::EntityType;
-  using typename BaseType::LocalfunctionType;
+  using typename BaseType::ElementType;
+  using typename BaseType::LocalFunctionType;
 
 private:
-  class LocalLambdaLocalFunction : public LocalfunctionInterface<E, D, d, R, r, rC>
+  class LocalLambdaLocalFunction : public LocalFunctionInterface<E, r, rC, R>
   {
-    typedef LocalfunctionInterface<E, D, d, R, r, rC> BaseType;
+    using BaseType = LocalFunctionInterface<E, r, rC, R>;
 
   public:
-    using typename BaseType::EntityType;
+    using typename BaseType::ElementType;
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
-    using typename BaseType::JacobianRangeType;
+    using typename BaseType::DerivativeRangeType;
+    using BaseType::d;
 
-    typedef std::function<RangeType(const EntityType&, const DomainType&, const Common::Parameter&)> LambdaType;
-    typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
-    typedef std::function<JacobianRangeType(const EntityType&, const DomainType&, const XT::Common::Parameter&)>
-        JacobianLambdaType;
+    using EvaluateLambdaType = std::function<RangeType(const DomainType&, const Common::Parameter&)>;
+    using PostBindLambdaType = std::function<void(const ElementType&)>;
+    using OrderLambdaType = std::function<int(const Common::Parameter&)>;
+    using JacobianLambdaType =
+        std::function<DerivativeRangeType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
+    using DerivativeLambdaType = std::function<DerivativeRangeType(
+        const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
-    LocalLambdaLocalFunction(const EntityType& ent,
-                             const LambdaType& lambda,
+
+    LocalLambdaLocalFunction(const ElementType& ele,
                              const OrderLambdaType& order_lambda,
+                             const PostBindLambdaType& post_bind_lambda,
+                             const EvaluateLambdaType& lambda,
                              const Common::ParameterType& param_type,
-                             const JacobianLambdaType& jacobian_lambda)
-      : BaseType(ent)
-      , lambda_(lambda)
+                             const JacobianLambdaType& jacobian_lambda,
+                             const DerivativeLambdaType& derivative_lambda)
+      : BaseType(ele)
       , order_lambda_(order_lambda)
+      , post_bind_lambda_(post_bind_lambda)
+      , evaluate_lambda_(lambda)
       , param_type_(param_type)
       , jacobian_lambda_(jacobian_lambda)
+      , derivative_lambda_(derivative_lambda)
+    {
+      post_bind(ele);
+    }
+
+    LocalLambdaLocalFunction(const OrderLambdaType& order_lambda,
+                             const PostBindLambdaType& post_bind_lambda,
+                             const EvaluateLambdaType& lambda,
+                             const Common::ParameterType& param_type,
+                             const JacobianLambdaType& jacobian_lambda,
+                             const DerivativeLambdaType& derivative_lambda)
+      : BaseType()
+      , order_lambda_(order_lambda)
+      , post_bind_lambda_(post_bind_lambda)
+      , param_type_(param_type)
+      , jacobian_lambda_(jacobian_lambda)
+      , derivative_lambda_(derivative_lambda)
     {
     }
 
-    virtual size_t order(const XT::Common::Parameter& mu = {}) const override final
+    void post_bind(const ElementType& element) override final
     {
-      auto parsed_mu = this->parse_parameter(mu);
-      return order_lambda_(parsed_mu);
+      post_bind_lambda_(element);
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
+    int order(const XT::Common::Parameter& param = {}) const override final
     {
-      auto parsed_mu = this->parse_parameter(mu);
-      ret = lambda_(this->entity(), xx, parsed_mu);
-    } // ... evaluate(...)
-
-    virtual void
-    jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
-    {
-      auto parsed_mu = this->parse_parameter(mu);
-      ret = jacobian_lambda_(this->entity(), xx, parsed_mu);
+      auto parsed_param = this->parse_parameter(param);
+      return order_lambda_(parsed_param);
     }
+
+    RangeType evaluate(const DomainType& point_in_local_coordinates,
+                       const Common::Parameter& param = {}) const override final
+    {
+      auto parsed_param = this->parse_parameter(param);
+      return evaluate_lambda_(point_in_local_coordinates, parsed_param);
+    }
+
+    DerivativeRangeType jacobian(const DomainType& point_in_local_coordinates,
+                                 const Common::Parameter& param = {}) const override final
+    {
+      auto parsed_param = this->parse_parameter(param);
+      return jacobian_lambda_(this->element(), point_in_local_coordinates, parsed_param);
+    }
+
+    DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
+                                   const DomainType& point_in_local_coordinates,
+                                   const Common::Parameter& param = {}) const override final
+    {
+      auto parsed_param = this->parse_parameter(param);
+      return derivative_lambda_(this->element(), alpha, point_in_local_coordinates, parsed_param);
+    }
+
 
     virtual const Common::ParameterType& parameter_type() const override final
     {
@@ -108,55 +149,59 @@ private:
     }
 
   private:
-    const LambdaType& lambda_;
     const OrderLambdaType& order_lambda_;
+    const PostBindLambdaType& post_bind_lambda_;
+    const EvaluateLambdaType& evaluate_lambda_;
     const Common::ParameterType param_type_;
     const JacobianLambdaType& jacobian_lambda_;
+    const DerivativeLambdaType& derivative_lambda_;
   }; // class LocalLambdaLocalFunction
 
 public:
-  typedef typename LocalLambdaLocalFunction::DomainType DomainType;
-  typedef typename LocalLambdaLocalFunction::RangeType RangeType;
-  typedef typename LocalLambdaLocalFunction::JacobianRangeType JacobianRangeType;
+  using BaseType::d;
+  using DomainType = typename LocalLambdaLocalFunction::DomainType;
+  using RangeType = typename LocalLambdaLocalFunction::RangeType;
+  using DerivativeRangeType = typename LocalLambdaLocalFunction::DerivativeRangeType;
   // we do not use the typedef from LocalLambdaLocalFunction here to document the type of the lambda
-  typedef std::function<RangeType(const EntityType&, const DomainType&, const Common::Parameter&)> LambdaType;
-  typedef std::function<size_t(const Common::Parameter&)> OrderLambdaType;
-  typedef std::function<JacobianRangeType(const EntityType&, const DomainType&, const XT::Common::Parameter&)>
-      JacobianLambdaType;
+  using OrderLambdaType = std::function<int(const Common::Parameter&)>;
+  using PostBindLambdaType = std::function<void(const ElementType&)>;
+  using EvaluateLambdaType = std::function<RangeType(const DomainType&, const Common::Parameter&)>;
+  using JacobianLambdaType =
+      std::function<DerivativeRangeType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
+  using DerivativeLambdaType = std::function<DerivativeRangeType(
+      const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
-  LocalLambdaFunction(LambdaType lambda,
-                      const size_t ord,
+  LocalLambdaFunction(const int ord,
+                      PostBindLambdaType post_bind_lambda = default_post_bind_lambda(),
+                      EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
                       const std::string nm = "locallambdafunction",
-                      JacobianLambdaType jacobian_lambda =
-                          [](const EntityType&, const DomainType&, const Common::Parameter&) {
-                            DUNE_THROW(NotImplemented,
-                                       "You need to provide a lambda for the jacobian if you want to use it!");
-                            return JacobianRangeType();
-                          })
-    : lambda_(lambda)
-    , order_lambda_([=](const Common::Parameter&) { return ord; })
+                      JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
+                      DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+    : order_lambda_(default_order_lambda(ord))
+    , post_bind_lambda_(post_bind_lambda)
+    , evaluate_lambda_(evaluate_lambda)
     , param_type_(param_type)
     , name_(nm)
     , jacobian_lambda_(jacobian_lambda)
+    , derivative_lambda_(derivative_lambda)
   {
   }
 
-  LocalLambdaFunction(LambdaType lambda,
-                      OrderLambdaType order_lambda,
+  LocalLambdaFunction(OrderLambdaType order_lambda,
+                      PostBindLambdaType post_bind_lambda = default_post_bind_lambda(),
+                      EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
                       const std::string nm = "locallambdafunction",
-                      JacobianLambdaType jacobian_lambda =
-                          [](const EntityType&, const DomainType&, const Common::Parameter&) {
-                            DUNE_THROW(NotImplemented,
-                                       "You need to provide a lambda for the jacobian if you want to use it!");
-                            return JacobianRangeType();
-                          })
-    : lambda_(lambda)
-    , order_lambda_(order_lambda)
+                      JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
+                      DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+    : order_lambda_(order_lambda)
+    , post_bind_lambda_(post_bind_lambda)
+    , evaluate_lambda_(evaluate_lambda)
     , param_type_(param_type)
     , name_(nm)
     , jacobian_lambda_(jacobian_lambda)
+    , derivative_lambda_(derivative_lambda)
   {
   }
 
@@ -175,17 +220,77 @@ public:
     return name_;
   }
 
-  std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
+  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
   {
-    return std::make_unique<LocalLambdaLocalFunction>(entity, lambda_, order_lambda_, param_type_, jacobian_lambda_);
+    return std::make_unique<LocalLambdaLocalFunction>(
+        element, order_lambda_, post_bind_lambda_, evaluate_lambda_, param_type_, jacobian_lambda_, derivative_lambda_);
   }
 
+  std::unique_ptr<LocalFunctionType> local_function() const override final
+  {
+    return std::make_unique<LocalLambdaLocalFunction>(
+        order_lambda_, post_bind_lambda_, evaluate_lambda_, param_type_, jacobian_lambda_, derivative_lambda_);
+  }
+
+  /**
+   * \}
+   * \name ´´These methods may be used to provide defaults on construction.''
+   * \{
+   */
+
+  static OrderLambdaType default_order_lambda(const int ord)
+  {
+    return [=](const Common::Parameter& /*param*/ = {}) { return ord; };
+  }
+
+  static PostBindLambdaType default_post_bind_lambda()
+  {
+    return [](const ElementType& /*element*/) {};
+  }
+
+  static EvaluateLambdaType default_evaluate_lambda()
+  {
+    return [](const DomainType& /* point_in_local_coordinates*/, const Common::Parameter& /*param*/ = {}) {
+      DUNE_THROW(NotImplemented,
+                 "This  LocalLambdaFunction does not provide evaluations, provide an evaluate_lambda on construction!");
+      return RangeType();
+    };
+  }
+
+  static JacobianLambdaType default_jacobian_lambda()
+  {
+    return [](const DomainType& /* point_in_local_coordinates*/, const Common::Parameter& /*param*/ = {}) {
+      DUNE_THROW(NotImplemented,
+                 "This  LocalLambdaFunction does not provide jacobian evaluations, provide a "
+                 "jacobian_lambda on construction!");
+      return DerivativeRangeType();
+    };
+  }
+
+  static DerivativeLambdaType default_derivative_lambda()
+  {
+    return [](const std::array<size_t, d>& /*alpha*/,
+              const DomainType& /* point_in_local_coordinates*/,
+              const Common::Parameter& /*param*/ = {}) {
+      DUNE_THROW(NotImplemented,
+                 "This  LocalLambdaFunction does not provide derivative evaluations, provide a "
+                 "derivative_lambda on construction!");
+      return DerivativeRangeType();
+    };
+  }
+
+  /**
+   * \}
+   */
+
 private:
-  const LambdaType lambda_;
   const OrderLambdaType order_lambda_;
+  const PostBindLambdaType post_bind_lambda_;
+  const EvaluateLambdaType evaluate_lambda_;
   const Common::ParameterType param_type_;
   const std::string name_;
   JacobianLambdaType jacobian_lambda_;
+  DerivativeLambdaType derivative_lambda_;
 }; // class LocalLambdaFunction
 
 
