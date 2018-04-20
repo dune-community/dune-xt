@@ -60,7 +60,7 @@ public:
 
   ParametricExpressionFunction(const std::string& variable,
                                const Common::ParameterType& param_type,
-                               const std::vector<std::string>& expressions,
+                               const Common::FieldVector<std::string, r>& expressions,
                                const size_t ord = 0,
                                const std::string nm = static_id())
     : order_(ord)
@@ -70,12 +70,11 @@ public:
   {
     if (variable.empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given, "Given variable must not be empty!");
-    if (expressions.size() != dimRange)
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "dimRange: " << size_t(dimRange) << "\n   "
-                              << "expressions.size(): "
-                              << expressions.size());
+
     std::vector<std::string> variables;
+    std::vector<std::string> expression;
+    for (size_t rr = 0; rr < r; ++rr)
+      expression.emplace_back(expressions[rr]);
     for (const auto& key : param_type_.keys()) {
       const size_t value_size = param_type_.get(key);
       if (value_size == 1) {
@@ -90,7 +89,7 @@ public:
     }
     for (size_t ii = 0; ii < dimDomain; ++ii)
       variables.push_back(variable + "[" + Common::to_string(ii) + "]");
-    function_ = std::make_shared<ActualFunctionType>(variables, expressions);
+    function_ = std::make_shared<ActualFunctionType>(variables, expression);
   }
 
   std::string type() const override final
