@@ -27,7 +27,7 @@ namespace Functions {
 /**
  * Smooth function you can pass lambda expressions to that gets evaluated.
  *
- * \example LambdaType lambda(1, [](const auto& x, const auto& mu = {}) { return x;});
+ * \example LambdaType lambda(1, [](const auto& x, const auto& param = {}) { return x;});
  */
 template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
 class SmoothLambdaFunction : public SmoothFunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>
@@ -97,26 +97,32 @@ public:
    * \{
    */
 
-  int order(const Common::Parameter& mu = {}) const override final
+  int order(const Common::Parameter& param = {}) const override final
   {
-    return order_lambda_(this->parse_and_check(mu));
+    auto parsed_param = this->parse_parameter(param);
+    return order_lambda_(parsed_param);
   }
 
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
+  RangeType evaluate(const DomainType& point_in_global_coordinates,
+                     const Common::Parameter& param = {}) const override final
   {
-    return evaluate_lambda_(xx, this->parse_and_check(mu));
+    auto parsed_param = this->parse_parameter(param);
+    return evaluate_lambda_(point_in_global_coordinates, parsed_param);
   }
 
-  DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const override final
+  DerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
+                               const Common::Parameter& param = {}) const override final
   {
-    return jacobian_lambda_(xx, this->parse_and_check(mu));
+    auto parsed_param = this->parse_parameter(param);
+    return jacobian_lambda_(point_in_global_coordinates, parsed_param);
   }
 
-  virtual DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                         const DomainType& xx,
-                                         const Common::Parameter& mu = {}) const override final
+  DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
+                                 const DomainType& point_in_global_coordinates,
+                                 const Common::Parameter& param = {}) const override final
   {
-    return derivative_lambda_(alpha, xx, this->parse_and_check(mu));
+    auto parsed_param = this->parse_parameter(param);
+    return derivative_lambda_(alpha, point_in_global_coordinates, parsed_param);
   }
 
   std::string type() const override final
@@ -137,12 +143,12 @@ public:
 
   static OrderLambdaType default_order_lambda(const int ord)
   {
-    return [=](const Common::Parameter& /*mu*/ = {}) { return ord; };
+    return [=](const Common::Parameter& /*param*/ = {}) { return ord; };
   }
 
   static EvaluateLambdaType default_evaluate_lambda()
   {
-    return [](const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) {
+    return [](const DomainType& /*point_in_global_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
                  "This SmoothLambdaFunction does not provide evaluations, provide an evaluate_lambda on construction!");
       return RangeType();
@@ -151,7 +157,7 @@ public:
 
   static JacobianLambdaType default_jacobian_lambda()
   {
-    return [](const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) {
+    return [](const DomainType& /*point_in_global_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
                  "This SmoothLambdaFunction does not provide jacobian evaluations, provide a "
                  "jacobian_lambda on construction!");
@@ -161,7 +167,9 @@ public:
 
   static DerivativeLambdaType default_derivative_lambda()
   {
-    return [](const std::array<size_t, d>& /*alpha*/, const DomainType& /*xx*/, const Common::Parameter& /*mu*/ = {}) {
+    return [](const std::array<size_t, d>& /*alpha*/,
+              const DomainType& /*point_in_global_coordinates*/,
+              const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
                  "This SmoothLambdaFunction does not provide derivative evaluations, provide a "
                  "derivative_lambda on construction!");
