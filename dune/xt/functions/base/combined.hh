@@ -104,7 +104,8 @@ public:
   using LeftLocalFunctionType = typename LeftType::LocalFunctionType;
   using RightLocalFunctionType = typename RightType::LocalFunctionType;
   using DomainType = typename LocalFunctionInterface<E, r, rC, R>::DomainType;
-  using RangeType = typename LocalFunctionInterface<E, r, rC, R>::RangeType;
+  using RangeType = typename RightType::LocalFunctionType::RangeType;
+  using ScalarRangeType = typename LeftType::LocalFunctionType::RangeType;
   using DerivativeRangeType = typename LocalFunctionInterface<E, r, rC, R>::DerivativeRangeType;
 
 private:
@@ -200,8 +201,12 @@ private:
                               const DomainType& point_in_reference_element,
                               const Common::Parameter& param)
     {
-      return left_local.evaluate(point_in_reference_element, param)
-             * right_local.evaluate(point_in_reference_element, param);
+      ScalarRangeType left_eval = left_local.evaluate(point_in_reference_element, param);
+      RangeType right_eval = right_local.evaluate(point_in_reference_element, param);
+      if (left_eval.size() != 1)
+        DUNE_THROW(NotImplemented, "Only available for scalar left type!");
+      right_eval *= left_eval[0];
+      return right_eval;
     } // ... evaluate(...)
 
     static DerivativeRangeType jacobian(const LeftLocalFunctionType& /*left_local*/,
@@ -210,7 +215,7 @@ private:
                                         const Common::Parameter& /*param*/)
     {
       DUNE_THROW(NotImplemented, "If you need this, implement it!");
-      return 0;
+      return DerivativeRangeType();
     }
   }; // class Call< ..., product >
 
