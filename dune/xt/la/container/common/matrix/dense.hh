@@ -269,7 +269,7 @@ private:
   {
     for (size_t ii = 0; ii < rows(); ++ii)
       for (size_t jj = 0; jj < cols(); ++jj)
-        add_to_entry(ii, jj, alpha * Common::MatrixAbstraction<OtherMatrixType>::get_entry(xx, ii, jj));
+        backend_->get_entry_ref(ii, jj) += alpha * Common::MatrixAbstraction<OtherMatrixType>::get_entry(xx, ii, jj);
   }
 
 public:
