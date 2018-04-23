@@ -1275,8 +1275,7 @@ public:
       const OtherMatrixType& mat,
       const typename std::enable_if<Common::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune = false,
       const EpsType eps_in = Common::FloatCmp::DefaultEpsilon<ScalarType>::value() / 1000.,
-      const size_t num_mutexes = 1,
-      const bool prune_dense = false)
+      const size_t num_mutexes = 1)
     : num_rows_(Common::MatrixAbstraction<OtherMatrixType>::rows(mat))
     , num_cols_(Common::MatrixAbstraction<OtherMatrixType>::cols(mat))
   {
@@ -1295,7 +1294,7 @@ public:
       dense_matrix_ = DenseMatrixType(0, 0, num_mutexes);
     } else {
       sparse_matrix_ = SparseMatrixType(0, 0, num_mutexes);
-      dense_matrix_ = DenseMatrixType(mat, prune_dense ? prune : false, eps_in, num_mutexes);
+      dense_matrix_ = DenseMatrixType(mat, num_mutexes);
     } // else (sparse_)
   } // CommonSparseOrDenseMatrix(...)
 
