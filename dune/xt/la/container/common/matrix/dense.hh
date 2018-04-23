@@ -241,7 +241,9 @@ public:
       entry *= alpha;
   }
 
-  void axpy(const ScalarType& alpha, const ThisType& xx)
+  template <class OtherMatrixType>
+  std::enable_if_t<Common::is_matrix<OtherMatrixType>::value, void> axpy(const ScalarType& alpha,
+                                                                         const OtherMatrixType& xx)
   {
     ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
@@ -252,11 +254,27 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    for (size_t ii = 0; ii < backend_->entries_.size(); ++ii)
-      backend_->entries_[ii] += alpha * xx.backend_->entries_[ii];
+    axpy_impl(alpha, xx);
   } // ... axpy(...)
 
-  bool has_equal_shape(const ThisType& other) const
+private:
+  void axpy_impl(const ScalarType& alpha, const ThisType& xx)
+  {
+    for (size_t ii = 0; ii < backend_->entries_.size(); ++ii)
+      backend_->entries_[ii] += alpha * xx.backend_->entries_[ii];
+  }
+
+  template <class OtherMatrixType>
+  void axpy_impl(const ScalarType& alpha, const OtherMatrixType& xx)
+  {
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (size_t jj = 0; jj < cols(); ++jj)
+        add_to_entry(ii, jj, alpha * Common::MatrixAbstraction<OtherMatrixType>::get_entry(xx, ii, jj));
+  }
+
+public:
+  template <class OtherMatrixType>
+  std::enable_if_t<Common::is_matrix<OtherMatrixType>::value, bool> has_equal_shape(const OtherMatrixType& other) const
   {
     return (rows() == other.rows()) && (cols() == other.cols());
   }
