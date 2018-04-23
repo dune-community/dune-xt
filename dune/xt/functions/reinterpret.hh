@@ -23,12 +23,12 @@
 #include <dune/geometry/referenceelements.hh>
 #endif
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/type_traits.hh>
 
+#include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/interfaces.hh>
 
 namespace Dune {
@@ -108,7 +108,7 @@ private:
       points_[0] = this->entity().geometry().global(xx);
       const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);
       if (source_entity_ptr_unique_ptrs.size() != 1)
-        DUNE_THROW(XT::Common::Exceptions::reinterpretation_error,
+        DUNE_THROW(Exceptions::reinterpretation_error,
                    "It was not possible to find a source entity for this point:\n\n"
                        << points_[0]);
       const auto& source_entity = *source_entity_ptr_unique_ptrs[0];
@@ -121,7 +121,7 @@ private:
       points_[0] = this->entity().geometry().global(xx);
       const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);
       if (source_entity_ptr_unique_ptrs.size() != 1)
-        DUNE_THROW(XT::Common::Exceptions::reinterpretation_error,
+        DUNE_THROW(Exceptions::reinterpretation_error,
                    "It was not possible to find a source entity for this point:\n\n"
                        << points_[0]);
       const auto& source_entity = *source_entity_ptr_unique_ptrs[0];

@@ -17,7 +17,6 @@
 #include "interfaces/localizable-flux-function.hh"
 #include "interfaces/global-function.hh"
 #include "interfaces/global-flux-function.hh"
-#include "interfaces/timedependent-function.hh"
 #include "interfaces.lib.hh"
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_HH
