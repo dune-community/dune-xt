@@ -151,7 +151,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
                  "Do not call eigenvalues() if 'compute_eigenvalues' is false!\n\nThese were the given options:\n\n"
-                     << options_);
+                     << *options_);
   } // ... eigenvalues(...)
 
   const std::vector<RealType>& real_eigenvalues() const
@@ -166,7 +166,7 @@ public:
       DUNE_THROW(
           Common::Exceptions::you_are_using_this_wrong,
           "Do not call real_eigenvalues() if 'compute_eigenvalues' is false!\n\nThese were the given options:\n\n"
-              << options_);
+              << *options_);
     assert(real_eigenvalues_ && "These have to exist after compute_real_eigenvalues()!");
     return *real_eigenvalues_;
   } // ... min_eigenvalues(...)
@@ -182,7 +182,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
                  "Do not call min_eigenvalues() if 'compute_eigenvalues' is false!\n\nThese were the given options:\n\n"
-                     << options_);
+                     << *options_);
     assert(real_eigenvalues_ && "These have to exist after compute_real_eigenvalues()!");
     std::vector<RealType> evs = *real_eigenvalues_;
     std::sort(evs.begin(), evs.end(), [](const RealType& a, const RealType& b) { return a < b; });
@@ -201,7 +201,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
                  "Do not call max_eigenvalues() if 'compute_eigenvalues' is false!\n\nThese were the given options:\n\n"
-                     << options_);
+                     << *options_);
     assert(real_eigenvalues_ && "These have to exist after compute_real_eigenvalues()!");
     std::vector<RealType> evs = *real_eigenvalues_;
     std::sort(evs.begin(), evs.end(), [](const RealType& a, const RealType& b) { return a > b; });
@@ -219,7 +219,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
                  "Do not call eigenvectors() if 'compute_eigenvectors' is false!\n\nThese were the given options:\n\n"
-                     << options_);
+                     << *options_);
   } // ... eigenvectors(...)
 
   const ComplexMatrixType& eigenvectors_inverse() const
@@ -233,7 +233,7 @@ public:
         DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
                    "Do not call eigenvectors_inverse() if 'compute_eigenvectors' is false!\n\nThese were the given "
                    "options:\n\n"
-                       << options_);
+                       << *options_);
     }
     invert_eigenvectors();
     assert(eigenvectors_inverse_ && "This must not happen after calling invert_eigenvectors()!");
@@ -258,7 +258,7 @@ public:
       DUNE_THROW(
           Common::Exceptions::you_are_using_this_wrong,
           "Do not call real_eigenvectors() if 'compute_eigenvectors' is false!\n\nThese were the given options:\n\n"
-              << options_);
+              << *options_);
     assert(real_eigenvectors_ && "These have to exist after compute_real_eigenvectors()!");
     return *real_eigenvectors_;
   } // ... real_eigenvectors(...)
@@ -274,7 +274,7 @@ public:
       else
         DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
                    "Do not call real_eigenvectors_inverse() after providing these options:\n\n"
-                       << options_);
+                       << *options_);
     }
     invert_real_eigenvectors();
     assert(real_eigenvectors_inverse_ && "This must not happen after calling invert_real_eigenvectors()!");
@@ -307,7 +307,7 @@ protected:
       if (!options_->has_key("type"))
         DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
                    "Missing 'type' in given options:\n\n"
-                       << options_);
+                       << *options_);
       internal::ensure_eigen_solver_type(options_->get<std::string>("type"), EigenSolverOptions<MatrixType>::types());
       const Common::Configuration default_opts =
           EigenSolverOptions<MatrixType>::options(options_->get<std::string>("type"));
@@ -341,7 +341,7 @@ protected:
                    "Given matrix contains inf or nan and you requested checking. To disable this check set "
                    "'check_for_inf_nan' to false in the options."
                        << "\n\nThese were the given options:\n\n"
-                       << options_
+                       << *options_
                        << "\nThis was the given matrix:\n\n"
                        << matrix_);
       }
@@ -363,7 +363,7 @@ protected:
                      "Computed eigenvalues contain inf or nan and you requested checking. To disable this check set "
                      "'check_for_inf_nan' to false in the options."
                          << "\n\nThese were the given options:\n\n"
-                         << options_
+                         << *options_
                          << "\nThese are the computed eigenvalues:\n\n"
                          << *eigenvalues_);
         if (eigenvectors_ && contains_inf_or_nan(*eigenvectors_))
@@ -371,7 +371,7 @@ protected:
                      "Computed eigenvectors contain inf or nan and you requested checking. To disable this check set "
                      "'check_for_inf_nan' to false in the options."
                          << "\n\nThese were the given options:\n\n"
-                         << options_
+                         << *options_
                          << "\nThese are the computed eigenvectors:\n\n"
                          << *eigenvectors_);
       }
@@ -388,7 +388,7 @@ protected:
           if (ev < assert_positive_eigenvalues)
             DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested,
                        "These were the given options:\n\n"
-                           << options_
+                           << *options_
                            << "\nThese are the computed eigenvectors:\n\n"
                            << *eigenvectors_);
         }
@@ -399,7 +399,7 @@ protected:
           if (ev > -1 * assert_negative_eigenvalues)
             DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_negative_as_requested,
                        "These were the given options:\n\n"
-                           << options_
+                           << *options_
                            << "\nThese are the computed eigenvectors:\n\n"
                            << *eigenvectors_);
         }
@@ -436,7 +436,7 @@ protected:
           if (std::abs((*eigenvalues_)[ii].imag()) > tolerance)
             DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested,
                        "These were the given options:\n\n"
-                           << options_
+                           << *options_
                            << "\nThese are the computed eigenvalues:\n\n"
                            << *eigenvalues_);
         } // ii
@@ -548,7 +548,7 @@ protected:
                 DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
                            "Eigenvectors are complex and calculating real eigenvectors failed!"
                                << "These were the given options:\n\n"
-                               << self.options_
+                               << *self.options_
                                << "\n\nThis was the given matrix: "
                                << std::setprecision(17)
                                << self.matrix_
@@ -565,7 +565,7 @@ protected:
             DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
                        "Eigenvectors are complex and calculating real eigenvectors failed!"
                            << "These were the given options:\n\n"
-                           << self.options_
+                           << *self.options_
                            << "\n\nThis was the given matrix: "
                            << std::setprecision(17)
                            << self.matrix_
@@ -594,7 +594,7 @@ protected:
             if (std::abs(complex_value.imag()) > tolerance)
               DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
                          "These were the given options:\n\n"
-                             << self.options_
+                             << *self.options_
                              << "\nThese are the computed eigenvectors:\n\n"
                              << std::setprecision(17)
                              << *self.eigenvectors_);
@@ -610,7 +610,7 @@ protected:
             if (std::abs(complex_value.imag()) > tolerance)
               DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested,
                          "These were the given options:\n\n"
-                             << self.options_
+                             << *self.options_
                              << "\nThese are the computed eigenvectors:\n\n"
                              << std::setprecision(17)
                              << *self.eigenvectors_);
@@ -647,7 +647,7 @@ protected:
                      << std::setprecision(17)
                      << matrix_
                      << "\n\noptions: "
-                     << options_
+                     << *options_
                      << "\n\neigenvectors = "
                      << std::setprecision(17)
                      << *eigenvectors_
@@ -672,7 +672,7 @@ protected:
                      << std::setprecision(17)
                      << matrix_
                      << "\n\noptions: "
-                     << options_
+                     << *options_
                      << "\n\nreal_eigenvectors = "
                      << std::setprecision(17)
                      << *real_eigenvectors_
@@ -709,7 +709,7 @@ protected:
       for (size_t jj = 0; jj < cols; ++jj)
         if (std::abs(Common::get_matrix_entry(decomposition_error, ii, jj)) > tolerance)
           DUNE_THROW(Exceptions::eigen_solver_failed_bc_result_is_not_an_eigendecomposition,
-                     "\n\nmatrix = " << std::setprecision(17) << matrix_ << "\n\noptions: " << options_
+                     "\n\nmatrix = " << std::setprecision(17) << matrix_ << "\n\noptions: " << *options_
                                      << "\n\neigenvalues (lambda)= "
                                      << std::setprecision(17)
                                      << eigenvalues
