@@ -274,7 +274,7 @@ public:
   {
     using std::abs;
     using std::sqrt;
-    return sqrt(abs(dot(this->as_imp(*this)))); // std::abs is only needed for the right return type:
+    return sqrt(abs(dot(this->as_imp()))); // std::abs is only needed for the right return type:
     // v.dot(v) should always be a ScalarType with zero imaginary part
   }
 
@@ -414,7 +414,7 @@ public:
   virtual derived_type& operator+=(const derived_type& other)
   {
     iadd(other);
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   /**
@@ -425,7 +425,7 @@ public:
   virtual derived_type& operator-=(const derived_type& other)
   {
     isub(other);
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   /**
@@ -452,21 +452,21 @@ public:
   {
     for (auto& element : *this)
       element += scalar;
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   virtual derived_type& operator-=(const ScalarType& scalar)
   {
     for (auto& element : *this)
       element -= scalar;
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   virtual derived_type& operator/=(const ScalarType& scalar)
   {
     for (auto& element : *this)
       element /= scalar;
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   /**
