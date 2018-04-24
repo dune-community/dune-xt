@@ -636,10 +636,10 @@ public:
 
     /* PeriodicIterator is the same as the Iterator of the RealGridLayerType, except that it visits only one entity of
      * several periodically equivalent entities */
-    class PeriodicIterator : public extract_iterator_t<RealGridLayerType, cd>
+    template <PartitionIteratorType pit>
+    class PeriodicIterator : public extract_iterator_t<RealGridLayerType, cd, pit>
     {
-      using BaseType = extract_iterator_t<RealGridLayerType, cd>;
-      typedef PeriodicIterator ThisType;
+      using BaseType = extract_iterator_t<RealGridLayerType, cd, pit>;
       using RealIndexSetType = extract_index_set_t<RealGridLayerType>;
 
     public:
@@ -661,7 +661,7 @@ public:
       {
       }
 
-      ThisType& operator++()
+      PeriodicIterator& operator++()
       {
         BaseType::operator++();
         while (cd > 0 && *this != *real_it_end_
@@ -671,7 +671,7 @@ public:
         return *this;
       }
 
-      ThisType operator++(int)
+      PeriodicIterator operator++(int)
       {
         return this->operator++();
       }
@@ -682,60 +682,12 @@ public:
       std::shared_ptr<const BaseType> real_it_end_;
     };
 
-    typedef PeriodicIterator Iterator;
+    using Iterator = PeriodicIterator<All_Partition>;
 
     template <PartitionIteratorType pit>
     struct Partition : public RealGridLayerTraits::template Codim<cd>::template Partition<pit>
     {
-      /* PeriodicIterator is the same as the Iterator of the RealGridLayerType, except that it visits only one entity of
-       * several periodically equivalent entities */
-      class PeriodicIterator : public extract_partition_iterator_t<RealGridLayerType, pit, cd>
-      {
-        using BaseType = extract_partition_iterator_t<RealGridLayerType, pit, cd>;
-        typedef PeriodicIterator ThisType;
-        using RealIndexSetType = extract_index_set_t<RealGridLayerType>;
-
-      public:
-        typedef typename IndexSet::IndexType IndexType;
-        typedef std::ptrdiff_t difference_type;
-        using value_type = const extract_entity_t<RealGridLayerImp>;
-        typedef value_type* pointer;
-        typedef value_type& reference;
-        typedef std::forward_iterator_tag iterator_category;
-
-        PeriodicIterator(BaseType real_iterator,
-                         const std::array<std::unordered_set<IndexType>, num_geometries>* entities_to_skip,
-                         const RealIndexSetType* real_index_set,
-                         const BaseType& real_it_end)
-          : BaseType(real_iterator)
-          , entities_to_skip_(entities_to_skip)
-          , real_index_set_(real_index_set)
-          , real_it_end_(std::make_shared<const BaseType>(real_it_end))
-        {
-        }
-
-        // methods that differ from BaseType
-        ThisType& operator++()
-        {
-          BaseType::operator++();
-          while (cd > 0 && *this != *real_it_end_
-                 && (*entities_to_skip_)[GlobalGeometryTypeIndex::index(this->type())].count(
-                        real_index_set_->index(this->operator*())))
-            BaseType::operator++();
-          return *this;
-        }
-
-        ThisType operator++(int)
-        {
-          return this->operator++();
-        }
-
-      private:
-        const std::array<std::unordered_set<IndexType>, num_geometries>* entities_to_skip_;
-        const RealIndexSetType* real_index_set_;
-        std::shared_ptr<const BaseType> real_it_end_;
-      };
-      typedef PeriodicIterator Iterator;
+      using Iterator = PeriodicIterator<pit>;
     }; // struct Partition
   }; // ... struct Codim ...
 
