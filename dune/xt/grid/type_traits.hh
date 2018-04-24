@@ -430,24 +430,13 @@ template <class T,
           int c = 0,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
-struct extract_partition_iterator : public AlwaysFalse<T>
+struct DUNE_DEPRECATED_MSG("Use extract_iterator instead (24.04.2018)!") extract_partition_iterator
+    : public extract_iterator<T, c, pit, view, part>
 {
-};
-
-template <class T, PartitionIteratorType pit, int c>
-struct extract_partition_iterator<T, pit, c, true, false>
-{
-  typedef typename T::template Codim<c>::template Partition<pit>::Iterator type;
-};
-
-template <class T, PartitionIteratorType pit, int c>
-struct extract_partition_iterator<T, pit, c, false, true>
-{
-  typedef typename T::template Codim<c>::template Partition<pit>::IteratorType type;
 };
 
 template <class T, PartitionIteratorType pit, int c = 0>
-using extract_partition_iterator_t = typename extract_partition_iterator<T, pit, c>::type;
+using extract_partition_iterator_t = extract_iterator_t<T, c, pit>;
 
 
 } // namespace Grid
