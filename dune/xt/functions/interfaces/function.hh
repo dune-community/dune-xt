@@ -16,6 +16,8 @@
 
 #include <dune/common/fvector.hh>
 
+#include <dune/grid/io/file/vtk/common.hh>
+
 #include <dune/xt/common/parameter.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/functions/exceptions.hh>
