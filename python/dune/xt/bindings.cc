@@ -20,6 +20,7 @@
 
 #include <python/dune/xt/common/exceptions.bindings.hh>
 #include <python/dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/exceptions.bindings.hh>
 
 #include <python/dune/xt/la/container/container-interface.hh>
 #include <python/dune/xt/la/container/vector-interface.hh>
@@ -30,6 +31,7 @@
 #include <dune/xt/common/timedlogging.hh>
 
 #include <dune/xt/la/container.hh>
+#include <dune/xt/common/timedlogging.hh>
 
 
 PYBIND11_MODULE(_la, m)
