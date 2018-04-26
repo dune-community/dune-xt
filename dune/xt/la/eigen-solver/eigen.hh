@@ -33,7 +33,7 @@ namespace LA {
 
 
 template <class S>
-class EigenSolverOptions<EigenDenseMatrix<S>>
+class EigenSolverOptions<EigenDenseMatrix<S>, true>
 {
 public:
   static std::vector<std::string> types()
@@ -57,10 +57,11 @@ public:
 
 
 template <class S>
-class EigenSolver<EigenDenseMatrix<S>> : public internal::EigenSolverBase<EigenDenseMatrix<S>,
-                                                                          S,
-                                                                          EigenDenseMatrix<XT::Common::real_t<S>>,
-                                                                          EigenDenseMatrix<XT::Common::complex_t<S>>>
+class EigenSolver<EigenDenseMatrix<S>, true>
+    : public internal::EigenSolverBase<EigenDenseMatrix<S>,
+                                       S,
+                                       EigenDenseMatrix<XT::Common::real_t<S>>,
+                                       EigenDenseMatrix<XT::Common::complex_t<S>>>
 {
   using BaseType = internal::EigenSolverBase<EigenDenseMatrix<S>,
                                              S,

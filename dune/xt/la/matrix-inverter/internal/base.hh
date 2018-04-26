@@ -27,7 +27,7 @@ namespace LA {
 
 
 // forward
-template <class MatrixType>
+template <class MatrixType, bool is_matrix>
 class MatrixInverterOptions;
 
 

@@ -823,7 +823,12 @@ template <class T>
 struct MatrixAbstraction<LA::IstlRowMajorSparseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>
 {
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>;
+
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
+
+  template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
+  using MatrixTypeTemplate = LA::IstlRowMajorSparseMatrix<FieldType>;
 };
 
 } // namespace Common

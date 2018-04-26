@@ -9,40 +9,27 @@
 //   Rene Milk       (2017 - 2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_LA_MATRIX_INVERTER_FMATRIX_HH
-#define DUNE_XT_LA_MATRIX_INVERTER_FMATRIX_HH
+#ifndef DUNE_XT_LA_MATRIX_INVERTER_DEFAULT_HH
+#define DUNE_XT_LA_MATRIX_INVERTER_DEFAULT_HH
 
-#include <dune/common/typetraits.hh>
-
-#include <dune/xt/common/fmatrix.hh>
-
+#include <dune/xt/la/algorithms/qr.hh>
 #include <dune/xt/la/exceptions.hh>
-#include <dune/xt/la/container/conversion.hh>
-#include <dune/xt/la/container/eigen/dense.hh>
 #include <dune/xt/la/matrix-inverter.hh>
 
 #include "internal/base.hh"
-#include "internal/eigen.hh"
 
 namespace Dune {
 namespace XT {
 namespace LA {
 
 
-template <class K, int ROWS, int COLS>
-class MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>, true>
+template <class MatrixType>
+class MatrixInverterOptions<MatrixType, true>
 {
 public:
   static std::vector<std::string> types()
   {
-    return
-    {
-      "direct"
-#if HAVE_EIGEN
-          ,
-          "moore_penrose"
-#endif
-    };
+    return {"direct"};
   }
 
   static Common::Configuration options(const std::string type = "")
@@ -53,18 +40,13 @@ public:
     opts["type"] = actual_type;
     return opts;
   }
-}; // class MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
+}; // class MatrixInverterOptions<MatrixType, true>
 
-template <class K, int ROWS, int COLS>
-class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>, true>
-    : public MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
-{
-};
 
-template <class K, int ROWS, int COLS>
-class MatrixInverter<FieldMatrix<K, ROWS, COLS>, true> : public internal::MatrixInverterBase<FieldMatrix<K, ROWS, COLS>>
+template <class MatrixImp>
+class MatrixInverter<MatrixImp, true> : public internal::MatrixInverterBase<MatrixImp>
 {
-  using BaseType = internal::MatrixInverterBase<FieldMatrix<K, ROWS, COLS>>;
+  using BaseType = internal::MatrixInverterBase<MatrixImp>;
 
 public:
   using MatrixType = typename BaseType::MatrixType;
@@ -81,28 +63,14 @@ public:
 
   void compute() override final
   {
+    using M = Common::MatrixAbstraction<MatrixType>;
     const auto type = options_.template get<std::string>("type");
     if (type == "direct") {
-      inverse_ = std::make_unique<MatrixType>(matrix_);
-      auto inverse_xt = std::make_unique<XT::Common::FieldMatrix<K, ROWS, COLS>>(*inverse_);
-      try {
-        inverse_xt->invert();
-        *inverse_ = *inverse_xt;
-      } catch (const FMatrixError& ee) {
-        if (std::strcmp(ee.what(), "matrix is singular") != 0)
-          DUNE_THROW(Exceptions::matrix_invert_failed_bc_data_did_not_fulfill_requirements,
-                     "This was the original error:\n\n"
-                         << ee.what());
-        DUNE_THROW(Exceptions::matrix_invert_failed, "This was the original error:\n\n" << ee.what());
-      }
-    }
-#if HAVE_EIGEN
-    else if (type == "moore_penrose") {
-      inverse_ = std::make_unique<MatrixType>(convert_to<MatrixType>(EigenDenseMatrix<K>(
-          internal::compute_moore_penrose_inverse_using_eigen(convert_to<EigenDenseMatrix<K>>(matrix_).backend()))));
-    }
-#endif
-    else
+      inverse_ = M::make_unique(M::rows(matrix_), M::cols(matrix_));
+      auto tmp_matrix = M::make_unique(M::rows(matrix_), M::cols(matrix_));
+      *tmp_matrix = matrix_;
+      solve_by_qr_decomposition(*tmp_matrix, *inverse_, eye_matrix<MatrixType>(M::rows(matrix_)));
+    } else
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type
                                 << "' is none of MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>::types(), and "
@@ -117,19 +85,7 @@ protected:
   using BaseType::matrix_;
   using BaseType::options_;
   using BaseType::inverse_;
-}; // class MatrixInverter<FieldMatrix<...>>
-
-
-template <class K, int ROWS, int COLS>
-class MatrixInverter<Common::FieldMatrix<K, ROWS, COLS>, true> : public MatrixInverter<FieldMatrix<K, ROWS, COLS>>
-{
-public:
-  template <class... Args>
-  explicit MatrixInverter(Args&&... args)
-    : MatrixInverter<FieldMatrix<K, ROWS, COLS>>(std::forward<Args>(args)...)
-  {
-  }
-};
+}; // class MatrixInverter<MatrixType, true>
 
 
 } // namespace Dune
@@ -137,4 +93,4 @@ public:
 } // namespace LA
 
 
-#endif // DUNE_XT_LA_MATRIX_INVERTER_FMATRIX_HH
+#endif // DUNE_XT_LA_MATRIX_INVERTER_DEFAULT_HH

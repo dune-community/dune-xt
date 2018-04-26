@@ -33,7 +33,7 @@ namespace LA {
 
 
 // forward
-template <class MatrixType>
+template <class MatrixType, bool is_matrix>
 class EigenSolverOptions;
 
 
@@ -88,6 +88,7 @@ class EigenSolverBase
 public:
   using MatrixType = MatrixImp;
   using RealType = XT::Common::field_t<FieldImp>;
+  using ComplexType = XT::Common::complex_t<RealType>;
   using RealMatrixType = RealMatrixImp;
   using ComplexMatrixType = ComplexMatrixImp;
 
@@ -141,7 +142,7 @@ protected:
   virtual void compute() const = 0;
 
 public:
-  const std::vector<XT::Common::complex_t<RealType>>& eigenvalues() const
+  const std::vector<ComplexType>& eigenvalues() const
   {
     compute_and_check();
     if (eigenvalues_)
@@ -799,7 +800,7 @@ protected:
   mutable Common::Configuration stored_options_;
   mutable Common::Configuration* options_;
   mutable bool computed_;
-  mutable std::unique_ptr<std::vector<XT::Common::complex_t<RealType>>> eigenvalues_;
+  mutable std::unique_ptr<std::vector<ComplexType>> eigenvalues_;
   mutable std::unique_ptr<std::vector<RealType>> real_eigenvalues_;
   mutable std::unique_ptr<ComplexMatrixType> eigenvectors_;
   mutable std::unique_ptr<RealMatrixType> real_eigenvectors_;

@@ -508,10 +508,7 @@ struct MatrixAbstractionBase
   typedef ScalarType S;
   typedef RealType R;
 
-  template <size_t rows = static_rows, size_t cols = static_cols, class FieldType = S>
-  using MatrixTypeTemplate = MatrixType;
-
-  template <size_t ROWS = static_rows, size_t COLS = static_cols, class SparsityPatternType = XT::Common::FullPattern>
+  template <class SparsityPatternType = XT::Common::FullPattern>
   static inline typename std::enable_if<is_matrix, MatrixType>::type
   create(const size_t rows,
          const size_t cols,
@@ -520,9 +517,20 @@ struct MatrixAbstractionBase
   {
     SparsityPatternDefault actual_pattern = get_actual_pattern(pattern, rows, cols);
     MatrixType ret(rows, cols, actual_pattern);
-    for (size_t ii = 0; ii < rows; ++ii)
-      for (const auto& jj : actual_pattern.inner(ii))
-        ret.set_entry(ii, jj, val);
+    fill_matrix(ret, val, actual_pattern);
+    return ret;
+  }
+
+  template <class SparsityPatternType = XT::Common::FullPattern>
+  static inline typename std::enable_if<is_matrix, std::unique_ptr<MatrixType>>::type
+  make_unique(const size_t rows,
+              const size_t cols,
+              const ScalarType& val = XT::Common::suitable_default<ScalarType>::value(),
+              const SparsityPatternType& pattern = SparsityPatternType())
+  {
+    SparsityPatternDefault actual_pattern = get_actual_pattern(pattern, rows, cols);
+    auto ret = std::make_unique<MatrixType>(rows, cols, actual_pattern);
+    fill_matrix(*ret, val, actual_pattern);
     return ret;
   }
 
@@ -576,6 +584,13 @@ private:
   static SparsityPatternDefault get_actual_pattern(const XT::Common::FullPattern& /*pattern*/, size_t rows, size_t cols)
   {
     return dense_pattern(rows, cols);
+  }
+
+  static void fill_matrix(MatrixType& matrix, const ScalarType& val, const SparsityPatternDefault& pattern)
+  {
+    for (size_t ii = 0; ii < rows(matrix); ++ii)
+      for (const auto& jj : pattern.inner(ii))
+        matrix.set_entry(ii, jj, val);
   }
 }; // struct MatrixAbstractionBase
 

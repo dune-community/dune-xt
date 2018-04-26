@@ -489,7 +489,12 @@ template <class T>
 struct MatrixAbstraction<LA::CommonDenseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T>>
 {
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T>>;
+
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::dense_row_major;
+
+  template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
+  using MatrixTypeTemplate = LA::CommonDenseMatrix<FieldType>;
 
   static inline T* data(LA::CommonDenseMatrix<T>& mat)
   {
