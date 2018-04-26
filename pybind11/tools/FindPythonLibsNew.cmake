@@ -1,5 +1,5 @@
 # - Find python libraries
-# This module finds the libraries corresponding to the Python interpeter
+# This module finds the libraries corresponding to the Python interpreter
 # FindPythonInterp provides.
 # This code sets the following variables:
 #
@@ -49,6 +49,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #=============================================================================
+
+# Checking for the extension makes sure that `LibsNew` was found and not just `Libs`.
+if(PYTHONLIBS_FOUND AND PYTHON_MODULE_EXTENSION)
+    return()
+endif()
+
+# Use the Python interpreter to find the libs.
+if(PythonLibsNew_FIND_REQUIRED)
+    find_package(PythonInterp ${PythonLibsNew_FIND_VERSION} REQUIRED)
+else()
+    find_package(PythonInterp ${PythonLibsNew_FIND_VERSION})
+endif()
 
 if(NOT PYTHONINTERP_FOUND)
     set(PYTHONLIBS_FOUND FALSE)
@@ -104,11 +116,13 @@ list(GET _PYTHON_VALUES 9 PYTHON_MULTIARCH)
 # Make sure the Python has the same pointer-size as the chosen compiler
 # Skip if CMAKE_SIZEOF_VOID_P is not defined
 if(CMAKE_SIZEOF_VOID_P AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZEOF_VOID_P}"))
-    math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
-    math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
-    message(FATAL_ERROR
-        "Python config failure: Python is ${_PYTHON_BITS}-bit, "
-        "chosen compiler is  ${_CMAKE_BITS}-bit")
+    if(PythonLibsNew_FIND_REQUIRED)
+        math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
+        math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
+        message(FATAL_ERROR
+            "Python config failure: Python is ${_PYTHON_BITS}-bit, "
+            "chosen compiler is  ${_CMAKE_BITS}-bit")
+    endif()
     set(PYTHONLIBS_FOUND FALSE)
     return()
 endif()
@@ -173,12 +187,6 @@ MARK_AS_ADVANCED(
 SET(PYTHON_INCLUDE_DIRS "${PYTHON_INCLUDE_DIR}")
 SET(PYTHON_LIBRARIES "${PYTHON_LIBRARY}")
 SET(PYTHON_DEBUG_LIBRARIES "${PYTHON_DEBUG_LIBRARY}")
-
-dune_register_package_flags(
-    INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS}
-    LIBRARIES ${PYTHON_LIBRARIES}
-    COMPILE_OPTIONS -fvisibility-inlines-hidden -fvisibility=hidden
-)
 
 find_package_message(PYTHON
     "Found PythonLibs: ${PYTHON_LIBRARY}"
