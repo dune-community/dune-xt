@@ -164,27 +164,28 @@ public:
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
   _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view)
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, view);                      \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, view)
+/*  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, view); \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, view)*/
 #else // HAVE_DUNE_ALUGRID
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B) static_assert(true, "Require semicolon to disable warnings")
 #endif
 
-//#if HAVE_DUNE_UGGRID || HAVE_UG
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)                                                           \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, leaf, view);                                                \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, level, view);                                               \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, dd_subdomain, view)
-//#else
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)
+/*#if HAVE_DUNE_UGGRID || HAVE_UG
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)                                                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, leaf, view);                                                \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, level, view);                                               \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, dd_subdomain, view)
+#else*/
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B) static_assert(true, "Require semicolon to disable warnings")
 //#endif
 
-//#if HAVE_ALBERTA
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)                                                      \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, leaf, view);                                           \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, dd_subdomain, view)
-//#else
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)
+/*#if HAVE_ALBERTA
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)                                                      \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, leaf, view);                                           \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, dd_subdomain, view)
+#else*/
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)                                                        \
+  static_assert(true, "Require semicolon to disable warnings")
 //#endif
 
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, _B)                                                            \
@@ -245,20 +246,20 @@ DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)
 #endif
 
-//#if HAVE_DUNE_UGGRID
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)                                                      \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, leaf, view, _class_name, "leaf");                                   \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, level, view, _class_name, "level");                                 \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, dd_subdomain, view, _class_name, "dd_subdomain")
-//#else
+/*#if HAVE_DUNE_UGGRID
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)                                                      \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, leaf, view, _class_name, "leaf");                                   \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, level, view, _class_name, "level");                                 \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, dd_subdomain, view, _class_name, "dd_subdomain")
+#else*/
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)
 //#endif
 
-//#if HAVE_ALBERTA
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, _B, _class_name)                                                 \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, leaf, view, _class_name, "");                                  \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, dd_subdomain, view, _class_name, "dd_subdomain")
-//#else
+/*#if HAVE_ALBERTA
+#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, _B, _class_name)                                                 \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, leaf, view, _class_name, "");                                  \
+  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, dd_subdomain, view, _class_name, "dd_subdomain")
+#else*/
 #define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, _B, _class_name)
 //#endif
 
