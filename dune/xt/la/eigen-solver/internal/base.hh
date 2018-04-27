@@ -93,7 +93,7 @@ public:
   using ComplexMatrixType = ComplexMatrixImp;
 
   EigenSolverBase(const MatrixType& matrix, const std::string& type = "")
-    : EigenSolverBase(matrix, EigenSolverOptions<MatrixType>::options(type))
+    : EigenSolverBase(matrix, EigenSolverOptions<MatrixType, true>::options(type))
   {
   }
 
@@ -309,9 +309,10 @@ protected:
         DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
                    "Missing 'type' in given options:\n\n"
                        << *options_);
-      internal::ensure_eigen_solver_type(options_->get<std::string>("type"), EigenSolverOptions<MatrixType>::types());
+      internal::ensure_eigen_solver_type(options_->get<std::string>("type"),
+                                         EigenSolverOptions<MatrixType, true>::types());
       const Common::Configuration default_opts =
-          EigenSolverOptions<MatrixType>::options(options_->get<std::string>("type"));
+          EigenSolverOptions<MatrixType, true>::options(options_->get<std::string>("type"));
       for (const std::string& default_key : default_opts.getValueKeys()) {
         if (!options_->has_key(default_key))
           (*options_)[default_key] = default_opts.get<std::string>(default_key);
