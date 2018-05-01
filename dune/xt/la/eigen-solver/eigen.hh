@@ -146,14 +146,14 @@ protected:
 
 
 template <class S>
-class EigenSolverOptions<EigenDenseMatrix<S>>
+class EigenSolverOptions<EigenDenseMatrix<S>, true>
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 };
 
 
 template <class S>
-class EigenSolver<EigenDenseMatrix<S>>
+class EigenSolver<EigenDenseMatrix<S>, true>
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 };
