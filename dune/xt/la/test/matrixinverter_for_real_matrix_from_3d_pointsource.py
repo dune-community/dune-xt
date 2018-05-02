@@ -12,7 +12,7 @@ from dune.xt.codegen import typeid_to_typedef_name as safe_name, have_eigen
 matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 6, 6>', 'CommonDenseMatrix<double>', 'CommonSparseMatrix<double>']
 
 def _ok(ft):
-    if 'Eigen' in ft[0]:
+    if 'Eigen' in ft:
         return have_eigen(cache)
     return True
 
