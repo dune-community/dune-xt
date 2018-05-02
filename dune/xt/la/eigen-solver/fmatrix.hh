@@ -38,7 +38,7 @@ namespace LA {
 
 
 template <class K, int SIZE>
-class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>, true>
 {
 public:
   static std::vector<std::string> types()
@@ -67,14 +67,14 @@ public:
 
 
 template <class K, int SIZE>
-class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>>
-    : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>, true>
+    : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>, true>
 {
 };
 
 
 template <class K, int SIZE>
-class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>, true>
     : public internal::EigenSolverBase<Dune::FieldMatrix<K, SIZE, SIZE>,
                                        K,
                                        Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>,
@@ -170,7 +170,8 @@ protected:
 
 
 template <class K, int SIZE>
-class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>> : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>, true>
+    : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
 {
 public:
   template <class... Args>

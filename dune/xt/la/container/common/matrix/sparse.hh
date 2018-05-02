@@ -1570,6 +1570,11 @@ template <class T>
 struct MatrixAbstraction<LA::CommonSparseMatrixCsr<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsr<T>>
 {
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsr<T>>;
+
+  template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
+  using MatrixTypeTemplate = LA::CommonSparseMatrixCsr<FieldType>;
+
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::csr;
 };
 
@@ -1577,6 +1582,11 @@ template <class T>
 struct MatrixAbstraction<LA::CommonSparseMatrixCsc<T>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsc<T>>
 {
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsc<T>>;
+
+  template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
+  using MatrixTypeTemplate = LA::CommonSparseMatrixCsc<FieldType>;
+
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::csc;
 };
 
@@ -1584,6 +1594,15 @@ template <class DenseMatrixImp, class SparseMatrixImp>
 struct MatrixAbstraction<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
     : public LA::internal::MatrixAbstractionBase<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
 {
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>;
+
+  template <size_t rows = BaseType::static_rows,
+            size_t cols = BaseType::static_cols,
+            class FieldType = typename BaseType::ScalarType>
+  using MatrixTypeTemplate = LA::CommonSparseOrDenseMatrix<
+      typename MatrixAbstraction<DenseMatrixImp>::template MatrixTypeTemplate<rows, cols, FieldType>,
+      typename MatrixAbstraction<SparseMatrixImp>::template MatrixTypeTemplate<rows, cols, FieldType>>;
+
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
 };
 

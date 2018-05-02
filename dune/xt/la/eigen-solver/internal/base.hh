@@ -33,7 +33,7 @@ namespace LA {
 
 
 // forward
-template <class MatrixType>
+template <class MatrixType, bool is_matrix>
 class EigenSolverOptions;
 
 
@@ -88,11 +88,12 @@ class EigenSolverBase
 public:
   using MatrixType = MatrixImp;
   using RealType = XT::Common::field_t<FieldImp>;
+  using ComplexType = XT::Common::complex_t<RealType>;
   using RealMatrixType = RealMatrixImp;
   using ComplexMatrixType = ComplexMatrixImp;
 
   EigenSolverBase(const MatrixType& matrix, const std::string& type = "")
-    : EigenSolverBase(matrix, EigenSolverOptions<MatrixType>::options(type))
+    : EigenSolverBase(matrix, EigenSolverOptions<MatrixType, true>::options(type))
   {
   }
 
@@ -141,7 +142,7 @@ protected:
   virtual void compute() const = 0;
 
 public:
-  const std::vector<XT::Common::complex_t<RealType>>& eigenvalues() const
+  const std::vector<ComplexType>& eigenvalues() const
   {
     compute_and_check();
     if (eigenvalues_)
@@ -308,9 +309,10 @@ protected:
         DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
                    "Missing 'type' in given options:\n\n"
                        << *options_);
-      internal::ensure_eigen_solver_type(options_->get<std::string>("type"), EigenSolverOptions<MatrixType>::types());
+      internal::ensure_eigen_solver_type(options_->get<std::string>("type"),
+                                         EigenSolverOptions<MatrixType, true>::types());
       const Common::Configuration default_opts =
-          EigenSolverOptions<MatrixType>::options(options_->get<std::string>("type"));
+          EigenSolverOptions<MatrixType, true>::options(options_->get<std::string>("type"));
       for (const std::string& default_key : default_opts.getValueKeys()) {
         if (!options_->has_key(default_key))
           (*options_)[default_key] = default_opts.get<std::string>(default_key);
@@ -799,7 +801,7 @@ protected:
   mutable Common::Configuration stored_options_;
   mutable Common::Configuration* options_;
   mutable bool computed_;
-  mutable std::unique_ptr<std::vector<XT::Common::complex_t<RealType>>> eigenvalues_;
+  mutable std::unique_ptr<std::vector<ComplexType>> eigenvalues_;
   mutable std::unique_ptr<std::vector<RealType>> real_eigenvalues_;
   mutable std::unique_ptr<ComplexMatrixType> eigenvectors_;
   mutable std::unique_ptr<RealMatrixType> real_eigenvectors_;

@@ -34,7 +34,7 @@ namespace LA {
  * \note  This class needs to be specialized for each MatrixType, the purpose of this variant is merely to document the
  *        expected functionality.
  */
-template <class MatrixType>
+template <class MatrixType, bool is_matrix = XT::Common::is_matrix<MatrixType>::value>
 class EigenSolverOptions
 {
   static_assert(AlwaysFalse<MatrixType>::value,
@@ -60,7 +60,7 @@ Common::Configuration eigen_solver_options(const MatrixType& /*matrix*/, const s
 }
 
 
-template <class MatrixImp>
+template <class MatrixImp, bool is_matrix = XT::Common::is_matrix<MatrixImp>::value>
 class EigenSolver
 {
   static_assert(AlwaysFalse<MatrixImp>::value,
@@ -126,6 +126,7 @@ EigenSolver<M> make_eigen_solver(const M& matrix, const XT::Common::Configuratio
 } // namespace XT
 } // namespace Dune
 
+#include "eigen-solver/default.hh"
 #include "eigen-solver/eigen.hh"
 #include "eigen-solver/fmatrix.hh"
 

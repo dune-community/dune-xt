@@ -41,3 +41,4 @@ CMakeLists.txt.user
 *.user
 .idea
 cmake/modules/petsc
+__pycache__

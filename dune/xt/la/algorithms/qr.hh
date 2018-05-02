@@ -245,7 +245,7 @@ struct QrHelper
       // create Q and copy values of QR to Q;
       const size_t num_rows = M::rows(QR);
       const size_t num_cols = M::cols(QR);
-      auto ret = M::template create<M::static_rows, M::static_rows>(num_rows, num_rows, 0.);
+      auto ret = Common::create<MatrixType, M::static_rows, M::static_rows>(num_rows, num_rows, 0.);
       typedef Common::MatrixAbstraction<decltype(ret)> Mret;
       for (size_t ii = 0; ii < num_rows; ++ii)
         for (size_t jj = 0; jj < num_cols; ++jj)
@@ -502,6 +502,37 @@ solve_by_qr_decomposition(MatrixType& A, VectorType& x, const SecondVectorType& 
   std::vector<int> permutations(M::cols(A));
   qr(A, tau, permutations);
   solve_qr_factorized(A, tau, permutations, x, b);
+} // void solve_lower_triangular(...)
+
+/**
+ *  \brief Performs a QR decomposition to solve AX = B, where A, X and B are matrices
+ *  \see qr
+ */
+template <class MatrixType, class SolutionMatrixType, class RhsMatrixType>
+typename std::enable_if_t<Common::is_matrix<MatrixType>::value && Common::is_matrix<SolutionMatrixType>::value
+                              && Common::is_matrix<RhsMatrixType>::value,
+                          void>
+solve_by_qr_decomposition(MatrixType& A, SolutionMatrixType& X, const RhsMatrixType& B)
+{
+  using M = typename Common::MatrixAbstraction<MatrixType>;
+  using MB = Common::MatrixAbstraction<SolutionMatrixType>;
+  using MX = Common::MatrixAbstraction<RhsMatrixType>;
+  using ScalarType = typename M::ScalarType;
+  assert(M::cols(A) == MX::rows(X));
+  assert(M::rows(A) == MB::rows(B));
+  assert(MB::cols(B) == MX::cols(X));
+  std::vector<ScalarType> tau(M::cols(A));
+  std::vector<int> permutations(M::cols(A));
+  qr(A, tau, permutations);
+  std::vector<ScalarType> b(MB::rows(B));
+  std::vector<ScalarType> x(MX::rows(X));
+  for (size_t jj = 0; jj < MB::cols(B); ++jj) {
+    for (size_t ii = 0; ii < M::rows(A); ++ii)
+      b[ii] = MB::get_entry(B, ii, jj);
+    solve_qr_factorized(A, tau, permutations, x, b);
+    for (size_t ii = 0; ii < MX::rows(X); ++ii)
+      MX::set_entry(X, ii, jj, x[ii]);
+  }
 } // void solve_lower_triangular(...)
 
 

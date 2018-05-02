@@ -51,7 +51,7 @@ public:
 
   static std::vector<std::string> types()
   {
-    return {"superlu"};
+    return {"qr.householder"};
   }
 
   static Common::Configuration options(const std::string type = "")
