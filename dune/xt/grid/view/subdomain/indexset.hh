@@ -167,7 +167,7 @@ public:
     return geometryTypesByCodim_[codim];
   }
 
-  //! not here the container is returned by value opposed to a reference in geomTypes !
+  //! note here the container is returned by value opposed to a reference in geomTypes !
   const std::vector<GeometryType> types(int codim) const
   {
     return geomTypes(codim);
