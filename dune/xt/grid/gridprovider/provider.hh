@@ -36,10 +36,14 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-template <class T>
-using DefaultDDGridImp = DD::SubdomainGrid<T>;
+struct none_t
+{
+  none_t() = delete;
+};
 
-template <class GridImp, typename DdGridImp = DefaultDDGridImp<GridImp>>
+using DefaultDDGridImp = none_t;
+
+template <class GridImp, typename DdGridImp = DefaultDDGridImp>
 class GridProvider
 {
   static_assert(is_grid<GridImp>::value, "");

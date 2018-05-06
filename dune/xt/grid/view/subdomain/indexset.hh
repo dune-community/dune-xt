@@ -167,6 +167,13 @@ public:
     return geometryTypesByCodim_[codim];
   }
 
+  //! note here the container is returned by value opposed to a reference in geomTypes !
+  const std::vector<GeometryType> types(int codim) const
+  {
+    return geomTypes(codim);
+  }
+
+
   IndexType size(GeometryType type) const
   {
     assert(sizeByGeometryType_.find(type) != sizeByGeometryType_.end());
