@@ -211,7 +211,7 @@ struct QrHelper
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage) {
+    } else if (has_contiguous_storage && M::rows(A) > 10) {
       assert(std::max(M::rows(A), M::cols(A)) < std::numeric_limits<int>::max());
       auto num_rows = static_cast<int>(M::rows(A));
       auto num_cols = static_cast<int>(M::cols(A));
@@ -276,35 +276,35 @@ struct QrHelper
     using V2 = Common::VectorAbstraction<SecondVectorType>;
     using V3 = Common::VectorAbstraction<ThirdVectorType>;
     using ScalarType = typename V2::ScalarType;
+    const size_t num_rows = M::rows(QR);
+    const size_t num_cols = M::cols(QR);
     for (size_t ii = 0; ii < M::rows(QR); ++ii)
       V3::set_entry(y, ii, V2::get_entry(x, ii));
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage) {
+    } else if (has_contiguous_storage && num_rows > 10) {
       // These are the number of rows and columns of the matrix C in the documentation of dormqr.
       // As we only have a vector, i.e. C = x, the number of columns is 1.
       assert(x.size() < std::numeric_limits<int>::max());
-      const int num_rows = static_cast<int>(x.size());
-      const int num_cols = 1;
+      const int num_rhs_rows = static_cast<int>(x.size());
+      const int num_rhs_cols = 1;
       auto info = multiply_by_q(lapacke_storage_layout(),
                                 'L',
                                 transpose == XT::Common::Transpose::yes ? 'T' : 'N',
-                                num_rows,
-                                num_cols,
+                                num_rhs_rows,
+                                num_rhs_cols,
                                 num_rows,
                                 M::data(QR),
-                                num_rows,
+                                num_rhs_rows,
                                 V::data(tau),
                                 V3::data(y),
-                                is_row_major ? num_cols : num_rows);
+                                is_row_major ? num_rhs_cols : num_rhs_rows);
       if (info)
         DUNE_THROW(Dune::MathError, "Multiplication by Q or Q^T failed");
 #endif // HAVE_LAPACKE || HAVE_MKL
     } else {
       assert(M::cols(QR) < std::numeric_limits<int>::max());
-      const auto num_rows = M::rows(QR);
-      const auto num_cols = static_cast<int>(M::cols(QR));
       VectorType w = V::create(num_rows, ScalarType(0.));
       if (transpose == XT::Common::Transpose::no)
         for (int jj = num_cols - 1; jj >= 0; --jj) {
@@ -349,7 +349,11 @@ private:
   static std::enable_if_t<Common::is_arithmetic<ScalarType>::value, int>
   geqp3(int matrix_layout, int m, int n, ScalarType* a, int lda, int* jpvt, ScalarType* tau)
   {
-    return Common::Lapacke::dgeqp3(matrix_layout, m, n, a, lda, jpvt, tau);
+    thread_local std::vector<double> work(m * n);
+    if (work.size() < m * n)
+      work.resize(m * n);
+    return Common::Lapacke::dgeqp3_work(
+        matrix_layout, m, n, a, lda, jpvt, tau, work.data(), static_cast<int>(work.size()));
   }
 
   template <class ScalarType>
@@ -372,7 +376,11 @@ private:
                                                                                        ScalarType* c,
                                                                                        int ldc)
   {
-    return Common::Lapacke::dormqr(matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc);
+    thread_local std::vector<double> work(m * n);
+    if (work.size() < m * n)
+      work.resize(m * n);
+    return Common::Lapacke::dormqr_work(
+        matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc, work.data(), static_cast<int>(work.size()));
   }
 
   template <class ScalarType>
@@ -453,8 +461,8 @@ void solve_qr_factorized(const MatrixType& QR,
   using V2 = Common::VectorAbstraction<SecondVectorType>;
   using VI = Common::VectorAbstraction<IndexVectorType>;
 
-  auto num_rows = M::rows(QR);
-  auto num_cols = M::cols(QR);
+  const auto num_rows = M::rows(QR);
+  const auto num_cols = M::cols(QR);
   if (num_rows != num_cols)
     DUNE_THROW(NotImplemented, "Not implemented for non-square matrices!");
 
@@ -483,7 +491,8 @@ void solve_qr_factorized(const MatrixType& QR,
   }
 
   // Undo permutations
-  for (int ii = 0; ii < int(M::rows(QR)); ++ii)
+  assert(num_rows <= std::numeric_limits<int>::max());
+  for (int ii = 0; ii < static_cast<int>(num_rows); ++ii)
     V2::set_entry(x, VI::get_entry(permutations, ii), V2::get_entry(*work, ii));
 }
 

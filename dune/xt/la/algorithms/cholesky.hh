@@ -53,7 +53,7 @@ solve_tridiag_ldlt(const FirstVectorType& diag, const SecondVectorType& subdiag,
   typedef Common::VectorAbstraction<VectorType> V;
   typedef typename V::ScalarType ScalarType;
   size_t size = vec.size();
-  auto L =
+  thread_local auto L =
       eye_matrix<CommonSparseMatrix<ScalarType>>(size, diagonal_pattern(size, size) + diagonal_pattern(size, size, -1));
   for (size_t ii = 0; ii < size - 1; ++ii)
     L.set_entry(ii + 1, ii, V2::get_entry(subdiag, ii));
@@ -212,7 +212,7 @@ struct CholeskySolver
       cholesky_colwise<only_set_nonzero>(A);
 #if HAVE_MKL || HAVE_LAPACKE
     } else if (storage_layout == Common::StorageLayout::dense_row_major
-               || storage_layout == Common::StorageLayout::dense_column_major) {
+               || storage_layout == Common::StorageLayout::dense_column_major && size > 10) {
       const int lapacke_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();
@@ -269,7 +269,7 @@ struct LDLTSolver
     if (false) {
       ;
 #if HAVE_MKL || HAVE_LAPACKE
-    } else if (is_contiguous) {
+    } else if (is_contiguous && size > 10) {
       assert(V::is_vector || std::max(M::cols(rhs), size) <= std::numeric_limits<int>::max());
       int rhs_cols = V::is_vector ? 1 : int(M::cols(rhs));
       int info = Common::Lapacke::dpttrs(is_row_major ? Common::Lapacke::row_major() : Common::Lapacke::col_major(),

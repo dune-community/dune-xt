@@ -140,18 +140,23 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
   std::vector<double> right_eigenvalues(size * size, 0.);
   assert(size < std::numeric_limits<int>::max());
   // lapacks favorite storage format is column-major, otherwise the matrix would be copied from row-major to col-major
-  const int info = Common::Lapacke::dgeev(Common::Lapacke::col_major(),
-                                          /*do_not_compute_left_egenvectors: */ 'N',
-                                          /*compute_right_egenvectors: */ 'V',
-                                          static_cast<int>(size),
-                                          Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
-                                          static_cast<int>(size),
-                                          real_part_of_eigenvalues.data(),
-                                          imag_part_of_eigenvalues.data(),
-                                          dummy_left_eigenvalues.data(),
-                                          static_cast<int>(size),
-                                          right_eigenvalues.data(),
-                                          static_cast<int>(size));
+  thread_local std::vector<double> work(size * size);
+  if (work.size() < size * size)
+    work.resize(size * size);
+  const int info = Common::Lapacke::dgeev_work(Common::Lapacke::col_major(),
+                                               /*do_not_compute_left_egenvectors: */ 'N',
+                                               /*compute_right_egenvectors: */ 'V',
+                                               static_cast<int>(size),
+                                               Dune::XT::Common::serialize_colwise<double>(serializable_matrix).get(),
+                                               static_cast<int>(size),
+                                               real_part_of_eigenvalues.data(),
+                                               imag_part_of_eigenvalues.data(),
+                                               dummy_left_eigenvalues.data(),
+                                               static_cast<int>(size),
+                                               right_eigenvalues.data(),
+                                               static_cast<int>(size),
+                                               work.data(),
+                                               static_cast<int>(work.size()));
   if (info != 0)
     DUNE_THROW(Dune::XT::LA::Exceptions::eigen_solver_failed, "The lapack backend reported '" << info << "'!");
   // set eigenvalues
