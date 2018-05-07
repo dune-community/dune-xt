@@ -44,11 +44,12 @@ void bind_walker(pybind11::module& m)
 
 
 template <class G>
-void addbind_for_Grid(pybind11::module& m)
+void addbind_for_Grid(pybind11::module& m, std::vector<std::string>& available_types)
 {
   using namespace Dune::XT::Grid;
 
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
+  available_types.push_back(grid_id);
   typedef typename Layer<G, Layers::dd_subdomain, Backends::view, DD::SubdomainGrid<G>>::type DdSubdomainPart;
 
   bind_GridProvider<G>(m, grid_id);
@@ -77,17 +78,21 @@ PYBIND11_PLUGIN(_grid)
 
   py::module::import("dune.xt.common");
 
-  addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m);
-  addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m);
+  std::vector<std::string> available_types;
+
+  addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m, available_types);
+  addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m, available_types);
 #if HAVE_DUNE_ALUGRID
-  addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m);
+  addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m, available_types);
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
-  addbind_for_Grid<Dune::UGGrid<2>>(m);
+  addbind_for_Grid<Dune::UGGrid<2>>(m, available_types);
 #endif
 #if HAVE_ALBERTA
-  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m);
+  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, available_types);
 #endif
+
+  m.attr("available_types") = available_types;
 
   DUNE_XT_GRID_BOUNDARYINFO_BIND(m);
   DUNE_XT_GRID_WALKER_APPLYON_BIND(m);
