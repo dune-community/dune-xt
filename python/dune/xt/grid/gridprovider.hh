@@ -36,7 +36,7 @@ pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const s
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef GridProvider<G, int> C;
+  typedef GridProvider<G, none_t> C;
 
   py::class_<C> c(m, std::string("GridProvider__" + grid_id).c_str(), std::string("GridProvider__" + grid_id).c_str());
 
