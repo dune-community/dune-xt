@@ -22,6 +22,7 @@
 
 #include "internal/base.hh"
 #include "internal/shifted-qr.hh"
+#include "internal/lapacke.hh"
 
 namespace Dune {
 namespace XT {
@@ -34,7 +35,11 @@ class EigenSolverOptions<MatrixType, true>
 public:
   static std::vector<std::string> types()
   {
-    return std::vector<std::string>{"shifted_qr"};
+    std::vector<std::string> tps;
+    if (Common::Lapacke::available())
+      tps.push_back("lapack");
+    tps.push_back("shifted_qr");
+    return tps;
   }
 
   static Common::Configuration options(const std::string type = "")
@@ -91,10 +96,21 @@ protected:
   void compute() const override final
   {
     const auto type = options_->template get<std::string>("type");
-    if (type == "shifted_qr") {
+    const auto rows = M::rows(matrix_);
+    const auto cols = M::rows(matrix_);
+#if HAVE_LAPACKE || HAVE_MKL
+    if (type == "lapack") {
+      if (!options_->template get<bool>("compute_eigenvectors"))
+        eigenvalues_ = std::make_unique<std::vector<ComplexType>>(internal::compute_eigenvalues_using_lapack(matrix_));
+      else {
+        eigenvalues_ = std::make_unique<std::vector<ComplexType>>(rows);
+        eigenvectors_ = ComplexM::make_unique(rows, cols);
+        internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
+      }
+    } else
+#endif // HAVE_LAPACKE || HAVE_MKL
+        if (type == "shifted_qr") {
       if (options_->template get<bool>("compute_eigenvalues") || options_->template get<bool>("compute_eigenvectors")) {
-        const auto rows = M::rows(matrix_);
-        const auto cols = M::rows(matrix_);
         eigenvalues_ = std::make_unique<std::vector<ComplexType>>(rows);
         eigenvectors_ = ComplexM::make_unique(rows, cols);
         std::vector<RealType> real_eigenvalues(rows);

@@ -52,6 +52,13 @@ struct MatrixBackendBase
   {
   }
 
+  void resize(size_t num_rows, size_t num_cols)
+  {
+    num_rows_ = num_rows;
+    num_cols_ = num_cols;
+    entries_.resize(num_rows_ * num_cols_);
+  }
+
   size_t num_rows_;
   size_t num_cols_;
   std::vector<ScalarType> entries_;

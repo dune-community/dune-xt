@@ -212,7 +212,7 @@ struct CholeskySolver
       cholesky_colwise<only_set_nonzero>(A);
 #if HAVE_MKL || HAVE_LAPACKE
     } else if (storage_layout == Common::StorageLayout::dense_row_major
-               || storage_layout == Common::StorageLayout::dense_column_major && size > 10) {
+               || storage_layout == Common::StorageLayout::dense_column_major) {
       const int lapacke_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();
@@ -269,7 +269,7 @@ struct LDLTSolver
     if (false) {
       ;
 #if HAVE_MKL || HAVE_LAPACKE
-    } else if (is_contiguous && size > 10) {
+    } else if (is_contiguous && size >= 5) {
       assert(V::is_vector || std::max(M::cols(rhs), size) <= std::numeric_limits<int>::max());
       int rhs_cols = V::is_vector ? 1 : int(M::cols(rhs));
       int info = Common::Lapacke::dpttrs(is_row_major ? Common::Lapacke::row_major() : Common::Lapacke::col_major(),
