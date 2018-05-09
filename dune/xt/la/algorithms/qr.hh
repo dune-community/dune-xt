@@ -14,6 +14,7 @@
 #include <complex>
 
 #include <dune/xt/common/lapacke.hh>
+#include <dune/xt/common/math.hh>
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/vector.hh>
 
@@ -34,7 +35,7 @@ partial_dot(const FirstVectorType& a, const SecondVectorType& b, const size_t be
   typedef Common::VectorAbstraction<SecondVectorType> V2;
   typename V1::ScalarType ret(0);
   for (size_t ii = begin; ii < end; ++ii)
-    ret += std::conj(V1::get_entry(a, ii)) * V2::get_entry(b, ii);
+    ret += Common::conj(V1::get_entry(a, ii)) * V2::get_entry(b, ii);
   return ret;
 }
 
@@ -73,7 +74,7 @@ void multiply_householder_from_left(MatrixType& A,
   auto wT_A = W::create(M::cols(A), ScalarType(0.));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      W::add_to_entry(wT_A, cc, std::conj(V::get_entry(v, rr)) * M::get_entry(A, rr, cc));
+      W::add_to_entry(wT_A, cc, Common::conj(V::get_entry(v, rr)) * M::get_entry(A, rr, cc));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
       M::add_to_entry(A, rr, cc, -tau * V::get_entry(v, rr) * W::get_entry(wT_A, cc));
@@ -100,7 +101,7 @@ void multiply_householder_from_right(MatrixType& A,
       W::add_to_entry(Aw, cc, V::get_entry(v, cc) * M::get_entry(A, rr, cc));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      M::add_to_entry(A, rr, cc, -tau * W::get_entry(Aw, rr) * std::conj(V::get_entry(v, cc)));
+      M::add_to_entry(A, rr, cc, -tau * W::get_entry(Aw, rr) * Common::conj(V::get_entry(v, cc)));
 }
 
 template <class T>
@@ -190,7 +191,7 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
         M::set_entry(A, rr, jj, W::get_entry(w, rr));
       }
       M::set_entry(A, jj, jj, s * normx);
-      V::set_entry(tau, jj, static_cast<ScalarType>(-s) * std::conj(u1) / normx);
+      V::set_entry(tau, jj, static_cast<ScalarType>(-s) * Common::conj(u1) / normx);
       // calculate A = H A
       multiply_householder_from_left(A, V::get_entry(tau, jj), w, jj, num_rows, jj + 1, num_cols);
     } // if (normx != 0)
