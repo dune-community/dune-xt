@@ -276,32 +276,30 @@ struct TriangularSolver
 
 #if HAVE_CBLAS || HAVE_MKL
 private:
-  template <class ScalarType>
-  static std::enable_if_t<Common::is_arithmetic<ScalarType>::value, void> trsv(const int layout,
-                                                                               const int uplo,
-                                                                               const int transa,
-                                                                               const int diag,
-                                                                               const int n,
-                                                                               const ScalarType* a,
-                                                                               const int lda,
-                                                                               ScalarType* x,
-                                                                               const int incx)
+  template <class ScalarImp = ScalarType>
+  static std::enable_if_t<Common::is_arithmetic<ScalarImp>::value, void> trsv(const int layout,
+                                                                              const int uplo,
+                                                                              const int transa,
+                                                                              const int diag,
+                                                                              const int n,
+                                                                              const ScalarType* a,
+                                                                              const int lda,
+                                                                              ScalarType* x,
+                                                                              const int incx)
   {
     return Common::Blas::dtrsv(layout, uplo, transa, diag, n, a, lda, x, incx);
   }
 
-  template <class ScalarType>
-  static std::enable_if_t<Common::is_complex<ScalarType>::value, void> trsv(const int layout,
-                                                                            const int uplo,
-                                                                            const int transa,
-                                                                            const int diag,
-                                                                            const int m,
-                                                                            const int n,
-                                                                            const ScalarType alpha,
-                                                                            const ScalarType* a,
-                                                                            const int lda,
-                                                                            ScalarType* x,
-                                                                            const int incx)
+  template <class ScalarImp = ScalarType>
+  static std::enable_if_t<Common::is_complex<ScalarImp>::value, void> trsv(const int layout,
+                                                                           const int uplo,
+                                                                           const int transa,
+                                                                           const int diag,
+                                                                           const int n,
+                                                                           const ScalarType* a,
+                                                                           const int lda,
+                                                                           ScalarType* x,
+                                                                           const int incx)
   {
     return Common::Blas::ztrsv(
         layout, uplo, transa, diag, n, static_cast<const void*>(a), lda, static_cast<void*>(x), incx);

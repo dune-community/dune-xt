@@ -354,8 +354,8 @@ private:
   geqp3(int matrix_layout, int m, int n, ScalarType* a, int lda, int* jpvt, ScalarType* tau)
   {
     thread_local std::vector<double> work(1);
-    thread_local int last_m = m;
-    thread_local int last_n = n;
+    thread_local int last_m = 0;
+    thread_local int last_n = 0;
     if (m != last_m || n != last_n) {
       // query workspace size
       Common::Lapacke::dgeqp3_work(matrix_layout, m, n, a, lda, jpvt, tau, work.data(), -1);
@@ -388,8 +388,8 @@ private:
                                                                                        int ldc)
   {
     thread_local std::vector<double> work(m * n);
-    thread_local int last_m = m;
-    thread_local int last_n = n;
+    thread_local int last_m = 0;
+    thread_local int last_n = 0;
     if (m != last_m || n != last_n) {
       // query workspace size
       Common::Lapacke::dormqr_work(matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc, work.data(), -1);
