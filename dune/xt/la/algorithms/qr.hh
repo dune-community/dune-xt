@@ -34,7 +34,7 @@ partial_dot(const FirstVectorType& a, const SecondVectorType& b, const size_t be
   typedef Common::VectorAbstraction<SecondVectorType> V2;
   typename V1::ScalarType ret(0);
   for (size_t ii = begin; ii < end; ++ii)
-    ret += V1::get_entry(a, ii) * V2::get_entry(b, ii);
+    ret += std::conj(V1::get_entry(a, ii)) * V2::get_entry(b, ii);
   return ret;
 }
 
@@ -49,7 +49,7 @@ void multiply_householder_from_left(FirstVectorType& x,
   typedef Common::VectorAbstraction<FirstVectorType> V1;
   typedef Common::VectorAbstraction<VectorType> V2;
   // calculate w^T x first
-  auto wT_x = partial_dot(x, v, begin, end);
+  auto wT_x = partial_dot(v, x, begin, end);
   for (size_t rr = begin; rr < end; ++rr)
     V1::add_to_entry(x, rr, -tau * wT_x * V2::get_entry(v, rr));
 }
@@ -73,7 +73,7 @@ void multiply_householder_from_left(MatrixType& A,
   auto wT_A = W::create(M::cols(A), ScalarType(0.));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      W::add_to_entry(wT_A, cc, V::get_entry(v, rr) * M::get_entry(A, rr, cc));
+      W::add_to_entry(wT_A, cc, std::conj(V::get_entry(v, rr)) * M::get_entry(A, rr, cc));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
       M::add_to_entry(A, rr, cc, -tau * V::get_entry(v, rr) * W::get_entry(wT_A, cc));
@@ -100,7 +100,19 @@ void multiply_householder_from_right(MatrixType& A,
       W::add_to_entry(Aw, cc, V::get_entry(v, cc) * M::get_entry(A, rr, cc));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      M::add_to_entry(A, rr, cc, -tau * V::get_entry(v, cc) * W::get_entry(Aw, rr));
+      M::add_to_entry(A, rr, cc, -tau * W::get_entry(Aw, rr) * std::conj(V::get_entry(v, cc)));
+}
+
+template <class T>
+std::enable_if_t<std::is_arithmetic<T>::value, T> get_s(T val)
+{
+  return -sign(val);
+}
+
+template <class T>
+std::complex<T> get_s(std::complex<T> val)
+{
+  return -std::exp(std::complex<T>(0., 1.) * std::arg(val));
 }
 
 /** \brief This is a simple QR scheme using Householder reflections and column pivoting.
@@ -170,7 +182,7 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
     normx = std::sqrt(normx);
 
     if (normx != 0.) {
-      const auto s = -sign(std::real(M::get_entry(A, jj, jj)));
+      const auto s = get_s(M::get_entry(A, jj, jj));
       const auto u1 = M::get_entry(A, jj, jj) - s * normx;
       W::set_entry(w, jj, 1.);
       for (size_t rr = jj + 1; rr < num_rows; ++rr) {
@@ -178,7 +190,7 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
         M::set_entry(A, rr, jj, W::get_entry(w, rr));
       }
       M::set_entry(A, jj, jj, s * normx);
-      V::set_entry(tau, jj, static_cast<ScalarType>(-s) * u1 / normx);
+      V::set_entry(tau, jj, static_cast<ScalarType>(-s) * std::conj(u1) / normx);
       // calculate A = H A
       multiply_householder_from_left(A, V::get_entry(tau, jj), w, jj, num_rows, jj + 1, num_cols);
     } // if (normx != 0)
@@ -214,7 +226,7 @@ struct QrHelper
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage && M::rows(A) > 10) {
+    } else if (has_contiguous_storage) {
       assert(std::max(M::rows(A), M::cols(A)) < std::numeric_limits<int>::max());
       auto num_rows = static_cast<int>(M::rows(A));
       auto num_cols = static_cast<int>(M::cols(A));
@@ -254,13 +266,13 @@ struct QrHelper
         for (size_t jj = 0; jj < num_cols; ++jj)
           Mret::set_entry(ret, ii, jj, M::get_entry(QR, ii, jj));
       assert(std::max(M::rows(QR), M::cols(QR)) < std::numeric_limits<int>::max());
-      auto info = Common::Lapacke::dorgqr(lapacke_storage_layout(),
-                                          static_cast<int>(num_rows),
-                                          static_cast<int>(num_rows),
-                                          static_cast<int>(num_cols),
-                                          Mret::data(ret),
-                                          static_cast<int>(num_rows),
-                                          V::data(tau));
+      auto info = calculate_q(lapacke_storage_layout(),
+                              static_cast<int>(num_rows),
+                              static_cast<int>(num_rows),
+                              static_cast<int>(num_cols),
+                              Mret::data(ret),
+                              static_cast<int>(num_rows),
+                              V::data(tau));
       if (info)
         DUNE_THROW(Dune::MathError, "Calculating Q explicitly failed!");
       return ret;
@@ -287,7 +299,7 @@ struct QrHelper
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage && num_rows > 10) {
+    } else if (has_contiguous_storage) {
       // These are the number of rows and columns of the matrix C in the documentation of dormqr.
       // As we only have a vector, i.e. C = x, the number of columns is 1.
       assert(x.size() < std::numeric_limits<int>::max());
@@ -387,7 +399,7 @@ private:
                                                                                        ScalarType* c,
                                                                                        int ldc)
   {
-    thread_local std::vector<double> work(m * n);
+    thread_local std::vector<double> work(1);
     thread_local int last_m = 0;
     thread_local int last_n = 0;
     if (m != last_m || n != last_n) {
@@ -415,6 +427,31 @@ private:
                                                                                     int ldc)
   {
     return Common::Lapacke::zunmqr(matrix_layout, side, trans == 'T' ? 'C' : trans, m, n, k, a, lda, tau, c, ldc);
+  }
+
+  template <class ScalarType>
+  static std::enable_if_t<Common::is_arithmetic<ScalarType>::value, int>
+  calculate_q(int matrix_layout, int m, int n, int k, ScalarType* a, int lda, const ScalarType* tau)
+  {
+    thread_local std::vector<double> work(1);
+    thread_local int last_m = 0;
+    thread_local int last_n = 0;
+    if (m != last_m || n != last_n) {
+      // query workspace size
+      Common::Lapacke::dorgqr_work(matrix_layout, m, n, k, a, lda, tau, work.data(), -1);
+      work.resize(work[0]);
+      last_m = m;
+      last_n = n;
+    }
+    return Common::Lapacke::dorgqr_work(
+        matrix_layout, m, n, k, a, lda, tau, work.data(), static_cast<int>(work.size()));
+  }
+
+  template <class ScalarType>
+  static std::enable_if_t<Common::is_complex<ScalarType>::value, int>
+  calculate_q(int matrix_layout, int m, int n, int k, ScalarType* a, int lda, const ScalarType* tau)
+  {
+    return Common::Lapacke::zungqr(matrix_layout, m, n, k, a, lda, tau);
   }
 #endif // HAVE_LAPACKE || HAVE_MKL
 }; // struct QrHelper

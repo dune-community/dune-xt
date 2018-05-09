@@ -39,7 +39,7 @@ struct MatrixInverterTest : public ::testing::Test
     , unit_matrix_(
           eye_matrix<MatrixType>(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
   {
-    M::set_entry(broken_matrix_, 0, 0, std::numeric_limits<typename M::S>::infinity());
+    M::set_entry(broken_matrix_, 0, 0, std::numeric_limits<typename M::R>::infinity());
   }
 
   static void exports_correct_types()
