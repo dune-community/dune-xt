@@ -68,12 +68,12 @@ public:
     return cfg;
   }
 
-  static GridProvider<GridType> create(const std::string& filename)
+  static GridProvider<GridType, none_t> create(const std::string& filename)
   {
-    return GridProvider<GridType>(GridPtr<GridType>(filename).release());
+    return GridProvider<GridType, none_t>(GridPtr<GridType>(filename).release());
   }
 
-  static GridProvider<GridType> create(const Common::Configuration& cfg = default_config())
+  static GridProvider<GridType, none_t> create(const Common::Configuration& cfg = default_config())
   {
     return create(cfg.get("filename", default_config().template get<std::string>("filename")));
   }
@@ -81,7 +81,7 @@ public:
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
 make_dgf_grid(const std::string& filename)
 {
   return DgfGridProviderFactory<GridType>(filename);
@@ -89,7 +89,7 @@ make_dgf_grid(const std::string& filename)
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
 make_dgf_grid(const Common::Configuration& cfg = DgfGridProviderFactory<GridType>::default_config())
 {
   return DgfGridProviderFactory<GridType>::create(cfg);

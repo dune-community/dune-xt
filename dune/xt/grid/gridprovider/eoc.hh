@@ -29,9 +29,9 @@ namespace Grid {
  *  means to obtain the real grid level corresponding to a refinement level.
  */
 template <class GridImp>
-class LevelBasedEOCGridProvider : public GridProvider<GridImp>
+class LevelBasedEOCGridProvider : public GridProvider<GridImp, none_t>
 {
-  typedef GridProvider<GridImp> BaseType;
+  typedef GridProvider<GridImp, none_t> BaseType;
 
 public:
   using typename BaseType::GridType;
@@ -102,7 +102,7 @@ private:
 template <class GridImp>
 class LeafBasedEOCGridProvider
 {
-  typedef GridProvider<GridImp> GridProviderType;
+  typedef GridProvider<GridImp, none_t> GridProviderType;
 
 public:
   typedef typename GridProviderType::GridType GridType;
@@ -241,7 +241,7 @@ private:
 }; // class DdSubdomainsBasedEOCGridProvider
 
 
-template <class G, class DdGrid = int>
+template <class G, class DdGrid = none_t>
 class EOCGridProvider : public LevelBasedEOCGridProvider<G>
 {
 public:

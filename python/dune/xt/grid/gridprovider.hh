@@ -31,12 +31,12 @@ namespace Grid {
 
 
 template <class G>
-pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const std::string& grid_id)
+pybind11::class_<GridProvider<G, Grid::none_t>> bind_GridProvider(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef GridProvider<G, none_t> C;
+  typedef GridProvider<G, Grid::none_t> C;
 
   py::class_<C> c(m, std::string("GridProvider__" + grid_id).c_str(), std::string("GridProvider__" + grid_id).c_str());
 

@@ -50,10 +50,10 @@ class GridProviderFactory
       return Common::Configuration();
     }
 
-    static GridProvider<GridType> create(const Common::Configuration& /*cfg*/)
+    static GridProvider<GridType, none_t> create(const Common::Configuration& /*cfg*/)
     {
       DUNE_THROW(Common::Exceptions::internal_error, "This should not happen!");
-      return GridProvider<GridType>(nullptr);
+      return GridProvider<GridType, none_t>(nullptr);
     }
   }; // struct Helper
 
@@ -76,7 +76,7 @@ class GridProviderFactory
       return G::default_config();
     }
 
-    static GridProvider<GridType> create(const Common::Configuration& cfg)
+    static GridProvider<GridType, none_t> create(const Common::Configuration& cfg)
     {
       if (cfg.empty())
         return G::create();
@@ -104,7 +104,7 @@ class GridProviderFactory
   }
 
   template <class G>
-  static GridProvider<GridType> call_create(const Common::Configuration& cfg)
+  static GridProvider<GridType, none_t> call_create(const Common::Configuration& cfg)
   {
     return Helper<G, G::available>::create(cfg);
   }
@@ -154,13 +154,13 @@ public:
                                     << available_as_str());
   } // ... default_config(...)
 
-  static GridProvider<GridType> create(const Common::Configuration& config)
+  static GridProvider<GridType, none_t> create(const Common::Configuration& config)
   {
     return create(config.get<std::string>("type"), config);
   }
 
-  static GridProvider<GridType> create(const std::string& type = available()[0],
-                                       const Common::Configuration config = Common::Configuration())
+  static GridProvider<GridType, none_t> create(const std::string& type = available()[0],
+                                               const Common::Configuration config = Common::Configuration())
   {
     if (call_compare<CubeType>(type))
       return call_create<CubeType>(config);

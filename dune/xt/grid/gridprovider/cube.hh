@@ -134,11 +134,12 @@ public:
   }
 
   /// TODO simplex grid overlap_size
-  static GridProvider<GridType> create(const FieldVector<typename GridType::ctype, GridType::dimension>& lower_left,
-                                       const FieldVector<typename GridType::ctype, GridType::dimension>& upper_right,
-                                       const std::array<unsigned int, GridType::dimension>& num_elements,
-                                       const unsigned int num_refinements,
-                                       const std::array<unsigned int, GridType::dimension>& overlap_size)
+  static GridProvider<GridType, none_t>
+  create(const FieldVector<typename GridType::ctype, GridType::dimension>& lower_left,
+         const FieldVector<typename GridType::ctype, GridType::dimension>& upper_right,
+         const std::array<unsigned int, GridType::dimension>& num_elements,
+         const unsigned int num_refinements,
+         const std::array<unsigned int, GridType::dimension>& overlap_size)
   {
     static const int variant = ElementVariant<GridType>::id;
     static_assert(variant == 1 || variant == 2, "variant has to be 1 or 2!");
@@ -170,10 +171,10 @@ public:
 #endif
       grd_ptr->postAdapt();
     grd_ptr->loadBalance();
-    return GridProvider<GridType>(grd_ptr);
+    return GridProvider<GridType, none_t>(grd_ptr);
   } // ... create(...)
 
-  static GridProvider<GridType>
+  static GridProvider<GridType, none_t>
   create(const typename GridType::ctype& lower_left,
          const typename GridType::ctype& upper_right,
          const unsigned int num_elements =
@@ -190,7 +191,7 @@ public:
                   Common::make_array<unsigned int, GridType::dimension>(overlap_size));
   } // ... create(...)
 
-  static GridProvider<GridType> create(const Common::Configuration& cfg = cube_gridprovider_default_config())
+  static GridProvider<GridType, none_t> create(const Common::Configuration& cfg = cube_gridprovider_default_config())
   {
     static const size_t d = GridType::dimension;
     auto overlap_size =
@@ -237,7 +238,7 @@ public:
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type make_cube_grid(
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type make_cube_grid(
     const FieldVector<typename GridType::ctype, GridType::dimension>& lower_left,
     const FieldVector<typename GridType::ctype, GridType::dimension>& upper_right,
     const std::array<unsigned int, GridType::dimension> num_elements =
@@ -253,7 +254,7 @@ typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type 
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
 make_cube_grid(const typename GridType::ctype& lower_left,
                const typename GridType::ctype& upper_right,
                const unsigned int num_elements =
@@ -269,7 +270,7 @@ make_cube_grid(const typename GridType::ctype& lower_left,
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
 make_cube_grid(const Common::Configuration& cfg = cube_gridprovider_default_config())
 {
   return CubeGridProviderFactory<GridType>::create(cfg);

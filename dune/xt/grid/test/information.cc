@@ -32,7 +32,7 @@ struct GridInfoTest : public ::testing::Test
   typedef Dune::YaspGrid<griddim, Dune::EquidistantOffsetCoordinates<double, griddim>> GridType;
   typedef Dimensions<typename GridType::LeafGridView> DimensionsType;
 
-  const GridProvider<GridType> grid_prv;
+  const GridProvider<GridType, none_t> grid_prv;
   GridInfoTest()
     : grid_prv(make_cube_grid<GridType>(0.f, 1.f, level))
   {

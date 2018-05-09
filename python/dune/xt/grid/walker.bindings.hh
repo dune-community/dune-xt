@@ -81,7 +81,7 @@ private:
       using namespace pybind11::literals;
 
       m.def(std::string("make_walker_on_" + layer_name<layer>::value() + "_" + backend_name<backend>::value()).c_str(),
-            [](GridProvider<G>& grid_provider, const int level) {
+            [](GridProvider<G, Dune::XT::Grid::none_t>& grid_provider, const int level) {
               return type(grid_provider.template layer<layer, backend>(level));
             },
             "grid_provider"_a,

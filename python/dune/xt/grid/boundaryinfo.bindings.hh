@@ -66,7 +66,7 @@ public:
 
 
 template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain, anything>
+class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain, anything>
 {
 public:
   static void bind(pybind11::module& /*m*/)
@@ -75,7 +75,7 @@ public:
 };
 
 template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain_boundary, anything>
+class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_boundary, anything>
 {
 public:
   static void bind(pybind11::module& /*m*/)
@@ -84,7 +84,7 @@ public:
 };
 
 template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain_coupling, anything>
+class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_coupling, anything>
 {
 public:
   static void bind(pybind11::module& /*m*/)
@@ -120,7 +120,7 @@ public:
     }
 
     // bind factory
-    internal::BoundaryInfoFactory<I, GridProvider<G>, layer>::bind(m);
+    internal::BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, layer>::bind(m);
     internal::BoundaryInfoFactory<I, GridProvider<G, DD::SubdomainGrid<G>>, layer>::bind(m);
 
     // bind class, guard since we might not be the first to do so for this intersection
