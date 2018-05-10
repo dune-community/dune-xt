@@ -37,8 +37,6 @@ namespace LA {
 template <class ScalarImp>
 class CommonDenseVector;
 
-template <class ScalarImp>
-class CommonDenseMatrix;
 
 namespace internal {
 
@@ -363,7 +361,6 @@ protected:
 
 private:
   friend class VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>;
-  friend class CommonDenseMatrix<ScalarType>;
 
   mutable std::shared_ptr<BackendType> backend_;
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;

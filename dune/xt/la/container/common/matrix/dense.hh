@@ -32,7 +32,7 @@ namespace XT {
 namespace LA {
 
 
-template <class ScalarImp>
+template <class ScalarImp, Common::StorageLayout storage_layout>
 class CommonDenseMatrix;
 
 template <class ScalarImp>
@@ -43,12 +43,38 @@ namespace internal {
 
 
 template <class ScalarType>
-struct RowMajorMatrixBackend
+struct MatrixBackendBase
 {
-  RowMajorMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+  MatrixBackendBase(size_t num_rows, size_t num_cols, const ScalarType value)
     : num_rows_(num_rows)
     , num_cols_(num_cols)
     , entries_(num_rows_ * num_cols_, value)
+  {
+  }
+
+  void resize(size_t num_rows, size_t num_cols)
+  {
+    num_rows_ = num_rows;
+    num_cols_ = num_cols;
+    entries_.resize(num_rows_ * num_cols_);
+  }
+
+  size_t num_rows_;
+  size_t num_cols_;
+  std::vector<ScalarType> entries_;
+};
+
+template <class ScalarType, Common::StorageLayout = Common::StorageLayout::dense_row_major>
+struct CommonDenseMatrixBackend;
+
+template <class ScalarType>
+struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_row_major>
+    : public MatrixBackendBase<ScalarType>
+{
+  using BaseType = MatrixBackendBase<ScalarType>;
+
+  CommonDenseMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+    : BaseType(num_rows, num_cols, value)
   {
   }
 
@@ -62,20 +88,45 @@ struct RowMajorMatrixBackend
     return entries_[rr * num_cols_ + cc];
   }
 
-  size_t num_rows_;
-  size_t num_cols_;
-  std::vector<ScalarType> entries_;
+  using BaseType::num_cols_;
+  using BaseType::entries_;
 };
 
 
-template <class ScalarImp>
+template <class ScalarType>
+struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_major>
+    : public MatrixBackendBase<ScalarType>
+{
+  using BaseType = MatrixBackendBase<ScalarType>;
+
+  CommonDenseMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+    : BaseType(num_rows, num_cols, value)
+  {
+  }
+
+  ScalarType& get_entry_ref(size_t rr, size_t cc)
+  {
+    return entries_[cc * num_rows_ + rr];
+  }
+
+  const ScalarType& get_entry_ref(size_t rr, size_t cc) const
+  {
+    return entries_[cc * num_rows_ + rr];
+  }
+
+  using BaseType::num_rows_;
+  using BaseType::entries_;
+};
+
+
+template <class ScalarImp, Common::StorageLayout storage_layout>
 class CommonDenseMatrixTraits
 {
 public:
   using ScalarType = typename Dune::FieldTraits<ScalarImp>::field_type;
   using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
-  using BackendType = RowMajorMatrixBackend<ScalarType>;
-  using derived_type = CommonDenseMatrix<ScalarType>;
+  using BackendType = CommonDenseMatrixBackend<ScalarType, storage_layout>;
+  using derived_type = CommonDenseMatrix<ScalarType, storage_layout>;
   static const Backends backend_type = Backends::common_dense;
   static const Backends vector_type = Backends::common_dense;
   static const constexpr bool sparse = false;
@@ -88,15 +139,16 @@ public:
 /**
  *  \brief  A dense matrix implementation of MatrixInterface using the a std::vector backend.
  */
-template <class ScalarImp = double>
-class CommonDenseMatrix : public MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp>,
-                          public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp>>
+template <class ScalarImp = double, Common::StorageLayout storage_layout = Common::StorageLayout::dense_row_major>
+class CommonDenseMatrix
+    : public MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>,
+      public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>>
 {
   using ThisType = CommonDenseMatrix;
-  using MatrixInterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp>, ScalarImp>;
+  using MatrixInterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>;
 
 public:
-  using Traits = typename internal::CommonDenseMatrixTraits<ScalarImp>;
+  using Traits = typename internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>;
   using BackendType = typename Traits::BackendType;
   using ScalarType = typename Traits::ScalarType;
   using RealType = typename Traits::RealType;
@@ -485,23 +537,23 @@ private:
 namespace Common {
 
 
-template <class T>
-struct MatrixAbstraction<LA::CommonDenseMatrix<T>>
-    : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T>>
+template <class T, Common::StorageLayout layout>
+struct MatrixAbstraction<LA::CommonDenseMatrix<T, layout>>
+    : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T, layout>>
 {
-  using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T>>;
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T, layout>>;
 
-  static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::dense_row_major;
+  static const constexpr Common::StorageLayout storage_layout = layout;
 
   template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
-  using MatrixTypeTemplate = LA::CommonDenseMatrix<FieldType>;
+  using MatrixTypeTemplate = LA::CommonDenseMatrix<FieldType, layout>;
 
-  static inline T* data(LA::CommonDenseMatrix<T>& mat)
+  static inline T* data(LA::CommonDenseMatrix<T, layout>& mat)
   {
     return mat.data();
   }
 
-  static inline const T* data(const LA::CommonDenseMatrix<T>& mat)
+  static inline const T* data(const LA::CommonDenseMatrix<T, layout>& mat)
   {
     return mat.data();
   }

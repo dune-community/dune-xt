@@ -32,6 +32,7 @@ struct MatrixInverterTest : public ::testing::Test
   typedef MatrixInverterOptions<MatrixType> MatrixInverterOpts;
 
   using M = Common::MatrixAbstraction<MatrixType>;
+  using ScalarType = typename M::ScalarType;
 
   MatrixInverterTest()
     : all_matrices_and_inverse_matrices_are_computed_(false)
@@ -39,7 +40,7 @@ struct MatrixInverterTest : public ::testing::Test
     , unit_matrix_(
           eye_matrix<MatrixType>(M::has_static_size ? M::static_rows : 1, M::has_static_size ? M::static_cols : 1))
   {
-    M::set_entry(broken_matrix_, 0, 0, std::numeric_limits<typename M::S>::infinity());
+    M::set_entry(broken_matrix_, 0, 0, std::numeric_limits<typename M::R>::infinity());
   }
 
   static void exports_correct_types()
@@ -110,8 +111,10 @@ struct MatrixInverterTest : public ::testing::Test
         EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_rows(actual_inverse));
         EXPECT_EQ(Common::get_matrix_rows(matrix_), Common::get_matrix_cols(actual_inverse));
         if (tolerance > 0) {
-          EXPECT_TRUE(Common::FloatCmp::eq(actual_inverse, expected_inverse_, tolerance))
+          EXPECT_TRUE(Common::FloatCmp::eq(
+              actual_inverse, expected_inverse_, real_or_complex_tolerance(tolerance, ScalarType())))
               << "\n\nactual inverse: " << actual_inverse << "\n\nexpected inverse: " << expected_inverse_
+              << "\n\nactual inverse - expected_inverse: " << actual_inverse - expected_inverse_
               << "\n\ntolerance: " << tolerance << "\n\ntype: " << tp;
         } else {
           // negative tolerance: we expect a failure
@@ -128,6 +131,19 @@ struct MatrixInverterTest : public ::testing::Test
       }
     }
   } // ... gives_correct_eigenvectors_in_correct_order(...)
+
+  template <class T>
+  T real_or_complex_tolerance(T tolerance, T) const
+  {
+    return tolerance;
+  }
+
+  template <class T>
+  std::complex<T> real_or_complex_tolerance(T tolerance, std::complex<T>) const
+  {
+    return std::complex<T>(tolerance, tolerance);
+  }
+
 
   bool all_matrices_and_inverse_matrices_are_computed_;
   MatrixType broken_matrix_;
