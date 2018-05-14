@@ -12,7 +12,14 @@
 # ~~~
 
 import dune.xt
-from dune.xt._grid import *
+try:
+    from dune.xt._grid import *
+except ImportError as e:
+    import os
+    import logging
+    if os.environ.get('DXT_PYTHON_DEBUG', False):
+        raise e
+    logging.error('dune-xt-grid bindings not available')
 
 HAVE_DUNE_ALUGRID = 'GridProvider__2d_simplex_aluconform' in globals()
 
