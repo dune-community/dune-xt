@@ -141,7 +141,7 @@ compute_eigenvalues_of_a_real_matrix_using_lapack_impl(const RealMatrixType& mat
                                                  dummy_right_eigenvectors.data(),
                                                  static_cast<int>(size),
                                                  work.data(),
-                                                 static_cast<int>(work.size()));
+                                                 -1);
     if (info != 0)
       DUNE_THROW(Dune::XT::LA::Exceptions::eigen_solver_failed, "The lapack backend reported '" << info << "'!");
     work.resize(work[0]);
