@@ -38,7 +38,12 @@ def _make_alu_3d():
     return grids
 
 def _if_active(val, guard, cache):
-    return val if cache[guard] else []
+    try:
+        cache[guard]
+        return val
+    except expection:
+        return []
+
 
 def type_and_dim_1d(cache):
     grid_yasp = [('Dune::YaspGrid<{d},Dune::EquidistantOffsetCoordinates<double,{d}>>'.format(d=d), d) for d in dimDomain_1d]
