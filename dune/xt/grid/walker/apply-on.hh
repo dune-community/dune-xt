@@ -80,6 +80,13 @@ public:
   }
 }; // class AllEntities
 
+template <class GridLayerImp>
+const AllEntities<GridLayerImp>* all_entities()
+{
+  static const AllEntities<GridLayerImp> all_entities_singleton;
+  return &all_entities_singleton;
+}
+
 
 /**
  *  \brief Selects entities which have a boundary intersection.
@@ -294,9 +301,16 @@ public:
   }
 }; // class AllIntersections
 
+template <class GridLayerImp>
+const AllIntersections<GridLayerImp>* all_intersections()
+{
+  static const AllIntersections<GridLayerImp> all_intersections_singleton;
+  return &all_intersections_singleton;
+}
+
 
 /**
- *  \brief Selects all intersections.
+ *  \brief Selects no intersections.
  */
 template <class GridLayerImp>
 class NoIntersections : public internal::WhichIntersectionBase<GridLayerImp, NoIntersections<GridLayerImp>>
