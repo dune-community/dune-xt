@@ -23,8 +23,9 @@
 #include <tbb/tbb_stddef.h>
 #endif
 
-#include <dune/common/version.hh>
 #include <dune/common/deprecated.hh>
+#include <dune/common/unused.hh>
+#include <dune/common/version.hh>
 
 #include <dune/grid/common/rangegenerators.hh>
 
@@ -226,7 +227,7 @@ public:
       return;
     }
 #else
-    DUNE_UNUSED const auto no_warning_for_use_tbb = use_tbb;
+    DUNE_UNUSED_PARAMETER(use_tbb);
 #endif
     // prepare functors
     prepare();
