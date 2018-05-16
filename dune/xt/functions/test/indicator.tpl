@@ -170,7 +170,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
             expected_value = value;
           // actual
           local_f->bind(element);
-          for (const auto& quadrature_point : QuadratureRules<double, d>::rule(element.type(), 3)) {
+          for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
             const auto local_x = quadrature_point.position();
             const auto actual_value = local_f->evaluate(local_x);
             EXPECT_EQ(expected_value, actual_value);
@@ -197,7 +197,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
       expected_value += second_value;
     // actual
     local_f_mult->bind(element);
-    for (const auto& quadrature_point : QuadratureRules<double, d>::rule(element.type(), 3)) {
+    for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
       const auto actual_value = local_f_mult->evaluate(local_x);
       EXPECT_EQ(expected_value, actual_value);
@@ -220,7 +220,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
       expected_value += first_value; // overlapping indicator
     // actual
     local_f_ol->bind(element);
-    for (const auto& quadrature_point : QuadratureRules<double, d>::rule(element.type(), 3)) {
+    for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
       const auto actual_value = local_f_ol->evaluate(local_x);
       EXPECT_EQ(expected_value, actual_value);
@@ -254,7 +254,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, ctors_are_equi
   for (auto&& element : elements(leaf_view)) {
     local_f_1->bind(element);
     local_f_2->bind(element);
-    for (const auto& quadrature_point : QuadratureRules<double, d>::rule(element.type(), 3)) {
+    for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
       const auto value_1 = local_f_1->evaluate(local_x);
       const auto value_2 = local_f_2->evaluate(local_x);
@@ -278,7 +278,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian
         auto local_f = function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);
-          for (const auto& quadrature_point : QuadratureRules<double, d>::rule(element.type(), 3)) {
+          for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
             const auto local_x = quadrature_point.position();
             const auto actual_jacobian = local_f->jacobian(local_x);
             EXPECT_EQ(expected_jacobian, actual_jacobian);
