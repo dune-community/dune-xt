@@ -49,7 +49,7 @@ static const bool available = true;
  *       In addition you have to add the appropriate include
  *       in this file (of course) and the appropriate type below (just like the rest, should be obvious).
  */
-template <classs E, size_t r = 1, size_t rC = 1, class R = double>
+template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class FunctionsFactory
 {
 public:
@@ -148,7 +148,7 @@ private:
 
   using IndicatorType = Functions::IndicatorFunction<E, r, rC, R>;
   using CheckerboardType = Functions::CheckerboardFunction<E, r, rC, R>;
-  using ESV2007CutoffType = Functions::ESV2007::CutoffFunction<E, r, rC, R>;
+  using ESV2007CutoffType = Functions::ESV2007::CutoffFunction<E, R>;
   using Spe10Model1Type = Functions::Spe10::Model1Function<E, r, rC, R>;
   using Spe10Model2Type = Functions::Spe10::Model2Function<E, r, rC, R>;
 
@@ -182,14 +182,14 @@ public:
 
     else if (available().empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(d) << " -> "
+                 "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(E::d) << " -> "
                                 << size_t(r)
                                 << " x "
                                 << size_t(rC)
                                 << "!");
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(d) << " -> "
+                 "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(E::d) << " -> "
                                     << size_t(r)
                                     << " x "
                                     << size_t(rC)
@@ -212,14 +212,14 @@ public:
       return call_create<Spe10Model2Type>(cfg);
     else if (available().empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(d) << " -> "
+                 "There is no " << InterfaceType::static_id() << " available for dimensions " << size_t(E::d) << " -> "
                                 << size_t(r)
                                 << " x "
                                 << size_t(rC)
                                 << "!");
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(d) << " -> "
+                 "Requested type '" << type << "' is not one of those avaible for dimensions " << size_t(E::d) << " -> "
                                     << size_t(r)
                                     << " x "
                                     << size_t(rC)
