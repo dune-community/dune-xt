@@ -103,6 +103,7 @@ private:
       : BaseType()
       , order_lambda_(order_lambda)
       , post_bind_lambda_(post_bind_lambda)
+      , evaluate_lambda_(lambda)
       , param_type_(param_type)
       , jacobian_lambda_(jacobian_lambda)
       , derivative_lambda_(derivative_lambda)
