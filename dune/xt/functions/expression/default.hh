@@ -8,7 +8,7 @@
 //   Felix Schindler (2012 - 2017)
 //   Kirsten Weber   (2013)
 //   Rene Milk       (2012 - 2016, 2018)
-//   Tobias Leibner  (2014 - 2017)
+//   Tobias Leibner  (2014 - 2018)
 
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DEFAULT_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_DEFAULT_HH
@@ -16,10 +16,11 @@
 #include <limits>
 #include <vector>
 
-#include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 #include <dune/xt/functions/exceptions.hh>
 

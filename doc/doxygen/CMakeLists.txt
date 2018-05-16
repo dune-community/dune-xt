@@ -1,3 +1,4 @@
+# ~~~
 # This file is part of the dune-xt-functions project:
 #   https://github.com/dune-community/dune-xt-functions
 # Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
@@ -10,5 +11,6 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 #
 # shortcut for creating the Doxyfile.in and Doxyfile
+# ~~~
 
 add_doxygen_target()

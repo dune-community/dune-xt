@@ -1,3 +1,4 @@
+# ~~~
 # This file is part of the dune-xt-functions project:
 #   https://github.com/dune-community/dune-xt-functions
 # Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
@@ -9,18 +10,19 @@
 #
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
+# ~~~
 
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 
 enable_testing()
 
-BEGIN_TESTCASES()
+begin_testcases()
 
-END_TESTCASES()
+end_testcases()
 
 # load binning setup from file
 if(DEFINED ENV{TRAVIS})
-    include("builder_definitions.cmake")
+  include("builder_definitions.cmake")
 endif(DEFINED ENV{TRAVIS})
 
 foreach (test ${dxt_test_binaries})

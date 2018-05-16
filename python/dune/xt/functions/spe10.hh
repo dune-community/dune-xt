@@ -7,19 +7,22 @@
 // Authors:
 //   Felix Schindler (2016 - 2017)
 //   Rene Milk       (2018)
+//   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_FUNCTIONS_SPE10_PBH
 #define DUNE_XT_FUNCTIONS_SPE10_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <python/dune/xt/common/fvector.pbh>
+
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <dune/xt/functions/spe10/model1.hh>
+
+#include <python/dune/xt/common/fvector.hh>
 
 namespace Dune {
 namespace XT {
@@ -123,5 +126,4 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_SPE10_PBH

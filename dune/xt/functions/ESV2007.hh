@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2014 - 2017)
 //   Rene Milk       (2014 - 2016, 2018)
-//   Tobias Leibner  (2014 - 2017)
+//   Tobias Leibner  (2014 - 2018)
 
 #ifndef DUNEXT_FUNCTIONS_ESV2007_HH
 #define DUNEXT_FUNCTIONS_ESV2007_HH
@@ -16,6 +16,14 @@
 #include <type_traits>
 
 #include <dune/geometry/quadraturerules.hh>
+
+#if HAVE_EIGEN
+#include <dune/xt/common/disable_warnings.hh>
+#include <Eigen/Eigenvalues>
+#include <dune/xt/common/reenable_warnings.hh>
+#endif
+
+#include <dune/geometry/referenceelements.hh>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/debug.hh>

@@ -8,7 +8,7 @@
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2017)
 //   Rene Milk       (2013 - 2016, 2018)
-//   Tobias Leibner  (2014 - 2015, 2017)
+//   Tobias Leibner  (2014 - 2015, 2017 - 2018)
 
 #ifndef DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
 #define DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
@@ -16,6 +16,8 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+
+#include <dune/common/unused.hh>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/debug.hh>
@@ -207,6 +209,7 @@ public:
       if (current_level > max_depth)
         return;
       for (const auto unused_counter : Common::value_range(children)) {
+        DUNE_UNUSED_PARAMETER(unused_counter);
         EllipsoidType child = parent;
         const double scale = std::pow(ellipsoid_cfg.get("ellipsoids.recursion_scale", 0.5), current_level);
         const auto displace = [&](DomainFieldType& coord) {

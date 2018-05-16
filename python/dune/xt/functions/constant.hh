@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_FUNCTIONS_CONSTANT_PBH
 #define DUNE_XT_FUNCTIONS_CONSTANT_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 
@@ -19,8 +18,8 @@
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include <python/dune/xt/common/fvector.pbh>
-#include <python/dune/xt/common/fmatrix.pbh>
+#include <python/dune/xt/common/fvector.hh>
+#include <python/dune/xt/common/fmatrix.hh>
 
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/constant.hh>
@@ -107,5 +106,4 @@ bind_ConstantFunction(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_CONSTANT_PBH

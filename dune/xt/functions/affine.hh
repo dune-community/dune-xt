@@ -8,7 +8,7 @@
 //   Felix Schindler (2013 - 2017)
 //   Kirsten Weber   (2013)
 //   Rene Milk       (2013 - 2018)
-//   Tobias Leibner  (2014 - 2015, 2017)
+//   Tobias Leibner  (2014 - 2015, 2017 - 2018)
 
 #ifndef DUNE_XT_FUNCTIONS_AFFINE_HH
 #define DUNE_XT_FUNCTIONS_AFFINE_HH
@@ -128,19 +128,6 @@ public:
   }
 
   AffineFunctionBase(const ThisType& other) = default;
-
-// if HAVE_DUNE_FEM is true, GlobalFunctionInterface is derived from Fem::Function which has a deleted copy assignment
-// operator
-#if HAVE_DUNE_FEM
-  ThisType& operator=(const ThisType& other)
-  {
-    A_ = other.A_;
-    b_ = other.b_;
-    name_ = other.name_;
-    b_zero_ = other.b_zero_;
-    return *this;
-  }
-#endif
 
   const std::vector<MatrixType>& A() const
   {
@@ -512,6 +499,11 @@ public:
                              const Common::Parameter& /*mu*/ = {}) const override final
   {
     BaseType::template helper<>::jacobian_col(col, A_, ret);
+  }
+
+  virtual bool is_affine() const override
+  {
+    return true;
   }
 
 private:

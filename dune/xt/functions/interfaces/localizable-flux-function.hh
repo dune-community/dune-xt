@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2018)
-//   Tobias Leibner  (2017)
+//   Tobias Leibner  (2017 - 2018)
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FLUX_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FLUX_FUNCTION_HH
@@ -67,6 +67,11 @@ public:
   }
 
   virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& /*entity*/) const = 0;
+
+  virtual bool is_affine() const
+  {
+    return false;
+  }
 
   /**
    * \name ´´These methods should be implemented in order to identify the function.''

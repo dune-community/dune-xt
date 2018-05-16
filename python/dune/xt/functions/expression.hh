@@ -10,7 +10,6 @@
 
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_PBH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
@@ -18,7 +17,7 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
-
+#include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/expression.hh>
 
@@ -187,5 +186,4 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_PBH

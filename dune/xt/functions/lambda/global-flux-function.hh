@@ -240,11 +240,11 @@ private:
   void create_col_lambdas(const PartialXLambdaType& partial_x_lambda, const PartialULambdaType& partial_u_lambda)
   {
     for (size_t ii = 0; ii < dimRangeCols; ++ii) {
-      partial_x_col_lambdas_[ii] = [&](const DomainType& x, const StateRangeType& u, const Common::Parameter& mu) {
+      partial_x_col_lambdas_[ii] = [&, ii](const DomainType& x, const StateRangeType& u, const Common::Parameter& mu) {
         return RangeColumnHelper<dimDomain, RangeFieldType, dimRange, dimRangeCols>::get_col_jacobian(
             ii, partial_x_lambda(x, u, mu));
       };
-      partial_u_col_lambdas_[ii] = [&](const DomainType& x, const StateRangeType& u, const Common::Parameter& mu) {
+      partial_u_col_lambdas_[ii] = [&, ii](const DomainType& x, const StateRangeType& u, const Common::Parameter& mu) {
         return RangeColumnHelper<U::dimRange, RangeFieldType, dimRange, dimRangeCols>::get_col_jacobian(
             ii, partial_u_lambda(x, u, mu));
       };

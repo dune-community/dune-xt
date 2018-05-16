@@ -7,21 +7,24 @@
 // Authors:
 //   Felix Schindler (2016 - 2017)
 //   Rene Milk       (2018)
+//   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
 #define DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
-#if HAVE_DUNE_PYBINDXI
 
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <python/dune/xt/common/fvector.pbh>
-#include <python/dune/xt/common/fmatrix.pbh>
+
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/checkerboard.hh>
+
+#include <python/dune/xt/common/fvector.hh>
+#include <python/dune/xt/common/fmatrix.hh>
 
 namespace Dune {
 namespace XT {
@@ -112,5 +115,4 @@ bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_DUNE_PYBINDXI
 #endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
