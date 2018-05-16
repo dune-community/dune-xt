@@ -19,6 +19,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
+#include <dune/grid/io/file/vtk/common.hh>
 
 namespace Dune {
 namespace XT {
