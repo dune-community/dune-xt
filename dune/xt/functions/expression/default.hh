@@ -94,7 +94,7 @@ public:
             Common::FieldMatrix<std::string, rC, d>(""));
         const Common::Configuration gradient_cfg = cfg.sub("gradient");
         for (size_t ii = 0; ii < r; ++ii)
-          gradient[ii] = gradient_cfg.get<FieldMatrix<std::string, rC, d>>(Common::to_string(ii));
+          gradient[ii] = gradient_cfg.get<Common::FieldMatrix<std::string, rC, d>>(Common::to_string(ii));
         return Common::make_unique<ThisType>(cfg.get<std::string>("variable"),
                                              cfg.get<Common::FieldMatrix<std::string, r, rC>>("expression"),
                                              gradient,
