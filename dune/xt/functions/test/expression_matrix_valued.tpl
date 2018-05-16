@@ -151,12 +151,8 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobi
   // Constant functions
   for (auto value : {-10., 3., 17., 41.}) {
     const RangeExpressionType constant_expr(Common::to_string(value));
-    DerivativeRangeExpressionSingleType constant_grad_single;
+    DerivativeRangeExpressionSingleType constant_grad_single("0");
     DerivativeRangeExpressionType constant_grad(constant_grad_single);
-    for (size_t rr = 0; rr < r; ++rr) {
-      for (size_t dd = 0; dd < d; ++dd)
-        constant_grad[rr][dd] = "0";
-    }
     DerivativeRangeType expected_jacobian(Common::FieldMatrix<double, rC, d>(0.));
     FunctionType function("x", constant_expr, constant_grad, 0);
     for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
@@ -264,14 +260,8 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobia
 
   for (auto value : {-10., 3., 17., 41.}) {
     const RangeExpressionType constant_expr(Common::to_string(value));
-    DerivativeRangeExpressionSingleType constant_grad_single;
+    DerivativeRangeExpressionSingleType constant_grad_single("0");
     DerivativeRangeExpressionType constant_grad(constant_grad_single);
-    for (size_t rr = 0; rr < r; ++rr) {
-      for (size_t rc = 0; rc < rC; ++rc) {
-        for (size_t dd = 0; dd < d; ++dd)
-          constant_grad[rr][rc][dd] = "0";
-      }
-    }
     DerivativeRangeType expected_jacobian(Common::FieldMatrix<double, rC, d>(0.));
     FunctionType function("x", constant_expr, constant_grad, 0);
     const auto& localizable_function = function.template as_localizable<ElementType>();
