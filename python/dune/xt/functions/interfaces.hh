@@ -166,24 +166,13 @@ struct get_combined<L, R, internal::Combination::product>
 
 
 template <class G, size_t r, size_t rC>
-pybind11::class_<LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
-                                              typename G::ctype,
-                                              G::dimension,
-                                              double,
-                                              r,
-                                              rC>>
+pybind11::class_<LocalizableFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>
 bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
-                                       typename G::ctype,
-                                       G::dimension,
-                                       double,
-                                       r,
-                                       rC>
-      C;
+  typedef LocalizableFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double> C;
 
   py::class_<C> c(m,
                   std::string("LocalizableFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x"
@@ -259,7 +248,7 @@ bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_i
         "path"_a,
         "subsampling"_a = true);
 
-  internal::Divergence<G>::addbind(m, c);
+  // internal::Divergence<G>::addbind(m, c);
 
   return c;
 } // ... bind_LocalizableFunctionInterface(...)
@@ -274,28 +263,18 @@ static const constexpr size_t d = G::dimension;
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <class G, size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
-pybind11::class_<typename internal::get_combined<LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
-                                                                              typename G::ctype,
-                                                                              G::dimension,
-                                                                              double,
-                                                                              lr,
-                                                                              lrC>,
-                                                 LocalizableFunctionInterface<typename G::template Codim<0>::Entity,
-                                                                              typename G::ctype,
-                                                                              G::dimension,
-                                                                              double,
-                                                                              rr,
-                                                                              rrC>,
-                                                 comb>::type>
+pybind11::class_<typename internal::
+                     get_combined<LocalizableFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
+                                  LocalizableFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
+                                  comb>::type>
 bind_combined_LocalizableFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
 
   typedef typename G::template Codim<0>::Entity E;
-  typedef typename G::ctype D;
   typedef double R;
-  typedef LocalizableFunctionInterface<E, D, d, R, lr, lrC> Left;
-  typedef LocalizableFunctionInterface<E, D, d, R, rr, rrC> Right;
+  typedef LocalizableFunctionInterface<E, lr, lrC, R> Left;
+  typedef LocalizableFunctionInterface<E, rr, rrC, R> Right;
   typedef typename internal::get_combined<Left, Right, comb>::type C;
   static const size_t r = C::dimRange;
   static const size_t rC = C::dimRangeCols;
@@ -306,7 +285,7 @@ bind_combined_LocalizableFunction(pybind11::module& m, const std::string& grid_i
                           + Common::to_string(lrC) + " and " + Common::to_string(rr) + "x" + Common::to_string(rrC)
                           + ")";
 
-  py::class_<C, LocalizableFunctionInterface<E, D, d, R, r, rC>> c(m, std::string(class_name).c_str(), doc.c_str());
+  py::class_<C, LocalizableFunctionInterface<E, r, rC, R>> c(m, std::string(class_name).c_str(), doc.c_str());
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
 
@@ -328,9 +307,8 @@ void addbind_LocalizableFunctionInterface_combined_op(C& c)
   namespace py = pybind11;
 
   typedef typename G::template Codim<0>::Entity E;
-  typedef typename G::ctype D;
-  typedef LocalizableFunctionInterface<E, D, d, double, r, rC> S;
-  typedef LocalizableFunctionInterface<E, D, d, double, oR, orC> O;
+  typedef LocalizableFunctionInterface<E, r, rC, double> S;
+  typedef LocalizableFunctionInterface<E, oR, orC, double> O;
 
   c.def(internal::get_combined<S, O, comb>::op().c_str(),
         [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
