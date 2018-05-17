@@ -25,9 +25,10 @@
 #include <python/dune/xt/functions/constant.hh>
 #include <python/dune/xt/functions/checkerboard.hh>
 #include <python/dune/xt/functions/ESV2007.bindings.hh>
-#include <python/dune/xt/functions/expression.hh>
+// #include <python/dune/xt/functions/expression.hh>
 #include <python/dune/xt/functions/spe10.hh>
 
+#include <python/dune/xt/common/exceptions.bindings.hh>
 
 template <class G>
 void addbind_for_Grid(pybind11::module& m)
@@ -102,16 +103,16 @@ void addbind_for_Grid(pybind11::module& m)
   bind_ConstantFunction<G, g_dim, 2, 2>(m, grid_id);
 
   bind_CheckerboardFunction<G, g_dim, 1, 1>(m, grid_id);
-  //  bind_CheckerboardFunction<G, g_dim, 2, 1>(m, grid_id);
-  //  bind_CheckerboardFunction<G, g_dim, 3, 1>(m, grid_id);
-  //  bind_CheckerboardFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_CheckerboardFunction<G, g_dim, 2, 1>(m, grid_id);
+  bind_CheckerboardFunction<G, g_dim, 3, 1>(m, grid_id);
+  bind_CheckerboardFunction<G, g_dim, 4, 1>(m, grid_id);
 
-  bindings::ESV2007::CutoffFunction<G>::bind(m);
+//  bindings::ESV2007::CutoffFunction<G>::bind(m);
 
-  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
+//  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
+//  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
+//  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
+//  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
 
   bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
 } // ... addbind_for_Grid(...)
