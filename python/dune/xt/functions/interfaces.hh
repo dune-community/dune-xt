@@ -111,56 +111,55 @@ struct get_combined<L, R, internal::Combination::product>
 }; // struct get_combined
 
 
-template <class G>
-struct Divergence
-{
-  template <size_t d, size_t r, size_t rC, bool dims_match = (d == r) && (rC == 1)>
-  struct helper
-  {
-    template <class E, class D, class R>
-    static void addbind(pybind11::module& m, pybind11::class_<LocalizableFunctionInterface<E, D, d, R, d, 1>>& c)
-    {
-      namespace py = pybind11;
-      using namespace pybind11::literals;
-      using Common::to_string;
+// template <class G>
+// struct Divergence
+//{
+//  template <size_t d, size_t r, size_t rC, bool dims_match = (d == r) && (rC == 1)>
+//  struct helper
+//  {
+//    template <class E, class R>
+//    static void addbind(pybind11::module& m, pybind11::class_<LocalizableFunctionInterface<E, d, 1, R>>& c)
+//    {
+//      namespace py = pybind11;
+//      using namespace pybind11::literals;
+//      using Common::to_string;
 
-      try { // guard since we might not be the first to do bind this combination
-        py::class_<DivergenceFunction<LocalizableFunctionInterface<E, D, d, R, d, 1>>,
-                   LocalizableFunctionInterface<E, D, d, R, 1, 1>>(
-            m,
-            Common::to_camel_case(
-                "divergence_of_function_from_" + Grid::bindings::grid_name<G>::value() + "_to_" + to_string(r) + "x"
-                + to_string(rC))
-                .c_str(),
-            "DivergenceFunction");
-      } catch (std::runtime_error&) {
-      }
+//      try { // guard since we might not be the first to do bind this combination
+//        py::class_<DivergenceFunction<LocalizableFunctionInterface<E, d, 1, R>>,
+//                   LocalizableFunctionInterface<E, d, 1, R>>(
+//            m,
+//            Common::to_camel_case(
+//                "divergence_of_function_from_" + Grid::bindings::grid_name<G>::value() + "_to_" + to_string(r) + "x"
+//                + to_string(rC))
+//                .c_str(),
+//            "DivergenceFunction");
+//      } catch (std::runtime_error&) {
+//      }
 
-      c.def("divergence",
-            [](const LocalizableFunctionInterface<E, D, d, R, d, 1>& self, const std::string& name) {
-              return new DivergenceFunction<LocalizableFunctionInterface<E, D, d, R, d, 1>>(self, name);
-            },
-            "name"_a = "",
-            py::keep_alive<0, 1>());
-    } // ... addbind(...)
-  }; // struct helper<..., true>
+//      c.def("divergence",
+//            [](const LocalizableFunctionInterface<E, d, 1, R>& self, const std::string& name) {
+//              return new DivergenceFunction<LocalizableFunctionInterface<E, d, 1, R>>(self, name);
+//            },
+//            "name"_a = "",
+//            py::keep_alive<0, 1>());
+//    } // ... addbind(...)
+//  }; // struct helper<..., true>
 
-  template <size_t d, size_t r, size_t rC>
-  struct helper<d, r, rC, false>
-  {
-    template <class E, class D, class R>
-    static void addbind(pybind11::module& /*m*/,
-                        pybind11::class_<LocalizableFunctionInterface<E, D, d, R, r, rC>>& /*c*/)
-    {
-    }
-  }; // struct helper<..., false>
+//  template <size_t d, size_t r, size_t rC>
+//  struct helper<d, r, rC, false>
+//  {
+//    template <class E, class R>
+//    static void addbind(pybind11::module& /*m*/, pybind11::class_<LocalizableFunctionInterface<E, r, rC, R>>& /*c*/)
+//    {
+//    }
+//  }; // struct helper<..., false>
 
-  template <class E, class D, size_t d, class R, size_t r, size_t rC>
-  static void addbind(pybind11::module& m, pybind11::class_<LocalizableFunctionInterface<E, D, d, R, r, rC>>& c)
-  {
-    helper<d, r, rC>::addbind(m, c);
-  } // ... addbind(...)
-}; // struct Divergence
+//  template <class E, size_t d, class R, size_t r, size_t rC>
+//  static void addbind(pybind11::module& m, pybind11::class_<LocalizableFunctionInterface<E, r, rC, R>>& c)
+//  {
+//    helper<d, r, rC>::addbind(m, c);
+//  } // ... addbind(...)
+//}; // struct Divergence
 
 
 } // namespace internal
