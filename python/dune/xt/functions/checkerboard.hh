@@ -41,13 +41,9 @@ static const constexpr size_t d = G::dimension;
  */
 template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<Grid::is_grid<G>::value,
-                        pybind11::class_<CheckerboardFunction<typename G::template Codim<0>::Entity,
-                                                              typename G::ctype,
-                                                              G::dimension,
-                                                              double,
-                                                              r,
-                                                              rC>>>::type
-bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
+                        pybind11::class_<CheckerboardFunction<typename G::template Codim<0>::Entity, r, rC, double>>>::
+    type
+    bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -56,8 +52,8 @@ bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
   typedef typename G::ctype D;
   typedef double R;
 
-  typedef LocalizableFunctionInterface<E, D, d, R, r, rC> I;
-  typedef CheckerboardFunction<E, D, d, R, r, rC> C;
+  typedef LocalizableFunctionInterface<E, r, rC, R> I;
+  typedef CheckerboardFunction<E, r, rC, R> C;
 
   py::class_<C, I> c(
       m,
