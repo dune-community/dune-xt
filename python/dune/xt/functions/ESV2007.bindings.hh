@@ -45,8 +45,8 @@ class CutoffFunction
 
       typedef typename G::template Codim<0>::Entity E;
       typedef double R;
-      typedef LocalizableFunctionInterface<E, D, d, R, 1, 1> ScalarFunction;
-      typedef LocalizableFunctionInterface<E, D, d, R, d, d> TensorFunction;
+      typedef LocalizableFunctionInterface<E, 1, 1, R> ScalarFunction;
+      typedef LocalizableFunctionInterface<E, d, d, R> TensorFunction;
       typedef Functions::ESV2007::CutoffFunction<ScalarFunction, void> type_single_diffusion;
       typedef Functions::ESV2007::CutoffFunction<ScalarFunction, TensorFunction> type;
 
