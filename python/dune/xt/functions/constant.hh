@@ -38,24 +38,16 @@ static const constexpr size_t d = G::dimension;
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <class G, size_t d, size_t r, size_t rC>
-typename std::enable_if<Grid::is_grid<G>::value,
-                        pybind11::class_<ConstantFunction<typename G::template Codim<0>::Entity,
-                                                          typename G::ctype,
-                                                          d,
-                                                          double,
-                                                          r,
-                                                          rC>>>::type
+typename std::enable_if<Grid::is_grid<G>::value, pybind11::class_<ConstantFunction<d, r, rC, double>>>::type
 bind_ConstantFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef typename G::template Codim<0>::Entity E;
-  typedef typename G::ctype D;
   typedef double R;
 
-  typedef LocalizableFunctionInterface<E, D, d, R, r, rC> I;
-  typedef ConstantFunction<E, D, d, R, r, rC> C;
+  typedef SmoothFunctionInterface<d, r, rC, R> I;
+  typedef ConstantFunction<d, r, rC, R> C;
 
   py::class_<C, I> c(
       m,
