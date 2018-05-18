@@ -30,7 +30,7 @@ struct CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
   using DerivativeRangeType = typename FunctionType::LocalFunctionType::DerivativeRangeType;
 
   CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
-    : grid_(Dune::XT::Grid::make_cube_grid<GridType>(-1., 1., 8))
+    : grid_(Dune::XT::Grid::make_cube_grid<GridType>(-1., 1., 4))
   {
   }
 
