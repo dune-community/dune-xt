@@ -30,7 +30,7 @@ struct FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
   using DerivativeRangeType = typename FunctionType::DerivativeRangeType;
 
   FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
-    : grid_(Dune::XT::Grid::make_cube_grid<GridType>(-2., 2., 16))
+    : grid_(Dune::XT::Grid::make_cube_grid<GridType>(-2., 2., 4))
   {
     grid_.visualize("grid");
   }
