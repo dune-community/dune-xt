@@ -12,11 +12,6 @@
 
 using namespace Dune::XT;
 
-GTEST_TEST(DISABLED_spe10_model1_test, test_takes_too_long)
-{
-}
-
-#if 0
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
 
@@ -147,4 +142,3 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobi
 }
 
 {% endfor  %}
-#endif
