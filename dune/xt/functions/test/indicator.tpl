@@ -28,7 +28,7 @@ struct IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::test
   using DerivativeRangeType = typename FunctionType::LocalFunctionType::DerivativeRangeType;
 
   IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
-    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 16))
+    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
   {
   }
 
