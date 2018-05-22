@@ -11,7 +11,7 @@
 
 #ifndef DUNE_XT_FUNCTIONS_LAMBDA_LOCAL_FLUX_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_LAMBDA_LOCAL_FLUX_FUNCTION_HH
-
+#if 0
 #include <functional>
 
 #include <dune/common/typetraits.hh>
@@ -20,6 +20,7 @@
 #include <dune/xt/functions/interfaces/localizable-function.hh>
 #include <dune/xt/functions/interfaces/localizable-flux-function.hh>
 #include <dune/xt/functions/type_traits.hh>
+
 
 namespace Dune {
 namespace XT {
@@ -355,5 +356,5 @@ private:
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
-
+#endif
 #endif // DUNE_XT_FUNCTIONS_LAMBDA_LOCAL_FLUX_FUNCTION_HH
