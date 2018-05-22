@@ -10,9 +10,10 @@
 
 #ifndef DUNE_XT_FUNCTIONS_TRANSFORMED_HH
 #define DUNE_XT_FUNCTIONS_TRANSFORMED_HH
-
+#if 0
 #include <dune/xt/functions/type_traits.hh>
 #include <dune/xt/functions/interfaces/localizable-function.hh>
+
 
 namespace Dune {
 namespace XT {
@@ -151,4 +152,5 @@ make_transformed_function(
 } // namespace XT
 } // namespace Dune
 
+#endif
 #endif // DUNE_XT_FUNCTIONS_TRANSFORMED_HH
