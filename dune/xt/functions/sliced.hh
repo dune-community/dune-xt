@@ -10,11 +10,12 @@
 
 #ifndef DUNE_XT_FUNCTIONS_SLICED_HH
 #define DUNE_XT_FUNCTIONS_SLICED_HH
-
+#if 0
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/functions/type_traits.hh>
 #include <dune/xt/functions/interfaces/localizable-function.hh>
+
 
 namespace Dune {
 namespace XT {
@@ -144,5 +145,5 @@ make_sliced_function(const LocalizableFunctionInterface<E, D, d, R, r>& function
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
-
+#endif
 #endif // DUNE_XT_FUNCTIONS_SLICED_HH
