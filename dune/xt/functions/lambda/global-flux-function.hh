@@ -11,12 +11,13 @@
 
 #ifndef DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FLUX_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FLUX_FUNCTION_HH
-
+#if 0
 #include <functional>
 
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/functions/interfaces.hh>
+
 
 namespace Dune {
 namespace XT {
@@ -265,5 +266,5 @@ private:
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
-
+#endif
 #endif // DUNE_XT_FUNCTIONS_LAMBDA_GLOBAL_FLUX_FUNCTION_HH
