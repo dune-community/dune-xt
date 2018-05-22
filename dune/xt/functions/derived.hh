@@ -11,7 +11,7 @@
 
 #ifndef DUNE_XT_FUNCTIONS_DERIVED_HH
 #define DUNE_XT_FUNCTIONS_DERIVED_HH
-
+#if 0
 #include <memory>
 #include <type_traits>
 
@@ -303,4 +303,5 @@ std::shared_ptr<DivergenceFunction<T>> make_divergence(std::shared_ptr<T> func, 
 } // namespace XT
 } // namespace Dune
 
+#endif
 #endif // DUNE_XT_FUNCTIONS_DERIVED_HH
