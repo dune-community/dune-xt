@@ -11,7 +11,7 @@
 
 #ifndef DUNE_XT_FUNCTION_REINTERPRET_HH
 #define DUNE_XT_FUNCTION_REINTERPRET_HH
-
+#if 0
 #include <vector>
 
 #include <dune/common/fvector.hh>
@@ -40,93 +40,90 @@ namespace Functions {
  * \brief Allows to reinterpret a given LocalizableFunctionInterface, associated with a given grid layer, on a different
  *        grid layer.
  *
- *        Therefore, we search for the correct entity in the original grid layer and use the corresponding
+ *        Therefore, we search for the correct element in the original grid layer and use the corresponding
  *        local_function to provide an evaluation for a point on the new grid layer. The physical domain covered by the
  *        new grid layer should thus be contained in the physical domain of the original grid layer. This is mainly used
  *        in the context of prolongations.
  *
- * \note  The current implementation is not thread safe (due to the entity search).
+ * \note  The current implementation is not thread safe (due to the element search).
  *
  * \note  There is no way to reliably obtain the local polynomial order of the source, and we thus use the order of the
- *        local_function corresponding to the first entity.
+ *        local_function corresponding to the first element.
  */
 template <class SourceType, class GridLayerType>
-class ReinterpretFunction : public LocalizableFunctionInterface<XT::Grid::extract_entity_t<GridLayerType>,
-                                                                typename GridLayerType::ctype,
-                                                                GridLayerType::dimension,
-                                                                typename SourceType::RangeFieldType,
+class ReinterpretFunction : public LocalizableFunctionInterface<XT::Grid::extract_element_t<GridLayerType>,
                                                                 SourceType::dimRange,
-                                                                SourceType::dimRangeCols>
+                                                                SourceType::dimRangeCols,
+                                                                typename SourceType::RangeFieldType>
 {
   static_assert(is_localizable_function<SourceType>::value, "");
   static_assert(Grid::is_layer<GridLayerType>::value, "");
-  typedef LocalizableFunctionInterface<XT::Grid::extract_entity_t<GridLayerType>,
-                                       typename GridLayerType::ctype,
-                                       GridLayerType::dimension,
-                                       typename SourceType::RangeFieldType,
+  typedef LocalizableFunctionInterface<XT::Grid::extract_element_t<GridLayerType>,
                                        SourceType::dimRange,
-                                       SourceType::dimRangeCols>
+                                       SourceType::dimRangeCols,
+                                       typename SourceType::RangeFieldType>
       BaseType;
   typedef ReinterpretFunction<SourceType, GridLayerType> ThisType;
 
 public:
-  using typename BaseType::EntityType;
+  using typename BaseType::ElementType;
   using typename BaseType::DomainFieldType;
   using BaseType::dimDomain;
   using typename BaseType::RangeFieldType;
   using BaseType::dimRange;
   using BaseType::dimRangeCols;
-  using typename BaseType::LocalfunctionType;
+  using typename BaseType::LocalFunctionType;
 
 private:
   class ReinterpretLocalfunction
-      : public LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+      : public LocalFunctionInterface<ElementType, dimRange, dimRangeCols, RangeFieldType>
   {
-    typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+    typedef LocalFunctionInterface<ElementType, dimRange, dimRangeCols, RangeFieldType>
         BaseType;
 
   public:
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
-    using typename BaseType::JacobianRangeType;
+    using typename BaseType::DerivativeRangeType;
 
-    ReinterpretLocalfunction(const EntityType& entity, const size_t order, const ThisType& func)
-      : BaseType(entity)
+    ReinterpretLocalfunction(const ElementType& element, const size_t order, const ThisType& func)
+      : BaseType(element)
       , order_(order)
       , func_(func)
       , points_(1)
     {
     }
 
-    virtual size_t order(const Common::Parameter& /*mu*/ = {}) const override final
+    size_t order(const Common::Parameter& /*mu*/ = {}) const override final
     {
       return order_;
     }
 
-    void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
+    RangeType evaluate(const DomainType& xx, const Common::Parameter& mu = {}) const override final
     {
-      points_[0] = this->entity().geometry().global(xx);
-      const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);
-      if (source_entity_ptr_unique_ptrs.size() != 1)
+      RangeType ret;
+      points_[0] = this->element().geometry().global(xx);
+      const auto source_element_ptr_unique_ptrs = func_.element_search_(points_);
+      if (source_element_ptr_unique_ptrs.size() != 1)
         DUNE_THROW(Exceptions::reinterpretation_error,
-                   "It was not possible to find a source entity for this point:\n\n"
+                   "It was not possible to find a source element for this point:\n\n"
                        << points_[0]);
-      const auto& source_entity = *source_entity_ptr_unique_ptrs[0];
-      const auto source_local_function = func_.source_.local_function(source_entity);
-      source_local_function->evaluate(source_entity.geometry().local(points_[0]), ret, mu);
+      const auto& source_element = *source_element_ptr_unique_ptrs[0];
+      const auto source_local_function = func_.source_.local_function(source_element);
+      source_local_function->evaluate(source_element.geometry().local(points_[0]), ret, mu);
     } // ... evaluate(...)
 
-    void jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
+    DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& mu = {}) const override final
     {
-      points_[0] = this->entity().geometry().global(xx);
-      const auto source_entity_ptr_unique_ptrs = func_.entity_search_(points_);
-      if (source_entity_ptr_unique_ptrs.size() != 1)
+      points_[0] = this->element().geometry().global(xx);
+      const auto source_element_ptr_unique_ptrs = func_.element_search_(points_);
+      if (source_element_ptr_unique_ptrs.size() != 1)
         DUNE_THROW(Exceptions::reinterpretation_error,
-                   "It was not possible to find a source entity for this point:\n\n"
+                   "It was not possible to find a source element for this point:\n\n"
                        << points_[0]);
-      const auto& source_entity = *source_entity_ptr_unique_ptrs[0];
-      const auto source_local_function = func_.source_.local_function(source_entity);
-      source_local_function->jacobian(source_entity.geometry().local(points_[0]), ret, mu);
+      const auto& source_element = *source_element_ptr_unique_ptrs[0];
+      const auto source_local_function = func_.source_.local_function(source_element);
+      source_local_function->jacobian(source_element.geometry().local(points_[0]), ret, mu);
     } // ... jacobian(...)
 
   private:
@@ -144,16 +141,16 @@ public:
   ReinterpretFunction(const SourceType& source, const GridLayerType& source_grid_layer)
     : source_(source)
     , source_grid_layer_(source_grid_layer)
-    , entity_search_(source_grid_layer_)
+    , element_search_(source_grid_layer_)
     , guessed_source_order_(source_.local_function(*source_grid_layer_.template begin<0>())->order())
   {
   }
 
   virtual ~ReinterpretFunction() = default;
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const
+  virtual std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const
   {
-    return Common::make_unique<ReinterpretLocalfunction>(entity, guessed_source_order_, *this);
+    return Common::make_unique<ReinterpretLocalfunction>(element, guessed_source_order_, *this);
   }
 
   virtual std::string type() const
@@ -171,7 +168,7 @@ private:
 
   const SourceType& source_;
   const GridLayerType& source_grid_layer_;
-  mutable XT::Grid::EntityInlevelSearch<GridLayerType> entity_search_;
+  mutable XT::Grid::EntityInlevelSearch<GridLayerType> element_search_;
   const size_t guessed_source_order_;
 }; // class ReinterpretFunction
 
@@ -179,5 +176,6 @@ private:
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
+#endif
 
 #endif // DUNE_XT_FUNCTION_REINTERPRET_HH
