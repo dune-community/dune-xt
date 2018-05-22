@@ -11,7 +11,7 @@
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FLUX_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FLUX_FUNCTION_HH
-
+#if 0
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/parameter.hh>
@@ -95,5 +95,5 @@ public:
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
-
+#endif
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FLUX_FUNCTION_HH
