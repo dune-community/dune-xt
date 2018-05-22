@@ -11,8 +11,9 @@
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_GLOBAL_FLUX_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_GLOBAL_FLUX_FUNCTION_HH
-
+#if 0
 #include "localizable-function.hh"
+
 
 namespace Dune {
 namespace XT {
@@ -332,4 +333,5 @@ private:
 } // namespace XT
 } // namespace Dune
 
+#endif
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_GLOBAL_FLUX_FUNCTION_HH
