@@ -72,7 +72,7 @@ private:
     static Common::Configuration default_config(const std::string /*sub_name*/)
     {
       DUNE_THROW(Common::Exceptions::internal_error, "This should not happen!");
-      return Common::Configuration(0);
+      return Common::Configuration();
     }
 
     static std::unique_ptr<FunctionType> create(const Common::Configuration& /*cfg*/)
