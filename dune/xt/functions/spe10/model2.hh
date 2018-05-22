@@ -77,7 +77,8 @@ public:
   } // ... static_id(...)
 
 private:
-  static std::vector<RangeType> read_values_from_file(const std::string& filename)
+  static std::vector<RangeType> read_values_from_file(const std::string& filename,
+                                                      const Common::FieldVector<size_t, dimDomain>& number_of_elements)
 
   {
     // read all the data from the file
@@ -92,23 +93,20 @@ private:
       DUNE_THROW(IOError, "Data file for Groundwaterflow permeability could not be opened!");
     }
     const size_t entries_per_coordinate =
-        internal::model2_x_elements * internal::model2_y_elements * internal::model2_z_elements;
-    assert(3 * entries_per_coordinate == 3366000 && "We know that there are exactly 3366000 values in the file!");
+        number_of_elements[0] /*x*/ * number_of_elements[1] /*y*/ * number_of_elements[2] /*z*/;
 
     std::vector<double> values_in_file(3 * entries_per_coordinate);
     double val;
     file >> val;
     size_t filecounter = 0;
-    while (!file.eof()) {
+    while (!file.eof() && filecounter < 3 * entries_per_coordinate) {
       values_in_file[filecounter++] = val;
       file >> val; // sets EOF flag if no value found
     }
     file.close();
-    if (filecounter != 3 * entries_per_coordinate)
-      DUNE_THROW(Dune::IOError,
-                 "wrong number of entries in '" << filename << "' (are " << filecounter << ", should be "
-                                                << 3 * entries_per_coordinate
-                                                << ")!");
+    /* todo */
+    // if (filecounter != 3366000)
+    //#warning you are not using the entire data file. Use default number_of_elements instead.
 
     std::vector<RangeType> data(entries_per_coordinate, RangeType(0));
 
@@ -132,6 +130,9 @@ public:
     config["upper_right"] = "[" + Common::to_string(internal::model_2_length_x) + " "
                             + Common::to_string(internal::model_2_length_y) + " "
                             + Common::to_string(internal::model_2_length_z) + "]";
+    config["number_of_elements"] = "[" + Common::to_string(internal::model2_x_elements) + " "
+                                   + Common::to_string(internal::model2_y_elements) + " "
+                                   + Common::to_string(internal::model2_z_elements) + "]";
     config["name"] = static_id();
     if (sub_name.empty())
       return config;
@@ -149,22 +150,23 @@ public:
     const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
     // create
-    return Common::make_unique<ThisType>(cfg.get("filename", default_cfg.get<std::string>("filename")),
-                                         cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
-                                         cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
-                                         cfg.get("name", default_cfg.get<std::string>("name")));
+    return Common::make_unique<ThisType>(
+        cfg.get("filename", default_cfg.get<std::string>("filename")),
+        cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
+        cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
+        cfg.get("number_of_elements", default_cfg.get<Common::FieldVector<size_t, dimDomain>>("number_of_elements")),
+        cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
 
   Model2Function(const std::string& filename,
                  const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
                  const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
+                 const Common::FieldVector<size_t, dimDomain>& number_of_elements = {internal::model2_x_elements,
+                                                                                     internal::model2_y_elements,
+                                                                                     internal::model2_z_elements},
                  const std::string nm = BaseType::static_id())
-    : BaseType(lower_left,
-               upper_right,
-               {internal::model2_x_elements, internal::model2_y_elements, internal::model2_z_elements},
-               read_values_from_file(filename),
-               nm)
+    : BaseType(lower_left, upper_right, number_of_elements, read_values_from_file(filename, number_of_elements), nm)
 
   {
   }
