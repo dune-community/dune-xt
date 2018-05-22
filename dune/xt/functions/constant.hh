@@ -106,7 +106,7 @@ public:
     return name_;
   }
 
-  std::string type() const
+  std::string type() const override final
   {
     return BaseType::static_id() + ".constant";
   }
