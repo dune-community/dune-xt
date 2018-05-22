@@ -11,7 +11,7 @@
 
 #ifndef DUNE_XT_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_HH
-
+#if 0
 #include <memory>
 #include <string>
 #include <vector>
@@ -253,4 +253,5 @@ public:
 } // namespace XT
 } // namespace Dune
 
+#endif
 #endif // DUNE_XT_FUNCTIONS_HH
