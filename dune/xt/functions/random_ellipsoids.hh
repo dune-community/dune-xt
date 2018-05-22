@@ -12,7 +12,7 @@
 
 #ifndef DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
 #define DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
-
+#if 0
 #include <cmath>
 #include <memory>
 #include <vector>
@@ -26,6 +26,8 @@
 #include <dune/xt/common/random.hh>
 
 #include <dune/xt/functions/interfaces.hh>
+
+#warning This header needs to be adjusted to introduce_bind_of_functions!
 
 namespace Dune {
 namespace XT {
@@ -316,5 +318,7 @@ private:
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
+
+#endif
 
 #endif // DUNE_XT_FUNCTIONS_RANDOMELLIPSOIDS_HH
