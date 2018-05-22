@@ -11,13 +11,14 @@
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_LOCAL_FLUX_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_LOCAL_FLUX_FUNCTION_HH
-
+#if 0
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/parameter.hh>
 #include <dune/xt/functions/type_traits.hh>
 
 #include "local-functions.hh"
+
 
 namespace Dune {
 namespace XT {
@@ -272,4 +273,5 @@ private:
 } // namespace XT
 } // namespace Dune
 
+#endif
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_LOCAL_FLUX_FUNCTION_HH
