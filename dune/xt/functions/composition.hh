@@ -11,13 +11,14 @@
 
 #ifndef DUNE_XT_FUNCTIONS_COMPOSITION_HH
 #define DUNE_XT_FUNCTIONS_COMPOSITION_HH
-
+#if 0
 #include <dune/grid/yaspgrid.hh>
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 #include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/grid/search.hh>
+
 
 namespace Dune {
 namespace XT {
@@ -288,4 +289,5 @@ private:
 } // namespace XT
 } // namespace Dune
 
+#endif
 #endif // DUNE_XT_FUNCTIONS_COMPOSITION_HH
