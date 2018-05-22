@@ -12,11 +12,6 @@
 
 using namespace Dune::XT;
 
-GTEST_TEST(DISABLED_spe10_model2_test, test_takes_too_long)
-{
-}
-
-#if 0
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
 struct Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
@@ -36,9 +31,7 @@ struct Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
                                                      {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                                                       Dune::XT::Functions::Spe10::internal::model_2_length_y,
                                                       Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                                                     {Dune::XT::Functions::Spe10::internal::model2_x_elements,
-                                                      Dune::XT::Functions::Spe10::internal::model2_y_elements,
-                                                      Dune::XT::Functions::Spe10::internal::model2_z_elements}))
+                                                     {12, 44, 17}))
   {
     grid_.visualize("grid");
   }
@@ -49,12 +42,12 @@ struct Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
-  auto filename = Dune::XT::Functions::Spe10::internal::model2_filename;
-  FunctionType function(filename,
+  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
-                         Dune::XT::Functions::Spe10::internal::model_2_length_z});
+                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
+                        {12, 44, 17});
 }
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
@@ -66,9 +59,8 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable)
 {
   auto default_function = FunctionType::create();
-
-  const auto leaf_view = grid_.leaf_view();
   auto local_f = default_function->local_function();
+  const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     const auto actual_order = local_f->order();
@@ -78,24 +70,41 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
-  auto default_function = FunctionType::create();
+  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+                        {0, 0, 0},
+                        {Dune::XT::Functions::Spe10::internal::model_2_length_x,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_y,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
+                        {12, 44, 17});
   const auto leaf_view = grid_.leaf_view();
-  default_function->visualize(leaf_view, "test__Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable", /*subsampling=*/false);
+  function.visualize(leaf_view, "test__Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable", /*subsampling=*/false);
 }
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
 {
-  auto default_function = FunctionType::create();
+  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+                        {0, 0, 0},
+                        {Dune::XT::Functions::Spe10::internal::model_2_length_x,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_y,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
+                        {12, 44, 17});
+
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = default_function->local_function(element);
+    const auto local_f = function.local_function(element);
   }
 }
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
-  auto default_function = FunctionType::create();
-  auto local_f = default_function->local_function();
+  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+                        {0, 0, 0},
+                        {Dune::XT::Functions::Spe10::internal::model_2_length_x,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_y,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
+                        {12, 44, 17});
+
+  auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -104,10 +113,15 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
-  auto default_function = FunctionType::create();
+  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+                        {0, 0, 0},
+                        {Dune::XT::Functions::Spe10::internal::model_2_length_x,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_y,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
+                        {12, 44, 17});
   const auto leaf_view = grid_.leaf_view();
   const int expected_order = 0;
-  auto local_f = default_function->local_function();
+  auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     const auto actual_order = local_f->order();
@@ -119,9 +133,13 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   const auto leaf_view = grid_.leaf_view();
-  auto default_function = FunctionType::create();
-  auto local_f = default_function->local_function();
-
+  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+                        {0, 0, 0},
+                        {Dune::XT::Functions::Spe10::internal::model_2_length_x,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_y,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
+                        {12, 44, 17});
+  auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
@@ -134,10 +152,15 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
+  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+                        {0, 0, 0},
+                        {Dune::XT::Functions::Spe10::internal::model_2_length_x,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_y,
+                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
+                        {12, 44, 17});
   const auto leaf_view = grid_.leaf_view();
   const DerivativeRangeType expected_jacobian = DerivativeRangeType();
-  auto default_function = FunctionType::create();
-  auto local_f = default_function->local_function();
+  auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
@@ -149,4 +172,3 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobi
 }
 
 {% endfor  %}
-#endif
