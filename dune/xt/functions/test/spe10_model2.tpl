@@ -2,9 +2,7 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/grid/grids.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
@@ -31,7 +29,7 @@ struct Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
                                                      {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                                                       Dune::XT::Functions::Spe10::internal::model_2_length_y,
                                                       Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                                                     {12, 44, 17}))
+                                                     {6, 22, 8}))
   {
     grid_.visualize("grid");
   }
@@ -47,7 +45,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_construct
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {12, 44, 17});
+                        {6, 22, 8});
 }
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
@@ -75,7 +73,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {12, 44, 17});
+                        {6, 22, 8});
   const auto leaf_view = grid_.leaf_view();
   function.visualize(leaf_view, "test__Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable", /*subsampling=*/false);
 }
@@ -87,7 +85,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizab
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {12, 44, 17});
+                        {6, 22, 8});
 
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -102,7 +100,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {12, 44, 17});
+                        {6, 22, 8});
 
   auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
@@ -118,7 +116,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {12, 44, 17});
+                        {6, 22, 8});
   const auto leaf_view = grid_.leaf_view();
   const int expected_order = 0;
   auto local_f = function.local_function();
@@ -138,7 +136,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {12, 44, 17});
+                        {6, 22, 8});
   auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -157,7 +155,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobi
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {12, 44, 17});
+                        {6, 22, 8});
   const auto leaf_view = grid_.leaf_view();
   const DerivativeRangeType expected_jacobian = DerivativeRangeType();
   auto local_f = function.local_function();
