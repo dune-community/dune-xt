@@ -12,15 +12,7 @@
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
 
-#include <memory>
-#include <type_traits>
-
-#include <dune/common/typetraits.hh>
-
-#include <dune/xt/common/memory.hh>
-
 #include <dune/xt/functions/interfaces.hh>
-#include <dune/xt/functions/type_traits.hh>
 
 namespace Dune {
 namespace XT {
