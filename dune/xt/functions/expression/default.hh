@@ -14,15 +14,10 @@
 #define DUNE_XT_FUNCTIONS_EXPRESSION_DEFAULT_HH
 
 #include <limits>
-#include <vector>
-
-#include <dune/common/fvector.hh>
 
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
-#include <dune/xt/functions/exceptions.hh>
 
 #include "base.hh"
 #include "../interfaces.hh"
