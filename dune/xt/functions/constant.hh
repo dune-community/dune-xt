@@ -13,8 +13,6 @@
 #ifndef DUNE_XT_FUNCTIONS_CONSTANT_HH
 #define DUNE_XT_FUNCTIONS_CONSTANT_HH
 
-#include <memory>
-
 #include <dune/xt/common/configuration.hh>
 
 #include "interfaces.hh"
