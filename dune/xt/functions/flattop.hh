@@ -13,10 +13,6 @@
 #define DUNE_XT_FUNCTIONS_FLATTOP_HH
 
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/common/fvector.hh>
-#include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/functions/interfaces.hh>
 
