@@ -12,12 +12,8 @@
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_PARAMETRIC_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_PARAMETRIC_HH
 
-#include <string>
 #include <limits>
 
-#include <dune/common/typetraits.hh>
-
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/parameter.hh>
 #include "../interfaces.hh"
 
