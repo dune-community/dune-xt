@@ -13,14 +13,11 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/grid/grids.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
 #include <dune/xt/functions/ESV2007.hh>
-#include <dune/xt/functions/constant.hh>
 #include <dune/xt/functions/expression.hh>
 
 using namespace Dune::XT;
