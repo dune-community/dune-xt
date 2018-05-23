@@ -61,7 +61,7 @@ void addbind_for_Grid(pybind11::module& m)
   addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 4, 1, 4, 1>(i_4_1);
 
   bind_combined_LocalizableFunction<G, g_dim, diff, 2, 2, 2, 2>(m, grid_id);
-  //  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, g_dim, g_dim, g_dim, g_dim>(i_d_d);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
 
   bind_combined_LocalizableFunction<G, g_dim, sum, 1, 1, 1, 1>(m, grid_id);
@@ -77,7 +77,7 @@ void addbind_for_Grid(pybind11::module& m)
   addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 4, 1, 4, 1>(i_4_1);
 
   bind_combined_LocalizableFunction<G, g_dim, sum, 2, 2, 2, 2>(m, grid_id);
-  //  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, g_dim, g_dim, g_dim, g_dim>(i_d_d);
+  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
 
   bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 1, 1>(m, grid_id);
@@ -96,23 +96,23 @@ void addbind_for_Grid(pybind11::module& m)
   addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 2>(i_1_1);
 
 
-  bind_ConstantFunction<G, g_dim, 1, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 2, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 3, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 4, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 2, 2>(m, grid_id);
+  //  bind_ConstantFunction<G, g_dim, 1, 1>(m, grid_id);
+  //  bind_ConstantFunction<G, g_dim, 2, 1>(m, grid_id);
+  //  bind_ConstantFunction<G, g_dim, 3, 1>(m, grid_id);
+  //  bind_ConstantFunction<G, g_dim, 4, 1>(m, grid_id);
+  //  bind_ConstantFunction<G, g_dim, 2, 2>(m, grid_id);
 
   bind_CheckerboardFunction<G, g_dim, 1, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 2, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 3, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 4, 1>(m, grid_id);
 
-//  bindings::ESV2007::CutoffFunction<G>::bind(m);
+  //  bindings::ESV2007::CutoffFunction<G>::bind(m);
 
-//  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
-//  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
-//  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
-//  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
+  //  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
+  //  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
+  //  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
+  //  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
 
   bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
 } // ... addbind_for_Grid(...)
