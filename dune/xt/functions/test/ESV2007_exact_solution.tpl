@@ -13,9 +13,7 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/grid/grids.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
