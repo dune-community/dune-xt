@@ -12,12 +12,7 @@
 #ifndef DUNE_XT_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_HH
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/exceptions.hh>
 
 #include "dune/xt/functions/interfaces.hh"
 

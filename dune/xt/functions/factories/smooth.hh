@@ -12,20 +12,13 @@
 #ifndef DUNE_XT_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_HH
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/exceptions.hh>
 
 #include "dune/xt/functions/constant.hh"
 #include "dune/xt/functions/ESV2007.hh"
 #include "dune/xt/functions/expression.hh"
 #include "dune/xt/functions/flattop.hh"
 #include "dune/xt/functions/interfaces.hh"
-#include "dune/xt/functions/spe10/model1.hh"
-#include "dune/xt/functions/spe10/model2.hh"
 
 namespace Dune {
 namespace XT {
