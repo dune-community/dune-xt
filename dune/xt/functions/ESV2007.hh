@@ -12,7 +12,6 @@
 #ifndef DUNEXT_FUNCTIONS_ESV2007_HH
 #define DUNEXT_FUNCTIONS_ESV2007_HH
 
-#include <cmath>
 #include <type_traits>
 
 #include <dune/geometry/quadraturerules.hh>
@@ -23,13 +22,8 @@
 #include <dune/xt/common/reenable_warnings.hh>
 #endif
 
-#include <dune/geometry/referenceelements.hh>
-
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/debug.hh>
-#include <dune/xt/common/ranges.hh>
 #include <dune/xt/la/eigen-solver.hh>
-#include <dune/xt/grid/entity.hh>
 
 #include <dune/xt/functions/interfaces.hh>
 
