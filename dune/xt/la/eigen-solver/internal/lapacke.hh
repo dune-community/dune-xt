@@ -44,7 +44,7 @@ template <class MatrixType>
 class MatrixDataProvider<MatrixType, true>
 {
 public:
-  MatrixDataProvider(const MatrixType& matrix)
+  MatrixDataProvider(MatrixType& matrix)
     : matrix_(matrix)
   {
   }
@@ -57,7 +57,7 @@ public:
   static const Common::StorageLayout storage_layout = Common::MatrixAbstraction<MatrixType>::storage_layout;
 
 private:
-  MatrixType matrix_;
+  MatrixType& matrix_;
 };
 
 template <class MatrixType>
