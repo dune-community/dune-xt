@@ -36,7 +36,6 @@ void forward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
   for (size_t ii = 0; ii < M::rows(A); ++ii) {
     for (size_t jj = 0; jj < ii; ++jj)
       rhs[ii] -= M::get_entry(A, transposed ? jj : ii, transposed ? ii : jj) * x[jj];
-    // We could simply use ==, but that gives a warning with -Wfloat-equal
     if (M::get_entry(A, ii, ii) == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / M::get_entry(A, ii, ii);
