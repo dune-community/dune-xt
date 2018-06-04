@@ -39,7 +39,6 @@ template <class MatrixType,
                || Common::MatrixAbstraction<MatrixType>::storage_layout == Common::StorageLayout::dense_column_major)>
 class MatrixDataProvider;
 
-// TODO: use non-const MatrixType, do not copy
 template <class MatrixType>
 class MatrixDataProvider<MatrixType, true>
 {
