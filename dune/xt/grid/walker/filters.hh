@@ -44,9 +44,12 @@ class NegatedIntersectionFilter;
 
 
 /**
- *  \brief Interface for element filters to restrict the range of elements a functor is applied on by the grid walker.
- *  \note  Filters are provided within the ApplyOn namespace.
- *  \note  See also the \sa GridWalker for typical use cases.
+ * \brief Interface for element filters to restrict the range of elements a functor is applied on by the Walker.
+ *
+ * \note  Filters are provided within the ApplyOn namespace.
+ * \note  See also the Walker for typical use cases.
+ *
+ * \sa Walker
  */
 template <class GL>
 class ElementFilter
@@ -95,10 +98,13 @@ public:
 
 
 /**
- *  \brief Interface for intersection filters to restrict the range of intersections a functor is applied on by the grid
- *         walker.
- *  \note  Filters are provided within the ApplyOn namespace.
- *  \note  See also the \sa GridWalker for typical use cases.
+ * \brief Interface for intersection filters to restrict the range of intersections a functor is applied on by the
+ *        Walker.
+ *
+ * \note Filters are provided within the ApplyOn namespace.
+ * \note See also the Walker for typical use cases.
+ *
+ * \sa Walker
  */
 template <class GL>
 class IntersectionFilter
@@ -150,7 +156,10 @@ namespace ApplyOn {
 
 
 /**
- *  \brief A filter which selects all elements.
+ * \brief A filter which selects all elements.
+ *
+ * \sa Walker
+ * \sa ElementFilter
  */
 template <class GL>
 class AllElements : public ElementFilter<GL>
@@ -176,7 +185,39 @@ public:
 
 
 /**
- *  \brief A filter which selects entities which have a boundary intersection.
+ * \brief A filter which selects no elements.
+ *
+ * \sa Walker
+ * \sa ElementFilter
+ */
+template <class GL>
+class NoElements : public ElementFilter<GL>
+{
+  using BaseType = ElementFilter<GL>;
+
+public:
+  using typename BaseType::GridViewType;
+  using typename BaseType::ElementType;
+
+  explicit NoElements() = default;
+
+  ElementFilter<GridViewType>* copy() const override final
+  {
+    return new NoElements<GridViewType>();
+  }
+
+  bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const override final
+  {
+    return false;
+  }
+}; // class NoElements
+
+
+/**
+ * \brief A filter which selects entities which have a boundary intersection.
+ *
+ * \sa Walker
+ * \sa ElementFilter
  */
 template <class GL>
 class BoundaryEntities : public ElementFilter<GL>
@@ -202,7 +243,10 @@ public:
 
 
 /**
- *  \brief A filter which selects entities based on a lambda expression.
+ * \brief A filter which selects entities based on a lambda expression.
+ *
+ * \sa Walker
+ * \sa ElementFilter
  */
 template <class GL>
 class LambdaFilteredElements : public ElementFilter<GL>
@@ -235,7 +279,10 @@ private:
 
 
 /**
- *  \brief A filter which selects entities in a compatible PartitionSet.
+ * \brief A filter which selects entities in a compatible PartitionSet.
+ *
+ * \sa Walker
+ * \sa ElementFilter
  */
 template <class GL, class PartitionSetType>
 class PartitionSetEntities : public ElementFilter<GL>
@@ -261,7 +308,10 @@ public:
 
 
 /**
- *  \brief A filter which selects all intersections.
+ * \brief A filter which selects all intersections.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class AllIntersections : public IntersectionFilter<GL>
@@ -287,13 +337,45 @@ public:
 
 
 /**
- *  \brief A filter which selects each inner intersection.
+ * \brief A filter which selects no intersections.
  *
- *  \note  To decide if this in an inner intersection,
+ * \sa Walker
+ * \sa IntersectionFilter
+ */
+template <class GL>
+class NoIntersections : public IntersectionFilter<GL>
+{
+  using BaseType = IntersectionFilter<GL>;
+
+public:
+  using typename BaseType::GridViewType;
+  using typename BaseType::IntersectionType;
+
+  explicit NoIntersections() = default;
+
+  IntersectionFilter<GridViewType>* copy() const override final
+  {
+    return new NoIntersections<GridViewType>();
+  }
+
+  bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const override final
+  {
+    return false;
+  }
+}; // class NoIntersections
+
+
+/**
+ * \brief A filter which selects each inner intersection.
+ *
+ * \note To decide if this in an inner intersection,
 \code
 intersection.neighbor() && !intersection.boundary()
 \endcode
- *         is used.
+ *       is used.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class InnerIntersections : public IntersectionFilter<GL>
@@ -319,14 +401,17 @@ public:
 
 
 /**
- *  \brief A filter which selects each inner intersection only once.
+ * \brief A filter which selects each inner intersection only once.
  *
- *  \note  To decide if this in an inner intersection,
+ * \note To decide if this in an inner intersection,
 \code
 intersection.neighbor() && !intersection.boundary()
 \endcode
- *         is used, and true is returned, if the index of the inside() element is smaller than the index of the
- *         outside() element.
+ *       is used, and true is returned, if the index of the inside() element is smaller than the index of the outside()
+ *       element.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class InnerIntersectionsOnce : public IntersectionFilter<GL>
@@ -357,8 +442,11 @@ public:
 
 
 /**
- *  \brief Selects each inner intersection in given partition only once.
- *  \see InnerIntersectionsOnce
+ * \brief Selects each inner intersection in given partition only once.
+ *
+ * \sa InnerIntersectionsOnce
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL, class PartitionSetType>
 class PartitionSetInnerIntersectionsOnce : public IntersectionFilter<GL>
@@ -392,7 +480,10 @@ public:
 
 
 /**
- *  \brief A filter which selects boundary intersections.
+ * \brief A filter which selects boundary intersections.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class BoundaryIntersections : public IntersectionFilter<GL>
@@ -418,7 +509,10 @@ public:
 
 
 /**
- *  \brief A filter which selects intersections on a non-periodic boundary.
+ * \brief A filter which selects intersections on a non-periodic boundary.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class NonPeriodicBoundaryIntersections : public IntersectionFilter<GL>
@@ -444,13 +538,16 @@ public:
 
 
 /**
- *  \brief A filter which selects intersections on a periodic boundary only once.
+ * \brief A filter which selects intersections on a periodic boundary only once.
  *
- *         To decide if this a periodic intersection,
+ *        To decide if this a periodic intersection,
 \code
 intersection.neighbor() && intersection.boundary()
 \endcode
- *         is used.
+ *        is used.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class PeriodicBoundaryIntersections : public IntersectionFilter<GL>
@@ -476,14 +573,17 @@ public:
 
 
 /**
- *  \brief A filter which selects intersections on a periodic boundary only once.
+ * \brief A filter which selects intersections on a periodic boundary only once.
  *
- *         To decide if this in an periodic intersection,
+ *        To decide if this in an periodic intersection,
 \code
 intersection.neighbor() && intersection.boundary()
 \endcode
- *         is used, and true is returned, if the index of the inside() element is smaller than the index of the
- *         outside() element.
+ *        is used, and true is returned, if the index of the inside() element is smaller than the index of the outside()
+ *        element.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class PeriodicBoundaryIntersectionsOnce : public IntersectionFilter<GL>
@@ -515,7 +615,10 @@ public:
 
 
 /**
- *  \brief A filter which selects intersections based on a lambda expression.
+ * \brief A filter which selects intersections based on a lambda expression.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class LambdaFilteredIntersections : public IntersectionFilter<GL>
@@ -548,7 +651,10 @@ private:
 
 
 /**
- *  \brief A filter which selects intersections on a given part of the boundary.
+ * \brief A filter which selects intersections on a given part of the boundary.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class CustomBoundaryIntersections : public IntersectionFilter<GL>
@@ -593,7 +699,10 @@ protected:
 
 
 /**
- *  \brief A filter which selects intersections on a given part of the physical boundary and the process boundary.
+ * \brief A filter which selects intersections on a given part of the physical boundary and the process boundary.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class CustomBoundaryAndProcessIntersections : public IntersectionFilter<GL>
@@ -640,7 +749,10 @@ protected:
 
 
 /**
- *  \brief A filter which selects intersections on a the process boundary.
+ * \brief A filter which selects intersections on a the process boundary.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
  */
 template <class GL>
 class ProcessIntersections : public IntersectionFilter<GL>
