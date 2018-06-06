@@ -31,9 +31,12 @@ namespace internal {
 
 
 /**
- * \brief To be used within the \sa Walker as internal storage type.
- * \note  Most likely you do not want to use this class directly, but instead append() an \sa ElementFunctor to a
- *        Walker.
+ * \brief To be used within the Walker as internal storage type.
+ *
+ * \note Most likely you do not want to use this class directly, but instead append() an ElementFunctor to a Walker.
+ *
+ * \sa ElementFunctor
+ * \sa Walker
  */
 template <class GL>
 class ElementFunctorWrapper
