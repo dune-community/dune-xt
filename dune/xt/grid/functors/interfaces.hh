@@ -23,8 +23,11 @@ namespace Grid {
 
 
 /**
- * \brief Interface for functors which are applied to elements (codim 0 entities) of a grid layer by the \sa GridWalker.
- * \sa    ElementReturnFunctor
+ * \brief Interface for functors which are applied to elements (codim 0 entities) of a grid layer by the Walker.
+ *
+ * \sa Walker
+ * \sa IntersectionFunctor
+ * \sa ElementAndIntersectionFunctor
  */
 template <class GL>
 class ElementFunctor
@@ -45,23 +48,28 @@ public:
   ElementFunctor() = default;
   virtual ~ElementFunctor() = default;
 
+  virtual ElementFunctor<GridViewType>* copy() = 0;
+
   virtual void prepare()
   {
   }
 
-  virtual void apply_local(const ElementType& element) = 0;
+  virtual void apply_local(const ElementType& /*element*/)
+  {
+  }
 
   virtual void finalize()
   {
   }
-
-  virtual ElementFunctor<GridViewType>* copy() = 0;
 }; // class ElementFunctor
 
 
 /**
- * \brief Interface for functors which are applied to (codim 1) intersection of a grid layer by the \sa GridWalker.
- * \sa    ElementFunctor
+ * \brief Interface for functors which are applied to intersections (codim 1 entities) of a grid layer by the Walker.
+ *
+ * \sa Walker
+ * \sa ElementFunctor
+ * \sa ElementAndIntersectionFunctor
  */
 template <class GL>
 class IntersectionFunctor
@@ -84,29 +92,34 @@ public:
   IntersectionFunctor() = default;
   virtual ~IntersectionFunctor() = default;
 
+  virtual IntersectionFunctor<GridViewType>* copy() = 0;
+
   virtual void prepare()
   {
   }
 
   /**
-   * \note The meaning of outside_intersection depends on the circumstances. In general, the result of
+   * \note The meaning of outside_element depends on the circumstances. In general, the result of
    *       intersection.outside() is given, but this might differ on periodic or boundary intersections.
    */
-  virtual void apply_local(const IntersectionType& intersection,
-                           const ElementType& inside_element,
-                           const ElementType& outside_element) = 0;
+  virtual void apply_local(const IntersectionType& /*intersection*/,
+                           const ElementType& /*inside_element*/,
+                           const ElementType& /*outside_element*/)
+  {
+  }
 
   virtual void finalize()
   {
   }
-
-  virtual IntersectionFunctor<GridViewType>* copy() = 0;
 }; // class IntersectionFunctor
 
+
 /**
- * \brief Interface for functors which are applied to entities and intersections of a grid layer by the \sa GridWalker.
- * \sa    ElementFunctor
- * \sa    IntersectionFunctor
+ * \brief Interface for functors which are applied to entities and intersections of a grid layer by the Walker.
+ *
+ * \sa Walker
+ * \sa ElementFunctor
+ * \sa IntersectionFunctor
  */
 template <class GL>
 class ElementAndIntersectionFunctor
@@ -129,21 +142,25 @@ public:
   ElementAndIntersectionFunctor() = default;
   virtual ~ElementAndIntersectionFunctor() = default;
 
+  virtual ElementAndIntersectionFunctor<GL>* copy() = 0;
+
   virtual void prepare()
   {
   }
 
-  virtual void apply_local(const ElementType& element) = 0;
+  virtual void apply_local(const ElementType& /*element*/)
+  {
+  }
 
-  virtual void apply_local(const IntersectionType& intersection,
-                           const ElementType& inside_element,
-                           const ElementType& outside_element) = 0;
+  virtual void apply_local(const IntersectionType& /*intersection*/,
+                           const ElementType& /*inside_element*/,
+                           const ElementType& /*outside_element*/)
+  {
+  }
 
   virtual void finalize()
   {
   }
-
-  virtual ElementAndIntersectionFunctor<GL>* copy() = 0;
 }; // class ElementAndIntersectionFunctor
 
 
