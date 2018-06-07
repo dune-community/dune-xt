@@ -14,10 +14,11 @@
 
 #include <functional>
 
+#include <dune/grid/common/partitionset.hh>
+
 #include <dune/xt/common/memory.hh>
 
 #include <dune/xt/grid/boundaryinfo.hh>
-#include <dune/grid/common/partitionset.hh>
 
 namespace Dune {
 namespace XT {
@@ -355,46 +356,13 @@ public:
 
 
 /**
- *  \brief Selects each inner intersection only once.
- *
- *  To decide if this in an inner intersection,
-\code
-intersection.neighbor() && !intersection.boundary()
-\endcode
- *  is used, and true is returned, if the index of the inside() entity is smaller than the index of the outside()
- *  entity.
+ *  \brief Selects each inner intersection (in given partition) only once.
  */
-template <class GridLayerImp>
+template <class GridLayerImp, class PartitionSetType = Dune::Partitions::All>
 class InnerIntersectionsPrimally
-    : public internal::WhichIntersectionBase<GridLayerImp, InnerIntersectionsPrimally<GridLayerImp>>
+    : public internal::WhichIntersectionBase<GridLayerImp, InnerIntersectionsPrimally<GridLayerImp, PartitionSetType>>
 {
-  typedef WhichIntersection<GridLayerImp> BaseType;
-
-public:
-  using typename BaseType::GridLayerType;
-  using typename BaseType::IntersectionType;
-
-  virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
-  {
-    if (intersection.neighbor() && !intersection.boundary()) {
-      const auto insideEntity = intersection.inside();
-      const auto outsideNeighbor = intersection.outside();
-      return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
-    } else
-      return false;
-  }
-}; // class InnerIntersectionsPrimally
-
-/**
- *  \brief Selects each inner intersection in given partition only once.
- *  \see InnerIntersectionsPrimally
- */
-template <class GridLayerImp, class PartitionSetType>
-class PartitionSetInnerIntersectionsPrimally
-    : public internal::WhichIntersectionBase<GridLayerImp,
-                                             PartitionSetInnerIntersectionsPrimally<GridLayerImp, PartitionSetType>>
-{
-  typedef WhichIntersection<GridLayerImp> BaseType;
+  typedef internal::WhichIntersectionBase<GridLayerImp, InnerIntersectionsPrimally> BaseType;
 
 public:
   using typename BaseType::GridLayerType;
@@ -406,19 +374,20 @@ public:
         && PartitionSetType::contains(intersection.inside().partitionType())) {
       const auto insideEntity = intersection.inside();
       const auto outsideNeighbor = intersection.outside();
+      // if outside entity is not in Partition, we need to use this intersection even if index is greater
       if (!PartitionSetType::contains(intersection.outside().partitionType()))
         return true;
       return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
     } else
       return false;
   }
-}; // class PartitionSetInnerIntersectionsPrimally
+}; // class InnerIntersectionsPrimally
 
 
 template <class GridLayerImp>
 class BoundaryIntersections : public internal::WhichIntersectionBase<GridLayerImp, BoundaryIntersections<GridLayerImp>>
 {
-  typedef WhichIntersection<GridLayerImp> BaseType;
+  typedef internal::WhichIntersectionBase<GridLayerImp, BoundaryIntersections> BaseType;
 
 public:
   using typename BaseType::GridLayerType;
@@ -431,11 +400,14 @@ public:
 }; // class BoundaryIntersections
 
 
-template <class GridLayerImp>
+template <class GridLayerImp, class PartitionSetType = Dune::Partitions::All>
 class NonPeriodicBoundaryIntersections
-    : public internal::WhichIntersectionBase<GridLayerImp, NonPeriodicBoundaryIntersections<GridLayerImp>>
+    : public internal::WhichIntersectionBase<GridLayerImp,
+                                             NonPeriodicBoundaryIntersections<GridLayerImp, PartitionSetType>>
 {
-  typedef WhichIntersection<GridLayerImp> BaseType;
+  typedef internal::WhichIntersectionBase<GridLayerImp,
+                                          NonPeriodicBoundaryIntersections<GridLayerImp, PartitionSetType>>
+      BaseType;
 
 public:
   using typename BaseType::GridLayerType;
@@ -443,9 +415,10 @@ public:
 
   virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
-    return intersection.boundary() && !intersection.neighbor();
+    return intersection.boundary() && !intersection.neighbor()
+           && PartitionSetType::contains(intersection.inside().partitionType());
   }
-}; // class BoundaryIntersections
+}; // class NonPeriodicBoundaryIntersections
 
 
 /**
@@ -457,10 +430,11 @@ intersection.neighbor() && intersection.boundary()
 \endcode
  *  is used.
  */
-template <class GridLayerImp>
-class PeriodicIntersections : public internal::WhichIntersectionBase<GridLayerImp, PeriodicIntersections<GridLayerImp>>
+template <class GridLayerImp, class PartitionSetType = Dune::Partitions::All>
+class PeriodicIntersections
+    : public internal::WhichIntersectionBase<GridLayerImp, PeriodicIntersections<GridLayerImp, PartitionSetType>>
 {
-  typedef WhichIntersection<GridLayerImp> BaseType;
+  typedef internal::WhichIntersectionBase<GridLayerImp, PeriodicIntersections> BaseType;
 
 public:
   using typename BaseType::GridLayerType;
@@ -468,16 +442,17 @@ public:
 
   virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
-    return intersection.neighbor() && intersection.boundary();
+    return intersection.neighbor() && intersection.boundary()
+           && PartitionSetType::contains(intersection.inside().partitionType());
   }
 }; // class PeriodicIntersections
 
-
-template <class GridLayerImp>
+template <class GridLayerImp, class PartitionSetType = Dune::Partitions::All>
 class PeriodicIntersectionsPrimally
-    : public internal::WhichIntersectionBase<GridLayerImp, PeriodicIntersectionsPrimally<GridLayerImp>>
+    : public internal::WhichIntersectionBase<GridLayerImp,
+                                             PeriodicIntersectionsPrimally<GridLayerImp, PartitionSetType>>
 {
-  typedef WhichIntersection<GridLayerImp> BaseType;
+  typedef internal::WhichIntersectionBase<GridLayerImp, PeriodicIntersectionsPrimally> BaseType;
 
 public:
   using typename BaseType::GridLayerType;
@@ -485,9 +460,12 @@ public:
 
   virtual bool apply_on(const GridLayerType& grid_layer, const IntersectionType& intersection) const override final
   {
-    if (intersection.neighbor() && intersection.boundary()) {
+    if (intersection.neighbor() && intersection.boundary()
+        && PartitionSetType::contains(intersection.inside().partitionType())) {
       const auto insideEntity = intersection.inside();
       const auto outsideNeighbor = intersection.outside();
+      if (!PartitionSetType::contains(intersection.outside().partitionType()))
+        return true;
       return grid_layer.indexSet().index(insideEntity) < grid_layer.indexSet().index(outsideNeighbor);
     } else {
       return false;
