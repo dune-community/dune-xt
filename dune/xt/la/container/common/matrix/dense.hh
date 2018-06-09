@@ -239,6 +239,11 @@ public:
     return *this;
   }
 
+  ThisType& copy_backend(const ThisType& other)
+  {
+    *backend_ = *other.backend_;
+  }
+
   /**
    *  \note Does a deep copy.
    */
@@ -274,6 +279,12 @@ public:
   const ScalarType* data() const
   {
     return backend().entries_.data();
+  }
+
+  void resize(const size_t ii, const size_t jj)
+  {
+    ensure_uniqueness();
+    backend_->resize(ii, jj);
   }
 
   /// \}
