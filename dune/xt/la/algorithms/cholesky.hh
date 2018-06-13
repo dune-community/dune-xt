@@ -208,8 +208,7 @@ struct CholeskySolver
     const size_t size = M::rows(A);
     if (size != M::cols(A))
       DUNE_THROW(Dune::InvalidStateException, "Matrix has to be square!");
-    if (size < 5) {
-      cholesky_colwise<only_set_nonzero>(A);
+    if (false) {
 #if HAVE_MKL || HAVE_LAPACKE
     } else if (storage_layout == Common::StorageLayout::dense_row_major
                || storage_layout == Common::StorageLayout::dense_column_major) {
@@ -217,7 +216,8 @@ struct CholeskySolver
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();
       assert(size <= std::numeric_limits<int>::max());
-      Common::Lapacke::dpotrf(lapacke_storage_layout, 'L', static_cast<int>(size), M::data(A), static_cast<int>(size));
+      Common::Lapacke::dpotrf_work(
+          lapacke_storage_layout, 'L', static_cast<int>(size), M::data(A), static_cast<int>(size));
 #endif // HAVE_MKL || HAVE_LAPACKE
     } else if (storage_layout == Common::StorageLayout::csr)
       cholesky_csr(A);
