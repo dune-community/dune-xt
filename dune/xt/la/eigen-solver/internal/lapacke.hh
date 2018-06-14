@@ -33,18 +33,25 @@ namespace LA {
 namespace internal {
 
 
-template <class MatrixType,
-          bool is_contiguous =
-              (Common::MatrixAbstraction<MatrixType>::storage_layout == Common::StorageLayout::dense_row_major
-               || Common::MatrixAbstraction<MatrixType>::storage_layout == Common::StorageLayout::dense_column_major)>
+template <class MatrixType>
+struct is_contiguous_and_mutable
+{
+  static constexpr bool value =
+      (Common::MatrixAbstraction<std::decay_t<MatrixType>>::storage_layout == Common::StorageLayout::dense_row_major
+       || Common::MatrixAbstraction<std::decay_t<MatrixType>>::storage_layout
+              == Common::StorageLayout::dense_column_major)
+      && !std::is_const<std::remove_reference_t<MatrixType>>::value;
+};
+
+
+template <class MatrixType, bool contiguous_and_mutable>
 class MatrixDataProvider;
 
-// TODO: use non-const MatrixType, do not copy
 template <class MatrixType>
 class MatrixDataProvider<MatrixType, true>
 {
 public:
-  MatrixDataProvider(const MatrixType& matrix)
+  MatrixDataProvider(MatrixType& matrix)
     : matrix_(matrix)
   {
   }
@@ -57,7 +64,7 @@ public:
   static const Common::StorageLayout storage_layout = Common::MatrixAbstraction<MatrixType>::storage_layout;
 
 private:
-  MatrixType matrix_;
+  MatrixType& matrix_;
 };
 
 template <class MatrixType>
@@ -90,15 +97,16 @@ template <class RealMatrixType>
 typename std::enable_if<Common::is_matrix<std::decay_t<RealMatrixType>>::value, std::vector<std::complex<double>>>::type
 compute_eigenvalues_of_a_real_matrix_using_lapack(RealMatrixType&& matrix)
 {
-  MatrixDataProvider<std::decay_t<RealMatrixType>> matrix_data_provider(matrix);
+  MatrixDataProvider<std::decay_t<RealMatrixType>, is_contiguous_and_mutable<RealMatrixType>::value>
+      matrix_data_provider(matrix);
   return compute_eigenvalues_of_a_real_matrix_using_lapack_impl(matrix, matrix_data_provider);
 }
 
 
-template <class RealMatrixType>
+template <class RealMatrixType, bool contiguous_and_mutable>
 typename std::enable_if<Common::is_matrix<RealMatrixType>::value, std::vector<std::complex<double>>>::type
-compute_eigenvalues_of_a_real_matrix_using_lapack_impl(const RealMatrixType& matrix,
-                                                       MatrixDataProvider<RealMatrixType>& matrix_data_provider)
+compute_eigenvalues_of_a_real_matrix_using_lapack_impl(
+    const RealMatrixType& matrix, MatrixDataProvider<RealMatrixType, contiguous_and_mutable>& matrix_data_provider)
 {
   if (!Common::Lapacke::available())
     DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
@@ -119,7 +127,8 @@ compute_eigenvalues_of_a_real_matrix_using_lapack_impl(const RealMatrixType& mat
   thread_local std::vector<double> dummy_left_eigenvectors(1, 0.);
   thread_local std::vector<double> dummy_right_eigenvectors(1, 0.);
   assert(size < std::numeric_limits<int>::max());
-  int storage_layout = MatrixDataProvider<RealMatrixType>::storage_layout == Common::StorageLayout::dense_row_major
+  int storage_layout = MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout
+                               == Common::StorageLayout::dense_row_major
                            ? Common::Lapacke::row_major()
                            : Common::Lapacke::col_major();
   thread_local std::vector<double> work(1);
@@ -183,18 +192,19 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(RealMat
                                                                          std::vector<std::complex<double>>& eigenvalues,
                                                                          ComplexMatrixType& right_eigenvectors)
 {
-  MatrixDataProvider<std::decay_t<RealMatrixType>> matrix_data_provider(matrix);
+  MatrixDataProvider<std::decay_t<RealMatrixType>, is_contiguous_and_mutable<RealMatrixType>::value>
+      matrix_data_provider(matrix);
   compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
       matrix, matrix_data_provider, eigenvalues, right_eigenvectors);
 }
 
 
-template <class RealMatrixType, class ComplexMatrixType>
+template <class RealMatrixType, class ComplexMatrixType, bool contiguous_and_mutable>
 typename std::enable_if<Common::is_matrix<RealMatrixType>::value && Common::is_matrix<ComplexMatrixType>::value,
                         void>::type
 compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
     const RealMatrixType& matrix,
-    MatrixDataProvider<RealMatrixType>& matrix_data_provider,
+    MatrixDataProvider<RealMatrixType, contiguous_and_mutable>& matrix_data_provider,
     std::vector<std::complex<double>>& eigenvalues,
     ComplexMatrixType& right_eigenvectors)
 {
@@ -233,14 +243,15 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
                    << Dune::XT::Common::get_matrix_cols(right_eigenvectors)
                    << "!");
 #endif // DUNE_XT_LA_DISABLE_ALL_CHECKS
-  int storage_layout = MatrixDataProvider<RealMatrixType>::storage_layout == Common::StorageLayout::dense_row_major
+  int storage_layout = MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout
+                               == Common::StorageLayout::dense_row_major
                            ? Common::Lapacke::row_major()
                            : Common::Lapacke::col_major();
   thread_local std::vector<double> real_part_of_eigenvalues(size);
   thread_local std::vector<double> imag_part_of_eigenvalues(size);
   thread_local std::vector<double> dummy_left_eigenvectors(1, 0.);
-  thread_local CommonDenseMatrix<double, MatrixDataProvider<RealMatrixType>::storage_layout> right_eigenvectors_matrix(
-      size, size, 0.);
+  thread_local CommonDenseMatrix<double, MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout>
+      right_eigenvectors_matrix(size, size, 0.);
   assert(size < std::numeric_limits<int>::max());
   thread_local std::vector<double> work(1);
   thread_local size_t last_size = -1;

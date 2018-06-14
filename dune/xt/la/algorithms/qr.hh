@@ -261,7 +261,7 @@ struct QrHelper
       // create Q and copy values of QR to Q;
       const size_t num_rows = M::rows(QR);
       const size_t num_cols = M::cols(QR);
-      auto ret = Common::create<MatrixType, M::static_rows, M::static_rows>(num_rows, num_rows, 0.);
+      auto ret = Common::create<MatrixType, M::static_rows, M::static_rows>(num_rows, num_rows, typename M::S(0.));
       typedef Common::MatrixAbstraction<decltype(ret)> Mret;
       for (size_t ii = 0; ii < num_rows; ++ii)
         for (size_t jj = 0; jj < num_cols; ++jj)

@@ -49,7 +49,7 @@ convert_to(const MatrixInterface<S>& source)
 {
   const size_t rows = source.rows();
   const size_t cols = source.cols();
-  auto ret = Common::create<RangeType>(rows, cols, 0);
+  auto ret = Common::create<RangeType>(rows, cols, typename MatrixInterface<S>::ScalarType(0));
   if (source.sparse) {
     const auto pattern = source.pattern();
     for (size_t ii = 0; ii < rows; ++ii)

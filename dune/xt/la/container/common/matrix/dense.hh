@@ -17,6 +17,8 @@
 #include <mutex>
 #include <vector>
 
+#include <boost/align/aligned_allocator.hpp>
+
 #include <dune/common/ftraits.hh>
 #include <dune/common/unused.hh>
 
@@ -61,7 +63,7 @@ struct MatrixBackendBase
 
   size_t num_rows_;
   size_t num_cols_;
-  std::vector<ScalarType> entries_;
+  std::vector<ScalarType, boost::alignment::aligned_allocator<ScalarType, 64>> entries_;
 };
 
 template <class ScalarType, Common::StorageLayout = Common::StorageLayout::dense_row_major>
@@ -176,7 +178,9 @@ public:
 
   CommonDenseMatrix(const ThisType& other)
     : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
-    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
+    , mutexes_(other.unshareable_
+                   ? (other.mutexes_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : nullptr)
+                   : other.mutexes_)
     , unshareable_(false)
   {
   }
@@ -239,6 +243,11 @@ public:
     return *this;
   }
 
+  ThisType& copy_backend(const ThisType& other)
+  {
+    *backend_ = *other.backend_;
+  }
+
   /**
    *  \note Does a deep copy.
    */
@@ -274,6 +283,12 @@ public:
   const ScalarType* data() const
   {
     return backend().entries_.data();
+  }
+
+  void resize(const size_t ii, const size_t jj)
+  {
+    ensure_uniqueness();
+    backend_->resize(ii, jj);
   }
 
   /// \}
