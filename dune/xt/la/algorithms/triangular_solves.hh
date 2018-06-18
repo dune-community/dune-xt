@@ -204,10 +204,10 @@ struct TriangularSolver
     assert(std::max(M::rows(A), M::cols(A)) <= std::numeric_limits<int>::max());
     const int num_rows = static_cast<int>(M::rows(A));
     const int num_cols = static_cast<int>(M::cols(A));
-    const bool trans = (transpose == Common::Transpose::yes);
-    const bool lower = (triangular_type == Common::MatrixPattern::lower_triangular);
-    const bool upper = !lower;
-    const bool solve_forward = (lower && !trans) || (upper && trans);
+    constexpr bool trans = (transpose == Common::Transpose::yes);
+    constexpr bool lower = (triangular_type == Common::MatrixPattern::lower_triangular);
+    constexpr bool upper = !lower;
+    constexpr bool solve_forward = (lower && !trans) || (upper && trans);
     if (num_rows != num_cols)
       DUNE_THROW(Dune::InvalidStateException, "Matrix has to be square!");
     if (num_rows == 2) {

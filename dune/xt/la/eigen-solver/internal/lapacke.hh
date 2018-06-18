@@ -124,8 +124,6 @@ compute_eigenvalues_of_a_real_matrix_using_lapack_impl(
 #endif // DUNE_XT_LA_DISABLE_ALL_CHECKS
   thread_local std::vector<double> real_part_of_eigenvalues(size, 0.);
   thread_local std::vector<double> imag_part_of_eigenvalues(size, 0.);
-  thread_local std::vector<double> dummy_left_eigenvectors(1, 0.);
-  thread_local std::vector<double> dummy_right_eigenvectors(1, 0.);
   assert(size < std::numeric_limits<int>::max());
   int storage_layout = MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout
                                == Common::StorageLayout::dense_row_major
@@ -145,9 +143,9 @@ compute_eigenvalues_of_a_real_matrix_using_lapack_impl(
                                                  static_cast<int>(size),
                                                  real_part_of_eigenvalues.data(),
                                                  imag_part_of_eigenvalues.data(),
-                                                 dummy_left_eigenvectors.data(),
+                                                 nullptr,
                                                  static_cast<int>(size),
-                                                 dummy_right_eigenvectors.data(),
+                                                 nullptr,
                                                  static_cast<int>(size),
                                                  work.data(),
                                                  -1);
@@ -164,9 +162,9 @@ compute_eigenvalues_of_a_real_matrix_using_lapack_impl(
                                                static_cast<int>(size),
                                                real_part_of_eigenvalues.data(),
                                                imag_part_of_eigenvalues.data(),
-                                               dummy_left_eigenvectors.data(),
+                                               nullptr,
                                                static_cast<int>(size),
-                                               dummy_right_eigenvectors.data(),
+                                               nullptr,
                                                static_cast<int>(size),
                                                work.data(),
                                                static_cast<int>(work.size()));
@@ -249,7 +247,6 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
                            : Common::Lapacke::col_major();
   thread_local std::vector<double> real_part_of_eigenvalues(size);
   thread_local std::vector<double> imag_part_of_eigenvalues(size);
-  thread_local std::vector<double> dummy_left_eigenvectors(1, 0.);
   thread_local CommonDenseMatrix<double, MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout>
       right_eigenvectors_matrix(size, size, 0.);
   assert(size < std::numeric_limits<int>::max());
@@ -268,7 +265,7 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
                                            static_cast<int>(size),
                                            real_part_of_eigenvalues.data(),
                                            imag_part_of_eigenvalues.data(),
-                                           dummy_left_eigenvectors.data(),
+                                           nullptr,
                                            static_cast<int>(size),
                                            right_eigenvectors_matrix.data(),
                                            static_cast<int>(size),
@@ -288,7 +285,7 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
                                          static_cast<int>(size),
                                          real_part_of_eigenvalues.data(),
                                          imag_part_of_eigenvalues.data(),
-                                         dummy_left_eigenvectors.data(),
+                                         nullptr,
                                          static_cast<int>(size),
                                          right_eigenvectors_matrix.data(),
                                          static_cast<int>(size),
