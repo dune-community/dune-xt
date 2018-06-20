@@ -19,6 +19,7 @@
 #include <dune/pybindxi/stl.h>
 
 #include <python/dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/exceptions.bindings.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 #include <python/dune/xt/functions/interfaces.hh>
