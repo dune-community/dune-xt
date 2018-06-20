@@ -196,9 +196,11 @@ public:
     build_gradients(variable, gradient_expressions);
   }
 
-#if !DUNE_XT_WITH_PYTHON_BINDINGS
-  ExpressionFunction(const ThisType& other) = default;
-#endif
+  ExpressionFunction(const ThisType& other)
+    : function_(other.function_)
+    , order_(other.order_)
+    , name_(other.name_)
+    , gradients_(other.gradients_){};
 
   ThisType& operator=(const ThisType& other)
   {
