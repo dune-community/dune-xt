@@ -118,7 +118,7 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id)
 
   const std::string make_name = "make_expression_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/,
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
            const std::string& variable,
            const std::string& expression,
            const size_t& order,
@@ -148,7 +148,7 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id)
         "name"_a = C::static_id(),
         "gradient_expressions"_a = std::vector<std::string>());
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/,
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
            const std::string& variable,
            const std::vector<std::vector<std::string>>& expression,
            const size_t& order,

@@ -82,7 +82,7 @@ class CutoffFunction
 
       const std::string make_name = "make_esv2007_cutoff_function";
       m.def(std::string(make_name + "_single_diffusion_to_1x1").c_str(),
-            [](const Grid::GridProvider<G>& /*grid*/,
+            [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
                const ScalarFunction& diffusion,
                const R& poincare_constant,
                const std::string& name) { return type_single_diffusion(diffusion, poincare_constant, name); },
@@ -102,7 +102,7 @@ class CutoffFunction
             "name"_a = type_single_diffusion::static_id(),
             py::keep_alive<0, 2>());
       m.def(std::string(make_name + "_diffusion_factor_and_tensor_to_1x1").c_str(),
-            [](const Grid::GridProvider<G>& /*grid*/,
+            [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
                const ScalarFunction& diffusion_factor,
                const TensorFunction& diffusion_tensor,
                const R& poincare_constant,

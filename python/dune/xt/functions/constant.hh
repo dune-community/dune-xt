@@ -70,9 +70,9 @@ bind_ConstantFunction(pybind11::module& m, const std::string& grid_id)
 
   const std::string make_name = "make_constant_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/, const typename C::RangeType& value, const std::string& name) {
-          return C(value, name);
-        },
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
+           const typename C::RangeType& value,
+           const std::string& name) { return C(value, name); },
         "grid_provider"_a,
         "value"_a,
         "name"_a = C::static_id());
@@ -84,9 +84,9 @@ bind_ConstantFunction(pybind11::module& m, const std::string& grid_id)
         "value"_a,
         "name"_a = C::static_id());
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/, const typename C::RangeFieldType& value, const std::string& name) {
-          return C(value, name);
-        },
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
+           const typename C::RangeFieldType& value,
+           const std::string& name) { return C(value, name); },
         "grid_provider"_a,
         "value"_a,
         "name"_a = C::static_id());

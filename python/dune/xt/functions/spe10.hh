@@ -88,7 +88,7 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
 
   const std::string make_name = "make_spe10_model1_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/,
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
            const std::string& filename,
            const Common::FieldVector<D, d>& lower_left,
            const Common::FieldVector<D, d>& upper_right,
