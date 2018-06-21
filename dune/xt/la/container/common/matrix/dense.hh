@@ -381,7 +381,7 @@ public:
     using V1 = typename Common::VectorAbstraction<FirstVectorType>;
     using V2 = typename Common::VectorAbstraction<SecondVectorType>;
     static_assert(V1::is_vector && V2::is_vector, "");
-    assert(V1::size(xx) == rows() && V1::size(yy) == cols());
+    assert(xx.size() == rows() && yy.size() == cols());
     yy *= ScalarType(0.);
     for (size_t cc = 0; cc < cols(); ++cc) {
       V2::set_entry(yy, cc, 0.);
