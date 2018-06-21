@@ -6,7 +6,7 @@ arguments = {'alu': namedtuple('alu_args', 'dim element_type refinement'),
              'alberta': namedtuple('alberta_args', 'dim')}
 templates = { 'alu': 'Dune::ALUGrid<{dim},{dim},Dune::{element_type},Dune::{refinement}>',
               'yasp': 'Dune::YaspGrid<{dim},Dune::EquidistantOffsetCoordinates<double,{dim}>>',
-              'ug': 'Dune::UGGrid<{}>',
+              'ug': 'Dune::UGGrid<{dim}>',
               'alberta': 'Dune::AlbertaGrid<{dim},{dim}>'}
 guards = { 'alu': 'dune-alugrid',
            'yasp': 'dune-grid',
