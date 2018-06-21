@@ -12,6 +12,7 @@
 #include <dune/xt/common/test/main.hxx>
 
 #include <dune/xt/la/test/container.hh>
+#include <dune/xt/common/test/float_cmp.hh>
 
 using namespace Dune;
 using namespace Dune::XT;
@@ -322,6 +323,12 @@ struct MatrixTest_{{T_NAME}} : public ::testing::Test
       for (size_t jj = 0; jj < cols; ++jj) {
         EXPECT_TRUE(Common::FloatCmp::eq(ScalarType(0), matrix_zeros_dense.get_entry(ii, jj))) << "check copy-on-write";
       }
+    }
+    VectorImp res_mtv = vector_zeros, res_mv = vector_zeros;
+    matrix_ones.mtv(vector_ones, res_mtv);
+    matrix_ones.mtv(vector_ones, res_mv);
+    for (size_t ii = 0; ii < rows; ++ii) {
+        DXTC_EXPECT_FLOAT_EQ(res_mtv[ii], res_mv[ii]);
     }
   } // void produces_correct_results() const
 }; // struct MatrixTest

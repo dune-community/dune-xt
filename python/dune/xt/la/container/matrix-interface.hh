@@ -209,6 +209,7 @@ void addbind_Matrix_Vector_interaction(pybind11::class_<M>& mat, pybind11::class
   namespace py = pybind11;
 
   mat.def("mv", [](const M& self, const V& xx, V& yy) { self.mv(xx, yy); }, "source", "range");
+  mat.def("mtv", [](const M& self, const V& xx, V& yy) { self.mtv(xx, yy); }, "source", "range");
 
   mat.def(py::self * V());
 

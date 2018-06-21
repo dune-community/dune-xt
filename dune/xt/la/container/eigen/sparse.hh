@@ -304,6 +304,12 @@ public:
     yy.backend().transpose() = backend() * xx.backend();
   }
 
+  template <class T1, class T2>
+  inline void mtv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
+  {
+    yy.backend().transpose() = backend().transpose() * xx.backend();
+  }
+
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     auto& backend_ref = backend();

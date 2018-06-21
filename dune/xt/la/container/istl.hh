@@ -570,6 +570,12 @@ public:
     backend_ref.mv(xx.backend(), yy.backend());
   }
 
+  inline void mtv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
+  {
+    auto& backend_ref = backend();
+    backend_ref.mtv(xx.backend(), yy.backend());
+  }
+
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     auto& backend_ref = backend();
