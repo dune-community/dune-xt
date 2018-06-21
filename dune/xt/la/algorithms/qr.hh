@@ -228,6 +228,7 @@ struct QrHelper
       ;
 #if HAVE_LAPACKE || HAVE_MKL
     } else if (has_contiguous_storage) {
+      std::fill(permutations.begin(), permutations.end(), 0.);
       assert(std::max(M::rows(A), M::cols(A)) < std::numeric_limits<int>::max());
       auto num_rows = static_cast<int>(M::rows(A));
       auto num_cols = static_cast<int>(M::cols(A));
