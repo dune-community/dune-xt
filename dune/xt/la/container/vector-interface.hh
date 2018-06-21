@@ -37,25 +37,48 @@
 namespace Dune {
 namespace XT {
 namespace LA {
+namespace internal {
+
+
+template <class ScalarImp,
+          class derived_imp,
+          class BackendImp,
+          Backends backend_imp,
+          Backends dense_matrix_imp,
+          Backends sparse_matrix_imp>
+class VectorTraitsBase
+{
+public:
+  using ScalarType = typename Dune::FieldTraits<ScalarImp>::field_type;
+  using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
+  using MutexesType = std::vector<std::mutex>;
+  using DataType = ScalarType;
+  using BackendType = BackendImp;
+  using derived_type = derived_imp;
+  static const Backends backend_type = backend_imp;
+  static const Backends dense_matrix_type = dense_matrix_imp;
+  static const Backends sparse_matrix_type = sparse_matrix_imp;
+};
+
+
+} // namespace internal
 
 
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class VectorInterface : public ContainerInterface<Traits, ScalarImp>
 {
-  typedef ContainerInterface<Traits, ScalarImp> BaseType;
+  using BaseType = ContainerInterface<Traits, ScalarImp>;
 
 public:
   using typename BaseType::derived_type;
-  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
-  static const constexpr Backends dense_matrix_type = Traits::dense_matrix_type;
-  static const constexpr Backends sparse_matrix_type = Traits::sparse_matrix_type;
-
-  typedef internal::VectorInputIterator<Traits, ScalarType> const_iterator;
-  typedef internal::VectorOutputIterator<Traits, ScalarType> iterator;
+  using typename BaseType::RealType;
+  using typename BaseType::ScalarType;
+  static constexpr Backends dense_matrix_type = Traits::dense_matrix_type;
+  static constexpr Backends sparse_matrix_type = Traits::sparse_matrix_type;
+  using const_iterator = internal::VectorInputIterator<Traits, ScalarType>;
+  using iterator = internal::VectorOutputIterator<Traits, ScalarType>;
   friend const_iterator;
   friend iterator;
-
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
   virtual ~VectorInterface()
@@ -517,7 +540,6 @@ public:
 
   iterator begin()
   {
-    this->as_imp().ensure_uniqueness();
     return iterator(*this);
   }
 
@@ -564,11 +586,11 @@ struct VectorAbstractionBase
 
   static const bool is_contiguous = true;
 
-  typedef typename std::conditional<is_vector, VectorImp, void>::type VectorType;
-  typedef typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type ScalarType;
-  typedef typename std::conditional<is_vector, typename VectorImp::RealType, void>::type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using VectorType = typename std::conditional<is_vector, VectorImp, void>::type;
+  using ScalarType = typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type;
+  using RealType = typename std::conditional<is_vector, typename VectorImp::RealType, void>::type;
+  using S = ScalarType;
+  using R = RealType;
 
   template <size_t SIZE = static_size, class Field = ScalarType>
   using VectorTypeTemplate = typename std::conditional<is_vector, VectorImp, void>::type;
@@ -605,29 +627,6 @@ struct VectorAbstractionBase
     return &(vec[0]);
   }
 }; // struct VectorAbstractionBase
-
-template <class XtLaVectorImp, size_t size>
-struct FieldVectorToLaVector
-{
-  typedef XtLaVectorImp LaVectorType;
-  typedef Dune::FieldVector<typename LaVectorType::ScalarType, size> FieldVectorType;
-
-  static LaVectorType convert(const FieldVectorType& in)
-  {
-    LaVectorType out(size);
-    for (size_t ii = 0; ii < size; ++ii)
-      out.set_entry(ii, in[ii]);
-    return out;
-  }
-
-  static FieldVectorType convert_back(const LaVectorType& in)
-  {
-    FieldVectorType out;
-    for (size_t ii = 0; ii < size; ++ii)
-      out[ii] = in.get_entry(ii);
-    return out;
-  }
-};
 
 
 } // namespace internal

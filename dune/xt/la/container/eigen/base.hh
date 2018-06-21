@@ -39,6 +39,7 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
 template <class ScalarImp>
 class EigenDenseMatrix;
 
@@ -56,26 +57,29 @@ class EigenBaseVector;
 template <class ImpTraits, class ScalarImp = double>
 class EigenBaseVector : public VectorInterface<ImpTraits, ScalarImp>, public ProvidesBackend<ImpTraits>
 {
-  typedef VectorInterface<ImpTraits, ScalarImp> VectorInterfaceType;
-  typedef EigenBaseVector<ImpTraits, ScalarImp> ThisType;
+
+  using ThisType = EigenBaseVector;
+  using InterfaceType = VectorInterface<ImpTraits, ScalarImp>;
 
 public:
-  typedef ImpTraits Traits;
-  typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealType RealType;
-  typedef typename Traits::BackendType BackendType;
-  typedef typename Traits::derived_type VectorImpType;
+  using typename InterfaceType::RealType;
+  using typename InterfaceType::ScalarType;
+  using typename InterfaceType::Traits;
+  using typename ProvidesBackend<Traits>::BackendType;
+  using VectorImpType = typename InterfaceType::derived_type;
 
+private:
+  using MutexesType = typename Traits::MutexesType;
+
+public:
   EigenBaseVector(size_t num_mutexes = 1)
-    : mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
-    , unshareable_(false)
+    : mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   EigenBaseVector(const EigenBaseVector& other)
-    : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
-    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
-    , unshareable_(false)
+    : backend_(std::make_shared<BackendType>(*other.backend_))
+    , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
   {
   }
 
@@ -84,17 +88,14 @@ public:
   VectorImpType& operator=(const ThisType& other)
   {
     if (this != &other) {
-      backend_ = other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_;
-      mutexes_ =
-          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
-      unshareable_ = false;
+      *backend_ = *other.backend_;
+      mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
     }
     return this->as_imp();
   } // ... operator=(...)
 
   VectorImpType& operator=(const ScalarType& value)
   {
-    ensure_uniqueness();
     for (auto& element : *this)
       element = value;
     return this->as_imp();
@@ -105,7 +106,6 @@ public:
 
   BackendType& backend()
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -125,20 +125,18 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
-    backend_ref *= alpha;
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    backend() *= alpha;
   }
 
   template <class T>
   void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    backend_ref += alpha * xx.backend();
+    backend() += alpha * xx.backend();
   } // ... axpy(...)
 
   bool has_equal_shape(const VectorImpType& other) const
@@ -157,17 +155,15 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii);
     assert(ii < size());
-    backend_ref(ii) += value;
+    backend()(ii) += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     assert(ii < size());
-    backend_ref(ii) = value;
+    backend()(ii) = value;
   }
 
   ScalarType get_entry(const size_t ii) const
@@ -190,15 +186,11 @@ protected:
 public:
   inline ScalarType& operator[](const size_t ii)
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return backend()[ii];
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return backend()[ii];
   }
 
@@ -256,12 +248,11 @@ public:
   template <class T>
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend_ref += other.backend();
+    backend() += other.backend();
   } // ... iadd(...)
 
   virtual void iadd(const VectorImpType& other) override final
@@ -272,12 +263,11 @@ public:
   template <class T>
   void isub(const EigenBaseVector<T, ScalarType>& other)
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend_ref -= *(other.backend_);
+    backend() -= other.backend();
   } // ... isub(...)
 
   virtual void isub(const VectorImpType& other) override final
@@ -288,22 +278,12 @@ public:
   /// \{
 
   //! disambiguation necessary since it exists in multiple bases
-  using VectorInterfaceType::as_imp;
-
-protected:
-  /**
-   * \see ContainerInterface
-   */
-  void ensure_uniqueness() const
-  {
-    CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
-    VectorInterfaceType::as_imp().ensure_uniqueness();
-  }
+  using InterfaceType::as_imp;
 
 private:
 #ifndef NDEBUG
   //! disambiguation necessary since it exists in multiple bases
-  using VectorInterfaceType::crtp_mutex_;
+  using InterfaceType::crtp_mutex_;
 #endif
 
   friend class VectorInterface<Traits, ScalarType>;
@@ -311,9 +291,8 @@ private:
   friend class EigenRowMajorSparseMatrix<ScalarType>;
 
 protected:
-  mutable std::shared_ptr<BackendType> backend_;
-  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  mutable bool unshareable_;
+  std::shared_ptr<BackendType> backend_;
+  std::unique_ptr<MutexesType> mutexes_;
 }; // class EigenBaseVector
 
 #else // HAVE_EIGEN

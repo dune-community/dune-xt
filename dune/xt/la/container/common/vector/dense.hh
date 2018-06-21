@@ -43,17 +43,13 @@ namespace internal {
 
 /// Traits for CommonDenseVector
 template <class ScalarImp>
-class CommonDenseVectorTraits
+class CommonDenseVectorTraits : public VectorTraitsBase<ScalarImp,
+                                                        CommonDenseVector<ScalarImp>,
+                                                        Dune::DynamicVector<ScalarImp>,
+                                                        Backends::common_dense,
+                                                        Backends::common_dense,
+                                                        Backends::common_sparse>
 {
-public:
-  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
-  typedef ScalarType DataType;
-  typedef CommonDenseVector<ScalarType> derived_type;
-  typedef Dune::DynamicVector<ScalarType> BackendType;
-  static const Backends backend_type = Backends::common_dense;
-  static const Backends dense_matrix_type = Backends::common_dense;
-  static const Backends sparse_matrix_type = Backends::common_sparse;
 };
 
 
@@ -68,27 +64,29 @@ class CommonDenseVector : public VectorInterface<internal::CommonDenseVectorTrai
                           public ProvidesBackend<internal::CommonDenseVectorTraits<ScalarImp>>,
                           public ProvidesDataAccess<internal::CommonDenseVectorTraits<ScalarImp>>
 {
-  typedef CommonDenseVector<ScalarImp> ThisType;
-  typedef VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp> VectorInterfaceType;
+  using ThisType = CommonDenseVector;
+  using InterfaceType = VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp>;
 
 public:
-  typedef internal::CommonDenseVectorTraits<ScalarImp> Traits;
-  typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealType RealType;
-  typedef typename Traits::DataType DataType;
-  typedef typename Traits::BackendType BackendType;
+  using typename InterfaceType::RealType;
+  using typename InterfaceType::ScalarType;
+  using typename InterfaceType::Traits;
+  using typename ProvidesBackend<Traits>::BackendType;
+  using typename ProvidesDataAccess<Traits>::DataType;
 
+private:
+  using MutexesType = typename Traits::MutexesType;
+
+public:
   explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0), const size_t num_mutexes = 1)
     : backend_(new BackendType(ss, value))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   explicit CommonDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.size()))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < other.size(); ++ii)
       backend_->operator[](ii) = other[ii];
@@ -96,8 +94,7 @@ public:
 
   explicit CommonDenseVector(const std::initializer_list<ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.size()))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     size_t ii = 0;
     for (auto element : other) {
@@ -107,9 +104,8 @@ public:
   } // CommonDenseVector(...)
 
   CommonDenseVector(const ThisType& other)
-    : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
-    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
-    , unshareable_(false)
+    : backend_(std::make_shared<BackendType>(*other.backend_))
+    , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
   {
   }
 
@@ -118,8 +114,7 @@ public:
                              const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
                              const size_t num_mutexes = 1)
     : backend_(new BackendType(other))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
@@ -128,34 +123,27 @@ public:
    */
   explicit CommonDenseVector(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   explicit CommonDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   ThisType& operator=(const ThisType& other)
   {
     if (this != &other) {
-      backend_ = other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_;
-      mutexes_ = other.mutexes_
-                     ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
-                                           : other.mutexes_)
-                     : nullptr;
-      unshareable_ = false;
+      *backend_ = *other.backend_;
+      mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
     }
     return *this;
   }
 
   ThisType& operator=(const ScalarType& value)
   {
-    ensure_uniqueness();
     for (auto& element : *this)
       element = value;
     return *this;
@@ -166,8 +154,7 @@ public:
    */
   ThisType& operator=(const BackendType& other)
   {
-    backend_ = std::make_shared<BackendType>(other);
-    unshareable_ = false;
+    *backend_ = other;
     return *this;
   }
 
@@ -176,7 +163,6 @@ public:
 
   BackendType& backend()
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -211,20 +197,18 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
-    backend_ref *= alpha;
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    backend() *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    for (size_t ii = 0; ii < backend_ref.size(); ++ii)
-      backend_ref[ii] += alpha * xx.backend()[ii];
+    for (size_t ii = 0; ii < backend().size(); ++ii)
+      backend()[ii] += alpha * xx.backend()[ii];
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -243,17 +227,15 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii);
     assert(ii < size());
-    backend_ref[ii] += value;
+    backend()[ii] += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     assert(ii < size());
-    backend_ref[ii] = value;
+    backend()[ii] = value;
   }
 
   ScalarType get_entry(const size_t ii) const
@@ -276,15 +258,11 @@ protected:
 public:
   inline ScalarType& operator[](const size_t ii)
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return get_unchecked_ref(ii);
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return get_unchecked_ref(ii);
   }
 
@@ -317,54 +295,35 @@ public:
 
   virtual void iadd(const ThisType& other) override final
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       if (other.size() != size())
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend_ref += other.backend();
+    backend() += other.backend();
   } // ... iadd(...)
 
   virtual void isub(const ThisType& other) override final
   {
-    auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       if (other.size() != size())
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
-    backend_ref -= other.backend();
+    backend() -= other.backend();
   } // ... isub(...)
 
   // without these using declarations, the free operator+/* function in xt/common/vector.hh is chosen instead of the
   // member function
-  using VectorInterfaceType::operator+;
-  using VectorInterfaceType::operator-;
-  using VectorInterfaceType::operator*;
-
-protected:
-  /**
-   * \see ContainerInterface
-   */
-  inline void ensure_uniqueness() const
-  {
-    if (!backend_.unique()) {
-      assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
-      if (!backend_.unique()) {
-        backend_ = std::make_shared<BackendType>(*backend_);
-        mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
-      }
-    }
-  } // ... ensure_uniqueness(...)
+  using InterfaceType::operator+;
+  using InterfaceType::operator-;
+  using InterfaceType::operator*;
 
 private:
   friend class VectorInterface<internal::CommonDenseVectorTraits<ScalarType>, ScalarType>;
 
-  mutable std::shared_ptr<BackendType> backend_;
-  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  mutable bool unshareable_;
+  std::shared_ptr<BackendType> backend_;
+  std::unique_ptr<MutexesType> mutexes_;
 }; // class CommonDenseVector
 
 } // namespace LA
