@@ -97,8 +97,7 @@ class EigenDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
                                                        EigenDenseMatrix<ScalarImp>,
                                                        ::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, ::Eigen::Dynamic>,
                                                        Backends::eigen_dense,
-                                                       Backends::eigen_dense,
-                                                       false>
+                                                       Backends::eigen_dense>
 {
 };
 
@@ -120,7 +119,7 @@ class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits
 public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
-  using typename InterfaceType::Traits;
+  using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
   using typename ProvidesDataAccess<Traits>::DataType;
   //! derived_type is ambiguous due to multiple parent classes otherwise
@@ -233,7 +232,7 @@ class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDense
 public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
-  using typename InterfaceType::Traits;
+  using Traits = typename InterfaceType::Traits;
   using BackendType = typename Traits::BackendType;
 
 private:
@@ -359,7 +358,7 @@ class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits
 public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
-  using typename InterfaceType::Traits;
+  using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
   using typename ProvidesDataAccess<Traits>::DataType;
   //! derived_type is ambiguous due to multiple parent classes otherwise
@@ -698,7 +697,7 @@ struct MatrixAbstraction<LA::EigenDenseMatrix<T>> : public LA::internal::MatrixA
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::EigenDenseMatrix<T>>;
 
-  static const constexpr XT::Common::StorageLayout storage_layout = XT::Common::StorageLayout::dense_column_major;
+  static constexpr XT::Common::StorageLayout storage_layout = XT::Common::StorageLayout::dense_column_major;
 
   template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
   using MatrixTypeTemplate = LA::EigenDenseMatrix<FieldType>;

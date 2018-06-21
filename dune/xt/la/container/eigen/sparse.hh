@@ -92,7 +92,7 @@ class EigenRowMajorSparseMatrix
 public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
-  using typename InterfaceType::Traits;
+  using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
 
 private:

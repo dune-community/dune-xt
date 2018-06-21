@@ -70,7 +70,7 @@ class CommonDenseVector : public VectorInterface<internal::CommonDenseVectorTrai
 public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
-  using typename InterfaceType::Traits;
+  using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
   using typename ProvidesDataAccess<Traits>::DataType;
 

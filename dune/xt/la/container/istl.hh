@@ -94,7 +94,7 @@ class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<S
 public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
-  using typename InterfaceType::Traits;
+  using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
   using typename ProvidesDataAccess<Traits>::DataType;
 
@@ -366,7 +366,7 @@ class IstlRowMajorSparseMatrix : public MatrixInterface<internal::IstlRowMajorSp
 public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
-  using typename InterfaceType::Traits;
+  using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
 
 private:
