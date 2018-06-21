@@ -34,7 +34,7 @@ namespace ESV2007 {
 
 
 template <size_t d, size_t r, size_t rC = 1, class R = double>
-class Testcase1Force : public SmoothFunctionInterface<d, r, rC, R>
+class Testcase1Force : public FunctionInterface<d, r, rC, R>
 {
   Testcase1Force()
   {
@@ -44,10 +44,10 @@ class Testcase1Force : public SmoothFunctionInterface<d, r, rC, R>
 
 
 template <class R>
-class Testcase1Force<2, 1, 1, R> : public SmoothFunctionInterface<2, 1, 1, R>
+class Testcase1Force<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
 {
   using ThisType = Testcase1Force<2, 1, 1, R>;
-  using BaseType = SmoothFunctionInterface<2, 1, 1, R>;
+  using BaseType = FunctionInterface<2, 1, 1, R>;
 
 public:
   using typename BaseType::DomainFieldType;
@@ -144,7 +144,7 @@ private:
 
 
 template <size_t d, size_t r, size_t rC = 1, class R = double>
-class Testcase1ExactSolution : public SmoothFunctionInterface<d, r, rC, R>
+class Testcase1ExactSolution : public FunctionInterface<d, r, rC, R>
 {
   Testcase1ExactSolution()
   {
@@ -154,10 +154,10 @@ class Testcase1ExactSolution : public SmoothFunctionInterface<d, r, rC, R>
 
 
 template <class R>
-class Testcase1ExactSolution<2, 1, 1, R> : public SmoothFunctionInterface<2, 1, 1, R>
+class Testcase1ExactSolution<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
 {
   using ThisType = Testcase1ExactSolution<2, 1, 1, R>;
-  using BaseType = SmoothFunctionInterface<2, 1, 1, R>;
+  using BaseType = FunctionInterface<2, 1, 1, R>;
 
 public:
   using typename BaseType::DomainFieldType;
@@ -254,20 +254,20 @@ private:
 
 
 template <class E, class R = double>
-class CutoffFunction : public LocalizableFunctionInterface<E, 1, 1, R>
+class CutoffFunction : public GridFunctionInterface<E, 1, 1, R>
 {
-  using BaseType = LocalizableFunctionInterface<E, 1, 1, R>;
+  using BaseType = GridFunctionInterface<E, 1, 1, R>;
   using ThisType = CutoffFunction<E, R>;
 
 public:
   using typename BaseType::D;
   using BaseType::d;
-  using DiffusionType = LocalizableFunctionInterface<E, d, d, R>;
+  using DiffusionType = GridFunctionInterface<E, d, d, R>;
 
 private:
-  class LocalCutoffFunction : public LocalFunctionInterface<E, 1, 1, R>
+  class LocalCutoffFunction : public ElementFunctionInterface<E, 1, 1, R>
   {
-    using BaseType = LocalFunctionInterface<E, 1, 1, R>;
+    using BaseType = ElementFunctionInterface<E, 1, 1, R>;
 
 
   public:

@@ -34,14 +34,14 @@
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-#include "local-functions.hh"
+#include "element-functions.hh"
 
 namespace Dune {
 namespace XT {
 namespace Functions {
 
 
-// forward, required in LocalizableFunctionInterface::visualize
+// forward, required in GridFunctionInterface::visualize
 template <class GridViewType, size_t dimRange, size_t dimRangeCols, class RangeFieldImp>
 class VisualizationAdapter;
 
@@ -71,12 +71,12 @@ class ProductFunction;
  *        implementing/using them, but avoids situations which could not be handled generically later on.
  */
 template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class LocalizableFunctionInterface : public Common::ParametricInterface
+class GridFunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = LocalizableFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = GridFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
-  using LocalFunctionType = LocalFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using LocalFunctionType = ElementFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
   using ElementType = typename LocalFunctionType::ElementType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
@@ -97,7 +97,7 @@ public:
   typedef Functions::DifferenceFunction<ThisType, ThisType> DifferenceType;
   typedef Functions::SumFunction<ThisType, ThisType> SumType;
 
-  virtual ~LocalizableFunctionInterface() = default;
+  virtual ~GridFunctionInterface() = default;
 
   static std::string static_id()
   {
@@ -142,8 +142,7 @@ public:
   }
 
   template <class OtherType>
-  typename std::enable_if<is_localizable_function<OtherType>::value,
-                          Functions::ProductFunction<ThisType, OtherType>>::type
+  typename std::enable_if<is_grid_function<OtherType>::value, Functions::ProductFunction<ThisType, OtherType>>::type
   operator*(const OtherType& other) const
   {
     return Functions::ProductFunction<ThisType, OtherType>(*this, other);
@@ -179,7 +178,7 @@ public:
     else
       vtk_writer->pwrite(Common::filename_only(path), directory, "", vtk_output_type);
   } // ... visualize(...)
-}; // class LocalizableFunctionInterface
+}; // class GridFunctionInterface
 
 
 } // namespace Functions

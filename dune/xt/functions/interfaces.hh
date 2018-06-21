@@ -13,9 +13,9 @@
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_HH
 
-#include "interfaces/localizable-function.hh"
+#include "interfaces/grid-function.hh"
 //#include "interfaces/localizable-flux-function.hh"
-#include "interfaces/smooth-function.hh"
+#include "interfaces/function.hh"
 //#include "interfaces/global-flux-function.hh"
 
 #include "interfaces.lib.hh"

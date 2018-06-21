@@ -25,14 +25,14 @@ namespace Functions {
 
 
 template <class E, size_t r, size_t rC = 1, class R = double>
-class IndicatorFunction : public LocalizableFunctionInterface<E, r, rC, R>
+class IndicatorFunction : public GridFunctionInterface<E, r, rC, R>
 {
-  using BaseType = LocalizableFunctionInterface<E, r, rC, R>;
+  using BaseType = GridFunctionInterface<E, r, rC, R>;
   using ThisType = IndicatorFunction<E, r, rC, R>;
 
-  class LocalIndicatorFunction : public LocalFunctionInterface<E, r, rC, R>
+  class LocalIndicatorFunction : public ElementFunctionInterface<E, r, rC, R>
   {
-    using InterfaceType = LocalFunctionInterface<E, r, rC, R>;
+    using InterfaceType = ElementFunctionInterface<E, r, rC, R>;
 
   public:
     using typename InterfaceType::ElementType;

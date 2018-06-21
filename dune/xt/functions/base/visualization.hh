@@ -16,7 +16,7 @@
 
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/functions/interfaces/localizable-function.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 
 namespace Dune {
 namespace XT {
@@ -30,15 +30,15 @@ class VisualizationAdapter : public VTKFunction<GridViewType>
 
 public:
   using EntityType = XT::Grid::extract_entity_t<GridViewType>;
-  using LocalizableFunctionType = LocalizableFunctionInterface<EntityType, dimRange, dimRangeCols, RangeFieldImp>;
+  using GridFunctionType = GridFunctionInterface<EntityType, dimRange, dimRangeCols, RangeFieldImp>;
 
 private:
-  using LocalFunctionType = typename LocalizableFunctionType::LocalFunctionType;
+  using LocalFunctionType = typename GridFunctionType::LocalFunctionType;
   using DomainType = typename LocalFunctionType::DomainType;
   using RangeType = typename LocalFunctionType::RangeType;
 
 public:
-  VisualizationAdapter(const LocalizableFunctionType& localizable_function,
+  VisualizationAdapter(const GridFunctionType& localizable_function,
                        const std::string nm = "",
                        const XT::Common::Parameter& param = {})
     : local_function_(localizable_function.local_function())

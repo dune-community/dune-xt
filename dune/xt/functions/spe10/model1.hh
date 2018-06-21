@@ -53,7 +53,7 @@ public:
 
   static std::string static_id()
   {
-    return LocalizableFunctionInterface<E, 1, 1, R>::static_id() + ".spe10.model1";
+    return GridFunctionInterface<E, 1, 1, R>::static_id() + ".spe10.model1";
   } // ... static_id(...)
 
 private:
@@ -149,7 +149,7 @@ public:
 
 // default, to allow for specialization
 template <class E, size_t r, size_t rC = 1, class R = double>
-class Model1Function : public LocalizableFunctionInterface<E, r, rC, R>
+class Model1Function : public GridFunctionInterface<E, r, rC, R>
 {
   Model1Function()
   {

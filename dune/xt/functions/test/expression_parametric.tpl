@@ -94,7 +94,7 @@ TEST_F(ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_
   const RangeExpressionType expr(std::string("sin(x[0]t_)"));
   FunctionType function("x", {"t_", 1}, expr, 3);
 
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
 
   for (auto&& element : Dune::elements(leaf_view)) {
     const auto local_f = localizable_function.local_function(element);
@@ -107,7 +107,7 @@ TEST_F(ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_
   const RangeExpressionType expr(std::string("sin(x[0]t_)"));
   FunctionType function("x", {"t_", 1}, expr, 3);
 
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
 
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -124,7 +124,7 @@ TEST_F(ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
 
   const auto leaf_view = grid_.leaf_view();
 
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -139,7 +139,7 @@ TEST_F(ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
 
   const RangeExpressionType expr(std::string("sin(x[0]t_)"));
   FunctionType function("x", {"t_", 1}, expr, 3);
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     const auto geometry = element.geometry();

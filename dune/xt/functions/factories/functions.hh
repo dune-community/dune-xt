@@ -30,7 +30,7 @@ all
 \code
 template< size_t d, size_t r, size_t rC = 1 , class R = double>
 class FooBar
-  : public SmoothFunctionInterface< d, r, rC, R >
+  : public FunctionInterface< d, r, rC, R >
 {
   FooBar() { static_assert(AlwaysFalse< E >::value, "Not available for these dimensions!"); }
 };
@@ -46,7 +46,7 @@ template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
 class SmoothFunctionsFactory
 {
 public:
-  typedef SmoothFunctionInterface<d, r, rC, R> InterfaceType;
+  typedef FunctionInterface<d, r, rC, R> InterfaceType;
 
 private:
   template <class FunctionType, bool available = false>

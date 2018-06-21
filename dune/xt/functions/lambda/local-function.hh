@@ -17,7 +17,7 @@
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/common/exceptions.hh>
-#include <dune/xt/functions/interfaces/localizable-function.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/type_traits.hh>
 
 namespace Dune {
@@ -47,18 +47,18 @@ param.get("power").at(0)));
  * \note  The Localfunction does not implement derivative.
  */
 template <class E, size_t r, size_t rC = 1, class R = double>
-class LocalLambdaFunction : public LocalizableFunctionInterface<E, r, rC, R>
+class LocalLambdaFunction : public GridFunctionInterface<E, r, rC, R>
 {
-  using BaseType = LocalizableFunctionInterface<E, r, rC, R>;
+  using BaseType = GridFunctionInterface<E, r, rC, R>;
 
 public:
   using typename BaseType::ElementType;
   using typename BaseType::LocalFunctionType;
 
 private:
-  class LocalLambdaLocalFunction : public LocalFunctionInterface<E, r, rC, R>
+  class LocalLambdaLocalFunction : public ElementFunctionInterface<E, r, rC, R>
   {
-    using BaseType = LocalFunctionInterface<E, r, rC, R>;
+    using BaseType = ElementFunctionInterface<E, r, rC, R>;
 
   public:
     using typename BaseType::ElementType;

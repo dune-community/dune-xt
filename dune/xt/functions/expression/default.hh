@@ -34,9 +34,9 @@ namespace Functions {
  */
 
 template <size_t d, size_t r = 1, size_t rC = 1, class RangeFieldImp = double>
-class ExpressionFunction : public SmoothFunctionInterface<d, r, rC, RangeFieldImp>
+class ExpressionFunction : public FunctionInterface<d, r, rC, RangeFieldImp>
 {
-  using BaseType = SmoothFunctionInterface<d, r, rC, RangeFieldImp>;
+  using BaseType = FunctionInterface<d, r, rC, RangeFieldImp>;
   using ThisType = ExpressionFunction<d, r, rC, RangeFieldImp>;
 
   using typename BaseType::DomainFieldType;
@@ -311,9 +311,9 @@ private:
 
 
 template <size_t d, size_t r, class RangeFieldImp>
-class ExpressionFunction<d, r, 1, RangeFieldImp> : public SmoothFunctionInterface<d, r, 1, RangeFieldImp>
+class ExpressionFunction<d, r, 1, RangeFieldImp> : public FunctionInterface<d, r, 1, RangeFieldImp>
 {
-  using BaseType = SmoothFunctionInterface<d, r, 1, RangeFieldImp>;
+  using BaseType = FunctionInterface<d, r, 1, RangeFieldImp>;
   using ThisType = ExpressionFunction<d, r, 1, RangeFieldImp>;
 
   using typename BaseType::DomainFieldType;

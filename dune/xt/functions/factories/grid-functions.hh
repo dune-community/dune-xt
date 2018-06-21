@@ -32,7 +32,7 @@ all
 \code
 template< class E, size_t r, size_t rC = 1, class R = double >
 class FooBar
-  : public LocalizableFunctionInterface< E, r, rC, R >
+  : public GridFunctionInterface< E, r, rC, R >
 {
   FooBar() { static_assert(AlwaysFalse< E >::value, "Not available for these dimensions!"); }
 };
@@ -48,7 +48,7 @@ template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class FunctionsFactory
 {
 public:
-  typedef LocalizableFunctionInterface<E, r, rC, R> InterfaceType;
+  typedef GridFunctionInterface<E, r, rC, R> InterfaceType;
 
 private:
   template <class FunctionType, bool available = false>

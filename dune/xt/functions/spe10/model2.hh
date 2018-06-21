@@ -37,7 +37,7 @@ static const double model_2_length_z = 1.417;
 
 // default, to allow for specialization
 template <class E, size_t r, size_t rC = 1, class R = double>
-class Model2Function : public LocalizableFunctionInterface<E, r, rC, R>
+class Model2Function : public GridFunctionInterface<E, r, rC, R>
 {
   Model2Function()
   {
@@ -66,7 +66,7 @@ public:
 
   static std::string static_id()
   {
-    return LocalizableFunctionInterface<E, 3, 3, R>::static_id() + ".spe10.model1";
+    return GridFunctionInterface<E, 3, 3, R>::static_id() + ".spe10.model1";
   } // ... static_id(...)
 
 private:

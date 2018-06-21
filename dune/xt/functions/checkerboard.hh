@@ -25,16 +25,16 @@ namespace Functions {
  * Note: This function does not allow for functions on the subdomains anymore. Only constant values are possible.
  */
 template <class E, size_t r = 1, size_t rC = 1, class R = double>
-class CheckerboardFunction : public LocalizableFunctionInterface<E, r, rC, R>
+class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
 {
-  using BaseType = LocalizableFunctionInterface<E, r, rC, R>;
+  using BaseType = GridFunctionInterface<E, r, rC, R>;
   using ThisType = CheckerboardFunction<E, r, rC, R>;
   using BaseType::dimDomain;
   static_assert(dimDomain <= 3, "Not implemented for dimDomain > 3 (see find_subdomain method)!");
 
-  class LocalCheckerboardFunction : public LocalFunctionInterface<E, r, rC, R>
+  class LocalCheckerboardFunction : public ElementFunctionInterface<E, r, rC, R>
   {
-    typedef LocalFunctionInterface<E, r, rC, R> InterfaceType;
+    typedef ElementFunctionInterface<E, r, rC, R> InterfaceType;
 
   public:
     using typename InterfaceType::ElementType;

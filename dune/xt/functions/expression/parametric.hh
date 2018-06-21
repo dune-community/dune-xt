@@ -25,7 +25,7 @@ namespace Functions {
 
 
 template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
-class ParametricExpressionFunction : public SmoothFunctionInterface<d, r, rC, R>
+class ParametricExpressionFunction : public FunctionInterface<d, r, rC, R>
 {
 public:
   ParametricExpressionFunction()
@@ -36,9 +36,9 @@ public:
 
 
 template <size_t d, size_t r, class R>
-class ParametricExpressionFunction<d, r, 1, R> : public SmoothFunctionInterface<d, r, 1, R>
+class ParametricExpressionFunction<d, r, 1, R> : public FunctionInterface<d, r, 1, R>
 {
-  using BaseType = SmoothFunctionInterface<d, r, 1, R>;
+  using BaseType = FunctionInterface<d, r, 1, R>;
   using typename BaseType::D;
   using ActualFunctionType = DynamicMathExpressionBase<D, R, r>;
 

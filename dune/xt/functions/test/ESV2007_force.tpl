@@ -116,7 +116,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jaco
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
 {
   auto default_function = FunctionType::create();
-  const auto& localizable_function = default_function->template as_localizable<ElementType>();
+  const auto& localizable_function = default_function->template as_grid_function<ElementType>();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
     const auto local_f = localizable_function.local_function(element);
@@ -126,7 +126,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localiza
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   auto default_function = FunctionType::create();
-  const auto& localizable_function = default_function->template as_localizable<ElementType>();
+  const auto& localizable_function = default_function->template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -139,7 +139,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order
 {
   const int expected_order = 3;
   auto default_function = FunctionType::create();
-  const auto& localizable_function = default_function->template as_localizable<ElementType>();
+  const auto& localizable_function = default_function->template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -153,7 +153,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   FunctionType function(3);
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -172,7 +172,7 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalu
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   FunctionType function(3);
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {

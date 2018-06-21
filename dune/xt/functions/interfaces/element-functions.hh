@@ -45,10 +45,10 @@ namespace Functions {
  *        its derivatives.
  **/
 template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class LocalFunctionSetInterface : public Common::ParametricInterface
+class ElementFunctionSetInterface : public Common::ParametricInterface
 {
   static_assert(XT::Grid::is_entity<ElementImp>::value, "");
-  using ThisType = LocalFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = ElementFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
   using ElementType = ElementImp;
@@ -73,34 +73,34 @@ public:
   using DynamicRangeType = typename RangeTypeSelector<R, r, rC>::dynamic_type;
   using DynamicDerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::dynamic_type;
 
-  LocalFunctionSetInterface()
+  ElementFunctionSetInterface()
     : element_(nullptr)
   {
   }
 
-  LocalFunctionSetInterface(const ElementType& ele)
+  ElementFunctionSetInterface(const ElementType& ele)
     : element_(new ElementType(ele))
   {
   }
 
-  LocalFunctionSetInterface(ElementType&& ele)
+  ElementFunctionSetInterface(ElementType&& ele)
     : element_(new ElementType(ele))
   {
   }
 
-  LocalFunctionSetInterface(const ThisType& other)
+  ElementFunctionSetInterface(const ThisType& other)
     : element_(nullptr)
   {
     if (other.element_)
       element_ = std::make_unique<ElementType>(*other.element_);
   }
 
-  LocalFunctionSetInterface(ThisType&& source)
+  ElementFunctionSetInterface(ThisType&& source)
     : element_(std::move(source.element_))
   {
   }
 
-  virtual ~LocalFunctionSetInterface() = default;
+  virtual ~ElementFunctionSetInterface() = default;
 
   ThisType& operator=(const ThisType& other)
   {
@@ -415,16 +415,16 @@ private:
   }; // struct single_derivative_helper<..., 1, ...>
 
   std::unique_ptr<ElementType> element_;
-}; // class LocalFunctionSetInterface
+}; // class ElementFunctionSetInterface
 
 /**
  *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Element.
  */
 template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class LocalFunctionInterface : public LocalFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>
+class ElementFunctionInterface : public ElementFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>
 {
-  using BaseType = LocalFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
-  using ThisType = LocalFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using BaseType = ElementFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = ElementFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
   using BaseType::d;
@@ -439,25 +439,25 @@ public:
   using typename BaseType::DynamicDerivativeRangeType;
   using typename BaseType::ElementType;
 
-  LocalFunctionInterface()
+  ElementFunctionInterface()
     : BaseType()
   {
   }
 
-  LocalFunctionInterface(const ElementType& ele)
+  ElementFunctionInterface(const ElementType& ele)
     : BaseType(ele)
   {
   }
 
-  LocalFunctionInterface(ElementType&& ele)
+  ElementFunctionInterface(ElementType&& ele)
     : BaseType(ele)
   {
   }
 
-  LocalFunctionInterface(const ThisType& other) = default;
-  LocalFunctionInterface(ThisType&& source) = default;
+  ElementFunctionInterface(const ThisType& other) = default;
+  ElementFunctionInterface(ThisType&& source) = default;
 
-  virtual ~LocalFunctionInterface() = default;
+  virtual ~ElementFunctionInterface() = default;
 
   ThisType& operator=(const ThisType& other) = default;
   ThisType& operator=(ThisType&& source) = default;
@@ -576,7 +576,7 @@ public:
 
   /**
    * \{
-   * \name ´´These methods are required by LocalFunctionSetInterface and are provided by this interface.''
+   * \name ´´These methods are required by ElementFunctionSetInterface and are provided by this interface.''
    * \{
    **/
 
@@ -661,7 +661,7 @@ private:
       return val[row];
     }
   }; // struct single_derivative_helper<..., 1, ...>
-}; // class LocalFunctionInterface
+}; // class ElementFunctionInterface
 
 } // namespace Functions
 } // namespace XT

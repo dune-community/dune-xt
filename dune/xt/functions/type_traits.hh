@@ -177,13 +177,13 @@ struct DerivativeRangeTypeSelector<d, R, r, 1>
 
 // forwards
 template <class E, size_t r, size_t rC, class R>
-class LocalFunctionSetInterface;
+class ElementFunctionSetInterface;
 
 template <class E, size_t r, size_t rC, class R>
-class LocalFunctionInterface;
+class ElementFunctionInterface;
 
 template <class E, size_t r, size_t rC, class R>
-class LocalizableFunctionInterface;
+class GridFunctionInterface;
 
 // smooth
 
@@ -195,7 +195,7 @@ namespace internal {
 
 
 template <class Tt>
-struct is_localizable_function_helper
+struct is_grid_function_helper
 {
   DXTC_has_typedef_initialize_once(E);
   DXTC_has_typedef_initialize_once(R);
@@ -203,23 +203,22 @@ struct is_localizable_function_helper
   DXTC_has_static_member_initialize_once(rC);
   static const bool is_candidate = DXTC_has_typedef(E)<Tt>::value && DXTC_has_typedef(R)<Tt>::value
                                    && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
-}; // struct is_localizable_function_helper
+}; // struct is_grid_function_helper
 
 
 } // namespace internal
 
 
-template <class T, bool is_candidate = internal::is_localizable_function_helper<T>::is_candidate>
-struct is_localizable_function;
+template <class T, bool is_candidate = internal::is_grid_function_helper<T>::is_candidate>
+struct is_grid_function;
 
 template <class T>
-struct is_localizable_function<T, false> : public std::false_type
+struct is_grid_function<T, false> : public std::false_type
 {
 };
 
 template <class T>
-struct is_localizable_function<T, true>
-    : std::is_base_of<LocalizableFunctionInterface<typename T::E, T::r, T::rC, typename T::R>, T>
+struct is_grid_function<T, true> : std::is_base_of<GridFunctionInterface<typename T::E, T::r, T::rC, typename T::R>, T>
 {
 };
 
@@ -259,7 +258,7 @@ struct is_localizable_function<T, true>
 
 
 // template <class T, bool candidate = internal::is_localfunction_set_helper<T>::is_candidate>
-// struct is_localizable_function : public std::is_base_of<LocalizableFunctionInterface<typename T::EntityType,
+// struct is_grid_function : public std::is_base_of<GridFunctionInterface<typename T::EntityType,
 //                                                                                     typename T::DomainFieldType,
 //                                                                                     T::dimDomain,
 //                                                                                     typename T::RangeFieldType,
@@ -270,7 +269,7 @@ struct is_localizable_function<T, true>
 //};
 
 // template <class T>
-// struct is_localizable_function<T, false> : public std::false_type
+// struct is_grid_function<T, false> : public std::false_type
 //{
 //};
 

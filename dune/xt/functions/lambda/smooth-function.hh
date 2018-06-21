@@ -17,7 +17,7 @@
 
 #include <dune/xt/common/memory.hh>
 
-#include <dune/xt/functions/interfaces/smooth-function.hh>
+#include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune {
 namespace XT {
@@ -30,9 +30,9 @@ namespace Functions {
  * \example LambdaType lambda(1, [](const auto& x, const auto& param = {}) { return x;});
  */
 template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class SmoothLambdaFunction : public SmoothFunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>
+class SmoothLambdaFunction : public FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>
 {
-  using BaseType = SmoothFunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
+  using BaseType = FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
   using BaseType::d;
@@ -93,7 +93,7 @@ public:
 
   /**
    * \}
-   * \name ´´These methods are required by SmoothFunctionInterface.''
+   * \name ´´These methods are required by FunctionInterface.''
    * \{
    */
 

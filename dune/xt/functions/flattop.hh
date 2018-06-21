@@ -28,7 +28,7 @@ namespace Functions {
  *           Subsection 2.1.1
  */
 template <size_t d, size_t r, size_t rC = 1, class R = double>
-class FlatTopFunction : public SmoothFunctionInterface<d, r, rC, R>
+class FlatTopFunction : public FunctionInterface<d, r, rC, R>
 {
   FlatTopFunction()
   {
@@ -37,9 +37,9 @@ class FlatTopFunction : public SmoothFunctionInterface<d, r, rC, R>
 };
 
 template <size_t d, class R>
-class FlatTopFunction<d, 1, 1, R> : public SmoothFunctionInterface<d, 1, 1, R>
+class FlatTopFunction<d, 1, 1, R> : public FunctionInterface<d, 1, 1, R>
 {
-  using BaseType = SmoothFunctionInterface<d, 1, 1, R>;
+  using BaseType = FunctionInterface<d, 1, 1, R>;
   using ThisType = FlatTopFunction<d, 1, 1, R>;
 
 public:

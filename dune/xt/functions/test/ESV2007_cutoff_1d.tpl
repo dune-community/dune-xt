@@ -55,7 +55,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_constructible)
 {
   ScalarRangeExpressionType expr(std::string("x[0]"));
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_localizable<ElementType>());
+  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
 }
 
 TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_visualizable)
@@ -63,7 +63,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_visualizable)
   const auto leaf_view = grid_.leaf_view();
   ScalarRangeExpressionType expr(std::string("x[0]"));
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_localizable<ElementType>());
+  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
   function.visualize(leaf_view, "test__ESV2007CutoffFunction_from_{{GRIDNAME}}__is_visualizable");
 }
 
@@ -72,7 +72,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_localizable)
 {
   ScalarRangeExpressionType expr(std::string("x[0]"));
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_localizable<ElementType>());
+  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
     const auto local_f = function.local_function(element);
@@ -83,7 +83,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_bindable)
 {
   ScalarRangeExpressionType expr(std::string("x[0]"));
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_localizable<ElementType>());
+  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
   auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -97,7 +97,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_order)
   const int expected_order = 0;
   ScalarRangeExpressionType expr(std::string("x[0]"));
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_localizable<ElementType>());
+  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
   auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -112,9 +112,9 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_evaluate)
 {
   ScalarRangeExpressionType expr(std::string("x[0]"));
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_localizable<ElementType>());
+  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
   auto local_f = function.local_function();
-  auto local_diffusion = diffusion_function.template as_localizable<ElementType>().local_function();
+  auto local_diffusion = diffusion_function.template as_grid_function<ElementType>().local_function();
   double poincare_constant_ = 1.0 / (M_PIl * M_PIl);
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -144,7 +144,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_jacobian)
 {
   ScalarRangeExpressionType expr(std::string("x[0]"));
   DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_localizable<ElementType>());
+  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
   auto local_f = function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {

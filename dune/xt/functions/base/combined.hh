@@ -36,8 +36,8 @@ enum class Combination
 template <class LeftType, class RightType, Combination comb>
 class SelectCombined
 {
-  static_assert(is_localizable_function<LeftType>::value, "");
-  static_assert(is_localizable_function<RightType>::value, "");
+  static_assert(is_grid_function<LeftType>::value, "");
+  static_assert(is_grid_function<RightType>::value, "");
 
 public:
   using E = typename LeftType::ElementType;
@@ -95,10 +95,10 @@ public:
 
   using LeftLocalFunctionType = typename LeftType::LocalFunctionType;
   using RightLocalFunctionType = typename RightType::LocalFunctionType;
-  using DomainType = typename LocalFunctionInterface<E, r, rC, R>::DomainType;
+  using DomainType = typename ElementFunctionInterface<E, r, rC, R>::DomainType;
   using RangeType = typename RightType::LocalFunctionType::RangeType;
   using ScalarRangeType = typename LeftType::LocalFunctionType::RangeType;
-  using DerivativeRangeType = typename LocalFunctionInterface<E, r, rC, R>::DerivativeRangeType;
+  using DerivativeRangeType = typename ElementFunctionInterface<E, r, rC, R>::DerivativeRangeType;
 
 private:
   template <Combination cc, bool anything = true>
@@ -245,15 +245,15 @@ public:
  * \note Most likely you do not want to use this class directly, but Combined.
  */
 template <class LeftType, class RightType, Combination type>
-class CombinedLocalFunction : public LocalFunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
-                                                            SelectCombined<LeftType, RightType, type>::r,
-                                                            SelectCombined<LeftType, RightType, type>::rC,
-                                                            typename SelectCombined<LeftType, RightType, type>::R>
+class CombinedLocalFunction : public ElementFunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
+                                                              SelectCombined<LeftType, RightType, type>::r,
+                                                              SelectCombined<LeftType, RightType, type>::rC,
+                                                              typename SelectCombined<LeftType, RightType, type>::R>
 {
-  using BaseType = LocalFunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
-                                          SelectCombined<LeftType, RightType, type>::r,
-                                          SelectCombined<LeftType, RightType, type>::rC,
-                                          typename SelectCombined<LeftType, RightType, type>::R>;
+  using BaseType = ElementFunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
+                                            SelectCombined<LeftType, RightType, type>::r,
+                                            SelectCombined<LeftType, RightType, type>::rC,
+                                            typename SelectCombined<LeftType, RightType, type>::R>;
 
   using Select = SelectCombined<LeftType, RightType, type>;
 
@@ -314,7 +314,7 @@ private:
  *        This class combines two given functions of type LeftType and RightType using the given combination
  *        Combination. This class (and any derived class, like Difference, Sum or Product) can be used in two ways:
  *        - You can pass references of the left and right operand to this class. This is done for instance when calling
- *          operator+, operator- or operator* on any function deriving from LocalizableFunctionInterface:
+ *          operator+, operator- or operator* on any function deriving from GridFunctionInterface:
 \code
 typedef Functions::IndicatorFunction< ..., double> IndicatorType;
 IndicatorType one( ... );
@@ -353,15 +353,15 @@ Difference< IndicatorType, IndicatorType > stupid_difference()
  * \note  Most likely you do not want to use this class diretly, but one of Difference, Sum or Product.
  */
 template <class LeftType, class RightType, Combination comb>
-class Combined : public LocalizableFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
-                                                     SelectCombined<LeftType, RightType, comb>::r,
-                                                     SelectCombined<LeftType, RightType, comb>::rC,
-                                                     typename SelectCombined<LeftType, RightType, comb>::R>
+class Combined : public GridFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
+                                              SelectCombined<LeftType, RightType, comb>::r,
+                                              SelectCombined<LeftType, RightType, comb>::rC,
+                                              typename SelectCombined<LeftType, RightType, comb>::R>
 {
-  using BaseType = LocalizableFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
-                                                SelectCombined<LeftType, RightType, comb>::r,
-                                                SelectCombined<LeftType, RightType, comb>::rC,
-                                                typename SelectCombined<LeftType, RightType, comb>::R>;
+  using BaseType = GridFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
+                                         SelectCombined<LeftType, RightType, comb>::r,
+                                         SelectCombined<LeftType, RightType, comb>::rC,
+                                         typename SelectCombined<LeftType, RightType, comb>::R>;
 
   using LeftStorageType = Common::ConstStorageProvider<LeftType>;
   using RightStorageType = Common::ConstStorageProvider<RightType>;

@@ -23,9 +23,9 @@ namespace Functions {
 
 
 template <size_t d, size_t r = 1, size_t rC = 1, class RangeFieldImp = double>
-class ConstantFunction : public SmoothFunctionInterface<d, r, rC, RangeFieldImp>
+class ConstantFunction : public FunctionInterface<d, r, rC, RangeFieldImp>
 {
-  using BaseType = SmoothFunctionInterface<d, r, rC, RangeFieldImp>;
+  using BaseType = FunctionInterface<d, r, rC, RangeFieldImp>;
   using ThisType = ConstantFunction<d, r, rC, RangeFieldImp>;
 
 public:

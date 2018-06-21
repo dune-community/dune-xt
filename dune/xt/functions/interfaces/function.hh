@@ -26,37 +26,37 @@ namespace XT {
 namespace Functions {
 
 
-// forward, required in SmoothFunctionInterface::as_localizable
+// forward, required in FunctionInterface::as_grid_function
 template <class E, size_t r, size_t rC, class R>
-class SmoothFunctionAsLocalizableWrapper;
+class FunctionAsGridFunctionWrapper;
 
 
 /**
- * \brief Interface for smooth functions (in the C^\infty sense) which can thus be evaluated in global coordinates.
+ * \brief Interface for functions (in the C^\infty sense) which can thus be evaluated in global coordinates.
  *
  *        These functions do not depend on a grid, but only on the dimensions and fields of their domain and range.
  *        See in particular RangeTypeSelector and DerivativeRangeTypeSelector for the interpretation of a function and
- *        its derivatives, and LocalizableFunctionInterface for functions which may have discontinuities between entites
+ *        its derivatives, and GridFunctionInterface for functions which may have discontinuities between entites
  *        (as in: which are double-valued on intersections).
  *
- *        To turn a smooth function into a function which is localizable w.r.t. a GridView of matching dimension (e.g.,
- *        to visualize it or to use it in a discretization scheme), use as_localizable to obtain a const reference to
+ *        To turn a function into a function which is localizable w.r.t. a GridView of matching dimension (e.g.,
+ *        to visualize it or to use it in a discretization scheme), use as_grid_function to obtain a const reference to
  *        a wrapped version of this function:
 \code
-auto smooth_function = ...;
+auto function = ...;
 auto grid_view = ...;
 using E = XT::Grid::extract_entity_t<decltype(grid_view)>;
-const auto& localizable_function = smooth_function.template as_localizable<E>();
+const auto& grid_function = function.template as_grid_function<E>();
 \endcode
  *
  * \sa    RangeTypeSelector
  * \sa    DerivativeRangeTypeSelector
- * \sa    LocalizableFunctionInterface
+ * \sa    GridFunctionInterface
  **/
 template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class SmoothFunctionInterface : public Common::ParametricInterface
+class FunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = SmoothFunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
 
 public:
   using DomainFieldType = double;
@@ -76,7 +76,7 @@ public:
   using DerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::type;
   using SingleDerivativeRangeType = typename DerivativeRangeTypeSelector<d, R, r, rC>::single_type;
 
-  virtual ~SmoothFunctionInterface() = default;
+  virtual ~FunctionInterface() = default;
 
   /**
    * \name ´´These methods have to be implemented.''
@@ -94,13 +94,13 @@ public:
   virtual RangeType evaluate(const DomainType& /*point_in_global_coordinates*/,
                              const Common::Parameter& /*param*/ = {}) const
   {
-    DUNE_THROW(NotImplemented, "This smooth function does not provide evaluations, override the 'evaluate' method!");
+    DUNE_THROW(NotImplemented, "This function does not provide evaluations, override the 'evaluate' method!");
   }
 
   virtual DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
                                        const Common::Parameter& /*param*/ = {}) const
   {
-    DUNE_THROW(NotImplemented, "This smooth function does not provide a jacobian, override the 'jacobian' method!");
+    DUNE_THROW(NotImplemented, "This function does not provide a jacobian, override the 'jacobian' method!");
   }
 
   virtual DerivativeRangeType derivative(const std::array<size_t, d>& /*alpha*/,
@@ -108,22 +108,22 @@ public:
                                          const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
-               "This smooth function does not provide arbitrary derivatives, override the 'derivative' method!");
+               "This function does not provide arbitrary derivatives, override the 'derivative' method!");
   }
 
   virtual std::string type() const
   {
-    return "dune.xt.functions.smooth";
+    return "dune.xt.functions";
   }
 
   static std::string static_id()
   {
-    return "dune.xt.functions.smooth";
+    return "dune.xt.functions";
   }
 
   virtual std::string name() const
   {
-    return "dune.xt.functions.smooth";
+    return "dune.xt.functions";
   }
 
   /**
@@ -174,17 +174,17 @@ public:
    */
   template <class E>
   const typename std::enable_if<XT::Grid::is_entity<E>::value && E::dimension == d,
-                                SmoothFunctionAsLocalizableWrapper<E, r, rC, R>>::type&
-  as_localizable() const
+                                FunctionAsGridFunctionWrapper<E, r, rC, R>>::type&
+  as_grid_function() const
   {
-    static std::map<const ThisType*, std::unique_ptr<SmoothFunctionAsLocalizableWrapper<E, r, rC, R>>> wrappers;
+    static std::map<const ThisType*, std::unique_ptr<FunctionAsGridFunctionWrapper<E, r, rC, R>>> wrappers;
     if (wrappers.find(this) == wrappers.end())
-      wrappers[this] = std::make_unique<SmoothFunctionAsLocalizableWrapper<E, r, rC, R>>(*this);
+      wrappers[this] = std::make_unique<FunctionAsGridFunctionWrapper<E, r, rC, R>>(*this);
     return *(wrappers[this]);
   }
 
   /**
-   * \copydoc LocalizableFunctionInterface::visualize
+   * \copydoc GridFunctionInterface::visualize
    */
   template <class GridLayerType>
   typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
@@ -193,7 +193,7 @@ public:
             const bool subsampling = true,
             const VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
-    this->as_localizable<XT::Grid::extract_entity_t<GridLayerType>>().visualize(
+    this->as_grid_function<XT::Grid::extract_entity_t<GridLayerType>>().visualize(
         grid_layer, path, subsampling, vtk_output_type);
   }
 
@@ -263,13 +263,13 @@ private:
       return val[row];
     }
   }; // struct single_derivative_helper<r, 1, ...>
-}; // class SmoothFunctionInterface
+}; // class FunctionInterface
 
 
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
 
-#include <dune/xt/functions/base/smooth-localizable-function.hh>
+#include <dune/xt/functions/base/function-as-grid-function.hh>
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH

@@ -99,7 +99,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
 {
   FunctionType function(1.);
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
     const auto local_f = localizable_function.local_function(element);
@@ -109,7 +109,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   FunctionType function(1.);
-  const auto& localizable_function = function.template as_localizable<ElementType>();
+  const auto& localizable_function = function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -123,7 +123,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
   for (auto vv : {-10., 3., 17., 41.}) {
     const RangeType value(vv);
     FunctionType function(value);
-    const auto& localizable_function = function.template as_localizable<ElementType>();
+    const auto& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -139,7 +139,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
   for (auto value : {-10., 3., 17., 41.}) {
     const RangeType expected_value(value);
     FunctionType function(expected_value);
-    const auto& localizable_function = function.template as_localizable<ElementType>();
+    const auto& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -160,7 +160,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
     DerivativeRangeType expected_jacobian;
     //expected_jacobian *= 0;
     FunctionType function(value);
-    const auto& localizable_function = function.template as_localizable<ElementType>();
+    const auto& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
     const auto leaf_view = grid_.leaf_view();
     for (auto&& element : Dune::elements(leaf_view)) {
