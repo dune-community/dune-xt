@@ -28,6 +28,7 @@
 #include <python/dune/xt/functions/ESV2007.bindings.hh>
 #include <python/dune/xt/functions/expression.hh>
 #include <python/dune/xt/functions/spe10.hh>
+#include <python/dune/xt/functions/indicator.hh>
 
 
 template <class G>
@@ -115,6 +116,8 @@ void addbind_for_Grid(pybind11::module& m)
   bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
 
   bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
+
+  bind_IndicatorFunction<G, g_dim, 1, 1>(m, grid_id);
 } // ... addbind_for_Grid(...)
 
 
