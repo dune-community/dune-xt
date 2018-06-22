@@ -79,14 +79,14 @@ static const constexpr size_t d = G::dimension;
  */
 template <class G, size_t d, size_t r>
 typename std::enable_if<Grid::is_grid<G>::value, pybind11::class_<ExpressionFunction<d, r, 3, double>>>::type
-bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::integral_constant<int, 3>())
+bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::integral_constant<int, 3>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
   const size_t rC = 3;
   typedef double R;
 
-  typedef SmoothFunctionInterface<d, r, rC, R> I;
+  typedef FunctionInterface<d, r, rC, R> I;
   typedef ExpressionFunction<d, r, rC, R> C;
 
   const std::string c_name =
@@ -145,7 +145,7 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::in
 
 template <class G, size_t d, size_t r>
 typename std::enable_if<Grid::is_grid<G>::value, pybind11::class_<ExpressionFunction<d, r, 2, double>>>::type
-bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::integral_constant<int, 2>())
+bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::integral_constant<int, 2>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -153,7 +153,7 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::in
   const size_t rC = 2;
   typedef double R;
 
-  typedef SmoothFunctionInterface<d, r, rC, R> I;
+  typedef FunctionInterface<d, r, rC, R> I;
   typedef ExpressionFunction<d, r, rC, R> C;
 
   const std::string c_name =
@@ -212,14 +212,14 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::in
 
 template <class G, size_t d, size_t r>
 typename std::enable_if<Grid::is_grid<G>::value, pybind11::class_<ExpressionFunction<d, r, 1, double>>>::type
-bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::integral_constant<int, 1>())
+bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::integral_constant<int, 1>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
   typedef double R;
 
-  typedef SmoothFunctionInterface<d, r, 1, R> I;
+  typedef FunctionInterface<d, r, 1, R> I;
   typedef ExpressionFunction<d, r, 1, R> C;
 
   const std::string c_name =
@@ -281,7 +281,7 @@ template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<Grid::is_grid<G>::value, pybind11::class_<ExpressionFunction<d, r, rC, double>>>::type
 bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id)
 {
-  return bind_ExpressionFunction(m, grid_id, std::integral_constant<int, rC>());
+  return bind_ExpressionFunction<G, d, r>(m, grid_id, std::integral_constant<int, rC>());
 } // ... bind_ExpressionFunction(...)
 
 

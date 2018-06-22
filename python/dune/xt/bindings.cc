@@ -25,7 +25,7 @@
 #include <python/dune/xt/functions/constant.hh>
 #include <python/dune/xt/functions/checkerboard.hh>
 #include <python/dune/xt/functions/ESV2007.bindings.hh>
-// #include <python/dune/xt/functions/expression.hh>
+#include <python/dune/xt/functions/expression.hh>
 #include <python/dune/xt/functions/spe10.hh>
 
 #include <python/dune/xt/common/exceptions.bindings.hh>
@@ -40,79 +40,83 @@ void addbind_for_Grid(pybind11::module& m)
   const auto prod = internal::Combination::product;
   const auto g_dim = G::dimension;
 
-  auto i_1_1 = bind_LocalizableFunctionInterface<G, 1, 1>(m, grid_id);
-  auto i_2_1 = bind_LocalizableFunctionInterface<G, 2, 1>(m, grid_id);
-  auto i_3_1 = bind_LocalizableFunctionInterface<G, 3, 1>(m, grid_id);
-  auto i_4_1 = bind_LocalizableFunctionInterface<G, 4, 1>(m, grid_id);
+  auto i_1_1 = bind_GridFunctionInterface<G, 1, 1>(m, grid_id);
+  auto i_2_1 = bind_GridFunctionInterface<G, 2, 1>(m, grid_id);
+  auto i_3_1 = bind_GridFunctionInterface<G, 3, 1>(m, grid_id);
+  auto i_4_1 = bind_GridFunctionInterface<G, 4, 1>(m, grid_id);
   //! this generates multiple binds for the same type
-  //! auto i_d_d = bind_LocalizableFunctionInterface<G, g_dim, g_dim>(m, grid_id);
-  auto i_d_d = bind_LocalizableFunctionInterface<G, 2, 2>(m, grid_id);
+  //! auto i_d_d = bind_GridFunctionInterface<G, g_dim, g_dim>(m, grid_id);
+  auto i_d_d = bind_GridFunctionInterface<G, 2, 2>(m, grid_id);
 
-  bind_combined_LocalizableFunction<G, g_dim, diff, 1, 1, 1, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 1, 1, 1, 1>(i_1_1);
+  bind_combined_GridFunction<G, g_dim, diff, 1, 1, 1, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, diff, 1, 1, 1, 1>(i_1_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, diff, 2, 1, 2, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 2, 1, 2, 1>(i_2_1);
+  bind_combined_GridFunction<G, g_dim, diff, 2, 1, 2, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, diff, 2, 1, 2, 1>(i_2_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, diff, 3, 1, 3, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 3, 1, 3, 1>(i_3_1);
+  bind_combined_GridFunction<G, g_dim, diff, 3, 1, 3, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, diff, 3, 1, 3, 1>(i_3_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, diff, 4, 1, 4, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, 4, 1, 4, 1>(i_4_1);
+  bind_combined_GridFunction<G, g_dim, diff, 4, 1, 4, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, diff, 4, 1, 4, 1>(i_4_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, diff, 2, 2, 2, 2>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, diff, g_dim, g_dim, g_dim, g_dim>(i_d_d);
-
-
-  bind_combined_LocalizableFunction<G, g_dim, sum, 1, 1, 1, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 1, 1, 1, 1>(i_1_1);
-
-  bind_combined_LocalizableFunction<G, g_dim, sum, 2, 1, 2, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 2, 1, 2, 1>(i_2_1);
-
-  bind_combined_LocalizableFunction<G, g_dim, sum, 3, 1, 3, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 3, 1, 3, 1>(i_3_1);
-
-  bind_combined_LocalizableFunction<G, g_dim, sum, 4, 1, 4, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, 4, 1, 4, 1>(i_4_1);
-
-  bind_combined_LocalizableFunction<G, g_dim, sum, 2, 2, 2, 2>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, sum, g_dim, g_dim, g_dim, g_dim>(i_d_d);
+  bind_combined_GridFunction<G, g_dim, diff, 2, 2, 2, 2>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, diff, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
 
-  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 1, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 1, 1>(i_1_1);
+  bind_combined_GridFunction<G, g_dim, sum, 1, 1, 1, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, sum, 1, 1, 1, 1>(i_1_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 2, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 1>(i_1_1);
+  bind_combined_GridFunction<G, g_dim, sum, 2, 1, 2, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, sum, 2, 1, 2, 1>(i_2_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 3, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 3, 1>(i_1_1);
+  bind_combined_GridFunction<G, g_dim, sum, 3, 1, 3, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, sum, 3, 1, 3, 1>(i_3_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 4, 1>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 4, 1>(i_1_1);
+  bind_combined_GridFunction<G, g_dim, sum, 4, 1, 4, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, sum, 4, 1, 4, 1>(i_4_1);
 
-  bind_combined_LocalizableFunction<G, g_dim, prod, 1, 1, 2, 2>(m, grid_id);
-  addbind_LocalizableFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 2>(i_1_1);
+  bind_combined_GridFunction<G, g_dim, sum, 2, 2, 2, 2>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, sum, g_dim, g_dim, g_dim, g_dim>(i_d_d);
 
 
-  //  bind_ConstantFunction<G, g_dim, 1, 1>(m, grid_id);
-  //  bind_ConstantFunction<G, g_dim, 2, 1>(m, grid_id);
-  //  bind_ConstantFunction<G, g_dim, 3, 1>(m, grid_id);
-  //  bind_ConstantFunction<G, g_dim, 4, 1>(m, grid_id);
-  //  bind_ConstantFunction<G, g_dim, 2, 2>(m, grid_id);
+  bind_combined_GridFunction<G, g_dim, prod, 1, 1, 1, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 1, 1>(i_1_1);
+
+  bind_combined_GridFunction<G, g_dim, prod, 1, 1, 2, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 1>(i_1_1);
+
+  bind_combined_GridFunction<G, g_dim, prod, 1, 1, 3, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 3, 1>(i_1_1);
+
+  bind_combined_GridFunction<G, g_dim, prod, 1, 1, 4, 1>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 4, 1>(i_1_1);
+
+  bind_combined_GridFunction<G, g_dim, prod, 1, 1, 2, 2>(m, grid_id);
+  addbind_GridFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 2>(i_1_1);
+
+
+  bind_ConstantFunction<G, g_dim, 1, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 2, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 3, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_ConstantFunction<G, g_dim, 2, 2>(m, grid_id);
 
   bind_CheckerboardFunction<G, g_dim, 1, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 2, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 3, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_CheckerboardFunction<G, g_dim, 1, 2>(m, grid_id);
+  bind_CheckerboardFunction<G, g_dim, 1, 3>(m, grid_id);
 
   //  bindings::ESV2007::CutoffFunction<G>::bind(m);
 
-  //  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
-  //  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
-  //  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
-  //  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 1, 2>(m, grid_id);
+  bind_ExpressionFunction<G, g_dim, 1, 3>(m, grid_id);
 
   bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
 } // ... addbind_for_Grid(...)

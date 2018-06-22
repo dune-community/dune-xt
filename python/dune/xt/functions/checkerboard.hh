@@ -52,7 +52,7 @@ typename std::enable_if<Grid::is_grid<G>::value,
   typedef typename G::ctype D;
   typedef double R;
 
-  typedef LocalizableFunctionInterface<E, r, rC, R> I;
+  typedef GridFunctionInterface<E, r, rC, R> I;
   typedef CheckerboardFunction<E, r, rC, R> C;
 
   py::class_<C, I> c(

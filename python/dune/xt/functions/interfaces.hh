@@ -118,15 +118,15 @@ struct get_combined<L, R, internal::Combination::product>
 //  struct helper
 //  {
 //    template <class E, class R>
-//    static void addbind(pybind11::module& m, pybind11::class_<LocalizableFunctionInterface<E, d, 1, R>>& c)
+//    static void addbind(pybind11::module& m, pybind11::class_<GridFunctionInterface<E, d, 1, R>>& c)
 //    {
 //      namespace py = pybind11;
 //      using namespace pybind11::literals;
 //      using Common::to_string;
 
 //      try { // guard since we might not be the first to do bind this combination
-//        py::class_<DivergenceFunction<LocalizableFunctionInterface<E, d, 1, R>>,
-//                   LocalizableFunctionInterface<E, d, 1, R>>(
+//        py::class_<DivergenceFunction<GridFunctionInterface<E, d, 1, R>>,
+//                   GridFunctionInterface<E, d, 1, R>>(
 //            m,
 //            Common::to_camel_case(
 //                "divergence_of_function_from_" + Grid::bindings::grid_name<G>::value() + "_to_" + to_string(r) + "x"
@@ -137,8 +137,8 @@ struct get_combined<L, R, internal::Combination::product>
 //      }
 
 //      c.def("divergence",
-//            [](const LocalizableFunctionInterface<E, d, 1, R>& self, const std::string& name) {
-//              return new DivergenceFunction<LocalizableFunctionInterface<E, d, 1, R>>(self, name);
+//            [](const GridFunctionInterface<E, d, 1, R>& self, const std::string& name) {
+//              return new DivergenceFunction<GridFunctionInterface<E, d, 1, R>>(self, name);
 //            },
 //            "name"_a = "",
 //            py::keep_alive<0, 1>());
@@ -149,13 +149,13 @@ struct get_combined<L, R, internal::Combination::product>
 //  struct helper<d, r, rC, false>
 //  {
 //    template <class E, class R>
-//    static void addbind(pybind11::module& /*m*/, pybind11::class_<LocalizableFunctionInterface<E, r, rC, R>>& /*c*/)
+//    static void addbind(pybind11::module& /*m*/, pybind11::class_<GridFunctionInterface<E, r, rC, R>>& /*c*/)
 //    {
 //    }
 //  }; // struct helper<..., false>
 
 //  template <class E, size_t d, class R, size_t r, size_t rC>
-//  static void addbind(pybind11::module& m, pybind11::class_<LocalizableFunctionInterface<E, r, rC, R>>& c)
+//  static void addbind(pybind11::module& m, pybind11::class_<GridFunctionInterface<E, r, rC, R>>& c)
 //  {
 //    helper<d, r, rC>::addbind(m, c);
 //  } // ... addbind(...)
@@ -166,21 +166,20 @@ struct get_combined<L, R, internal::Combination::product>
 
 
 template <class G, size_t r, size_t rC>
-pybind11::class_<LocalizableFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>
-bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_id)
+pybind11::class_<GridFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>
+bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef LocalizableFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double> C;
+  typedef GridFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double> C;
 
-  py::class_<C> c(m,
-                  std::string("LocalizableFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x"
-                              + Common::to_string(rC))
-                      .c_str(),
-                  std::string("LocalizableFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x"
-                              + Common::to_string(rC))
-                      .c_str());
+  py::class_<C> c(
+      m,
+      std::string("GridFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC))
+          .c_str(),
+      std::string("GridFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC))
+          .c_str());
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
   c.def_property_readonly("type", [](const C& self) { return self.type(); });
@@ -251,7 +250,7 @@ bind_LocalizableFunctionInterface(pybind11::module& m, const std::string& grid_i
   // internal::Divergence<G>::addbind(m, c);
 
   return c;
-} // ... bind_LocalizableFunctionInterface(...)
+} // ... bind_GridFunctionInterface(...)
 
 
 /**
@@ -263,18 +262,18 @@ static const constexpr size_t d = G::dimension;
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <class G, size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
-pybind11::class_<typename internal::
-                     get_combined<LocalizableFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
-                                  LocalizableFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
-                                  comb>::type>
-bind_combined_LocalizableFunction(pybind11::module& m, const std::string& grid_id)
+pybind11::class_<
+    typename internal::get_combined<GridFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
+                                    GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
+                                    comb>::type>
+bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
 
   typedef typename G::template Codim<0>::Entity E;
   typedef double R;
-  typedef LocalizableFunctionInterface<E, lr, lrC, R> Left;
-  typedef LocalizableFunctionInterface<E, rr, rrC, R> Right;
+  typedef GridFunctionInterface<E, lr, lrC, R> Left;
+  typedef GridFunctionInterface<E, rr, rrC, R> Right;
   typedef typename internal::get_combined<Left, Right, comb>::type C;
   static const size_t r = C::dimRange;
   static const size_t rC = C::dimRangeCols;
@@ -285,12 +284,12 @@ bind_combined_LocalizableFunction(pybind11::module& m, const std::string& grid_i
                           + Common::to_string(lrC) + " and " + Common::to_string(rr) + "x" + Common::to_string(rrC)
                           + ")";
 
-  py::class_<C, LocalizableFunctionInterface<E, r, rC, R>> c(m, std::string(class_name).c_str(), doc.c_str());
+  py::class_<C, GridFunctionInterface<E, r, rC, R>> c(m, std::string(class_name).c_str(), doc.c_str());
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
 
   return c;
-} // ... bind_combined_LocalizableFunction(...)
+} // ... bind_combined_GridFunction(...)
 
 
 /**
@@ -302,20 +301,107 @@ static const constexpr size_t d = G::dimension;
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <class G, size_t d, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
-void addbind_LocalizableFunctionInterface_combined_op(C& c)
+void addbind_GridFunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
 
   typedef typename G::template Codim<0>::Entity E;
-  typedef LocalizableFunctionInterface<E, r, rC, double> S;
-  typedef LocalizableFunctionInterface<E, oR, orC, double> O;
+  typedef GridFunctionInterface<E, r, rC, double> S;
+  typedef GridFunctionInterface<E, oR, orC, double> O;
 
   c.def(internal::get_combined<S, O, comb>::op().c_str(),
         [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
         py::keep_alive<0, 1>(),
         py::keep_alive<0, 2>());
-} // ... addbind_LocalizableFunctionInterface_combined_op(...)
+} // ... addbind_GridFunctionInterface_combined_op(...)
 
+
+template <class G, size_t r, size_t rC>
+pybind11::class_<FunctionInterface<G::dimension, r, rC, double>> bind_FunctionInterface(pybind11::module& m,
+                                                                                        const std::string& grid_id)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  typedef FunctionInterface<G::dimension, r, rC, double> C;
+
+  py::class_<C> c(
+      m,
+      std::string("FunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC))
+          .c_str(),
+      std::string("FunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC))
+          .c_str());
+
+  c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
+  c.def_property_readonly("type", [](const C& self) { return self.type(); });
+  c.def_property_readonly("name", [](const C& self) { return self.name(); });
+
+  c.def("visualize",
+        [](const C& self,
+           const Grid::GridProvider<G>& grid_provider,
+           const std::string& layer,
+           const ssize_t lvl,
+           const std::string& path,
+           const bool subsampling) {
+          const auto level = XT::Common::numeric_cast<int>(lvl);
+          if (layer == "leaf")
+            self.visualize(grid_provider.leaf_view(), path, subsampling);
+          else if (layer == "level")
+            self.visualize(grid_provider.template layer<XT::Grid::Layers::level, XT::Grid::Backends::view>(level),
+                           path,
+                           subsampling);
+          else
+            DUNE_THROW(XT::Common::Exceptions::wrong_input_given,
+                       "Given layer has to be one of ('leaf', 'level'), is '" << layer << "'!");
+        },
+        "grid_provider"_a,
+        "layer"_a = "leaf",
+        "level"_a = -1,
+        "path"_a,
+        "subsampling"_a = true);
+  c.def("visualize",
+        [](const C& self,
+           const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& dd_grid_provider,
+           const std::string& layer,
+           const ssize_t lvl_or_sbdmn,
+           const std::string& path,
+           const bool subsampling) {
+          const auto level_or_subdomain = XT::Common::numeric_cast<int>(lvl_or_sbdmn);
+          if (layer == "leaf")
+            self.visualize(dd_grid_provider.leaf_view(), path, subsampling);
+          else if (layer == "level")
+            self.visualize(
+                dd_grid_provider.template layer<XT::Grid::Layers::level, XT::Grid::Backends::view>(level_or_subdomain),
+                path,
+                subsampling);
+          else if (layer == "dd_subdomain")
+            self.visualize(dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain, XT::Grid::Backends::view>(
+                               level_or_subdomain),
+                           path,
+                           subsampling);
+          else if (layer == "dd_subdomain_oversampled")
+            self.visualize(
+                dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain_oversampled, XT::Grid::Backends::view>(
+                    level_or_subdomain),
+                path,
+                subsampling);
+          else
+            DUNE_THROW(
+                XT::Common::Exceptions::wrong_input_given,
+                "Given layer has to be one of ('leaf', 'level', 'dd_subdomain', 'dd_subdomain_oversampled'), is '"
+                    << layer
+                    << "'!");
+        },
+        "dd_grid_provider"_a,
+        "layer"_a = "leaf",
+        "level_or_subdomain"_a = -1,
+        "path"_a,
+        "subsampling"_a = true);
+
+  // internal::Divergence<G>::addbind(m, c);
+
+  return c;
+} // ... bind_GridFunctionInterface(...)
 
 } // namespace Functions
 } // namespace XT

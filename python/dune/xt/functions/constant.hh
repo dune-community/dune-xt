@@ -46,7 +46,7 @@ bind_ConstantFunction(pybind11::module& m, const std::string& grid_id)
 
   typedef double R;
 
-  typedef SmoothFunctionInterface<d, r, rC, R> I;
+  typedef FunctionInterface<d, r, rC, R> I;
   typedef ConstantFunction<d, r, rC, R> C;
 
   py::class_<C, I> c(
