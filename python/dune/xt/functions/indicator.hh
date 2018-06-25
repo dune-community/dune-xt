@@ -30,12 +30,7 @@ namespace Functions {
 
 template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<Grid::is_grid<G>::value,
-                        pybind11::class_<IndicatorFunction<typename G::template Codim<0>::Entity,
-                                                           typename G::ctype,
-                                                           d,
-                                                           double,
-                                                           r,
-                                                           rC>>>::type
+                        pybind11::class_<IndicatorFunction<typename G::template Codim<0>::Entity, r, rC, double>>>::type
 bind_IndicatorFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
@@ -44,11 +39,12 @@ bind_IndicatorFunction(pybind11::module& m, const std::string& grid_id)
   typedef typename G::template Codim<0>::Entity E;
   typedef typename G::ctype D;
   typedef double R;
-  typedef LocalizableFunctionInterface<E, D, d, R, r, rC> I;
-  typedef IndicatorFunction<E, D, d, R, r, rC> C;
+  typedef GridFunctionInterface<E, r, rC, R> I;
+  typedef IndicatorFunction<E, r, rC, R> C;
   using DomainType = typename C::DomainType;
-  using CornerVector = std::vector<std::tuple<DomainType, DomainType, R>>;
-  using IntervalVector = std::vector<std::pair<std::pair<Common::FieldVector<D, d>, Common::FieldVector<D, d>>, R>>;
+  using RangeType = typename C::RangeType;
+  using CornerVector = std::vector<std::tuple<DomainType, DomainType, RangeType>>;
+  using IntervalVector = std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeType>>;
 
   const std::string classname =
       std::string("IndicatorFunction__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC));
