@@ -187,7 +187,7 @@ bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
 
   c.def("visualize",
         [](const C& self,
-           const Grid::GridProvider<G>& grid_provider,
+           const Grid::GridProvider<G, Grid::none_t>& grid_provider,
            const std::string& layer,
            const ssize_t lvl,
            const std::string& path,

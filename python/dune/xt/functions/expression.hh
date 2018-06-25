@@ -182,7 +182,7 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::in
 
   const std::string make_name = "make_expression_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/,
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
            const std::string& variable,
            const Common::FieldMatrix<std::string, r, rC>& expression,
            const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
@@ -248,7 +248,7 @@ bind_ExpressionFunction(pybind11::module& m, const std::string& grid_id, std::in
 
   const std::string make_name = "make_expression_function_" + Common::to_string(r) + "x" + Common::to_string(1);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/,
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
            const std::string& variable,
            const Common::FieldVector<std::string, r>& expression,
            const Common::FieldMatrix<std::string, r, d>& gradient_expressions,

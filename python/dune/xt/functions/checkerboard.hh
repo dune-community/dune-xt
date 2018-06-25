@@ -77,7 +77,7 @@ typename std::enable_if<Grid::is_grid<G>::value,
 
   const std::string make_name = "make_checkerboard_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid_provider*/,
+        [](const Grid::GridProvider<G, Grid::none_t>& /*grid_provider*/,
            const Common::FieldVector<D, d>& lower_left,
            const Common::FieldVector<D, d>& upper_right,
            const Common::FieldVector<size_t, d>& num_elements,
