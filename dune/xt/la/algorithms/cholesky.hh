@@ -214,8 +214,9 @@ struct CholeskySolver
       DUNE_THROW(Dune::InvalidStateException, "Matrix has to be square!");
     if (false) {
 #if HAVE_MKL || HAVE_LAPACKE
-    } else if (storage_layout == Common::StorageLayout::dense_row_major
-               || storage_layout == Common::StorageLayout::dense_column_major) {
+    } else if ((storage_layout == Common::StorageLayout::dense_row_major
+                || storage_layout == Common::StorageLayout::dense_column_major)
+               && size > 10) {
       const int lapacke_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();
