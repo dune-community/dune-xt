@@ -349,7 +349,7 @@ public:
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 
@@ -867,7 +867,7 @@ public:
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 

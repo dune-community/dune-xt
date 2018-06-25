@@ -253,7 +253,7 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     assert(ii < size());
     backend()[ii][0] += value;
   }
@@ -536,7 +536,7 @@ public:
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     assert(these_are_valid_indices(ii, jj));
     backend()[ii][jj][0][0] += value;
   }

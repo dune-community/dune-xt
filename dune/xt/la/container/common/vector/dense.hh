@@ -227,7 +227,7 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     assert(ii < size());
     backend()[ii] += value;
   }

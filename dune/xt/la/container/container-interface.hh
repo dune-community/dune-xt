@@ -102,9 +102,9 @@ struct VectorLockGuard
 
 struct LockGuard
 {
-  LockGuard(std::vector<std::mutex>& mutexes, const size_t ii)
+  LockGuard(std::vector<std::mutex>& mutexes, const size_t ii, const size_t container_size)
     : mutexes_(mutexes)
-    , index_(ii % mutexes_.size())
+    , index_(ii * mutexes_.size() / container_size)
   {
     if (mutexes_.size())
       mutexes_[index_].lock();
@@ -204,7 +204,6 @@ public:
     return this->as_imp().has_equal_shape(other);
   }
 
-public:
   /// \}
   /// \name Are provided by the interface for convenience!
   /// \note Those marked as virtual may be implemented more efficiently in a derived class!
