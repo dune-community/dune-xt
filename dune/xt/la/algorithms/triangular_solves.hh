@@ -36,7 +36,6 @@ void forward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
   for (size_t ii = 0; ii < M::rows(A); ++ii) {
     for (size_t jj = 0; jj < ii; ++jj)
       rhs[ii] -= M::get_entry(A, transposed ? jj : ii, transposed ? ii : jj) * x[jj];
-    // We could simply use ==, but that gives a warning with -Wfloat-equal
     if (M::get_entry(A, ii, ii) == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");
     x[ii] = rhs[ii] / M::get_entry(A, ii, ii);
@@ -205,10 +204,10 @@ struct TriangularSolver
     assert(std::max(M::rows(A), M::cols(A)) <= std::numeric_limits<int>::max());
     const int num_rows = static_cast<int>(M::rows(A));
     const int num_cols = static_cast<int>(M::cols(A));
-    const bool trans = (transpose == Common::Transpose::yes);
-    const bool lower = (triangular_type == Common::MatrixPattern::lower_triangular);
-    const bool upper = !lower;
-    const bool solve_forward = (lower && !trans) || (upper && trans);
+    constexpr bool trans = (transpose == Common::Transpose::yes);
+    constexpr bool lower = (triangular_type == Common::MatrixPattern::lower_triangular);
+    constexpr bool upper = !lower;
+    constexpr bool solve_forward = (lower && !trans) || (upper && trans);
     if (num_rows != num_cols)
       DUNE_THROW(Dune::InvalidStateException, "Matrix has to be square!");
     if (num_rows == 2) {
@@ -228,18 +227,15 @@ struct TriangularSolver
       const int blas_triangular =
           (triangular_type == Common::MatrixPattern::upper_triangular) ? Common::Blas::upper() : Common::Blas::lower();
       const int blas_trans = (transpose == Common::Transpose::yes) ? Common::Blas::trans() : Common::Blas::no_trans();
-      trsm(blas_storage_layout,
-           Common::Blas::left(),
+      trsv(blas_storage_layout,
            blas_triangular,
            blas_trans,
            Common::Blas::non_unit(),
            num_rows,
-           1,
-           ScalarType(1.),
            M::data(A),
            num_rows,
            rhs,
-           storage_layout == Common::StorageLayout::dense_row_major ? 1 : num_rows);
+           1);
 #endif // HAVE_MKL || HAVE_CBLAS
     } else if (storage_layout == Common::StorageLayout::csr) {
       if (lower && !trans) {
@@ -279,49 +275,33 @@ struct TriangularSolver
 
 #if HAVE_CBLAS || HAVE_MKL
 private:
-  template <class ScalarType>
-  static std::enable_if_t<Common::is_arithmetic<ScalarType>::value, void> trsm(const int layout,
-                                                                               const int side,
-                                                                               const int uplo,
-                                                                               const int transa,
-                                                                               const int diag,
-                                                                               const int m,
-                                                                               const int n,
-                                                                               const ScalarType alpha,
-                                                                               const ScalarType* a,
-                                                                               const int lda,
-                                                                               ScalarType* b,
-                                                                               const int ldb)
+  template <class ScalarImp = ScalarType>
+  static std::enable_if_t<Common::is_arithmetic<ScalarImp>::value, void> trsv(const int layout,
+                                                                              const int uplo,
+                                                                              const int transa,
+                                                                              const int diag,
+                                                                              const int n,
+                                                                              const ScalarType* a,
+                                                                              const int lda,
+                                                                              ScalarType* x,
+                                                                              const int incx)
   {
-    return Common::Blas::dtrsm(layout, side, uplo, transa, diag, m, n, alpha, a, lda, b, ldb);
+    return Common::Blas::dtrsv(layout, uplo, transa, diag, n, a, lda, x, incx);
   }
 
-  template <class ScalarType>
-  static std::enable_if_t<Common::is_complex<ScalarType>::value, void> trsm(const int layout,
-                                                                            const int side,
-                                                                            const int uplo,
-                                                                            const int transa,
-                                                                            const int diag,
-                                                                            const int m,
-                                                                            const int n,
-                                                                            const ScalarType alpha,
-                                                                            const ScalarType* a,
-                                                                            const int lda,
-                                                                            ScalarType* b,
-                                                                            const int ldb)
+  template <class ScalarImp = ScalarType>
+  static std::enable_if_t<Common::is_complex<ScalarImp>::value, void> trsv(const int layout,
+                                                                           const int uplo,
+                                                                           const int transa,
+                                                                           const int diag,
+                                                                           const int n,
+                                                                           const ScalarType* a,
+                                                                           const int lda,
+                                                                           ScalarType* x,
+                                                                           const int incx)
   {
-    return Common::Blas::ztrsm(layout,
-                               side,
-                               uplo,
-                               transa,
-                               diag,
-                               m,
-                               n,
-                               static_cast<const void*>(&alpha),
-                               static_cast<const void*>(a),
-                               lda,
-                               static_cast<void*>(b),
-                               ldb);
+    return Common::Blas::ztrsv(
+        layout, uplo, transa, diag, n, static_cast<const void*>(a), lda, static_cast<void*>(x), incx);
   }
 #endif // HAVE_CBLAS || HAVE_MKL
 };

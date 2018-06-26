@@ -14,6 +14,7 @@
 #include <complex>
 
 #include <dune/xt/common/lapacke.hh>
+#include <dune/xt/common/math.hh>
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/vector.hh>
 
@@ -34,7 +35,7 @@ partial_dot(const FirstVectorType& a, const SecondVectorType& b, const size_t be
   typedef Common::VectorAbstraction<SecondVectorType> V2;
   typename V1::ScalarType ret(0);
   for (size_t ii = begin; ii < end; ++ii)
-    ret += V1::get_entry(a, ii) * V2::get_entry(b, ii);
+    ret += Common::conj(V1::get_entry(a, ii)) * V2::get_entry(b, ii);
   return ret;
 }
 
@@ -49,7 +50,7 @@ void multiply_householder_from_left(FirstVectorType& x,
   typedef Common::VectorAbstraction<FirstVectorType> V1;
   typedef Common::VectorAbstraction<VectorType> V2;
   // calculate w^T x first
-  auto wT_x = partial_dot(x, v, begin, end);
+  auto wT_x = partial_dot(v, x, begin, end);
   for (size_t rr = begin; rr < end; ++rr)
     V1::add_to_entry(x, rr, -tau * wT_x * V2::get_entry(v, rr));
 }
@@ -67,15 +68,16 @@ void multiply_householder_from_left(MatrixType& A,
 {
   using M = Common::MatrixAbstraction<MatrixType>;
   using V = Common::VectorAbstraction<VectorType>;
+  using W = Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_cols>>;
   using ScalarType = typename M::ScalarType;
   // calculate w^T A first
-  VectorType wT_A = V::create(M::cols(A), ScalarType(0.));
+  auto wT_A = W::create(M::cols(A), ScalarType(0.));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      V::add_to_entry(wT_A, cc, V::get_entry(v, rr) * M::get_entry(A, rr, cc));
+      W::add_to_entry(wT_A, cc, Common::conj(V::get_entry(v, rr)) * M::get_entry(A, rr, cc));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      M::add_to_entry(A, rr, cc, -tau * V::get_entry(v, rr) * V::get_entry(wT_A, cc));
+      M::add_to_entry(A, rr, cc, -tau * V::get_entry(v, rr) * W::get_entry(wT_A, cc));
 }
 
 // Calculates A = A * H.
@@ -91,14 +93,27 @@ void multiply_householder_from_right(MatrixType& A,
 {
   typedef Common::MatrixAbstraction<MatrixType> M;
   typedef Common::VectorAbstraction<VectorType> V;
+  using W = Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_rows>>;
   // calculate A w first
-  VectorType Aw = V::create(M::rows(A), 0.);
+  auto Aw = W::create(M::rows(A), 0.);
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      V::add_to_entry(Aw, cc, V::get_entry(v, cc) * M::get_entry(A, rr, cc));
+      W::add_to_entry(Aw, cc, V::get_entry(v, cc) * M::get_entry(A, rr, cc));
   for (size_t rr = row_begin; rr < row_end; ++rr)
     for (size_t cc = col_begin; cc < col_end; ++cc)
-      M::add_to_entry(A, rr, cc, -tau * V::get_entry(v, cc) * V::get_entry(Aw, rr));
+      M::add_to_entry(A, rr, cc, -tau * W::get_entry(Aw, rr) * Common::conj(V::get_entry(v, cc)));
+}
+
+template <class T>
+std::enable_if_t<std::is_arithmetic<T>::value, T> get_s(T val)
+{
+  return -sign(val);
+}
+
+template <class T>
+std::complex<T> get_s(std::complex<T> val)
+{
+  return -std::exp(std::complex<T>(0., 1.) * std::arg(val));
 }
 
 /** \brief This is a simple QR scheme using Householder reflections and column pivoting.
@@ -118,6 +133,7 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
 {
   using M = typename Common::MatrixAbstraction<MatrixType>;
   using V = typename Common::VectorAbstraction<VectorType>;
+  using W = typename Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_rows>>;
   using VI = typename Common::VectorAbstraction<IndexVectorType>;
   using IndexType = typename VI::ScalarType;
   using RealType = typename M::RealType;
@@ -137,7 +153,7 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
     for (size_t cc = 0; cc < num_cols; ++cc)
       col_norms[cc] += std::pow(std::abs(M::get_entry(A, rr, cc)), 2);
 
-  VectorType w = V::create(num_rows, ScalarType(0.));
+  auto w = W::create(num_rows, ScalarType(0.));
 
   for (size_t jj = 0; jj < num_cols - 1; ++jj) {
 
@@ -167,15 +183,15 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
     normx = std::sqrt(normx);
 
     if (normx != 0.) {
-      const auto s = -sign(std::real(M::get_entry(A, jj, jj)));
+      const auto s = get_s(M::get_entry(A, jj, jj));
       const auto u1 = M::get_entry(A, jj, jj) - s * normx;
-      V::set_entry(w, jj, 1.);
+      W::set_entry(w, jj, 1.);
       for (size_t rr = jj + 1; rr < num_rows; ++rr) {
-        V::set_entry(w, rr, M::get_entry(A, rr, jj) / u1);
-        M::set_entry(A, rr, jj, V::get_entry(w, rr));
+        W::set_entry(w, rr, M::get_entry(A, rr, jj) / u1);
+        M::set_entry(A, rr, jj, W::get_entry(w, rr));
       }
       M::set_entry(A, jj, jj, s * normx);
-      V::set_entry(tau, jj, static_cast<ScalarType>(-s) * u1 / normx);
+      V::set_entry(tau, jj, static_cast<ScalarType>(-s) * Common::conj(u1) / normx);
       // calculate A = H A
       multiply_householder_from_left(A, V::get_entry(tau, jj), w, jj, num_rows, jj + 1, num_cols);
     } // if (normx != 0)
@@ -212,6 +228,7 @@ struct QrHelper
       ;
 #if HAVE_LAPACKE || HAVE_MKL
     } else if (has_contiguous_storage) {
+      std::fill(permutations.begin(), permutations.end(), 0.);
       assert(std::max(M::rows(A), M::cols(A)) < std::numeric_limits<int>::max());
       auto num_rows = static_cast<int>(M::rows(A));
       auto num_cols = static_cast<int>(M::cols(A));
@@ -245,19 +262,19 @@ struct QrHelper
       // create Q and copy values of QR to Q;
       const size_t num_rows = M::rows(QR);
       const size_t num_cols = M::cols(QR);
-      auto ret = M::template create<M::static_rows, M::static_rows>(num_rows, num_rows, 0.);
+      auto ret = Common::create<MatrixType, M::static_rows, M::static_rows>(num_rows, num_rows, typename M::S(0.));
       typedef Common::MatrixAbstraction<decltype(ret)> Mret;
       for (size_t ii = 0; ii < num_rows; ++ii)
         for (size_t jj = 0; jj < num_cols; ++jj)
           Mret::set_entry(ret, ii, jj, M::get_entry(QR, ii, jj));
       assert(std::max(M::rows(QR), M::cols(QR)) < std::numeric_limits<int>::max());
-      auto info = Common::Lapacke::dorgqr(lapacke_storage_layout(),
-                                          static_cast<int>(num_rows),
-                                          static_cast<int>(num_rows),
-                                          static_cast<int>(num_cols),
-                                          Mret::data(ret),
-                                          static_cast<int>(num_rows),
-                                          V::data(tau));
+      auto info = calculate_q(lapacke_storage_layout(),
+                              static_cast<int>(num_rows),
+                              static_cast<int>(num_rows),
+                              static_cast<int>(num_cols),
+                              Mret::data(ret),
+                              static_cast<int>(num_rows),
+                              V::data(tau));
       if (info)
         DUNE_THROW(Dune::MathError, "Calculating Q explicitly failed!");
       return ret;
@@ -275,7 +292,10 @@ struct QrHelper
   {
     using V2 = Common::VectorAbstraction<SecondVectorType>;
     using V3 = Common::VectorAbstraction<ThirdVectorType>;
+    using W = typename Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_rows>>;
     using ScalarType = typename V2::ScalarType;
+    const size_t num_rows = M::rows(QR);
+    const size_t num_cols = M::cols(QR);
     for (size_t ii = 0; ii < M::rows(QR); ++ii)
       V3::set_entry(y, ii, V2::get_entry(x, ii));
     if (false) {
@@ -285,34 +305,32 @@ struct QrHelper
       // These are the number of rows and columns of the matrix C in the documentation of dormqr.
       // As we only have a vector, i.e. C = x, the number of columns is 1.
       assert(x.size() < std::numeric_limits<int>::max());
-      const int num_rows = static_cast<int>(x.size());
-      const int num_cols = 1;
+      const int num_rhs_rows = static_cast<int>(x.size());
+      const int num_rhs_cols = 1;
       auto info = multiply_by_q(lapacke_storage_layout(),
                                 'L',
                                 transpose == XT::Common::Transpose::yes ? 'T' : 'N',
-                                num_rows,
-                                num_cols,
-                                num_rows,
+                                num_rhs_rows,
+                                num_rhs_cols,
+                                static_cast<int>(num_rows),
                                 M::data(QR),
-                                num_rows,
+                                num_rhs_rows,
                                 V::data(tau),
                                 V3::data(y),
-                                is_row_major ? num_cols : num_rows);
+                                is_row_major ? num_rhs_cols : num_rhs_rows);
       if (info)
         DUNE_THROW(Dune::MathError, "Multiplication by Q or Q^T failed");
 #endif // HAVE_LAPACKE || HAVE_MKL
     } else {
-      assert(M::cols(QR) < std::numeric_limits<int>::max());
-      const auto num_rows = M::rows(QR);
-      const auto num_cols = static_cast<int>(M::cols(QR));
-      VectorType w = V::create(num_rows, ScalarType(0.));
+      assert(num_cols < std::numeric_limits<int>::max());
+      auto w = W::create(num_rows, ScalarType(0.));
       if (transpose == XT::Common::Transpose::no)
-        for (int jj = num_cols - 1; jj >= 0; --jj) {
+        for (int jj = static_cast<int>(num_cols) - 1; jj >= 0; --jj) {
           set_w_vector(QR, jj, w);
           multiply_householder_from_left(y, tau[jj], w, jj, num_rows);
         }
       else
-        for (int jj = 0; jj < num_cols; ++jj) {
+        for (int jj = 0; jj < static_cast<int>(num_cols); ++jj) {
           set_w_vector(QR, jj, w);
           multiply_householder_from_left(y, tau[jj], w, jj, num_rows);
         }
@@ -349,7 +367,18 @@ private:
   static std::enable_if_t<Common::is_arithmetic<ScalarType>::value, int>
   geqp3(int matrix_layout, int m, int n, ScalarType* a, int lda, int* jpvt, ScalarType* tau)
   {
-    return Common::Lapacke::dgeqp3(matrix_layout, m, n, a, lda, jpvt, tau);
+    thread_local std::vector<double> work(1);
+    thread_local int last_m = 0;
+    thread_local int last_n = 0;
+    if (m != last_m || n != last_n) {
+      // query workspace size
+      Common::Lapacke::dgeqp3_work(matrix_layout, m, n, a, lda, jpvt, tau, work.data(), -1);
+      work.resize(work[0]);
+      last_m = m;
+      last_n = n;
+    }
+    return Common::Lapacke::dgeqp3_work(
+        matrix_layout, m, n, a, lda, jpvt, tau, work.data(), static_cast<int>(work.size()));
   }
 
   template <class ScalarType>
@@ -372,7 +401,18 @@ private:
                                                                                        ScalarType* c,
                                                                                        int ldc)
   {
-    return Common::Lapacke::dormqr(matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc);
+    thread_local std::vector<double> work(1);
+    thread_local int last_m = 0;
+    thread_local int last_n = 0;
+    if (m != last_m || n != last_n) {
+      // query workspace size
+      Common::Lapacke::dormqr_work(matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc, work.data(), -1);
+      work.resize(work[0]);
+      last_m = m;
+      last_n = n;
+    }
+    return Common::Lapacke::dormqr_work(
+        matrix_layout, side, trans, m, n, k, a, lda, tau, c, ldc, work.data(), static_cast<int>(work.size()));
   }
 
   template <class ScalarType>
@@ -389,6 +429,31 @@ private:
                                                                                     int ldc)
   {
     return Common::Lapacke::zunmqr(matrix_layout, side, trans == 'T' ? 'C' : trans, m, n, k, a, lda, tau, c, ldc);
+  }
+
+  template <class ScalarType>
+  static std::enable_if_t<Common::is_arithmetic<ScalarType>::value, int>
+  calculate_q(int matrix_layout, int m, int n, int k, ScalarType* a, int lda, const ScalarType* tau)
+  {
+    thread_local std::vector<double> work(1);
+    thread_local int last_m = 0;
+    thread_local int last_n = 0;
+    if (m != last_m || n != last_n) {
+      // query workspace size
+      Common::Lapacke::dorgqr_work(matrix_layout, m, n, k, a, lda, tau, work.data(), -1);
+      work.resize(work[0]);
+      last_m = m;
+      last_n = n;
+    }
+    return Common::Lapacke::dorgqr_work(
+        matrix_layout, m, n, k, a, lda, tau, work.data(), static_cast<int>(work.size()));
+  }
+
+  template <class ScalarType>
+  static std::enable_if_t<Common::is_complex<ScalarType>::value, int>
+  calculate_q(int matrix_layout, int m, int n, int k, ScalarType* a, int lda, const ScalarType* tau)
+  {
+    return Common::Lapacke::zungqr(matrix_layout, m, n, k, a, lda, tau);
   }
 #endif // HAVE_LAPACKE || HAVE_MKL
 }; // struct QrHelper
@@ -453,8 +518,8 @@ void solve_qr_factorized(const MatrixType& QR,
   using V2 = Common::VectorAbstraction<SecondVectorType>;
   using VI = Common::VectorAbstraction<IndexVectorType>;
 
-  auto num_rows = M::rows(QR);
-  auto num_cols = M::cols(QR);
+  const auto num_rows = M::rows(QR);
+  const auto num_cols = M::cols(QR);
   if (num_rows != num_cols)
     DUNE_THROW(NotImplemented, "Not implemented for non-square matrices!");
 
@@ -483,7 +548,8 @@ void solve_qr_factorized(const MatrixType& QR,
   }
 
   // Undo permutations
-  for (int ii = 0; ii < int(M::rows(QR)); ++ii)
+  assert(num_rows <= std::numeric_limits<int>::max());
+  for (int ii = 0; ii < static_cast<int>(num_rows); ++ii)
     V2::set_entry(x, VI::get_entry(permutations, ii), V2::get_entry(*work, ii));
 }
 
@@ -502,6 +568,37 @@ solve_by_qr_decomposition(MatrixType& A, VectorType& x, const SecondVectorType& 
   std::vector<int> permutations(M::cols(A));
   qr(A, tau, permutations);
   solve_qr_factorized(A, tau, permutations, x, b);
+} // void solve_lower_triangular(...)
+
+/**
+ *  \brief Performs a QR decomposition to solve AX = B, where A, X and B are matrices
+ *  \see qr
+ */
+template <class MatrixType, class SolutionMatrixType, class RhsMatrixType>
+typename std::enable_if_t<Common::is_matrix<MatrixType>::value && Common::is_matrix<SolutionMatrixType>::value
+                              && Common::is_matrix<RhsMatrixType>::value,
+                          void>
+solve_by_qr_decomposition(MatrixType& A, SolutionMatrixType& X, const RhsMatrixType& B)
+{
+  using M = typename Common::MatrixAbstraction<MatrixType>;
+  using MB = Common::MatrixAbstraction<SolutionMatrixType>;
+  using MX = Common::MatrixAbstraction<RhsMatrixType>;
+  using ScalarType = typename M::ScalarType;
+  assert(M::cols(A) == MX::rows(X));
+  assert(M::rows(A) == MB::rows(B));
+  assert(MB::cols(B) == MX::cols(X));
+  std::vector<ScalarType> tau(M::cols(A));
+  std::vector<int> permutations(M::cols(A));
+  qr(A, tau, permutations);
+  std::vector<ScalarType> b(MB::rows(B));
+  std::vector<ScalarType> x(MX::rows(X));
+  for (size_t jj = 0; jj < MB::cols(B); ++jj) {
+    for (size_t ii = 0; ii < M::rows(A); ++ii)
+      b[ii] = MB::get_entry(B, ii, jj);
+    solve_qr_factorized(A, tau, permutations, x, b);
+    for (size_t ii = 0; ii < MX::rows(X); ++ii)
+      MX::set_entry(X, ii, jj, x[ii]);
+  }
 } // void solve_lower_triangular(...)
 
 

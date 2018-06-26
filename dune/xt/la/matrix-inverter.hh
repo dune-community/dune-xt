@@ -28,7 +28,7 @@ namespace LA {
  * \note  This class needs to be specialized for each MatrixType, the purpose of this variant is merely to document the
  *        expected functionality.
  */
-template <class MatrixType>
+template <class MatrixType, bool is_matrix = Common::is_matrix<MatrixType>::value>
 class MatrixInverterOptions
 {
   static_assert(AlwaysFalse<MatrixType>::value,
@@ -69,7 +69,7 @@ Common::Configuration matrix_inverter_options(const MatrixType& /*matrix*/, cons
  * \note  This class needs to bespecialized for each MatrixType, the purpose of this class is merely to document the
  *        expected functionality.
  */
-template <class MatrixType>
+template <class MatrixType, bool is_matrix = Common::is_matrix<MatrixType>::value>
 class MatrixInverter
 {
   static_assert(AlwaysFalse<MatrixType>::value,
@@ -104,7 +104,7 @@ MatrixInverter<M> make_matrix_inverter(const M& matrix, const std::string& type 
 
 
 template <class M>
-MatrixInverter<M> make_matrix_inverter(const M& matrix, const XT::Common::Configuration& options)
+MatrixInverter<M> make_matrix_inverter(const M& matrix, const Common::Configuration& options)
 {
   return MatrixInverter<M>(matrix, options);
 }
@@ -120,7 +120,7 @@ invert_matrix(const M& matrix, const std::string& inversion_type = "")
 
 template <class M>
 typename std::enable_if<is_matrix<M>::value || Common::is_matrix<M>::value, M>::type
-invert_matrix(const M& matrix, const XT::Common::Configuration& inversion_options)
+invert_matrix(const M& matrix, const Common::Configuration& inversion_options)
 {
   return MatrixInverter<M>(matrix, inversion_options).inverse();
 }
@@ -130,6 +130,7 @@ invert_matrix(const M& matrix, const XT::Common::Configuration& inversion_option
 } // namespace XT
 } // namespace LA
 
+#include "matrix-inverter/default.hh"
 #include "matrix-inverter/eigen.hh"
 #include "matrix-inverter/fmatrix.hh"
 

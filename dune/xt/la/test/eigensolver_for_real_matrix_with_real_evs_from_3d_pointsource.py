@@ -11,10 +11,11 @@
 
 from dune.xt.codegen import typeid_to_typedef_name as safe_name, have_eigen
 
-matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 32, 32>']
-field = ['double', 'double']
-complex_matrix = ['EigenDenseMatrix<std::complex<double>>', 'FieldMatrix<std::complex<double>, 32, 32>']
-real_matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 32, 32>']
+matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 32, 32>', 'CommonDenseMatrix<double>', 'CommonSparseMatrix<double>']
+field = ['double', 'double', 'double', 'double']
+complex_matrix = ['EigenDenseMatrix<std::complex<double>>', 'FieldMatrix<std::complex<double>, 32, 32>',
+                  'CommonDenseMatrix<std::complex<double>>', 'CommonSparseMatrix<std::complex<double>>']
+real_matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 32, 32>', 'CommonDenseMatrix<double>', 'CommonSparseMatrix<double>']
 
 def _ok(ft):
     if 'Eigen' in ft[0]:

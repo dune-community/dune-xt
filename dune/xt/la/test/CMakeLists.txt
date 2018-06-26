@@ -16,6 +16,8 @@ include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
 
 enable_testing()
 
+set(DXT_BIN_COUNT "2")
+
 begin_testcases(dunextla)
 
 end_testcases()

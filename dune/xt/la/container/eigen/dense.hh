@@ -803,7 +803,12 @@ struct VectorAbstraction<LA::EigenMappedDenseVector<T>>
 template <class T>
 struct MatrixAbstraction<LA::EigenDenseMatrix<T>> : public LA::internal::MatrixAbstractionBase<LA::EigenDenseMatrix<T>>
 {
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::EigenDenseMatrix<T>>;
+
   static const constexpr XT::Common::StorageLayout storage_layout = XT::Common::StorageLayout::dense_column_major;
+
+  template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
+  using MatrixTypeTemplate = LA::EigenDenseMatrix<FieldType>;
 
   static inline T* data(LA::EigenDenseMatrix<T>& mat)
   {

@@ -27,7 +27,7 @@ namespace LA {
 
 
 // forward
-template <class MatrixType>
+template <class MatrixType, bool is_matrix>
 class MatrixInverterOptions;
 
 
@@ -73,7 +73,7 @@ public:
    */
   MatrixInverterBase(const MatrixType& matrix, const std::string& type = "")
     : matrix_(matrix)
-    , options_(MatrixInverterOptions<MatrixType>::options(type))
+    , options_(MatrixInverterOptions<MatrixType, true>::options(type))
     , inverse_(nullptr)
   {
     pre_checks();
@@ -138,9 +138,9 @@ protected:
                      << "\n\nThese were the given options:\n\n"
                      << options_);
     internal::ensure_matrix_inverter_type(options_.get<std::string>("type"),
-                                          MatrixInverterOptions<MatrixType>::types());
+                                          MatrixInverterOptions<MatrixType, true>::types());
     const Common::Configuration default_opts =
-        MatrixInverterOptions<MatrixType>::options(options_.get<std::string>("type"));
+        MatrixInverterOptions<MatrixType, true>::options(options_.get<std::string>("type"));
     // check matrix
     if (options_.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"))) {
       if (contains_inf_or_nan(matrix_))
@@ -159,7 +159,7 @@ protected:
     if (!inverse_)
       DUNE_THROW(Common::Exceptions::internal_error, "The inverse_ member is not filled after calling compute()!");
     const Common::Configuration default_opts =
-        MatrixInverterOptions<MatrixType>::options(options_.get<std::string>("type"));
+        MatrixInverterOptions<MatrixType, true>::options(options_.get<std::string>("type"));
     if (options_.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"))) {
       if (contains_inf_or_nan(*inverse_))
         DUNE_THROW(Exceptions::matrix_invert_failed_bc_result_contained_inf_or_nan,

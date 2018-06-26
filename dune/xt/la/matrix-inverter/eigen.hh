@@ -28,7 +28,7 @@ namespace LA {
 
 
 template <class S>
-class MatrixInverterOptions<EigenDenseMatrix<S>>
+class MatrixInverterOptions<EigenDenseMatrix<S>, true>
 {
 public:
   static std::vector<std::string> types()
@@ -50,7 +50,7 @@ public:
 
 
 template <class S>
-class MatrixInverter<EigenDenseMatrix<S>> : public internal::MatrixInverterBase<EigenDenseMatrix<S>>
+class MatrixInverter<EigenDenseMatrix<S>, true> : public internal::MatrixInverterBase<EigenDenseMatrix<S>>
 {
   using BaseType = internal::MatrixInverterBase<EigenDenseMatrix<S>>;
 
@@ -99,14 +99,14 @@ protected:
 
 
 template <class S>
-class MatrixInverterOptions<EigenDenseMatrix<S>>
+class MatrixInverterOptions<EigenDenseMatrix<S>, true>
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 };
 
 
 template <class S>
-class MatrixInverter<EigenDenseMatrix<S>>
+class MatrixInverter<EigenDenseMatrix<S>, true>
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 };

@@ -17,6 +17,7 @@
 
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/lapacke.hh>
+#include <dune/xt/common/string.hh>
 
 #include <dune/xt/la/container.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
@@ -53,7 +54,7 @@ solve_tridiag_ldlt(const FirstVectorType& diag, const SecondVectorType& subdiag,
   typedef Common::VectorAbstraction<VectorType> V;
   typedef typename V::ScalarType ScalarType;
   size_t size = vec.size();
-  auto L =
+  thread_local auto L =
       eye_matrix<CommonSparseMatrix<ScalarType>>(size, diagonal_pattern(size, size) + diagonal_pattern(size, size, -1));
   for (size_t ii = 0; ii < size - 1; ++ii)
     L.set_entry(ii + 1, ii, V2::get_entry(subdiag, ii));
@@ -208,8 +209,7 @@ struct CholeskySolver
     const size_t size = M::rows(A);
     if (size != M::cols(A))
       DUNE_THROW(Dune::InvalidStateException, "Matrix has to be square!");
-    if (size < 5) {
-      cholesky_colwise<only_set_nonzero>(A);
+    if (false) {
 #if HAVE_MKL || HAVE_LAPACKE
     } else if (storage_layout == Common::StorageLayout::dense_row_major
                || storage_layout == Common::StorageLayout::dense_column_major) {
@@ -217,7 +217,11 @@ struct CholeskySolver
                                              ? Common::Lapacke::row_major()
                                              : Common::Lapacke::col_major();
       assert(size <= std::numeric_limits<int>::max());
-      Common::Lapacke::dpotrf(lapacke_storage_layout, 'L', static_cast<int>(size), M::data(A), static_cast<int>(size));
+      int info = Common::Lapacke::dpotrf_work(
+          lapacke_storage_layout, 'L', static_cast<int>(size), M::data(A), static_cast<int>(size));
+      if (info)
+        DUNE_THROW(Dune::MathError,
+                   "Cholesky factorization using Lapacke::dpotrf failed with status " + Common::to_string(info) + "!");
 #endif // HAVE_MKL || HAVE_LAPACKE
     } else if (storage_layout == Common::StorageLayout::csr)
       cholesky_csr(A);

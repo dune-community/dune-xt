@@ -579,6 +579,12 @@ public:
     backend_ref.mv(xx.backend(), yy.backend());
   }
 
+  inline void mtv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
+  {
+    auto& backend_ref = backend();
+    backend_ref.mtv(xx.backend(), yy.backend());
+  }
+
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     auto& backend_ref = backend();
@@ -833,7 +839,12 @@ template <class T>
 struct MatrixAbstraction<LA::IstlRowMajorSparseMatrix<T>>
     : public LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>
 {
+  using BaseType = LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>;
+
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
+
+  template <size_t rows = BaseType::static_rows, size_t cols = BaseType::static_cols, class FieldType = T>
+  using MatrixTypeTemplate = LA::IstlRowMajorSparseMatrix<FieldType>;
 };
 
 } // namespace Common

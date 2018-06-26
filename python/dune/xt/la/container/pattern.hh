@@ -35,10 +35,9 @@ pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::m
 
   py::class_<SparsityPatternDefault> c(m, "SparsityPatternDefault", "SparsityPatternDefault");
 
-  c.def("__init__",
-        [](C& self, const ssize_t size) {
+  c.def(py::init([](const ssize_t size) {
           try {
-            new (&self) C(boost::numeric_cast<size_t>(size));
+            return new C(boost::numeric_cast<size_t>(size));
           } catch (boost::bad_numeric_cast& ee) {
             DUNE_THROW(Common::Exceptions::wrong_input_given,
                        "Given size has to be positive!\n\n The error in boost while converting '"
@@ -48,7 +47,7 @@ pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::m
                            << "' was: "
                            << ee.what());
           }
-        },
+        }),
         "size"_a = 0);
 
   c.def("insert", &C::insert, "outer_index"_a, "inner_index"_a);

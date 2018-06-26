@@ -38,7 +38,7 @@ namespace LA {
 
 
 template <class K, int SIZE>
-class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>, true>
 {
 public:
   static std::vector<std::string> types()
@@ -67,14 +67,14 @@ public:
 
 
 template <class K, int SIZE>
-class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>>
-    : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>, true>
+    : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>, true>
 {
 };
 
 
 template <class K, int SIZE>
-class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>, true>
     : public internal::EigenSolverBase<Dune::FieldMatrix<K, SIZE, SIZE>,
                                        K,
                                        Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>,
@@ -100,13 +100,17 @@ protected:
     const auto type = options_->template get<std::string>("type");
 #if HAVE_LAPACKE || HAVE_MKL
     if (type == "lapack") {
-      if (!options_->template get<bool>("compute_eigenvectors"))
+      if (!options_->template get<bool>("compute_eigenvectors")) {
+        auto tmp_matrix = std::make_unique<MatrixType>(matrix_);
+        *tmp_matrix = matrix_;
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(
-            internal::compute_eigenvalues_using_lapack(matrix_));
-      else {
+            internal::compute_eigenvalues_using_lapack(*tmp_matrix));
+      } else {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<K>>>(SIZE);
         eigenvectors_ = std::make_unique<Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>();
-        internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
+        thread_local auto tmp_matrix = std::make_unique<MatrixType>(matrix_);
+        *tmp_matrix = matrix_;
+        internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(*tmp_matrix, *eigenvalues_, *eigenvectors_);
       }
     } else
 #endif // HAVE_LAPACKE || HAVE_MKL
@@ -170,7 +174,8 @@ protected:
 
 
 template <class K, int SIZE>
-class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>> : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
+class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>, true>
+    : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
 {
 public:
   template <class... Args>
