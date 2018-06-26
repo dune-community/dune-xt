@@ -59,12 +59,13 @@ public:
   using typename BaseType::const_iterator;
   using typename BaseType::iterator;
 
-  ListVectorArray(const size_t dm, const size_t lngth)
+  ListVectorArray(const size_t dm, const size_t lngth = 0, const size_t resrv = 0)
     : dim_(dm)
     , array_(lngth)
   {
     for (auto& v : array_)
       v = VectorType(dm, 0.);
+    array_.reserve(resrv);
   }
 
   size_t dim() const
@@ -75,6 +76,21 @@ public:
   size_t length() const
   {
     return array_.size();
+  }
+
+  void reserve(const size_t len)
+  {
+    array_.reserve(len);
+  }
+
+  void append(const VectorType& vec)
+  {
+    array_.emplace_back(vec);
+  }
+
+  void append(VectorType&& vec)
+  {
+    array_.emplace_back(std::move(vec));
   }
 
   const VectorType& operator[](const size_t ii) const

@@ -52,6 +52,21 @@ public:
     return this->as_imp().length();
   }
 
+  void reserve(const size_t len)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().reserve(len));
+  }
+
+  void append(const VectorType& vec)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().append(vec));
+  }
+
+  void append(VectorType&& vec)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().append(std::move(vec)));
+  }
+
   const VectorType& operator[](const size_t ii) const
   {
     CHECK_CRTP(this->as_imp()[ii]);
