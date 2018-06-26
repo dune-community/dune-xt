@@ -28,10 +28,10 @@ namespace internal {
 
 // forwards
 template <class GL>
-class CombinedElementFilters;
+class CombinedElementFilter;
 
 template <class GL>
-class CombinedIntersectionFilters;
+class CombinedIntersectionFilter;
 
 template <class GL>
 class NegatedElementFilter;
@@ -66,32 +66,44 @@ public:
 
   virtual bool contains(const GridViewType& /*grid_layer*/, const ElementType& /*element*/) const = 0;
 
-  ElementFilter<GridViewType>* operator!() const
+  std::unique_ptr<ElementFilter<GridViewType>> operator!() const
   {
-    return new internal::NegatedElementFilter<GridViewType>(*this);
+    return std::make_unique<internal::NegatedElementFilter<GridViewType>>(*this);
   }
 
-  ElementFilter<GridViewType>* operator&&(const ElementFilter<GridViewType>& other) const
+  std::unique_ptr<ElementFilter<GridViewType>> operator&&(const ElementFilter<GridViewType>& other) const
   {
-    return new internal::CombinedElementFilters<GridViewType>(
+    return std::make_unique<internal::CombinedElementFilter<GridViewType>>(
         *this, other, [](const auto& left, const auto& right) { return left && right; });
   }
 
-  ElementFilter<GridViewType>* operator&&(ElementFilter<GridViewType>*&& other) const
+  std::unique_ptr<ElementFilter<GridViewType>> operator&&(ElementFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedElementFilters<GridViewType>(
+    return std::make_unique<internal::CombinedElementFilter<GridViewType>>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left && right; });
   }
 
-  ElementFilter<GridViewType>* operator||(const ElementFilter<GridViewType>& other) const
+  std::unique_ptr<ElementFilter<GridViewType>> operator&&(std::unique_ptr<ElementFilter<GridViewType>> other) const
   {
-    return new internal::CombinedElementFilters<GridViewType>(
+    return std::make_unique<internal::CombinedElementFilter<GridViewType>>(
+        *this, std::move(other), [](const auto& left, const auto& right) { return left && right; });
+  }
+
+  std::unique_ptr<ElementFilter<GridViewType>> operator||(const ElementFilter<GridViewType>& other) const
+  {
+    return std::make_unique<internal::CombinedElementFilter<GridViewType>>(
         *this, other, [](const auto& left, const auto& right) { return left || right; });
   }
 
-  ElementFilter<GridViewType>* operator||(ElementFilter<GridViewType>*&& other) const
+  std::unique_ptr<ElementFilter<GridViewType>> operator||(ElementFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedElementFilters<GridViewType>(
+    return std::make_unique<internal::CombinedElementFilter<GridViewType>>(
+        *this, std::move(other), [](const auto& left, const auto& right) { return left || right; });
+  }
+
+  std::unique_ptr<ElementFilter<GridViewType>> operator||(std::unique_ptr<ElementFilter<GridViewType>> other) const
+  {
+    return std::make_unique<internal::CombinedElementFilter<GridViewType>>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left || right; });
   }
 }; // class ElementFilter
@@ -121,32 +133,46 @@ public:
 
   virtual bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& /*intersection*/) const = 0;
 
-  IntersectionFilter<GridViewType>* operator!() const
+  std::unique_ptr<IntersectionFilter<GridViewType>> operator!() const
   {
-    return new internal::NegatedIntersectionFilter<GridViewType>(*this);
+    return std::make_unique<internal::NegatedIntersectionFilter<GridViewType>>(*this);
   }
 
-  IntersectionFilter<GridViewType>* operator&&(const IntersectionFilter<GridViewType>& other) const
+  std::unique_ptr<IntersectionFilter<GridViewType>> operator&&(const IntersectionFilter<GridViewType>& other) const
   {
-    return new internal::CombinedIntersectionFilters<GridViewType>(
+    return std::make_unique<internal::CombinedIntersectionFilter<GridViewType>>(
         *this, other, [](const auto& left, const auto& right) { return left && right; });
   }
 
-  IntersectionFilter<GridViewType>* operator&&(IntersectionFilter<GridViewType>*&& other) const
+  std::unique_ptr<IntersectionFilter<GridViewType>> operator&&(IntersectionFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedIntersectionFilters<GridViewType>(
+    return std::make_unique<internal::CombinedIntersectionFilter<GridViewType>>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left && right; });
   }
 
-  IntersectionFilter<GridViewType>* operator||(const IntersectionFilter<GridViewType>& other) const
+  std::unique_ptr<IntersectionFilter<GridViewType>>
+  operator&&(std::unique_ptr<IntersectionFilter<GridViewType>> other) const
   {
-    return new internal::CombinedIntersectionFilters<GridViewType>(
+    return std::make_unique<internal::CombinedIntersectionFilter<GridViewType>>(
+        *this, std::move(other), [](const auto& left, const auto& right) { return left && right; });
+  }
+
+  std::unique_ptr<IntersectionFilter<GridViewType>> operator||(const IntersectionFilter<GridViewType>& other) const
+  {
+    return std::make_unique<internal::CombinedIntersectionFilter<GridViewType>>(
         *this, other, [](const auto& left, const auto& right) { return left || right; });
   }
 
-  IntersectionFilter<GridViewType>* operator||(IntersectionFilter<GridViewType>*&& other) const
+  std::unique_ptr<IntersectionFilter<GridViewType>> operator||(IntersectionFilter<GridViewType>*&& other) const
   {
-    return new internal::CombinedIntersectionFilters<GridViewType>(
+    return std::make_unique<internal::CombinedIntersectionFilter<GridViewType>>(
+        *this, std::move(other), [](const auto& left, const auto& right) { return left || right; });
+  }
+
+  std::unique_ptr<IntersectionFilter<GridViewType>>
+  operator||(std::unique_ptr<IntersectionFilter<GridViewType>> other) const
+  {
+    return std::make_unique<internal::CombinedIntersectionFilter<GridViewType>>(
         *this, std::move(other), [](const auto& left, const auto& right) { return left || right; });
   }
 }; // class IntersectionFilter
@@ -782,7 +808,7 @@ namespace internal {
 
 
 template <class GL>
-class CombinedIntersectionFilters : public IntersectionFilter<GL>
+class CombinedIntersectionFilter : public IntersectionFilter<GL>
 {
   using BaseType = IntersectionFilter<GL>;
 
@@ -790,18 +816,27 @@ public:
   using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
-  CombinedIntersectionFilters(const BaseType& left,
-                              const BaseType& right,
-                              std::function<bool(const bool&, const bool&)> combine_lambda)
+  CombinedIntersectionFilter(const BaseType& left,
+                             const BaseType& right,
+                             std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(right.copy())
     , combine_lambda_(combine_lambda)
   {
   }
 
-  CombinedIntersectionFilters(const BaseType& left,
-                              BaseType*&& right,
-                              std::function<bool(const bool&, const bool&)> combine_lambda)
+  CombinedIntersectionFilter(const BaseType& left,
+                             BaseType*&& right,
+                             std::function<bool(const bool&, const bool&)> combine_lambda)
+    : left_(left.copy())
+    , right_(std::move(right))
+    , combine_lambda_(combine_lambda)
+  {
+  }
+
+  CombinedIntersectionFilter(const BaseType& left,
+                             std::unique_ptr<BaseType> right,
+                             std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(std::move(right))
     , combine_lambda_(combine_lambda)
@@ -810,7 +845,7 @@ public:
 
   IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new CombinedIntersectionFilters<GridViewType>(*left_, *right_, combine_lambda_);
+    return new CombinedIntersectionFilter<GridViewType>(*left_, *right_, combine_lambda_);
   }
 
   bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
@@ -822,11 +857,11 @@ private:
   const std::unique_ptr<BaseType> left_;
   const std::unique_ptr<BaseType> right_;
   const std::function<bool(const bool&, const bool&)> combine_lambda_;
-}; // class CombinedIntersectionFilters
+}; // class CombinedIntersectionFilter
 
 
 template <class GL>
-class CombinedElementFilters : public ElementFilter<GL>
+class CombinedElementFilter : public ElementFilter<GL>
 {
   using BaseType = ElementFilter<GL>;
 
@@ -834,18 +869,27 @@ public:
   using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
 
-  CombinedElementFilters(const BaseType& left,
-                         const BaseType& right,
-                         std::function<bool(const bool&, const bool&)> combine_lambda)
+  CombinedElementFilter(const BaseType& left,
+                        const BaseType& right,
+                        std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(right.copy())
     , combine_lambda_(combine_lambda)
   {
   }
 
-  CombinedElementFilters(const BaseType& left,
-                         BaseType*&& right,
-                         std::function<bool(const bool&, const bool&)> combine_lambda)
+  CombinedElementFilter(const BaseType& left,
+                        BaseType*&& right,
+                        std::function<bool(const bool&, const bool&)> combine_lambda)
+    : left_(left.copy())
+    , right_(std::move(right))
+    , combine_lambda_(combine_lambda)
+  {
+  }
+
+  CombinedElementFilter(const BaseType& left,
+                        std::unique_ptr<BaseType> right,
+                        std::function<bool(const bool&, const bool&)> combine_lambda)
     : left_(left.copy())
     , right_(std::move(right))
     , combine_lambda_(combine_lambda)
@@ -854,7 +898,7 @@ public:
 
   ElementFilter<GridViewType>* copy() const override final
   {
-    return new CombinedElementFilters<GridViewType>(*left_, *right_, combine_lambda_);
+    return new CombinedElementFilter<GridViewType>(*left_, *right_, combine_lambda_);
   }
 
   bool contains(const GridViewType& grid_layer, const ElementType& element) const override final
@@ -866,7 +910,7 @@ private:
   const std::unique_ptr<BaseType> left_;
   const std::unique_ptr<BaseType> right_;
   const std::function<bool(const bool&, const bool&)> combine_lambda_;
-}; // class CombinedElementFilters
+}; // class CombinedElementFilter
 
 
 template <class GL>
