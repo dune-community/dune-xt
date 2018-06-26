@@ -99,6 +99,11 @@ public:
 
   /// \}
 
+  explicit FunctionInterface(const Common::ParameterType& param_type = {})
+    : Common::ParametricInterface(param_type)
+  {
+  }
+
   virtual ~FunctionInterface() = default;
 
   /**
@@ -136,17 +141,17 @@ public:
 
   virtual std::string type() const
   {
-    return "dune.xt.functions";
+    return "dune.xt.functions.function";
   }
 
   static std::string static_id()
   {
-    return "dune.xt.functions";
+    return "dune.xt.functions.function";
   }
 
   virtual std::string name() const
   {
-    return "dune.xt.functions";
+    return "dune.xt.functions.function";
   }
 
   /**

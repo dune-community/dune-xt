@@ -52,11 +52,11 @@ public:
                        const Common::ParameterType& param_type = {},
                        JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
                        DerivativeLambdaType derivative_lambda = default_derivative_lambda())
-    : order_lambda_(order_lambda)
+    : BaseType(param_type)
+    , order_lambda_(order_lambda)
     , evaluate_lambda_(evaluate_lambda)
     , jacobian_lambda_(jacobian_lambda)
     , derivative_lambda_(derivative_lambda)
-    , parameter_type_(param_type)
     , name_(nm)
   {
   }
@@ -67,32 +67,16 @@ public:
                        const Common::ParameterType& param_type = {},
                        JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
                        DerivativeLambdaType derivative_lambda = default_derivative_lambda())
-    : order_lambda_([=](const auto& /*param*/) { return ord; })
+    : BaseType(param_type)
+    , order_lambda_([=](const auto& /*param*/) { return ord; })
     , evaluate_lambda_(evaluate_lambda)
     , jacobian_lambda_(jacobian_lambda)
     , derivative_lambda_(derivative_lambda)
-    , parameter_type_(param_type)
     , name_(nm)
   {
   }
 
   /**
-   * \name ´´These methods are required by XT::Common::ParametricInterface.''
-   * \{
-   */
-
-  bool is_parametric() const override final
-  {
-    return !parameter_type_.empty();
-  }
-
-  const Common::ParameterType& parameter_type() const override final
-  {
-    return parameter_type_;
-  }
-
-  /**
-   * \}
    * \name ´´These methods are required by FunctionInterface.''
    * \{
    */
@@ -176,7 +160,6 @@ public:
   const EvaluateLambdaType evaluate_lambda_;
   const JacobianLambdaType jacobian_lambda_;
   const DerivativeLambdaType derivative_lambda_;
-  const Common::ParameterType parameter_type_;
   const std::string name_;
 }; // class SmoothLambdaFunction
 
