@@ -32,6 +32,10 @@ class reinterpretation_error : public Dune::Exception
 {
 };
 
+class parameter_error : public Common::Exceptions::parameter_error
+{
+};
+
 class spe10_data_file_missing : public Dune::IOError
 {
 };
