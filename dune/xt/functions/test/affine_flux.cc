@@ -14,10 +14,15 @@
 #include <memory>
 
 #include <dune/xt/common/exceptions.hh>
+
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
-#include <dune/xt/functions/affine.hh>
 
+#if HAVE_DUNE_XT_LA
+#include <dune/xt/la/container/eye-matrix.hh>
+#endif // HAVE_DUNE_XT_LA
+
+#include <dune/xt/functions/affine.hh>
 #include <dune/xt/functions/test/functions.hh>
 
 using namespace Dune;
@@ -25,19 +30,43 @@ using namespace Dune::XT;
 using namespace Dune::XT::Functions;
 
 #if HAVE_DUNE_XT_LA
-struct FunctionsTest : public FunctionTest<TESTFUNCTIONTYPE>
+struct AffineFluxFunctionTest : public FunctionTest<TESTFUNCTIONTYPE>
 {
   void check()
   {
+    using MatrixType = typename TESTFUNCTIONTYPE::FieldMatrixType;
+    static constexpr size_t dimRange = TESTFUNCTIONTYPE::dimRange;
+    static constexpr size_t dimRangeCols = TESTFUNCTIONTYPE::dimRangeCols;
+    static constexpr size_t stateDimRange = TESTFUNCTIONTYPE::StateType::dimRange;
     auto grid = XT::Grid::make_cube_grid<GRIDTYPE>();
-    const auto testfunction = TESTFUNCTIONTYPE::create();
+    auto unit_matrix = XT::LA::eye_matrix<MatrixType>(dimRange, stateDimRange);
+    auto matrices = FieldVector<MatrixType, dimRangeCols>(unit_matrix);
+    for (size_t rC = 0; rC < dimRangeCols; ++rC)
+      matrices[rC] *= rC + 1;
+    const auto testfunction = TESTFUNCTIONTYPE(matrices);
     for (auto&& entity : elements(grid.leaf_view())) {
       auto xx_global = entity.geometry().center();
       auto xx_local = entity.geometry().local(xx_global);
-      TESTFUNCTIONTYPE::PartialURangeType partial_u;
-      TESTFUNCTIONTYPE::StateRangeType u(0.);
-      testfunction->local_function(entity)->partial_u(xx_local, u);
+      FieldVector<MatrixType, dimRangeCols> partial_u;
+      TESTFUNCTIONTYPE::StateRangeType u(1.);
+      auto ret = testfunction.local_function(entity)->evaluate(xx_local, u);
+      for (size_t ii = 0; ii < std::min(dimRange, stateDimRange); ++ii) {
+        FieldVector<double, dimRangeCols> ret_row(ret[ii]);
+        for (size_t rC = 0; rC < dimRangeCols; ++rC)
+          EXPECT_DOUBLE_EQ((rC + 1), ret_row[rC]);
+      }
+      for (size_t ii = std::min(dimRange, stateDimRange) + 1; ii < dimRange; ++ii) {
+        FieldVector<double, dimRangeCols> ret_row(ret[ii]);
+        for (size_t rC = 0; rC < dimRangeCols; ++rC)
+          EXPECT_DOUBLE_EQ(0., ret_row[rC]);
+      }
     }
   }
 };
+
+TEST_F(AffineFluxFunctionTest, creation_and_evalution)
+{
+  this->check();
+}
+
 #endif // HAVE_DUNE_XT_LA
