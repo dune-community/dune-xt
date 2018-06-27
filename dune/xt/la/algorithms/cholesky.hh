@@ -313,7 +313,6 @@ typename std::enable_if_t<Common::is_vector<FirstVectorType>::value && Common::i
 tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
 {
   internal::LDLTSolver<FirstVectorType, SecondVectorType, SecondVectorType>::tridiagonal_ldlt(diag, subdiag);
-
 } // void tridiagonal_ldlt(...)
 
 
