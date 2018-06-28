@@ -246,8 +246,8 @@ public:
   template <class ViewTraits>
   const typename std::
       enable_if<(ViewTraits::Grid::dimension == d),
-                SmoothFunctionAsLocalizableWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
-      as_localizable(const GridView<ViewTraits>& /*grid_view*/) const
+                FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
+      as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
   {
     return this->as_localizable<typename ViewTraits::template Codim<0>::Entity>();
   }
