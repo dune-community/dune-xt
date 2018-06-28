@@ -201,7 +201,7 @@ assert(max_set_size <= local_function_set.max_size());
                         const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
-               "This set of local functions does not provide evaluations, override the 'evaluate' method!");
+               "This set of element functions does not provide evaluations, override the 'evaluate' method!");
   }
 
   virtual void jacobians(const DomainType& /*point_in_reference_element*/,
@@ -209,7 +209,7 @@ assert(max_set_size <= local_function_set.max_size());
                          const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
-               "This set of local functions does not provide jacobians, override the 'jacobians' method!");
+               "This set of element functions does not provide jacobians, override the 'jacobians' method!");
   }
 
   virtual void derivatives(const std::array<size_t, d>& alpha,
@@ -222,7 +222,7 @@ assert(max_set_size <= local_function_set.max_size());
     else
       DUNE_THROW(
           NotImplemented,
-          "This set of local functions does not provide arbitrary derivatives, override the 'derivatives' method!");
+          "This set of element functions does not provide arbitrary derivatives, override the 'derivatives' method!");
   }
 
   /**
@@ -374,11 +374,9 @@ protected:
   {
     if (!ReferenceElements<D, d>::general(element().type()).checkInside(point_in_reference_element)) {
       std::stringstream error_message;
-      error_message << "This given point point_in_reference_element is not inside the current element!"
-                    << "\n\n";
+      error_message << "Given point_in_reference_element is not inside the current element!\n\n";
       XT::Grid::print_entity(element(), XT::Common::Typename<E>::value(), error_message, "   ");
-      error_message << "\n   "
-                    << "point_in_reference_element = " << point_in_reference_element << std::endl;
+      error_message << "\n   point_in_reference_element = " << point_in_reference_element << std::endl;
       DUNE_THROW(XT::Functions::Exceptions::wrong_input_given, error_message.str());
     }
   }
