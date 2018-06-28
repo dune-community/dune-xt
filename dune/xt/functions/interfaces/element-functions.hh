@@ -736,4 +736,4 @@ private:
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_INTERFACES_LOCAL_FUNCTIONS_HH
+#endif // DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTIONS_HH
