@@ -159,7 +159,7 @@ public:
     return this->as_imp()[ii];
   }
 
-  inline size_t DXT_DEPRECATED_MSG("Use size() instead (09.04.2018)!") dim() const
+  DXT_DEPRECATED_MSG("Use size() instead (09.04.2018)!") inline size_t dim() const
   {
     return size();
   }
