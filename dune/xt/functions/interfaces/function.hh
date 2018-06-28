@@ -249,7 +249,7 @@ public:
                 FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
       as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
   {
-    return this->as_localizable<typename ViewTraits::template Codim<0>::Entity>();
+    return this->as_grid_function<typename ViewTraits::template Codim<0>::Entity>();
   }
 
   /**
