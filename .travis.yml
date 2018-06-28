@@ -70,11 +70,6 @@ jobs:
   - stage: test_cpp
     env: DOCKER_TAG=debian_clang_full TESTS=1
     
-  - stage: test_cpp
-    env: DOCKER_TAG=arch_gcc_full TESTS=0
-  - stage: test_cpp
-    env: DOCKER_TAG=arch_gcc_full TESTS=1
-    
   - stage: test_python
     env: DOCKER_TAG=debian_gcc_full
     script: ${DOCKER_RUN} /root/src/dune-xt-grid/.travis.test_python.bash
@@ -82,11 +77,6 @@ jobs:
     after_script: true
   - stage: test_python
     env: DOCKER_TAG=debian_clang_full
-    script: ${DOCKER_RUN} /root/src/dune-xt-grid/.travis.test_python.bash
-    # overwrite other global/matrix settings
-    after_script: true
-  - stage: test_python
-    env: DOCKER_TAG=arch_gcc_full
     script: ${DOCKER_RUN} /root/src/dune-xt-grid/.travis.test_python.bash
     # overwrite other global/matrix settings
     after_script: true
