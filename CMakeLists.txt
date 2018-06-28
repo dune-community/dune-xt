@@ -49,6 +49,8 @@ if(dune-pybindxi_FOUND)
   add_subdirectory(python)
 endif()
 
+dxt_add_make_dependent_bindings(dune-xt-common dune-xt-grid)
+
 # enable headercheck
 add_definitions("-DENABLE_HEADERCHECK=1")
 add_format(${CMAKE_CURRENT_SOURCE_DIR})
