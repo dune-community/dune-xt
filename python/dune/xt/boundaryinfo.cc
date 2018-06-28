@@ -10,6 +10,27 @@
 
 #include "config.h"
 
+#include <string>
+#include <vector>
+
+#include <dune/common/parallel/mpihelper.hh>
+
+#include <dune/pybindxi/pybind11.h>
+#include <dune/pybindxi/stl.h>
+
+#include <python/dune/xt/common/exceptions.bindings.hh>
+
+
+#include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/boundaryinfo.bindings.hh>
+
+
+PYBIND11_MODULE(_boundaryinfo, m)
+{
+  namespace py = pybind11;
+  using namespace pybind11::literals;
+
+  DUNE_XT_GRID_BOUNDARYINFO_BIND(m);
+}
 
 DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(template);

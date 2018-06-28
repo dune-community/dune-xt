@@ -12,8 +12,12 @@
 # ~~~
 
 import dune.xt
+
 try:
-    from dune.xt._grid import *
+    from dune.xt._boundaryinfo import *
+    from dune.xt._types import *
+    from dune.xt._walker import *
+    from dune.xt._provider import *
 except ImportError as e:
     import os
     import logging

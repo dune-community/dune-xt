@@ -7,5 +7,14 @@
 #   Rene Milk (2018)
 # ~~~
 
-dune_pybindxi_add_module(_grid EXCLUDE_FROM_ALL bindings.cc boundaryinfo.bindings.cc)
+dune_pybindxi_add_module(_grid EXCLUDE_FROM_ALL bindings.cc)
+dune_pybindxi_add_module(_boundaryinfo EXCLUDE_FROM_ALL boundaryinfo.cc)
+dune_pybindxi_add_module(_types EXCLUDE_FROM_ALL types.cc)
+dune_pybindxi_add_module(_walker EXCLUDE_FROM_ALL walker.cc)
+dune_pybindxi_add_module(_provider EXCLUDE_FROM_ALL provider.cc)
+
 add_dune_alberta_flags(GRIDDIM 2 _grid)
+add_dune_alberta_flags(GRIDDIM 2 _boundaryinfo)
+add_dune_alberta_flags(GRIDDIM 2 _types)
+add_dune_alberta_flags(GRIDDIM 2 _walker)
+add_dune_alberta_flags(GRIDDIM 2 _provider)
