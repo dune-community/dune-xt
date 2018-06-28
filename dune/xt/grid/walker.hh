@@ -76,7 +76,7 @@ private:
   void emplace_all(Common::PerThreadValue<std::list<std::shared_ptr<WrapperType>>>& thread_storage, Args&&... args)
   {
     for (auto&& local_list : thread_storage) {
-      local_list->emplace_back(new WrapperType(std::forward<Args>(args)...));
+      local_list.emplace_back(new WrapperType(std::forward<Args>(args)...));
     }
   }
 
@@ -98,8 +98,8 @@ public:
       auto source_wrappers_it = source_thread_ctr.begin();
       for (; target_wrappers_it != target_thread_ctr.end() && source_wrappers_it != source_thread_ctr.end();
            ++target_wrappers_it, ++source_wrappers_it) {
-        auto& target__wrappers = *(*target_wrappers_it);
-        for (auto&& source_wrapper : **source_wrappers_it) {
+        auto& target__wrappers = *target_wrappers_it;
+        for (auto&& source_wrapper : *source_wrappers_it) {
           target__wrappers.emplace_back(gen_function(*source_wrapper));
         }
       }
@@ -348,8 +348,8 @@ public:
   virtual void prepare() override
   {
     auto prep = [](auto& pt) {
-      for (auto&& list_ptr : pt) {
-        for (auto&& wrapper : *list_ptr)
+      for (auto&& list : pt) {
+        for (auto&& wrapper : list)
           wrapper->functor().prepare();
       }
     };
@@ -387,8 +387,8 @@ public:
   virtual void finalize() override
   {
     auto fin = [](auto& pt) {
-      for (auto&& list_ptr : pt) {
-        for (auto&& wrapper : *list_ptr)
+      for (auto&& list : pt) {
+        for (auto&& wrapper : list)
           wrapper->functor().finalize();
       }
     };
@@ -434,8 +434,8 @@ public:
   void clear()
   {
     auto clr = [](auto& pt) {
-      for (auto&& list_ptr : pt) {
-        list_ptr->clear();
+      for (auto&& list : pt) {
+        list.clear();
       }
     };
     clr(element_functor_wrappers_);
