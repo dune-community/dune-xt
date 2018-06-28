@@ -422,7 +422,7 @@ public:
          + element_and_intersection_functor_wrappers_->size())
         > 0) {
       walk_range(elements(grid_view_));
-    } // only do something, if we have to
+    }
 
     // finalize functors
     finalize();
@@ -514,7 +514,9 @@ public:
     prepare();
 
     // only do something, if we have to
-    if ((codim0_functors_.size() + codim1_functors_.size()) > 0) {
+    if ((element_functor_wrappers_->size() + intersection_functor_wrappers_->size()
+         + element_and_intersection_functor_wrappers_->size())
+        > 0) {
       // no actual SMP walk, use range as is
       walk_range(partitioning.everything());
     }
