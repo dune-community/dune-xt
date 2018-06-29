@@ -151,6 +151,7 @@ class CommonDenseMatrix
 
 public:
   using Traits = typename internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>;
+  using derived_type = typename MatrixInterfaceType::derived_type;
   using BackendType = typename Traits::BackendType;
   using ScalarType = typename Traits::ScalarType;
   using RealType = typename Traits::RealType;

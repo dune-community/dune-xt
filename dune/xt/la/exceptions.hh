@@ -20,6 +20,10 @@ namespace LA {
 namespace Exceptions {
 
 
+class not_available : public Dune::Exception
+{
+};
+
 class linear_solver_failed : public Dune::Exception
 {
 };

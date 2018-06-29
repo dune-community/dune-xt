@@ -55,9 +55,11 @@ class EigenMappedDenseVector;
 template <class ScalarImp>
 class EigenDenseMatrix;
 
+
 #if HAVE_EIGEN
 
 namespace internal {
+
 
 /**
  *  \brief Traits for EigenDenseVector.
@@ -75,6 +77,7 @@ public:
   static const constexpr Backends dense_matrix_type = Backends::eigen_dense;
   static const constexpr Backends sparse_matrix_type = Backends::eigen_sparse;
 }; // class EigenDenseVectorTraits
+
 
 /**
  *  \brief Traits for EigenMappedDenseVector.
@@ -94,6 +97,7 @@ public:
   static const constexpr Backends sparse_matrix_type = Backends::eigen_sparse;
 }; // class EigenMappedDenseVectorTraits
 
+
 /**
  *  \brief Traits for EigenDenseMatrix.
  */
@@ -111,7 +115,9 @@ public:
   static const constexpr bool sparse = false;
 }; // class EigenDenseMatrixTraits
 
+
 } // namespace internal
+
 
 /**
  *  \brief A dense vector implementation of VectorInterface using the eigen backend.
@@ -125,9 +131,8 @@ class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits
   typedef EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp> BaseType;
 
 public:
-  //! derived_type is ambiguous due to multiple parent classes otherwise
+  using Traits = typename VectorInterfaceType::Traits;
   using derived_type = typename VectorInterfaceType::derived_type;
-  typedef internal::EigenDenseVectorTraits<ScalarImp> Traits;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
   typedef typename Traits::DataType DataType;
@@ -258,7 +263,8 @@ class EigenMappedDenseVector : public EigenBaseVector<internal::EigenMappedDense
   static_assert(std::is_same<ScalarImp, double>::value, "Undefined behaviour for non-double data!");
 
 public:
-  typedef internal::EigenMappedDenseVectorTraits<ScalarImp> Traits;
+  using Traits = typename VectorInterfaceType::Traits;
+  using derived_type = typename VectorInterfaceType::derived_type;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -418,9 +424,8 @@ class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits
   typedef MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp> MatrixInterfaceType;
 
 public:
-  //! derived_type is ambiguous due to multiple parent classes otherwise
+  using Traits = typename MatrixInterfaceType::Traits;
   using derived_type = typename MatrixInterfaceType::derived_type;
-  typedef internal::EigenDenseMatrixTraits<ScalarImp> Traits;
   typedef typename Traits::BackendType BackendType;
   typedef typename Traits::ScalarType ScalarType;
   typedef typename Traits::RealType RealType;
@@ -755,6 +760,7 @@ private:
   mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
   mutable bool unshareable_;
 }; // class EigenDenseMatrix
+
 
 #else // HAVE_EIGEN
 

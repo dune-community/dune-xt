@@ -170,7 +170,6 @@ class ContainerInterface : public Common::CRTPInterface<ContainerInterface<Trait
 
 public:
   typedef ScalarImp ScalarType;
-  typedef typename Traits::RealType RealType;
 
   using typename CRTP::derived_type;
 
