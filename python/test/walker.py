@@ -8,6 +8,7 @@
 # ~~~
 
 import pytest
+import dune.xt.common as xtc
 import dune.xt.grid as xtg
 
 
@@ -29,7 +30,7 @@ def test_grid_provider(grid_provider):
     grid_provider.global_refine(1)
     try:
         grid_provider.visualize()
-    except xtg.DuneError as e:
+    except xtc.DuneError as e:
         if 'NotImplemented' not in str(e):
             raise e
     assert grid_provider.num_elements > num_el

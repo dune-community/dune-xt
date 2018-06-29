@@ -18,13 +18,13 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include "types.hh"
+#include <python/dune/xt/grid/available_types.hh>
 
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 #include <boost/tuple/tuple.hpp>
 
-template <class Tuple>
+template <class Tuple = Dune::XT::Grid::bindings::AvailableTypes>
 void addbind_for_Grid(pybind11::module& m, std::vector<std::string>& available_types)
 {
   using G = typename Tuple::head_type;
@@ -45,6 +45,6 @@ PYBIND11_MODULE(_types, m)
 
   py::module::import("dune.xt.common");
   std::vector<std::string> available_types;
-  addbind_for_Grid<Dune::XT::Grid::bindings::AvailableTypes>(m, available_types);
+  addbind_for_Grid(m, available_types);
   m.attr("available_types") = available_types;
 }
