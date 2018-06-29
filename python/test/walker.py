@@ -38,6 +38,14 @@ def test_grid_provider(grid_provider):
     assert grid_provider.max_entity_diameter() > 0
     assert grid_provider.dim > 0
 
+
+def test_walker(grid_provider):
+    walker = xtg.make_walker(grid_provider)
+    walker.walk()
+    walker.clear()
+
+
+
 def test_count():
     pass
 

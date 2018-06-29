@@ -27,3 +27,11 @@ except ImportError as e:
 
 HAVE_DUNE_ALUGRID = 'GridProvider__2d_simplex_aluconform' in globals()
 
+
+def make_walker(gridprovider, level = 0):
+    for factory in [globals()[s] for s in globals().keys() if s.startswith('make_walker_on_')]:
+        try:
+            return factory(gridprovider, level)
+        except:
+            continue
+    raise TypeError('no matching walker for gridview {}'.format(gridprovider.__class__))
