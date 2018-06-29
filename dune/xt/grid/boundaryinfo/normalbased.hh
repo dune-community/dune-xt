@@ -20,7 +20,7 @@
 #include <dune/xt/grid/exceptions.hh>
 
 #include "interfaces.hh"
-#include "types.hh"
+#include <dune/xt/grid/boundaryinfo/types.hh>
 
 namespace Dune {
 namespace XT {
