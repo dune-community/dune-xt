@@ -15,6 +15,7 @@
 
 #include <dune/common/typetraits.hh>
 
+#include <dune/xt/common/fixed_map.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/view/subdomain/view.hh>
 
@@ -49,6 +50,16 @@ enum class Layers
   dd_subdomain_coupling
 };
 
+namespace {
+const XT::Common::FixedMap<Layers, std::string, 7> layer_names{
+    {Layers::adaptive_leaf, "adaptive_leaf"},
+    {Layers::leaf, "leaf"},
+    {Layers::level, "level"},
+    {Layers::dd_subdomain, "dd_subdomain"},
+    {Layers::dd_subdomain_oversampled, "dd_subdomain_oversampled"},
+    {Layers::dd_subdomain_boundary, "dd_subdomain_boundary"},
+    {Layers::dd_subdomain_coupling, "dd_subdomain_coupling"}};
+}
 
 namespace internal {
 
