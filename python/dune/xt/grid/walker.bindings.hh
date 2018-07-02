@@ -64,7 +64,7 @@ private:
     {
       using namespace pybind11::literals;
 
-      m.def(std::string("make_walker_on_" + layer_name<layer>::value() + "_" + backend_name<backend>::value()).c_str(),
+      m.def(std::string("make_walker_on_" + layer_names[layer] + "_" + backend_name<backend>::value()).c_str(),
             [](GridProvider<G, DD::SubdomainGrid<G>>& grid_provider, const int level_or_subdomain) {
               return type(grid_provider.template layer<layer, backend>(level_or_subdomain));
             },
@@ -80,7 +80,7 @@ private:
     {
       using namespace pybind11::literals;
 
-      m.def(std::string("make_walker_on_" + layer_name<layer>::value() + "_" + backend_name<backend>::value()).c_str(),
+      m.def(std::string("make_walker_on_" + layer_names[layer] + "_" + backend_name<backend>::value()).c_str(),
             [](GridProvider<G, Dune::XT::Grid::none_t>& grid_provider, const int level) {
               return type(grid_provider.template layer<layer, backend>(level));
             },
@@ -97,8 +97,7 @@ public:
     // we need to add the factory methods first, since adding the class below might fail (if someone added it before)
     factory_method<>::addbind(m);
 
-    const auto gl_name =
-        grid_name<G>::value() + "_" + layer_name<layer>::value() + "_" + backend_name<backend>::value();
+    const auto gl_name = grid_name<G>::value() + "_" + layer_names[layer] + "_" + backend_name<backend>::value();
     bound_type c(m, Common::to_camel_case(std::string("walker_") + gl_name).c_str());
     internal::bind_walker_functions(c);
     return c;
