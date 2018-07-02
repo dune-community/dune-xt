@@ -170,7 +170,7 @@ public:
               << *options_);
     assert(real_eigenvalues_ && "These have to exist after compute_real_eigenvalues()!");
     return *real_eigenvalues_;
-  } // ... min_eigenvalues(...)
+  } // ... real_eigenvalues(...)
 
   std::vector<RealType> min_eigenvalues(const size_t num_evs = std::numeric_limits<size_t>::max()) const
   {

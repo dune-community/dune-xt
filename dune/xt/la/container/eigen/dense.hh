@@ -75,6 +75,7 @@ class EigenDenseVectorTraits : public VectorTraitsBase<ScalarImp,
 {
 };
 
+
 /**
  *  \brief Traits for EigenMappedDenseVector.
  */
@@ -88,6 +89,7 @@ class EigenMappedDenseVectorTraits
                               Backends::eigen_sparse>
 {
 };
+
 
 /**
  *  \brief Traits for EigenDenseMatrix.
@@ -653,6 +655,7 @@ private:
   std::shared_ptr<BackendType> backend_;
   std::unique_ptr<std::vector<std::mutex>> mutexes_;
 }; // class EigenDenseMatrix
+
 
 #else // HAVE_EIGEN
 

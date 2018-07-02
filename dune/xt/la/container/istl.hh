@@ -63,6 +63,7 @@ class IstlDenseVectorTraits : public VectorTraitsBase<ScalarImp,
 {
 };
 
+
 /**
  * \brief Traits for IstlRowMajorSparseMatrix.
  */
@@ -352,6 +353,7 @@ private:
   std::shared_ptr<BackendType> backend_;
   std::unique_ptr<MutexesType> mutexes_;
 }; // class IstlDenseVector
+
 
 /**
  * \brief A sparse matrix implementation of the MatrixInterface using the Dune::BCRSMatrix from dune-istl.
@@ -717,6 +719,7 @@ private:
   std::shared_ptr<BackendType> backend_;
   std::unique_ptr<MutexesType> mutexes_;
 }; // class IstlRowMajorSparseMatrix
+
 
 template <class S>
 std::ostream& operator<<(std::ostream& out, const IstlRowMajorSparseMatrix<S>& matrix)

@@ -23,6 +23,7 @@
 #include <dune/common/unused.hh>
 
 #include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/math.hh>
@@ -30,6 +31,8 @@
 #include <dune/xt/common/vector.hh>
 
 #include <dune/xt/la/type_traits.hh>
+
+#include <dune/xt/la/exceptions.hh>
 
 #include "container-interface.hh"
 #include "vector-interface-internal.hh"
@@ -179,14 +182,19 @@ public:
     return this->as_imp()[ii];
   }
 
-  /**
-   * \brief   The dimension of the vector.
-   * \return  The dimension of the vector.
-   * \see     size()
-   */
-  inline size_t dim() const
+  DXT_DEPRECATED_MSG("Use size() instead (09.04.2018)!") inline size_t dim() const
   {
     return size();
+  }
+
+  virtual ScalarType min() const
+  {
+    return complex_switch<>::min(this->as_imp());
+  }
+
+  virtual ScalarType max() const
+  {
+    return complex_switch<>::min(this->as_imp());
   }
 
   virtual ScalarType mean() const
@@ -200,7 +208,7 @@ public:
 
   /**
    *  \brief  The maximum absolute value of the vector.
-   *  \return A pair of the lowest index at which the maximum is attained and the absolute maximum value.
+   *  \return A pair of the highest index at which the maximum is attained and the absolute maximum value.
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
   virtual std::pair<size_t, RealType> amax() const
@@ -220,10 +228,10 @@ public:
   /**
    *  \brief  Check vectors for equality.
    *          Equality of two vectors is defined as in Dune::FloatCmp componentwise.
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::XT::Common::FloatCmp
+   *  \see    Dune::Common::FloatCmp
    *  \note   If you override this method please use exceptions instead of assertions (for the python bindings).
    */
   virtual bool almost_equal(const derived_type& other,
@@ -232,16 +240,17 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    // If you get an error here, you might be missing the VectorAbstraction for you type!
     return Common::FloatCmp::eq(this->as_imp(), other, epsilon);
   } // ... almost_equal(...)
 
   /**
    *  \brief  Check vectors for equality (variant for arbitrary derived combinations).
    *          Equality of two vectors is defined as in Dune::FloatCmp componentwise.
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \param  epsilon See Dune::FloatCmp.
    *  \return Truth value of the comparison.
-   *  \see    Dune::XT::Common::FloatCmp
+   *  \see    Dune::Common::FloatCmp
    */
   template <class T>
   bool almost_equal(const VectorInterface<T>& other,
@@ -250,44 +259,10 @@ public:
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    // If you get an error here, you might be missing the VectorAbstraction for you type!
     return Common::FloatCmp::eq(this->as_imp(), other.as_imp(), epsilon);
   } // ... almost_equal(...)
 
-private:
-  template <bool is_complex = XT::Common::is_complex<ScalarType>::value, bool anything = true>
-  struct dot_helper
-  {
-    static ScalarType compute(const derived_type& ths, const derived_type& other)
-    {
-      using std::conj;
-      if (other.size() != ths.size())
-        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                   "The size of other (" << other.size() << ") does not match the size of this (" << ths.size()
-                                         << ")!");
-      ScalarType result = 0;
-      for (size_t ii = 0; ii < ths.size(); ++ii)
-        result += conj(ths.get_unchecked_ref(ii)) * other.get_unchecked_ref(ii);
-      return result;
-    }
-  }; // struct dot_helper<true, ...>
-
-  template <bool anything>
-  struct dot_helper<false, anything>
-  {
-    static ScalarType compute(const derived_type& ths, const derived_type& other)
-    {
-      if (other.size() != ths.size())
-        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                   "The size of other (" << other.size() << ") does not match the size of this (" << ths.size()
-                                         << ")!");
-      ScalarType result = 0;
-      for (size_t ii = 0; ii < ths.size(); ++ii)
-        result += ths.get_unchecked_ref(ii) * other.get_unchecked_ref(ii);
-      return result;
-    }
-  }; // struct dot_helper<false, ...>
-
-public:
   /**
    *  \brief  Computes the scalar products between two vectors.
    *  \param  other The second factor.
@@ -296,7 +271,7 @@ public:
    */
   virtual ScalarType dot(const derived_type& other) const
   {
-    return dot_helper<>::compute(this->as_imp(), other);
+    return complex_switch<>::dot(this->as_imp(), other);
   }
 
   /**
@@ -322,7 +297,7 @@ public:
   {
     using std::abs;
     using std::sqrt;
-    return sqrt(abs(dot(this->as_imp(*this)))); // std::abs is only needed for the right return type:
+    return sqrt(abs(dot(this->as_imp()))); // std::abs is only needed for the right return type:
     // v.dot(v) should always be a ScalarType with zero imaginary part
   }
 
@@ -462,7 +437,7 @@ public:
   virtual derived_type& operator+=(const derived_type& other)
   {
     iadd(other);
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   /**
@@ -473,7 +448,7 @@ public:
   virtual derived_type& operator-=(const derived_type& other)
   {
     isub(other);
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   /**
@@ -500,26 +475,26 @@ public:
   {
     for (auto& element : *this)
       element += scalar;
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   virtual derived_type& operator-=(const ScalarType& scalar)
   {
     for (auto& element : *this)
       element -= scalar;
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   virtual derived_type& operator/=(const ScalarType& scalar)
   {
     for (auto& element : *this)
       element /= scalar;
-    return this->as_imp(*this);
+    return this->as_imp();
   }
 
   /**
    *  \brief  Check vectors for equality (componentwise) using almost_equal()
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \return Truth value of the comparison.
    *  \see    almost_equal()
    */
@@ -530,7 +505,7 @@ public:
 
   /**
    *  \brief  Check vectors for inequality using !almost_equal()
-   *  \param  other   A vector of same dimension to compare with.
+   *  \param  other   A vector of same size to compare with.
    *  \return Truth value of the comparison.
    */
   virtual bool operator!=(const derived_type& other) const
@@ -560,13 +535,76 @@ public:
 
   operator std::vector<ScalarType>() const
   {
-    std::vector<ScalarType> ret(dim());
-    for (size_t ii = 0; ii < dim(); ++ii)
+    std::vector<ScalarType> ret(this->size());
+    for (size_t ii = 0; ii < this->size(); ++ii)
       ret[ii] = this->operator[](ii);
     return ret;
   }
 
 private:
+  template <bool is_complex = Common::is_complex<ScalarType>::value, bool anything = true>
+  struct complex_switch
+  {
+    static ScalarType min(const derived_type& /*self*/)
+    {
+      DUNE_THROW(Exceptions::not_available, "For complex data types (implement this if you think otherwise)!");
+      return ScalarType();
+    }
+
+    static ScalarType max(const derived_type& /*self*/)
+    {
+      DUNE_THROW(Exceptions::not_available, "For complex data types (implement this if you think otherwise)!");
+      return ScalarType();
+    }
+
+    static ScalarType dot(const derived_type& self, const derived_type& other)
+    {
+      using std::conj;
+      if (other.size() != self.size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << self.size()
+                                         << ")!");
+      ScalarType result = 0;
+      for (size_t ii = 0; ii < self.size(); ++ii)
+        result += conj(self.get_unchecked_ref(ii)) * other.get_unchecked_ref(ii);
+      return result;
+    }
+  }; // struct complex_switch<true, ...>
+
+  template <bool anything>
+  struct complex_switch<false, anything>
+  {
+    static ScalarType min(const derived_type& self)
+    {
+      using std::min;
+      ScalarType ret = 0;
+      for (const auto& element : self)
+        ret = min(ret, element);
+      return ret;
+    }
+
+    static ScalarType max(const derived_type& self)
+    {
+      using std::max;
+      ScalarType ret = 0;
+      for (const auto& element : self)
+        ret = max(ret, element);
+      return ret;
+    }
+
+    static ScalarType dot(const derived_type& self, const derived_type& other)
+    {
+      if (other.size() != self.size())
+        DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                   "The size of other (" << other.size() << ") does not match the size of this (" << self.size()
+                                         << ")!");
+      ScalarType result = 0;
+      for (size_t ii = 0; ii < self.size(); ++ii)
+        result += self.get_unchecked_ref(ii) * other.get_unchecked_ref(ii);
+      return result;
+    }
+  }; // struct complex_switch<false, ...>
+
   template <class T, class S>
   friend std::ostream& operator<<(std::ostream& /*out*/, const VectorInterface<T, S>& /*vector*/);
 }; // class VectorInterface
@@ -638,11 +676,10 @@ std::ostream& operator<<(std::ostream& out, const VectorInterface<T, S>& vector)
   out << "[";
   const size_t sz = vector.size();
   if (sz > 0) {
-    out << vector.get_entry(0);
+    out << vector[0];
     for (size_t ii = 1; ii < sz; ++ii)
-      out << "\n " << vector.get_entry(ii);
-  } else
-    out << " ";
+      out << " " << vector[ii];
+  }
   out << "]";
   return out;
 } // ... operator<<(...)

@@ -29,22 +29,16 @@ struct ContainerTest{{NAME}} : public ::testing::Test
     typedef typename Traits::derived_type T_derived_type;
     static_assert(std::is_same<ContainerImp, T_derived_type>::value, "derived_type has to be the correct Type!");
     typedef typename Traits::ScalarType T_ScalarType;
-    typedef typename Traits::RealType T_RealType;
     // * of the container as itself (aka the derived type)
     typedef typename ContainerImp::ScalarType D_ScalarType;
-    typedef typename ContainerImp::RealType D_RealType;
     static_assert(std::is_same<T_ScalarType, D_ScalarType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
-    static_assert(std::is_same<T_RealType, D_RealType>::value, "RealType of derived_type has to be the correct Type!");
     // * of the container as the interface
     typedef typename XT::LA::ContainerInterface<Traits, D_ScalarType> InterfaceType;
     typedef typename InterfaceType::derived_type I_derived_type;
     typedef typename InterfaceType::ScalarType I_ScalarType;
-    typedef typename InterfaceType::RealType I_RealType;
     static_assert(std::is_same<ContainerImp, I_derived_type>::value, "derived_type has to be the correct Type!");
     static_assert(std::is_same<T_ScalarType, I_ScalarType>::value,
-                  "ScalarType of derived_type has to be the correct Type!");
-    static_assert(std::is_same<T_RealType, I_RealType>::value,
                   "ScalarType of derived_type has to be the correct Type!");
 
     // dynamic tests

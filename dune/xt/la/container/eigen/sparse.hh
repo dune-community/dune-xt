@@ -513,6 +513,7 @@ private:
   std::shared_ptr<MutexesType> mutexes_;
 }; // class EigenRowMajorSparseMatrix
 
+
 #else // HAVE_EIGEN
 
 template <class ScalarImp>
