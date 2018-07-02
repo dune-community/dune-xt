@@ -18,8 +18,6 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <python/dune/xt/common/exceptions.bindings.hh>
-
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
@@ -27,7 +25,6 @@
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 #include <python/dune/xt/grid/gridprovider.hh>
-
 #include <python/dune/xt/grid/available_types.hh>
 
 template <class Tuple = Dune::XT::Grid::bindings::AvailableTypes>
