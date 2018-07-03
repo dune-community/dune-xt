@@ -15,7 +15,7 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-#include <dune/xt/functions/lambda/local-function.hh>
+#include <dune/xt/functions/lambda/grid-function.hh>
 
 using namespace Dune::XT;
 
@@ -32,8 +32,11 @@ struct LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
   using LocalLambdaType = Functions::LocalLambdaFunction<ElementType, r, rC>;
 
   using RangeType = typename LocalLambdaType::LocalFunctionType::RangeType;
+  using RangeReturnType = typename LocalLambdaType::LocalFunctionType::RangeReturnType;
   using DomainType = typename LocalLambdaType::LocalFunctionType::DomainType;
   using DerivativeRangeType = typename LocalLambdaType::LocalFunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename LocalLambdaType::LocalFunctionType::DerivativeRangeReturnType;
+
 
   LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
     : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
@@ -52,30 +55,11 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_construct
   LocalLambdaType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
-      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeType(element_index); },
+      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); });
-}
-
-
-TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  size_t element_index = 0;
-  const auto leaf_view = grid_.leaf_view();
-
-  LocalLambdaType  function(
-      /*order=*/0,
-      [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
-      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeType(element_index); },
-      /*parameter=*/{},
-      "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); });
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = function.local_function(element);
-  }
+      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
 }
 
 TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
@@ -86,11 +70,11 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   LocalLambdaType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
-      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeType(element_index); },
+      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); });
+      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
   auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -107,11 +91,11 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
     LocalLambdaType  function(
         /*order=*/vv,
         [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
-        [&](const auto& /*xx*/, const auto& /*param*/) { return RangeType(element_index); },
+        [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
         /*parameter=*/{},
         "element_index_",
-        [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); },
-        [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); });
+        [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+        [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
 
     auto local_f = function.local_function();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -130,18 +114,18 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
   LocalLambdaType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
-      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeType(element_index); },
+      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); });
+      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
   auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
       Common::ParameterType param("power", 1);
-      RangeType expected_value(leaf_view.indexSet().index(element));
+      RangeReturnType expected_value(leaf_view.indexSet().index(element));
       const auto actual_value = local_f->evaluate(local_x);
       EXPECT_EQ(expected_value, actual_value);
     }
@@ -156,13 +140,13 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobi
   LocalLambdaType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
-      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeType(element_index); },
+      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeType(); });
+      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
   auto local_f = function.local_function();
-  DerivativeRangeType expected_jacobian;
+  DerivativeRangeReturnType expected_jacobian;
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {

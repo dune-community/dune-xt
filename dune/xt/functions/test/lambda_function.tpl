@@ -15,7 +15,7 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-#include <dune/xt/functions/lambda/smooth-function.hh>
+#include <dune/xt/functions/lambda/function.hh>
 
 using namespace Dune::XT;
 
