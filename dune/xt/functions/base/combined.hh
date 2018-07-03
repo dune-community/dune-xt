@@ -428,7 +428,7 @@ public:
            + right_->access().type() + "'";
   } // ... type(...)
 
-  std::string name() const override final
+  const std::string name() const override final
   {
     return name_;
   }

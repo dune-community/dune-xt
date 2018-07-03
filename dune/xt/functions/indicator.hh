@@ -183,7 +183,7 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
   {
   }
 
-  std::string name() const override final
+  const std::string name() const override final
   {
     return name_;
   }

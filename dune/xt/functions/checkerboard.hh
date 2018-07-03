@@ -236,7 +236,7 @@ public:
     return BaseType::static_id() + ".checkerboard";
   }
 
-  std::string name() const override
+  const std::string name() const override
   {
     return name_;
   }

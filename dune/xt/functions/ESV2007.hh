@@ -398,7 +398,7 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  std::string name() const override final
+  const std::string name() const override final
   {
     return name_;
   }

@@ -76,7 +76,7 @@ public:
     return function_storage_.access().type();
   }
 
-  const std::string& name() const override final
+  const std::string name() const override final
   {
     return function_storage_.access().name();
   }

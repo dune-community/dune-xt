@@ -123,7 +123,7 @@ public:
     return "dune.xt.functions.gridfunction";
   }
 
-  virtual const std::string& name() const
+  virtual const std::string name() const
   {
     return "dune.xt.functions.gridfunction";
   }
