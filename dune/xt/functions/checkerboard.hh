@@ -40,7 +40,9 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     using typename InterfaceType::ElementType;
     using typename InterfaceType::DomainType;
     using typename InterfaceType::RangeType;
+    using typename InterfaceType::RangeReturnType;
     using typename InterfaceType::DerivativeRangeType;
+    using typename InterfaceType::DerivativeRangeReturnType;
     using GeometryType = typename ElementType::Geometry;
 
     LocalCheckerboardFunction(const ElementType& element,
@@ -83,18 +85,18 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
       return 0;
     }
 
-    RangeType evaluate(const DomainType& point_in_reference_element,
-                       const Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& point_in_reference_element,
+                             const Common::Parameter& /*param*/ = {}) const override final
     {
       this->assert_inside_reference_element(point_in_reference_element);
       return current_value_;
     }
 
-    DerivativeRangeType jacobian(const DomainType& point_in_reference_element,
-                                 const Common::Parameter& /*param*/ = {}) const override final
+    DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
+                                       const Common::Parameter& /*param*/ = {}) const override final
     {
       this->assert_inside_reference_element(point_in_reference_element);
-      return DerivativeRangeType();
+      return DerivativeRangeReturnType();
     }
 
   private:

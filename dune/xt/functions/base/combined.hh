@@ -100,6 +100,7 @@ public:
   using RangeType = typename RightType::LocalFunctionType::RangeType;
   using ScalarRangeType = typename LeftType::LocalFunctionType::RangeType;
   using DerivativeRangeType = typename ElementFunctionInterface<E, r, rC, R>::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename ElementFunctionInterface<E, r, rC, R>::DerivativeRangeReturnType;
 
 private:
   template <Combination cc, bool anything = true>
@@ -131,10 +132,10 @@ private:
              - right_local.evaluate(point_in_reference_element, param);
     }
 
-    static DerivativeRangeType jacobian(const LeftLocalFunctionType& left_local,
-                                        const RightLocalFunctionType& right_local,
-                                        const DomainType& point_in_reference_element,
-                                        const Common::Parameter& param)
+    static DerivativeRangeReturnType jacobian(const LeftLocalFunctionType& left_local,
+                                              const RightLocalFunctionType& right_local,
+                                              const DomainType& point_in_reference_element,
+                                              const Common::Parameter& param)
     {
       return left_local.jacobian(point_in_reference_element, param)
              - right_local.jacobian(point_in_reference_element, param);
@@ -164,10 +165,10 @@ private:
              + right_local.evaluate(point_in_reference_element, param);
     } // ... evaluate(...)
 
-    static DerivativeRangeType jacobian(const LeftLocalFunctionType& left_local,
-                                        const RightLocalFunctionType& right_local,
-                                        const DomainType& point_in_reference_element,
-                                        const Common::Parameter& param)
+    static DerivativeRangeReturnType jacobian(const LeftLocalFunctionType& left_local,
+                                              const RightLocalFunctionType& right_local,
+                                              const DomainType& point_in_reference_element,
+                                              const Common::Parameter& param)
     {
       return left_local.jacobian(point_in_reference_element, param)
              + right_local.jacobian(point_in_reference_element, param);
@@ -202,13 +203,13 @@ private:
       return right_eval;
     } // ... evaluate(...)
 
-    static DerivativeRangeType jacobian(const LeftLocalFunctionType& /*left_local*/,
-                                        const RightLocalFunctionType& /*right_local*/,
-                                        const DomainType& /*point_in_reference_element*/,
-                                        const Common::Parameter& /*param*/)
+    static DerivativeRangeReturnType jacobian(const LeftLocalFunctionType& /*left_local*/,
+                                              const RightLocalFunctionType& /*right_local*/,
+                                              const DomainType& /*point_in_reference_element*/,
+                                              const Common::Parameter& /*param*/)
     {
       DUNE_THROW(NotImplemented, "If you need this, implement it!");
-      return DerivativeRangeType();
+      return DerivativeRangeReturnType();
     }
   }; // class Call< ..., product >
 
@@ -231,10 +232,10 @@ public:
     return Call<comb>::evaluate(left_local, right_local, point_in_reference_element, param);
   }
 
-  static DerivativeRangeType jacobian(const LeftLocalFunctionType& left_local,
-                                      const RightLocalFunctionType& right_local,
-                                      const DomainType& point_in_reference_element,
-                                      const Common::Parameter& param)
+  static DerivativeRangeReturnType jacobian(const LeftLocalFunctionType& left_local,
+                                            const RightLocalFunctionType& right_local,
+                                            const DomainType& point_in_reference_element,
+                                            const Common::Parameter& param)
   {
     return Call<comb>::jacobian(left_local, right_local, point_in_reference_element, param);
   }
@@ -263,6 +264,8 @@ public:
   using typename BaseType::DomainType;
   using typename BaseType::RangeType;
   using typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
 
   CombinedLocalFunction(const LeftType& left, const RightType& right, const ElementType& ent)
     : BaseType(ent)
@@ -292,14 +295,14 @@ public:
     return Select::order(left_local_->order(param), right_local_->order(param));
   }
 
-  RangeType evaluate(const DomainType& point_in_reference_element,
-                     const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& point_in_reference_element,
+                           const Common::Parameter& param = {}) const override final
   {
     return Select::evaluate(*left_local_, *right_local_, point_in_reference_element, param);
   }
 
-  DerivativeRangeType jacobian(const DomainType& point_in_reference_element,
-                               const Common::Parameter& param = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
+                                     const Common::Parameter& param = {}) const override final
   {
     return Select::jacobian(*left_local_, *right_local_, point_in_reference_element, param);
   }

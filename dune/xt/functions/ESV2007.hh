@@ -275,9 +275,11 @@ private:
     using typename BaseType::ElementType;
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
+    using typename BaseType::RangeReturnType;
     using typename BaseType::RangeFieldType;
     using typename BaseType::DomainFieldType;
     using typename BaseType::DerivativeRangeType;
+    using typename BaseType::DerivativeRangeReturnType;
 
     LocalCutoffFunction(const ElementType& ele, const DiffusionType& diffusion, const RangeFieldType poincare_constant)
       : BaseType(ele)
@@ -306,15 +308,15 @@ private:
       return 0;
     }
 
-    RangeType evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
-                       const Common::Parameter& /*param*/ = {}) const override final
+    RangeReturnType evaluate(const DomainType& DXTC_DEBUG_ONLY(xx),
+                             const Common::Parameter& /*param*/ = {}) const override final
     {
       this->assert_inside_reference_element(xx);
       return value_;
     }
 
-    DerivativeRangeType jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
-                                 const Common::Parameter& /*param*/ = {}) const override final
+    DerivativeRangeReturnType jacobian(const DomainType& DXTC_DEBUG_ONLY(xx),
+                                       const Common::Parameter& /*param*/ = {}) const override final
     {
       this->assert_inside_reference_element(xx);
       return DerivativeRangeType();
