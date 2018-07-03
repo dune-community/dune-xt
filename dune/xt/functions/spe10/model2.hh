@@ -178,7 +178,4 @@ public:
 } // namespace Dune
 
 
-#include "model2.lib.hh"
-
-
 #endif // DUNE_XT_FUNCTIONS_SPE10_MODEL2_HH

@@ -119,7 +119,4 @@ public:
 } // namespace Dune
 
 
-#include "constant.lib.hh"
-
-
 #endif // DUNE_XT_FUNCTIONS_CONSTANT_HH

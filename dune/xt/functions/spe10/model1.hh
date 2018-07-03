@@ -224,7 +224,4 @@ private:
 } // namespace Dune
 
 
-#include "model1.lib.hh"
-
-
 #endif // DUNE_XT_FUNCTIONS_SPE10_MODEL1_HH

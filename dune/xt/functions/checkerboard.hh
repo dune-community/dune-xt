@@ -301,7 +301,4 @@ private:
 } // namespace Dune
 
 
-#include "checkerboard.lib.hh"
-
-
 #endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
