@@ -9,8 +9,8 @@
 //   Rene Milk       (2018)
 //   Tobias Leibner  (2017)
 
-#ifndef DUNE_XT_FUNCTIONS_LAMBDA_LOCAL_FUNCTION_HH
-#define DUNE_XT_FUNCTIONS_LAMBDA_LOCAL_FUNCTION_HH
+#ifndef DUNE_XT_FUNCTIONS_LAMBDA_GRID_FUNCTION_HH
+#define DUNE_XT_FUNCTIONS_LAMBDA_GRID_FUNCTION_HH
 
 #include <functional>
 
@@ -65,34 +65,18 @@ private:
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
     using typename BaseType::DerivativeRangeType;
+    using typename BaseType::RangeReturnType;
+    using typename BaseType::DerivativeRangeReturnType;
+
     using BaseType::d;
 
-    using EvaluateLambdaType = std::function<RangeType(const DomainType&, const Common::Parameter&)>;
+    using EvaluateLambdaType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
     using PostBindLambdaType = std::function<void(const ElementType&)>;
     using OrderLambdaType = std::function<int(const Common::Parameter&)>;
     using JacobianLambdaType =
-        std::function<DerivativeRangeType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
-    using DerivativeLambdaType = std::function<DerivativeRangeType(
+        std::function<DerivativeRangeReturnType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
+    using DerivativeLambdaType = std::function<DerivativeRangeReturnType(
         const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
-
-
-    LocalLambdaLocalFunction(const ElementType& ele,
-                             const OrderLambdaType& order_lambda,
-                             const PostBindLambdaType& post_bind_lambda,
-                             const EvaluateLambdaType& lambda,
-                             const Common::ParameterType& param_type,
-                             const JacobianLambdaType& jacobian_lambda,
-                             const DerivativeLambdaType& derivative_lambda)
-      : BaseType(ele)
-      , order_lambda_(order_lambda)
-      , post_bind_lambda_(post_bind_lambda)
-      , evaluate_lambda_(lambda)
-      , param_type_(param_type)
-      , jacobian_lambda_(jacobian_lambda)
-      , derivative_lambda_(derivative_lambda)
-    {
-      post_bind(ele);
-    }
 
     LocalLambdaLocalFunction(const OrderLambdaType& order_lambda,
                              const PostBindLambdaType& post_bind_lambda,
@@ -121,23 +105,23 @@ private:
       return order_lambda_(parsed_param);
     }
 
-    RangeType evaluate(const DomainType& point_in_local_coordinates,
-                       const Common::Parameter& param = {}) const override final
+    RangeReturnType evaluate(const DomainType& point_in_local_coordinates,
+                             const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
       return evaluate_lambda_(point_in_local_coordinates, parsed_param);
     }
 
-    DerivativeRangeType jacobian(const DomainType& point_in_local_coordinates,
-                                 const Common::Parameter& param = {}) const override final
+    DerivativeRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
+                                       const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
       return jacobian_lambda_(this->element(), point_in_local_coordinates, parsed_param);
     }
 
-    DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                   const DomainType& point_in_local_coordinates,
-                                   const Common::Parameter& param = {}) const override final
+    DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
+                                         const DomainType& point_in_local_coordinates,
+                                         const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
       return derivative_lambda_(this->element(), alpha, point_in_local_coordinates, parsed_param);
@@ -163,13 +147,16 @@ public:
   using DomainType = typename LocalLambdaLocalFunction::DomainType;
   using RangeType = typename LocalLambdaLocalFunction::RangeType;
   using DerivativeRangeType = typename LocalLambdaLocalFunction::DerivativeRangeType;
+  using RangeReturnType = typename LocalLambdaLocalFunction::RangeReturnType;
+  using DerivativeRangeReturnType = typename LocalLambdaLocalFunction::DerivativeRangeReturnType;
+
   // we do not use the typedef from LocalLambdaLocalFunction here to document the type of the lambda
   using OrderLambdaType = std::function<int(const Common::Parameter&)>;
   using PostBindLambdaType = std::function<void(const ElementType&)>;
-  using EvaluateLambdaType = std::function<RangeType(const DomainType&, const Common::Parameter&)>;
+  using EvaluateLambdaType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
   using JacobianLambdaType =
-      std::function<DerivativeRangeType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
-  using DerivativeLambdaType = std::function<DerivativeRangeType(
+      std::function<DerivativeRangeReturnType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
+  using DerivativeLambdaType = std::function<DerivativeRangeReturnType(
       const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
   LocalLambdaFunction(const int ord,
@@ -216,15 +203,9 @@ public:
     return "locallambdafunction";
   }
 
-  std::string name() const override final
+  const std::string name() const override final
   {
     return name_;
-  }
-
-  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
-  {
-    return std::make_unique<LocalLambdaLocalFunction>(
-        element, order_lambda_, post_bind_lambda_, evaluate_lambda_, param_type_, jacobian_lambda_, derivative_lambda_);
   }
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
@@ -264,7 +245,7 @@ public:
       DUNE_THROW(NotImplemented,
                  "This  LocalLambdaFunction does not provide jacobian evaluations, provide a "
                  "jacobian_lambda on construction!");
-      return DerivativeRangeType();
+      return DerivativeRangeReturnType();
     };
   }
 
@@ -276,7 +257,7 @@ public:
       DUNE_THROW(NotImplemented,
                  "This  LocalLambdaFunction does not provide derivative evaluations, provide a "
                  "derivative_lambda on construction!");
-      return DerivativeRangeType();
+      return DerivativeRangeReturnType();
     };
   }
 

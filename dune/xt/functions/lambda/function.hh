@@ -10,8 +10,8 @@
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014, 2017)
 
-#ifndef DUNE_XT_FUNCTIONS_LAMBDA_SMOOTH_FUNCTION_HH
-#define DUNE_XT_FUNCTIONS_LAMBDA_SMOOTH_FUNCTION_HH
+#ifndef DUNE_XT_FUNCTIONS_LAMBDA_FUNCTION_HH
+#define DUNE_XT_FUNCTIONS_LAMBDA_FUNCTION_HH
 
 #include <functional>
 
@@ -29,10 +29,10 @@ namespace Functions {
  *
  * \example LambdaType lambda(1, [](const auto& x, const auto& param = {}) { return x;});
  */
-template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class SmoothLambdaFunction : public FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>
+template <size_t domain_dim, size_t range_dim = 1, size_t range_dim_cols = 1, class RangeField = double>
+class SmoothLambdaFunction : public FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>
 {
-  using BaseType = FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
+  using BaseType = FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>;
 
 public:
   using BaseType::d;
