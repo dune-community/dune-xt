@@ -15,7 +15,7 @@
 #include <limits>
 
 #include <dune/xt/common/parameter.hh>
-#include "../interfaces.hh"
+#include "dune/xt/functions/interfaces/function.hh"
 
 #include "base.hh"
 

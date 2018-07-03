@@ -19,7 +19,8 @@
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
-#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
+#include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune {
 namespace XT {

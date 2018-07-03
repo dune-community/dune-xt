@@ -12,7 +12,8 @@
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
 
-#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
+#include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune {
 namespace XT {

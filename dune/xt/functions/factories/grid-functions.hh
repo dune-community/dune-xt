@@ -14,7 +14,7 @@
 
 #include <dune/xt/common/configuration.hh>
 
-#include "dune/xt/functions/interfaces.hh"
+#include <dune/xt/functions/interfaces/grid-function.hh>
 
 #include "dune/xt/functions/checkerboard.hh"
 #include "dune/xt/functions/ESV2007.hh"

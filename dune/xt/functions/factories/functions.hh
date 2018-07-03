@@ -18,7 +18,7 @@
 #include "dune/xt/functions/ESV2007.hh"
 #include "dune/xt/functions/expression.hh"
 #include "dune/xt/functions/flattop.hh"
-#include "dune/xt/functions/interfaces.hh"
+#include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune {
 namespace XT {

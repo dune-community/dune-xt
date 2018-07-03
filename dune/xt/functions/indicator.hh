@@ -17,7 +17,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/numeric_cast.hh>
 
-#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 
 namespace Dune {
 namespace XT {

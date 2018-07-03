@@ -20,7 +20,7 @@
 #include <dune/xt/common/parallel/threadstorage.hh>
 
 #include "base.hh"
-#include "../interfaces.hh"
+#include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune {
 namespace XT {
