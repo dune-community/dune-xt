@@ -60,7 +60,7 @@ public:
   using DomainType = typename LocalFunctionType::DomainType;
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
-  static const constexpr size_t dimDomain = E::dimension;
+  static const constexpr size_t domain_dim = E::dimension;
 
   static const bool available = true;
 
@@ -71,7 +71,7 @@ public:
 
 private:
   static std::vector<RangeType> read_values_from_file(const std::string& filename,
-                                                      const Common::FieldVector<size_t, dimDomain>& number_of_elements)
+                                                      const Common::FieldVector<size_t, domain_dim>& number_of_elements)
 
   {
     // read all the data from the file
@@ -104,7 +104,7 @@ private:
     std::vector<RangeType> data(entries_per_coordinate, RangeType(0));
 
     for (size_t ii = 0; ii < entries_per_coordinate; ++ii) {
-      for (size_t dim = 0; dim < dimDomain; ++dim) {
+      for (size_t dim = 0; dim < domain_dim; ++dim) {
         const auto idx = ii + dim * entries_per_coordinate;
         data[ii][dim][dim] = values_in_file[idx];
       }
@@ -147,17 +147,17 @@ public:
         cfg.get("filename", default_cfg.get<std::string>("filename")),
         cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
         cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
-        cfg.get("number_of_elements", default_cfg.get<Common::FieldVector<size_t, dimDomain>>("number_of_elements")),
+        cfg.get("number_of_elements", default_cfg.get<Common::FieldVector<size_t, domain_dim>>("number_of_elements")),
         cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
 
   Model2Function(const std::string& filename,
-                 const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
-                 const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
-                 const Common::FieldVector<size_t, dimDomain>& number_of_elements = {internal::model2_x_elements,
-                                                                                     internal::model2_y_elements,
-                                                                                     internal::model2_z_elements},
+                 const Common::FieldVector<DomainFieldType, domain_dim>& lower_left,
+                 const Common::FieldVector<DomainFieldType, domain_dim>& upper_right,
+                 const Common::FieldVector<size_t, domain_dim>& number_of_elements = {internal::model2_x_elements,
+                                                                                      internal::model2_y_elements,
+                                                                                      internal::model2_z_elements},
                  const std::string nm = BaseType::static_id())
     : BaseType(lower_left, upper_right, number_of_elements, read_values_from_file(filename, number_of_elements), nm)
 

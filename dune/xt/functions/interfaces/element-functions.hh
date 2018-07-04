@@ -45,26 +45,26 @@ namespace Functions {
  *        See in particular RangeTypeSelector and DerivativeRangeTypeSelector for the interpretation of a function and
  *        its derivatives.
  **/
-template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
 class ElementFunctionSetInterface : public Common::ParametricInterface
 {
-  static_assert(XT::Grid::is_entity<ElementImp>::value, "");
-  using ThisType = ElementFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  static_assert(XT::Grid::is_entity<Element>::value, "");
+  using ThisType = ElementFunctionSetInterface<Element, rangeDim, rangeDimCols, RangeField>;
 
 public:
-  using ElementType = ElementImp;
+  using ElementType = Element;
   using DomainFieldType = double;
-  static const constexpr size_t dimDomain = ElementType::dimension;
-  using RangeFieldType = RangeFieldImp;
-  static const constexpr size_t dimRange = rangeDim;
-  static const constexpr size_t dimRangeCols = rangeDimCols;
+  static const constexpr size_t domain_dim = ElementType::dimension;
+  using RangeFieldType = RangeField;
+  static const constexpr size_t range_dim = rangeDim;
+  static const constexpr size_t range_dim_cols = rangeDimCols;
 
   using E = ElementType;
   using D = DomainFieldType;
-  static const constexpr size_t d = dimDomain;
+  static const constexpr size_t d = domain_dim;
   using R = RangeFieldType;
-  static const constexpr size_t r = dimRange;
-  static const constexpr size_t rC = dimRangeCols;
+  static const constexpr size_t r = range_dim;
+  static const constexpr size_t rC = range_dim_cols;
 
   using DomainType = Dune::FieldVector<D, d>;
 
@@ -411,7 +411,7 @@ private:
   struct single_evaluate_helper
   {
     template <class FullType, class SingleType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<R>& ret)
+    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<SingleType>& ret)
     {
       for (size_t ii = 0; ii < val.size(); ++ii)
         ret[ii] = val[ii][row][col];
@@ -459,11 +459,11 @@ private:
 /**
  *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Element.
  */
-template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
-class ElementFunctionInterface : public ElementFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>
+template <class Element, size_t range_dim = 1, size_t range_dim_cols = 1, class RangeField = double>
+class ElementFunctionInterface : public ElementFunctionSetInterface<Element, range_dim, range_dim_cols, RangeField>
 {
-  using BaseType = ElementFunctionSetInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
-  using ThisType = ElementFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using BaseType = ElementFunctionSetInterface<Element, range_dim, range_dim_cols, RangeField>;
+  using ThisType = ElementFunctionInterface<Element, range_dim, range_dim_cols, RangeField>;
 
 public:
   using BaseType::d;

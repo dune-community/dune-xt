@@ -23,14 +23,14 @@ namespace XT {
 namespace Functions {
 
 
-template <class GridViewType, size_t dimRange, size_t dimRangeCols, class RangeFieldImp>
+template <class GridViewType, size_t range_dim, size_t range_dim_cols, class RangeField>
 class VisualizationAdapter : public VTKFunction<GridViewType>
 {
   static_assert(XT::Grid::is_view<GridViewType>::value, "");
 
 public:
   using EntityType = XT::Grid::extract_entity_t<GridViewType>;
-  using GridFunctionType = GridFunctionInterface<EntityType, dimRange, dimRangeCols, RangeFieldImp>;
+  using GridFunctionType = GridFunctionInterface<EntityType, range_dim, range_dim_cols, RangeField>;
 
 private:
   using LocalFunctionType = typename GridFunctionType::LocalFunctionType;
@@ -64,7 +64,7 @@ public:
   }
 
 private:
-  template <size_t r_ = dimRange, size_t rC_ = dimRangeCols, bool anything = true>
+  template <size_t r_ = range_dim, size_t rC_ = range_dim_cols, bool anything = true>
   class helper
   {
   public:

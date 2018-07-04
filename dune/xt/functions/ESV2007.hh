@@ -28,6 +28,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/interfaces/function.hh>
 
+
 namespace Dune {
 namespace XT {
 namespace Functions {

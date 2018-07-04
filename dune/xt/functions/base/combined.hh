@@ -43,13 +43,13 @@ class SelectCombined
 public:
   using E = typename LeftType::ElementType;
   using D = typename LeftType::DomainFieldType;
-  static const size_t d = LeftType::dimDomain;
+  static const size_t d = LeftType::domain_dim;
   using R = typename LeftType::RangeFieldType;
 
 private:
   static_assert(std::is_same<typename RightType::ElementType, E>::value, "Types do not match!");
   static_assert(std::is_same<typename RightType::DomainFieldType, D>::value, "Types do not match!");
-  static_assert(RightType::dimDomain == d, "Dimensions do not match!");
+  static_assert(RightType::domain_dim == d, "Dimensions do not match!");
   static_assert(std::is_same<typename RightType::RangeFieldType, R>::value, "Types do not match!");
 
   template <class L, class R>
@@ -86,8 +86,8 @@ private:
     };
 
   public:
-    static const size_t r = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::r;
-    static const size_t rC = Dimension<L::dimRange, R::dimRange, L::dimRangeCols, R::dimRangeCols, comb>::rC;
+    static const size_t r = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::r;
+    static const size_t rC = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::rC;
   }; // class Choose
 
 public:
@@ -241,6 +241,7 @@ public:
   }
 }; // class SelectCombined
 
+
 /**
  * \brief Generic combined local function.
  *
@@ -311,6 +312,7 @@ private:
   std::unique_ptr<typename LeftType::LocalFunctionType> left_local_;
   std::unique_ptr<typename RightType::LocalFunctionType> right_local_;
 }; // class CombinedLocalFunction
+
 
 /**
  * \brief Generic combined function.
@@ -439,7 +441,9 @@ private:
   const std::string name_;
 }; // class Combined
 
+
 } // namespace internal
+
 
 /**
  * \brief Function representing the difference between two functions.
@@ -478,6 +482,7 @@ public:
   }
 }; // class SumFunction
 
+
 /**
  * \brief Function representing the product of two functions.
  *
@@ -495,6 +500,7 @@ public:
   {
   }
 }; // class ProductFunction
+
 
 template <class T1, class T2, class... Args>
 std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)

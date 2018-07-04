@@ -56,23 +56,23 @@ const auto& grid_function = function.template as_grid_function<E>();
  * \sa    DerivativeRangeTypeSelector
  * \sa    GridFunctionInterface
  **/
-template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
 class FunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeField>;
 
 public:
   using DomainFieldType = double;
-  static const constexpr size_t dimDomain = domainDim;
-  using RangeFieldType = RangeFieldImp;
-  static const constexpr size_t dimRange = rangeDim;
-  static const constexpr size_t dimRangeCols = rangeDimCols;
+  static const constexpr size_t domain_dim = domainDim;
+  using RangeFieldType = RangeField;
+  static const constexpr size_t range_dim = rangeDim;
+  static const constexpr size_t range_dim_cols = rangeDimCols;
 
   using D = DomainFieldType;
-  static const constexpr size_t d = dimDomain;
+  static const constexpr size_t d = domain_dim;
   using R = RangeFieldType;
-  static const constexpr size_t r = dimRange;
-  static const constexpr size_t rC = dimRangeCols;
+  static const constexpr size_t r = range_dim;
+  static const constexpr size_t rC = range_dim_cols;
 
   using DomainType = Dune::FieldVector<D, d>;
 

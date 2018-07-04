@@ -44,10 +44,10 @@ class ParametricExpressionFunction<d, r, 1, R> : public FunctionInterface<d, r, 
 
 public:
   using typename BaseType::DomainType;
-  using BaseType::dimDomain;
+  using BaseType::domain_dim;
   using typename BaseType::RangeType;
   using typename BaseType::DerivativeRangeType;
-  using BaseType::dimRange;
+  using BaseType::range_dim;
 
   static std::string static_id()
   {
@@ -83,7 +83,7 @@ public:
         }
       }
     }
-    for (size_t ii = 0; ii < dimDomain; ++ii)
+    for (size_t ii = 0; ii < domain_dim; ++ii)
       variables.push_back(variable + "[" + Common::to_string(ii) + "]");
     function_ = std::make_shared<ActualFunctionType>(variables, expression);
   }
@@ -126,7 +126,7 @@ public:
                                         << "param.type(): "
                                         << param.type());
     }
-    DynamicVector<D> args(num_parameter_variables_ + dimDomain);
+    DynamicVector<D> args(num_parameter_variables_ + domain_dim);
     size_t II = 0;
     for (const auto& key : param_type_.keys()) {
       for (const auto& value : parsed_param.get(key)) {
@@ -134,7 +134,7 @@ public:
         ++II;
       }
     }
-    for (size_t ii = 0; ii < dimDomain; ++ii) {
+    for (size_t ii = 0; ii < domain_dim; ++ii) {
       args[II] = point_in_global_coordinates[ii];
       ++II;
     }
@@ -144,7 +144,7 @@ public:
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
-    for (size_t rr = 0; rr < dimRange; ++rr) {
+    for (size_t rr = 0; rr < range_dim; ++rr) {
       if (Common::isnan(ret[rr])) {
         failure = true;
         error_type = "NaN";

@@ -22,11 +22,11 @@ namespace XT {
 namespace Functions {
 
 
-template <size_t d, size_t r = 1, size_t rC = 1, class RangeFieldImp = double>
-class ConstantFunction : public FunctionInterface<d, r, rC, RangeFieldImp>
+template <size_t d, size_t r = 1, size_t rC = 1, class RangeField = double>
+class ConstantFunction : public FunctionInterface<d, r, rC, RangeField>
 {
-  using BaseType = FunctionInterface<d, r, rC, RangeFieldImp>;
-  using ThisType = ConstantFunction<d, r, rC, RangeFieldImp>;
+  using BaseType = FunctionInterface<d, r, rC, RangeField>;
+  using ThisType = ConstantFunction<d, r, rC, RangeField>;
 
 public:
   using DerivativeRangeType = typename BaseType::DerivativeRangeType;
@@ -72,7 +72,7 @@ public:
   {
   }
 
-  explicit ConstantFunction(const RangeFieldImp& constant, const std::string name_in = static_id())
+  explicit ConstantFunction(const RangeField& constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
   {

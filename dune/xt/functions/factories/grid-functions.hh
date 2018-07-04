@@ -22,9 +22,12 @@
 #include "dune/xt/functions/spe10/model2.hh"
 #include "dune/xt/functions/indicator.hh"
 
+
 namespace Dune {
 namespace XT {
 namespace Functions {
+
+
 /**
  * \note If you want to add a new local function FooBar, do the following: provide a definition that is available for
 all
@@ -225,7 +228,9 @@ public:
       DUNE_THROW(Common::Exceptions::wrong_input_given, "Missing 'type' in given cfg (see below)!\n\n" << cfg);
     return create(cfg.get<std::string>("type"), cfg);
   }
+
 }; // class FunctionsProvider
+
 
 } // namespace Functions {
 } // namespace XT

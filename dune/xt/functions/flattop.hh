@@ -48,8 +48,8 @@ public:
   using DomainType = typename BaseType::DomainType;
   using RangeType = typename BaseType::RangeType;
 
-  static const size_t dimDomain = BaseType::dimDomain;
-  static const size_t dimRange = BaseType::dimRange;
+  static const size_t domain_dim = BaseType::domain_dim;
+  static const size_t range_dim = BaseType::range_dim;
 
   static const bool available = true;
 
@@ -123,14 +123,14 @@ public:
 
   int order(const XT::Common::Parameter& /*param*/ = {}) const override
   {
-    return 3 * dimDomain;
+    return 3 * domain_dim;
   }
 
   RangeType evaluate(const DomainType& point_in_reference_element,
                      const Common::Parameter& /*param*/ = {}) const override final
   {
     RangeType ret = value_;
-    for (size_t dd = 0; dd < dimDomain; ++dd) {
+    for (size_t dd = 0; dd < domain_dim; ++dd) {
       const auto& left = lower_left_[dd];
       const auto& right = upper_right_[dd];
       const auto& point = point_in_reference_element[dd];

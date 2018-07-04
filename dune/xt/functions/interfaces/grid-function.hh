@@ -42,7 +42,7 @@ namespace Functions {
 
 
 // forward, required in GridFunctionInterface::visualize
-template <class GridViewType, size_t dimRange, size_t dimRangeCols, class RangeFieldImp>
+template <class GridViewType, size_t range_dim, size_t range_dim_cols, class RangeField>
 class VisualizationAdapter;
 
 template <class MinuendType, class SubtrahendType>
@@ -54,7 +54,7 @@ class SumFunction;
 template <class LeftSummandType, class RightSummandType>
 class ProductFunction;
 
-// template <class FunctionImp>
+// template <class Function>
 // class DivergenceFunction;
 
 
@@ -69,20 +69,20 @@ class ProductFunction;
  *        encourages the user to really think about the data functions when implementing/using them, but avoids
  *        situations which could not be handled generically later on.
  */
-template <class ElementImp, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeFieldImp = double>
+template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
 class GridFunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = GridFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using ThisType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
 
 public:
-  using LocalFunctionType = ElementFunctionInterface<ElementImp, rangeDim, rangeDimCols, RangeFieldImp>;
+  using LocalFunctionType = ElementFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
 
   using ElementType = typename LocalFunctionType::ElementType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
-  static const constexpr size_t dimDomain = LocalFunctionType::dimDomain;
+  static const constexpr size_t domain_dim = LocalFunctionType::domain_dim;
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;
-  static const constexpr size_t dimRange = LocalFunctionType::dimRange;
-  static const constexpr size_t dimRangeCols = LocalFunctionType::dimRangeCols;
+  static const constexpr size_t range_dim = LocalFunctionType::range_dim;
+  static const constexpr size_t range_dim_cols = LocalFunctionType::range_dim_cols;
 
   using E = typename LocalFunctionType::E;
   using D = typename LocalFunctionType::D;
@@ -167,7 +167,8 @@ public:
     const auto& grid_view = tmp_grid_view.access();
     using GridViewType = std::decay_t<decltype(grid_view)>;
     const auto adapter =
-        std::make_shared<VisualizationAdapter<GridViewType, dimRange, dimRangeCols, RangeFieldType>>(*this, "", param);
+        std::make_shared<VisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
+            *this, "", param);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
         subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
                     : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);

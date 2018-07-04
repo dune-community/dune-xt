@@ -33,15 +33,15 @@ namespace Functions {
  * complicated!
  */
 
-template <size_t d, size_t r = 1, size_t rC = 1, class RangeFieldImp = double>
-class ExpressionFunction : public FunctionInterface<d, r, rC, RangeFieldImp>
+template <size_t d, size_t r = 1, size_t rC = 1, class RangeField = double>
+class ExpressionFunction : public FunctionInterface<d, r, rC, RangeField>
 {
-  using BaseType = FunctionInterface<d, r, rC, RangeFieldImp>;
-  using ThisType = ExpressionFunction<d, r, rC, RangeFieldImp>;
+  using BaseType = FunctionInterface<d, r, rC, RangeField>;
+  using ThisType = ExpressionFunction<d, r, rC, RangeField>;
 
   using typename BaseType::DomainFieldType;
-  using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, r * rC>;
-  using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, d>;
+  using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeField, r * rC>;
+  using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeField, d>;
 
 public:
   using typename BaseType::RangeType;
@@ -307,15 +307,15 @@ private:
 }; // class ExpressionFunction
 
 
-template <size_t d, size_t r, class RangeFieldImp>
-class ExpressionFunction<d, r, 1, RangeFieldImp> : public FunctionInterface<d, r, 1, RangeFieldImp>
+template <size_t d, size_t r, class RangeField>
+class ExpressionFunction<d, r, 1, RangeField> : public FunctionInterface<d, r, 1, RangeField>
 {
-  using BaseType = FunctionInterface<d, r, 1, RangeFieldImp>;
-  using ThisType = ExpressionFunction<d, r, 1, RangeFieldImp>;
+  using BaseType = FunctionInterface<d, r, 1, RangeField>;
+  using ThisType = ExpressionFunction<d, r, 1, RangeField>;
 
   using typename BaseType::DomainFieldType;
-  using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, r>;
-  using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeFieldImp, d>;
+  using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeField, r>;
+  using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeField, d>;
 
 public:
   using typename BaseType::RangeType;

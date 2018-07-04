@@ -20,9 +20,12 @@
 #include "dune/xt/functions/flattop.hh"
 #include <dune/xt/functions/interfaces/function.hh>
 
+
 namespace Dune {
 namespace XT {
 namespace Functions {
+
+
 /**
  * \note If you want to add a new smooth function FooBar, do the following: provide a definition that is available for
 all
@@ -231,6 +234,7 @@ public:
     return create(cfg.get<std::string>("type"), cfg);
   }
 }; // class FunctionsProvider
+
 
 } // namespace Functions {
 } // namespace XT

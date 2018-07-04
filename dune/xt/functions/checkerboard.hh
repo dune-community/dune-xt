@@ -29,8 +29,8 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
   using ThisType = CheckerboardFunction<E, r, rC, R>;
-  using BaseType::dimDomain;
-  static_assert(dimDomain <= 3, "Not implemented for dimDomain > 3 (see find_subdomain method)!");
+  using BaseType::domain_dim;
+  static_assert(domain_dim <= 3, "Not implemented for domain_dim > 3 (see find_subdomain method)!");
 
   class LocalCheckerboardFunction : public ElementFunctionInterface<E, r, rC, R>
   {
@@ -48,7 +48,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     LocalCheckerboardFunction(const ElementType& element,
                               const DomainType& lower_left,
                               const DomainType& upper_right,
-                              const FieldVector<size_t, dimDomain>& num_elements,
+                              const FieldVector<size_t, domain_dim>& num_elements,
                               const std::vector<RangeType>& values)
       : InterfaceType(element)
       , lower_left_(lower_left)
@@ -61,7 +61,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
 
     LocalCheckerboardFunction(const DomainType& lower_left,
                               const DomainType& upper_right,
-                              const FieldVector<size_t, dimDomain>& num_elements,
+                              const FieldVector<size_t, domain_dim>& num_elements,
                               std::vector<RangeType>& values)
       : InterfaceType()
       , lower_left_(lower_left)
@@ -113,20 +113,20 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     {
       // decide to which subdomain the center of the element belongs to
       const auto center = element.geometry().center();
-      std::vector<size_t> which_partition(dimDomain, 0);
+      std::vector<size_t> which_partition(domain_dim, 0);
       const auto& ll = lower_left_;
       const auto& ur = upper_right_;
       const auto& ne = num_elements_;
-      for (size_t dd = 0; dd < dimDomain; ++dd) {
+      for (size_t dd = 0; dd < domain_dim; ++dd) {
         // for points that are on upper_right_[d], this selects one partition too much
         // so we need to cap this
         which_partition[dd] =
             std::min(size_t(std::floor(ne[dd] * ((center[dd] - ll[dd]) / (ur[dd] - ll[dd])))), ne[dd] - 1);
       }
       size_t subdomain = 0;
-      if (dimDomain == 1)
+      if (domain_dim == 1)
         subdomain = which_partition[0];
-      else if (dimDomain == 2)
+      else if (domain_dim == 2)
         subdomain = which_partition[0] + which_partition[1] * ne[0];
       else
         subdomain = which_partition[0] + which_partition[1] * ne[0] + which_partition[2] * ne[1] * ne[0];
@@ -136,7 +136,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
 
     const DomainType lower_left_;
     const DomainType upper_right_;
-    const FieldVector<size_t, dimDomain> num_elements_;
+    const FieldVector<size_t, domain_dim> num_elements_;
     const std::vector<RangeType>& values_;
     RangeType current_value_;
   }; // class LocalCheckerboardFunction
@@ -181,7 +181,7 @@ public:
     const Common::Configuration def_cfg = default_config();
     // calculate number of values and get values
     auto num_elements =
-        cfg.get("num_elements", def_cfg.get<Common::FieldVector<size_t, dimDomain>>("num_elements"), dimDomain);
+        cfg.get("num_elements", def_cfg.get<Common::FieldVector<size_t, domain_dim>>("num_elements"), domain_dim);
     size_t num_values = 1;
     for (size_t ii = 0; ii < num_elements.size(); ++ii)
       num_values *= num_elements[ii];
@@ -190,8 +190,8 @@ public:
     for (size_t ii = 0; ii < values_range.size(); ++ii)
       values.emplace_back(values_range[ii]);
     // create
-    return Common::make_unique<ThisType>(cfg.get("lower_left", def_cfg.get<DomainType>("lower_left"), dimDomain),
-                                         cfg.get("upper_right", def_cfg.get<DomainType>("upper_right"), dimDomain),
+    return Common::make_unique<ThisType>(cfg.get("lower_left", def_cfg.get<DomainType>("lower_left"), domain_dim),
+                                         cfg.get("upper_right", def_cfg.get<DomainType>("upper_right"), domain_dim),
                                          std::move(num_elements),
                                          std::move(values),
                                          cfg.get("name", def_cfg.get<std::string>("name")));
@@ -199,7 +199,7 @@ public:
 
   CheckerboardFunction(const DomainType& lower_left,
                        const DomainType& upper_right,
-                       const FieldVector<size_t, dimDomain>& num_elements,
+                       const FieldVector<size_t, domain_dim>& num_elements,
                        const std::vector<RangeType>& values,
                        const std::string nm = "checkerboard")
     : lower_left_(lower_left)
@@ -211,7 +211,7 @@ public:
 #ifndef NDEBUG
     // checks
     size_t total_subdomains = 1;
-    for (size_t dd = 0; dd < dimDomain; ++dd) {
+    for (size_t dd = 0; dd < domain_dim; ++dd) {
       const auto& ll = (lower_left_)[dd];
       const auto& ur = (upper_right_)[dd];
       const auto& ne = (num_elements_)[dd];
@@ -271,20 +271,20 @@ private:
   {
     // decide on the subdomain the center of the element belongs to
     const auto center = element.geometry().center();
-    std::vector<size_t> which_partition(dimDomain, 0);
+    std::vector<size_t> which_partition(domain_dim, 0);
     const auto& ll = lower_left_;
     const auto& ur = upper_right_;
     const auto& ne = num_elements_;
-    for (size_t dd = 0; dd < dimDomain; ++dd) {
+    for (size_t dd = 0; dd < domain_dim; ++dd) {
       // for points that are on upper_right_[d], this selects one partition too much
       // so we need to cap this
       which_partition[dd] =
           std::min(size_t(std::floor(ne[dd] * ((center[dd] - ll[dd]) / (ur[dd] - ll[dd])))), ne[dd] - 1);
     }
     size_t subdomain = 0;
-    if (dimDomain == 1)
+    if (domain_dim == 1)
       subdomain = which_partition[0];
-    else if (dimDomain == 2)
+    else if (domain_dim == 2)
       subdomain = which_partition[0] + which_partition[1] * ne[0];
     else
       subdomain = which_partition[0] + which_partition[1] * ne[0] + which_partition[2] * ne[1] * ne[0];
@@ -293,7 +293,7 @@ private:
 
   const DomainType lower_left_;
   const DomainType upper_right_;
-  const FieldVector<size_t, dimDomain> num_elements_;
+  const FieldVector<size_t, domain_dim> num_elements_;
   std::shared_ptr<std::vector<RangeType>> values_;
   std::string name_;
 }; // class CheckerboardFunction

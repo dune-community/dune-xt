@@ -169,7 +169,7 @@ class Model1Function<E, r, r, R> : public internal::Model1Base<E, r, r, R>
 
 public:
   using DomainFieldType = typename BaseType::DomainFieldType;
-  static const constexpr size_t dimDomain = E::dimension;
+  static const constexpr size_t domain_dim = E::dimension;
   using RangeFieldType = typename BaseType::RangeFieldType;
   using RangeType = typename BaseType::RangeType;
 
@@ -180,8 +180,8 @@ public:
   } // ... create(...)
 
   Model1Function(const std::string& filename,
-                 const Common::FieldVector<DomainFieldType, dimDomain>& lower_left,
-                 const Common::FieldVector<DomainFieldType, dimDomain>& upper_right,
+                 const Common::FieldVector<DomainFieldType, domain_dim>& lower_left,
+                 const Common::FieldVector<DomainFieldType, domain_dim>& upper_right,
                  const RangeFieldType min = internal::model1_min_value,
                  const RangeFieldType max = internal::model1_max_value,
                  const std::string nm = BaseType::static_id())
