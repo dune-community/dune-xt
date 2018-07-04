@@ -8,11 +8,11 @@
 //   Felix Schindler (2017)
 //   Rene Milk       (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_TRANSFORMED_HH
-#define DUNE_XT_FUNCTIONS_TRANSFORMED_HH
-#if 0
+#ifndef DUNE_XT_FUNCTIONS_BASE_TRANSFORMED_HH
+#define DUNE_XT_FUNCTIONS_BASE_TRANSFORMED_HH
+
 #include <dune/xt/functions/type_traits.hh>
-#include <dune/xt/functions/interfaces/localizable-function.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 
 
 namespace Dune {
@@ -47,48 +47,50 @@ auto u_primitive = XT::Functions::make_transformed_function<d + 2, 1, R>(u_conse
 \endcode
  */
 template <class LF, size_t r = LF::r, size_t rC = LF::rC, class R = typename LF::R>
-class TransformedLocalizableFunction
-    : public XT::Functions::LocalizableFunctionInterface<typename LF::E, typename LF::D, LF::d, R, r, rC>
+class TransformedGridFunction : public XT::Functions::GridFunctionInterface<typename LF::E, r, rC, R>
 {
-  static_assert(is_localizable_function<LF>::value, "");
-  using BaseType = XT::Functions::LocalizableFunctionInterface<typename LF::E, typename LF::D, LF::d, R, r, rC>;
+  static_assert(is_grid_function<LF>::value, "");
+  using BaseType = XT::Functions::GridFunctionInterface<typename LF::E, r, rC, R>;
 
-  class TransformedLocalFunction
-      : public XT::Functions::LocalfunctionInterface<typename LF::E, typename LF::D, LF::d, R, r, rC>
+  class TransformedLocalFunction : public XT::Functions::ElementFunctionInterface<typename LF::E, r, rC, R>
   {
-    using BaseType = XT::Functions::LocalfunctionInterface<typename LF::E, typename LF::D, LF::d, R, r, rC>;
-    using UntransformedLocalFunctionType = typename LF::LocalfunctionType;
+    using BaseType = XT::Functions::ElementFunctionInterface<typename LF::E, r, rC, R>;
+    using UntransformedLocalFunctionType = typename LF::LocalFunctionType;
 
   public:
     using UntransformedRangeType = typename UntransformedLocalFunctionType::RangeType;
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
-    using typename BaseType::JacobianRangeType;
-    using typename BaseType::EntityType;
+    using typename BaseType::DerivativeRangeType;
+    using typename BaseType::ElementType;
     using Transformation = std::function<RangeType(const UntransformedRangeType&)>;
 
-    TransformedLocalFunction(const EntityType& en, const LF& function, const Transformation& transformation)
-      : BaseType(en)
-      , local_function_(function.local_function(en))
+    TransformedLocalFunction(const LF& function, const Transformation& transformation)
+      : BaseType()
+      , local_function_(function.local_function())
       , transformation_(transformation)
     {
     }
 
-    size_t order(const XT::Common::Parameter& mu = {}) const override final
+    void post_bind(const ElementType& element) override final
+    {
+      local_function_->post_bind(element);
+    }
+
+    int order(const XT::Common::Parameter& mu = {}) const override final
     {
       return local_function_->order(mu);
     }
 
-    void evaluate(const DomainType& xx, RangeType& ret, const XT::Common::Parameter& mu = {}) const override final
+    RangeType evaluate(const DomainType& xx, const XT::Common::Parameter& mu = {}) const override final
     {
       RangeType tmp;
       local_function_->evaluate(xx, tmp, mu);
-      ret = transformation_(tmp);
+      return transformation_(tmp);
     }
 
-    void jacobian(const DomainType& /*xx*/,
-                  JacobianRangeType& /*ret*/,
-                  const XT::Common::Parameter& /*mu*/ = {}) const override final
+    DerivativeRangeType jacobian(const DomainType& /*xx*/,
+                                 const XT::Common::Parameter& /*mu*/ = {}) const override final
     {
       DUNE_THROW(NotImplemented, "Yet!");
     }
@@ -99,14 +101,14 @@ class TransformedLocalizableFunction
   }; // class TransformedLocalFunction
 
 public:
-  using typename BaseType::EntityType;
-  using typename BaseType::LocalfunctionType;
+  using typename BaseType::ElementType;
+  using typename BaseType::LocalFunctionType;
   using UntransformedRangeType = typename TransformedLocalFunction::UntransformedRangeType;
   using TransformedRangeType = typename TransformedLocalFunction::RangeType;
 
-  TransformedLocalizableFunction(const LF& f,
-                                 std::function<TransformedRangeType(const UntransformedRangeType&)> transformation,
-                                 const std::string& nm = "")
+  TransformedGridFunction(const LF& f,
+                          std::function<TransformedRangeType(const UntransformedRangeType&)> transformation,
+                          const std::string& nm = "")
     : function_(f)
     , transformation_(transformation)
     , name_(nm)
@@ -118,32 +120,29 @@ public:
     return name_.empty() ? "transformed " + function_.name() : name_;
   }
 
-  std::unique_ptr<LocalfunctionType> local_function(const EntityType& en) const override final
+  std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<TransformedLocalFunction>(en, function_, transformation_);
+    return std::make_unique<TransformedLocalFunction>(function_, transformation_);
   }
 
 private:
   const LF& function_;
   const typename TransformedLocalFunction::Transformation transformation_;
   const std::string name_;
-}; // class TransformedLocalizableFunction
+}; // class TransformedGridFunction
 
 
-template <size_t new_r, size_t new_rC, class new_R, class E, class D, size_t d, class R, size_t r, size_t rC>
-TransformedLocalizableFunction<LocalizableFunctionInterface<E, D, d, R, r>, new_r, new_rC, new_R>
-make_transformed_function(
-    const LocalizableFunctionInterface<E, D, d, R, r, rC>& function,
+template <size_t new_r, size_t new_rC, class new_R, class E, size_t r, size_t rC, class R>
+TransformedGridFunction<GridFunctionInterface<E, r, rC, R>, new_r, new_rC, new_R> make_transformed_function(
+    const GridFunctionInterface<E, r, rC, R>& function,
     std::function<
-        typename TransformedLocalizableFunction<LocalizableFunctionInterface<E, D, d, R, r>, new_r, new_rC, new_R>::
+        typename TransformedGridFunction<GridFunctionInterface<E, r, rC, R>, new_r, new_rC, new_R>::
             TransformedRangeType(
-                const typename TransformedLocalizableFunction<LocalizableFunctionInterface<E, D, d, R, r>,
-                                                              new_r,
-                                                              new_rC,
-                                                              new_R>::UntransformedRangeType&)> transformation,
+                const typename TransformedGridFunction<GridFunctionInterface<E, r, rC, R>, new_r, new_rC, new_R>::
+                    UntransformedRangeType&)> transformation,
     const std::string& name = "xt.functions.transformed")
 {
-  return TransformedLocalizableFunction<LocalizableFunctionInterface<E, D, d, R, r>, new_r, new_rC, new_R>(
+  return TransformedGridFunction<GridFunctionInterface<E, r, rC, R>, new_r, new_rC, new_R>(
       function, transformation, name);
 }
 
@@ -152,5 +151,4 @@ make_transformed_function(
 } // namespace XT
 } // namespace Dune
 
-#endif
 #endif // DUNE_XT_FUNCTIONS_TRANSFORMED_HH
