@@ -9,9 +9,9 @@
 //   Rene Milk       (2015 - 2018)
 //   Tobias Leibner  (2017)
 
-#ifndef DUNE_XT_FUNCTIONS_DERIVED_HH
-#define DUNE_XT_FUNCTIONS_DERIVED_HH
-#if 0
+#ifndef DUNE_XT_FUNCTIONS_BASE_DERIVED_HH
+#define DUNE_XT_FUNCTIONS_BASE_DERIVED_HH
+
 #include <memory>
 #include <type_traits>
 
@@ -22,8 +22,10 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/memory.hh>
 
-#include <dune/xt/functions/interfaces.hh>
+//#include <dune/xt/functions/interfaces.hh>
 
+
+#if 0
 namespace Dune {
 namespace XT {
 namespace Functions {
@@ -44,7 +46,7 @@ class SelectDerived
 public:
   typedef typename FunctionType::EntityType E;
   typedef typename FunctionType::DomainFieldType D;
-  static const size_t d = FunctionType::dimDomain;
+  static const size_t d = FunctionType::domain_dim;
   typedef typename FunctionType::RangeFieldType R;
 
 private:
@@ -66,8 +68,8 @@ private:
     };
 
   public:
-    static const size_t r = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::r;
-    static const size_t rC = Dimension<d, F::dimRange, F::dimRangeCols, derivative>::rC;
+    static const size_t r = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::r;
+    static const size_t rC = Dimension<d, F::range_dim, F::range_dim_cols, derivative>::rC;
   }; // class SelectDerived
 
 public:
