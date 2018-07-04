@@ -8,13 +8,13 @@
 //   Felix Schindler (2017)
 //   Rene Milk       (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_SLICED_HH
-#define DUNE_XT_FUNCTIONS_SLICED_HH
-#if 0
+#ifndef DUNE_XT_FUNCTIONS_BASE_SLICED_HH
+#define DUNE_XT_FUNCTIONS_BASE_SLICED_HH
+
 #include <dune/common/typetraits.hh>
 
 #include <dune/xt/functions/type_traits.hh>
-#include <dune/xt/functions/interfaces/localizable-function.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 
 
 namespace Dune {
@@ -23,7 +23,7 @@ namespace Functions {
 
 
 template <class LF, size_t r, size_t rC = 1>
-class SlicedLocalizableFunction
+class SlicedGridFunction
 {
   static_assert(AlwaysFalse<LF>::value, "Not available for matrix-valued functions (yet)!");
 };
@@ -43,61 +43,67 @@ auto energy = XT::Functions::make_sliced_function<1>(u, {3}, "energy");
 \endcode
  */
 template <class LF, size_t r>
-class SlicedLocalizableFunction<LF, r, 1>
-    : public XT::Functions::LocalizableFunctionInterface<typename LF::E, typename LF::D, LF::d, typename LF::R, r, 1>
+class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface<typename LF::E, r, 1, typename LF::R>
 {
-  static_assert(is_localizable_function<LF>::value, "");
+  static_assert(is_grid_function<LF>::value, "");
   static_assert(r <= LF::r, "Does not make sense!");
-  using BaseType =
-      XT::Functions::LocalizableFunctionInterface<typename LF::E, typename LF::D, LF::d, typename LF::R, r, 1>;
+  using BaseType = XT::Functions::GridFunctionInterface<typename LF::E, r, 1, typename LF::R>;
 
-  class SlicedLocalFunction
-      : public XT::Functions::LocalfunctionInterface<typename LF::E, typename LF::D, LF::d, typename LF::R, r, 1>
+  class SlicedLocalFunction : public XT::Functions::ElementFunctionInterface<typename LF::E, r, 1, typename LF::R>
   {
-    using BaseType = XT::Functions::LocalfunctionInterface<typename LF::E, typename LF::D, LF::d, typename LF::R, r, 1>;
+    using BaseType = XT::Functions::ElementFunctionInterface<typename LF::E, r, 1, typename LF::R>;
 
   public:
-    using typename BaseType::EntityType;
+    using typename BaseType::ElementType;
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
-    using typename BaseType::JacobianRangeType;
+    using typename BaseType::RangeReturnType;
+    using typename BaseType::DerivativeRangeType;
+    using typename BaseType::DerivativeRangeReturnType;
 
-    SlicedLocalFunction(const LF& function, const std::array<size_t, r>& dims, const EntityType& ent)
-      : BaseType(ent)
-      , local_function_(function.local_function(ent))
+
+    SlicedLocalFunction(const LF& function, const std::array<size_t, r>& dims)
+      : BaseType()
+      , local_function_(function.local_function())
       , dims_(dims)
     {
     }
 
-    size_t order(const XT::Common::Parameter& = {}) const override final
+    void post_bind(const ElementType& element) override final
+    {
+      local_function_->post_bind(element);
+    }
+
+    int order(const XT::Common::Parameter& = {}) const override final
     {
       return local_function_->order();
     }
 
-    void evaluate(const DomainType& xx, RangeType& ret, const XT::Common::Parameter& mu = {}) const override final
+    RangeReturnType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
     {
-      const auto value = local_function_->evaluate(xx, mu);
+      RangeReturnType ret;
+      const auto value = local_function_->evaluate(xx, param);
       for (size_t ii = 0; ii < r; ++ii)
         ret[ii] = value[dims_[ii]];
+      return ret;
     }
 
-    void jacobian(const DomainType& /*xx*/,
-                  JacobianRangeType& /*ret*/,
-                  const XT::Common::Parameter& /*mu*/ = {}) const override final
+    DerivativeRangeReturnType jacobian(const DomainType& /*xx*/,
+                                       const XT::Common::Parameter& /*param*/ = {}) const override final
     {
       DUNE_THROW(NotImplemented, "Yet!");
     }
 
   private:
-    const std::unique_ptr<typename LF::LocalfunctionType> local_function_;
+    const std::unique_ptr<typename LF::LocalFunctionType> local_function_;
     const std::array<size_t, r>& dims_;
   }; // class SlicedLocalFunction
 
 public:
-  using typename BaseType::EntityType;
-  using typename BaseType::LocalfunctionType;
+  using typename BaseType::ElementType;
+  using typename BaseType::LocalFunctionType;
 
-  SlicedLocalizableFunction(const LF& function, const std::array<size_t, r>& dims, const std::string& nm = "")
+  SlicedGridFunction(const LF& function, const std::array<size_t, r>& dims, const std::string& nm = "")
     : function_(function)
     , dims_(dims)
     , name_(nm)
@@ -115,35 +121,33 @@ public:
                               << dims_[ii]);
   }
 
-  std::string name() const override final
+  const std::string& name() const override final
   {
     return name_.empty() ? "sliced " + function_.name() : name_;
   }
 
-  std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
+  std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<SlicedLocalFunction>(function_, dims_, entity);
+    return std::make_unique<SlicedLocalFunction>(function_, dims_);
   }
 
 private:
   const LF& function_;
   const std::array<size_t, r> dims_;
-  const std::string name_;
-}; // class SlicedLocalizableFunction
+  const std::string& name_;
+}; // class SlicedGridFunction
 
 
-template <size_t sliced_r, class E, class D, size_t d, class R, size_t r>
-SlicedLocalizableFunction<LocalizableFunctionInterface<E, D, d, R, r>, sliced_r>
-make_sliced_function(const LocalizableFunctionInterface<E, D, d, R, r>& function,
-                     const std::array<size_t, sliced_r>& dims,
-                     const std::string& name = "")
+template <size_t sliced_r, class E, size_t r>
+SlicedGridFunction<GridFunctionInterface<E, r>, sliced_r> make_sliced_function(
+    const GridFunctionInterface<E, r>& function, const std::array<size_t, sliced_r>& dims, const std::string& name = "")
 {
-  return SlicedLocalizableFunction<LocalizableFunctionInterface<E, D, d, R, r>, sliced_r>(function, dims, name);
+  return SlicedGridFunction<GridFunctionInterface<E, r>, sliced_r>(function, dims, name);
 }
 
 
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
-#endif
+
 #endif // DUNE_XT_FUNCTIONS_SLICED_HH
