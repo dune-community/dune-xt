@@ -9,8 +9,8 @@
 //   Rene Milk       (2016, 2018)
 //   Tobias Leibner  (2016 - 2018)
 
-#ifndef DUNE_XT_FUNCTION_REINTERPRET_HH
-#define DUNE_XT_FUNCTION_REINTERPRET_HH
+#ifndef DUNE_XT_FUNCTION_BASE_REINTERPRET_HH
+#define DUNE_XT_FUNCTION_BASE_REINTERPRET_HH
 
 #include <dune/geometry/referenceelements.hh>
 
