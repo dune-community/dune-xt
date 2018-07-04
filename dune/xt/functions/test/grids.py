@@ -1,6 +1,4 @@
 import itertools
-import sys
-from dune.xt.codegen import typeid_to_typedef_name
 
 
 def _make_alu(dimDomain):
