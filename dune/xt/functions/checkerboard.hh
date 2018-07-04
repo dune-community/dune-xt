@@ -34,7 +34,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
 
   class LocalCheckerboardFunction : public ElementFunctionInterface<E, r, rC, R>
   {
-    typedef ElementFunctionInterface<E, r, rC, R> InterfaceType;
+    using InterfaceType = ElementFunctionInterface<E, r, rC, R>;
 
   public:
     using typename InterfaceType::ElementType;

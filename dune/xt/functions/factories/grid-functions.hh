@@ -48,7 +48,7 @@ template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class FunctionsFactory
 {
 public:
-  typedef GridFunctionInterface<E, r, rC, R> InterfaceType;
+  using InterfaceType = GridFunctionInterface<E, r, rC, R>;
 
 private:
   template <class FunctionType, bool available = false>

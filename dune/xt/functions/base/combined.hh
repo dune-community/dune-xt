@@ -320,7 +320,7 @@ private:
  *        - You can pass references of the left and right operand to this class. This is done for instance when calling
  *          operator+, operator- or operator* on any function deriving from GridFunctionInterface:
 \code
-typedef Functions::IndicatorFunction< ..., double> IndicatorType;
+using IndicatorType = Functions::IndicatorFunction< ..., double>;
 IndicatorType one( ... );
 IndicatorType two( ... );
 // the following code
@@ -333,7 +333,7 @@ internal::Combined< IndicatorType, IndicatorType, Combination::difference > diff
  *          In this situation you are responsible to ensure that the arguments given are valid throughout the lifetime
  *          of this class. The following will lead to a segfault:
 \code
-typedef Functions::IndicatorFunction< ..., double > IndicatorType;
+using IndicatorType = Functions::IndicatorFunction< ..., double >;
 
 Difference< IndicatorType, IndicatorType > stupid_difference()
 {
@@ -344,7 +344,7 @@ Difference< IndicatorType, IndicatorType > stupid_difference()
 \endcode
  *        - You can pass shared_ptr of the left and right operands to this class. In this case the following is valid:
 \code
-typedef Functions::IndicatorFunction< ..., double > IndicatorType;
+using IndicatorType = Functions::IndicatorFunction< ..., double >;
 
 Difference< IndicatorType, IndicatorType > stupid_difference()
 {
@@ -408,7 +408,7 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
   {
-    typedef CombinedLocalFunction<LeftType, RightType, comb> RealLocalFunctionType;
+    using RealLocalFunctionType = CombinedLocalFunction<LeftType, RightType, comb>;
     assert(left_);
     assert(right_);
     return Common::make_unique<RealLocalFunctionType>(left_->access(), right_->access(), element);
@@ -416,7 +416,7 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    typedef CombinedLocalFunction<LeftType, RightType, comb> RealLocalFunctionType;
+    using RealLocalFunctionType = CombinedLocalFunction<LeftType, RightType, comb>;
     assert(left_);
     assert(right_);
     return Common::make_unique<RealLocalFunctionType>(left_->access(), right_->access());
@@ -449,7 +449,7 @@ private:
 template <class MinuendType, class SubtrahendType>
 class DifferenceFunction : public internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference>
 {
-  typedef internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference> BaseType;
+  using BaseType = internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference>;
 
 public:
   template <class... Args>
@@ -459,6 +459,7 @@ public:
   }
 }; // class DifferenceFunction
 
+
 /**
  * \brief Function representing the sum of two functions.
  *
@@ -467,7 +468,7 @@ public:
 template <class LeftSummandType, class RightSummandType>
 class SumFunction : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>
 {
-  typedef internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum> BaseType;
+  using BaseType = internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>;
 
 public:
   template <class... Args>
@@ -485,7 +486,7 @@ public:
 template <class LeftSummandType, class RightSummandType>
 class ProductFunction : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>
 {
-  typedef internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product> BaseType;
+  using BaseType = internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>;
 
 public:
   template <class... Args>

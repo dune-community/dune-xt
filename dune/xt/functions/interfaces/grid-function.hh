@@ -93,8 +93,8 @@ public:
 
   static const constexpr bool available = false;
 
-  typedef Functions::DifferenceFunction<ThisType, ThisType> DifferenceType;
-  typedef Functions::SumFunction<ThisType, ThisType> SumType;
+  using DifferenceType = Functions::DifferenceFunction<ThisType, ThisType>;
+  using SumType = Functions::SumFunction<ThisType, ThisType>;
 
   virtual ~GridFunctionInterface() = default;
 

@@ -46,7 +46,7 @@ template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
 class SmoothFunctionsFactory
 {
 public:
-  typedef FunctionInterface<d, r, rC, R> InterfaceType;
+  using InterfaceType = FunctionInterface<d, r, rC, R>;
 
 private:
   template <class FunctionType, bool available = false>

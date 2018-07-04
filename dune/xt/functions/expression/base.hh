@@ -48,12 +48,12 @@ class MathExpressionBase
   static_assert((rangeDim > 0), "Really?");
 
 public:
-  typedef MathExpressionBase<DomainFieldImp, domainDim, RangeFieldImp, rangeDim> ThisType;
+  using ThisType = MathExpressionBase<DomainField, domainDim, RangeField, rangeDim>;
 
-  typedef DomainFieldImp DomainFieldType;
+  using DomainFieldType = DomainField;
   static const size_t dimDomain = domainDim;
 
-  typedef RangeFieldImp RangeFieldType;
+  using RangeFieldType = RangeField;
   static const size_t dimRange = rangeDim;
 
   //  MathExpressionBase(const std::string var, const std::string expr)
@@ -226,12 +226,12 @@ template <class D, class R, size_t r, size_t max_d = DUNE_XT_FUNCTIONS_EXPRESSIO
 class DynamicMathExpressionBase
 {
 public:
-  typedef DynamicMathExpressionBase<D, R, r, max_d> ThisType;
+  using ThisType = DynamicMathExpressionBase<D, R, r, max_d>;
 
-  typedef D DomainFieldType;
+  using DomainFieldType = D;
   static const size_t maxDimDomain = max_d;
 
-  typedef R RangeFieldType;
+  using RangeFieldType = R;
   static const size_t dimRange = r;
 
   DynamicMathExpressionBase(const std::vector<std::string>& vars, const std::vector<std::string>& exprs)
