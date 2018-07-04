@@ -9,8 +9,8 @@
 //   Rene Milk       (2013 - 2016)
 //   Tobias Leibner  (2014)
 
-#ifndef DUNE_XT_FUNCTIONS_HH
-#define DUNE_XT_FUNCTIONS_HH
+#ifndef DUNE_XT_FACTORIES_FUNCTIONS_HH
+#define DUNE_XT_FACTORIES_FUNCTIONS_HH
 
 #include <dune/xt/common/configuration.hh>
 
