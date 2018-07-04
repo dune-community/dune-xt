@@ -20,6 +20,8 @@
 
 #include <dune/common/parallel/mpihelper.hh>
 
+#include <dune/common/deprecated.hh>
+
 #include <dune/grid/io/file/vtk.hh>
 
 #include <dune/xt/common/filesystem.hh>
@@ -104,13 +106,23 @@ public:
   }
 
   /**
-   * \name ´´These methods have to be implemented.''
+   * \name ´´This method has to be implemented.''
    * \{
    **/
 
   virtual std::unique_ptr<LocalFunctionType> local_function() const = 0;
 
-  virtual std::unique_ptr<LocalFunctionType> local_function(const ElementType& /*element*/) const = 0;
+  /**
+   * \name ´´This method is deprecated.''
+   * \{
+   **/
+
+
+  virtual std::unique_ptr<LocalFunctionType> local_function(const ElementType& /*element*/) const
+  {
+    DXT_DEPRECATED_MSG("This function is deprecated. Use local_function() and call bind(element).")
+    return nullptr;
+  }
 
   /**
    * \}
