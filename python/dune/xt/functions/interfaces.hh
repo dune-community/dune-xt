@@ -276,8 +276,8 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
   typedef GridFunctionInterface<E, lr, lrC, R> Left;
   typedef GridFunctionInterface<E, rr, rrC, R> Right;
   typedef typename internal::get_combined<Left, Right, comb>::type C;
-  static const size_t r = C::dimRange;
-  static const size_t rC = C::dimRangeCols;
+  static const size_t r = C::range_dim;
+  static const size_t rC = C::range_dim_cols;
   const std::string id = internal::get_combined<Left, Right, comb>::id();
   const std::string op = internal::get_combined<Left, Right, comb>::doc();
   const std::string class_name = id + "__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC);
@@ -317,87 +317,90 @@ void addbind_GridFunctionInterface_combined_op(C& c)
 } // ... addbind_GridFunctionInterface_combined_op(...)
 
 
-template <class G, size_t r, size_t rC>
-pybind11::class_<FunctionInterface<G::dimension, r, rC, double>> bind_FunctionInterface(pybind11::module& m,
-                                                                                        const std::string& grid_id)
+template <size_t d, size_t r, size_t rC>
+pybind11::class_<FunctionInterface<d, r, rC, double>> bind_FunctionInterface(pybind11::module& m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef FunctionInterface<G::dimension, r, rC, double> C;
+  typedef FunctionInterface<d, r, rC, double> C;
 
-  py::class_<C> c(
-      m,
-      std::string("FunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC))
-          .c_str(),
-      std::string("FunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC))
-          .c_str());
+  py::class_<C> c(m,
+                  std::string("FunctionInterface__" + Common::to_string(d) + "d_to_" + Common::to_string(r) + "x"
+                              + Common::to_string(rC))
+                      .c_str(),
+                  std::string("FunctionInterface__" + Common::to_string(d) + "d_to_" + Common::to_string(r) + "x"
+                              + Common::to_string(rC))
+                      .c_str());
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
   c.def_property_readonly("type", [](const C& self) { return self.type(); });
   c.def_property_readonly("name", [](const C& self) { return self.name(); });
 
-  c.def("visualize",
-        [](const C& self,
-           const Grid::GridProvider<G>& grid_provider,
-           const std::string& layer,
-           const ssize_t lvl,
-           const std::string& path,
-           const bool subsampling) {
-          const auto level = XT::Common::numeric_cast<int>(lvl);
-          if (layer == "leaf")
-            self.visualize(grid_provider.leaf_view(), path, subsampling);
-          else if (layer == "level")
-            self.visualize(grid_provider.template layer<XT::Grid::Layers::level, XT::Grid::Backends::view>(level),
-                           path,
-                           subsampling);
-          else
-            DUNE_THROW(XT::Common::Exceptions::wrong_input_given,
-                       "Given layer has to be one of ('leaf', 'level'), is '" << layer << "'!");
-        },
-        "grid_provider"_a,
-        "layer"_a = "leaf",
-        "level"_a = -1,
-        "path"_a,
-        "subsampling"_a = true);
-  c.def("visualize",
-        [](const C& self,
-           const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& dd_grid_provider,
-           const std::string& layer,
-           const ssize_t lvl_or_sbdmn,
-           const std::string& path,
-           const bool subsampling) {
-          const auto level_or_subdomain = XT::Common::numeric_cast<int>(lvl_or_sbdmn);
-          if (layer == "leaf")
-            self.visualize(dd_grid_provider.leaf_view(), path, subsampling);
-          else if (layer == "level")
-            self.visualize(
-                dd_grid_provider.template layer<XT::Grid::Layers::level, XT::Grid::Backends::view>(level_or_subdomain),
-                path,
-                subsampling);
-          else if (layer == "dd_subdomain")
-            self.visualize(dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain, XT::Grid::Backends::view>(
-                               level_or_subdomain),
-                           path,
-                           subsampling);
-          else if (layer == "dd_subdomain_oversampled")
-            self.visualize(
-                dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain_oversampled, XT::Grid::Backends::view>(
-                    level_or_subdomain),
-                path,
-                subsampling);
-          else
-            DUNE_THROW(
-                XT::Common::Exceptions::wrong_input_given,
-                "Given layer has to be one of ('leaf', 'level', 'dd_subdomain', 'dd_subdomain_oversampled'), is '"
-                    << layer
-                    << "'!");
-        },
-        "dd_grid_provider"_a,
-        "layer"_a = "leaf",
-        "level_or_subdomain"_a = -1,
-        "path"_a,
-        "subsampling"_a = true);
+  //  c.def("visualize",
+  //        [](const C& self,
+  //           const Grid::GridProvider<G>& grid_provider,
+  //           const std::string& layer,
+  //           const ssize_t lvl,
+  //           const std::string& path,
+  //           const bool subsampling) {
+  //          const auto level = XT::Common::numeric_cast<int>(lvl);
+  //          if (layer == "leaf")
+  //            self.visualize(grid_provider.leaf_view(), path, subsampling);
+  //          else if (layer == "level")
+  //            self.visualize(grid_provider.template layer<XT::Grid::Layers::level, XT::Grid::Backends::view>(level),
+  //                           path,
+  //                           subsampling);
+  //          else
+  //            DUNE_THROW(XT::Common::Exceptions::wrong_input_given,
+  //                       "Given layer has to be one of ('leaf', 'level'), is '" << layer << "'!");
+  //        },
+  //        "grid_provider"_a,
+  //        "layer"_a = "leaf",
+  //        "level"_a = -1,
+  //        "path"_a,
+  //        "subsampling"_a = true);
+  //  c.def("visualize",
+  //        [](const C& self,
+  //           const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& dd_grid_provider,
+  //           const std::string& layer,
+  //           const ssize_t lvl_or_sbdmn,
+  //           const std::string& path,
+  //           const bool subsampling) {
+  //          const auto level_or_subdomain = XT::Common::numeric_cast<int>(lvl_or_sbdmn);
+  //          if (layer == "leaf")
+  //            self.visualize(dd_grid_provider.leaf_view(), path, subsampling);
+  //          else if (layer == "level")
+  //            self.visualize(
+  //                dd_grid_provider.template layer<XT::Grid::Layers::level,
+  //                XT::Grid::Backends::view>(level_or_subdomain),
+  //                path,
+  //                subsampling);
+  //          else if (layer == "dd_subdomain")
+  //            self.visualize(dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain,
+  //            XT::Grid::Backends::view>(
+  //                               level_or_subdomain),
+  //                           path,
+  //                           subsampling);
+  //          else if (layer == "dd_subdomain_oversampled")
+  //            self.visualize(
+  //                dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain_oversampled,
+  //                XT::Grid::Backends::view>(
+  //                    level_or_subdomain),
+  //                path,
+  //                subsampling);
+  //          else
+  //            DUNE_THROW(
+  //                XT::Common::Exceptions::wrong_input_given,
+  //                "Given layer has to be one of ('leaf', 'level', 'dd_subdomain', 'dd_subdomain_oversampled'), is '"
+  //                    << layer
+  //                    << "'!");
+  //        },
+  //        "dd_grid_provider"_a,
+  //        "layer"_a = "leaf",
+  //        "level_or_subdomain"_a = -1,
+  //        "path"_a,
+  //        "subsampling"_a = true);
 
   // internal::Divergence<G>::addbind(m, c);
 
