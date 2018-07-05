@@ -85,9 +85,9 @@ public:
   }
 
 private:
-  class ReinterpretLocalfunction : public LocalFunctionInterface<TargetElement, r, rC, R>
+  class ReinterpretLocalfunction : public ElementFunctionInterface<TargetElement, r, rC, R>
   {
-    using BaseType = LocalFunctionInterface<TargetElement, r, rC, R>;
+    using BaseType = ElementFunctionInterface<TargetElement, r, rC, R>;
 
   public:
     using typename BaseType::D;
