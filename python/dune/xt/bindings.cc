@@ -46,6 +46,9 @@ void addbind_for_Grid(pybind11::module& m)
   auto i_2_1 = bind_GridFunctionInterface<G, 2, 1>(m, grid_id);
   auto i_3_1 = bind_GridFunctionInterface<G, 3, 1>(m, grid_id);
   auto i_4_1 = bind_GridFunctionInterface<G, 4, 1>(m, grid_id);
+  auto i_1_3 = bind_GridFunctionInterface<G, 1, 3>(m, grid_id);
+  auto i_3_3 = bind_GridFunctionInterface<G, 3, 3>(m, grid_id);
+
   //! this generates multiple binds for the same type
   //! auto i_d_d = bind_GridFunctionInterface<G, g_dim, g_dim>(m, grid_id);
   auto i_d_d = bind_GridFunctionInterface<G, 2, 2>(m, grid_id);
@@ -98,31 +101,26 @@ void addbind_for_Grid(pybind11::module& m)
   addbind_GridFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 2>(i_1_1);
 
 
-  bind_ConstantFunction<G, g_dim, 1, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 2, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 3, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 4, 1>(m, grid_id);
-  bind_ConstantFunction<G, g_dim, 2, 2>(m, grid_id);
-
   bind_CheckerboardFunction<G, g_dim, 1, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 2, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 3, 1>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 4, 1>(m, grid_id);
-  bind_CheckerboardFunction<G, g_dim, 1, 2>(m, grid_id);
   bind_CheckerboardFunction<G, g_dim, 1, 3>(m, grid_id);
+  bind_CheckerboardFunction<G, g_dim, 3, 3>(m, grid_id);
+  //  bind_CheckerboardFunction<G, g_dim, 1, 2>(m, grid_id);
+  //  bind_CheckerboardFunction<G, g_dim, 1, 3>(m, grid_id);
 
   //  bindings::ESV2007::CutoffFunction<G>::bind(m);
 
-  bind_ExpressionFunction<G, g_dim, 1, 1>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 2, 1>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 3, 1>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 4, 1>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 1, 2>(m, grid_id);
-  bind_ExpressionFunction<G, g_dim, 1, 3>(m, grid_id);
 
   bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
 
   bind_IndicatorFunction<G, g_dim, 1, 1>(m, grid_id);
+  bind_IndicatorFunction<G, g_dim, 2, 1>(m, grid_id);
+  bind_IndicatorFunction<G, g_dim, 3, 1>(m, grid_id);
+  bind_IndicatorFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_IndicatorFunction<G, g_dim, 1, 3>(m, grid_id);
+  bind_IndicatorFunction<G, g_dim, 3, 3>(m, grid_id);
 } // ... addbind_for_Grid(...)
 
 
@@ -130,6 +128,7 @@ PYBIND11_PLUGIN(_functions)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
+  using namespace Dune::XT::Functions;
 
   py::module m("_functions", "dune-xt-functions");
 
@@ -138,14 +137,86 @@ PYBIND11_PLUGIN(_functions)
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.grid");
 
+  bind_FunctionInterface<1, 1, 1>(m);
+  bind_FunctionInterface<1, 2, 1>(m);
+  bind_FunctionInterface<1, 3, 1>(m);
+  bind_FunctionInterface<1, 4, 1>(m);
+  bind_FunctionInterface<1, 2, 2>(m);
+  bind_FunctionInterface<1, 1, 2>(m);
+  bind_FunctionInterface<1, 1, 3>(m);
+  bind_FunctionInterface<1, 3, 3>(m);
+
+  bind_FunctionInterface<2, 1, 1>(m);
+  bind_FunctionInterface<2, 2, 1>(m);
+  bind_FunctionInterface<2, 3, 1>(m);
+  bind_FunctionInterface<2, 4, 1>(m);
+  bind_FunctionInterface<2, 2, 2>(m);
+  bind_FunctionInterface<2, 1, 2>(m);
+  bind_FunctionInterface<2, 1, 3>(m);
+  bind_FunctionInterface<2, 3, 3>(m);
+
+  bind_FunctionInterface<3, 1, 1>(m);
+  bind_FunctionInterface<3, 2, 1>(m);
+  bind_FunctionInterface<3, 3, 1>(m);
+  bind_FunctionInterface<3, 4, 1>(m);
+  bind_FunctionInterface<3, 2, 2>(m);
+  bind_FunctionInterface<3, 1, 2>(m);
+  bind_FunctionInterface<3, 1, 3>(m);
+  bind_FunctionInterface<3, 3, 3>(m);
+
+  bind_ConstantFunction<1, 1, 1>(m);
+  bind_ConstantFunction<1, 2, 1>(m);
+  bind_ConstantFunction<1, 3, 1>(m);
+  bind_ConstantFunction<1, 4, 1>(m);
+  bind_ConstantFunction<1, 1, 3>(m);
+  bind_ConstantFunction<1, 3, 3>(m);
+
+  bind_ConstantFunction<2, 1, 1>(m);
+  bind_ConstantFunction<2, 2, 1>(m);
+  bind_ConstantFunction<2, 3, 1>(m);
+  bind_ConstantFunction<2, 4, 1>(m);
+  bind_ConstantFunction<2, 1, 3>(m);
+  bind_ConstantFunction<2, 3, 3>(m);
+
+  bind_ConstantFunction<3, 1, 1>(m);
+  bind_ConstantFunction<3, 2, 1>(m);
+  bind_ConstantFunction<3, 3, 1>(m);
+  bind_ConstantFunction<3, 4, 1>(m);
+  bind_ConstantFunction<3, 1, 3>(m);
+  bind_ConstantFunction<3, 3, 3>(m);
+
+  bind_ExpressionFunction<1, 1, 1>(m);
+  bind_ExpressionFunction<1, 2, 1>(m);
+  bind_ExpressionFunction<1, 3, 1>(m);
+  bind_ExpressionFunction<1, 4, 1>(m);
+  bind_ExpressionFunction<1, 1, 3>(m);
+  bind_ExpressionFunction<1, 2, 2>(m);
+  bind_ExpressionFunction<1, 3, 3>(m);
+
+  bind_ExpressionFunction<2, 1, 1>(m);
+  bind_ExpressionFunction<2, 2, 1>(m);
+  bind_ExpressionFunction<2, 3, 1>(m);
+  bind_ExpressionFunction<2, 4, 1>(m);
+  bind_ExpressionFunction<2, 1, 3>(m);
+  bind_ExpressionFunction<2, 2, 2>(m);
+  bind_ExpressionFunction<2, 3, 3>(m);
+
+  bind_ExpressionFunction<3, 1, 1>(m);
+  bind_ExpressionFunction<3, 2, 1>(m);
+  bind_ExpressionFunction<3, 3, 1>(m);
+  bind_ExpressionFunction<3, 4, 1>(m);
+  bind_ExpressionFunction<3, 1, 3>(m);
+  bind_ExpressionFunction<3, 2, 2>(m);
+  bind_ExpressionFunction<3, 3, 3>(m);
+
   addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m);
   addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m);
 #if HAVE_DUNE_ALUGRID
   addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m);
 #endif
-  //#if HAVE_UG
-  //  addbind_for_Grid<Dune::UGGrid<2>>(m, "2d_simplex_uggrid");
-  //#endif
+#if HAVE_UG
+  addbind_for_Grid<Dune::UGGrid<2>>(m);
+#endif
   //#if HAVE_ALBERTA
   //  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, "2d_simplex_albertagrid");
   //#endif
