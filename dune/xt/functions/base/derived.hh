@@ -22,10 +22,10 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/memory.hh>
 
-//#include <dune/xt/functions/interfaces.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
+#include <dune/xt/functions/interfaces/function.hh>
 
 
-#if 0
 namespace Dune {
 namespace XT {
 namespace Functions {
@@ -41,10 +41,10 @@ enum class Derivative
 template <class FunctionType, Derivative derivative>
 class SelectDerived
 {
-  static_assert(is_localizable_function<FunctionType>::value, "FunctionType has to be a LocalizableFunction!");
+  static_assert(is_grid_function<FunctionType>::value, "FunctionType has to be a GridFunction!");
 
 public:
-  typedef typename FunctionType::EntityType E;
+  typedef typename FunctionType::ElementType E;
   typedef typename FunctionType::DomainFieldType D;
   static const size_t d = FunctionType::domain_dim;
   typedef typename FunctionType::RangeFieldType R;
@@ -76,10 +76,10 @@ public:
   static const size_t r = Choose<FunctionType>::r;
   static const size_t rC = Choose<FunctionType>::rC;
 
-  typedef typename FunctionType::LocalfunctionType FunctionLocalfunctionType;
-  typedef typename LocalfunctionInterface<E, D, d, R, r, rC>::DomainType DomainType;
-  typedef typename LocalfunctionInterface<E, D, d, R, r, rC>::RangeType RangeType;
-  typedef typename LocalfunctionInterface<E, D, d, R, r, rC>::JacobianRangeType JacobianRangeType;
+  using FunctionLocalFunctionType = typename FunctionType::LocalFunctionType;
+  using DomainType = typename ElementFunctionInterface<E, r, rC, R>::DomainType;
+  using RangeType = typename ElementFunctionInterface<E, r, rC, R>::RangeType;
+  using DerivativeRangeType = typename ElementFunctionInterface<E, r, rC, R>::DerivativeRangeType;
 
 private:
   template <Derivative der, bool anything = true>
@@ -97,27 +97,20 @@ private:
       return "divergence";
     }
 
-    static size_t order(const size_t ord)
+    static int order(const size_t ord)
     {
       return boost::numeric_cast<size_t>(std::max(boost::numeric_cast<ssize_t>(ord) - 1, ssize_t(0)));
     }
 
-    static void evaluate(const FunctionLocalfunctionType& func_local,
-                         const DomainType& xx,
-                         RangeType& ret,
-                         const Common::Parameter& mu)
+    static RangeType
+    evaluate(const FunctionLocalFunctionType& func_local, const DomainType& xx, const Common::Parameter& param)
     {
-      typename FunctionLocalfunctionType::JacobianRangeType tmp_jac(0.0);
-      func_local.jacobian(xx, tmp_jac, mu);
-      ret *= 0.0;
-      for (size_t dd = 0; dd < d; ++dd)
-        ret[0] += tmp_jac[dd][dd];
+      return func_local.jacobian(xx, param);
     } // ... evaluate(...)
 
-    static void jacobian(const FunctionLocalfunctionType& /*func_local*/,
-                         const DomainType& /*xx*/,
-                         JacobianRangeType& /*ret*/,
-                         const Common::Parameter& /*mu*/)
+    static DerivativeRangeType jacobian(const FunctionLocalFunctionType& /*func_local*/,
+                                        const DomainType& /*xx*/,
+                                        const Common::Parameter& /*param*/)
     {
       DUNE_THROW(NotImplemented, "for divergence!");
     }
@@ -129,101 +122,93 @@ public:
     return Call<derivative>::type();
   }
 
-  static size_t order(const size_t ord)
+  static int order(const size_t ord)
   {
     return Call<derivative>::order(ord);
   }
 
-  static void evaluate(const FunctionLocalfunctionType& func_local,
-                       const DomainType& xx,
-                       RangeType& ret,
-                       const Common::Parameter& mu)
+  static RangeType
+  evaluate(const FunctionLocalFunctionType& func_local, const DomainType& xx, const Common::Parameter& param)
   {
-    Call<derivative>::evaluate(func_local, xx, ret, mu);
+    return Call<derivative>::evaluate(func_local, xx, param);
   }
 
-  static void jacobian(const FunctionLocalfunctionType& func_local,
-                       const DomainType& xx,
-                       JacobianRangeType& ret,
-                       const Common::Parameter& mu)
+  static DerivativeRangeType
+  jacobian(const FunctionLocalFunctionType& func_local, const DomainType& xx, const Common::Parameter& param)
   {
-    Call<derivative>::jacobian(func_local, xx, ret, mu);
+    return Call<derivative>::jacobian(func_local, xx, param);
   }
 }; // class SelectDerived
 
 
 template <class FunctionType, Derivative derivative>
-class DerivedLocalFunction : public LocalfunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
-                                                           typename SelectDerived<FunctionType, derivative>::D,
-                                                           SelectDerived<FunctionType, derivative>::d,
-                                                           typename SelectDerived<FunctionType, derivative>::R,
-                                                           SelectDerived<FunctionType, derivative>::r,
-                                                           SelectDerived<FunctionType, derivative>::rC>
+class DerivedLocalFunction : public ElementFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                                             SelectDerived<FunctionType, derivative>::r,
+                                                             SelectDerived<FunctionType, derivative>::rC,
+                                                             typename SelectDerived<FunctionType, derivative>::R>
 {
-  typedef LocalfunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
-                                 typename SelectDerived<FunctionType, derivative>::D,
-                                 SelectDerived<FunctionType, derivative>::d,
-                                 typename SelectDerived<FunctionType, derivative>::R,
-                                 SelectDerived<FunctionType, derivative>::r,
-                                 SelectDerived<FunctionType, derivative>::rC>
-      BaseType;
+  using BaseType = ElementFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                            SelectDerived<FunctionType, derivative>::r,
+                                            SelectDerived<FunctionType, derivative>::rC,
+                                            typename SelectDerived<FunctionType, derivative>::R>;
 
-  typedef SelectDerived<FunctionType, derivative> Select;
+  using Select = SelectDerived<FunctionType, derivative>;
 
 public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeType RangeType;
-  typedef typename BaseType::JacobianRangeType JacobianRangeType;
+  using ElementType = typename BaseType::ElementType;
+  using DomainType = typename BaseType::DomainType;
+  using RangeType = typename BaseType::RangeType;
+  using DerivativeRangeType = typename BaseType::DerivativeRangeType;
 
-  DerivedLocalFunction(const FunctionType& func, const EntityType& ent)
-    : BaseType(ent)
-    , func_local_(func.local_function(this->entity()))
+  DerivedLocalFunction(const FunctionType& func)
+    : BaseType()
+    , func_local_(func.local_function())
   {
   }
 
-  virtual size_t order(const XT::Common::Parameter& mu = {}) const override final
+  int order(const XT::Common::Parameter& param = {}) const override final
   {
-    return Select::order(func_local_->order(mu));
+    return Select::order(func_local_->order(param));
   }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
+  RangeType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
   {
-    Select::evaluate(*func_local_, xx, ret, mu);
+    return Select::evaluate(*func_local_, xx, param);
   }
 
-  virtual void
-  jacobian(const DomainType& xx, JacobianRangeType& ret, const Common::Parameter& mu = {}) const override final
+  DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& param = {}) const override final
   {
-    Select::jacobian(*func_local_, xx, ret, mu);
+    return Select::jacobian(*func_local_, xx, param);
+  }
+
+protected:
+  void post_bind(const ElementType& element)
+  {
+    DUNE_THROW(NotImplemented, 'Implement it');
+    // func_local_.post_bind(element);
   }
 
 private:
-  const std::unique_ptr<const typename FunctionType::LocalfunctionType> func_local_;
+  const std::unique_ptr<const typename FunctionType::LocalFunctionType> func_local_;
 }; // class DerivedLocalFunction
 
 
 template <class FunctionType, Derivative derivative>
-class Derived : public LocalizableFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
-                                                    typename SelectDerived<FunctionType, derivative>::D,
-                                                    SelectDerived<FunctionType, derivative>::d,
-                                                    typename SelectDerived<FunctionType, derivative>::R,
-                                                    SelectDerived<FunctionType, derivative>::r,
-                                                    SelectDerived<FunctionType, derivative>::rC>
+class Derived : public GridFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                             SelectDerived<FunctionType, derivative>::r,
+                                             SelectDerived<FunctionType, derivative>::rC,
+                                             typename SelectDerived<FunctionType, derivative>::R>
 {
-  typedef LocalizableFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
-                                       typename SelectDerived<FunctionType, derivative>::D,
-                                       SelectDerived<FunctionType, derivative>::d,
-                                       typename SelectDerived<FunctionType, derivative>::R,
-                                       SelectDerived<FunctionType, derivative>::r,
-                                       SelectDerived<FunctionType, derivative>::rC>
-      BaseType;
-  typedef Common::ConstStorageProvider<FunctionType> FunctionStorageType;
-  typedef Derived<FunctionType, derivative> ThisType;
+  using BaseType = GridFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                         SelectDerived<FunctionType, derivative>::r,
+                                         SelectDerived<FunctionType, derivative>::rC,
+                                         typename SelectDerived<FunctionType, derivative>::R>;
+  using FunctionStorageType = Common::ConstStorageProvider<FunctionType>;
+  using ThisType = Derived<FunctionType, derivative>;
 
 public:
-  typedef typename BaseType::EntityType EntityType;
-  typedef typename BaseType::LocalfunctionType LocalfunctionType;
+  using ElementType = typename BaseType::ElementType;
+  using LocalFunctionType = typename BaseType::LocalFunctionType;
 
   Derived(const FunctionType& func, const std::string nm = "")
     : func_(Common::make_unique<FunctionStorageType>(func))
@@ -243,11 +228,11 @@ public:
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& other) = delete;
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override final
+  virtual std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     typedef DerivedLocalFunction<FunctionType, derivative> RealLocalFunctionType;
     assert(func_);
-    return Common::make_unique<RealLocalFunctionType>(func_->access(), entity);
+    return Common::make_unique<RealLocalFunctionType>(func_->access());
   } // ... local_function(...)
 
   virtual ThisType* copy() const
@@ -305,5 +290,5 @@ std::shared_ptr<DivergenceFunction<T>> make_divergence(std::shared_ptr<T> func, 
 } // namespace XT
 } // namespace Dune
 
-#endif
+
 #endif // DUNE_XT_FUNCTIONS_DERIVED_HH
