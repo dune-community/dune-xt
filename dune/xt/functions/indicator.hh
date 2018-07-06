@@ -42,14 +42,6 @@ class IndicatorFunction : public GridFunctionInterface<E, r, rC, R>
     using typename InterfaceType::DerivativeRangeReturnType;
     using GeometryType = typename ElementType::Geometry;
 
-    LocalIndicatorFunction(const ElementType& element,
-                           const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
-      : InterfaceType(element)
-      , subdomain_and_value_tuples_(subdomain_and_value_tuples)
-    {
-      post_bind(element);
-    }
-
     LocalIndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
       : InterfaceType()
       , subdomain_and_value_tuples_(subdomain_and_value_tuples)
@@ -191,11 +183,6 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<LocalIndicatorFunction>(subdomain_and_value_tuples_);
-  }
-
-  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
-  {
-    return std::make_unique<LocalIndicatorFunction>(element, subdomain_and_value_tuples_);
   }
 
 private:

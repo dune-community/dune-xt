@@ -45,20 +45,6 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     using typename InterfaceType::DerivativeRangeReturnType;
     using GeometryType = typename ElementType::Geometry;
 
-    LocalCheckerboardFunction(const ElementType& element,
-                              const DomainType& lower_left,
-                              const DomainType& upper_right,
-                              const FieldVector<size_t, domain_dim>& num_elements,
-                              const std::vector<RangeType>& values)
-      : InterfaceType(element)
-      , lower_left_(lower_left)
-      , upper_right_(upper_right)
-      , num_elements_(num_elements)
-      , values_(values)
-    {
-      post_bind(element);
-    }
-
     LocalCheckerboardFunction(const DomainType& lower_left,
                               const DomainType& upper_right,
                               const FieldVector<size_t, domain_dim>& num_elements,
@@ -244,11 +230,6 @@ public:
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<LocalCheckerboardFunction>(lower_left_, upper_right_, num_elements_, *values_);
-  }
-
-  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
-  {
-    return std::make_unique<LocalCheckerboardFunction>(element, lower_left_, upper_right_, num_elements_, *values_);
   }
 
   size_t subdomain(const ElementType& element) const

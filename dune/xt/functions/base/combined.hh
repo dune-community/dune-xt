@@ -268,14 +268,6 @@ public:
   using typename BaseType::RangeReturnType;
   using typename BaseType::DerivativeRangeReturnType;
 
-  CombinedLocalFunction(const LeftType& left, const RightType& right, const ElementType& ent)
-    : BaseType(ent)
-    , left_local_(left.local_function())
-    , right_local_(right.local_function())
-  {
-    post_bind(ent);
-  }
-
   CombinedLocalFunction(const LeftType& left, const RightType& right)
     : BaseType()
     , left_local_(left.local_function())
@@ -407,14 +399,6 @@ public:
   ThisType& operator=(const ThisType& other) = delete;
 
   ThisType& operator=(ThisType&& other) = delete;
-
-  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
-  {
-    using RealLocalFunctionType = CombinedLocalFunction<LeftType, RightType, comb>;
-    assert(left_);
-    assert(right_);
-    return Common::make_unique<RealLocalFunctionType>(left_->access(), right_->access(), element);
-  } // ... local_function(...)
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {

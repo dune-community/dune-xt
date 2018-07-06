@@ -282,15 +282,6 @@ private:
     using typename BaseType::DerivativeRangeType;
     using typename BaseType::DerivativeRangeReturnType;
 
-    LocalCutoffFunction(const ElementType& ele, const DiffusionType& diffusion, const RangeFieldType poincare_constant)
-      : BaseType(ele)
-      , value_(0)
-      , local_diffusion_(diffusion.local_function())
-      , poincare_constant_(poincare_constant)
-    {
-      post_bind(ele);
-    }
-
     LocalCutoffFunction(const DiffusionType& diffusion, const RangeFieldType poincare_constant)
       : BaseType()
       , value_(0)
@@ -407,11 +398,6 @@ public:
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<LocalCutoffFunction>(diffusion_, poincare_constant_);
-  }
-
-  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
-  {
-    return std::make_unique<LocalCutoffFunction>(element, diffusion_, poincare_constant_);
   }
 
 private:

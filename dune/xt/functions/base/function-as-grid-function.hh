@@ -51,14 +51,9 @@ public:
   }
 
   /**
-   * \name ´´These methods are required by GridFunctionInterface.''
+   * \name ´´This method is required by GridFunctionInterface.''
    * \{
    **/
-
-  std::unique_ptr<LocalFunctionType> local_function(const ElementType& element) const override final
-  {
-    return std::make_unique<LocalFunction>(function_storage_.access(), element);
-  }
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
@@ -95,14 +90,6 @@ private:
     using typename BaseType::DomainType;
     using typename BaseType::RangeReturnType;
     using typename BaseType::DerivativeRangeReturnType;
-
-    LocalFunction(const FunctionType& function, const ElementType& el)
-      : BaseType(el)
-      , function_(function)
-      , geometry_(nullptr) // <- happens in post_bind
-    {
-      post_bind(el);
-    }
 
     LocalFunction(const FunctionType& function)
       : BaseType()

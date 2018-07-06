@@ -69,11 +69,6 @@ public:
     return std::make_unique<ReinterpretLocalfunction>(source_, source_grid_view_);
   }
 
-  std::unique_ptr<LocalFunctionType> local_function(const TargetElement& element) const override final
-  {
-    return std::make_unique<ReinterpretLocalfunction>(source_, source_grid_view_, element);
-  }
-
   std::string type() const
   {
     return BaseType::type() + ".reinterpret";
@@ -105,20 +100,6 @@ private:
       , source_element_which_contains_complete_target_element_(nullptr)
       , source_element_which_contains_some_point_of_target_element_(nullptr)
     {
-    }
-
-    ReinterpretLocalfunction(const SourceType& source,
-                             const SourceGridView& source_grid_view,
-                             const TargetElement& target_element)
-      : BaseType(source.parameter_type())
-      , source_(source)
-      , source_grid_view_(source_grid_view)
-      , source_element_search_(source_grid_view_)
-      , local_source_(source_.local_function())
-      , source_element_which_contains_complete_target_element_(nullptr)
-      , source_element_which_contains_some_point_of_target_element_(nullptr)
-    {
-      this->bind(target_element);
     }
 
   protected:
