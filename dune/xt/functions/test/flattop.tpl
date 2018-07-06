@@ -98,17 +98,6 @@ TEST_F(FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluate)
   }
 }
 
-
-TEST_F(FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  auto default_function = FunctionType::create();
-  const auto& localizable_function = default_function->template as_grid_function<ElementType>();
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = localizable_function.local_function(element);
-  }
-}
-
 TEST_F(FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   auto default_function = FunctionType::create();

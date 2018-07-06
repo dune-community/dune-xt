@@ -97,16 +97,6 @@ TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiz
   function_all.visualize(leaf_view, "test__AllDomain__CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
-
-TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  auto default_function = FunctionType::create();
-  const auto leaf_view = grid_.leaf_view();
-
-  for (auto&& element : Dune::elements(leaf_view))
-    const auto local_f = default_function->local_function(element);
-}
-
 TEST_F(CheckerboardFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   auto default_function = FunctionType::create();

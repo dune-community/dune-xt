@@ -109,34 +109,6 @@ TEST_F(SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
   sum.visualize(leaf_view, "test__SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
-TEST_F(SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  Common::FieldMatrix<double, d, 2> domains_1(0);
-  Common::FieldMatrix<double, d, 2> domains_2(0);
-
-  RangeType first_value(10.);
-  RangeType second_value(5.);
-
-
-  for (size_t dd = 0; dd < d; ++dd) {
-    domains_1[dd][0] = -1;
-    domains_1[dd][1] = -0.5;
-    domains_2[dd][0] = 0;
-    domains_2[dd][1] = 1;
-  }
-
-  IndicatorFunctionType f({{'{{domains_1, first_value}}'}});
-  IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
-
-  SumFunctionType manual_sum(f, g);
-  const auto& sum = f + g;
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = manual_sum.local_function(element);
-    const auto local_sum = sum.local_function(element);
-  }
-}
-
 TEST_F(SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   Common::FieldMatrix<double, d, 2> domains_1(0);

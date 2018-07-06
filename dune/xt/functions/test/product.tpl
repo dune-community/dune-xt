@@ -115,34 +115,6 @@ TEST_F(ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
   product.visualize(leaf_view, "test__ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
-TEST_F(ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  Common::FieldMatrix<double, d, 2> domains_1(0);
-  Common::FieldMatrix<double, d, 2> domains_2(0);
-
-  ScalarRangeType first_value(10.);
-  RangeType second_value(5.);
-
-
-  for (size_t dd = 0; dd < d; ++dd) {
-    domains_1[dd][0] = -1;
-    domains_1[dd][1] = -0.5;
-    domains_2[dd][0] = 0;
-    domains_2[dd][1] = 1;
-  }
-
-  ScalarIndicatorFunctionType f({{'{{domains_1, first_value}}'}});
-  IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
-
-  ProductFunctionType manual_product(f, g);
-  const auto& product = f * g;
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = manual_product.local_function(element);
-    const auto local_product = product.local_function(element);
-  }
-}
-
 TEST_F(ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   Common::FieldMatrix<double, d, 2> domains_1(0);

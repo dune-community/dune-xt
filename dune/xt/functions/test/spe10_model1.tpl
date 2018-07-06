@@ -70,15 +70,6 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
   default_function->visualize(leaf_view, "test__Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
-TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  auto default_function = FunctionType::create();
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = default_function->local_function(element);
-  }
-}
-
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   auto default_function = FunctionType::create();

@@ -74,21 +74,6 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_visualizable)
   function.visualize(leaf_view, "test__ESV2007CutoffFunction_from_{{GRIDNAME}}__is_visualizable");
 }
 
-
-TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_localizable)
-{
-  MatrixRangeExpressionType expr(std::string("0"));
-  for (size_t dd = 0; dd < d; ++dd) {
-    expr[dd][dd] = "x[" + Common::to_string(dd) + "]";
-  }
-  DiffusionType diffusion_function("x", expr, 1);
-  FunctionType function(diffusion_function.template as_grid_function<ElementType>());
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = function.local_function(element);
-  }
-}
-
 TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, is_bindable)
 {
   MatrixRangeExpressionType expr(std::string("0"));

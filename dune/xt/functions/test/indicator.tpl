@@ -106,15 +106,6 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizabl
   function_overlap.visualize(leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
 }
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  auto default_function = FunctionType::create();
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : elements(leaf_view)) {
-    const auto local_f = default_function->local_function(element);
-  }
-}
-
 TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   auto default_function = FunctionType::create();

@@ -78,21 +78,6 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
   function.visualize(leaf_view, "test__Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable", /*subsampling=*/false);
 }
 
-TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
-                        {0, 0, 0},
-                        {Dune::XT::Functions::Spe10::internal::model_2_length_x,
-                         Dune::XT::Functions::Spe10::internal::model_2_length_y,
-                         Dune::XT::Functions::Spe10::internal::model_2_length_z},
-                        {6, 22, 8});
-
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = function.local_function(element);
-  }
-}
-
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,

@@ -94,16 +94,6 @@ TEST_F(GlobalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jaco
   }
 }
 
-TEST_F(GlobalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_localizable)
-{
-  LambdaType function(1.);
-  const auto& localizable_function = function.template as_grid_function<ElementType>();
-  const auto leaf_view = grid_.leaf_view();
-  for (auto&& element : Dune::elements(leaf_view)) {
-    const auto local_f = localizable_function.local_function(element);
-  }
-}
-
 TEST_F(GlobalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   LambdaType function(1.);
