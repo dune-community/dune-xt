@@ -113,18 +113,6 @@ public:
   virtual std::unique_ptr<LocalFunctionType> local_function() const = 0;
 
   /**
-   * \name ´´This method is deprecated.''
-   * \{
-   **/
-
-
-  virtual std::unique_ptr<LocalFunctionType> local_function(const ElementType& /*element*/) const
-  {
-    DXT_DEPRECATED_MSG("This function is deprecated. Use local_function() and call bind(element).")
-    return nullptr;
-  }
-
-  /**
    * \}
    * \name ´´These methods should be implemented in order to identify the function.''
    * \{
