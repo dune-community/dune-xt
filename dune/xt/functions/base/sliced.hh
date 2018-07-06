@@ -71,7 +71,8 @@ class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface
 
     void post_bind(const ElementType& element) override final
     {
-      local_function_->post_bind(element);
+      // local_function_->post_bind(element);
+      DUNE_THROW(NotImplemented, 'Implement it');
     }
 
     int order(const XT::Common::Parameter& = {}) const override final
