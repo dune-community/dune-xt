@@ -11,7 +11,7 @@
 
 #ifndef DUNE_XT_FUNCTIONS_COMPOSITION_HH
 #define DUNE_XT_FUNCTIONS_COMPOSITION_HH
-#if 0
+
 #include <dune/grid/yaspgrid.hh>
 
 #include <dune/xt/common/configuration.hh>
@@ -19,76 +19,68 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/grid/search.hh>
 
-
 namespace Dune {
 namespace XT {
 namespace Functions {
 namespace internal {
 
 template <class InnerType, class OuterType, class OuterGridViewType>
-struct GeneralLocalfunctionChooser
+struct GeneralElementFunctionChooser
 {
-  typedef LocalizableFunctionInterface<typename InnerType::EntityType,
-                                       typename InnerType::DomainFieldType,
-                                       InnerType::dimDomain,
-                                       typename OuterType::RangeFieldType,
-                                       OuterType::dimRange,
-                                       OuterType::dimRangeCols>
-      LocalizableFunctionInterfaceType;
-  typedef typename LocalizableFunctionInterfaceType::EntityType EntityType;
-  typedef typename LocalizableFunctionInterfaceType::DomainFieldType DomainFieldType;
-  typedef typename LocalizableFunctionInterfaceType::RangeFieldType RangeFieldType;
-  typedef typename LocalizableFunctionInterfaceType::DomainType DomainType;
-  typedef typename LocalizableFunctionInterfaceType::RangeType RangeType;
-  typedef typename LocalizableFunctionInterfaceType::JacobianRangeType JacobianRangeType;
-  static const size_t dimDomain = LocalizableFunctionInterfaceType::dimDomain;
-  static const size_t dimRange = LocalizableFunctionInterfaceType::dimRange;
-  static const size_t dimRangeCols = LocalizableFunctionInterfaceType::dimRangeCols;
+  using GridFunctionInterfaceType = GridFunctionInterface<typename InnerType::ElementType,
+                                                          OuterType::range_dim,
+                                                          OuterType::range_dim_cols,
+                                                          typename OuterType::RangeFieldType>;
+  using ElementType = typename GridFunctionInterfaceType::ElementType;
+  using DomainFieldType = typename GridFunctionInterfaceType::DomainFieldType;
+  using RangeFieldType = typename GridFunctionInterfaceType::RangeFieldType;
+  using DomainType = typename GridFunctionInterfaceType::DomainType;
+  using RangeType = typename GridFunctionInterfaceType::RangeType;
+  using DerivativeRangeType = typename GridFunctionInterfaceType::DerivativeRangeType;
+  static const size_t domain_dim = GridFunctionInterfaceType::domain_dim;
+  static const size_t range_dim = GridFunctionInterfaceType::range_dim;
+  static const size_t range_dim_cols = GridFunctionInterfaceType::range_dim_cols;
 
-  class Localfunction
-      : public LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+  class ElementFunction : public ElementFunctionInterface<ElementType, range_dim, range_dim_cols, RangeFieldType>
   {
-    typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
-        BaseType;
+    using BaseType = ElementFunctionInterface<ElementType, range_dim, range_dim_cols, RangeFieldType>;
 
   public:
-    Localfunction(const EntityType& entity,
-                  const InnerType& inner_function,
-                  const OuterType& outer_function,
-                  std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search)
-      : BaseType(entity)
+    ElementFunction(const InnerType& inner_function,
+                    const OuterType& outer_function,
+                    std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& element_search)
+      : BaseType()
       , inner_function_(inner_function)
       , outer_function_(outer_function)
-      , entity_search_(entity_search)
-      , entity_(entity)
+      , element_search_(element_search)
     {
     }
 
-    Localfunction(const Localfunction& /*other*/) = delete;
+    ElementFunction(const ElementFunction& /*other*/) = delete;
 
-    Localfunction& operator=(const Localfunction& /*other*/) = delete;
+    ElementFunction& operator=(const ElementFunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& /*mu*/ = {}) const override
+    int order(const XT::Common::Parameter& /*mu*/ = {}) const override final
     {
       return 2;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
+    RangeType evaluate(const DomainType& xx) const override final
     {
       // evaluate inner function
-      const auto inner_value = inner_function_.local_function(entity_)->evaluate(xx);
-      // find entity on outer grid the value of inner function belongs to
-      const auto entity_ptrs = (*entity_search_)(std::vector<typename OuterType::DomainType>(1, inner_value));
-      const auto& entity_ptr = entity_ptrs[0];
-      if (entity_ptr == nullptr)
+      const auto inner_value = inner_function_.local_function(element_)->evaluate(xx);
+      // find element on outer grid the value of inner function belongs to
+      const auto element_ptrs = (*element_search_)(std::vector<typename OuterType::DomainType>(1, inner_value));
+      const auto& element_ptr = element_ptrs[0];
+      if (element_ptr == nullptr)
         DUNE_THROW(Dune::InvalidStateException,
-                   "Could not find entity, maybe inner function does not map to the domain of outer function");
-      const auto& outer_entity = *entity_ptr;
+                   "Could not find element, maybe inner function does not map to the domain of outer function");
+      const auto& outer_element = *element_ptr;
       // evaluate outer function
-      outer_function_.local_function(outer_entity)->evaluate(outer_entity.geometry().local(inner_value), ret);
+      return outer_function_.local_function(outer_element)->evaluate(outer_element.geometry().local(inner_value));
     }
 
-    virtual void jacobian(const DomainType& /*xx*/, JacobianRangeType& /*ret*/) const override
+    DerivativeRangeType jacobian(const DomainType& /*xx*/) const override final
     {
       DUNE_THROW(Dune::NotImplemented, "");
     }
@@ -96,66 +88,58 @@ struct GeneralLocalfunctionChooser
   private:
     const InnerType& inner_function_;
     const OuterType& outer_function_;
-    std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& entity_search_;
-    const EntityType& entity_;
-  }; // class Localfunction
-}; // GeneralLocalfunctionChooser
+    std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& element_search_;
+    const ElementType& element_;
+  }; // class ElementFunction
+}; // GeneralElementFunctionChooser
 
 template <class InnerType, class OuterType, class OuterGridViewType>
-struct LocalfunctionForGlobalChooser
+struct ElementFunctionForGlobalChooser
 {
-  typedef LocalizableFunctionInterface<typename InnerType::EntityType,
-                                       typename InnerType::DomainFieldType,
-                                       InnerType::dimDomain,
-                                       typename OuterType::RangeFieldType,
-                                       OuterType::dimRange,
-                                       OuterType::dimRangeCols>
-      LocalizableFunctionInterfaceType;
-  typedef typename LocalizableFunctionInterfaceType::EntityType EntityType;
-  typedef typename LocalizableFunctionInterfaceType::DomainFieldType DomainFieldType;
-  typedef typename LocalizableFunctionInterfaceType::RangeFieldType RangeFieldType;
-  typedef typename LocalizableFunctionInterfaceType::DomainType DomainType;
-  typedef typename LocalizableFunctionInterfaceType::RangeType RangeType;
-  typedef typename LocalizableFunctionInterfaceType::JacobianRangeType JacobianRangeType;
-  static const size_t dimDomain = LocalizableFunctionInterfaceType::dimDomain;
-  static const size_t dimRange = LocalizableFunctionInterfaceType::dimRange;
-  static const size_t dimRangeCols = LocalizableFunctionInterfaceType::dimRangeCols;
+  using GridFunctionInterfaceType = GridFunctionInterface<typename InnerType::ElementType,
+                                                          OuterType::range_dim,
+                                                          OuterType::range_dim_cols,
+                                                          typename OuterType::RangeFieldType>;
+  using ElementType = typename GridFunctionInterfaceType::ElementType;
+  using DomainFieldType = typename GridFunctionInterfaceType::DomainFieldType;
+  using RangeFieldType = typename GridFunctionInterfaceType::RangeFieldType;
+  using DomainType = typename InnerType::DomainType;
+  using RangeType = typename OuterType::RangeType;
+  using DerivativeRangeType = typename OuterType::DerivativeRangeType;
+  static const size_t domain_dim = GridFunctionInterfaceType::domain_dim;
+  static const size_t range_dim = GridFunctionInterfaceType::range_dim;
+  static const size_t range_dim_cols = GridFunctionInterfaceType::range_dim_cols;
 
-  class Localfunction
-      : public LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
+  class ElementFunction : public ElementFunctionInterface<ElementType, range_dim, range_dim_cols, RangeFieldType>
   {
-    typedef LocalfunctionInterface<EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols>
-        BaseType;
+    using BaseType = ElementFunctionInterface<ElementType, range_dim, range_dim_cols, RangeFieldType>;
 
   public:
-    Localfunction(const EntityType& entity,
-                  const InnerType& localizable_function,
-                  const OuterType& global_function,
-                  std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& /*entity_search*/)
-      : BaseType(entity)
+    ElementFunction(const InnerType& localizable_function,
+                    const OuterType& global_function,
+                    std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& /*element_search*/)
+      : BaseType()
       , localizable_function_(localizable_function)
       , global_function_(global_function)
-      , entity_(entity)
     {
     }
 
-    Localfunction(const Localfunction& /*other*/) = delete;
+    ElementFunction(const ElementFunction& /*other*/) = delete;
 
-    Localfunction& operator=(const Localfunction& /*other*/) = delete;
+    ElementFunction& operator=(const ElementFunction& /*other*/) = delete;
 
-    virtual size_t order(const XT::Common::Parameter& mu = {}) const override
+    int order(const XT::Common::Parameter& param = {}) const override final
     {
-      return global_function_.order(mu) * localizable_function_.local_function(entity_)->order(mu);
+      return global_function_.order(param) * localizable_function_.local_function(element_)->order(param);
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret, const XT::Common::Parameter& mu = {}) const override
+    RangeType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
     {
-      global_function_.evaluate(localizable_function_.local_function(entity_)->evaluate(xx, mu), ret, mu);
+      return global_function_.evaluate(localizable_function_.local_function(element_)->evaluate(xx, param), param);
     }
 
-    virtual void jacobian(const DomainType& /*xx*/,
-                          JacobianRangeType& /*ret*/,
-                          const XT::Common::Parameter& /*mu*/ = {}) const override
+    DerivativeRangeType jacobian(const DomainType& /*xx*/,
+                                 const XT::Common::Parameter& /*param*/ = {}) const override final
     {
       DUNE_THROW(Dune::NotImplemented, "");
     }
@@ -163,24 +147,22 @@ struct LocalfunctionForGlobalChooser
   private:
     const InnerType& localizable_function_;
     const OuterType& global_function_;
-    const EntityType& entity_;
-  }; // class Localfunction
-}; // LocalfunctionForGlobalChooser
+    const ElementType& element_;
+  }; // class ElementFunction
+}; // ElementFunctionForGlobalChooser
 
 template <class InnerType, class OuterType, class OuterGridViewType>
-struct LocalfunctionChooser
+struct ElementFunctionChooser
 {
-  typedef typename std::
-      conditional<std::is_base_of<Functions::GlobalFunctionInterface<typename OuterType::EntityType,
-                                                                     typename OuterType::DomainFieldType,
-                                                                     OuterType::dimDomain,
-                                                                     typename OuterType::RangeFieldType,
-                                                                     OuterType::dimRange,
-                                                                     OuterType::dimRangeCols>,
+  using ElementFunctionType = typename std::
+      conditional<std::is_base_of<Functions::FunctionInterface<OuterType::domain_dim,
+                                                               OuterType::range_dim,
+                                                               OuterType::range_dim_cols,
+                                                               typename OuterType::RangeFieldType>,
                                   OuterType>::value,
-                  typename LocalfunctionForGlobalChooser<InnerType, OuterType, OuterGridViewType>::Localfunction,
-                  typename GeneralLocalfunctionChooser<InnerType, OuterType, OuterGridViewType>::Localfunction>::type
-          LocalfunctionType;
+                  typename ElementFunctionForGlobalChooser<InnerType, OuterType, OuterGridViewType>::ElementFunction,
+                  typename GeneralElementFunctionChooser<InnerType, OuterType, OuterGridViewType>::ElementFunction>::
+          type;
 };
 
 
@@ -188,39 +170,31 @@ struct LocalfunctionChooser
 
 
 template <class InnerType, class OuterType, class OuterGridViewType = typename Dune::YaspGrid<1>::LeafGridView>
-class CompositionFunction : public LocalizableFunctionInterface<typename InnerType::EntityType,
-                                                                typename InnerType::DomainFieldType,
-                                                                InnerType::dimDomain,
-                                                                typename OuterType::RangeFieldType,
-                                                                OuterType::dimRange,
-                                                                OuterType::dimRangeCols>
+class CompositionFunction : public GridFunctionInterface<typename InnerType::ElementType,
+                                                         OuterType::range_dim,
+                                                         OuterType::range_dim_cols,
+                                                         typename OuterType::RangeFieldType>
 {
-  typedef LocalizableFunctionInterface<typename InnerType::EntityType,
-                                       typename InnerType::DomainFieldType,
-                                       InnerType::dimDomain,
-                                       typename OuterType::RangeFieldType,
-                                       OuterType::dimRange,
-                                       OuterType::dimRangeCols>
-      BaseType;
-  typedef CompositionFunction<InnerType, OuterType, OuterGridViewType> ThisType;
+  using BaseType = GridFunctionInterface<typename InnerType::ElementType,
+                                         OuterType::range_dim,
+                                         OuterType::range_dim_cols,
+                                         typename OuterType::RangeFieldType>;
+  using ThisType = CompositionFunction<InnerType, OuterType, OuterGridViewType>;
 
 public:
-  using typename BaseType::EntityType;
+  using typename BaseType::ElementType;
   using typename BaseType::DomainFieldType;
   using typename BaseType::RangeFieldType;
-  using typename BaseType::DomainType;
-  using typename BaseType::RangeType;
-  using typename BaseType::JacobianRangeType;
-  using BaseType::dimDomain;
-  using BaseType::dimRange;
-  using BaseType::dimRangeCols;
+  using BaseType::domain_dim;
+  using BaseType::range_dim;
+  using BaseType::range_dim_cols;
 
 private:
-  typedef
-      typename internal::LocalfunctionChooser<InnerType, OuterType, OuterGridViewType>::LocalfunctionType Localfunction;
+  using ElementFunction =
+      typename internal::ElementFunctionChooser<InnerType, OuterType, OuterGridViewType>::ElementFunctionType;
 
 public:
-  using typename BaseType::LocalfunctionType;
+  using typename BaseType::LocalFunctionType;
 
   static const bool available = true;
 
@@ -235,25 +209,23 @@ public:
                       const std::string nm = static_id())
     : inner_function_(inner_function)
     , outer_function_(outer_function)
-    , entity_search_(std::make_shared<typename Grid::EntityInlevelSearch<OuterGridViewType>>(outer_grid_view))
+    , element_search_(std::make_shared<typename Grid::EntityInlevelSearch<OuterGridViewType>>(outer_grid_view))
     , name_(nm)
   {
   }
 
-  // constructor without grid view, only makes sense if OuterType is derived from GlobalFunctionInterface
+  // constructor without grid view, only makes sense if OuterType is derived from FunctionInterface
   CompositionFunction(const InnerType local_func, const OuterType global_func, const std::string nm = static_id())
     : inner_function_(local_func)
     , outer_function_(global_func)
     , name_(nm)
   {
-    static_assert(std::is_base_of<XT::Functions::GlobalFunctionInterface<typename OuterType::EntityType,
-                                                                         typename OuterType::DomainFieldType,
-                                                                         OuterType::dimDomain,
-                                                                         typename OuterType::RangeFieldType,
-                                                                         OuterType::dimRange,
-                                                                         OuterType::dimRangeCols>,
+    static_assert(std::is_base_of<XT::Functions::FunctionInterface<OuterType::domain_dim,
+                                                                   OuterType::range_dim,
+                                                                   OuterType::range_dim_cols,
+                                                                   typename OuterType::RangeFieldType>,
                                   OuterType>::value,
-                  "OuterType has to be derived from GlobalFunctionInterface if no GridView is provided");
+                  "OuterType has to be derived from FunctionInterface if no GridView is provided");
   }
 
   CompositionFunction(const ThisType& other) = default;
@@ -272,15 +244,16 @@ public:
     return name_;
   }
 
-  virtual std::unique_ptr<LocalfunctionType> local_function(const EntityType& entity) const override
+  std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return Common::make_unique<Localfunction>(entity, inner_function_, outer_function_, entity_search_);
+    return Common::make_unique<ElementFunction>(inner_function_, outer_function_, element_search_);
   } // ... local_function(...)
+
 
 private:
   const InnerType inner_function_;
   const OuterType outer_function_;
-  mutable std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>> entity_search_;
+  mutable std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>> element_search_;
   std::string name_;
 }; // class Composition
 
@@ -289,5 +262,4 @@ private:
 } // namespace XT
 } // namespace Dune
 
-#endif
 #endif // DUNE_XT_FUNCTIONS_COMPOSITION_HH
