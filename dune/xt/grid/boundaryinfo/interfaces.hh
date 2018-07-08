@@ -5,9 +5,9 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2016 - 2017)
+//   Felix Schindler (2016 - 2018)
 //   Rene Milk       (2016, 2018)
-//   Tobias Leibner  (2016 - 2017)
+//   Tobias Leibner  (2016 - 2018)
 
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_INTERFACE_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_INTERFACE_HH
@@ -51,11 +51,6 @@ private:
 }; // class BoundaryType
 
 
-#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
-#pragma GCC diagnostic pop
-#endif
-
-
 std::ostream& operator<<(std::ostream& out, const BoundaryType& type);
 
 
@@ -82,6 +77,10 @@ public:
   }
 }; // class BoundaryInfo
 
+
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 } // namespace Grid
 } // namespace XT

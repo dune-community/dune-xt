@@ -8,7 +8,7 @@
 //   Felix Schindler (2012, 2014 - 2017)
 //   Rene Milk       (2012 - 2018)
 //   Sven Kaulmann   (2014)
-//   Tobias Leibner  (2014, 2016 - 2017)
+//   Tobias Leibner  (2014, 2016 - 2018)
 
 #ifndef DUNE_XT_GRID_INFORMATION_HH
 #define DUNE_XT_GRID_INFORMATION_HH
@@ -89,8 +89,7 @@ size_t max_number_of_neighbors(const GridLayerType& grid_layer)
   for (auto&& entity : elements(grid_layer)) {
     size_t neighbours = 0;
     const auto intersection_it_end = grid_layer.iend(entity);
-    for (DUNE_UNUSED auto intersection_it = grid_layer.ibegin(entity); intersection_it != intersection_it_end;
-         ++intersection_it) {
+    for (auto intersection_it = grid_layer.ibegin(entity); intersection_it != intersection_it_end; ++intersection_it) {
       ++neighbours;
     }
     maxNeighbours = std::max(maxNeighbours, neighbours);

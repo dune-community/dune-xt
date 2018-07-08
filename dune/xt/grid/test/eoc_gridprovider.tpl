@@ -5,11 +5,21 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2017)
 //   Rene Milk       (2018)
 
-#include "config.h"
+#include <dune/xt/common/test/main.hxx>
 
-#include <python/dune/xt/grid/boundaryinfo.bindings.hh>
+#include <dune/xt/grid/gridprovider/eoc.hh>
+#include <dune/xt/grid/grids.hh>
 
-DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(template);
+
+{% for name, type in config.all_grids %}
+
+GTEST_TEST(EocProvider_{{name}}, layers)
+{
+  using Level = Dune::XT::Grid::LevelBasedEOCGridProvider<{{type}}>;
+  using DD = Dune::XT::Grid::DdSubdomainsBasedEOCGridProvider<{{type}}>;
+  using Leaf = Dune::XT::Grid::LeafBasedEOCGridProvider<{{type}}>;
+}
+
+{% endfor %}

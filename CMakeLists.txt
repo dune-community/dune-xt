@@ -1,3 +1,4 @@
+# ~~~
 # This file is part of the dune-xt-grid project:
 #   https://github.com/dune-community/dune-xt-grid
 # Copyright 2009-2018 dune-xt-grid developers and contributors. All rights reserved.
@@ -9,50 +10,44 @@
 #
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
+# ~~~
 
 cmake_minimum_required(VERSION 3.1)
 project(dune-xt-grid CXX)
 
-if(NOT (dune-common_DIR OR dune-common_ROOT OR
-      "${CMAKE_PREFIX_PATH}" MATCHES ".*dune-common.*"))
-    string(REPLACE  ${CMAKE_PROJECT_NAME} dune-common dune-common_DIR
-      ${PROJECT_BINARY_DIR})
+if(NOT (dune-common_DIR OR dune-common_ROOT OR "${CMAKE_PREFIX_PATH}" MATCHES ".*dune-common.*"))
+  string(REPLACE ${CMAKE_PROJECT_NAME} dune-common dune-common_DIR ${PROJECT_BINARY_DIR})
 endif()
 
 # dune-common
 find_package(dune-common REQUIRED)
-list(APPEND CMAKE_MODULE_PATH
-     "${PROJECT_SOURCE_DIR}/cmake/modules"
-     "${dune-common_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules" "${dune-common_MODULE_PATH}")
 include(DuneMacros)
 
 # dune-xt-common
 find_package(dune-xt-common REQUIRED)
-list(APPEND CMAKE_MODULE_PATH
-     "${dune-xt-common_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH "${dune-xt-common_MODULE_PATH}")
 include(DuneUtils)
 
 # start a dune project with information from dune.module
 dune_project()
-dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-grid_SOURCE_DIR}/dune
-                         MODULE_LIBRARIES dunextgrid
-                         )
+dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-grid_SOURCE_DIR}/dune MODULE_LIBRARIES dunextgrid)
 
 add_header_listing()
 make_dependent_modules_sys_included()
 
-add_subdirectory(dune)
-add_subdirectory(doc)
-
 include(DuneXTInstallPythonPackage)
-# this symlinks all files in python/ to the binary dir and install into the virtualenv from there
-# thereby making the compiled extensions directly usable from the venv
+# this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the
+# compiled extensions directly usable from the venv
 dune_xt_install_python_package(PATH python)
 include_dependent_binary_python_dirs()
 # do not change order here
-if(dune-pybindxi_FOUND)
-  add_subdirectory(python)
-endif()
+add_subdirectory(python)
+dxt_add_make_dependent_bindings(dune-xt-common dune-xt-la)
+
+# this needs to come after the python install so we can use it in test generation
+add_subdirectory(dune)
+add_subdirectory(doc)
 
 # enable headercheck
 add_definitions("-DENABLE_HEADERCHECK=1")

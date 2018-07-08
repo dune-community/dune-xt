@@ -8,13 +8,14 @@
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2014 - 2017)
 //   Rene Milk       (2014 - 2018)
-//   Tobias Leibner  (2017)
+//   Tobias Leibner  (2017 - 2018)
 
 #ifndef DUNE_XT_GRID_LAYERS_HH
 #define DUNE_XT_GRID_LAYERS_HH
 
 #include <dune/common/typetraits.hh>
 
+#include <dune/xt/common/fixed_map.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/view/subdomain/view.hh>
 
@@ -49,6 +50,16 @@ enum class Layers
   dd_subdomain_coupling
 };
 
+namespace {
+const XT::Common::FixedMap<Layers, std::string, 7> layer_names{
+    {Layers::adaptive_leaf, "adaptive_leaf"},
+    {Layers::leaf, "leaf"},
+    {Layers::level, "level"},
+    {Layers::dd_subdomain, "dd_subdomain"},
+    {Layers::dd_subdomain_oversampled, "dd_subdomain_oversampled"},
+    {Layers::dd_subdomain_boundary, "dd_subdomain_boundary"},
+    {Layers::dd_subdomain_coupling, "dd_subdomain_coupling"}};
+}
 
 namespace internal {
 
@@ -178,7 +189,7 @@ struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType
   typedef typename DD::SubdomainGrid<GridType>::CouplingGridViewType type;
 
   static type create(const GridType& /*grid*/,
-                     const int subdomain = 0,
+                     const int /*subdomain */ = 0,
                      const std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid = nullptr)
   {
     static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
@@ -187,7 +198,7 @@ struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType
     return dd_grid->coupling_grid_view(0, 0);
   }
 
-  static type create(GridType& /*grid*/, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  static type create(GridType& /*grid*/, const int /*subdomain*/, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
   {
     static_assert(std::is_same<DdGridType, DD::SubdomainGrid<GridType>>::value,
                   "Only available for DD::SubdomainGrid!");

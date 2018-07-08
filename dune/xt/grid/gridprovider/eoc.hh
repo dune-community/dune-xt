@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   Rene Milk       (2016, 2018)
+//   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_GRID_PROVIDER_EOC_HH
 #define DUNE_XT_GRID_PROVIDER_EOC_HH
@@ -28,9 +29,9 @@ namespace Grid {
  *  means to obtain the real grid level corresponding to a refinement level.
  */
 template <class GridImp>
-class LevelBasedEOCGridProvider : public GridProvider<GridImp>
+class LevelBasedEOCGridProvider : public GridProvider<GridImp, none_t>
 {
-  typedef GridProvider<GridImp> BaseType;
+  typedef GridProvider<GridImp, none_t> BaseType;
 
 public:
   using typename BaseType::GridType;
@@ -101,7 +102,7 @@ private:
 template <class GridImp>
 class LeafBasedEOCGridProvider
 {
-  typedef GridProvider<GridImp> GridProviderType;
+  typedef GridProvider<GridImp, none_t> GridProviderType;
 
 public:
   typedef typename GridProviderType::GridType GridType;
@@ -127,7 +128,7 @@ public:
     return level_grids_.size() - 1;
   }
 
-  int level_of(const size_t refinement) const
+  int level_of(const size_t /*refinement*/) const
   {
     return -1;
   }
@@ -199,7 +200,7 @@ public:
     return level_grids_.size() - 1;
   }
 
-  int level_of(const size_t refinement) const
+  int level_of(const size_t /*refinement*/) const
   {
     return -1;
   }
@@ -240,7 +241,7 @@ private:
 }; // class DdSubdomainsBasedEOCGridProvider
 
 
-template <class G, class DdGrid = int>
+template <class G, class DdGrid = none_t>
 class EOCGridProvider : public LevelBasedEOCGridProvider<G>
 {
 public:
@@ -280,7 +281,7 @@ public:
 
 
 } // namespace Grid
-} // namespace Stuff
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_PROVIDER_EOC_HH

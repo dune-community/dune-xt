@@ -5,9 +5,9 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2016 - 2017)
+//   Felix Schindler (2016 - 2018)
 //   Rene Milk       (2016, 2018)
-//   Tobias Leibner  (2016 - 2017)
+//   Tobias Leibner  (2016 - 2018)
 
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_TYPES_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_TYPES_HH
@@ -196,7 +196,7 @@ public:
 #endif
 
 
-static BoundaryType* make_boundary_type(const std::string& id)
+static inline BoundaryType* make_boundary_type(const std::string& id)
 {
   if (id == NoBoundary().id())
     return new NoBoundary();
@@ -225,6 +225,12 @@ static BoundaryType* make_boundary_type(const std::string& id)
     return new UnknownBoundary();
   }
 } // ... make_boundary_type(...)
+
+
+static constexpr AbsorbingBoundary absorbing_boundary{};
+static constexpr DirichletBoundary dirichlet_boundary{};
+static constexpr NoBoundary no_boundary{};
+static constexpr ReflectingBoundary reflecting_boundary{};
 
 
 } // namespace Grid

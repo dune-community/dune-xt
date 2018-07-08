@@ -45,75 +45,9 @@ struct backend_name<Backends::view>
 template <Layers layer>
 struct layer_name
 {
-  static_assert(AlwaysFalse<typename XT::Grid::internal::layer_dependent_typename<layer>::type>::value,
-                "Please add a specialization for this layer!");
-
-  static std::string value()
+  DXT_DEPRECATED_MSG("use layer_names[layer] directly. 2018/7/2") static std::string value()
   {
-    return "";
-  }
-};
-
-template <>
-struct layer_name<Layers::adaptive_leaf>
-{
-  static std::string value()
-  {
-    return "adaptive_leaf";
-  }
-};
-
-template <>
-struct layer_name<Layers::dd_subdomain>
-{
-  static std::string value()
-  {
-    return "dd_subdomain";
-  }
-};
-
-template <>
-struct layer_name<Layers::dd_subdomain_boundary>
-{
-  static std::string value()
-  {
-    return "dd_subdomain_boundary";
-  }
-};
-
-template <>
-struct layer_name<Layers::dd_subdomain_coupling>
-{
-  static std::string value()
-  {
-    return "dd_subdomain_coupling";
-  }
-};
-
-template <>
-struct layer_name<Layers::dd_subdomain_oversampled>
-{
-  static std::string value()
-  {
-    return "dd_subdomain_oversampled";
-  }
-};
-
-template <>
-struct layer_name<Layers::leaf>
-{
-  static std::string value()
-  {
-    return "leaf";
-  }
-};
-
-template <>
-struct layer_name<Layers::level>
-{
-  static std::string value()
-  {
-    return "level";
+    return layer_names[layer];
   }
 };
 

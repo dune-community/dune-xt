@@ -120,10 +120,10 @@ public:
                Dune::XT::Grid::bindings::layer_name<Dune::XT::Grid::Layers::_layer>::value() + "_"                     \
                    + Dune::XT::Grid::bindings::backend_name<Dune::XT::Grid::Backends::_backend>::value())
 
-//#if HAVE_ALBERTA
-//#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _backend, _class_name)                                   \
-//  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALBERTA_2D, _layer, _backend, _class_name)
-//#else
+/*#if HAVE_ALBERTA
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _backend, _class_name) \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALBERTA_2D, _layer, _backend, _class_name)
+#else*/
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _backend, _class_name)
 //#endif
 
@@ -134,10 +134,10 @@ public:
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _backend, _class_name)
 #endif
 
-//#if HAVE_DUNE_UGGRID
-//#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, _W, _w, _layer, _backend, _class_name)                                        \
-//  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, UG_2D, _layer, _backend, _class_name)
-//#else
+/*#if HAVE_DUNE_UGGRID
+#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, _W, _w, _layer, _backend, _class_name) \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, UG_2D, _layer, _backend, _class_name)
+#else*/
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_UG(_m, _W, _w, _layer, _backend, _class_name)
 //#endif
 

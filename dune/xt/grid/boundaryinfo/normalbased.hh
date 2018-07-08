@@ -5,9 +5,9 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2016 - 2017)
+//   Felix Schindler (2016 - 2018)
 //   Rene Milk       (2016, 2018)
-//   Tobias Leibner  (2016 - 2017)
+//   Tobias Leibner  (2016 - 2018)
 
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_NORMALBASED_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_NORMALBASED_HH
@@ -20,7 +20,7 @@
 #include <dune/xt/grid/exceptions.hh>
 
 #include "interfaces.hh"
-#include "types.hh"
+#include <dune/xt/grid/boundaryinfo/types.hh>
 
 namespace Dune {
 namespace XT {
@@ -163,13 +163,13 @@ public:
       if (XT::Common::FloatCmp::eq(existing_normal, normalized_normal, tol_))
         DUNE_THROW(InvalidStateException, "Given normals are too close for given tolerance '" << tol_ << "'!");
     }
-    normal_to_type_map_.emplace(normal, std::move(boundary_type));
+    normal_to_type_map_.emplace(normal, std::shared_ptr<BoundaryType>(std::move(boundary_type)));
   } // ... void register_new_normal(...)
 
   const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (!intersection.boundary())
-      return no_boundary_;
+      return no_boundary;
     const WorldType outer_normal = intersection.centerUnitOuterNormal();
     for (const auto& normal_and_type_pair : normal_to_type_map_) {
       const auto& normal = normal_and_type_pair.first;
@@ -183,7 +183,6 @@ public:
 private:
   const DomainFieldType tol_;
   const std::unique_ptr<BoundaryType> default_boundary_type_;
-  const NoBoundary no_boundary_;
   std::unordered_map<WorldType, std::shared_ptr<BoundaryType>> normal_to_type_map_;
 }; // class NormalBasedBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)

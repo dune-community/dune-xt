@@ -5,7 +5,7 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2015 - 2017)
+//   Felix Schindler (2015 - 2018)
 //   Rene Milk       (2015 - 2018)
 //   Tobias Leibner  (2015 - 2017)
 
@@ -636,10 +636,10 @@ public:
 
     /* PeriodicIterator is the same as the Iterator of the RealGridLayerType, except that it visits only one entity of
      * several periodically equivalent entities */
-    class PeriodicIterator : public extract_iterator_t<RealGridLayerType, cd>
+    template <PartitionIteratorType pit>
+    class PeriodicIterator : public extract_iterator_t<RealGridLayerType, cd, pit>
     {
-      using BaseType = extract_iterator_t<RealGridLayerType, cd>;
-      typedef PeriodicIterator ThisType;
+      using BaseType = extract_iterator_t<RealGridLayerType, cd, pit>;
       using RealIndexSetType = extract_index_set_t<RealGridLayerType>;
 
     public:
@@ -661,7 +661,7 @@ public:
       {
       }
 
-      ThisType& operator++()
+      PeriodicIterator& operator++()
       {
         BaseType::operator++();
         while (cd > 0 && *this != *real_it_end_
@@ -671,7 +671,7 @@ public:
         return *this;
       }
 
-      ThisType operator++(int)
+      PeriodicIterator operator++(int)
       {
         return this->operator++();
       }
@@ -682,60 +682,12 @@ public:
       std::shared_ptr<const BaseType> real_it_end_;
     };
 
-    typedef PeriodicIterator Iterator;
+    using Iterator = PeriodicIterator<All_Partition>;
 
     template <PartitionIteratorType pit>
     struct Partition : public RealGridLayerTraits::template Codim<cd>::template Partition<pit>
     {
-      /* PeriodicIterator is the same as the Iterator of the RealGridLayerType, except that it visits only one entity of
-       * several periodically equivalent entities */
-      class PeriodicIterator : public extract_partition_iterator_t<RealGridLayerType, pit, cd>
-      {
-        using BaseType = extract_partition_iterator_t<RealGridLayerType, pit, cd>;
-        typedef PeriodicIterator ThisType;
-        using RealIndexSetType = extract_index_set_t<RealGridLayerType>;
-
-      public:
-        typedef typename IndexSet::IndexType IndexType;
-        typedef std::ptrdiff_t difference_type;
-        using value_type = const extract_entity_t<RealGridLayerImp>;
-        typedef value_type* pointer;
-        typedef value_type& reference;
-        typedef std::forward_iterator_tag iterator_category;
-
-        PeriodicIterator(BaseType real_iterator,
-                         const std::array<std::unordered_set<IndexType>, num_geometries>* entities_to_skip,
-                         const RealIndexSetType* real_index_set,
-                         const BaseType& real_it_end)
-          : BaseType(real_iterator)
-          , entities_to_skip_(entities_to_skip)
-          , real_index_set_(real_index_set)
-          , real_it_end_(std::make_shared<const BaseType>(real_it_end))
-        {
-        }
-
-        // methods that differ from BaseType
-        ThisType& operator++()
-        {
-          BaseType::operator++();
-          while (cd > 0 && *this != *real_it_end_
-                 && (*entities_to_skip_)[GlobalGeometryTypeIndex::index(this->type())].count(
-                        real_index_set_->index(this->operator*())))
-            BaseType::operator++();
-          return *this;
-        }
-
-        ThisType operator++(int)
-        {
-          return this->operator++();
-        }
-
-      private:
-        const std::array<std::unordered_set<IndexType>, num_geometries>* entities_to_skip_;
-        const RealIndexSetType* real_index_set_;
-        std::shared_ptr<const BaseType> real_it_end_;
-      };
-      typedef PeriodicIterator Iterator;
+      using Iterator = PeriodicIterator<pit>;
     }; // struct Partition
   }; // ... struct Codim ...
 
@@ -1006,9 +958,6 @@ std::pair<bool, typename PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_
  * In the constructor, PeriodicGridLayerWrapper will build a map mapping intersections on a periodic boundary to the
  * corresponding outside entity. Further, periodically equivalent entities will be identified and given the same index.
  * Thus, the construction may take quite some time as several grid walks have to be done.
- * By default, new indices will be assigned for all entities. This may take a lot of memory for fine grids. If
- * use_less_memory is set to true, as few entities as possible will get new indices, which saves memory but may
- * degrade performance.
  * By default, all coordinate directions will be made periodic. By supplying a std::bitset< dimension > you can decide
  * for each direction whether it should be periodic (1 means periodic, 0 means 'behave like underlying grid layer in
  that
@@ -1070,12 +1019,12 @@ public:
 }; // class PeriodicGridView
 
 
-template <bool use_less_memory, class GL>
-PeriodicGridView<GL, use_less_memory>
+template <bool codim_iters_provided, class GL>
+PeriodicGridView<GL, codim_iters_provided>
 make_periodic_grid_view(const GL& real_grid_layer,
                         const std::bitset<GL::dimension> periodic_directions = std::bitset<GL::dimension>().set())
 {
-  return PeriodicGridView<GL, use_less_memory>(real_grid_layer, periodic_directions);
+  return PeriodicGridView<GL, codim_iters_provided>(real_grid_layer, periodic_directions);
 }
 
 template <class GL>
@@ -1095,12 +1044,12 @@ make_periodic_grid_view(const GL& real_grid_layer,
 template <class GL, bool c = false>
 using PeriodicGridLayer = PeriodicGridView<GL, c>;
 
-template <bool use_less_memory, class GP>
-PeriodicGridLayer<GP, use_less_memory>
+template <bool codim_iters_provided, class GP>
+PeriodicGridLayer<GP, codim_iters_provided>
 make_periodic_grid_layer(const GP& real_grid_layer,
                          const std::bitset<GP::dimension> periodic_directions = std::bitset<GP::dimension>().set())
 {
-  return PeriodicGridLayer<GP, use_less_memory>(real_grid_layer, periodic_directions);
+  return PeriodicGridLayer<GP, codim_iters_provided>(real_grid_layer, periodic_directions);
 }
 
 template <class GP>

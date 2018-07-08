@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2016 - 2018)
 //   Rene Milk       (2017 - 2018)
+//   TiKeil          (2018)
 //   Tobias Leibner  (2016)
 
 #ifndef DUNE_XT_GRID_GRIDS_HH

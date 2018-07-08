@@ -22,7 +22,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
-#include <python/dune/xt/common/configuration.pbh>
+#include <python/dune/xt/common/configuration.hh>
 #include "grids.bindings.hh"
 #include "layers.bindings.hh"
 
@@ -44,16 +44,16 @@ public:
     using namespace pybind11::literals;
 
     try { // guard since we might not be the first to do so for this grid/intersection
-      m.def(std::string("available_boundary_infos_on_" + layer_name<layer>::value() + "_layer").c_str(),
+      m.def(std::string("available_boundary_infos_on_" + layer_names[layer] + "_layer").c_str(),
             [](const GP& /*grid_provider*/) { return XT::Grid::BoundaryInfoFactory<I>::available(); },
             "grid_provider"_a);
-      m.def(std::string("default_boundary_info_config_on_" + layer_name<layer>::value() + "_layer").c_str(),
+      m.def(std::string("default_boundary_info_config_on_" + layer_names[layer] + "_layer").c_str(),
             [](const GP& /*grid_provider*/, const std::string& type) {
               return XT::Grid::BoundaryInfoFactory<I>::default_config(type);
             },
             "grid_provider"_a,
             "type"_a);
-      m.def(std::string("make_boundary_info_on_" + layer_name<layer>::value() + "_layer").c_str(),
+      m.def(std::string("make_boundary_info_on_" + layer_names[layer] + "_layer").c_str(),
             [](const GP& /*grid_provider*/, const Common::Configuration& cfg) {
               return XT::Grid::BoundaryInfoFactory<I>::create(cfg).release();
             },
@@ -66,7 +66,7 @@ public:
 
 
 template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain, anything>
+class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain, anything>
 {
 public:
   static void bind(pybind11::module& /*m*/)
@@ -75,7 +75,7 @@ public:
 };
 
 template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain_boundary, anything>
+class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_boundary, anything>
 {
 public:
   static void bind(pybind11::module& /*m*/)
@@ -84,7 +84,7 @@ public:
 };
 
 template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G>, Layers::dd_subdomain_coupling, anything>
+class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_coupling, anything>
 {
 public:
   static void bind(pybind11::module& /*m*/)
@@ -120,7 +120,7 @@ public:
     }
 
     // bind factory
-    internal::BoundaryInfoFactory<I, GridProvider<G>, layer>::bind(m);
+    internal::BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, layer>::bind(m);
     internal::BoundaryInfoFactory<I, GridProvider<G, DD::SubdomainGrid<G>>, layer>::bind(m);
 
     // bind class, guard since we might not be the first to do so for this intersection
@@ -139,143 +139,5 @@ public:
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
-
-
-// begin: this is what we need for the lib
-
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, _G, _layer, _backend)                                          \
-  prefix class Dune::XT::Grid::bindings::                                                                              \
-      BoundaryInfo<_B<Dune::XT::Grid::extract_intersection_t<                                                          \
-                       typename Dune::XT::Grid::Layer<_G,                                                              \
-                                                      Dune::XT::Grid::Layers::_layer,                                  \
-                                                      Dune::XT::Grid::Backends::_backend,                              \
-                                                      Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
-                   _G,                                                                                                 \
-                   Dune::XT::Grid::Layers::_layer>
-
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B)                                                           \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, view);                     \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, view)
-
-#if HAVE_DUNE_ALUGRID
-
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)                                                            \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view);                              \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, level, view)
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, view);                      \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, view)
-#else // HAVE_DUNE_ALUGRID
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
-#endif
-
-//#if HAVE_DUNE_UGGRID || HAVE_UG
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)                                                           \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, leaf, view);                                                \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, level, view);                                               \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, UG_2D, dd_subdomain, view)
-//#else
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B)
-//#endif
-
-//#if HAVE_ALBERTA
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)                                                      \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, leaf, view);                                           \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix, _B, ALBERTA_2D, dd_subdomain, view)
-//#else
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B)
-//#endif
-
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, _B)                                                            \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_YASP(prefix, _B);                                                                \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_UG(prefix, _B);                                                                  \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALBERTA(prefix, _B);                                                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALU(prefix, _B)
-
-#define DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(prefix)                                                                     \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::AllDirichletBoundaryInfo);                           \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::AllNeumannBoundaryInfo);                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::BoundarySegmentIndexBasedBoundaryInfo);              \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB_ALL(prefix, Dune::XT::Grid::NormalBasedBoundaryInfo)
-
-DUNE_XT_GRID_BOUNDARYINFO_BIND_LIB(extern template);
-
-// end: this is what we need for the lib
-
-
-// begin: this is what we need for the .so
-
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, _G, _layer, _backend, _class_name, _layer_name)                        \
-  Dune::XT::Grid::bindings::                                                                                           \
-      BoundaryInfo<_B<Dune::XT::Grid::extract_intersection_t<                                                          \
-                       typename Dune::XT::Grid::Layer<_G,                                                              \
-                                                      Dune::XT::Grid::Layers::_layer,                                  \
-                                                      Dune::XT::Grid::Backends::_backend,                              \
-                                                      Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>>,                  \
-                   _G,                                                                                                 \
-                   Dune::XT::Grid::Layers::_layer>::bind(_m, _class_name, _layer_name)
-
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, _B, _class_name)                                                      \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_1D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain, view, _class_name, "dd_subdomain");                            \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain_boundary, view, _class_name, "dd_subdomain_boundary");          \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_1D_EQUIDISTANT_OFFSET, dd_subdomain_coupling, view, _class_name, "dd_subdomain_coupling");          \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, YASP_2D_EQUIDISTANT_OFFSET, leaf, view, _class_name, "");                    \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain, view, _class_name, "dd_subdomain");                            \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain_boundary, view, _class_name, "dd_subdomain_boundary");          \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, YASP_2D_EQUIDISTANT_OFFSET, dd_subdomain_coupling, view, _class_name, "dd_subdomain_coupling")
-
-#if HAVE_DUNE_ALUGRID
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)                                                       \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, leaf, view, _class_name, "leaf");                 \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, level, view, _class_name, "level");               \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain, view, _class_name, "dd_subdomain"); \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_boundary, view, _class_name, "dd_subdomain_boundary");           \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND(                                                                                     \
-      _m, _B, ALU_2D_SIMPLEX_CONFORMING, dd_subdomain_coupling, view, _class_name, "dd_subdomain_coupling")
-#else
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, _B, _class_name)
-#endif
-
-//#if HAVE_DUNE_UGGRID
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)                                                      \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, leaf, view, _class_name, "leaf");                                   \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, level, view, _class_name, "level");                                 \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, UG_2D, dd_subdomain, view, _class_name, "dd_subdomain")
-//#else
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, _B, _class_name)
-//#endif
-
-//#if HAVE_ALBERTA
-//#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, _B, _class_name)                                                 \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, leaf, view, _class_name, "");                                  \
-//  _DUNE_XT_GRID_BOUNDARYINFO_BIND(_m, _B, ALBERTA_2D, dd_subdomain, view, _class_name, "dd_subdomain")
-//#else
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, _B, _class_name)
-//#endif
-
-#define _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, _B, _class_name)                                                       \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_YASP(_m, Dune::XT::Grid::_B, _class_name);                                           \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_UG(_m, Dune::XT::Grid::_B, _class_name);                                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALBERTA(_m, Dune::XT::Grid::_B, _class_name);                                        \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALU(_m, Dune::XT::Grid::_B, _class_name)
-
-#define DUNE_XT_GRID_BOUNDARYINFO_BIND(_m)                                                                             \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, AllDirichletBoundaryInfo, "all_dirichlet_boundary_info");                    \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, AllNeumannBoundaryInfo, "all_neumann_boundary_info");                        \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(                                                                                 \
-      _m, BoundarySegmentIndexBasedBoundaryInfo, "boundary_segment_index_based_boundary_info");                        \
-  _DUNE_XT_GRID_BOUNDARYINFO_BIND_ALL(_m, NormalBasedBoundaryInfo, "normal_based_boundary_info")
-
-// end: this is what we need for the .so
-
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_BINDINGS_HH

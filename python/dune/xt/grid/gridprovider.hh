@@ -16,9 +16,9 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <python/dune/xt/common/configuration.pbh>
+#include <python/dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
-#include <python/dune/xt/common/fvector.pbh>
+#include <python/dune/xt/common/fvector.hh>
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/entity.hh>
@@ -31,12 +31,12 @@ namespace Grid {
 
 
 template <class G>
-pybind11::class_<GridProvider<G>> bind_GridProvider(pybind11::module& m, const std::string& grid_id)
+pybind11::class_<GridProvider<G, Grid::none_t>> bind_GridProvider(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef GridProvider<G, int> C;
+  typedef GridProvider<G, Grid::none_t> C;
 
   py::class_<C> c(m, std::string("GridProvider__" + grid_id).c_str(), std::string("GridProvider__" + grid_id).c_str());
 

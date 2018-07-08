@@ -38,7 +38,7 @@ struct GridWalkerTest : public ::testing::Test
   typedef typename GridType::LeafGridView GridLayerType;
   using EntityType = extract_entity_t<GridLayerType>;
   using IntersectionType = extract_intersection_t<GridLayerType>;
-  const GridProvider<GridType> grid_prv;
+  const GridProvider<GridType, none_t> grid_prv;
   GridWalkerTest()
     : grid_prv(make_cube_grid<GridType>(0.f, 1.f, level))
   {
