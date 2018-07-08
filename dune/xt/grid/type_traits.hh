@@ -24,6 +24,15 @@
 #include <dune/xt/grid/grids.hh>
 
 namespace Dune {
+namespace GridGlue {
+
+
+// forward
+template <typename P0, typename P1, int I, int O>
+class Intersection;
+
+
+} // namespace GridGlue
 namespace XT {
 namespace Grid {
 
@@ -54,13 +63,33 @@ struct has_traits_helper
 template <class T>
 struct is_intersection : public std::false_type
 {
+  using GridType = std::false_type;
+  using InsideElementType = std::false_type;
+  using OutsideElementType = std::false_type;
 };
 
 template <class G, class I>
 struct is_intersection<Dune::Intersection<G, I>> : public std::true_type
 {
   typedef std::remove_const_t<G> GridType;
+  using InsideElementType = typename Dune::Intersection<G, I>::Entity;
+  using OutsideElementType = typename Dune::Intersection<G, I>::Entity;
 };
+
+template <typename P0, typename P1, int I, int O>
+struct is_intersection<Dune::GridGlue::Intersection<P0, P1, I, O>> : public std::true_type
+{
+  typedef typename Dune::GridGlue::Intersection<P0, P1, I, O>::InsideGridView::Grid GridType;
+  using InsideElementType = typename Dune::GridGlue::Intersection<P0, P1, I, O>::InsideEntity;
+  using OutsideElementType = typename Dune::GridGlue::Intersection<P0, P1, I, O>::OutsideEntity;
+};
+
+
+template <class T>
+using extract_inside_element_t = typename is_intersection<T>::InsideElementType;
+
+template <class T>
+using extract_outside_element_t = typename is_intersection<T>::OutsideElementType;
 
 
 template <class T>
