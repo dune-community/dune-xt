@@ -172,7 +172,9 @@ public:
    **/
 
   /**
-   * The number of functions in this set, after being bound to an element.
+   * The number of functions in this set.
+   *
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
   virtual size_t size(const Common::Parameter& /*param*/ = {}) const = 0;
 
@@ -182,12 +184,15 @@ public:
 auto local_function_set = ...;
 size_t max_set_size = 0;
 for (auto&& element : grid_view)
-  max_set_size = std::max(max_set_size, local_function_set.bind(element).size());
+  max_set_size = std::max(max_set_size, local_function_set.bind(element).size(param));
 assert(max_set_size <= local_function_set.max_size());
 \endcode
    **/
   virtual size_t max_size(const Common::Parameter& /*param*/ = {}) const = 0;
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual int order(const Common::Parameter& /*param*/ = {}) const = 0;
 
   /**
@@ -196,6 +201,9 @@ assert(max_set_size <= local_function_set.max_size());
    * \{
    **/
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void evaluate(const DomainType& /*point_in_reference_element*/,
                         std::vector<RangeType>& /*result*/,
                         const Common::Parameter& /*param*/ = {}) const
@@ -204,6 +212,9 @@ assert(max_set_size <= local_function_set.max_size());
                "This set of element functions does not provide evaluations, override the 'evaluate' method!");
   }
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void jacobians(const DomainType& /*point_in_reference_element*/,
                          std::vector<DerivativeRangeType>& /*result*/,
                          const Common::Parameter& /*param*/ = {}) const
@@ -212,6 +223,9 @@ assert(max_set_size <= local_function_set.max_size());
                "This set of element functions does not provide jacobians, override the 'jacobians' method!");
   }
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void derivatives(const std::array<size_t, d>& alpha,
                            const DomainType& point_in_reference_element,
                            std::vector<DerivativeRangeType>& result,
@@ -231,6 +245,9 @@ assert(max_set_size <= local_function_set.max_size());
    * \{
    **/
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual std::vector<RangeType> evaluate_set(const DomainType& point_in_reference_element,
                                               const Common::Parameter& param = {}) const
   {
@@ -239,6 +256,9 @@ assert(max_set_size <= local_function_set.max_size());
     return result;
   }
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual std::vector<DerivativeRangeType> jacobians_of_set(const DomainType& point_in_reference_element,
                                                             const Common::Parameter& param = {}) const
   {
@@ -247,6 +267,9 @@ assert(max_set_size <= local_function_set.max_size());
     return result;
   }
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual std::vector<DerivativeRangeType> derivatives_of_set(const std::array<size_t, d>& alpha,
                                                               const DomainType& point_in_reference_element,
                                                               const Common::Parameter& param = {}) const
@@ -263,6 +286,9 @@ assert(max_set_size <= local_function_set.max_size());
    * \{
    **/
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void evaluate(const DomainType& point_in_reference_element,
                         std::vector<R>& result,
                         const size_t row,
@@ -276,6 +302,9 @@ assert(max_set_size <= local_function_set.max_size());
     single_evaluate_helper<>::call(tmp_values, row, col, result);
   }
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void jacobians(const DomainType& point_in_reference_element,
                          std::vector<SingleDerivativeRangeType>& result,
                          const size_t row,
@@ -289,6 +318,9 @@ assert(max_set_size <= local_function_set.max_size());
     single_derivative_helper<>::call(tmp_values, row, col, result);
   }
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void derivatives(const std::array<size_t, d>& alpha,
                            const DomainType& point_in_reference_element,
                            std::vector<SingleDerivativeRangeType>& result,
@@ -310,6 +342,9 @@ assert(max_set_size <= local_function_set.max_size());
    * \{
    **/
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void evaluate(const DomainType& point_in_reference_element,
                         std::vector<DynamicRangeType>& result,
                         const Common::Parameter& param = {}) const
@@ -328,6 +363,9 @@ assert(max_set_size <= local_function_set.max_size());
       RangeSelector::convert((*tmp_result)[ii], result[ii]);
   } // ... evaluate(...)
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void jacobians(const DomainType& point_in_reference_element,
                          std::vector<DynamicDerivativeRangeType>& result,
                          const Common::Parameter& param = {}) const
@@ -346,6 +384,9 @@ assert(max_set_size <= local_function_set.max_size());
       DerivativeRangeSelector::convert((*tmp_result)[ii], result[ii]);
   } // ... jacobians(...)
 
+  /**
+   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
+   **/
   virtual void derivatives(const std::array<size_t, d>& alpha,
                            const DomainType& point_in_reference_element,
                            std::vector<DynamicDerivativeRangeType>& result,
@@ -372,10 +413,10 @@ protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
   void assert_inside_reference_element(const DomainType& point_in_reference_element) const
   {
-    if (!ReferenceElements<D, d>::general(element().type()).checkInside(point_in_reference_element)) {
+    if (!ReferenceElements<D, d>::general(this->element().geometry().type()).checkInside(point_in_reference_element)) {
       std::stringstream error_message;
-      error_message << "Given point_in_reference_element is not inside the current element!\n\n";
-      XT::Grid::print_entity(element(), XT::Common::Typename<E>::value(), error_message, "   ");
+      error_message << "Given point_in_reference_element is not inside the current elements reference element!\n\n";
+      XT::Grid::print_entity(this->element(), XT::Common::Typename<E>::value(), error_message, "   ");
       error_message << "\n   point_in_reference_element = " << point_in_reference_element << std::endl;
       DUNE_THROW(XT::Functions::Exceptions::wrong_input_given, error_message.str());
     }
@@ -408,8 +449,8 @@ private:
   template <size_t _r = r, size_t _rC = rC, bool anything = true>
   struct single_evaluate_helper
   {
-    template <class FullType, class SingleType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<SingleType>& ret)
+    template <class FullType>
+    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<R>& ret)
     {
       for (size_t ii = 0; ii < val.size(); ++ii)
         ret[ii] = val[ii][row][col];
