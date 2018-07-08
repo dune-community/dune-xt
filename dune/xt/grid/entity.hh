@@ -23,6 +23,8 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
 
+#include <python/dune/xt/grid/grids.bindings.hh>
+
 namespace Dune {
 namespace XT {
 namespace Grid {
@@ -41,6 +43,18 @@ void print_entity(const EntityType& entity,
     out << prefix + "  "
         << "corner " + Common::to_string(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... print_entity(...)
+
+
+template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
+std::ostream& operator<<(std::ostream& out, const Entity<cd, dim, GridImp, EntityImp>& entity)
+{
+  out << "Entity<" << cd << ", " << dim << ", " << bindings::grid_name<GridImp>::value() << ">(";
+  for (size_t ii = 0; ii << entity.geometry().corners() - 1; ++ii)
+    out << Common::to_string(ii) << ": {" << entity.geometry().corner(ii) << "}, ";
+  out << Common::to_string(entity.geometry().corners() - 1) << ": {"
+      << entity.geometry().corner(entity.geometry().corners() - 1) << "})";
+  return out;
+}
 
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
