@@ -14,7 +14,7 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	 26cc8cb4161a3a51002ab2a81b8c81d2c951ee79 dune-testtools (remotes/origin/p/renemilk/testname_listing_hack_no-skiptest)
 	 c2addd62e6f6302e4f90ed7fbe62c9b633c3bf42 dune-uggrid (v2.5.1rc1)
 	 12c3466261972c4aae6b64846f496f04c450cad5 dune-xt-common (heads/master)
-	+eaf05556db3733faa51be9f2e218ff98d9b76604 dune-xt-functions (heads/dbg_new-master)
+	+4e7723fb0292fe2b82ddda2cd43e6b4c74bfef70 dune-xt-functions (heads/dbg_new-master)
 	 0dd8a1650426b923fd7f7cd5f8c20074784170d9 dune-xt-grid (heads/master)
 	 aa32474e9ed4b2c3ac84ee100c7a97592e3e91ed dune-xt-la (heads/master)
 	 60cd896bf3f1eb99066563aa1a07113e5a791d47 scripts (remotes/origin/HEAD)
@@ -93,7 +93,7 @@ commit = 12c3466261972c4aae6b64846f496f04c450cad5
 [submodule.dune-xt-functions]
 remote = git@github.com:dune-community/dune-xt-functions.git
 status = 55b26d14c82caf4a26b99514cf09651285db8d80 .vcsetup (55b26d1)
-commit = eaf05556db3733faa51be9f2e218ff98d9b76604
+commit = 4e7723fb0292fe2b82ddda2cd43e6b4c74bfef70
 
 [submodule.dune-xt-grid]
 remote = git@github.com:dune-community/dune-xt-grid.git
