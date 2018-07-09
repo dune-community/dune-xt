@@ -17,6 +17,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/numeric_cast.hh>
 
+#include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
 namespace Dune {
@@ -25,12 +26,12 @@ namespace Functions {
 
 
 template <class E, size_t r, size_t rC = 1, class R = double>
-class IndicatorFunction : public GridFunctionInterface<E, r, rC, R>
+class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
-  using ThisType = IndicatorFunction<E, r, rC, R>;
+  using ThisType = IndicatorGridFunction<E, r, rC, R>;
 
-  class LocalIndicatorFunction : public ElementFunctionInterface<E, r, rC, R>
+  class LocalIndicatorGridFunction : public ElementFunctionInterface<E, r, rC, R>
   {
     using InterfaceType = ElementFunctionInterface<E, r, rC, R>;
 
@@ -42,7 +43,8 @@ class IndicatorFunction : public GridFunctionInterface<E, r, rC, R>
     using typename InterfaceType::DerivativeRangeReturnType;
     using GeometryType = typename ElementType::Geometry;
 
-    LocalIndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
+    LocalIndicatorGridFunction(
+        const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
       : InterfaceType()
       , subdomain_and_value_tuples_(subdomain_and_value_tuples)
     {
@@ -84,12 +86,12 @@ class IndicatorFunction : public GridFunctionInterface<E, r, rC, R>
   private:
     const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples_;
     RangeType current_value_;
-  }; // class LocalIndicatorFunction
+  }; // class LocalIndicatorGridFunction
 
 
 public:
-  using DomainType = typename LocalIndicatorFunction::DomainType;
-  using RangeType = typename LocalIndicatorFunction::RangeType;
+  using DomainType = typename LocalIndicatorGridFunction::DomainType;
+  using RangeType = typename LocalIndicatorGridFunction::RangeType;
 
   using typename BaseType::ElementType;
   using typename BaseType::LocalFunctionType;
@@ -154,8 +156,8 @@ FunctionType function({{lowerleft_1, upperright_1, value_1}, {lowerleft_2, upper
 \endcode
    */
 
-  IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& values,
-                    const std::string name_in = "indicator")
+  IndicatorGridFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& values,
+                        const std::string name_in = "indicator")
     : subdomain_and_value_tuples_(values)
     , name_(name_in)
   {
@@ -170,8 +172,8 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
 \endcode
    * if you want to set indicator intervals [0,1] x [0,1] with value 0.7 and [6,10] x [8,10] with value 0.9.
    */
-  IndicatorFunction(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeType>>& values,
-                    const std::string name_in = "indicator")
+  IndicatorGridFunction(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeType>>& values,
+                        const std::string name_in = "indicator")
     : subdomain_and_value_tuples_(convert_from_domains(values))
     , name_(name_in)
   {
@@ -184,7 +186,7 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<LocalIndicatorFunction>(subdomain_and_value_tuples_);
+    return std::make_unique<LocalIndicatorGridFunction>(subdomain_and_value_tuples_);
   }
 
 private:
@@ -205,6 +207,97 @@ private:
   } // convert_from_tuples(...)
 
   const std::vector<std::tuple<DomainType, DomainType, RangeType>> subdomain_and_value_tuples_;
+  const std::string name_;
+}; // class IndicatorGridFunction
+
+
+template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
+class IndicatorFunction : public FunctionInterface<d, r, rC, R>
+{
+  using BaseType = FunctionInterface<d, r, rC, R>;
+
+public:
+  using typename BaseType::D;
+  using typename BaseType::DomainType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
+
+  IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>& values,
+                    const std::string nm = "indicator")
+    : subdomain_and_value_tuples_(values)
+    , name_(nm)
+  {
+  }
+
+  IndicatorFunction(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeReturnType>>& values,
+                    const std::string nm = "indicator")
+    : subdomain_and_value_tuples_(convert_from_domains(values))
+    , name_(nm)
+  {
+  }
+
+  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  {
+    return 0;
+  }
+
+  std::string type() const override final
+  {
+    return "dune.xt.functions.indicatorfunction";
+  }
+
+  static std::string static_id()
+  {
+    return "dune.xt.functions.indicatorfunction";
+  }
+
+  std::string name() const override final
+  {
+    return "dune.xt.functions.indicatorfunction";
+  }
+
+  using BaseType::evaluate;
+
+  RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
+                           const Common::Parameter& /*param*/ = {}) const override final
+  {
+    RangeReturnType value(0.);
+    for (const auto& subdomain_and_value_tuple : subdomain_and_value_tuples_) {
+      const auto& subdomain_ll = std::get<0>(subdomain_and_value_tuple);
+      const auto& subdomain_ur = std::get<1>(subdomain_and_value_tuple);
+      if (Common::FloatCmp::le(subdomain_ll, point_in_global_coordinates)
+          && Common::FloatCmp::lt(point_in_global_coordinates, subdomain_ur))
+        value += std::get<2>(subdomain_and_value_tuple);
+    }
+    return value;
+  } // ... evaluate(...)
+
+  using BaseType::jacobian;
+
+  DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                                     const Common::Parameter& /*param*/ = {}) const override final
+  {
+    return DerivativeRangeReturnType(0.);
+  }
+
+private:
+  static std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>
+  convert_from_domains(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeReturnType>>& values)
+  {
+    std::vector<std::tuple<DomainType, DomainType, RangeReturnType>> ret;
+    for (const auto& element : values) {
+      DomainType tmp_coordinates_ll(0.);
+      DomainType tmp_coordinates_ur(0.);
+      for (size_t dd = 0; dd < d; ++dd) {
+        tmp_coordinates_ll[dd] = element.first[dd][0];
+        tmp_coordinates_ur[dd] = element.first[dd][1];
+      }
+      ret.emplace_back(tmp_coordinates_ll, tmp_coordinates_ur, element.second);
+    }
+    return ret;
+  } // convert_from_tuples(...)
+
+  const std::vector<std::tuple<DomainType, DomainType, RangeReturnType>> subdomain_and_value_tuples_;
   const std::string name_;
 }; // class IndicatorFunction
 

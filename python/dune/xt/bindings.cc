@@ -49,12 +49,12 @@ void addbind_for_Grid(pybind11::module& m)
 
   bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
 
-  bind_IndicatorFunction<G, g_dim, 1, 1>(m, grid_id);
-  bind_IndicatorFunction<G, g_dim, 2, 1>(m, grid_id);
-  bind_IndicatorFunction<G, g_dim, 3, 1>(m, grid_id);
-  bind_IndicatorFunction<G, g_dim, 4, 1>(m, grid_id);
-  bind_IndicatorFunction<G, g_dim, 1, 3>(m, grid_id);
-  bind_IndicatorFunction<G, g_dim, 3, 3>(m, grid_id);
+  bind_IndicatorGridFunction<G, g_dim, 1, 1>(m, grid_id);
+  bind_IndicatorGridFunction<G, g_dim, 2, 1>(m, grid_id);
+  bind_IndicatorGridFunction<G, g_dim, 3, 1>(m, grid_id);
+  bind_IndicatorGridFunction<G, g_dim, 4, 1>(m, grid_id);
+  bind_IndicatorGridFunction<G, g_dim, 1, 3>(m, grid_id);
+  bind_IndicatorGridFunction<G, g_dim, 3, 3>(m, grid_id);
 } // ... addbind_for_Grid(...)
 
 
@@ -88,6 +88,27 @@ PYBIND11_MODULE(_functions, m)
   bind_ConstantFunction<3, 4, 1>(m);
   bind_ConstantFunction<3, 1, 3>(m);
   bind_ConstantFunction<3, 3, 3>(m);
+
+  bind_IndicatorFunction<1, 1, 1>(m);
+  bind_IndicatorFunction<1, 2, 1>(m);
+  bind_IndicatorFunction<1, 3, 1>(m);
+  bind_IndicatorFunction<1, 4, 1>(m);
+  bind_IndicatorFunction<1, 1, 3>(m);
+  bind_IndicatorFunction<1, 3, 3>(m);
+
+  bind_IndicatorFunction<2, 1, 1>(m);
+  bind_IndicatorFunction<2, 2, 1>(m);
+  bind_IndicatorFunction<2, 3, 1>(m);
+  bind_IndicatorFunction<2, 4, 1>(m);
+  bind_IndicatorFunction<2, 1, 3>(m);
+  bind_IndicatorFunction<2, 3, 3>(m);
+
+  bind_IndicatorFunction<3, 1, 1>(m);
+  bind_IndicatorFunction<3, 2, 1>(m);
+  bind_IndicatorFunction<3, 3, 1>(m);
+  bind_IndicatorFunction<3, 4, 1>(m);
+  bind_IndicatorFunction<3, 1, 3>(m);
+  bind_IndicatorFunction<3, 3, 3>(m);
 
   bind_ExpressionFunction<1, 1, 1>(m);
   bind_ExpressionFunction<1, 2, 1>(m);
