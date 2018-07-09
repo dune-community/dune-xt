@@ -21,6 +21,7 @@ before_script:
     - export IMAGE="dunecommunity/dune-xt-functions-testing_${DOCKER_TAG}:${TRAVIS_BRANCH}"
     # get image with fallback to master branch of the super repo
     - docker pull ${IMAGE} || export IMAGE="dunecommunity/dune-xt-functions-testing_${DOCKER_TAG}:master" ; docker pull ${IMAGE}
+    - docker inspect -s ${IMAGE}  
     - export MY_MODULE=dune-xt-functions
     - export ENV_FILE=${HOME}/env
     - python3 ./.travis.make_env_file.py
