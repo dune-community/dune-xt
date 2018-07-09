@@ -277,7 +277,7 @@ public:
   DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
                                      const Common::Parameter& /*param*/ = {}) const override final
   {
-    return DerivativeRangeReturnType(0.);
+    return DerivativeRangeReturnType(); // <- defaults to 0
   }
 
 private:
