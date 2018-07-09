@@ -222,7 +222,7 @@ public:
     return BaseType::static_id() + ".checkerboard";
   }
 
-  const std::string name() const override
+  std::string name() const override
   {
     return name_;
   }

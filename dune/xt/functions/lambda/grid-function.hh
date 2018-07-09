@@ -203,7 +203,7 @@ public:
     return "locallambdafunction";
   }
 
-  const std::string name() const override final
+  std::string name() const override final
   {
     return name_;
   }

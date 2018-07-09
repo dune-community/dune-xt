@@ -71,7 +71,7 @@ public:
     return function_storage_.access().type();
   }
 
-  const std::string name() const override final
+  std::string name() const override final
   {
     return function_storage_.access().name();
   }
@@ -94,7 +94,7 @@ private:
     LocalFunction(const FunctionType& function)
       : BaseType()
       , function_(function)
-      , geometry_(nullptr) // <- happens in post_bind
+      , geometry_(nullptr)
     {
     }
 

@@ -293,7 +293,7 @@ private:
     void post_bind(const ElementType& ele) override final
     {
       post_bind_helper<ElementType, d>::post_bind(ele, value_, local_diffusion_, poincare_constant_);
-    } // ... post_bind(...)
+    }
 
     int order(const XT::Common::Parameter& /*param*/ = {}) const override final
     {
@@ -390,7 +390,7 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  const std::string name() const override final
+  std::string name() const override final
   {
     return name_;
   }
