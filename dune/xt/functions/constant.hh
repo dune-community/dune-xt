@@ -29,10 +29,10 @@ class ConstantFunction : public FunctionInterface<d, r, rC, RangeField>
   using ThisType = ConstantFunction<d, r, rC, RangeField>;
 
 public:
-  using DerivativeRangeType = typename BaseType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename BaseType::DerivativeRangeReturnType;
   using DomainType = typename BaseType::DomainType;
-  using RangeType = typename BaseType::RangeType;
-  using SingleDerivativeRangeType = typename BaseType::SingleDerivativeRangeType;
+  using RangeReturnType = typename BaseType::RangeReturnType;
+  using SingleDerivativeRangeReturnType = typename BaseType::SingleDerivativeRangeReturnType;
 
   static const bool available = true;
 
@@ -62,11 +62,11 @@ public:
     // get correct config
     const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     const Common::Configuration default_cfg = default_config();
-    return Common::make_unique<ThisType>(cfg.get<RangeType>("value"),
+    return Common::make_unique<ThisType>(cfg.get<RangeReturnType>("value"),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
-  explicit ConstantFunction(const RangeType& constant, const std::string name_in = static_id())
+  explicit ConstantFunction(const RangeReturnType& constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
   {
@@ -87,16 +87,16 @@ public:
     return 0;
   }
 
-  RangeType evaluate(const DomainType& /*point_in_global_coordinates*/,
-                     const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& /*point_in_global_coordinates*/,
+                           const Common::Parameter& /*param*/ = {}) const override final
   {
     return constant_;
   }
 
-  DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                               const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                                     const Common::Parameter& /*param*/ = {}) const override final
   {
-    return DerivativeRangeType(); // defaults to 0
+    return DerivativeRangeReturnType(); // defaults to 0
   }
 
   std::string name() const override final
@@ -109,7 +109,7 @@ public:
     return BaseType::static_id() + ".constant";
   }
 
-  const RangeType constant_;
+  const RangeReturnType constant_;
   const std::string name_;
 };
 

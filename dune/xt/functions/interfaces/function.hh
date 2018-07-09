@@ -38,9 +38,9 @@ class FunctionAsGridFunctionWrapper;
  * \brief Interface for functions (in the C^\infty sense) which can thus be evaluated in global coordinates.
  *
  *        These functions do not depend on a grid, but only on the dimensions and fields of their domain and range.
- *        See in particular RangeTypeSelector and DerivativeRangeTypeSelector for the interpretation of a function and
- *        its derivatives, and GridFunctionInterface for functions which may have discontinuities between entites
- *        (as in: which are double-valued on intersections).
+ *        See in particular RangeReturnTypeSelector and DerivativeRangeReturnTypeSelector for the interpretation of a
+ *        function and its derivatives, and GridFunctionInterface for functions which may have discontinuities between
+ *        entites (as in: which are double-valued on intersections).
  *
  *        To turn a function into a function which is localizable w.r.t. a GridView of matching dimension (e.g.,
  *        to visualize it or to use it in a discretization scheme), use as_grid_function to obtain a const reference to
@@ -52,8 +52,8 @@ using E = XT::Grid::extract_entity_t<decltype(grid_view)>;
 const auto& grid_function = function.template as_grid_function<E>();
 \endcode
  *
- * \sa    RangeTypeSelector
- * \sa    DerivativeRangeTypeSelector
+ * \sa    RangeReturnTypeSelector
+ * \sa    DerivativeRangeReturnTypeSelector
  * \sa    GridFunctionInterface
  **/
 template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
@@ -84,9 +84,9 @@ public:
    * \{
    */
 
-  using RangeType = typename RangeSelector::return_type;
-  using DerivativeRangeType = typename DerivativeRangeSelector::return_type;
-  using SingleDerivativeRangeType = typename DerivativeRangeSelector::return_single_type;
+  using RangeReturnType = typename RangeSelector::return_type;
+  using DerivativeRangeReturnType = typename DerivativeRangeSelector::return_type;
+  using SingleDerivativeRangeReturnType = typename DerivativeRangeSelector::return_single_type;
 
   /**
    * \}
@@ -95,7 +95,7 @@ public:
    */
 
   using DynamicRangeType = typename RangeSelector::dynamic_type;
-  using DynamicDerivativeRangeType = typename DerivativeRangeSelector::dynamic_type;
+  using DynamicDerivativeRangeReturnType = typename DerivativeRangeSelector::dynamic_type;
 
   /// \}
 
@@ -119,21 +119,21 @@ public:
    * \{
    **/
 
-  virtual RangeType evaluate(const DomainType& /*point_in_global_coordinates*/,
-                             const Common::Parameter& /*param*/ = {}) const
+  virtual RangeReturnType evaluate(const DomainType& /*point_in_global_coordinates*/,
+                                   const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "This function does not provide evaluations, override the 'evaluate' method!");
   }
 
-  virtual DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                                       const Common::Parameter& /*param*/ = {}) const
+  virtual DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                                             const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "This function does not provide a jacobian, override the 'jacobian' method!");
   }
 
-  virtual DerivativeRangeType derivative(const std::array<size_t, d>& /*alpha*/,
-                                         const DomainType& /*point_in_global_coordinates*/,
-                                         const Common::Parameter& /*param*/ = {}) const
+  virtual DerivativeRangeReturnType derivative(const std::array<size_t, d>& /*alpha*/,
+                                               const DomainType& /*point_in_global_coordinates*/,
+                                               const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
                "This function does not provide arbitrary derivatives, override the 'derivative' method!");
@@ -169,31 +169,31 @@ public:
     return single_evaluate_helper<R>::call(this->evaluate(point_in_global_coordinates, param), row, col);
   }
 
-  virtual SingleDerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
-                                             const size_t row,
-                                             const size_t col = 0,
-                                             const Common::Parameter& param = {}) const
+  virtual SingleDerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
+                                                   const size_t row,
+                                                   const size_t col = 0,
+                                                   const Common::Parameter& param = {}) const
   {
     assert_correct_dims(row, col, "jacobian");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(
+    return single_derivative_helper<SingleDerivativeRangeReturnType>::call(
         this->jacobian(point_in_global_coordinates, param), row, col);
   }
 
-  virtual SingleDerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                               const DomainType& point_in_global_coordinates,
-                                               const size_t row,
-                                               const size_t col = 0,
-                                               const Common::Parameter& param = {}) const
+  virtual SingleDerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
+                                                     const DomainType& point_in_global_coordinates,
+                                                     const size_t row,
+                                                     const size_t col = 0,
+                                                     const Common::Parameter& param = {}) const
   {
     assert_correct_dims(row, col, "derivative");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(
+    return single_derivative_helper<SingleDerivativeRangeReturnType>::call(
         this->derivative(alpha, point_in_global_coordinates, param), row, col);
   }
 
   /**
    * \}
-   * \name ´´These methods are provided for large dimensions (when RangeType or DerivativeRangeType do not fit on the
-   *         stack) and should be overridden to improve their performance.''
+   * \name ´´These methods are provided for large dimensions (when RangeReturnType or DerivativeRangeReturnType do not
+   *         fit on the stack) and should be overridden to improve their performance.''
    * \{
    **/
 
@@ -206,7 +206,7 @@ public:
   }
 
   virtual void jacobian(const DomainType& point_in_reference_element,
-                        DynamicDerivativeRangeType& result,
+                        DynamicDerivativeRangeReturnType& result,
                         const Common::Parameter& param = {}) const
   {
     DerivativeRangeSelector::ensure_size(result);
@@ -215,7 +215,7 @@ public:
 
   virtual void derivative(const std::array<size_t, d>& alpha,
                           const DomainType& point_in_reference_element,
-                          DynamicDerivativeRangeType& result,
+                          DynamicDerivativeRangeReturnType& result,
                           const Common::Parameter& param = {}) const
   {
     DerivativeRangeSelector::ensure_size(result);

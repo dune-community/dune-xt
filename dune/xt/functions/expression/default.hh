@@ -44,12 +44,12 @@ class ExpressionFunction : public FunctionInterface<d, r, rC, RangeField>
   using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeField, d>;
 
 public:
-  using typename BaseType::RangeType;
-  using DerivativeRangeType = typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeReturnType;
+  using DerivativeRangeReturnType = typename BaseType::DerivativeRangeReturnType;
 
   using DomainType = typename BaseType::DomainType;
   using RangeFieldType = typename BaseType::RangeFieldType;
-  using SingleDerivativeRangeType = typename BaseType::SingleDerivativeRangeType;
+  using SingleDerivativeRangeReturnType = typename BaseType::SingleDerivativeRangeReturnType;
 
   static std::string static_id()
   {
@@ -208,10 +208,10 @@ public:
 
   using BaseType::evaluate;
 
-  RangeType evaluate(const DomainType& point_in_global_coordinates,
-                     const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
+                           const Common::Parameter& /*param*/ = {}) const override final
   {
-    RangeType ret(0.);
+    RangeReturnType ret(0.);
     Common::FieldVector<RangeFieldType, r * rC> tmp_vector_;
     function_->evaluate(point_in_global_coordinates, tmp_vector_);
     for (size_t rr = 0; rr < r; ++rr) {
@@ -226,13 +226,13 @@ public:
 
   using BaseType::jacobian;
 
-  DerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
-                               const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
+                                     const Common::Parameter& /*param*/ = {}) const override final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");
 
-    DerivativeRangeType ret(Common::FieldMatrix<double, rC, d>(0.));
+    DerivativeRangeReturnType ret(Common::FieldMatrix<double, rC, d>(0.));
     for (size_t cc = 0; cc < r; ++cc) {
       assert(gradients_[cc].size() == rC);
       for (size_t rr = 0; rr < rC; ++rr) {
@@ -318,11 +318,11 @@ class ExpressionFunction<d, r, 1, RangeField> : public FunctionInterface<d, r, 1
   using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeField, d>;
 
 public:
-  using typename BaseType::RangeType;
-  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeFieldType;
-  using typename BaseType::SingleDerivativeRangeType;
+  using typename BaseType::SingleDerivativeRangeReturnType;
 
   static std::string static_id()
   {
@@ -454,10 +454,10 @@ public:
 
   using BaseType::evaluate;
 
-  RangeType evaluate(const DomainType& point_in_global_coordinates,
-                     const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
+                           const Common::Parameter& /*param*/ = {}) const override final
   {
-    RangeType ret(0.);
+    RangeReturnType ret(0.);
     function_->evaluate(point_in_global_coordinates, ret);
     check_value(point_in_global_coordinates, ret);
     return ret;
@@ -465,12 +465,12 @@ public:
 
   using BaseType::jacobian;
 
-  DerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
-                               const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
+                                     const Common::Parameter& /*param*/ = {}) const override final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");
-    DerivativeRangeType ret(0.);
+    DerivativeRangeReturnType ret(0.);
     for (size_t rr = 0; rr < r; ++rr) {
       gradients_[rr]->evaluate(point_in_global_coordinates, ret[rr]);
       check_value(point_in_global_coordinates, ret[rr]);
