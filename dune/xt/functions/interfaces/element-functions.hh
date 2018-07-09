@@ -25,6 +25,7 @@
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/parameter.hh>
+#include <dune/xt/grid/bound-object.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/type_traits.hh>
 
@@ -46,13 +47,13 @@ namespace Functions {
  *        its derivatives.
  **/
 template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
-class ElementFunctionSetInterface : public Common::ParametricInterface
+class ElementFunctionSetInterface : public Common::ParametricInterface, public XT::Grid::ElementBoundObject<Element>
 {
   static_assert(XT::Grid::is_entity<Element>::value, "");
   using ThisType = ElementFunctionSetInterface<Element, rangeDim, rangeDimCols, RangeField>;
 
 public:
-  using ElementType = Element;
+  using typename XT::Grid::ElementBoundObject<Element>::ElementType;
   using DomainFieldType = double;
   static const constexpr size_t domain_dim = ElementType::dimension;
   using RangeFieldType = RangeField;
@@ -94,78 +95,21 @@ public:
 
   ElementFunctionSetInterface(const XT::Common::ParameterType& param_type = {})
     : Common::ParametricInterface(param_type)
-    , element_(nullptr)
-  {
-  }
-
-  ElementFunctionSetInterface(const ElementType& ele, const XT::Common::ParameterType& param_type = {})
-    : Common::ParametricInterface(param_type)
-    , element_(new ElementType(ele))
-  {
-  }
-
-  ElementFunctionSetInterface(ElementType&& ele, const XT::Common::ParameterType& param_type = {})
-    : Common::ParametricInterface(param_type)
-    , element_(new ElementType(ele))
   {
   }
 
   ElementFunctionSetInterface(const ThisType& other)
     : Common::ParametricInterface(other.parameter_type())
-    , element_(nullptr)
   {
-    if (other.element_)
-      element_ = std::make_unique<ElementType>(*other.element_);
   }
 
   ElementFunctionSetInterface(ThisType&& source)
     : Common::ParametricInterface(source.parameter_type())
-    , element_(std::move(source.element_))
   {
   }
 
   virtual ~ElementFunctionSetInterface() = default;
 
-  ThisType& operator=(const ThisType& other)
-  {
-    if (&other != this && other.element_)
-      element_ = std::make_unique<ElementType>(other.element_);
-  }
-
-  ThisType& operator=(ThisType&& source)
-  {
-    if (&source != this)
-      element_ = source.element_;
-  }
-
-  /**
-   * \attention The returned reference will change as soon as the funtion is bound to another element!
-   */
-  const ElementType& element() const
-  {
-    if (!element_)
-      DUNE_THROW(Exceptions::not_bound_to_an_element_yet, "");
-    return *element_;
-  }
-
-  ThisType& bind(const ElementType& ele)
-  {
-    if (element_ && ele == *element_)
-      return *this;
-    element_ = std::make_unique<ElementType>(ele);
-    post_bind(*element_);
-    return *this;
-  }
-
-protected:
-  /**
-   * \note Override this function if you need/want to do preparatory work on an element.
-   */
-  virtual void post_bind(const ElementType& /*ele*/)
-  {
-  }
-
-public:
   /**
    * \name ´´These methods have to be implemented.''
    * \{
@@ -491,8 +435,6 @@ private:
         ret[ii] = val[ii][row];
     }
   }; // struct single_derivative_helper<..., 1, ...>
-
-  std::unique_ptr<ElementType> element_;
 }; // class ElementFunctionSetInterface
 
 /**
@@ -546,16 +488,6 @@ public:
 
   ElementFunctionInterface(const XT::Common::ParameterType& param_type = {})
     : BaseType(param_type)
-  {
-  }
-
-  ElementFunctionInterface(const ElementType& ele, const XT::Common::ParameterType& param_type = {})
-    : BaseType(ele, param_type)
-  {
-  }
-
-  ElementFunctionInterface(ElementType&& ele, const XT::Common::ParameterType& param_type = {})
-    : BaseType(ele, param_type)
   {
   }
 
