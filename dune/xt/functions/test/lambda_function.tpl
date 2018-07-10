@@ -29,7 +29,7 @@ struct GlobalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
   static const size_t r = {{r}};
   static const size_t rC = {{rC}};
 
-  using LambdaType = Functions::SmoothLambdaFunction<d, r, rC>;
+  using LambdaType = Functions::LambdaFunction<d, r, rC>;
 
   using RangeType = typename LambdaType::RangeType;
   using DomainType = typename LambdaType::DomainType;

@@ -30,7 +30,7 @@ namespace Functions {
  * \example LambdaType lambda(1, [](const auto& x, const auto& param = {}) { return x;});
  */
 template <size_t domain_dim, size_t range_dim = 1, size_t range_dim_cols = 1, class RangeField = double>
-class SmoothLambdaFunction : public FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>
+class LambdaFunction : public FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>
 {
   using BaseType = FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>;
 
@@ -43,15 +43,15 @@ public:
   using OrderLambdaType = std::function<int(const Common::Parameter&)>;
   using EvaluateLambdaType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
   using JacobianLambdaType = std::function<DerivativeRangeReturnType(const DomainType&, const Common::Parameter&)>;
-  using DerivativeLambdaType =
-      std::function<DerivativeRangeReturnType(const std::array<size_t, d>&, const DomainType&, const Common::Parameter&)>;
+  using DerivativeLambdaType = std::function<DerivativeRangeReturnType(
+      const std::array<size_t, d>&, const DomainType&, const Common::Parameter&)>;
 
-  SmoothLambdaFunction(OrderLambdaType order_lambda,
-                       EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
-                       const std::string nm = "smooth_lambda_function",
-                       const Common::ParameterType& param_type = {},
-                       JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
-                       DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+  LambdaFunction(OrderLambdaType order_lambda,
+                 EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
+                 const std::string nm = "smooth_lambda_function",
+                 const Common::ParameterType& param_type = {},
+                 JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
+                 DerivativeLambdaType derivative_lambda = default_derivative_lambda())
     : BaseType(param_type)
     , order_lambda_(order_lambda)
     , evaluate_lambda_(evaluate_lambda)
@@ -61,12 +61,12 @@ public:
   {
   }
 
-  SmoothLambdaFunction(int ord,
-                       EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
-                       const std::string nm = "smooth_lambda_function",
-                       const Common::ParameterType& param_type = {},
-                       JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
-                       DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+  LambdaFunction(int ord,
+                 EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
+                 const std::string nm = "smooth_lambda_function",
+                 const Common::ParameterType& param_type = {},
+                 JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
+                 DerivativeLambdaType derivative_lambda = default_derivative_lambda())
     : BaseType(param_type)
     , order_lambda_([=](const auto& /*param*/) { return ord; })
     , evaluate_lambda_(evaluate_lambda)
@@ -125,8 +125,8 @@ public:
   {
     return [](const DomainType& /*point_in_global_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This SmoothLambdaFunction does not provide evaluations, provide an evaluate_lambda on construction!");
-      return RangeType();
+                 "This LambdaFunction does not provide evaluations, provide an evaluate_lambda on construction!");
+      return RangeReturnType();
     };
   }
 
@@ -134,7 +134,7 @@ public:
   {
     return [](const DomainType& /*point_in_global_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This SmoothLambdaFunction does not provide jacobian evaluations, provide a "
+                 "This LambdaFunction does not provide jacobian evaluations, provide a "
                  "jacobian_lambda on construction!");
       return DerivativeRangeReturnType();
     };
@@ -146,7 +146,7 @@ public:
               const DomainType& /*point_in_global_coordinates*/,
               const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This SmoothLambdaFunction does not provide derivative evaluations, provide a "
+                 "This LambdaFunction does not provide derivative evaluations, provide a "
                  "derivative_lambda on construction!");
       return DerivativeRangeReturnType();
     };
