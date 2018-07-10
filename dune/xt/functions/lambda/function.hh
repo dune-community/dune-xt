@@ -37,14 +37,14 @@ class SmoothLambdaFunction : public FunctionInterface<domain_dim, range_dim, ran
 public:
   using BaseType::d;
   using typename BaseType::DomainType;
-  using typename BaseType::RangeType;
-  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
 
   using OrderLambdaType = std::function<int(const Common::Parameter&)>;
-  using EvaluateLambdaType = std::function<RangeType(const DomainType&, const Common::Parameter&)>;
-  using JacobianLambdaType = std::function<DerivativeRangeType(const DomainType&, const Common::Parameter&)>;
+  using EvaluateLambdaType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
+  using JacobianLambdaType = std::function<DerivativeRangeReturnType(const DomainType&, const Common::Parameter&)>;
   using DerivativeLambdaType =
-      std::function<DerivativeRangeType(const std::array<size_t, d>&, const DomainType&, const Common::Parameter&)>;
+      std::function<DerivativeRangeReturnType(const std::array<size_t, d>&, const DomainType&, const Common::Parameter&)>;
 
   SmoothLambdaFunction(OrderLambdaType order_lambda,
                        EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
@@ -86,21 +86,21 @@ public:
     return order_lambda_(this->parse_parameter(param));
   }
 
-  RangeType evaluate(const DomainType& point_in_global_coordinates,
-                     const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
+                           const Common::Parameter& param = {}) const override final
   {
     return evaluate_lambda_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
-  DerivativeRangeType jacobian(const DomainType& point_in_global_coordinates,
-                               const Common::Parameter& param = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
+                                     const Common::Parameter& param = {}) const override final
   {
     return jacobian_lambda_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
-  DerivativeRangeType derivative(const std::array<size_t, d>& alpha,
-                                 const DomainType& point_in_global_coordinates,
-                                 const Common::Parameter& param = {}) const override final
+  DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
+                                       const DomainType& point_in_global_coordinates,
+                                       const Common::Parameter& param = {}) const override final
   {
     return derivative_lambda_(alpha, point_in_global_coordinates, this->parse_parameter(param));
   }
@@ -136,7 +136,7 @@ public:
       DUNE_THROW(NotImplemented,
                  "This SmoothLambdaFunction does not provide jacobian evaluations, provide a "
                  "jacobian_lambda on construction!");
-      return DerivativeRangeType();
+      return DerivativeRangeReturnType();
     };
   }
 
@@ -148,7 +148,7 @@ public:
       DUNE_THROW(NotImplemented,
                  "This SmoothLambdaFunction does not provide derivative evaluations, provide a "
                  "derivative_lambda on construction!");
-      return DerivativeRangeType();
+      return DerivativeRangeReturnType();
     };
   }
 
@@ -161,7 +161,7 @@ public:
   const JacobianLambdaType jacobian_lambda_;
   const DerivativeLambdaType derivative_lambda_;
   const std::string name_;
-}; // class SmoothLambdaFunction
+}; // class LambdaFunction
 
 
 } // namespace Functions

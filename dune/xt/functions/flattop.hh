@@ -46,7 +46,7 @@ public:
   using DomainFieldType = typename BaseType::DomainFieldType;
   using RangeFieldType = typename BaseType::RangeFieldType;
   using DomainType = typename BaseType::DomainType;
-  using RangeType = typename BaseType::RangeType;
+  using RangeReturnType = typename BaseType::RangeReturnType;
 
   static const size_t domain_dim = BaseType::domain_dim;
   static const size_t range_dim = BaseType::range_dim;
@@ -85,14 +85,14 @@ public:
     return Common::make_unique<ThisType>(cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
                                          cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
                                          cfg.get("boundary_layer", default_cfg.get<DomainType>("boundary_layer")),
-                                         cfg.get("value", default_cfg.get<RangeType>("value")),
+                                         cfg.get("value", default_cfg.get<RangeReturnType>("value")),
                                          cfg.get("name", default_cfg.get<std::string>("name")));
   } // ... create(...)
 
   FlatTopFunction(const DomainType& lower_left,
                   const DomainType& upper_right,
                   const DomainType& boundary_layer,
-                  const RangeType& value = default_config().template get<RangeType>("value"),
+                  const RangeReturnType& value = default_config().template get<RangeReturnType>("value"),
                   const std::string name_in = default_config().template get<std::string>("name"))
     : lower_left_(lower_left)
     , upper_right_(upper_right)
@@ -126,10 +126,10 @@ public:
     return 3 * domain_dim;
   }
 
-  RangeType evaluate(const DomainType& point_in_reference_element,
-                     const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& point_in_reference_element,
+                           const Common::Parameter& /*param*/ = {}) const override final
   {
-    RangeType ret = value_;
+    RangeReturnType ret = value_;
     for (size_t dd = 0; dd < domain_dim; ++dd) {
       const auto& left = lower_left_[dd];
       const auto& right = upper_right_[dd];
@@ -209,7 +209,7 @@ private:
   const DomainType lower_left_;
   const DomainType upper_right_;
   const DomainType boundary_layer_;
-  const RangeType value_;
+  const RangeReturnType value_;
   const std::string name_;
 }; // class FlatTopFunction< ..., 1, 1 >
 
