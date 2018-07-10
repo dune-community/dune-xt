@@ -38,9 +38,9 @@ struct ESV2007CutoffFunction_from_{{GRIDNAME}} : public ::testing::Test
 
   using ScalarRangeExpressionType = typename Dune::XT::Common::FieldVector<std::string, 1>;
 
-  using RangeType = typename FunctionType::LocalFunctionType::RangeType;
+  using RangeReturnType = typename FunctionType::LocalFunctionType::RangeReturnType;
   using DomainType = typename FunctionType::LocalFunctionType::DomainType;
-  using DerivativeRangeType = typename FunctionType::LocalFunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename FunctionType::LocalFunctionType::DerivativeRangeReturnType;
 
   ESV2007CutoffFunction_from_{{GRIDNAME}}()
     : grid_(Dune::XT::Grid::make_cube_grid<GridType>(1, 3., 4))
@@ -137,7 +137,7 @@ TEST_F(ESV2007CutoffFunction_from_{{GRIDNAME}}, local_jacobian)
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
-    DerivativeRangeType expected_jacobian = DerivativeRangeType();
+    DerivativeRangeReturnType expected_jacobian = DerivativeRangeReturnType();
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
       const auto value = local_f->jacobian(local_x);

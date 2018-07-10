@@ -20,9 +20,9 @@ struct ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testi
 
   using FunctionType = Functions::ConstantFunction<d, r, rC>;
 
-  using RangeType = typename FunctionType::RangeType;
+  using RangeReturnType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
-  using DerivativeRangeType = typename FunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename FunctionType::DerivativeRangeReturnType;
 
   ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
     : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
@@ -61,7 +61,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
 {
   const int expected_order = 0;
   for (auto vv : {-10., 3., 17., 41.}) {
-    const RangeType value(vv);
+    const RangeReturnType value(vv);
     FunctionType function(value);
     const auto actual_order = function.order();
     EXPECT_EQ(expected_order, actual_order);
@@ -71,7 +71,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluate)
 {
   for (auto value : {-10., 3., 17., 41.}) {
-    const RangeType expected_value(value);
+    const RangeReturnType expected_value(value);
     FunctionType function(expected_value);
     for (auto point : {-100., -10., 0., 10., 100.}) {
       const DomainType xx(point);
@@ -84,8 +84,8 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluate
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian)
 {
   for (auto vv : {-10., 3., 17., 41.}) {
-    const RangeType value(vv);
-    DerivativeRangeType expected_jacobian;
+    const RangeReturnType value(vv);
+    DerivativeRangeReturnType expected_jacobian;
     //expected_jacobian *= 0;
     FunctionType function(value);
     for (auto point : {-100., -10., 0., 10., 100.}) {
@@ -111,7 +111,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
   const int expected_order = 0;
   for (auto vv : {-10., 3., 17., 41.}) {
-    const RangeType value(vv);
+    const RangeReturnType value(vv);
     FunctionType function(value);
     const auto& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
@@ -127,7 +127,7 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   for (auto value : {-10., 3., 17., 41.}) {
-    const RangeType expected_value(value);
+    const RangeReturnType expected_value(value);
     FunctionType function(expected_value);
     const auto& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();
@@ -146,8 +146,8 @@ TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 TEST_F(ConstantFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   for (auto vv : {-10., 3., 17., 41.}) {
-    RangeType value(vv);
-    DerivativeRangeType expected_jacobian;
+    RangeReturnType value(vv);
+    DerivativeRangeReturnType expected_jacobian;
     //expected_jacobian *= 0;
     FunctionType function(value);
     const auto& localizable_function = function.template as_grid_function<ElementType>();

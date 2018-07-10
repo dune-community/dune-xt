@@ -22,9 +22,9 @@ struct ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::tes
 
   using FunctionType = Dune::XT::Functions::ExpressionFunction<d, r, rC>;
 
-  using RangeType = typename FunctionType::RangeType;
+  using RangeReturnType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
-  using DerivativeRangeType = typename FunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename FunctionType::DerivativeRangeReturnType;
 
   using RangeExpressionType = typename Dune::XT::Common::FieldVector<std::string, r>;
   using DerivativeRangeExpressionType = typename Dune::XT::Common::FieldMatrix<std::string, r, d>;
@@ -104,7 +104,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evalua
 {
   // Constant functions
   for (auto value : {-10., 3., 17., 41.}) {
-    const RangeType expected_value(value);
+    const RangeReturnType expected_value(value);
     const RangeExpressionType constant_expr(Common::to_string(value));
     FunctionType function("x", constant_expr, 0);
     for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
@@ -121,7 +121,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evalua
   FunctionType function_id_1("x", id_expr, 1);
   for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
     const DomainType xx(point);
-    RangeType expected(0.);
+    RangeReturnType expected(0.);
     for (size_t rr = 0; rr < d; ++rr)
         expected[rr] = point;
     const auto actual_value = function_id_1.evaluate(xx);
@@ -139,7 +139,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evalua
 
   for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
       const DomainType xx(point);
-      RangeType expected_value(exp(point) + sin(point) + point);
+      RangeReturnType expected_value(exp(point) + sin(point) + point);
       const auto actual_value = second_function.evaluate(xx);
       EXPECT_EQ(expected_value, actual_value);
     }
@@ -156,7 +156,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobi
       for (size_t dd = 0; dd < d; ++dd)
         constant_grad[rr][dd] = "0";
     }
-    const DerivativeRangeType expected_jacobian;
+    const DerivativeRangeReturnType expected_jacobian;
     FunctionType function("x", constant_expr, constant_grad, 0);
     for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
       const DomainType xx(point);
@@ -176,7 +176,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobi
 
   for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
     const DomainType xx(point);
-    DerivativeRangeType expected_jacobian_1;
+    DerivativeRangeReturnType expected_jacobian_1;
     for (size_t rr = 0; rr < r; ++rr)
       expected_jacobian_1[rr][0] = exp(point) + cos(point) + 1;
     const auto actual_jacobian = second_function.jacobian(xx);
@@ -222,7 +222,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluat
 
   // Constant functions
   for (auto value : {-10., 3., 17., 41.}) {
-    const RangeType expected_value(value);
+    const RangeReturnType expected_value(value);
     const RangeExpressionType constant_expr(Common::to_string(value));
     FunctionType function("x", constant_expr, 0);
     const auto& localizable_function = function.template as_grid_function<ElementType>();
@@ -250,7 +250,7 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobia
       for (size_t dd = 0; dd < d; ++dd)
         constant_grad[rr][dd] = "0";
     }
-    const DerivativeRangeType expected_jacobian;
+    const DerivativeRangeReturnType expected_jacobian;
     FunctionType function("x", constant_expr, constant_grad, 0);
     const auto& localizable_function = function.template as_grid_function<ElementType>();
     auto local_f = localizable_function.local_function();

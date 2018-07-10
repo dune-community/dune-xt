@@ -24,9 +24,9 @@ struct ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : pu
 
   using FunctionType = Dune::XT::Functions::ParametricExpressionFunction<d, r, rC>;
 
-  using RangeType = typename FunctionType::RangeType;
+  using RangeReturnType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
-  using DerivativeRangeType = typename FunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename FunctionType::DerivativeRangeReturnType;
   using RangeExpressionType = typename Dune::XT::Common::FieldVector<std::string, r>;
 
   ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
@@ -63,7 +63,7 @@ TEST_F(ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, glo
 {
     // constant functions
     for (auto vv : {-10., 3., 17., 41.}) {
-      const RangeType expected_value(sin(vv));
+      const RangeReturnType expected_value(sin(vv));
       const RangeExpressionType expr(std::string("sin(t_)"));
       FunctionType function("x", {"t_", 1}, expr, 3);
       for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
@@ -78,7 +78,7 @@ TEST_F(ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, glo
       const RangeExpressionType expr(std::string("sin(x[0]t_)"));
       FunctionType function("x", {"t_", 1}, expr, 3);
       for (auto point : {-1., -0.5, 0., 0.5, 1.}) {
-        const RangeType expected_value(sin(point * vv));
+        const RangeReturnType expected_value(sin(point * vv));
         const DomainType xx(point);
         const auto actual_value = function.evaluate(xx, {"t_", vv});
         EXPECT_EQ(expected_value, actual_value);
@@ -134,7 +134,7 @@ TEST_F(ParametricExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
       const auto local_x = quadrature_point.position();
       const auto global_x = geometry.global(local_x);
       for (auto vv : {-10., 3., 17., 41.}) {
-        const RangeType expected_value(sin(global_x[0] * vv));
+        const RangeReturnType expected_value(sin(global_x[0] * vv));
         const auto actual_value = local_f->evaluate(local_x, {"t_", vv});
         EXPECT_EQ(expected_value, actual_value);
       }
