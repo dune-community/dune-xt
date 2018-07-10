@@ -143,26 +143,13 @@ function(dune_pybindxi_add_module target_name)
   endif()
 
   # Make sure C++11/14 are enabled
-  target_compile_options(${target_name} PUBLIC ${PYBIND11_CPP_STANDARD})
+  target_compile_options(${target_name} PUBLIC ${PYBIND11_CPP_STANDARD} -g)
 
   if(ARG_NO_EXTRAS)
     return()
   endif()
 
   _dune_pybind11_add_lto_flags(${target_name} ${ARG_THIN_LTO})
-
-  if (NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug)
-    # Strip unnecessary sections of the binary on Linux/Mac OS
-    if(CMAKE_STRIP)
-      if(APPLE)
-        add_custom_command(TARGET ${target_name} POST_BUILD
-                           COMMAND ${CMAKE_STRIP} -x $<TARGET_FILE:${target_name}>)
-      else()
-        add_custom_command(TARGET ${target_name} POST_BUILD
-                           COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${target_name}>)
-      endif()
-    endif()
-  endif()
 
   if(MSVC)
     # /MP enables multithreaded builds (relevant when there are many files), /bigobj is
@@ -194,7 +181,7 @@ macro(dxt_add_make_dependent_bindings)
       set(tdir ${${_mod}_binary_dir})
       if(IS_DIRECTORY ${tdir})
         add_custom_target( ${_mod}_bindings
-                            COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings)
+                            COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings -- -j1)
         add_dependencies(dependent_bindings ${_mod}_bindings)
       endif()
     endforeach()
