@@ -290,11 +290,13 @@ private:
     {
     }
 
+  protected:
     void post_bind(const ElementType& ele) override final
     {
       post_bind_helper<ElementType, d>::post_bind(ele, value_, local_diffusion_, poincare_constant_);
     }
 
+  public:
     int order(const XT::Common::Parameter& /*param*/ = {}) const override final
     {
       return 0;

@@ -57,6 +57,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     {
     }
 
+  protected:
     void post_bind(const ElementType& element) override final
     {
       current_value_ = 0;
@@ -64,8 +65,9 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
         const size_t subdomain = find_subdomain(element);
         current_value_ = values_[subdomain];
       }
-    } // ... post_bind(...)
+    }
 
+  public:
     int order(const Common::Parameter& /*param*/ = {}) const override final
     {
       return 0;

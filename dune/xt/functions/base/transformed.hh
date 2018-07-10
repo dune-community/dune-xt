@@ -72,12 +72,14 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     {
     }
 
+  protected:
     void post_bind(const ElementType& element) override final
     {
       //      local_function_->post_bind(element);
       DUNE_THROW(NotImplemented, 'Implement it');
     }
 
+  public:
     int order(const XT::Common::Parameter& mu = {}) const override final
     {
       return local_function_->order(mu);

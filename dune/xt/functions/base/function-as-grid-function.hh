@@ -98,11 +98,13 @@ private:
     {
     }
 
+  protected:
     void post_bind(const ElementType& el) override final
     {
       geometry_ = std::make_unique<GeometryType>(el.geometry());
     }
 
+  public:
     int order(const Common::Parameter& param = {}) const override final
     {
       DUNE_THROW_IF(!this->is_bound_, Exceptions::not_bound_to_an_element_yet, "");
