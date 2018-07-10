@@ -65,6 +65,8 @@ jobs:
     env: DOCKER_TAG=debian_gcc_full TESTS=2
   - stage: test_cpp
     env: DOCKER_TAG=debian_gcc_full TESTS=3
+  - stage: test_cpp
+    env: DOCKER_TAG=debian_gcc_full TESTS=4
     
   - stage: test_cpp
     env: DOCKER_TAG=debian_clang_full TESTS=0
@@ -74,6 +76,8 @@ jobs:
     env: DOCKER_TAG=debian_clang_full TESTS=2
   - stage: test_cpp
     env: DOCKER_TAG=debian_clang_full TESTS=3
+  - stage: test_cpp
+    env: DOCKER_TAG=debian_clang_full TESTS=4
     
   - stage: test_python
     env: DOCKER_TAG=debian_gcc_full
