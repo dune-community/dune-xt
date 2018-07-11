@@ -27,8 +27,6 @@ PYBIND11_MODULE(_grid, m)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  Dune::XT::Common::bindings::addbind_exceptions(m);
-
   py::module::import("dune.xt.common");
 
   Dune::XT::Common::bindings::add_initialization(m, "dune.xt.grid");
