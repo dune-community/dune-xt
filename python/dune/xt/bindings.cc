@@ -121,14 +121,10 @@ void addbind_for_Grid(pybind11::module& m)
 } // ... addbind_for_Grid(...)
 
 
-PYBIND11_PLUGIN(_functions)
+PYBIND11_MODULE(_functions, m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
-
-  py::module m("_functions", "dune-xt-functions");
-
-  Dune::XT::Common::bindings::addbind_exceptions(m);
 
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.grid");
@@ -146,5 +142,4 @@ PYBIND11_PLUGIN(_functions)
   //#endif
 
   Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions");
-  return m.ptr();
 }
