@@ -310,7 +310,9 @@ public:
                          << opts);
       }
     } catch (ISTLError& e) {
-      DUNE_THROW(Exceptions::linear_solver_failed, "The dune-istl backend reported: " << e.what());
+      DUNE_THROW(Exceptions::linear_solver_failed,
+                 "The dune-istl backend reported: " << e.what() << "Those were the given options:\n\n"
+                                                    << opts);
     }
   } // ... apply(...)
 

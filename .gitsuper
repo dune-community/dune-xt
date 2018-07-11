@@ -16,7 +16,7 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	+ace00d3bce4cf7963add36d44214400088eae3cd dune-xt-common (heads/update_vcsetup)
 	+b1b209edb362862ab3960569385253605959f456 dune-xt-functions (heads/update_vcsetup)
 	+0847ae4d67647e0014855d19c1c8979f62428aa3 dune-xt-grid (heads/update_vcsetup)
-	+d777f282999a54ddb0ee71d76b216f5a4976a38e dune-xt-la (heads/bindings_update)
+	+2bb857b24367d5a4175c2afa717d3b55a16eb634 dune-xt-la (heads/bindings_update)
 	 60cd896bf3f1eb99066563aa1a07113e5a791d47 scripts (remotes/origin/HEAD)
 commit = 0dd5c18cfdb9f8d51069611ee90d31ba1e63bde3
 
@@ -103,7 +103,7 @@ commit = d777f282999a54ddb0ee71d76b216f5a4976a38e
 [submodule.dune-xt-la]
 remote = git@github.com:dune-community/dune-xt-la.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = d3772f6d9bbeaeef5e15583b6abea4921b79fcb6
+commit = 2bb857b24367d5a4175c2afa717d3b55a16eb634
 
 [submodule.scripts]
 remote = https://github.com/wwu-numerik/scripts.git
