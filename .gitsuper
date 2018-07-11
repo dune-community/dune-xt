@@ -14,7 +14,7 @@ status = +a3f7e3b4c5317dc77a3c9d6578dd58d880ffcdc1 config.opts (heads/master)
 	-87f81bcc161d385bb4d52978b78443f65aa43f02 dune-visibility-demo
 	+5da0a41a3eb9255c22d4e32d85853feda442ccc4 dune-xt-common (heads/bindings_update)
 	 ecf3bc96b7dc011f2d74923a496b5ad0bd5b1ec7 dune-xt-functions (heads/master)
-	+916b98050c9bdec9dc9df070dbd5e72af3daef78 dune-xt-grid (heads/bindings_update)
+	+a1b2d81ee823ae8b6cd6d9aea5ce0066dbef9ac0 dune-xt-grid (heads/bindings_update)
 	 c82a8502baddbc85185f1c142945111ba52fa759 dune-xt-la (heads/master)
 	 1a90ca104f7551110c402dbbee50b4fa2a2a0f26 local/bin (remotes/origin/semicolonAsSeperator-89-g1a90ca1)
 	-d1d56509f0744dc6003234c2b72e393c64faf050 pylrbms
@@ -89,7 +89,7 @@ commit = ecf3bc96b7dc011f2d74923a496b5ad0bd5b1ec7
 [submodule.dune-xt-grid]
 remote = https://github.com/dune-community/dune-xt-grid.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 916b98050c9bdec9dc9df070dbd5e72af3daef78
+commit = a1b2d81ee823ae8b6cd6d9aea5ce0066dbef9ac0
 
 [submodule.dune-xt-la]
 remote = https://github.com/dune-community/dune-xt-la.git
