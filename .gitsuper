@@ -13,7 +13,7 @@ status = +a3f7e3b4c5317dc77a3c9d6578dd58d880ffcdc1 config.opts (heads/master)
 	 26cc8cb4161a3a51002ab2a81b8c81d2c951ee79 dune-testtools (remotes/origin/p/renemilk/testname_listing_hack_no-skiptest)
 	-87f81bcc161d385bb4d52978b78443f65aa43f02 dune-visibility-demo
 	+5da0a41a3eb9255c22d4e32d85853feda442ccc4 dune-xt-common (heads/bindings_update)
-	+bc9c440031930bd9122fab6df71a213e10b7972c dune-xt-functions (remotes/origin/HEAD)
+	+ccecaa9c4d7f5d055d7735b177c06cbfc334696d dune-xt-functions (heads/master)
 	+8147017cdd9c043e7841163cc4fc46dc51815dcc dune-xt-grid (heads/bindings_update)
 	+d85592d8764f522646e250c91472f931dadb5f3c dune-xt-la (heads/bindings_update)
 	 1a90ca104f7551110c402dbbee50b4fa2a2a0f26 local/bin (remotes/origin/semicolonAsSeperator-89-g1a90ca1)
@@ -84,7 +84,7 @@ commit = 5da0a41a3eb9255c22d4e32d85853feda442ccc4
 [submodule.dune-xt-functions]
 remote = https://github.com/dune-community/dune-xt-functions.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = bc9c440031930bd9122fab6df71a213e10b7972c
+commit = ccecaa9c4d7f5d055d7735b177c06cbfc334696d
 
 [submodule.dune-xt-grid]
 remote = https://github.com/dune-community/dune-xt-grid.git
