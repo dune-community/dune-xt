@@ -116,11 +116,7 @@ public:
   {
   }
 
-  Solver(Solver&& source)
-    : matrix_(source.matrix_)
-    , communicator_(source.communicator_.access())
-  {
-  }
+  Solver(Solver&& source) = default;
 
   static std::vector<std::string> types()
   {
