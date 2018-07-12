@@ -66,7 +66,7 @@ PYBIND11_MODULE(_functions, m)
 
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.grid");
-  py::module::import("dune.xt.interfaces");
+  py::module::import("dune.xt._interfaces");
 
   bind_ConstantFunction<1, 1, 1>(m);
   bind_ConstantFunction<1, 2, 1>(m);
