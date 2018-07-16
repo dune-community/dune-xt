@@ -171,8 +171,10 @@ public:
   static const size_t dimDomain = MacroGridType::dimension;
   static const size_t dimWorld = MacroGridType::dimensionworld;
 
-private:
+public:
   typedef typename Layer<LocalGridType, layer, Backends::view>::type LocalViewType;
+
+private:
   typedef GridGlue::Codim1Extractor<LocalViewType> LocalExtractorType;
 
 public:
@@ -1037,45 +1039,86 @@ public:
   }
 
   template <class V>
+  void addCellData(const size_t subdomain, const std::vector<V>& vector, const std::string& name, const int ncomps = 1)
+  {
+    DUNE_THROW_IF(subdomain > glued_grid_.num_subdomains(),
+                  Common::Exceptions::index_out_of_range,
+                  "subdomain = " << subdomain
+                                 << "\n   glued_grid_.num_subdomains() = " << glued_grid_.num_subdomains());
+    local_vtk_writers_[subdomain]->addCellData(vector, name, ncomps);
+  } // ... addCellData(...)
+
+  template <class V>
   void addCellData(const std::vector<std::vector<V>>& vectors, const std::string& name, const int ncomps = 1)
   {
-    if (vectors.size() != glued_grid_.num_subdomains())
-      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
-                 "vectors.size(): " << vectors.size() << "\n"
-                                    << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
+    DUNE_THROW_IF(vectors.size() != glued_grid_.num_subdomains(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "vectors.size() =  " << vectors.size()
+                                       << "\n   glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       local_vtk_writers_[ss]->addCellData(vectors[ss], name, ncomps);
   } // ... addCellData(...)
 
   template <class VTKFunctionType>
-  void addCellData(const std::vector<std::shared_ptr<VTKFunctionType>>& functions)
+  void addCellData(const size_t subdomain, const std::shared_ptr<VTKFunctionType>& function, const std::string& name)
   {
-    if (functions.size() != glued_grid_.num_subdomains())
-      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
-                 "funcitons.size(): " << functions.size() << "\n"
-                                      << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
-    for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
-      local_vtk_writers_[ss]->addCellData(functions[ss]);
+    DUNE_THROW_IF(subdomain > glued_grid_.num_subdomains(),
+                  Common::Exceptions::index_out_of_range,
+                  "subdomain = " << subdomain
+                                 << "\n   glued_grid_.num_subdomains() = " << glued_grid_.num_subdomains());
+    local_vtk_writers_[subdomain]->addCellData(function, name);
   } // ... addCellData(...)
+
+  template <class VTKFunctionType>
+  void addCellData(const std::vector<std::shared_ptr<VTKFunctionType>>& functions, const std::string& name)
+  {
+    DUNE_THROW_IF(functions.size() != glued_grid_.num_subdomains(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "functions.size() =  " << functions.size()
+                                         << "\n   glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
+    for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
+      local_vtk_writers_[ss]->addCellData(functions[ss], name);
+  } // ... addCellData(...)
+
+  template <class V>
+  void
+  addVertexData(const size_t subdomain, const std::vector<V>& vector, const std::string& name, const int ncomps = 1)
+  {
+    DUNE_THROW_IF(subdomain > glued_grid_.num_subdomains(),
+                  Common::Exceptions::index_out_of_range,
+                  "subdomain = " << subdomain
+                                 << "\n   glued_grid_.num_subdomains() = " << glued_grid_.num_subdomains());
+    local_vtk_writers_[subdomain]->addVertexData(vector, name, ncomps);
+  } // ... addVertexData(...)
 
   template <class V>
   void addVertexData(const std::vector<std::vector<V>>& vectors, const std::string& name, const int ncomps = 1)
   {
-    if (vectors.size() != glued_grid_.num_subdomains())
-      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
-                 "vectors.size(): " << vectors.size() << "\n"
-                                    << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
+    DUNE_THROW_IF(vectors.size() != glued_grid_.num_subdomains(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "vectors.size() =  " << vectors.size()
+                                       << "\n   glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       local_vtk_writers_[ss]->addVertexData(vectors[ss], name, ncomps);
   } // ... addVertexData(...)
 
   template <class VTKFunctionType>
+  void addVertexData(const size_t subdomain, const std::shared_ptr<VTKFunctionType>& function)
+  {
+    DUNE_THROW_IF(subdomain > glued_grid_.num_subdomains(),
+                  Common::Exceptions::index_out_of_range,
+                  "subdomain = " << subdomain
+                                 << "\n   glued_grid_.num_subdomains() = " << glued_grid_.num_subdomains());
+    local_vtk_writers_[subdomain]->addVertexData(function);
+  } // ... addVertexData(...)
+
+  template <class VTKFunctionType>
   void addVertexData(const std::vector<std::shared_ptr<VTKFunctionType>>& functions)
   {
-    if (functions.size() != glued_grid_.num_subdomains())
-      DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
-                 "funcitons.size(): " << functions.size() << "\n"
-                                      << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
+    DUNE_THROW_IF(functions.size() != glued_grid_.num_subdomains(),
+                  Common::Exceptions::shapes_do_not_match,
+                  "functions.size() =  " << functions.size()
+                                         << "\n   glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       local_vtk_writers_[ss]->addVertexData(functions[ss]);
   } // ... addVertexData(...)
@@ -1083,7 +1126,7 @@ public:
   void clear()
   {
     for (auto& local_vtk_writer : local_vtk_writers_)
-      local_vtk_writer.clear();
+      local_vtk_writer->clear();
   }
 
   void write(const std::string& name, VTK::OutputType type = VTK::ascii)
