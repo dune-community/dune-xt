@@ -149,7 +149,11 @@ function(dune_pybindxi_add_module target_name)
     return()
   endif()
 
-  _dune_pybind11_add_lto_flags(${target_name} ${ARG_THIN_LTO})
+  if(CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
+    message(WARNING "not enabling LTO although it was requested due to buggy gcc version")
+  else()
+    _dune_pybind11_add_lto_flags(${target_name} ${ARG_THIN_LTO})
+  endif()
 
   if(MSVC)
     # /MP enables multithreaded builds (relevant when there are many files), /bigobj is
