@@ -80,7 +80,7 @@ void bind_grid_layer(pybind11::module& m, std::integral_constant<size_t, counter
 {
   bind_grid_layer_info<Grid, layers[counter - 1]>::bind(m);
   bind_grid_layer<Grid>(m, std::integral_constant<size_t, counter - 1>());
-};
+}
 
 template <class GridTuple = Dune::XT::Grid::bindings::AvailableTypes>
 void bind_grid(pybind11::module& m)
