@@ -45,8 +45,8 @@ class ParametricExpressionFunction<d, r, 1, R> : public FunctionInterface<d, r, 
 public:
   using typename BaseType::DomainType;
   using BaseType::domain_dim;
-  using typename BaseType::RangeType;
-  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
   using BaseType::range_dim;
 
   static std::string static_id()
@@ -113,10 +113,10 @@ public:
     return param_type_;
   }
 
-  RangeType evaluate(const DomainType& point_in_global_coordinates,
-                     const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
+                           const Common::Parameter& param = {}) const override final
   {
-    RangeType ret(0.);
+    RangeReturnType ret(0.);
     Common::Parameter parsed_param;
     if (!param_type_.empty()) {
       parsed_param = this->parse_parameter(param);
@@ -182,8 +182,8 @@ public:
     return ret;
   } // ... evaluate(...)
 
-  DerivativeRangeType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                               const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                                     const Common::Parameter& /*param*/ = {}) const override final
   {
     DUNE_THROW(NotImplemented, "Not yet, at least...");
   }

@@ -184,12 +184,11 @@ public:
 protected:
   void post_bind(const ElementType& element)
   {
-    DUNE_THROW(NotImplemented, 'Implement it');
-    // func_local_.post_bind(element);
+    func_local_->bind(element);
   }
 
 private:
-  const std::unique_ptr<const typename FunctionType::LocalFunctionType> func_local_;
+  std::unique_ptr<typename FunctionType::LocalFunctionType> func_local_;
 }; // class DerivedLocalFunction
 
 

@@ -94,11 +94,13 @@ private:
     {
     }
 
+  protected:
     void post_bind(const ElementType& element) override final
     {
       post_bind_lambda_(element);
     }
 
+  public:
     int order(const XT::Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);

@@ -23,9 +23,9 @@ struct FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
 
   using FunctionType = Functions::FlatTopFunction<d, r, rC>;
 
-  using RangeType = typename FunctionType::RangeType;
+  using RangeReturnType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
-  using DerivativeRangeType = typename FunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename FunctionType::DerivativeRangeReturnType;
 
   FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
     : grid_(Dune::XT::Grid::make_cube_grid<GridType>(-2., 2., 4))
@@ -88,7 +88,7 @@ TEST_F(FlattopFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluate)
     const DomainType left(0);
     const DomainType right(1);
     const DomainType delta(1e-6);
-    const RangeType expected_value(value);
+    const RangeReturnType expected_value(value);
     FunctionType function(left, right, delta, value);
     for (auto point : {0.25, 0.5, 0.75}) {
       const DomainType xx(point);

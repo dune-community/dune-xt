@@ -54,8 +54,8 @@ class Testcase1Force<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
 public:
   using typename BaseType::DomainFieldType;
   using typename BaseType::DomainType;
-  using typename BaseType::RangeType;
-  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
 
   static const bool available = true;
 
@@ -119,7 +119,7 @@ public:
   /**
    * \brief "0.5 * pi * pi * cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
     return (M_PI_2l * M_PIl * cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]));
   }
@@ -128,9 +128,9 @@ public:
    * \brief ["-0.25 * pi * pi * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.25 * pi * pi * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
-    DerivativeRangeType ret(0.);
+    DerivativeRangeReturnType ret(0.);
     const DomainFieldType pre = -0.25 * M_PIl * M_PIl * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
     const DomainFieldType y_arg = M_PI_2l * xx[1];
@@ -164,8 +164,8 @@ class Testcase1ExactSolution<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
 public:
   using typename BaseType::DomainFieldType;
   using typename BaseType::DomainType;
-  using typename BaseType::RangeType;
-  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
 
   static const bool available = true;
 
@@ -229,7 +229,7 @@ public:
   /**
    * \brief "cos(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    */
-  RangeType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
     return (cos(M_PI_2l * xx[0]) * cos(M_PI_2l * xx[1]));
   }
@@ -238,9 +238,9 @@ public:
    * \brief ["-0.5 * pi * sin(0.5 * pi * x[0]) * cos(0.5 * pi * x[1])"
    *         "-0.5 * pi * cos(0.5 * pi * x[0]) * sin(0.5 * pi * x[1])"]
    */
-  DerivativeRangeType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& /*param*/ = {}) const override final
   {
-    DerivativeRangeType ret(0.);
+    DerivativeRangeReturnType ret(0.);
     const DomainFieldType pre = -0.5 * M_PIl;
     const DomainFieldType x_arg = M_PI_2l * xx[0];
     const DomainFieldType y_arg = M_PI_2l * xx[1];
@@ -275,11 +275,9 @@ private:
   public:
     using typename BaseType::ElementType;
     using typename BaseType::DomainType;
-    using typename BaseType::RangeType;
     using typename BaseType::RangeReturnType;
     using typename BaseType::RangeFieldType;
     using typename BaseType::DomainFieldType;
-    using typename BaseType::DerivativeRangeType;
     using typename BaseType::DerivativeRangeReturnType;
 
     LocalCutoffFunction(const DiffusionType& diffusion, const RangeFieldType poincare_constant)
@@ -290,11 +288,13 @@ private:
     {
     }
 
+  protected:
     void post_bind(const ElementType& ele) override final
     {
       post_bind_helper<ElementType, d>::post_bind(ele, value_, local_diffusion_, poincare_constant_);
     }
 
+  public:
     int order(const XT::Common::Parameter& /*param*/ = {}) const override final
     {
       return 0;
@@ -311,7 +311,7 @@ private:
                                        const Common::Parameter& /*param*/ = {}) const override final
     {
       this->assert_inside_reference_element(xx);
-      return DerivativeRangeType();
+      return DerivativeRangeReturnType();
     }
 
   private:

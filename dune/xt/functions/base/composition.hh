@@ -24,6 +24,7 @@ namespace XT {
 namespace Functions {
 namespace internal {
 
+
 template <class InnerType, class OuterType, class OuterGridViewType>
 struct GeneralElementFunctionChooser
 {
@@ -53,6 +54,8 @@ struct GeneralElementFunctionChooser
       , inner_function_(inner_function)
       , outer_function_(outer_function)
       , element_search_(element_search)
+      , local_inner_function_(inner_function_.local_function())
+      , local_outer_function_(outer_function_.local_function())
     {
     }
 
@@ -60,7 +63,14 @@ struct GeneralElementFunctionChooser
 
     ElementFunction& operator=(const ElementFunction& /*other*/) = delete;
 
-    int order(const XT::Common::Parameter& /*mu*/ = {}) const override final
+  protected:
+    void post_bind(const ElementType& element)
+    {
+      local_inner_function_->bind(element);
+    }
+
+  public:
+    int order(const XT::Common::Parameter& /*param*/ = {}) const override final
     {
       return 2;
     }
@@ -68,7 +78,7 @@ struct GeneralElementFunctionChooser
     RangeType evaluate(const DomainType& xx) const override final
     {
       // evaluate inner function
-      const auto inner_value = inner_function_.local_function(element_)->evaluate(xx);
+      const auto inner_value = local_inner_function_->evaluate(xx);
       // find element on outer grid the value of inner function belongs to
       const auto element_ptrs = (*element_search_)(std::vector<typename OuterType::DomainType>(1, inner_value));
       const auto& element_ptr = element_ptrs[0];
@@ -77,7 +87,8 @@ struct GeneralElementFunctionChooser
                    "Could not find element, maybe inner function does not map to the domain of outer function");
       const auto& outer_element = *element_ptr;
       // evaluate outer function
-      return outer_function_.local_function(outer_element)->evaluate(outer_element.geometry().local(inner_value));
+      local_outer_function_->bind(outer_element);
+      return local_outer_function_->evaluate(outer_element.geometry().local(inner_value));
     }
 
     DerivativeRangeType jacobian(const DomainType& /*xx*/) const override final
@@ -89,9 +100,12 @@ struct GeneralElementFunctionChooser
     const InnerType& inner_function_;
     const OuterType& outer_function_;
     std::shared_ptr<typename Grid::EntityInlevelSearch<OuterGridViewType>>& element_search_;
+    std::unique_ptr<typename InnerType::LocalFunctionType>& local_inner_function_;
+    std::unique_ptr<typename OuterType::LocalFunctionType>& local_outer_function_;
     const ElementType& element_;
   }; // class ElementFunction
 }; // GeneralElementFunctionChooser
+
 
 template <class InnerType, class OuterType, class OuterGridViewType>
 struct ElementFunctionForGlobalChooser

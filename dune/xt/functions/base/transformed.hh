@@ -72,32 +72,31 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     {
     }
 
+  protected:
     void post_bind(const ElementType& element) override final
     {
-      //      local_function_->post_bind(element);
-      DUNE_THROW(NotImplemented, 'Implement it');
+      local_function_->bind(element);
     }
 
-    int order(const XT::Common::Parameter& mu = {}) const override final
+  public:
+    int order(const XT::Common::Parameter& param = {}) const override final
     {
-      return local_function_->order(mu);
+      return local_function_->order(param);
     }
 
-    RangeType evaluate(const DomainType& xx, const XT::Common::Parameter& mu = {}) const override final
+    RangeType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
     {
-      RangeType tmp;
-      local_function_->evaluate(xx, tmp, mu);
-      return transformation_(tmp);
+      return transformation_(local_function_->evaluate(xx, param));
     }
 
     DerivativeRangeType jacobian(const DomainType& /*xx*/,
-                                 const XT::Common::Parameter& /*mu*/ = {}) const override final
+                                 const XT::Common::Parameter& /*param*/ = {}) const override final
     {
       DUNE_THROW(NotImplemented, "Yet!");
     }
 
   private:
-    const std::unique_ptr<UntransformedLocalFunctionType> local_function_;
+    std::unique_ptr<UntransformedLocalFunctionType> local_function_;
     const Transformation& transformation_;
   }; // class TransformedLocalFunction
 

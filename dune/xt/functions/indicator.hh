@@ -48,6 +48,7 @@ class IndicatorFunction : public GridFunctionInterface<E, r, rC, R>
     {
     }
 
+  protected:
     void post_bind(const ElementType& element) override final
     {
       current_value_ = 0.;
@@ -60,6 +61,7 @@ class IndicatorFunction : public GridFunctionInterface<E, r, rC, R>
       }
     } // ... post_bind(...)
 
+  public:
     int order(const Common::Parameter& /*param*/ = {}) const override final
     {
       return 0;

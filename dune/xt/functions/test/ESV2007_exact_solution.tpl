@@ -34,9 +34,9 @@ struct ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : pu
 
   using FunctionType = Functions::ESV2007::Testcase1ExactSolution<d, r, rC>;
 
-  using RangeType = typename FunctionType::RangeType;
+  using RangeReturnType = typename FunctionType::RangeReturnType;
   using DomainType = typename FunctionType::DomainType;
-  using DerivativeRangeType = typename FunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename FunctionType::DerivativeRangeReturnType;
 
   ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
     : grid_(Dune::XT::Grid::make_cube_grid<GridType>(-1., 1., 4))
@@ -89,7 +89,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, glo
   FunctionType function(3);
   for (auto point : {0.25, 0.5, 0.75}) {
     const DomainType xx(point);
-    const RangeType expected_value(cos(M_PI_2l * point) * cos(M_PI_2l * point));
+    const RangeReturnType expected_value(cos(M_PI_2l * point) * cos(M_PI_2l * point));
     const auto actual_value = function.evaluate(xx);
     EXPECT_EQ(expected_value, actual_value);
   }
@@ -100,7 +100,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, glo
   FunctionType function(3);
   for (auto point : {0.25, 0.5, 0.75}) {
     const DomainType xx(point);
-    DerivativeRangeType ret(0.);
+    DerivativeRangeReturnType ret(0.);
     const double pre = -0.5 * M_PIl;
     const double x_arg = M_PI_2l * xx[0];
     const double y_arg = M_PI_2l * xx[1];
@@ -150,7 +150,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
       const auto local_x = quadrature_point.position();
       const auto value = local_f->evaluate(local_x);
       const auto point = element.geometry().global(local_x);
-      const RangeType expected_value(cos(M_PI_2l * point[0]) * cos(M_PI_2l * point[1]));
+      const RangeReturnType expected_value(cos(M_PI_2l * point[0]) * cos(M_PI_2l * point[1]));
       EXPECT_EQ(expected_value, value);
     }
   }
@@ -169,7 +169,7 @@ TEST_F(ESV2007ExactSolutionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, loc
       const auto local_x = quadrature_point.position();
       const auto value = local_f->jacobian(local_x);
       const auto point = element.geometry().global(local_x);
-      DerivativeRangeType ret(0.);
+      DerivativeRangeReturnType ret(0.);
       const double pre = -0.5 * M_PIl;
       const double x_arg = M_PI_2l * point[0];
       const double y_arg = M_PI_2l * point[1];
