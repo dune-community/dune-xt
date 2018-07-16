@@ -911,7 +911,7 @@ struct SubdomainGridFactory<GridType>::Add<c, c>
     // loop over all codim c subentities of this entity
     for (unsigned int i = 0; i < entity.subEntities(c); ++i) {
       const auto codimCentity = entity.template subEntity<c>(i);
-      const SubdomainGridFactory<GridType>::GeometryType& geometryType = codimCentity.type();
+      const typename SubdomainGridFactory<GridType>::GeometryType& geometryType = codimCentity.type();
       const typename SubdomainGridFactory<GridType>::IndexType globalIndex =
           factory.globalGridView_->indexSet().index(codimCentity);
       factory.addGeometryAndIndex(geometryMap, localCodimSizes, geometryType, globalIndex);
