@@ -15,7 +15,10 @@ guards = { 'alu': 'dune-alugrid',
 
 
 def _is_usable(grid, cache):
-    return cache[guards[grid]]
+    try:
+        return cache[guards[grid]]
+    except KeyError:
+        return False
 
 
 def all_args(dims):
