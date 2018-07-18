@@ -48,13 +48,13 @@ template <class GridViewType, size_t range_dim, size_t range_dim_cols, class Ran
 class VisualizationAdapter;
 
 template <class MinuendType, class SubtrahendType>
-class DifferenceFunction;
+class DifferenceGridFunction;
 
 template <class LeftSummandType, class RightSummandType>
-class SumFunction;
+class SumGridFunction;
 
 template <class LeftSummandType, class RightSummandType>
-class ProductFunction;
+class ProductGridFunction;
 
 // template <class Function>
 // class DivergenceFunction;
@@ -95,8 +95,8 @@ public:
 
   static const constexpr bool available = false;
 
-  using DifferenceType = Functions::DifferenceFunction<ThisType, ThisType>;
-  using SumType = Functions::SumFunction<ThisType, ThisType>;
+  using DifferenceType = Functions::DifferenceGridFunction<ThisType, ThisType>;
+  using SumType = Functions::SumGridFunction<ThisType, ThisType>;
 
   virtual ~GridFunctionInterface() = default;
 
@@ -141,10 +141,10 @@ public:
   }
 
   template <class OtherType>
-  typename std::enable_if<is_grid_function<OtherType>::value, Functions::ProductFunction<ThisType, OtherType>>::type
+  typename std::enable_if<is_grid_function<OtherType>::value, Functions::ProductGridFunction<ThisType, OtherType>>::type
   operator*(const OtherType& other) const
   {
-    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
+    return Functions::ProductGridFunction<ThisType, OtherType>(*this, other);
   }
 
   /**
@@ -185,7 +185,7 @@ public:
 } // namespace XT
 } // namespace Dune
 
-#include <dune/xt/functions/base/combined.hh>
+#include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/base/visualization.hh>
 //#include "../derived.hh"
 
