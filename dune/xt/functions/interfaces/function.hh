@@ -28,6 +28,14 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+template <class MinuendType, class SubtrahendType>
+class DifferenceFunction;
+
+template <class LeftSummandType, class RightSummandType>
+class SumFunction;
+
+template <class LeftSummandType, class RightSummandType>
+class ProductFunction;
 
 // forward, required in FunctionInterface::as_grid_function
 template <class E, size_t r, size_t rC, class R>
@@ -78,6 +86,9 @@ public:
 
   using RangeSelector = RangeTypeSelector<R, r, rC>;
   using DerivativeRangeSelector = DerivativeRangeTypeSelector<d, R, r, rC>;
+
+  using DifferenceType = Functions::DifferenceFunction<ThisType, ThisType>;
+  using SumType = Functions::SumFunction<ThisType, ThisType>;
 
   /**
    * \name ``These types are the _standard_ types to be used.''
@@ -154,11 +165,29 @@ public:
     return "dune.xt.functions.function";
   }
 
+
   /**
    * \}
    * \name ´´These methods are default implemented and should be overridden to improve their performance.''
    * \{
    **/
+
+  DifferenceType operator-(const ThisType& other) const
+  {
+    return DifferenceType(*this, other);
+  }
+
+  SumType operator+(const ThisType& other) const
+  {
+    return SumType(*this, other);
+  }
+
+  template <class OtherType>
+  typename std::enable_if<is_grid_function<OtherType>::value, Functions::ProductFunction<ThisType, OtherType>>::type
+  operator*(const OtherType& other) const
+  {
+    return Functions::ProductFunction<ThisType, OtherType>(*this, other);
+  }
 
   virtual R evaluate(const DomainType& point_in_global_coordinates,
                      const size_t row,
