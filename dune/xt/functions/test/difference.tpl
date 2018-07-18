@@ -6,7 +6,7 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-#include <dune/xt/functions/base/combined.hh>
+#include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/indicator.hh>
 
 using namespace Dune::XT;
@@ -23,7 +23,7 @@ struct DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::tes
 
   using IndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, r, rC>;
 
-  using DifferenceFunctionType = Dune::XT::Functions::DifferenceFunction<IndicatorFunctionType, IndicatorFunctionType>;
+  using DifferenceFunctionType = Dune::XT::Functions::DifferenceGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
 
   using RangeType = typename IndicatorFunctionType::RangeType;
   using DomainType = typename IndicatorFunctionType::DomainType;
