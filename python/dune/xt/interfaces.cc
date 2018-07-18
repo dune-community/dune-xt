@@ -31,9 +31,9 @@ void add_bind_for_Grid_interface(pybind11::module& m)
 {
   using namespace Dune::XT::Functions;
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
-  const auto diff = internal::Combination::difference;
-  const auto sum = internal::Combination::sum;
-  const auto prod = internal::Combination::product;
+  const auto diff = internal::Combinations::difference;
+  const auto sum = internal::Combinations::sum;
+  const auto prod = internal::Combinations::product;
   const auto g_dim = G::dimension;
 
   auto i_1_1 = bind_GridFunctionInterface<G, 1, 1>(m, grid_id);
@@ -102,35 +102,182 @@ PYBIND11_MODULE(_interfaces, m)
   using namespace pybind11::literals;
   using namespace Dune::XT::Functions;
 
+  const auto diff = internal::Combination::difference;
+  const auto sum = internal::Combination::sum;
+  const auto prod = internal::Combination::product;
+
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.grid");
 
-  bind_FunctionInterface<1, 1, 1>(m);
-  bind_FunctionInterface<1, 2, 1>(m);
-  bind_FunctionInterface<1, 3, 1>(m);
-  bind_FunctionInterface<1, 4, 1>(m);
-  bind_FunctionInterface<1, 2, 2>(m);
-  bind_FunctionInterface<1, 1, 2>(m);
-  bind_FunctionInterface<1, 1, 3>(m);
-  bind_FunctionInterface<1, 3, 3>(m);
+  auto i_1_1_1 = bind_FunctionInterface<1, 1, 1>(m);
+  auto i_1_2_1 = bind_FunctionInterface<1, 2, 1>(m);
+  auto i_1_3_1 = bind_FunctionInterface<1, 3, 1>(m);
+  auto i_1_4_1 = bind_FunctionInterface<1, 4, 1>(m);
+  auto i_1_2_2 = bind_FunctionInterface<1, 2, 2>(m);
+//  auto i_1_1_2 = bind_FunctionInterface<1, 1, 2>(m);
+//  auto i_1_1_3 = bind_FunctionInterface<1, 1, 3>(m);
+//  auto i_1_3_3 = bind_FunctionInterface<1, 3, 3>(m);
 
-  bind_FunctionInterface<2, 1, 1>(m);
-  bind_FunctionInterface<2, 2, 1>(m);
-  bind_FunctionInterface<2, 3, 1>(m);
-  bind_FunctionInterface<2, 4, 1>(m);
-  bind_FunctionInterface<2, 2, 2>(m);
-  bind_FunctionInterface<2, 1, 2>(m);
-  bind_FunctionInterface<2, 1, 3>(m);
-  bind_FunctionInterface<2, 3, 3>(m);
+  auto i_2_1_1 = bind_FunctionInterface<2, 1, 1>(m);
+  auto i_2_2_1 = bind_FunctionInterface<2, 2, 1>(m);
+  auto i_2_3_1 = bind_FunctionInterface<2, 3, 1>(m);
+  auto i_2_4_1 = bind_FunctionInterface<2, 4, 1>(m);
+  auto i_2_2_2 = bind_FunctionInterface<2, 2, 2>(m);
+//  auto i_2_1_2 = bind_FunctionInterface<2, 1, 2>(m);
+//  auto i_2_1_3 = bind_FunctionInterface<2, 1, 3>(m);
+//  auto i_2_3_3 = bind_FunctionInterface<2, 3, 3>(m);
 
-  bind_FunctionInterface<3, 1, 1>(m);
-  bind_FunctionInterface<3, 2, 1>(m);
-  bind_FunctionInterface<3, 3, 1>(m);
-  bind_FunctionInterface<3, 4, 1>(m);
-  bind_FunctionInterface<3, 2, 2>(m);
-  bind_FunctionInterface<3, 1, 2>(m);
-  bind_FunctionInterface<3, 1, 3>(m);
-  bind_FunctionInterface<3, 3, 3>(m);
+  auto i_3_1_1 = bind_FunctionInterface<3, 1, 1>(m);
+  auto i_3_2_1 = bind_FunctionInterface<3, 2, 1>(m);
+  auto i_3_3_1 = bind_FunctionInterface<3, 3, 1>(m);
+  auto i_3_4_1 = bind_FunctionInterface<3, 4, 1>(m);
+  auto i_3_2_2 = bind_FunctionInterface<3, 2, 2>(m);
+//  auto i_3_1_2 = bind_FunctionInterface<3, 1, 2>(m);
+//  auto i_3_1_3 = bind_FunctionInterface<3, 1, 3>(m);
+//  auto i_3_3_3 = bind_FunctionInterface<3, 3, 3>(m);
+
+  bind_combined_Function<1, diff, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<1, diff, 1, 1, 1, 1>(i_1_1_1);
+
+  bind_combined_Function<1, diff, 2, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<1, diff, 2, 1, 2, 1>(i_1_2_1);
+
+  bind_combined_Function<1, diff, 3, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<1, diff, 3, 1, 3, 1>(i_1_3_1);
+
+  bind_combined_Function<1, diff, 4, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<1, diff, 4, 1, 4, 1>(i_1_4_1);
+
+  bind_combined_Function<1, diff, 2, 2, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<1, diff, 2, 2, 2, 2>(i_1_2_2);
+
+
+  bind_combined_Function<1, sum, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<1, sum, 1, 1, 1, 1>(i_1_1_1);
+
+  bind_combined_Function<1, sum, 2, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<1, sum, 2, 1, 2, 1>(i_1_2_1);
+
+  bind_combined_Function<1, sum, 3, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<1, sum, 3, 1, 3, 1>(i_1_3_1);
+
+  bind_combined_Function<1, sum, 4, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<1, sum, 4, 1, 4, 1>(i_1_4_1);
+
+  bind_combined_Function<1, sum, 2, 2, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<1, sum, 2, 2, 2, 2>(i_1_2_2);
+
+
+  bind_combined_Function<1, prod, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<1, prod, 1, 1, 1, 1>(i_1_1_1);
+
+  bind_combined_Function<1, prod, 1, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<1, prod, 1, 1, 2, 1>(i_1_1_1);
+
+  bind_combined_Function<1, prod, 1, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<1, prod, 1, 1, 3, 1>(i_1_1_1);
+
+  bind_combined_Function<1, prod, 1, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<1, prod, 1, 1, 4, 1>(i_1_1_1);
+
+  bind_combined_Function<1, prod, 1, 1, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<1, prod, 1, 1, 2, 2>(i_1_1_1);
+
+
+  bind_combined_Function<2, diff, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<2, diff, 1, 1, 1, 1>(i_2_1_1);
+
+  bind_combined_Function<2, diff, 2, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<2, diff, 2, 1, 2, 1>(i_2_2_1);
+
+  bind_combined_Function<2, diff, 3, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<2, diff, 3, 1, 3, 1>(i_2_3_1);
+
+  bind_combined_Function<2, diff, 4, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<2, diff, 4, 1, 4, 1>(i_2_4_1);
+
+  bind_combined_Function<2, diff, 2, 2, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<2, diff, 2, 2, 2, 2>(i_2_2_2);
+
+
+  bind_combined_Function<2, sum, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<2, sum, 1, 1, 1, 1>(i_2_1_1);
+
+  bind_combined_Function<2, sum, 2, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<2, sum, 2, 1, 2, 1>(i_2_2_1);
+
+  bind_combined_Function<2, sum, 3, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<2, sum, 3, 1, 3, 1>(i_2_3_1);
+
+  bind_combined_Function<2, sum, 4, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<2, sum, 4, 1, 4, 1>(i_2_4_1);
+
+  bind_combined_Function<2, sum, 2, 2, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<2, sum, 2, 2, 2, 2>(i_2_2_2);
+
+
+  bind_combined_Function<2, prod, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<2, prod, 1, 1, 1, 1>(i_2_1_1);
+
+  bind_combined_Function<2, prod, 1, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<2, prod, 1, 1, 2, 1>(i_2_1_1);
+
+  bind_combined_Function<2, prod, 1, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<2, prod, 1, 1, 3, 1>(i_2_1_1);
+
+  bind_combined_Function<2, prod, 1, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<2, prod, 1, 1, 4, 1>(i_2_1_1);
+
+  bind_combined_Function<2, prod, 1, 1, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<2, prod, 1, 1, 2, 2>(i_2_1_1);
+
+
+  bind_combined_Function<3, diff, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<3, diff, 1, 1, 1, 1>(i_3_1_1);
+
+  bind_combined_Function<3, diff, 2, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<3, diff, 2, 1, 2, 1>(i_3_2_1);
+
+  bind_combined_Function<3, diff, 3, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<3, diff, 3, 1, 3, 1>(i_3_3_1);
+
+  bind_combined_Function<3, diff, 4, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<3, diff, 4, 1, 4, 1>(i_3_4_1);
+
+  bind_combined_Function<3, diff, 2, 2, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<3, diff, 2, 2, 2, 2>(i_3_2_2);
+
+
+  bind_combined_Function<3, sum, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<3, sum, 1, 1, 1, 1>(i_3_1_1);
+
+  bind_combined_Function<3, sum, 2, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<3, sum, 2, 1, 2, 1>(i_3_2_1);
+
+  bind_combined_Function<3, sum, 3, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<3, sum, 3, 1, 3, 1>(i_3_3_1);
+
+  bind_combined_Function<3, sum, 4, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<3, sum, 4, 1, 4, 1>(i_3_4_1);
+
+  bind_combined_Function<3, sum, 2, 2, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<3, sum, 2, 2, 2, 2>(i_3_2_2);
+
+
+  bind_combined_Function<3, prod, 1, 1, 1, 1>(m);
+  addbind_FunctionInterface_combined_op<3, prod, 1, 1, 1, 1>(i_3_1_1);
+
+  bind_combined_Function<3, prod, 1, 1, 2, 1>(m);
+  addbind_FunctionInterface_combined_op<3, prod, 1, 1, 2, 1>(i_3_1_1);
+
+  bind_combined_Function<3, prod, 1, 1, 3, 1>(m);
+  addbind_FunctionInterface_combined_op<3, prod, 1, 1, 3, 1>(i_3_1_1);
+
+  bind_combined_Function<3, prod, 1, 1, 4, 1>(m);
+  addbind_FunctionInterface_combined_op<3, prod, 1, 1, 4, 1>(i_3_1_1);
+
+  bind_combined_Function<3, prod, 1, 1, 2, 2>(m);
+  addbind_FunctionInterface_combined_op<3, prod, 1, 1, 2, 2>(i_3_1_1);
 
   add_bind_for_Grid_interface<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m);
   add_bind_for_Grid_interface<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m);
