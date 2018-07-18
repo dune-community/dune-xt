@@ -11,8 +11,8 @@
 //   Rene Milk       (2014 - 2018)
 //   Tobias Leibner  (2014, 2017)
 
-#ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
-#define DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
+#ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
+#define DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 
 #include <dune/xt/functions/interfaces/function.hh>
 
