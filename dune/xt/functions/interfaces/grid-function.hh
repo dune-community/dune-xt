@@ -187,6 +187,5 @@ public:
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/base/visualization.hh>
-//#include "../derived.hh"
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FUNCTION_HH
