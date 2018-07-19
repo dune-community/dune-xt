@@ -17,6 +17,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
+#include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/grid/search.hh>
 
 namespace Dune {
