@@ -28,6 +28,8 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+
+// forwards, required in operator+-*
 template <class MinuendType, class SubtrahendType>
 class DifferenceFunction;
 
@@ -368,6 +370,9 @@ private:
 } // namespace XT
 } // namespace Dune
 
+
+#include <dune/xt/functions/base/combined-functions.hh>
 #include <dune/xt/functions/base/function-as-grid-function.hh>
+
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH
