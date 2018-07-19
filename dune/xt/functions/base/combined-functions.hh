@@ -21,7 +21,9 @@ namespace XT {
 namespace Functions {
 namespace internal {
 
+
 enum class Combination { difference, sum, product }; // enum class Combination
+
 
 /**
  * \brief Helper class defining types of combined functions, if available.

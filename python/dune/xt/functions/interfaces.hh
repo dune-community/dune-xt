@@ -116,13 +116,13 @@ struct get_combined<L, R, internal::Combination::product>
  * grid_combined
  */
 
-template <class L, class R, internal::Combinations comb>
+template <class L, class R, internal::Combination comb>
 struct get_grid_combined
 {
 }; // struct get_grid_combined
 
 template <class L, class R>
-struct get_grid_combined<L, R, internal::Combinations::difference>
+struct get_grid_combined<L, R, internal::Combination::difference>
 {
   typedef DifferenceGridFunction<L, R> type;
 
@@ -148,7 +148,7 @@ struct get_grid_combined<L, R, internal::Combinations::difference>
 }; // struct get_grid_combined
 
 template <class L, class R>
-struct get_grid_combined<L, R, internal::Combinations::sum>
+struct get_grid_combined<L, R, internal::Combination::sum>
 {
   typedef SumGridFunction<L, R> type;
 
@@ -174,7 +174,7 @@ struct get_grid_combined<L, R, internal::Combinations::sum>
 }; // struct get_grid_combined
 
 template <class L, class R>
-struct get_grid_combined<L, R, internal::Combinations::product>
+struct get_grid_combined<L, R, internal::Combination::product>
 {
   typedef ProductGridFunction<L, R> type;
 
@@ -349,11 +349,11 @@ static const constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
-template <class G, size_t d, internal::Combinations comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
+template <class G, size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
 pybind11::class_<
     typename internal::get_grid_combined<GridFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
-                                    GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
-                                    comb>::type>
+                                         GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
+                                         comb>::type>
 bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
@@ -381,10 +381,9 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 
 
 template <size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
-pybind11::class_<
-    typename internal::get_combined<FunctionInterface<d, lr, lrC, double>,
-                                    FunctionInterface<d, rr, rrC, double>,
-                                    comb>::type>
+pybind11::class_<typename internal::get_combined<FunctionInterface<d, lr, lrC, double>,
+                                                 FunctionInterface<d, rr, rrC, double>,
+                                                 comb>::type>
 bind_combined_Function(pybind11::module& m)
 {
   namespace py = pybind11;
@@ -419,7 +418,7 @@ static const constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
-template <class G, size_t d, internal::Combinations comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+template <class G, size_t d, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
 void addbind_GridFunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
