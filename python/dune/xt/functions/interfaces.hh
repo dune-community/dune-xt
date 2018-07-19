@@ -397,7 +397,8 @@ bind_combined_Function(pybind11::module& m)
   static const size_t rC = C::range_dim_cols;
   const std::string id = internal::get_combined<Left, Right, comb>::id();
   const std::string op = internal::get_combined<Left, Right, comb>::doc();
-  const std::string class_name = id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC);
+  const std::string class_name =
+      id + "__" + Common::to_string(d) + "d_to_" + Common::to_string(r) + "x" + Common::to_string(rC);
   const std::string doc = class_name + " (as a " + op + " of functions of dimensions " + Common::to_string(lr) + "x"
                           + Common::to_string(lrC) + " and " + Common::to_string(rr) + "x" + Common::to_string(rrC)
                           + ")";
