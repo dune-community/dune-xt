@@ -114,27 +114,27 @@ PYBIND11_MODULE(_interfaces, m)
   auto i_1_3_1 = bind_FunctionInterface<1, 3, 1>(m);
   auto i_1_4_1 = bind_FunctionInterface<1, 4, 1>(m);
   auto i_1_2_2 = bind_FunctionInterface<1, 2, 2>(m);
-//  auto i_1_1_2 = bind_FunctionInterface<1, 1, 2>(m);
-//  auto i_1_1_3 = bind_FunctionInterface<1, 1, 3>(m);
-//  auto i_1_3_3 = bind_FunctionInterface<1, 3, 3>(m);
+  auto i_1_1_2 = bind_FunctionInterface<1, 1, 2>(m);
+  auto i_1_1_3 = bind_FunctionInterface<1, 1, 3>(m);
+  auto i_1_3_3 = bind_FunctionInterface<1, 3, 3>(m);
 
   auto i_2_1_1 = bind_FunctionInterface<2, 1, 1>(m);
   auto i_2_2_1 = bind_FunctionInterface<2, 2, 1>(m);
   auto i_2_3_1 = bind_FunctionInterface<2, 3, 1>(m);
   auto i_2_4_1 = bind_FunctionInterface<2, 4, 1>(m);
   auto i_2_2_2 = bind_FunctionInterface<2, 2, 2>(m);
-//  auto i_2_1_2 = bind_FunctionInterface<2, 1, 2>(m);
-//  auto i_2_1_3 = bind_FunctionInterface<2, 1, 3>(m);
-//  auto i_2_3_3 = bind_FunctionInterface<2, 3, 3>(m);
+  auto i_2_1_2 = bind_FunctionInterface<2, 1, 2>(m);
+  auto i_2_1_3 = bind_FunctionInterface<2, 1, 3>(m);
+  auto i_2_3_3 = bind_FunctionInterface<2, 3, 3>(m);
 
   auto i_3_1_1 = bind_FunctionInterface<3, 1, 1>(m);
   auto i_3_2_1 = bind_FunctionInterface<3, 2, 1>(m);
   auto i_3_3_1 = bind_FunctionInterface<3, 3, 1>(m);
   auto i_3_4_1 = bind_FunctionInterface<3, 4, 1>(m);
   auto i_3_2_2 = bind_FunctionInterface<3, 2, 2>(m);
-//  auto i_3_1_2 = bind_FunctionInterface<3, 1, 2>(m);
-//  auto i_3_1_3 = bind_FunctionInterface<3, 1, 3>(m);
-//  auto i_3_3_3 = bind_FunctionInterface<3, 3, 3>(m);
+  auto i_3_1_2 = bind_FunctionInterface<3, 1, 2>(m);
+  auto i_3_1_3 = bind_FunctionInterface<3, 1, 3>(m);
+  auto i_3_3_3 = bind_FunctionInterface<3, 3, 3>(m);
 
   bind_combined_Function<1, diff, 1, 1, 1, 1>(m);
   addbind_FunctionInterface_combined_op<1, diff, 1, 1, 1, 1>(i_1_1_1);
