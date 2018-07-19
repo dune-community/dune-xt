@@ -14,8 +14,6 @@
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTIONS_HH
 
-#include <dune/xt/functions/base/combined-functions.hh>
-#include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
 namespace Dune {
@@ -23,7 +21,12 @@ namespace XT {
 namespace Functions {
 namespace internal {
 
-
+enum class Combination
+{
+  difference,
+  sum,
+  product
+}; // enum class Combination
 /**
  * \brief Helper class defining types of combined functions, if available.
  *

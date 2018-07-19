@@ -14,6 +14,7 @@
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 
+#include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune {
@@ -21,17 +22,14 @@ namespace XT {
 namespace Functions {
 namespace internal {
 
-
-enum class Combination { difference, sum, product }; // enum class Combination
-
-
 /**
  * \brief Helper class defining types of combined functions, if available.
  *
  * \note Most likely you do not want to use this class directly, but Combined.
  */
 template <class LeftType, class RightType, Combination comb>
-class SelectCombined {
+class SelectCombined
+{
 
 public:
   using D = typename LeftType::DomainFieldType;
@@ -39,49 +37,46 @@ public:
   using R = typename LeftType::RangeFieldType;
 
 private:
-  static_assert(std::is_same<typename RightType::DomainFieldType, D>::value,
-                "Types do not match!");
+  static_assert(std::is_same<typename RightType::DomainFieldType, D>::value, "Types do not match!");
   static_assert(RightType::domain_dim == d, "Dimensions do not match!");
-  static_assert(std::is_same<typename RightType::RangeFieldType, R>::value,
-                "Types do not match!");
+  static_assert(std::is_same<typename RightType::RangeFieldType, R>::value, "Types do not match!");
 
-  template <class L, class R> class Choose {
-    template <size_t rL, size_t rR, size_t rCL, size_t rcR, Combination cc,
-              bool anything = true>
-    class Dimension {
-      static_assert(!anything,
-                    "No combination for these dimensions available!");
+  template <class L, class R>
+  class Choose
+  {
+    template <size_t rL, size_t rR, size_t rCL, size_t rcR, Combination cc, bool anything = true>
+    class Dimension
+    {
+      static_assert(!anything, "No combination for these dimensions available!");
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
-    class Dimension<r_in, r_in, rC_in, rC_in, Combination::difference,
-                    anything> {
+    class Dimension<r_in, r_in, rC_in, rC_in, Combination::difference, anything>
+    {
     public:
       static const size_t r = r_in;
       static const size_t rC = rC_in;
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
-    class Dimension<r_in, r_in, rC_in, rC_in, Combination::sum, anything> {
+    class Dimension<r_in, r_in, rC_in, rC_in, Combination::sum, anything>
+    {
     public:
       static const size_t r = r_in;
       static const size_t rC = rC_in;
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
-    class Dimension<1, r_in, 1, rC_in, Combination::product, anything> {
+    class Dimension<1, r_in, 1, rC_in, Combination::product, anything>
+    {
     public:
       static const size_t r = r_in;
       static const size_t rC = rC_in;
     };
 
   public:
-    static const size_t r =
-        Dimension<L::range_dim, R::range_dim, L::range_dim_cols,
-                  R::range_dim_cols, comb>::r;
-    static const size_t rC =
-        Dimension<L::range_dim, R::range_dim, L::range_dim_cols,
-                  R::range_dim_cols, comb>::rC;
+    static const size_t r = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::r;
+    static const size_t rC = Dimension<L::range_dim, R::range_dim, L::range_dim_cols, R::range_dim_cols, comb>::rC;
   }; // class Choose
 
 public:
@@ -91,113 +86,140 @@ public:
   using DomainType = typename FunctionInterface<d, r, rC, R>::DomainType;
   using RangeReturnType = typename RightType::RangeReturnType;
   using ScalarRangeReturnType = typename LeftType::RangeReturnType;
-  using DerivativeRangeReturnType =
-      typename FunctionInterface<d, r, rC, R>::DerivativeRangeReturnType;
+  using DerivativeRangeReturnType = typename FunctionInterface<d, r, rC, R>::DerivativeRangeReturnType;
 
 private:
-  template <Combination cc, bool anything = true> class Call {
+  template <Combination cc, bool anything = true>
+  class Call
+  {
     static_assert(!anything, "Nothing available for these combinations!");
   }; // class Call
 
-  template <bool anything> class Call<Combination::difference, anything> {
+  template <bool anything>
+  class Call<Combination::difference, anything>
+  {
   public:
-    static std::string type() { return "difference"; }
+    static std::string type()
+    {
+      return "difference";
+    }
 
-    static size_t order(const size_t left_order, const size_t right_order) {
+    static size_t order(const size_t left_order, const size_t right_order)
+    {
       return std::max(left_order, right_order);
     }
 
-    static RangeReturnType evaluate(const LeftType &left_, const RightType &right_,
-                              const DomainType &point_in_global_coordinates,
-                              const Common::Parameter &param) {
-      return left_.evaluate(point_in_global_coordinates, param) -
-             right_.evaluate(point_in_global_coordinates, param);
+    static RangeReturnType evaluate(const LeftType& left_,
+                                    const RightType& right_,
+                                    const DomainType& point_in_global_coordinates,
+                                    const Common::Parameter& param)
+    {
+      return left_.evaluate(point_in_global_coordinates, param) - right_.evaluate(point_in_global_coordinates, param);
     }
 
-    static DerivativeRangeReturnType
-    jacobian(const LeftType &left_, const RightType &right_,
-             const DomainType &point_in_global_coordinates,
-             const Common::Parameter &param) {
-      return left_.jacobian(point_in_global_coordinates, param) -
-             right_.jacobian(point_in_global_coordinates, param);
+    static DerivativeRangeReturnType jacobian(const LeftType& left_,
+                                              const RightType& right_,
+                                              const DomainType& point_in_global_coordinates,
+                                              const Common::Parameter& param)
+    {
+      return left_.jacobian(point_in_global_coordinates, param) - right_.jacobian(point_in_global_coordinates, param);
     } // ... jacobian(...)
-  };  // class Call< ..., difference >
+  }; // class Call< ..., difference >
 
-  template <bool anything> class Call<Combination::sum, anything> {
+  template <bool anything>
+  class Call<Combination::sum, anything>
+  {
   public:
-    static std::string type() { return "sum"; }
+    static std::string type()
+    {
+      return "sum";
+    }
 
-    static size_t order(const size_t left_order, const size_t right_order) {
+    static size_t order(const size_t left_order, const size_t right_order)
+    {
       return std::max(left_order, right_order);
     }
 
-    static RangeReturnType evaluate(const LeftType &left_, const RightType &right_,
-                              const DomainType &point_in_global_coordinates,
-                              const Common::Parameter &param) {
-      return left_.evaluate(point_in_global_coordinates, param) +
-             right_.evaluate(point_in_global_coordinates, param);
+    static RangeReturnType evaluate(const LeftType& left_,
+                                    const RightType& right_,
+                                    const DomainType& point_in_global_coordinates,
+                                    const Common::Parameter& param)
+    {
+      return left_.evaluate(point_in_global_coordinates, param) + right_.evaluate(point_in_global_coordinates, param);
     } // ... evaluate(...)
 
-    static DerivativeRangeReturnType
-    jacobian(const LeftType &left_, const RightType &right_,
-             const DomainType &point_in_global_coordinates,
-             const Common::Parameter &param) {
-      return left_.jacobian(point_in_global_coordinates, param) +
-             right_.jacobian(point_in_global_coordinates, param);
+    static DerivativeRangeReturnType jacobian(const LeftType& left_,
+                                              const RightType& right_,
+                                              const DomainType& point_in_global_coordinates,
+                                              const Common::Parameter& param)
+    {
+      return left_.jacobian(point_in_global_coordinates, param) + right_.jacobian(point_in_global_coordinates, param);
     } // ... jacobian(...)
-  };  // class Call< ..., sum >
+  }; // class Call< ..., sum >
 
   // left only scalar atm
-  template <bool anything> class Call<Combination::product, anything> {
+  template <bool anything>
+  class Call<Combination::product, anything>
+  {
   public:
-    static std::string type() { return "product"; }
+    static std::string type()
+    {
+      return "product";
+    }
 
-    static size_t order(const size_t left_order, const size_t right_order) {
+    static size_t order(const size_t left_order, const size_t right_order)
+    {
       return left_order + right_order;
     }
 
-    static RangeReturnType evaluate(const LeftType &left_, const RightType &right_,
-                              const DomainType &point_in_global_coordinates,
-                              const Common::Parameter &param) {
-      ScalarRangeReturnType left_eval =
-          left_.evaluate(point_in_global_coordinates, param);
-      RangeReturnType right_eval =
-          right_.evaluate(point_in_global_coordinates, param);
+    static RangeReturnType evaluate(const LeftType& left_,
+                                    const RightType& right_,
+                                    const DomainType& point_in_global_coordinates,
+                                    const Common::Parameter& param)
+    {
+      ScalarRangeReturnType left_eval = left_.evaluate(point_in_global_coordinates, param);
+      RangeReturnType right_eval = right_.evaluate(point_in_global_coordinates, param);
       if (left_eval.size() != 1)
         DUNE_THROW(NotImplemented, "Only available for scalar left type!");
       right_eval *= left_eval[0];
       return right_eval;
     } // ... evaluate(...)
 
-    static DerivativeRangeReturnType
-    jacobian(const LeftType & /*left_*/, const RightType & /*right_*/,
-             const DomainType & /*point_in_global_coordinates*/,
-             const Common::Parameter & /*param*/) {
+    static DerivativeRangeReturnType jacobian(const LeftType& /*left_*/,
+                                              const RightType& /*right_*/,
+                                              const DomainType& /*point_in_global_coordinates*/,
+                                              const Common::Parameter& /*param*/)
+    {
       DUNE_THROW(NotImplemented, "If you need this, implement it!");
       return DerivativeRangeReturnType();
     }
   }; // class Call< ..., product >
 
 public:
-  static std::string type() { return Call<comb>::type(); }
+  static std::string type()
+  {
+    return Call<comb>::type();
+  }
 
-  static size_t order(const size_t left_order, const size_t right_order) {
+  static size_t order(const size_t left_order, const size_t right_order)
+  {
     return Call<comb>::order(left_order, right_order);
   }
 
-  static RangeReturnType evaluate(const LeftType &left_, const RightType &right_,
-                            const DomainType &point_in_global_coordinates,
-                            const Common::Parameter &param) {
-    return Call<comb>::evaluate(left_, right_, point_in_global_coordinates,
-                                param);
+  static RangeReturnType evaluate(const LeftType& left_,
+                                  const RightType& right_,
+                                  const DomainType& point_in_global_coordinates,
+                                  const Common::Parameter& param)
+  {
+    return Call<comb>::evaluate(left_, right_, point_in_global_coordinates, param);
   }
 
-  static DerivativeRangeReturnType
-  jacobian(const LeftType &left_, const RightType &right_,
-           const DomainType &point_in_global_coordinates,
-           const Common::Parameter &param) {
-    return Call<comb>::jacobian(left_, right_, point_in_global_coordinates,
-                                param);
+  static DerivativeRangeReturnType jacobian(const LeftType& left_,
+                                            const RightType& right_,
+                                            const DomainType& point_in_global_coordinates,
+                                            const Common::Parameter& param)
+  {
+    return Call<comb>::jacobian(left_, right_, point_in_global_coordinates, param);
   }
 }; // class SelectCombined
 
@@ -254,16 +276,15 @@ Difference< ConstantType, ConstantType > stupid_difference()
 Difference, Sum or Product.
  */
 template <class LeftType, class RightType, Combination comb>
-class CombinedFunction
-    : public FunctionInterface<
-          LeftType::domain_dim, SelectCombined<LeftType, RightType, comb>::r,
-          SelectCombined<LeftType, RightType, comb>::rC,
-          typename SelectCombined<LeftType, RightType, comb>::R> {
-  using BaseType =
-      FunctionInterface<LeftType::domain_dim,
-                        SelectCombined<LeftType, RightType, comb>::r,
-                        SelectCombined<LeftType, RightType, comb>::rC,
-                        typename SelectCombined<LeftType, RightType, comb>::R>;
+class CombinedFunction : public FunctionInterface<LeftType::domain_dim,
+                                                  SelectCombined<LeftType, RightType, comb>::r,
+                                                  SelectCombined<LeftType, RightType, comb>::rC,
+                                                  typename SelectCombined<LeftType, RightType, comb>::R>
+{
+  using BaseType = FunctionInterface<LeftType::domain_dim,
+                                     SelectCombined<LeftType, RightType, comb>::r,
+                                     SelectCombined<LeftType, RightType, comb>::rC,
+                                     typename SelectCombined<LeftType, RightType, comb>::R>;
 
   using ThisType = CombinedFunction<LeftType, RightType, comb>;
 
@@ -271,62 +292,69 @@ class CombinedFunction
 
   using LeftStorageType = Common::ConstStorageProvider<LeftType>;
   using RightStorageType = Common::ConstStorageProvider<RightType>;
+
 public:
-  CombinedFunction(const LeftType &left, const RightType &right,
-                   const std::string nm = "")
-      : left_(Common::make_unique<LeftStorageType>(left)),
-        right_(Common::make_unique<RightStorageType>(right)),
-        name_(nm.empty()
-                  ? SelectCombined<LeftType, RightType, comb>::type() +
-                        " of '" + left.name() + "' and '" + right.name() + "'"
-                  : nm) {}
+  CombinedFunction(const LeftType& left, const RightType& right, const std::string nm = "")
+    : left_(Common::make_unique<LeftStorageType>(left))
+    , right_(Common::make_unique<RightStorageType>(right))
+    , name_(nm.empty()
+                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '" + right.name()
+                      + "'"
+                : nm)
+  {
+  }
 
   CombinedFunction(const std::shared_ptr<const LeftType> left,
                    const std::shared_ptr<const RightType> right,
                    const std::string nm = "")
-      : left_(Common::make_unique<LeftStorageType>(left)),
-        right_(Common::make_unique<RightStorageType>(right)),
-        name_(nm.empty()
-                  ? SelectCombined<LeftType, RightType, comb>::type() +
-                        " of '" + left_->access().name() + "' and '" +
-                        right_->access().name() + "'"
-                  : nm) {}
+    : left_(Common::make_unique<LeftStorageType>(left))
+    , right_(Common::make_unique<RightStorageType>(right))
+    , name_(nm.empty()
+                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name() + "' and '"
+                      + right_->access().name()
+                      + "'"
+                : nm)
+  {
+  }
 
-  CombinedFunction(ThisType &&source) = default;
+  CombinedFunction(ThisType&& source) = default;
 
-  CombinedFunction(const ThisType &other) = delete;
+  CombinedFunction(const ThisType& other) = delete;
 
-  ThisType &operator=(const ThisType &other) = delete;
+  ThisType& operator=(const ThisType& other) = delete;
 
-  ThisType &operator=(ThisType &&other) = delete;
+  ThisType& operator=(ThisType&& other) = delete;
 
-  std::string type() const override final {
-    return SelectCombined<LeftType, RightType, comb>::type() + " of '" +
-           left_->access().type() + "' and '" + right_->access().type() + "'";
+  std::string type() const override final
+  {
+    return SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().type() + "' and '"
+           + right_->access().type() + "'";
   } // ... type(...)
 
-  std::string name() const override final { return name_; }
+  std::string name() const override final
+  {
+    return name_;
+  }
 
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
   using typename BaseType::DerivativeRangeReturnType;
 
-  int order(const XT::Common::Parameter &param = {}) const override final {
+  int order(const XT::Common::Parameter& param = {}) const override final
+  {
     return Select::order(left_->access().order(param), right_->access().order(param));
   }
 
-  RangeReturnType
-  evaluate(const DomainType &point_in_global_coordinates,
-           const Common::Parameter &param = {}) const override final {
-    return Select::evaluate(left_->access(), right_->access(), point_in_global_coordinates,
-                            param);
+  RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
+                           const Common::Parameter& param = {}) const override final
+  {
+    return Select::evaluate(left_->access(), right_->access(), point_in_global_coordinates, param);
   }
 
-  DerivativeRangeReturnType
-  jacobian(const DomainType &point_in_global_coordinates,
-           const Common::Parameter &param = {}) const override final {
-    return Select::jacobian(left_->access(), right_->access(), point_in_global_coordinates,
-                            param);
+  DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
+                                     const Common::Parameter& param = {}) const override final
+  {
+    return Select::jacobian(left_->access(), right_->access(), point_in_global_coordinates, param);
   }
 
 private:
@@ -344,16 +372,16 @@ private:
  */
 template <class MinuendType, class SubtrahendType>
 class DifferenceFunction
-    : public internal::CombinedFunction<MinuendType, SubtrahendType,
-                                        internal::Combination::difference> {
-  using BaseType =
-      internal::CombinedFunction<MinuendType, SubtrahendType,
-                                 internal::Combination::difference>;
+    : public internal::CombinedFunction<MinuendType, SubtrahendType, internal::Combination::difference>
+{
+  using BaseType = internal::CombinedFunction<MinuendType, SubtrahendType, internal::Combination::difference>;
 
 public:
   template <class... Args>
-  explicit DifferenceFunction(Args &&... args)
-      : BaseType(std::forward<Args>(args)...) {}
+  explicit DifferenceFunction(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {
+  }
 }; // class DifferenceFunction
 
 /**
@@ -362,16 +390,16 @@ public:
  * \see internal::Combined
  */
 template <class LeftSummandType, class RightSummandType>
-class SumFunction
-    : public internal::CombinedFunction<LeftSummandType, RightSummandType,
-                                        internal::Combination::sum> {
-  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType,
-                                              internal::Combination::sum>;
+class SumFunction : public internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::sum>
+{
+  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::sum>;
 
 public:
   template <class... Args>
-  explicit SumFunction(Args &&... args)
-      : BaseType(std::forward<Args>(args)...) {}
+  explicit SumFunction(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {
+  }
 }; // class SumFunction
 
 /**
@@ -381,59 +409,54 @@ public:
  */
 template <class LeftSummandType, class RightSummandType>
 class ProductFunction
-    : public internal::CombinedFunction<LeftSummandType, RightSummandType,
-                                        internal::Combination::product> {
-  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType,
-                                              internal::Combination::product>;
+    : public internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::product>
+{
+  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::product>;
 
 public:
   template <class... Args>
-  explicit ProductFunction(Args &&... args)
-      : BaseType(std::forward<Args>(args)...) {}
+  explicit ProductFunction(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {
+  }
 }; // class ProductFunction
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceFunction<T1, T2>>
-make_difference(const T1 &left, const T2 &right, Args &&... args) {
-  return std::make_shared<DifferenceFunction<T1, T2>>(
-      left, right, std::forward<Args>(args)...);
+std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
+{
+  return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
 std::shared_ptr<DifferenceFunction<T1, T2>>
-make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right,
-                Args &&... args) {
-  return std::make_shared<DifferenceFunction<T1, T2>>(
-      left, right, std::forward<Args>(args)...);
+make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+{
+  return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<SumFunction<T1, T2>> make_sum(const T1 &left, const T2 &right,
-                                              Args &&... args) {
-  return std::make_shared<SumFunction<T1, T2>>(left, right,
-                                               std::forward<Args>(args)...);
+std::shared_ptr<SumFunction<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
+{
+  return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<SumFunction<T1, T2>>
-make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args &&... args) {
-  return std::make_shared<SumFunction<T1, T2>>(left, right,
-                                               std::forward<Args>(args)...);
+std::shared_ptr<SumFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+{
+  return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<ProductFunction<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
+{
+  return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
 std::shared_ptr<ProductFunction<T1, T2>>
-make_product(const T1 &left, const T2 &right, Args &&... args) {
-  return std::make_shared<ProductFunction<T1, T2>>(left, right,
-                                                   std::forward<Args>(args)...);
-}
-
-template <class T1, class T2, class... Args>
-std::shared_ptr<ProductFunction<T1, T2>> make_product(std::shared_ptr<T1> left,
-                                                      std::shared_ptr<T2> right,
-                                                      Args &&... args) {
-  return std::make_shared<ProductFunction<T1, T2>>(left, right,
-                                                   std::forward<Args>(args)...);
+make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+{
+  return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 } // namespace Functions
