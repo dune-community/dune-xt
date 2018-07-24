@@ -6,7 +6,7 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-#include <dune/xt/functions/base/combined.hh>
+#include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/indicator.hh>
 
 using namespace Dune::XT;
@@ -24,7 +24,7 @@ struct ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
   using IndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, r, rC>;
   using ScalarIndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, 1, 1>;
 
-  using ProductFunctionType = Dune::XT::Functions::ProductFunction<ScalarIndicatorFunctionType, IndicatorFunctionType>;
+  using ProductFunctionType = Dune::XT::Functions::ProductGridFunction<ScalarIndicatorFunctionType, IndicatorFunctionType>;
 
   using RangeType = typename IndicatorFunctionType::RangeType;
   using ScalarRangeType = typename ScalarIndicatorFunctionType::RangeType;

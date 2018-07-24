@@ -112,6 +112,93 @@ struct get_combined<L, R, internal::Combination::product>
 }; // struct get_combined
 
 
+/**
+ * grid_combined
+ */
+
+template <class L, class R, internal::Combination comb>
+struct get_grid_combined
+{
+}; // struct get_grid_combined
+
+template <class L, class R>
+struct get_grid_combined<L, R, internal::Combination::difference>
+{
+  typedef DifferenceGridFunction<L, R> type;
+
+  static std::string id()
+  {
+    return "DifferenceGridFunction";
+  }
+
+  static std::string doc()
+  {
+    return "difference";
+  }
+
+  static std::string op()
+  {
+    return "__sub__";
+  }
+
+  static auto call(const L& l, const R& r) -> decltype(l - r)
+  {
+    return l - r;
+  }
+}; // struct get_grid_combined
+
+template <class L, class R>
+struct get_grid_combined<L, R, internal::Combination::sum>
+{
+  typedef SumGridFunction<L, R> type;
+
+  static std::string id()
+  {
+    return "SumGridFunction";
+  }
+
+  static std::string doc()
+  {
+    return "sum";
+  }
+
+  static std::string op()
+  {
+    return "__add__";
+  }
+
+  static auto call(const L& l, const R& r) -> decltype(l + r)
+  {
+    return l + r;
+  }
+}; // struct get_grid_combined
+
+template <class L, class R>
+struct get_grid_combined<L, R, internal::Combination::product>
+{
+  typedef ProductGridFunction<L, R> type;
+
+  static std::string id()
+  {
+    return "ProductGridFunction";
+  }
+
+  static std::string doc()
+  {
+    return "product";
+  }
+
+  static std::string op()
+  {
+    return "__mul__";
+  }
+
+  static auto call(const L& l, const R& r) -> decltype(l * r)
+  {
+    return l * r;
+  }
+}; // struct get_grid_combined
+
 // template <class G>
 // struct Divergence
 //{
@@ -264,9 +351,9 @@ static const constexpr size_t d = G::dimension;
  */
 template <class G, size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
 pybind11::class_<
-    typename internal::get_combined<GridFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
-                                    GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
-                                    comb>::type>
+    typename internal::get_grid_combined<GridFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
+                                         GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
+                                         comb>::type>
 bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
@@ -275,11 +362,11 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
   typedef double R;
   typedef GridFunctionInterface<E, lr, lrC, R> Left;
   typedef GridFunctionInterface<E, rr, rrC, R> Right;
-  typedef typename internal::get_combined<Left, Right, comb>::type C;
+  typedef typename internal::get_grid_combined<Left, Right, comb>::type C;
   static const size_t r = C::range_dim;
   static const size_t rC = C::range_dim_cols;
-  const std::string id = internal::get_combined<Left, Right, comb>::id();
-  const std::string op = internal::get_combined<Left, Right, comb>::doc();
+  const std::string id = internal::get_grid_combined<Left, Right, comb>::id();
+  const std::string op = internal::get_grid_combined<Left, Right, comb>::doc();
   const std::string class_name = id + "__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC);
   const std::string doc = class_name + " (as a " + op + " of functions of dimensions " + Common::to_string(lr) + "x"
                           + Common::to_string(lrC) + " and " + Common::to_string(rr) + "x" + Common::to_string(rrC)
@@ -291,6 +378,36 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 
   return c;
 } // ... bind_combined_GridFunction(...)
+
+
+template <size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
+pybind11::class_<typename internal::get_combined<FunctionInterface<d, lr, lrC, double>,
+                                                 FunctionInterface<d, rr, rrC, double>,
+                                                 comb>::type>
+bind_combined_Function(pybind11::module& m)
+{
+  namespace py = pybind11;
+
+  typedef double R;
+  typedef FunctionInterface<d, lr, lrC, R> Left;
+  typedef FunctionInterface<d, rr, rrC, R> Right;
+  typedef typename internal::get_combined<Left, Right, comb>::type C;
+  static const size_t r = C::range_dim;
+  static const size_t rC = C::range_dim_cols;
+  const std::string id = internal::get_combined<Left, Right, comb>::id();
+  const std::string op = internal::get_combined<Left, Right, comb>::doc();
+  const std::string class_name =
+      id + "__" + Common::to_string(d) + "d_to_" + Common::to_string(r) + "x" + Common::to_string(rC);
+  const std::string doc = class_name + " (as a " + op + " of functions of dimensions " + Common::to_string(lr) + "x"
+                          + Common::to_string(lrC) + " and " + Common::to_string(rr) + "x" + Common::to_string(rrC)
+                          + ")";
+
+  py::class_<C, FunctionInterface<d, r, rC, R>> c(m, std::string(class_name).c_str(), doc.c_str());
+
+  c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
+
+  return c;
+} // ... bind_combined_Function(...)
 
 
 /**
@@ -310,11 +427,26 @@ void addbind_GridFunctionInterface_combined_op(C& c)
   typedef GridFunctionInterface<E, r, rC, double> S;
   typedef GridFunctionInterface<E, oR, orC, double> O;
 
+  c.def(internal::get_grid_combined<S, O, comb>::op().c_str(),
+        [](const S& self, const O& other) { return internal::get_grid_combined<S, O, comb>::call(self, other); },
+        py::keep_alive<0, 1>(),
+        py::keep_alive<0, 2>());
+} // ... addbind_GridFunctionInterface_combined_op(...)
+
+
+template <size_t d, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+void addbind_FunctionInterface_combined_op(C& c)
+{
+  namespace py = pybind11;
+
+  typedef FunctionInterface<d, r, rC, double> S;
+  typedef FunctionInterface<d, oR, orC, double> O;
+
   c.def(internal::get_combined<S, O, comb>::op().c_str(),
         [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
         py::keep_alive<0, 1>(),
         py::keep_alive<0, 2>());
-} // ... addbind_GridFunctionInterface_combined_op(...)
+} // ... addbind_FunctionInterface_combined_op(...)
 
 
 template <size_t d, size_t r, size_t rC>

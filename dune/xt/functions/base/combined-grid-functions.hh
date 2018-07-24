@@ -1,7 +1,9 @@
 // This file is part of the dune-xt-functions project:
 //   https://github.com/dune-community/dune-xt-functions
-// Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
-// License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+// Copyright 2009-2018 dune-xt-functions developers and contributors. All rights
+// reserved.
+// License: Dual licensed as BSD 2-Clause License
+// (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
@@ -9,17 +11,15 @@
 //   Rene Milk       (2014 - 2018)
 //   Tobias Leibner  (2014, 2017)
 
-#ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
-#define DUNE_XT_FUNCTIONS_BASE_COMBINED_HH
+#ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTIONS_HH
+#define DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTIONS_HH
 
 #include <dune/xt/functions/interfaces/grid-function.hh>
-#include <dune/xt/functions/interfaces/function.hh>
 
 namespace Dune {
 namespace XT {
 namespace Functions {
 namespace internal {
-
 
 enum class Combination
 {
@@ -27,15 +27,13 @@ enum class Combination
   sum,
   product
 }; // enum class Combination
-
-
 /**
  * \brief Helper class defining types of combined functions, if available.
  *
  * \note Most likely you do not want to use this class directly, but Combined.
  */
 template <class LeftType, class RightType, Combination comb>
-class SelectCombined
+class SelectCombinedGridFunction
 {
   static_assert(is_grid_function<LeftType>::value, "");
   static_assert(is_grid_function<RightType>::value, "");
@@ -106,7 +104,7 @@ private:
   template <Combination cc, bool anything = true>
   class Call
   {
-    static_assert(!anything, "Nothing available for these combinations!");
+    static_assert(!anything, "Nothing available for these Combination!");
   }; // class Call
 
   template <bool anything>
@@ -239,8 +237,7 @@ public:
   {
     return Call<comb>::jacobian(left_local, right_local, point_in_reference_element, param);
   }
-}; // class SelectCombined
-
+}; // class SelectCombinedGridFunction
 
 /**
  * \brief Generic combined local function.
@@ -248,17 +245,18 @@ public:
  * \note Most likely you do not want to use this class directly, but Combined.
  */
 template <class LeftType, class RightType, Combination type>
-class CombinedLocalFunction : public ElementFunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
-                                                              SelectCombined<LeftType, RightType, type>::r,
-                                                              SelectCombined<LeftType, RightType, type>::rC,
-                                                              typename SelectCombined<LeftType, RightType, type>::R>
+class CombinedLocalFunction
+    : public ElementFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, type>::E,
+                                      SelectCombinedGridFunction<LeftType, RightType, type>::r,
+                                      SelectCombinedGridFunction<LeftType, RightType, type>::rC,
+                                      typename SelectCombinedGridFunction<LeftType, RightType, type>::R>
 {
-  using BaseType = ElementFunctionInterface<typename SelectCombined<LeftType, RightType, type>::E,
-                                            SelectCombined<LeftType, RightType, type>::r,
-                                            SelectCombined<LeftType, RightType, type>::rC,
-                                            typename SelectCombined<LeftType, RightType, type>::R>;
+  using BaseType = ElementFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, type>::E,
+                                            SelectCombinedGridFunction<LeftType, RightType, type>::r,
+                                            SelectCombinedGridFunction<LeftType, RightType, type>::rC,
+                                            typename SelectCombinedGridFunction<LeftType, RightType, type>::R>;
 
-  using Select = SelectCombined<LeftType, RightType, type>;
+  using Select = SelectCombinedGridFunction<LeftType, RightType, type>;
 
 public:
   using typename BaseType::ElementType;
@@ -305,14 +303,17 @@ private:
   std::unique_ptr<typename RightType::LocalFunctionType> right_local_;
 }; // class CombinedLocalFunction
 
-
 /**
  * \brief Generic combined function.
  *
- *        This class combines two given functions of type LeftType and RightType using the given combination
- *        Combination. This class (and any derived class, like Difference, Sum or Product) can be used in two ways:
- *        - You can pass references of the left and right operand to this class. This is done for instance when calling
- *          operator+, operator- or operator* on any function deriving from GridFunctionInterface:
+ *        This class combines two given functions of type LeftType and RightType
+using the given combination
+ *        Combination. This class (and any derived class, like Difference, Sum
+or Product) can be used in two ways:
+ *        - You can pass references of the left and right operand to this class.
+This is done for instance when calling
+ *          operator+, operator- or operator* on any function deriving from
+GridFunctionInterface:
 \code
 using IndicatorType = Functions::IndicatorFunction< ..., double>;
 IndicatorType one( ... );
@@ -322,9 +323,11 @@ auto difference = one - two;
 // is equivalent to
 Difference< IndicatorType, IndicatorType > difference(one, two);
 // and
-internal::Combined< IndicatorType, IndicatorType, Combination::difference > difference(one, tow);
+internal::Combined< IndicatorType, IndicatorType, Combination::difference >
+difference(one, tow);
 \endcode
- *          In this situation you are responsible to ensure that the arguments given are valid throughout the lifetime
+ *          In this situation you are responsible to ensure that the arguments
+given are valid throughout the lifetime
  *          of this class. The following will lead to a segfault:
 \code
 using IndicatorType = Functions::IndicatorFunction< ..., double >;
@@ -336,7 +339,8 @@ Difference< IndicatorType, IndicatorType > stupid_difference()
   return one - two;
 }
 \endcode
- *        - You can pass shared_ptr of the left and right operands to this class. In this case the following is valid:
+ *        - You can pass shared_ptr of the left and right operands to this
+class. In this case the following is valid:
 \code
 using IndicatorType = Functions::IndicatorFunction< ..., double >;
 
@@ -348,53 +352,57 @@ Difference< IndicatorType, IndicatorType > stupid_difference()
 }
 \endcode
  *
- * \note  Most likely you do not want to use this class diretly, but one of Difference, Sum or Product.
+ * \note  Most likely you do not want to use this class diretly, but one of
+Difference, Sum or Product.
  */
 template <class LeftType, class RightType, Combination comb>
-class Combined : public GridFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
-                                              SelectCombined<LeftType, RightType, comb>::r,
-                                              SelectCombined<LeftType, RightType, comb>::rC,
-                                              typename SelectCombined<LeftType, RightType, comb>::R>
+class CombinedGridFunction
+    : public GridFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, comb>::E,
+                                   SelectCombinedGridFunction<LeftType, RightType, comb>::r,
+                                   SelectCombinedGridFunction<LeftType, RightType, comb>::rC,
+                                   typename SelectCombinedGridFunction<LeftType, RightType, comb>::R>
 {
-  using BaseType = GridFunctionInterface<typename SelectCombined<LeftType, RightType, comb>::E,
-                                         SelectCombined<LeftType, RightType, comb>::r,
-                                         SelectCombined<LeftType, RightType, comb>::rC,
-                                         typename SelectCombined<LeftType, RightType, comb>::R>;
+  using BaseType = GridFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, comb>::E,
+                                         SelectCombinedGridFunction<LeftType, RightType, comb>::r,
+                                         SelectCombinedGridFunction<LeftType, RightType, comb>::rC,
+                                         typename SelectCombinedGridFunction<LeftType, RightType, comb>::R>;
 
   using LeftStorageType = Common::ConstStorageProvider<LeftType>;
   using RightStorageType = Common::ConstStorageProvider<RightType>;
-  using ThisType = Combined<LeftType, RightType, comb>;
+  using ThisType = CombinedGridFunction<LeftType, RightType, comb>;
 
 public:
   using ElementType = typename BaseType::ElementType;
   using LocalFunctionType = typename BaseType::LocalFunctionType;
 
-  Combined(const LeftType& left, const RightType& right, const std::string nm = "")
+  CombinedGridFunction(const LeftType& left, const RightType& right, const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
     , name_(nm.empty()
-                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '" + right.name()
+                ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '"
+                      + right.name()
                       + "'"
                 : nm)
   {
   }
 
-  Combined(const std::shared_ptr<const LeftType> left,
-           const std::shared_ptr<const RightType> right,
-           const std::string nm = "")
+  CombinedGridFunction(const std::shared_ptr<const LeftType> left,
+                       const std::shared_ptr<const RightType> right,
+                       const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
     , name_(nm.empty()
-                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name() + "' and '"
+                ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
+                      + "' and '"
                       + right_->access().name()
                       + "'"
                 : nm)
   {
   }
 
-  Combined(ThisType&& source) = default;
+  CombinedGridFunction(ThisType&& source) = default;
 
-  Combined(const ThisType& other) = delete;
+  CombinedGridFunction(const ThisType& other) = delete;
 
   ThisType& operator=(const ThisType& other) = delete;
 
@@ -410,7 +418,7 @@ public:
 
   std::string type() const override final
   {
-    return SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().type() + "' and '"
+    return SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left_->access().type() + "' and '"
            + right_->access().type() + "'";
   } // ... type(...)
 
@@ -423,107 +431,104 @@ private:
   std::unique_ptr<const LeftStorageType> left_;
   std::unique_ptr<const RightStorageType> right_;
   const std::string name_;
-}; // class Combined
-
+}; // class CombinedGridFunction
 
 } // namespace internal
-
 
 /**
  * \brief Function representing the difference between two functions.
  *
- * \see internal::Combined
+ * \see internal::CombinedGridFunction
  */
 template <class MinuendType, class SubtrahendType>
-class DifferenceFunction : public internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference>
+class DifferenceGridFunction
+    : public internal::CombinedGridFunction<MinuendType, SubtrahendType, internal::Combination::difference>
 {
-  using BaseType = internal::Combined<MinuendType, SubtrahendType, internal::Combination::difference>;
+  using BaseType = internal::CombinedGridFunction<MinuendType, SubtrahendType, internal::Combination::difference>;
 
 public:
   template <class... Args>
-  explicit DifferenceFunction(Args&&... args)
+  explicit DifferenceGridFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {
   }
-}; // class DifferenceFunction
-
+}; // class DifferenceGridFunction
 
 /**
  * \brief Function representing the sum of two functions.
  *
- * \see internal::Combined
+ * \see internal::CombinedGridFunction
  */
 template <class LeftSummandType, class RightSummandType>
-class SumFunction : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>
+class SumGridFunction
+    : public internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::sum>
 {
-  using BaseType = internal::Combined<LeftSummandType, RightSummandType, internal::Combination::sum>;
+  using BaseType = internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::sum>;
 
 public:
   template <class... Args>
-  explicit SumFunction(Args&&... args)
+  explicit SumGridFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {
   }
-}; // class SumFunction
-
+}; // class SumGridFunction
 
 /**
  * \brief Function representing the product of two functions.
  *
- * \see internal::Combined
+ * \see internal::CombinedGridFunction
  */
 template <class LeftSummandType, class RightSummandType>
-class ProductFunction : public internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>
+class ProductGridFunction
+    : public internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::product>
 {
-  using BaseType = internal::Combined<LeftSummandType, RightSummandType, internal::Combination::product>;
+  using BaseType = internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::product>;
 
 public:
   template <class... Args>
-  explicit ProductFunction(Args&&... args)
+  explicit ProductGridFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {
   }
-}; // class ProductFunction
-
+}; // class ProductGridFunction
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
+std::shared_ptr<DifferenceGridFunction<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
 {
-  return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<DifferenceGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<DifferenceFunction<T1, T2>>
+std::shared_ptr<DifferenceGridFunction<T1, T2>>
 make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
-  return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<DifferenceGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<SumFunction<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
+std::shared_ptr<SumGridFunction<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
 {
-  return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<SumGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<SumFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
+std::shared_ptr<SumGridFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
-  return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<SumGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<ProductFunction<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
+std::shared_ptr<ProductGridFunction<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
 {
-  return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<ProductGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
 template <class T1, class T2, class... Args>
-std::shared_ptr<ProductFunction<T1, T2>>
+std::shared_ptr<ProductGridFunction<T1, T2>>
 make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
-  return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+  return std::make_shared<ProductGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
-
 
 } // namespace Functions
 } // namespace XT

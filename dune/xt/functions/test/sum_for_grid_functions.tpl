@@ -6,7 +6,7 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-#include <dune/xt/functions/base/combined.hh>
+#include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/indicator.hh>
 
 using namespace Dune::XT;
@@ -23,7 +23,7 @@ struct SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::T
 
   using IndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, r, rC>;
 
-  using SumFunctionType = Dune::XT::Functions::SumFunction<IndicatorFunctionType, IndicatorFunctionType>;
+  using SumFunctionType = Dune::XT::Functions::SumGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
 
   using RangeType = typename IndicatorFunctionType::RangeType;
   using DomainType = typename IndicatorFunctionType::DomainType;
