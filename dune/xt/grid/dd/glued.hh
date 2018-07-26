@@ -162,8 +162,11 @@ public:
 private:
   typedef typename Layer<LocalGridType, layer, Backends::view>::type LocalViewType;
   typedef GridGlue::Codim1Extractor<LocalViewType> LocalExtractorType;
+
+public:
   typedef GridGlue::GridGlue<LocalExtractorType, LocalExtractorType> GlueType;
 
+private:
   template <class GridView, class MacroIntersectionType>
   class CouplingFaceDescriptor : public GridGlue::ExtractorPredicate<GridView, 1>
   {
@@ -259,7 +262,6 @@ public:
     prepare_global_grid();
     return global_grid_->level_view(global_grid_->grid().maxLevel());
   }
-
 
   const std::vector<std::vector<size_t>>& local_to_global_indices()
   {

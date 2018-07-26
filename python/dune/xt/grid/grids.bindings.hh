@@ -41,6 +41,16 @@ struct grid_name
 };
 
 
+template <class G>
+struct grid_name<const G>
+{
+  static std::string value()
+  {
+    return grid_name<G>::value();
+  }
+};
+
+
 template <int dim>
 struct grid_name<YaspGrid<dim, EquidistantOffsetCoordinates<double, dim>>>
 {
