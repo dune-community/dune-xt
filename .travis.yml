@@ -24,6 +24,7 @@ before_script:
     - export MY_MODULE=dune-xt-la
     - export ENV_FILE=${HOME}/env
     - python3 ./.travis.make_env_file.py
+    - docker inspect ${IMAGE}
     - export DOCKER_RUN="docker run --env-file ${ENV_FILE} -v ${TRAVIS_BUILD_DIR}:/root/src/dune-xt-la ${IMAGE}"
 
 script:
