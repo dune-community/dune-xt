@@ -13,10 +13,10 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	 741e4f8e53bdd3e1b6e19d84eb22b6e3dc48526c dune-python (remotes/origin/releases/2.5)
 	 26cc8cb4161a3a51002ab2a81b8c81d2c951ee79 dune-testtools (heads/dune_xt)
 	 8fe883e99c58c9f0c2f92457d546a0ac9f5a9bf9 dune-uggrid (v2.5.2-1-g8fe883e9)
-	+1f6938bbfcd86b367db854b8f22765d16aa3df23 dune-xt-common (heads/fix_python_coverage_report)
+	+841c87c4e18702fe477354929bf632421229b636 dune-xt-common (heads/fix_python_coverage_report)
 	+819b9372cba55ea7d0bcf6bab36d8b5a3efd97a8 dune-xt-functions (heads/coverage_upload)
-	+0885a17fce55d5e5d8f5ff32b66a454b3d57a9de dune-xt-grid (heads/coverage_upload)
-	 4bad9ce8823aacf0b9de3295ad17039a02833844 dune-xt-la (heads/coverage_upload)
+	+372e57809ade18d37a76aec76d5cd1efcbccfdfb dune-xt-grid (heads/coverage_upload)
+	+02a065e3cb535043ae491de2f25fd9e15b4dbd24 dune-xt-la (heads/coverage_upload)
 	 60cd896bf3f1eb99066563aa1a07113e5a791d47 scripts (remotes/origin/HEAD)
 commit = 3334da25b478cbb7148376bf1eafe904108e2f48
 
@@ -88,7 +88,7 @@ commit = 8fe883e99c58c9f0c2f92457d546a0ac9f5a9bf9
 [submodule.dune-xt-common]
 remote = git@github.com:dune-community/dune-xt-common.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 1f6938bbfcd86b367db854b8f22765d16aa3df23
+commit = 841c87c4e18702fe477354929bf632421229b636
 
 [submodule.dune-xt-functions]
 remote = git@github.com:dune-community/dune-xt-functions.git
@@ -98,12 +98,12 @@ commit = 819b9372cba55ea7d0bcf6bab36d8b5a3efd97a8
 [submodule.dune-xt-grid]
 remote = git@github.com:dune-community/dune-xt-grid.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 0885a17fce55d5e5d8f5ff32b66a454b3d57a9de
+commit = 372e57809ade18d37a76aec76d5cd1efcbccfdfb
 
 [submodule.dune-xt-la]
 remote = git@github.com:dune-community/dune-xt-la.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 4bad9ce8823aacf0b9de3295ad17039a02833844
+commit = 02a065e3cb535043ae491de2f25fd9e15b4dbd24
 
 [submodule.scripts]
 remote = https://github.com/wwu-numerik/scripts.git
