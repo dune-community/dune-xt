@@ -14,11 +14,12 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	 26cc8cb4161a3a51002ab2a81b8c81d2c951ee79 dune-testtools (heads/dune_xt)
 	 8fe883e99c58c9f0c2f92457d546a0ac9f5a9bf9 dune-uggrid (v2.5.2-1-g8fe883e9)
 	+841c87c4e18702fe477354929bf632421229b636 dune-xt-common (heads/fix_python_coverage_report)
-	+819b9372cba55ea7d0bcf6bab36d8b5a3efd97a8 dune-xt-functions (heads/coverage_upload)
-	+372e57809ade18d37a76aec76d5cd1efcbccfdfb dune-xt-grid (heads/coverage_upload)
+	+264e23e9d9e6485c9e1797dc85f3f1df01d29f69 dune-xt-data (heads/master)
+	+8a076a3ab94f24d7a06f91f9f03044ba4a42c9a8 dune-xt-functions (heads/coverage_upload)
+	+32db3bf43626fdb653ab17c4b4ac53f9d0906484 dune-xt-grid (heads/coverage_upload)
 	+0da20b9a2cdc356bd8917aa72a49d21fd30a2486 dune-xt-la (heads/coverage_upload)
 	 60cd896bf3f1eb99066563aa1a07113e5a791d47 scripts (remotes/origin/HEAD)
-commit = 3334da25b478cbb7148376bf1eafe904108e2f48
+commit = 89cd3e885c3d97006d2b5d1340d87fd35fc30a94
 
 [submodule.bin]
 remote = git@github.com:dune-community/local-bin.git
@@ -90,15 +91,20 @@ remote = git@github.com:dune-community/dune-xt-common.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
 commit = 841c87c4e18702fe477354929bf632421229b636
 
+[submodule.dune-xt-data]
+remote = https://github.com/dune-community/dune-xt-data
+status = 
+commit = 264e23e9d9e6485c9e1797dc85f3f1df01d29f69
+
 [submodule.dune-xt-functions]
 remote = git@github.com:dune-community/dune-xt-functions.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 819b9372cba55ea7d0bcf6bab36d8b5a3efd97a8
+commit = 8a076a3ab94f24d7a06f91f9f03044ba4a42c9a8
 
 [submodule.dune-xt-grid]
 remote = git@github.com:dune-community/dune-xt-grid.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 372e57809ade18d37a76aec76d5cd1efcbccfdfb
+commit = 32db3bf43626fdb653ab17c4b4ac53f9d0906484
 
 [submodule.dune-xt-la]
 remote = git@github.com:dune-community/dune-xt-la.git
