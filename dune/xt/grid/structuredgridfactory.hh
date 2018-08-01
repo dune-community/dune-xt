@@ -24,8 +24,13 @@
 #include <dune/grid/spgrid.hh>
 #endif
 
+#if HAVE_ALBERTA
+#include <dune/grid/albertagrid.hh>
+#endif
+
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/ranges.hh>
+#include <dune/xt/common/logging.hh>
 
 namespace Dune {
 
@@ -128,11 +133,60 @@ public:
                  const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
                  const Dune::array<unsigned int, GridType::dimension>& elements,
                  Dune::array<unsigned int, GridType::dimension> /*overlap*/ = default_overlap<GridType>(),
-                 Dune::MPIHelper::MPICommunicator /*communicator*/ = Dune::MPIHelper::getCommunicator())
+                 Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
-    return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
+    return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements, mpi_comm);
   }
 };
+#if HAVE_ALBERTA
+template <int dim>
+class StructuredGridFactory<AlbertaGrid<dim, dim>> : public Dune::StructuredGridFactory<AlbertaGrid<dim, dim>>
+{
+  typedef AlbertaGrid<dim, dim> GridType;
+  typedef typename GridType::ctype ctype;
+
+public:
+  static std::shared_ptr<GridType>
+  createCubeGrid(const Dune::FieldVector<ctype, GridType::dimension>& lowerLeft,
+                 const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
+                 const Dune::array<unsigned int, GridType::dimension>& elements,
+                 Dune::array<unsigned int, GridType::dimension> overlap = default_overlap<GridType>(),
+                 Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
+  {
+    bool warn = false;
+    unsigned int sum = 0;
+    for (auto i : Common::value_range(1, dim)) {
+      warn = warn || (overlap[i] > 1);
+      sum += overlap[i];
+    }
+    if (warn || sum >= dim)
+      DXTC_LOG_INFO << "Ignoring non-default overlap for alberta cube creation";
+    if (Dune::MPIHelper::isFake)
+      return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
+#if HAVE_MPI
+    if (mpi_comm == MPI_COMM_WORLD)
+      return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
+#endif
+    DUNE_THROW(InvalidStateException, "Alberta construction cannot handle non-world communicators");
+  }
+
+  static std::shared_ptr<GridType>
+  createSimplexGrid(const Dune::FieldVector<ctype, dim>& lowerLeft,
+                    const Dune::FieldVector<ctype, dim>& upperRight,
+                    const Dune::array<unsigned int, dim>& elements,
+                    Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
+  {
+    if (Dune::MPIHelper::isFake)
+      return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
+#if HAVE_MPI
+    if (mpi_comm == MPI_COMM_WORLD)
+      return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
+#endif
+    DUNE_THROW(InvalidStateException, "Alberta construction cannot handle non-world communicators");
+  }
+};
+#endif // HAVE_ALBERTA
+
 
 #if HAVE_DUNE_SPGRID
 template <class ct, int dim, template <int> class Refinement, class Comm>
@@ -182,6 +236,14 @@ public:
       if (overlap[i] != overlap[0])
         DUNE_THROW(Dune::InvalidStateException, "YaspGrid only supports uniform overlap");
     return std::make_shared<GridType>(lowerLeft, upperRight, elements, no_periodic_direction, overlap[0], communicator);
+  }
+  static std::shared_ptr<GridType>
+  createSimplexGrid(const Dune::FieldVector<ctype, GridType::dimension>&,
+                    const Dune::FieldVector<ctype, GridType::dimension>&,
+                    const array<unsigned int, GridType::dimension>&,
+                    Dune::MPIHelper::MPICommunicator = Dune::MPIHelper::getCommunicator())
+  {
+    DUNE_THROW(NotImplemented, "YaspGrid does not provide Simplex Geometries");
   }
 };
 
