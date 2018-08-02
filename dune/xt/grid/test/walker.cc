@@ -49,7 +49,11 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
     const auto correct_size = gv.size(0);
     atomic<size_t> count(0);
+    atomic<size_t> intersection_count(0);
     auto counter = [&](const EntityType&) { count++; };
+    auto intersection_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) {
+      intersection_count++;
+    };
     auto test1 = [&] {
       walker.append(counter);
       walker.walk(false);
@@ -59,6 +63,8 @@ struct GridWalkerTest : public ::testing::Test
       walker.walk(true);
     };
     auto test3 = [&] { walker.append(counter).walk(true); };
+    auto test4 = [&] { walker.append(intersection_counter).walk(false); };
+    auto test5 = [&] { walker.append(intersection_counter).walk(true); };
     list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     auto test0 = [&] {
@@ -89,8 +95,8 @@ struct GridWalkerTest : public ::testing::Test
     auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
     auto all_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
 
-    auto on_filter_boundaries = new ApplyOn::FilteredIntersections<GridLayerType>(boundaries);
-    auto on_all_boundaries = new ApplyOn::BoundaryIntersections<GridLayerType>();
+    const auto* on_filter_boundaries = new ApplyOn::FilteredIntersections<GridLayerType>(boundaries);
+    const auto* on_all_boundaries = new ApplyOn::BoundaryIntersections<GridLayerType>();
     walker.append(filter_counter, on_filter_boundaries);
     walker.append(all_counter, on_all_boundaries);
     walker.walk();
@@ -109,16 +115,19 @@ struct GridWalkerTest : public ::testing::Test
     };
     auto all_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
     auto inner_counter = [&](const IntersectionType&, const EntityType& e, const EntityType&) {
-      inner_count += e.partitionType == Dune::PartitionType::InteriorEntity;
+      inner_count += e.partitionType() == Dune::PartitionType::InteriorEntity;
     };
 
-    auto on_interior_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
-    auto on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
-    auto on_all = new ApplyOn::AllEntities<GridLayerType>();
+    const auto* on_interior_partitionset =
+        new ApplyOn::PartitionSetIntersections<GridLayerType, Dune::Partitions::Interior>();
+    const auto* on_all_partitionset = new ApplyOn::PartitionSetIntersections<GridLayerType, Dune::Partitions::All>();
+    const auto* on_all = new ApplyOn::AllIntersections<GridLayerType>();
+    const auto* on_all2 =
+        new ApplyOn::AllIntersections<GridLayerType>(); // second one needed because append owns pointer
     walker.append(filter_counter, on_all_partitionset);
     walker.append(inner_filter_counter, on_interior_partitionset);
     walker.append(all_counter, on_all);
-    walker.append(inner_count, on_all);
+    walker.append(inner_counter, on_all2);
     walker.walk();
     EXPECT_EQ(filter_count, all_count);
   }
@@ -129,10 +138,11 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
 
     size_t all_count = 0, inner_count = 0;
-    auto all_set_counter = [&](...) { all_count++; };
-    auto inner_set_counter = [&](...) { inner_count++; };
-    auto on_interior_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
-    auto on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
+    auto all_set_counter = [&](const EntityType&) { all_count++; };
+    auto inner_set_counter = [&](const EntityType&) { inner_count++; };
+    const auto* on_interior_partitionset =
+        new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior>();
+    const auto* on_all_partitionset = new ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All>();
     walker.append(inner_set_counter, on_interior_partitionset);
     walker.append(all_set_counter, on_all_partitionset);
     walker.walk();
@@ -147,5 +157,6 @@ TYPED_TEST(GridWalkerTest, Misc)
 {
   this->check_count();
   this->check_apply_on();
+  this->check_partitionsets();
   this->check_partitioning();
 }

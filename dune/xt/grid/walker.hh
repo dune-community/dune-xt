@@ -247,7 +247,7 @@ protected:
   template <class PartioningType, class WalkerType>
   struct Body
   {
-    Body(WalkerType& walker, PartioningType& partitioning)
+    Body(WalkerType& walker, const PartioningType& partitioning)
       : walker_(walker)
       , partitioning_(partitioning)
     {
