@@ -81,13 +81,6 @@ public:
   }
 }; // class AllEntities
 
-template <class GridLayerImp>
-const AllEntities<GridLayerImp>* all_entities()
-{
-  static const AllEntities<GridLayerImp> all_entities_singleton;
-  return &all_entities_singleton;
-}
-
 
 /**
  *  \brief Selects entities which have a boundary intersection.
@@ -302,13 +295,6 @@ public:
   }
 }; // class AllIntersections
 
-template <class GridLayerImp>
-const AllIntersections<GridLayerImp>* all_intersections()
-{
-  static const AllIntersections<GridLayerImp> all_intersections_singleton;
-  return &all_intersections_singleton;
-}
-
 
 /**
  *  \brief Selects no intersections.
@@ -328,6 +314,30 @@ public:
     return false;
   }
 }; // class NoIntersections
+
+
+/**
+ *  \brief Selects entities in the compatible PartitionSet.
+ */
+template <class GridLayerImp, class PartitionSetType>
+class PartitionSetIntersections : public WhichIntersection<GridLayerImp>
+{
+  typedef WhichIntersection<GridLayerImp> BaseType;
+
+public:
+  using typename BaseType::GridLayerType;
+  using typename BaseType::IntersectionType;
+
+  virtual WhichIntersection<GridLayerImp>* copy() const override final
+  {
+    return new PartitionSetIntersections<GridLayerImp, PartitionSetType>();
+  }
+
+  virtual bool apply_on(const GridLayerType& /*grid_layer*/, const IntersectionType& intersection) const override final
+  {
+    return PartitionSetType::contains(intersection.inside().partitionType());
+  }
+}; // class PartitionSetIntersections
 
 
 /**
@@ -446,6 +456,7 @@ public:
            && PartitionSetType::contains(intersection.inside().partitionType());
   }
 }; // class PeriodicIntersections
+
 
 template <class GridLayerImp, class PartitionSetType = Dune::Partitions::All>
 class PeriodicIntersectionsPrimally
@@ -572,6 +583,7 @@ protected:
   using BaseType::boundary_info_;
 }; // class DirichletIntersections
 
+
 template <class GridLayerImp>
 class DirichletAndProcessIntersections
     : public internal::WhichIntersectionBase<GridLayerImp, DirichletAndProcessIntersections<GridLayerImp>, true>
@@ -597,6 +609,7 @@ public:
 protected:
   using BaseType::boundary_info_;
 }; // class DirichletAndProcessIntersections
+
 
 template <class GridLayerImp>
 class ProcessIntersections : public internal::WhichIntersectionBase<GridLayerImp, ProcessIntersections<GridLayerImp>>
@@ -639,6 +652,7 @@ protected:
   using BaseType::boundary_info_;
 }; // class NeumannIntersections
 
+
 template <class GridLayerImp>
 class ReflectingIntersections
     : public internal::WhichIntersectionBase<GridLayerImp, ReflectingIntersections<GridLayerImp>, true>
@@ -663,6 +677,7 @@ protected:
   using BaseType::boundary_info_;
 }; // class ReflectingIntersections
 
+
 /**
  *  \brief Selects entities in the compatible PartitionSet.
  */
@@ -685,6 +700,8 @@ public:
     return PartitionSetType::contains(entity.partitionType());
   }
 }; // class PartitionSetEntities
+
+
 } // namespace ApplyOn
 } // namespace Grid
 } // namespace XT
