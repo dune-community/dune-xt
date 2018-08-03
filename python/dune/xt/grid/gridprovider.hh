@@ -17,8 +17,9 @@
 #include <dune/pybindxi/stl.h>
 
 #include <python/dune/xt/common/configuration.hh>
-#include <dune/xt/common/exceptions.hh>
 #include <python/dune/xt/common/fvector.hh>
+#include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/entity.hh>
@@ -139,16 +140,21 @@ void bind_make_cube_grid(pybind11::module& m, const std::string& grid_id)
   using namespace pybind11::literals;
 
   m.def(std::string("make_cube_grid__" + grid_id).c_str(),
-        [](const Common::Configuration& cfg) { return make_cube_grid<G>(cfg); },
-        "cfg"_a = cube_gridprovider_default_config());
+        [](const Common::Configuration& cfg, Common::MPI_Comm_Wrapper mpi_comm) {
+          return make_cube_grid<G>(cfg, mpi_comm.get());
+        },
+        "cfg"_a = cube_gridprovider_default_config(),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
 
   m.def(std::string("make_cube_grid__" + grid_id).c_str(),
         [](const FieldVector<typename G::ctype, G::dimension>& lower_left,
            const FieldVector<typename G::ctype, G::dimension>& upper_right,
            const std::array<unsigned int, G::dimension>& num_elements,
            const unsigned int num_refinements,
-           const std::array<unsigned int, G::dimension>& overlap_size) {
-          return make_cube_grid<G>(lower_left, upper_right, num_elements, num_refinements, overlap_size);
+           const std::array<unsigned int, G::dimension>& overlap_size,
+           Common::MPI_Comm_Wrapper mpi_comm) {
+          return make_cube_grid<G>(
+              lower_left, upper_right, num_elements, num_refinements, overlap_size, mpi_comm.get());
         },
         "lower_left"_a,
         "upper_right"_a,
@@ -156,7 +162,8 @@ void bind_make_cube_grid(pybind11::module& m, const std::string& grid_id)
             cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")),
         "num_refinements"_a = cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
         "overlap_size"_a = XT::Common::make_array<unsigned int, G::dimension>(
-            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")));
+            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
 } // ... bind_make_cube_grid(...)
 
 
