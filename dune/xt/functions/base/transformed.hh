@@ -11,8 +11,9 @@
 #ifndef DUNE_XT_FUNCTIONS_BASE_TRANSFORMED_HH
 #define DUNE_XT_FUNCTIONS_BASE_TRANSFORMED_HH
 
-#include <dune/xt/functions/type_traits.hh>
+#include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
+#include <dune/xt/functions/type_traits.hh>
 
 
 namespace Dune {
@@ -61,7 +62,9 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     using UntransformedRangeType = typename UntransformedLocalFunctionType::RangeType;
     using typename BaseType::DomainType;
     using typename BaseType::RangeType;
+    using typename BaseType::RangeReturnType;
     using typename BaseType::DerivativeRangeType;
+    using typename BaseType::DerivativeRangeReturnType;
     using typename BaseType::ElementType;
     using Transformation = std::function<RangeType(const UntransformedRangeType&)>;
 
@@ -84,15 +87,15 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
       return local_function_->order(param);
     }
 
-    RangeType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
+    RangeReturnType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
     {
       return transformation_(local_function_->evaluate(xx, param));
     }
 
-    DerivativeRangeType jacobian(const DomainType& /*xx*/,
-                                 const XT::Common::Parameter& /*param*/ = {}) const override final
+    DerivativeRangeReturnType jacobian(const DomainType& /*xx*/,
+                                       const XT::Common::Parameter& /*param*/ = {}) const override final
     {
-      DUNE_THROW(NotImplemented, "Yet!");
+      DUNE_THROW(NotImplemented, "TransformedLocalFunction does not provide jacobian evaluations (yet)!");
     }
 
   private:
