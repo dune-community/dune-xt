@@ -123,7 +123,7 @@ public:
                               << dims_[ii]);
   }
 
-  const std::string& name() const override final
+  std::string name() const override final
   {
     return name_.empty() ? "sliced " + function_.name() : name_;
   }
