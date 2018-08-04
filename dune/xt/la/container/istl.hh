@@ -96,6 +96,7 @@ public:
   using typename InterfaceType::RealType;
   using typename InterfaceType::ScalarType;
   using Traits = typename InterfaceType::Traits;
+  using derived_type = typename InterfaceType::derived_type;
   using typename ProvidesBackend<Traits>::BackendType;
   using typename ProvidesDataAccess<Traits>::DataType;
 
