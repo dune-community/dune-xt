@@ -18,6 +18,7 @@
 
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/print.hh>
 
 #include "cube.hh"
 #include "dgf.hh"
@@ -111,14 +112,9 @@ class GridProviderFactory
 
   static std::string available_as_str()
   {
-    std::string ret = "";
-    const auto vals = available();
-    if (vals.size() > 0) {
-      ret += vals[0];
-      for (size_t ii = 1; ii < vals.size(); ++ii)
-        ret += "\n   " + vals[ii];
-    }
-    return ret;
+    std::stringstream ret;
+    std::copy(available().begin(), available().end(), Common::PrefixOutputIterator<std::string>(ret, "\n   "));
+    return ret.str();
   } // ... available_as_str(...)
 
   typedef CubeGridProviderFactory<GridType> CubeType;
