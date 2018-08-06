@@ -20,3 +20,4 @@ def test_types():
     cache = {}
     rt = types.all_types(cache=cache, dims=(2,3))
     assert len(rt) == 0
+

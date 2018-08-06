@@ -11,6 +11,16 @@ import pytest
 import dune.xt.common as xtc
 import dune.xt.grid as xtg
 
+@pytest.fixture(params=xtg.available_types)
+def mpi_grid_provider(request):
+    try:
+        from mpi4py import MPI
+    except ImportError:
+        pytest.skip('optional mpi4py is missing')
+        return
+    fn = 'make_cube_grid__{}'.format(request.param)
+    maker = getattr(xtg, fn)
+    return maker()
 
 @pytest.fixture(params=xtg.available_types)
 def grid_provider(request):
@@ -45,6 +55,9 @@ def test_walker(grid_provider):
     walker.clear()
 
 
+
+def test_mpi_cubegrid(mpi_grid_provider):
+    pass
 
 def test_count():
     pass

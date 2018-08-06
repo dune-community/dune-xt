@@ -50,12 +50,22 @@ static inline Common::Configuration gmsh_gridprovider_default_config()
 template <class GridType>
 class GmshGridProviderFactory;
 
-
+//! TODO: WHY is this not available?
 template <int dim, class Coordinates>
 class GmshGridProviderFactory<Dune::YaspGrid<dim, Coordinates>>
 {
 public:
   static const bool available = false;
+
+  static std::string static_id()
+  {
+    return "dune.xt.grid.none_t";
+  }
+
+  static Common::Configuration default_config()
+  {
+    DUNE_THROW(NotImplemented, "No default config for GmshGridProviderFactory Yaspgrid");
+  }
 };
 
 
