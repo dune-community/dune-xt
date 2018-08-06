@@ -97,6 +97,7 @@ function(dune_pybindxi_add_module target_name)
   endif()
 
   add_library(${target_name} ${lib_type} ${exclude_from_all} ${ARG_UNPARSED_ARGUMENTS})
+  dune_target_link_libraries(${target_name} "${DUNE_LIB_ADD_LIBS}")
 
   target_include_directories(${target_name}
     PRIVATE ${PYBIND11_INCLUDE_DIR}  # from project CMakeLists.txt
@@ -144,6 +145,18 @@ function(dune_pybindxi_add_module target_name)
 
   # Make sure C++11/14 are enabled
   target_compile_options(${target_name} PUBLIC ${PYBIND11_CPP_STANDARD} -g)
+  add_dune_all_flags(${target_name})
+  target_include_directories(${target_name} PUBLIC ${MPI4PY_INCLUDE_DIR})
+
+  if(TARGET bindings)
+    add_dependencies(bindings ${target_name})
+  else()
+    if(DUNE_XT_WITH_PYTHON_BINDINGS)
+      add_custom_target(bindings ALL DEPENDS ${target_name})
+    else()
+      add_custom_target(bindings DEPENDS ${target_name})
+    endif()
+  endif()
 
   if(ARG_NO_EXTRAS)
     return()
@@ -161,16 +174,7 @@ function(dune_pybindxi_add_module target_name)
     target_compile_options(${target_name} PRIVATE /MP /bigobj)
   endif()
 
-  add_dune_all_flags(${target_name})
-  if(TARGET bindings)
-    add_dependencies(bindings ${target_name})
-  else()
-    if(DUNE_XT_WITH_PYTHON_BINDINGS)
-      add_custom_target(bindings ALL DEPENDS ${target_name})
-    else()
-      add_custom_target(bindings DEPENDS ${target_name})
-    endif()
-  endif()
+
 endfunction()
 
 macro(dxt_add_make_dependent_bindings)
