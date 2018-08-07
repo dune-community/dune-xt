@@ -15,7 +15,7 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	 26cc8cb4161a3a51002ab2a81b8c81d2c951ee79 dune-testtools (heads/dune_xt)
 	+e5097dbc6210df6a5e934a17af2043c75477ec31 dune-xt-common (heads/py_mpi)
 	 17b4d7e9e16feada2b5409f7af5ac2d304b27df0 dune-xt-functions (heads/master)
-	+9a94ef959b385ad39b3cfbe6df91c2da25a26d04 dune-xt-grid (heads/mpi_factory)
+	+5d4057a6e72803ce42401723f20c5eb1ea725268 dune-xt-grid (heads/mpi_factory)
 	 4bad9ce8823aacf0b9de3295ad17039a02833844 dune-xt-la (heads/master)
 	+96b95d4b844d2b65b13352a9c65db1b77588a8a3 pylrbms (heads/master)
 	 37f7861dd9b8fd00cc28fc6c80d2b005567e8a0d pymor (0.1.0-3239-g37f7861d)
@@ -100,7 +100,7 @@ commit = 17b4d7e9e16feada2b5409f7af5ac2d304b27df0
 [submodule.dune-xt-grid]
 remote = https://github.com/dune-community/dune-xt-grid.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 9a94ef959b385ad39b3cfbe6df91c2da25a26d04
+commit = 5d4057a6e72803ce42401723f20c5eb1ea725268
 
 [submodule.dune-xt-la]
 remote = https://github.com/dune-community/dune-xt-la.git

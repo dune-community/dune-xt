@@ -32,10 +32,17 @@ namespace Grid {
 
 
 template <class G>
-pybind11::class_<GridProvider<G, Grid::none_t>> bind_GridProvider(pybind11::module& m, const std::string& grid_id)
+void bind_GridProvider(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
+
+  typedef GridProviderFactory<G> F;
+  const std::string fac_id = std::string("GridProviderFactory__" + grid_id);
+  py::class_<F> fac(m, fac_id.c_str(), fac_id.c_str());
+  fac.def_static("available", &F::available);
+  fac.def_static("default_config", &F::default_config);
+
 
   typedef GridProvider<G, Grid::none_t> C;
 
@@ -61,14 +68,11 @@ pybind11::class_<GridProvider<G, Grid::none_t>> bind_GridProvider(pybind11::modu
   });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
-
-  return c;
 } // ... bind_GridProvider(...)
 
 
 template <class G>
-pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridProvider(pybind11::module& m,
-                                                                                      const std::string& grid_id)
+void bind_DdSubdomainsGridProvider(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -128,8 +132,6 @@ pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridPro
           return result;
         },
         "subdomain"_a);
-
-  return c;
 } // ... bind_DdSubdomainsGridProvider(...)
 
 

@@ -35,3 +35,4 @@ def make_walker(gridprovider, level = 0):
         except:
             continue
     raise TypeError('no matching walker for gridview {}'.format(gridprovider.__class__))
+
