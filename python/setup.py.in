@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+#
+# ~~~
+# This file is part of the dune-pybindxi project:
+#   https://github.com/dune-community/dune-pybindxi
+# Copyright 2009-2018 dune-pybindxi developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+# Authors:
+#   Rene Milk       (2018)
+#
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# ~~~
+
+'''This is currently just a dummy package, used for nothing
+else than to workaround having mpi4py already present at configure time for
+dune-pybindxi
+'''
+
+import sys
+from setuptools import setup, find_packages
+
+requires=[]
+if '${HAVE_MPI}' == 'TRUE':
+    requires.append('mpi4py')
+
+setup(name='dune.pybindxi',
+      version='2.4',
+      namespace_packages=['dune'],
+      description='Python for Dune-Xt',
+      author='The dune-xt devs',
+      author_email='dune-xt-dev@listserv.uni-muenster.de',
+      url='https://github.com/dune-community/dune-pybindxi',
+      packages = find_packages(),
+      zip_safe = 0,
+      package_data = {'': ['*.so']},
+      install_requires=requires,
+      scripts=[])
