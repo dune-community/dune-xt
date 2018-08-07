@@ -6,34 +6,52 @@
 # Authors:
 #   Rene Milk (2018)
 # ~~~
+import itertools
 
 import pytest
 import dune.xt.common as xtc
 import dune.xt.grid as xtg
+from dune.xt.grid import provider
 
-@pytest.fixture(params=xtg.available_types)
-def mpi_grid_provider(request):
+
+def _grid_provider_factory(grid_type, mpi):
+    if not mpi:
+        fn = 'make_cube_grid__{}'.format(grid_type)
+        maker = getattr(xtg, fn)
+        return maker()
+
     try:
         from mpi4py import MPI
     except ImportError:
         pytest.skip('optional mpi4py is missing')
         return
-    fn = 'make_cube_grid__{}'.format(request.param)
+    opts = provider.default_options_cube_grid(grid_type)
+    fn = 'make_cube_grid__{}'.format(grid_type)
     maker = getattr(xtg, fn)
-    return maker()
+    return maker(opts, MPI.COMM_WORLD)
+
+
+@pytest.fixture(params=xtg.available_types)
+def mpi_grid_provider(request):
+    return _grid_provider_factory(request.param, mpi=True)
+
 
 @pytest.fixture(params=xtg.available_types)
 def grid_provider(request):
-    fn = 'make_cube_grid__{}'.format(request.param)
-    maker = getattr(xtg, fn)
-    return maker()
+    return _grid_provider_factory(request.param, mpi=False)
+
+
+@pytest.fixture(params=itertools.product(xtg.available_types, (True, False)))
+def combined_grid_provider(request):
+    return _grid_provider_factory(*request.param)
 
 
 def test_available():
     assert len(xtg.available_types) > 0
 
 
-def test_grid_provider(grid_provider):
+def test_grid_provider(combined_grid_provider):
+    grid_provider = combined_grid_provider
     assert grid_provider.max_level() >= 0
     num_el = grid_provider.num_elements
     assert num_el > 1
@@ -54,10 +72,6 @@ def test_walker(grid_provider):
     walker.walk()
     walker.clear()
 
-
-
-def test_mpi_cubegrid(mpi_grid_provider):
-    pass
 
 def test_count():
     pass
