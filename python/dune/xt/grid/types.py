@@ -1,3 +1,12 @@
+try:
+    from dune.xt._types import *
+except ImportError as e:
+    import os
+    import logging
+    if os.environ.get('DXT_PYTHON_DEBUG', False):
+        raise e
+    logging.error('dune-xt-grid bindings not available')
+
 from collections import namedtuple
 
 arguments = {'alu': namedtuple('alu_args', 'dim element_type refinement'),

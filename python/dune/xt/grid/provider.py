@@ -1,4 +1,11 @@
-from dune.xt._provider import *
+try:
+    from dune.xt._provider import *
+except ImportError as e:
+    import os
+    import logging
+    if os.environ.get('DXT_PYTHON_DEBUG', False):
+        raise e
+    logging.error('dune-xt-grid bindings not available')
 
 
 def default_options_cube_grid(type_str):
