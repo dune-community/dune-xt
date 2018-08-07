@@ -33,12 +33,13 @@ template <class GridType>
 class GridProviderFactory
 {
   template <class G>
-  static GridProvider<GridType, none_t> call_create(const Common::Configuration& cfg)
+  static GridProvider<GridType, none_t> call_create(const Common::Configuration& cfg,
+                                                    MPIHelper::MPICommunicator mpi_comm)
   {
     if (cfg.empty())
-      return G::create();
+      return G::create(G::default_config(), mpi_comm);
     else
-      return G::create(cfg);
+      return G::create(cfg, mpi_comm);
   }
 
   static std::string available_as_str()
@@ -80,20 +81,22 @@ public:
                                     << available_as_str());
   } // ... default_config(...)
 
-  static GridProvider<GridType, none_t> create(const Common::Configuration& config)
+  static GridProvider<GridType, none_t> create(const Common::Configuration& config,
+                                               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
-    return create(config.get<std::string>("type"), config);
+    return create(config.get<std::string>("type"), config, mpi_comm);
   }
 
   static GridProvider<GridType, none_t> create(const std::string& type = available()[0],
-                                               const Common::Configuration config = Common::Configuration())
+                                               const Common::Configuration config = Common::Configuration(),
+                                               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
     if (CubeType::static_id() == type)
-      return call_create<CubeType>(config);
+      return call_create<CubeType>(config, mpi_comm);
     else if (DgfType::static_id() == type)
-      return call_create<DgfType>(config);
-    else if (GmshType::static_id() == type)
-      return call_create<GmshType>(config);
+      return call_create<DgfType>(config, mpi_comm);
+    else if (GmshType::static_id() == type, mpi_comm)
+      return call_create<GmshType>(config, mpi_comm);
     else if (available().empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "There is no grid provider available for " << Common::Typename<GridType>::value() << "!");
@@ -111,12 +114,13 @@ template <class GridType>
 class DdSubdomainGridProviderFactory
 {
   template <class G>
-  static GridProvider<GridType, DD::SubdomainGrid<GridType>> call_create(const Common::Configuration& cfg)
+  static GridProvider<GridType, DD::SubdomainGrid<GridType>> call_create(const Common::Configuration& cfg,
+                                                                         MPIHelper::MPICommunicator mpi_comm)
   {
     if (cfg.empty())
-      return G::create();
+      return G::create(G::default_config(), mpi_comm);
     else
-      return G::create(cfg);
+      return G::create(cfg, mpi_comm);
   }
 
   static std::string available_as_str()
@@ -149,16 +153,19 @@ public:
                                     << available_as_str());
   } // ... default_config(...)
 
-  static GridProvider<GridType, DD::SubdomainGrid<GridType>> create(const Common::Configuration& config)
+  static GridProvider<GridType, DD::SubdomainGrid<GridType>>
+  create(const Common::Configuration& config, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
-    return create(config.get<std::string>("type"), config);
+    return create(config.get<std::string>("type"), config, mpi_comm);
   }
 
   static GridProvider<GridType, DD::SubdomainGrid<GridType>>
-  create(const std::string& type = available()[0], const Common::Configuration config = Common::Configuration())
+  create(const std::string& type = available()[0],
+         const Common::Configuration config = Common::Configuration(),
+         MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
     if (CubeType::static_id() == type)
-      return call_create<CubeType>(config);
+      return call_create<CubeType>(config, mpi_comm);
     else if (available().empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "There is no grid provider available for " << Common::Typename<GridType>::value() << "!");
