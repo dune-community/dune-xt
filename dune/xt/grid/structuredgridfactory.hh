@@ -32,6 +32,10 @@
 #include <dune/alugrid/common/structuredgridfactory.hh>
 #endif
 
+#if HAVE_DUNE_UGGRID
+#include <dune/grid/uggrid.hh>
+#endif
+
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/logging.hh>
@@ -142,6 +146,48 @@ public:
     return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements, mpi_comm);
   }
 };
+
+#if HAVE_DUNE_UGGRID
+template <int dim>
+class StructuredGridFactory<UGGrid<dim>> : public Dune::StructuredGridFactory<UGGrid<dim>>
+{
+  typedef UGGrid<dim> GridType;
+  typedef typename GridType::ctype ctype;
+
+public:
+  static std::shared_ptr<GridType>
+  createCubeGrid(const Dune::FieldVector<ctype, GridType::dimension>& lowerLeft,
+                 const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
+                 const Dune::array<unsigned int, GridType::dimension>& elements,
+                 Dune::array<unsigned int, GridType::dimension> = default_overlap<GridType>(),
+                 Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
+  {
+    if (Dune::MPIHelper::isFake)
+      return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
+#if HAVE_MPI
+    if (mpi_comm == MPI_COMM_WORLD)
+      return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
+#endif
+    DUNE_THROW(InvalidStateException, "Alberta construction cannot handle non-world communicators");
+  }
+
+  static std::shared_ptr<GridType>
+  createSimplexGrid(const Dune::FieldVector<ctype, dim>& lowerLeft,
+                    const Dune::FieldVector<ctype, dim>& upperRight,
+                    const Dune::array<unsigned int, dim>& elements,
+                    Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
+  {
+    if (Dune::MPIHelper::isFake)
+      return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
+#if HAVE_MPI
+    if (mpi_comm == MPI_COMM_WORLD)
+      return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
+#endif
+    DUNE_THROW(InvalidStateException, "UGGRid construction cannot handle non-world communicators");
+  }
+};
+#endif // HAVE_DUNE_UGGRID
+
 #if HAVE_ALBERTA
 template <int dim>
 class StructuredGridFactory<AlbertaGrid<dim, dim>> : public Dune::StructuredGridFactory<AlbertaGrid<dim, dim>>
@@ -205,7 +251,7 @@ public:
   createCubeGrid(const Dune::FieldVector<ctype, GridType::dimension>& lowerLeft,
                  const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
                  const Dune::array<unsigned int, GridType::dimension>& elements,
-                 Dune::array<unsigned int, GridType::dimension> overlap = default_overlap<GridType>(),
+                 Dune::array<unsigned int, GridType::dimension> = default_overlap<GridType>(),
                  Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
   {
     if (Dune::MPIHelper::isFake)
@@ -240,7 +286,7 @@ public:
   }
 };
 
-#endif
+#endif // HAVE_DUNE_SPGRID
 
 template <int dim, class Coords>
 class StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
