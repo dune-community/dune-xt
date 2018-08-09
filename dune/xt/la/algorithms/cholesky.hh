@@ -37,7 +37,7 @@ void tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
   typedef Common::VectorAbstraction<SecondVectorType> V2;
   V1::set_entry(diag, 0, V1::get_entry(diag, 0));
   for (size_t ii = 0; ii < diag.size() - 1; ++ii) {
-    if (V1::get_entry(diag, ii) <= 0)
+    if (!(V1::get_entry(diag, ii) > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "LDL^T factorization failed!");
     V2::set_entry(subdiag, ii, V2::get_entry(subdiag, ii) / V1::get_entry(diag, ii));
     V1::set_entry(
@@ -104,7 +104,7 @@ void cholesky_rowwise(MatrixType& A)
     auto L_ii = M::get_entry(A, ii, ii);
     for (size_t kk = 0; kk < ii; ++kk)
       L_ii -= std::pow(M::get_entry(L, ii, kk), 2);
-    if (L_ii <= 0)
+    if (!(L_ii > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "Cholesky factorization failed!");
     M::set_entry(L, ii, ii, std::sqrt(L_ii));
   } // ii
@@ -120,7 +120,7 @@ void cholesky_colwise(MatrixType& A)
     auto L_jj = M::get_entry(A, jj, jj);
     for (size_t kk = 0; kk < jj; ++kk)
       L_jj -= std::pow(M::get_entry(L, jj, kk), 2);
-    if (L_jj <= 0)
+    if (!(L_jj > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "Cholesky factorization failed!");
     L_jj = std::sqrt(L_jj);
     M::set_entry(L, jj, jj, L_jj);
@@ -167,7 +167,7 @@ cholesky_csr(MatrixType& A)
     auto kk = row_pointers[ii];
     while (kk < row_pointers[ii + 1] && size_t(column_indices[kk]) < ii)
       L_ii -= std::pow(entries[kk++], 2);
-    if (L_ii <= 0)
+    if (!(L_ii > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "Cholesky factorization failed!");
     M::set_entry(L, ii, ii, std::sqrt(L_ii));
   } // ii
