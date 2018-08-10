@@ -301,8 +301,8 @@ public:
     return cube_dd_subdomains_gridprovider_default_config();
   }
 
-  static GridProvider<GridType, DdGridType>
-  create(const Common::Configuration& cfg = cube_dd_subdomains_gridprovider_default_config())
+  static GridProvider<GridType, DdGridType> create(const Common::Configuration& cfg,
+                                                   MPIHelper::MPICommunicator mpi_comm)
   {
     const auto default_cfg = cube_dd_subdomains_gridprovider_default_config();
     return create(
@@ -315,7 +315,8 @@ public:
         cfg.get("overlap_size", default_cfg.get<std::array<unsigned int, GridType::dimension>>("overlap_size")),
         cfg.get("num_partitions", default_cfg.get<std::array<unsigned int, GridType::dimension>>("num_partitions")),
         cfg.get("oversampling_layers", default_cfg.get<size_t>("oversampling_layers")),
-        cfg.get("inner_boundary_segment_index", default_cfg.get<size_t>("inner_boundary_segment_index")));
+        cfg.get("inner_boundary_segment_index", default_cfg.get<size_t>("inner_boundary_segment_index")),
+        mpi_comm);
   }
 
   static GridProvider<GridType, DdGridType>
@@ -326,10 +327,11 @@ public:
          const std::array<unsigned int, GridType::dimension>& overlap_size,
          const std::array<unsigned int, GridType::dimension>& num_partitions,
          const size_t num_oversampling_layers,
-         const size_t inner_boundary_segment_index)
+         const size_t inner_boundary_segment_index,
+         MPIHelper::MPICommunicator mpi_comm)
   {
-    auto grid =
-        make_cube_grid<GridType>(lower_left, upper_right, num_elements, num_refinements, overlap_size).grid_ptr();
+    auto grid = make_cube_grid<GridType>(lower_left, upper_right, num_elements, num_refinements, overlap_size, mpi_comm)
+                    .grid_ptr();
     grid->loadBalance();
     const auto dims = XT::Grid::dimensions(grid->leafGridView());
     const auto bounding_box = dims.bounding_box();
@@ -396,7 +398,8 @@ make_cube_dd_subdomains_grid(
     const size_t num_oversampling_layers =
         cube_dd_subdomains_gridprovider_default_config().template get<size_t>("num_refinements"),
     const size_t inner_boundary_segment_index =
-        cube_dd_subdomains_gridprovider_default_config().template get<size_t>("inner_boundary_segment_index"))
+        cube_dd_subdomains_gridprovider_default_config().template get<size_t>("inner_boundary_segment_index"),
+    MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
   return CubeDdSubdomainsGridProviderFactory<GridType>::create(lower_left,
                                                                upper_right,
@@ -405,14 +408,16 @@ make_cube_dd_subdomains_grid(
                                                                overlap_size,
                                                                num_partitions,
                                                                num_oversampling_layers,
-                                                               inner_boundary_segment_index);
+                                                               inner_boundary_segment_index,
+                                                               mpi_comm);
 }
 
 template <class GridType>
 typename std::enable_if<XT::Grid::is_grid<GridType>::value, GridProvider<GridType, DD::SubdomainGrid<GridType>>>::type
-make_cube_dd_subdomains_grid(const Common::Configuration& cfg = cube_dd_subdomains_gridprovider_default_config())
+make_cube_dd_subdomains_grid(const Common::Configuration& cfg = cube_dd_subdomains_gridprovider_default_config(),
+                             MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
-  return CubeDdSubdomainsGridProviderFactory<GridType>::create(cfg);
+  return CubeDdSubdomainsGridProviderFactory<GridType>::create(cfg, mpi_comm);
 }
 
 

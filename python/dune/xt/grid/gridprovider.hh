@@ -176,6 +176,13 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
   using namespace pybind11::literals;
 
   m.def(std::string("make_cube_dd_subdomains_grid__" + grid_id).c_str(),
+        [](const Common::Configuration& cfg, Common::MPI_Comm_Wrapper mpi_comm) {
+          return make_cube_dd_subdomains_grid<G>(cfg, mpi_comm.get());
+        },
+        "cfg"_a = cube_gridprovider_default_config(),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
+
+  m.def(std::string("make_cube_dd_subdomains_grid__" + grid_id).c_str(),
         [](const FieldVector<typename G::ctype, G::dimension>& lower_left,
            const FieldVector<typename G::ctype, G::dimension>& upper_right,
            const std::array<unsigned int, G::dimension>& num_elements,
@@ -183,7 +190,8 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
            const std::array<unsigned int, G::dimension>& overlap_size,
            const std::array<unsigned int, G::dimension> num_partitions,
            const size_t num_oversampling_layers,
-           const size_t inner_boundary_segment_index) {
+           const size_t inner_boundary_segment_index,
+           Common::MPI_Comm_Wrapper mpi_comm) {
           return make_cube_dd_subdomains_grid<G>(lower_left,
                                                  upper_right,
                                                  num_elements,
@@ -191,7 +199,8 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
                                                  overlap_size,
                                                  num_partitions,
                                                  num_oversampling_layers,
-                                                 inner_boundary_segment_index);
+                                                 inner_boundary_segment_index,
+                                                 mpi_comm.get());
         },
         "lower_left"_a,
         "upper_right"_a,
@@ -205,7 +214,8 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
         "num_oversampling_layers"_a =
             cube_dd_subdomains_gridprovider_default_config().template get<size_t>("num_refinements"),
         "inner_boundary_segment_index"_a =
-            cube_dd_subdomains_gridprovider_default_config().template get<size_t>("inner_boundary_segment_index"));
+            cube_dd_subdomains_gridprovider_default_config().template get<size_t>("inner_boundary_segment_index"),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
 } // ... bind_make_cube_dd_subdomains_grid(...)
 
 
