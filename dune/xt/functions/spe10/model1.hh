@@ -21,6 +21,7 @@
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/data/paths.hh>
 
 #include "../checkerboard.hh"
 
@@ -37,7 +38,6 @@ namespace Functions {
 namespace Spe10 {
 namespace internal {
 
-static const std::string model1_filename = "perm_case1.dat";
 static const size_t model1_x_elements = 100;
 static const size_t model1_y_elements = 1;
 static const size_t model1_z_elements = 20;
@@ -103,7 +103,7 @@ public:
   static Common::Configuration default_config(const std::string sub_name = "")
   {
     Common::Configuration config;
-    config["filename"] = internal::model1_filename;
+    config["filename"] = Data::spe10_model1_filename();
     config["lower_left"] = "[0.0 0.0]";
     config["upper_right"] =
         "[" + Common::to_string(internal::model_1_length_x) + " " + Common::to_string(internal::model_1_length_z) + "]";
