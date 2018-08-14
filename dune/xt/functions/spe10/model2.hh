@@ -44,7 +44,7 @@ class Model2Function : public GlobalFunctionInterface<EntityImp, DomainFieldImp,
   typedef GlobalFunctionInterface<EntityImp, DomainFieldImp, dim_domain, RangeFieldImp, r, rC> BaseType;
 
 public:
-  Model2Function(std::string data_filename = Data::spe10_model1_filename(),
+  Model2Function(std::string data_filename = Data::spe10_model2_filename(),
                  Common::FieldVector<double, dim_domain> upper_right = default_upper_right)
     : deltas_{{upper_right[0] / num_elements[0], upper_right[1] / num_elements[1], upper_right[2] / num_elements[2]}}
     , permeability_(nullptr)
