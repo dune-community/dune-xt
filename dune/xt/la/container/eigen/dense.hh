@@ -33,8 +33,9 @@
 #include <dune/common/ftraits.hh>
 #include <dune/common/unused.hh>
 
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/numeric_cast.hh>
 
 #include "dune/xt/la/container/interfaces.hh"
 #include "dune/xt/la/container/pattern.hh"
@@ -144,7 +145,7 @@ public:
   explicit EigenDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
     : BaseType(num_mutexes)
   {
-    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ = std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(other.size()));
     for (size_t ii = 0; ii < other.size(); ++ii)
       backend_->operator[](ii) = other[ii];
   }
@@ -152,7 +153,7 @@ public:
   explicit EigenDenseVector(const std::initializer_list<ScalarType>& other, const size_t num_mutexes = 1)
     : BaseType(num_mutexes)
   {
-    backend_ = std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ = std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(other.size()));
     size_t ii = 0;
     for (auto element : other)
       backend_->operator[](ii++) = element;
@@ -247,7 +248,7 @@ public:
   EigenMappedDenseVector(ScalarType* data, size_t data_size, const size_t num_mutexes = 1)
     : BaseType(num_mutexes)
   {
-    backend_ = std::make_shared<BackendType>(data, internal::boost_numeric_cast<EIGEN_size_t>(data_size));
+    backend_ = std::make_shared<BackendType>(data, Common::numeric_cast<EIGEN_size_t>(data_size));
   }
 
   /**
@@ -258,7 +259,7 @@ public:
                                   const size_t num_mutexes = 1)
     : BaseType(num_mutexes)
   {
-    backend_ = std::make_shared<BackendType>(new ScalarType[ss], internal::boost_numeric_cast<EIGEN_size_t>(ss));
+    backend_ = std::make_shared<BackendType>(new ScalarType[ss], Common::numeric_cast<EIGEN_size_t>(ss));
     backend_->setOnes();
     backend_->operator*=(value);
   }
@@ -266,8 +267,8 @@ public:
   explicit EigenMappedDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
     : BaseType(num_mutexes)
   {
-    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
-                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ =
+        std::make_shared<BackendType>(new ScalarType[other.size()], Common::numeric_cast<EIGEN_size_t>(other.size()));
     for (size_t ii = 0; ii < other.size(); ++ii)
       (*backend_)[ii] = other[ii];
   }
@@ -275,8 +276,8 @@ public:
   explicit EigenMappedDenseVector(const std::initializer_list<ScalarType>& other, const size_t num_mutexes = 1)
     : BaseType(num_mutexes)
   {
-    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
-                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ =
+        std::make_shared<BackendType>(new ScalarType[other.size()], Common::numeric_cast<EIGEN_size_t>(other.size()));
     size_t ii = 0;
     for (auto element : other)
       (*backend_)[ii++] = element;
@@ -285,8 +286,8 @@ public:
   EigenMappedDenseVector(const ThisType& other)
     : BaseType(other)
   {
-    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
-                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ =
+        std::make_shared<BackendType>(new ScalarType[other.size()], Common::numeric_cast<EIGEN_size_t>(other.size()));
     backend_->operator=(other.backend());
   }
 
@@ -296,8 +297,8 @@ public:
                                   const size_t num_mutexes = 1)
     : BaseType(num_mutexes)
   {
-    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
-                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ =
+        std::make_shared<BackendType>(new ScalarType[other.size()], Common::numeric_cast<EIGEN_size_t>(other.size()));
     backend_->operator=(other);
   }
 
@@ -387,8 +388,7 @@ public:
                    const size_t cc,
                    const SparsityPatternDefault& /*pattern*/,
                    const size_t num_mutexes = 1)
-    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
+    : backend_(new BackendType(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     backend_->setZero();

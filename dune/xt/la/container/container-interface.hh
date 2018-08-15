@@ -66,23 +66,6 @@ static constexpr Backends default_dense_backend =
 namespace internal {
 
 
-/**
- * \brief Tries a boost::numeric_cast and throws an Exceptions::wrong_input_given on failure.
- *
- *        This can be used in the ctor initializer list.
- */
-template <class Out, class In>
-static Out boost_numeric_cast(const In& in)
-{
-  try {
-    return boost::numeric_cast<Out>(in);
-  } catch (boost::bad_numeric_cast& ee) {
-    DUNE_THROW(Common::Exceptions::wrong_input_given,
-               "There was an error in boost converting '" << in << "' to '" << Common::Typename<Out>::value() << "': "
-                                                          << ee.what());
-  }
-} // ... boost_numeric_cast(...)
-
 struct VectorLockGuard
 {
   VectorLockGuard(std::vector<std::mutex>& mutexes)
@@ -99,6 +82,7 @@ struct VectorLockGuard
 
   std::vector<std::mutex>& mutexes_;
 }; // VectorLockGuard
+
 
 struct LockGuard
 {

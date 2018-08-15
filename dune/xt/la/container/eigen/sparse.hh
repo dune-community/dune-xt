@@ -31,10 +31,11 @@
 #include <dune/common/ftraits.hh>
 #include <dune/common/unused.hh>
 
-#include <dune/xt/common/math.hh>
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/crtp.hh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
+#include <dune/xt/common/math.hh>
+#include <dune/xt/common/numeric_cast.hh>
 
 #include "dune/xt/la/container/interfaces.hh"
 #include "dune/xt/la/container/pattern.hh"
@@ -107,8 +108,8 @@ public:
                             const size_t cc,
                             const SparsityPatternDefault& pattern_in,
                             const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                                             internal::boost_numeric_cast<EIGEN_size_t>(cc)))
+    : backend_(
+          std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     if (rr > 0 && cc > 0) {
@@ -118,7 +119,7 @@ public:
                                                << rr
                                                << ")!");
       for (size_t row = 0; row < size_t(pattern_in.size()); ++row) {
-        backend_->startVec(internal::boost_numeric_cast<EIGEN_size_t>(row));
+        backend_->startVec(Common::numeric_cast<EIGEN_size_t>(row));
         const auto& columns = pattern_in.inner(row);
         for (auto& column : columns) {
 #ifndef NDEBUG
@@ -128,12 +129,12 @@ public:
                                           << cc
                                           << ")!");
 #endif // NDEBUG
-          backend_->insertBackByOuterInner(internal::boost_numeric_cast<EIGEN_size_t>(row),
-                                           internal::boost_numeric_cast<EIGEN_size_t>(column));
+          backend_->insertBackByOuterInner(Common::numeric_cast<EIGEN_size_t>(row),
+                                           Common::numeric_cast<EIGEN_size_t>(column));
         }
         // create entry (insertBackByOuterInner() can not handle empty rows)
         if (columns.size() == 0)
-          backend_->insertBackByOuterInner(internal::boost_numeric_cast<EIGEN_size_t>(row), 0);
+          backend_->insertBackByOuterInner(Common::numeric_cast<EIGEN_size_t>(row), 0);
       }
       backend_->finalize();
       backend_->makeCompressed();
@@ -305,23 +306,20 @@ public:
   {
     internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     assert(these_are_valid_indices(ii, jj));
-    backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii),
-                       internal::boost_numeric_cast<EIGEN_size_t>(jj)) += value;
+    backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(jj)) += value;
   }
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii), internal::boost_numeric_cast<EIGEN_size_t>(jj)) =
-        value;
+    backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(jj)) = value;
   }
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend().coeff(internal::boost_numeric_cast<EIGEN_size_t>(ii),
-                           internal::boost_numeric_cast<EIGEN_size_t>(jj));
+    return backend().coeff(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(jj));
   }
 
   void clear_row(const size_t ii)
@@ -329,7 +327,7 @@ public:
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend().row(internal::boost_numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
+    backend().row(Common::numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
   }
 
   void clear_col(const size_t jj)
@@ -337,14 +335,13 @@ public:
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(backend(), internal::boost_numeric_cast<EIGEN_size_t>(row));
-           row_it;
+    for (size_t row = 0; Common::numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(backend(), Common::numeric_cast<EIGEN_size_t>(row)); row_it;
            ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
-          backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(row),
-                             internal::boost_numeric_cast<EIGEN_size_t>(jj)) = ScalarType(0);
+          backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(row), Common::numeric_cast<EIGEN_size_t>(jj)) =
+              ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -363,9 +360,8 @@ public:
     if (!these_are_valid_indices(ii, ii))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
-    backend().row(internal::boost_numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
-    backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(ii), internal::boost_numeric_cast<EIGEN_size_t>(ii)) =
-        ScalarType(1);
+    backend().row(Common::numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
+    backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(ii)) = ScalarType(1);
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
@@ -376,18 +372,17 @@ public:
     if (jj >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
-    for (size_t row = 0; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(backend(), internal::boost_numeric_cast<EIGEN_size_t>(row));
-           row_it;
+    for (size_t row = 0; Common::numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(backend(), Common::numeric_cast<EIGEN_size_t>(row)); row_it;
            ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
           if (col == row)
-            backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(row),
-                               internal::boost_numeric_cast<EIGEN_size_t>(col)) = ScalarType(1);
+            backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(row), Common::numeric_cast<EIGEN_size_t>(col)) =
+                ScalarType(1);
           else
-            backend().coeffRef(internal::boost_numeric_cast<EIGEN_size_t>(row),
-                               internal::boost_numeric_cast<EIGEN_size_t>(jj)) = ScalarType(0);
+            backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(row), Common::numeric_cast<EIGEN_size_t>(jj)) =
+                ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -494,9 +489,8 @@ private:
       return false;
     if (jj >= cols())
       return false;
-    for (size_t row = ii; internal::boost_numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(backend(), internal::boost_numeric_cast<EIGEN_size_t>(row));
-           row_it;
+    for (size_t row = ii; Common::numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(backend(), Common::numeric_cast<EIGEN_size_t>(row)); row_it;
            ++row_it) {
         const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
