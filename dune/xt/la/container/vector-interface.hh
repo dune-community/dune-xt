@@ -102,6 +102,14 @@ public:
   }
 
   /**
+   * \note This is supposed to do nothing if new_size == size()
+   */
+  inline void resize(const size_t new_size)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().resize(new_size));
+  }
+
+  /**
    * \brief Add a scalar to the iith entry.
    */
   inline void add_to_entry(const size_t ii, const ScalarType& value)

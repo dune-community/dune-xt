@@ -198,6 +198,18 @@ public:
   using InterfaceType::operator*;
   using BaseType::backend;
 
+  /// \name Required by VectorInterface
+  /// \{
+
+  inline void resize(const size_t new_size)
+  {
+    if (new_size != backend_->size()) {
+      backend_ = std::make_shared<BackendType>(new_size);
+      backend_->setZeros();
+    }
+  }
+
+  /// \}
   /// \name Required by ProvidesDataAccess.
   /// \{
 
@@ -330,6 +342,12 @@ public:
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     backend_->operator=(other);
     return *this;
+  }
+
+  inline void resize(const size_t new_size)
+  {
+    if (new_size != this->size())
+      DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This does not make sense for mapped memory!");
   }
 
   using InterfaceType::add;

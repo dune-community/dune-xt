@@ -48,8 +48,6 @@ class EigenRowMajorSparseMatrix;
 
 #if HAVE_EIGEN
 
-template <class Traits, class ScalarImp>
-class EigenBaseVector;
 
 /**
  *  \brief Base class for all eigen implementations of VectorInterface.

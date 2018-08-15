@@ -253,6 +253,14 @@ public:
     return backend_->N();
   }
 
+  inline void resize(const size_t new_size)
+  {
+    if (new_size != size()) {
+      backend_ = std::make_shared<BackendType>(new_size);
+      backend_->operator=(0);
+    }
+  }
+
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
