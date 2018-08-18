@@ -266,7 +266,7 @@ public:
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
   operator=(const OtherMatrixImp& other)
   {
-    assign(other, dense_pattern(num_rows_, num_cols_));
+    return assign(other, dense_pattern(num_rows_, num_cols_));
   }
 
   void deep_copy(const ThisType& other)
@@ -1229,7 +1229,7 @@ public:
     for (size_t row = 0; row < num_rows_; ++row)
       nnz += patt.inner(row).size();
     size_t num_entries = rr * cc;
-    double density = double(nnz) / double(num_entries);
+    const double density = double(nnz) / double(num_entries);
     sparse_ = density < sparse_limit;
     if (sparse_) {
       sparse_matrix_ = SparseMatrixType(rr, cc, patt, num_mutexes, eps);
@@ -1290,7 +1290,7 @@ public:
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
         nnz += XT::Common::FloatCmp::ne(value, ScalarType(0), 0., eps);
       }
-    double density = double(nnz) / double(num_rows_ * num_cols_);
+    const double density = double(nnz) / double(num_rows_ * num_cols_);
     sparse_ = density < sparse_limit;
     if (sparse_) {
       sparse_matrix_ = SparseMatrixType(mat, prune, eps_in, num_mutexes);
@@ -1335,8 +1335,8 @@ public:
         const auto& value = Common::MatrixAbstraction<DenseMatrixType>::get_entry(other, rr, cc);
         nnz += XT::Common::FloatCmp::ne(value, ScalarType(0), 0., tol);
       }
-    double density = double(nnz) / (Common::MatrixAbstraction<DenseMatrixType>::rows(other)
-                                    * Common::MatrixAbstraction<DenseMatrixType>::cols(other));
+    const double density = double(nnz) / (Common::MatrixAbstraction<DenseMatrixType>::rows(other)
+                                          * Common::MatrixAbstraction<DenseMatrixType>::cols(other));
     sparse_ = density < sparse_limit;
     if (sparse_)
       sparse_matrix_ = other;
