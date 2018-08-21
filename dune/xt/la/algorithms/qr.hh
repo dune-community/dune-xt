@@ -225,7 +225,7 @@ void qr_decomposition(XT::Common::BlockedFieldMatrix<FieldType, num_blocks, bloc
     qr_decomposition(A.block(jj), tau_block, permutations_block);
     for (size_t mm = 0; mm < block_cols; ++mm) {
       tau[jj * block_cols + mm] = tau_block[mm];
-      permutations[jj * block_cols + mm] = permutations_block[mm];
+      permutations[jj * block_cols + mm] = jj * block_cols + permutations_block[mm];
     }
   }
 }
