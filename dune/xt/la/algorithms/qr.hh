@@ -14,6 +14,7 @@
 #include <complex>
 
 #include <dune/xt/common/lapacke.hh>
+#include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/vector.hh>
@@ -203,6 +204,32 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
   } // jj
 } // void qr_decomposition(...)
 
+// specialization for BlockedFieldMatrix
+template <class FieldType,
+          size_t num_blocks,
+          size_t block_rows,
+          size_t block_cols,
+          class VectorType,
+          class IndexVectorType>
+void qr_decomposition(XT::Common::BlockedFieldMatrix<FieldType, num_blocks, block_rows, block_cols>& A,
+                      VectorType& tau,
+                      IndexVectorType& permutations)
+{
+  FieldVector<FieldType, block_cols> tau_block;
+  FieldVector<int, block_cols> permutations_block;
+  for (size_t jj = 0; jj < num_blocks; ++jj) {
+    for (size_t mm = 0; mm < block_cols; ++mm) {
+      tau_block[mm] = tau[jj * block_cols + mm];
+      permutations_block[mm] = permutations[jj * block_cols + mm];
+    }
+    qr_decomposition(A.block(jj), tau_block, permutations_block);
+    for (size_t mm = 0; mm < block_cols; ++mm) {
+      tau[jj * block_cols + mm] = tau_block[mm];
+      permutations[jj * block_cols + mm] = permutations_block[mm];
+    }
+  }
+}
+
 template <class MatrixType,
           class VectorType,
           class IndexVectorType = std::vector<int>,
@@ -373,7 +400,7 @@ private:
     if (m != last_m || n != last_n) {
       // query workspace size
       Common::Lapacke::dgeqp3_work(matrix_layout, m, n, a, lda, jpvt, tau, work.data(), -1);
-      work.resize(work[0]);
+      work.resize(static_cast<size_t>(work[0] + 0.5));
       last_m = m;
       last_n = n;
     }
@@ -599,7 +626,17 @@ solve_by_qr_decomposition(MatrixType& A, SolutionMatrixType& X, const RhsMatrixT
     for (size_t ii = 0; ii < MX::rows(X); ++ii)
       MX::set_entry(X, ii, jj, x[ii]);
   }
-} // void solve_lower_triangular(...)
+} // void solve_by_qr_decomposition(...)
+
+template <class FieldType, size_t num_blocks, size_t block_rows, size_t rhs_block_cols>
+void solve_by_qr_decomposition(
+    XT::Common::BlockedFieldMatrix<FieldType, num_blocks, block_rows, block_rows>& A,
+    XT::Common::BlockedFieldMatrix<FieldType, num_blocks, block_rows, rhs_block_cols>& X,
+    const XT::Common::BlockedFieldMatrix<FieldType, num_blocks, block_rows, rhs_block_cols>& B)
+{
+  for (size_t jj = 0; jj < num_blocks; ++jj)
+    solve_by_qr_decomposition(A.block(jj), X.block(jj), B.block(jj));
+} // void solve_by_qr_decomposition(BlockedFieldMatrix<...>)
 
 
 } // namespace LA
