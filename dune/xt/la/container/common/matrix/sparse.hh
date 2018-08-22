@@ -597,8 +597,8 @@ class CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>
     : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
 {
   using ThisType = CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>;
-  using = MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
-      MatrixInterfaceType;
+  using MatrixInterfaceType =
+      MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>;
 
 public:
   using Traits = typename MatrixInterfaceType::Traits;
