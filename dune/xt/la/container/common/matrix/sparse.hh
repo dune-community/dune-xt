@@ -43,14 +43,14 @@ template <class ScalarImp, Common::StorageLayout layout>
 class CommonSparseMatrixTraits
 {
 public:
-  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
+  using ScalarType = typename Dune::FieldTraits<ScalarImp>::field_type;
+  using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
   static const Backends backend_type = Backends::common_dense;
   static const Backends vector_type = Backends::common_dense;
-  typedef std::vector<ScalarImp> EntriesVectorType;
-  typedef std::vector<size_t> IndexVectorType;
-  typedef typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type EpsType;
-  typedef CommonSparseMatrix<ScalarImp, layout> derived_type;
+  using EntriesVectorType = std::vector<ScalarImp>;
+  using IndexVectorType = std::vector<size_t>;
+  using EpsType = typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type;
+  using derived_type = CommonSparseMatrix<ScalarImp, layout>;
   static const constexpr bool sparse = true;
 };
 
@@ -58,14 +58,14 @@ template <class DenseMatrixImp, class SparseMatrixImp>
 class CommonSparseOrDenseMatrixTraits
 {
 public:
-  typedef DenseMatrixImp DenseMatrixType;
-  typedef SparseMatrixImp SparseMatrixType;
-  typedef typename DenseMatrixType::ScalarType ScalarType;
-  typedef typename DenseMatrixType::RealType RealType;
+  using DenseMatrixType = DenseMatrixImp;
+  using SparseMatrixType = SparseMatrixImp;
+  using ScalarType = typename DenseMatrixType::ScalarType;
+  using RealType = typename DenseMatrixType::RealType;
   static const Backends backend_type = Backends::common_dense;
   static const Backends vector_type = Backends::common_dense;
-  typedef typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type EpsType;
-  typedef CommonSparseOrDenseMatrix<DenseMatrixType, SparseMatrixType> derived_type;
+  using EpsType = typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type;
+  using derived_type = CommonSparseOrDenseMatrix<DenseMatrixType, SparseMatrixType>;
   static const constexpr bool sparse = false;
 };
 
@@ -79,17 +79,17 @@ public:
 template <class ScalarImp = double, Common::StorageLayout layout = Common::StorageLayout::csr>
 class CommonSparseMatrix : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp>
 {
-  typedef CommonSparseMatrix<ScalarImp, layout> ThisType;
-  typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp> MatrixInterfaceType;
+  using ThisType = CommonSparseMatrix<ScalarImp, layout>;
+  using MatrixInterfaceType = MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp>;
 
 public:
   using Traits = typename MatrixInterfaceType::Traits;
   using derived_type = typename MatrixInterfaceType::derived_type;
-  typedef typename Traits::EntriesVectorType EntriesVectorType;
-  typedef typename Traits::IndexVectorType IndexVectorType;
-  typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealType RealType;
-  typedef typename Traits::EpsType EpsType;
+  using EntriesVectorType = typename Traits::EntriesVectorType;
+  using IndexVectorType = typename Traits::IndexVectorType;
+  using ScalarType = typename Traits::ScalarType;
+  using RealType = typename Traits::RealType;
+  using EpsType = typename Traits::EpsType;
 
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
@@ -247,7 +247,7 @@ public:
   assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
   {
     clear();
-    typedef XT::Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
+    using MatAbstrType = XT::Common::MatrixAbstraction<OtherMatrixImp>;
     num_rows_ = MatAbstrType::rows(other);
     num_cols_ = MatAbstrType::cols(other);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
@@ -596,18 +596,18 @@ template <class ScalarImp>
 class CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>
     : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
 {
-  typedef CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc> ThisType;
-  typedef MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
+  using ThisType = CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>;
+  using = MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
       MatrixInterfaceType;
 
 public:
   using Traits = typename MatrixInterfaceType::Traits;
   using derived_type = typename MatrixInterfaceType::derived_type;
-  typedef typename Traits::EntriesVectorType EntriesVectorType;
-  typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealType RealType;
-  typedef typename Traits::EpsType EpsType;
-  typedef std::vector<size_t> IndexVectorType;
+  using EntriesVectorType = typename Traits::EntriesVectorType;
+  using ScalarType = typename Traits::ScalarType;
+  using RealType = typename Traits::RealType;
+  using EpsType = typename Traits::EpsType;
+  using IndexVectorType = std::vector<size_t>;
 
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
@@ -762,7 +762,7 @@ public:
   assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
   {
 
-    typedef Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
+    using MatAbstrType = Common::MatrixAbstraction<OtherMatrixImp>;
     clear();
     num_rows_ = MatAbstrType::rows(other);
     num_cols_ = MatAbstrType::cols(other);
@@ -1199,19 +1199,19 @@ class CommonSparseOrDenseMatrix
     : public MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
                              typename SparseMatrixImp::ScalarType>
 {
-  typedef CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp> ThisType;
-  typedef MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
-                          typename SparseMatrixImp::ScalarType>
-      MatrixInterfaceType;
+  using ThisType = CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>;
+  using MatrixInterfaceType =
+      MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
+                      typename SparseMatrixImp::ScalarType>;
 
 public:
   using Traits = typename MatrixInterfaceType::Traits;
   using derived_type = typename MatrixInterfaceType::derived_type;
-  typedef typename Traits::DenseMatrixType DenseMatrixType;
-  typedef typename Traits::SparseMatrixType SparseMatrixType;
-  typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealType RealType;
-  typedef typename Traits::EpsType EpsType;
+  using DenseMatrixType = typename Traits::DenseMatrixType;
+  using SparseMatrixType = typename Traits::SparseMatrixType;
+  using ScalarType = typename Traits::ScalarType;
+  using RealType = typename Traits::RealType;
+  using EpsType = typename Traits::EpsType;
   static constexpr double sparse_limit = 0.1;
 
   /**
