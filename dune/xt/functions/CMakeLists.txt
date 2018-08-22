@@ -39,4 +39,3 @@ endif()
 dune_library_add_sources(dunextfunctions SOURCES ${lib_dune_xt_functions_sources})
 
 add_subdirectory(test EXCLUDE_FROM_ALL)
-

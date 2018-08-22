@@ -34,4 +34,3 @@ foreach(test ${dxt_test_binaries})
     add_dune_alberta_flags(GRIDDIM 3 ${test})
   endif()
 endforeach()
-
