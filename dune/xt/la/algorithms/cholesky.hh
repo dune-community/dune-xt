@@ -29,6 +29,13 @@ namespace LA {
 namespace internal {
 
 
+// avoid Wfloat-equal warning
+template <class FieldType>
+inline bool is_zero(const FieldType& val)
+{
+  return std::equal_to<FieldType>()(val, FieldType(0));
+}
+
 // computes the LDL^T factorization of a tridiagonal matrix
 template <class FirstVectorType, class SecondVectorType>
 void tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
@@ -89,7 +96,7 @@ solve_tridiag_ldlt(const FirstVectorType& diag, const SecondVectorType& subdiag,
 template <bool only_set_nonzero, class MatrixType>
 void cholesky_rowwise(MatrixType& A)
 {
-  typedef Common::MatrixAbstraction<MatrixType> M;
+  using M = Common::MatrixAbstraction<MatrixType>;
   size_t size = M::rows(A);
   auto& L = A;
   for (size_t ii = 0; ii < size; ++ii) {
@@ -98,7 +105,7 @@ void cholesky_rowwise(MatrixType& A)
       for (size_t kk = 0; kk < jj; ++kk)
         L_ij -= M::get_entry(L, ii, kk) * M::get_entry(L, jj, kk);
       L_ij /= M::get_entry(L, jj, jj);
-      if (!only_set_nonzero || L_ij != 0)
+      if (!only_set_nonzero || !is_zero(L_ij))
         M::set_entry(L, ii, jj, L_ij);
     } // jj
     auto L_ii = M::get_entry(A, ii, ii);
@@ -113,7 +120,7 @@ void cholesky_rowwise(MatrixType& A)
 template <bool only_set_nonzero, class MatrixType>
 void cholesky_colwise(MatrixType& A)
 {
-  typedef Common::MatrixAbstraction<MatrixType> M;
+  using M = Common::MatrixAbstraction<MatrixType>;
   size_t size = M::rows(A);
   auto& L = A;
   for (size_t jj = 0; jj < size; ++jj) {
@@ -130,7 +137,7 @@ void cholesky_colwise(MatrixType& A)
       for (size_t kk = 0; kk < jj; ++kk)
         L_ij -= M::get_entry(L, ii, kk) * M::get_entry(L, jj, kk);
       L_ij *= L_jj_inv;
-      if (!only_set_nonzero || L_ij != 0)
+      if (!only_set_nonzero || !is_zero(L_ij))
         M::set_entry(L, ii, jj, L_ij);
     } // ii
   } // jj
@@ -143,7 +150,7 @@ cholesky_csr(MatrixType& A)
   const auto* entries = A.entries();
   const auto* row_pointers = A.outer_index_ptr();
   const auto* column_indices = A.inner_index_ptr();
-  typedef Common::MatrixAbstraction<MatrixType> M;
+  using M = Common::MatrixAbstraction<MatrixType>;
   size_t size = M::rows(A);
   auto& L = A;
   for (size_t ii = 0; ii < size; ++ii) {
@@ -160,7 +167,7 @@ cholesky_csr(MatrixType& A)
           L_ij -= entries[ll++] * entries[kk++];
       }
       L_ij /= M::get_entry(L, jj, jj);
-      if (L_ij != 0)
+      if (!is_zero(L_ij))
         M::set_entry(L, ii, jj, L_ij);
     } // jj
     auto L_ii = M::get_entry(A, ii, ii);

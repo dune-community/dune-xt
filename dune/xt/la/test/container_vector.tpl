@@ -94,7 +94,6 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
     VectorImp d_by_size_and_value_2(dim, D_ScalarType(1));
     InterfaceType& i_by_size = static_cast<InterfaceType&>(d_by_size_2);
     InterfaceType& i_by_size_and_value = static_cast<InterfaceType&>(d_by_size_and_value_2);
-    auto i_dim DUNE_UNUSED = i_by_size.dim();
     EXPECT_TRUE(i_by_size.almost_equal(d_by_size_2));
     i_by_size_and_value.scal(I_ScalarType(0));
     EXPECT_TRUE(i_by_size_and_value.almost_equal(d_by_size_2));
