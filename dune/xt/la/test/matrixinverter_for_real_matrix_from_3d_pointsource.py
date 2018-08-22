@@ -9,7 +9,8 @@
 
 from dune.xt.codegen import typeid_to_typedef_name as safe_name, have_eigen
 
-matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 6, 6>', 'CommonDenseMatrix<double>', 'CommonSparseMatrix<double>']
+matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 6, 6>', 'CommonDenseMatrix<double>',
+          'CommonSparseMatrix<double>', 'XT::Common::BlockedFieldMatrix<double, 1, 6, 6>']
 
 def _ok(ft):
     if 'Eigen' in ft:

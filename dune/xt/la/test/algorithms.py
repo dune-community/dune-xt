@@ -25,10 +25,12 @@ def la_types_creator():
 
 la_types = la_types_creator()
 
-common_types = [f.split('_') for f in ['FieldMatrix_FieldVector_FieldVector_double,3,3']]
+common_types = [f.split('_') for f in ['FieldMatrix_FieldVector_FieldVector_double,3,3',
+                                       'BlockedFieldMatrix_FieldVector_FieldVector_double,1,3,3',
+                                       'BlockedFieldMatrix_BlockedFieldVector_BlockedFieldVector_double,1,3,3']]
 
 dune_types = [f.split('_') for f in ['FieldMatrix_FieldVector_FieldVector_double,3,3',
-                                            'DynamicMatrix_DynamicVector_DynamicVector_double']]
+                                     'DynamicMatrix_DynamicVector_DynamicVector_double']]
 
 
 def la_test_tuple(args):
@@ -41,7 +43,12 @@ def common_test_tuple(args, xt):
     typefunc = commontype if xt == 'XT_' else dunetype;
     o, r, s, f = args
     fs = f.split(',');
-    fvec = f if len(fs) == 1 else '{},{}'.format(fs[0], fs[1])
+    if len(fs) == 1:
+        fvec = f
+    elif r.startswith('FieldVector'):
+        fvec = '{},{}'.format(fs[0], fs[1] if len(fs) == 3 else int(fs[1])*int(fs[2]))
+    else:
+        fvec = '{},{},{}'.format(fs[0], fs[1], fs[2])
     f.replace('complex', 'std::complex<double>')
     return (safe_name('{}{}_{}_{}_{}'.format(xt, o, r, s, f)), typefunc(o,f), typefunc(r,fvec), typefunc(s,fvec))
 

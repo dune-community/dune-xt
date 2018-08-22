@@ -11,10 +11,11 @@
 
 from dune.xt.codegen import typeid_to_typedef_name as safe_name, have_eigen
 
-matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 5, 5>', 'CommonDenseMatrix<double>']
-field = ['double', 'double', 'double']
-complex_matrix = ['EigenDenseMatrix<std::complex<double>>', 'FieldMatrix<std::complex<double>, 5, 5>', 'CommonDenseMatrix<std::complex<double>>']
-real_matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 5, 5>', 'CommonDenseMatrix<double>']
+matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 5, 5>', 'CommonDenseMatrix<double>', 'XT::Common::BlockedFieldMatrix<double, 1, 5, 5>']
+field = ['double', 'double', 'double', 'double']
+complex_matrix = ['EigenDenseMatrix<std::complex<double>>', 'FieldMatrix<std::complex<double>, 5, 5>',
+                  'CommonDenseMatrix<std::complex<double>>', 'XT::Common::BlockedFieldMatrix<std::complex<double>, 1, 5, 5>']
+real_matrix = ['EigenDenseMatrix<double>', 'FieldMatrix<double, 5, 5>', 'CommonDenseMatrix<double>', 'XT::Common::BlockedFieldMatrix<double, 1, 5, 5>']
 
 
 def _ok(ft):

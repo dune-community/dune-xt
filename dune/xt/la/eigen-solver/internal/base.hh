@@ -20,6 +20,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
+#include <dune/xt/common/matrix.hh>
 
 #include <dune/xt/la/container/common/vector/dense.hh>
 #include <dune/xt/la/container/conversion.hh>
@@ -731,7 +732,7 @@ protected:
     static void check(const ThisType& self, const double& tolerance)
     {
       self.invert_eigenvectors();
-      self.assert_eigendecomposition(convert_to<ComplexMatrixType>(self.matrix_),
+      self.assert_eigendecomposition(Dune::XT::LA::convert_to<ComplexMatrixType>(self.matrix_),
                                      *self.eigenvalues_,
                                      *self.eigenvectors_,
                                      *self.eigenvectors_inverse_,
