@@ -202,12 +202,17 @@ public:
   /* \} */
 
 protected:
+#ifndef DUNE_XT_FUNCTIONS_ENABLE_CHECKS
+  bool is_a_valid_point(const DomainType&, DomainFieldType = DomainFieldType(0)) const
+  {
+    return true;
+  }
+#else
   // default tolerance is copypasta from ReferenceElement::checkInside
   bool is_a_valid_point(const DomainType& xx,
                         DomainFieldType tolerance = DomainFieldType(64)
                                                     * std::numeric_limits<DomainFieldType>::epsilon()) const
   {
-#ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
     const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
     const bool inside =
         Impl::template checkInside<DomainFieldType, dimDomain>(reference_element.type().id(), dimDomain, xx, tolerance);
@@ -222,10 +227,8 @@ protected:
       DXTC_LOG_ERROR << ent_str.str();
     }
     return inside;
-#else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-    return true;
-#endif
   }
+#endif // DUNE_XT_FUNCTIONS_ENABLE_CHECKS
 
   const EntityType& entity_;
 }; // class LocalfunctionSetInterface

@@ -16,7 +16,7 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	 8fe883e99c58c9f0c2f92457d546a0ac9f5a9bf9 dune-uggrid (v2.5.2-1-g8fe883e9)
 	+e4eefbdd13cb91f19e84c2bd3cce9b716ca86a68 dune-xt-common (heads/dbg_assert)
 	 b8cf8efc32e46511990b691afee55da3b7af15c8 dune-xt-data (heads/master)
-	+50786737f00eb0333c495bc78e9f8d5b3b7cb10c dune-xt-functions (heads/cmake_format)
+	+a8cb52b2ce0f23a2918278e7e58ba5cefe915668 dune-xt-functions (heads/cmake_format)
 	 dd30fcd7d4485eb2a8158d5ddf01333f58502c40 dune-xt-grid (heads/master)
 	 fab7ebec48ebafb5cf541ea3ff696955b480a768 dune-xt-la (heads/master)
 	+b1f1eed91687f9b468097dd4cad896c5c4222cb3 pylrbms (heads/master)
@@ -107,7 +107,7 @@ commit = b8cf8efc32e46511990b691afee55da3b7af15c8
 [submodule.dune-xt-functions]
 remote = https://github.com/dune-community/dune-xt-functions.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 50786737f00eb0333c495bc78e9f8d5b3b7cb10c
+commit = a8cb52b2ce0f23a2918278e7e58ba5cefe915668
 
 [submodule.dune-xt-grid]
 remote = https://github.com/dune-community/dune-xt-grid.git
