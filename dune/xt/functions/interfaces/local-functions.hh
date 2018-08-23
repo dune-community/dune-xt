@@ -22,6 +22,8 @@
 #include <dune/geometry/referenceelements.hh>
 
 #include <dune/xt/common/parameter.hh>
+#include <dune/xt/common/logging.hh>
+#include <dune/xt/grid/entity.hh>
 
 namespace Dune {
 namespace XT {
@@ -200,17 +202,26 @@ public:
   /* \} */
 
 protected:
-  bool is_a_valid_point(const DomainType&
-#ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-                            xx
-#else
-/*xx*/
-#endif
-                        ) const
+  // default tolerance is copypasta from ReferenceElement::checkInside
+  bool is_a_valid_point(const DomainType& xx,
+                        DomainFieldType tolerance = DomainFieldType(64)
+                                                    * std::numeric_limits<DomainFieldType>::epsilon()) const
   {
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
     const auto& reference_element = ReferenceElements<DomainFieldType, dimDomain>::general(entity().type());
-    return reference_element.checkInside(xx);
+    const bool inside =
+        Impl::template checkInside<DomainFieldType, dimDomain>(reference_element.type().id(), dimDomain, xx, tolerance);
+
+    if (!inside) {
+      std::stringstream ent_str;
+      const auto global = entity().geometry().global(xx);
+      const int max_precision = std::numeric_limits<DomainFieldType>::digits10 + 1;
+      ent_str << std::setprecision(max_precision) << "global point " << global << " not inside entity ";
+      XT::Grid::print_entity(entity(), Common::Typename<EntityType>::value(), ent_str);
+      ent_str << "\ncheckInside tolerance " << tolerance << "\nlocal coordinates " << xx;
+      DXTC_LOG_ERROR << ent_str.str();
+    }
+    return inside;
 #else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
     return true;
 #endif
