@@ -95,7 +95,7 @@ public:
       return call_create<CubeType>(config, mpi_comm);
     else if (DgfType::static_id() == type)
       return call_create<DgfType>(config, mpi_comm);
-    else if (GmshType::static_id() == type, mpi_comm)
+    else if (GmshType::static_id() == type)
       return call_create<GmshType>(config, mpi_comm);
     else if (available().empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given,
