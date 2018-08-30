@@ -40,7 +40,7 @@
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/functors/interfaces.hh>
-#include <dune/xt/grid/functors/lambda.hh>
+#include <dune/xt/grid/functors/generic.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 #include "walker/filters.hh"
@@ -66,12 +66,12 @@ public:
   using typename BaseType::IntersectionType;
 
 private:
-  using IntersectionElementElementFunction =
+  using GenericElementApplyFunctionType = std::function<void(const ElementType&)>;
+  using GenericIntersectionApplyFunctionType =
       std::function<void(const IntersectionType&, const ElementType&, const ElementType&)>;
-  using ElementFunction = std::function<void(const ElementType&)>;
-  using ViewElementFunction = std::function<bool(const GL&, const ElementType&)>;
-  using ViewIntersectionFunction = std::function<bool(const GL&, const IntersectionType&)>;
-  using VoidFunction = std::function<void()>;
+  using GenericElementFilterFunctionType = std::function<bool(const GL&, const ElementType&)>;
+  using GenericIntersectionFilterFunctionType = std::function<bool(const GL&, const IntersectionType&)>;
+  using VoidFunctionType = std::function<void()>;
 
   template <typename WrapperType, class... Args>
   void emplace_all(Common::PerThreadValue<std::list<std::shared_ptr<WrapperType>>>& thread_storage, Args&&... args)
@@ -151,15 +151,15 @@ public:
     return *this;
   }
 
-  ThisType& append(ElementFunctor<GL>& functor, ViewElementFunction element_filter)
+  ThisType& append(ElementFunctor<GL>& functor, GenericElementFilterFunctionType filter)
   {
-    emplace_all(element_functor_wrappers_, functor, ApplyOn::LambdaFilteredElements<GL>(element_filter));
+    emplace_all(element_functor_wrappers_, functor, ApplyOn::LambdaFilteredElements<GL>(filter));
     return *this;
   }
 
-  ThisType& append(ElementFunctor<GL>*&& functor, ViewElementFunction element_filter)
+  ThisType& append(ElementFunctor<GL>*&& functor, GenericElementFilterFunctionType filter)
   {
-    emplace_all(element_functor_wrappers_, *functor, ApplyOn::LambdaFilteredElements<GL>(element_filter));
+    emplace_all(element_functor_wrappers_, *functor, ApplyOn::LambdaFilteredElements<GL>(filter));
     delete functor;
     return *this;
   }
@@ -170,20 +170,20 @@ public:
    * \{
    */
 
-  ThisType& append(ElementFunction apply_lambda,
-                   const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>(),
-                   VoidFunction prepare_lambda = dxt_void_noop,
-                   VoidFunction finalize_lambda = dxt_void_noop)
+  ThisType& append(VoidFunctionType prepare_func,
+                   GenericElementApplyFunctionType apply_func,
+                   VoidFunctionType finalize_func,
+                   const ElementFilter<GL>& filter = ApplyOn::AllElements<GL>())
   {
-    return this->append(new ElementLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda), filter);
+    return this->append(new GenericElementFunctor<GL>(prepare_func, apply_func, finalize_func), filter);
   }
 
-  ThisType& append(ElementFunction apply_lambda,
-                   ViewElementFunction filter,
-                   VoidFunction prepare_lambda = dxt_void_noop,
-                   VoidFunction finalize_lambda = dxt_void_noop)
+  ThisType& append(VoidFunctionType prepare_func,
+                   GenericElementApplyFunctionType apply_func,
+                   VoidFunctionType finalize_func,
+                   GenericElementFilterFunctionType filter)
   {
-    return this->append(new ElementLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda),
+    return this->append(new GenericElementFunctor<GL>(prepare_func, apply_func, finalize_func),
                         ApplyOn::LambdaFilteredElements<GL>(filter));
   }
 
@@ -208,13 +208,13 @@ public:
     return *this;
   }
 
-  ThisType& append(IntersectionFunctor<GL>& functor, ViewIntersectionFunction filter)
+  ThisType& append(IntersectionFunctor<GL>& functor, GenericIntersectionFilterFunctionType filter)
   {
     emplace_all(intersection_functor_wrappers_, functor, ApplyOn::LambdaFilteredIntersections<GL>(filter));
     return *this;
   }
 
-  ThisType& append(IntersectionFunctor<GL>*&& functor, ViewIntersectionFunction filter)
+  ThisType& append(IntersectionFunctor<GL>*&& functor, GenericIntersectionFilterFunctionType filter)
   {
     emplace_all(intersection_functor_wrappers_, *functor, ApplyOn::LambdaFilteredIntersections<GL>(filter));
     delete functor;
@@ -227,20 +227,20 @@ public:
    * \{
    */
 
-  ThisType& append(IntersectionElementElementFunction apply_lambda,
-                   const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>(),
-                   VoidFunction prepare_lambda = dxt_void_noop,
-                   VoidFunction finalize_lambda = dxt_void_noop)
+  ThisType& append(VoidFunctionType prepare_func,
+                   GenericIntersectionApplyFunctionType apply_func,
+                   VoidFunctionType finalize_func,
+                   const IntersectionFilter<GL>& filter = ApplyOn::AllIntersections<GL>())
   {
-    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda), filter);
+    return this->append(new GenericIntersectionFunctor<GL>(prepare_func, apply_func, finalize_func), filter);
   }
 
-  ThisType& append(IntersectionElementElementFunction apply_lambda,
-                   ViewIntersectionFunction filter,
-                   VoidFunction prepare_lambda = dxt_void_noop,
-                   VoidFunction finalize_lambda = dxt_void_noop)
+  ThisType& append(VoidFunctionType prepare_func,
+                   GenericIntersectionApplyFunctionType apply_func,
+                   VoidFunctionType finalize_func,
+                   GenericIntersectionFilterFunctionType filter)
   {
-    return this->append(new IntersectionLambdaFunctor<GL>(apply_lambda, prepare_lambda, finalize_lambda),
+    return this->append(new GenericIntersectionFunctor<GL>(prepare_func, apply_func, finalize_func),
                         ApplyOn::LambdaFilteredIntersections<GL>(filter));
   }
 
@@ -272,8 +272,8 @@ public:
   }
 
   ThisType& append(ElementAndIntersectionFunctor<GL>& functor,
-                   ViewElementFunction element_filter,
-                   ViewIntersectionFunction intersection_filter)
+                   GenericElementFilterFunctionType element_filter,
+                   GenericIntersectionFilterFunctionType intersection_filter)
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
@@ -285,8 +285,8 @@ public:
   }
 
   ThisType& append(ElementAndIntersectionFunctor<GL>*&& functor,
-                   ViewElementFunction element_filter,
-                   ViewIntersectionFunction intersection_filter)
+                   GenericElementFilterFunctionType element_filter,
+                   GenericIntersectionFilterFunctionType intersection_filter)
   {
     if (functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
@@ -304,38 +304,28 @@ public:
    * \{
    */
 
-  ThisType& append(ElementFunction element_apply_on,
-                   IntersectionElementElementFunction intersection_apply_on,
-                   ViewElementFunction element_filter,
-                   ViewIntersectionFunction intersection_filter)
-  {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(element_apply_on, intersection_apply_on),
-                        ApplyOn::LambdaFilteredElements<GL>(element_filter),
-                        ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
-  }
-
-  ThisType& append(ElementFunction element_apply_on,
-                   IntersectionElementElementFunction intersection_apply_on,
+  ThisType& append(VoidFunctionType prepare_func,
+                   GenericElementApplyFunctionType element_apply_on,
+                   GenericIntersectionApplyFunctionType intersection_apply_on,
+                   VoidFunctionType finalize_func,
                    const ElementFilter<GL>& element_filter = ApplyOn::AllElements<GL>(),
-                   const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>(),
-                   VoidFunction prepare_lambda = dxt_void_noop,
-                   VoidFunction finalize_lambda = dxt_void_noop)
+                   const IntersectionFilter<GL>& intersection_filter = ApplyOn::AllIntersections<GL>())
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(
-                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
+    return this->append(new GenericElementAndIntersectionFunctor<GL>(
+                            prepare_func, element_apply_on, intersection_apply_on, finalize_func),
                         element_filter,
                         intersection_filter);
   }
 
-  ThisType& append(ElementFunction element_apply_on,
-                   IntersectionElementElementFunction intersection_apply_on,
-                   ViewElementFunction element_filter,
-                   ViewIntersectionFunction intersection_filter,
-                   VoidFunction prepare_lambda = dxt_void_noop,
-                   VoidFunction finalize_lambda = dxt_void_noop)
+  ThisType& append(VoidFunctionType prepare_func,
+                   GenericElementApplyFunctionType element_apply_on,
+                   GenericIntersectionApplyFunctionType intersection_apply_on,
+                   VoidFunctionType finalize_func,
+                   GenericElementFilterFunctionType element_filter,
+                   GenericIntersectionFilterFunctionType intersection_filter)
   {
-    return this->append(new ElementAndIntersectionLambdaFunctor<GL>(
-                            element_apply_on, intersection_apply_on, prepare_lambda, finalize_lambda),
+    return this->append(new GenericElementAndIntersectionFunctor<GL>(
+                            prepare_func, element_apply_on, intersection_apply_on, finalize_func),
                         ApplyOn::LambdaFilteredElements<GL>(element_filter),
                         ApplyOn::LambdaFilteredIntersections<GL>(intersection_filter));
   }

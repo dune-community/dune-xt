@@ -99,8 +99,9 @@ public:
   }
 
   /**
-   * \note The meaning of outside_element depends on the circumstances. In general, the result of
-   *       intersection.outside() is given, but this might differ on periodic or boundary intersections.
+   * \note The meaning of outside_element depends on the circumstances. If intersection.neighbor() is true, the result
+   *       of intersection.outside() is given (the meaning of which is different on inner, periodic or process boundary
+   *       intersections). If intersection.neighbor() is false, intersection.inside() is given.
    */
   virtual void apply_local(const IntersectionType& /*intersection*/,
                            const ElementType& /*inside_element*/,
