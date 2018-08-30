@@ -180,6 +180,14 @@ public:
     ret.scal(alpha);
     return ret;
   }
+
+  virtual derived_type operator/(const ScalarType& alpha) const
+  {
+    auto ret = this->copy();
+    ret.scal(1. / alpha);
+    return ret;
+  }
+
   /// \}
 }; // class ContainerInterface
 
