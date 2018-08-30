@@ -23,46 +23,11 @@
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/type_traits.hh>
+#include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
-
-
-enum class Backends
-{
-  common_dense,
-  common_sparse,
-  istl_dense,
-  istl_sparse,
-  eigen_dense,
-  eigen_sparse,
-  none
-}; // enum class Backends
-
-static constexpr Backends default_backend =
-#if HAVE_EIGEN
-    Backends::eigen_sparse;
-#else
-    Backends::istl_sparse;
-#endif
-
-static constexpr Backends default_sparse_backend =
-#if HAVE_EIGEN
-    Backends::eigen_sparse;
-#else
-    Backends::istl_sparse;
-#endif
-
-static constexpr Backends default_dense_backend =
-#if HAVE_EIGEN
-    Backends::eigen_dense;
-#else
-    Backends::common_dense;
-#endif
-
-
 namespace internal {
 
 
