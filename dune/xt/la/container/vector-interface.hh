@@ -88,6 +88,15 @@ public:
   {
   }
 
+  template <class Vector>
+  std::enable_if_t<Common::is_vector<Vector>::value, derived_type&> assign_from(const Vector& other)
+  {
+    this->resize(other.size());
+    for (size_t ii = 0; ii < other.size(); ++ii)
+      this->set_entry(ii, other[ii]);
+    return this->as_imp();
+  }
+
   /// \name Have to be implemented by a derived class in addition to the ones required by ContainerInterface!
   /// \{
 
