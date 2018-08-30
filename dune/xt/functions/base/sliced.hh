@@ -37,9 +37,9 @@ class SlicedGridFunction
  *        individual components for further postprocessing or visualization, the following code would achieve just that
  *        (in the case d = 2 with u already given):
 \code
-auto density = XT::Functions::make_sliced_function<1>(u, {0}, "density");
+auto density                = XT::Functions::make_sliced_function<1>(u, {0},    "density");
 auto density_times_velocity = XT::Functions::make_sliced_function<d>(u, {1, 2}, "density_times_velocity");
-auto energy = XT::Functions::make_sliced_function<1>(u, {3}, "energy");
+auto energy                 = XT::Functions::make_sliced_function<1>(u, {3},    "energy");
 \endcode
  */
 template <class LF, size_t r>
