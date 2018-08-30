@@ -363,6 +363,41 @@ public:
 
 
 /**
+ * \brief A filter which selects all intersections only once.
+ *
+ * \sa Walker
+ * \sa IntersectionFilter
+ */
+template <class GL>
+class AllIntersectionsOnce : public IntersectionFilter<GL>
+{
+  using BaseType = IntersectionFilter<GL>;
+
+public:
+  using typename BaseType::GridViewType;
+  using typename BaseType::IntersectionType;
+
+  explicit AllIntersectionsOnce() = default;
+
+  IntersectionFilter<GridViewType>* copy() const override final
+  {
+    return new AllIntersectionsOnce<GridViewType>();
+  }
+
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  {
+    if (!intersection.neighbor())
+      return true;
+    else {
+      const auto inside_element = intersection.inside();
+      const auto outside_element = intersection.outside();
+      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
+    }
+  }
+}; // class AllIntersectionsOnce
+
+
+/**
  * \brief A filter which selects no intersections.
  *
  * \sa Walker
