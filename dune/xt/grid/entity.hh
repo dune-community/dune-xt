@@ -18,6 +18,7 @@
 #include <dune/grid/common/entity.hh>
 #include <dune/grid/common/gridview.hh>
 
+#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/string.hh>
@@ -58,7 +59,7 @@ std::ostream& operator<<(std::ostream& out, const Entity<cd, dim, GridImp, Entit
 
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
-double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
+double diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
 {
   auto max_dist = std::numeric_limits<typename GridImp::ctype>::min();
   const auto& geometry = entity.geometry();
@@ -71,7 +72,14 @@ double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
     }
   }
   return max_dist;
-} // entity_diameter
+} // diameter
+
+
+template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
+double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
+{
+  return diameter(entity);
+}
 
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
