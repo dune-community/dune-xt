@@ -220,8 +220,9 @@ struct TriangularSolver
         x[0] = (x[0] - M::get_entry(A, trans ? 1 : 0, trans ? 0 : 1) * x[1]) / M::get_entry(A, 0, 0);
       } // if (solve_forward)
 #if HAVE_MKL || HAVE_CBLAS
-    } else if (storage_layout == Common::StorageLayout::dense_row_major
-               || storage_layout == Common::StorageLayout::dense_column_major) {
+    } else if ((storage_layout == Common::StorageLayout::dense_row_major
+                || storage_layout == Common::StorageLayout::dense_column_major)
+               && num_rows > 10) {
       const int blas_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
                                           ? Common::Blas::row_major()
                                           : Common::Blas::col_major();

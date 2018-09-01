@@ -236,9 +236,11 @@ template <class MatrixType,
           Common::StorageLayout storage_layout = Common::MatrixAbstraction<MatrixType>::storage_layout>
 struct QrHelper
 {
-  typedef Common::MatrixAbstraction<MatrixType> M;
-  typedef Common::VectorAbstraction<VectorType> V;
-  typedef Common::VectorAbstraction<IndexVectorType> VI;
+  using M = Common::MatrixAbstraction<MatrixType>;
+  using V = Common::VectorAbstraction<VectorType>;
+  using VI = Common::VectorAbstraction<IndexVectorType>;
+  using WVectorType = typename V::template VectorTypeTemplate<M::static_rows>;
+  using W = typename Common::VectorAbstraction<WVectorType>;
   static const bool is_row_major = (storage_layout == Common::StorageLayout::dense_row_major);
   static const bool has_contiguous_storage = (storage_layout == Common::StorageLayout::dense_row_major)
                                              || (storage_layout == Common::StorageLayout::dense_column_major);
@@ -254,7 +256,7 @@ struct QrHelper
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage) {
+    } else if (has_contiguous_storage && M::rows(A) > 10) {
       std::fill(permutations.begin(), permutations.end(), 0.);
       assert(std::max(M::rows(A), M::cols(A)) < std::numeric_limits<int>::max());
       auto num_rows = static_cast<int>(M::rows(A));
@@ -285,7 +287,7 @@ struct QrHelper
     if (false) {
       ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage) {
+    } else if (has_contiguous_storage && M::rows(QR) > 10) {
       // create Q and copy values of QR to Q;
       const size_t num_rows = M::rows(QR);
       const size_t num_cols = M::cols(QR);
@@ -319,16 +321,14 @@ struct QrHelper
   {
     using V2 = Common::VectorAbstraction<SecondVectorType>;
     using V3 = Common::VectorAbstraction<ThirdVectorType>;
-    using W = typename Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_rows>>;
     using ScalarType = typename V2::ScalarType;
     const size_t num_rows = M::rows(QR);
     const size_t num_cols = M::cols(QR);
     for (size_t ii = 0; ii < M::rows(QR); ++ii)
       V3::set_entry(y, ii, V2::get_entry(x, ii));
     if (false) {
-      ;
 #if HAVE_LAPACKE || HAVE_MKL
-    } else if (has_contiguous_storage) {
+    } else if (has_contiguous_storage && num_rows > 10) {
       // These are the number of rows and columns of the matrix C in the documentation of dormqr.
       // As we only have a vector, i.e. C = x, the number of columns is 1.
       assert(x.size() < std::numeric_limits<int>::max());
@@ -366,12 +366,12 @@ struct QrHelper
 
 private:
   // w is the vector [1; QR(j+1:end,j)]
-  static void set_w_vector(const MatrixType& QR, const int jj, VectorType& w)
+  static void set_w_vector(const MatrixType& QR, const int jj, WVectorType& w)
   {
     const size_t num_rows = M::rows(QR);
-    V::set_entry(w, jj, 1);
+    W::set_entry(w, jj, 1);
     for (int ii = jj + 1; ii < int(num_rows); ++ii)
-      V::set_entry(w, ii, M::get_entry(QR, ii, jj));
+      W::set_entry(w, ii, M::get_entry(QR, ii, jj));
   }
 
   static typename M::template MatrixTypeTemplate<M::static_rows, M::static_rows>
@@ -381,7 +381,7 @@ private:
     const size_t num_cols = M::cols(QR);
     auto ret = eye_matrix<typename M::template MatrixTypeTemplate<M::static_rows, M::static_rows>>(
         num_rows, dense_pattern(num_rows, num_rows));
-    VectorType w = V::create(num_rows, 1.);
+    auto w = W::create(num_rows, 1.);
     for (int jj = int(num_cols) - 1; jj >= 0; --jj) {
       set_w_vector(QR, jj, w);
       multiply_householder_from_left(ret, V::get_entry(tau, jj), w, jj, num_rows, 0, num_rows);
