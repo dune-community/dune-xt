@@ -82,7 +82,6 @@ public:
   using iterator = internal::VectorOutputIterator<Traits, ScalarType>;
   friend const_iterator;
   friend iterator;
-
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
   virtual ~VectorInterface()
@@ -516,7 +515,6 @@ public:
 
   iterator begin()
   {
-    this->as_imp().ensure_uniqueness();
     return iterator(*this);
   }
 
