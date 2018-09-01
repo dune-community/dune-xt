@@ -484,7 +484,7 @@ public:
   {
     if (!entries_.unique()) {
       assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!entries_.unique()) {
         entries_ = std::make_shared<EntriesVectorType>(*entries_);
         indices_ = std::make_shared<IndicesVectorType>(*indices_);

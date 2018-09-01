@@ -553,7 +553,7 @@ public:
   {
     if (!entries_.unique()) {
       assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!entries_.unique()) {
         entries_ = std::make_shared<EntriesVectorType>(*entries_);
         row_pointers_ = std::make_shared<IndexVectorType>(*row_pointers_);
@@ -1162,7 +1162,7 @@ public:
   {
     if (!entries_.unique()) {
       assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!entries_.unique()) {
         entries_ = std::make_shared<EntriesVectorType>(*entries_);
         column_pointers_ = std::make_shared<IndexVectorType>(*column_pointers_);

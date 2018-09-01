@@ -360,6 +360,10 @@ public:
 
   // without these using declarations, the free operator+/* function in xt/common/vector.hh is chosen instead of the
   // member function
+  using InterfaceType::operator+;
+  using InterfaceType::operator-;
+  using InterfaceType::operator*;
+
 protected:
   /**
    * \see ContainerInterface
@@ -368,16 +372,13 @@ protected:
   {
     if (!backend_.unique()) {
       assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!backend_.unique()) {
         backend_ = std::make_shared<BackendType>(*backend_);
         mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
       }
     }
   } // ... ensure_uniqueness(...)
-  using InterfaceType::operator+;
-  using InterfaceType::operator-;
-  using InterfaceType::operator*;
 
 private:
   friend class VectorInterface<internal::IstlDenseVectorTraits<ScalarType>, ScalarType>;
@@ -776,7 +777,7 @@ protected:
   {
     if (!backend_.unique()) {
       assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!backend_.unique()) {
         backend_ = std::make_shared<BackendType>(*backend_);
         mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());

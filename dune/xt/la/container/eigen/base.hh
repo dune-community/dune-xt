@@ -301,8 +301,8 @@ protected:
    */
   void ensure_uniqueness() const
   {
-    CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
-    VectorInterfaceType::as_imp().ensure_uniqueness();
+    CHECK_AND_CALL_CRTP(InterfaceType::as_imp().ensure_uniqueness());
+    InterfaceType::as_imp().ensure_uniqueness();
   }
   using InterfaceType::as_imp;
 

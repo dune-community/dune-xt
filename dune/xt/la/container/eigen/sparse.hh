@@ -544,7 +544,7 @@ protected:
   {
     if (!backend_.unique()) {
       assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!backend_.unique()) {
         backend_ = std::make_shared<BackendType>(*backend_);
         mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());

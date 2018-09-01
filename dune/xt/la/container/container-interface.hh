@@ -160,7 +160,6 @@ public:
   }
 \endcode
  */
-
 template <class TraitsImp, class ScalarImp = typename TraitsImp::ScalarType>
 class ContainerInterface : public Common::CRTPInterface<ContainerInterface<TraitsImp, ScalarImp>, TraitsImp>
 {
