@@ -339,8 +339,6 @@ public:
 
   // without these using declarations, the free operator+/* function in xt/common/vector.hh is chosen instead of the
   // member function
-
-protected:
   /**
    * \see ContainerInterface
    */

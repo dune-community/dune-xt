@@ -549,7 +549,6 @@ public:
     return eps_;
   }
 
-protected:
   inline void ensure_uniqueness() const
   {
     if (!entries_.unique()) {
@@ -1159,7 +1158,6 @@ public:
     return eps_;
   }
 
-protected:
   inline void ensure_uniqueness() const
   {
     if (!entries_.unique()) {

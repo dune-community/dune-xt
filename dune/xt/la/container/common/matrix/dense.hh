@@ -525,7 +525,6 @@ public:
     return ret;
   } // ... pruned(...)
 
-protected:
   /**
    * \see ContainerInterface
    */
