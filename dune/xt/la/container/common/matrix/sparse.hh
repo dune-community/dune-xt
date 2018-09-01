@@ -40,33 +40,31 @@ namespace internal {
 
 
 template <class ScalarImp, Common::StorageLayout layout>
-class CommonSparseMatrixTraits
+struct CommonSparseMatrixTraits : public MatrixTraitsBase<ScalarImp,
+                                                          CommonSparseMatrix<ScalarImp, layout>,
+                                                          void,
+                                                          Backends::common_sparse,
+                                                          Backends::common_dense,
+                                                          true>
 {
-public:
-  using ScalarType = typename Dune::FieldTraits<ScalarImp>::field_type;
-  using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
-  static const Backends backend_type = Backends::common_dense;
-  static const Backends vector_type = Backends::common_dense;
   using EntriesVectorType = std::vector<ScalarImp>;
   using IndexVectorType = std::vector<size_t>;
-  using EpsType = typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type;
-  using derived_type = CommonSparseMatrix<ScalarImp, layout>;
-  static const constexpr bool sparse = true;
+  using EpsType = typename Common::FloatCmp::DefaultEpsilon<ScalarImp>::Type;
 };
 
+
 template <class DenseMatrixImp, class SparseMatrixImp>
-class CommonSparseOrDenseMatrixTraits
+struct CommonSparseOrDenseMatrixTraits
+    : public MatrixTraitsBase<typename DenseMatrixImp::ScalarType,
+                              CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>,
+                              void,
+                              Backends::common_dense,
+                              Backends::common_dense,
+                              false>
 {
-public:
   using DenseMatrixType = DenseMatrixImp;
   using SparseMatrixType = SparseMatrixImp;
-  using ScalarType = typename DenseMatrixType::ScalarType;
-  using RealType = typename DenseMatrixType::RealType;
-  static const Backends backend_type = Backends::common_dense;
-  static const Backends vector_type = Backends::common_dense;
-  using EpsType = typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type;
-  using derived_type = CommonSparseOrDenseMatrix<DenseMatrixType, SparseMatrixType>;
-  static const constexpr bool sparse = false;
+  using EpsType = typename Common::FloatCmp::DefaultEpsilon<typename DenseMatrixImp::ScalarType>::Type;
 };
 
 
@@ -79,18 +77,21 @@ public:
 template <class ScalarImp = double, Common::StorageLayout layout = Common::StorageLayout::csr>
 class CommonSparseMatrix : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp>
 {
-  using ThisType = CommonSparseMatrix<ScalarImp, layout>;
-  using MatrixInterfaceType = MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp>;
+  using ThisType = CommonSparseMatrix;
+  using InterfaceType = MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, layout>, ScalarImp>;
 
 public:
-  using Traits = typename MatrixInterfaceType::Traits;
-  using derived_type = typename MatrixInterfaceType::derived_type;
+  using typename InterfaceType::RealType;
+  using typename InterfaceType::ScalarType;
+  using typename InterfaceType::Traits;
   using EntriesVectorType = typename Traits::EntriesVectorType;
-  using IndexVectorType = typename Traits::IndexVectorType;
-  using ScalarType = typename Traits::ScalarType;
-  using RealType = typename Traits::RealType;
   using EpsType = typename Traits::EpsType;
+  using IndexVectorType = typename Traits::IndexVectorType;
 
+private:
+  using MutexesType = typename Traits::MutexesType;
+
+public:
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
   */
@@ -300,7 +301,7 @@ public:
   inline void scal(const ScalarType& alpha)
   {
     ensure_uniqueness();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     std::transform(
         entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
   }
@@ -308,7 +309,7 @@ public:
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     ensure_uniqueness();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     assert(has_equal_shape(xx));
     const auto& xx_entries = *xx.entries_;
     for (size_t ii = 0; ii < entries_->size(); ++ii)
@@ -372,7 +373,7 @@ public:
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
     ensure_uniqueness();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, rr);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 
@@ -496,10 +497,10 @@ public:
     column_indices_ = new_column_indices;
   } // void rightmultiply(...)
 
-  using MatrixInterfaceType::operator+;
-  using MatrixInterfaceType::operator-;
-  using MatrixInterfaceType::operator+=;
-  using MatrixInterfaceType::operator-=;
+  using InterfaceType::operator+;
+  using InterfaceType::operator-;
+  using InterfaceType::operator+=;
+  using InterfaceType::operator-=;
 
   ScalarType* entries()
   {
@@ -601,19 +602,22 @@ template <class ScalarImp>
 class CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>
     : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
 {
-  using ThisType = CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>;
-  using MatrixInterfaceType =
+  using ThisType = CommonSparseMatrix;
+  using InterfaceType =
       MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>;
 
 public:
-  using Traits = typename MatrixInterfaceType::Traits;
-  using derived_type = typename MatrixInterfaceType::derived_type;
+  using typename InterfaceType::RealType;
+  using typename InterfaceType::ScalarType;
+  using typename InterfaceType::Traits;
   using EntriesVectorType = typename Traits::EntriesVectorType;
-  using ScalarType = typename Traits::ScalarType;
-  using RealType = typename Traits::RealType;
   using EpsType = typename Traits::EpsType;
-  using IndexVectorType = std::vector<size_t>;
+  using IndexVectorType = typename Traits::IndexVectorType;
 
+private:
+  using MutexesType = typename Traits::MutexesType;
+
+public:
   /**
   * \brief This is the constructor of interest which creates a sparse matrix.
   */
@@ -823,7 +827,7 @@ public:
   inline void scal(const ScalarType& alpha)
   {
     ensure_uniqueness();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     std::transform(
         entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
   }
@@ -831,7 +835,7 @@ public:
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     ensure_uniqueness();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     assert(has_equal_shape(xx));
     const auto& xx_entries = *xx.entries_;
     for (size_t ii = 0; ii < entries_->size(); ++ii)
@@ -938,7 +942,7 @@ public:
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
     ensure_uniqueness();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, rr);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
 
@@ -1103,10 +1107,10 @@ public:
     *row_indices_ = new_row_indices;
   } // void rightmultiply(...)
 
-  using MatrixInterfaceType::operator+;
-  using MatrixInterfaceType::operator-;
-  using MatrixInterfaceType::operator+=;
-  using MatrixInterfaceType::operator-=;
+  using InterfaceType::operator+;
+  using InterfaceType::operator-;
+  using InterfaceType::operator+=;
+  using InterfaceType::operator-=;
 
   ScalarType* entries()
   {
@@ -1209,19 +1213,17 @@ class CommonSparseOrDenseMatrix
     : public MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
                              typename SparseMatrixImp::ScalarType>
 {
-  using ThisType = CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>;
-  using MatrixInterfaceType =
-      MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
-                      typename SparseMatrixImp::ScalarType>;
+  using ThisType = CommonSparseOrDenseMatrix;
+  using InterfaceType = MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
+                                        typename SparseMatrixImp::ScalarType>;
 
 public:
-  using Traits = typename MatrixInterfaceType::Traits;
-  using derived_type = typename MatrixInterfaceType::derived_type;
+  using typename InterfaceType::RealType;
+  using typename InterfaceType::ScalarType;
+  using typename InterfaceType::Traits;
+  using EpsType = typename Traits::EpsType;
   using DenseMatrixType = typename Traits::DenseMatrixType;
   using SparseMatrixType = typename Traits::SparseMatrixType;
-  using ScalarType = typename Traits::ScalarType;
-  using RealType = typename Traits::RealType;
-  using EpsType = typename Traits::EpsType;
   static constexpr double sparse_limit = 0.1;
 
   /**
@@ -1524,33 +1526,33 @@ public:
       sparse_ ? sparse_matrix_.rightmultiply(other.dense_matrix()) : dense_matrix_.rightmultiply(other.dense_matrix());
   } // void rightmultiply(...)
 
-  using MatrixInterfaceType::operator+;
-  using MatrixInterfaceType::operator-;
-  using MatrixInterfaceType::operator+=;
-  using MatrixInterfaceType::operator-=;
+  using InterfaceType::operator+;
+  using InterfaceType::operator-;
+  using InterfaceType::operator+=;
+  using InterfaceType::operator-=;
 
   // clang does not find the conversion operators from the interface if they are not redefined here
   template <int ROWS, int COLS>
   explicit operator Dune::FieldMatrix<ScalarType, ROWS, COLS>() const
   {
-    return MatrixInterfaceType::operator Dune::FieldMatrix<ScalarType, ROWS, COLS>();
+    return InterfaceType::operator Dune::FieldMatrix<ScalarType, ROWS, COLS>();
   }
 
   template <int ROWS, int COLS>
   explicit operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>() const
   {
-    return MatrixInterfaceType::operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>();
+    return InterfaceType::operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>();
   }
 
   template <int ROWS, int COLS>
   explicit operator std::unique_ptr<XT::Common::FieldMatrix<ScalarType, ROWS, COLS>>() const
   {
-    return MatrixInterfaceType::operator std::unique_ptr<XT::Common::FieldMatrix<ScalarType, ROWS, COLS>>();
+    return InterfaceType::operator std::unique_ptr<XT::Common::FieldMatrix<ScalarType, ROWS, COLS>>();
   }
 
   explicit operator Dune::DynamicMatrix<ScalarType>() const
   {
-    return MatrixInterfaceType::operator Dune::DynamicMatrix<ScalarType>();
+    return InterfaceType::operator Dune::DynamicMatrix<ScalarType>();
   }
 
 private:

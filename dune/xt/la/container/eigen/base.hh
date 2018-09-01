@@ -39,6 +39,7 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
 template <class ScalarImp>
 class EigenDenseMatrix;
 
@@ -56,17 +57,21 @@ class EigenBaseVector;
 template <class ImpTraits, class ScalarImp = double>
 class EigenBaseVector : public VectorInterface<ImpTraits, ScalarImp>, public ProvidesBackend<ImpTraits>
 {
-  typedef VectorInterface<ImpTraits, ScalarImp> VectorInterfaceType;
-  typedef EigenBaseVector<ImpTraits, ScalarImp> ThisType;
+
+  using ThisType = EigenBaseVector;
+  using InterfaceType = VectorInterface<ImpTraits, ScalarImp>;
 
 public:
-  using Traits = typename VectorInterfaceType::Traits;
-  using derived_type = typename VectorInterfaceType::derived_type;
-  typedef typename Traits::ScalarType ScalarType;
-  typedef typename Traits::RealType RealType;
-  typedef typename Traits::BackendType BackendType;
-  typedef typename Traits::derived_type VectorImpType;
+  using typename InterfaceType::RealType;
+  using typename InterfaceType::ScalarType;
+  using typename InterfaceType::Traits;
+  using typename ProvidesBackend<Traits>::BackendType;
+  using VectorImpType = typename InterfaceType::derived_type;
 
+private:
+  using MutexesType = typename Traits::MutexesType;
+
+public:
   EigenBaseVector(size_t num_mutexes = 1)
     : mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
     , unshareable_(false)
@@ -127,15 +132,15 @@ public:
   void scal(const ScalarType& alpha)
   {
     auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
     backend_ref *= alpha;
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
   }
 
   template <class T>
   void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
   {
     auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
@@ -159,7 +164,7 @@ public:
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
     auto& backend_ref = backend();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     assert(ii < size());
     backend_ref(ii) += value;
   }
@@ -258,7 +263,7 @@ public:
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
     auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
@@ -274,7 +279,7 @@ public:
   void isub(const EigenBaseVector<T, ScalarType>& other)
   {
     auto& backend_ref = backend();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
@@ -289,7 +294,6 @@ public:
   /// \{
 
   //! disambiguation necessary since it exists in multiple bases
-  using VectorInterfaceType::as_imp;
 
 protected:
   /**
@@ -300,11 +304,12 @@ protected:
     CHECK_AND_CALL_CRTP(VectorInterfaceType::as_imp().ensure_uniqueness());
     VectorInterfaceType::as_imp().ensure_uniqueness();
   }
+  using InterfaceType::as_imp;
 
 private:
 #ifndef NDEBUG
   //! disambiguation necessary since it exists in multiple bases
-  using VectorInterfaceType::crtp_mutex_;
+  using InterfaceType::crtp_mutex_;
 #endif
 
   friend class VectorInterface<Traits, ScalarType>;

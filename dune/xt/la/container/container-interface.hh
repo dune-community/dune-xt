@@ -85,40 +85,38 @@ static Out boost_numeric_cast(const In& in)
 
 struct VectorLockGuard
 {
-  VectorLockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes)
-    : mutexes_(mutexes ? mutexes.get() : nullptr)
+  VectorLockGuard(std::vector<std::mutex>& mutexes)
+    : mutexes_(mutexes)
   {
-    if (mutexes_)
-      boost::lock(mutexes_->begin(), mutexes_->end());
+    boost::lock(mutexes_.begin(), mutexes_.end());
   }
 
   ~VectorLockGuard()
   {
-    if (mutexes_)
-      for (auto& mutex : *mutexes_)
-        mutex.unlock();
+    for (auto& mutex : mutexes_)
+      mutex.unlock();
   }
 
-  std::vector<std::mutex>* mutexes_;
+  std::vector<std::mutex>& mutexes_;
 }; // VectorLockGuard
 
 struct LockGuard
 {
-  LockGuard(std::shared_ptr<std::vector<std::mutex>>& mutexes, const size_t ii)
-    : mutexes_(mutexes ? mutexes.get() : nullptr)
-    , index_(mutexes_ ? (ii % mutexes_->size()) : 0)
+  LockGuard(std::vector<std::mutex>& mutexes, const size_t ii, const size_t container_size)
+    : mutexes_(mutexes)
+    , index_(ii * mutexes_.size() / container_size)
   {
-    if (mutexes_)
-      mutexes_->operator[](index_).lock();
+    if (mutexes_.size())
+      mutexes_[index_].lock();
   }
 
   ~LockGuard()
   {
-    if (mutexes_)
-      mutexes_->operator[](index_).unlock();
+    if (mutexes_.size())
+      mutexes_[index_].unlock();
   }
 
-  std::vector<std::mutex>* mutexes_;
+  std::vector<std::mutex>& mutexes_;
   const size_t index_;
 }; // LockGuard
 
@@ -130,8 +128,8 @@ template <class Traits>
 class ProvidesBackend : public Common::CRTPInterface<ProvidesBackend<Traits>, Traits>
 {
 public:
-  typedef typename Traits::BackendType BackendType;
-  static const constexpr Backends backend_type = Traits::backend_type;
+  using BackendType = typename Traits::BackendType;
+  static constexpr Backends backend_type = Traits::backend_type;
 
   inline BackendType& backend()
   {
@@ -165,13 +163,15 @@ public:
 template <class Traits, class ScalarImp = typename Traits::ScalarType>
 class ContainerInterface : public Common::CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
 {
-  typedef Common::CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits> CRTP;
-  static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value, "");
+  using CRTP = Common::CRTPInterface<ContainerInterface<TraitsImp, ScalarImp>, TraitsImp>;
 
 public:
-  typedef ScalarImp ScalarType;
-
+  using typename CRTP::Traits;
   using typename CRTP::derived_type;
+  using ScalarType = ScalarImp;
+  using RealType = typename Traits::RealType;
+
+  static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
   virtual ~ContainerInterface()
   {
@@ -261,7 +261,7 @@ template <class Traits>
 class ProvidesConstContainer : public Common::CRTPInterface<ProvidesConstContainer<Traits>, Traits>
 {
 public:
-  typedef typename Traits::ContainerType ContainerType;
+  using ContainerType = typename Traits::ContainerType;
 
   inline std::shared_ptr<const ContainerType> container() const
   {
@@ -274,10 +274,10 @@ public:
 template <class Traits>
 class ProvidesContainer : public ProvidesConstContainer<Traits>
 {
-  typedef ProvidesConstContainer<Traits> BaseType;
+  using BaseType = ProvidesConstContainer<Traits>;
 
 public:
-  typedef typename Traits::ContainerType ContainerType;
+  using ContainerType = typename Traits::ContainerType;
 
   using BaseType::container;
 
@@ -293,7 +293,7 @@ template <class Traits>
 class ProvidesDataAccess : public Common::CRTPInterface<ProvidesDataAccess<Traits>, Traits>
 {
 public:
-  typedef typename Traits::DataType DataType;
+  using DataType = typename Traits::DataType;
 
   inline DataType* data()
   {

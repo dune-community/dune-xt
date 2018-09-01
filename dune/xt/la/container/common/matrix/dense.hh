@@ -122,16 +122,12 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_
 
 
 template <class ScalarImp, Common::StorageLayout storage_layout>
-class CommonDenseMatrixTraits
+class CommonDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
+                                                        CommonDenseMatrix<ScalarImp, storage_layout>,
+                                                        CommonDenseMatrixBackend<ScalarImp, storage_layout>,
+                                                        Backends::common_dense,
+                                                        Backends::common_dense>
 {
-public:
-  using ScalarType = typename Dune::FieldTraits<ScalarImp>::field_type;
-  using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
-  using BackendType = CommonDenseMatrixBackend<ScalarType, storage_layout>;
-  using derived_type = CommonDenseMatrix<ScalarType, storage_layout>;
-  static const Backends backend_type = Backends::common_dense;
-  static const Backends vector_type = Backends::common_dense;
-  static const constexpr bool sparse = false;
 };
 
 
@@ -147,15 +143,18 @@ class CommonDenseMatrix
       public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>>
 {
   using ThisType = CommonDenseMatrix;
-  using MatrixInterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>;
+  using InterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>;
 
 public:
-  using Traits = typename internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>;
-  using derived_type = typename MatrixInterfaceType::derived_type;
-  using BackendType = typename Traits::BackendType;
-  using ScalarType = typename Traits::ScalarType;
-  using RealType = typename Traits::RealType;
+  using typename InterfaceType::RealType;
+  using typename InterfaceType::ScalarType;
+  using Traits = typename InterfaceType::Traits;
+  using typename ProvidesBackend<Traits>::BackendType;
 
+private:
+  using MutexesType = typename Traits::MutexesType;
+
+public:
   explicit CommonDenseMatrix(const size_t rr = 0,
                              const size_t cc = 0,
                              const ScalarType value = ScalarType(0),
@@ -304,7 +303,7 @@ public:
   void scal(const ScalarType& alpha)
   {
     ensure_uniqueness();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     for (auto& entry : backend_->entries_)
       entry *= alpha;
   }
@@ -314,7 +313,7 @@ public:
                                                                          const OtherMatrixType& xx)
   {
     ensure_uniqueness();
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(mutexes_);
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
@@ -412,7 +411,7 @@ public:
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     ensure_uniqueness();
-    internal::LockGuard DUNE_UNUSED(lock)(mutexes_, ii);
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     assert(ii < rows());
     assert(jj < cols());
     backend_->get_entry_ref(ii, jj) += value;
@@ -488,10 +487,10 @@ public:
 
   /// \}
 
-  using MatrixInterfaceType::operator+;
-  using MatrixInterfaceType::operator-;
-  using MatrixInterfaceType::operator+=;
-  using MatrixInterfaceType::operator-=;
+  using InterfaceType::operator+;
+  using InterfaceType::operator-;
+  using InterfaceType::operator+=;
+  using InterfaceType::operator-=;
 
   void deep_copy(const ThisType& other)
   {

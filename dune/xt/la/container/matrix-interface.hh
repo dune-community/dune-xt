@@ -37,20 +37,47 @@
 namespace Dune {
 namespace XT {
 namespace LA {
+namespace internal {
 
 
-template <class Traits, class ScalarImp = typename Traits::ScalarType>
-class MatrixInterface : public ContainerInterface<Traits, ScalarImp>
+template <class ScalarImp,
+          class derived_imp,
+          class BackendImp,
+          Backends backend_imp,
+          Backends vector_imp,
+          bool is_sparse = false>
+class MatrixTraitsBase
 {
-  typedef ContainerInterface<Traits, ScalarImp> BaseType;
+public:
+  using ScalarType = typename Dune::FieldTraits<ScalarImp>::field_type;
+  using RealType = typename Dune::FieldTraits<ScalarImp>::real_type;
+  using MutexesType = std::vector<std::mutex>;
+  using DataType = ScalarType;
+  using BackendType = BackendImp;
+  using derived_type = derived_imp;
+  static constexpr Backends backend_type = backend_imp;
+  static constexpr Backends vector_type = vector_imp;
+  static constexpr bool sparse = is_sparse;
+};
+
+
+} // namespace internal
+
+
+template <class TraitsImp, class ScalarImp = typename TraitsImp::ScalarType>
+class MatrixInterface : public ContainerInterface<TraitsImp, ScalarImp>
+{
+  using BaseType = ContainerInterface<TraitsImp, ScalarImp>;
 
 public:
+  using typename BaseType::Traits;
   using typename BaseType::derived_type;
-  typedef typename Dune::FieldTraits<ScalarImp>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<ScalarImp>::real_type RealType;
-  static const constexpr Backends vector_type = Traits::vector_type;
-  static const constexpr bool sparse = Traits::sparse;
-  static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
+  using ScalarType = typename Traits::ScalarType;
+  using RealType = typename Traits::RealType;
+  using MutexesType = typename Traits::MutexesType;
+  static constexpr Backends vector_type = Traits::vector_type;
+  static constexpr bool sparse = Traits::sparse;
+  static_assert(std::is_same<ScalarImp, typename Traits::ScalarType>::value, "");
 
   virtual ~MatrixInterface() = default;
 
@@ -471,7 +498,7 @@ create(const std::initializer_list<std::initializer_list<typename Common::Matrix
            initializer_list,
        const SparsityPatternDefault& /*pattern*/ = SparsityPatternDefault())
 {
-  typedef Common::MatrixAbstraction<MatrixType> Mat;
+  using Mat = Common::MatrixAbstraction<MatrixType>;
   auto ret = Mat::create(initializer_list.size(), initializer_list.begin()->size());
   size_t ii = 0;
   for (const auto& row : initializer_list) {
@@ -504,11 +531,11 @@ struct MatrixAbstractionBase
 
   static const bool has_ostream = true;
 
-  typedef typename std::conditional<is_matrix, MatrixImp, void>::type MatrixType;
-  typedef typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type ScalarType;
-  typedef typename std::conditional<is_matrix, typename MatrixImp::RealType, void>::type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using MatrixType = typename std::conditional<is_matrix, MatrixImp, void>::type;
+  using ScalarType = typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type;
+  using RealType = typename std::conditional<is_matrix, typename MatrixImp::RealType, void>::type;
+  using S = ScalarType;
+  using R = RealType;
 
   template <class SparsityPatternType = XT::Common::FullPattern>
   static inline typename std::enable_if<is_matrix, MatrixType>::type
