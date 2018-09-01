@@ -160,8 +160,9 @@ public:
   }
 \endcode
  */
-template <class Traits, class ScalarImp = typename Traits::ScalarType>
-class ContainerInterface : public Common::CRTPInterface<ContainerInterface<Traits, ScalarImp>, Traits>
+
+template <class TraitsImp, class ScalarImp = typename TraitsImp::ScalarType>
+class ContainerInterface : public Common::CRTPInterface<ContainerInterface<TraitsImp, ScalarImp>, TraitsImp>
 {
   using CRTP = Common::CRTPInterface<ContainerInterface<TraitsImp, ScalarImp>, TraitsImp>;
 
