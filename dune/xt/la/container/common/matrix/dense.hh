@@ -159,7 +159,7 @@ public:
                              const size_t cc = 0,
                              const ScalarType value = ScalarType(0),
                              const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(rr, cc, value))
+    : backend_(std::make_unique<BackendType>(rr, cc, value))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
@@ -169,13 +169,13 @@ public:
                     const size_t cc,
                     const SparsityPatternDefault& /*pattern*/,
                     const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(rr, cc, ScalarType(0)))
+    : backend_(std::make_unique<BackendType>(rr, cc, ScalarType(0)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   CommonDenseMatrix(const ThisType& other)
-    : backend_(std::make_shared<BackendType>(*other.backend_))
+    : backend_(std::make_unique<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
   {
   }
@@ -193,12 +193,12 @@ public:
     if (prune)
       backend_ = ThisType(other).pruned(eps).backend_;
     else
-      backend_ = std::make_shared<BackendType>(other);
+      backend_ = std::make_unique<BackendType>(other);
   }
 
   template <class T>
   CommonDenseMatrix(const DenseMatrix<T>& other, const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(other.rows(), other.cols()))
+    : backend_(std::make_unique<BackendType>(other.rows(), other.cols()))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < other.rows(); ++ii)
@@ -210,12 +210,6 @@ public:
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
   explicit CommonDenseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
-    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
-
-  explicit CommonDenseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
@@ -237,7 +231,7 @@ public:
 
   ThisType& operator=(const BackendType& other)
   {
-    backend_ = std::make_shared<BackendType>(other);
+    backend_ = std::make_unique<BackendType>(other);
     return *this;
   }
 
@@ -510,7 +504,7 @@ public:
   }
 
 private:
-  std::shared_ptr<BackendType> backend_;
+  std::unique_ptr<BackendType> backend_;
   std::unique_ptr<MutexesType> mutexes_;
 }; // class CommonDenseMatrix
 
