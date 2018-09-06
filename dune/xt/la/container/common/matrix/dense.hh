@@ -235,9 +235,6 @@ public:
     *backend_ = *other.backend_;
   }
 
-  /**
-   *  \note Does a deep copy.
-   */
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
@@ -465,11 +462,6 @@ public:
   using InterfaceType::operator+=;
   using InterfaceType::operator-=;
 
-  void deep_copy(const ThisType& other)
-  {
-    *backend_ = *other.backend_;
-  }
-
   template <class OtherMatrixType>
   void rightmultiply(const OtherMatrixType& other)
   {
@@ -498,12 +490,12 @@ public:
 
   ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
-    return backend_.get_entry_ref(rr, cc);
+    return backend_->get_entry_ref(rr, cc);
   }
 
   const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
-    return backend_.get_entry_ref(rr, cc);
+    return backend_->get_entry_ref(rr, cc);
   }
 
   // get pointer to begin of row (row major backend) or column (column major backend)
