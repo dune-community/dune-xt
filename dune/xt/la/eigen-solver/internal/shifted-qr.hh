@@ -27,28 +27,43 @@ namespace internal {
 
 // A shifted QR eigensolver for real matrices with real eigenvalues. Complex matrices and real matrices with complex
 // eigenvalues are not supported.
-template <class FieldType>
+template <class FieldType, class MatrixType = DynamicMatrix<FieldType>, class VectorType = DynamicVector<FieldType>>
 struct RealQrEigenSolver
 {
-  typedef Dune::DynamicVector<FieldType> VectorType;
-  typedef Dune::DynamicMatrix<FieldType> MatrixType;
   static constexpr size_t max_iterations = 10000;
+  using M = Common::MatrixAbstraction<MatrixType>;
+  using V = Common::VectorAbstraction<VectorType>;
 
-  static std::vector<double> calculate_eigenvalues_by_shifted_qr(MatrixType& A, const std::unique_ptr<MatrixType>& Q)
+  static void resize(DynamicMatrix<FieldType>& mat, const size_t num_rows, const size_t num_cols, const FieldType& val)
   {
-    const size_t num_rows = A.rows();
-    const size_t num_cols = A.cols();
+    mat.resize(num_rows, num_cols, val);
+  }
+
+  template <int rows, int cols>
+  static void resize(FieldMatrix<FieldType, rows, cols>& /*mat*/,
+                     const size_t /*num_rows*/,
+                     const size_t /*num_cols*/,
+                     const FieldType& /*val*/)
+  {
+  }
+
+  static void
+  calculate_eigenvalues_by_shifted_qr(MatrixType& A, const std::unique_ptr<MatrixType>& Q, std::vector<double>& eigvals)
+  {
+    const size_t num_rows = M::rows(A);
+    const size_t num_cols = M::cols(A);
     const FieldType tol = 1e-15;
-    auto R_k = XT::Common::make_unique<MatrixType>(num_rows, num_cols, 0.);
-    auto Q_k = XT::Common::make_unique<MatrixType>(num_rows, num_cols, 0.);
+    thread_local auto R_k = M::make_unique(num_rows, num_cols, 0.);
+    thread_local auto Q_k = M::make_unique(num_rows, num_cols, 0.);
+    resize(*R_k, num_rows, num_cols, 0.);
+    resize(*Q_k, num_rows, num_cols, 0.);
     for (size_t jj = num_rows - 1; jj > 0; --jj) {
       size_t num_remaining_rows = jj + 1;
       size_t num_remaining_cols = num_remaining_rows;
       FieldType residual = std::abs(A[jj][jj - 1]);
       size_t kk = 0;
       // TODO: Choose appropiate stopping criterion
-      while (XT::Common::FloatCmp::gt(residual, tol * (std::abs(A[jj][jj]) + std::abs(A[jj - 1][jj - 1])))
-             && kk < max_iterations) {
+      while (residual > tol * (std::abs(A[jj][jj]) + std::abs(A[jj - 1][jj - 1])) && kk < max_iterations) {
         // Use Wilkinson shift, i.e. use the eigenvalue of the lower right 2x2 matrix [a b; c d] that is closer to
         // A[jj][jj].
         // If the eigenvalues are complex, we just use the eigenvalues of the symmetric matrix [a c; c d].
@@ -120,31 +135,27 @@ struct RealQrEigenSolver
     } // jj
 
     // Now eigenvalues are the diagonal elements of A
-    std::vector<double> eigenvalues(num_rows);
     for (size_t rr = 0; rr < num_rows; ++rr)
-      eigenvalues[rr] = A[rr][rr];
-    return eigenvalues;
+      eigvals[rr] = A[rr][rr];
   } // .. calculate_eigenvalues_by_shifted_qr(...)
 
   // if Q is provided, Q is expected to be the unit matrix initially
-  static std::vector<double> get_eigenvalues(MatrixType& A, const std::unique_ptr<MatrixType>& Q = nullptr)
+  static void get_eigenvalues(MatrixType& A, std::vector<double>& ret, const std::unique_ptr<MatrixType>& Q = nullptr)
   {
     hessenberg_transformation(A, Q);
-    return calculate_eigenvalues_by_shifted_qr(A, Q);
+    calculate_eigenvalues_by_shifted_qr(A, Q, ret);
   } // ... get_eigenvalues(...)
 
-  static std::unique_ptr<MatrixType> get_eigenvectors(const MatrixType& A_triangular, const MatrixType& Q)
+  static void get_eigenvectors(const MatrixType& A_triangular, const MatrixType& Q, MatrixType& ret)
   {
     const MatrixType& A = A_triangular;
-    auto ret = std::make_unique<MatrixType>(A);
-    *ret *= 0.;
+    ret *= 0.;
     // Calculate eigenvectors by calculating eigenvectors of triangular matrix T blockwise by backward substitution,
     // see Handbook Series Linear Algebra, Eigenvectors of Real and Complex Matrices by LR and QR triangularizations,
     // contributed by G. Peters and J. H. Wilkinsons,
     // https://link.springer.com/content/pdf/10.1007/BF02219772.pdf, equation (3)
-    VectorType eigvec(A.rows());
-    for (size_t kk = 0; kk < A.rows(); ++kk) {
-      eigvec *= 0.; // TODO: should be unnecessary, remove
+    VectorType eigvec = V::create(M::rows(A), 0.);
+    for (size_t kk = 0; kk < M::rows(A); ++kk) {
       // Compute k-th eigenvector by backsubstitution. For that purpose, set k-th component to 1 and then
       // do the usual backsubstitution. If we encounter a zero on the diagonal in the process, we just assign
       // zero to that component.
@@ -159,13 +170,12 @@ struct RealQrEigenSolver
         }
       } // rr
       // apply matrix Q
-      for (size_t rr = 0; rr < A.rows(); ++rr) {
-        (*ret)[rr][kk] = 0.;
+      for (size_t rr = 0; rr < M::rows(A); ++rr) {
+        ret[rr][kk] = 0.;
         for (size_t cc = 0; cc <= kk; ++cc)
-          (*ret)[rr][kk] += Q[rr][cc] * eigvec[cc];
+          ret[rr][kk] += Q[rr][cc] * eigvec[cc];
       }
     } // kk (eigenvectors)
-    return ret;
   } // ... get_eigenvectors(...)
 
   //! \brief modified sign function returning 1 instead of 0 if the value is 0
@@ -187,13 +197,13 @@ struct RealQrEigenSolver
       MatrixType& A, const FieldType& beta, const VectorType& v, const size_t first_row, const size_t past_last_row)
   {
     // calculate u^T A first
-    VectorType uT_A(v.size(), 0.);
-    for (size_t cc = 0; cc < A.cols(); ++cc)
+    VectorType uT_A = V::create(v.size(), 0.);
+    for (size_t cc = 0; cc < M::cols(A); ++cc)
       for (size_t rr = first_row; rr < past_last_row; ++rr)
         uT_A[cc] += v[rr] * A[rr][cc];
     // uT_A now contains u^T A[first_row:past_last_row,:]
     for (size_t rr = first_row; rr < past_last_row; ++rr)
-      for (size_t cc = 0; cc < A.cols(); ++cc)
+      for (size_t cc = 0; cc < M::cols(A); ++cc)
         A[rr][cc] -= beta * v[rr] * uT_A[cc];
   }
 
@@ -203,12 +213,12 @@ struct RealQrEigenSolver
       MatrixType& A, const FieldType& beta, const VectorType& v, const size_t first_col, const size_t past_last_col)
   {
     // calculate A u first
-    VectorType Au(v.size(), 0.);
-    for (size_t rr = 0; rr < A.rows(); ++rr)
+    VectorType Au = V::create(v.size(), 0.);
+    for (size_t rr = 0; rr < M::rows(A); ++rr)
       for (size_t cc = first_col; cc < past_last_col; ++cc)
         Au[rr] += A[rr][cc] * v[cc];
     // Au now contains A[:,first_col:past_last_col] u
-    for (size_t rr = 0; rr < A.rows(); ++rr)
+    for (size_t rr = 0; rr < M::rows(A); ++rr)
       for (size_t cc = first_col; cc < past_last_col; ++cc)
         A[rr][cc] -= beta * Au[rr] * v[cc];
   }
@@ -232,7 +242,8 @@ struct RealQrEigenSolver
       Q[rr][rr] = 1.;
     }
 
-    VectorType w(A.rows(), 0.);
+    VectorType w = V::create(M::rows(A), 0.);
+    VectorType e_diff;
     FieldType tau;
     for (size_t jj = 0; jj < std::min(num_rows - 1, num_cols); ++jj) {
       const auto norm_x = get_norm_x(R, jj, num_rows);
@@ -248,7 +259,7 @@ struct RealQrEigenSolver
         }
         if (index != jj) { // swap rows
           // swapping of rows i,j can be done by Householder I - (e_i - e_j)(e_i-e_j)^T
-          VectorType e_diff(A.rows(), 0.);
+          e_diff = V::create(M::rows(A), 0.);
           e_diff[jj] = 1.;
           e_diff[index] = -1.;
           multiply_householder_from_left(R, 1., e_diff, jj, num_rows);
@@ -292,33 +303,33 @@ struct RealQrEigenSolver
   //! \see https://lp.uni-goettingen.de/get/text/2137
   static void hessenberg_transformation(MatrixType& A, const std::unique_ptr<MatrixType>& Q)
   {
-    assert(A.rows() == A.cols() && "Hessenberg transformation needs a square matrix!");
-    VectorType u(A.rows(), 0.);
-    for (size_t jj = 0; jj < A.rows() - 2; ++jj) {
+    assert(M::rows(A) == M::cols(A) && "Hessenberg transformation needs a square matrix!");
+    VectorType u = V::create(M::rows(A), 0.);
+    for (size_t jj = 0; jj < M::rows(A) - 2; ++jj) {
       FieldType gamma = 0;
-      for (size_t rr = jj + 1; rr < A.rows(); ++rr)
+      for (size_t rr = jj + 1; rr < M::rows(A); ++rr)
         gamma += std::pow(A[rr][jj], 2);
       gamma = std::sqrt(gamma);
       FieldType beta = gamma * (gamma + std::abs(A[jj + 1][jj]));
       if (XT::Common::FloatCmp::ne(gamma, 0.) && XT::Common::FloatCmp::ne(beta, 0.)) {
         beta = 1. / beta;
-        for (size_t rr = jj + 1; rr < A.rows(); ++rr)
+        for (size_t rr = jj + 1; rr < M::rows(A); ++rr)
           u[rr] = A[rr][jj];
         u[jj + 1] += xi(A[jj + 1][jj]) * gamma;
         // calculate P A P with P = diag(I_j, (I_{n-j} - beta u u*))
         // calculate P A = A - (beta u) (u^T A) first
-        multiply_householder_from_left(A, beta, u, jj + 1, A.rows());
+        multiply_householder_from_left(A, beta, u, jj + 1, M::rows(A));
         // now calculate (PA) P  = PA - (PA u) (beta u^T)
-        multiply_householder_from_right(A, beta, u, jj + 1, A.cols());
+        multiply_householder_from_right(A, beta, u, jj + 1, M::cols(A));
         if (Q)
-          multiply_householder_from_right(*Q, beta, u, jj + 1, A.cols());
+          multiply_householder_from_right(*Q, beta, u, jj + 1, M::cols(A));
       } // if (gamma != 0)
     } // jj
   } // void hessenberg_transformation(...)
 }; // class RealQrEigenSolver<...>
 
-template <class FieldType>
-constexpr size_t RealQrEigenSolver<FieldType>::max_iterations;
+template <class FieldType, class MatrixType, class VectorType>
+constexpr size_t RealQrEigenSolver<FieldType, MatrixType, VectorType>::max_iterations;
 
 template <class MatrixType>
 Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>
@@ -363,14 +374,31 @@ compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(const MatrixType& 
                                                               EigenVectorType& right_eigenvectors)
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
-  typedef typename Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType> DynamicMatrixType;
-  auto Q =
-      std::make_unique<DynamicMatrixType>(XT::LA::eye_matrix<DynamicMatrixType>(tmp_matrix.rows(), tmp_matrix.cols()));
-  eigenvalues =
-      RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix, Q);
-  auto tmp_eigenvectors =
-      RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvectors(tmp_matrix, *Q);
-  copy_from_dynamic_matrix(*tmp_eigenvectors, right_eigenvectors);
+  using DynamicMatrixType = typename Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>;
+  DynamicMatrixType tmp_eigenvectors(matrix.rows(), matrix.cols(), 0.);
+  auto Q = std::make_unique<DynamicMatrixType>(
+      XT::LA::eye_matrix<DynamicMatrixType>(tmp_matrix.rows(), eigenvalues, tmp_matrix.cols()));
+  RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(
+      tmp_matrix, eigenvalues, Q);
+  RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvectors(
+      tmp_matrix, *Q, tmp_eigenvectors);
+  copy_from_dynamic_matrix(tmp_eigenvectors, right_eigenvectors);
+}
+
+template <class FieldType, int size>
+void fmatrix_compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(
+    FieldMatrix<FieldType, size, size>& matrix,
+    std::vector<double>& eigenvalues,
+    FieldMatrix<FieldType, size, size>& right_eigenvectors)
+{
+  using MatrixType = FieldMatrix<FieldType, size, size>;
+  using VectorType = FieldVector<FieldType, size>;
+  thread_local auto Q = std::make_unique<MatrixType>(XT::LA::eye_matrix<MatrixType>(size));
+  XT::LA::eye_matrix(*Q);
+  RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType, MatrixType, VectorType>::
+      get_eigenvalues(matrix, eigenvalues, Q);
+  RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType, MatrixType, VectorType>::
+      get_eigenvectors(matrix, *Q, right_eigenvectors);
 }
 
 

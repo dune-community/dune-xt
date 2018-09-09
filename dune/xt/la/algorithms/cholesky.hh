@@ -303,6 +303,15 @@ typename std::enable_if_t<Common::is_matrix<MatrixType>::value, void> cholesky(M
   internal::CholeskySolver<MatrixType>::cholesky(A);
 } // void solve_lower_triangular(...)
 
+template <class MatrixType, class VectorType>
+typename std::enable_if_t<Common::is_matrix<MatrixType>::value && Common::is_vector<VectorType>::value, void>
+solve_cholesky_factorized(const MatrixType& L, VectorType& rhs)
+{
+  auto x = rhs;
+  solve_lower_triangular(L, x, rhs);
+  solve_lower_triangular_transposed(L, rhs, x);
+} // void solve_lower_triangular(...)
+
 
 template <class FirstVectorType, class SecondVectorType>
 typename std::enable_if_t<Common::is_vector<FirstVectorType>::value && Common::is_vector<SecondVectorType>::value, void>
