@@ -17,6 +17,7 @@
 
 #include <dune/xt/common/fixed_map.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/view/periodic.hh>
 #include <dune/xt/grid/view/subdomain/view.hh>
 
 namespace Dune {
@@ -67,14 +68,14 @@ namespace internal {
 template <Backends backend>
 struct backend_dependent_typename
 {
-  typedef void type;
+  using type = void;
 };
 
 
 template <Layers layer>
 struct layer_dependent_typename
 {
-  typedef void type;
+  using type = void;
 };
 
 
@@ -84,12 +85,12 @@ struct layer_dependent_typename
 /**
  * \brief Allows to statically create a leaf or level part or view (unspecialized variant).
  */
-template <class GridType, Layers layer, Backends backend, class DdGridType = int>
+template <class GridType, Layers layer, Backends backend, class DdGridType = int, bool periodic = false>
 struct Layer
 {
   static_assert(AlwaysFalse<GridType>::value, "No layer available for this combination!");
 
-  typedef void type;
+  using type = void;
 
   static type
   create(const GridType& /*grid*/, const int /*level*/ = 0, const std::shared_ptr<DdGridType> /*dd_grid*/ = nullptr)
@@ -108,9 +109,9 @@ struct Layer
  * \brief Allows to statically create a leaf or level part or view (leaf view variant).
  */
 template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::leaf, Backends::view, DdGridType>
+struct Layer<GridType, Layers::leaf, Backends::view, DdGridType, false>
 {
-  typedef typename GridType::LeafGridView type;
+  using type = typename GridType::LeafGridView;
 
   static type
   create(const GridType& grid, const int /*level*/ = 0, const std::shared_ptr<DdGridType> /*dd_grid*/ = nullptr)
@@ -124,9 +125,9 @@ struct Layer<GridType, Layers::leaf, Backends::view, DdGridType>
  * \brief Allows to statically create a leaf or level part or view (leaf view variant).
  */
 template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::level, Backends::view, DdGridType>
+struct Layer<GridType, Layers::level, Backends::view, DdGridType, false>
 {
-  typedef typename GridType::LevelGridView type;
+  using type = typename GridType::LevelGridView;
 
   static type create(const GridType& grid, const int level, const std::shared_ptr<DdGridType> /*dd_grid*/ = nullptr)
   {
@@ -138,9 +139,9 @@ struct Layer<GridType, Layers::level, Backends::view, DdGridType>
 
 
 template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain, Backends::view, DdGridType>
+struct Layer<GridType, Layers::dd_subdomain, Backends::view, DdGridType, false>
 {
-  typedef typename DD::SubdomainGrid<GridType>::LocalGridViewType type;
+  using type = typename DD::SubdomainGrid<GridType>::LocalGridViewType;
 
   static type create(const GridType& /*grid*/,
                      const int subdomain = 0,
@@ -161,9 +162,9 @@ struct Layer<GridType, Layers::dd_subdomain, Backends::view, DdGridType>
 
 
 template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::view, DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::view, DdGridType, false>
 {
-  typedef typename DD::SubdomainGrid<GridType>::LocalGridViewType type;
+  using type = typename DD::SubdomainGrid<GridType>::LocalGridViewType;
 
   static type create(const GridType& /*grid*/,
                      const int subdomain = 0,
@@ -184,9 +185,9 @@ struct Layer<GridType, Layers::dd_subdomain_oversampled, Backends::view, DdGridT
 
 
 template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType, false>
 {
-  typedef typename DD::SubdomainGrid<GridType>::CouplingGridViewType type;
+  using type = typename DD::SubdomainGrid<GridType>::CouplingGridViewType;
 
   static type create(const GridType& /*grid*/,
                      const int /*subdomain */ = 0,
@@ -209,9 +210,9 @@ struct Layer<GridType, Layers::dd_subdomain_coupling, Backends::view, DdGridType
 
 
 template <class GridType, class DdGridType>
-struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::view, DdGridType>
+struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::view, DdGridType, false>
 {
-  typedef typename DD::SubdomainGrid<GridType>::BoundaryGridViewType type;
+  using type = typename DD::SubdomainGrid<GridType>::BoundaryGridViewType;
 
   static type create(const GridType& /*grid*/,
                      const int subdomain = 0,
@@ -229,6 +230,27 @@ struct Layer<GridType, Layers::dd_subdomain_boundary, Backends::view, DdGridType
     return dd_grid->boundary_grid_view(subdomain);
   }
 }; // struct Layer<..., dd_subdomain_boundary, view>
+
+
+// create periodic grid_layer
+template <class GridType, Layers layer, Backends backend, class DdGridType>
+struct Layer<GridType, layer, backend, DdGridType, true>
+{
+  using NonPeriodicLayerType = Layer<GridType, layer, backend, DdGridType, false>;
+  using type = XT::Grid::PeriodicGridLayer<typename NonPeriodicLayerType::type>;
+
+  static type create(const GridType& grid,
+                     const int subdomain = 0,
+                     const std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid = nullptr)
+  {
+    return type(NonPeriodicLayerType::create(grid, subdomain, dd_grid));
+  }
+
+  static type create(GridType& grid, const int subdomain, std::shared_ptr<DD::SubdomainGrid<GridType>> dd_grid)
+  {
+    return type(NonPeriodicLayerType::create(grid, subdomain, dd_grid));
+  }
+}; // struct Layer<..., periodic>
 
 
 namespace internal {
