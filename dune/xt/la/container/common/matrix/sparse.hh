@@ -105,7 +105,7 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1, 0))
     , column_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , eps_(eps)
     , unshareable_(false)
   {
@@ -145,7 +145,7 @@ public:
     , entries_(std::make_shared<EntriesVectorType>(is_zero(value, eps) ? 0 : num_rows_ * num_cols_, value))
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1, 0))
     , column_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , eps_(eps)
     , unshareable_(false)
   {
@@ -183,7 +183,7 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , eps_(eps)
     , unshareable_(false)
   {
@@ -232,10 +232,8 @@ public:
       entries_ = other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_;
       row_pointers_ = other.row_pointers_;
       column_indices_ = other.column_indices_;
-      mutexes_ = other.mutexes_
-                     ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
-                                           : other.mutexes_)
-                     : nullptr;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
       unshareable_ = false;
     }
     return *this;
@@ -294,7 +292,7 @@ public:
     ret.entries_ = std::make_shared<EntriesVectorType>(*entries_);
     ret.row_pointers_ = std::make_shared<IndexVectorType>(*row_pointers_);
     ret.column_indices_ = std::make_shared<IndexVectorType>(*column_indices_);
-    ret.mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
+    ret.mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
     return ret;
   }
 
@@ -558,7 +556,7 @@ public:
         entries_ = std::make_shared<EntriesVectorType>(*entries_);
         row_pointers_ = std::make_shared<IndexVectorType>(*row_pointers_);
         column_indices_ = std::make_shared<IndexVectorType>(*column_indices_);
-        mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
       }
     }
   } // ... ensure_uniqueness(...)
@@ -630,7 +628,7 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , eps_(eps)
     , unshareable_(false)
   {
@@ -662,7 +660,7 @@ public:
     , entries_(std::make_shared<EntriesVectorType>(is_zero(value, eps) ? 0 : num_rows_ * num_cols_, value))
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , eps_(eps)
     , unshareable_(false)
   {
@@ -683,7 +681,7 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
@@ -711,7 +709,7 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , eps_(eps)
     , unshareable_(false)
   {
@@ -753,10 +751,8 @@ public:
       entries_ = other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_;
       column_pointers_ = other.column_pointers_;
       row_indices_ = other.row_indices_;
-      mutexes_ = other.mutexes_
-                     ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
-                                           : other.mutexes_)
-                     : nullptr;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
       eps_ = other.eps_;
       unshareable_ = false;
     }
@@ -819,7 +815,7 @@ public:
     ret.entries_ = std::make_shared<EntriesVectorType>(*entries_);
     ret.column_pointers_ = std::make_shared<IndexVectorType>(*column_pointers_);
     ret.row_indices_ = std::make_shared<IndexVectorType>(*row_indices_);
-    ret.mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
+    ret.mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
     return ret;
   }
 
@@ -1167,7 +1163,7 @@ public:
         entries_ = std::make_shared<EntriesVectorType>(*entries_);
         column_pointers_ = std::make_shared<IndexVectorType>(*column_pointers_);
         row_indices_ = std::make_shared<IndexVectorType>(*row_indices_);
-        mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
       }
     }
   } // ... ensure_uniqueness(...)
