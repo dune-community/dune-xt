@@ -54,9 +54,9 @@ struct RealQrEigenSolver
     const size_t num_cols = M::cols(A);
     const FieldType tol = 1e-15;
     thread_local auto R_k = M::make_unique(num_rows, num_cols, 0.);
-    thread_local auto Q_k = M::make_unique(num_rows, num_cols, 0.);
+    thread_local auto Q_k = M::make_unique(num_cols, num_rows, 0.); // save in column-major format for performance
     resize(*R_k, num_rows, num_cols, 0.);
-    resize(*Q_k, num_rows, num_cols, 0.);
+    resize(*Q_k, num_cols, num_rows, 0.);
     for (size_t jj = num_rows - 1; jj > 0; --jj) {
       size_t num_remaining_rows = jj + 1;
       size_t num_remaining_cols = num_remaining_rows;
@@ -96,7 +96,7 @@ struct RealQrEigenSolver
           for (size_t cc = 0; cc < num_remaining_cols; ++cc) {
             A[rr][cc] = 0.;
             for (size_t ll = 0; ll < num_remaining_rows; ++ll)
-              A[rr][cc] += (*R_k)[rr][ll] * (*Q_k)[ll][cc];
+              A[rr][cc] += (*R_k)[rr][ll] * (*Q_k)[cc][ll];
           } // cc
           A[rr][rr] += shift;
         } // rr
@@ -108,7 +108,7 @@ struct RealQrEigenSolver
           for (size_t cc = num_remaining_cols; cc < num_cols; ++cc) {
             A[rr][cc] = 0.;
             for (size_t ll = 0; ll < num_remaining_rows; ++ll)
-              A[rr][cc] += (*Q_k)[ll][rr] * A_copy[ll][cc];
+              A[rr][cc] += (*Q_k)[rr][ll] * A_copy[ll][cc];
           } // cc
         } // rr
 
@@ -120,7 +120,7 @@ struct RealQrEigenSolver
             for (size_t cc = 0; cc < num_remaining_cols; ++cc) {
               (*Q)[rr][cc] = 0.;
               for (size_t ll = 0; ll < num_remaining_rows; ++ll)
-                (*Q)[rr][cc] += Q_copy[rr][ll] * (*Q_k)[ll][cc];
+                (*Q)[rr][cc] += Q_copy[rr][ll] * (*Q_k)[cc][ll];
             } // cc
           } // rr
         } // if (Q)
@@ -198,8 +198,8 @@ struct RealQrEigenSolver
   {
     // calculate u^T A first
     VectorType uT_A = V::create(v.size(), 0.);
-    for (size_t cc = 0; cc < M::cols(A); ++cc)
-      for (size_t rr = first_row; rr < past_last_row; ++rr)
+    for (size_t rr = first_row; rr < past_last_row; ++rr)
+      for (size_t cc = 0; cc < M::cols(A); ++cc)
         uT_A[cc] += v[rr] * A[rr][cc];
     // uT_A now contains u^T A[first_row:past_last_row,:]
     for (size_t rr = first_row; rr < past_last_row; ++rr)
@@ -222,6 +222,23 @@ struct RealQrEigenSolver
       for (size_t cc = first_col; cc < past_last_col; ++cc)
         A[rr][cc] -= beta * Au[rr] * v[cc];
   }
+
+  // Calculates A * P.
+  // \see multiply_householder_from_left
+  static void multiply_householder_from_right_col_major(
+      MatrixType& A, const FieldType& beta, const VectorType& v, const size_t first_col, const size_t past_last_col)
+  {
+    // calculate A u first
+    VectorType Au = V::create(v.size(), 0.);
+    for (size_t cc = first_col; cc < past_last_col; ++cc)
+      for (size_t rr = 0; rr < M::rows(A); ++rr)
+        Au[rr] += A[cc][rr] * v[cc];
+    // Au now contains A[:,first_col:past_last_col] u
+    for (size_t cc = first_col; cc < past_last_col; ++cc)
+      for (size_t rr = 0; rr < M::rows(A); ++rr)
+        A[cc][rr] -= beta * Au[rr] * v[cc];
+  }
+
 
   /** \brief This is a simple QR scheme using Householder reflections.
   * The householder matrix is written as H = I - 2 v v^T, where v = u/||u|| and u = x - s ||x|| e_1, s = +-1 has the
@@ -263,7 +280,7 @@ struct RealQrEigenSolver
           e_diff[jj] = 1.;
           e_diff[index] = -1.;
           multiply_householder_from_left(R, 1., e_diff, jj, num_rows);
-          multiply_householder_from_right(Q, 1., e_diff, jj, num_cols);
+          multiply_householder_from_right_col_major(Q, 1., e_diff, jj, num_cols);
         }
         const auto s = -sign(R[jj][jj]);
         const FieldType u1 = R[jj][jj] - s * norm_x;
@@ -274,7 +291,7 @@ struct RealQrEigenSolver
 
         // calculate R = Q_k R and Q = Q Q_k
         multiply_householder_from_left(R, tau, w, jj, num_rows);
-        multiply_householder_from_right(Q, tau, w, jj, num_cols);
+        multiply_householder_from_right_col_major(Q, tau, w, jj, num_cols);
       } // if (norm_x != 0)
     } // jj
 
@@ -283,8 +300,8 @@ struct RealQrEigenSolver
     for (size_t cc = 0; cc < num_cols; ++cc) {
       FieldType max = std::numeric_limits<FieldType>::lowest();
       for (size_t rr = 0; rr < num_rows; ++rr) {
-        if (std::abs(Q[rr][cc]) > max) {
-          max = std::abs(Q[rr][cc]);
+        if (std::abs(Q[cc][rr]) > max) {
+          max = std::abs(Q[cc][rr]);
           row_index = rr;
         }
       } // rr
@@ -292,8 +309,8 @@ struct RealQrEigenSolver
         // scal column of Q if largest entry is negative
         // scal row of R to ensure that still A = QR
         for (size_t rr = 0; rr < num_rows; ++rr) {
-          Q[rr][cc] = -Q[rr][cc];
-          R[cc][rr] = -R[cc][rr];
+          Q[cc][rr] *= -1.;
+          R[cc][rr] *= -1.;
         } // rr
       } // if (largest entry negative)
     } // cc
@@ -375,9 +392,9 @@ compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(const MatrixType& 
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
   using DynamicMatrixType = typename Dune::DynamicMatrix<typename Common::MatrixAbstraction<MatrixType>::RealType>;
-  DynamicMatrixType tmp_eigenvectors(matrix.rows(), matrix.cols(), 0.);
-  auto Q = std::make_unique<DynamicMatrixType>(
-      XT::LA::eye_matrix<DynamicMatrixType>(tmp_matrix.rows(), eigenvalues, tmp_matrix.cols()));
+  DynamicMatrixType tmp_eigenvectors(tmp_matrix.rows(), tmp_matrix.cols(), 0.);
+  auto Q =
+      std::make_unique<DynamicMatrixType>(XT::LA::eye_matrix<DynamicMatrixType>(tmp_matrix.rows(), tmp_matrix.cols()));
   RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(
       tmp_matrix, eigenvalues, Q);
   RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvectors(
