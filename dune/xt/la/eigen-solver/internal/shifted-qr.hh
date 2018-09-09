@@ -63,7 +63,8 @@ struct RealQrEigenSolver
       FieldType residual = std::abs(A[jj][jj - 1]);
       size_t kk = 0;
       // TODO: Choose appropiate stopping criterion
-      while (residual > tol * (std::abs(A[jj][jj]) + std::abs(A[jj - 1][jj - 1])) && kk < max_iterations) {
+      while (XT::Common::FloatCmp::gt(residual, tol * (std::abs(A[jj][jj]) + std::abs(A[jj - 1][jj - 1])))
+             && kk < max_iterations) {
         // Use Wilkinson shift, i.e. use the eigenvalue of the lower right 2x2 matrix [a b; c d] that is closer to
         // A[jj][jj].
         // If the eigenvalues are complex, we just use the eigenvalues of the symmetric matrix [a c; c d].
@@ -135,6 +136,7 @@ struct RealQrEigenSolver
     } // jj
 
     // Now eigenvalues are the diagonal elements of A
+    eigvals.resize(num_rows);
     for (size_t rr = 0; rr < num_rows; ++rr)
       eigvals[rr] = A[rr][rr];
   } // .. calculate_eigenvalues_by_shifted_qr(...)
@@ -230,12 +232,14 @@ struct RealQrEigenSolver
   {
     // calculate A u first
     VectorType Au = V::create(v.size(), 0.);
+    // As A is assumed to be in col-major format, but stored in a row-major matrix, we use A.cols() to get the number of
+    // rows of A
     for (size_t cc = first_col; cc < past_last_col; ++cc)
-      for (size_t rr = 0; rr < M::rows(A); ++rr)
+      for (size_t rr = 0; rr < M::cols(A); ++rr)
         Au[rr] += A[cc][rr] * v[cc];
     // Au now contains A[:,first_col:past_last_col] u
     for (size_t cc = first_col; cc < past_last_col; ++cc)
-      for (size_t rr = 0; rr < M::rows(A); ++rr)
+      for (size_t rr = 0; rr < M::cols(A); ++rr)
         A[cc][rr] -= beta * Au[rr] * v[cc];
   }
 
@@ -381,7 +385,9 @@ typename std::enable_if<Common::is_matrix<MatrixType>::value, std::vector<double
 compute_eigenvalues_using_qr(const MatrixType& matrix)
 {
   auto tmp_matrix = copy_to_dynamic_matrix(matrix);
-  return RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix);
+  std::vector<double> ret;
+  RealQrEigenSolver<typename XT::Common::MatrixAbstraction<MatrixType>::RealType>::get_eigenvalues(tmp_matrix, ret);
+  return ret;
 }
 
 template <class MatrixType, class EigenVectorType>
