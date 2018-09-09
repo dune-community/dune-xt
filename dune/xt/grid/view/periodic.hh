@@ -417,27 +417,27 @@ private:
  *
  * \see PeriodicGridView
  */
-template <class RealGridLayerImp>
-class PeriodicIntersectionImp : public extract_intersection_t<RealGridLayerImp>
+template <class RealIntersectionImp>
+class PeriodicIntersectionImp : public RealIntersectionImp
 {
-  typedef RealGridLayerImp RealGridLayerType;
-  using BaseType = extract_intersection_t<RealGridLayerType>;
+  //  using BaseType = extract_intersection_t<RealGridLayerType>;
+  using BaseType = RealIntersectionImp;
 
 public:
   using typename BaseType::LocalGeometry;
-  typedef typename BaseType::Entity EntityType;
-  using RealIntersectionIteratorType = extract_intersection_iterator_t<RealGridLayerType>;
-  static const size_t dimDomain = RealGridLayerType::dimension;
+  using EntityType = typename BaseType::Entity;
 
   //! \brief Constructor from real intersection
+  template <class RealGridLayerType>
   PeriodicIntersectionImp(const BaseType& real_intersection,
                           const RealGridLayerType& real_grid_layer,
                           const std::pair<bool, EntityType>& periodic_pair)
     : BaseType(real_intersection)
     , periodic_(periodic_pair.first)
     , outside_(periodic_pair.second)
-    , real_grid_layer_(&real_grid_layer)
   {
+    if (periodic_)
+      intersection_in_outside_ = find_intersection_in_outside(real_grid_layer);
   }
 
   //! \brief Default constructor
@@ -466,7 +466,7 @@ public:
   LocalGeometry geometryInOutside() const
   {
     if (periodic_) {
-      return find_intersection_in_outside().geometryInInside();
+      return intersection_in_outside_.geometryInInside();
     } else {
       return BaseType::geometryInOutside();
     }
@@ -475,7 +475,7 @@ public:
   int indexInOutside() const
   {
     if (periodic_) {
-      return find_intersection_in_outside().indexInInside();
+      return intersection_in_outside_.indexInInside();
     } else {
       return BaseType::indexInOutside();
     }
@@ -483,18 +483,19 @@ public:
 
 private:
   // tries to find intersection in outside (works only if periodic_ == true)
-  BaseType find_intersection_in_outside() const
+  template <class RealGridLayerType>
+  BaseType find_intersection_in_outside(const RealGridLayerType& real_grid_layer) const
   {
     const auto coords = this->geometry().center();
-    RealIntersectionIteratorType outside_i_it = real_grid_layer_->ibegin(outside_);
-    const RealIntersectionIteratorType outside_i_it_end = real_grid_layer_->iend(outside_);
+    auto outside_i_it = real_grid_layer.ibegin(outside_);
+    const auto outside_i_it_end = real_grid_layer.iend(outside_);
     // walk over outside intersections and find an intersection on the boundary that differs only in one coordinate
     for (; outside_i_it != outside_i_it_end; ++outside_i_it) {
       const BaseType& curr_outside_intersection = *outside_i_it;
       if (curr_outside_intersection.boundary()) {
         const auto curr_outside_intersection_coords = curr_outside_intersection.geometry().center();
         size_t coord_difference_count = 0;
-        for (size_t ii = 0; ii < dimDomain; ++ii) {
+        for (size_t ii = 0; ii < coords.size(); ++ii) {
           if (Dune::XT::Common::FloatCmp::ne(curr_outside_intersection_coords[ii], coords[ii])) {
             ++coord_difference_count;
           }
@@ -505,13 +506,13 @@ private:
       }
     }
     DUNE_THROW(Dune::InvalidStateException, "Could not find outside intersection!");
-    return *(real_grid_layer_->ibegin(outside_));
+    return *(real_grid_layer.ibegin(outside_));
   } // ... find_intersection_in_outside() const
 
 protected:
   bool periodic_;
   EntityType outside_;
-  const RealGridLayerType* real_grid_layer_;
+  BaseType intersection_in_outside_;
 }; // ... class PeriodicIntersectionImp ...
 
 
@@ -529,7 +530,7 @@ class PeriodicIntersectionIterator : public extract_intersection_iterator_t<Real
   typedef RealGridLayerImp RealGridLayerType;
   using BaseType = extract_intersection_iterator_t<RealGridLayerImp>;
   typedef PeriodicIntersectionIterator<RealGridLayerImp> ThisType;
-  typedef PeriodicIntersectionImp<RealGridLayerType> IntersectionImp;
+  typedef PeriodicIntersectionImp<extract_intersection_t<RealGridLayerImp>> IntersectionImp;
 
 public:
   typedef typename BaseType::Intersection RealIntersectionType;
@@ -707,7 +708,8 @@ public:
   typedef typename Grid::ctype ctype;
 
   // ...except for the Intersection and IntersectionIterator
-  typedef Dune::Intersection<extract_grid_t<RealGridLayerType>, PeriodicIntersectionImp<RealGridLayerType>>
+  typedef Dune::Intersection<extract_grid_t<RealGridLayerType>,
+                             PeriodicIntersectionImp<extract_intersection_t<RealGridLayerType>>>
       Intersection;
   typedef PeriodicIntersectionIterator<RealGridLayerType> IntersectionIterator;
 }; // ... class PeriodicGridLayerWrapperTraits ...
@@ -732,7 +734,7 @@ public:
   typedef typename Traits::IndexSet::IndexType IndexType;
   typedef int IntersectionIndexType;
   typedef typename RealIntersectionType::GlobalCoordinate DomainType;
-  typedef Dune::Intersection<Grid, PeriodicIntersectionImp<BaseType>> Intersection;
+  typedef Dune::Intersection<Grid, PeriodicIntersectionImp<RealIntersectionType>> Intersection;
   typedef std::vector<std::pair<bool, EntityType>> IntersectionMapType;
   static const size_t dimDomain = BaseType::dimension;
   static const size_t num_geometries = GlobalGeometryTypeIndex::size(dimDomain);
