@@ -47,14 +47,14 @@ namespace internal {
 template <class ScalarType>
 struct MatrixBackendBase
 {
-  MatrixBackendBase(size_t num_rows, size_t num_cols, const ScalarType value)
+  MatrixBackendBase(const size_t num_rows, const size_t num_cols, const ScalarType value)
     : num_rows_(num_rows)
     , num_cols_(num_cols)
     , entries_(num_rows_ * num_cols_, value)
   {
   }
 
-  void resize(size_t num_rows, size_t num_cols)
+  void resize(const size_t num_rows, const size_t num_cols)
   {
     num_rows_ = num_rows;
     num_cols_ = num_cols;
@@ -75,17 +75,17 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_row_maj
 {
   using BaseType = MatrixBackendBase<ScalarType>;
 
-  CommonDenseMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+  CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
   {
   }
 
-  ScalarType& get_entry_ref(size_t rr, size_t cc)
+  ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
     return entries_[rr * num_cols_ + cc];
   }
 
-  const ScalarType& get_entry_ref(size_t rr, size_t cc) const
+  const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
     return entries_[rr * num_cols_ + cc];
   }
@@ -101,17 +101,17 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_
 {
   using BaseType = MatrixBackendBase<ScalarType>;
 
-  CommonDenseMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+  CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
   {
   }
 
-  ScalarType& get_entry_ref(size_t rr, size_t cc)
+  ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
     return entries_[cc * num_rows_ + rr];
   }
 
-  const ScalarType& get_entry_ref(size_t rr, size_t cc) const
+  const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
     return entries_[cc * num_rows_ + rr];
   }
@@ -539,6 +539,27 @@ public:
       }
     }
   } // ... ensure_uniqueness(...)
+
+  ScalarType& get_entry_ref(const size_t rr, const size_t cc)
+  {
+    return backend_.get_entry_ref(rr, cc);
+  }
+
+  const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
+  {
+    return backend_.get_entry_ref(rr, cc);
+  }
+
+  // get pointer to begin of row (row major backend) or column (column major backend)
+  ScalarType* get_ptr(const size_t row_or_col)
+  {
+    return &(backend_->get_entry_ref(row_or_col, 0));
+  }
+
+  const ScalarType* get_ptr(const size_t row_or_col) const
+  {
+    return &(backend_->get_entry_ref(row_or_col, 0));
+  }
 
 private:
   mutable std::shared_ptr<BackendType> backend_;
