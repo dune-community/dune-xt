@@ -80,14 +80,14 @@ private:
 public:
   explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0), const size_t num_mutexes = 1)
     : backend_(new BackendType(ss, value))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
 
   explicit CommonDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.size()))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     for (size_t ii = 0; ii < other.size(); ++ii)
@@ -96,7 +96,7 @@ public:
 
   explicit CommonDenseVector(const std::initializer_list<ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.size()))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     size_t ii = 0;
@@ -118,7 +118,7 @@ public:
                              const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
                              const size_t num_mutexes = 1)
     : backend_(new BackendType(other))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
@@ -128,14 +128,14 @@ public:
    */
   explicit CommonDenseVector(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
 
   explicit CommonDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
@@ -144,10 +144,8 @@ public:
   {
     if (this != &other) {
       backend_ = other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_;
-      mutexes_ = other.mutexes_
-                     ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
-                                           : other.mutexes_)
-                     : nullptr;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
       unshareable_ = false;
     }
     return *this;
@@ -349,7 +347,7 @@ public:
       const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!backend_.unique()) {
         backend_ = std::make_shared<BackendType>(*backend_);
-        mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
       }
     }
   } // ... ensure_uniqueness(...)

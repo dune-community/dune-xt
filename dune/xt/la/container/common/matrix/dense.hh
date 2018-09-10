@@ -160,7 +160,7 @@ public:
                              const ScalarType value = ScalarType(0),
                              const size_t num_mutexes = 1)
     : backend_(std::make_shared<BackendType>(rr, cc, value))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
@@ -171,16 +171,14 @@ public:
                     const SparsityPatternDefault& /*pattern*/,
                     const size_t num_mutexes = 1)
     : backend_(std::make_shared<BackendType>(rr, cc, ScalarType(0)))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
 
   CommonDenseMatrix(const ThisType& other)
     : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
-    , mutexes_(other.unshareable_
-                   ? (other.mutexes_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : nullptr)
-                   : other.mutexes_)
+    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
     , unshareable_(false)
   {
   }
@@ -193,7 +191,7 @@ public:
                              const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                  Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
                              const size_t num_mutexes = 1)
-    : mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    : mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     if (prune)
@@ -205,7 +203,7 @@ public:
   template <class T>
   CommonDenseMatrix(const DenseMatrix<T>& other, const size_t num_mutexes = 1)
     : backend_(std::make_shared<BackendType>(other.rows(), other.cols()))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     for (size_t ii = 0; ii < other.rows(); ++ii)
@@ -218,14 +216,14 @@ public:
    */
   explicit CommonDenseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
 
   explicit CommonDenseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
@@ -234,10 +232,8 @@ public:
   {
     if (this != &other) {
       backend_ = other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_;
-      mutexes_ = other.mutexes_
-                     ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
-                                           : other.mutexes_)
-                     : nullptr;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
       unshareable_ = false;
     }
     return *this;
@@ -535,7 +531,7 @@ public:
       const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
       if (!backend_.unique()) {
         backend_ = std::make_shared<BackendType>(*backend_);
-        mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
       }
     }
   } // ... ensure_uniqueness(...)

@@ -82,7 +82,7 @@ public:
     : size_(sz)
     , entries_(new EntriesVectorType())
     , indices_(new IndicesVectorType())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
@@ -91,7 +91,7 @@ public:
     : size_(sz)
     , entries_(new EntriesVectorType(size_, value))
     , indices_(new IndicesVectorType(size_))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     for (size_t ii = 0; ii < size_; ++ii)
@@ -102,7 +102,7 @@ public:
     : size_(other.size())
     , entries_(new EntriesVectorType(size_))
     , indices_(new IndicesVectorType(size_))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     for (size_t ii = 0; ii < size_; ++ii) {
@@ -120,7 +120,7 @@ public:
     : size_(sz)
     , entries_(new EntriesVectorType(entries.size()))
     , indices_(new IndicesVectorType(indices.size()))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     assert(entries.size() == indices.size());
@@ -134,7 +134,7 @@ public:
     : size_(other.size())
     , entries_(new EntriesVectorType(size_))
     , indices_(new IndicesVectorType(size_))
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     size_t ii = 0;
@@ -149,9 +149,7 @@ public:
     : size_(other.size_)
     , entries_(other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_)
     , indices_(other.unshareable_ ? std::make_shared<IndicesVectorType>(*other.indices_) : other.indices_)
-    , mutexes_(other.mutexes_ ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
-                                                    : other.mutexes_)
-                              : nullptr)
+    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
     , unshareable_(false)
   {
   }
@@ -165,7 +163,7 @@ public:
     : size_(other.size())
     , entries_(new EntriesVectorType())
     , indices_(new IndicesVectorType())
-    , mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
     for (size_t ii = 0; ii < size_; ++ii) {
@@ -192,10 +190,8 @@ public:
       size_ = other.size_;
       entries_ = other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_;
       indices_ = other.unshareable_ ? std::make_shared<IndicesVectorType>(*other.indices_) : other.indices_;
-      mutexes_ = other.mutexes_
-                     ? (other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size())
-                                           : other.mutexes_)
-                     : nullptr;
+      mutexes_ =
+          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
       unshareable_ = false;
     }
     return *this;
@@ -234,7 +230,7 @@ public:
 
   ThisType copy() const
   {
-    return ThisType(size_, *entries_, *indices_, mutexes_ ? mutexes_->size() : 0);
+    return ThisType(size_, *entries_, *indices_, mutexes_->size());
   }
 
   void scal(const ScalarType& alpha)
@@ -488,7 +484,7 @@ public:
       if (!entries_.unique()) {
         entries_ = std::make_shared<EntriesVectorType>(*entries_);
         indices_ = std::make_shared<IndicesVectorType>(*indices_);
-        mutexes_ = mutexes_ ? std::make_shared<std::vector<std::mutex>>(mutexes_->size()) : nullptr;
+        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
       }
     }
   } // ... ensure_uniqueness(...)
