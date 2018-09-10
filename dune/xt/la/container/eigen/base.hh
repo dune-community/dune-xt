@@ -73,7 +73,7 @@ private:
 
 public:
   EigenBaseVector(size_t num_mutexes = 1)
-    : mutexes_(num_mutexes > 0 ? std::make_shared<std::vector<std::mutex>>(num_mutexes) : nullptr)
+    : mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
     , unshareable_(false)
   {
   }
