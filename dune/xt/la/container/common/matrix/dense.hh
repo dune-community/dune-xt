@@ -15,6 +15,7 @@
 #include <cmath>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <vector>
 
 #include <boost/align/aligned_allocator.hpp>
@@ -135,7 +136,7 @@ class CommonDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
 
 
 /**
- *  \brief  A dense matrix implementation of MatrixInterface using the a std::vector backend.
+ *  \brief  A dense matrix implementation of MatrixInterface using a std::vector backend.
  */
 template <class ScalarImp = double, Common::StorageLayout storage_layout = Common::StorageLayout::dense_row_major>
 class CommonDenseMatrix
@@ -337,11 +338,17 @@ public:
     using V2 = typename Common::VectorAbstraction<SecondVectorType>;
     static_assert(V1::is_vector && V2::is_vector, "");
     assert(xx.size() == cols() && yy.size() == rows());
-    yy *= ScalarType(0.);
-    for (size_t rr = 0; rr < rows(); ++rr) {
-      V2::set_entry(yy, rr, 0.);
-      for (size_t cc = 0; cc < cols(); ++cc)
-        V2::add_to_entry(yy, rr, get_entry(rr, cc) * V1::get_entry(xx, cc));
+    if (storage_layout == Common::StorageLayout::dense_row_major && V1::is_contiguous) {
+      for (size_t rr = 0; rr < rows(); ++rr)
+        V2::set_entry(yy, rr, std::inner_product(get_ptr(rr), get_ptr(rr + 1), V1::data(xx), ScalarType(0.)));
+    } else {
+      assert(xx.size() == cols() && yy.size() == rows());
+      yy *= ScalarType(0.);
+      for (size_t rr = 0; rr < rows(); ++rr) {
+        V2::set_entry(yy, rr, 0.);
+        for (size_t cc = 0; cc < cols(); ++cc)
+          V2::add_to_entry(yy, rr, get_entry(rr, cc) * V1::get_entry(xx, cc));
+      }
     }
   }
 
