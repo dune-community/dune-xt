@@ -24,11 +24,11 @@ before_script:
     # get image with fallback to master branch of the super repo
     - docker pull dunecommunity/${BASEIMAGE} || export BASEIMAGE="${MY_MODULE}-testing_${DOCKER_TAG}:master" ; docker pull dunecommunity/${BASEIMAGE}
     - docker build --build-arg BASE=${BASEIMAGE} -t ${IMAGE} -f .ci/docker/Dockerfile .
-    
+
     - export ENV_FILE=${HOME}/env
     - python3 ./.travis.make_env_file.py
     - docker inspect ${IMAGE}
-    - export DOCKER_RUN="docker run --env-file ${ENV_FILE} -v ${TRAVIS_BUILD_DIR}:/home/dune-ci/src/dune-xt-la ${IMAGE}"
+    - export DOCKER_RUN="docker run --env-file ${ENV_FILE} ${IMAGE}"
 
 script:
     - ${DOCKER_RUN} /home/dune-ci/src/dune-xt-la/.travis.script.bash
@@ -40,6 +40,10 @@ after_script:
     - docker images ${IMAGE}
     - echo ${DOCKER_RUN}
 
+after_failure:
+    - echo $DOCKER_PW | docker login --username="$DOCKER_USER" --password-stdin
+    - docker push ${IMAGE}
+    - echo "execute\n ${DOCKER_RUN} /home/dune-ci/src/dune-xt-la/.travis.script.bash\n to examine errors"
 
 notifications:
   email:
