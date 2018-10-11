@@ -37,11 +37,11 @@
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/timedlogging.hh>
+#include <dune/xt/grid/filters.hh>
 #include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/functors/generic.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-#include "walker/filters.hh"
 namespace Dune {
 namespace XT {
 
