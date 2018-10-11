@@ -97,6 +97,67 @@ struct IstlSolverTraits<S, SequentialCommunication>
 
 } // namespace internal
 
+
+template <class S, class CommunicatorType>
+class SolverOptions<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
+{
+public:
+  using MatrixType = IstlRowMajorSparseMatrix<S>;
+
+  static std::vector<std::string> types()
+  {
+    std::vector<std::string> ret{
+        "bicgstab.ssor", "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab"};
+
+    if (std::is_same<CommunicatorType, XT::SequentialCommunication>::value) {
+#if HAVE_SUPERLU
+      ret.insert(ret.begin(), "superlu");
+#endif
+#if HAVE_UMFPACK
+      ret.push_back("umfpack");
+#endif
+    }
+    return ret;
+  } // ... types(...)
+
+  static Common::Configuration options(const std::string type = "")
+  {
+    const std::string tp = !type.empty() ? type : types()[0];
+    internal::SolverUtils::check_given(tp, types());
+    Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp.c_str(), "1e-5", "0"});
+    Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
+    iterative_options += general_opts;
+    if (tp.substr(0, 13) == "bicgstab.amg." || tp == "bicgstab") {
+      iterative_options.set("smoother.iterations", "1");
+      iterative_options.set("smoother.relaxation_factor", "1");
+      iterative_options.set("smoother.verbose", "0");
+      iterative_options.set("preconditioner.max_level", "100");
+      iterative_options.set("preconditioner.coarse_target", "1000");
+      iterative_options.set("preconditioner.min_coarse_rate", "1.2");
+      iterative_options.set("preconditioner.prolong_damp", "1.6");
+      iterative_options.set("preconditioner.anisotropy_dim", "2"); // <- this should be the dimDomain of the problem!
+      iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
+      iterative_options.set("preconditioner.verbose", "0");
+      return iterative_options;
+    } else if (tp == "bicgstab.ilut" || tp == "bicgstab.ssor") {
+      iterative_options.set("preconditioner.iterations", "2");
+      iterative_options.set("preconditioner.relaxation_factor", "1.0");
+      return iterative_options;
+#if HAVE_UMFPACK
+    } else if (tp == "umfpack") {
+      return general_opts;
+#endif
+#if HAVE_SUPERLU
+    } else if (tp == "superlu") {
+      return general_opts;
+#endif
+    } else
+      DUNE_THROW(Common::Exceptions::internal_error, "Given solver type '" << tp << "' has no default options");
+    return Common::Configuration();
+  }
+}; // class SolverOptions
+
+
 template <class S, class CommunicatorType>
 class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {

@@ -51,6 +51,19 @@ public:
 } // namespace internal
 
 
+template <class MatrixType, class CommunicatorType = SequentialCommunication>
+class SolverOptions
+{
+  static_assert(AlwaysFalse<MatrixType>::value,
+                "Please implement for given MatrixType and add the respective include below!");
+
+public:
+  static std::vector<std::string> types();
+
+  static Common::Configuration options(const std::string /*type*/ = "");
+}; // class SolverOptions
+
+
 template <class MatrixImp, class CommunicatorType = SequentialCommunication>
 class Solver
 {

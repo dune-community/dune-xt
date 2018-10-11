@@ -33,6 +33,26 @@ namespace LA {
 
 
 template <class S, class CommunicatorType>
+class SolverOptions<CommonDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
+{
+public:
+  using MatrixType = CommonDenseMatrix<S>;
+
+  static std::vector<std::string> types()
+  {
+    return {"qr.householder"};
+  }
+
+  static Common::Configuration options(const std::string type = "")
+  {
+    const std::string tp = !type.empty() ? type : types()[0];
+    internal::SolverUtils::check_given(tp, types());
+    return Common::Configuration({"type", "post_check_solves_system"}, {tp.c_str(), "1e-5"});
+  }
+}; // class SolverOptions<CommonDenseMatrix<...>>
+
+
+template <class S, class CommunicatorType>
 class Solver<CommonDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
