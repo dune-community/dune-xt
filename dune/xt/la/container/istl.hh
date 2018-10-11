@@ -366,6 +366,8 @@ private:
 
 /**
  * \brief A sparse matrix implementation of the MatrixInterface using the Dune::BCRSMatrix from dune-istl.
+ *
+ * \todo Rename to IstlSparseMatrix
  */
 template <class ScalarImp = double>
 class IstlRowMajorSparseMatrix : public MatrixInterface<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>,
