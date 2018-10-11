@@ -153,35 +153,39 @@ typename std::enable_if<is_matrix<M>::value, Solver<M>>::type make_solver(const 
 }
 
 
-template <class M, class V, class... Args>
-typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, void>::type
-solve(const M& A, const V& b, V& x, Args&&... args)
+// template <class M, class V, class... Args>
+// typename std::enable_if<is_matrix<M>::value && is_vector<V>::value, void>::type
+// solve(const M& A, const V& b, V& x, Args&&... args)
+//{
+//  make_solver(A).apply(b, x, std::forward<Args>(args)...);
+//}
+
+
+// template <class M, class C>
+// typename std::enable_if<is_matrix<M>::value, Solver<M, C>>::type make_solver(const M& matrix, const C&
+// dof_comm)
+//{
+//  return Solver<M, C>(matrix, dof_comm);
+//}
+
+
+// template <class M, class V, class C, class... Args>
+// typename std::enable_if<is_matrix<M>::value && is_vector<V>::value, void>::type
+// solve(const M& A, const V& b, V& x, const C& dof_comm, Args&&... args)
+//{
+//  make_solver(A, dof_comm).apply(b, x, std::forward<Args>(args)...);
+//}
+
+
+template <class M, class V>
+typename VectorInterface<V>::derived_type
+solve(const MatrixInterface<M>& A,
+      const VectorInterface<V>& b,
+      const Common::Configuration& opts = SolverOptions<typename MatrixInterface<M>::derived_type>::options())
 {
-  make_solver(A).apply(b, x, std::forward<Args>(args)...);
-}
-
-
-template <class M, class C>
-typename std::enable_if<XT::LA::is_matrix<M>::value, Solver<M, C>>::type make_solver(const M& matrix, const C& dof_comm)
-{
-  return Solver<M, C>(matrix, dof_comm);
-}
-
-
-template <class M, class V, class C, class... Args>
-typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, void>::type
-solve(const M& A, const V& b, V& x, const C& dof_comm, Args&&... args)
-{
-  make_solver(A, dof_comm).apply(b, x, std::forward<Args>(args)...);
-}
-
-
-template <class M, class V, class... Args>
-typename std::enable_if<XT::LA::is_matrix<M>::value && XT::LA::is_vector<V>::value, V>::type
-solve(const M& A, const V& b, Args&&... args)
-{
-  V x(A.cols());
-  solve(A, b, x, std::forward<Args>(args)...);
+  typename VectorInterface<V>::derived_type x(A.cols(), 0.);
+  Solver<typename MatrixInterface<M>::derived_type> solver(A.as_imp());
+  solver.apply(b.as_imp(), x, opts);
   return x;
 }
 
