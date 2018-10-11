@@ -27,31 +27,164 @@
 #include <dune/common/version.hh>
 
 #include <dune/grid/common/rangegenerators.hh>
-
 #if HAVE_TBB
 #include <dune/xt/grid/parallel/partitioning/ranged.hh>
 #endif
+
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/parallel/threadmanager.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/common/timedlogging.hh>
-#include <dune/xt/grid/dd/subdomains/grid.hh>
-#include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/functors/generic.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 #include "walker/filters.hh"
-#include "walker/wrapper.hh"
-
 namespace Dune {
 namespace XT {
 
+
 static const std::function<void()> dxt_void_noop = [](...) {};
 
+
 namespace Grid {
+
+
+// forward
+template <class Gl>
+class Walker;
+
+
+namespace internal {
+
+
+/**
+ * \brief To be used within the Walker as internal storage type.
+ *
+ * \note Most likely you do not want to use this class directly, but instead append() an ElementFunctor to a Walker.
+ *
+ * \sa ElementFunctor
+ * \sa Walker
+ */
+template <class GL>
+class ElementFunctorWrapper
+{
+  static_assert(is_layer<GL>::value, "");
+  using ThisType = ElementFunctorWrapper<GL>;
+
+public:
+  using FunctorType = ElementFunctor<GL>;
+  using FilterType = ElementFilter<GL>;
+
+  ElementFunctorWrapper(FunctorType& functr, const FilterType& filtr)
+    : functor_(functr.copy())
+    , filter_(filtr.copy())
+  {
+  }
+
+  const FilterType& filter() const
+  {
+    return *filter_;
+  }
+
+  FunctorType& functor()
+  {
+    return *functor_;
+  }
+
+private:
+  std::unique_ptr<FunctorType> functor_;
+  const std::unique_ptr<const FilterType> filter_;
+}; // class ElementFunctorWrapper
+
+
+/**
+ * \brief To be used within the \sa Walker as internal storage type.
+ * \note  Most likely you do not want to use this class directly, but instead append() an \sa IntersectionFunctor to a
+ *        Walker.
+ */
+template <class GL>
+class IntersectionFunctorWrapper
+{
+  static_assert(is_layer<GL>::value, "");
+  using ThisType = IntersectionFunctorWrapper<GL>;
+
+public:
+  using FunctorType = IntersectionFunctor<GL>;
+  using FilterType = IntersectionFilter<GL>;
+
+  IntersectionFunctorWrapper(FunctorType& functr, const FilterType& filtr)
+    : functor_(functr.copy())
+    , filter_(filtr.copy())
+  {
+  }
+
+  const FilterType& filter() const
+  {
+    return *filter_;
+  }
+
+  FunctorType& functor()
+  {
+    return *functor_;
+  }
+
+private:
+  std::unique_ptr<FunctorType> functor_;
+  const std::unique_ptr<const FilterType> filter_;
+}; // class IntersectionFunctorWrapper
+
+
+/**
+ * \brief To be used within the \sa Walker as internal storage type.
+ * \note  Most likely you do not want to use this class directly, but instead append() an \sa
+ *        ElementAndIntersectionFunctor to a Walker.
+ */
+template <class GL>
+class ElementAndIntersectionFunctorWrapper
+{
+  static_assert(is_layer<GL>::value, "");
+  using ThisType = ElementAndIntersectionFunctorWrapper<GL>;
+
+public:
+  using FunctorType = ElementAndIntersectionFunctor<GL>;
+  using ElementFilterType = ElementFilter<GL>;
+  using IntersectionFilterType = IntersectionFilter<GL>;
+
+  ElementAndIntersectionFunctorWrapper(FunctorType& functr,
+                                       const ElementFilterType& element_filtr,
+                                       const IntersectionFilterType& intersection_filtr)
+    : functor_(functr.copy())
+    , element_filter_(element_filtr.copy())
+    , intersection_filter_(intersection_filtr.copy())
+  {
+  }
+
+  const ElementFilterType& element_filter() const
+  {
+    return *element_filter_;
+  }
+
+  const IntersectionFilterType& intersection_filter() const
+  {
+    return *intersection_filter_;
+  }
+
+  FunctorType& functor()
+  {
+    return *functor_;
+  }
+
+private:
+  std::unique_ptr<FunctorType> functor_;
+  const std::unique_ptr<const ElementFilterType> element_filter_;
+  const std::unique_ptr<const IntersectionFilterType> intersection_filter_;
+}; // class ElementAndIntersectionFunctorWrapper
+
+
+} // namespace internal
 
 
 template <class GL>
