@@ -147,7 +147,7 @@ public:
 
 
 template <class M>
-typename std::enable_if<XT::LA::is_matrix<M>::value, Solver<M>>::type make_solver(const M& matrix)
+typename std::enable_if<is_matrix<M>::value, Solver<M>>::type make_solver(const M& matrix)
 {
   return Solver<M>(matrix);
 }
