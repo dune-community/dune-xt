@@ -88,11 +88,6 @@ public:
     function_ = std::make_shared<ActualFunctionType>(variables, expression);
   }
 
-  std::string type() const override final
-  {
-    return BaseType::static_id() + ".parametricexpression";
-  }
-
   std::string name() const override final
   {
     return name_;

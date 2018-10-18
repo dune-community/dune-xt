@@ -41,30 +41,14 @@ public:
     return BaseType::static_id() + ".constant";
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
     config["type"] = static_id();
     config["value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = "")
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    return Common::make_unique<ThisType>(cfg.get<RangeReturnType>("value"),
-                                         cfg.get("name", default_cfg.get<std::string>("name")));
-  } // ... create(...)
+    return config;
+  } // ... defaults(...)
 
   explicit ConstantFunction(const RangeReturnType& constant, const std::string name_in = static_id())
     : constant_(constant)
@@ -102,11 +86,6 @@ public:
   std::string name() const override final
   {
     return name_;
-  }
-
-  std::string type() const override final
-  {
-    return BaseType::static_id() + ".constant";
   }
 
   const RangeReturnType constant_;

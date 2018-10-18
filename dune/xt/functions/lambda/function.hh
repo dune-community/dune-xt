@@ -105,11 +105,6 @@ public:
     return derivative_lambda_(alpha, point_in_global_coordinates, this->parse_parameter(param));
   }
 
-  std::string type() const override final
-  {
-    return "smooth_lambda_function";
-  }
-
   std::string name() const override final
   {
     return name_;

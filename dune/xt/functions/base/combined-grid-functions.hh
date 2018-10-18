@@ -416,12 +416,6 @@ public:
     return Common::make_unique<RealLocalFunctionType>(left_->access(), right_->access());
   } // ... local_function(...)
 
-  std::string type() const override final
-  {
-    return SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left_->access().type() + "' and '"
-           + right_->access().type() + "'";
-  } // ... type(...)
-
   std::string name() const override final
   {
     return name_;

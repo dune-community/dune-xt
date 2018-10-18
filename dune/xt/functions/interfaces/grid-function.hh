@@ -123,11 +123,6 @@ public:
    * \{
    */
 
-  virtual std::string type() const
-  {
-    return "dune.xt.functions.gridfunction";
-  }
-
   virtual std::string name() const
   {
     return "dune.xt.functions.gridfunction";

@@ -64,33 +64,15 @@ public:
     return BaseType::static_id() + ".ESV2007.testcase1.force";
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
-    config["type"] = static_id();
     config["integration_order"] = "3";
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
+    return config;
+  } // ... defaults(...)
 
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    // create
-    return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<int>("integration_order")),
-                                         cfg.get("name", default_cfg.get<std::string>("name")));
-  } // ... create(...)
-
-  Testcase1Force(const size_t ord = default_config().template get<int>("integration_order"),
+  Testcase1Force(const size_t ord = defaults().template get<int>("integration_order"),
                  const std::string nm = static_id())
     : order_(ord)
     , name_(nm)
@@ -100,11 +82,6 @@ public:
   Testcase1Force(const ThisType& /*other*/) = default;
 
   ThisType& operator=(const ThisType& /*other*/) = delete;
-
-  std::string type() const override final
-  {
-    return BaseType::static_id() + ".ESV2007.testcase1.force";
-  }
 
   std::string name() const override final
   {
@@ -174,33 +151,15 @@ public:
     return BaseType::static_id() + ".ESV2007.testcase1.exactsolution";
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
-    config["type"] = static_id();
     config["integration_order"] = "3";
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
+    return config;
+  } // ... defaults(...)
 
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = static_id())
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    // create
-    return Common::make_unique<ThisType>(cfg.get("integration_order", default_cfg.get<int>("integration_order")),
-                                         cfg.get("name", default_cfg.get<std::string>("name")));
-  } // ... create(...)
-
-  Testcase1ExactSolution(const size_t ord = default_config().template get<int>("integration_order"),
+  Testcase1ExactSolution(const size_t ord = defaults().template get<int>("integration_order"),
                          const std::string nm = static_id())
     : order_(ord)
     , name_(nm)
@@ -210,11 +169,6 @@ public:
   Testcase1ExactSolution(const ThisType& /*other*/) = default;
 
   ThisType& operator=(const ThisType& /*other*/) = delete;
-
-  std::string type() const override final
-  {
-    return BaseType::static_id() + ".ESV2007.testcase1.exactsolution";
-  }
 
   std::string name() const override final
   {

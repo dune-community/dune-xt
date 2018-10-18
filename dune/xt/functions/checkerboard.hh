@@ -21,6 +21,7 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
+
 /**
  * Note: This function does not allow for functions on the subdomains anymore. Only constant values are possible.
  */
@@ -143,47 +144,16 @@ public:
     return BaseType::static_id() + ".checkerboard";
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
-    config["type"] = static_id();
     config["lower_left"] = "[0.0 0.0 0.0]";
     config["upper_right"] = "[1.0 1.0 1.0]";
     config["num_elements"] = "[2 2 2]";
     config["values"] = "[1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0]";
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  }
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = "")
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration def_cfg = default_config();
-    // calculate number of values and get values
-    auto num_elements =
-        cfg.get("num_elements", def_cfg.get<Common::FieldVector<size_t, domain_dim>>("num_elements"), domain_dim);
-    size_t num_values = 1;
-    for (size_t ii = 0; ii < num_elements.size(); ++ii)
-      num_values *= num_elements[ii];
-    std::vector<RangeType> values;
-    auto values_range = cfg.get("values", def_cfg.get<std::vector<R>>("values"), num_values);
-    for (size_t ii = 0; ii < values_range.size(); ++ii)
-      values.emplace_back(values_range[ii]);
-    // create
-    return Common::make_unique<ThisType>(cfg.get("lower_left", def_cfg.get<DomainType>("lower_left"), domain_dim),
-                                         cfg.get("upper_right", def_cfg.get<DomainType>("upper_right"), domain_dim),
-                                         std::move(num_elements),
-                                         std::move(values),
-                                         cfg.get("name", def_cfg.get<std::string>("name")));
-  } // ... create(...)
+    return config;
+  } // ... defaults(...)
 
   CheckerboardFunction(const DomainType& lower_left,
                        const DomainType& upper_right,
@@ -218,11 +188,6 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& source) = delete;
-
-  std::string type() const override
-  {
-    return BaseType::static_id() + ".checkerboard";
-  }
 
   std::string name() const override
   {
@@ -281,9 +246,9 @@ private:
   std::string name_;
 }; // class CheckerboardFunction
 
+
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
-
 
 #endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_HH

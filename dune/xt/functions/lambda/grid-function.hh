@@ -200,11 +200,6 @@ public:
     return param_type_;
   }
 
-  std::string type() const override final
-  {
-    return "locallambdafunction";
-  }
-
   std::string name() const override final
   {
     return name_;

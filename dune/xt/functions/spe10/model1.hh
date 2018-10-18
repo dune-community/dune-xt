@@ -87,10 +87,9 @@ private:
   } // ... read_values_from_file(...)
 
 public:
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
-    config["type"] = static_id();
     config["filename"] = internal::model1_filename;
     config["lower_left"] = "[0.0 0.0]";
     config["upper_right"] =
@@ -98,29 +97,8 @@ public:
     config.set("min_value", internal::model1_min_value);
     config.set("max_value", internal::model1_max_value);
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  template <class DerivedType>
-  static std::unique_ptr<DerivedType> create_derived(const Common::Configuration config, const std::string sub_name)
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    // create
-    return Common::make_unique<DerivedType>(cfg.get("filename", default_cfg.get<std::string>("filename")),
-                                            cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
-                                            cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
-                                            cfg.get("min_value", default_cfg.get<RangeFieldType>("min_value")),
-                                            cfg.get("max_value", default_cfg.get<RangeFieldType>("max_value")),
-                                            cfg.get("name", default_cfg.get<std::string>("name")));
-  } // ... create(...)
+    return config;
+  } // ... defaults(...)
 
   Model1Base(const std::string& filename,
              const DomainType& lowerLeft,
@@ -135,11 +113,6 @@ public:
                read_values_from_file(filename, min, max, unit_range),
                nm)
   {
-  }
-
-  virtual std::string type() const override
-  {
-    return BaseType::static_id() + ".spe10.model1";
   }
 }; // class Model1Base
 
@@ -172,12 +145,6 @@ public:
   static const constexpr size_t domain_dim = E::dimension;
   using RangeFieldType = typename BaseType::RangeFieldType;
   using RangeType = typename BaseType::RangeType;
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = BaseType::default_config(),
-                                          const std::string sub_name = BaseType::static_id())
-  {
-    return BaseType::template create_derived<ThisType>(config, sub_name);
-  } // ... create(...)
 
   Model1Function(const std::string& filename,
                  const Common::FieldVector<DomainFieldType, domain_dim>& lower_left,

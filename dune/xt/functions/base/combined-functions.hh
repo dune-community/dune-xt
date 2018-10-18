@@ -325,12 +325,6 @@ public:
 
   ThisType& operator=(ThisType&& other) = delete;
 
-  std::string type() const override final
-  {
-    return SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().type() + "' and '"
-           + right_->access().type() + "'";
-  } // ... type(...)
-
   std::string name() const override final
   {
     return name_;

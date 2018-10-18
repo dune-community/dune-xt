@@ -249,11 +249,6 @@ public:
 
   ThisType& operator=(ThisType&& source) = delete;
 
-  virtual std::string type() const override
-  {
-    return BaseType::static_id() + ".composition";
-  }
-
   virtual std::string name() const override
   {
     return name_;

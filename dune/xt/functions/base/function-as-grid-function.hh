@@ -66,11 +66,6 @@ public:
    * \{
    **/
 
-  std::string type() const override final
-  {
-    return function_storage_.access().type();
-  }
-
   std::string name() const override final
   {
     return function_storage_.access().name();

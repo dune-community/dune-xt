@@ -32,7 +32,6 @@ namespace Functions {
  * \note We have a specialization for the other case on purpose, disabling all ctors and using helpers got too
  * complicated!
  */
-
 template <size_t d, size_t r = 1, size_t rC = 1, class RangeField = double>
 class ExpressionFunction : public FunctionInterface<d, r, rC, RangeField>
 {
@@ -56,10 +55,9 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration default_config()
   {
     Common::Configuration config;
-    config["type"] = static_id();
     config["variable"] = "x";
     config["expression"] = "[x[0] sin(x[0]*pi) exp(x[0]); x[0] sin(x[0]*pi) exp(x[0]); x[0] sin(x[0]*pi) exp(x[0])]";
     // seperation for range
@@ -68,53 +66,8 @@ public:
     config["gradient.2"] = "[1 0 0; pi*cos(x[0]*pi) 0 0; exp(x[0]) 0 0]";
     config["order"] = "3";
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
+    return config;
   } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = "")
-  {
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-
-    try {
-      if (cfg.has_sub("gradient")) {
-        Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r> gradient(
-            Common::FieldMatrix<std::string, rC, d>(""));
-        const Common::Configuration gradient_cfg = cfg.sub("gradient");
-        for (size_t ii = 0; ii < r; ++ii)
-          gradient[ii] = gradient_cfg.get<Common::FieldMatrix<std::string, rC, d>>(Common::to_string(ii));
-        return Common::make_unique<ThisType>(cfg.get<std::string>("variable"),
-                                             cfg.get<Common::FieldMatrix<std::string, r, rC>>("expression"),
-                                             gradient,
-                                             cfg.get<size_t>("order"),
-                                             cfg.get("name", default_cfg.get<std::string>("name")));
-      } else {
-        return Common::make_unique<ThisType>(cfg.get("variable", default_cfg.get<std::string>("variable")),
-                                             cfg.get<Common::FieldMatrix<std::string, r, rC>>("expression"),
-                                             cfg.get("order", default_cfg.get<size_t>("order")),
-                                             cfg.get("name", default_cfg.get<std::string>("name")));
-      }
-    } catch (const Common::Exceptions::configuration_error& ee) {
-      DUNE_THROW(Exceptions::wrong_input_given,
-                 "Given configuration was insufficient (see below)."
-                     << "\n"
-                     << "Note: if you only want to provide a gradient you still need to provide a dummy expression."
-                     << "\n\n"
-                     << "This was the original error: \n"
-                     << ee.what()
-                     << "\n\nThis would be a suitable default config:\n\n"
-                     << default_config());
-    }
-
-
-  } // ... create(...)
 
 private:
   // This function is required because MathExpressionFunctionBase is only valid for a scalar or vector
@@ -127,7 +80,6 @@ private:
     }
     return ret;
   }
-
 
 public:
   /**
@@ -150,7 +102,6 @@ public:
    * FunctionType function("x", {{"1", "sin(x[0])"}, {"2", "x[1]"}}, {{{"0", "0"}, {"cos(x[0])", "0"}}, {{"0", "0"},
    {"0", "1"}}}, 3);
    */
-
   ExpressionFunction(const std::string& variable,
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
@@ -167,7 +118,6 @@ public:
    * @brief ExpressionFunction without given gradient
    *
    */
-
   ExpressionFunction(const std::string& variable,
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const size_t ord,
@@ -189,11 +139,6 @@ public:
       gradients_ = other.gradients_;
     }
     return *this;
-  }
-
-  std::string type() const override final
-  {
-    return BaseType::static_id() + ".expression";
   }
 
   std::string name() const override final
@@ -435,11 +380,6 @@ public:
       gradients_ = other.gradients_;
     }
     return *this;
-  }
-
-  std::string type() const override final
-  {
-    return BaseType::static_id() + ".expression";
   }
 
   std::string name() const override final

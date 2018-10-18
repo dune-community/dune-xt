@@ -239,11 +239,6 @@ public:
     DUNE_THROW(NotImplemented, "Are you kidding me?");
   }
 
-  virtual std::string type() const override final
-  {
-    return SelectDerived<FunctionType, derivative>::type() + " of '" + func_->access().type() + "'";
-  }
-
   virtual std::string name() const override final
   {
     return name_;

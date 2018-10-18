@@ -114,7 +114,7 @@ private:
 
 
 public:
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
     config["type"] = static_id();
@@ -127,30 +127,8 @@ public:
                                    + Common::to_string(internal::model2_y_elements) + " "
                                    + Common::to_string(internal::model2_z_elements) + "]";
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = ThisType::default_config(),
-                                          const std::string sub_name = ThisType::static_id())
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-    // create
-    return Common::make_unique<ThisType>(
-        cfg.get("filename", default_cfg.get<std::string>("filename")),
-        cfg.get("lower_left", default_cfg.get<DomainType>("lower_left")),
-        cfg.get("upper_right", default_cfg.get<DomainType>("upper_right")),
-        cfg.get("number_of_elements", default_cfg.get<Common::FieldVector<size_t, domain_dim>>("number_of_elements")),
-        cfg.get("name", default_cfg.get<std::string>("name")));
-  } // ... create(...)
-
+    return config;
+  } // ... defaults(...)
 
   Model2Function(const std::string& filename,
                  const Common::FieldVector<DomainFieldType, domain_dim>& lower_left,
@@ -163,12 +141,6 @@ public:
 
   {
   }
-
-  virtual std::string type() const override
-  {
-    return BaseType::static_id() + ".spe10.model2";
-  }
-
 }; // class Model2Function
 
 

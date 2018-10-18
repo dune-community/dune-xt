@@ -69,11 +69,6 @@ public:
     return std::make_unique<ReinterpretLocalfunction>(source_, source_grid_view_);
   }
 
-  std::string type() const
-  {
-    return BaseType::type() + ".reinterpret";
-  }
-
   std::string name() const
   {
     return BaseType::name() + ".reinterpret";

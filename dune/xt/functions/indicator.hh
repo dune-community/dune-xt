@@ -105,7 +105,7 @@ public:
     return BaseType::static_id() + ".indicator";
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
     config["type"] = static_id();
@@ -114,40 +114,8 @@ public:
     config["1.domain"] = "[-1 0.5; -1 0.5; -1 0.5]";
     config["1.value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
     config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Common::Configuration tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = "")
-  {
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration def_cfg = default_config();
-    std::vector<std::tuple<DomainType, DomainType, RangeType>> values;
-    DomainType tmp_lower;
-    DomainType tmp_upper;
-    size_t cc = 0;
-    while (cfg.has_sub(Common::to_string(cc))) {
-      const Common::Configuration local_cfg = cfg.sub(Common::to_string(cc));
-      if (local_cfg.has_key("domain") && local_cfg.has_key("value")) {
-        auto domains = local_cfg.get<FieldMatrix<D, d, 2>>("domain");
-        for (size_t dd = 0; dd < d; ++dd) {
-          tmp_lower[dd] = domains[dd][0];
-          tmp_upper[dd] = domains[dd][1];
-        }
-        auto val = local_cfg.get<RangeType>("value");
-        values.emplace_back(tmp_lower, tmp_upper, val);
-      } else
-        break;
-      ++cc;
-    }
-    return Common::make_unique<ThisType>(values, cfg.get("name", def_cfg.get<std::string>("name")));
-  } // ... create(...)
+    return config;
+  } // ... defaults(...)
 
   /**
    *        Can be used for declaration of lower left corner and upper right corner of the desired domains.
@@ -155,7 +123,6 @@ public:
 FunctionType function({{lowerleft_1, upperright_1, value_1}, {lowerleft_2, upperright_2, value_2}});
 \endcode
    */
-
   IndicatorGridFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& values,
                         const std::string name_in = "indicator")
     : subdomain_and_value_tuples_(values)
@@ -239,11 +206,6 @@ public:
   int order(const XT::Common::Parameter& /*param*/ = {}) const override final
   {
     return 0;
-  }
-
-  std::string type() const override final
-  {
-    return "dune.xt.functions.indicatorfunction";
   }
 
   static std::string static_id()

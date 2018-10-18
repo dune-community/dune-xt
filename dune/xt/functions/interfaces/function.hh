@@ -152,11 +152,6 @@ public:
                "This function does not provide arbitrary derivatives, override the 'derivative' method!");
   }
 
-  virtual std::string type() const
-  {
-    return "dune.xt.functions.function";
-  }
-
   static std::string static_id()
   {
     return "dune.xt.functions.function";
@@ -166,7 +161,6 @@ public:
   {
     return "dune.xt.functions.function";
   }
-
 
   /**
    * \}
