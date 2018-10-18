@@ -9,8 +9,8 @@
 //   Rene Milk       (2018)
 //   Tobias Leibner  (2017)
 
-#ifndef DUNE_XT_FUNCTIONS_LAMBDA_GRID_FUNCTION_HH
-#define DUNE_XT_FUNCTIONS_LAMBDA_GRID_FUNCTION_HH
+#ifndef DUNE_XT_FUNCTIONS_GENERIC_GRID_FUNCTION_HH
+#define DUNE_XT_FUNCTIONS_GENERIC_GRID_FUNCTION_HH
 
 #include <functional>
 
@@ -26,11 +26,11 @@ namespace Functions {
 
 
 /**
- * \brief A function given by a lambda expression which is evaluated locally on each element.
+ * \brief A function given by a lambda expression or std::function which is evaluated locally on each element.
  *
  *        To model the function f(x) = x^p with a variable exponent p, use as
  * \code
-LocalLambdaFunction<...> f(
+GenericGridFunction<...> f(
                            [](const typename F::ElementType& element,
                               const typename F::DomainType& point_in_local_coordinates,
                               const XT::Common::Parameter&  param) {
@@ -42,12 +42,12 @@ param.get("power").at(0)));
                            XT::Common::ParameterType("power", 1),
                            "x_power_p");
 \endcode
- *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter  param which is
- *        passed on to the lambda is of correct type.
+ *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter param which is
+ *        passed on to the generic function is of correct type.
  * \note  The Localfunction does not implement derivative.
  */
 template <class E, size_t r, size_t rC = 1, class R = double>
-class LocalLambdaFunction : public GridFunctionInterface<E, r, rC, R>
+class GenericGridFunction : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
 
@@ -56,7 +56,7 @@ public:
   using typename BaseType::LocalFunctionType;
 
 private:
-  class LocalLambdaLocalFunction : public ElementFunctionInterface<E, r, rC, R>
+  class LocalGenericGridFunction : public ElementFunctionInterface<E, r, rC, R>
   {
     using BaseType = ElementFunctionInterface<E, r, rC, R>;
 
@@ -70,55 +70,55 @@ private:
 
     using BaseType::d;
 
-    using EvaluateLambdaType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
-    using PostBindLambdaType = std::function<void(const ElementType&)>;
-    using OrderLambdaType = std::function<int(const Common::Parameter&)>;
-    using JacobianLambdaType =
+    using GenericEvaluateFunctionType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
+    using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
+    using GenericOrderFunctionType = std::function<int(const Common::Parameter&)>;
+    using GenericJacobianFunctionType =
         std::function<DerivativeRangeReturnType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
-    using DerivativeLambdaType = std::function<DerivativeRangeReturnType(
+    using GenericDerivativeFunctionType = std::function<DerivativeRangeReturnType(
         const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
-    LocalLambdaLocalFunction(const OrderLambdaType& order_lambda,
-                             const PostBindLambdaType& post_bind_lambda,
-                             const EvaluateLambdaType& lambda,
+    LocalGenericGridFunction(const GenericOrderFunctionType& order_func,
+                             const GenericPostBindFunctionType& post_bind_func,
+                             const GenericEvaluateFunctionType& evalaute_func,
                              const Common::ParameterType& param_type,
-                             const JacobianLambdaType& jacobian_lambda,
-                             const DerivativeLambdaType& derivative_lambda)
+                             const GenericJacobianFunctionType& jacobian_func,
+                             const GenericDerivativeFunctionType& derivative_func)
       : BaseType()
-      , order_lambda_(order_lambda)
-      , post_bind_lambda_(post_bind_lambda)
-      , evaluate_lambda_(lambda)
+      , order_(order_func)
+      , post_bind_(post_bind_func)
+      , evaluate_(evalaute_func)
       , param_type_(param_type)
-      , jacobian_lambda_(jacobian_lambda)
-      , derivative_lambda_(derivative_lambda)
+      , jacobian_(jacobian_func)
+      , derivative_(derivative_func)
     {
     }
 
   protected:
     void post_bind(const ElementType& element) override final
     {
-      post_bind_lambda_(element);
+      post_bind_(element);
     }
 
   public:
     int order(const XT::Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return order_lambda_(parsed_param);
+      return order_(parsed_param);
     }
 
     RangeReturnType evaluate(const DomainType& point_in_local_coordinates,
                              const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return evaluate_lambda_(point_in_local_coordinates, parsed_param);
+      return evaluate_(point_in_local_coordinates, parsed_param);
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
                                        const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return jacobian_lambda_(this->element(), point_in_local_coordinates, parsed_param);
+      return jacobian_(this->element(), point_in_local_coordinates, parsed_param);
     }
 
     DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
@@ -126,7 +126,7 @@ private:
                                          const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return derivative_lambda_(this->element(), alpha, point_in_local_coordinates, parsed_param);
+      return derivative_(this->element(), alpha, point_in_local_coordinates, parsed_param);
     }
 
 
@@ -136,62 +136,62 @@ private:
     }
 
   private:
-    const OrderLambdaType& order_lambda_;
-    const PostBindLambdaType& post_bind_lambda_;
-    const EvaluateLambdaType& evaluate_lambda_;
-    const Common::ParameterType param_type_;
-    const JacobianLambdaType& jacobian_lambda_;
-    const DerivativeLambdaType& derivative_lambda_;
-  }; // class LocalLambdaLocalFunction
+    const GenericOrderFunctionType& order_;
+    const GenericPostBindFunctionType& post_bind_;
+    const GenericEvaluateFunctionType& evaluate_;
+    const Common::ParameterType& param_type_;
+    const GenericJacobianFunctionType& jacobian_;
+    const GenericDerivativeFunctionType& derivative_;
+  }; // class LocalGenericGridFunction
 
 public:
   using BaseType::d;
-  using DomainType = typename LocalLambdaLocalFunction::DomainType;
-  using RangeType = typename LocalLambdaLocalFunction::RangeType;
-  using DerivativeRangeType = typename LocalLambdaLocalFunction::DerivativeRangeType;
-  using RangeReturnType = typename LocalLambdaLocalFunction::RangeReturnType;
-  using DerivativeRangeReturnType = typename LocalLambdaLocalFunction::DerivativeRangeReturnType;
+  using DomainType = typename LocalGenericGridFunction::DomainType;
+  using RangeType = typename LocalGenericGridFunction::RangeType;
+  using DerivativeRangeType = typename LocalGenericGridFunction::DerivativeRangeType;
+  using RangeReturnType = typename LocalGenericGridFunction::RangeReturnType;
+  using DerivativeRangeReturnType = typename LocalGenericGridFunction::DerivativeRangeReturnType;
 
-  // we do not use the typedef from LocalLambdaLocalFunction here to document the type of the lambda
-  using OrderLambdaType = std::function<int(const Common::Parameter&)>;
-  using PostBindLambdaType = std::function<void(const ElementType&)>;
-  using EvaluateLambdaType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
-  using JacobianLambdaType =
+  // we do not use the typedef from LocalGenericGridFunction here to document the type of the generic functions
+  using GenericOrderFunctionType = std::function<int(const Common::Parameter&)>;
+  using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
+  using GenericEvaluateFunctionType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
+  using GenericJacobianFunctionType =
       std::function<DerivativeRangeReturnType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
-  using DerivativeLambdaType = std::function<DerivativeRangeReturnType(
+  using GenericDerivativeFunctionType = std::function<DerivativeRangeReturnType(
       const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
-  LocalLambdaFunction(const int ord,
-                      PostBindLambdaType post_bind_lambda = default_post_bind_lambda(),
-                      EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
+  GenericGridFunction(const int ord,
+                      GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
+                      GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "locallambdafunction",
-                      JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
-                      DerivativeLambdaType derivative_lambda = default_derivative_lambda())
-    : order_lambda_(default_order_lambda(ord))
-    , post_bind_lambda_(post_bind_lambda)
-    , evaluate_lambda_(evaluate_lambda)
+                      const std::string nm = "GenericGridFunction",
+                      GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
+                      GenericDerivativeFunctionType derivative_func = default_derivative_function())
+    : order_(default_order_lambda(ord))
+    , post_bind_(post_bind_func)
+    , evaluate_(evaluate_func)
     , param_type_(param_type)
     , name_(nm)
-    , jacobian_lambda_(jacobian_lambda)
-    , derivative_lambda_(derivative_lambda)
+    , jacobian_(jacobian_func)
+    , derivative_(derivative_func)
   {
   }
 
-  LocalLambdaFunction(OrderLambdaType order_lambda,
-                      PostBindLambdaType post_bind_lambda = default_post_bind_lambda(),
-                      EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
+  GenericGridFunction(GenericOrderFunctionType order_func,
+                      GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
+                      GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
-                      const std::string nm = "locallambdafunction",
-                      JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
-                      DerivativeLambdaType derivative_lambda = default_derivative_lambda())
-    : order_lambda_(order_lambda)
-    , post_bind_lambda_(post_bind_lambda)
-    , evaluate_lambda_(evaluate_lambda)
+                      const std::string nm = "GenericGridFunction",
+                      GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
+                      GenericDerivativeFunctionType derivative_func = default_derivative_function())
+    : order_(order_func)
+    , post_bind_(post_bind_func)
+    , evaluate_(evaluate_func)
     , param_type_(param_type)
     , name_(nm)
-    , jacobian_lambda_(jacobian_lambda)
-    , derivative_lambda_(derivative_lambda)
+    , jacobian_(jacobian_func)
+    , derivative_(derivative_func)
   {
   }
 
@@ -207,8 +207,8 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<LocalLambdaLocalFunction>(
-        order_lambda_, post_bind_lambda_, evaluate_lambda_, param_type_, jacobian_lambda_, derivative_lambda_);
+    return std::make_unique<LocalGenericGridFunction>(
+        order_, post_bind_, evaluate_, param_type_, jacobian_, derivative_);
   }
 
   /**
@@ -217,42 +217,42 @@ public:
    * \{
    */
 
-  static OrderLambdaType default_order_lambda(const int ord)
+  static GenericOrderFunctionType default_order_lambda(const int ord)
   {
     return [=](const Common::Parameter& /*param*/ = {}) { return ord; };
   }
 
-  static PostBindLambdaType default_post_bind_lambda()
+  static GenericPostBindFunctionType default_post_bind_function()
   {
     return [](const ElementType& /*element*/) {};
   }
 
-  static EvaluateLambdaType default_evaluate_lambda()
+  static GenericEvaluateFunctionType default_evaluate_function()
   {
     return [](const DomainType& /* point_in_local_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This  LocalLambdaFunction does not provide evaluations, provide an evaluate_lambda on construction!");
+                 "This GenericGridFunction does not provide evaluations, provide an evaluate_lambda on construction!");
       return RangeType();
     };
   }
 
-  static JacobianLambdaType default_jacobian_lambda()
+  static GenericJacobianFunctionType default_jacobian_function()
   {
     return [](const DomainType& /* point_in_local_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This  LocalLambdaFunction does not provide jacobian evaluations, provide a "
+                 "This GenericGridFunction does not provide jacobian evaluations, provide a "
                  "jacobian_lambda on construction!");
       return DerivativeRangeReturnType();
     };
   }
 
-  static DerivativeLambdaType default_derivative_lambda()
+  static GenericDerivativeFunctionType default_derivative_function()
   {
     return [](const std::array<size_t, d>& /*alpha*/,
               const DomainType& /* point_in_local_coordinates*/,
               const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This  LocalLambdaFunction does not provide derivative evaluations, provide a "
+                 "This GenericGridFunction does not provide derivative evaluations, provide a "
                  "derivative_lambda on construction!");
       return DerivativeRangeReturnType();
     };
@@ -263,14 +263,14 @@ public:
    */
 
 private:
-  const OrderLambdaType order_lambda_;
-  const PostBindLambdaType post_bind_lambda_;
-  const EvaluateLambdaType evaluate_lambda_;
+  const GenericOrderFunctionType order_;
+  const GenericPostBindFunctionType post_bind_;
+  const GenericEvaluateFunctionType evaluate_;
   const Common::ParameterType param_type_;
   const std::string name_;
-  JacobianLambdaType jacobian_lambda_;
-  DerivativeLambdaType derivative_lambda_;
-}; // class LocalLambdaFunction
+  GenericJacobianFunctionType jacobian_;
+  GenericDerivativeFunctionType derivative_;
+}; // class GenericGridFunction
 
 
 } // namespace Functions

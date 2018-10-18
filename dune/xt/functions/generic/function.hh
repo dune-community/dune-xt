@@ -10,8 +10,8 @@
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014, 2017)
 
-#ifndef DUNE_XT_FUNCTIONS_LAMBDA_FUNCTION_HH
-#define DUNE_XT_FUNCTIONS_LAMBDA_FUNCTION_HH
+#ifndef DUNE_XT_FUNCTIONS_GENRIC_FUNCTION_HH
+#define DUNE_XT_FUNCTIONS_GENRIC_FUNCTION_HH
 
 #include <functional>
 
@@ -25,12 +25,12 @@ namespace Functions {
 
 
 /**
- * Smooth function you can pass lambda expressions to that gets evaluated.
+ * Smooth function you can pass lambda expressions or std::functions to that gets evaluated.
  *
  * \example LambdaType lambda(1, [](const auto& x, const auto& param = {}) { return x;});
  */
 template <size_t domain_dim, size_t range_dim = 1, size_t range_dim_cols = 1, class RangeField = double>
-class LambdaFunction : public FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>
+class GenericFunction : public FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>
 {
   using BaseType = FunctionInterface<domain_dim, range_dim, range_dim_cols, RangeField>;
 
@@ -40,38 +40,39 @@ public:
   using typename BaseType::RangeReturnType;
   using typename BaseType::DerivativeRangeReturnType;
 
-  using OrderLambdaType = std::function<int(const Common::Parameter&)>;
-  using EvaluateLambdaType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
-  using JacobianLambdaType = std::function<DerivativeRangeReturnType(const DomainType&, const Common::Parameter&)>;
-  using DerivativeLambdaType = std::function<DerivativeRangeReturnType(
+  using GenericOrderFunctionType = std::function<int(const Common::Parameter&)>;
+  using GenericEvaluateFunctionType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
+  using GenericJacobianFunctionType =
+      std::function<DerivativeRangeReturnType(const DomainType&, const Common::Parameter&)>;
+  using GenericDerivativeFunctionType = std::function<DerivativeRangeReturnType(
       const std::array<size_t, d>&, const DomainType&, const Common::Parameter&)>;
 
-  LambdaFunction(OrderLambdaType order_lambda,
-                 EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
-                 const std::string nm = "smooth_lambda_function",
-                 const Common::ParameterType& param_type = {},
-                 JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
-                 DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+  GenericFunction(GenericOrderFunctionType order_func,
+                  GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
+                  const std::string nm = "smooth_lambda_function",
+                  const Common::ParameterType& param_type = {},
+                  GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
+                  GenericDerivativeFunctionType derivative_func = default_derivative_function())
     : BaseType(param_type)
-    , order_lambda_(order_lambda)
-    , evaluate_lambda_(evaluate_lambda)
-    , jacobian_lambda_(jacobian_lambda)
-    , derivative_lambda_(derivative_lambda)
+    , order_(order_func)
+    , evaluate_(evaluate_func)
+    , jacobian_(jacobian_func)
+    , derivative_(derivative_func)
     , name_(nm)
   {
   }
 
-  LambdaFunction(int ord,
-                 EvaluateLambdaType evaluate_lambda = default_evaluate_lambda(),
-                 const std::string nm = "smooth_lambda_function",
-                 const Common::ParameterType& param_type = {},
-                 JacobianLambdaType jacobian_lambda = default_jacobian_lambda(),
-                 DerivativeLambdaType derivative_lambda = default_derivative_lambda())
+  GenericFunction(int ord,
+                  GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
+                  const std::string nm = "smooth_lambda_function",
+                  const Common::ParameterType& param_type = {},
+                  GenericJacobianFunctionType jacobian_lambda = default_jacobian_function(),
+                  GenericDerivativeFunctionType derivative_lambda = default_derivative_function())
     : BaseType(param_type)
-    , order_lambda_([=](const auto& /*param*/) { return ord; })
-    , evaluate_lambda_(evaluate_lambda)
-    , jacobian_lambda_(jacobian_lambda)
-    , derivative_lambda_(derivative_lambda)
+    , order_([=](const auto& /*param*/) { return ord; })
+    , evaluate_(evaluate_lambda)
+    , jacobian_(jacobian_lambda)
+    , derivative_(derivative_lambda)
     , name_(nm)
   {
   }
@@ -83,26 +84,26 @@ public:
 
   int order(const Common::Parameter& param = {}) const override final
   {
-    return order_lambda_(this->parse_parameter(param));
+    return order_(this->parse_parameter(param));
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
                            const Common::Parameter& param = {}) const override final
   {
-    return evaluate_lambda_(point_in_global_coordinates, this->parse_parameter(param));
+    return evaluate_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
                                      const Common::Parameter& param = {}) const override final
   {
-    return jacobian_lambda_(point_in_global_coordinates, this->parse_parameter(param));
+    return jacobian_(point_in_global_coordinates, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                        const DomainType& point_in_global_coordinates,
                                        const Common::Parameter& param = {}) const override final
   {
-    return derivative_lambda_(alpha, point_in_global_coordinates, this->parse_parameter(param));
+    return derivative_(alpha, point_in_global_coordinates, this->parse_parameter(param));
   }
 
   std::string name() const override final
@@ -116,32 +117,32 @@ public:
    * \{
    */
 
-  static EvaluateLambdaType default_evaluate_lambda()
+  static GenericEvaluateFunctionType default_evaluate_function()
   {
     return [](const DomainType& /*point_in_global_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This LambdaFunction does not provide evaluations, provide an evaluate_lambda on construction!");
+                 "This GenericFunction does not provide evaluations, provide an evaluate_lambda on construction!");
       return RangeReturnType();
     };
   }
 
-  static JacobianLambdaType default_jacobian_lambda()
+  static GenericJacobianFunctionType default_jacobian_function()
   {
     return [](const DomainType& /*point_in_global_coordinates*/, const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This LambdaFunction does not provide jacobian evaluations, provide a "
+                 "This GenericFunction does not provide jacobian evaluations, provide a "
                  "jacobian_lambda on construction!");
       return DerivativeRangeReturnType();
     };
   }
 
-  static DerivativeLambdaType default_derivative_lambda()
+  static GenericDerivativeFunctionType default_derivative_function()
   {
     return [](const std::array<size_t, d>& /*alpha*/,
               const DomainType& /*point_in_global_coordinates*/,
               const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This LambdaFunction does not provide derivative evaluations, provide a "
+                 "This GenericFunction does not provide derivative evaluations, provide a "
                  "derivative_lambda on construction!");
       return DerivativeRangeReturnType();
     };
@@ -151,12 +152,12 @@ public:
    * \}
    */
 
-  const OrderLambdaType order_lambda_;
-  const EvaluateLambdaType evaluate_lambda_;
-  const JacobianLambdaType jacobian_lambda_;
-  const DerivativeLambdaType derivative_lambda_;
+  const GenericOrderFunctionType order_;
+  const GenericEvaluateFunctionType evaluate_;
+  const GenericJacobianFunctionType jacobian_;
+  const GenericDerivativeFunctionType derivative_;
   const std::string name_;
-}; // class LambdaFunction
+}; // class GenericFunction
 
 
 } // namespace Functions
