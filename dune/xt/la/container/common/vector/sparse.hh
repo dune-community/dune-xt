@@ -82,8 +82,7 @@ public:
     : size_(sz)
     , entries_(new EntriesVectorType())
     , indices_(new IndicesVectorType())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
@@ -91,8 +90,7 @@ public:
     : size_(sz)
     , entries_(new EntriesVectorType(size_, value))
     , indices_(new IndicesVectorType(size_))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < size_; ++ii)
       (*indices_)[ii] = ii;
@@ -102,8 +100,7 @@ public:
     : size_(other.size())
     , entries_(new EntriesVectorType(size_))
     , indices_(new IndicesVectorType(size_))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < size_; ++ii) {
       (*entries_)[ii] = other[ii];
@@ -120,8 +117,7 @@ public:
     : size_(sz)
     , entries_(new EntriesVectorType(entries.size()))
     , indices_(new IndicesVectorType(indices.size()))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     assert(entries.size() == indices.size());
     for (size_t ii = 0; ii < entries.size(); ++ii) {
@@ -134,8 +130,7 @@ public:
     : size_(other.size())
     , entries_(new EntriesVectorType(size_))
     , indices_(new IndicesVectorType(size_))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     size_t ii = 0;
     for (auto element : other) {
@@ -147,10 +142,9 @@ public:
 
   CommonSparseVector(const ThisType& other)
     : size_(other.size_)
-    , entries_(other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_)
-    , indices_(other.unshareable_ ? std::make_shared<IndicesVectorType>(*other.indices_) : other.indices_)
-    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
-    , unshareable_(false)
+    , entries_(std::make_shared<EntriesVectorType>(*other.entries_))
+    , indices_(std::make_shared<IndicesVectorType>(*other.indices_))
+    , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
   {
   }
 
@@ -163,8 +157,7 @@ public:
     : size_(other.size())
     , entries_(new EntriesVectorType())
     , indices_(new IndicesVectorType())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < size_; ++ii) {
       const ScalarType& value = XT::Common::VectorAbstraction<OtherVectorType>::get_entry(other, ii);
@@ -188,11 +181,9 @@ public:
   {
     if (this != &other) {
       size_ = other.size_;
-      entries_ = other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_;
-      indices_ = other.unshareable_ ? std::make_shared<IndicesVectorType>(*other.indices_) : other.indices_;
-      mutexes_ =
-          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
-      unshareable_ = false;
+      *entries_ = *other.entries_;
+      *indices_ = *other.indices_;
+      mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
     }
     return *this;
   }
@@ -211,7 +202,6 @@ public:
 
   void deep_copy(const ThisType& other)
   {
-    ensure_uniqueness();
     size_ = other.size_;
     *entries_ = *other.entries_;
     *indices_ = *other.indices_;
@@ -219,7 +209,6 @@ public:
 
   ThisType& operator=(const ScalarType& value)
   {
-    ensure_uniqueness();
     for (auto& element : *entries_)
       element = value;
     return *this;
@@ -235,7 +224,6 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     auto& entries_ref = *entries_;
     for (size_t ii = 0; ii < entries_ref.size(); ++ii)
@@ -269,21 +257,18 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    ensure_uniqueness();
     internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     get_unchecked_ref(ii) += value;
   }
 
   void set_entry(const size_t ii, const ScalarType& value)
   {
-    ensure_uniqueness();
     get_unchecked_ref(ii) = value;
   }
 
   // set entry without checking if entry already exists
   void set_new_entry(const size_t ii, const ScalarType& value, bool front = false)
   {
-    ensure_uniqueness();
     if (front) {
       indices_->insert(indices_->begin(), ii);
       entries_->insert(entries_->begin(), value);
@@ -340,15 +325,11 @@ protected:
 public:
   inline ScalarType& operator[](const size_t ii)
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return get_unchecked_ref(ii);
   }
 
   inline const ScalarType& operator[](const size_t ii) const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return get_unchecked_ref(ii);
   }
 
@@ -356,7 +337,6 @@ public:
 
   EntriesVectorType& entries()
   {
-    ensure_uniqueness();
     return *entries_;
   }
 
@@ -367,7 +347,6 @@ public:
 
   IndicesVectorType& indices()
   {
-    ensure_uniqueness();
     return *indices_;
   }
 
@@ -378,7 +357,6 @@ public:
 
   void clear()
   {
-    ensure_uniqueness();
     entries_->clear();
     indices_->clear();
   }
@@ -473,21 +451,6 @@ public:
 
   // without these using declarations, the free operator+/* function in xt/common/vector.hh is chosen instead of the
   // member function
-  /**
-   * \see ContainerInterface
-   */
-  inline void ensure_uniqueness() const
-  {
-    if (!entries_.unique()) {
-      assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-      if (!entries_.unique()) {
-        entries_ = std::make_shared<EntriesVectorType>(*entries_);
-        indices_ = std::make_shared<IndicesVectorType>(*indices_);
-        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
-      }
-    }
-  } // ... ensure_uniqueness(...)
   using InterfaceType::operator+;
   using InterfaceType::operator-;
   using InterfaceType::operator*;
@@ -496,10 +459,9 @@ private:
   friend class VectorInterface<internal::CommonSparseVectorTraits<ScalarType>, ScalarType>;
 
   size_t size_;
-  mutable std::shared_ptr<EntriesVectorType> entries_;
-  mutable std::shared_ptr<IndicesVectorType> indices_;
-  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  mutable bool unshareable_;
+  std::shared_ptr<EntriesVectorType> entries_;
+  std::shared_ptr<IndicesVectorType> indices_;
+  std::unique_ptr<MutexesType> mutexes_;
 }; // class CommonSparseVector
 
 

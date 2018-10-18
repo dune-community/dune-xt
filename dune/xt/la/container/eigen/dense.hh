@@ -184,13 +184,9 @@ public:
 
   using BaseType::operator=;
 
-  /**
-   *  \note Does a deep copy.
-   */
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
-    unshareable_ = false;
     return *this;
   } // ... operator=(...)
 
@@ -219,23 +215,7 @@ public:
 
 private:
   using BaseType::backend_;
-  using BaseType::mutexes_;
-  using BaseType::unshareable_;
 
-protected:
-  inline void ensure_uniqueness() const
-  {
-    if (!backend_.unique()) {
-      assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-      if (!backend_.unique()) {
-        backend_ = std::make_shared<BackendType>(*backend_);
-        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
-      }
-    }
-  } // ... ensure_uniqueness(...)
-
-private:
   friend class VectorInterface<internal::EigenDenseVectorTraits<ScalarType>, ScalarType>;
   friend class EigenBaseVector<internal::EigenDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenDenseVector
@@ -302,22 +282,14 @@ public:
       (*backend_)[ii++] = element;
   }
 
-  /**
-   *  \brief  This constructor does not do a deep copy.
-   */
   EigenMappedDenseVector(const ThisType& other)
     : BaseType(other)
   {
-    if (other.unshareable_) {
-      auto new_backend = std::make_shared<BackendType>(new ScalarType[other.backend_->size()], other.backend_->size());
-      new_backend->operator=(*(other.backend_));
-      backend_ = new_backend;
-    }
+    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
+                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_->operator=(other.backend());
   }
 
-  /**
-   * \brief This constructor does a deep copy.
-   */
   explicit EigenMappedDenseVector(const BackendType& other,
                                   const bool /*prune*/ = false,
                                   const ScalarType /*eps*/ = Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
@@ -349,22 +321,13 @@ public:
   ThisType& operator=(const ThisType& other)
   {
     BaseType::operator=(other);
-    if (other.unshareable_) {
-      auto new_backend = std::make_shared<BackendType>(new ScalarType[other.backend_->size()], other.backend_->size());
-      new_backend->operator=(*(other.backend_));
-      backend_ = new_backend;
-    }
     return *this;
   }
 
-  /**
-   * \brief does a deep copy;
-   */
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(new ScalarType[other.size()], other.size());
     backend_->operator=(other);
-    unshareable_ = false;
     return *this;
   }
 
@@ -377,25 +340,7 @@ public:
 
 private:
   using BaseType::backend_;
-  using BaseType::mutexes_;
-  using BaseType::unshareable_;
 
-protected:
-  inline void ensure_uniqueness() const
-  {
-    if (!backend_.unique()) {
-      assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-      if (!backend_.unique()) {
-        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
-        auto new_backend = std::make_shared<BackendType>(new ScalarType[backend_->size()], backend_->size());
-        new_backend->operator=(*backend_);
-        backend_ = new_backend;
-      }
-    }
-  } // ... ensure_uniqueness(...)
-
-private:
   friend class VectorInterface<internal::EigenMappedDenseVectorTraits<ScalarType>, ScalarType>;
   friend class EigenBaseVector<internal::EigenMappedDenseVectorTraits<ScalarType>, ScalarType>;
 }; // class EigenMappedDenseVector
@@ -431,8 +376,7 @@ public:
                             const ScalarType value = ScalarType(0),
                             const size_t num_mutexes = 1)
     : backend_(new BackendType(rr, cc))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     this->backend_->setOnes();
     this->backend_->operator*=(value);
@@ -445,16 +389,14 @@ public:
                    const size_t num_mutexes = 1)
     : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
                                internal::boost_numeric_cast<EIGEN_size_t>(cc)))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     backend_->setZero();
   }
 
   EigenDenseMatrix(const ThisType& other)
-    : backend_(other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_)
-    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
-    , unshareable_(false)
+    : backend_(std::make_shared<BackendType>(*other.backend_))
+    , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
   {
   }
 
@@ -466,8 +408,7 @@ public:
                             const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
                                 Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
                             const size_t num_mutexes = 1)
-    : mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    : mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     if (prune)
       backend_ = ThisType(other).pruned(eps).backend_;
@@ -478,8 +419,7 @@ public:
   template <class M>
   EigenDenseMatrix(const MatrixInterface<M, ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.rows(), other.cols()))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < other.rows(); ++ii)
       for (size_t jj = 0; jj < other.cols(); ++jj)
@@ -489,8 +429,7 @@ public:
   template <class T>
   EigenDenseMatrix(const DenseMatrix<T>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.rows(), other.cols()))
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < other.rows(); ++ii)
       for (size_t jj = 0; jj < other.cols(); ++jj)
@@ -502,36 +441,28 @@ public:
    */
   explicit EigenDenseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   explicit EigenDenseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   ThisType& operator=(const ThisType& other)
   {
     if (this != &other) {
-      backend_ = other.unshareable_ ? std::make_shared<BackendType>(*other.backend_) : other.backend_;
-      mutexes_ =
-          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
-      unshareable_ = false;
+      *backend_ = *other.backend_;
+      mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
     }
     return *this;
   }
 
-  /**
-   *  \note Does a deep copy.
-   */
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
-    unshareable_ = false;
     return *this;
   }
 
@@ -540,7 +471,6 @@ public:
 
   BackendType& backend()
   {
-    ensure_uniqueness();
     return *backend_;
   }
 
@@ -574,14 +504,12 @@ public:
 
   void scal(const ScalarType& alpha)
   {
-    auto& backend_ref = backend();
-    backend_ref *= alpha;
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    backend() *= alpha;
   }
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    auto& backend_ref = backend();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -590,7 +518,7 @@ public:
                                      << "x"
                                      << cols()
                                      << ")!");
-    backend_ref += alpha * xx.backend();
+    backend() += alpha * xx.backend();
   } // ... axpy(...)
 
   bool has_equal_shape(const ThisType& other) const
@@ -620,19 +548,17 @@ public:
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, jj, cols());
     assert(ii < rows());
     assert(jj < cols());
-    backend_ref(ii, jj) += value;
+    backend()(ii, jj) += value;
   } // ... add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    auto& backend_ref = backend();
     assert(ii < rows());
     assert(jj < cols());
-    backend_ref(ii, jj) = value;
+    backend()(ii, jj) = value;
   } // ... set_entry(...)
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
@@ -644,27 +570,24 @@ public:
 
   void clear_row(const size_t ii)
   {
-    auto& backend_ref = backend();
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     for (size_t jj = 0; jj < cols(); ++jj)
-      backend_ref(ii, jj) = ScalarType(0);
+      backend()(ii, jj) = ScalarType(0);
   } // ... clear_row(...)
 
   void clear_col(const size_t jj)
   {
-    auto& backend_ref = backend();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     for (size_t ii = 0; ii < rows(); ++ii)
-      backend_ref(ii, jj) = ScalarType(0);
+      backend()(ii, jj) = ScalarType(0);
   } // ... clear_col(...)
 
   void unit_row(const size_t ii)
   {
-    auto& backend_ref = backend();
     if (ii >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the cols of this (" << cols() << ")!");
@@ -672,13 +595,12 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
     for (size_t jj = 0; jj < cols(); ++jj)
-      backend_ref(ii, jj) = ScalarType(0);
-    backend_ref(ii, ii) = ScalarType(1);
+      backend()(ii, jj) = ScalarType(0);
+    backend()(ii, ii) = ScalarType(1);
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
   {
-    auto& backend_ref = backend();
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
@@ -686,8 +608,8 @@ public:
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
     for (size_t ii = 0; ii < rows(); ++ii)
-      backend_ref(ii, jj) = ScalarType(0);
-    backend_ref(jj, jj) = ScalarType(1);
+      backend()(ii, jj) = ScalarType(0);
+    backend()(jj, jj) = ScalarType(1);
   } // ... unit_col(...)
 
   bool valid() const
@@ -732,24 +654,9 @@ public:
   /**
    * \}
    */
-
-protected:
-  inline void ensure_uniqueness() const
-  {
-    if (!backend_.unique()) {
-      assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-      if (!backend_.unique()) {
-        backend_ = std::make_shared<BackendType>(*backend_);
-        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
-      }
-    }
-  } // ... ensure_uniqueness(...)
-
 private:
-  mutable std::shared_ptr<BackendType> backend_;
-  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  mutable bool unshareable_;
+  std::shared_ptr<BackendType> backend_;
+  std::unique_ptr<std::vector<std::mutex>> mutexes_;
 }; // class EigenDenseMatrix
 
 

@@ -105,9 +105,8 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1, 0))
     , column_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
-    , unshareable_(false)
   {
     if (num_rows_ > 0 && num_cols_ > 0) {
       if (size_t(patt.size()) != num_rows_)
@@ -145,9 +144,8 @@ public:
     , entries_(std::make_shared<EntriesVectorType>(is_zero(value, eps) ? 0 : num_rows_ * num_cols_, value))
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1, 0))
     , column_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
-    , unshareable_(false)
   {
     if (!is_zero(value, eps)) {
       IndexVectorType row_column_indices(num_cols_);
@@ -163,12 +161,11 @@ public:
   CommonSparseMatrix(const ThisType& other)
     : num_rows_(other.num_rows_)
     , num_cols_(other.num_cols_)
-    , entries_(other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_)
-    , row_pointers_(other.row_pointers_)
-    , column_indices_(other.column_indices_)
-    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
+    , entries_(std::make_shared<EntriesVectorType>(*other.entries_))
+    , row_pointers_(std::make_shared<IndexVectorType>(*other.row_pointers_))
+    , column_indices_(std::make_shared<IndexVectorType>(*other.column_indices_))
+    , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
     , eps_(other.eps_)
-    , unshareable_(false)
   {
   }
 
@@ -183,9 +180,8 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1))
     , column_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
-    , unshareable_(false)
   {
     size_t index = 0;
     for (size_t rr = 0; rr < num_rows_; ++rr) {
@@ -229,12 +225,10 @@ public:
     if (this != &other) {
       num_rows_ = other.num_rows_;
       num_cols_ = other.num_cols_;
-      entries_ = other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_;
-      row_pointers_ = other.row_pointers_;
-      column_indices_ = other.column_indices_;
-      mutexes_ =
-          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
-      unshareable_ = false;
+      *entries_ = *other.entries_;
+      *row_pointers_ = *other.row_pointers_;
+      *column_indices_ = *other.column_indices_;
+      mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
     }
     return *this;
   }
@@ -266,19 +260,8 @@ public:
     return assign(other, dense_pattern(num_rows_, num_cols_));
   }
 
-  void deep_copy(const ThisType& other)
-  {
-    ensure_uniqueness();
-    num_rows_ = other.num_rows_;
-    num_cols_ = other.num_cols_;
-    *entries_ = *other.entries_;
-    *row_pointers_ = *other.row_pointers_;
-    *column_indices_ = *other.column_indices_;
-  }
-
   void clear()
   {
-    ensure_uniqueness();
     entries_->clear();
     std::fill(row_pointers_->begin(), row_pointers_->end(), 0);
     column_indices_->clear();
@@ -289,16 +272,11 @@ public:
   inline ThisType copy() const
   {
     ThisType ret(*this);
-    ret.entries_ = std::make_shared<EntriesVectorType>(*entries_);
-    ret.row_pointers_ = std::make_shared<IndexVectorType>(*row_pointers_);
-    ret.column_indices_ = std::make_shared<IndexVectorType>(*column_indices_);
-    ret.mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
     return ret;
   }
 
   inline void scal(const ScalarType& alpha)
   {
-    ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     std::transform(
         entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
@@ -306,7 +284,6 @@ public:
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     assert(has_equal_shape(xx));
     const auto& xx_entries = *xx.entries_;
@@ -370,7 +347,6 @@ public:
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
-    ensure_uniqueness();
     internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
@@ -383,7 +359,6 @@ public:
 
   inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)
   {
-    ensure_uniqueness();
     entries_->operator[](get_entry_index(rr, cc)) = value;
   }
 
@@ -400,14 +375,12 @@ public:
 
   inline void push_entry(const size_t cc, const ScalarType value)
   {
-    ensure_uniqueness();
     entries_->push_back(value);
     column_indices_->push_back(cc);
   }
 
   inline void clear_row(const size_t rr)
   {
-    ensure_uniqueness();
     std::fill(entries_->begin() + row_pointers_->operator[](rr),
               entries_->begin() + row_pointers_->operator[](rr + 1),
               ScalarType(0));
@@ -415,7 +388,6 @@ public:
 
   inline void clear_col(const size_t cc)
   {
-    ensure_uniqueness();
     for (size_t kk = 0; kk < entries_->size(); ++kk) {
       if (column_indices_->operator[](kk) == cc)
         entries_->operator[](kk) = ScalarType(0);
@@ -468,7 +440,6 @@ public:
   template <class MatrixType>
   void rightmultiply(const MatrixType& other)
   {
-    ensure_uniqueness();
     auto new_entries = std::make_shared<EntriesVectorType>();
     auto new_row_pointers = std::make_shared<IndexVectorType>(num_rows_ + 1);
     auto new_column_indices = std::make_shared<IndexVectorType>();
@@ -502,43 +473,31 @@ public:
 
   ScalarType* entries()
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return entries_->data();
   }
 
   const ScalarType* entries() const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return entries_->data();
   }
 
   size_t* outer_index_ptr()
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return row_pointers_->data();
   }
 
   const size_t* outer_index_ptr() const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return row_pointers_->data();
   }
 
   size_t* inner_index_ptr()
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return column_indices_->data();
   }
 
   const size_t* inner_index_ptr() const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return column_indices_->data();
   }
 
@@ -546,20 +505,6 @@ public:
   {
     return eps_;
   }
-
-  inline void ensure_uniqueness() const
-  {
-    if (!entries_.unique()) {
-      assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-      if (!entries_.unique()) {
-        entries_ = std::make_shared<EntriesVectorType>(*entries_);
-        row_pointers_ = std::make_shared<IndexVectorType>(*row_pointers_);
-        column_indices_ = std::make_shared<IndexVectorType>(*column_indices_);
-        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
-      }
-    }
-  } // ... ensure_uniqueness(...)
 
 private:
   size_t get_entry_index(const size_t rr, const size_t cc, const bool throw_if_not_in_pattern = true) const
@@ -584,12 +529,11 @@ private:
   }
 
   size_t num_rows_, num_cols_;
-  mutable std::shared_ptr<EntriesVectorType> entries_;
-  mutable std::shared_ptr<IndexVectorType> row_pointers_;
-  mutable std::shared_ptr<IndexVectorType> column_indices_;
-  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  mutable EpsType eps_;
-  mutable bool unshareable_;
+  std::shared_ptr<EntriesVectorType> entries_;
+  std::shared_ptr<IndexVectorType> row_pointers_;
+  std::shared_ptr<IndexVectorType> column_indices_;
+  std::unique_ptr<MutexesType> mutexes_;
+  EpsType eps_;
 }; // class CommonSparseMatrix
 
 /**
@@ -628,9 +572,8 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
-    , unshareable_(false)
   {
     if (num_rows_ > 0 && num_cols_ > 0) {
       if (size_t(patt.size()) != num_rows_)
@@ -660,9 +603,8 @@ public:
     , entries_(std::make_shared<EntriesVectorType>(is_zero(value, eps) ? 0 : num_rows_ * num_cols_, value))
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
-    , unshareable_(false)
   {
     if (!is_zero(value, eps)) {
       IndexVectorType column_row_indices(num_rows_);
@@ -681,22 +623,21 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
-    , unshareable_(false)
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   CommonSparseMatrix(const ThisType& other)
     : num_rows_(other.num_rows_)
     , num_cols_(other.num_cols_)
-    , entries_(other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_)
-    , column_pointers_(other.unshareable_ ? std::make_shared<IndexVectorType>(*other.column_pointers_)
-                                          : other.column_pointers_)
-    , row_indices_(other.unshareable_ ? std::make_shared<IndexVectorType>(*other.row_indices_) : other.row_indices_)
-    , mutexes_(other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_)
-    , unshareable_(false)
+    , entries_(std::make_shared<EntriesVectorType>(*other.entries_))
+    , column_pointers_(std::make_shared<IndexVectorType>(*other.column_pointers_))
+    , row_indices_(std::make_shared<IndexVectorType>(*other.row_indices_))
+    , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
+    , eps_(other.eps_)
   {
   }
+
 
   template <class OtherMatrixType>
   explicit CommonSparseMatrix(
@@ -709,9 +650,8 @@ public:
     , entries_(std::make_shared<EntriesVectorType>())
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
-    , mutexes_(std::make_shared<std::vector<std::mutex>>(num_mutexes))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
-    , unshareable_(false)
   {
     entries_->reserve(0.1 * num_rows_ * num_cols_);
     row_indices_->reserve(0.1 * num_rows_ * num_cols_);
@@ -748,13 +688,11 @@ public:
     if (this != &other) {
       num_rows_ = other.num_rows_;
       num_cols_ = other.num_cols_;
-      entries_ = other.unshareable_ ? std::make_shared<EntriesVectorType>(*other.entries_) : other.entries_;
-      column_pointers_ = other.column_pointers_;
-      row_indices_ = other.row_indices_;
-      mutexes_ =
-          other.unshareable_ ? std::make_shared<std::vector<std::mutex>>(other.mutexes_->size()) : other.mutexes_;
+      *entries_ = *other.entries_;
+      *column_pointers_ = *other.column_pointers_;
+      *row_indices_ = *other.row_indices_;
+      mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
       eps_ = other.eps_;
-      unshareable_ = false;
     }
     return *this;
   }
@@ -791,7 +729,6 @@ public:
 
   void deep_copy(const ThisType& other)
   {
-    ensure_uniqueness();
     num_rows_ = other.num_rows_;
     num_cols_ = other.num_cols_;
     *entries_ = *other.entries_;
@@ -801,7 +738,6 @@ public:
 
   void clear()
   {
-    ensure_uniqueness();
     entries_->clear();
     std::fill(column_pointers_->begin(), column_pointers_->end(), 0);
     row_indices_->clear();
@@ -815,13 +751,12 @@ public:
     ret.entries_ = std::make_shared<EntriesVectorType>(*entries_);
     ret.column_pointers_ = std::make_shared<IndexVectorType>(*column_pointers_);
     ret.row_indices_ = std::make_shared<IndexVectorType>(*row_indices_);
-    ret.mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
+    ret.mutexes_ = std::make_unique<MutexesType>(mutexes_->size());
     return ret;
   }
 
   inline void scal(const ScalarType& alpha)
   {
-    ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     std::transform(
         entries_->begin(), entries_->end(), entries_->begin(), std::bind1st(std::multiplies<ScalarType>(), alpha));
@@ -829,7 +764,6 @@ public:
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    ensure_uniqueness();
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     assert(has_equal_shape(xx));
     const auto& xx_entries = *xx.entries_;
@@ -936,7 +870,6 @@ public:
 
   inline void add_to_entry(const size_t rr, const size_t cc, const ScalarType& value)
   {
-    ensure_uniqueness();
     internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, rr, rows());
     entries_->operator[](get_entry_index(rr, cc)) += value;
   }
@@ -949,33 +882,28 @@ public:
 
   inline void set_entry(const size_t rr, const size_t cc, const ScalarType value)
   {
-    ensure_uniqueness();
     entries_->operator[](get_entry_index(rr, cc)) = value;
   }
 
   inline void start_column()
   {
-    ensure_uniqueness();
     if (column_pointers_->empty())
       column_pointers_->push_back(0);
   }
 
   inline void end_column()
   {
-    ensure_uniqueness();
     column_pointers_->push_back(row_indices_->size());
   }
 
   inline void push_entry(const size_t cc, const ScalarType value)
   {
-    ensure_uniqueness();
     entries_->push_back(value);
     row_indices_->push_back(cc);
   }
 
   inline void clear_row(const size_t rr)
   {
-    ensure_uniqueness();
     for (size_t kk = 0; kk < entries_->size(); ++kk) {
       if ((*row_indices_)[kk] == rr)
         (*entries_)[kk] = ScalarType(0);
@@ -984,7 +912,6 @@ public:
 
   inline void clear_col(const size_t cc)
   {
-    ensure_uniqueness();
     std::fill(
         entries_->begin() + (*column_pointers_)[cc], entries_->begin() + (*column_pointers_)[cc + 1], ScalarType(0));
   }
@@ -1038,7 +965,6 @@ public:
                             void>
   rightmultiply(const OtherMatrixImp& other)
   {
-    ensure_uniqueness();
     EntriesVectorType new_entries;
     new_entries.reserve(entries_->size());
     IndexVectorType new_column_pointers(num_cols_ + 1, 0);
@@ -1069,7 +995,6 @@ public:
 
   void rightmultiply(const ThisType& other)
   {
-    ensure_uniqueness();
     thread_local EntriesVectorType new_entries;
     thread_local IndexVectorType new_column_pointers(num_cols_ + 1, 0);
     thread_local IndexVectorType new_row_indices;
@@ -1109,43 +1034,31 @@ public:
 
   ScalarType* entries()
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return entries_->data();
   }
 
   const ScalarType* entries() const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return entries_->data();
   }
 
   size_t* outer_index_ptr()
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return column_pointers_->data();
   }
 
   const size_t* outer_index_ptr() const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return column_pointers_->data();
   }
 
   size_t* inner_index_ptr()
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return row_indices_->data();
   }
 
   const size_t* inner_index_ptr() const
   {
-    ensure_uniqueness();
-    unshareable_ = true;
     return row_indices_->data();
   }
 
@@ -1153,20 +1066,6 @@ public:
   {
     return eps_;
   }
-
-  inline void ensure_uniqueness() const
-  {
-    if (!entries_.unique()) {
-      assert(!unshareable_);
-      const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-      if (!entries_.unique()) {
-        entries_ = std::make_shared<EntriesVectorType>(*entries_);
-        column_pointers_ = std::make_shared<IndexVectorType>(*column_pointers_);
-        row_indices_ = std::make_shared<IndexVectorType>(*row_indices_);
-        mutexes_ = std::make_shared<std::vector<std::mutex>>(mutexes_->size());
-      }
-    }
-  } // ... ensure_uniqueness(...)
 
 private:
   size_t get_entry_index(const size_t rr, const size_t cc, const bool throw_if_not_in_pattern = true) const
@@ -1191,12 +1090,11 @@ private:
   }
 
   size_t num_rows_, num_cols_;
-  mutable std::shared_ptr<EntriesVectorType> entries_;
-  mutable std::shared_ptr<IndexVectorType> column_pointers_;
-  mutable std::shared_ptr<IndexVectorType> row_indices_;
-  mutable std::shared_ptr<std::vector<std::mutex>> mutexes_;
-  mutable EpsType eps_;
-  mutable bool unshareable_;
+  std::shared_ptr<EntriesVectorType> entries_;
+  std::shared_ptr<IndexVectorType> column_pointers_;
+  std::shared_ptr<IndexVectorType> row_indices_;
+  std::unique_ptr<MutexesType> mutexes_;
+  EpsType eps_;
 }; // class CommonSparseMatrix<..., Common::StorageLayout::csc>
 
 /**
@@ -1559,8 +1457,8 @@ private:
 
   size_t num_rows_, num_cols_;
   bool sparse_;
-  mutable SparseMatrixType sparse_matrix_;
-  mutable DenseMatrixType dense_matrix_;
+  SparseMatrixType sparse_matrix_;
+  DenseMatrixType dense_matrix_;
 }; // class CommonSparseOrDenseMatrix<...>
 
 template <class ScalarType = double>
