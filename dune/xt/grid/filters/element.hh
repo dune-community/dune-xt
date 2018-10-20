@@ -180,6 +180,7 @@ public:
 }; // class PartitionSetElements
 
 
+} // namespace ApplyOn
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
