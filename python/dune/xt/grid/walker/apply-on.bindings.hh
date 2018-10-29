@@ -22,7 +22,7 @@
 #include <python/dune/xt/grid/layers.bindings.hh>
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
 
-#include <dune/xt/grid/walker/filters.hh>
+#include <dune/xt/grid/filters.hh>
 
 namespace Dune {
 namespace XT {
