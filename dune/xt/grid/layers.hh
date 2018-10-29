@@ -17,7 +17,6 @@
 
 #include <dune/xt/common/fixed_map.hh>
 #include <dune/xt/grid/type_traits.hh>
-#include <dune/xt/grid/view/periodic.hh>
 #include <dune/xt/grid/view/subdomain/view.hh>
 
 namespace Dune {
@@ -32,6 +31,11 @@ class SubdomainGrid;
 
 
 } // namespace DD
+
+
+// forward
+template <class RealGridLayerImp, bool codim_iters_provided>
+class PeriodicGridView;
 
 
 enum class Backends
@@ -237,7 +241,7 @@ template <class GridType, Layers layer, Backends backend, class DdGridType>
 struct Layer<GridType, layer, backend, DdGridType, true>
 {
   using NonPeriodicLayerType = Layer<GridType, layer, backend, DdGridType, false>;
-  using type = XT::Grid::PeriodicGridLayer<typename NonPeriodicLayerType::type>;
+  using type = PeriodicGridView<typename NonPeriodicLayerType::type, false>;
 
   static type create(const GridType& grid,
                      const int subdomain = 0,
