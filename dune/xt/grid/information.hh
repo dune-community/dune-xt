@@ -127,7 +127,7 @@ struct Dimensions
     {
     }
 
-    virtual void apply_local(const ElementType& element)
+    virtual void apply_local(const ElementType& element) override
     {
       const auto& geo = element.geometry();
       entity_volume_(geo.volume());
