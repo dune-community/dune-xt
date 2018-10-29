@@ -50,7 +50,7 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
     const auto correct_size = gv.size(0);
     std::atomic<size_t> count(0);
-    auto counter = [&count](const EntityType&) { count++; };
+    auto counter = GenericElementFunctor<GridLayerType>([] {}, [&count](const EntityType&) { count++; }, [] {});
     auto test1 = [&] {
       walker.append(counter);
       walker.walk(false);
@@ -89,10 +89,12 @@ struct GridWalkerTest : public ::testing::Test
 
     size_t filter_count = 0, all_count = 0;
     auto boundaries = [=](const GridLayerType&, const IntersectionType& inter) { return inter.boundary(); };
-    auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
-    auto all_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; };
+    auto filter_counter = GenericIntersectionFunctor<GridLayerType>(
+        [] {}, [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; }, [] {});
+    auto all_counter = GenericIntersectionFunctor<GridLayerType>(
+        [] {}, [&](const IntersectionType&, const EntityType&, const EntityType&) { all_count++; }, [] {});
 
-    ApplyOn::LambdaFilteredIntersections<GridLayerType> on_filter_boundaries{boundaries};
+    ApplyOn::GenericFilteredIntersections<GridLayerType> on_filter_boundaries{boundaries};
     ApplyOn::BoundaryIntersections<GridLayerType> on_all_boundaries{};
     walker.append(filter_counter, on_filter_boundaries);
     walker.append(all_counter, on_all_boundaries);
@@ -106,15 +108,14 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
 
     size_t filter_count = 0, all_count = 0, inner_count = 0, inner_set_count = 0;
-    auto filter_counter = [&](...) { filter_count++; };
-    auto inner_filter_counter = [&](...) { inner_set_count++; };
-    auto all_counter = [&](...) { all_count++; };
-    auto inner_counter = [&](const auto& e) {
-      inner_count += e.partitionType() == Dune::PartitionType::InteriorEntity;
-    };
+    auto filter_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { filter_count++; }, [] {});
+    auto inner_filter_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { inner_set_count++; }, [] {});
+    auto all_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { all_count++; }, [] {});
+    auto inner_counter = GenericElementFunctor<GridLayerType>(
+        [] {}, [&](const auto& e) { inner_count += e.partitionType() == Dune::PartitionType::InteriorEntity; }, [] {});
 
-    ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior> on_interior_partitionset{};
-    ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All> on_all_partitionset{};
+    ApplyOn::PartitionSetElements<GridLayerType, Dune::Partitions::Interior> on_interior_partitionset{};
+    ApplyOn::PartitionSetElements<GridLayerType, Dune::Partitions::All> on_all_partitionset{};
     ApplyOn::AllElements<GridLayerType> on_all{};
     walker.append(filter_counter, on_all_partitionset);
     walker.append(inner_filter_counter, on_interior_partitionset);
@@ -131,10 +132,10 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
 
     size_t all_count = 0, inner_count = 0;
-    auto all_set_counter = [&](...) { all_count++; };
-    auto inner_set_counter = [&](...) { inner_count++; };
-    ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::Interior> on_interior_partitionset{};
-    ApplyOn::PartitionSetEntities<GridLayerType, Dune::Partitions::All> on_all_partitionset{};
+    auto all_set_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { all_count++; }, [] {});
+    auto inner_set_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { inner_count++; }, [] {});
+    ApplyOn::PartitionSetElements<GridLayerType, Dune::Partitions::Interior> on_interior_partitionset{};
+    ApplyOn::PartitionSetElements<GridLayerType, Dune::Partitions::All> on_all_partitionset{};
     walker.append(inner_set_counter, on_interior_partitionset);
     walker.append(all_set_counter, on_all_partitionset);
     walker.walk();
@@ -143,7 +144,6 @@ struct GridWalkerTest : public ::testing::Test
     Dune::XT::Grid::RangedPartitioning<GridLayerType, 0, Dune::All_Partition> all_part(gv, 1);
 
     auto filter_inner = inner_count;
-    auto filter_all = all_count;
 
     ApplyOn::AllElements<GridLayerType> on_all_elements{};
     walker.append(all_set_counter, on_all_elements);
@@ -168,7 +168,8 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
 
     std::atomic<size_t> filter_count{0};
-    auto filter_counter = [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; };
+    auto filter_counter = GenericIntersectionFunctor<GridLayerType>(
+        [] {}, [&](const IntersectionType&, const EntityType&, const EntityType&) { filter_count++; }, [] {});
     const auto info = make_alldirichlet_boundaryinfo(gv);
     BoundaryDetectorFunctor<GridLayerType> detector(*info, new DirichletBoundary());
 
@@ -191,10 +192,12 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> inner_walker(gv);
     // This functor is restricted to some elements of the grid view.
     size_t num_elements_applied = 0;
-    inner_walker.append([&](const auto& /*element*/) { ++num_elements_applied; },
-                        [](const auto& grid_view, const auto& element) {
+    auto functor =
+        GenericElementFunctor<GridLayerType>([] {}, [&](const auto& /*element*/) { ++num_elements_applied; }, [] {});
+    inner_walker.append(functor,
+                        ApplyOn::GenericFilteredElements<GridLayerType>([](const auto& grid_view, const auto& element) {
                           return grid_view.indexSet().index(element) < grid_view.indexSet().size(0) / 2;
-                        });
+                        }));
     inner_walker.walk(false, /*clear_functors=*/false); // We want to keep the functor.
     ASSERT_LT(num_elements_applied, gv.indexSet().size(0));
     auto num_half_elements = num_elements_applied;
