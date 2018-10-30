@@ -17,7 +17,7 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	+effefc7695eba0c0ca94fff0f93026b86501027e dune-xt-common (heads/master)
 	+3e3f3bf06e21cbbf3c0a559891b44c6f5d987d0f dune-xt-data (heads/master)
 	+d95ecb2f7f97e0f67cd499ca8a2d0a40e4d728bc dune-xt-functions (heads/new-master)
-	+be11e17850621da0847812f667c650cd008ae281 dune-xt-grid (heads/new-master)
+	+3aaaee9492012ba8f5845c467fc73f760b7c11ba dune-xt-grid (heads/new-master)
 	+f6904b69f9a3ee5d45ee824d3b244e59cfed7ff4 dune-xt-la (heads/master)
 	 09d0378f616b94d68bcdd9fc6114813181849ec0 scripts (heads/master)
 commit = 5f5841ee7a2dff290b98845c46262151752189c1
@@ -110,7 +110,7 @@ commit = d95ecb2f7f97e0f67cd499ca8a2d0a40e4d728bc
 [submodule.dune-xt-grid]
 remote = https://github.com/dune-community/dune-xt-grid.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = be11e17850621da0847812f667c650cd008ae281
+commit = 3aaaee9492012ba8f5845c467fc73f760b7c11ba
 
 [submodule.dune-xt-la]
 remote = https://github.com/dune-community/dune-xt-la.git
