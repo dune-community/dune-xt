@@ -1,20 +1,11 @@
 #!/usr/bin/env python3
-#
-# ~~~
-# This file is part of the dune-xt-grid project:
-#   https://github.com/dune-community/dune-xt-grid
-# Copyright 2009-2018 dune-xt-grid developers and contributors. All rights reserved.
-# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-# Authors:
-#   Rene Milk (2017 - 2018)
-# ~~~
 
 import os
 from os.path import expanduser
 from shlex import quote
 home = expanduser("~")
 
-prefixes = os.environ.get('ENV_PREFIXES', 'TRAVIS CI encrypt TOKEN TESTS').split(' ')
+prefixes = os.environ.get('ENV_PREFIXES', 'TRAVIS DRONE GITLAB CODECOV CI encrypt TOKEN TESTS').split(' ')
 blacklist = ['TRAVIS_COMMIT_MESSAGE']
 env_file = os.environ.get('ENV_FILE', os.path.join(home, 'env'))
 with open(env_file, 'wt') as env:

@@ -49,8 +49,11 @@ struct GridWalkerTest : public ::testing::Test
     const auto gv = grid_prv.grid().leafGridView();
     Walker<GridLayerType> walker(gv);
     const auto correct_size = gv.size(0);
-    std::atomic<size_t> count(0);
+    atomic<size_t> count(0);
+    atomic<size_t> intersection_count(0);
     auto counter = GenericElementFunctor<GridLayerType>([] {}, [&count](const EntityType&) { count++; }, [] {});
+    auto intersection_counter = GenericIntersectionFunctor(
+        [] {}, [&](const IntersectionType&, const EntityType&, const EntityType&) { intersection_count++; }, [] {});
     auto test1 = [&] {
       walker.append(counter);
       walker.walk(false);
@@ -60,6 +63,8 @@ struct GridWalkerTest : public ::testing::Test
       walker.walk(true);
     };
     auto test3 = [&] { walker.append(counter).walk(true); };
+    auto test4 = [&] { walker.append(intersection_counter).walk(false); };
+    auto test5 = [&] { walker.append(intersection_counter).walk(true); };
 
     list<function<void()>> tests({test1, test2, test3});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
@@ -78,7 +83,7 @@ struct GridWalkerTest : public ::testing::Test
     for (const auto& test : tests) {
       count = 0;
       test();
-      EXPECT_EQ(correct_size, count);
+      EXPECT_EQ(count, correct_size);
     }
   }
 

@@ -117,7 +117,7 @@ public:
                          _w>::                                                                                         \
           bind(_m,                                                                                                     \
                _class_name,                                                                                            \
-               Dune::XT::Grid::bindings::layer_name<Dune::XT::Grid::Layers::_layer>::value() + "_"                     \
+               Dune::XT::Grid::layer_names[Dune::XT::Grid::Layers::_layer] + "_"                                       \
                    + Dune::XT::Grid::bindings::backend_name<Dune::XT::Grid::Backends::_backend>::value())
 
 /*#if HAVE_ALBERTA

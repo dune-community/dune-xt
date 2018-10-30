@@ -781,6 +781,8 @@ public:
     , new_indices_(std::make_shared<std::array<std::vector<IndexType>, num_geometries>>())
     , real_index_set_(BaseType::indexSet())
   {
+    if (real_grid_layer.comm().size() > 1)
+      DUNE_THROW(Dune::NotImplemented, "PeriodicGridView does not work for MPI-distributed grids!");
     this->update();
   } // constructor PeriodicGridLayerWrapper(...)
 

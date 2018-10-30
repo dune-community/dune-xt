@@ -85,10 +85,12 @@ struct PeriodicViewTest : public testing::Test
     const IndexSet& index_set = periodic_grid_view.indexSet();
     const int codim0_size = periodic_grid_view.size(0);
     EXPECT_EQ(grid_view.size(0), codim0_size);
-    if (is_cube)
+    if (is_cube) {
       EXPECT_EQ(std::pow(elements_per_direction, dimDomain), codim0_size);
-    if (is_simplex)
+    }
+    if (is_simplex) {
       EXPECT_EQ(std::pow(elements_per_direction, dimDomain) * factorial(dimDomain), codim0_size);
+    }
     EXPECT_EQ(grid_view.overlapSize(0), periodic_grid_view.overlapSize(0));
     EXPECT_EQ(grid_view.overlapSize(1), periodic_grid_view.overlapSize(1));
     EXPECT_EQ(grid_view.ghostSize(0), periodic_grid_view.ghostSize(0));

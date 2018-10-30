@@ -17,8 +17,9 @@
 #include <dune/pybindxi/stl.h>
 
 #include <python/dune/xt/common/configuration.hh>
-#include <dune/xt/common/exceptions.hh>
 #include <python/dune/xt/common/fvector.hh>
+#include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/entity.hh>
@@ -31,10 +32,17 @@ namespace Grid {
 
 
 template <class G>
-pybind11::class_<GridProvider<G, Grid::none_t>> bind_GridProvider(pybind11::module& m, const std::string& grid_id)
+void bind_GridProvider(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
+
+  typedef GridProviderFactory<G> F;
+  const std::string fac_id = std::string("GridProviderFactory__" + grid_id);
+  py::class_<F> fac(m, fac_id.c_str(), fac_id.c_str());
+  fac.def_static("available", &F::available);
+  fac.def_static("default_config", &F::default_config);
+
 
   typedef GridProvider<G, Grid::none_t> C;
 
@@ -60,14 +68,11 @@ pybind11::class_<GridProvider<G, Grid::none_t>> bind_GridProvider(pybind11::modu
   });
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
-
-  return c;
 } // ... bind_GridProvider(...)
 
 
 template <class G>
-pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridProvider(pybind11::module& m,
-                                                                                      const std::string& grid_id)
+void bind_DdSubdomainsGridProvider(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -127,8 +132,6 @@ pybind11::class_<GridProvider<G, DD::SubdomainGrid<G>>> bind_DdSubdomainsGridPro
           return result;
         },
         "subdomain"_a);
-
-  return c;
 } // ... bind_DdSubdomainsGridProvider(...)
 
 
@@ -139,16 +142,21 @@ void bind_make_cube_grid(pybind11::module& m, const std::string& grid_id)
   using namespace pybind11::literals;
 
   m.def(std::string("make_cube_grid__" + grid_id).c_str(),
-        [](const Common::Configuration& cfg) { return make_cube_grid<G>(cfg); },
-        "cfg"_a = cube_gridprovider_default_config());
+        [](const Common::Configuration& cfg, Common::MPI_Comm_Wrapper mpi_comm) {
+          return make_cube_grid<G>(cfg, mpi_comm.get());
+        },
+        "cfg"_a = cube_gridprovider_default_config(),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
 
   m.def(std::string("make_cube_grid__" + grid_id).c_str(),
         [](const FieldVector<typename G::ctype, G::dimension>& lower_left,
            const FieldVector<typename G::ctype, G::dimension>& upper_right,
            const std::array<unsigned int, G::dimension>& num_elements,
            const unsigned int num_refinements,
-           const std::array<unsigned int, G::dimension>& overlap_size) {
-          return make_cube_grid<G>(lower_left, upper_right, num_elements, num_refinements, overlap_size);
+           const std::array<unsigned int, G::dimension>& overlap_size,
+           Common::MPI_Comm_Wrapper mpi_comm) {
+          return make_cube_grid<G>(
+              lower_left, upper_right, num_elements, num_refinements, overlap_size, mpi_comm.get());
         },
         "lower_left"_a,
         "upper_right"_a,
@@ -156,7 +164,8 @@ void bind_make_cube_grid(pybind11::module& m, const std::string& grid_id)
             cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")),
         "num_refinements"_a = cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
         "overlap_size"_a = XT::Common::make_array<unsigned int, G::dimension>(
-            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")));
+            cube_dd_subdomains_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
 } // ... bind_make_cube_grid(...)
 
 
@@ -167,6 +176,13 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
   using namespace pybind11::literals;
 
   m.def(std::string("make_cube_dd_subdomains_grid__" + grid_id).c_str(),
+        [](const Common::Configuration& cfg, Common::MPI_Comm_Wrapper mpi_comm) {
+          return make_cube_dd_subdomains_grid<G>(cfg, mpi_comm.get());
+        },
+        "cfg"_a = cube_gridprovider_default_config(),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
+
+  m.def(std::string("make_cube_dd_subdomains_grid__" + grid_id).c_str(),
         [](const FieldVector<typename G::ctype, G::dimension>& lower_left,
            const FieldVector<typename G::ctype, G::dimension>& upper_right,
            const std::array<unsigned int, G::dimension>& num_elements,
@@ -174,7 +190,8 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
            const std::array<unsigned int, G::dimension>& overlap_size,
            const std::array<unsigned int, G::dimension> num_partitions,
            const size_t num_oversampling_layers,
-           const size_t inner_boundary_segment_index) {
+           const size_t inner_boundary_segment_index,
+           Common::MPI_Comm_Wrapper mpi_comm) {
           return make_cube_dd_subdomains_grid<G>(lower_left,
                                                  upper_right,
                                                  num_elements,
@@ -182,7 +199,8 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
                                                  overlap_size,
                                                  num_partitions,
                                                  num_oversampling_layers,
-                                                 inner_boundary_segment_index);
+                                                 inner_boundary_segment_index,
+                                                 mpi_comm.get());
         },
         "lower_left"_a,
         "upper_right"_a,
@@ -196,7 +214,8 @@ void bind_make_cube_dd_subdomains_grid(pybind11::module& m, const std::string& g
         "num_oversampling_layers"_a =
             cube_dd_subdomains_gridprovider_default_config().template get<size_t>("num_refinements"),
         "inner_boundary_segment_index"_a =
-            cube_dd_subdomains_gridprovider_default_config().template get<size_t>("inner_boundary_segment_index"));
+            cube_dd_subdomains_gridprovider_default_config().template get<size_t>("inner_boundary_segment_index"),
+        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
 } // ... bind_make_cube_dd_subdomains_grid(...)
 
 
