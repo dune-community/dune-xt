@@ -52,7 +52,7 @@ struct GridWalkerTest : public ::testing::Test
     atomic<size_t> count(0);
     atomic<size_t> intersection_count(0);
     auto counter = GenericElementFunctor<GridLayerType>([] {}, [&count](const EntityType&) { count++; }, [] {});
-    auto intersection_counter = GenericIntersectionFunctor(
+    auto intersection_counter = GenericIntersectionFunctor<GridLayerType>(
         [] {}, [&](const IntersectionType&, const EntityType&, const EntityType&) { intersection_count++; }, [] {});
     auto test1 = [&] {
       walker.append(counter);
@@ -66,7 +66,7 @@ struct GridWalkerTest : public ::testing::Test
     auto test4 = [&] { walker.append(intersection_counter).walk(false); };
     auto test5 = [&] { walker.append(intersection_counter).walk(true); };
 
-    list<function<void()>> tests({test1, test2, test3});
+    list<function<void()>> tests({test1, test2, test3, test4, test5});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     // exadune guard for SeedListPartitioning
     auto test0 = [&] {
