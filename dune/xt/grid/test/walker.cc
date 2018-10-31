@@ -48,7 +48,7 @@ struct GridWalkerTest : public ::testing::Test
   {
     const auto gv = grid_prv.grid().leafGridView();
     Walker<GridLayerType> walker(gv);
-    const auto correct_size = gv.size(0);
+    const auto num_elements = gv.size(0);
     atomic<size_t> count(0);
     atomic<size_t> intersection_count(0);
     auto counter = GenericElementFunctor<GridLayerType>([] {}, [&count](const EntityType&) { count++; }, [] {});
@@ -66,7 +66,8 @@ struct GridWalkerTest : public ::testing::Test
     auto test4 = [&] { walker.append(intersection_counter).walk(false); };
     auto test5 = [&] { walker.append(intersection_counter).walk(true); };
 
-    list<function<void()>> tests({test1, test2, test3, test4, test5});
+    list<function<void()>> element_tests({test1, test2, test3});
+    list<function<void()>> intersection_tests({test4, test5});
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     // exadune guard for SeedListPartitioning
     auto test0 = [&] {
@@ -80,10 +81,16 @@ struct GridWalkerTest : public ::testing::Test
     tests.push_back(test0);
 #endif // DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB
 
-    for (const auto& test : tests) {
+    for (const auto& test : element_tests) {
       count = 0;
       test();
-      EXPECT_EQ(count, correct_size);
+      EXPECT_EQ(num_elements, count);
+    }
+    const auto faces_per_element = 2 * griddim; // only for cube grids
+    for (const auto& test : intersection_tests) {
+      intersection_count = 0;
+      test();
+      EXPECT_EQ(num_elements * faces_per_element, intersection_count);
     }
   }
 
@@ -113,9 +120,10 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
 
     size_t filter_count = 0, all_count = 0, inner_count = 0, inner_set_count = 0;
-    auto filter_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { filter_count++; }, [] {});
-    auto inner_filter_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { inner_set_count++; }, [] {});
-    auto all_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { all_count++; }, [] {});
+    auto filter_counter = GenericElementFunctor<GridLayerType>([] {}, [&](const auto&) { filter_count++; }, [] {});
+    auto inner_filter_counter =
+        GenericElementFunctor<GridLayerType>([] {}, [&](const auto&) { inner_set_count++; }, [] {});
+    auto all_counter = GenericElementFunctor<GridLayerType>([] {}, [&](const auto&) { all_count++; }, [] {});
     auto inner_counter = GenericElementFunctor<GridLayerType>(
         [] {}, [&](const auto& e) { inner_count += e.partitionType() == Dune::PartitionType::InteriorEntity; }, [] {});
 
@@ -137,8 +145,8 @@ struct GridWalkerTest : public ::testing::Test
     Walker<GridLayerType> walker(gv);
 
     size_t all_count = 0, inner_count = 0;
-    auto all_set_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { all_count++; }, [] {});
-    auto inner_set_counter = GenericElementFunctor<GridLayerType>([] {}, [&](...) { inner_count++; }, [] {});
+    auto all_set_counter = GenericElementFunctor<GridLayerType>([] {}, [&](const auto&) { all_count++; }, [] {});
+    auto inner_set_counter = GenericElementFunctor<GridLayerType>([] {}, [&](const auto&) { inner_count++; }, [] {});
     ApplyOn::PartitionSetElements<GridLayerType, Dune::Partitions::Interior> on_interior_partitionset{};
     ApplyOn::PartitionSetElements<GridLayerType, Dune::Partitions::All> on_all_partitionset{};
     walker.append(inner_set_counter, on_interior_partitionset);

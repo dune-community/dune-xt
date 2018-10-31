@@ -79,6 +79,12 @@ public:
   {
   }
 
+  ElementFunctorWrapper(const ThisType& other)
+    : functor_(other.functor_->copy())
+    , filter_(other.filter_->copy())
+  {
+  }
+
   const FilterType& filter() const
   {
     return *filter_;
@@ -113,6 +119,12 @@ public:
   IntersectionFunctorWrapper(FunctorType& functr, const FilterType& filtr)
     : functor_(functr.copy())
     , filter_(filtr.copy())
+  {
+  }
+
+  IntersectionFunctorWrapper(const ThisType& other)
+    : functor_(other.functor_->copy())
+    , filter_(other.filter_->copy())
   {
   }
 
@@ -154,6 +166,13 @@ public:
     : functor_(functr.copy())
     , element_filter_(element_filtr.copy())
     , intersection_filter_(intersection_filtr.copy())
+  {
+  }
+
+  ElementAndIntersectionFunctorWrapper(const ThisType& other)
+    : functor_(other.functor_->copy())
+    , element_filter_(other.element_filter_->copy())
+    , intersection_filter_(other.intersection_filter_->copy())
   {
   }
 
@@ -202,11 +221,12 @@ private:
   using VoidFunctionType = std::function<void()>;
 
   template <typename WrapperType, class... Args>
-  void emplace_all(Common::PerThreadValue<std::list<std::shared_ptr<WrapperType>>>& thread_storage, Args&&... args)
+  void emplace_all(std::list<WrapperType>& storage,
+                   Common::PerThreadValue<std::list<WrapperType>>& thread_storage,
+                   Args&&... args)
   {
-    for (auto&& local_list : thread_storage) {
-      local_list.emplace_back(new WrapperType(std::forward<Args>(args)...));
-    }
+    storage.emplace_back(std::forward<Args>(args)...);
+    thread_storage = Common::PerThreadValue<std::list<WrapperType>>(storage);
   }
 
 public:
@@ -216,36 +236,20 @@ public:
   }
 
   Walker(const ThisType& other)
-    : BaseType()
-    , grid_view_(other.grid_view_)
+    : grid_view_(other.grid_view_)
+    , stored_element_functor_wrappers_(other.stored_element_functor_wrappers_)
+    , stored_intersection_functor_wrappers_(other.stored_intersection_functor_wrappers_)
+    , stored_element_and_intersection_functor_wrappers_(other.stored_element_and_intersection_functor_wrappers_)
   {
-    // Since all Common::PerThreadValue are created with the same size given by the global singleton threadManager(),
-    // we just assume they are of the same size!
-    // Copy the element functors ...
-    auto zip_emplace = [](auto& target_thread_ctr, const auto& source_thread_ctr, auto& gen_function) {
-      auto target_wrappers_it = target_thread_ctr.begin();
-      auto source_wrappers_it = source_thread_ctr.begin();
-      for (; target_wrappers_it != target_thread_ctr.end() && source_wrappers_it != source_thread_ctr.end();
-           ++target_wrappers_it, ++source_wrappers_it) {
-        auto& target__wrappers = *target_wrappers_it;
-        for (auto&& source_wrapper : *source_wrappers_it) {
-          target__wrappers.emplace_back(gen_function(*source_wrapper));
-        }
-      }
-    };
-    auto el_wrapper = [](auto&& wrapper) {
-      return new typename std::decay<decltype(wrapper)>::type(wrapper.functor(), wrapper.filter());
-    };
-    zip_emplace(element_functor_wrappers_, other.element_functor_wrappers_, el_wrapper);
-    zip_emplace(intersection_functor_wrappers_, other.intersection_functor_wrappers_, el_wrapper);
-
-    auto elint_wrapper = [](auto&& wrapper) {
-      return new typename std::decay<decltype(wrapper)>::type(
-          wrapper.functor(), wrapper.element_filter(), wrapper.intersection_filter());
-    };
-    zip_emplace(
-        element_and_intersection_functor_wrappers_, other.element_and_intersection_functor_wrappers_, elint_wrapper);
-  } // Walker(...)
+    element_functor_wrappers_ = Common::PerThreadValue<std::list<internal::ElementFunctorWrapper<GridViewType>>>(
+        stored_element_functor_wrappers_);
+    intersection_functor_wrappers_ =
+        Common::PerThreadValue<std::list<internal::IntersectionFunctorWrapper<GridViewType>>>(
+            stored_intersection_functor_wrappers_);
+    element_and_intersection_functor_wrappers_ =
+        Common::PerThreadValue<std::list<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>>(
+            stored_element_and_intersection_functor_wrappers_);
+  }
 
   Walker(ThisType&& source) = default;
 
@@ -268,26 +272,32 @@ public:
 
   ThisType& append(ElementFunctor<GV>& functor, const ElementFilter<GV>& filter = ApplyOn::AllElements<GV>())
   {
-    emplace_all(element_functor_wrappers_, functor, filter);
+    emplace_all(stored_element_functor_wrappers_, element_functor_wrappers_, functor, filter);
     return *this;
   }
 
   ThisType& append(ElementFunctor<GV>*&& functor, const ElementFilter<GV>& filter = ApplyOn::AllElements<GV>())
   {
-    emplace_all(element_functor_wrappers_, *functor, filter);
+    emplace_all(stored_element_functor_wrappers_, element_functor_wrappers_, *functor, filter);
     delete functor;
     return *this;
   }
 
   ThisType& append(ElementFunctor<GV>& functor, GenericElementFilterFunctionType filter)
   {
-    emplace_all(element_functor_wrappers_, functor, ApplyOn::GenericFilteredElements<GV>(filter));
+    emplace_all(stored_element_functor_wrappers_,
+                element_functor_wrappers_,
+                functor,
+                ApplyOn::GenericFilteredElements<GV>(filter));
     return *this;
   }
 
   ThisType& append(ElementFunctor<GV>*&& functor, GenericElementFilterFunctionType filter)
   {
-    emplace_all(element_functor_wrappers_, *functor, ApplyOn::GenericFilteredElements<GV>(filter));
+    emplace_all(stored_element_functor_wrappers_,
+                element_functor_wrappers_,
+                *functor,
+                ApplyOn::GenericFilteredElements<GV>(filter));
     delete functor;
     return *this;
   }
@@ -324,27 +334,33 @@ public:
   ThisType& append(IntersectionFunctor<GV>& functor,
                    const IntersectionFilter<GV>& filter = ApplyOn::AllIntersections<GV>())
   {
-    emplace_all(intersection_functor_wrappers_, functor, filter);
+    emplace_all(stored_intersection_functor_wrappers_, intersection_functor_wrappers_, functor, filter);
     return *this;
   }
 
   ThisType& append(IntersectionFunctor<GV>*&& functor,
                    const IntersectionFilter<GV>& filter = ApplyOn::AllIntersections<GV>())
   {
-    emplace_all(intersection_functor_wrappers_, *functor, filter);
+    emplace_all(stored_intersection_functor_wrappers_, intersection_functor_wrappers_, *functor, filter);
     delete functor;
     return *this;
   }
 
   ThisType& append(IntersectionFunctor<GV>& functor, GenericIntersectionFilterFunctionType filter)
   {
-    emplace_all(intersection_functor_wrappers_, functor, ApplyOn::GenericFilteredIntersections<GV>(filter));
+    emplace_all(stored_intersection_functor_wrappers_,
+                intersection_functor_wrappers_,
+                functor,
+                ApplyOn::GenericFilteredIntersections<GV>(filter));
     return *this;
   }
 
   ThisType& append(IntersectionFunctor<GV>*&& functor, GenericIntersectionFilterFunctionType filter)
   {
-    emplace_all(intersection_functor_wrappers_, *functor, ApplyOn::GenericFilteredIntersections<GV>(filter));
+    emplace_all(stored_intersection_functor_wrappers_,
+                intersection_functor_wrappers_,
+                *functor,
+                ApplyOn::GenericFilteredIntersections<GV>(filter));
     delete functor;
     return *this;
   }
@@ -384,7 +400,11 @@ public:
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    emplace_all(element_and_intersection_functor_wrappers_, functor, element_filter, intersection_filter);
+    emplace_all(stored_element_and_intersection_functor_wrappers_,
+                element_and_intersection_functor_wrappers_,
+                functor,
+                element_filter,
+                intersection_filter);
     return *this;
   }
 
@@ -394,7 +414,11 @@ public:
   {
     if (functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    emplace_all(element_and_intersection_functor_wrappers_, *functor, element_filter, intersection_filter);
+    emplace_all(stored_element_and_intersection_functor_wrappers_,
+                element_and_intersection_functor_wrappers_,
+                *functor,
+                element_filter,
+                intersection_filter);
     delete functor;
     return *this;
   }
@@ -405,7 +429,8 @@ public:
   {
     if (&functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    emplace_all(element_and_intersection_functor_wrappers_,
+    emplace_all(stored_element_and_intersection_functor_wrappers_,
+                element_and_intersection_functor_wrappers_,
                 functor,
                 ApplyOn::GenericFilteredElements<GV>(element_filter),
                 ApplyOn::GenericFilteredIntersections<GV>(intersection_filter));
@@ -418,7 +443,8 @@ public:
   {
     if (functor == this)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "Do not append a Walker to itself!");
-    emplace_all(element_and_intersection_functor_wrappers_,
+    emplace_all(stored_element_and_intersection_functor_wrappers_,
+                element_and_intersection_functor_wrappers_,
                 *functor,
                 ApplyOn::GenericFilteredElements<GV>(element_filter),
                 ApplyOn::GenericFilteredIntersections<GV>(intersection_filter));
@@ -466,10 +492,10 @@ public:
 
   virtual void prepare() override
   {
-    auto prep = [](auto& pt) {
-      for (auto&& list : pt) {
-        for (auto&& wrapper : list)
-          wrapper->functor().prepare();
+    auto prep = [](auto& functor_list) {
+      for (auto&& pt_wrapper : functor_list) {
+        for (auto&& wrapper : pt_wrapper)
+          wrapper.functor().prepare();
       }
     };
     prep(element_functor_wrappers_);
@@ -480,12 +506,12 @@ public:
   virtual void apply_local(const ElementType& element) override
   {
     for (auto&& wrapper : *element_functor_wrappers_) {
-      if (wrapper->filter().contains(grid_view_, element))
-        wrapper->functor().apply_local(element);
+      if (wrapper.filter().contains(grid_view_, element))
+        wrapper.functor().apply_local(element);
     }
     for (auto&& wrapper : *element_and_intersection_functor_wrappers_) {
-      if (wrapper->element_filter().contains(grid_view_, element))
-        wrapper->functor().apply_local(element);
+      if (wrapper.element_filter().contains(grid_view_, element))
+        wrapper.functor().apply_local(element);
     }
   } // ... apply_local(...)
 
@@ -494,21 +520,21 @@ public:
                            const ElementType& outside_element) override
   {
     for (auto&& wrapper : *intersection_functor_wrappers_) {
-      if (wrapper->filter().contains(grid_view_, intersection))
-        wrapper->functor().apply_local(intersection, inside_element, outside_element);
+      if (wrapper.filter().contains(grid_view_, intersection))
+        wrapper.functor().apply_local(intersection, inside_element, outside_element);
     }
     for (auto&& wrapper : *element_and_intersection_functor_wrappers_) {
-      if (wrapper->intersection_filter().contains(grid_view_, intersection))
-        wrapper->functor().apply_local(intersection, inside_element, outside_element);
+      if (wrapper.intersection_filter().contains(grid_view_, intersection))
+        wrapper.functor().apply_local(intersection, inside_element, outside_element);
     }
   } // ... apply_local(...)
 
   virtual void finalize() override
   {
-    auto fin = [](auto& pt) {
-      for (auto&& list : pt) {
-        for (auto&& wrapper : list)
-          wrapper->functor().finalize();
+    auto fin = [](auto& list) {
+      for (auto&& pt : list) {
+        for (auto&& wrapper : pt)
+          wrapper.functor().finalize();
       }
     };
     fin(element_and_intersection_functor_wrappers_);
@@ -552,14 +578,17 @@ public:
 
   void clear()
   {
-    auto clr = [](auto& pt) {
-      for (auto&& list : pt) {
-        list.clear();
-      }
-    };
-    clr(element_functor_wrappers_);
-    clr(intersection_functor_wrappers_);
-    clr(element_and_intersection_functor_wrappers_);
+    stored_element_functor_wrappers_.clear();
+    stored_intersection_functor_wrappers_.clear();
+    stored_element_and_intersection_functor_wrappers_.clear();
+    element_functor_wrappers_ = Common::PerThreadValue<std::list<internal::ElementFunctorWrapper<GridViewType>>>(
+        stored_element_functor_wrappers_);
+    intersection_functor_wrappers_ =
+        Common::PerThreadValue<std::list<internal::IntersectionFunctorWrapper<GridViewType>>>(
+            stored_intersection_functor_wrappers_);
+    element_and_intersection_functor_wrappers_ =
+        Common::PerThreadValue<std::list<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>>(
+            stored_element_and_intersection_functor_wrappers_);
   }
 
   BaseType* copy() override
@@ -679,14 +708,20 @@ private:
   } // ... walk_range(...)
 
   GridViewType grid_view_;
-  Common::PerThreadValue<std::list<std::shared_ptr<internal::ElementFunctorWrapper<GridViewType>>>>
-      element_functor_wrappers_;
-  Common::PerThreadValue<std::list<std::shared_ptr<internal::IntersectionFunctorWrapper<GridViewType>>>>
-      intersection_functor_wrappers_;
-  Common::PerThreadValue<std::list<std::shared_ptr<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>>>
+  // We want each thread to have its own copy of each functor. However, as we do not know in advance how many different
+  // threads we will have (even if DXTC_CONFIG["threading.max_count"] is set, there may be only max_threads at a time,
+  // but we cannot guarantee that there will only be max_threads over the whole runtime of our program), we store the
+  // wrappers in a list that is shared by all threads and copy that list to the thread once a new thread tries to access
+  // the functors.
+  std::list<internal::ElementFunctorWrapper<GridViewType>> stored_element_functor_wrappers_;
+  std::list<internal::IntersectionFunctorWrapper<GridViewType>> stored_intersection_functor_wrappers_;
+  std::list<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>
+      stored_element_and_intersection_functor_wrappers_;
+  Common::PerThreadValue<std::list<internal::ElementFunctorWrapper<GridViewType>>> element_functor_wrappers_;
+  Common::PerThreadValue<std::list<internal::IntersectionFunctorWrapper<GridViewType>>> intersection_functor_wrappers_;
+  Common::PerThreadValue<std::list<internal::ElementAndIntersectionFunctorWrapper<GridViewType>>>
       element_and_intersection_functor_wrappers_;
 }; // class Walker
-
 
 template <class GV>
 Walker<GV> make_walker(GV grid_view)
