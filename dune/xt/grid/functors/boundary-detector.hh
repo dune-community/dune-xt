@@ -53,7 +53,7 @@ public:
   {
   }
 
-  void prepare() override final
+  virtual void prepare() override final
   {
     found_ = 0;
   }
@@ -65,9 +65,9 @@ public:
     return boundary_info_.type(intersection) == *boundary_type_;
   }
 
-  void apply_local(const IntersectionType& intersection,
-                   const ElementType& inside_element,
-                   const ElementType& outside_element) override final
+  virtual void apply_local(const IntersectionType& intersection,
+                           const ElementType& inside_element,
+                           const ElementType& outside_element) override final
   {
     found_ += compute_locally(intersection, inside_element, outside_element);
   }
@@ -77,12 +77,12 @@ public:
     return found_;
   }
 
-  void finalize() override
+  virtual void finalize() override
   {
     Propagator::finalize_imp();
   }
 
-  BaseType* copy() override
+  virtual BaseType* copy() override
   {
     return Propagator::copy_imp();
   }
