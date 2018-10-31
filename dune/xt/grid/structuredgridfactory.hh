@@ -141,9 +141,18 @@ public:
                  const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
                  const Dune::array<unsigned int, GridType::dimension>& elements,
                  Dune::array<unsigned int, GridType::dimension> /*overlap*/ = default_overlap<GridType>(),
-                 Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
+                 Dune::MPIHelper::MPICommunicator /*mpi_comm*/ = Dune::MPIHelper::getCommunicator())
   {
-    return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements, mpi_comm);
+    return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
+  }
+
+  static std::shared_ptr<GridType>
+  createSimplexGrid(const Dune::FieldVector<ctype, GridType::dimension>& lowerLeft,
+                    const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
+                    const Dune::array<unsigned int, GridType::dimension>& elements,
+                    Dune::MPIHelper::MPICommunicator /*mpi_comm*/ = Dune::MPIHelper::getCommunicator())
+  {
+    return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
   }
 };
 
