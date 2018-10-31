@@ -53,6 +53,15 @@ public:
   {
   }
 
+  BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other)
+    : Propagator(*this)
+    , boundary_info_(other.boundary_info_)
+    , boundary_type_(other.boundary_type_)
+    , found_(other.found_)
+    , res_mutex_()
+  {
+  }
+
   virtual void prepare() override final
   {
     found_ = 0;
@@ -93,10 +102,17 @@ protected:
     found_ = res;
   }
 
+  void add_to_result(size_t res)
+  {
+    std::lock_guard<std::mutex>{res_mutex_};
+    found_ += res;
+  }
+
 private:
   const BoundaryInfo<IntersectionType>& boundary_info_;
   const std::shared_ptr<BoundaryType> boundary_type_;
   size_t found_;
+  std::mutex res_mutex_;
 }; // class BoundaryDetectorFunctor
 
 
