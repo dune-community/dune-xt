@@ -336,7 +336,9 @@ public:
 
   int order(const XT::Common::Parameter& param = {}) const override final
   {
-    return Select::order(left_->access().order(param), right_->access().order(param));
+    auto ret = Select::order(left_->access().order(param), right_->access().order(param));
+    assert(ret < std::numeric_limits<int>::max());
+    return static_cast<int>(ret);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,

@@ -145,6 +145,7 @@ public:
   static const constexpr size_t domain_dim = E::dimension;
   using RangeFieldType = typename BaseType::RangeFieldType;
   using RangeType = typename BaseType::RangeType;
+  using BaseType::defaults;
 
   Model1Function(const std::string& filename,
                  const Common::FieldVector<DomainFieldType, domain_dim>& lower_left,

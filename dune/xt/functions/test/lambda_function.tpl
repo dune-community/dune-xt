@@ -15,13 +15,13 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-#include <dune/xt/functions/lambda/function.hh>
+#include <dune/xt/functions/generic/function.hh>
 
 using namespace Dune::XT;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
-struct LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
+struct GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
@@ -29,13 +29,13 @@ struct LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing
   static const size_t r = {{r}};
   static const size_t rC = {{rC}};
 
-  using LambdaType = Functions::LambdaFunction<d, r, rC>;
+  using LambdaType = Functions::GenericFunction<d, r, rC>;
 
   using RangeReturnType = typename LambdaType::RangeReturnType;
   using DomainType = typename LambdaType::DomainType;
   using DerivativeRangeReturnType = typename LambdaType::DerivativeRangeReturnType;
 
-  LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
+  GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
     : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
   {
   }
@@ -44,19 +44,19 @@ struct LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing
 };
 
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
   LambdaType lambda(1, [](const auto& /*xx*/, const auto& /*param*/) { RangeReturnType ret(1.); return ret;});
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
   const auto leaf_view = grid_.leaf_view();
   LambdaType function(1, [](const auto& /*xx*/, const auto& /*param*/) { RangeReturnType ret(1.); return ret;});
-  function.visualize(leaf_view, "test__LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  function.visualize(leaf_view, "test__GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
 {
   for (auto vv : {1, 2, 5}) {
     LambdaType function(vv);
@@ -65,7 +65,7 @@ TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
   }
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluate)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluate)
 {
   LambdaType function(4,
                       [](const auto& xx, const auto& param) { RangeReturnType ret(std::pow(xx[0], param.get("power").at(0))); return ret;},
@@ -79,7 +79,7 @@ TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluate)
   }
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian)
 {
   DerivativeRangeReturnType expected_jacobian;
   LambdaType function(1,
@@ -94,7 +94,7 @@ TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobian)
   }
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   LambdaType function(1.);
   const auto& localizable_function = function.template as_grid_function<ElementType>();
@@ -105,7 +105,7 @@ TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   }
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
   for (auto vv : {1, 3, 5}) {
     const int expected_order = vv;
@@ -121,7 +121,7 @@ TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
   }
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   LambdaType function(4,
                       [](const auto& xx, const auto& param) { RangeReturnType ret(std::pow(xx[0], param.get("power").at(0))); return ret;},
@@ -143,7 +143,7 @@ TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
   }
 }
 
-TEST_F(LambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   DerivativeRangeReturnType expected_jacobian;
   LambdaType function(1,

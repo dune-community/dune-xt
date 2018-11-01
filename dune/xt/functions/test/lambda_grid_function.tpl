@@ -15,13 +15,13 @@
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
 
-#include <dune/xt/functions/lambda/grid-function.hh>
+#include <dune/xt/functions/generic/grid-function.hh>
 
 using namespace Dune::XT;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
-struct LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
+struct GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
@@ -29,16 +29,16 @@ struct LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
   static const size_t r = {{r}};
   static const size_t rC = {{rC}};
 
-  using LocalLambdaType = Functions::LocalLambdaFunction<ElementType, r, rC>;
+  using GenericType = Functions::GenericGridFunction<ElementType, r, rC>;
 
-  using RangeType = typename LocalLambdaType::LocalFunctionType::RangeType;
-  using RangeReturnType = typename LocalLambdaType::LocalFunctionType::RangeReturnType;
-  using DomainType = typename LocalLambdaType::LocalFunctionType::DomainType;
-  using DerivativeRangeType = typename LocalLambdaType::LocalFunctionType::DerivativeRangeType;
-  using DerivativeRangeReturnType = typename LocalLambdaType::LocalFunctionType::DerivativeRangeReturnType;
+  using RangeType = typename GenericType::LocalFunctionType::RangeType;
+  using RangeReturnType = typename GenericType::LocalFunctionType::RangeReturnType;
+  using DomainType = typename GenericType::LocalFunctionType::DomainType;
+  using DerivativeRangeType = typename GenericType::LocalFunctionType::DerivativeRangeType;
+  using DerivativeRangeReturnType = typename GenericType::LocalFunctionType::DerivativeRangeReturnType;
 
 
-  LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
+  GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
     : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
   {
   }
@@ -47,12 +47,12 @@ struct LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
 };
 
 
-TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
   size_t element_index = 0;
   const auto leaf_view = grid_.leaf_view();
 
-  LocalLambdaType  function(
+  GenericType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
@@ -62,12 +62,12 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_construct
       [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
 }
 
-TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   size_t element_index = 0;
   const auto leaf_view = grid_.leaf_view();
 
-  LocalLambdaType  function(
+  GenericType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
@@ -81,14 +81,14 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   }
 }
 
-TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
   size_t element_index = 0;
   const auto leaf_view = grid_.leaf_view();
 
   for (auto vv : {1, 3, 5}) {
     const int expected_order = vv;
-    LocalLambdaType  function(
+    GenericType  function(
         /*order=*/vv,
         [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
         [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
@@ -106,12 +106,12 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
   }
 }
 
-TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   size_t element_index = 0;
   const auto leaf_view = grid_.leaf_view();
 
-  LocalLambdaType  function(
+  GenericType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
@@ -132,12 +132,12 @@ TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
   }
 }
 
-TEST_F(LocalLambdaFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
+TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   size_t element_index = 0;
   const auto leaf_view = grid_.leaf_view();
 
-  LocalLambdaType  function(
+  GenericType  function(
       /*order=*/0,
       [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },

@@ -95,7 +95,7 @@ public:
 
   virtual int order(const Common::Parameter& /*param*/ = {}) const override final
   {
-    return order_;
+    return static_cast<int>(order_);
   }
 
   bool is_parametric() const override final

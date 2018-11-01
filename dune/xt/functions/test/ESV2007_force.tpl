@@ -55,15 +55,15 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_construc
 
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
 {
-  auto cfg = FunctionType::default_config();
-  EXPECT_EQ(cfg.get<std::string>("type"), FunctionType::static_id());
+  auto cfg = FunctionType::defaults();
+  EXPECT_EQ(cfg.get<std::string>("name"), FunctionType::static_id());
 }
 
 
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable)
 {
-  auto default_function = FunctionType::create();
-  EXPECT_EQ(default_function->order(), 3);
+  // auto default_function = FunctionType::create();
+  // EXPECT_EQ(default_function->order(), 3);
 }
 
 
@@ -78,8 +78,8 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiz
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
 {
   const int expected_order = 3;
-  auto default_function = FunctionType::create();
-  const auto actual_order = default_function->order();
+  FunctionType default_function(3);
+  const auto actual_order = default_function.order();
   EXPECT_EQ(expected_order, actual_order);
 }
 
@@ -113,8 +113,8 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jaco
 
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
-  auto default_function = FunctionType::create();
-  const auto& localizable_function = default_function->template as_grid_function<ElementType>();
+  FunctionType default_function(3);
+  const auto& localizable_function = default_function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -126,8 +126,8 @@ TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable
 TEST_F(ESV2007ForceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
   const int expected_order = 3;
-  auto default_function = FunctionType::create();
-  const auto& localizable_function = default_function->template as_grid_function<ElementType>();
+  FunctionType default_function(3);
+  const auto& localizable_function = default_function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : Dune::elements(leaf_view)) {

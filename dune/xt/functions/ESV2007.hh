@@ -74,7 +74,7 @@ public:
 
   Testcase1Force(const size_t ord = defaults().template get<int>("integration_order"),
                  const std::string nm = static_id())
-    : order_(ord)
+    : order_(static_cast<int>(ord))
     , name_(nm)
   {
   }
@@ -161,7 +161,7 @@ public:
 
   Testcase1ExactSolution(const size_t ord = defaults().template get<int>("integration_order"),
                          const std::string nm = static_id())
-    : order_(ord)
+    : order_(static_cast<int>(ord))
     , name_(nm)
   {
   }

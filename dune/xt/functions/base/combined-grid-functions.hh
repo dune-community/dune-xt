@@ -283,7 +283,9 @@ protected:
 public:
   int order(const XT::Common::Parameter& param = {}) const override final
   {
-    return Select::order(left_local_->order(param), right_local_->order(param));
+    const auto ret = Select::order(left_local_->order(param), right_local_->order(param));
+    assert(ret < std::numeric_limits<int>::max());
+    return static_cast<int>(ret);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,

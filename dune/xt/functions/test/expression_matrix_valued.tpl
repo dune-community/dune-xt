@@ -71,14 +71,14 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructi
 
 TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
 {
-  auto cfg = FunctionType::default_config();
-  EXPECT_EQ(cfg.get<std::string>("type"), FunctionType::static_id());
+  auto cfg = FunctionType::defaults();
+  EXPECT_EQ(cfg.get<std::string>("name"), FunctionType::static_id());
 }
 
 TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable)
 {
-  auto default_function = FunctionType::create();
-  EXPECT_EQ(3, default_function->order());
+  //auto default_function = FunctionType::create();
+  //EXPECT_EQ(3, default_function->order());
 }
 
 TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
@@ -185,9 +185,10 @@ TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobi
 
 TEST_F(ExpressionFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
-  auto default_function = FunctionType::create();
+  RangeExpressionType expr_1(std::string("x[0]*x[0]"));
+  FunctionType default_function("x", expr_1, 2);
 
-  const auto& localizable_function = default_function->template as_grid_function<ElementType>();
+  const auto& localizable_function = default_function.template as_grid_function<ElementType>();
 
   auto local_f = localizable_function.local_function();
 

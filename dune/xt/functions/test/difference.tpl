@@ -21,7 +21,7 @@ struct DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::tes
   static const size_t r = {{r}};
   static const size_t rC = {{rC}};
 
-  using IndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, r, rC>;
+  using IndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, r, rC>;
 
   using DifferenceFunctionType = Dune::XT::Functions::DifferenceGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
 
@@ -81,7 +81,7 @@ TEST_F(DifferenceFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, operator_work
   IndicatorFunctionType f({{'{{domains_1, first_value}}'}});
   IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
 
-  const auto& difference = f - g;
+  const auto& difference DUNE_UNUSED = f - g;
 }
 
 

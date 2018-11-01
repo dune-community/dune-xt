@@ -55,7 +55,7 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Common::Configuration default_config()
+  static Common::Configuration defaults()
   {
     Common::Configuration config;
     config["variable"] = "x";
@@ -67,7 +67,7 @@ public:
     config["order"] = "3";
     config["name"] = static_id();
     return config;
-  } // ... default_config(...)
+  } // ... defaults(...)
 
 private:
   // This function is required because MathExpressionFunctionBase is only valid for a scalar or vector
@@ -148,7 +148,7 @@ public:
 
   int order(const Common::Parameter& /*param*/ = {}) const override final
   {
-    return order_;
+    return static_cast<int>(order_);
   }
 
   using BaseType::evaluate;
@@ -274,7 +274,7 @@ public:
     return BaseType::static_id() + ".expression";
   }
 
-  static Common::Configuration default_config(const std::string sub_name = "")
+  static Common::Configuration defaults(const std::string sub_name = "")
   {
     Common::Configuration config;
     config["type"] = static_id();
@@ -290,44 +290,7 @@ public:
       tmp.add(config, sub_name);
       return tmp;
     }
-  } // ... default_config(...)
-
-  static std::unique_ptr<ThisType> create(const Common::Configuration config = default_config(),
-                                          const std::string sub_name = "")
-  {
-    // get correct config
-    const Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Common::Configuration default_cfg = default_config();
-
-    try {
-      if (cfg.has_key("gradient")) {
-        const auto expression = cfg.get<Common::FieldVector<std::string, r>>("expression");
-        const auto gradient = cfg.get<Common::FieldMatrix<std::string, r, d>>("gradient");
-        return Common::make_unique<ThisType>(cfg.get<std::string>("variable"),
-                                             expression,
-                                             gradient,
-                                             cfg.get<size_t>("order"),
-                                             cfg.get("name", default_cfg.get<std::string>("name")));
-      } else {
-        auto expression = cfg.get<Common::FieldVector<std::string, r>>("expression");
-        return Common::make_unique<ThisType>(cfg.get<std::string>("variable"),
-                                             expression,
-                                             cfg.get<size_t>("order"),
-                                             cfg.get("name", default_cfg.get<std::string>("name")));
-      }
-    } catch (const Common::Exceptions::configuration_error& ee) {
-      DUNE_THROW(Exceptions::wrong_input_given,
-                 "Given configuration was insufficient (see below)."
-                     << "\n"
-                     << "Note: if you only want to provide a gradient you still need to provide a dummy expression."
-                     << "\n\n"
-                     << "This was the original error: \n"
-                     << ee.what()
-                     << "\n\nThis would be a suitable default config:\n\n"
-                     << default_config());
-    }
-
-  } // ... create(...)
+  } // ... defaults(...)
 
   /**
    * \brief Creates an Expression function
@@ -389,7 +352,7 @@ public:
 
   int order(const Common::Parameter& /*param*/ = {}) const override final
   {
-    return order_;
+    return static_cast<int>(order_);
   }
 
   using BaseType::evaluate;

@@ -21,8 +21,8 @@ struct ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
   static const size_t r = {{r}};
   static const size_t rC = {{rC}};
 
-  using IndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, r, rC>;
-  using ScalarIndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, 1, 1>;
+  using IndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, r, rC>;
+  using ScalarIndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, 1, 1>;
 
   using ProductFunctionType = Dune::XT::Functions::ProductGridFunction<ScalarIndicatorFunctionType, IndicatorFunctionType>;
 
@@ -85,7 +85,7 @@ TEST_F(ProductFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, operator_works)
   ScalarIndicatorFunctionType f({{'{{domains_1, first_value}}'}});
   IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
 
-  const auto& product = f * g;
+  const auto& product DUNE_UNUSED = f * g;
 }
 
 

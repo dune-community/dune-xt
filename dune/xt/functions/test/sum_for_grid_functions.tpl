@@ -21,7 +21,7 @@ struct SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::T
   static const size_t r = {{r}};
   static const size_t rC = {{rC}};
 
-  using IndicatorFunctionType = Dune::XT::Functions::IndicatorFunction<ElementType, r, rC>;
+  using IndicatorFunctionType = Dune::XT::Functions::IndicatorGridFunction<ElementType, r, rC>;
 
   using SumFunctionType = Dune::XT::Functions::SumGridFunction<IndicatorFunctionType, IndicatorFunctionType>;
 
@@ -79,7 +79,7 @@ TEST_F(SumFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, operator_works)
   IndicatorFunctionType f({{'{{domains_1, first_value}}'}});
   IndicatorFunctionType g({{'{{domains_2, second_value}}'}});
 
-  const auto& sum = f + g;
+  const auto& sum DUNE_UNUSED = f + g;
 }
 
 
