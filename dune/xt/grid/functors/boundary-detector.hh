@@ -54,7 +54,8 @@ public:
   }
 
   BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other)
-    : Propagator(*this)
+    : BaseType(other)
+    , Propagator(other)
     , boundary_info_(other.boundary_info_)
     , boundary_type_(other.boundary_type_)
     , found_(other.found_)

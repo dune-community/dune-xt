@@ -248,7 +248,8 @@ public:
   }
 
   Walker(const ThisType& other)
-    : grid_view_(other.grid_view_)
+    : BaseType(other)
+    , grid_view_(other.grid_view_)
     , stored_element_functor_wrappers_(other.stored_element_functor_wrappers_)
     , stored_intersection_functor_wrappers_(other.stored_intersection_functor_wrappers_)
     , stored_element_and_intersection_functor_wrappers_(other.stored_element_and_intersection_functor_wrappers_)
