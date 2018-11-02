@@ -141,15 +141,13 @@ public:
                      const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value() / 1000.)
     : num_rows_(rr)
     , num_cols_(cc)
-    , entries_(std::make_shared<EntriesVectorType>(
-          XT::Common::FloatCmp::eq(value, ScalarType(0.), 0., eps / ScalarType(num_cols_)) ? 0 : num_rows_ * num_cols_,
-          value))
+    , entries_(std::make_shared<EntriesVectorType>(is_zero(value, eps) ? 0 : num_rows_ * num_cols_, value))
     , row_pointers_(std::make_shared<IndexVectorType>(num_rows_ + 1, 0))
     , column_indices_(std::make_shared<IndexVectorType>())
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
   {
-    if (XT::Common::FloatCmp::ne(value, ScalarType(0), 0., eps / ScalarType(num_cols_))) {
+    if (!is_zero(value, eps)) {
       IndexVectorType row_column_indices(num_cols_);
       for (size_t col = 0; col < num_cols_; ++col)
         row_column_indices[col] = col;
@@ -240,7 +238,7 @@ public:
   assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
   {
     clear();
-    typedef XT::Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
+    using MatAbstrType = XT::Common::MatrixAbstraction<OtherMatrixImp>;
     num_rows_ = MatAbstrType::rows(other);
     num_cols_ = MatAbstrType::cols(other);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
@@ -259,7 +257,7 @@ public:
   typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
   operator=(const OtherMatrixImp& other)
   {
-    assign(other, dense_pattern(num_rows_, num_cols_));
+    return assign(other, dense_pattern(num_rows_, num_cols_));
   }
 
   void clear()
@@ -430,7 +428,7 @@ public:
     SparsityPatternDefault ret(num_rows_);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
       for (size_t kk = row_pointers_->operator[](rr); kk < row_pointers_->operator[](rr + 1); ++kk) {
-        if (!prune || Common::FloatCmp::ne(entries_->operator[](kk), ScalarType(0), 0., eps / ScalarType(num_cols_)))
+        if (!prune || !is_zero(entries_->operator[](kk), eps))
           ret.insert(rr, column_indices_->operator[](kk));
       }
     }
@@ -523,6 +521,13 @@ private:
     return size_t(-1);
   }
 
+  bool is_zero(const ScalarType val, const ScalarType eps) const
+  {
+    const auto factor = (num_cols_ == 0 ? 1. : ScalarType(num_cols_));
+    const ScalarType tol = eps / factor;
+    return XT::Common::FloatCmp::eq(val, ScalarType(0.), 0., tol);
+  }
+
   size_t num_rows_, num_cols_;
   std::shared_ptr<EntriesVectorType> entries_;
   std::shared_ptr<IndexVectorType> row_pointers_;
@@ -595,15 +600,13 @@ public:
                      const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value() / 1000.)
     : num_rows_(rr)
     , num_cols_(cc)
-    , entries_(std::make_shared<EntriesVectorType>(
-          XT::Common::FloatCmp::eq(value, ScalarType(0.), 0., eps / ScalarType(num_cols_)) ? 0 : num_rows_ * num_cols_,
-          value))
+    , entries_(std::make_shared<EntriesVectorType>(is_zero(value, eps) ? 0 : num_rows_ * num_cols_, value))
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1, 0))
     , row_indices_(std::make_shared<IndexVectorType>())
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
     , eps_(eps)
   {
-    if (XT::Common::FloatCmp::ne(value, ScalarType(0.), 0., eps / ScalarType(num_cols_))) {
+    if (!is_zero(value, eps)) {
       IndexVectorType column_row_indices(num_rows_);
       for (size_t row = 0; row < num_rows_; ++row)
         column_row_indices[row] = row;
@@ -699,7 +702,7 @@ public:
   assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
   {
 
-    typedef Common::MatrixAbstraction<OtherMatrixImp> MatAbstrType;
+    using MatAbstrType = Common::MatrixAbstraction<OtherMatrixImp>;
     clear();
     num_rows_ = MatAbstrType::rows(other);
     num_cols_ = MatAbstrType::cols(other);
@@ -947,7 +950,7 @@ public:
     SparsityPatternDefault ret(num_rows_);
     for (size_t cc = 0; cc < num_cols_; ++cc) {
       for (size_t kk = (*column_pointers_)[cc]; kk < (*column_pointers_)[cc + 1]; ++kk) {
-        if (!prune || Common::FloatCmp::ne((*entries_)[kk], ScalarType(0), 0., eps / ScalarType(num_cols_)))
+        if (!prune || !is_zero((*entries_)[kk], eps))
           ret.insert((*row_indices_)[kk], cc);
       }
     } // cc
@@ -1079,6 +1082,13 @@ private:
     return size_t(-1);
   }
 
+  bool is_zero(const ScalarType val, const ScalarType eps) const
+  {
+    const auto factor = (num_cols_ == 0 ? 1. : ScalarType(num_cols_));
+    const ScalarType tol = eps / factor;
+    return XT::Common::FloatCmp::eq(val, ScalarType(0.), 0., tol);
+  }
+
   size_t num_rows_, num_cols_;
   std::shared_ptr<EntriesVectorType> entries_;
   std::shared_ptr<IndexVectorType> column_pointers_;
@@ -1123,7 +1133,7 @@ public:
     for (size_t row = 0; row < num_rows_; ++row)
       nnz += patt.inner(row).size();
     size_t num_entries = rr * cc;
-    double density = double(nnz) / double(num_entries);
+    const double density = double(nnz) / double(num_entries);
     sparse_ = density < sparse_limit;
     if (sparse_) {
       sparse_matrix_ = SparseMatrixType(rr, cc, patt, num_mutexes, eps);
@@ -1143,7 +1153,7 @@ public:
     : num_rows_(rr)
     , num_cols_(cc)
   {
-    if (XT::Common::FloatCmp::ne(value, ScalarType(0.), 0., eps / ScalarType(num_cols_)) || !use_sparse_if_zero) {
+    if (!is_zero(value, eps) || !use_sparse_if_zero) {
       sparse_matrix_ = SparseMatrixType(0, 0, value, num_mutexes, eps);
       dense_matrix_ = DenseMatrixType(rr, cc, value, num_mutexes);
     } else {
@@ -1170,7 +1180,7 @@ public:
   template <class OtherMatrixType>
   explicit CommonSparseOrDenseMatrix(
       const OtherMatrixType& mat,
-      const typename std::enable_if<Common::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune = false,
+      const typename std::enable_if<Common::MatrixAbstraction<OtherMatrixType>::is_matrix, bool>::type prune = true,
       const EpsType eps_in = Common::FloatCmp::DefaultEpsilon<ScalarType>::value() / 1000.,
       const size_t num_mutexes = 1)
     : num_rows_(Common::MatrixAbstraction<OtherMatrixType>::rows(mat))
@@ -1184,7 +1194,7 @@ public:
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
         nnz += XT::Common::FloatCmp::ne(value, ScalarType(0), 0., eps);
       }
-    double density = double(nnz) / double(num_rows_ * num_cols_);
+    const double density = double(nnz) / double(num_rows_ * num_cols_);
     sparse_ = density < sparse_limit;
     if (sparse_) {
       sparse_matrix_ = SparseMatrixType(mat, prune, eps_in, num_mutexes);
@@ -1229,8 +1239,8 @@ public:
         const auto& value = Common::MatrixAbstraction<DenseMatrixType>::get_entry(other, rr, cc);
         nnz += XT::Common::FloatCmp::ne(value, ScalarType(0), 0., tol);
       }
-    double density = double(nnz) / (Common::MatrixAbstraction<DenseMatrixType>::rows(other)
-                                    * Common::MatrixAbstraction<DenseMatrixType>::cols(other));
+    const double density = double(nnz) / (Common::MatrixAbstraction<DenseMatrixType>::rows(other)
+                                          * Common::MatrixAbstraction<DenseMatrixType>::cols(other));
     sparse_ = density < sparse_limit;
     if (sparse_)
       sparse_matrix_ = other;
@@ -1438,6 +1448,13 @@ public:
   }
 
 private:
+  bool is_zero(const ScalarType val, const ScalarType eps) const
+  {
+    const auto factor = (num_cols_ == 0 ? 1. : ScalarType(num_cols_));
+    const ScalarType tol = eps / factor;
+    return XT::Common::FloatCmp::eq(val, ScalarType(0.), 0., tol);
+  }
+
   size_t num_rows_, num_cols_;
   bool sparse_;
   SparseMatrixType sparse_matrix_;

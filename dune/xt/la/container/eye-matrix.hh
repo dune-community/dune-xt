@@ -25,10 +25,11 @@ namespace internal {
 
 
 template <class MatrixType>
-typename std::enable_if<is_matrix<MatrixType>::value, void>::type set_diagonal_to_one(MatrixType& mat)
+typename std::enable_if<Common::is_matrix<MatrixType>::value, void>::type set_diagonal_to_one(MatrixType& mat)
 {
-  for (size_t ii = 0; ii < std::min(mat.rows(), mat.cols()); ++ii)
-    mat.set_entry(ii, ii, 1.);
+  using M = Common::MatrixAbstraction<MatrixType>;
+  for (size_t ii = 0; ii < std::min(M::rows(mat), M::cols(mat)); ++ii)
+    M::set_entry(mat, ii, ii, 1.);
 }
 
 
@@ -42,6 +43,13 @@ eye_matrix(const size_t rows, const size_t cols, const SparsityPatternDefault& p
   MatrixType mat = MatrixType(rows, cols, pattern.size() == 0 ? diagonal_pattern(rows, cols) : pattern);
   internal::set_diagonal_to_one(mat);
   return mat;
+}
+
+template <class MatrixType>
+typename std::enable_if<Common::is_matrix<MatrixType>::value, void>::type eye_matrix(MatrixType& matrix)
+{
+  matrix *= 0.;
+  internal::set_diagonal_to_one(matrix);
 }
 
 template <class MatrixType>

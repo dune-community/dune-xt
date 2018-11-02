@@ -15,6 +15,7 @@
 #include <cmath>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <vector>
 
 #include <boost/align/aligned_allocator.hpp>
@@ -47,14 +48,14 @@ namespace internal {
 template <class ScalarType>
 struct MatrixBackendBase
 {
-  MatrixBackendBase(size_t num_rows, size_t num_cols, const ScalarType value)
+  MatrixBackendBase(const size_t num_rows, const size_t num_cols, const ScalarType value)
     : num_rows_(num_rows)
     , num_cols_(num_cols)
     , entries_(num_rows_ * num_cols_, value)
   {
   }
 
-  void resize(size_t num_rows, size_t num_cols)
+  void resize(const size_t num_rows, const size_t num_cols)
   {
     num_rows_ = num_rows;
     num_cols_ = num_cols;
@@ -75,17 +76,17 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_row_maj
 {
   using BaseType = MatrixBackendBase<ScalarType>;
 
-  CommonDenseMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+  CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
   {
   }
 
-  ScalarType& get_entry_ref(size_t rr, size_t cc)
+  ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
     return entries_[rr * num_cols_ + cc];
   }
 
-  const ScalarType& get_entry_ref(size_t rr, size_t cc) const
+  const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
     return entries_[rr * num_cols_ + cc];
   }
@@ -101,17 +102,17 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_
 {
   using BaseType = MatrixBackendBase<ScalarType>;
 
-  CommonDenseMatrixBackend(size_t num_rows, size_t num_cols, const ScalarType value = ScalarType(0))
+  CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
   {
   }
 
-  ScalarType& get_entry_ref(size_t rr, size_t cc)
+  ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
     return entries_[cc * num_rows_ + rr];
   }
 
-  const ScalarType& get_entry_ref(size_t rr, size_t cc) const
+  const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
     return entries_[cc * num_rows_ + rr];
   }
@@ -135,7 +136,7 @@ class CommonDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
 
 
 /**
- *  \brief  A dense matrix implementation of MatrixInterface using the a std::vector backend.
+ *  \brief  A dense matrix implementation of MatrixInterface using a std::vector backend.
  */
 template <class ScalarImp = double, Common::StorageLayout storage_layout = Common::StorageLayout::dense_row_major>
 class CommonDenseMatrix
@@ -159,7 +160,7 @@ public:
                              const size_t cc = 0,
                              const ScalarType value = ScalarType(0),
                              const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(rr, cc, value))
+    : backend_(std::make_unique<BackendType>(rr, cc, value))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
@@ -169,13 +170,13 @@ public:
                     const size_t cc,
                     const SparsityPatternDefault& /*pattern*/,
                     const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(rr, cc, ScalarType(0)))
+    : backend_(std::make_unique<BackendType>(rr, cc, ScalarType(0)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
   }
 
   CommonDenseMatrix(const ThisType& other)
-    : backend_(std::make_shared<BackendType>(*other.backend_))
+    : backend_(std::make_unique<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
   {
   }
@@ -193,12 +194,12 @@ public:
     if (prune)
       backend_ = ThisType(other).pruned(eps).backend_;
     else
-      backend_ = std::make_shared<BackendType>(other);
+      backend_ = std::make_unique<BackendType>(other);
   }
 
   template <class T>
   CommonDenseMatrix(const DenseMatrix<T>& other, const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(other.rows(), other.cols()))
+    : backend_(std::make_unique<BackendType>(other.rows(), other.cols()))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     for (size_t ii = 0; ii < other.rows(); ++ii)
@@ -210,12 +211,6 @@ public:
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
   explicit CommonDenseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
-    : backend_(backend_ptr)
-    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
-
-  explicit CommonDenseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
@@ -235,12 +230,9 @@ public:
     *backend_ = *other.backend_;
   }
 
-  /**
-   *  \note Does a deep copy.
-   */
   ThisType& operator=(const BackendType& other)
   {
-    backend_ = std::make_shared<BackendType>(other);
+    backend_ = std::make_unique<BackendType>(other);
     return *this;
   }
 
@@ -346,11 +338,17 @@ public:
     using V2 = typename Common::VectorAbstraction<SecondVectorType>;
     static_assert(V1::is_vector && V2::is_vector, "");
     assert(xx.size() == cols() && yy.size() == rows());
-    yy *= ScalarType(0.);
-    for (size_t rr = 0; rr < rows(); ++rr) {
-      V2::set_entry(yy, rr, 0.);
-      for (size_t cc = 0; cc < cols(); ++cc)
-        V2::add_to_entry(yy, rr, get_entry(rr, cc) * V1::get_entry(xx, cc));
+    if (storage_layout == Common::StorageLayout::dense_row_major && V1::is_contiguous) {
+      for (size_t rr = 0; rr < rows(); ++rr)
+        V2::set_entry(yy, rr, std::inner_product(get_ptr(rr), get_ptr(rr + 1), V1::data(xx), ScalarType(0.)));
+    } else {
+      assert(xx.size() == cols() && yy.size() == rows());
+      yy *= ScalarType(0.);
+      for (size_t rr = 0; rr < rows(); ++rr) {
+        V2::set_entry(yy, rr, 0.);
+        for (size_t cc = 0; cc < cols(); ++cc)
+          V2::add_to_entry(yy, rr, get_entry(rr, cc) * V1::get_entry(xx, cc));
+      }
     }
   }
 
@@ -465,11 +463,6 @@ public:
   using InterfaceType::operator+=;
   using InterfaceType::operator-=;
 
-  void deep_copy(const ThisType& other)
-  {
-    *backend_ = *other.backend_;
-  }
-
   template <class OtherMatrixType>
   void rightmultiply(const OtherMatrixType& other)
   {
@@ -496,8 +489,29 @@ public:
     return ret;
   } // ... pruned(...)
 
+  ScalarType& get_entry_ref(const size_t rr, const size_t cc)
+  {
+    return backend_->get_entry_ref(rr, cc);
+  }
+
+  const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
+  {
+    return backend_->get_entry_ref(rr, cc);
+  }
+
+  // get pointer to begin of row (row major backend) or column (column major backend)
+  ScalarType* get_ptr(const size_t row_or_col)
+  {
+    return &(backend_->get_entry_ref(row_or_col, 0));
+  }
+
+  const ScalarType* get_ptr(const size_t row_or_col) const
+  {
+    return &(backend_->get_entry_ref(row_or_col, 0));
+  }
+
 private:
-  std::shared_ptr<BackendType> backend_;
+  std::unique_ptr<BackendType> backend_;
   std::unique_ptr<MutexesType> mutexes_;
 }; // class CommonDenseMatrix
 

@@ -62,8 +62,6 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
       EXPECT_FALSE(Common::FloatCmp::ne(d_by_size_and_value.get_entry(ii), d_by_size_and_value.get_entry(ii)))
           << d_by_size_and_value.get_entry(ii);
     }
-    size_t d_dim = d_by_size.dim();
-    EXPECT_EQ(dim, d_dim);
     EXPECT_TRUE(d_by_size.almost_equal(d_by_size));
     d_by_size_and_value.scal(D_ScalarType(0));
     EXPECT_TRUE(d_by_size_and_value.almost_equal(d_by_size));
@@ -96,7 +94,6 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
     VectorImp d_by_size_and_value_2(dim, D_ScalarType(1));
     InterfaceType& i_by_size = static_cast<InterfaceType&>(d_by_size_2);
     InterfaceType& i_by_size_and_value = static_cast<InterfaceType&>(d_by_size_and_value_2);
-    auto i_dim DUNE_UNUSED = i_by_size.dim();
     EXPECT_TRUE(i_by_size.almost_equal(d_by_size_2));
     i_by_size_and_value.scal(I_ScalarType(0));
     EXPECT_TRUE(i_by_size_and_value.almost_equal(d_by_size_2));

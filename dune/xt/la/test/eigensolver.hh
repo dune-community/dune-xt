@@ -84,7 +84,7 @@ struct EigenSolverTest : public ::testing::Test
   void throws_on_broken_matrix_construction() const
   {
     try {
-      EigenSolverType DXTC_UNUSED(default_solver)(broken_matrix_);
+      EigenSolverType DXTC_UNUSED(default_solver){broken_matrix_};
       FAIL() << "Expected LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements";
     } catch (const LA::Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements& /*ee*/) {
     } catch (...) {
@@ -136,7 +136,7 @@ struct EigenSolverTest : public ::testing::Test
   void is_constructible() const
   {
     ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
-    EigenSolverType DXTC_UNUSED(default_solver)(matrix_);
+    EigenSolverType DXTC_UNUSED(default_solver){matrix_};
     for (const auto& tp : EigenSolverOpts::types()) {
       EigenSolverType DXTC_UNUSED(default_opts_solver)(matrix_, tp);
       EigenSolverType DXTC_UNUSED(solver)(matrix_, EigenSolverOpts::options(tp));
@@ -191,7 +191,7 @@ struct EigenSolverTest : public ::testing::Test
   {
     using MC = Common::MatrixAbstraction<ComplexMatrixType>;
     ASSERT_TRUE(all_matrices_and_expected_eigenvalues_and_vectors_are_computed_);
-    const auto matrix_as_complex = convert_to<ComplexMatrixType>(matrix_);
+    const auto matrix_as_complex = Dune::XT::LA::convert_to<ComplexMatrixType>(matrix_);
     for (const auto& tp : EigenSolverOpts::types()) {
       const double tolerance = tolerances.get(tp, 1e-15);
       EigenSolverType solver(matrix_, tp);

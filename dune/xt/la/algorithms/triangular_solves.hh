@@ -51,8 +51,9 @@ void backward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
   typedef Common::MatrixAbstraction<MatrixType> M;
   const size_t num_rows = M::rows(A);
   const size_t num_cols = num_rows;
+  assert(num_rows < std::numeric_limits<int>::max());
   for (int ii = static_cast<int>(num_rows) - 1; ii >= 0.; --ii) {
-    for (size_t jj = ii + 1; jj < num_cols; ++jj)
+    for (size_t jj = static_cast<size_t>(ii) + 1; jj < num_cols; ++jj)
       rhs[ii] -= M::get_entry(A, transposed ? jj : ii, transposed ? ii : jj) * x[jj];
     if (M::get_entry(A, ii, ii) == 0.)
       DUNE_THROW(Dune::MathError, "Triangular solve failed, matrix is singular!");

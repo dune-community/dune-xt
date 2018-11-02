@@ -28,7 +28,6 @@ namespace XT {
 namespace LA {
 namespace internal {
 
-
 // computes the LDL^T factorization of a tridiagonal matrix
 template <class FirstVectorType, class SecondVectorType>
 void tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
@@ -37,7 +36,7 @@ void tridiagonal_ldlt(FirstVectorType& diag, SecondVectorType& subdiag)
   using V2 = Common::VectorAbstraction<SecondVectorType>;
   V1::set_entry(diag, 0, V1::get_entry(diag, 0));
   for (size_t ii = 0; ii < diag.size() - 1; ++ii) {
-    if (V1::get_entry(diag, ii) <= 0)
+    if (!(V1::get_entry(diag, ii) > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "LDL^T factorization failed!");
     V2::set_entry(subdiag, ii, V2::get_entry(subdiag, ii) / V1::get_entry(diag, ii));
     V1::set_entry(
@@ -90,7 +89,6 @@ template <bool only_set_nonzero, class MatrixType>
 void cholesky_rowwise(MatrixType& A)
 {
   using M = Common::MatrixAbstraction<MatrixType>;
-  using ScalarType = typename M::ScalarType;
   size_t size = M::rows(A);
   auto& L = A;
   for (size_t ii = 0; ii < size; ++ii) {
@@ -99,13 +97,13 @@ void cholesky_rowwise(MatrixType& A)
       for (size_t kk = 0; kk < jj; ++kk)
         L_ij -= M::get_entry(L, ii, kk) * M::get_entry(L, jj, kk);
       L_ij /= M::get_entry(L, jj, jj);
-      if (!only_set_nonzero || !std::equal_to<ScalarType>()(L_ij, 0.))
+      if (!only_set_nonzero || !XT::Common::is_zero(L_ij))
         M::set_entry(L, ii, jj, L_ij);
     } // jj
     auto L_ii = M::get_entry(A, ii, ii);
     for (size_t kk = 0; kk < ii; ++kk)
       L_ii -= std::pow(M::get_entry(L, ii, kk), 2);
-    if (L_ii <= 0)
+    if (!(L_ii > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "Cholesky factorization failed!");
     M::set_entry(L, ii, ii, std::sqrt(L_ii));
   } // ii
@@ -115,14 +113,13 @@ template <bool only_set_nonzero, class MatrixType>
 void cholesky_colwise(MatrixType& A)
 {
   using M = Common::MatrixAbstraction<MatrixType>;
-  using ScalarType = typename M::ScalarType;
   size_t size = M::rows(A);
   auto& L = A;
   for (size_t jj = 0; jj < size; ++jj) {
     auto L_jj = M::get_entry(A, jj, jj);
     for (size_t kk = 0; kk < jj; ++kk)
       L_jj -= std::pow(M::get_entry(L, jj, kk), 2);
-    if (L_jj <= 0)
+    if (!(L_jj > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "Cholesky factorization failed!");
     L_jj = std::sqrt(L_jj);
     M::set_entry(L, jj, jj, L_jj);
@@ -132,7 +129,7 @@ void cholesky_colwise(MatrixType& A)
       for (size_t kk = 0; kk < jj; ++kk)
         L_ij -= M::get_entry(L, ii, kk) * M::get_entry(L, jj, kk);
       L_ij *= L_jj_inv;
-      if (!only_set_nonzero || !std::equal_to<ScalarType>()(L_ij, 0.))
+      if (!only_set_nonzero || !XT::Common::is_zero(L_ij))
         M::set_entry(L, ii, jj, L_ij);
     } // ii
   } // jj
@@ -146,7 +143,6 @@ cholesky_csr(MatrixType& A)
   const auto* row_pointers = A.outer_index_ptr();
   const auto* column_indices = A.inner_index_ptr();
   using M = Common::MatrixAbstraction<MatrixType>;
-  using ScalarType = typename M::ScalarType;
   size_t size = M::rows(A);
   auto& L = A;
   for (size_t ii = 0; ii < size; ++ii) {
@@ -163,14 +159,14 @@ cholesky_csr(MatrixType& A)
           L_ij -= entries[ll++] * entries[kk++];
       }
       L_ij /= M::get_entry(L, jj, jj);
-      if (!std::equal_to<ScalarType>()(L_ij, 0.))
+      if (!XT::Common::is_zero(L_ij))
         M::set_entry(L, ii, jj, L_ij);
     } // jj
     auto L_ii = M::get_entry(A, ii, ii);
     auto kk = row_pointers[ii];
     while (kk < row_pointers[ii + 1] && size_t(column_indices[kk]) < ii)
       L_ii -= std::pow(entries[kk++], 2);
-    if (L_ii <= 0)
+    if (!(L_ii > 0)) // use !(.. > 0) instead of (.. <= 0) to also throw on NaNs
       DUNE_THROW(MathError, "Cholesky factorization failed!");
     M::set_entry(L, ii, ii, std::sqrt(L_ii));
   } // ii
@@ -305,6 +301,15 @@ template <class MatrixType>
 typename std::enable_if_t<Common::is_matrix<MatrixType>::value, void> cholesky(MatrixType& A)
 {
   internal::CholeskySolver<MatrixType>::cholesky(A);
+} // void solve_lower_triangular(...)
+
+template <class MatrixType, class VectorType>
+typename std::enable_if_t<Common::is_matrix<MatrixType>::value && Common::is_vector<VectorType>::value, void>
+solve_cholesky_factorized(const MatrixType& L, VectorType& rhs)
+{
+  auto x = rhs;
+  solve_lower_triangular(L, x, rhs);
+  solve_lower_triangular_transposed(L, rhs, x);
 } // void solve_lower_triangular(...)
 
 

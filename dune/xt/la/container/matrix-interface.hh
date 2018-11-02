@@ -529,6 +529,8 @@ struct MatrixAbstractionBase
 
   static const constexpr Common::StorageLayout storage_layout = Common::StorageLayout::other;
 
+  static const bool has_ostream = true;
+
   using MatrixType = typename std::conditional<is_matrix, MatrixImp, void>::type;
   using ScalarType = typename std::conditional<is_matrix, typename MatrixImp::ScalarType, void>::type;
   using RealType = typename std::conditional<is_matrix, typename MatrixImp::RealType, void>::type;
