@@ -53,15 +53,7 @@ public:
   {
   }
 
-  BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other)
-    : BaseType(other)
-    , Propagator(other)
-    , boundary_info_(other.boundary_info_)
-    , boundary_type_(other.boundary_type_)
-    , found_(other.found_)
-    , res_mutex_()
-  {
-  }
+  BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other) = default;
 
   virtual void prepare() override final
   {
@@ -103,22 +95,16 @@ protected:
     found_ = res;
   }
 
-  void add_to_result(size_t res)
-  {
-    std::lock_guard<std::mutex>{res_mutex_};
-    found_ += res;
-  }
-
 private:
   const BoundaryInfo<IntersectionType>& boundary_info_;
   const std::shared_ptr<BoundaryType> boundary_type_;
   size_t found_;
-  std::mutex res_mutex_;
 }; // class BoundaryDetectorFunctor
 
 
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
+
 
 #endif // DUNE_XT_GRID_FUNCTORS_BOUNDARY_DETECTOR_HH

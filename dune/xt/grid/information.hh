@@ -182,7 +182,7 @@ struct Dimensions
       box[1][i] = coord_limits[i].max();
     }
     return box;
-  };
+  }
 };
 
 template <class GridType>
