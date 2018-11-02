@@ -42,3 +42,4 @@ data
 *.user
 cmake/modules/petsc
 .idea
+__pycache__
