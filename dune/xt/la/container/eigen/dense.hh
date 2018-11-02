@@ -298,8 +298,8 @@ public:
   EigenMappedDenseVector(const ThisType& other)
     : BaseType(other)
   {
-    backend_ = std::make_shared<BackendType>(new ScalarType[other.size()],
-                                             internal::boost_numeric_cast<EIGEN_size_t>(other.size()));
+    backend_ =
+        std::make_shared<BackendType>(new ScalarType[other.size()], Common::numeric_cast<EIGEN_size_t>(other.size()));
     backend_->operator=(other.backend());
   }
 
@@ -406,8 +406,7 @@ public:
                    const size_t cc,
                    const SparsityPatternDefault& /*pattern*/,
                    const size_t num_mutexes = 1)
-    : backend_(new BackendType(internal::boost_numeric_cast<EIGEN_size_t>(rr),
-                               internal::boost_numeric_cast<EIGEN_size_t>(cc)))
+    : backend_(new BackendType(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     backend_->setZero();

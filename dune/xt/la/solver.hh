@@ -177,14 +177,14 @@ typename std::enable_if<is_matrix<M>::value, Solver<M>>::type make_solver(const 
 //}
 
 
-template <class M, class V>
-typename VectorInterface<V>::derived_type
-solve(const MatrixInterface<M>& A,
-      const VectorInterface<V>& b,
-      const Common::Configuration& opts = SolverOptions<typename MatrixInterface<M>::derived_type>::options())
+template <class M, class V, class S>
+typename VectorInterface<V, S>::derived_type
+solve(const MatrixInterface<M, S>& A,
+      const VectorInterface<V, S>& b,
+      const Common::Configuration& opts = SolverOptions<typename MatrixInterface<M, S>::derived_type>::options())
 {
-  typename VectorInterface<V>::derived_type x(A.cols(), 0.);
-  Solver<typename MatrixInterface<M>::derived_type> solver(A.as_imp());
+  typename VectorInterface<V, S>::derived_type x(A.cols(), 0.);
+  Solver<typename MatrixInterface<M, S>::derived_type> solver(A.as_imp());
   solver.apply(b.as_imp(), x, opts);
   return x;
 }

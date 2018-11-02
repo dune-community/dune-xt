@@ -377,7 +377,6 @@ private:
   static typename M::template MatrixTypeTemplate<M::static_rows, M::static_rows>
   calculate_q_explicitly(const MatrixType& QR, const VectorType& tau)
   {
-    using W = typename Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_rows>>;
     const size_t num_rows = M::rows(QR);
     const size_t num_cols = M::cols(QR);
     auto ret = eye_matrix<typename M::template MatrixTypeTemplate<M::static_rows, M::static_rows>>(
