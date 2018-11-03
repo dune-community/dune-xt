@@ -30,7 +30,7 @@ namespace Dune {
 namespace XT {
 namespace Grid {
 
-
+#if 0
 template <class G>
 void bind_GridProvider(pybind11::module& m, const std::string& grid_id)
 {
@@ -69,7 +69,6 @@ void bind_GridProvider(pybind11::module& m, const std::string& grid_id)
   c.def_property_readonly("grid_type", [grid_id](const C& /*self*/) { return grid_id; });
   c.def_property_readonly("dim", [](const C& /*self*/) { return C::dimDomain; });
 } // ... bind_GridProvider(...)
-
 
 template <class G>
 void bind_DdSubdomainsGridProvider(pybind11::module& m, const std::string& grid_id)
@@ -133,6 +132,7 @@ void bind_DdSubdomainsGridProvider(pybind11::module& m, const std::string& grid_
         },
         "subdomain"_a);
 } // ... bind_DdSubdomainsGridProvider(...)
+#endif
 
 
 template <class G>
