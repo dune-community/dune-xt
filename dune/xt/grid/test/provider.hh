@@ -20,8 +20,6 @@
 
 #include <dune/xt/common/test/gtest/gtest.h>
 
-#include <dune/xt/grid/grids.bindings.hh>
-
 template <class GridType>
 struct GridProviderBase : public testing::Test
 {

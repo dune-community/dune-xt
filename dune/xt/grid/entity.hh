@@ -13,17 +13,18 @@
 #ifndef DUNE_XT_GRID_ENTITY_HH
 #define DUNE_XT_GRID_ENTITY_HH
 
-#include <dune/common/deprecated.hh>
-
 #include <dune/geometry/referenceelements.hh>
 
 #include <dune/grid/common/entity.hh>
 #include <dune/grid/common/gridview.hh>
 
+#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
+
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 namespace Dune {
 namespace XT {
@@ -45,8 +46,20 @@ void print_entity(const EntityType& entity,
 } // ... print_entity(...)
 
 
+template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
+std::ostream& operator<<(std::ostream& out, const Entity<cd, dim, GridImp, EntityImp>& entity)
+{
+  out << "Entity<" << cd << ", " << dim << ", " << bindings::grid_name<GridImp>::value() << ">(";
+  for (size_t ii = 0; ii << entity.geometry().corners() - 1; ++ii)
+    out << Common::to_string(ii) << ": {" << entity.geometry().corner(ii) << "}, ";
+  out << Common::to_string(entity.geometry().corners() - 1) << ": {"
+      << entity.geometry().corner(entity.geometry().corners() - 1) << "})";
+  return out;
+}
+
+
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
-double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
+double diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
 {
   auto max_dist = std::numeric_limits<typename GridImp::ctype>::min();
   const auto& geometry = entity.geometry();
@@ -59,7 +72,14 @@ double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& 
     }
   }
   return max_dist;
-} // entity_diameter
+} // diameter
+
+
+template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
+double entity_diameter(const Dune::Entity<codim, worlddim, GridImp, EntityImp>& entity)
+{
+  return diameter(entity);
+}
 
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>

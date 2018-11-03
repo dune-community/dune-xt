@@ -41,6 +41,7 @@ typedef Dune::OneDGrid ONED_1D;
 typedef Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>> YASP_1D_EQUIDISTANT_OFFSET;
 typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>> YASP_2D_EQUIDISTANT_OFFSET;
 typedef Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>> YASP_3D_EQUIDISTANT_OFFSET;
+typedef Dune::YaspGrid<4, Dune::EquidistantOffsetCoordinates<double, 4>> YASP_4D_EQUIDISTANT_OFFSET;
 #if HAVE_DUNE_ALUGRID
 typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming> ALU_2D_SIMPLEX_CONFORMING;
 typedef Dune::ALUGrid<2, 2, Dune::simplex, Dune::nonconforming> ALU_2D_SIMPLEX_NONCONFORMING;

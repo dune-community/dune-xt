@@ -27,7 +27,7 @@
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
 #include <dune/xt/grid/walker.hh>
-#include <dune/xt/grid/walker/functors.hh>
+#include <dune/xt/grid/functors/interfaces.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
@@ -106,14 +106,14 @@ struct Dimensions
   //! automatic running min/max
   typedef Dune::XT::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
   typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
-  typedef typename GridType::template Codim<0>::Entity EntityType;
+  typedef typename GridType::template Codim<0>::Entity ElementType;
   using BoundingBoxType = std::array<FieldVector<typename GridType::ctype, GridType::dimensionworld>, 2>;
   CoordLimitsType coord_limits;
   MinMaxAvgType entity_volume;
   MinMaxAvgType entity_width;
 
   //! gridwalk functor that does the actual work for \ref GridDimensions
-  class GridDimensionsFunctor : public Functor::Codim0<GridLayerType>
+  class GridDimensionsFunctor : public ElementFunctor<GridLayerType>
   {
     CoordLimitsType& coord_limits_;
     MinMaxAvgType& entity_volume_;
@@ -127,17 +127,22 @@ struct Dimensions
     {
     }
 
-    virtual void apply_local(const EntityType& ent)
+    virtual void apply_local(const ElementType& element) override
     {
-      const auto& geo = ent.geometry();
+      const auto& geo = element.geometry();
       entity_volume_(geo.volume());
-      entity_width_(entity_diameter(ent));
+      entity_width_(entity_diameter(element));
       for (auto i : Common::value_range(geo.corners())) {
         const auto& corner(geo.corner(i));
         for (size_t k = 0; k < GridType::dimensionworld; ++k)
           coord_limits_[k](corner[k]);
       }
     } // ()
+
+    ElementFunctor<GridLayerType>* copy() override
+    {
+      return new GridDimensionsFunctor(*this);
+    }
   };
 
   double volume_relation() const
@@ -153,7 +158,7 @@ struct Dimensions
     gw.walk();
   }
 
-  Dimensions(const EntityType& entity)
+  Dimensions(const ElementType& entity)
   {
     GridDimensionsFunctor f(coord_limits, entity_volume, entity_width);
     f.apply_local(entity);
@@ -177,7 +182,7 @@ struct Dimensions
       box[1][i] = coord_limits[i].max();
     }
     return box;
-  };
+  }
 };
 
 template <class GridType>

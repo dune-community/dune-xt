@@ -35,10 +35,10 @@ void addbind_for_Grid(pybind11::module& m)
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
   typedef typename Layer<G, Layers::dd_subdomain, Backends::view, DD::SubdomainGrid<G>>::type DdSubdomainPart;
 
-  bind_GridProvider<G>(m, grid_id);
+  // bind_GridProvider<G>(m, grid_id);
   bind_make_cube_grid<G>(m, grid_id);
 
-  bind_DdSubdomainsGridProvider<G>(m, grid_id);
+  // bind_DdSubdomainsGridProvider<G>(m, grid_id);
   bind_make_cube_dd_subdomains_grid<G>(m, grid_id);
 
   addbind_for_Grid<typename Tuple::tail_type>(m);

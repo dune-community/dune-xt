@@ -21,7 +21,8 @@
 #include <dune/common/array.hh>
 #include <dune/common/fvector.hh>
 
-#include <dune/xt/grid/walk_functors.hh>
+#include <dune/xt/grid/functors/interfaces.hh>
+#include <dune/xt/grid/functors/bounding-box.hh>
 #include <dune/xt/grid/walker.hh>
 
 namespace Dune {
@@ -95,9 +96,9 @@ private:
  *  \see Pgf
  **/
 template <class GridViewType>
-class PgfEntityFunctorIntersections : public Functor::Codim0And1<GridViewType>
+class PgfEntityFunctorIntersections : public ElementAndIntersectionFunctor<GridViewType>
 {
-  typedef Functor::Codim0And1<GridViewType> BaseType;
+  typedef ElementAndIntersectionFunctor<GridViewType> BaseType;
 
 public:
   PgfEntityFunctorIntersections(const GridViewType& grid_view,
@@ -111,15 +112,15 @@ public:
   {
   }
 
-  virtual void apply_local(const typename BaseType::EntityType& entity)
+  virtual void apply_local(const typename BaseType::ElementType& entity) override
   {
     const auto ent_idx = grid_view_.indexSet().index(entity);
     maybePrintEntityIndex(entity, ent_idx);
   }
 
   virtual void apply_local(const typename BaseType::IntersectionType& intersection,
-                           const typename BaseType::EntityType& /*inside_entity*/,
-                           const typename BaseType::EntityType& /*outside_entity*/)
+                           const typename BaseType::ElementType& /*inside_entity*/,
+                           const typename BaseType::ElementType& /*outside_entity*/) override
   {
     PgfCoordWrapper a(intersection.geometry().corner(0));
     PgfCoordWrapper b(intersection.geometry().corner(1));
@@ -136,7 +137,12 @@ public:
     file_.flush();
   }
 
-  void maybePrintEntityIndex(const typename BaseType::EntityType& entity, const int idx)
+  BaseType* copy() override
+  {
+    return new PgfEntityFunctorIntersections<GridViewType>(*this);
+  }
+
+  void maybePrintEntityIndex(const typename BaseType::ElementType& entity, const int idx)
   {
     if (!print_entityIndex_)
       return;
@@ -179,8 +185,8 @@ public:
   }
 
   virtual void apply_local(const typename BaseType::IntersectionType& intersection,
-                           const typename BaseType::EntityType& inside_entity,
-                           const typename BaseType::EntityType& /*outside_entity*/)
+                           const typename BaseType::ElementType& inside_entity,
+                           const typename BaseType::ElementType& /*outside_entity*/) override
   {
     const PgfCoordWrapper center(inside_entity.geometry().center());
     const float fac = 0.16 * level_;
@@ -204,6 +210,12 @@ public:
     this->file_ << buffer;
     this->file_.flush();
   }
+
+  ElementAndIntersectionFunctor<GridViewType>* copy() override
+  {
+    return new PgfEntityFunctorIntersectionsWithShift<GridViewType>(*this);
+  }
+
 
 private:
   const int level_;

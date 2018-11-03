@@ -97,6 +97,11 @@ struct is_grid : public std::false_type
 {
 };
 
+template <class T>
+struct is_grid<const T> : public is_grid<T>
+{
+};
+
 template <>
 struct is_grid<Dune::OneDGrid> : public std::true_type
 {
@@ -154,6 +159,11 @@ struct is_entity<Dune::Entity<cd, dim, GridImp, EntityImp>, cd> : public std::tr
 
 template <class T, bool candidate = internal::has_traits_helper<std::remove_const_t<T>>::is_candidate>
 struct is_view : public std::false_type
+{
+};
+
+template <class T>
+struct is_view<const T, true> : public is_view<T, true>
 {
 };
 
@@ -362,6 +372,11 @@ template <class T,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
           bool part = is_part<T>::value>
 struct extract_entity : public AlwaysFalse<T>
+{
+};
+
+template <class T, size_t codim, bool view, bool part>
+struct extract_entity<const T&, codim, view, part> : public extract_entity<T, codim, view, part>
 {
 };
 

@@ -35,6 +35,7 @@ class functor_error : public Dune::InvalidStateException
 {
 };
 
+
 } // namespace Exceptions
 } // namespace Grid
 } // namespace XT

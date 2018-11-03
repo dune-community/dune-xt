@@ -67,6 +67,8 @@ public:
   typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef Common::FieldVector<DomainFieldType, dimWorld> WorldType;
 
+  virtual ~BoundaryInfo() = default;
+
   virtual const BoundaryType& type(const IntersectionType& intersection) const = 0;
 
   static std::string static_id()

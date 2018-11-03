@@ -16,7 +16,6 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <dune/common/deprecated.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/geometry/referenceelements.hh>
@@ -47,9 +46,9 @@ namespace Grid {
   \param[out] stream
               std::ostream, into which the information is printed
   **/
-template <class IntersectionType>
-void print_intersection(const IntersectionType& intersection,
-                        const std::string name = Common::Typename<IntersectionType>::value(),
+template <class G, class I>
+void print_intersection(const Intersection<G, I>& intersection,
+                        const std::string name = Common::Typename<Intersection<G, I>>::value(),
                         std::ostream& out = std::cout,
                         const std::string prefix = "")
 {
@@ -60,6 +59,23 @@ void print_intersection(const IntersectionType& intersection,
     out << prefix << "  corner " + Common::to_string(ii) << " = " << geometry.corner(ii)
         << " (local: " << geometry.local(geometry.corner(ii)) << ")\n";
 } // ... print_intersection(...)
+
+
+template <class G, class I>
+double diameter(const Intersection<G, I>& intersection)
+{
+  auto max_dist = std::numeric_limits<typename G::ctype>::min();
+  const auto& geometry = intersection.geometry();
+  for (auto i : Common::value_range(geometry.corners())) {
+    const auto xi = geometry.corner(i);
+    for (auto j : Common::value_range(i + 1, geometry.corners())) {
+      auto xj = geometry.corner(j);
+      xj -= xi;
+      max_dist = std::max(max_dist, xj.two_norm());
+    }
+  }
+  return max_dist;
+} // diameter
 
 
 /**

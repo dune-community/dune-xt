@@ -22,21 +22,20 @@
 #include <python/dune/xt/grid/layers.bindings.hh>
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
 
-#include <dune/xt/grid/walker/apply-on.hh>
+#include <dune/xt/grid/filters.hh>
 
 namespace Dune {
 namespace XT {
 namespace Grid {
-namespace ApplyOn {
 namespace bindings {
 
 
 template <class Imp, bool ctor_expects_boundary_info>
-class WhichIntersection
+class IntersectionFilter
 {
-  typedef typename Imp::GridLayerType GL;
+  typedef typename Imp::GridViewType GL;
   typedef typename extract_grid<GL>::type G;
-  typedef XT::Grid::ApplyOn::WhichIntersection<GL> InterfaceType;
+  typedef XT::Grid::IntersectionFilter<GL> InterfaceType;
 
 public:
   typedef Imp type;
@@ -66,11 +65,14 @@ private:
     {
       using namespace pybind11::literals;
 
-      c.def(pybind11::init<const BoundaryInfoType&>());
+      c.def(pybind11::init<const BoundaryInfoType&, XT::Grid::BoundaryType*&&>());
 
       m.def(std::string("make_apply_on_" + class_name + "_" + layer_name).c_str(),
-            [](const BoundaryInfoType& boundary_info) { return type(boundary_info); },
-            "boundary_info"_a);
+            [](const BoundaryInfoType& boundary_info, XT::Grid::BoundaryType*&& boundary_type) {
+              return type(boundary_info, std::move(boundary_type));
+            },
+            "boundary_info"_a,
+            "boundary_type"_a);
     }
   };
 
@@ -99,7 +101,6 @@ public:
 
 
 } // namespace bindings
-} // namespace ApplyOn
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
@@ -108,12 +109,12 @@ public:
 // begin: this is what we need for the .so
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, _G, _layer, _backend, _class_name)                               \
-  Dune::XT::Grid::ApplyOn::bindings::                                                                                  \
-      WhichIntersection<_W<typename Dune::XT::Grid::Layer<_G,                                                          \
-                                                          Dune::XT::Grid::Layers::_layer,                              \
-                                                          Dune::XT::Grid::Backends::_backend,                          \
-                                                          Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>,               \
-                        _w>::                                                                                          \
+  Dune::XT::Grid::bindings::                                                                                           \
+      IntersectionFilter<_W<typename Dune::XT::Grid::Layer<_G,                                                         \
+                                                           Dune::XT::Grid::Layers::_layer,                             \
+                                                           Dune::XT::Grid::Backends::_backend,                         \
+                                                           Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>,              \
+                         _w>::                                                                                         \
           bind(_m,                                                                                                     \
                _class_name,                                                                                            \
                Dune::XT::Grid::layer_names[Dune::XT::Grid::Layers::_layer] + "_"                                       \
@@ -160,14 +161,14 @@ public:
 #define DUNE_XT_GRID_WALKER_APPLYON_BIND(_m)                                                                           \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, AllIntersections, false, "all_intersections");                             \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, InnerIntersections, false, "inner_intersections");                         \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, InnerIntersectionsPrimally, false, "inner_intersections_primally");        \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, InnerIntersectionsOnce, false, "inner_intersections_once");                \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, BoundaryIntersections, false, "boundary_intersections");                   \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(                                                                               \
       _m, NonPeriodicBoundaryIntersections, false, "non_periodic_boundary_intersections");                             \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, PeriodicIntersections, false, "periodic_intersections");                   \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, PeriodicIntersectionsPrimally, false, "periodic_intersections_primally");  \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, DirichletIntersections, true, "dirichlet_intersections");                  \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, NeumannIntersections, true, "neumann_intersections")
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, PeriodicBoundaryIntersections, false, "periodic_intersections");           \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, PeriodicBoundaryIntersectionsOnce, false, "periodic_intersections_once");  \
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(                                                                               \
+      _m, CustomBoundaryAndProcessIntersections, true, "custom_boundary_and_process_intersections");
 
 // end: this is what we need for the .so
 

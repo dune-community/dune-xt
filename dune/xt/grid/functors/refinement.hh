@@ -8,47 +8,52 @@
 //   Felix Schindler (2012, 2014 - 2017)
 //   Rene Milk       (2012, 2015 - 2016, 2018)
 
-#ifndef DUNE_XT_WALK_FUNCTORS_HH
-#define DUNE_XT_WALK_FUNCTORS_HH
+#ifndef DUNE_XT_GRID_FUNCTORS_REFINEMENT_HH
+#define DUNE_XT_GRID_FUNCTORS_REFINEMENT_HH
 
 #include <dune/xt/common/ranges.hh>
-
 #include <dune/xt/grid/information.hh>
 
-#include "walker.hh"
-#include "walker/functors.hh"
+#include "interfaces.hh"
 
 namespace Dune {
 namespace XT {
 namespace Grid {
 
+
 //! GridWalk functor that refines all entitites above given volume
 template <class GridViewType>
-struct MaximumEntityVolumeRefineFunctor : public Functor::Codim0<GridViewType>
+struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
 {
-  typedef Functor::Codim0<GridViewType> BaseType;
+  typedef ElementFunctor<GridViewType> BaseType;
   typedef typename GridViewType::GridType GridType;
+
   MaximumEntityVolumeRefineFunctor(GridType& grid, double volume, double factor)
     : threshold_volume_(volume * factor)
     , grid_(grid)
   {
   }
 
-  virtual void apply_local(const typename BaseType::EntityType& ent)
+  void apply_local(const typename BaseType::ElementType& element) override final
   {
-
-    const double volume = ent.geometry().volume();
+    const double volume = element.geometry().volume();
     if (volume > threshold_volume_)
-      grid_.mark(1, ent);
+      grid_.mark(1, element);
+  }
+
+  ElementFunctor<GridViewType>* copy() override
+  {
+    return new MaximumEntityVolumeRefineFunctor<GridViewType>(*this);
   }
 
   const double threshold_volume_;
   GridType& grid_;
 };
 
+
 //! refine entities until all have volume < size_factor * unrefined_minimum_volume
 template <class GridType>
-void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
+void enforce_maximum_entity_volume(GridType& grid, const double size_factor)
 {
   using namespace Dune::XT;
   const typename Grid::Dimensions<GridType> unrefined_dimensions(grid);
@@ -66,39 +71,11 @@ void EnforceMaximumEntityVolume(GridType& grid, const double size_factor)
     grid.postAdapt();
     std::cout << Grid::Dimensions<GridType>()(grid);
   }
-} // EnforceMaximumEntityVolume
+} // enforce_maximum_entity_volume
 
-/** \brief Functor for a \ref GridWalk calculating minima and maxima of entities' coordinates
- **/
-template <class GridViewType>
-struct MinMaxCoordinateFunctor : public Functor::Codim0<GridViewType>
-{
-  typedef Functor::Codim0<GridViewType> BaseType;
-  typedef typename BaseType::EntityType::Geometry EntityGeometryType;
-  typedef typename EntityGeometryType::ctype ctype;
-  typedef FieldVector<ctype, EntityGeometryType::coorddimension> VectorType;
-  MinMaxCoordinateFunctor()
-    : minima_(VectorType(std::numeric_limits<ctype>::max()))
-    , maxima_(VectorType(std::numeric_limits<ctype>::min()))
-  {
-  }
-
-  virtual void apply_local(const typename BaseType::EntityType& ent)
-  {
-    const auto& geo = ent.geometry();
-    for (auto i : Common::value_range(geo.corners())) {
-      for (auto k : Common::value_range(EntityGeometryType::coorddimension)) {
-        minima_[k] = std::min(minima_[k], geo.corner(i)[k]);
-        maxima_[k] = std::max(maxima_[k], geo.corner(i)[k]);
-      }
-    }
-  }
-  VectorType minima_;
-  VectorType maxima_;
-};
 
 } // namespace Grid
 } // namespace Stud
 } // namespace Dune
 
-#endif // DUNE_XT_WALK_FUNCTORS_HH
+#endif // DUNE_XT_GRID_FUNCTORS_REFINEMENT_HH
