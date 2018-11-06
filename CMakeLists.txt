@@ -18,6 +18,7 @@ endif()
 find_package(dune-common REQUIRED)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules"
   ${dune-common_MODULE_PATH})
+#message(FATAL_ERROR "${CMAKE_MODULE_PATH}")
 
 #include the dune macros
 include(DuneMacros)

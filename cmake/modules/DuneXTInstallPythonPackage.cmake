@@ -8,25 +8,47 @@
 #
 # ~~~
 
-# copy from dune-python with adjusted install path and such
+# copy from dune-common
 function(dune_xt_execute_process)
   include(CMakeParseArguments)
-  cmake_parse_arguments(EXECUTE "" "ERROR_MESSAGE;RESULT_VARIABLE;OUTPUT_VARIABLE" "" ${ARGN})
+  cmake_parse_arguments(EXECUTE "" "ERROR_MESSAGE;RESULT_VARIABLE;OUTPUT_VARIABLE;ERROR_VARIABLE" "" ${ARGN})
 
-  execute_process(${EXECUTE_UNPARSED_ARGUMENTS} RESULT_VARIABLE retcode OUTPUT_VARIABLE log ERROR_VARIABLE log)
-
-  if(NOT "${retcode}" STREQUAL "0")
-    cmake_parse_arguments(ERR "" "" "COMMAND" ${EXECUTE_UNPARSED_ARGUMENTS})
-    message(
-      FATAL_ERROR
-        "${EXECUTE_ERROR_MESSAGE}\nRun command:${ERR_COMMAND}\nReturn code: ${retcode}\nDetailed log:\n${log}")
+  # Decide whether stdout and stderr have to be split
+  if(EXECUTE_OUTPUT_VARIABLE AND EXECUTE_ERROR_VARIABLE)
+    set(SPLIT_ERROR TRUE)
+    set(ERRLOGVAR errlog)
+  else()
+    set(SPLIT_ERROR FALSE)
+    set(ERRLOGVAR log)
   endif()
 
+  # Call the original cmake function
+  execute_process(${EXECUTE_UNPARSED_ARGUMENTS}
+                  RESULT_VARIABLE retcode
+                  OUTPUT_VARIABLE log
+                  ERROR_VARIABLE ${ERRLOGVAR}
+                  )
+
+  # Issue an error if requested!
+  if(EXECUTE_ERROR_MESSAGE)
+    if(NOT "${retcode}" STREQUAL "0")
+      cmake_parse_arguments(ERR "" "" "COMMAND" ${EXECUTE_UNPARSED_ARGUMENTS})
+      if(SPLIT_ERROR)
+        set(log "stdout:\n${log}\n\nstderr:\b${errlog}")
+      endif()
+      message(FATAL_ERROR "${EXECUTE_ERROR_MESSAGE}\nRun command:${ERR_COMMAND}\nReturn code: ${retcode}\nDetailed log:\n${log}")
+    endif()
+  endif()
+
+  # Propagate logs back to the calling scope
   if(EXECUTE_RESULT_VARIABLE)
-    set(${EXECUTE_RESULT_VARIABLE} 0 PARENT_SCOPE)
+    set(${EXECUTE_RESULT_VARIABLE} ${retcode} PARENT_SCOPE)
   endif()
   if(EXECUTE_OUTPUT_VARIABLE)
     set(${EXECUTE_OUTPUT_VARIABLE} ${log} PARENT_SCOPE)
+  endif()
+  if(EXECUTE_ERROR_VARIABLE)
+    set(${EXECUTE_ERROR_VARIABLE} ${${ERROR_VARIABLE}} PARENT_SCOPE)
   endif()
 endfunction()
 
@@ -55,7 +77,7 @@ function(dune_xt_install_python_package) # Parse Arguments
                  "_"
                  name_suffix
                  ${PYINST_PATH})
-  set(targetname "pyinstall_${DUNE_MOD_NAME}_${name_suffix}")
+  set(targetname "install_python_${DUNE_MOD_NAME}_${name_suffix}")
   if(TARGET ${targetname})
     return()
   endif()
@@ -104,7 +126,7 @@ function(dune_xt_install_python_package) # Parse Arguments
 
   # install the package into the virtual env
   dune_xt_execute_process(COMMAND
-                          ${DUNE_PYTHON_VIRTUALENV_INTERPRETER}
+	  ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}
                           ${VENV_INSTALL_COMMAND}
                           WORKING_DIRECTORY
                           ${PYINST_PATH}
@@ -134,7 +156,7 @@ function(dune_xt_install_python_package) # Parse Arguments
   endif()
 
   #
-  # Now define rules for `make pyinstall`.
+  # Now define rules for `make install_python`.
   #
 
   dune_module_path(MODULE dune-python RESULT DUNE_PYTHON_MODULE_DIR CMAKE_MODULES)
@@ -146,7 +168,7 @@ function(dune_xt_install_python_package) # Parse Arguments
                             ${DUNE_PYTHON_MODULE_DIR}/install_python_package.cmake
                     COMMENT "Installing the python package at ${CMAKE_CURRENT_SOURCE_DIR}/${PYINST_PATH}")
 
-  add_dependencies(pyinstall ${targetname})
+  add_dependencies(install_python ${targetname})
 
   #
   # Define rules for `make install` that install a wheel into a central wheelhouse
