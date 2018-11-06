@@ -11,6 +11,8 @@
 #ifndef DUNE_XT_GRID_CAPABILITIES_HH
 #define DUNE_XT_GRID_CAPABILITIES_HH
 
+#include <dune/common/version.hh>
+
 #include "grids.hh"
 
 namespace Dune {
@@ -21,10 +23,14 @@ namespace Grid {
 template <class G, bool anything = true>
 struct has_boundary_id
 {
+#if DUNE_VERSION_GTE(DUNE_GRID, 2, 6)
+  static const constexpr bool value = false;
+#else
 #if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
   static const constexpr bool value = true;
 #else
   static const constexpr bool value = false;
+#endif
 #endif
 };
 

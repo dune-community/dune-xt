@@ -158,12 +158,12 @@ public:
           std::swap(cubeVertices[2], cubeVertices[3]);
         if (dimDomain == 3)
           std::swap(cubeVertices[6], cubeVertices[7]);
-        factory.insertElement(Dune::GeometryType(Dune::GeometryType::cube, dimDomain), cubeVertices);
+        factory.insertElement(Dune::GeometryTypes::cube(dimDomain), cubeVertices);
       } else if ((items2.size() == numberOfVerticesPrism + 1) && (dimDomain == 3)) { // prism
         numberOfPrisms++;
         for (size_t k = 0; k < numberOfVerticesPrism; k++)
           prismVertices[k] = items2[k + 1] - 1;
-        factory.insertElement(Dune::GeometryType(Dune::GeometryType::prism, dimDomain), prismVertices);
+        factory.insertElement(Dune::GeometryTypes::prism, prismVertices);
       } else // neither cube or prism
         DUNE_THROW(Dune::IOError, "Type of element " << numberOfElements << " is not cube or prism!");
     } // while loop

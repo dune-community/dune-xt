@@ -18,7 +18,6 @@
 #include <limits>
 #include <ostream>
 
-#include <dune/common/array.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/xt/grid/functors/interfaces.hh>

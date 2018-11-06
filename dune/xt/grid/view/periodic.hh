@@ -190,7 +190,7 @@ struct IndexMapCreatorBase
     const auto& type_index = index.first;
     const auto& entity_index = index.second;
     const auto periodic_entity_index = real_index_set_.index(periodic_entity);
-    const auto& periodic_entity_type_index = GlobalGeometryTypeIndex::index(periodic_entity.type());
+    const auto& periodic_entity_type_index = GlobalGeometryTypeIndex::index(periodic_entity.geometry().type());
     new_indices_[type_index][entity_index] = new_indices_[periodic_entity_type_index][periodic_entity_index];
   }
 
@@ -253,7 +253,7 @@ struct IndexMapCreator
       for (IndexType local_index = 0; local_index < codim0_entity.subEntities(codim); ++local_index) {
         const auto& entity = codim0_entity.template subEntity<codim>(local_index);
         const auto old_index = real_grid_layer_.indexSet().index(entity);
-        const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
+        const auto type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
         if (!visited_entities_[type_index].count(old_index)) {
           this->loop_body(entity, type_index, old_index);
           visited_entities_[type_index].insert(old_index);
@@ -283,7 +283,7 @@ struct IndexMapCreator<true, codim, DomainType, dimDomain, RealGridLayerType, In
   {
     for (const auto& entity : entities(real_grid_layer_, Dune::Codim<codim>())) {
       const auto old_index = real_grid_layer_.indexSet().index(entity);
-      const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
+      const auto type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
       this->loop_body(entity, type_index, old_index);
     }
     this->after_loop();
@@ -345,7 +345,7 @@ public:
     if (cd == 0)
       return real_entity_index;
     else {
-      const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
+      const auto type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
       return new_indices_[type_index][real_entity_index];
     }
   }
@@ -661,7 +661,7 @@ public:
       {
         BaseType::operator++();
         while (cd > 0 && *this != *real_it_end_
-               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index(this->type())].count(
+               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->geometry().type())].count(
                       real_index_set_->index(this->operator*())))
           BaseType::operator++();
         return *this;
@@ -885,7 +885,7 @@ public:
 
   IntersectionIterator ibegin(const typename Codim<0>::Entity& entity) const
   {
-    const auto& type_index = GlobalGeometryTypeIndex::index(entity.type());
+    const auto& type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
     assert(!entity.hasBoundaryIntersections()
            || (*entity_to_intersection_map_map_)[type_index].count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::ibegin(entity),
@@ -900,7 +900,7 @@ public:
 
   IntersectionIterator iend(const typename Codim<0>::Entity& entity) const
   {
-    const auto& type_index = GlobalGeometryTypeIndex::index(entity.type());
+    const auto& type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
     assert(!entity.hasBoundaryIntersections()
            || (*entity_to_intersection_map_map_)[type_index].count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::iend(entity),

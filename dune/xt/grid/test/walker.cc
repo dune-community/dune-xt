@@ -11,7 +11,7 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
+#if DUNE_VERSION_GTE(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
 #  include <dune/grid/utility/partitioning/seedlist.hh>
 #endif
 
@@ -20,6 +20,7 @@
 
 #include <dune/xt/grid/gridprovider/cube.hh>
 #include <dune/xt/grid/functors/boundary-detector.hh>
+#include <dune/xt/grid/parallel/partitioning/ranged.hh>
 #include <dune/xt/grid/walker.hh>
 
 
@@ -67,7 +68,7 @@ struct GridWalkerTest : public ::testing::Test
 
     list<function<void()>> element_tests({test1, test2, test3});
     list<function<void()>> intersection_tests({test4, test5});
-#if DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
+#if DUNE_VERSION_GTE(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
     // exadune guard for SeedListPartitioning
     auto test0 = [&] {
       const auto& set = gv.grid().leafIndexSet();
@@ -78,7 +79,7 @@ struct GridWalkerTest : public ::testing::Test
       walker.walk(partitioning);
     };
     tests.push_back(test0);
-#endif // DUNE_VERSION_NEWER(DUNE_COMMON, 3, 9) && HAVE_TBB
+#endif // DUNE_VERSION_GTE(DUNE_COMMON, 3, 9) && HAVE_TBB
 
     for (const auto& test : element_tests) {
       count = 0;
