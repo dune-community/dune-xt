@@ -14,4 +14,4 @@
 Module: dune-xt-la
 Version: 18.11-dev
 Maintainer: dune-xt-dev@listserv.uni-muenster.de
-Depends: dune-testtools (>= 2.5) dune-xt-common (>= 18.11) dune-istl (>= 2.5)
+Depends: dune-testtools (>= 2.6) dune-xt-common (>= 18.11) dune-istl (>= 2.6)
