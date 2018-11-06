@@ -21,7 +21,6 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
-#include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/checkerboard.hh>
 
 #include <python/dune/xt/common/fvector.hh>

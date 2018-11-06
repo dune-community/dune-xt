@@ -22,7 +22,6 @@
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/common/fmatrix.hh>
 
-#include <dune/xt/functions/interfaces.hh>
 #include <dune/xt/functions/constant.hh>
 
 namespace Dune {
