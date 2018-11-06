@@ -307,9 +307,9 @@ public:
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
       } else if (type == "bicgstab") {
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
-        constexpr auto cat = decltype(matrix_operator)::category;
-        typedef IdentityPreconditioner<MatrixOperatorType, cat> SequentialPreconditioner;
-        SequentialPreconditioner seq_preconditioner;
+        const auto cat = matrix_operator.category();
+        typedef IdentityPreconditioner<MatrixOperatorType> SequentialPreconditioner;
+        SequentialPreconditioner seq_preconditioner(cat);
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         // define the BiCGStab as the actual solver
         BiCgSolverType solver(matrix_operator,
