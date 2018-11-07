@@ -35,11 +35,11 @@ fi
 
 pushd ${DUNE_BUILD_DIR}/${MY_MODULE}
 COVERAGE_INFO=${PWD}/coverage.info
-lcov --directory . --output-file ${COVERAGE_INFO} -c
+lcov --directory . --output-file ${COVERAGE_INFO} --ignore-errors gcov -c
 for d in "dune-common" "dune-pybindxi" "dune-geometry"  "dune-istl"  "dune-grid" "dune-alugrid"  "dune-uggrid"  "dune-localfunctions" ; do
     lcov --directory . --output-file ${COVERAGE_INFO} -r ${COVERAGE_INFO} "${SUPERDIR}/${d}/*"
 done
-lcov --directory . --output-file ${COVERAGE_INFO} --ignore-errors gcov -r ${COVERAGE_INFO} "${SUPERDIR}/${MY_MODULE}/dune/xt/*/test/*"
+lcov --directory . --output-file ${COVERAGE_INFO} -r ${COVERAGE_INFO} "${SUPERDIR}/${MY_MODULE}/dune/xt/*/test/*"
 cd ${SUPERDIR}/${MY_MODULE}
 ${OLDPWD}/dune-env pip install codecov
 ${OLDPWD}/dune-env codecov -v -X gcov -X coveragepy -F ctest -f ${COVERAGE_INFO} -t ${CODECOV_TOKEN}
