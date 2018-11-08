@@ -203,10 +203,14 @@ public:
 
   inline void resize(const size_t new_size)
   {
-    if (new_size != backend_->size()) {
-      backend_ = std::make_shared<BackendType>(new_size);
-      backend_->setZeros();
-    }
+    // Eigens resize loses all values, so we have to store them before...
+    auto stored_size = new_size > this->size() ? this->size() : new_size;
+    std::vector<ScalarType> old_values(stored_size);
+    for (size_t ii = 0; ii < stored_size; ++ii)
+      old_values[ii] = this->get_entry(ii);
+    backend_->resize(new_size, 1);
+    for (size_t ii = 0; ii < stored_size; ++ii)
+      this->set_entry(ii, old_values[ii]);
   }
 
   /// \}

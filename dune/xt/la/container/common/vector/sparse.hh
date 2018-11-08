@@ -258,9 +258,17 @@ public:
   inline void resize(const size_t new_size)
   {
     if (new_size != size()) {
+      EntriesVectorType new_entries;
+      IndicesVectorType new_indices;
+      for (size_t ii = 0; ii < indices_->size(); ++ii) {
+        if ((*indices_)[ii] < new_size) {
+          new_entries.push_back((*entries_)[ii]);
+          new_indices.push_back((*indices_)[ii]);
+        }
+      }
+      *entries_ = new_entries;
+      *indices_ = new_indices;
       size_ = new_size;
-      entries_ = std::make_unique<EntriesVectorType>();
-      indices_ = std::make_unique<IndicesVectorType>();
     }
   }
 

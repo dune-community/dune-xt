@@ -10,6 +10,7 @@
 //   Tobias Leibner  (2014 - 2017)
 
 #include <dune/xt/common/test/main.hxx>
+#include <dune/xt/common/vector.hh>
 
 #include <dune/xt/la/test/container.hh>
 
@@ -127,6 +128,7 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
   {
     typedef typename VectorImp::ScalarType ScalarType;
     typedef typename VectorImp::RealType RealType;
+    using V = XT::Common::VectorAbstraction<VectorImp>;
 
     // create test vectors
     VectorImp zeros(dim); // [0, 0, 0, 0]
@@ -159,6 +161,23 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
     testvector_5.set_entry(1, ScalarType(0));
     testvector_5.set_entry(2, ScalarType(2.5));
     testvector_5.set_entry(3, ScalarType(-3.5));
+
+    // test resize, should not change existing entries
+    if (!V::has_static_size) {
+        try {
+        auto testvector_1_saved = testvector_1;
+        testvector_1.resize(dim-1);
+        EXPECT_EQ(dim-1, testvector_1.size());
+        EXPECT_EQ(dim, testvector_1_saved.size());
+        for (size_t ii = 0; ii < dim-1; ++ii)
+          EXPECT_DOUBLE_OR_COMPLEX_EQ(std::real(testvector_1_saved.get_entry(ii)), testvector_1.get_entry(ii));
+        testvector_1.resize(dim);
+        testvector_1.set_entry(dim-1, testvector_1_saved[dim-1]);
+        for (size_t ii = 0; ii < dim; ++ii)
+          EXPECT_DOUBLE_OR_COMPLEX_EQ(std::real(testvector_1_saved.get_entry(ii)), testvector_1.get_entry(ii));
+        } catch(XT::Common::Exceptions::you_are_using_this_wrong) {
+        }
+    }
 
     // test get_entry()
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), testvector_1.get_entry(0));

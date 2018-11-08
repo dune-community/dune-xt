@@ -254,10 +254,7 @@ public:
 
   inline void resize(const size_t new_size)
   {
-    if (new_size != size()) {
-      backend_ = std::make_shared<BackendType>(new_size);
-      backend_->operator=(0);
-    }
+    backend_->resize(new_size);
   }
 
   void add_to_entry(const size_t ii, const ScalarType& value)

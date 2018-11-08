@@ -227,8 +227,7 @@ public:
 
   inline void resize(const size_t new_size)
   {
-    if (new_size != backend_->size())
-      backend_->resize(new_size);
+    backend_->resize(new_size);
   }
 
   void add_to_entry(const size_t ii, const ScalarType& value)
