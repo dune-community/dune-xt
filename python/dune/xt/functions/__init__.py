@@ -12,4 +12,13 @@
 # ~~~
 
 import dune.xt
-from dune.xt._functions import *
+
+try:
+    from dune.xt._interfaces import *
+    from dune.xt._functions import *
+except ImportError as e:
+    import os
+    import logging
+    if os.environ.get('DXT_PYTHON_DEBUG', False):
+        raise e
+    logging.error('dune-xt-functions bindings not available')

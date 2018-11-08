@@ -14,4 +14,4 @@
 Module: dune-xt-functions
 Version: 18.11-dev
 Maintainer: dune-xt-dev@listserv.uni-muenster.de
-Depends: dune-common (>= 2.5) dune-testtools (>= 2.5) dune-geometry (>= 2.5) dune-grid (>= 2.5) dune-xt-common (>=2.5) dune-xt-grid (>= 2.5) dune-xt-la (>= 2.5) dune-xt-data
+Depends: dune-common (>= 2.5) dune-testtools (>= 2.5) dune-geometry (>= 2.5) dune-grid (>= 2.5) dune-xt-common (>= 18.11) dune-xt-grid (>= 18.11) dune-xt-la (>= 18.11) dune-xt-data (>= 18.11)

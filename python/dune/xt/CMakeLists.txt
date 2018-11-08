@@ -7,5 +7,8 @@
 #   Rene Milk (2018)
 # ~~~
 
+dune_pybindxi_add_module(_interfaces EXCLUDE_FROM_ALL interfaces.cc)
 dune_pybindxi_add_module(_functions EXCLUDE_FROM_ALL bindings.cc)
+
+add_dune_alberta_flags(GRIDDIM 2 _interfaces)
 add_dune_alberta_flags(GRIDDIM 2 _functions)

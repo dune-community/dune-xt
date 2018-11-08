@@ -12,14 +12,10 @@
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_PARAMETRIC_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_PARAMETRIC_HH
 
-#include <string>
 #include <limits>
 
-#include <dune/common/typetraits.hh>
-
-#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/parameter.hh>
-#include <dune/xt/functions/interfaces/global-function.hh>
+#include "dune/xt/functions/interfaces/function.hh"
 
 #include "base.hh"
 
@@ -28,25 +24,30 @@ namespace XT {
 namespace Functions {
 
 
-template <class E, class D, size_t d, class R, size_t r, size_t rC = 1>
-class ParametricExpressionFunction
+template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
+class ParametricExpressionFunction : public FunctionInterface<d, r, rC, R>
 {
-  static_assert(AlwaysFalse<E>::value, "Not available for these dimension!");
+public:
+  ParametricExpressionFunction()
+  {
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimension!");
+  }
 };
 
 
-template <class E, class D, size_t d, class R, size_t r>
-class ParametricExpressionFunction<E, D, d, R, r, 1> : public GlobalFunctionInterface<E, D, d, R, r, 1>
+template <size_t d, size_t r, class R>
+class ParametricExpressionFunction<d, r, 1, R> : public FunctionInterface<d, r, 1, R>
 {
-  typedef GlobalFunctionInterface<E, D, d, R, r, 1> BaseType;
-  typedef DynamicMathExpressionBase<D, R, r> ActualFunctionType;
+  using BaseType = FunctionInterface<d, r, 1, R>;
+  using typename BaseType::D;
+  using ActualFunctionType = DynamicMathExpressionBase<D, R, r>;
 
 public:
   using typename BaseType::DomainType;
-  using BaseType::dimDomain;
-  using typename BaseType::RangeType;
-  using typename BaseType::JacobianRangeType;
-  using BaseType::dimRange;
+  using BaseType::domain_dim;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::DerivativeRangeReturnType;
+  using BaseType::range_dim;
 
   static std::string static_id()
   {
@@ -55,7 +56,7 @@ public:
 
   ParametricExpressionFunction(const std::string& variable,
                                const Common::ParameterType& param_type,
-                               const std::vector<std::string>& expressions,
+                               const Common::FieldVector<std::string, r>& expressions,
                                const size_t ord = 0,
                                const std::string nm = static_id())
     : order_(ord)
@@ -65,12 +66,11 @@ public:
   {
     if (variable.empty())
       DUNE_THROW(Common::Exceptions::wrong_input_given, "Given variable must not be empty!");
-    if (expressions.size() != dimRange)
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "dimRange: " << size_t(dimRange) << "\n   "
-                              << "expressions.size(): "
-                              << expressions.size());
+
     std::vector<std::string> variables;
+    std::vector<std::string> expression;
+    for (size_t rr = 0; rr < r; ++rr)
+      expression.emplace_back(expressions[rr]);
     for (const auto& key : param_type_.keys()) {
       const size_t value_size = param_type_.get(key);
       if (value_size == 1) {
@@ -83,14 +83,9 @@ public:
         }
       }
     }
-    for (size_t ii = 0; ii < dimDomain; ++ii)
+    for (size_t ii = 0; ii < domain_dim; ++ii)
       variables.push_back(variable + "[" + Common::to_string(ii) + "]");
-    function_ = std::make_shared<ActualFunctionType>(variables, expressions);
-  }
-
-  std::string type() const override final
-  {
-    return BaseType::static_id() + ".parametricexpression";
+    function_ = std::make_shared<ActualFunctionType>(variables, expression);
   }
 
   std::string name() const override final
@@ -98,9 +93,9 @@ public:
     return name_;
   }
 
-  virtual size_t order(const Common::Parameter& /*mu*/ = {}) const override final
+  virtual int order(const Common::Parameter& /*param*/ = {}) const override final
   {
-    return order_;
+    return static_cast<int>(order_);
   }
 
   bool is_parametric() const override final
@@ -113,27 +108,29 @@ public:
     return param_type_;
   }
 
-  void evaluate(const DomainType& xx, RangeType& ret, const Common::Parameter& mu = {}) const override final
+  RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
+                           const Common::Parameter& param = {}) const override final
   {
-    Common::Parameter parsed_mu;
+    RangeReturnType ret(0.);
+    Common::Parameter parsed_param;
     if (!param_type_.empty()) {
-      parsed_mu = this->parse_parameter(mu);
-      if (parsed_mu.type() != param_type_)
+      parsed_param = this->parse_parameter(param);
+      if (parsed_param.type() != param_type_)
         DUNE_THROW(Common::Exceptions::parameter_error,
                    "parameter_type(): " << param_type_ << "\n   "
-                                        << "mu.type(): "
-                                        << mu.type());
+                                        << "param.type(): "
+                                        << param.type());
     }
-    DynamicVector<D> args(num_parameter_variables_ + dimDomain);
+    DynamicVector<D> args(num_parameter_variables_ + domain_dim);
     size_t II = 0;
     for (const auto& key : param_type_.keys()) {
-      for (const auto& value : parsed_mu.get(key)) {
+      for (const auto& value : parsed_param.get(key)) {
         args[II] = value;
         ++II;
       }
     }
-    for (size_t ii = 0; ii < dimDomain; ++ii) {
-      args[II] = xx[ii];
+    for (size_t ii = 0; ii < domain_dim; ++ii) {
+      args[II] = point_in_global_coordinates[ii];
       ++II;
     }
     function_->evaluate(args, ret);
@@ -142,11 +139,11 @@ public:
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
-    for (size_t rr = 0; rr < dimRange; ++rr) {
-      if (Dune::XT::Common::isnan(ret[rr])) {
+    for (size_t rr = 0; rr < range_dim; ++rr) {
+      if (Common::isnan(ret[rr])) {
         failure = true;
         error_type = "NaN";
-      } else if (Dune::XT::Common::isinf(ret[rr])) {
+      } else if (Common::isinf(ret[rr])) {
         failure = true;
         error_type = "inf";
       } else if (std::abs(ret[rr]) > (0.9 * std::numeric_limits<R>::max())) {
@@ -164,11 +161,11 @@ public:
                        << "The expressions of this function are: "
                        << function_->expressions()
                        << "\n   "
-                       << "You evaluated it with            xx : "
-                       << xx
+                       << "You evaluated it with            point_in_global_coordinates : "
+                       << point_in_global_coordinates
                        << "\n   "
-                       << "                                 mu : "
-                       << mu
+                       << "                                 param : "
+                       << param
                        << "\n   "
                        << "The result was:                       "
                        << ret[rr]
@@ -177,11 +174,11 @@ public:
     }
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
+    return ret;
   } // ... evaluate(...)
 
-  void jacobian(const DomainType& /*xx*/,
-                JacobianRangeType& /*ret*/,
-                const Common::Parameter& /*mu*/ = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
+                                     const Common::Parameter& /*param*/ = {}) const override final
   {
     DUNE_THROW(NotImplemented, "Not yet, at least...");
   }

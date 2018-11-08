@@ -5,12 +5,14 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
+//   Felix Schindler (2017)
 //   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_FUNCTIONS_EXCEPTIONS_HH
 #define DUNE_XT_FUNCTIONS_EXCEPTIONS_HH
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/grid/exceptions.hh>
 
 namespace Dune {
 namespace XT {
@@ -18,7 +20,19 @@ namespace Functions {
 namespace Exceptions {
 
 
+class wrong_input_given : public Common::Exceptions::wrong_input_given
+{
+};
+
+class not_bound_to_an_element_yet : public Grid::Exceptions::not_bound_to_an_element_yet
+{
+};
+
 class reinterpretation_error : public Dune::Exception
+{
+};
+
+class parameter_error : public Common::Exceptions::parameter_error
 {
 };
 

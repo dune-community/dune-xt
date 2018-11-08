@@ -46,13 +46,9 @@ static const constexpr size_t d = G::dimension;
  */
 template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<Grid::is_grid<G>::value && d == 2,
-                        pybind11::class_<Spe10::Model1Function<typename G::template Codim<0>::Entity,
-                                                               typename G::ctype,
-                                                               G::dimension,
-                                                               double,
-                                                               r,
-                                                               rC>>>::type
-bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
+                        pybind11::class_<Spe10::Model1Function<typename G::template Codim<0>::Entity, r, rC, double>>>::
+    type
+    bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -61,8 +57,8 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
   typedef typename G::ctype D;
   typedef double R;
 
-  typedef LocalizableFunctionInterface<E, D, d, R, r, rC> I;
-  typedef Spe10::Model1Function<E, D, d, R, r, rC> C;
+  typedef GridFunctionInterface<E, r, rC, R> I;
+  typedef Spe10::Model1Function<E, r, rC, R> C;
 
   py::class_<C, I> c(
       m,
