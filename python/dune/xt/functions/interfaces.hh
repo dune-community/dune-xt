@@ -270,7 +270,6 @@ bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
           .c_str());
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
-  c.def_property_readonly("type", [](const C& self) { return self.type(); });
   c.def_property_readonly("name", [](const C& self) { return self.name(); });
 
   c.def("visualize",
@@ -466,7 +465,6 @@ pybind11::class_<FunctionInterface<d, r, rC, double>> bind_FunctionInterface(pyb
                       .c_str());
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
-  c.def_property_readonly("type", [](const C& self) { return self.type(); });
   c.def_property_readonly("name", [](const C& self) { return self.name(); });
 
   //  c.def("visualize",

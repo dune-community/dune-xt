@@ -9,10 +9,11 @@
 
 import pytest
 import dune.xt.grid as xtg
+from dune.xt.grid import types
 import dune.xt.functions as xtf
 
 
-@pytest.fixture(params=xtg.available_types)
+@pytest.fixture(params=xtg.types.available_types)
 def function_provider(request):
     grid_type = request.param
     dim = 1
@@ -26,7 +27,7 @@ def function_provider(request):
 
 
 def test_available():
-    assert len(xtg.available_types) > 0
+    assert len(xtg.types.available_types) > 0
 
 
 def test_grid_provider(function_provider):
