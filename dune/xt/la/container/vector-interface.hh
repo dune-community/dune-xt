@@ -76,8 +76,6 @@ public:
   using typename BaseType::derived_type;
   using typename BaseType::RealType;
   using typename BaseType::ScalarType;
-  static constexpr Backends dense_matrix_type = Traits::dense_matrix_type;
-  static constexpr Backends sparse_matrix_type = Traits::sparse_matrix_type;
   using const_iterator = internal::VectorInputIterator<Traits, ScalarType>;
   using iterator = internal::VectorOutputIterator<Traits, ScalarType>;
   friend const_iterator;
@@ -86,6 +84,15 @@ public:
 
   virtual ~VectorInterface()
   {
+  }
+
+  template <class Vector>
+  std::enable_if_t<Common::is_vector<Vector>::value, derived_type&> assign_from(const Vector& other)
+  {
+    this->resize(other.size());
+    for (size_t ii = 0; ii < other.size(); ++ii)
+      this->set_entry(ii, other[ii]);
+    return this->as_imp();
   }
 
   /// \name Have to be implemented by a derived class in addition to the ones required by ContainerInterface!
@@ -99,6 +106,14 @@ public:
   {
     CHECK_CRTP(this->as_imp().size());
     return this->as_imp().size();
+  }
+
+  /**
+   * \note This is supposed to do nothing if new_size == size()
+   */
+  inline void resize(const size_t new_size)
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().resize(new_size));
   }
 
   /**

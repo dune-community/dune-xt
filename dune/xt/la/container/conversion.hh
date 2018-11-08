@@ -14,6 +14,7 @@
 
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/numeric_cast.hh>
+#include <dune/xt/common/vector.hh>
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/la/container/matrix-interface.hh>
@@ -23,13 +24,26 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
+// "pull in" the vector variant from Common, cannot be done with using (would pull the matrix one, too)
+template <class RangeType, class SourceType>
+typename std::enable_if<Common::is_vector<SourceType>::value && Common::is_vector<RangeType>::value, RangeType>::type
+convert_to(const SourceType& source)
+{
+  return Common::convert_to<RangeType>(source);
+}
+
+
 /**
+ Matrix variants
+
  |     Source     |     Range      | convert_to |
  |----------------|----------------|------------|
  | Common, not LA | Common or LA   | 1st        |
  | LA, not Common | Common, not LA | 2nd        |
  | LA, not Common | LA, not Common | 3rd        |
  */
+
 
 //! 1st convert_to
 template <class RangeType, class SourceType>

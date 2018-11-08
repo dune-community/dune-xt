@@ -23,65 +23,13 @@
 #include <dune/xt/common/crtp.hh>
 #include <dune/xt/common/math.hh>
 #include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/type_traits.hh>
+#include <dune/xt/la/type_traits.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
-
-
-enum class Backends
-{
-  common_dense,
-  common_sparse,
-  istl_dense,
-  istl_sparse,
-  eigen_dense,
-  eigen_sparse,
-  none
-}; // enum class Backends
-
-static constexpr Backends default_backend =
-#if HAVE_EIGEN
-    Backends::eigen_sparse;
-#else
-    Backends::istl_sparse;
-#endif
-
-static constexpr Backends default_sparse_backend =
-#if HAVE_EIGEN
-    Backends::eigen_sparse;
-#else
-    Backends::istl_sparse;
-#endif
-
-static constexpr Backends default_dense_backend =
-#if HAVE_EIGEN
-    Backends::eigen_dense;
-#else
-    Backends::common_dense;
-#endif
-
-
 namespace internal {
 
-
-/**
- * \brief Tries a boost::numeric_cast and throws an Exceptions::wrong_input_given on failure.
- *
- *        This can be used in the ctor initializer list.
- */
-template <class Out, class In>
-static Out boost_numeric_cast(const In& in)
-{
-  try {
-    return boost::numeric_cast<Out>(in);
-  } catch (boost::bad_numeric_cast& ee) {
-    DUNE_THROW(Common::Exceptions::wrong_input_given,
-               "There was an error in boost converting '" << in << "' to '" << Common::Typename<Out>::value() << "': "
-                                                          << ee.what());
-  }
-} // ... boost_numeric_cast(...)
 
 struct VectorLockGuard
 {
@@ -99,6 +47,7 @@ struct VectorLockGuard
 
   std::vector<std::mutex>& mutexes_;
 }; // VectorLockGuard
+
 
 struct LockGuard
 {
@@ -230,6 +179,14 @@ public:
     ret.scal(alpha);
     return ret;
   }
+
+  virtual derived_type operator/(const ScalarType& alpha) const
+  {
+    auto ret = this->copy();
+    ret.scal(1. / alpha);
+    return ret;
+  }
+
   /// \}
 }; // class ContainerInterface
 

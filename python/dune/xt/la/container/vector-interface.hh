@@ -20,7 +20,7 @@
 #include <dune/xt/common/string.hh>
 
 #include <dune/xt/la/type_traits.hh>
-#include <dune/xt/la/container.bindings.hh>
+#include <python/dune/xt/la/container.bindings.hh>
 
 #include <dune/xt/la/container/io.hh>
 #include <dune/xt/la/container/vector-interface.hh>
@@ -131,7 +131,7 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
         "jj"_a);
   c.def("set_all", [](C& self, const S& value) { self.set_all(value); }, "value"_a);
   c.def("valid", [](const C& self) { return self.valid(); });
-  c.def("dim", [](const C& self) { return self.dim(); });
+  c.def("dim", [](const C& self) { return self.size(); });
   c.def("mean", [](const C& self) { return self.mean(); });
   c.def("amax", [](const C& self) { return self.amax(); });
   c.def("almost_equal",

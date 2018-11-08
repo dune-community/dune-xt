@@ -19,6 +19,23 @@ namespace XT {
 namespace LA {
 
 
+enum class Backends
+{
+  common_dense,
+  common_sparse,
+  istl_dense,
+  istl_sparse,
+  eigen_dense,
+  eigen_sparse,
+  none
+}; // enum class Backends
+
+
+static constexpr Backends default_backend = Backends::istl_sparse;
+static constexpr Backends default_sparse_backend = Backends::istl_sparse;
+static constexpr Backends default_dense_backend = Backends::common_dense;
+
+
 // forwards
 template <class Traits>
 class ProvidesBackend;
@@ -34,6 +51,9 @@ class MatrixInterface;
 
 template <class Traits, class ScalarImp>
 class VectorInterface;
+
+template <class ScalarType, Backends backend>
+struct Container;
 
 
 namespace internal {
@@ -144,6 +164,44 @@ template <class C>
 struct provides_data_access<C, false> : public std::false_type
 {
 };
+
+
+template <class V, bool = is_vector<V>::value>
+struct extract_matrix;
+
+template <class V>
+struct extract_matrix<V, false>
+{
+  static_assert(AlwaysFalse<V>::value, "V is not a vector!");
+};
+
+template <class V>
+struct extract_matrix<V, true>
+{
+  using type = typename Container<typename V::ScalarType, V::sparse_matrix_type>::MatrixType;
+};
+
+template <class V>
+using matrix_t = typename extract_matrix<V>::type;
+
+
+template <class M, bool = is_matrix<M>::value>
+struct extract_vector;
+
+template <class M>
+struct extract_vector<M, false>
+{
+  static_assert(AlwaysFalse<M>::value, "M is not a matrix!");
+};
+
+template <class M>
+struct extract_vector<M, true>
+{
+  using type = typename Container<typename M::ScalarType, M::vector_type>::VectorType;
+};
+
+template <class M>
+using vector_t = typename extract_vector<M>::type;
 
 
 } // namespace LA

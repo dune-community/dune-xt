@@ -28,9 +28,6 @@ else
     ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${CTEST} -L "^builder_${TESTS}$"
 fi
 
-${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} install | grep -v "Installing"
-${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} package_source
-
 # clang coverage currently disabled for being to mem hungry
 if [[ ${CC} == *"clang"* ]] ; then
     exit 0
@@ -38,7 +35,7 @@ fi
 
 pushd ${DUNE_BUILD_DIR}/${MY_MODULE}
 COVERAGE_INFO=${PWD}/coverage.info
-lcov --directory . --output-file ${COVERAGE_INFO} -c
+lcov --directory . --output-file ${COVERAGE_INFO} --ignore-errors gcov -c
 for d in "dune-common" "dune-pybindxi" "dune-geometry"  "dune-istl"  "dune-grid" "dune-alugrid"  "dune-uggrid"  "dune-localfunctions" ; do
     lcov --directory . --output-file ${COVERAGE_INFO} -r ${COVERAGE_INFO} "${SUPERDIR}/${d}/*"
 done
