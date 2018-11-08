@@ -11,7 +11,7 @@
 
 #Name of the module
 Module: dune-pybindxi
-Version: 2.2.1
+Version: 18.11
 Maintainer: felix.schindler@wwu.de
 #depending on
 Depends: dune-common (>= 2.6)
