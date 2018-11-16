@@ -2,6 +2,8 @@
 
 #include <dune/xt/common/test/main.hxx>
 
+#include <dune/xt/data/paths.hh>
+
 #include <dune/xt/grid/grids.hh>
 #include <dune/geometry/quadraturerules.hh>
 #include <dune/xt/grid/gridprovider/cube.hh>
@@ -37,7 +39,7 @@ struct Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
-  auto filename = Dune::XT::Functions::Spe10::internal::model1_filename;
+  auto filename = Dune::XT::Data::spe10_model1_filename();
   FunctionType function(
       filename,
       {0, 0},
@@ -65,7 +67,7 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
-  auto filename = Dune::XT::Functions::Spe10::internal::model1_filename;
+  auto filename = Dune::XT::Data::spe10_model1_filename();
   FunctionType default_function(
       filename,
       {0, 0},
@@ -76,7 +78,7 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
-  auto filename = Dune::XT::Functions::Spe10::internal::model1_filename;
+  auto filename = Dune::XT::Data::spe10_model1_filename();
   FunctionType default_function(
       filename,
       {0, 0},
@@ -90,7 +92,7 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
-  auto filename = Dune::XT::Functions::Spe10::internal::model1_filename;
+  auto filename = Dune::XT::Data::spe10_model1_filename();
   FunctionType default_function(
       filename,
       {0, 0},
@@ -109,7 +111,7 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   const auto leaf_view = grid_.leaf_view();
-  auto filename = Dune::XT::Functions::Spe10::internal::model1_filename;
+  auto filename = Dune::XT::Data::spe10_model1_filename();
   FunctionType default_function(
       filename,
       {0, 0},
@@ -134,7 +136,7 @@ TEST_F(Spe10Model1Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobi
 {
   const auto leaf_view = grid_.leaf_view();
   const DerivativeRangeType expected_jacobian = DerivativeRangeType();
-  auto filename = Dune::XT::Functions::Spe10::internal::model1_filename;
+  auto filename = Dune::XT::Data::spe10_model1_filename();
   FunctionType default_function(
       filename,
       {0, 0},

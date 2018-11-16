@@ -14,6 +14,7 @@
 
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/data/paths.hh>
 
 #include "../checkerboard.hh"
 
@@ -24,7 +25,6 @@ namespace Spe10 {
 namespace internal {
 
 
-static const std::string model2_filename = "spe_perm.dat";
 static const size_t model2_x_elements = 60;
 static const size_t model2_y_elements = 220;
 static const size_t model2_z_elements = 85;
@@ -118,7 +118,7 @@ public:
   {
     Common::Configuration config;
     config["type"] = static_id();
-    config["filename"] = internal::model2_filename;
+    config["filename"] = Data::spe10_model2_filename();
     config["lower_left"] = "[0.0 0.0 0.0]";
     config["upper_right"] = "[" + Common::to_string(internal::model_2_length_x) + " "
                             + Common::to_string(internal::model_2_length_y) + " "
