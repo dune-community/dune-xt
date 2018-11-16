@@ -181,7 +181,7 @@ public:
 
 private:
   template <class GridView, class MacroIntersectionType>
-  class CouplingFaceDescriptor : public GridGlue::Codim1Extractor<GridView>::Predicate
+  class CouplingFaceDescriptor
   {
     using LocalEntityType = XT::Grid::extract_entity_t<GridView>;
     typedef typename GridView::ctype ctype;
@@ -191,22 +191,21 @@ private:
       : macro_intersection_(macro_intersection)
     {}
 
-    // The contains method is commented out in dune-grid-glue 2.6, so do the same here
-    //     virtual bool contains(const LocalEntityType& element, unsigned int face) const override final
-    //     {
-    //       const auto local_intersection_ptr = element.template subEntity<1>(face);
-    // #if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
-    //       const auto& local_intersection = local_intersection_ptr;
-    // #else
-    //       const auto& local_intersection = *local_intersection_ptr;
-    // #endif
-    //       const auto& local_intersection_geometry = local_intersection.geometry();
-    //       // Check if all corners of the local intersection lie within the macro intersection.
-    //       for (auto ii : XT::Common::value_range(local_intersection_geometry.corners()))
-    //         if (!XT::Grid::contains(macro_intersection_, local_intersection_geometry.corner(ii)))
-    //           return false;
-    //       return true;
-    //     } // ... contains(...)
+    bool operator()(const LocalEntityType& element, unsigned int face) const
+    {
+          const auto local_intersection_ptr = element.template subEntity<1>(face);
+     #if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
+           const auto& local_intersection = local_intersection_ptr;
+     #else
+           const auto& local_intersection = *local_intersection_ptr;
+     #endif
+           const auto& local_intersection_geometry = local_intersection.geometry();
+           // Check if all corners of the local intersection lie within the macro intersection.
+           for (auto ii : XT::Common::value_range(local_intersection_geometry.corners()))
+             if (!XT::Grid::contains(macro_intersection_, local_intersection_geometry.corner(ii)))
+               return false;
+           return true;
+    } // ... contains(...)
 
   private:
     const MacroIntersectionType& macro_intersection_;
