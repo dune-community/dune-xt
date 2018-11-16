@@ -73,6 +73,8 @@ public:
   using typename InterfaceType::Traits;
   using IndicesVectorType = typename Traits::IndicesVectorType;
   using EntriesVectorType = typename Traits::EntriesVectorType;
+  // needed to fix gcc compilation error due to ambiguous lookup of derived type
+  using derived_type = typename Traits::derived_type;
 
 private:
   using MutexesType = typename Traits::MutexesType;

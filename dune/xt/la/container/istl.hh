@@ -98,6 +98,8 @@ public:
   using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
   using typename ProvidesDataAccess<Traits>::DataType;
+  // needed to fix gcc compilation error due to ambiguous lookup of derived type
+  using derived_type = typename Traits::derived_type;
 
 private:
   using MutexesType = typename Traits::MutexesType;

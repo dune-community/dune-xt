@@ -253,6 +253,8 @@ public:
   using typename InterfaceType::ScalarType;
   using Traits = typename InterfaceType::Traits;
   using BackendType = typename Traits::BackendType;
+  // needed to fix gcc compilation error due to ambiguous lookup of derived type
+  using derived_type = typename Traits::derived_type;
 
 private:
   using EIGEN_size_t = typename BackendType::Index;
