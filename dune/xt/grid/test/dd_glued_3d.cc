@@ -177,17 +177,17 @@ typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<do
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
                                      Dune::ALUGrid<3, 3, cube, nonconforming>>
 //                      , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
-//                                   ALUGrid<3, 3, simplex, conforming>>                  // <- knwon to fail completely
+//                                   ALUGrid<3, 3, simplex, conforming>>                  // <- known to fail completely
 //                      , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
-//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
+//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- known to fail completely
                         , std::tuple<Dune::ALUGrid<3, 3, cube, nonconforming>,
                                      YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>>
 //                      , std::tuple<ALUGrid<3, 3, simplex, conforming>,
-//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
+//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- known to fail completely
 //                      , std::tuple<ALUGrid<3, 3, simplex, nonconforming>,
-//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
+//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- known to fail completely
 //                      , std::tuple<ALUGrid<3, 3, cube, nonconforming>,
-//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
+//                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- known to fail completely
 #endif // HAVE_DUNE_ALUGRID
 #if !HAVE_MPI && (HAVE_DUNE_UGGRID || HAVE_UG)
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>>
