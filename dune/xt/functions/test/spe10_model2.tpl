@@ -40,7 +40,7 @@ struct Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
-  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+  FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
@@ -68,7 +68,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
-  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+  FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
@@ -80,7 +80,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
-  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+  FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
@@ -96,7 +96,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
-  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+  FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
@@ -116,7 +116,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   const auto leaf_view = grid_.leaf_view();
-  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+  FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
@@ -135,7 +135,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
-  FunctionType function(Dune::XT::Functions::Spe10::internal::model2_filename,
+  FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
