@@ -350,24 +350,31 @@ using extract_intersection_iterator_t = typename extract_intersection_iterator<T
 template <class T,
           size_t codim = 0,
           bool view = is_view<T>::value || is_dd_subdomain<T>::value || is_dd_subdomain_boundary<T>::value,
-          bool part = is_part<T>::value>
+          bool part = is_part<T>::value,
+          bool grid = is_grid<T>::value>
 struct extract_entity : public AlwaysFalse<T>
 {};
 
-template <class T, size_t codim, bool view, bool part>
-struct extract_entity<const T&, codim, view, part> : public extract_entity<T, codim, view, part>
-{};
+// template <class T, size_t codim, bool view, bool part>
+// struct extract_entity<const T&, codim, view, part> : public extract_entity<T, codim, view, part>
+//{};
 
 template <class T, size_t codim>
-struct extract_entity<T, codim, true, false>
+struct extract_entity<T, codim, true, false, false>
 {
   typedef typename T::template Codim<codim>::Entity type;
 };
 
 template <class T, size_t codim>
-struct extract_entity<T, codim, false, true>
+struct extract_entity<T, codim, false, true, false>
 {
   typedef typename T::template Codim<codim>::EntityType type;
+};
+
+template <class T, size_t codim>
+struct extract_entity<T, codim, false, false, true>
+{
+  typedef typename T::template Codim<codim>::Entity type;
 };
 
 template <class T, size_t codim = 0>
