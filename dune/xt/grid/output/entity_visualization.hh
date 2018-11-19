@@ -228,6 +228,24 @@ struct ElementVisualization
   }
 };
 
+template <class GridType>
+void visualize_index_per_level(const GridType& grid_, std::string filename)
+{
+  if (GridType::dimension > 3)
+    DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
+  for (auto lvl : Common::value_range(grid_.maxLevel() + 1)) {
+    const auto grid_view = grid_.levelGridView(lvl);
+    std::vector<double> entityId(grid_view.indexSet().size(0));
+    for (auto&& entity : elements(grid_view)) {
+      const auto& index = grid_view.indexSet().index(entity);
+      entityId[index] = double(index);
+    }
+    Dune::VTKWriter<decltype(grid_view)> vtkwriter(grid_view);
+    vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
+    vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
+  }
+} // ... visualize_plain(...)
+
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
