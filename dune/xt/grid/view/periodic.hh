@@ -981,12 +981,12 @@ std::pair<bool, typename PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_
  */
 template <class RealGridLayerImp, bool codim_iters_provided = false>
 class PeriodicGridView
-    : XT::Common::ConstStorageProvider<internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>>,
+    : XT::Common::StorageProvider<internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>>,
       public Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>
 {
   static_assert(is_layer<RealGridLayerImp>::value, "");
   using Implementation = internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>;
-  using ImplementationStorage = typename XT::Common::ConstStorageProvider<Implementation>;
+  using ImplementationStorage = typename XT::Common::StorageProvider<Implementation>;
   using BaseType = Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>;
 
 public:
