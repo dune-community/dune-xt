@@ -139,6 +139,22 @@ class Glued
   };
 #endif // HAVE_DUNE_ALUGRID
 
+#if HAVE_MPI && (HAVE_DUNE_UGGRID || HAVE_UG)
+  // UGGrid does not support multiple parallel instances in parallel and we have no means yet to create multiple
+  // sequential grids once MPI was found.
+  template <bool anything>
+  struct allowed_local_grid<UGGrid<2>, anything>
+  {
+    static const bool value = false;
+  };
+
+  template <bool anything>
+  struct allowed_local_grid<UGGrid<3>, anything>
+  {
+    static const bool value = false;
+  };
+#endif
+
   static_assert(allowed_macro_grid<MacroGridImp>::value,
                 "This macro grid is known to fail, enable on your onw risk by disabling this check!");
   static_assert(allowed_local_grid<LocalGridImp>::value,
