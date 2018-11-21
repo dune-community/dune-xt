@@ -189,7 +189,7 @@ typedef ::testing::Types< std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<do
 //                      , std::tuple<ALUGrid<3, 3, cube, nonconforming>,
 //                                   ALUGrid<3, 3, simplex, nonconforming>>               // <- knwon to fail completely
 #endif // HAVE_DUNE_ALUGRID
-#if !ENABLE_MPI && (HAVE_DUNE_UGGRID || HAVE_UG)
+#if !HAVE_MPI && (HAVE_DUNE_UGGRID || HAVE_UG)
                         , std::tuple<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>>
 #endif
 #if HAVE_ALBERTA

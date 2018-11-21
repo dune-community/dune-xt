@@ -118,9 +118,9 @@ typedef ::testing::Types< std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<do
 //                      , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
 //                                   ALUGrid<2, 2, simplex, conforming>>
 //#endif
-//#if HAVE_DUNE_UGGRID || HAVE_UG
-//                      , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>>
-//#endif
+#if !HAVE_MPI && (HAVE_DUNE_UGGRID || HAVE_UG)
+                        , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>>
+#endif
 #if HAVE_ALBERTA
                         , std::tuple<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>>
 #endif
