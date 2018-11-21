@@ -43,34 +43,6 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
   {
     return {4};
   }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return false;
-  }
-
-  static bool failure_for_higher()
-  {
-    return false;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {{{0, 0}, 0},
-            {{0, 1}, 0},
-            {{0, 2}, 0},
-            {{1, 0}, 24},
-            {{1, 1}, 0},
-            {{1, 2}, 0},
-            {{2, 0}, 72},
-            {{2, 1}, 48},
-            {{2, 2}, 0}};
-  }
 }; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, YaspGrid<2,
 // EquidistantOffsetCoordinates<double, 2>>, anything>
 
@@ -98,34 +70,6 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGG
   {
     return {4};
   }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return false;
-  }
-
-  static bool failure_for_higher()
-  {
-    return false;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {{{0, 0}, 0},
-            {{0, 1}, 0},
-            {{0, 2}, 0},
-            {{1, 0}, 24},
-            {{1, 1}, 0},
-            {{1, 2}, 0},
-            {{2, 0}, 72},
-            {{2, 1}, 48},
-            {{2, 2}, 0}};
-  }
 }; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>, anything>
 
 #endif // HAVE_DUNE_UGGRID || HAVE_UG
@@ -152,26 +96,6 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Alb
   static std::set<size_t> num_local_couplings_intersections()
   {
     return {2};
-  }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return false;
-  }
-
-  static bool failure_for_higher()
-  {
-    return false;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {};
   }
 }; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>, anything>
 
@@ -214,18 +138,6 @@ TYPED_TEST(GluedDdGridTest, visualize_is_callable)
 TYPED_TEST(GluedDdGridTest, couplings_are_of_correct_size)
 {
   this->couplings_are_of_correct_size();
-}
-TYPED_TEST(GluedDdGridTest, intersections_are_correctly_oriented_for_equal_levels)
-{
-  this->check_intersection_orientation_for_equal_levels();
-}
-TYPED_TEST(GluedDdGridTest, intersections_are_correctly_oriented_for_higher_neighbor_levels)
-{
-  this->check_intersection_orientation_for_higher_neighbor_levels();
-}
-TYPED_TEST(GluedDdGridTest, __STILL_BROKEN__intersection_orientation_is_wrong_for_lower_or_equal_neighbor_levels)
-{
-  this->check_intersection_orientation_for_lower_or_equal_neighbor_levels();
 }
 
 

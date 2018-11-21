@@ -45,34 +45,6 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
     // we expect 16 rectangles, each containing two triangles
     return {32};
   }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_higher()
-  {
-    return true;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {{{0, 0}, 216},
-            {{0, 1}, 864},
-            {{0, 2}, 3456},
-            {{1, 0}, 108},
-            {{1, 1}, 864},
-            {{1, 2}, 3456},
-            {{2, 0}, 108},
-            {{2, 1}, 108},
-            {{2, 2}, 3456}};
-  }
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, YaspGrid<3,
 // EquidistantOffsetCoordinates<double, 3>>, anything>
 
@@ -102,34 +74,6 @@ struct ExpectedResults<ALUGrid<3, 3, cube, nonconforming, Comm>,
   {
     return {32};
   }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_higher()
-  {
-    return true;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {{{0, 0}, 216},
-            {{0, 1}, 864},
-            {{0, 2}, 3456},
-            {{1, 0}, 108},
-            {{1, 1}, 864},
-            {{1, 2}, 3456},
-            {{2, 0}, 108},
-            {{2, 1}, 108},
-            {{2, 2}, 3456}};
-  }
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, ALUGrid<3, 3, simplex, nonconforming,
 // Comm>, anything>
 
@@ -156,34 +100,6 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>,
   static std::set<size_t> num_local_couplings_intersections()
   {
     return {32};
-  }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_higher()
-  {
-    return true;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {{{0, 0}, 216},
-            {{0, 1}, 864},
-            {{0, 2}, 3456},
-            {{1, 0}, 108},
-            {{1, 1}, 864},
-            {{1, 2}, 3456},
-            {{2, 0}, 108},
-            {{2, 1}, 108},
-            {{2, 2}, 3456}};
   }
 }; // ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, ALUGrid<3, 3, cube, nonconforming, Comm>,
 // anything>
@@ -214,34 +130,6 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGG
     // we expect 16 rectangles, each containing two triangles
     return {32};
   }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_higher()
-  {
-    return true;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {{{0, 0}, 216},
-            {{0, 1}, 864},
-            {{0, 2}, 3456},
-            {{1, 0}, 72},
-            {{1, 1}, 864},
-            {{1, 2}, 3456},
-            {{2, 0}, 72},
-            {{2, 1}, 36},
-            {{2, 2}, 3456}};
-  }
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, UGGrid<3>, anything>
 
 #endif // HAVE_DUNE_UGGRID || HAVE_UG
@@ -268,26 +156,6 @@ struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, Alb
   static std::set<size_t> num_local_couplings_intersections()
   {
     return {10};
-  }
-
-  static bool failure_for_lower_or_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_equal()
-  {
-    return true;
-  }
-
-  static bool failure_for_higher()
-  {
-    return true;
-  }
-
-  static std::map<std::pair<ssize_t, ssize_t>, size_t> results()
-  {
-    return {{{-1, -1}, 702}};
   }
 }; // struct ExpectedResults<YaspGrid<3, EquidistantOffsetCoordinates<double, 3>>, AlbertaGrid<3>, anything>
 
@@ -341,18 +209,6 @@ TYPED_TEST(GluedDdGridTest, visualize_is_callable)
 TYPED_TEST(GluedDdGridTest, couplings_are_of_correct_size)
 {
   this->couplings_are_of_correct_size();
-}
-TYPED_TEST(GluedDdGridTest, __STILL_BROKEN__intersections_are_correctly_oriented_for_equal_levels)
-{
-  this->check_intersection_orientation_for_equal_levels();
-}
-TYPED_TEST(GluedDdGridTest, __STILL_BROKEN__intersections_are_correctly_oriented_for_higher_neighbor_levels)
-{
-  this->check_intersection_orientation_for_higher_neighbor_levels();
-}
-TYPED_TEST(GluedDdGridTest, __STILL_BROKEN__intersection_orientation_is_wrong_for_lower_or_equal_neighbor_levels)
-{
-  this->check_intersection_orientation_for_lower_or_equal_neighbor_levels();
 }
 
 
