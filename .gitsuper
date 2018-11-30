@@ -14,10 +14,10 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	 26cc8cb4161a3a51002ab2a81b8c81d2c951ee79 dune-testtools (heads/dune_xt)
 	 8fe883e99c58c9f0c2f92457d546a0ac9f5a9bf9 dune-uggrid (v2.5.2-1-g8fe883e9)
 	+bbeae013f1a82dd66179ff1b27f3ac079f5f448f dune-xt-common (heads/master)
-	+3e3f3bf06e21cbbf3c0a559891b44c6f5d987d0f dune-xt-data (heads/master)
+	+55fc6ba415a25d4a95a3c16a9345b564bbbd8ec2 dune-xt-data (heads/namechange)
 	+93e975ee2a4d8b8e2d150198590b8dbf4dbd0262 dune-xt-functions (heads/namechange)
-	+0a7c8b5115dfe30f7fde21b7face54a17a97c207 dune-xt-grid (heads/namechange)
-	+c9d4ecef084631d2296ca49e9a61b795f30a643b dune-xt-la (heads/master)
+	+e87b1e6cc177072e98079f516fabbc479da28f43 dune-xt-grid (heads/namechange)
+	+772b71f8f23efb42943292ee499a84ec004fec35 dune-xt-la (heads/namechange)
 	 09d0378f616b94d68bcdd9fc6114813181849ec0 scripts (heads/master)
 commit = a211a5c7ba4c103fc0da57add321c5bdef7b07b5
 
@@ -94,7 +94,7 @@ commit = bbeae013f1a82dd66179ff1b27f3ac079f5f448f
 [submodule.dune-xt-data]
 remote = https://github.com/dune-community/dune-xt-data
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 3e3f3bf06e21cbbf3c0a559891b44c6f5d987d0f
+commit = 55fc6ba415a25d4a95a3c16a9345b564bbbd8ec2
 
 [submodule.dune-xt-functions]
 remote = git@github.com:dune-community/dune-xt-functions.git
@@ -104,12 +104,12 @@ commit = 93e975ee2a4d8b8e2d150198590b8dbf4dbd0262
 [submodule.dune-xt-grid]
 remote = git@github.com:dune-community/dune-xt-grid.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 0a7c8b5115dfe30f7fde21b7face54a17a97c207
+commit = e87b1e6cc177072e98079f516fabbc479da28f43
 
 [submodule.dune-xt-la]
 remote = git@github.com:dune-community/dune-xt-la.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = c9d4ecef084631d2296ca49e9a61b795f30a643b
+commit = 772b71f8f23efb42943292ee499a84ec004fec35
 
 [submodule.scripts]
 remote = https://github.com/wwu-numerik/scripts.git
