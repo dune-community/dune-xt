@@ -17,7 +17,7 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	+55fc6ba415a25d4a95a3c16a9345b564bbbd8ec2 dune-xt-data (heads/namechange)
 	+93e975ee2a4d8b8e2d150198590b8dbf4dbd0262 dune-xt-functions (heads/namechange)
 	+e87b1e6cc177072e98079f516fabbc479da28f43 dune-xt-grid (heads/namechange)
-	+772b71f8f23efb42943292ee499a84ec004fec35 dune-xt-la (heads/namechange)
+	+c28db670d19f65f43a5a32b739419325e2661cb4 dune-xt-la (heads/namechange)
 	 09d0378f616b94d68bcdd9fc6114813181849ec0 scripts (heads/master)
 commit = a211a5c7ba4c103fc0da57add321c5bdef7b07b5
 
@@ -109,7 +109,7 @@ commit = e87b1e6cc177072e98079f516fabbc479da28f43
 [submodule.dune-xt-la]
 remote = git@github.com:dune-community/dune-xt-la.git
 status = 2424627f0ad5de7e4aaa5e7f48bc2a02414d95a1 .vcsetup (heads/master)
-commit = 772b71f8f23efb42943292ee499a84ec004fec35
+commit = c28db670d19f65f43a5a32b739419325e2661cb4
 
 [submodule.scripts]
 remote = https://github.com/wwu-numerik/scripts.git
