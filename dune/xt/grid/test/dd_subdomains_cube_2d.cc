@@ -6,7 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017)
-//   Rene Milk       (2017 - 2018)
+//   René Fritze     (2017 - 2018)
 
 #include <dune/xt/common/test/main.hxx> // <- this one has to come first (includes the config.h)!
 

@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2012 - 2017)
 //   Kirsten Weber   (2012 - 2013)
-//   Rene Milk       (2012 - 2018)
+//   René Fritze     (2012 - 2018)
 //   Tobias Leibner  (2014)
 
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_STARCD_HH

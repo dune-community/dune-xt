@@ -8,7 +8,7 @@
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2018)
 //   Kirsten Weber   (2012)
-//   Rene Milk       (2012 - 2018)
+//   René Fritze     (2012 - 2018)
 //   Sven Kaulmann   (2014)
 //   Tobias Leibner  (2014, 2016 - 2017)
 

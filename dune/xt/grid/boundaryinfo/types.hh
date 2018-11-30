@@ -6,7 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2016 - 2018)
-//   Rene Milk       (2016, 2018)
+//   René Fritze     (2016, 2018)
 //   Tobias Leibner  (2016 - 2018)
 
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_TYPES_HH

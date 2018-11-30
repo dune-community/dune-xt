@@ -6,7 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017)
-//   Rene Milk       (2017 - 2018)
+//   René Fritze     (2017 - 2018)
 
 #ifndef DUNE_GRID_MULTISCALE_TEST_PROVIDER_CUBE_HH
 #define DUNE_GRID_MULTISCALE_TEST_PROVIDER_CUBE_HH

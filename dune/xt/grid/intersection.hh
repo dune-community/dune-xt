@@ -7,7 +7,7 @@
 // Authors:
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2018)
-//   Rene Milk       (2012 - 2013, 2015 - 2016, 2018)
+//   René Fritze     (2012 - 2013, 2015 - 2016, 2018)
 //   Sven Kaulmann   (2013)
 //   Tobias Leibner  (2014)
 

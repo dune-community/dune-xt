@@ -5,9 +5,9 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2015 - 2017)
-//   Rene Milk       (2014 - 2018)
-//   Tobias Leibner  (2015 - 2016)
+//   Felix Schindler (2015 - 2018)
+//   René Fritze     (2014 - 2018)
+//   Tobias Leibner  (2015 - 2016, 2018)
 
 #include <dune/xt/common/test/main.hxx>
 

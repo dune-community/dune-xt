@@ -8,7 +8,7 @@
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2017)
 //   Kirsten Weber   (2012)
-//   Rene Milk       (2012 - 2013, 2015 - 2016, 2018)
+//   René Fritze     (2012 - 2013, 2015 - 2016, 2018)
 //   Tobias Leibner  (2014, 2016)
 
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_DGF_HH
