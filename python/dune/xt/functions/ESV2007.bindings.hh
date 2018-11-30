@@ -6,7 +6,8 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017)
-//   Rene Milk       (2018)
+//   René Fritze     (2018)
+//   TiKeil          (2018)
 
 #ifndef DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH
 #define DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH
