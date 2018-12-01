@@ -18,9 +18,9 @@
 #include <vector>
 
 #if HAVE_TBB
-#include <tbb/blocked_range.h>
-#include <tbb/parallel_reduce.h>
-#include <tbb/tbb_stddef.h>
+#  include <tbb/blocked_range.h>
+#  include <tbb/parallel_reduce.h>
+#  include <tbb/tbb_stddef.h>
 #endif
 
 #include <dune/common/unused.hh>
@@ -28,7 +28,7 @@
 
 #include <dune/grid/common/rangegenerators.hh>
 #if HAVE_TBB
-#include <dune/xt/grid/parallel/partitioning/ranged.hh>
+#  include <dune/xt/grid/parallel/partitioning/ranged.hh>
 #endif
 
 #include <dune/xt/common/memory.hh>

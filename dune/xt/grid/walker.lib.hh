@@ -19,19 +19,20 @@
 #if DUNE_XT_WITH_PYTHON_BINDINGS
 
 
-#define _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, _type, _backend)                                                      \
-  _prefix class Dune::XT::Grid::Walker<typename Dune::XT::Grid::Layer<_GRID,                                           \
-                                                                      Dune::XT::Grid::Layers::_type,                   \
-                                                                      Dune::XT::Grid::Backends::_backend,              \
-                                                                      Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::type>
+#  define _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, _type, _backend)                                                    \
+    _prefix class Dune::XT::Grid::Walker<                                                                              \
+        typename Dune::XT::Grid::Layer<_GRID,                                                                          \
+                                       Dune::XT::Grid::Layers::_type,                                                  \
+                                       Dune::XT::Grid::Backends::_backend,                                             \
+                                       Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::type>
 
-#define DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID)                                                                        \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, view);                                                               \
-  _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, leaf, view)
+#  define DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID)                                                                      \
+    _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, view);                                                             \
+    _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, leaf, view)
 
-#if HAVE_DUNE_ALUGRID
+#  if HAVE_DUNE_ALUGRID
 DUNE_XT_GRID_WALKER_LIB(extern template, ALU_2D_SIMPLEX_CONFORMING);
-#endif
+#  endif
 
 DUNE_XT_GRID_WALKER_LIB(extern template, YASP_1D_EQUIDISTANT_OFFSET);
 DUNE_XT_GRID_WALKER_LIB(extern template, YASP_2D_EQUIDISTANT_OFFSET);

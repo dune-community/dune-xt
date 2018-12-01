@@ -31,8 +31,8 @@ static inline Common::Configuration allneumann_boundaryinfo_default_config()
 // We do not want to add a virtual destructor (to be able to use this as constexpr),
 // so just silence the warning.
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #endif
 template <class IntersectionImp>
 class AllNeumannBoundaryInfo : public BoundaryInfo<IntersectionImp>
@@ -59,7 +59,7 @@ protected:
   static constexpr NeumannBoundary neumann_boundary_{};
 }; // class AllNeumannBoundaryInfo
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
-#pragma GCC diagnostic pop
+#  pragma GCC diagnostic pop
 #endif
 
 template <class I>

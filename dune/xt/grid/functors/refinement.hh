@@ -74,7 +74,7 @@ void enforce_maximum_entity_volume(GridType& grid, const double size_factor)
 
 
 } // namespace Grid
-} // namespace Stud
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_FUNCTORS_REFINEMENT_HH

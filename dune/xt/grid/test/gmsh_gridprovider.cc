@@ -13,7 +13,7 @@
 
 #if HAVE_DUNE_ALUGRID
 
-#include "provider.hh"
+#  include "provider.hh"
 
 
 struct GmshGridProvider : public GridProviderBase<TESTGRIDTYPE>

@@ -12,18 +12,18 @@
 #define DUNE_XT_GRID_TEST_DD_GLUED_HH
 #if HAVE_DUNE_GRID_GLUE
 
-#include <map>
-#include <set>
-#include <sstream>
-#include <vector>
+#  include <map>
+#  include <set>
+#  include <sstream>
+#  include <vector>
 
-#include <dune/grid/common/rangegenerators.hh>
+#  include <dune/grid/common/rangegenerators.hh>
 
-#include <dune/xt/common/memory.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
-#include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/gridprovider.hh>
-#include <dune/xt/grid/dd/glued.hh>
+#  include <dune/xt/common/memory.hh>
+#  include <dune/xt/common/test/gtest/gtest.h>
+#  include <dune/xt/grid/grids.hh>
+#  include <dune/xt/grid/gridprovider.hh>
+#  include <dune/xt/grid/dd/glued.hh>
 
 
 template <class T>
@@ -101,7 +101,7 @@ struct GluedDdGridTest : public ::testing::Test
     static const constexpr Layers type = Layers::level;
   };
 
-#if HAVE_ALBERTA
+#  if HAVE_ALBERTA
 
   template <int d, int dw, bool anything>
   struct get_local_layer<AlbertaGrid<d, dw>, anything>
@@ -109,7 +109,7 @@ struct GluedDdGridTest : public ::testing::Test
     static const constexpr Layers type = Layers::leaf;
   };
 
-#endif
+#  endif
 
   static const constexpr Layers local_layer = get_local_layer<LocalGridType>::type;
 

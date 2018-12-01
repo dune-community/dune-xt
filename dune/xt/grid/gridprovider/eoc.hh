@@ -13,7 +13,7 @@
 #define DUNE_XT_GRID_PROVIDER_EOC_HH
 
 #if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/grid.hh>
+#  include <dune/alugrid/grid.hh>
 #endif
 
 #include <dune/xt/grid/gridprovider/provider.hh>

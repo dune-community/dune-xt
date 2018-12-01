@@ -19,7 +19,7 @@
 #include <dune/grid/io/file/dgfparser/dgfgridfactory.hh> // How convenient that GridPtr requires DGFGridFactory but ...
 #include <dune/grid/io/file/dgfparser.hh>
 #if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/dgf.hh>
+#  include <dune/alugrid/dgf.hh>
 #endif
 #include <dune/grid/io/file/dgfparser/gridptr.hh> // ... does not include it!
 

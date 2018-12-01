@@ -12,7 +12,7 @@
 
 #if HAVE_DUNE_ALUGRID
 
-#include "../walker.lib.hh"
+#  include "../walker.lib.hh"
 
 
 DUNE_XT_GRID_WALKER_LIB(template, ALU_2D_SIMPLEX_CONFORMING);

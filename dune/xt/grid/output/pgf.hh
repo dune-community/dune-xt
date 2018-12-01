@@ -378,8 +378,8 @@ private:
   GridType& grid_;
 };
 
-} // namespace XT
 } // namespace Grid
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_OUTPUT_PGF_HH

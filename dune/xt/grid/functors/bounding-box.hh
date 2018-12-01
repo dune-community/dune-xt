@@ -58,7 +58,7 @@ struct MinMaxCoordinateFunctor : public ElementFunctor<GridViewType>
 
 
 } // namespace Grid
-} // namespace Stud
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_FUNCTORS_BOUNDING_BOX_HH

@@ -228,8 +228,8 @@ struct ElementVisualization
   }
 };
 
-} // namespace XT
 } // namespace Grid
+} // namespace XT
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_OUTPUT_ENTITY_VISUALIZATION_HH

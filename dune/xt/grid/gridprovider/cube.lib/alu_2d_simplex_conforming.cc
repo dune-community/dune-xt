@@ -12,7 +12,7 @@
 
 #if HAVE_DUNE_ALUGRID
 
-#include "../cube.lib.hh"
+#  include "../cube.lib.hh"
 
 
 DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(template, ALU_2D_SIMPLEX_CONFORMING);

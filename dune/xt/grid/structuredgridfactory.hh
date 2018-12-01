@@ -21,19 +21,19 @@
 #include <dune/grid/yaspgrid.hh>
 
 #if HAVE_DUNE_SPGRID
-#include <dune/grid/spgrid.hh>
+#  include <dune/grid/spgrid.hh>
 #endif
 
 #if HAVE_ALBERTA
-#include <dune/grid/albertagrid.hh>
+#  include <dune/grid/albertagrid.hh>
 #endif
 
 #if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/common/structuredgridfactory.hh>
+#  include <dune/alugrid/common/structuredgridfactory.hh>
 #endif
 
 #if HAVE_DUNE_UGGRID
-#include <dune/grid/uggrid.hh>
+#  include <dune/grid/uggrid.hh>
 #endif
 
 #include <dune/xt/common/float_cmp.hh>
@@ -173,10 +173,10 @@ public:
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
-#if HAVE_MPI
+#  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
-#endif
+#  endif
     DUNE_THROW(InvalidStateException, "Alberta construction cannot handle non-world communicators");
   }
 
@@ -188,10 +188,10 @@ public:
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
-#if HAVE_MPI
+#  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
-#endif
+#  endif
     DUNE_THROW(InvalidStateException, "UGGRid construction cannot handle non-world communicators");
   }
 };
@@ -222,10 +222,10 @@ public:
       DXTC_LOG_INFO << "Ignoring non-default overlap for alberta cube creation";
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
-#if HAVE_MPI
+#  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
-#endif
+#  endif
     DUNE_THROW(InvalidStateException, "Alberta construction cannot handle non-world communicators");
   }
 
@@ -237,10 +237,10 @@ public:
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
-#if HAVE_MPI
+#  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
       return Dune::StructuredGridFactory<GridType>::createSimplexGrid(lowerLeft, upperRight, elements);
-#endif
+#  endif
     DUNE_THROW(InvalidStateException, "Alberta construction cannot handle non-world communicators");
   }
 };
@@ -265,10 +265,10 @@ public:
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
-#if HAVE_MPI
+#  if HAVE_MPI
     if (mpi_comm == MPI_COMM_WORLD)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
-#endif
+#  endif
     DUNE_THROW(InvalidStateException, "ALUgrid Cube construction cannot handle non-world communicators");
   }
 };

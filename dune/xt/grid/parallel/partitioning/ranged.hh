@@ -14,9 +14,9 @@
 
 #include <dune/common/version.hh>
 #if DUNE_VERSION_NEWER(DUNE_GRID, 3, 9) // EXADUNE
-#include <dune/grid/utility/partitioning/ranged.hh>
+#  include <dune/grid/utility/partitioning/ranged.hh>
 #else
-#include <dune/xt/grid/parallel/partitioning/ranged-internal.hh>
+#  include <dune/xt/grid/parallel/partitioning/ranged-internal.hh>
 namespace Dune {
 template <class GridView, int codim>
 using RangedPartitioning = Dune::XT::Grid::RangedPartitioning<GridView, codim, All_Partition>;

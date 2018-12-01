@@ -46,7 +46,7 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
 }; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, YaspGrid<2,
 // EquidistantOffsetCoordinates<double, 2>>, anything>
 
-#if HAVE_DUNE_UGGRID || HAVE_UG
+#  if HAVE_DUNE_UGGRID || HAVE_UG
 
 template <bool anything>
 struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>, anything>
@@ -72,8 +72,8 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGG
   }
 }; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>, anything>
 
-#endif // HAVE_DUNE_UGGRID || HAVE_UG
-#if HAVE_ALBERTA
+#  endif // HAVE_DUNE_UGGRID || HAVE_UG
+#  if HAVE_ALBERTA
 
 template <bool anything>
 struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>, anything>
@@ -99,7 +99,7 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, Alb
   }
 }; // struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>, anything>
 
-#endif // HAVE_ALBERTA
+#  endif // HAVE_ALBERTA
 
 
 } // namespace Grid

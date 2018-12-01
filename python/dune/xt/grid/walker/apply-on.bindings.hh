@@ -128,10 +128,10 @@ public:
 //#endif
 
 #if HAVE_DUNE_ALUGRID
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _backend, _class_name)                               \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALU_2D_SIMPLEX_CONFORMING, _layer, _backend, _class_name)
+#  define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _backend, _class_name)                             \
+    _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, ALU_2D_SIMPLEX_CONFORMING, _layer, _backend, _class_name)
 #else
-#define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _backend, _class_name)
+#  define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALU(_m, _W, _w, _layer, _backend, _class_name)
 #endif
 
 /*#if HAVE_DUNE_UGGRID

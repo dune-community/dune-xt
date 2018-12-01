@@ -14,22 +14,22 @@
 #define DUNE_XT_GRID_GRIDS_HH
 
 #if HAVE_ALBERTA
-#include <dune/xt/common/disable_warnings.hh>
-#include <dune/grid/albertagrid.hh>
-#include <dune/xt/common/reenable_warnings.hh>
+#  include <dune/xt/common/disable_warnings.hh>
+#  include <dune/grid/albertagrid.hh>
+#  include <dune/xt/common/reenable_warnings.hh>
 #endif
 
 #if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/grid.hh>
+#  include <dune/alugrid/grid.hh>
 #endif
 
 #if HAVE_DUNE_SPGRID
-#include <dune/grid/spgrid.hh>
-#include <dune/grid/spgrid/dgfparser.hh>
+#  include <dune/grid/spgrid.hh>
+#  include <dune/grid/spgrid/dgfparser.hh>
 #endif
 
 #if HAVE_DUNE_UGGRID || HAVE_UG
-#include <dune/grid/uggrid.hh>
+#  include <dune/grid/uggrid.hh>
 #endif
 
 #include <dune/grid/onedgrid.hh>

@@ -22,10 +22,10 @@
 #include <dune/grid/common/rangegenerators.hh>
 
 #if HAVE_DUNE_GRID_GLUE
-#include <dune/grid-glue/extractors/codim1extractor.hh>
-#include <dune/grid-glue/extractors/extractorpredicate.hh>
-#include <dune/grid-glue/gridglue.hh>
-#include <dune/grid-glue/merging/contactmerge.hh>
+#  include <dune/grid-glue/extractors/codim1extractor.hh>
+#  include <dune/grid-glue/extractors/extractorpredicate.hh>
+#  include <dune/grid-glue/gridglue.hh>
+#  include <dune/grid-glue/merging/contactmerge.hh>
 #endif // HAVE_DUNE_GRID_GLUE
 
 #include <dune/xt/common/exceptions.hh>
@@ -122,7 +122,7 @@ class Glued
     static const bool value = true;
   };
 
-#if HAVE_DUNE_ALUGRID
+#  if HAVE_DUNE_ALUGRID
   template <class Comm, bool anything>
   struct allowed_local_grid<ALUGrid<3, 3, simplex, conforming, Comm>, anything>
   {
@@ -134,9 +134,9 @@ class Glued
   {
     static const bool value = false;
   };
-#endif // HAVE_DUNE_ALUGRID
+#  endif // HAVE_DUNE_ALUGRID
 
-#if HAVE_MPI && (HAVE_DUNE_UGGRID || HAVE_UG)
+#  if HAVE_MPI && (HAVE_DUNE_UGGRID || HAVE_UG)
   // UGGrid does not support multiple parallel instances in parallel and we have no means yet to create multiple
   // sequential grids once MPI was found.
   template <bool anything>
@@ -150,7 +150,7 @@ class Glued
   {
     static const bool value = false;
   };
-#endif
+#  endif
 
   static_assert(allowed_macro_grid<MacroGridImp>::value,
                 "This macro grid is known to fail, enable on your onw risk by disabling this check!");
@@ -194,11 +194,11 @@ private:
     virtual bool contains(const LocalEntityType& element, unsigned int face) const override final
     {
       const auto local_intersection_ptr = element.template subEntity<1>(face);
-#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
       const auto& local_intersection = local_intersection_ptr;
-#else
+#  else
       const auto& local_intersection = *local_intersection_ptr;
-#endif
+#  endif
       const auto& local_intersection_geometry = local_intersection.geometry();
       // Check if all corners of the local intersection lie within the macro intersection.
       for (auto ii : XT::Common::value_range(local_intersection_geometry.corners()))
@@ -447,11 +447,11 @@ public:
         const auto& macro_intersection = *macro_intersection_it;
         if (macro_intersection.neighbor() && !macro_intersection.boundary()) {
           const auto real_neighbor_ptr = macro_intersection.outside();
-#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
           const auto& real_neighbor = real_neighbor_ptr;
-#else
+#  else
           const auto& real_neighbor = *real_neighbor_ptr;
-#endif
+#  endif
           if (macro_index_set.index(real_neighbor) == neighbor_index)
             glues_for_this_entity_neighbor[local_entity_grid_level][local_neighbor_grid_level] =
                 create_glue(macro_entity,
@@ -624,11 +624,11 @@ public:
       for (auto&& macro_intersection : intersections(macro_leaf_view_, macro_entity)) {
         if (!macro_intersection.boundary() && macro_intersection.neighbor()) {
           const auto macro_neighbor_ptr = macro_intersection.outside();
-#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
           const auto& macro_neighbor = macro_neighbor_ptr;
-#else
+#  else
           const auto& macro_neighbor = *macro_neighbor_ptr;
-#endif
+#  endif
           const size_t macro_neighbor_index = macro_leaf_view_.indexSet().index(macro_neighbor);
           const auto local_neighbor_level = max_local_level(macro_neighbor);
           const auto local_neighbor_grid_view =
@@ -822,11 +822,11 @@ private:
         const auto& macro_intersection = *macro_intersection_it;
         if (macro_intersection.neighbor() && !macro_intersection.boundary()) {
           const auto macro_neighbor_ptr = macro_intersection.outside();
-#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
           const auto& macro_neighbor = macro_neighbor_ptr;
-#else
+#  else
           const auto& macro_neighbor = *macro_neighbor_ptr;
-#endif
+#  endif
           const auto macro_neighbor_index = macro_index_set.index(macro_neighbor);
           for (auto local_entity_level :
                XT::Common::value_range(local_grids_[macro_entity_index]->grid().maxLevel() + 1))
@@ -872,23 +872,23 @@ private:
       for (auto&& micro_entity : elements(local_leaf_view)) {
         const size_t micro_index = local_index_set.index(micro_entity);
         const auto num_vertices = micro_entity.
-#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
 
                                   subEntities(dimDomain);
-#else
+#  else
                                   template count<dimDomain>();
-#endif
+#  endif
         entity_to_vertex_ids[macro_index][micro_index] = std::vector<unsigned int>(num_vertices);
         geometry_types[macro_index][micro_index] = micro_entity.geometry().type();
         for (unsigned int local_vertex_id = 0; local_vertex_id < num_vertices; ++local_vertex_id) {
           const unsigned int global_vertex_id = find_insert_vertex(vertices,
                                                                    micro_entity
                                                                        .template subEntity<dimDomain>(local_vertex_id)
-#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
                                                                        .
-#else
+#  else
                                                                        ->
-#endif
+#  endif
                                                                    geometry()
                                                                        .center());
           entity_to_vertex_ids[macro_index][micro_index][local_vertex_id] = global_vertex_id;
