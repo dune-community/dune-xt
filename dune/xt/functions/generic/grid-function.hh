@@ -62,12 +62,12 @@ private:
     using BaseType = ElementFunctionInterface<E, r, rC, R>;
 
   public:
-    using typename BaseType::ElementType;
-    using typename BaseType::DomainType;
-    using typename BaseType::RangeType;
-    using typename BaseType::DerivativeRangeType;
-    using typename BaseType::RangeReturnType;
     using typename BaseType::DerivativeRangeReturnType;
+    using typename BaseType::DerivativeRangeType;
+    using typename BaseType::DomainType;
+    using typename BaseType::ElementType;
+    using typename BaseType::RangeReturnType;
+    using typename BaseType::RangeType;
 
     using BaseType::d;
 
@@ -92,8 +92,7 @@ private:
       , param_type_(param_type)
       , jacobian_(jacobian_func)
       , derivative_(derivative_func)
-    {
-    }
+    {}
 
   protected:
     void post_bind(const ElementType& element) override final
@@ -176,8 +175,7 @@ public:
     , name_(nm)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-  {
-  }
+  {}
 
   GenericGridFunction(GenericOrderFunctionType order_func,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
@@ -193,8 +191,7 @@ public:
     , name_(nm)
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
-  {
-  }
+  {}
 
   const Common::ParameterType& parameter_type() const override final
   {

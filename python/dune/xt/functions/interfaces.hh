@@ -32,8 +32,7 @@ namespace internal {
 
 template <class L, class R, internal::Combination comb>
 struct get_combined
-{
-}; // struct get_combined
+{}; // struct get_combined
 
 template <class L, class R>
 struct get_combined<L, R, internal::Combination::difference>
@@ -120,8 +119,7 @@ struct get_combined<L, R, internal::Combination::product>
 
 template <class L, class R, internal::Combination comb>
 struct get_grid_combined
-{
-}; // struct get_grid_combined
+{}; // struct get_grid_combined
 
 template <class L, class R>
 struct get_grid_combined<L, R, internal::Combination::difference>
@@ -327,8 +325,7 @@ bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
             DUNE_THROW(
                 XT::Common::Exceptions::wrong_input_given,
                 "Given layer has to be one of ('leaf', 'level', 'dd_subdomain', 'dd_subdomain_oversampled'), is '"
-                    << layer
-                    << "'!");
+                    << layer << "'!");
         },
         "dd_grid_provider"_a,
         "layer"_a = "leaf",

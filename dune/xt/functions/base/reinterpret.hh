@@ -39,7 +39,7 @@ template <class SourceGridView,
           size_t range_dim_cols = 1,
           class RangeField = double>
 class ReinterpretLocalizableFunction
-    : public GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>
+  : public GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>
 {
   static_assert(XT::Grid::is_layer<SourceGridView>::value, "");
   using ThisType = ReinterpretLocalizableFunction<SourceGridView, TargetElement, range_dim, range_dim_cols, RangeField>;
@@ -48,8 +48,8 @@ class ReinterpretLocalizableFunction
 public:
   using BaseType::r;
   using BaseType::rC;
-  using typename BaseType::R;
   using typename BaseType::LocalFunctionType;
+  using typename BaseType::R;
 
   using SourceType = GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridView>, r, rC, R>;
 
@@ -62,8 +62,7 @@ public:
     : BaseType(source.parameter_type())
     , source_(source)
     , source_grid_view_(source_grid_view)
-  {
-  }
+  {}
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
@@ -81,11 +80,11 @@ private:
     using BaseType = ElementFunctionInterface<TargetElement, r, rC, R>;
 
   public:
-    using typename BaseType::D;
     using BaseType::d;
+    using typename BaseType::D;
+    using typename BaseType::DerivativeRangeReturnType;
     using typename BaseType::DomainType;
     using typename BaseType::RangeReturnType;
-    using typename BaseType::DerivativeRangeReturnType;
 
     ReinterpretLocalfunction(const SourceType& source, const SourceGridView& source_grid_view)
       : BaseType(source.parameter_type())
@@ -95,8 +94,7 @@ private:
       , local_source_(source_.local_function())
       , source_element_which_contains_complete_target_element_(nullptr)
       , source_element_which_contains_some_point_of_target_element_(nullptr)
-    {
-    }
+    {}
 
   protected:
     void post_bind(const TargetElement& target_element)
@@ -111,10 +109,10 @@ private:
         vertices_[ii] = target_element.geometry().global(reference_element.position(ii, 1));
       // * search for a source element for each vertex
       auto source_element_ptrs = source_element_search_(vertices_);
-      DUNE_THROW_IF(
-          source_element_ptrs.size() != num_vertices,
-          Exceptions::reinterpretation_error,
-          "source_element_ptrs.size() = " << source_element_ptrs.size() << "\n   num_vertices = " << num_vertices);
+      DUNE_THROW_IF(source_element_ptrs.size() != num_vertices,
+                    Exceptions::reinterpretation_error,
+                    "source_element_ptrs.size() = " << source_element_ptrs.size()
+                                                    << "\n   num_vertices = " << num_vertices);
       // * and check if these are all the same
       if (num_vertices == 1) {
         source_element_which_contains_complete_target_element_ = std::move(source_element_ptrs[0]);
@@ -140,9 +138,9 @@ private:
 
   public:
     /**
-      * \note In some special situations (e.g., if the target element is not completely contained in one source
-      *       element), this may give inaccurate results.
-      **/
+     * \note In some special situations (e.g., if the target element is not completely contained in one source
+     *       element), this may give inaccurate results.
+     **/
     int order(const Common::Parameter& param = {}) const override final
     {
       DUNE_THROW_IF(!source_element_which_contains_complete_target_element_

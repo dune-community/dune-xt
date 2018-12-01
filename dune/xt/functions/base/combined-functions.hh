@@ -277,10 +277,11 @@ Difference< ConstantType, ConstantType > stupid_difference()
 Difference, Sum or Product.
  */
 template <class LeftType, class RightType, Combination comb>
-class CombinedFunction : public FunctionInterface<LeftType::domain_dim,
-                                                  SelectCombined<LeftType, RightType, comb>::r,
-                                                  SelectCombined<LeftType, RightType, comb>::rC,
-                                                  typename SelectCombined<LeftType, RightType, comb>::R>
+class CombinedFunction
+  : public FunctionInterface<LeftType::domain_dim,
+                             SelectCombined<LeftType, RightType, comb>::r,
+                             SelectCombined<LeftType, RightType, comb>::rC,
+                             typename SelectCombined<LeftType, RightType, comb>::R>
 {
   using BaseType = FunctionInterface<LeftType::domain_dim,
                                      SelectCombined<LeftType, RightType, comb>::r,
@@ -298,25 +299,20 @@ public:
   CombinedFunction(const LeftType& left, const RightType& right, const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
-    , name_(nm.empty()
-                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '" + right.name()
-                      + "'"
-                : nm)
-  {
-  }
+    , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '"
+                             + right.name() + "'"
+                       : nm)
+  {}
 
   CombinedFunction(const std::shared_ptr<const LeftType> left,
                    const std::shared_ptr<const RightType> right,
                    const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
-    , name_(nm.empty()
-                ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name() + "' and '"
-                      + right_->access().name()
-                      + "'"
-                : nm)
-  {
-  }
+    , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
+                             + "' and '" + right_->access().name() + "'"
+                       : nm)
+  {}
 
   CombinedFunction(ThisType&& source) = default;
 
@@ -331,9 +327,9 @@ public:
     return name_;
   }
 
+  using typename BaseType::DerivativeRangeReturnType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
-  using typename BaseType::DerivativeRangeReturnType;
 
   int order(const XT::Common::Parameter& param = {}) const override final
   {
@@ -369,7 +365,7 @@ private:
  */
 template <class MinuendType, class SubtrahendType>
 class DifferenceFunction
-    : public internal::CombinedFunction<MinuendType, SubtrahendType, internal::Combination::difference>
+  : public internal::CombinedFunction<MinuendType, SubtrahendType, internal::Combination::difference>
 {
   using BaseType = internal::CombinedFunction<MinuendType, SubtrahendType, internal::Combination::difference>;
 
@@ -377,8 +373,7 @@ public:
   template <class... Args>
   explicit DifferenceFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 }; // class DifferenceFunction
 
 /**
@@ -395,8 +390,7 @@ public:
   template <class... Args>
   explicit SumFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 }; // class SumFunction
 
 /**
@@ -406,7 +400,7 @@ public:
  */
 template <class LeftSummandType, class RightSummandType>
 class ProductFunction
-    : public internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::product>
+  : public internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::product>
 {
   using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::product>;
 
@@ -414,8 +408,7 @@ public:
   template <class... Args>
   explicit ProductFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 }; // class ProductFunction
 
 template <class T1, class T2, class... Args>

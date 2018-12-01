@@ -54,14 +54,12 @@ public:
   explicit ConstantFunction(const RangeReturnType& constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
-  {
-  }
+  {}
 
   explicit ConstantFunction(const RangeField& constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
-  {
-  }
+  {}
 
 #if !DUNE_XT_WITH_PYTHON_BINDINGS
   ConstantFunction(const ThisType& other) = default;

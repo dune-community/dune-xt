@@ -61,20 +61,19 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
 
   public:
     using UntransformedRangeType = typename UntransformedLocalFunctionType::RangeType;
-    using typename BaseType::DomainType;
-    using typename BaseType::RangeType;
-    using typename BaseType::RangeReturnType;
-    using typename BaseType::DerivativeRangeType;
     using typename BaseType::DerivativeRangeReturnType;
+    using typename BaseType::DerivativeRangeType;
+    using typename BaseType::DomainType;
     using typename BaseType::ElementType;
+    using typename BaseType::RangeReturnType;
+    using typename BaseType::RangeType;
     using Transformation = std::function<RangeType(const UntransformedRangeType&)>;
 
     TransformedLocalFunction(const LF& function, const Transformation& transformation)
       : BaseType()
       , local_function_(function.local_function())
       , transformation_(transformation)
-    {
-    }
+    {}
 
   protected:
     void post_bind(const ElementType& element) override final
@@ -116,8 +115,7 @@ public:
     : function_(f)
     , transformation_(transformation)
     , name_(nm)
-  {
-  }
+  {}
 
   std::string name() const override final
   {

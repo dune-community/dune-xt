@@ -55,20 +55,19 @@ class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface
     using BaseType = XT::Functions::ElementFunctionInterface<typename LF::E, r, 1, typename LF::R>;
 
   public:
-    using typename BaseType::ElementType;
-    using typename BaseType::DomainType;
-    using typename BaseType::RangeType;
-    using typename BaseType::RangeReturnType;
-    using typename BaseType::DerivativeRangeType;
     using typename BaseType::DerivativeRangeReturnType;
+    using typename BaseType::DerivativeRangeType;
+    using typename BaseType::DomainType;
+    using typename BaseType::ElementType;
+    using typename BaseType::RangeReturnType;
+    using typename BaseType::RangeType;
 
 
     SlicedLocalFunction(const LF& function, const std::array<size_t, r>& dims)
       : BaseType()
       , local_function_(function.local_function())
       , dims_(dims)
-    {
-    }
+    {}
 
   protected:
     void post_bind(const ElementType& element) override final
@@ -115,13 +114,8 @@ public:
       if (dims_[ii] >= LF::r)
         DUNE_THROW(InvalidStateException,
                    "LF::r = " << LF::r << "\n   "
-                              << "r = "
-                              << r
-                              << "\n   "
-                              << "dims["
-                              << ii
-                              << "] = "
-                              << dims_[ii]);
+                              << "r = " << r << "\n   "
+                              << "dims[" << ii << "] = " << dims_[ii]);
   }
 
   std::string name() const override final

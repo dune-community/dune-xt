@@ -114,8 +114,7 @@ public:
 
   explicit FunctionInterface(const Common::ParameterType& param_type = {})
     : Common::ParametricInterface(param_type)
-  {
-  }
+  {}
 
   virtual ~FunctionInterface() = default;
 
@@ -269,10 +268,10 @@ public:
   }
 
   template <class ViewTraits>
-  const typename std::
-      enable_if<(ViewTraits::Grid::dimension == d),
-                FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
-      as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
+  const typename std::enable_if<
+      (ViewTraits::Grid::dimension == d),
+      FunctionAsGridFunctionWrapper<typename ViewTraits::template Codim<0>::Entity, r, rC, R>>::type&
+  as_grid_function(const GridView<ViewTraits>& /*grid_view*/) const
   {
     return this->as_grid_function<typename ViewTraits::template Codim<0>::Entity>();
   }
@@ -302,16 +301,10 @@ protected:
     if (row >= r || col >= rC)
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "in " << caller << ": this function maps from u:" << d << " -> " << r << "x" << rC << "\n   "
-                       << "and you are trying to access component u_"
-                       << row
-                       << "_"
-                       << col
-                       << "!");
+                       << "and you are trying to access component u_" << row << "_" << col << "!");
   }
 #else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-  static void assert_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/)
-  {
-  }
+  static void assert_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/) {}
 #endif
 
 private:

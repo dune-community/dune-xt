@@ -33,8 +33,7 @@ struct addbind_ExpressionFunction_scalar_ctor
 {
   template <class C>
   void operator()(C& /*c*/, const std::string& /*static_id*/)
-  {
-  }
+  {}
 };
 
 template <size_t d, size_t r>

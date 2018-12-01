@@ -31,10 +31,10 @@ namespace Functions {
 
 
 template <class G, size_t d, size_t r, size_t rC>
-typename std::enable_if<Grid::is_grid<G>::value,
-                        pybind11::class_<IndicatorGridFunction<typename G::template Codim<0>::Entity, r, rC, double>>>::
-    type
-    bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
+typename std::enable_if<
+    Grid::is_grid<G>::value,
+    pybind11::class_<IndicatorGridFunction<typename G::template Codim<0>::Entity, r, rC, double>>>::type
+bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -104,8 +104,8 @@ typename pybind11::class_<IndicatorFunction<d, r, rC, double>> bind_IndicatorFun
   using CornerVector = std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>;
   using IntervalVector = std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeReturnType>>;
 
-  const std::string classname = std::string(
-      "IndicatorFunction__" + Common::to_string(d) + "d_to_" + Common::to_string(r) + "x" + Common::to_string(rC));
+  const std::string classname = std::string("IndicatorFunction__" + Common::to_string(d) + "d_to_"
+                                            + Common::to_string(r) + "x" + Common::to_string(rC));
   py::class_<C, I> c(m, classname.c_str(), classname.c_str());
   c.def(py::init<CornerVector, std::string>(), "values"_a, "name"_a = C::static_id());
   c.def(py::init<IntervalVector, std::string>(), "values"_a, "name"_a = C::static_id());

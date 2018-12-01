@@ -140,8 +140,7 @@ public:
                  const std::string nm = BaseType::static_id())
     : BaseType(lower_left, upper_right, number_of_elements, read_values_from_file(filename, number_of_elements), nm)
 
-  {
-  }
+  {}
 }; // class Model2Function
 
 

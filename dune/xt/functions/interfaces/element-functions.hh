@@ -49,7 +49,9 @@ namespace Functions {
  *        its derivatives.
  **/
 template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
-class ElementFunctionSetInterface : public Common::ParametricInterface, public XT::Grid::ElementBoundObject<Element>
+class ElementFunctionSetInterface
+  : public Common::ParametricInterface
+  , public XT::Grid::ElementBoundObject<Element>
 {
   static_assert(XT::Grid::is_entity<Element>::value, "");
   using ThisType = ElementFunctionSetInterface<Element, rangeDim, rangeDimCols, RangeField>;
@@ -97,18 +99,15 @@ public:
 
   ElementFunctionSetInterface(const XT::Common::ParameterType& param_type = {})
     : Common::ParametricInterface(param_type)
-  {
-  }
+  {}
 
   ElementFunctionSetInterface(const ThisType& other)
     : Common::ParametricInterface(other.parameter_type())
-  {
-  }
+  {}
 
   ElementFunctionSetInterface(ThisType&& source)
     : Common::ParametricInterface(source.parameter_type())
-  {
-  }
+  {}
 
   virtual ~ElementFunctionSetInterface() = default;
 
@@ -368,9 +367,7 @@ protected:
     }
   }
 #else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-  void assert_inside_reference_element(const DomainType& /*point_in_reference_element*/) const
-  {
-  }
+  void assert_inside_reference_element(const DomainType& /*point_in_reference_element*/) const {}
 #endif
 
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
@@ -379,16 +376,11 @@ protected:
     if (row >= r || col >= rC)
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "in " << caller << ": this function maps from " << d << " -> " << r << "x" << rC << "\n   "
-                       << "and you are trying to access the entry in row "
-                       << row
-                       << " and column "
-                       << col
+                       << "and you are trying to access the entry in row " << row << " and column " << col
                        << " of its range!");
   }
 #else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
-  static void assert_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/)
-  {
-  }
+  static void assert_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/) {}
 #endif
 
 private:
@@ -452,20 +444,20 @@ public:
   using BaseType::d;
   using BaseType::r;
   using BaseType::rC;
-  using typename BaseType::R;
   using typename BaseType::DomainType;
   using typename BaseType::ElementType;
+  using typename BaseType::R;
 
-  using typename BaseType::RangeSelector;
   using typename BaseType::DerivativeRangeSelector;
+  using typename BaseType::RangeSelector;
 
   /**
    * \name ``These types are the _standard_ types used by the LocalFunctionSetInterface.''
    * \{
    */
 
-  using typename BaseType::RangeType;
   using typename BaseType::DerivativeRangeType;
+  using typename BaseType::RangeType;
   using typename BaseType::SingleDerivativeRangeType;
 
   /**
@@ -474,8 +466,8 @@ public:
    * \{
    */
 
-  using typename BaseType::DynamicRangeType;
   using typename BaseType::DynamicDerivativeRangeType;
+  using typename BaseType::DynamicRangeType;
 
   /**
    * \name ``These types are the _standard_ types to be used for LocalFunctionInterface.''
@@ -490,8 +482,7 @@ public:
 
   ElementFunctionInterface(const XT::Common::ParameterType& param_type = {})
     : BaseType(param_type)
-  {
-  }
+  {}
 
   ElementFunctionInterface(const ThisType& other) = default;
   ElementFunctionInterface(ThisType&& source) = default;

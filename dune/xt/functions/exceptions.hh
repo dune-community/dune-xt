@@ -22,24 +22,19 @@ namespace Exceptions {
 
 
 class wrong_input_given : public Common::Exceptions::wrong_input_given
-{
-};
+{};
 
 class not_bound_to_an_element_yet : public Grid::Exceptions::not_bound_to_an_element_yet
-{
-};
+{};
 
 class reinterpretation_error : public Dune::Exception
-{
-};
+{};
 
 class parameter_error : public Common::Exceptions::parameter_error
-{
-};
+{};
 
 class spe10_data_file_missing : public Dune::IOError
-{
-};
+{};
 
 
 } // namespace Exceptions

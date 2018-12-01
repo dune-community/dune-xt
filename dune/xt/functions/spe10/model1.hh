@@ -113,8 +113,7 @@ public:
                {model1_x_elements, model1_z_elements},
                read_values_from_file(filename, min, max, unit_range),
                nm)
-  {
-  }
+  {}
 }; // class Model1Base
 
 
@@ -155,8 +154,7 @@ public:
                  const RangeFieldType max = internal::model1_max_value,
                  const std::string nm = BaseType::static_id())
     : BaseType(filename, lower_left, upper_right, min, max, nm, unit_matrix())
-  {
-  }
+  {}
 
 private:
   template <size_t d, bool anything = true>

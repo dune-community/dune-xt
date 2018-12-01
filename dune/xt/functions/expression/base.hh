@@ -280,8 +280,7 @@ public:
     if (arg.size() != originalvars_.size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "arg.size(): " << arg.size() << "\n   "
-                                << "variables.size(): "
-                                << originalvars_.size());
+                                << "variables.size(): " << originalvars_.size());
     // copy arg
     for (size_t ii = 0; ii < originalvars_.size(); ++ii)
       *(arg_[ii]) = arg[ii];
@@ -299,8 +298,7 @@ private:
     if (exprs.size() != range_dim)
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "expressions.size(): " << exprs.size() << "\n   "
-                                        << "range_dim: "
-                                        << range_dim);
+                                        << "range_dim: " << range_dim);
     expressions_ = exprs;
     for (const auto& ex : expressions_)
       if (ex.empty())
@@ -309,9 +307,7 @@ private:
       DUNE_THROW(
           Common::Exceptions::shapes_do_not_match,
           "This expression function of dynamic size was compiled to work for up to "
-              << DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE
-              << " variables, but you provided "
-              << vars.size()
+              << DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE << " variables, but you provided " << vars.size()
               << "!\n\n"
               << "Configure dune-xt-functions with a larger DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE!");
     originalvars_ = vars;

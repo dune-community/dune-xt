@@ -247,10 +247,10 @@ public:
  */
 template <class LeftType, class RightType, Combination type>
 class CombinedLocalFunction
-    : public ElementFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, type>::E,
-                                      SelectCombinedGridFunction<LeftType, RightType, type>::r,
-                                      SelectCombinedGridFunction<LeftType, RightType, type>::rC,
-                                      typename SelectCombinedGridFunction<LeftType, RightType, type>::R>
+  : public ElementFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, type>::E,
+                                    SelectCombinedGridFunction<LeftType, RightType, type>::r,
+                                    SelectCombinedGridFunction<LeftType, RightType, type>::rC,
+                                    typename SelectCombinedGridFunction<LeftType, RightType, type>::R>
 {
   using BaseType = ElementFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, type>::E,
                                             SelectCombinedGridFunction<LeftType, RightType, type>::r,
@@ -260,19 +260,18 @@ class CombinedLocalFunction
   using Select = SelectCombinedGridFunction<LeftType, RightType, type>;
 
 public:
-  using typename BaseType::ElementType;
-  using typename BaseType::DomainType;
-  using typename BaseType::RangeType;
-  using typename BaseType::DerivativeRangeType;
-  using typename BaseType::RangeReturnType;
   using typename BaseType::DerivativeRangeReturnType;
+  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::DomainType;
+  using typename BaseType::ElementType;
+  using typename BaseType::RangeReturnType;
+  using typename BaseType::RangeType;
 
   CombinedLocalFunction(const LeftType& left, const RightType& right)
     : BaseType()
     , left_local_(left.local_function())
     , right_local_(right.local_function())
-  {
-  }
+  {}
 
 protected:
   void post_bind(const ElementType& element) override final
@@ -360,10 +359,10 @@ Difference, Sum or Product.
  */
 template <class LeftType, class RightType, Combination comb>
 class CombinedGridFunction
-    : public GridFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, comb>::E,
-                                   SelectCombinedGridFunction<LeftType, RightType, comb>::r,
-                                   SelectCombinedGridFunction<LeftType, RightType, comb>::rC,
-                                   typename SelectCombinedGridFunction<LeftType, RightType, comb>::R>
+  : public GridFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, comb>::E,
+                                 SelectCombinedGridFunction<LeftType, RightType, comb>::r,
+                                 SelectCombinedGridFunction<LeftType, RightType, comb>::rC,
+                                 typename SelectCombinedGridFunction<LeftType, RightType, comb>::R>
 {
   using BaseType = GridFunctionInterface<typename SelectCombinedGridFunction<LeftType, RightType, comb>::E,
                                          SelectCombinedGridFunction<LeftType, RightType, comb>::r,
@@ -381,27 +380,20 @@ public:
   CombinedGridFunction(const LeftType& left, const RightType& right, const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
-    , name_(nm.empty()
-                ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '"
-                      + right.name()
-                      + "'"
-                : nm)
-  {
-  }
+    , name_(nm.empty() ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left.name()
+                             + "' and '" + right.name() + "'"
+                       : nm)
+  {}
 
   CombinedGridFunction(const std::shared_ptr<const LeftType> left,
                        const std::shared_ptr<const RightType> right,
                        const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
-    , name_(nm.empty()
-                ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
-                      + "' and '"
-                      + right_->access().name()
-                      + "'"
-                : nm)
-  {
-  }
+    , name_(nm.empty() ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '"
+                             + left_->access().name() + "' and '" + right_->access().name() + "'"
+                       : nm)
+  {}
 
   CombinedGridFunction(ThisType&& source) = default;
 
@@ -439,7 +431,7 @@ private:
  */
 template <class MinuendType, class SubtrahendType>
 class DifferenceGridFunction
-    : public internal::CombinedGridFunction<MinuendType, SubtrahendType, internal::Combination::difference>
+  : public internal::CombinedGridFunction<MinuendType, SubtrahendType, internal::Combination::difference>
 {
   using BaseType = internal::CombinedGridFunction<MinuendType, SubtrahendType, internal::Combination::difference>;
 
@@ -447,8 +439,7 @@ public:
   template <class... Args>
   explicit DifferenceGridFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 }; // class DifferenceGridFunction
 
 /**
@@ -458,7 +449,7 @@ public:
  */
 template <class LeftSummandType, class RightSummandType>
 class SumGridFunction
-    : public internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::sum>
+  : public internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::sum>
 {
   using BaseType = internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::sum>;
 
@@ -466,8 +457,7 @@ public:
   template <class... Args>
   explicit SumGridFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 }; // class SumGridFunction
 
 /**
@@ -477,7 +467,7 @@ public:
  */
 template <class LeftSummandType, class RightSummandType>
 class ProductGridFunction
-    : public internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::product>
+  : public internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::product>
 {
   using BaseType = internal::CombinedGridFunction<LeftSummandType, RightSummandType, internal::Combination::product>;
 
@@ -485,8 +475,7 @@ public:
   template <class... Args>
   explicit ProductGridFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 }; // class ProductGridFunction
 
 template <class T1, class T2, class... Args>

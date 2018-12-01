@@ -53,8 +53,8 @@ class CutoffFunction
 
       py::class_<type_single_diffusion, ScalarFunction> c_single_diffusion(
           m,
-          Common::to_camel_case(
-              "esv2007_cutoff_function_single_diffusion_from_" + XT::Grid::bindings::grid_name<G>::value() + "_to_1x1")
+          Common::to_camel_case("esv2007_cutoff_function_single_diffusion_from_"
+                                + XT::Grid::bindings::grid_name<G>::value() + "_to_1x1")
               .c_str(),
           "ESV2007::CutoffFunction");
 
@@ -69,8 +69,7 @@ class CutoffFunction
       py::class_<type, ScalarFunction> c(
           m,
           Common::to_camel_case("esv2007_cutoff_function_diffusion_factor_and_tensor_from_"
-                                + XT::Grid::bindings::grid_name<G>::value()
-                                + "_to_1x1")
+                                + XT::Grid::bindings::grid_name<G>::value() + "_to_1x1")
               .c_str(),
           "ESV2007::CutoffFunction");
 
@@ -134,9 +133,7 @@ class CutoffFunction
   template <bool anything>
   struct helper<false, anything>
   {
-    static void bind(pybind11::module& /*m*/)
-    {
-    }
+    static void bind(pybind11::module& /*m*/) {}
   };
 
 public:

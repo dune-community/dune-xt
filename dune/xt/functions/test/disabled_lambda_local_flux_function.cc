@@ -12,9 +12,7 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-GTEST_TEST(DISABLED_LocalLambdaFluxFunction, function_is_not_yet_up_to_date_with_new_interface)
-{
-}
+GTEST_TEST(DISABLED_LocalLambdaFluxFunction, function_is_not_yet_up_to_date_with_new_interface) {}
 
 #if 0
 struct LocalLambdaFluxFunctionTest : public ::testing::Test

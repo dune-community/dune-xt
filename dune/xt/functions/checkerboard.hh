@@ -39,12 +39,12 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     using InterfaceType = ElementFunctionInterface<E, r, rC, R>;
 
   public:
-    using typename InterfaceType::ElementType;
-    using typename InterfaceType::DomainType;
-    using typename InterfaceType::RangeType;
-    using typename InterfaceType::RangeReturnType;
-    using typename InterfaceType::DerivativeRangeType;
     using typename InterfaceType::DerivativeRangeReturnType;
+    using typename InterfaceType::DerivativeRangeType;
+    using typename InterfaceType::DomainType;
+    using typename InterfaceType::ElementType;
+    using typename InterfaceType::RangeReturnType;
+    using typename InterfaceType::RangeType;
     using GeometryType = typename ElementType::Geometry;
 
     LocalCheckerboardFunction(const DomainType& lower_left,
@@ -56,8 +56,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
       , upper_right_(upper_right)
       , num_elements_(num_elements)
       , values_(values)
-    {
-    }
+    {}
 
   protected:
     void post_bind(const ElementType& element) override final

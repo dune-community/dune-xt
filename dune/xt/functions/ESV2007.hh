@@ -53,10 +53,10 @@ class Testcase1Force<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
   using BaseType = FunctionInterface<2, 1, 1, R>;
 
 public:
+  using typename BaseType::DerivativeRangeReturnType;
   using typename BaseType::DomainFieldType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
-  using typename BaseType::DerivativeRangeReturnType;
 
   static const bool available = true;
 
@@ -77,8 +77,7 @@ public:
                  const std::string nm = static_id())
     : order_(static_cast<int>(ord))
     , name_(nm)
-  {
-  }
+  {}
 
   Testcase1Force(const ThisType& /*other*/) = default;
 
@@ -140,10 +139,10 @@ class Testcase1ExactSolution<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
   using BaseType = FunctionInterface<2, 1, 1, R>;
 
 public:
+  using typename BaseType::DerivativeRangeReturnType;
   using typename BaseType::DomainFieldType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
-  using typename BaseType::DerivativeRangeReturnType;
 
   static const bool available = true;
 
@@ -164,8 +163,7 @@ public:
                          const std::string nm = static_id())
     : order_(static_cast<int>(ord))
     , name_(nm)
-  {
-  }
+  {}
 
   Testcase1ExactSolution(const ThisType& /*other*/) = default;
 
@@ -217,8 +215,8 @@ class CutoffFunction : public GridFunctionInterface<E, 1, 1, R>
   using ThisType = CutoffFunction<E, R>;
 
 public:
-  using typename BaseType::D;
   using BaseType::d;
+  using typename BaseType::D;
   using DiffusionType = GridFunctionInterface<E, d, d, R>;
 
 private:
@@ -228,20 +226,19 @@ private:
 
 
   public:
-    using typename BaseType::ElementType;
-    using typename BaseType::DomainType;
-    using typename BaseType::RangeReturnType;
-    using typename BaseType::RangeFieldType;
-    using typename BaseType::DomainFieldType;
     using typename BaseType::DerivativeRangeReturnType;
+    using typename BaseType::DomainFieldType;
+    using typename BaseType::DomainType;
+    using typename BaseType::ElementType;
+    using typename BaseType::RangeFieldType;
+    using typename BaseType::RangeReturnType;
 
     LocalCutoffFunction(const DiffusionType& diffusion, const RangeFieldType poincare_constant)
       : BaseType()
       , value_(0)
       , local_diffusion_(diffusion.local_function())
       , poincare_constant_(poincare_constant)
-    {
-    }
+    {}
 
   protected:
     void post_bind(const ElementType& ele) override final
@@ -338,8 +335,7 @@ public:
     : diffusion_(diffusion)
     , poincare_constant_(poincare_constant)
     , name_(nm)
-  {
-  }
+  {}
 
   CutoffFunction(const ThisType& other) = default;
 

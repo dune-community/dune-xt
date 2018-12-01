@@ -689,8 +689,7 @@ void SupprSpaces(char*& s) // Deletes the old string
 signed char IsNumeric(char c)
 {
   if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' && c != '6' && c != '7' && c != '8'
-      && c != '9'
-      && c != '.')
+      && c != '9' && c != '.')
     return 0;
   return 1;
 }
@@ -845,9 +844,7 @@ int IsVar(const char* s, int n, int nvar, PRVar* ppvar)
 int IsFunction(const char* s, int n)
 {
   if (CompStr(s, n, "sin") || CompStr(s, n, "cos") || CompStr(s, n, "exp") || CompStr(s, n, "tan")
-      || CompStr(s, n, "log")
-      || CompStr(s, n, "atg")
-      || CompStr(s, n, "abs"))
+      || CompStr(s, n, "log") || CompStr(s, n, "atg") || CompStr(s, n, "abs"))
     return 3;
   if (CompStr(s, n, "tg") || CompStr(s, n, "ln"))
     return 2;
@@ -880,10 +877,7 @@ int IsFunction(const char* s, int n, int nfunc, PRFunction* ppfunc)
 signed char IsFunction(ROperator op)
 {
   return (op == Exp || op == Abs || op == Sin || op == Cos || op == Tg || op == Ln || op == Atan || op == Asin
-          || op == Acos
-          || op == Atan
-          || op == Sqrt
-          || op == Opp);
+          || op == Acos || op == Atan || op == Sqrt || op == Opp);
 }
 
 void IsolateVars(char*& s, int nvar, PRVar* ppvar, int nfunc, PRFunction* ppfunc) // Deletes the old string
@@ -1674,8 +1668,9 @@ char* ROperation::Expr() const
       break;
     case Div:
       f = f || (mmb1->op == Juxt || mmb1->op == Add || mmb1->op == Sub || mmb1->op == Opp || mmb1->op == Div);
-      g = g || (mmb2->op == Juxt || mmb2->op == Add || mmb2->op == Sub || mmb2->op == Opp || mmb2->op == Mult
-                || mmb2->op == Div);
+      g = g
+          || (mmb2->op == Juxt || mmb2->op == Add || mmb2->op == Sub || mmb2->op == Opp || mmb2->op == Mult
+              || mmb2->op == Div);
       if (f && g)
         sprintf(s, "(%s)/(%s)", s1, s2);
       else if (f)
@@ -1922,15 +1917,9 @@ void ArcTangente2(double*& p)
   };
   *p = (*p || *(p + 1) ? atan2(*p, *(p + 1)) : ErrVal);
 }
-void NextVal(double*&)
-{
-}
-void RFunc(double*&)
-{
-}
-void JuxtF(double*&)
-{
-}
+void NextVal(double*&) {}
+void RFunc(double*&) {}
+void JuxtF(double*&) {}
 void Absolu(double*& p)
 {
   *p = ((*p == ErrVal) ? ErrVal : fabsl(*p));

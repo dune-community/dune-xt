@@ -11,6 +11,4 @@
 
 #include <dune/xt/common/test/main.hxx>
 
-GTEST_TEST(DISABLED_AffineFunction, function_is_not_yet_up_to_date_with_new_interface)
-{
-}
+GTEST_TEST(DISABLED_AffineFunction, function_is_not_yet_up_to_date_with_new_interface) {}

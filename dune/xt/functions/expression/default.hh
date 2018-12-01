@@ -126,8 +126,7 @@ public:
     : function_(new MathExpressionFunctionType(variable, matrix_to_vector(expressions)))
     , order_(ord)
     , name_(nm)
-  {
-  }
+  {}
 
   ExpressionFunction(const ThisType& other) = default;
 
@@ -212,20 +211,13 @@ public:
       if (failure)
         DUNE_THROW(Common::Exceptions::internal_error,
                    "evaluating this function yielded "
-                       << error_type
-                       << "!\n"
-                       << "The variable of this function is:     "
-                       << function_->variable()
-                       << "\n"
-                       << "The expression of this function is: "
-                       << function_->expression() // at
+                       << error_type << "!\n"
+                       << "The variable of this function is:     " << function_->variable() << "\n"
+                       << "The expression of this function is: " << function_->expression() // at
                        << "\n"
                        << "You tried to evaluate it with:   point_in_global_coordinates = "
-                       << point_in_global_coordinates
-                       << "\n"
-                       << "The result was:                       "
-                       << value[rr]
-                       << "\n\n"
+                       << point_in_global_coordinates << "\n"
+                       << "The result was:                       " << value[rr] << "\n\n"
                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     } // check_value(...)
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
@@ -264,10 +256,10 @@ class ExpressionFunction<d, r, 1, RangeField> : public FunctionInterface<d, r, 1
   using MathExpressionGradientType = MathExpressionBase<DomainFieldType, d, RangeField, d>;
 
 public:
-  using typename BaseType::RangeReturnType;
   using typename BaseType::DerivativeRangeReturnType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeFieldType;
+  using typename BaseType::RangeReturnType;
   using typename BaseType::SingleDerivativeRangeReturnType;
 
   static std::string static_id()
@@ -328,8 +320,7 @@ public:
     : function_(new MathExpressionFunctionType(variable, expressions))
     , order_(ord)
     , name_(nm)
-  {
-  }
+  {}
 
 #if !DUNE_XT_WITH_PYTHON_BINDINGS
   ExpressionFunction(const ThisType& other) = default;
@@ -405,20 +396,13 @@ private:
       if (failure)
         DUNE_THROW(Common::Exceptions::internal_error,
                    "evaluating this function yielded "
-                       << error_type
-                       << "!\n"
-                       << "The variable of this function is:     "
-                       << function_->variable()
-                       << "\n"
-                       << "The expression of this function is: "
-                       << function_->expression() // at
+                       << error_type << "!\n"
+                       << "The variable of this function is:     " << function_->variable() << "\n"
+                       << "The expression of this function is: " << function_->expression() // at
                        << "\n"
                        << "You tried to evaluate it with:   point_in_global_coordinates = "
-                       << point_in_global_coordinates
-                       << "\n"
-                       << "The result was:                       "
-                       << value[rr]
-                       << "\n\n"
+                       << point_in_global_coordinates << "\n"
+                       << "The result was:                       " << value[rr] << "\n\n"
                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     } // check_value(...)
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS

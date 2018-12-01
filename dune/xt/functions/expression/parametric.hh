@@ -44,11 +44,11 @@ class ParametricExpressionFunction<d, r, 1, R> : public FunctionInterface<d, r, 
   using ActualFunctionType = DynamicMathExpressionBase<D, R, r>;
 
 public:
-  using typename BaseType::DomainType;
   using BaseType::domain_dim;
-  using typename BaseType::RangeReturnType;
-  using typename BaseType::DerivativeRangeReturnType;
   using BaseType::range_dim;
+  using typename BaseType::DerivativeRangeReturnType;
+  using typename BaseType::DomainType;
+  using typename BaseType::RangeReturnType;
 
   static std::string static_id()
   {
@@ -119,8 +119,7 @@ public:
       if (parsed_param.type() != param_type_)
         DUNE_THROW(Common::Exceptions::parameter_error,
                    "parameter_type(): " << param_type_ << "\n   "
-                                        << "param.type(): "
-                                        << param.type());
+                                        << "param.type(): " << param.type());
     }
     DynamicVector<D> args(num_parameter_variables_ + domain_dim);
     size_t II = 0;
@@ -154,23 +153,13 @@ public:
       if (failure)
         DUNE_THROW(Common::Exceptions::internal_error,
                    "evaluating this function yielded:     "
-                       << error_type
-                       << "\n   "
-                       << "The variables of this function are:   "
-                       << function_->variables()
-                       << "\n   "
-                       << "The expressions of this function are: "
-                       << function_->expressions()
-                       << "\n   "
+                       << error_type << "\n   "
+                       << "The variables of this function are:   " << function_->variables() << "\n   "
+                       << "The expressions of this function are: " << function_->expressions() << "\n   "
                        << "You evaluated it with            point_in_global_coordinates : "
-                       << point_in_global_coordinates
-                       << "\n   "
-                       << "                                 param : "
-                       << param
-                       << "\n   "
-                       << "The result was:                       "
-                       << ret[rr]
-                       << "\n\n"
+                       << point_in_global_coordinates << "\n   "
+                       << "                                 param : " << param << "\n   "
+                       << "The result was:                       " << ret[rr] << "\n\n"
                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     }
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS

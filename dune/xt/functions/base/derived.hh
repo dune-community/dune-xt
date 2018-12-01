@@ -143,10 +143,11 @@ public:
 
 
 template <class FunctionType, Derivative derivative>
-class DerivedLocalFunction : public ElementFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
-                                                             SelectDerived<FunctionType, derivative>::r,
-                                                             SelectDerived<FunctionType, derivative>::rC,
-                                                             typename SelectDerived<FunctionType, derivative>::R>
+class DerivedLocalFunction
+  : public ElementFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                    SelectDerived<FunctionType, derivative>::r,
+                                    SelectDerived<FunctionType, derivative>::rC,
+                                    typename SelectDerived<FunctionType, derivative>::R>
 {
   using BaseType = ElementFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
                                             SelectDerived<FunctionType, derivative>::r,
@@ -164,8 +165,7 @@ public:
   DerivedLocalFunction(const FunctionType& func)
     : BaseType()
     , func_local_(func.local_function())
-  {
-  }
+  {}
 
   int order(const XT::Common::Parameter& param = {}) const override final
   {
@@ -194,10 +194,11 @@ private:
 
 
 template <class FunctionType, Derivative derivative>
-class Derived : public GridFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
-                                             SelectDerived<FunctionType, derivative>::r,
-                                             SelectDerived<FunctionType, derivative>::rC,
-                                             typename SelectDerived<FunctionType, derivative>::R>
+class Derived
+  : public GridFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
+                                 SelectDerived<FunctionType, derivative>::r,
+                                 SelectDerived<FunctionType, derivative>::rC,
+                                 typename SelectDerived<FunctionType, derivative>::R>
 {
   using BaseType = GridFunctionInterface<typename SelectDerived<FunctionType, derivative>::E,
                                          SelectDerived<FunctionType, derivative>::r,
@@ -213,14 +214,12 @@ public:
   Derived(const FunctionType& func, const std::string nm = "")
     : func_(Common::make_unique<FunctionStorageType>(func))
     , name_(nm.empty() ? SelectDerived<FunctionType, derivative>::type() + " of '" + func.name() + "'" : nm)
-  {
-  }
+  {}
 
   Derived(const std::shared_ptr<const FunctionType> func, const std::string nm = "")
     : func_(Common::make_unique<FunctionStorageType>(func))
     , name_(nm.empty() ? SelectDerived<FunctionType, derivative>::type() + " of '" + func_->access().name() + "'" : nm)
-  {
-  }
+  {}
 
   Derived(ThisType&& source) = default;
   Derived(const ThisType& other) = delete;
@@ -263,8 +262,7 @@ public:
   template <class... Args>
   DivergenceFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 }; // class DivergenceFunction
 
 

@@ -37,9 +37,9 @@ class GenericFunction : public FunctionInterface<domain_dim, range_dim, range_di
 
 public:
   using BaseType::d;
+  using typename BaseType::DerivativeRangeReturnType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
-  using typename BaseType::DerivativeRangeReturnType;
 
   using GenericOrderFunctionType = std::function<int(const Common::Parameter&)>;
   using GenericEvaluateFunctionType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
@@ -60,8 +60,7 @@ public:
     , jacobian_(jacobian_func)
     , derivative_(derivative_func)
     , name_(nm)
-  {
-  }
+  {}
 
   GenericFunction(int ord,
                   GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
@@ -75,8 +74,7 @@ public:
     , jacobian_(jacobian_lambda)
     , derivative_(derivative_lambda)
     , name_(nm)
-  {
-  }
+  {}
 
   /**
    * \name ´´These methods are required by FunctionInterface.''

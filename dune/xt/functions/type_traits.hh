@@ -219,13 +219,11 @@ struct is_grid_function;
 
 template <class T>
 struct is_grid_function<T, false> : public std::false_type
-{
-};
+{};
 
 template <class T>
 struct is_grid_function<T, true> : std::is_base_of<GridFunctionInterface<typename T::E, T::r, T::rC, typename T::R>, T>
-{
-};
+{};
 
 
 // template <class T, bool candidate = internal::is_localfunction_set_helper<T>::is_candidate>

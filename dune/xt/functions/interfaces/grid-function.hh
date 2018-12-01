@@ -101,8 +101,7 @@ public:
 
   GridFunctionInterface(const Common::ParameterType& param_type = {})
     : Common::ParametricInterface(param_type)
-  {
-  }
+  {}
 
   virtual ~GridFunctionInterface() = default;
 

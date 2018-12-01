@@ -58,8 +58,7 @@ struct GeneralElementFunctionChooser
       , element_search_(element_search)
       , local_inner_function_(inner_function_.local_function())
       , local_outer_function_(outer_function_.local_function())
-    {
-    }
+    {}
 
     ElementFunction(const ElementFunction& /*other*/) = delete;
 
@@ -137,8 +136,7 @@ struct ElementFunctionForGlobalChooser
       : BaseType()
       , localizable_function_(localizable_function)
       , global_function_(global_function)
-    {
-    }
+    {}
 
     ElementFunction(const ElementFunction& /*other*/) = delete;
 
@@ -170,15 +168,14 @@ struct ElementFunctionForGlobalChooser
 template <class InnerType, class OuterType, class OuterGridViewType>
 struct ElementFunctionChooser
 {
-  using ElementFunctionType = typename std::
-      conditional<std::is_base_of<Functions::FunctionInterface<OuterType::domain_dim,
-                                                               OuterType::range_dim,
-                                                               OuterType::range_dim_cols,
-                                                               typename OuterType::RangeFieldType>,
-                                  OuterType>::value,
-                  typename ElementFunctionForGlobalChooser<InnerType, OuterType, OuterGridViewType>::ElementFunction,
-                  typename GeneralElementFunctionChooser<InnerType, OuterType, OuterGridViewType>::ElementFunction>::
-          type;
+  using ElementFunctionType = typename std::conditional<
+      std::is_base_of<Functions::FunctionInterface<OuterType::domain_dim,
+                                                   OuterType::range_dim,
+                                                   OuterType::range_dim_cols,
+                                                   typename OuterType::RangeFieldType>,
+                      OuterType>::value,
+      typename ElementFunctionForGlobalChooser<InnerType, OuterType, OuterGridViewType>::ElementFunction,
+      typename GeneralElementFunctionChooser<InnerType, OuterType, OuterGridViewType>::ElementFunction>::type;
 };
 
 
@@ -186,10 +183,11 @@ struct ElementFunctionChooser
 
 
 template <class InnerType, class OuterType, class OuterGridViewType = typename Dune::YaspGrid<1>::LeafGridView>
-class CompositionFunction : public GridFunctionInterface<typename InnerType::ElementType,
-                                                         OuterType::range_dim,
-                                                         OuterType::range_dim_cols,
-                                                         typename OuterType::RangeFieldType>
+class CompositionFunction
+  : public GridFunctionInterface<typename InnerType::ElementType,
+                                 OuterType::range_dim,
+                                 OuterType::range_dim_cols,
+                                 typename OuterType::RangeFieldType>
 {
   using BaseType = GridFunctionInterface<typename InnerType::ElementType,
                                          OuterType::range_dim,
@@ -198,12 +196,12 @@ class CompositionFunction : public GridFunctionInterface<typename InnerType::Ele
   using ThisType = CompositionFunction<InnerType, OuterType, OuterGridViewType>;
 
 public:
-  using typename BaseType::ElementType;
-  using typename BaseType::DomainFieldType;
-  using typename BaseType::RangeFieldType;
   using BaseType::domain_dim;
   using BaseType::range_dim;
   using BaseType::range_dim_cols;
+  using typename BaseType::DomainFieldType;
+  using typename BaseType::ElementType;
+  using typename BaseType::RangeFieldType;
 
 private:
   using ElementFunction =
@@ -227,8 +225,7 @@ public:
     , outer_function_(outer_function)
     , element_search_(std::make_shared<typename Grid::EntityInlevelSearch<OuterGridViewType>>(outer_grid_view))
     , name_(nm)
-  {
-  }
+  {}
 
   // constructor without grid view, only makes sense if OuterType is derived from FunctionInterface
   CompositionFunction(const InnerType local_func, const OuterType global_func, const std::string nm = static_id())

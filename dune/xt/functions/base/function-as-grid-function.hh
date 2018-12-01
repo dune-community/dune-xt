@@ -39,18 +39,15 @@ public:
 
   FunctionAsGridFunctionWrapper(const FunctionType& function)
     : function_storage_(function)
-  {
-  }
+  {}
 
   FunctionAsGridFunctionWrapper(const FunctionType*&& function_ptr)
     : function_storage_(std::move(function_ptr))
-  {
-  }
+  {}
 
   FunctionAsGridFunctionWrapper(std::unique_ptr<FunctionType>&& function_ptr)
     : function_storage_(std::move(function_ptr))
-  {
-  }
+  {}
 
   /**
    * \name ´´This method is required by GridFunctionInterface.''
@@ -84,16 +81,15 @@ private:
     using GeometryType = typename ElementType::Geometry;
 
   public:
+    using typename BaseType::DerivativeRangeReturnType;
     using typename BaseType::DomainType;
     using typename BaseType::RangeReturnType;
-    using typename BaseType::DerivativeRangeReturnType;
 
     LocalFunction(const FunctionType& function)
       : BaseType()
       , function_(function)
       , geometry_(nullptr)
-    {
-    }
+    {}
 
   protected:
     void post_bind(const ElementType& el) override final

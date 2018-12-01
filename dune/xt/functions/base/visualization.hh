@@ -45,8 +45,7 @@ public:
     : local_function_(localizable_function.local_function())
     , name_(nm.empty() ? localizable_function.name() : nm)
     , param_(param)
-  {
-  }
+  {}
 
   int ncomps() const override final
   {
