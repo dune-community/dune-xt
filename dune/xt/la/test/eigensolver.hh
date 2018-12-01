@@ -241,16 +241,16 @@ template <class M, class F, class C, class R>
 struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSolverTest<M, F, C, R>
 {
   using BaseType = EigenSolverTest<M, F, C, R>;
-  using typename BaseType::MatrixType;
-  using typename BaseType::FieldType;
-  using typename BaseType::RealType;
-  using typename BaseType::ComplexMatrixType;
-  using typename BaseType::RealMatrixType;
-  using typename BaseType::EigenValuesType;
-  using typename BaseType::RealEigenValuesType;
-  using typename BaseType::EigenSolverType;
-  using typename BaseType::EigenSolverOpts;
   using BaseType::find_ev;
+  using typename BaseType::ComplexMatrixType;
+  using typename BaseType::EigenSolverOpts;
+  using typename BaseType::EigenSolverType;
+  using typename BaseType::EigenValuesType;
+  using typename BaseType::FieldType;
+  using typename BaseType::MatrixType;
+  using typename BaseType::RealEigenValuesType;
+  using typename BaseType::RealMatrixType;
+  using typename BaseType::RealType;
 
   void gives_correct_real_eigenvalues(const Common::Configuration& tolerances = {}) const
   {
@@ -262,8 +262,8 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
       EXPECT_EQ(Common::get_matrix_rows(matrix_), eigenvalues.size());
       for (const auto& complex_ev : eigenvalues) {
         if (tolerance > 0)
-          EXPECT_TRUE(Common::FloatCmp::eq(0., complex_ev.imag(), tolerance)) << "\n  type: " << tp
-                                                                              << "\n  tolerance: " << tolerance;
+          EXPECT_TRUE(Common::FloatCmp::eq(0., complex_ev.imag(), tolerance))
+              << "\n  type: " << tp << "\n  tolerance: " << tolerance;
         else {
           // negative tolerance: we expect a failure
           EXPECT_FALSE(Common::FloatCmp::eq(0., complex_ev.imag()))
@@ -400,8 +400,8 @@ struct EigenSolverTestForMatricesWithRealEigenvaluesAndVectors : public EigenSol
   } // ... gives_correct_real_eigendecomposition(...)
 
   using BaseType::all_matrices_and_expected_eigenvalues_and_vectors_are_computed_;
-  using BaseType::matrix_;
   using BaseType::expected_eigenvalues_;
+  using BaseType::matrix_;
   RealEigenValuesType expected_real_eigenvalues_;
   RealType expected_max_ev_;
   RealType expected_min_ev_;

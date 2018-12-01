@@ -168,14 +168,12 @@ public:
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
     , communicator_(new CommunicatorType())
-  {
-  }
+  {}
 
   Solver(const MatrixType& matrix, const CommunicatorType& communicator)
     : matrix_(matrix)
     , communicator_(communicator)
-  {
-  }
+  {}
 
   Solver(Solver&& source) = default;
 
@@ -360,9 +358,7 @@ public:
                          << "reported no error) and you requested checking (see options below)!\n"
                          << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
                          << "\n\n"
-                         << "  (A * x - b).sup_norm() = "
-                         << sup_norm
-                         << "\n\n"
+                         << "  (A * x - b).sup_norm() = " << sup_norm << "\n\n"
                          << "Those were the given options:\n\n"
                          << opts);
       }

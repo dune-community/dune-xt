@@ -15,7 +15,8 @@
 #if HAVE_FASP
 #if HAVE_EIGEN
 
-extern "C" {
+extern "C"
+{
 #include "fasp_functs.h"
 }
 
@@ -29,8 +30,8 @@ namespace LA {
 
 template <class ElementImp>
 class AmgSolver<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>, Dune::XT::LA::EigenDenseVector<ElementImp>>
-    : public SolverInterface<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>,
-                             Dune::XT::LA::EigenDenseVector<ElementImp>>
+  : public SolverInterface<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>,
+                           Dune::XT::LA::EigenDenseVector<ElementImp>>
 {
 public:
   typedef SolverInterface<Dune::XT::LA::EigenRowMajorSparseMatrix<ElementImp>,

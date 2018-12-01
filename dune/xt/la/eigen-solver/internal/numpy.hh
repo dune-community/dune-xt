@@ -52,15 +52,17 @@ void compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
   PybindXI::GlobalInterpreter().import_module("numpy").attr("seterr")("raise");
   auto eig = PybindXI::GlobalInterpreter().import_module("numpy.linalg").attr("eig");
   try {
-    auto result = eig(matrix)
-                      .template cast<std::tuple<FieldVector<Common::complex_t<K>, SIZE>,
-                                                FieldMatrix<Common::complex_t<K>, SIZE, SIZE>>>();
+    auto result =
+        eig(matrix)
+            .template cast<
+                std::tuple<FieldVector<Common::complex_t<K>, SIZE>, FieldMatrix<Common::complex_t<K>, SIZE, SIZE>>>();
     eigenvalues = Common::convert_to<std::vector<Common::complex_t<K>>>(std::get<0>(result));
     right_eigenvectors = std::get<1>(result);
   } catch (const pybind11::cast_error&) {
-    auto result = eig(matrix)
-                      .template cast<std::tuple<FieldVector<Common::real_t<K>, SIZE>,
-                                                FieldMatrix<Common::real_t<K>, SIZE, SIZE>>>();
+    auto result =
+        eig(matrix)
+            .template cast<
+                std::tuple<FieldVector<Common::real_t<K>, SIZE>, FieldMatrix<Common::real_t<K>, SIZE, SIZE>>>();
     eigenvalues = Common::convert_to<std::vector<Common::complex_t<K>>>(std::get<0>(result));
     right_eigenvectors = Common::convert_to<FieldMatrix<Common::complex_t<K>, SIZE, SIZE>>(std::get<1>(result));
   } catch (const std::runtime_error& ee) {

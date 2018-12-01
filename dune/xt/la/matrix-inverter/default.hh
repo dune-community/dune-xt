@@ -82,9 +82,9 @@ public:
   } // ... compute(...)
 
 protected:
+  using BaseType::inverse_;
   using BaseType::matrix_;
   using BaseType::options_;
-  using BaseType::inverse_;
 }; // class MatrixInverter<MatrixType, true>
 
 

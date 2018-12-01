@@ -118,17 +118,17 @@ std::complex<T> get_s(std::complex<T> val)
 }
 
 /** \brief This is a simple QR scheme using Householder reflections and column pivoting.
-  * The householder matrix applied in each step is H = I - 2 v v^T, where v = u/||u|| and u = x - s ||x|| e_1,
-  * s = +-1 has the opposite sign of u_1 and x is the current column of A. The matrix H is rewritten as
-  * H = I - tau w w^T, where w=u/u_1 and tau = -s u_1/||x||.
-  * Calculates AP = QR, where P is a permutation matrix reordering the columns of A.
-  * The matrix A is overwritten with the QR decomposition in compressed form, i.e. after completion of this function
-  * the upper triangular part of A contains R and each column jj of the strictly lower triangular part of A contains
-  * w_jj (except for the first element of w_jj, which always is 1). The vector tau contains the tau_jj used for the
-  * householder matrices. From this information, Q can be reconstructed if necessary.
-  * \see https://en.wikipedia.org/wiki/QR_decomposition#Using_Householder_reflections.
-  * \see http://www.cs.cornell.edu/~bindel/class/cs6210-f09/lec18.pdf
-  */
+ * The householder matrix applied in each step is H = I - 2 v v^T, where v = u/||u|| and u = x - s ||x|| e_1,
+ * s = +-1 has the opposite sign of u_1 and x is the current column of A. The matrix H is rewritten as
+ * H = I - tau w w^T, where w=u/u_1 and tau = -s u_1/||x||.
+ * Calculates AP = QR, where P is a permutation matrix reordering the columns of A.
+ * The matrix A is overwritten with the QR decomposition in compressed form, i.e. after completion of this function
+ * the upper triangular part of A contains R and each column jj of the strictly lower triangular part of A contains
+ * w_jj (except for the first element of w_jj, which always is 1). The vector tau contains the tau_jj used for the
+ * householder matrices. From this information, Q can be reconstructed if necessary.
+ * \see https://en.wikipedia.org/wiki/QR_decomposition#Using_Householder_reflections.
+ * \see http://www.cs.cornell.edu/~bindel/class/cs6210-f09/lec18.pdf
+ */
 template <class MatrixType, class VectorType, class IndexVectorType>
 void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutations)
 {

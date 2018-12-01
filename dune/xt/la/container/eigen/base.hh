@@ -53,7 +53,9 @@ class EigenRowMajorSparseMatrix;
  *  \brief Base class for all eigen implementations of VectorInterface.
  */
 template <class ImpTraits, class ScalarImp = double>
-class EigenBaseVector : public VectorInterface<ImpTraits, ScalarImp>, public ProvidesBackend<ImpTraits>
+class EigenBaseVector
+  : public VectorInterface<ImpTraits, ScalarImp>
+  , public ProvidesBackend<ImpTraits>
 {
 
   using ThisType = EigenBaseVector;
@@ -72,14 +74,12 @@ private:
 public:
   EigenBaseVector(size_t num_mutexes = 1)
     : mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   EigenBaseVector(const EigenBaseVector& other)
     : backend_(std::make_shared<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
-  {
-  }
+  {}
 
   EigenBaseVector(EigenBaseVector&& source) = default;
 

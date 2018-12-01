@@ -75,8 +75,7 @@ private:
       : vectors_(vectors)
       , notes_(notes)
       , ii_(ii)
-    {
-    }
+    {}
 
     const VectorType& vector() const
     {

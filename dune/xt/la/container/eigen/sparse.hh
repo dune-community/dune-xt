@@ -52,8 +52,7 @@ template <class ScalarType>
 class EigenRowMajorSparseMatrix;
 
 class EigenMatrixInterfaceDynamic
-{
-};
+{};
 
 
 #if HAVE_EIGEN
@@ -65,14 +64,14 @@ namespace internal {
  * \brief Traits for EigenRowMajorSparseMatrix.
  */
 template <class ScalarImp = double>
-class EigenRowMajorSparseMatrixTraits : public MatrixTraitsBase<ScalarImp,
-                                                                EigenRowMajorSparseMatrix<ScalarImp>,
-                                                                ::Eigen::SparseMatrix<ScalarImp, ::Eigen::RowMajor>,
-                                                                Backends::eigen_sparse,
-                                                                Backends::eigen_dense,
-                                                                true>
-{
-};
+class EigenRowMajorSparseMatrixTraits
+  : public MatrixTraitsBase<ScalarImp,
+                            EigenRowMajorSparseMatrix<ScalarImp>,
+                            ::Eigen::SparseMatrix<ScalarImp, ::Eigen::RowMajor>,
+                            Backends::eigen_sparse,
+                            Backends::eigen_dense,
+                            true>
+{};
 
 
 } // namespace internal
@@ -83,8 +82,8 @@ class EigenRowMajorSparseMatrixTraits : public MatrixTraitsBase<ScalarImp,
  */
 template <class ScalarImp = double>
 class EigenRowMajorSparseMatrix
-    : public MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>,
-      public ProvidesBackend<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>>
+  : public MatrixInterface<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>
+  , public ProvidesBackend<internal::EigenRowMajorSparseMatrixTraits<ScalarImp>>
 {
 
   using ThisType = EigenRowMajorSparseMatrix;
@@ -116,8 +115,7 @@ public:
       if (size_t(pattern_in.size()) != rr)
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of the pattern (" << pattern_in.size() << ") does not match the number of rows of this ("
-                                               << rr
-                                               << ")!");
+                                               << rr << ")!");
       for (size_t row = 0; row < size_t(pattern_in.size()); ++row) {
         backend_->startVec(Common::numeric_cast<EIGEN_size_t>(row));
         const auto& columns = pattern_in.inner(row);
@@ -126,8 +124,7 @@ public:
           if (column >= cc)
             DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                        "The size of row " << row << " of the pattern does not match the number of columns of this ("
-                                          << cc
-                                          << ")!");
+                                          << cc << ")!");
 #endif // NDEBUG
           backend_->insertBackByOuterInner(Common::numeric_cast<EIGEN_size_t>(row),
                                            Common::numeric_cast<EIGEN_size_t>(column));
@@ -144,8 +141,7 @@ public:
   explicit EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0, const size_t num_mutexes = 1)
     : backend_(std::make_shared<BackendType>(rr, cc))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   explicit EigenRowMajorSparseMatrix(const size_t rr,
                                      const size_t cc,
@@ -166,8 +162,7 @@ public:
   EigenRowMajorSparseMatrix(const ThisType& other)
     : backend_(std::make_shared<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
-  {
-  }
+  {}
 
   explicit EigenRowMajorSparseMatrix(const BackendType& mat,
                                      const bool prune = false,
@@ -203,14 +198,12 @@ public:
   explicit EigenRowMajorSparseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   explicit EigenRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   ThisType& operator=(const ThisType& other)
   {
@@ -264,10 +257,7 @@ public:
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
-                                     << rows()
-                                     << "x"
-                                     << cols()
-                                     << ")!");
+                                     << rows() << "x" << cols() << ")!");
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -527,7 +517,7 @@ namespace Common {
 
 template <class T>
 struct MatrixAbstraction<LA::EigenRowMajorSparseMatrix<T>>
-    : public LA::internal::MatrixAbstractionBase<LA::EigenRowMajorSparseMatrix<T>>
+  : public LA::internal::MatrixAbstractionBase<LA::EigenRowMajorSparseMatrix<T>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::EigenRowMajorSparseMatrix<T>>;
 

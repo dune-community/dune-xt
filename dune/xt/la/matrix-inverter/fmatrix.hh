@@ -57,9 +57,8 @@ public:
 
 template <class K, int ROWS, int COLS>
 class MatrixInverterOptions<Common::FieldMatrix<K, ROWS, COLS>, true>
-    : public MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
-{
-};
+  : public MatrixInverterOptions<FieldMatrix<K, ROWS, COLS>>
+{};
 
 template <class K, int ROWS, int COLS>
 class MatrixInverter<FieldMatrix<K, ROWS, COLS>, true> : public internal::MatrixInverterBase<FieldMatrix<K, ROWS, COLS>>
@@ -114,9 +113,9 @@ public:
   } // ... compute(...)
 
 protected:
+  using BaseType::inverse_;
   using BaseType::matrix_;
   using BaseType::options_;
-  using BaseType::inverse_;
 }; // class MatrixInverter<FieldMatrix<...>>
 
 
@@ -127,8 +126,7 @@ public:
   template <class... Args>
   explicit MatrixInverter(Args&&... args)
     : MatrixInverter<FieldMatrix<K, ROWS, COLS>>(std::forward<Args>(args)...)
-  {
-  }
+  {}
 };
 
 

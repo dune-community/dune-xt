@@ -79,8 +79,7 @@ public:
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
                "Please include the correct header for your matrix implementation '"
-                   << Common::Typename<MatrixType>::value()
-                   << "'!");
+                   << Common::Typename<MatrixType>::value() << "'!");
   }
 
   Solver(const MatrixType& /*matrix*/)
@@ -88,8 +87,7 @@ public:
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
                "Please include the correct header for your matrix implementation '"
-                   << Common::Typename<MatrixType>::value()
-                   << "'!");
+                   << Common::Typename<MatrixType>::value() << "'!");
   }
 
   static std::vector<std::string> types()
@@ -97,8 +95,7 @@ public:
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
                "Please include the correct header for your matrix implementation '"
-                   << Common::Typename<MatrixType>::value()
-                   << "'!");
+                   << Common::Typename<MatrixType>::value() << "'!");
   }
 
   static Common::Configuration options(const std::string /*type*/ = "")
@@ -106,8 +103,7 @@ public:
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
                "Please include the correct header for your matrix implementation '"
-                   << Common::Typename<MatrixType>::value()
-                   << "'!");
+                   << Common::Typename<MatrixType>::value() << "'!");
   }
 
   /**
@@ -120,8 +116,7 @@ public:
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
                "Please include the correct header for your matrix implementation '"
-                   << Common::Typename<MatrixType>::value()
-                   << "'!");
+                   << Common::Typename<MatrixType>::value() << "'!");
   }
 
   template <class RhsType, class SolutionType>
@@ -130,8 +125,7 @@ public:
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
                "Please include the correct header for your matrix implementation '"
-                   << Common::Typename<MatrixType>::value()
-                   << "'!");
+                   << Common::Typename<MatrixType>::value() << "'!");
   }
 
   template <class RhsType, class SolutionType>
@@ -140,8 +134,7 @@ public:
     DUNE_THROW(NotImplemented,
                "This is the unspecialized version of LA::Solver< ... >. "
                "Please include the correct header for your matrix implementation '"
-                   << Common::Typename<MatrixType>::value()
-                   << "'!");
+                   << Common::Typename<MatrixType>::value() << "'!");
   }
 }; // class Solver
 

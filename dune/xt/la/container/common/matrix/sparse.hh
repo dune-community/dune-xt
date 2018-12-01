@@ -40,12 +40,13 @@ namespace internal {
 
 
 template <class ScalarImp, Common::StorageLayout layout>
-struct CommonSparseMatrixTraits : public MatrixTraitsBase<ScalarImp,
-                                                          CommonSparseMatrix<ScalarImp, layout>,
-                                                          void,
-                                                          Backends::common_sparse,
-                                                          Backends::common_dense,
-                                                          true>
+struct CommonSparseMatrixTraits
+  : public MatrixTraitsBase<ScalarImp,
+                            CommonSparseMatrix<ScalarImp, layout>,
+                            void,
+                            Backends::common_sparse,
+                            Backends::common_dense,
+                            true>
 {
   using EntriesVectorType = std::vector<ScalarImp>;
   using IndexVectorType = std::vector<size_t>;
@@ -55,12 +56,12 @@ struct CommonSparseMatrixTraits : public MatrixTraitsBase<ScalarImp,
 
 template <class DenseMatrixImp, class SparseMatrixImp>
 struct CommonSparseOrDenseMatrixTraits
-    : public MatrixTraitsBase<typename DenseMatrixImp::ScalarType,
-                              CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>,
-                              void,
-                              Backends::common_dense,
-                              Backends::common_dense,
-                              false>
+  : public MatrixTraitsBase<typename DenseMatrixImp::ScalarType,
+                            CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>,
+                            void,
+                            Backends::common_dense,
+                            Backends::common_dense,
+                            false>
 {
   using DenseMatrixType = DenseMatrixImp;
   using SparseMatrixType = SparseMatrixImp;
@@ -93,8 +94,8 @@ private:
 
 public:
   /**
-  * \brief This is the constructor of interest which creates a sparse matrix.
-  */
+   * \brief This is the constructor of interest which creates a sparse matrix.
+   */
   CommonSparseMatrix(const size_t rr,
                      const size_t cc,
                      const SparsityPatternDefault& patt,
@@ -112,8 +113,7 @@ public:
       if (size_t(patt.size()) != num_rows_)
         DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                    "The size of the pattern (" << patt.size() << ") does not match the number of rows of this ("
-                                               << num_rows_
-                                               << ")!");
+                                               << num_rows_ << ")!");
       for (size_t row = 0; row < num_rows_; ++row) {
         const auto& columns = patt.inner(row);
         const auto num_nonzero_entries_in_row = columns.size();
@@ -124,8 +124,7 @@ public:
           if (columns[kk] >= num_cols_)
             DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                        "The size of row " << row << " of the pattern does not match the number of columns of this ("
-                                          << num_cols_
-                                          << ")!");
+                                          << num_cols_ << ")!");
 #endif // NDEBUG
           column_indices_->push_back(columns[kk]);
         } // kk
@@ -166,8 +165,7 @@ public:
     , column_indices_(std::make_shared<IndexVectorType>(*other.column_indices_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
     , eps_(other.eps_)
-  {
-  }
+  {}
 
   template <class OtherMatrixType>
   explicit CommonSparseMatrix(
@@ -188,8 +186,9 @@ public:
       (*row_pointers_)[rr] = index;
       for (size_t cc = 0; cc < num_cols_; ++cc) {
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
-        if (!prune || XT::Common::FloatCmp::ne(
-                          value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
+        if (!prune
+            || XT::Common::FloatCmp::ne(
+                   value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
           entries_->push_back(value);
           column_indices_->push_back(cc);
           ++index;
@@ -209,8 +208,7 @@ public:
                          Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
                              / (1000. * Common::MatrixAbstraction<OtherMatrixType>::cols(mat)),
                          num_mutexes)
-  {
-  } // CommonSparseMatrix(...)
+  {} // CommonSparseMatrix(...)
 
   template <class DenseMatrixImp>
   void copy_to_densematrix(DenseMatrixImp& ret) const
@@ -541,7 +539,7 @@ private:
  */
 template <class ScalarImp>
 class CommonSparseMatrix<ScalarImp, Common::StorageLayout::csc>
-    : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
+  : public MatrixInterface<internal::CommonSparseMatrixTraits<ScalarImp, Common::StorageLayout::csc>, ScalarImp>
 {
   using ThisType = CommonSparseMatrix;
   using InterfaceType =
@@ -560,8 +558,8 @@ private:
 
 public:
   /**
-  * \brief This is the constructor of interest which creates a sparse matrix.
-  */
+   * \brief This is the constructor of interest which creates a sparse matrix.
+   */
   CommonSparseMatrix(const size_t rr,
                      const size_t cc,
                      const SparsityPatternDefault& patt,
@@ -579,8 +577,7 @@ public:
       if (size_t(patt.size()) != num_rows_)
         DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                    "The size of the pattern (" << patt.size() << ") does not match the number of rows of this ("
-                                               << num_rows_
-                                               << ")!");
+                                               << num_rows_ << ")!");
       for (size_t col = 0; col < num_cols_; ++col) {
         for (size_t row = 0; row < num_rows_; ++row) {
           const auto& column_indices = patt.inner(row);
@@ -624,8 +621,7 @@ public:
     , column_pointers_(std::make_shared<IndexVectorType>(num_cols_ + 1))
     , row_indices_(std::make_shared<IndexVectorType>())
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   CommonSparseMatrix(const ThisType& other)
     : num_rows_(other.num_rows_)
@@ -635,8 +631,7 @@ public:
     , row_indices_(std::make_shared<IndexVectorType>(*other.row_indices_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
     , eps_(other.eps_)
-  {
-  }
+  {}
 
 
   template <class OtherMatrixType>
@@ -659,8 +654,9 @@ public:
     for (size_t cc = 0; cc < num_cols_; ++cc) {
       for (size_t rr = 0; rr < num_rows_; ++rr) {
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
-        if (!prune || XT::Common::FloatCmp::ne(
-                          value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
+        if (!prune
+            || XT::Common::FloatCmp::ne(
+                   value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
           entries_->push_back(value);
           row_indices_->push_back(rr);
           ++index;
@@ -680,8 +676,7 @@ public:
                          Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
                              / (1000. * Common::MatrixAbstraction<OtherMatrixType>::cols(mat)),
                          num_mutexes)
-  {
-  } // CommonSparseMatrix(...)
+  {} // CommonSparseMatrix(...)
 
   ThisType& operator=(const ThisType& other)
   {
@@ -1102,8 +1097,8 @@ private:
  */
 template <class DenseMatrixImp, class SparseMatrixImp>
 class CommonSparseOrDenseMatrix
-    : public MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
-                             typename SparseMatrixImp::ScalarType>
+  : public MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
+                           typename SparseMatrixImp::ScalarType>
 {
   using ThisType = CommonSparseOrDenseMatrix;
   using InterfaceType = MatrixInterface<internal::CommonSparseOrDenseMatrixTraits<DenseMatrixImp, SparseMatrixImp>,
@@ -1119,8 +1114,8 @@ public:
   static constexpr double sparse_limit = 0.1;
 
   /**
-  * \brief This is the constructor of interest which creates a sparse matrix.
-  */
+   * \brief This is the constructor of interest which creates a sparse matrix.
+   */
   CommonSparseOrDenseMatrix(const size_t rr,
                             const size_t cc,
                             const SparsityPatternDefault& patt,
@@ -1165,8 +1160,7 @@ public:
 
   CommonSparseOrDenseMatrix(const size_t rr, const size_t cc, const size_t num_mutexes, bool use_sparse = true)
     : CommonSparseOrDenseMatrix(rr, cc, ScalarType(0.), num_mutexes, use_sparse)
-  {
-  }
+  {}
 
   CommonSparseOrDenseMatrix(const ThisType& other)
     : num_rows_(other.num_rows_)
@@ -1174,8 +1168,7 @@ public:
     , sparse_(other.sparse_)
     , sparse_matrix_(other.sparse_matrix_)
     , dense_matrix_(other.dense_matrix_)
-  {
-  }
+  {}
 
   template <class OtherMatrixType>
   explicit CommonSparseOrDenseMatrix(
@@ -1215,8 +1208,7 @@ public:
                                 Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
                                     / (1000. * Common::MatrixAbstraction<OtherMatrixType>::cols(mat)),
                                 num_mutexes)
-  {
-  } // CommonSparseOrDenseMatrix(...)
+  {} // CommonSparseOrDenseMatrix(...)
 
   ThisType& operator=(const ThisType& other)
   {
@@ -1239,8 +1231,9 @@ public:
         const auto& value = Common::MatrixAbstraction<DenseMatrixType>::get_entry(other, rr, cc);
         nnz += XT::Common::FloatCmp::ne(value, ScalarType(0), 0., tol);
       }
-    const double density = double(nnz) / (Common::MatrixAbstraction<DenseMatrixType>::rows(other)
-                                          * Common::MatrixAbstraction<DenseMatrixType>::cols(other));
+    const double density = double(nnz)
+                           / (Common::MatrixAbstraction<DenseMatrixType>::rows(other)
+                              * Common::MatrixAbstraction<DenseMatrixType>::cols(other));
     sparse_ = density < sparse_limit;
     if (sparse_)
       sparse_matrix_ = other;
@@ -1482,7 +1475,7 @@ namespace Common {
 
 template <class T>
 struct MatrixAbstraction<LA::CommonSparseMatrixCsr<T>>
-    : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsr<T>>
+  : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsr<T>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsr<T>>;
 
@@ -1494,7 +1487,7 @@ struct MatrixAbstraction<LA::CommonSparseMatrixCsr<T>>
 
 template <class T>
 struct MatrixAbstraction<LA::CommonSparseMatrixCsc<T>>
-    : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsc<T>>
+  : public LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsc<T>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonSparseMatrixCsc<T>>;
 
@@ -1506,7 +1499,7 @@ struct MatrixAbstraction<LA::CommonSparseMatrixCsc<T>>
 
 template <class DenseMatrixImp, class SparseMatrixImp>
 struct MatrixAbstraction<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
-    : public LA::internal::MatrixAbstractionBase<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
+  : public LA::internal::MatrixAbstractionBase<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMatrixImp>>;
 

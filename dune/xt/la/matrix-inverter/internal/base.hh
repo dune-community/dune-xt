@@ -148,8 +148,7 @@ protected:
                    "Given matrix contains inf or nan and you requested checking. To disable this check set "
                    "'check_for_inf_nan' to false in the options."
                        << "\n\nThese were the given options:\n\n"
-                       << options_
-                       << "\nThis was the given matrix:\n\n"
+                       << options_ << "\nThis was the given matrix:\n\n"
                        << matrix_);
     }
   } // ... pre_checks(...)
@@ -166,10 +165,8 @@ protected:
                    "Computed inverse contains inf or nan and you requested checking. To disable this check set "
                    "'check_for_inf_nan' to false in the options."
                        << "\n\nThese were the given options:\n\n"
-                       << options_
-                       << "\nThis was the given matrix:\n\n"
-                       << matrix_
-                       << "\n\nThis was the computed inverse:\n\n"
+                       << options_ << "\nThis was the given matrix:\n\n"
+                       << matrix_ << "\n\nThis was the computed inverse:\n\n"
                        << *inverse_);
     }
     const auto left_inverse_check =
@@ -181,14 +178,10 @@ protected:
                    "Computed inverse is not a left inverse and you requested checking. To disable this check set "
                    "'post_check_is_left_inverse' to 0 in the options."
                        << "\n\nThe error is ||M_inv * M - Identity||_L_\\infty = "
-                       << sup_norm(*inverse_ * matrix_ - eye)
-                       << "\n\nThese were the given options:\n\n"
-                       << options_
-                       << "\nThis was the given matrix M:\n\n"
-                       << matrix_
-                       << "\n\nThis is its computed inverse M_inv:\n\n"
-                       << *inverse_
-                       << "\n\nThis is M_inv * M\n\n"
+                       << sup_norm(*inverse_ * matrix_ - eye) << "\n\nThese were the given options:\n\n"
+                       << options_ << "\nThis was the given matrix M:\n\n"
+                       << matrix_ << "\n\nThis is its computed inverse M_inv:\n\n"
+                       << *inverse_ << "\n\nThis is M_inv * M\n\n"
                        << *inverse_ * matrix_);
     }
     const auto right_inverse_check =
@@ -200,14 +193,10 @@ protected:
                    "Computed inverse is not a right inverse and you requested checking. To disable this check set "
                    "'post_check_is_right_inverse' to 0 in the options."
                        << "\n\nThe error is ||M_inv * M - Identity||_L_\\infty = "
-                       << sup_norm(matrix_ * *inverse_ - eye)
-                       << "\n\nThese were the given options:\n\n"
-                       << options_
-                       << "\nThis was the given matrix M:\n\n"
-                       << matrix_
-                       << "\n\nThis is its computed inverse M_inv:\n\n"
-                       << *inverse_
-                       << "\n\nThis is M * M_inv\n\n"
+                       << sup_norm(matrix_ * *inverse_ - eye) << "\n\nThese were the given options:\n\n"
+                       << options_ << "\nThis was the given matrix M:\n\n"
+                       << matrix_ << "\n\nThis is its computed inverse M_inv:\n\n"
+                       << *inverse_ << "\n\nThis is M * M_inv\n\n"
                        << matrix_ * *inverse_);
     }
   } // ... post_checks(...)

@@ -61,13 +61,11 @@ public:
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
-  {
-  }
+  {}
 
   Solver(const MatrixType& matrix, const CommunicatorType& /*communicator*/)
     : matrix_(matrix)
-  {
-  }
+  {}
 
   static std::vector<std::string> types()
   {
@@ -124,9 +122,7 @@ public:
                        << "reported no error) and you requested checking (see options below)! "
                        << "If you want to disable this check, set 'post_check_solves_system = 0' in the options."
                        << "\n\n"
-                       << "  (A * x - b).sup_norm() = "
-                       << tmp.sup_norm()
-                       << "\n\n"
+                       << "  (A * x - b).sup_norm() = " << tmp.sup_norm() << "\n\n"
                        << "Those were the given options:\n\n"
                        << opts);
     }

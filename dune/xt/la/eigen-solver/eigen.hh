@@ -58,10 +58,10 @@ public:
 
 template <class S>
 class EigenSolver<EigenDenseMatrix<S>, true>
-    : public internal::EigenSolverBase<EigenDenseMatrix<S>,
-                                       S,
-                                       EigenDenseMatrix<XT::Common::real_t<S>>,
-                                       EigenDenseMatrix<XT::Common::complex_t<S>>>
+  : public internal::EigenSolverBase<EigenDenseMatrix<S>,
+                                     S,
+                                     EigenDenseMatrix<XT::Common::real_t<S>>,
+                                     EigenDenseMatrix<XT::Common::complex_t<S>>>
 {
   using BaseType = internal::EigenSolverBase<EigenDenseMatrix<S>,
                                              S,
@@ -74,8 +74,7 @@ public:
   template <class... Args>
   explicit EigenSolver(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 
 protected:
   void compute() const override final
@@ -129,16 +128,17 @@ protected:
       }
     } else
       DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type << "' is none of EigenSolverOptions<EigenDenseMatrix<S>>::types(), and "
-                                           "internal::EigenSolverBase promised to check this!"
+                 "Given type '" << type
+                                << "' is none of EigenSolverOptions<EigenDenseMatrix<S>>::types(), and "
+                                   "internal::EigenSolverBase promised to check this!"
                                 << "\n\nThese are the available types:\n\n"
                                 << EigenSolverOptions<EigenDenseMatrix<S>>::types());
   } // ... compute(...)
 
-  using BaseType::matrix_;
-  using BaseType::options_;
   using BaseType::eigenvalues_;
   using BaseType::eigenvectors_;
+  using BaseType::matrix_;
+  using BaseType::options_;
 }; // class EigenSolver<EigenDenseMatrix<...>>
 
 

@@ -99,16 +99,14 @@ class ContainerInterface : public Common::CRTPInterface<ContainerInterface<Trait
   using CRTP = Common::CRTPInterface<ContainerInterface<TraitsImp, ScalarImp>, TraitsImp>;
 
 public:
-  using typename CRTP::Traits;
   using typename CRTP::derived_type;
+  using typename CRTP::Traits;
   using ScalarType = ScalarImp;
   using RealType = typename Traits::RealType;
 
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");
 
-  virtual ~ContainerInterface()
-  {
-  }
+  virtual ~ContainerInterface() {}
 
   /// \name Have to be implemented by a derived class!
   /// \{

@@ -21,90 +21,69 @@ namespace Exceptions {
 
 
 class not_available : public Dune::Exception
-{
-};
+{};
 
 class linear_solver_failed : public Dune::Exception
-{
-};
+{};
 
 class linear_solver_failed_bc_data_did_not_fulfill_requirements : public linear_solver_failed
-{
-};
+{};
 
 class linear_solver_failed_bc_it_did_not_converge : public linear_solver_failed
-{
-};
+{};
 
 class linear_solver_failed_bc_it_was_not_set_up_correctly : public linear_solver_failed
-{
-};
+{};
 
 class linear_solver_failed_bc_the_solution_does_not_solve_the_system : public linear_solver_failed
-{
-};
+{};
 
 
 class eigen_solver_failed : public Dune::Exception
-{
-};
+{};
 
 class eigen_solver_failed_bc_data_did_not_fulfill_requirements : public eigen_solver_failed
-{
-};
+{};
 
 class eigen_solver_failed_bc_it_was_not_set_up_correctly : public eigen_solver_failed
-{
-};
+{};
 
 class eigen_solver_failed_bc_result_contained_inf_or_nan : public eigen_solver_failed
-{
-};
+{};
 
 class eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested : public eigen_solver_failed
-{
-};
+{};
 
 class eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested : public eigen_solver_failed
-{
-};
+{};
 
 class eigen_solver_failed_bc_eigenvalues_are_not_negative_as_requested : public eigen_solver_failed
-{
-};
+{};
 
 class eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested : public eigen_solver_failed
-{
-};
+{};
 
 class eigen_solver_failed_bc_result_is_not_an_eigendecomposition : public eigen_solver_failed
-{
-};
+{};
 
 
 class matrix_invert_failed : public Dune::Exception
-{
-};
+{};
 
 class matrix_invert_failed_bc_data_did_not_fulfill_requirements : public matrix_invert_failed
-{
-};
+{};
 
 class matrix_invert_failed_bc_it_was_not_set_up_correctly : public matrix_invert_failed
-{
-};
+{};
 
 class matrix_invert_failed_bc_result_contained_inf_or_nan : public matrix_invert_failed
-{
-};
+{};
 
 class matrix_invert_failed_bc_result_is_not_a_left_inverse : public matrix_invert_failed
-{
-};
+{};
 
 class matrix_invert_failed_bc_result_is_not_a_right_inverse : public matrix_invert_failed
-{
-};
+{};
 
 
 } // namespace Exceptions

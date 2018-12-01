@@ -68,17 +68,16 @@ public:
 
 template <class K, int SIZE>
 class EigenSolverOptions<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>, true>
-    : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>, true>
-{
-};
+  : public EigenSolverOptions<Dune::FieldMatrix<K, SIZE, SIZE>, true>
+{};
 
 
 template <class K, int SIZE>
 class EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>, true>
-    : public internal::EigenSolverBase<Dune::FieldMatrix<K, SIZE, SIZE>,
-                                       K,
-                                       Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>,
-                                       Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>
+  : public internal::EigenSolverBase<Dune::FieldMatrix<K, SIZE, SIZE>,
+                                     K,
+                                     Dune::FieldMatrix<XT::Common::real_t<K>, SIZE, SIZE>,
+                                     Dune::FieldMatrix<XT::Common::complex_t<K>, SIZE, SIZE>>
 {
   using BaseType = internal::EigenSolverBase<Dune::FieldMatrix<K, SIZE, SIZE>,
                                              K,
@@ -91,8 +90,7 @@ public:
   template <class... Args>
   explicit EigenSolver(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 
 protected:
   void compute() const override final
@@ -160,29 +158,29 @@ protected:
       }
     } else
       DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type << "' is none of EigenSolverOptions<Dune::FieldMatrix<K, ROWS, "
-                                           "COLS>>::types(), and  internal::EigenSolverBase promised to check this!"
+                 "Given type '" << type
+                                << "' is none of EigenSolverOptions<Dune::FieldMatrix<K, ROWS, "
+                                   "COLS>>::types(), and  internal::EigenSolverBase promised to check this!"
                                 << "\n\nThese are the available types:\n\n"
                                 << EigenSolverOptions<MatrixType>::types());
   } //... compute(...)
 
-  using BaseType::matrix_;
-  using BaseType::options_;
   using BaseType::eigenvalues_;
   using BaseType::eigenvectors_;
+  using BaseType::matrix_;
+  using BaseType::options_;
 }; // class EigenSolver<FieldMatrix<...>>
 
 
 template <class K, int SIZE>
 class EigenSolver<Dune::XT::Common::FieldMatrix<K, SIZE, SIZE>, true>
-    : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
+  : public EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>
 {
 public:
   template <class... Args>
   EigenSolver(Args&&... args)
     : EigenSolver<Dune::FieldMatrix<K, SIZE, SIZE>>(std::forward<Args>(args)...)
-  {
-  }
+  {}
 };
 
 

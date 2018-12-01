@@ -44,8 +44,7 @@ struct RealQrEigenSolver
                      const size_t /*num_rows*/,
                      const size_t /*num_cols*/,
                      const FieldType& /*val*/)
-  {
-  }
+  {}
 
   static void
   calculate_eigenvalues_by_shifted_qr(MatrixType& A, const std::unique_ptr<MatrixType>& Q, std::vector<double>& eigvals)
@@ -245,16 +244,16 @@ struct RealQrEigenSolver
 
 
   /** \brief This is a simple QR scheme using Householder reflections.
-  * The householder matrix is written as H = I - 2 v v^T, where v = u/||u|| and u = x - s ||x|| e_1, s = +-1 has the
-  * opposite sign of u_1 and x is the current column of A. The matrix H is rewritten as
-  * H = I - tau w w^T, where w=u/u_1 and tau = -s u_1/||x||.
-  * The num_rows and num_cols parameter is used to restrict the rows and columns, the Q and R will only contain
-  * the QR decomposition of A[0:num_rows, 0:num_cols].
-  * \see https://en.wikipedia.org/wiki/QR_decomposition#Using_Householder_reflections.
-  * \see http://www.cs.cornell.edu/~bindel/class/cs6210-f09/lec18.pdf
-  * \todo The scheme does not take into account that A is in Hessenberg form, so there could be a significant
-  * speedup if an according QR scheme is used (e.g. givens rotations, see https://lp.uni-goettingen.de/get/text/2138).
-  */
+   * The householder matrix is written as H = I - 2 v v^T, where v = u/||u|| and u = x - s ||x|| e_1, s = +-1 has the
+   * opposite sign of u_1 and x is the current column of A. The matrix H is rewritten as
+   * H = I - tau w w^T, where w=u/u_1 and tau = -s u_1/||x||.
+   * The num_rows and num_cols parameter is used to restrict the rows and columns, the Q and R will only contain
+   * the QR decomposition of A[0:num_rows, 0:num_cols].
+   * \see https://en.wikipedia.org/wiki/QR_decomposition#Using_Householder_reflections.
+   * \see http://www.cs.cornell.edu/~bindel/class/cs6210-f09/lec18.pdf
+   * \todo The scheme does not take into account that A is in Hessenberg form, so there could be a significant
+   * speedup if an according QR scheme is used (e.g. givens rotations, see https://lp.uni-goettingen.de/get/text/2138).
+   */
   static void QR_decomp(const MatrixType& A, MatrixType& Q, MatrixType& R, size_t num_rows, size_t num_cols)
   {
     R = A;

@@ -80,8 +80,9 @@ public:
           internal::compute_moore_penrose_inverse_using_eigen(matrix_.backend(), eigenvalues_tolerance_factor));
     } else
       DUNE_THROW(Common::Exceptions::internal_error,
-                 "Given type '" << type << "' is none of MatrixInverterOptions<EigenDenseMatrix<S>>::types(), and "
-                                           "internal::MatrixInverterBase promised to check this!"
+                 "Given type '" << type
+                                << "' is none of MatrixInverterOptions<EigenDenseMatrix<S>>::types(), and "
+                                   "internal::MatrixInverterBase promised to check this!"
                                 << "\n\nThese are the available types:\n\n"
                                 << MatrixInverterOptions<EigenDenseMatrix<S>>::types());
 
@@ -89,9 +90,9 @@ public:
   } // ... compute(...)
 
 protected:
+  using BaseType::inverse_;
   using BaseType::matrix_;
   using BaseType::options_;
-  using BaseType::inverse_;
 }; // class MatrixInverter<EigenDenseMatrix<...>>
 
 

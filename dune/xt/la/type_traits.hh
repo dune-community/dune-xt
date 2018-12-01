@@ -113,57 +113,47 @@ struct is_vector_helper
 
 template <class C, bool candidate = internal::is_container_helper<C>::is_candidate>
 struct is_container : public std::is_base_of<ContainerInterface<typename C::Traits, typename C::ScalarType>, C>
-{
-};
+{};
 
 template <class C>
 struct is_container<C, false> : public std::false_type
-{
-};
+{};
 
 
 template <class M, bool candidate = internal::is_matrix_helper<M>::is_candidate>
 struct is_matrix : public std::is_base_of<MatrixInterface<typename M::Traits, typename M::ScalarType>, M>
-{
-};
+{};
 
 template <class M>
 struct is_matrix<M, false> : public std::false_type
-{
-};
+{};
 
 
 template <class V, bool candidate = internal::is_vector_helper<V>::is_candidate>
 struct is_vector : public std::is_base_of<VectorInterface<typename V::Traits, typename V::ScalarType>, V>
-{
-};
+{};
 
 template <class V>
 struct is_vector<V, false> : public std::false_type
-{
-};
+{};
 
 
 template <class C, bool candidate = internal::provides_backend_helper<C>::is_candidate>
 struct provides_backend : public std::is_base_of<ProvidesBackend<typename C::Traits>, C>
-{
-};
+{};
 
 template <class C>
 struct provides_backend<C, false> : public std::false_type
-{
-};
+{};
 
 
 template <class C, bool candidate = internal::provides_data_access_helper<C>::is_candidate>
 struct provides_data_access : public std::is_base_of<ProvidesDataAccess<typename C::Traits>, C>
-{
-};
+{};
 
 template <class C>
 struct provides_data_access<C, false> : public std::false_type
-{
-};
+{};
 
 
 template <class V, bool = is_vector<V>::value>

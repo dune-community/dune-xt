@@ -70,8 +70,8 @@ class MatrixInterface : public ContainerInterface<TraitsImp, ScalarImp>
   using BaseType = ContainerInterface<TraitsImp, ScalarImp>;
 
 public:
-  using typename BaseType::Traits;
   using typename BaseType::derived_type;
+  using typename BaseType::Traits;
   using ScalarType = typename Traits::ScalarType;
   using RealType = typename Traits::RealType;
   using MutexesType = typename Traits::MutexesType;
@@ -303,13 +303,11 @@ public:
     if (other.rows() != rows())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "rows(): " << rows() << "\n   "
-                            << "other.rows(): "
-                            << other.rows());
+                            << "other.rows(): " << other.rows());
     if (other.cols() != cols())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "cols(): " << cols() << "\n   "
-                            << "other.cols(): "
-                            << other.cols());
+                            << "other.cols(): " << other.cols());
     auto my_pattern = pattern();
     auto other_pattern = other.pattern();
     for (size_t ii = 0; ii < rows(); ++ii) {

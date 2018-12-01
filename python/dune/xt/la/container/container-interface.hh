@@ -83,8 +83,7 @@ typename std::enable_if<provides_backend<C>::value, void>::type addbind_Provides
 
 template <class C>
 typename std::enable_if<!provides_backend<C>::value, void>::type addbind_ProvidesBackend(pybind11::class_<C>& /*c*/)
-{
-}
+{}
 
 
 /**

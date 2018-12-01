@@ -78,7 +78,7 @@ convert_to(const MatrixInterface<S>& source)
 #ifndef DXT_DISABLE_CHECKS
                                          )
 #endif
-                                     );
+        );
   } else {
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
@@ -92,7 +92,7 @@ convert_to(const MatrixInterface<S>& source)
 #ifndef DXT_DISABLE_CHECKS
                                          )
 #endif
-                                     );
+        );
   }
   return ret;
 } // ... convert_to(...)
@@ -118,7 +118,7 @@ typename std::enable_if<is_matrix<RangeType>::value, RangeType>::type convert_to
 #ifndef DXT_DISABLE_CHECKS
                               )
 #endif
-                          );
+        );
     return ret;
   } else {
     RangeType ret(rows, cols);
@@ -133,7 +133,7 @@ typename std::enable_if<is_matrix<RangeType>::value, RangeType>::type convert_to
 #ifndef DXT_DISABLE_CHECKS
                               )
 #endif
-                          );
+        );
     return ret;
   }
 } // ... convert_to(...)

@@ -53,18 +53,14 @@ public:
     category = c
   };
 
-  void pre(domain_type&, range_type&)
-  {
-  }
+  void pre(domain_type&, range_type&) {}
 
   void apply(domain_type& v, const range_type& d)
   {
     v = d;
   }
 
-  void post(domain_type&)
-  {
-  }
+  void post(domain_type&) {}
 };
 
 //! the general, parallel case
@@ -80,8 +76,7 @@ public:
   AmgApplicator(const MatrixType& matrix, const CommunicatorType& comm)
     : matrix_(matrix)
     , communicator_(comm)
-  {
-  }
+  {}
 
   InverseOperatorResult call(IstlDenseVector<S>& rhs,
                              IstlDenseVector<S>& solution,
@@ -145,7 +140,7 @@ public:
 #else // HAVE_MPI
           opts.get("verbose", default_opts.get<int>("verbose"))
 #endif
-          );
+      );
 
       InverseOperatorResult stats;
       solver.apply(solution.backend(), rhs.backend(), stats);
@@ -166,7 +161,7 @@ public:
 #else // HAVE_MPI
           opts.get("verbose", default_opts.get<int>("verbose"))
 #endif
-          );
+      );
 
       InverseOperatorResult stats;
       solver.apply(solution.backend(), rhs.backend(), stats);
@@ -192,8 +187,7 @@ public:
   AmgApplicator(const MatrixType& matrix, const SequentialCommunication& comm)
     : matrix_(matrix)
     , communicator_(comm)
-  {
-  }
+  {}
 
   InverseOperatorResult call(IstlDenseVector<S>& rhs,
                              IstlDenseVector<S>& solution,

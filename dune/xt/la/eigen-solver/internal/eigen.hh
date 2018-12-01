@@ -107,8 +107,8 @@ compute_eigenvalues_using_eigen(const MatrixType& /*::Eigen::Matrix<S, ::Eigen::
 
 template <class S, class MatrixType, class ComplexMatrixType>
 ComplexMatrixType /*::Eigen::Matrix<XT::Common::complex_t<S>, ::Eigen::Dynamic, ::Eigen::Dynamic>*/
-    compute_right_eigenvectors_using_eigen(
-        const MatrixType& /*::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& matrix*/)
+compute_right_eigenvectors_using_eigen(
+    const MatrixType& /*::Eigen::Matrix<S, ::Eigen::Dynamic, ::Eigen::Dynamic>& matrix*/)
 {
   static_assert(AlwaysFalse<S>::value, "You are missing eigen!");
 }

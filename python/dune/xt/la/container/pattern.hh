@@ -41,11 +41,7 @@ pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::m
           } catch (boost::bad_numeric_cast& ee) {
             DUNE_THROW(Common::Exceptions::wrong_input_given,
                        "Given size has to be positive!\n\n The error in boost while converting '"
-                           << size
-                           << "' to '"
-                           << Common::Typename<size_t>::value()
-                           << "' was: "
-                           << ee.what());
+                           << size << "' to '" << Common::Typename<size_t>::value() << "' was: " << ee.what());
           }
         }),
         "size"_a = 0);

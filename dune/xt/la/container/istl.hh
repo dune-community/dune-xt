@@ -54,28 +54,28 @@ namespace internal {
  * \brief Traits for IstlDenseVector.
  */
 template <class ScalarImp>
-class IstlDenseVectorTraits : public VectorTraitsBase<ScalarImp,
-                                                      IstlDenseVector<ScalarImp>,
-                                                      BlockVector<FieldVector<ScalarImp, 1>>,
-                                                      Backends::istl_dense,
-                                                      Backends::none,
-                                                      Backends::istl_sparse>
-{
-};
+class IstlDenseVectorTraits
+  : public VectorTraitsBase<ScalarImp,
+                            IstlDenseVector<ScalarImp>,
+                            BlockVector<FieldVector<ScalarImp, 1>>,
+                            Backends::istl_dense,
+                            Backends::none,
+                            Backends::istl_sparse>
+{};
 
 
 /**
  * \brief Traits for IstlRowMajorSparseMatrix.
  */
 template <class ScalarImp>
-class IstlRowMajorSparseMatrixTraits : public MatrixTraitsBase<ScalarImp,
-                                                               IstlRowMajorSparseMatrix<ScalarImp>,
-                                                               BCRSMatrix<FieldMatrix<ScalarImp, 1, 1>>,
-                                                               Backends::istl_sparse,
-                                                               Backends::istl_dense,
-                                                               true>
-{
-};
+class IstlRowMajorSparseMatrixTraits
+  : public MatrixTraitsBase<ScalarImp,
+                            IstlRowMajorSparseMatrix<ScalarImp>,
+                            BCRSMatrix<FieldMatrix<ScalarImp, 1, 1>>,
+                            Backends::istl_sparse,
+                            Backends::istl_dense,
+                            true>
+{};
 
 
 } // namespace internal
@@ -85,9 +85,10 @@ class IstlRowMajorSparseMatrixTraits : public MatrixTraitsBase<ScalarImp,
  *  \brief A dense vector implementation of VectorInterface using the Dune::BlockVector from dune-istl.
  */
 template <class ScalarImp = double>
-class IstlDenseVector : public VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp>,
-                        public ProvidesBackend<internal::IstlDenseVectorTraits<ScalarImp>>,
-                        public ProvidesDataAccess<internal::IstlDenseVectorTraits<ScalarImp>>
+class IstlDenseVector
+  : public VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp>
+  , public ProvidesBackend<internal::IstlDenseVectorTraits<ScalarImp>>
+  , public ProvidesDataAccess<internal::IstlDenseVectorTraits<ScalarImp>>
 {
   using ThisType = IstlDenseVector;
   using InterfaceType = VectorInterface<internal::IstlDenseVectorTraits<ScalarImp>, ScalarImp>;
@@ -134,8 +135,7 @@ public:
   IstlDenseVector(const ThisType& other)
     : backend_(std::make_shared<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
-  {
-  }
+  {}
 
   explicit IstlDenseVector(const BackendType& other,
                            const bool /*prune*/ = false,
@@ -143,8 +143,7 @@ public:
                            const size_t num_mutexes = 1)
     : backend_(new BackendType(other))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
@@ -152,14 +151,12 @@ public:
   explicit IstlDenseVector(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   explicit IstlDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::unique_ptr<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   ThisType& operator=(const ThisType& other)
   {
@@ -368,8 +365,9 @@ private:
  * \todo Rename to IstlSparseMatrix
  */
 template <class ScalarImp = double>
-class IstlRowMajorSparseMatrix : public MatrixInterface<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>,
-                                 public ProvidesBackend<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>>
+class IstlRowMajorSparseMatrix
+  : public MatrixInterface<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>
+  , public ProvidesBackend<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>>
 {
   using ThisType = IstlRowMajorSparseMatrix;
   using InterfaceType = MatrixInterface<internal::IstlRowMajorSparseMatrixTraits<ScalarImp>, ScalarImp>;
@@ -409,14 +407,12 @@ public:
   explicit IstlRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0, const size_t num_mutexes = 1)
     : backend_(new BackendType(rr, cc, BackendType::row_wise))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   IstlRowMajorSparseMatrix(const ThisType& other)
     : backend_(std::make_shared<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
-  {
-  }
+  {}
 
   explicit IstlRowMajorSparseMatrix(const BackendType& mat,
                                     const bool prune = false,
@@ -447,14 +443,12 @@ public:
   explicit IstlRowMajorSparseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   explicit IstlRowMajorSparseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   ThisType& operator=(const ThisType& other)
   {
@@ -508,10 +502,7 @@ public:
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
-                                     << rows()
-                                     << "x"
-                                     << cols()
-                                     << ")!");
+                                     << rows() << "x" << cols() << ")!");
     backend().axpy(alpha, xx.backend());
   } // ... axpy(...)
 
@@ -769,12 +760,11 @@ namespace Common {
 
 template <class T>
 struct VectorAbstraction<LA::IstlDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::IstlDenseVector<T>>
-{
-};
+{};
 
 template <class T>
 struct MatrixAbstraction<LA::IstlRowMajorSparseMatrix<T>>
-    : public LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>
+  : public LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::IstlRowMajorSparseMatrix<T>>;
 

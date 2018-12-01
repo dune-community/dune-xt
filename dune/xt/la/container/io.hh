@@ -83,9 +83,7 @@ typename std::enable_if<is_matrix<M>::value, M>::type from_file(const std::strin
     if (words.size() != 3)
       DUNE_THROW(IOError,
                  "Encountered illegal line (see below), Each line has to be of the form 'ii jj value'!\n\n"
-                     << "The line is '"
-                     << line
-                     << "'");
+                     << "The line is '" << line << "'");
     auto ii = Common::from_string<size_t>(words[0]);
     auto jj = Common::from_string<size_t>(words[1]);
     auto value = Common::from_string<R>(words[2]);
@@ -132,9 +130,7 @@ from_file(const std::string& filename, const ssize_t min_size = -1, const std::s
     if (words.size() != 2)
       DUNE_THROW(IOError,
                  "Encountered illegal line (see below), Each line has to be of the form 'ii value'!\n\n"
-                     << "The line is '"
-                     << line
-                     << "'");
+                     << "The line is '" << line << "'");
     auto ii = Common::from_string<size_t>(words[0]);
     auto value = Common::from_string<R>(words[1]);
     max_size = std::max(max_size, ii);

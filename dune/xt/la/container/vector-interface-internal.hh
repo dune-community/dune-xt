@@ -43,8 +43,7 @@ private:
   {
     explicit ConstHolder(const VectorType& vec)
       : element(vec)
-    {
-    }
+    {}
 
     const VectorType& element;
   }; // struct ConstHolder
@@ -54,8 +53,7 @@ public:
     : const_holder_(std::make_shared<ConstHolder>(vec))
     , position_(0)
     , end_(end)
-  {
-  }
+  {}
 
   ThisType& operator++()
   {
@@ -92,8 +90,9 @@ protected:
 }; // class VectorInputIterator
 
 template <class Traits, class ScalarImp>
-class VectorOutputIterator : public VectorInputIterator<Traits, ScalarImp>,
-                             public std::iterator<std::output_iterator_tag, typename Traits::ScalarType>
+class VectorOutputIterator
+  : public VectorInputIterator<Traits, ScalarImp>
+  , public std::iterator<std::output_iterator_tag, typename Traits::ScalarType>
 {
   typedef VectorInputIterator<Traits, ScalarImp> BaseType;
   typedef VectorOutputIterator<Traits, ScalarImp> ThisType;
@@ -109,8 +108,7 @@ private:
   {
     explicit Holder(VectorType& vec)
       : element(vec)
-    {
-    }
+    {}
 
     VectorType& element;
   }; // struct Holder
@@ -119,8 +117,7 @@ public:
   explicit VectorOutputIterator(VectorType& vec, const bool end = false)
     : BaseType(vec, end)
     , holder_(std::make_shared<Holder>(vec))
-  {
-  }
+  {}
 
   ScalarType& operator*()
   {

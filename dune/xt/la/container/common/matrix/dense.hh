@@ -52,8 +52,7 @@ struct MatrixBackendBase
     : num_rows_(num_rows)
     , num_cols_(num_cols)
     , entries_(num_rows_ * num_cols_, value)
-  {
-  }
+  {}
 
   void resize(const size_t num_rows, const size_t num_cols)
   {
@@ -72,14 +71,13 @@ struct CommonDenseMatrixBackend;
 
 template <class ScalarType>
 struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_row_major>
-    : public MatrixBackendBase<ScalarType>
+  : public MatrixBackendBase<ScalarType>
 {
   using BaseType = MatrixBackendBase<ScalarType>;
 
   CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
-  {
-  }
+  {}
 
   ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
@@ -91,21 +89,20 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_row_maj
     return entries_[rr * num_cols_ + cc];
   }
 
-  using BaseType::num_cols_;
   using BaseType::entries_;
+  using BaseType::num_cols_;
 };
 
 
 template <class ScalarType>
 struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_major>
-    : public MatrixBackendBase<ScalarType>
+  : public MatrixBackendBase<ScalarType>
 {
   using BaseType = MatrixBackendBase<ScalarType>;
 
   CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
-  {
-  }
+  {}
 
   ScalarType& get_entry_ref(const size_t rr, const size_t cc)
   {
@@ -117,19 +114,19 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_
     return entries_[cc * num_rows_ + rr];
   }
 
-  using BaseType::num_rows_;
   using BaseType::entries_;
+  using BaseType::num_rows_;
 };
 
 
 template <class ScalarImp, Common::StorageLayout storage_layout>
-class CommonDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
-                                                        CommonDenseMatrix<ScalarImp, storage_layout>,
-                                                        CommonDenseMatrixBackend<ScalarImp, storage_layout>,
-                                                        Backends::common_dense,
-                                                        Backends::common_dense>
-{
-};
+class CommonDenseMatrixTraits
+  : public MatrixTraitsBase<ScalarImp,
+                            CommonDenseMatrix<ScalarImp, storage_layout>,
+                            CommonDenseMatrixBackend<ScalarImp, storage_layout>,
+                            Backends::common_dense,
+                            Backends::common_dense>
+{};
 
 
 } // namespace internal
@@ -140,8 +137,8 @@ class CommonDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
  */
 template <class ScalarImp = double, Common::StorageLayout storage_layout = Common::StorageLayout::dense_row_major>
 class CommonDenseMatrix
-    : public MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>,
-      public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>>
+  : public MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>
+  , public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>>
 {
   using ThisType = CommonDenseMatrix;
   using InterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>;
@@ -162,8 +159,7 @@ public:
                              const size_t num_mutexes = 1)
     : backend_(std::make_unique<BackendType>(rr, cc, value))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   /// This constructors ignores the given pattern and initializes the matrix with 0.
   CommonDenseMatrix(const size_t rr,
@@ -172,14 +168,12 @@ public:
                     const size_t num_mutexes = 1)
     : backend_(std::make_unique<BackendType>(rr, cc, ScalarType(0)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   CommonDenseMatrix(const ThisType& other)
     : backend_(std::make_unique<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
-  {
-  }
+  {}
 
   /**
    * \note If prune == true, this implementation is not optimal!
@@ -213,8 +207,7 @@ public:
   explicit CommonDenseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   ThisType& operator=(const ThisType& other)
   {
@@ -288,10 +281,7 @@ public:
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
-                                     << rows()
-                                     << "x"
-                                     << cols()
-                                     << ")!");
+                                     << rows() << "x" << cols() << ")!");
     axpy_impl(alpha, xx);
   } // ... axpy(...)
 
@@ -522,7 +512,7 @@ namespace Common {
 
 template <class T, Common::StorageLayout layout>
 struct MatrixAbstraction<LA::CommonDenseMatrix<T, layout>>
-    : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T, layout>>
+  : public LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T, layout>>
 {
   using BaseType = LA::internal::MatrixAbstractionBase<LA::CommonDenseMatrix<T, layout>>;
 

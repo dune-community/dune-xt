@@ -27,10 +27,10 @@ namespace LA {
 
 
 /**  \brief Solves linear equation for tridiagonal symmetric positive definite matrix.
-  * \param[in] diag vector containing the diagonal elements of the matrix (length dimRange)
-  * \param[in] subdiag vector containing the sub-diagonal elements of the matrix (length dimRange-1)
-  * \param[in/out] b vector containing the rhs (length dimRange). Is overwritten by the solution of the equation.
-  */
+ * \param[in] diag vector containing the diagonal elements of the matrix (length dimRange)
+ * \param[in] subdiag vector containing the sub-diagonal elements of the matrix (length dimRange-1)
+ * \param[in/out] b vector containing the rhs (length dimRange). Is overwritten by the solution of the equation.
+ */
 template <class VectorType, class SecondVectorType, class RhsVectorType>
 std::enable_if_t<Common::is_vector<VectorType>::value && Common::is_vector<SecondVectorType>::value
                      && Common::is_vector<RhsVectorType>::value,

@@ -53,8 +53,7 @@ class MatrixDataProvider<MatrixType, true>
 public:
   MatrixDataProvider(MatrixType& matrix)
     : matrix_(matrix)
-  {
-  }
+  {}
 
   double* data()
   {
@@ -74,8 +73,7 @@ public:
   // lapacks favorite storage format is column-major, otherwise the matrix would be copied from row-major to col-major
   MatrixDataProvider(const MatrixType& matrix)
     : serialized_matrix_(Dune::XT::Common::serialize_colwise<double>(matrix))
-  {
-  }
+  {}
 
   double* data()
   {
@@ -229,17 +227,13 @@ compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack_impl(
   if (Dune::XT::Common::get_matrix_rows(right_eigenvectors) != size)
     DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
                "Given matrix of right eigenvectors has to be of same size as given matrix, is "
-                   << Dune::XT::Common::get_matrix_rows(right_eigenvectors)
-                   << "x"
-                   << Dune::XT::Common::get_matrix_cols(right_eigenvectors)
-                   << "!");
+                   << Dune::XT::Common::get_matrix_rows(right_eigenvectors) << "x"
+                   << Dune::XT::Common::get_matrix_cols(right_eigenvectors) << "!");
   if (Dune::XT::Common::get_matrix_cols(right_eigenvectors) != size)
     DUNE_THROW(Exceptions::eigen_solver_failed_bc_data_did_not_fulfill_requirements,
                "Given matrix of right eigenvectors has to be of same size as given matrix, is "
-                   << Dune::XT::Common::get_matrix_rows(right_eigenvectors)
-                   << "x"
-                   << Dune::XT::Common::get_matrix_cols(right_eigenvectors)
-                   << "!");
+                   << Dune::XT::Common::get_matrix_rows(right_eigenvectors) << "x"
+                   << Dune::XT::Common::get_matrix_cols(right_eigenvectors) << "!");
 #endif // DUNE_XT_LA_DISABLE_ALL_CHECKS
   int storage_layout = MatrixDataProvider<RealMatrixType, contiguous_and_mutable>::storage_layout
                                == Common::StorageLayout::dense_row_major

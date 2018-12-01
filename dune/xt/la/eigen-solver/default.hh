@@ -55,42 +55,37 @@ public:
 
 template <class MatrixImp>
 class EigenSolver<MatrixImp, true>
-    : public internal::
-          EigenSolverBase<MatrixImp,
-                          typename Common::MatrixAbstraction<MatrixImp>::ScalarType,
-                          typename Common::MatrixAbstraction<MatrixImp>::
-                              template MatrixTypeTemplate<Common::MatrixAbstraction<MatrixImp>::static_rows,
-                                                          Common::MatrixAbstraction<MatrixImp>::static_cols,
-                                                          typename Common::MatrixAbstraction<MatrixImp>::RealType>,
-                          typename Common::MatrixAbstraction<MatrixImp>::
-                              template MatrixTypeTemplate<Common::MatrixAbstraction<MatrixImp>::static_rows,
-                                                          Common::MatrixAbstraction<MatrixImp>::static_cols,
-                                                          std::complex<
-                                                              typename Common::MatrixAbstraction<MatrixImp>::RealType>>>
+  : public internal::EigenSolverBase<MatrixImp,
+                                     typename Common::MatrixAbstraction<MatrixImp>::ScalarType,
+                                     typename Common::MatrixAbstraction<MatrixImp>::template MatrixTypeTemplate<
+                                         Common::MatrixAbstraction<MatrixImp>::static_rows,
+                                         Common::MatrixAbstraction<MatrixImp>::static_cols,
+                                         typename Common::MatrixAbstraction<MatrixImp>::RealType>,
+                                     typename Common::MatrixAbstraction<MatrixImp>::template MatrixTypeTemplate<
+                                         Common::MatrixAbstraction<MatrixImp>::static_rows,
+                                         Common::MatrixAbstraction<MatrixImp>::static_cols,
+                                         std::complex<typename Common::MatrixAbstraction<MatrixImp>::RealType>>>
 {
   using M = Common::MatrixAbstraction<MatrixImp>;
-  using BaseType = internal::
-      EigenSolverBase<MatrixImp,
-                      typename M::ScalarType,
-                      typename M::template MatrixTypeTemplate<M::static_rows, M::static_cols, typename M::RealType>,
-                      typename M::template MatrixTypeTemplate<M::static_rows,
-                                                              M::static_cols,
-                                                              std::complex<typename M::RealType>>>;
+  using BaseType = internal::EigenSolverBase<
+      MatrixImp,
+      typename M::ScalarType,
+      typename M::template MatrixTypeTemplate<M::static_rows, M::static_cols, typename M::RealType>,
+      typename M::template MatrixTypeTemplate<M::static_rows, M::static_cols, std::complex<typename M::RealType>>>;
 
 public:
-  using typename BaseType::MatrixType;
-  using typename BaseType::RealType;
-  using typename BaseType::ComplexType;
-  using typename BaseType::RealMatrixType;
   using typename BaseType::ComplexMatrixType;
+  using typename BaseType::ComplexType;
+  using typename BaseType::MatrixType;
+  using typename BaseType::RealMatrixType;
+  using typename BaseType::RealType;
   using RealM = Common::MatrixAbstraction<RealMatrixType>;
   using ComplexM = Common::MatrixAbstraction<ComplexMatrixType>;
 
   template <class... Args>
   explicit EigenSolver(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 
 protected:
   void compute() const override final
@@ -131,10 +126,10 @@ protected:
                                 << EigenSolverOptions<MatrixType>::types());
   } //... compute(...)
 
-  using BaseType::matrix_;
-  using BaseType::options_;
   using BaseType::eigenvalues_;
   using BaseType::eigenvectors_;
+  using BaseType::matrix_;
+  using BaseType::options_;
 }; // class EigenSolver<MatrixType, true>
 
 

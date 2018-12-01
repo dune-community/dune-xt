@@ -9,8 +9,8 @@
 //   Rene Milk       (2018)
 
 /**
-  * This file is intended as a starting point for quick testing.
-  */
+ * This file is intended as a starting point for quick testing.
+ */
 
 #define DUNE_XT_COMMON_TEST_MAIN_ENABLE_DEBUG_LOGGING 1
 #define DUNE_XT_COMMON_TEST_MAIN_ENABLE_INFO_LOGGING 1

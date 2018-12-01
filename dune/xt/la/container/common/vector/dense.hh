@@ -43,14 +43,14 @@ namespace internal {
 
 /// Traits for CommonDenseVector
 template <class ScalarImp>
-class CommonDenseVectorTraits : public VectorTraitsBase<ScalarImp,
-                                                        CommonDenseVector<ScalarImp>,
-                                                        Dune::DynamicVector<ScalarImp>,
-                                                        Backends::common_dense,
-                                                        Backends::common_dense,
-                                                        Backends::common_sparse>
-{
-};
+class CommonDenseVectorTraits
+  : public VectorTraitsBase<ScalarImp,
+                            CommonDenseVector<ScalarImp>,
+                            Dune::DynamicVector<ScalarImp>,
+                            Backends::common_dense,
+                            Backends::common_dense,
+                            Backends::common_sparse>
+{};
 
 
 } // namespace internal
@@ -60,9 +60,10 @@ class CommonDenseVectorTraits : public VectorTraitsBase<ScalarImp,
  *  \brief A dense vector implementation of VectorInterface using the Dune::DynamicVector.
  */
 template <class ScalarImp = double>
-class CommonDenseVector : public VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp>,
-                          public ProvidesBackend<internal::CommonDenseVectorTraits<ScalarImp>>,
-                          public ProvidesDataAccess<internal::CommonDenseVectorTraits<ScalarImp>>
+class CommonDenseVector
+  : public VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp>
+  , public ProvidesBackend<internal::CommonDenseVectorTraits<ScalarImp>>
+  , public ProvidesDataAccess<internal::CommonDenseVectorTraits<ScalarImp>>
 {
   using ThisType = CommonDenseVector;
   using InterfaceType = VectorInterface<internal::CommonDenseVectorTraits<ScalarImp>, ScalarImp>;
@@ -83,8 +84,7 @@ public:
   explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0), const size_t num_mutexes = 1)
     : backend_(new BackendType(ss, value))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   explicit CommonDenseVector(const std::vector<ScalarType>& other, const size_t num_mutexes = 1)
     : backend_(new BackendType(other.size()))
@@ -108,8 +108,7 @@ public:
   CommonDenseVector(const ThisType& other)
     : backend_(std::make_shared<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
-  {
-  }
+  {}
 
   explicit CommonDenseVector(const BackendType& other,
                              const bool /*prune*/ = false,
@@ -117,8 +116,7 @@ public:
                              const size_t num_mutexes = 1)
     : backend_(new BackendType(other))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
@@ -126,14 +124,12 @@ public:
   explicit CommonDenseVector(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   explicit CommonDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   ThisType& operator=(const ThisType& other)
   {
@@ -339,9 +335,8 @@ namespace Common {
 
 template <class T>
 struct VectorAbstraction<LA::CommonDenseVector<T>>
-    : public LA::internal::VectorAbstractionBase<LA::CommonDenseVector<T>>
-{
-};
+  : public LA::internal::VectorAbstractionBase<LA::CommonDenseVector<T>>
+{};
 
 
 } // namespace Common

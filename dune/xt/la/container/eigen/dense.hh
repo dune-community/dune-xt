@@ -67,14 +67,14 @@ namespace internal {
  *  \brief Traits for EigenDenseVector.
  */
 template <class ScalarImp = double>
-class EigenDenseVectorTraits : public VectorTraitsBase<ScalarImp,
-                                                       EigenDenseVector<ScalarImp>,
-                                                       ::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, 1>,
-                                                       Backends::eigen_dense,
-                                                       Backends::eigen_dense,
-                                                       Backends::eigen_sparse>
-{
-};
+class EigenDenseVectorTraits
+  : public VectorTraitsBase<ScalarImp,
+                            EigenDenseVector<ScalarImp>,
+                            ::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, 1>,
+                            Backends::eigen_dense,
+                            Backends::eigen_dense,
+                            Backends::eigen_sparse>
+{};
 
 
 /**
@@ -82,27 +82,26 @@ class EigenDenseVectorTraits : public VectorTraitsBase<ScalarImp,
  */
 template <class ScalarImp = double>
 class EigenMappedDenseVectorTraits
-    : public VectorTraitsBase<ScalarImp,
-                              EigenMappedDenseVector<ScalarImp>,
-                              Eigen::Map<::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, 1>>,
-                              Backends::eigen_dense,
-                              Backends::eigen_dense,
-                              Backends::eigen_sparse>
-{
-};
+  : public VectorTraitsBase<ScalarImp,
+                            EigenMappedDenseVector<ScalarImp>,
+                            Eigen::Map<::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, 1>>,
+                            Backends::eigen_dense,
+                            Backends::eigen_dense,
+                            Backends::eigen_sparse>
+{};
 
 
 /**
  *  \brief Traits for EigenDenseMatrix.
  */
 template <class ScalarImp = double>
-class EigenDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
-                                                       EigenDenseMatrix<ScalarImp>,
-                                                       ::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, ::Eigen::Dynamic>,
-                                                       Backends::eigen_dense,
-                                                       Backends::eigen_dense>
-{
-};
+class EigenDenseMatrixTraits
+  : public MatrixTraitsBase<ScalarImp,
+                            EigenDenseMatrix<ScalarImp>,
+                            ::Eigen::Matrix<ScalarImp, ::Eigen::Dynamic, ::Eigen::Dynamic>,
+                            Backends::eigen_dense,
+                            Backends::eigen_dense>
+{};
 
 
 } // namespace internal
@@ -112,8 +111,9 @@ class EigenDenseMatrixTraits : public MatrixTraitsBase<ScalarImp,
  *  \brief A dense vector implementation of VectorInterface using the eigen backend.
  */
 template <class ScalarImp = double>
-class EigenDenseVector : public EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp>,
-                         public ProvidesDataAccess<internal::EigenDenseVectorTraits<ScalarImp>>
+class EigenDenseVector
+  : public EigenBaseVector<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp>
+  , public ProvidesDataAccess<internal::EigenDenseVectorTraits<ScalarImp>>
 {
   using ThisType = EigenDenseVector;
   using InterfaceType = VectorInterface<internal::EigenDenseVectorTraits<ScalarImp>, ScalarImp>;
@@ -374,9 +374,10 @@ private:
  *  \brief  A dense matrix implementation of MatrixInterface using the eigen backend.
  */
 template <class ScalarImp = double>
-class EigenDenseMatrix : public MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp>,
-                         public ProvidesBackend<internal::EigenDenseMatrixTraits<ScalarImp>>,
-                         public ProvidesDataAccess<internal::EigenDenseMatrixTraits<ScalarImp>>
+class EigenDenseMatrix
+  : public MatrixInterface<internal::EigenDenseMatrixTraits<ScalarImp>, ScalarImp>
+  , public ProvidesBackend<internal::EigenDenseMatrixTraits<ScalarImp>>
+  , public ProvidesDataAccess<internal::EigenDenseMatrixTraits<ScalarImp>>
 {
 
   using ThisType = EigenDenseMatrix;
@@ -421,8 +422,7 @@ public:
   EigenDenseMatrix(const ThisType& other)
     : backend_(std::make_shared<BackendType>(*other.backend_))
     , mutexes_(std::make_unique<MutexesType>(other.mutexes_->size()))
-  {
-  }
+  {}
 
   /**
    * \note If prune == true, this implementation is not optimal!
@@ -466,14 +466,12 @@ public:
   explicit EigenDenseMatrix(BackendType* backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   explicit EigenDenseMatrix(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
-  {
-  }
+  {}
 
   ThisType& operator=(const ThisType& other)
   {
@@ -538,10 +536,7 @@ public:
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
-                                     << rows()
-                                     << "x"
-                                     << cols()
-                                     << ")!");
+                                     << rows() << "x" << cols() << ")!");
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -713,14 +708,12 @@ namespace Common {
 
 template <class T>
 struct VectorAbstraction<LA::EigenDenseVector<T>> : public LA::internal::VectorAbstractionBase<LA::EigenDenseVector<T>>
-{
-};
+{};
 
 template <class T>
 struct VectorAbstraction<LA::EigenMappedDenseVector<T>>
-    : public LA::internal::VectorAbstractionBase<LA::EigenMappedDenseVector<T>>
-{
-};
+  : public LA::internal::VectorAbstractionBase<LA::EigenMappedDenseVector<T>>
+{};
 
 template <class T>
 struct MatrixAbstraction<LA::EigenDenseMatrix<T>> : public LA::internal::MatrixAbstractionBase<LA::EigenDenseMatrix<T>>
