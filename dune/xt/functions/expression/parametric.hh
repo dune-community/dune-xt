@@ -136,7 +136,7 @@ public:
     function_->evaluate(args, ret);
 
 #ifndef NDEBUG
-#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < range_dim; ++rr) {
@@ -162,7 +162,7 @@ public:
                        << "The result was:                       " << ret[rr] << "\n\n"
                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     }
-#endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#  endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
     return ret;
   } // ... evaluate(...)

@@ -194,7 +194,7 @@ public:
   {
     size_t range = value.size();
 #ifndef NDEBUG
-#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < range; ++rr) {
@@ -220,7 +220,7 @@ public:
                        << "The result was:                       " << value[rr] << "\n\n"
                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     } // check_value(...)
-#endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#  endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
   }
 
@@ -379,7 +379,7 @@ private:
   {
     size_t range = value.size();
 #ifndef NDEBUG
-#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
     for (size_t rr = 0; rr < range; ++rr) {
@@ -405,7 +405,7 @@ private:
                        << "The result was:                       " << value[rr] << "\n\n"
                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     } // check_value(...)
-#endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#  endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
 #endif // NDEBUG
   }
 

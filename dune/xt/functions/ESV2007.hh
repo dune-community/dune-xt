@@ -18,9 +18,9 @@
 #include <dune/geometry/quadraturerules.hh>
 
 #if HAVE_EIGEN
-#include <dune/xt/common/disable_warnings.hh>
-#include <Eigen/Eigenvalues>
-#include <dune/xt/common/reenable_warnings.hh>
+#  include <dune/xt/common/disable_warnings.hh>
+#  include <Eigen/Eigenvalues>
+#  include <dune/xt/common/reenable_warnings.hh>
 #endif
 
 #include <dune/xt/common/configuration.hh>
