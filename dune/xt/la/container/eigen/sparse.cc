@@ -13,7 +13,7 @@
 
 #if HAVE_EIGEN
 
-#include "sparse.hh"
+#  include "sparse.hh"
 
 
 template class Dune::XT::LA::EigenRowMajorSparseMatrix<double>;

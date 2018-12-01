@@ -15,10 +15,10 @@
 #include <vector>
 
 #if HAVE_EIGEN
-#include <dune/xt/common/disable_warnings.hh>
-#include <Eigen/Core>
-#include <Eigen/Eigenvalues>
-#include <dune/xt/common/reenable_warnings.hh>
+#  include <dune/xt/common/disable_warnings.hh>
+#  include <Eigen/Core>
+#  include <Eigen/Eigenvalues>
+#  include <dune/xt/common/reenable_warnings.hh>
 #endif
 
 #include <dune/common/typetraits.hh>

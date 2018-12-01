@@ -13,16 +13,16 @@
 #define DUNE_XT_LA_SOLVER_FASP_HH
 
 #if HAVE_FASP
-#if HAVE_EIGEN
+#  if HAVE_EIGEN
 
 extern "C"
 {
-#include "fasp_functs.h"
+#    include "fasp_functs.h"
 }
 
-#include <dune/xt/la/container/eigen.hh>
+#    include <dune/xt/la/container/eigen.hh>
 
-#include "interface.hh"
+#    include "interface.hh"
 
 namespace Dune {
 namespace XT {
@@ -372,7 +372,7 @@ private:
 } // namespace XT
 } // namespace Dune
 
-#endif // HAVE_EIGEN
+#  endif // HAVE_EIGEN
 #endif // HAVE_FASP
 
 #endif // DUNE_XT_LA_SOLVER_FASP_HH

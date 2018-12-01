@@ -17,10 +17,10 @@
 #include <cmath>
 
 #if HAVE_DUNE_ISTL
-#include <dune/istl/operators.hh>
-#include <dune/istl/solvers.hh>
-#include <dune/istl/paamg/amg.hh>
-#include <dune/istl/preconditioners.hh>
+#  include <dune/istl/operators.hh>
+#  include <dune/istl/solvers.hh>
+#  include <dune/istl/paamg/amg.hh>
+#  include <dune/istl/preconditioners.hh>
 #endif // HAVE_DUNE_ISTL
 
 #include <dune/xt/common/exceptions.hh>
@@ -135,11 +135,11 @@ public:
           preconditioner,
           opts.get("precision", default_opts.get<S>("precision")),
           opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-#if HAVE_MPI
+#  if HAVE_MPI
           (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
-#else // HAVE_MPI
+#  else // HAVE_MPI
           opts.get("verbose", default_opts.get<int>("verbose"))
-#endif
+#  endif
       );
 
       InverseOperatorResult stats;
@@ -156,11 +156,11 @@ public:
           preconditioner,
           opts.get("precision", default_opts.get<S>("precision")),
           opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-#if HAVE_MPI
+#  if HAVE_MPI
           (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
-#else // HAVE_MPI
+#  else // HAVE_MPI
           opts.get("verbose", default_opts.get<int>("verbose"))
-#endif
+#  endif
       );
 
       InverseOperatorResult stats;

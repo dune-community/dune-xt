@@ -126,9 +126,9 @@ invert_matrix(const M& matrix, const Common::Configuration& inversion_options)
 }
 
 
-} // namespace Dune
-} // namespace XT
 } // namespace LA
+} // namespace XT
+} // namespace Dune
 
 #include "matrix-inverter/default.hh"
 #include "matrix-inverter/eigen.hh"

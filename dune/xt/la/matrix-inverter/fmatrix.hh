@@ -130,9 +130,9 @@ public:
 };
 
 
-} // namespace Dune
-} // namespace XT
 } // namespace LA
+} // namespace XT
+} // namespace Dune
 
 
 #endif // DUNE_XT_LA_MATRIX_INVERTER_FMATRIX_HH

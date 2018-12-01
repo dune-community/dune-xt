@@ -21,13 +21,13 @@
 #include <complex>
 
 #if HAVE_EIGEN
-#include <dune/xt/common/disable_warnings.hh>
-#include <Eigen/Dense>
-#include <Eigen/SparseCore>
-#include <Eigen/IterativeLinearSolvers>
-#include <Eigen/SparseCholesky>
-#include <Eigen/SparseLU>
-#include <Eigen/SparseQR>
+#  include <dune/xt/common/disable_warnings.hh>
+#  include <Eigen/Dense>
+#  include <Eigen/SparseCore>
+#  include <Eigen/IterativeLinearSolvers>
+#  include <Eigen/SparseCholesky>
+#  include <Eigen/SparseLU>
+#  include <Eigen/SparseQR>
 //#   if HAVE_UMFPACK
 //#     include <Eigen/UmfPackSupport>
 //#   endif
@@ -36,7 +36,7 @@
 //#   if HAVE_SUPERLU
 //#     include <Eigen/SuperLUSupport>
 //#   endif
-#include <dune/xt/common/reenable_warnings.hh>
+#  include <dune/xt/common/reenable_warnings.hh>
 #endif // HAVE_EIGEN
 
 #include <dune/xt/common/exceptions.hh>

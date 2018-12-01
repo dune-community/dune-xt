@@ -20,9 +20,9 @@
 #include <mutex>
 
 #if HAVE_EIGEN
-#include <dune/xt/common/disable_warnings.hh>
-#include <Eigen/Core>
-#include <dune/xt/common/reenable_warnings.hh>
+#  include <dune/xt/common/disable_warnings.hh>
+#  include <Eigen/Core>
+#  include <dune/xt/common/reenable_warnings.hh>
 #endif
 
 #include <dune/common/typetraits.hh>
@@ -279,10 +279,10 @@ public:
   using InterfaceType::as_imp;
 
 private:
-#ifndef NDEBUG
+#  ifndef NDEBUG
   //! disambiguation necessary since it exists in multiple bases
   using InterfaceType::crtp_mutex_;
-#endif
+#  endif
 
   friend class VectorInterface<Traits, ScalarType>;
   friend class EigenDenseMatrix<ScalarType>;

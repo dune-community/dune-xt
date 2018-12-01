@@ -95,7 +95,7 @@ protected:
       else if (compute_eigenvectors)
         eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(
             internal::compute_right_eigenvectors_using_eigen(matrix_.backend()));
-#if HAVE_LAPACKE || HAVE_MKL
+#  if HAVE_LAPACKE || HAVE_MKL
     } else if (type == "lapack") {
       if (!compute_eigenvectors)
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(
@@ -105,7 +105,7 @@ protected:
         eigenvectors_ = std::make_unique<EigenDenseMatrix<XT::Common::complex_t<S>>>(N, N);
         internal::compute_eigenvalues_and_right_eigenvectors_using_lapack(matrix_, *eigenvalues_, *eigenvectors_);
       }
-#endif // HAVE_LAPACKE || HAVE_MKL
+#  endif // HAVE_LAPACKE || HAVE_MKL
     } else if (type == "shifted_qr") {
       if (!compute_eigenvectors) {
         eigenvalues_ = std::make_unique<std::vector<XT::Common::complex_t<RealType>>>(N);

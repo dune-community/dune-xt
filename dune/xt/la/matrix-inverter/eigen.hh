@@ -115,9 +115,9 @@ class MatrixInverter<EigenDenseMatrix<S>, true>
 
 #endif // HAVE_EIGEN
 
-} // namespace Dune
-} // namespace XT
 } // namespace LA
+} // namespace XT
+} // namespace Dune
 
 
 #endif // DUNE_XT_LA_MATRIX_INVERTER_EIGEN_HH

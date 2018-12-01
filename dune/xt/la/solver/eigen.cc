@@ -13,7 +13,7 @@
 
 #if HAVE_EIGEN
 
-#include "eigen.hh"
+#  include "eigen.hh"
 
 
 template class Dune::XT::LA::Solver<Dune::XT::LA::EigenDenseMatrix<double>>;

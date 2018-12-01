@@ -22,9 +22,9 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #if HAVE_EIGEN
-#include <dune/xt/common/disable_warnings.hh>
-#include <Eigen/SparseCore>
-#include <dune/xt/common/reenable_warnings.hh>
+#  include <dune/xt/common/disable_warnings.hh>
+#  include <Eigen/SparseCore>
+#  include <dune/xt/common/reenable_warnings.hh>
 #endif
 
 #include <dune/common/typetraits.hh>
@@ -120,12 +120,12 @@ public:
         backend_->startVec(Common::numeric_cast<EIGEN_size_t>(row));
         const auto& columns = pattern_in.inner(row);
         for (auto& column : columns) {
-#ifndef NDEBUG
+#  ifndef NDEBUG
           if (column >= cc)
             DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                        "The size of row " << row << " of the pattern does not match the number of columns of this ("
                                           << cc << ")!");
-#endif // NDEBUG
+#  endif // NDEBUG
           backend_->insertBackByOuterInner(Common::numeric_cast<EIGEN_size_t>(row),
                                            Common::numeric_cast<EIGEN_size_t>(column));
         }

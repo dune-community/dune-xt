@@ -13,7 +13,7 @@
 
 #if HAVE_EIGEN
 
-#include "dense.hh"
+#  include "dense.hh"
 
 
 template class Dune::XT::LA::EigenDenseVector<double>;
