@@ -57,8 +57,7 @@ class PgfEntityFunctor
 public:
   PgfEntityFunctor(std::ostream& output)
     : file_(output)
-  {
-  }
+  {}
 
   template <class Entity>
   void operator()(const Entity& ent, const int ent_idx)
@@ -109,8 +108,7 @@ public:
     , color_(color)
     , print_entityIndex_(print_entityIndex)
     , grid_view_(grid_view)
-  {
-  }
+  {}
 
   virtual void apply_local(const typename BaseType::ElementType& entity) override
   {
@@ -181,8 +179,7 @@ public:
                                          bool print_entityIndex = false)
     : BaseType(grid_view, file, color, print_entityIndex)
     , level_(level)
-  {
-  }
+  {}
 
   virtual void apply_local(const typename BaseType::IntersectionType& intersection,
                            const typename BaseType::ElementType& inside_entity,
@@ -230,8 +227,7 @@ class PgfOutput
 public:
   PgfOutput(GridType& grid)
     : grid_(grid)
-  {
-  }
+  {}
 
   //! print a tex representation of any given 2D grid leaf level to file
   void leaf(std::ostream& file, const bool includable = true) const

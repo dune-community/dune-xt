@@ -231,7 +231,7 @@ template <bool codim_iters_provided,
           class IndexType,
           class EntityType>
 struct IndexMapCreator
-    : IndexMapCreatorBase<codim_iters_provided, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
+  : IndexMapCreatorBase<codim_iters_provided, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
 {
   typedef IndexMapCreatorBase<codim_iters_provided,
                               codim,
@@ -245,8 +245,7 @@ struct IndexMapCreator
   template <class... Args>
   IndexMapCreator(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 
   void create_index_map()
   {
@@ -271,15 +270,14 @@ struct IndexMapCreator
 
 template <int codim, class DomainType, size_t dimDomain, class RealGridLayerType, class IndexType, class EntityType>
 struct IndexMapCreator<true, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
-    : IndexMapCreatorBase<true, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
+  : IndexMapCreatorBase<true, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType>
 {
   typedef IndexMapCreatorBase<true, codim, DomainType, dimDomain, RealGridLayerType, IndexType, EntityType> BaseType;
 
   template <class... Args>
   IndexMapCreator(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
-  {
-  }
+  {}
 
   void create_index_map()
   {
@@ -306,10 +304,11 @@ struct IndexMapCreator<true, codim, DomainType, dimDomain, RealGridLayerType, In
  * \see PeriodicGridView
  */
 template <class RealGridLayerImp>
-class PeriodicIndexSet : public Dune::IndexSet<extract_grid_t<RealGridLayerImp>,
-                                               PeriodicIndexSet<RealGridLayerImp>,
-                                               typename extract_index_set_t<RealGridLayerImp>::IndexType,
-                                               typename extract_index_set_t<RealGridLayerImp>::Types>
+class PeriodicIndexSet
+  : public Dune::IndexSet<extract_grid_t<RealGridLayerImp>,
+                          PeriodicIndexSet<RealGridLayerImp>,
+                          typename extract_index_set_t<RealGridLayerImp>::IndexType,
+                          typename extract_index_set_t<RealGridLayerImp>::Types>
 {
   typedef RealGridLayerImp RealGridLayerType;
   typedef PeriodicIndexSet<RealGridLayerType> ThisType;
@@ -443,8 +442,7 @@ public:
   //! \brief Default constructor
   PeriodicIntersectionImp()
     : BaseType()
-  {
-  }
+  {}
 
   // methods that differ from BaseType
   bool neighbor() const
@@ -552,8 +550,7 @@ public:
     , intersection_map_(intersection_map)
     , nonperiodic_pair_(nonperiodic_pair)
     , current_intersection_(create_current_intersection_safely())
-  {
-  }
+  {}
 
   PeriodicIntersectionIterator(const ThisType& other)
     : BaseType(BaseType(other))
@@ -563,8 +560,7 @@ public:
     , intersection_map_(other.intersection_map_)
     , nonperiodic_pair_(other.nonperiodic_pair_)
     , current_intersection_(Dune::XT::Common::make_unique<Intersection>(*(other.current_intersection_)))
-  {
-  }
+  {}
 
   // methods that differ from BaseType
   const Intersection operator*() const
@@ -659,8 +655,7 @@ public:
         , entities_to_skip_(entities_to_skip)
         , real_index_set_(real_index_set)
         , real_it_end_(std::make_shared<const BaseType>(real_it_end))
-      {
-      }
+      {}
 
       PeriodicIterator& operator++()
       {
@@ -717,7 +712,7 @@ public:
 
 /** \brief Actual Implementation of PeriodicGridView, PeriodicGridPart, PeriodicGridLayer
  *  \see PeriodicGridView
-*/
+ */
 template <class RealGridLayerImp, bool codim_iters_provided>
 class PeriodicGridLayerWrapper : public RealGridLayerImp
 {
@@ -741,8 +736,7 @@ public:
 
   template <int cd>
   struct Codim : public Traits::template Codim<cd>
-  {
-  };
+  {};
 
 private:
   // compile time for loop to loop over the codimensions in constructor, see http://stackoverflow.com/a/11081785
@@ -765,8 +759,7 @@ private:
   {
     template <class... Args>
     void operator()(Args&&... /*args*/)
-    {
-    }
+    {}
   };
 
 public:
@@ -981,8 +974,8 @@ std::pair<bool, typename PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_
  */
 template <class RealGridLayerImp, bool codim_iters_provided = false>
 class PeriodicGridView
-    : XT::Common::StorageProvider<internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>>,
-      public Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>
+  : XT::Common::StorageProvider<internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>>
+  , public Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>
 {
   static_assert(is_layer<RealGridLayerImp>::value, "");
   using Implementation = internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>;
@@ -997,14 +990,12 @@ public:
                    const std::bitset<dimension> periodic_directions = std::bitset<dimension>().set())
     : ImplementationStorage(new Implementation(real_grid_layer, periodic_directions))
     , BaseType(ImplementationStorage::access())
-  {
-  }
+  {}
 
   PeriodicGridView(const PeriodicGridView& other)
     : ImplementationStorage(new Implementation(other.access()))
     , BaseType(ImplementationStorage::access())
-  {
-  }
+  {}
 
   const RealGridLayerType& as_real_grid_layer() const
   {

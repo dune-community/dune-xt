@@ -46,8 +46,7 @@ void addbind_for_Grid(pybind11::module& m)
 
 template <>
 void addbind_for_Grid<boost::tuples::null_type>(pybind11::module&)
-{
-}
+{}
 
 PYBIND11_MODULE(_provider, m)
 {

@@ -38,8 +38,8 @@ class AllElements : public ElementFilter<GL>
   using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
 
   explicit AllElements() = default;
 
@@ -67,8 +67,8 @@ class NoElements : public ElementFilter<GL>
   using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
 
   explicit NoElements() = default;
 
@@ -96,8 +96,8 @@ class BoundaryElements : public ElementFilter<GL>
   using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
 
   explicit BoundaryElements() = default;
 
@@ -125,14 +125,13 @@ class GenericFilteredElements : public ElementFilter<GL>
   using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
   using GenericFunctionType = std::function<bool(const GridViewType&, const ElementType&)>;
 
   explicit GenericFilteredElements(GenericFunctionType lambda)
     : filter_(lambda)
-  {
-  }
+  {}
 
   ElementFilter<GridViewType>* copy() const override final
   {

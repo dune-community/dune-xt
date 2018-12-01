@@ -138,8 +138,7 @@ public:
     , indexContainer_(indexContainer)
     , boundaryInfoContainer_(boundaryInfoContainer)
     , indexSet_(std::make_shared<IndexSet>(*globalGridView_, indexContainer_))
-  {
-  }
+  {}
 
   SubdomainGridViewCommon(const ThisType& other) = default;
   SubdomainGridViewCommon(ThisType&& source) = default;
@@ -240,18 +239,15 @@ public:
                     const std::shared_ptr<const IndexContainerType> indexContainer,
                     const std::shared_ptr<const BoundaryInfoContainerType> boundaryInfoContainer)
     : BaseType(globalGrdPrt, indexContainer, boundaryInfoContainer)
-  {
-  }
+  {}
 
   SubdomainGridView(const ThisType& other)
     : BaseType(other)
-  {
-  }
+  {}
 
   SubdomainGridView(ThisType&& source)
     : BaseType(source)
-  {
-  }
+  {}
 
   IntersectionIterator ibegin(const EntityType& ent) const
   {
@@ -291,7 +287,7 @@ public:
 
 template <class GlobalGridViewImp>
 class SubdomainCouplingGridView
-    : public internal::SubdomainGridViewCommon<internal::SubdomainCouplingGridViewTraits<GlobalGridViewImp>>
+  : public internal::SubdomainGridViewCommon<internal::SubdomainCouplingGridViewTraits<GlobalGridViewImp>>
 {
   using BaseType = internal::SubdomainGridViewCommon<internal::SubdomainCouplingGridViewTraits<GlobalGridViewImp>>;
 
@@ -343,8 +339,7 @@ public:
     , intersectionContainer_(std::move(source.intersectionContainer_))
     , inside_(std::move(source.inside_))
     , outside_(std::move(source.outside_))
-  {
-  }
+  {}
 
   IntersectionIterator ibegin(const EntityType& ent) const
   {
@@ -388,7 +383,7 @@ private:
 
 template <class GlobalGridViewImp>
 class SubdomainBoundaryGridView
-    : public internal::SubdomainGridViewCommon<internal::SubdomainBoundaryGridViewTraits<GlobalGridViewImp>>
+  : public internal::SubdomainGridViewCommon<internal::SubdomainBoundaryGridViewTraits<GlobalGridViewImp>>
 {
   using BaseType = internal::SubdomainGridViewCommon<internal::SubdomainBoundaryGridViewTraits<GlobalGridViewImp>>;
 
@@ -416,22 +411,19 @@ public:
                std::shared_ptr<const BoundaryInfoContainerType>(new BoundaryInfoContainerType()))
     , intersectionContainer_(intersectionContainer)
     , inside_(insd)
-  {
-  }
+  {}
 
   SubdomainBoundaryGridView(const ThisType& other)
     : BaseType(other)
     , intersectionContainer_(other.intersectionContainer_)
     , inside_(other.inside_)
-  {
-  }
+  {}
 
   SubdomainBoundaryGridView(ThisType&& source)
     : BaseType(source)
     , intersectionContainer_(std::move(source.intersectionContainer_))
     , inside_(std::move(source.inside_))
-  {
-  }
+  {}
 
   IntersectionIterator ibegin(const EntityType& ent) const
   {

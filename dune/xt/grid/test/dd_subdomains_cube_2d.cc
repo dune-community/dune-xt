@@ -127,7 +127,7 @@ struct ExpectedResults<Dune::ALUGrid<2, 2, simplex, conforming>, anything>
 
 template <bool anything>
 struct ExpectedResults<Dune::ALUGrid<2, 2, simplex, nonconforming>, anything>
-    : public Expected2dSimplexNonconformingResults
+  : public Expected2dSimplexNonconformingResults
 {
   static std::string grid_name()
   {

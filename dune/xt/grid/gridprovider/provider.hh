@@ -72,14 +72,12 @@ public:
   GridProvider(GridType*&& grd_ptr, DdGridType*&& dd_grd_ptr = nullptr)
     : grid_ptr_(std::move(grd_ptr))
     , dd_grid_ptr_(std::move(dd_grd_ptr))
-  {
-  }
+  {}
 
   GridProvider(std::shared_ptr<GridType> grd_ptr, std::shared_ptr<DdGridType> dd_grd_ptr = nullptr)
     : grid_ptr_(grd_ptr)
     , dd_grid_ptr_(dd_grd_ptr)
-  {
-  }
+  {}
 
   GridProvider(const ThisType& other) = default;
 
@@ -87,8 +85,7 @@ public:
   GridProvider(ThisType&& source)
     : grid_ptr_(source.grid_ptr_)
     , dd_grid_ptr_(source.dd_grid_ptr_)
-  {
-  }
+  {}
 
   ThisType& operator=(const ThisType& other) = delete;
   ThisType& operator=(ThisType&& source) = delete;
@@ -362,9 +359,7 @@ private:
   template <class G, bool enable = has_boundary_id<G>::value>
   struct add_boundary_id_visualization
   {
-    add_boundary_id_visualization()
-    {
-    }
+    add_boundary_id_visualization() {}
 
     template <class V>
     void operator()(V& vtk_writer, const std::vector<double>& boundary_id, const int lvl) const
@@ -402,14 +397,11 @@ private:
   template <class G>
   struct add_boundary_id_visualization<G, false>
   {
-    add_boundary_id_visualization()
-    {
-    }
+    add_boundary_id_visualization() {}
 
     template <class V>
     void operator()(V& /*vtk_writer*/, const std::vector<double>& /*boundary_id*/, const int /*lvl*/) const
-    {
-    }
+    {}
 
     std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType&) const
     {

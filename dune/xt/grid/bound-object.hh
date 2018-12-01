@@ -34,14 +34,15 @@ public:
 
   ElementBoundObject()
     : /*DebugLogging("dune.xt.grid", "ElementBoundObject")
-    ,*/ element_(nullptr)
+    ,*/
+    element_(nullptr)
     , is_bound_(false)
-  {
-  }
+  {}
 
   ElementBoundObject(const ThisType& other)
     : /*DebugLogging(other)
-    ,*/ element_(nullptr)
+    ,*/
+    element_(nullptr)
     , is_bound_(false)
   {
     if (other.element_) {
@@ -52,10 +53,10 @@ public:
 
   ElementBoundObject(ThisType&& source)
     : /*DebugLogging(source)
-    ,*/ element_(std::move(source.element_))
+    ,*/
+    element_(std::move(source.element_))
     , is_bound_(source.is_bound_)
-  {
-  }
+  {}
 
   virtual ~ElementBoundObject() = default;
 
@@ -101,9 +102,7 @@ protected:
   /**
    * \note Override this function if you need/want to do preparatory work on an element.
    */
-  virtual void post_bind(const ElementType& /*ele*/)
-  {
-  }
+  virtual void post_bind(const ElementType& /*ele*/) {}
 
 private:
   std::unique_ptr<ElementType> element_;
@@ -126,8 +125,7 @@ public:
   IntersectionBoundObject()
     : intersection_(nullptr)
     , is_bound_(false)
-  {
-  }
+  {}
 
   IntersectionBoundObject(const ThisType& other)
     : intersection_(nullptr)
@@ -183,9 +181,7 @@ protected:
   /**
    * \note Override this function if you need/want to do preparatory work on an intersection.
    */
-  virtual void post_bind(const IntersectionType& /*inter*/)
-  {
-  }
+  virtual void post_bind(const IntersectionType& /*inter*/) {}
 
 private:
   std::unique_ptr<IntersectionType> intersection_;

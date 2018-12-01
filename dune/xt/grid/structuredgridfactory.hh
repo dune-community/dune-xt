@@ -250,7 +250,7 @@ public:
 #if HAVE_DUNE_ALUGRID
 template <int dim_world, int dim, ALUGridRefinementType refineType, class Comm>
 class StructuredGridFactory<ALUGrid<dim, dim_world, Dune::cube, refineType, Comm>>
-    : public Dune::StructuredGridFactory<ALUGrid<dim, dim_world, Dune::cube, refineType, Comm>>
+  : public Dune::StructuredGridFactory<ALUGrid<dim, dim_world, Dune::cube, refineType, Comm>>
 {
   typedef ALUGrid<dim, dim_world, Dune::cube, refineType, Comm> GridType;
   typedef typename GridType::ctype ctype;
@@ -277,7 +277,7 @@ public:
 #if HAVE_DUNE_SPGRID
 template <class ct, int dim, template <int> class Refinement, class Comm>
 class StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
-    : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
+  : public Dune::StructuredGridFactory<Dune::SPGrid<ct, dim, Refinement, Comm>>
 {
   typedef Dune::SPGrid<ct, dim, Refinement, Comm> GridType;
   typedef typename GridType::ctype ctype;
@@ -299,7 +299,7 @@ public:
 
 template <int dim, class Coords>
 class StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
-    : public Dune::StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
+  : public Dune::StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
 {
   typedef Dune::YaspGrid<dim, Coords> GridType;
   typedef typename GridType::ctype ctype;

@@ -50,17 +50,11 @@ public:
 
   virtual ElementFunctor<GridViewType>* copy() = 0;
 
-  virtual void prepare()
-  {
-  }
+  virtual void prepare() {}
 
-  virtual void apply_local(const ElementType& /*element*/)
-  {
-  }
+  virtual void apply_local(const ElementType& /*element*/) {}
 
-  virtual void finalize()
-  {
-  }
+  virtual void finalize() {}
 }; // class ElementFunctor
 
 
@@ -94,9 +88,7 @@ public:
 
   virtual IntersectionFunctor<GridViewType>* copy() = 0;
 
-  virtual void prepare()
-  {
-  }
+  virtual void prepare() {}
 
   /**
    * \note The meaning of outside_element depends on the circumstances. If intersection.neighbor() is true, the result
@@ -106,12 +98,9 @@ public:
   virtual void apply_local(const IntersectionType& /*intersection*/,
                            const ElementType& /*inside_element*/,
                            const ElementType& /*outside_element*/)
-  {
-  }
+  {}
 
-  virtual void finalize()
-  {
-  }
+  virtual void finalize() {}
 }; // class IntersectionFunctor
 
 
@@ -145,23 +134,16 @@ public:
 
   virtual ElementAndIntersectionFunctor<GL>* copy() = 0;
 
-  virtual void prepare()
-  {
-  }
+  virtual void prepare() {}
 
-  virtual void apply_local(const ElementType& /*element*/)
-  {
-  }
+  virtual void apply_local(const ElementType& /*element*/) {}
 
   virtual void apply_local(const IntersectionType& /*intersection*/,
                            const ElementType& /*inside_element*/,
                            const ElementType& /*outside_element*/)
-  {
-  }
+  {}
 
-  virtual void finalize()
-  {
-  }
+  virtual void finalize() {}
 }; // class ElementAndIntersectionFunctor
 
 

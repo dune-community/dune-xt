@@ -70,27 +70,21 @@ template <class I, class G, bool anything>
 class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain, anything>
 {
 public:
-  static void bind(pybind11::module& /*m*/)
-  {
-  }
+  static void bind(pybind11::module& /*m*/) {}
 };
 
 template <class I, class G, bool anything>
 class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_boundary, anything>
 {
 public:
-  static void bind(pybind11::module& /*m*/)
-  {
-  }
+  static void bind(pybind11::module& /*m*/) {}
 };
 
 template <class I, class G, bool anything>
 class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_coupling, anything>
 {
 public:
-  static void bind(pybind11::module& /*m*/)
-  {
-  }
+  static void bind(pybind11::module& /*m*/) {}
 };
 
 

@@ -67,7 +67,7 @@ struct Statistics
 };
 
 /** \brief grid statistic output to given stream
-   */
+ */
 template <class GridLayerType>
 void print_info(const GridLayerType& grid_layer, std::ostream& out)
 {
@@ -80,8 +80,8 @@ void print_info(const GridLayerType& grid_layer, std::ostream& out)
 } // ... print_info(...)
 
 /**
-* \attention Not optimal, does a whole grid walk!
-**/
+ * \attention Not optimal, does a whole grid walk!
+ **/
 template <class GridLayerType>
 size_t max_number_of_neighbors(const GridLayerType& grid_layer)
 {
@@ -124,8 +124,7 @@ struct Dimensions
       : coord_limits_(c)
       , entity_volume_(e)
       , entity_width_(w)
-    {
-    }
+    {}
 
     virtual void apply_local(const ElementType& element) override
     {

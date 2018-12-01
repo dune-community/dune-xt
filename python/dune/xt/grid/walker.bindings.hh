@@ -55,8 +55,7 @@ public:
 
 private:
   template <bool is_dd = (layer == Layers::dd_subdomain || layer == Layers::dd_subdomain_boundary
-                          || layer == Layers::dd_subdomain_coupling
-                          || layer == Layers::dd_subdomain_oversampled),
+                          || layer == Layers::dd_subdomain_coupling || layer == Layers::dd_subdomain_oversampled),
             bool anything = true>
   struct factory_method
   {

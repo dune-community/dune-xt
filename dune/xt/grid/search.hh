@@ -84,7 +84,7 @@ struct CheckInside<0>
  * is used in the search. The search position iterator on the grid persists
  * between searches, reducing complexity of repeated searches on the grid.
  * \attention This makes it inherently not thread safe
-**/
+ **/
 template <class GridLayerType, int codim = 0>
 class EntityInlevelSearch : public EntitySearchBase<GridLayerType, codim>
 {
@@ -109,8 +109,7 @@ public:
   EntityInlevelSearch(const GridLayerType& grid_layer)
     : grid_layer_(grid_layer)
     , it_last_(grid_layer_.template begin<codim>())
-  {
-  }
+  {}
 
   /** \arg points iterable sequence of global coordinates to search for
    *  \return a vector of size points.size() of, potentially nullptr if no corresponding one was found,
@@ -163,7 +162,7 @@ private:
 /** Like EntityInlevelSearch, but works also for grids where there is no iterator for the given
  * codimension (e.g. UGGrid for codim != dim && codim != 0)
  * \see EntityInlevelSearch
-**/
+ **/
 template <class GridLayerType, int codim = 0>
 class FallbackEntityInlevelSearch : public EntitySearchBase<GridLayerType>
 {
@@ -188,8 +187,7 @@ public:
   FallbackEntityInlevelSearch(const GridLayerType& grid_layer)
     : grid_layer_(grid_layer)
     , it_last_(grid_layer_.template begin<0>())
-  {
-  }
+  {}
 
   /** \arg points iterable sequence of global coordinates to search for
    *  \return a vector of size points.size() of, potentially nullptr if no corresponding one was found,
@@ -263,8 +261,7 @@ public:
   EntityHierarchicSearch(const GridLayerType& grid_layer)
     : grid_layer_(grid_layer)
     , start_level_(0)
-  {
-  }
+  {}
 
   typedef typename BaseType::EntityVectorType EntityVectorType;
 

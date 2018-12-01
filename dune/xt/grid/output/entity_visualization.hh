@@ -71,8 +71,7 @@ struct ElementVisualization
     FunctorBase(const std::string fname, const std::string dname)
       : filename_(fname)
       , dir_(dname)
-    {
-    }
+    {}
     const std::string filename() const
     {
       return filename_;
@@ -92,8 +91,7 @@ struct ElementVisualization
   public:
     VolumeFunctor(const std::string fname, const std::string dname)
       : FunctorBase(fname, dname)
-    {
-    }
+    {}
 
     template <class Entity>
     double operator()(const Entity& ent) const
@@ -107,8 +105,7 @@ struct ElementVisualization
   public:
     ProcessIdFunctor(const std::string fname, const std::string dname)
       : FunctorBase(fname, dname)
-    {
-    }
+    {}
 
     template <class Entity>
     double operator()(const Entity& /*ent*/) const
@@ -126,8 +123,7 @@ struct ElementVisualization
     BoundaryFunctor(const GridType& grid, const std::string fname, const std::string dname)
       : FunctorBase(fname, dname)
       , grid_(grid)
-    {
-    }
+    {}
 
     template <class Entity>
     double operator()(const Entity& entity) const
@@ -158,8 +154,7 @@ struct ElementVisualization
   public:
     AreaMarker(const std::string fname, const std::string dname)
       : FunctorBase(fname, dname)
-    {
-    }
+    {}
 
     template <class Entity>
     double operator()(const Entity& entity) const
@@ -193,8 +188,7 @@ struct ElementVisualization
   public:
     GeometryFunctor(const std::string fname, const std::string dname)
       : FunctorBase(fname, dname)
-    {
-    }
+    {}
 
     template <class Entity>
     double operator()(const Entity& ent) const

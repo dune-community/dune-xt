@@ -110,16 +110,15 @@ public:
 // begin: this is what we need for the .so
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, _G, _layer, _backend, _class_name)                               \
-  Dune::XT::Grid::bindings::                                                                                           \
-      IntersectionFilter<_W<typename Dune::XT::Grid::Layer<_G,                                                         \
-                                                           Dune::XT::Grid::Layers::_layer,                             \
-                                                           Dune::XT::Grid::Backends::_backend,                         \
-                                                           Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>,              \
-                         _w>::                                                                                         \
-          bind(_m,                                                                                                     \
-               _class_name,                                                                                            \
-               Dune::XT::Grid::layer_names[Dune::XT::Grid::Layers::_layer] + "_"                                       \
-                   + Dune::XT::Grid::bindings::backend_name<Dune::XT::Grid::Backends::_backend>::value())
+  Dune::XT::Grid::bindings::IntersectionFilter<                                                                        \
+      _W<typename Dune::XT::Grid::Layer<_G,                                                                            \
+                                        Dune::XT::Grid::Layers::_layer,                                                \
+                                        Dune::XT::Grid::Backends::_backend,                                            \
+                                        Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>,                                 \
+      _w>::bind(_m,                                                                                                    \
+                _class_name,                                                                                           \
+                Dune::XT::Grid::layer_names[Dune::XT::Grid::Layers::_layer] + "_"                                      \
+                    + Dune::XT::Grid::bindings::backend_name<Dune::XT::Grid::Backends::_backend>::value())
 
 /*#if HAVE_ALBERTA
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALBERTA(_m, _W, _w, _layer, _backend, _class_name) \

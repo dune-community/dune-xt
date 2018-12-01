@@ -266,8 +266,7 @@ public:
     , finalized_(false)
     , size_(0)
     , oversampled_(false)
-  {
-  }
+  {}
 
   SubdomainGridFactory(const std::shared_ptr<const GridType> grid,
                        const size_t boundary_segment_index = std::numeric_limits<size_t>::max() - 42)
@@ -277,8 +276,7 @@ public:
     , finalized_(false)
     , size_(0)
     , oversampled_(false)
-  {
-  }
+  {}
 
   void prepare()
   {
@@ -508,8 +506,7 @@ public:
       if (assert_connected && subdomainSizes[entitySubdomain] != 1 && !subdomainsEntitiesAreConnected) {
         DUNE_THROW(InvalidStateException,
                    "at least one entity of subdomain " << entitySubdomain << " is not connected to entity "
-                                                       << entityGlobalIndex
-                                                       << " (connected)!");
+                                                       << entityGlobalIndex << " (connected)!");
       } // check if this entity is connected to the other entities of this subdomain
     } // walk the global grid part
     // walk the subdomains
@@ -540,8 +537,8 @@ public:
     typename std::map<size_t, CodimSizesType>::const_iterator boundaryCodimSizesMapIt = boundaryCodimSizesMap.begin();
     typename std::map<size_t, std::shared_ptr<EntityToIntersectionSetMapType>>::const_iterator boundaryInfoMapIt =
         boundaryInfoMap.begin();
-    for (typename std::map<size_t, std::shared_ptr<GeometryMapType>>::const_iterator
-             boundaryGeometryMapMapIt = boundaryGeometryMapMap.begin();
+    for (typename std::map<size_t, std::shared_ptr<GeometryMapType>>::const_iterator boundaryGeometryMapMapIt =
+             boundaryGeometryMapMap.begin();
          boundaryGeometryMapMapIt != boundaryGeometryMapMap.end();
          ++boundaryGeometryMapMapIt, ++boundaryCodimSizesMapIt, ++boundaryInfoMapIt) {
       const size_t boundarySubdomain = boundaryGeometryMapMapIt->first;
@@ -562,10 +559,8 @@ public:
     } // walk those subdomains which have a boundary grid part
     // walk the subdomains
     //   * to create the coupling grid parts
-    couplingGridPartsMaps_ =
-        std::make_shared<std::vector<std::map<size_t,
-                                              std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>(
-            size_);
+    couplingGridPartsMaps_ = std::make_shared<
+        std::vector<std::map<size_t, std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>(size_);
     auto& couplingGridPartsMaps = *couplingGridPartsMaps_;
     for (size_t subdomain = 0; subdomain < couplingMaps.size(); ++subdomain) {
       // get the coupling map for this subdomain

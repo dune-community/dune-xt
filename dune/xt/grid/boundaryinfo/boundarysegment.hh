@@ -46,12 +46,12 @@ class BoundarySegmentIndexBasedBoundaryInfo : public BoundaryInfo<IntersectionIm
   typedef BoundarySegmentIndexBasedBoundaryInfo<IntersectionImp> ThisType;
 
 public:
-  using typename BaseType::IntersectionType;
-  using typename BaseType::DomainFieldType;
-  using typename BaseType::DomainType;
-  using typename BaseType::WorldType;
   using BaseType::dimDomain;
   using BaseType::dimWorld;
+  using typename BaseType::DomainFieldType;
+  using typename BaseType::DomainType;
+  using typename BaseType::IntersectionType;
+  using typename BaseType::WorldType;
 
   static std::string static_id()
   {
@@ -85,8 +85,7 @@ public:
                                         const std::map<std::string, std::pair<size_t, size_t>>& id_map)
     : default_(def)
     , id_map_(id_map)
-  {
-  }
+  {}
 
   virtual const BoundaryType& type(const IntersectionType& intersection) const override final
   {

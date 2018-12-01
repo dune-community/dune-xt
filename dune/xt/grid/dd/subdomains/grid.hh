@@ -74,13 +74,12 @@ public:
       const std::shared_ptr<const EntityToSubdomainMapType> entityToSubdMap,
       const std::shared_ptr<const std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>
           localGridViews,
-      const std::shared_ptr<const std::map<size_t,
-                                           std::shared_ptr<const typename BoundaryGridViewType::Implementation>>>
+      const std::shared_ptr<
+          const std::map<size_t, std::shared_ptr<const typename BoundaryGridViewType::Implementation>>>
           boundaryGridViews,
-      const std::
-          shared_ptr<const std::vector<std::map<size_t,
-                                                std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>
-              couplingGridViewsMaps)
+      const std::shared_ptr<
+          const std::vector<std::map<size_t, std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>
+          couplingGridViewsMaps)
     : grid_(grd)
     , globalGridView_(globalGrdPrt)
     , size_(sz)
@@ -117,13 +116,12 @@ public:
       const std::shared_ptr<const EntityToSubdomainMapType> entityToSubdMap,
       const std::shared_ptr<const std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>
           localGridViews,
-      const std::shared_ptr<const std::map<size_t,
-                                           std::shared_ptr<const typename BoundaryGridViewType::Implementation>>>
+      const std::shared_ptr<
+          const std::map<size_t, std::shared_ptr<const typename BoundaryGridViewType::Implementation>>>
           boundaryGridViews,
-      const std::
-          shared_ptr<const std::vector<std::map<size_t,
-                                                std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>
-              couplingGridViewsMaps,
+      const std::shared_ptr<
+          const std::vector<std::map<size_t, std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>
+          couplingGridViewsMaps,
       const std::shared_ptr<const std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>
           oversampledLocalGridViews)
     : grid_(grd)
@@ -268,10 +266,9 @@ public:
       localGridViews_;
   const std::shared_ptr<const std::map<size_t, std::shared_ptr<const typename BoundaryGridViewType::Implementation>>>
       boundaryGridViews_;
-  const std::
-      shared_ptr<const std::vector<std::map<size_t,
-                                            std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>
-          couplingGridViewsMaps_;
+  const std::shared_ptr<
+      const std::vector<std::map<size_t, std::shared_ptr<const typename CouplingGridViewType::Implementation>>>>
+      couplingGridViewsMaps_;
   bool oversampling_;
   const std::shared_ptr<const std::vector<std::shared_ptr<const typename LocalGridViewType::Implementation>>>
       oversampledLocalGridViews_;

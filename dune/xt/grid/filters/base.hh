@@ -194,8 +194,7 @@ public:
     : left_(left.copy())
     , right_(right.copy())
     , combine_lambda_(combine_lambda)
-  {
-  }
+  {}
 
   CombinedIntersectionFilter(const BaseType& left,
                              BaseType*&& right,
@@ -203,8 +202,7 @@ public:
     : left_(left.copy())
     , right_(std::move(right))
     , combine_lambda_(combine_lambda)
-  {
-  }
+  {}
 
   CombinedIntersectionFilter(const BaseType& left,
                              std::unique_ptr<BaseType> right,
@@ -212,8 +210,7 @@ public:
     : left_(left.copy())
     , right_(std::move(right))
     , combine_lambda_(combine_lambda)
-  {
-  }
+  {}
 
   IntersectionFilter<GridViewType>* copy() const override final
   {
@@ -238,8 +235,8 @@ class CombinedElementFilter : public ElementFilter<GL>
   using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
 
   CombinedElementFilter(const BaseType& left,
                         const BaseType& right,
@@ -247,8 +244,7 @@ public:
     : left_(left.copy())
     , right_(right.copy())
     , combine_lambda_(combine_lambda)
-  {
-  }
+  {}
 
   CombinedElementFilter(const BaseType& left,
                         BaseType*&& right,
@@ -256,8 +252,7 @@ public:
     : left_(left.copy())
     , right_(std::move(right))
     , combine_lambda_(combine_lambda)
-  {
-  }
+  {}
 
   CombinedElementFilter(const BaseType& left,
                         std::unique_ptr<BaseType> right,
@@ -265,8 +260,7 @@ public:
     : left_(left.copy())
     , right_(std::move(right))
     , combine_lambda_(combine_lambda)
-  {
-  }
+  {}
 
   ElementFilter<GridViewType>* copy() const override final
   {
@@ -296,13 +290,11 @@ public:
 
   NegatedIntersectionFilter(const BaseType& filter)
     : filter_(filter.copy())
-  {
-  }
+  {}
 
   NegatedIntersectionFilter(BaseType*&& filter)
     : filter_(std::move(filter))
-  {
-  }
+  {}
 
   IntersectionFilter<GridViewType>* copy() const override final
   {
@@ -325,18 +317,16 @@ class NegatedElementFilter : public ElementFilter<GL>
   using BaseType = ElementFilter<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
 
   NegatedElementFilter(const BaseType& filter)
     : filter_(filter.copy())
-  {
-  }
+  {}
 
   NegatedElementFilter(BaseType*&& filter)
     : filter_(std::move(filter))
-  {
-  }
+  {}
 
   ElementFilter<GridViewType>* copy() const override final
   {

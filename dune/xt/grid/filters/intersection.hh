@@ -396,8 +396,7 @@ public:
 
   explicit GenericFilteredIntersections(GenericFunctionType func)
     : filter_(func)
-  {
-  }
+  {}
 
   virtual IntersectionFilter<GridViewType>* copy() const override final
   {
@@ -436,15 +435,13 @@ public:
                                        BoundaryType*&& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
-  {
-  }
+  {}
 
   explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
                                        const std::shared_ptr<BoundaryType>& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
-  {
-  }
+  {}
 
   IntersectionFilter<GridViewType>* copy() const override final
   {
@@ -484,15 +481,13 @@ public:
                                                  BoundaryType*&& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(std::move(boundary_type))
-  {
-  }
+  {}
 
   explicit CustomBoundaryAndProcessIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
                                                  const std::shared_ptr<BoundaryType>& boundary_type)
     : boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
-  {
-  }
+  {}
 
   IntersectionFilter<GridViewType>* copy() const override final
   {

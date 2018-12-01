@@ -25,8 +25,8 @@ class GenericElementFunctor : public ElementFunctor<GL>
   using BaseType = ElementFunctor<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
 
   using GenericPrepareFunctionType = std::function<void()>;
   using GenericApplyFunctionType = std::function<void(const ElementType&)>;
@@ -38,8 +38,7 @@ public:
     : prepare_func_(prepare_func)
     , apply_func_(apply_func)
     , finalize_func_(finalize_func)
-  {
-  }
+  {}
 
   BaseType* copy() override final
   {
@@ -74,8 +73,8 @@ class GenericIntersectionFunctor : public IntersectionFunctor<GL>
   using BaseType = IntersectionFunctor<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   using GenericPrepareFunctionType = std::function<void()>;
@@ -89,8 +88,7 @@ public:
     : prepare_func_(prepare_func)
     , apply_func_(apply_func)
     , finalize_func_(finalize_func)
-  {
-  }
+  {}
 
   BaseType* copy() override final
   {
@@ -127,8 +125,8 @@ class GenericElementAndIntersectionFunctor : public ElementAndIntersectionFuncto
   using BaseType = ElementAndIntersectionFunctor<GL>;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   using GenericPrepareFunctionType = std::function<void()>;
@@ -145,8 +143,7 @@ public:
     , element_apply_func_(element_apply_func)
     , intersection_apply_func_(intersection_apply_func)
     , finalize_func_(finalize_func)
-  {
-  }
+  {}
 
   void prepare() override final
   {

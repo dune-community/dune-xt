@@ -248,8 +248,7 @@ public:
   template <class... Args>
   EOCGridProvider(Args&&... args)
     : LevelBasedEOCGridProvider<G>(std::forward<Args>(args)...)
-  {
-  }
+  {}
 };
 
 template <class G>
@@ -259,22 +258,20 @@ public:
   template <class... Args>
   EOCGridProvider(Args&&... args)
     : DdSubdomainsBasedEOCGridProvider<G>(std::forward<Args>(args)...)
-  {
-  }
+  {}
 };
 
 #if HAVE_DUNE_ALUGRID
 
 template <class Comm>
 class EOCGridProvider<Dune::ALUGrid<2, 2, simplex, conforming, Comm>>
-    : public LeafBasedEOCGridProvider<Dune::ALUGrid<2, 2, simplex, conforming, Comm>>
+  : public LeafBasedEOCGridProvider<Dune::ALUGrid<2, 2, simplex, conforming, Comm>>
 {
 public:
   template <class... Args>
   EOCGridProvider(Args&&... args)
     : LeafBasedEOCGridProvider<Dune::ALUGrid<2, 2, simplex, conforming, Comm>>(std::forward<Args>(args)...)
-  {
-  }
+  {}
 };
 
 #endif // HAVE_DUNE_ALUGRID

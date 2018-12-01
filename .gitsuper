@@ -16,7 +16,7 @@ status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
 	+1aa3ee2c91870c55d5ac52cb227dd3bec2da2849 dune-xt-common (heads/clang_format_6)
 	 7694fbeee4a57b162d404a497e6254721468a3ee dune-xt-data (heads/python_ci-7-g7694fbe)
 	+f0577006ed7d947bb978328f815c3b532ffab68a dune-xt-functions (heads/clang_format_6)
-	+dae7cb3f4edc13eb2fe3a0f6224913e1bf6fad62 dune-xt-grid (heads/clang_format_6)
+	+094a61f6f9291f09a13cfc52edbe3085b5384443 dune-xt-grid (heads/clang_format_6)
 	+136f5767afee02eb71991aa79c87462e1524040b dune-xt-la (heads/clang_format_6)
 	 09d0378f616b94d68bcdd9fc6114813181849ec0 scripts (remotes/origin/HEAD)
 commit = a211a5c7ba4c103fc0da57add321c5bdef7b07b5
@@ -103,8 +103,8 @@ commit = f0577006ed7d947bb978328f815c3b532ffab68a
 
 [submodule.dune-xt-grid]
 remote = git@github.com:dune-community/dune-xt-grid.git
-status = +bd037dab8299b4622dcaa632b4445e70584f81b1 .vcsetup (heads/master)
-commit = dae7cb3f4edc13eb2fe3a0f6224913e1bf6fad62
+status = bd037dab8299b4622dcaa632b4445e70584f81b1 .vcsetup (heads/master)
+commit = 094a61f6f9291f09a13cfc52edbe3085b5384443
 
 [submodule.dune-xt-la]
 remote = git@github.com:dune-community/dune-xt-la.git

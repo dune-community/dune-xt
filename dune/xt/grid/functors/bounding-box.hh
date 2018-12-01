@@ -34,8 +34,7 @@ struct MinMaxCoordinateFunctor : public ElementFunctor<GridViewType>
   MinMaxCoordinateFunctor()
     : minima_(VectorType(std::numeric_limits<ctype>::max()))
     , maxima_(VectorType(std::numeric_limits<ctype>::min()))
-  {
-  }
+  {}
 
   void apply_local(const typename BaseType::ElementType& element) override final
   {

@@ -24,16 +24,17 @@ namespace Grid {
 
 
 template <class GL>
-class BoundaryDetectorFunctor : public IntersectionFunctor<GL>,
-                                public Common::ThreadResultPropagator<BoundaryDetectorFunctor<GL>, size_t>
+class BoundaryDetectorFunctor
+  : public IntersectionFunctor<GL>
+  , public Common::ThreadResultPropagator<BoundaryDetectorFunctor<GL>, size_t>
 {
   using BaseType = IntersectionFunctor<GL>;
   using Propagator = Common::ThreadResultPropagator<BoundaryDetectorFunctor<GL>, size_t>;
   friend Propagator;
 
 public:
-  using typename BaseType::GridViewType;
   using typename BaseType::ElementType;
+  using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
   /**
@@ -44,16 +45,14 @@ public:
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type_ptr)
     , found_(0)
-  {
-  }
+  {}
 
   BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, const BoundaryType& boundary_type)
     : Propagator(this)
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type.copy())
     , found_(0)
-  {
-  }
+  {}
 
   BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other) = default;
 

@@ -47,8 +47,7 @@ namespace Exceptions {
 
 
 class intersection_orientation_is_broken : public Dune::InvalidStateException
-{
-};
+{};
 
 
 } // namespace Exceptions
@@ -91,9 +90,7 @@ size_t check_for_broken_coupling_intersections(
     if (found != 1)
       DUNE_THROW(InvalidStateException,
                  "This should not happen!\n"
-                     << "There were "
-                     << found
-                     << " local intersections which contain the coupling intersection, "
+                     << "There were " << found << " local intersections which contain the coupling intersection, "
                      << "and there must not be more than one!");
     // now the expected normal is local_intersection_normal
     // and we would like coupling_intersection_normal to point in the same direction
@@ -192,8 +189,7 @@ private:
   public:
     CouplingFaceDescriptor(const MacroIntersectionType& macro_intersection)
       : macro_intersection_(macro_intersection)
-    {
-    }
+    {}
 
     virtual bool contains(const LocalEntityType& element, unsigned int face) const override final
     {
@@ -310,11 +306,8 @@ public:
     }
     DUNE_THROW(XT::Common::Exceptions::wrong_input_given,
                "subdomain: " << subd << "\n"
-                             << "local_entity_index: "
-                             << local_entity_index
-                             << "\n"
-                             << "global_index_of_local_entity: "
-                             << global_index_of_local_entity);
+                             << "local_entity_index: " << local_entity_index << "\n"
+                             << "global_index_of_local_entity: " << global_index_of_local_entity);
     return *global_micro_grid_view.template begin<0>();
   } // ... local_to_global_entity(...)
 
@@ -342,12 +335,11 @@ public:
         return entity;
     }
     DUNE_THROW(XT::Common::Exceptions::wrong_input_given,
-               "micro_entity_index: " << micro_entity_index << "\n"
-                                                               "subdomain: "
-                                      << subd
+               "micro_entity_index: " << micro_entity_index
                                       << "\n"
-                                      << "local_index_of_global_entity: "
-                                      << local_index_of_global_entity);
+                                         "subdomain: "
+                                      << subd << "\n"
+                                      << "local_index_of_global_entity: " << local_index_of_global_entity);
     return *local_grid_view.template begin<0>();
   } // ... global_to_local_entity(...)
 
@@ -409,8 +401,7 @@ public:
     if (local_level_macro_entity > max_local_level(macro_entity))
       DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                  "max_local_level(macro_entity): " << max_local_level(macro_entity) << "\n"
-                                                   << "   local_level_macro_entity:      "
-                                                   << local_level_macro_entity);
+                                                   << "   local_level_macro_entity:      " << local_level_macro_entity);
     if (local_level_macro_neighbor > max_local_level(macro_neighbor))
       DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                  "max_local_level(macro_neighbor): " << max_local_level(macro_neighbor) << "\n"
@@ -478,21 +469,12 @@ public:
       if (brocken_intersections > 0)
         DUNE_THROW(Exceptions::intersection_orientation_is_broken,
                    "The coupling glue between the grid views of\n"
-                       << "     level "
-                       << local_entity_grid_level
-                       << " on macro entity   "
-                       << macro_leaf_view_.indexSet().index(macro_entity)
-                       << " and\n"
-                       << "     level "
-                       << local_neighbor_grid_level
-                       << " on macro neighbor "
-                       << macro_leaf_view_.indexSet().index(macro_neighbor)
-                       << "\n"
+                       << "     level " << local_entity_grid_level << " on macro entity   "
+                       << macro_leaf_view_.indexSet().index(macro_entity) << " and\n"
+                       << "     level " << local_neighbor_grid_level << " on macro neighbor "
+                       << macro_leaf_view_.indexSet().index(macro_neighbor) << "\n"
                        << "   contains\n"
-                       << "     "
-                       << brocken_intersections
-                       << "/"
-                       << glue.size()
+                       << "     " << brocken_intersections << "/" << glue.size()
                        << " intersections with wrong orientation!");
     }
     return glue;
@@ -536,11 +518,8 @@ public:
     if (local_level > max_local_level(macro_entity))
       DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                  "macro_entity_index: " << macro_entity_index << "\n"
-                                        << "local_level: "
-                                        << local_level
-                                        << "\n"
-                                        << "max_local_level(macro_entity): "
-                                        << max_local_level(macro_entity));
+                                        << "local_level: " << local_level << "\n"
+                                        << "max_local_level(macro_entity): " << max_local_level(macro_entity));
     auto& local_level_to_boundary_entity_ptrs_with_local_intersections =
         macro_entity_to_local_level_to_boundary_entity_ptrs_with_local_intersections_[macro_entity_index];
     auto& boundary_entity_ptrs_with_local_intersections =
@@ -703,15 +682,8 @@ public:
           if (num_coupling_intersections != out_in_num_coupling_intersections)
             DUNE_THROW(XT::Common::Exceptions::internal_error,
                        "The coupling glue is broken!\n"
-                           << "macro entity (local level):   "
-                           << macro_entity_index
-                           << " ("
-                           << local_level
-                           << ")\n"
-                           << "macro neighbor (local level): "
-                           << macro_neighbor_index
-                           << " ("
-                           << local_neighbor_level
+                           << "macro entity (local level):   " << macro_entity_index << " (" << local_level << ")\n"
+                           << "macro neighbor (local level): " << macro_neighbor_index << " (" << local_neighbor_level
                            << ")");
           logger.debug() << "  " << num_coupling_intersections << " coupling intersections with neighbor "
                          << macro_neighbor_index << std::endl;
@@ -743,11 +715,8 @@ private:
     } catch (GridError& ee) {
       DUNE_THROW(GridError,
                  "It was not possible to create a grid for this simplex with the given GridType!\n\n"
-                     << "GridType: "
-                     << XT::Common::Typename<LocalGridType>::value()
-                     << "\n\n"
-                     << "This was the original error: "
-                     << ee.what());
+                     << "GridType: " << XT::Common::Typename<LocalGridType>::value() << "\n\n"
+                     << "This was the original error: " << ee.what());
     }
   } // ... create_grid_of_simplex(...)
 
@@ -832,18 +801,10 @@ private:
     if (glue->size() == 0)
       DUNE_THROW(GridError,
                  "Something went wrong, the coupling glue is empty!\n"
-                     << "   macro_entity "
-                     << macro_leaf_view_.indexSet().index(macro_entity)
-                     << "\n"
-                     << "   local_entity_level "
-                     << local_entity_level
-                     << "\n"
-                     << "   macro_neighbor "
-                     << macro_leaf_view_.indexSet().index(macro_neighbor)
-                     << "\n"
-                     << "   local_neighbor_level "
-                     << local_neighbor_level
-                     << "\n");
+                     << "   macro_entity " << macro_leaf_view_.indexSet().index(macro_entity) << "\n"
+                     << "   local_entity_level " << local_entity_level << "\n"
+                     << "   macro_neighbor " << macro_leaf_view_.indexSet().index(macro_neighbor) << "\n"
+                     << "   local_neighbor_level " << local_neighbor_level << "\n");
     return glue;
   } // ... create_glue(...)
 
@@ -878,22 +839,12 @@ private:
                 if (brocken_intersections > 0)
                   DUNE_THROW(Exceptions::intersection_orientation_is_broken,
                              "The coupling glue between the grid views of\n"
-                                 << "  level "
-                                 << local_entity_level
-                                 << " on macro entity   "
-                                 << macro_leaf_view_.indexSet().index(macro_entity)
-                                 << " and\n"
-                                 << "  level "
-                                 << local_neighbor_level
-                                 << " on macro neighbor "
-                                 << macro_leaf_view_.indexSet().index(macro_neighbor)
-                                 << "\n"
+                                 << "  level " << local_entity_level << " on macro entity   "
+                                 << macro_leaf_view_.indexSet().index(macro_entity) << " and\n"
+                                 << "  level " << local_neighbor_level << " on macro neighbor "
+                                 << macro_leaf_view_.indexSet().index(macro_neighbor) << "\n"
                                  << "contains\n"
-                                 << "  "
-                                 << brocken_intersections
-                                 << "/"
-                                 << glue->size()
-                                 << " intersections with wrong"
+                                 << "  " << brocken_intersections << "/" << glue->size() << " intersections with wrong"
                                  << "orientation!");
               }
               entity_glues[macro_neighbor_index][local_entity_level][local_neighbor_level] = glue;
@@ -956,15 +907,10 @@ private:
     } catch (GridError& ee) {
       DUNE_THROW(GridError,
                  "It was not possible to insert an element into the grid factory!\n\n"
-                     << "GridType: "
-                     << XT::Common::Typename<LocalGridType>::value()
+                     << "GridType: " << XT::Common::Typename<LocalGridType>::value() << "\n"
+                     << "GeometryType: " << geometry_types[II][JJ] << "\n"
                      << "\n"
-                     << "GeometryType: "
-                     << geometry_types[II][JJ]
-                     << "\n"
-                     << "\n"
-                     << "This was the original error: "
-                     << ee.what());
+                     << "This was the original error: " << ee.what());
     } // try
     global_grid_ = std::make_unique<XT::Grid::GridProvider<LocalGridType>>(global_factory.createGrid());
 
@@ -1021,9 +967,7 @@ private:
     if (macro_leaf_view_.indexSet().size(0) != macro_leaf_view_size_)
       DUNE_THROW(InvalidStateException,
                  "The size of the macro leaf grid view has changed (from "
-                     << macro_leaf_view_size_
-                     << " to "
-                     << macro_leaf_view_.indexSet().size(0)
+                     << macro_leaf_view_size_ << " to " << macro_leaf_view_.indexSet().size(0)
                      << "), which invalidates this object!\n"
                      << "Do not adapt the macro grid after instantiating this object!");
   } // void assert_macro_grid_state()
@@ -1057,8 +1001,7 @@ class GluedVTKWriter
       : BaseType(local_grid_view)
       , commRank_(boost::numeric_cast<int>(subdomain))
       , commSize_(boost::numeric_cast<int>(num_subdomains))
-    {
-    }
+    {}
 
     void write_locally(const std::string& name, VTK::OutputType ot)
     {
@@ -1100,8 +1043,7 @@ public:
     if (vectors.size() != glued_grid_.num_subdomains())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "vectors.size(): " << vectors.size() << "\n"
-                                    << "glued_grid_.num_subdomains(): "
-                                    << glued_grid_.num_subdomains());
+                                    << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       local_vtk_writers_[ss]->addCellData(vectors[ss], name, ncomps);
   } // ... addCellData(...)
@@ -1112,8 +1054,7 @@ public:
     if (functions.size() != glued_grid_.num_subdomains())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "funcitons.size(): " << functions.size() << "\n"
-                                      << "glued_grid_.num_subdomains(): "
-                                      << glued_grid_.num_subdomains());
+                                      << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       local_vtk_writers_[ss]->addCellData(functions[ss]);
   } // ... addCellData(...)
@@ -1124,8 +1065,7 @@ public:
     if (vectors.size() != glued_grid_.num_subdomains())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "vectors.size(): " << vectors.size() << "\n"
-                                    << "glued_grid_.num_subdomains(): "
-                                    << glued_grid_.num_subdomains());
+                                    << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       local_vtk_writers_[ss]->addVertexData(vectors[ss], name, ncomps);
   } // ... addVertexData(...)
@@ -1136,8 +1076,7 @@ public:
     if (functions.size() != glued_grid_.num_subdomains())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "funcitons.size(): " << functions.size() << "\n"
-                                      << "glued_grid_.num_subdomains(): "
-                                      << glued_grid_.num_subdomains());
+                                      << "glued_grid_.num_subdomains(): " << glued_grid_.num_subdomains());
     for (size_t ss = 0; ss < glued_grid_.num_subdomains(); ++ss)
       local_vtk_writers_[ss]->addVertexData(functions[ss]);
   } // ... addVertexData(...)

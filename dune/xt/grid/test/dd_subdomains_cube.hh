@@ -561,10 +561,10 @@ struct CubeProviderTest : public ::testing::Test
     // this code is copied from Providers::Cube
     std::vector<size_t> whichPartition(d, 0);
     for (size_t dd = 0; dd < d; ++dd)
-      whichPartition[dd] =
-          (std::min((unsigned int)(std::floor(num_partitions()[dd] * ((center[dd] - lower_left()[dd])
-                                                                      / (upper_right()[dd] - lower_left()[dd])))),
-                    num_partitions()[dd] - 1));
+      whichPartition[dd] = (std::min(
+          (unsigned int)(std::floor(num_partitions()[dd]
+                                    * ((center[dd] - lower_left()[dd]) / (upper_right()[dd] - lower_left()[dd])))),
+          num_partitions()[dd] - 1));
     size_t subdomain = 0;
     if (d == 1)
       subdomain = whichPartition[0];
@@ -682,7 +682,7 @@ struct CubeProviderTest : public ::testing::Test
 #else
         9
 #endif
-        );
+    );
   }
 
   template <class Grid, bool anything = true>

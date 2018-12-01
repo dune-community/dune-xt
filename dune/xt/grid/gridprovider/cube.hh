@@ -147,9 +147,8 @@ public:
     for (unsigned int dd = 0; dd < GridType::dimension; ++dd) {
       if (!(lower_left[dd] < upper_right[dd]))
         DUNE_THROW(Common::Exceptions::wrong_input_given,
-                   "lower_left has to be elementwise smaller than upper_right!\n\nlower_left = " << lower_left
-                                                                                                 << "\n\nupper_right = "
-                                                                                                 << upper_right);
+                   "lower_left has to be elementwise smaller than upper_right!\n\nlower_left = "
+                       << lower_left << "\n\nupper_right = " << upper_right);
     }
     std::shared_ptr<GridType> grd_ptr(nullptr);
     switch (variant) {
@@ -206,9 +205,8 @@ public:
       overlap_size_array = Common::make_array<unsigned int, d>(overlap_size);
     } else {
       DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "overlap_size has to be a single number or a vector with at least " << d << "elements, has only "
-                                                                                     << overlap_size.size()
-                                                                                     << " elements!");
+                 "overlap_size has to be a single number or a vector with at least "
+                     << d << "elements, has only " << overlap_size.size() << " elements!");
     }
     auto lower_left = cfg.get(
         "lower_left",
@@ -227,9 +225,8 @@ public:
       num_elements_array = Common::make_array<unsigned int, d>(num_elements);
     } else {
       DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "num_elements has to be a single number or a vector with at least " << d << "elements, has only "
-                                                                                     << num_elements.size()
-                                                                                     << " elements!");
+                 "num_elements has to be a single number or a vector with at least "
+                     << d << "elements, has only " << num_elements.size() << " elements!");
     }
     auto num_refinements =
         cfg.get("num_refinements", cube_gridprovider_default_config().template get<unsigned int>("num_refinements"));
@@ -353,10 +350,10 @@ public:
       // decide on the subdomain this entity shall belong to
       std::vector<size_t> whichPartition(GridType::dimension, 0);
       for (size_t dd = 0; dd < GridType::dimension; ++dd)
-        whichPartition[dd] =
-            (std::min((unsigned int)(std::floor(num_partitions[dd] * ((center[dd] - bounding_box[0][dd])
-                                                                      / (bounding_box[1][dd] - bounding_box[0][dd])))),
-                      num_partitions[dd] - 1));
+        whichPartition[dd] = (std::min((unsigned int)(std::floor(num_partitions[dd]
+                                                                 * ((center[dd] - bounding_box[0][dd])
+                                                                    / (bounding_box[1][dd] - bounding_box[0][dd])))),
+                                       num_partitions[dd] - 1));
       size_t subdomain = 0;
       if (GridType::dimension == 1)
         subdomain = whichPartition[0];

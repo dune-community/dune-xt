@@ -45,8 +45,7 @@ public:
     : intersectionIterator_(intersectionIterator)
     , passThrough_(true)
     , boundary_segment_index_(std::numeric_limits<size_t>::max())
-  {
-  }
+  {}
 
   void setPassThrough(const bool passThrough)
   {

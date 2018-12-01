@@ -119,8 +119,7 @@ public:
     : BaseType(end ? GlobalGridView.iend(entity) : GlobalGridView.ibegin(entity))
     , passThrough_(true)
     , intersection_(IntersectionImp(*this))
-  {
-  }
+  {}
 
   FakeDomainBoundaryIntersectionIterator(const GlobalGridViewType& GlobalGridView,
                                          const EntityType& entity,
@@ -130,8 +129,7 @@ public:
     , passThrough_(false)
     , intersection_(IntersectionImp(*this))
     , infoContainer_(infoContainer)
-  {
-  }
+  {}
 
   const Intersection& operator*() const
   {
@@ -193,8 +191,7 @@ public:
   SubdomainGridViewIntersectionRange(const SubdomainGridViewImp& layer, const EntityType& entity)
     : layer_(layer)
     , entity_(entity)
-  {
-  }
+  {}
 
   IntersectionIterator begin() const
   {

@@ -9,12 +9,10 @@
 //   René Fritze     (2016, 2018)
 
 /**
-  * This file is intended as a starting point for quick testing.
-  */
+ * This file is intended as a starting point for quick testing.
+ */
 
 #include <dune/xt/common/test/main.hxx>
 
 
-GTEST_TEST(empty, main)
-{
-}
+GTEST_TEST(empty, main) {}

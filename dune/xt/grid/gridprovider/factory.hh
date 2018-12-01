@@ -76,8 +76,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "Requested type '" << type << "' is not one of those avaible for "
-                                    << Common::Typename<GridType>::value()
-                                    << ":\n"
+                                    << Common::Typename<GridType>::value() << ":\n"
                                     << available_as_str());
   } // ... default_config(...)
 
@@ -103,8 +102,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "Requested type '" << type << "' is not one of those avaible for "
-                                    << Common::Typename<GridType>::value()
-                                    << ":\n"
+                                    << Common::Typename<GridType>::value() << ":\n"
                                     << available_as_str());
   } // ... create(...)
 }; // class GridProviderFactory
@@ -148,8 +146,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "Requested type '" << type << "' is not one of those avaible for "
-                                    << Common::Typename<GridType>::value()
-                                    << ":\n"
+                                    << Common::Typename<GridType>::value() << ":\n"
                                     << available_as_str());
   } // ... default_config(...)
 
@@ -172,8 +169,7 @@ public:
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "Requested type '" << type << "' is not one of those avaible for "
-                                    << Common::Typename<GridType>::value()
-                                    << ":\n"
+                                    << Common::Typename<GridType>::value() << ":\n"
                                     << available_as_str());
   } // ... create(...)
 }; // class DdSubdomainGridProviderFactory

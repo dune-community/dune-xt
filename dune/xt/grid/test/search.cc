@@ -25,8 +25,7 @@ struct InLevelSearch : public testing::Test
 
   InLevelSearch()
     : grid_provider_(Dune::XT::Grid::make_cube_grid<TESTGRIDTYPE>())
-  {
-  }
+  {}
 
   void check()
   {

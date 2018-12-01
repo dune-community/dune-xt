@@ -37,10 +37,11 @@ namespace internal {
  *  \todo       Document!
  */
 template <class GlobalGridViewImp>
-class IndexBasedIndexSet : public Dune::IndexSet<GlobalGridViewImp,
-                                                 IndexBasedIndexSet<GlobalGridViewImp>,
-                                                 typename extract_index_set_t<GlobalGridViewImp>::IndexType,
-                                                 typename extract_index_set_t<GlobalGridViewImp>::Types>
+class IndexBasedIndexSet
+  : public Dune::IndexSet<GlobalGridViewImp,
+                          IndexBasedIndexSet<GlobalGridViewImp>,
+                          typename extract_index_set_t<GlobalGridViewImp>::IndexType,
+                          typename extract_index_set_t<GlobalGridViewImp>::Types>
 {
 public:
   typedef GlobalGridViewImp GlobalGridViewType;

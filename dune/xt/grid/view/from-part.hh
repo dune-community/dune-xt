@@ -46,8 +46,7 @@ class TemporaryConstView
 
     const_storage(const GridLayerType& grid_view)
       : value(grid_view)
-    {
-    }
+    {}
 
     const type& value;
   };
@@ -60,8 +59,7 @@ class TemporaryConstView
     const_storage(const GridLayerType& grid_part)
       : grid_part_(grid_part)
       , value(grid_part_)
-    {
-    }
+    {}
 
     const GridLayerType& grid_part_;
     const type value;
@@ -72,8 +70,7 @@ public:
 
   TemporaryConstView(const GridLayerType& grid_layer)
     : const_storage_(grid_layer)
-  {
-  }
+  {}
 
   const type& access() const
   {
@@ -89,9 +86,9 @@ template <class GridLayerType>
 class TemporaryView : public TemporaryConstView<GridLayerType>
 {
   template <bool view = is_view<GridLayerType>::value,
-            bool part = (is_part<GridLayerType>::value || is_dd_subdomain<GridLayerType>::value
-                         || is_dd_subdomain_boundary<GridLayerType>::value
-                         || is_dd_subdomain_coupling<GridLayerType>::value),
+            bool part =
+                (is_part<GridLayerType>::value || is_dd_subdomain<GridLayerType>::value
+                 || is_dd_subdomain_boundary<GridLayerType>::value || is_dd_subdomain_coupling<GridLayerType>::value),
             bool anything = true>
   struct storage
   {
@@ -106,8 +103,7 @@ class TemporaryView : public TemporaryConstView<GridLayerType>
 
     storage(GridLayerType& grid_view)
       : value(grid_view)
-    {
-    }
+    {}
 
     type& value;
   };
@@ -119,8 +115,7 @@ class TemporaryView : public TemporaryConstView<GridLayerType>
 
     storage(GridLayerType& grid_part)
       : value(grid_part)
-    {
-    }
+    {}
 
     type value;
   };
@@ -133,8 +128,7 @@ public:
   TemporaryView(GridLayerType& grid_layer)
     : BaseType(grid_layer)
     , storage_(grid_layer)
-  {
-  }
+  {}
 
   using BaseType::access;
 

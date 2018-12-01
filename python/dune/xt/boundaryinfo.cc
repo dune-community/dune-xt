@@ -64,16 +64,13 @@ struct bind_grid_layer_info
 template <class Grid, Layers l>
 struct bind_grid_layer_info<Grid, l, null_template_tuple>
 {
-  static void bind(pybind11::module&, size_t)
-  {
-  }
+  static void bind(pybind11::module&, size_t) {}
 };
 
 
 template <class>
 void bind_grid_layer(pybind11::module&, std::integral_constant<size_t, 0>)
-{
-}
+{}
 
 template <class Grid, size_t counter>
 void bind_grid_layer(pybind11::module& m, std::integral_constant<size_t, counter>)
@@ -92,8 +89,7 @@ void bind_grid(pybind11::module& m)
 
 template <>
 void bind_grid<boost::tuples::null_type>(pybind11::module&)
-{
-}
+{}
 
 PYBIND11_MODULE(_boundaryinfo, m)
 {

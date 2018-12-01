@@ -44,12 +44,8 @@ TEST_F(GmshGridProvider, visualize)
 #else // HAVE_DUNE_ALUGRID
 
 
-TEST(DISABLED_GmshGridProvider, layers)
-{
-}
-TEST(DISABLED_GmshGridProvider, visualize)
-{
-}
+TEST(DISABLED_GmshGridProvider, layers) {}
+TEST(DISABLED_GmshGridProvider, visualize) {}
 
 
 #endif // HAVE_DUNE_ALUGRID

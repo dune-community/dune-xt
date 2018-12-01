@@ -31,8 +31,7 @@ struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
   MaximumEntityVolumeRefineFunctor(GridType& grid, double volume, double factor)
     : threshold_volume_(volume * factor)
     , grid_(grid)
-  {
-  }
+  {}
 
   void apply_local(const typename BaseType::ElementType& element) override final
   {

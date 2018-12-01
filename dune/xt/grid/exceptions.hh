@@ -20,20 +20,16 @@ namespace Exceptions {
 
 
 class boundary_type_error : public Dune::Exception
-{
-};
+{};
 
 class boundary_info_error : public Dune::Exception
-{
-};
+{};
 
 class not_bound_to_an_element_yet : public Dune::InvalidStateException
-{
-};
+{};
 
 class functor_error : public Dune::InvalidStateException
-{
-};
+{};
 
 
 } // namespace Exceptions

@@ -171,9 +171,7 @@ public:
     if (!(numberOfElements == (numberOfCubes + numberOfPrisms)))
       DUNE_THROW(Dune::IOError,
                  "Number of Elements (" << numberOfElements << ") is not equal to number of cubes (" << numberOfCubes
-                                        << ") and number of prisms ("
-                                        << numberOfPrisms
-                                        << ").");
+                                        << ") and number of prisms (" << numberOfPrisms << ").");
 
     out << "done: " << numberOfElements << " elements read (" << numberOfPrisms << " prisms and " << numberOfCubes
         << " cubes)." << std::endl;
