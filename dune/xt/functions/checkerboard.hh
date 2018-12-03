@@ -8,7 +8,7 @@
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2012 - 2018)
 //   René Fritze     (2013 - 2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 //   Tobias Leibner  (2014 - 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_CHECKERBOARD_HH

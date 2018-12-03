@@ -8,7 +8,7 @@
 //   Felix Schindler (2013 - 2018)
 //   René Fritze     (2013 - 2016, 2018)
 //   Sven Kaulmann   (2013)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 //   Tobias Leibner  (2014, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_GENRIC_FUNCTION_HH

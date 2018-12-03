@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   René Fritze     (2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 
 #ifndef DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH
 #define DUNE_XT_FUNCTIONS_ESV2007_BINDINGS_HH

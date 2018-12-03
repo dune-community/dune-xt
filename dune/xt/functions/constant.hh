@@ -8,7 +8,7 @@
 //   Felix Schindler (2013 - 2018)
 //   Kirsten Weber   (2013)
 //   René Fritze     (2013 - 2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 //   Tobias Leibner  (2014 - 2015, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_CONSTANT_HH

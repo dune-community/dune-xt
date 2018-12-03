@@ -8,7 +8,7 @@
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2013 - 2017)
 //   René Fritze     (2013, 2015 - 2016, 2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 //   Tobias Leibner  (2014 - 2015, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH

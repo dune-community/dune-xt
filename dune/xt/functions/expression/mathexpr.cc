@@ -6,7 +6,7 @@
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2012 - 2013, 2015 - 2016)
-//   René Fritze     (2012)
+//   René Fritze     (2012, 2018)
 
 /*
 

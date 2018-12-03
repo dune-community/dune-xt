@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2018)
 //   René Fritze     (2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 
 #ifndef PYTHON_DUNE_XT_FUNCTIONS_INDICATOR_HH
 #define PYTHON_DUNE_XT_FUNCTIONS_INDICATOR_HH

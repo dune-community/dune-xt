@@ -7,7 +7,7 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   René Fritze (2018)
-#   TiKeil      (2018)
+#   Tim Keil    (2018)
 # ~~~
 
 dune_pybindxi_add_module(_interfaces EXCLUDE_FROM_ALL interfaces.cc)

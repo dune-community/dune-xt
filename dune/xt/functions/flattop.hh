@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2014 - 2018)
 //   René Fritze     (2014 - 2016, 2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 //   Tobias Leibner  (2015, 2017)
 
 #ifndef DUNE_XT_FUNCTIONS_FLATTOP_HH

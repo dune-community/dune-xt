@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2013 - 2018)
 //   René Fritze     (2013 - 2016, 2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 //   Tobias Leibner  (2014)
 
 #ifndef DUNE_XT_FUNCTIONS_BASE_VISUALIZATION_HH

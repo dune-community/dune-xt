@@ -6,7 +6,8 @@
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   TiKeil (2018)
+#   René Fritze (2018)
+#   Tim Keil    (2018)
 # ~~~
 
 import grids

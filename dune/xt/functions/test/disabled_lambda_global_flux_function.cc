@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   René Fritze     (2018)
-//   TiKeil          (2018)
+//   Tim Keil        (2018)
 //   Tobias Leibner  (2017)
 
 #include <dune/xt/common/test/main.hxx>
