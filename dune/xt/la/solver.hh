@@ -146,12 +146,12 @@ typename std::enable_if<is_matrix<M>::value, Solver<M>>::type make_solver(const 
 }
 
 
-// template <class M, class V, class... Args>
-// typename std::enable_if<is_matrix<M>::value && is_vector<V>::value, void>::type
-// solve(const M& A, const V& b, V& x, Args&&... args)
-//{
-//  make_solver(A).apply(b, x, std::forward<Args>(args)...);
-//}
+template <class M, class V, class... Args>
+typename std::enable_if<is_matrix<M>::value && is_vector<V>::value, void>::type
+solve(const M& A, const V& b, V& x, Args&&... args)
+{
+  make_solver(A).apply(b, x, std::forward<Args>(args)...);
+}
 
 
 // template <class M, class C>
