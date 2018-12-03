@@ -11,7 +11,7 @@ using namespace Dune::XT;
 
 {% for GRIDNAME, GRID, r, rC in config['types'] %}
 
-struct IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
+struct IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
 {
   using GridType = {{GRID}};
   using ElementType = typename GridType::template Codim<0>::Entity;
@@ -19,14 +19,15 @@ struct IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::test
   static const size_t r = {{r}};
   static const size_t rC = {{rC}};
 
+  int dummy = 0;
   using FunctionType = Functions::IndicatorGridFunction<ElementType, r, rC>;
 
   using RangeType = typename FunctionType::RangeType;
   using DomainType = typename FunctionType::DomainType;
   using DerivativeRangeType = typename FunctionType::LocalFunctionType::DerivativeRangeType;
 
-  IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
-    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
+  IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
+    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 8))
   {
   }
 
@@ -35,7 +36,7 @@ struct IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::test
 
 
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
   //first constructor
   DomainType lower_left(-1.);
@@ -69,13 +70,13 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructib
 }
 
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
 {
   auto cfg = FunctionType::defaults();
   EXPECT_EQ(cfg.get<std::string>("name"), FunctionType::static_id());
 }
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable)
 {
   // auto default_function = FunctionType::create();
 
@@ -88,7 +89,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable)
   // }
 }
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
   const auto leaf_view = grid_.leaf_view();
 
@@ -99,14 +100,14 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizabl
   RangeType first_value(1.);
   RangeType second_value(2.);
 
-  FunctionType function({{'{{lower_left, upper_right, first_value}}'}});
-  function.visualize(leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
+  FunctionType function({{'{{middle_1, upper_right, first_value}}'}});
+  function.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 
   FunctionType function_overlap({{'{{lower_left, middle_2, first_value}, {middle_1, upper_right, second_value}}'}});
-  function_overlap.visualize(leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
+  function_overlap.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
 }
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
   DomainType lower_left(-1.);
   DomainType upper_right(0.5);
@@ -120,7 +121,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   }
 }
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
   const auto leaf_view = grid_.leaf_view();
   const int expected_order = 0;
@@ -143,7 +144,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 }
 
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
   const auto leaf_view = grid_.leaf_view();
   // single indicator
@@ -222,7 +223,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
 }
 
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, ctors_are_equivalent)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, ctors_are_equivalent)
 {
   const auto leaf_view = grid_.leaf_view();
 
@@ -257,7 +258,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, ctors_are_equi
 }
 
 
-TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
+TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   const auto leaf_view = grid_.leaf_view();
   const DerivativeRangeType expected_jacobian;
