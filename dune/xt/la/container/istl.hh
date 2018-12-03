@@ -437,6 +437,25 @@ public:
       backend_ = std::shared_ptr<BackendType>(new BackendType(mat));
   } // IstlRowMajorSparseMatrix(...)
 
+  template <class OtherMatrixType>
+  explicit IstlRowMajorSparseMatrix(
+      const OtherMatrixType& mat,
+      const std::enable_if_t<Common::is_matrix<OtherMatrixType>::value, bool> prune = false,
+      const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+          Common::FloatCmp::DefaultEpsilon<ScalarType>::value(),
+      const size_t num_mutexes = 1)
+    : mutexes_(std::make_unique<std::vector<std::mutex>>(num_mutexes))
+  {
+    using OtherM = Common::MatrixAbstraction<OtherMatrixType>;
+    const auto m_rows = OtherM::rows(mat);
+    const auto m_cols = OtherM::cols(mat);
+    const auto patt = prune ? pruned_pattern(mat, eps) : dense_pattern(m_rows, m_cols);
+    build_sparse_matrix(m_rows, m_cols, patt);
+    for (size_t ii = 0; ii < patt.size(); ++ii)
+      for (const size_t jj : patt.inner(ii))
+        backend_->operator[](ii)[jj] = OtherM::get_entry(mat, ii, jj);
+  } // IstlRowMajorSparseMatrix(...)
+
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
@@ -700,6 +719,27 @@ private:
           if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(val, decltype(val)(0), eps))
             ret.insert(ii, it.index());
         }
+      }
+    }
+    ret.sort();
+    return ret;
+  } // ... pruned_pattern_from_backend(...)
+
+  template <class OtherMatrixType>
+  std::enable_if_t<Common::is_matrix<OtherMatrixType>::value, SparsityPatternDefault>
+  pruned_pattern(const OtherMatrixType& mat,
+                 const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const
+  {
+    using OtherM = Common::MatrixAbstraction<OtherMatrixType>;
+    const auto other_rows = OtherM::rows(mat);
+    const auto other_cols = OtherM::cols(mat);
+    SparsityPatternDefault ret(other_rows);
+    for (size_t ii = 0; ii < other_rows; ++ii) {
+      for (size_t jj = 0; jj < other_cols; ++jj) {
+        const auto val = OtherM::get_entry(mat, ii, jj);
+        if (Common::FloatCmp::ne<Common::FloatCmp::Style::absolute>(val, decltype(val)(0), eps))
+          ret.insert(ii, jj);
       }
     }
     ret.sort();
