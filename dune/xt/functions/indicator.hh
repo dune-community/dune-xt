@@ -209,6 +209,18 @@ public:
     return "dune.xt.functions.indicatorfunction";
   }
 
+  static Common::Configuration defaults()
+  {
+    Common::Configuration config;
+    config["type"] = static_id();
+    config["0.domain"] = "[0 1; 0 1; 0 1]";
+    config["0.value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
+    config["1.domain"] = "[-1 0.5; -1 0.5; -1 0.5]";
+    config["1.value"] = "[1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]";
+    config["name"] = static_id();
+    return config;
+  } // ... defaults(...)
+
   std::string name() const override final
   {
     return "dune.xt.functions.indicatorfunction";
@@ -224,7 +236,7 @@ public:
       const auto& subdomain_ll = std::get<0>(subdomain_and_value_tuple);
       const auto& subdomain_ur = std::get<1>(subdomain_and_value_tuple);
       if (Common::FloatCmp::le(subdomain_ll, point_in_global_coordinates)
-          && Common::FloatCmp::lt(point_in_global_coordinates, subdomain_ur))
+          && Common::FloatCmp::le(point_in_global_coordinates, subdomain_ur))
         value += std::get<2>(subdomain_and_value_tuple);
     }
     return value;
