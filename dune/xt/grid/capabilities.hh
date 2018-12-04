@@ -26,11 +26,11 @@ struct has_boundary_id
 #if DUNE_VERSION_GTE(DUNE_GRID, 2, 6)
   static const constexpr bool value = false;
 #else
-#if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
+#  if defined(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS) && DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS
   static const constexpr bool value = true;
-#else
+#  else
   static const constexpr bool value = false;
-#endif
+#  endif
 #endif
 };
 

@@ -192,18 +192,18 @@ private:
 
     bool operator()(const LocalEntityType& element, unsigned int face) const
     {
-          const auto local_intersection_ptr = element.template subEntity<1>(face);
-     #if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
-           const auto& local_intersection = local_intersection_ptr;
-     #else
-           const auto& local_intersection = *local_intersection_ptr;
-     #endif
-           const auto& local_intersection_geometry = local_intersection.geometry();
-           // Check if all corners of the local intersection lie within the macro intersection.
-           for (auto ii : XT::Common::value_range(local_intersection_geometry.corners()))
-             if (!XT::Grid::contains(macro_intersection_, local_intersection_geometry.corner(ii)))
-               return false;
-           return true;
+      const auto local_intersection_ptr = element.template subEntity<1>(face);
+#  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
+      const auto& local_intersection = local_intersection_ptr;
+#  else
+      const auto& local_intersection = *local_intersection_ptr;
+#  endif
+      const auto& local_intersection_geometry = local_intersection.geometry();
+      // Check if all corners of the local intersection lie within the macro intersection.
+      for (auto ii : XT::Common::value_range(local_intersection_geometry.corners()))
+        if (!XT::Grid::contains(macro_intersection_, local_intersection_geometry.corner(ii)))
+          return false;
+      return true;
     } // ... contains(...)
 
   private:
@@ -446,7 +446,7 @@ public:
         const auto& macro_intersection = *macro_intersection_it;
         if (macro_intersection.neighbor() && !macro_intersection.boundary()) {
           const auto real_neighbor_ptr = macro_intersection.outside();
-#if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
           const auto& real_neighbor = real_neighbor_ptr;
 #  else
           const auto& real_neighbor = *real_neighbor_ptr;
@@ -623,7 +623,7 @@ public:
       for (auto&& macro_intersection : intersections(macro_leaf_view_, macro_entity)) {
         if (!macro_intersection.boundary() && macro_intersection.neighbor()) {
           const auto macro_neighbor_ptr = macro_intersection.outside();
-#if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
           const auto& macro_neighbor = macro_neighbor_ptr;
 #  else
           const auto& macro_neighbor = *macro_neighbor_ptr;
@@ -821,7 +821,7 @@ private:
         const auto& macro_intersection = *macro_intersection_it;
         if (macro_intersection.neighbor() && !macro_intersection.boundary()) {
           const auto macro_neighbor_ptr = macro_intersection.outside();
-#if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
           const auto& macro_neighbor = macro_neighbor_ptr;
 #  else
           const auto& macro_neighbor = *macro_neighbor_ptr;
@@ -871,7 +871,7 @@ private:
       for (auto&& micro_entity : elements(local_leaf_view)) {
         const size_t micro_index = local_index_set.index(micro_entity);
         const auto num_vertices = micro_entity.
-#if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
 
                                   subEntities(dimDomain);
 #  else
@@ -883,7 +883,7 @@ private:
           const unsigned int global_vertex_id = find_insert_vertex(vertices,
                                                                    micro_entity
                                                                        .template subEntity<dimDomain>(local_vertex_id)
-#if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
+#  if DUNE_VERSION_GTE(DUNE_GRID, 2, 4)
                                                                        .
 #  else
                                                                        ->
