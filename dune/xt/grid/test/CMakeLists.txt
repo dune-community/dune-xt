@@ -23,6 +23,13 @@ dune_symlink_to_source_files(FILES
 
 dxt_exclude_from_headercheck(dd_subdomains_cube.hh)
 
+# we want to discard one of the tests via cmake_guard if UG is parallel, so define a suitable variable here
+if("${UG_PARALLEL}" STREQUAL "yes")
+  set(UG_IS_NOT_PARALLEL FALSE)
+else()
+  set(UG_IS_NOT_PARALLEL TRUE)
+endif()
+
 begin_testcases(dunextgrid)
 
 end_testcases()
