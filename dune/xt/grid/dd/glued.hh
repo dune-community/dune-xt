@@ -23,7 +23,6 @@
 
 #if HAVE_DUNE_GRID_GLUE
 #  include <dune/grid-glue/extractors/codim1extractor.hh>
-#  include <dune/grid-glue/extractors/extractorpredicate.hh>
 #  include <dune/grid-glue/gridglue.hh>
 #  include <dune/grid-glue/merging/contactmerge.hh>
 #endif // HAVE_DUNE_GRID_GLUE
