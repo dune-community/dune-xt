@@ -224,7 +224,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
           // expected
           RangeType expected_value(0.);
           const auto center = element.geometry().center();
-          if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::lt(center, upper_right))
+          if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::le(center, upper_right))
             expected_value = value;
           // actual
           local_f->bind(element);
@@ -251,9 +251,9 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
     // expected
     RangeType expected_value(0.);
     const auto center = element.geometry().center();
-    if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::lt(center, middle))
+    if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::le(center, middle))
       expected_value += first_value;
-    if (Common::FloatCmp::le(middle, center) && Common::FloatCmp::lt(center, upper_right))
+    if (Common::FloatCmp::le(middle, center) && Common::FloatCmp::le(center, upper_right))
       expected_value += second_value;
     // actual
     local_f_mult->bind(element);
@@ -273,11 +273,11 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
     // expected
     RangeType expected_value(0.);
     const auto center = element.geometry().center();
-    if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::lt(center, middle))
+    if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::le(center, middle))
       expected_value += first_value;
-    if (Common::FloatCmp::le(middle, center) && Common::FloatCmp::lt(center, upper_right))
+    if (Common::FloatCmp::le(middle, center) && Common::FloatCmp::le(center, upper_right))
       expected_value += second_value;
-    if (Common::FloatCmp::le(lower_left_ol, center) && Common::FloatCmp::lt(center, upper_right_ol))
+    if (Common::FloatCmp::le(lower_left_ol, center) && Common::FloatCmp::le(center, upper_right_ol))
       expected_value += first_value; // overlapping indicator
     // actual
     local_f_ol->bind(element);
