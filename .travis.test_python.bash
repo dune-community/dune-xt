@@ -14,6 +14,11 @@ ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD}
 ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} bindings
 ${WAIT} ${SRC_DCTRL} ${BLD} --only=${MY_MODULE} bexec ${BUILD_CMD} test_python
 
+if [ "${TRAVIS_SECURE_ENV_VARS}" == "false" ] ; then
+    echo "Coverage reporting disabled for forked repo/PR"
+    exit 0
+fi
+
 cd ${SUPERDIR}/${MY_MODULE}
 ${DUNE_BUILD_DIR}/${MY_MODULE}/run-in-dune-env pip install codecov
 ${DUNE_BUILD_DIR}/${MY_MODULE}/run-in-dune-env codecov -X gcov -F pytest -t ${CODECOV_TOKEN}
