@@ -26,7 +26,7 @@ struct IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::test
   using DerivativeRangeType = typename FunctionType::DerivativeRangeReturnType;
 
   IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
-    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 8))
+    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
   {
   }
 
@@ -90,6 +90,8 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable)
 
 TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
+  // NOTE: Visualization of the indicators does only make sense for a suitable fine mesh !
+
   const auto leaf_view = grid_.leaf_view();
 
   DomainType lower_left(-1.);
@@ -126,20 +128,18 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluat
     DomainType lower_left(ll);
     for (auto ur : {1., 0.75, 0.5, 0.25}) {
       DomainType upper_right(ur);
-      for (auto vv : {1., 2., 3., 4.}) {
-        RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
-        for (auto&& element : elements(leaf_view)) {
+      RangeType value(1.);
+      FunctionType function({{'{{lower_left, upper_right, value}}'}});
+      for (auto&& element : elements(leaf_view)) {
+        for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
           // expected
           RangeType expected_value(0.);
-          const auto center = element.geometry().center();
-          if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::le(center, upper_right))
+          DomainType point = element.geometry().global(quadrature_point.position());
+          if (Common::FloatCmp::le(lower_left, point) && Common::FloatCmp::le(point, upper_right)) {
             expected_value = value;
-          // actual
-          for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
-            const auto actual_value = function.evaluate(element.geometry().global(quadrature_point.position()));
-            EXPECT_EQ(expected_value, actual_value);
           }
+          const auto actual_value = function.evaluate(element.geometry().global(quadrature_point.position()));
+          EXPECT_EQ(expected_value, actual_value);
         }
       }
     }
@@ -221,14 +221,13 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
         const auto& localizable_function = function.template as_grid_function<ElementType>();
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
-          // expected
-          RangeType expected_value(0.);
-          const auto center = element.geometry().center();
-          if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::le(center, upper_right))
-            expected_value = value;
-          // actual
           local_f->bind(element);
           for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
+            // expected
+            RangeType expected_value(0.);
+            DomainType point = element.geometry().global(quadrature_point.position());
+            if (Common::FloatCmp::le(lower_left, point) && Common::FloatCmp::le(point, upper_right))
+              expected_value = value;
             const auto local_x = quadrature_point.position();
             const auto actual_value = local_f->evaluate(local_x);
             EXPECT_EQ(expected_value, actual_value);
@@ -248,16 +247,15 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
   auto local_f_mult = localizable_function_mult.local_function();
 
   for (auto&& element : elements(leaf_view)) {
-    // expected
-    RangeType expected_value(0.);
-    const auto center = element.geometry().center();
-    if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::le(center, middle))
-      expected_value += first_value;
-    if (Common::FloatCmp::le(middle, center) && Common::FloatCmp::le(center, upper_right))
-      expected_value += second_value;
-    // actual
     local_f_mult->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
+      // expected
+      RangeType expected_value(0.);
+      DomainType point = element.geometry().global(quadrature_point.position());
+      if (Common::FloatCmp::le(lower_left, point) && Common::FloatCmp::le(point, middle))
+        expected_value += first_value;
+      if (Common::FloatCmp::le(middle, point) && Common::FloatCmp::le(point, upper_right))
+        expected_value += second_value;
       const auto local_x = quadrature_point.position();
       const auto actual_value = local_f_mult->evaluate(local_x);
       EXPECT_EQ(expected_value, actual_value);
@@ -270,18 +268,18 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
   const auto& localizable_function_ol = function_overlap.template as_grid_function<ElementType>();
   auto local_f_ol = localizable_function_ol.local_function();
   for (auto&& element : elements(leaf_view)) {
-    // expected
-    RangeType expected_value(0.);
-    const auto center = element.geometry().center();
-    if (Common::FloatCmp::le(lower_left, center) && Common::FloatCmp::le(center, middle))
-      expected_value += first_value;
-    if (Common::FloatCmp::le(middle, center) && Common::FloatCmp::le(center, upper_right))
-      expected_value += second_value;
-    if (Common::FloatCmp::le(lower_left_ol, center) && Common::FloatCmp::le(center, upper_right_ol))
-      expected_value += first_value; // overlapping indicator
     // actual
     local_f_ol->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
+      // expected
+      RangeType expected_value(0.);
+      DomainType point = element.geometry().global(quadrature_point.position());
+      if (Common::FloatCmp::le(lower_left, point) && Common::FloatCmp::le(point, middle))
+        expected_value += first_value;
+      if (Common::FloatCmp::le(middle, point) && Common::FloatCmp::le(point, upper_right))
+        expected_value += second_value;
+      if (Common::FloatCmp::le(lower_left_ol, point) && Common::FloatCmp::le(point, upper_right_ol))
+        expected_value += first_value; // overlapping indicator
       const auto local_x = quadrature_point.position();
       const auto actual_value = local_f_ol->evaluate(local_x);
       EXPECT_EQ(expected_value, actual_value);

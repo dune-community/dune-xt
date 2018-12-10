@@ -27,7 +27,7 @@ struct IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::
   using DerivativeRangeType = typename FunctionType::LocalFunctionType::DerivativeRangeType;
 
   IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
-    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 8))
+    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
   {
   }
 
@@ -91,6 +91,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatab
 
 TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
+  // NOTE: Visualization of the indicators does only make sense for a suitable fine mesh !
   const auto leaf_view = grid_.leaf_view();
 
   DomainType lower_left(-1.);
