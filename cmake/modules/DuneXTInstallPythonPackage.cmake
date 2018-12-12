@@ -58,7 +58,7 @@ function(dune_xt_install_python_package)
   endif()
 
   # Find out whether we should install in editable mode
-  set(INSTALL_EDITABLE ${DUNE_PYTHON_INSTALL_EDITABLE})
+  set(INSTALL_EDITABLE 1)
 
   # Construct the wheel house installation option string
   set(WHEEL_OPTION "")
