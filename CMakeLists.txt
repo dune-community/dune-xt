@@ -61,7 +61,7 @@ add_subdirectory(cmake/modules)
 include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the
 # compiled extensions directly usable from the venv
-dune_xt_install_python_package(PATH python)
+dune_pybindxi_install_python_package(PATH python)
 
 # finalize the dune project, e.g. generating config.h etc.
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)

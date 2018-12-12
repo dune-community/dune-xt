@@ -21,7 +21,7 @@ endmacro(include_dependent_binary_python_dirs)
 # copy of dune_python_install_package from dune-common
 # changes: - package is always installed into the dune-env, even if a setup.py.in is found instead of a setup.py
 #          - if a setup.py.in is found, the whole directory is symlinked to the binary dir
-function(dune_xt_install_python_package)
+function(dune_pybindxi_install_python_package)
   # Parse Arguments
   set(OPTION)
   set(SINGLE PATH)
