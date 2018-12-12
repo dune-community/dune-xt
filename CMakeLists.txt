@@ -27,7 +27,7 @@ include(DuneMacros)
 dune_project()
 
 if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
-  dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-pybindxi_SOURCE_DIR}/dune
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-pybindxi_SOURCE_DIR}/dune
                            MODULE_LIBRARIES dunepybindxi dunepybindxiinterface dunepybindximodule dunepybindxiembed)
   # Build an interface library target:
   add_library(pybind11::pybind11 ALIAS dunepybindxiinterface)  # to match exported target
@@ -51,7 +51,7 @@ if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
   add_library(pybind11::embed ALIAS dunepybindxiembed)
   target_link_libraries(dunepybindxi dunepybindxiembed)
 else()
-  dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-pybindxi_SOURCE_DIR}/dune)
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-pybindxi_SOURCE_DIR}/dune)
 endif()
 
 add_subdirectory(dune)
