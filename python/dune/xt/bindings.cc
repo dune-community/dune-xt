@@ -31,6 +31,7 @@
 #include <python/dune/xt/functions/indicator.hh>
 
 #include <python/dune/xt/common/exceptions.bindings.hh>
+#include <python/dune/xt/grid/available_types.hh>
 
 template <class G>
 void addbind_for_Grid(pybind11::module& m)
@@ -57,6 +58,19 @@ void addbind_for_Grid(pybind11::module& m)
   bind_IndicatorGridFunction<G, g_dim, 1, 3>(m, grid_id);
   bind_IndicatorGridFunction<G, g_dim, 3, 3>(m, grid_id);
 } // ... addbind_for_Grid(...)
+
+
+template <class Tuple = Dune::XT::Grid::bindings::AvailableTypes>
+void all_grids(pybind11::module& m)
+{
+  addbind_for_Grid<typename Tuple::head_type>(m);
+  all_grids<typename Tuple::tail_type>(m);
+} // ... addbind_for_Grid(...)
+
+
+template <>
+void all_grids<boost::tuples::null_type>(pybind11::module&)
+{}
 
 
 PYBIND11_MODULE(_functions, m)
@@ -135,17 +149,8 @@ PYBIND11_MODULE(_functions, m)
   bind_ExpressionFunction<3, 2, 2>(m);
   bind_ExpressionFunction<3, 3, 3>(m);
 
-  addbind_for_Grid<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m);
-  addbind_for_Grid<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m);
-#if HAVE_DUNE_ALUGRID
-  addbind_for_Grid<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m);
-#endif
-#if HAVE_UG
-  addbind_for_Grid<Dune::UGGrid<2>>(m);
-#endif
-  //#if HAVE_ALBERTA
-  //  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, "2d_simplex_albertagrid");
-  //#endif
+
+  all_grids(m);
 
   Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions");
 }
