@@ -26,6 +26,8 @@
 #include <python/dune/xt/functions/interfaces.hh>
 
 #include <python/dune/xt/common/exceptions.bindings.hh>
+#include <python/dune/xt/grid/available_types.hh>
+
 
 template <class G>
 void add_bind_for_Grid_interface(pybind11::module& m)
@@ -94,7 +96,20 @@ void add_bind_for_Grid_interface(pybind11::module& m)
 
   bind_combined_GridFunction<G, g_dim, prod, 1, 1, 2, 2>(m, grid_id);
   addbind_GridFunctionInterface_combined_op<G, g_dim, prod, 1, 1, 2, 2>(i_1_1);
+} // ... addbind_for_Grid_interface(...)
+
+
+template <class Tuple = Dune::XT::Grid::bindings::AvailableTypes>
+void all_grid_interfaces(pybind11::module& m)
+{
+  add_bind_for_Grid_interface<typename Tuple::head_type>(m);
+  all_grid_interfaces<typename Tuple::tail_type>(m);
 } // ... addbind_for_Grid(...)
+
+
+template <>
+void all_grid_interfaces<boost::tuples::null_type>(pybind11::module&)
+{}
 
 
 PYBIND11_MODULE(_interfaces, m)
@@ -280,17 +295,7 @@ PYBIND11_MODULE(_interfaces, m)
   bind_combined_Function<3, prod, 1, 1, 2, 2>(m);
   addbind_FunctionInterface_combined_op<3, prod, 1, 1, 2, 2>(i_3_1_1);
 
-  add_bind_for_Grid_interface<Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>>>(m);
-  add_bind_for_Grid_interface<Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>>>(m);
-#if HAVE_DUNE_ALUGRID
-  add_bind_for_Grid_interface<Dune::ALUGrid<2, 2, Dune::simplex, Dune::conforming>>(m);
-#endif
-#if HAVE_UG
-  add_bind_for_Grid_interface<Dune::UGGrid<2>>(m);
-#endif
-  //#if HAVE_ALBERTA
-  //  addbind_for_Grid<Dune::AlbertaGrid<2, 2>>(m, "2d_simplex_albertagrid");
-  //#endif
+  all_grid_interfaces(m);
 
   Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions");
 }
