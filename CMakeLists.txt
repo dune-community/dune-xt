@@ -18,6 +18,7 @@ endif()
 find_package(dune-common REQUIRED)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules"
   ${dune-common_MODULE_PATH})
+#message(FATAL_ERROR "${CMAKE_MODULE_PATH}")
 
 #include the dune macros
 include(DuneMacros)
@@ -26,7 +27,7 @@ include(DuneMacros)
 dune_project()
 
 if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
-  dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-pybindxi_SOURCE_DIR}/dune
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-pybindxi_SOURCE_DIR}/dune
                            MODULE_LIBRARIES dunepybindxi dunepybindxiinterface dunepybindximodule dunepybindxiembed)
   # Build an interface library target:
   add_library(pybind11::pybind11 ALIAS dunepybindxiinterface)  # to match exported target
@@ -50,18 +51,17 @@ if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
   add_library(pybind11::embed ALIAS dunepybindxiembed)
   target_link_libraries(dunepybindxi dunepybindxiembed)
 else()
-  dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-pybindxi_SOURCE_DIR}/dune)
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-pybindxi_SOURCE_DIR}/dune)
 endif()
 
 add_subdirectory(dune)
 add_subdirectory(doc)
 add_subdirectory(cmake/modules)
 
-include(DuneXTInstallPythonPackage)
+include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the
 # compiled extensions directly usable from the venv
-configure_file(python/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/python/setup.py)
-dune_xt_install_python_package(PATH python)
+dune_pybindxi_install_python_package(PATH python)
 
 # finalize the dune project, e.g. generating config.h etc.
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
