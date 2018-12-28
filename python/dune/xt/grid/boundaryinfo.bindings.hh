@@ -47,16 +47,16 @@ public:
 
     try { // guard since we might not be the first to do so for this grid/intersection
       std::string postfix{layer_names[layer] + "_layer_" + gridname};
-      m.def((std::string("available_boundary_infos_on_") + postfix) .c_str(),
+      m.def((std::string("available_boundary_infos_on_") + postfix).c_str(),
             [](const GP& /*grid_provider*/) { return XT::Grid::BoundaryInfoFactory<I>::available(); },
             "grid_provider"_a);
-      m.def((std::string("default_boundary_info_config_on_")+ postfix) .c_str(),
+      m.def((std::string("default_boundary_info_config_on_") + postfix).c_str(),
             [](const GP& /*grid_provider*/, const std::string& type) {
               return XT::Grid::BoundaryInfoFactory<I>::default_config(type);
             },
             "grid_provider"_a,
             "type"_a);
-      m.def((std::string("make_boundary_info_on_")+ postfix) .c_str(),
+      m.def((std::string("make_boundary_info_on_") + postfix).c_str(),
             [](const GP& /*grid_provider*/, const Common::Configuration& cfg) {
               return XT::Grid::BoundaryInfoFactory<I>::create(cfg).release();
             },

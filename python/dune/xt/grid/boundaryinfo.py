@@ -31,8 +31,10 @@ def _meta_boundary(name, grid_provider, config):
 def make_boundary_info_on_dd_subdomain_boundary_layer(grid_provider, config):
     return _meta_boundary('make_boundary_info_on_dd_subdomain_boundary_layer', grid_provider, config)
 
+
 def make_boundary_info_on_dd_subdomain_layer(grid_provider, config):
     return _meta_boundary('make_boundary_info_on_dd_subdomain_layer', grid_provider, config)
+
 
 def make_boundary_info_on_leaf_layer(grid_provider, config):
     return _meta_boundary('make_boundary_info_on_leaf_layer', grid_provider, config)
