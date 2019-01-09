@@ -122,6 +122,15 @@ struct container_name<CommonDenseVector<double>>
 };
 
 template <>
+struct container_name<CommonDenseVector<size_t>>
+{
+  static std::string value()
+  {
+    return "common_dense_vector_size_t";
+  }
+};
+
+template <>
 struct container_name<CommonDenseMatrix<double>>
 {
   static std::string value()

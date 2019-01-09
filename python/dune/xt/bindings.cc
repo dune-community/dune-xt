@@ -45,6 +45,7 @@ PYBIND11_MODULE(_la, m)
   LA::bind_Backends(m);
 
   auto common_dense_vector_double = LA::bind_Vector<LA::CommonDenseVector<double>>(m);
+  LA::bind_Vector<LA::CommonDenseVector<size_t>>(m);
 #if HAVE_DUNE_ISTL
   auto istl_dense_vector_double = LA::bind_Vector<LA::IstlDenseVector<double>>(m);
 #endif

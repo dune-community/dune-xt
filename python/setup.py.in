@@ -9,8 +9,6 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Rene Fritze (2018)
-#
-# This file is part of the dune-xt-common project:
 # ~~~
 
 import sys
