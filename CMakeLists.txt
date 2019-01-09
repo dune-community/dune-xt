@@ -39,10 +39,10 @@ dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-grid_SOURCE_DIR}/dune MODULE_LIB
 add_header_listing()
 make_dependent_modules_sys_included()
 
-include(DuneXTInstallPythonPackage)
+include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the
 # compiled extensions directly usable from the venv
-dune_python_install_package(PATH python)
+dune_pybindxi_install_python_package(PATH python)
 include_dependent_binary_python_dirs()
 # do not change order here
 add_subdirectory(python)
