@@ -43,10 +43,10 @@ make_dependent_modules_sys_included()
 add_subdirectory(dune)
 add_subdirectory(doc)
 
-include(DuneXTInstallPythonPackage)
+include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the
 # compiled extensions directly usable from the venv
-dune_python_install_package(PATH python)
+dune_pybindxi_install_python_package(PATH python)
 include_dependent_binary_python_dirs()
 # do not change order here
 if(dune-pybindxi_FOUND)
