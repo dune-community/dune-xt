@@ -571,22 +571,10 @@ public:
           wrapper.functor().finalize();
       }
     };
-    fin(element_and_intersection_functor_wrappers_);
     fin(element_functor_wrappers_);
     fin(intersection_functor_wrappers_);
+    fin(element_and_intersection_functor_wrappers_);
   } // ... finalize()
-
-  // finalize calling thread
-  void finalize_thread()
-  {
-    auto fin = [](auto& wrapper_list) {
-      for (auto&& wrapper : wrapper_list)
-        wrapper.functor().finalize();
-    };
-    fin(*element_functor_wrappers_);
-    fin(*intersection_functor_wrappers_);
-    fin(*element_and_intersection_functor_wrappers_);
-  }
 
   /**
    * \}
