@@ -51,12 +51,7 @@ public:
     return config;
   } // ... defaults(...)
 
-  explicit ConstantFunction(const RangeReturnType& constant, const std::string name_in = static_id())
-    : constant_(constant)
-    , name_(name_in)
-  {}
-
-  explicit ConstantFunction(const RangeField& constant, const std::string name_in = static_id())
+  ConstantFunction(const RangeReturnType& constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
   {}
