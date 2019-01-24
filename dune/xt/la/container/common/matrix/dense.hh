@@ -277,11 +277,11 @@ public:
   std::enable_if_t<Common::is_matrix<OtherMatrixType>::value, void> axpy(const ScalarType& alpha,
                                                                          const OtherMatrixType& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     axpy_impl(alpha, xx);
   } // ... axpy(...)
 
@@ -377,9 +377,9 @@ public:
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     assert(ii < rows());
     assert(jj < cols());
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     backend_->get_entry_ref(ii, jj) += value;
   } // ... add_to_entry(...)
 

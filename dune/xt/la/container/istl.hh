@@ -227,10 +227,10 @@ public:
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend().axpy(alpha, xx.backend());
   }
 
@@ -258,8 +258,8 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     assert(ii < size());
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     backend()[ii][0] += value;
   }
 
@@ -326,19 +326,19 @@ public:
 
   virtual void iadd(const ThisType& other) override final
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() += other.backend();
   } // ... iadd(...)
 
   virtual void isub(const ThisType& other) override final
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() -= other.backend();
   } // ... isub(...)
 
@@ -517,11 +517,11 @@ public:
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend().axpy(alpha, xx.backend());
   } // ... axpy(...)
 
@@ -557,8 +557,8 @@ public:
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     assert(these_are_valid_indices(ii, jj));
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     backend()[ii][jj][0][0] += value;
   }
 

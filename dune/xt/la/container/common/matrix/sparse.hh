@@ -282,8 +282,8 @@ public:
 
   inline void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     assert(has_equal_shape(xx));
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     const auto& xx_entries = *xx.entries_;
     for (size_t ii = 0; ii < entries_->size(); ++ii)
       entries_->operator[](ii) += alpha * xx_entries[ii];

@@ -130,10 +130,10 @@ public:
   template <class T>
   void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -153,8 +153,8 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     assert(ii < size());
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     backend()(ii) += value;
   }
 
@@ -246,10 +246,10 @@ public:
   template <class T>
   void iadd(const EigenBaseVector<T, ScalarType>& other)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() += other.backend();
   } // ... iadd(...)
 
@@ -261,10 +261,10 @@ public:
   template <class T>
   void isub(const EigenBaseVector<T, ScalarType>& other)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() -= other.backend();
   } // ... isub(...)
 

@@ -48,8 +48,7 @@ public:
 
   IdentityPreconditioner(const SolverCategory::Category cat)
     : category_(cat)
-  {
-  }
+  {}
 
   //! Category of the preconditioner (see SolverCategory::Category)
   virtual SolverCategory::Category category() const override final
@@ -57,18 +56,14 @@ public:
     return category_;
   }
 
-  virtual void pre(domain_type&, range_type&) override final
-  {
-  }
+  virtual void pre(domain_type&, range_type&) override final {}
 
   virtual void apply(domain_type& v, const range_type& d) override final
   {
     v = d;
   }
 
-  virtual void post(domain_type&) override final
-  {
-  }
+  virtual void post(domain_type&) override final {}
 
 private:
   SolverCategory::Category category_;

@@ -201,10 +201,10 @@ public:
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of x (" << xx.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     for (size_t ii = 0; ii < backend().size(); ++ii)
       backend()[ii] += alpha * xx.backend()[ii];
   } // ... axpy(...)
@@ -230,8 +230,8 @@ public:
 
   void add_to_entry(const size_t ii, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     assert(ii < size());
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, size());
     backend()[ii] += value;
   }
 
@@ -298,21 +298,21 @@ public:
 
   virtual void iadd(const ThisType& other) override final
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       if (other.size() != size())
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() += other.backend();
   } // ... iadd(...)
 
   virtual void isub(const ThisType& other) override final
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (other.size() != size())
       if (other.size() != size())
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                    "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() -= other.backend();
   } // ... isub(...)
 

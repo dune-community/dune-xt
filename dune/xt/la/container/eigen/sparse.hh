@@ -253,11 +253,11 @@ public:
 
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() += alpha * xx.backend();
   } // ... axpy(...)
 
@@ -294,8 +294,8 @@ public:
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     assert(these_are_valid_indices(ii, jj));
+    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
     backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(jj)) += value;
   }
 
