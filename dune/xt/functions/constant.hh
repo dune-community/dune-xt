@@ -51,12 +51,7 @@ public:
     return config;
   } // ... defaults(...)
 
-  explicit ConstantFunction(const RangeReturnType& constant, const std::string name_in = static_id())
-    : constant_(constant)
-    , name_(name_in)
-  {}
-
-  explicit ConstantFunction(const RangeField& constant, const std::string name_in = static_id())
+  ConstantFunction(const RangeReturnType constant, const std::string name_in = static_id())
     : constant_(constant)
     , name_(name_in)
   {}
@@ -100,13 +95,8 @@ class ConstantGridFunction : public GridFunctionInterface<Element, rangeDim, ran
 public:
   using typename BaseType::LocalFunctionType;
 
-  explicit ConstantGridFunction(const typename LocalFunctionType::RangeType& constant,
-                                const std::string name_in = static_id())
-    : constant_function_(constant, name_in)
-    , constant_grid_function_(constant_function_)
-  {}
-
-  explicit ConstantGridFunction(const RangeField& constant, const std::string name_in = static_id())
+  ConstantGridFunction(const typename LocalFunctionType::RangeReturnType constant,
+                       const std::string name_in = static_id())
     : constant_function_(constant, name_in)
     , constant_grid_function_(constant_function_)
   {}
@@ -121,7 +111,7 @@ public:
     return constant_grid_function_.local_function();
   }
 
-  virtual std::string name() const
+  virtual std::string name() const override final
   {
     return constant_function_.name();
   }
