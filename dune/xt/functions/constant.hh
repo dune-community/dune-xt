@@ -92,6 +92,46 @@ public:
 };
 
 
+template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
+class ConstantGridFunction : public GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>
+{
+  using BaseType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
+
+public:
+  using typename BaseType::LocalFunctionType;
+
+  explicit ConstantGridFunction(const typename LocalFunctionType::RangeType& constant,
+                                const std::string name_in = static_id())
+    : constant_function_(constant, name_in)
+    , constant_grid_function_(constant_function_)
+  {}
+
+  explicit ConstantGridFunction(const RangeField& constant, const std::string name_in = static_id())
+    : constant_function_(constant, name_in)
+    , constant_grid_function_(constant_function_)
+  {}
+
+  static std::string static_id()
+  {
+    return "dune.xt.functions.constantgridfunction";
+  }
+
+  virtual std::unique_ptr<LocalFunctionType> local_function() const override final
+  {
+    return constant_grid_function_.local_function();
+  }
+
+  virtual std::string name() const
+  {
+    return constant_function_.name();
+  }
+
+private:
+  ConstantFunction<BaseType::domain_dim, rangeDim, rangeDimCols, RangeField> constant_function_;
+  FunctionAsGridFunctionWrapper<Element, rangeDim, rangeDimCols, RangeField> constant_grid_function_;
+};
+
+
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
