@@ -555,8 +555,6 @@ public:
     IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
       xx_istl[ii] = xx[ii];
-    for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy_istl[ii] = yy[ii];
     mv(xx_istl, yy_istl);
     for (size_t ii = 0; ii < yy.size(); ++ii)
       yy.set_entry(ii, yy_istl[ii]);
@@ -574,8 +572,6 @@ public:
     IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
       xx_istl[ii] = xx[ii];
-    for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy_istl[ii] = yy[ii];
     mtv(xx_istl, yy_istl);
     for (size_t ii = 0; ii < yy.size(); ++ii)
       yy.set_entry(ii, yy_istl[ii]);

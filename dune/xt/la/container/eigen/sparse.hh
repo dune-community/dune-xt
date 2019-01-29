@@ -292,8 +292,6 @@ public:
     EigenDenseVector<ScalarType> xx_eigen(xx.size()), yy_eigen(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
       xx_eigen[ii] = xx[ii];
-    for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy_eigen[ii] = yy[ii];
     mv(xx_eigen, yy_eigen);
     for (size_t ii = 0; ii < yy.size(); ++ii)
       yy.set_entry(ii, yy_eigen[ii]);
@@ -311,8 +309,6 @@ public:
     EigenDenseVector<ScalarType> xx_eigen(xx.size()), yy_eigen(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
       xx_eigen[ii] = xx[ii];
-    for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy_eigen[ii] = yy[ii];
     mtv(xx_eigen, yy_eigen);
     for (size_t ii = 0; ii < yy.size(); ++ii)
       yy.set_entry(ii, yy_eigen[ii]);
