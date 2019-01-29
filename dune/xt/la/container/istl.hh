@@ -472,7 +472,7 @@ public:
   ThisType& operator=(const ThisType& other)
   {
     if (this != &other) {
-      backend_ = *other.backend_;
+      *backend_ = *other.backend_;
       mutexes_ = std::make_unique<MutexesType>(other.mutexes_->size());
     }
     return *this;
@@ -549,10 +549,36 @@ public:
     backend().mv(xx.backend(), yy.backend());
   }
 
+  template <class T1, class T2>
+  inline void mv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  {
+    IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
+    for (size_t ii = 0; ii < xx.size(); ++ii)
+      xx_istl[ii] = xx[ii];
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy_istl[ii] = yy[ii];
+    mv(xx_istl, yy_istl);
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy.set_entry(ii, yy_istl[ii]);
+  }
+
   inline void mtv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
   {
     auto& backend_ref = backend();
     backend_ref.mtv(xx.backend(), yy.backend());
+  }
+
+  template <class T1, class T2>
+  inline void mtv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  {
+    IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
+    for (size_t ii = 0; ii < xx.size(); ++ii)
+      xx_istl[ii] = xx[ii];
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy_istl[ii] = yy[ii];
+    mtv(xx_istl, yy_istl);
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy.set_entry(ii, yy_istl[ii]);
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)

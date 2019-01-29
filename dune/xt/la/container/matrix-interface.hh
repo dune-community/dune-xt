@@ -102,6 +102,12 @@ public:
     CHECK_AND_CALL_CRTP(this->as_imp().mv(xx, yy));
   }
 
+  template <class XX, class YY>
+  inline void mtv(const XX& xx, YY& yy) const
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().mtv(xx, yy));
+  }
+
   inline void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     CHECK_AND_CALL_CRTP(this->as_imp().add_to_entry(ii, jj, value));

@@ -16,7 +16,6 @@ from dune.xt import codegen
 def matrices(cache):
   mat = ['CommonDenseMatrix', 'CommonSparseMatrixCsr', 'CommonSparseMatrixCsc',
     'CommonSparseOrDenseMatrixCsr', 'CommonSparseOrDenseMatrixCsc']
-
   if codegen.have_eigen(cache):
       mat.extend(['EigenRowMajorSparseMatrix', 'EigenDenseMatrix'])
   if codegen.have_istl(cache):

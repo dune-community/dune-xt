@@ -381,7 +381,7 @@ public:
         tmp_vec[cc] += vec_entries[ii] * backend_->get_entry_ref(rr, cc);
     }
     for (size_t cc = 0; cc < cols(); ++cc)
-      if (XT::Common::FloatCmp::ne(tmp_vec[cc], 0.))
+      if (XT::Common::FloatCmp::ne(tmp_vec[cc], ScalarType(0.)))
         yy.set_new_entry(cc, tmp_vec[cc]);
   } // void mtv(...)
 

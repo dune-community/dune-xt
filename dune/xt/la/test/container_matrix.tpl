@@ -130,6 +130,16 @@ struct MatrixTest_{{T_NAME}} : public ::testing::Test
     sparse_pattern.inner(1).push_back(1); //|-, -, -, x|
     sparse_pattern.inner(2).push_back(3); //|-, -, -, -|
 
+    PatternType sparse_pattern2(dim);
+    for (size_t jj = 0; jj < dim; ++jj)
+      sparse_pattern2.inner(0).push_back(jj); //|x, x, x, x|
+    sparse_pattern2.inner(1).push_back(0);    //|x, x, -, -|
+    sparse_pattern2.inner(1).push_back(1);    //|x, -, x, -|
+    sparse_pattern2.inner(2).push_back(0);    //|x, -, x, -|
+    sparse_pattern2.inner(2).push_back(2);
+    sparse_pattern2.inner(3).push_back(0);
+    sparse_pattern2.inner(3).push_back(2);
+
     // create test matrizes
     MatrixImp matrix_zeros_dense(dim, dim, dense_pattern); // |0, 0, 0, 0|
     for (size_t ii = 0; ii < dim; ++ii) { // |0, 0, 0, 0|
@@ -162,6 +172,11 @@ struct MatrixTest_{{T_NAME}} : public ::testing::Test
     testmatrix_sparse.set_entry(1, 0, ScalarType(1)); //|-,   -,   -, -0.5|
     testmatrix_sparse.set_entry(1, 1, ScalarType(1.5)); //|-,   -,   -,    -|
     testmatrix_sparse.set_entry(2, 3, ScalarType(-0.5));
+
+    MatrixImp testmatrix_sparse2(dim, dim, sparse_pattern2);
+    for (size_t ii = 0; ii < dim; ++ii)
+      for (auto&& jj : sparse_pattern2.inner(ii))
+        testmatrix_sparse2.set_entry(ii, jj, 2.);
 
     // create test vectors
     VectorImp vector_zeros(dim); // [0, 0, 0, 0]
@@ -329,6 +344,67 @@ struct MatrixTest_{{T_NAME}} : public ::testing::Test
     matrix_ones.mtv(vector_ones, res_mv);
     for (size_t ii = 0; ii < rows; ++ii) {
         DXTC_EXPECT_FLOAT_EQ(res_mtv[ii], res_mv[ii]);
+    }
+    // test clear_row/col, unit_row/col
+    auto testm1 = matrix_ones;
+    testm1 *= 2.;
+    testm1.clear_row(0);
+    testm1.clear_row(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (size_t jj = 0; jj < dim; ++jj)
+        DXTC_EXPECT_FLOAT_EQ(testm1.get_entry(ii, jj), ii == 0 || ii == 2 ? ScalarType(0.) : ScalarType(2.));
+    }
+    testm1 = matrix_ones;
+    testm1 *= 2.;
+    testm1.clear_col(0);
+    testm1.clear_col(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (size_t jj = 0; jj < dim; ++jj)
+        DXTC_EXPECT_FLOAT_EQ(testm1.get_entry(ii, jj), jj == 0 || jj == 2 ? ScalarType(0.) : ScalarType(2.));
+    }
+    testm1 = matrix_ones;
+    testm1 *= 2.;
+    testm1.unit_row(0);
+    testm1.unit_row(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (size_t jj = 0; jj < dim; ++jj)
+        DXTC_EXPECT_FLOAT_EQ(testm1.get_entry(ii, jj), ii == 0 || ii == 2 ? ScalarType(ii == jj) : 2.);
+    }
+    testm1 = matrix_ones;
+    testm1 *= 2.;
+    testm1.unit_col(0);
+    testm1.unit_col(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (size_t jj = 0; jj < dim; ++jj)
+        DXTC_EXPECT_FLOAT_EQ(testm1.get_entry(ii, jj), jj == 0 || jj == 2 ? ScalarType(ii == jj) : 2.);
+    }
+    auto testm2 = testmatrix_sparse2;
+    testm2.clear_row(0);
+    testm2.clear_row(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (auto&& jj : sparse_pattern2.inner(ii))
+        DXTC_EXPECT_FLOAT_EQ(testm2.get_entry(ii, jj), ii == 0 || ii == 2 ? ScalarType(0.) : ScalarType(2.));
+    }
+    testm2 = testmatrix_sparse2;
+    testm2.clear_col(0);
+    testm2.clear_col(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (auto&& jj : sparse_pattern2.inner(ii))
+        DXTC_EXPECT_FLOAT_EQ(testm2.get_entry(ii, jj), jj == 0 || jj == 2 ? ScalarType(0.) : ScalarType(2.));
+    }
+    testm2 = testmatrix_sparse2;
+    testm2.unit_row(0);
+    testm2.unit_row(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (auto&& jj : sparse_pattern2.inner(ii))
+        DXTC_EXPECT_FLOAT_EQ(testm2.get_entry(ii, jj), ii == 0 || ii == 2 ? ScalarType(ii == jj) : 2.);
+    }
+    testm2 = testmatrix_sparse2;
+    testm2.unit_col(0);
+    testm2.unit_col(2);
+    for (size_t ii = 0; ii < dim; ++ii) {
+      for (auto&& jj : sparse_pattern2.inner(ii))
+        DXTC_EXPECT_FLOAT_EQ(testm2.get_entry(ii, jj), jj == 0 || jj == 2 ? ScalarType(ii == jj) : 2.);
     }
   } // void produces_correct_results() const
 }; // struct MatrixTest

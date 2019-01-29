@@ -565,6 +565,38 @@ public:
     yy.backend().transpose() = backend() * xx.backend();
   }
 
+  template <class T1, class T2>
+  inline void mv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  {
+    EigenDenseVector<ScalarType> xx_eigen(xx.size()), yy_eigen(yy.size());
+    for (size_t ii = 0; ii < xx.size(); ++ii)
+      xx_eigen[ii] = xx[ii];
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy_eigen[ii] = yy[ii];
+    mv(xx_eigen, yy_eigen);
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy.set_entry(ii, yy_eigen[ii]);
+  }
+
+  template <class T1, class T2>
+  inline void mtv(const EigenBaseVector<T1, ScalarType>& xx, EigenBaseVector<T2, ScalarType>& yy) const
+  {
+    yy.backend().transpose() = backend().transpose() * xx.backend();
+  }
+
+  template <class T1, class T2>
+  inline void mtv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  {
+    EigenDenseVector<ScalarType> xx_eigen(xx.size()), yy_eigen(yy.size());
+    for (size_t ii = 0; ii < xx.size(); ++ii)
+      xx_eigen[ii] = xx[ii];
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy_eigen[ii] = yy[ii];
+    mtv(xx_eigen, yy_eigen);
+    for (size_t ii = 0; ii < yy.size(); ++ii)
+      yy.set_entry(ii, yy_eigen[ii]);
+  }
+
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(ii < rows());
