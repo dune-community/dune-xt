@@ -642,21 +642,13 @@ public:
 
   void unit_col(const size_t jj)
   {
-    if (jj >= cols())
-      DUNE_THROW(Common::Exceptions::index_out_of_range,
-                 "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
     if (jj >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
     if (!backend_->exists(jj, jj))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << jj << ", " << jj << ") is not contained in the sparsity pattern!");
-    for (size_t ii = 0; (ii < rows()) && (ii != jj); ++ii) {
-      auto& row = backend_->operator[](ii);
-      const auto search_result = row.find(jj);
-      if (search_result != row.end())
-        row.operator[](jj)[0][0] = ScalarType(0);
-    }
+    clear_col(jj);
     set_entry(jj, jj, ScalarType(1));
   } // ... unit_col(...)
 
