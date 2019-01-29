@@ -201,6 +201,16 @@ public:
         set_entry(ii, jj, other[ii][jj]);
   } // CommonDenseMatrix(...)
 
+  template <class T, class F>
+  CommonDenseMatrix(const MatrixInterface<T, F>& other, const size_t num_mutexes = 1)
+    : backend_(std::make_unique<BackendType>(other.rows(), other.cols()))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
+  {
+    for (size_t ii = 0; ii < other.rows(); ++ii)
+      for (size_t jj = 0; jj < other.cols(); ++jj)
+        set_entry(ii, jj, other.get_entry(ii, jj));
+  } // CommonDenseMatrix(...)
+
   /**
    *  \note Takes ownership of backend_ptr in the sense that you must not delete it afterwards!
    */
