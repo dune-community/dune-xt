@@ -110,6 +110,16 @@ void SparsityPatternDefault::sort()
     std::sort(inner_vector.begin(), inner_vector.end());
 }
 
+SparsityPatternDefault SparsityPatternDefault::transposed(const size_t cols) const
+{
+  SparsityPatternDefault transposed_pattern(cols);
+  for (size_t rr = 0; rr < size(); ++rr)
+    for (const auto& cc : inner(rr))
+      transposed_pattern.insert(cc, rr);
+  transposed_pattern.sort();
+  return transposed_pattern;
+}
+
 SparsityPatternDefault dense_pattern(const size_t rows, const size_t cols)
 {
   SparsityPatternDefault ret(rows);

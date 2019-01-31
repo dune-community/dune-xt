@@ -61,6 +61,8 @@ public:
 
   void sort();
 
+  SparsityPatternDefault transposed(const size_t cols) const;
+
 private:
   BaseType vector_of_vectors_;
 }; // class SparsityPatternDefault

@@ -235,10 +235,11 @@ public:
 
   derived_type transposed() const
   {
-    derived_type yy(rows(), cols(), 0.);
+    const auto this_pattern = pattern();
+    derived_type yy(cols(), rows(), this_pattern.transposed(cols()));
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (size_t cc = 0; cc < cols(); ++cc)
-        yy.set_entry(rr, cc, get_entry(cc, rr));
+      for (const auto& cc : this_pattern.inner(rr))
+        yy.set_entry(cc, rr, get_entry(rr, cc));
     return yy;
   }
 
@@ -376,11 +377,12 @@ protected:
   {
     if (other.rows() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be multiplied do not match!");
-    const auto new_pattern = multiplication_pattern(pattern(), other.pattern(), other.cols());
+    const auto this_pattern = pattern();
+    const auto new_pattern = multiplication_pattern(this_pattern, other.pattern(), other.cols());
     derived_type yy(rows(), other.cols(), new_pattern);
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (size_t cc = 0; cc < other.cols(); ++cc)
-        for (size_t kk = 0; kk < cols(); ++kk)
+      for (auto&& cc : new_pattern.inner(rr))
+        for (auto&& kk : this_pattern.inner(rr))
           yy.add_to_entry(rr, cc, get_entry(rr, kk) * other.get_entry(kk, cc));
     return yy;
   }
