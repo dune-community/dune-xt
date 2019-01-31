@@ -300,6 +300,28 @@ struct MatrixTest_{{T_NAME}} : public ::testing::Test
       }
     }
 
+    // test multiply
+    const auto A = testmatrix_sparse;
+    const auto B = matrix_ones;
+    const auto A_squared = A*A;
+    const auto B_squared = B*B;
+    const auto A_times_B = A*B;
+    for (size_t ii = 0; ii < rows; ++ii) {
+      for (size_t jj = 0; jj < cols; ++jj) {
+        ScalarType A_squared_ii_jj(0.);
+        ScalarType B_squared_ii_jj(0.);
+        ScalarType A_times_B_ii_jj(0.);
+        for (size_t kk = 0; kk < cols; ++kk) {
+          A_squared_ii_jj += A.get_entry(ii, kk) * A.get_entry(kk, jj);
+          B_squared_ii_jj += B.get_entry(ii, kk) * B.get_entry(kk, jj);
+          A_times_B_ii_jj += A.get_entry(ii, kk) * B.get_entry(kk, jj);
+        }
+        DXTC_EXPECT_FLOAT_EQ(A_squared_ii_jj, A_squared.get_entry(ii, jj));
+        DXTC_EXPECT_FLOAT_EQ(B_squared_ii_jj, B_squared.get_entry(ii, jj));
+        DXTC_EXPECT_FLOAT_EQ(A_times_B_ii_jj, A_times_B.get_entry(ii, jj));
+      } // jj
+    } // ii
+
     // test axpy
     MatrixImp result_axpy = matrix_zeros_dense;
     result_axpy.axpy(ScalarType(1.5), matrix_ones);

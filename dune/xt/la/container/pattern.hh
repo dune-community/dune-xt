@@ -61,6 +61,8 @@ public:
 
   void sort();
 
+  bool contains(const size_t outer_index, const size_t inner_index) const;
+
   SparsityPatternDefault transposed(const size_t cols) const;
 
 private:

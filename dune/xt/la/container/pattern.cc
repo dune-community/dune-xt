@@ -85,7 +85,8 @@ SparsityPatternDefault SparsityPatternDefault::operator+(const SparsityPatternDe
       ret.insert(rr, cc);
   for (size_t rr = 0; rr < other.size(); ++rr)
     for (const auto& cc : other.inner(rr))
-      ret.insert(rr, cc);
+      if (!ret.contains(rr, cc))
+        ret.insert(rr, cc);
   ret.sort();
   return ret;
 }
@@ -108,6 +109,12 @@ void SparsityPatternDefault::sort()
 {
   for (auto& inner_vector : vector_of_vectors_)
     std::sort(inner_vector.begin(), inner_vector.end());
+}
+
+bool SparsityPatternDefault::contains(const size_t outer_index, const size_t inner_index) const
+{
+  const auto& row = inner(outer_index);
+  return std::find(row.begin(), row.end(), inner_index) != row.end();
 }
 
 SparsityPatternDefault SparsityPatternDefault::transposed(const size_t cols) const
