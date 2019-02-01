@@ -101,6 +101,8 @@ public:
   using typename ProvidesDataAccess<Traits>::DataType;
   // needed to fix gcc compilation error due to ambiguous lookup of derived type
   using derived_type = typename Traits::derived_type;
+  // for dune-istl's LinearOperator
+  using field_type = ScalarType;
 
 private:
   using MutexesType = typename Traits::MutexesType;
