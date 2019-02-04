@@ -94,12 +94,7 @@ public:
   int verbosity(const Common::Configuration& opts, const Common::Configuration& default_opts) const
   {
     const auto actual_value = opts.get("verbose", default_opts.get<int>("verbose"));
-    return
-#  if HAVE_MPI
-        (communicator_.access().communicator().rank() == 0) ? actual_value : 0;
-#  else
-        actual_value;
-#  endif
+    return actual_value;
   }
 
   void apply(const Vector& f, const Vector& g, Vector& u, Vector& p, const Common::Configuration& opts) const
