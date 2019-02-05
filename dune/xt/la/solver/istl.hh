@@ -107,7 +107,7 @@ public:
   static std::vector<std::string> types()
   {
     std::vector<std::string> ret{
-        "bicgstab.ssor", "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab"};
+        "bicgstab.ssor", "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab", "cg"};
 
     if (std::is_same<CommunicatorType, XT::SequentialCommunication>::value) {
 #if HAVE_SUPERLU
@@ -127,7 +127,7 @@ public:
     Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp.c_str(), "1e-5", "0"});
     Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
     iterative_options += general_opts;
-    if (tp.substr(0, 13) == "bicgstab.amg." || tp == "bicgstab") {
+    if (tp.substr(0, 13) == "bicgstab.amg." || tp == "bicgstab" || tp == "cg") {
       iterative_options.set("smoother.iterations", "1");
       iterative_options.set("smoother.relaxation_factor", "1");
       iterative_options.set("smoother.verbose", "0");
@@ -179,54 +179,12 @@ public:
 
   static std::vector<std::string> types()
   {
-    std::vector<std::string> ret{
-        "bicgstab.ssor", "bicgstab.amg.ssor", "bicgstab.amg.ilu0", "bicgstab.ilut", "bicgstab"};
-
-    if (std::is_same<CommunicatorType, XT::SequentialCommunication>::value) {
-#if HAVE_SUPERLU
-      ret.insert(ret.begin(), "superlu");
-#endif
-#if HAVE_UMFPACK
-      ret.push_back("umfpack");
-#endif
-    }
-    return ret;
+    return SolverOptions<MatrixType, CommunicatorType>::types();
   } // ... types()
 
   static XT::Common::Configuration options(const std::string type = "")
   {
-    const std::string tp = !type.empty() ? type : types()[0];
-    internal::SolverUtils::check_given(tp, types());
-    Common::Configuration general_opts({"type", "post_check_solves_system", "verbose"}, {tp.c_str(), "1e-5", "0"});
-    Common::Configuration iterative_options({"max_iter", "precision"}, {"10000", "1e-10"});
-    iterative_options += general_opts;
-    if (tp.substr(0, 13) == "bicgstab.amg." || tp == "bicgstab") {
-      iterative_options.set("smoother.iterations", "1");
-      iterative_options.set("smoother.relaxation_factor", "1");
-      iterative_options.set("smoother.verbose", "0");
-      iterative_options.set("preconditioner.max_level", "100");
-      iterative_options.set("preconditioner.coarse_target", "1000");
-      iterative_options.set("preconditioner.min_coarse_rate", "1.2");
-      iterative_options.set("preconditioner.prolong_damp", "1.6");
-      iterative_options.set("preconditioner.anisotropy_dim", "2"); // <- this should be the dimDomain of the problem!
-      iterative_options.set("preconditioner.isotropy_dim", "2"); // <- this as well
-      iterative_options.set("preconditioner.verbose", "0");
-      return iterative_options;
-    } else if (tp == "bicgstab.ilut" || tp == "bicgstab.ssor") {
-      iterative_options.set("preconditioner.iterations", "2");
-      iterative_options.set("preconditioner.relaxation_factor", "1.0");
-      return iterative_options;
-#if HAVE_UMFPACK
-    } else if (tp == "umfpack") {
-      return general_opts;
-#endif
-#if HAVE_SUPERLU
-    } else if (tp == "superlu") {
-      return general_opts;
-#endif
-    } else
-      DUNE_THROW(Common::Exceptions::internal_error, "Given solver type '" << tp << "' has no default options");
-    return Common::Configuration();
+    return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)
 
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution) const
@@ -255,10 +213,12 @@ public:
    */
   void apply(const IstlDenseVector<S>& rhs, IstlDenseVector<S>& solution, const Common::Configuration& opts) const
   {
-    typedef internal::IstlSolverTraits<S, CommunicatorType> Traits;
-    typedef typename Traits::IstlVectorType IstlVectorType;
-    typedef typename Traits::MatrixOperatorType MatrixOperatorType;
-    typedef BiCGSTABSolver<IstlVectorType> BiCgSolverType;
+    using Traits = internal::IstlSolverTraits<S, CommunicatorType>;
+    using IstlVectorType = typename Traits::IstlVectorType;
+    using MatrixOperatorType = typename Traits::MatrixOperatorType;
+    using BiCgSolverType = BiCGSTABSolver<IstlVectorType>;
+    using CgSolverType = CGSolver<IstlVectorType>;
+
     InverseOperatorResult solver_result;
     auto scalar_product = Traits::make_scalarproduct(communicator_.access());
 
@@ -318,6 +278,21 @@ public:
                               opts.get("precision", default_opts.get<S>("precision")),
                               opts.get("max_iter", default_opts.get<int>("max_iter")),
                               verbosity(opts, default_opts));
+        solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
+      } else if (type == "cg") {
+        auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
+        const auto cat = matrix_operator.category();
+        typedef IdentityPreconditioner<MatrixOperatorType> SequentialPreconditioner;
+        SequentialPreconditioner seq_preconditioner(cat);
+        auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
+        // define the CG as the actual solver
+        CgSolverType solver(matrix_operator,
+                            scalar_product,
+                            preconditioner,
+                            opts.get("precision", default_opts.get<S>("precision")),
+                            opts.get("max_iter", default_opts.get<int>("max_iter")),
+                            verbosity(opts, default_opts),
+                            false);
         solver.apply(solution.backend(), writable_rhs.backend(), solver_result);
 #if HAVE_UMFPACK
       } else if (type == "umfpack") {

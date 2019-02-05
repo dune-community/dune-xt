@@ -175,4 +175,15 @@ GTEST_TEST(SaddlePointSolver, test_cg_direct_schurcomplement)
   DXTC_EXPECT_FLOAT_EQ(0., (p - data.expected_p_).l2_norm(), 1e-12, 1e-12);
 }
 
+GTEST_TEST(SaddlePointSolver, test_cg_cg_schurcomplement)
+{
+  using Vector = typename SaddlePointTestData::Vector;
+  SaddlePointTestData data;
+  XT::LA::SaddlePointSolver<double> solver(data.A_, data.B_, data.B_, data.C_);
+  Vector u(data.f_.size()), p(data.g_.size());
+  solver.apply(data.f_, data.g_, u, p, "cg_cg_schurcomplement");
+  DXTC_EXPECT_FLOAT_EQ(0., (u - data.expected_u_).l2_norm(), 1e-12, 1e-12);
+  DXTC_EXPECT_FLOAT_EQ(0., (p - data.expected_p_).l2_norm(), 1e-12, 1e-12);
+}
+
 #endif

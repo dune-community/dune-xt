@@ -41,7 +41,7 @@ public:
   using Vector = IstlDenseVector<FieldType>;
   using VectorBackend = typename Vector::BackendType;
   using Matrix = IstlRowMajorSparseMatrix<FieldType>;
-  using Solver = Solver<Matrix, CommunicatorType>;
+  using SolverType = Solver<Matrix, CommunicatorType>;
 
   // Matrix dimensions are
   // A: m x m, B1, B2: m x n, C: n x n
@@ -95,7 +95,7 @@ public:
     B1_.mv(x, B1x);
     // calculate A^{-1} B1 x
     auto& AinvB1x = m_vec_2_;
-    A_inv_.apply(B1x, AinvB1x);
+    A_inv_.apply(B1x, AinvB1x, solver_opts_);
     // apply B2^T
     B2_.mtv(AinvB1x, y);
     // calculate Cx
@@ -128,7 +128,7 @@ public:
     return SolverCategory::Category::sequential;
   }
 
-  const Solver& A_inv() const
+  const SolverType& A_inv() const
   {
     return A_inv_;
   }
@@ -155,7 +155,7 @@ public:
 
 private:
   const Matrix& A_;
-  const Solver A_inv_;
+  const SolverType A_inv_;
   const Matrix& B1_;
   const Matrix& B2_;
   const Matrix& C_;

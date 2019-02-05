@@ -47,22 +47,19 @@ class SaddlePointSolver
 public:
   using Vector = IstlDenseVector<FieldType>;
   using Matrix = IstlRowMajorSparseMatrix<FieldType>;
-  using Solver = Solver<Matrix, CommunicatorType>;
 
   // Matrix and vector dimensions are
   // A: m x m, B1, B2: m x n, C: n x n, f: m, g: n
-  SaddlePointSolver(const Matrix& A,
-                    const Matrix& B1,
-                    const Matrix& B2,
-                    const Matrix& C,
-                    const Common::Configuration& solver_opts = SolverOptions<Matrix>::options())
-    : schur_complement_(A, B1, B2, C, solver_opts)
+  SaddlePointSolver(const Matrix& A, const Matrix& B1, const Matrix& B2, const Matrix& C)
+    : A_(A)
+    , B1_(B1)
+    , B2_(B2)
+    , C_(C)
   {}
 
   static std::vector<std::string> types()
   {
-    std::vector<std::string> ret{"direct"};
-    ret.insert(ret.begin(), "cg_direct_schurcomplement");
+    std::vector<std::string> ret{"direct", "cg_cg_schurcomplement", "cg_direct_schurcomplement"};
     return ret;
   } // ... types()
 
@@ -75,7 +72,7 @@ public:
     iterative_options += general_opts;
     if (tp == "direct")
       return general_opts;
-    else if (tp == "cg_direct_schurcomplement")
+    else if (tp == "cg_direct_schurcomplement" || tp == "cg_cg_schurcomplement")
       return iterative_options;
     else
       return general_opts;
@@ -106,14 +103,10 @@ public:
       const size_t m = f.size();
       const size_t n = g.size();
       XT::LA::SparsityPatternDefault system_matrix_pattern(m + n);
-      const auto& A = schur_complement_.A();
-      const auto& B1 = schur_complement_.B1();
-      const auto& B2 = schur_complement_.B2();
-      const auto& C = schur_complement_.C();
-      const auto pattern_A = A.pattern();
-      const auto pattern_B1 = B1.pattern();
-      const auto pattern_B2 = B2.pattern();
-      const auto pattern_C = C.pattern();
+      const auto pattern_A = A_.pattern();
+      const auto pattern_B1 = B1_.pattern();
+      const auto pattern_B2 = B2_.pattern();
+      const auto pattern_C = C_.pattern();
       for (size_t ii = 0; ii < m; ++ii) {
         for (const auto& jj : pattern_A.inner(ii))
           system_matrix_pattern.insert(ii, jj);
@@ -131,15 +124,15 @@ public:
       Matrix system_matrix(m + n, m + n, system_matrix_pattern);
       for (size_t ii = 0; ii < m; ++ii) {
         for (const auto& jj : pattern_A.inner(ii))
-          system_matrix.set_entry(ii, jj, A.get_entry(ii, jj));
+          system_matrix.set_entry(ii, jj, A_.get_entry(ii, jj));
         for (const auto& jj : pattern_B1.inner(ii))
-          system_matrix.set_entry(ii, m + jj, B1.get_entry(ii, jj));
+          system_matrix.set_entry(ii, m + jj, B1_.get_entry(ii, jj));
         for (const auto& jj : pattern_B2.inner(ii))
-          system_matrix.set_entry(m + jj, ii, B2.get_entry(ii, jj));
+          system_matrix.set_entry(m + jj, ii, B2_.get_entry(ii, jj));
       } // ii
       for (size_t ii = 0; ii < n; ++ii)
         for (const auto& jj : pattern_C.inner(ii))
-          system_matrix.set_entry(m + ii, m + jj, C.get_entry(ii, jj));
+          system_matrix.set_entry(m + ii, m + jj, C_.get_entry(ii, jj));
 
       // also copy the rhs
       Vector system_vector(m + n, 0.), solution_vector(m + n, 0.);
@@ -149,38 +142,51 @@ public:
         system_vector[m + ii] = g[ii];
 
       // solve the system by a direct solver
-      XT::LA::solve(system_matrix, system_vector, solution_vector);
+      if (opts.has_sub("inner_solver"))
+        XT::LA::solve(system_matrix, system_vector, solution_vector, opts.sub("inner_solver"));
+      else
+        XT::LA::solve(system_matrix, system_vector, solution_vector);
 
       // copy to result vectors
       for (size_t ii = 0; ii < m; ++ii)
         u[ii] = solution_vector[ii];
       for (size_t ii = 0; ii < n; ++ii)
         p[ii] = solution_vector[m + ii];
-    } else if (type == "cg_direct_schurcomplement") {
+    } else if (type == "cg_direct_schurcomplement" || type == "cg_cg_schurcomplement") {
       // calculate rhs B2^T A^{-1} f - g
       auto Ainv_f = f;
       auto rhs_p = g;
-      schur_complement_.A_inv().apply(f, Ainv_f);
-      schur_complement_.B2().mtv(Ainv_f, rhs_p);
+      SchurComplementOperator<FieldType, CommunicatorType> schur_complement_op(
+          A_,
+          B1_,
+          B2_,
+          C_,
+          opts.has_sub("inner_solver") ? opts.sub("inner_solver")
+                                       : XT::LA::SolverOptions<Matrix, CommunicatorType>::options(
+                                             type == "cg_direct_schurcomplement" ? "" : "cg"));
+      schur_complement_op.A_inv().apply(f, Ainv_f);
+      B2_.mtv(Ainv_f, rhs_p);
       rhs_p -= g;
 
       // Solve S p = rhs
       IdentityPreconditioner<SchurComplementOperator<FieldType, CommunicatorType>> prec(
           SolverCategory::Category::sequential);
-      auto schur_complement_copy = schur_complement_;
-      Dune::CGSolver<typename Vector::BackendType> outer_solver(schur_complement_copy, prec, 1e-10, 10000, 0, false);
+      Dune::CGSolver<typename Vector::BackendType> outer_solver(schur_complement_op, prec, 1e-10, 10000, 0, false);
       InverseOperatorResult res;
       outer_solver.apply(p.backend(), rhs_p.backend(), res);
 
       // Now solve u = A^{-1}(f - B1 p)
       auto rhs_u = f;
-      rhs_u -= schur_complement_.B1() * p;
-      schur_complement_.A_inv().apply(rhs_u, u);
+      rhs_u -= B1_ * p;
+      schur_complement_op.A_inv().apply(rhs_u, u);
     }
   } // ... apply(...)
 
 private:
-  const SchurComplementOperator<FieldType, CommunicatorType> schur_complement_;
+  const Matrix& A_;
+  const Matrix& B1_;
+  const Matrix& B2_;
+  const Matrix& C_;
 };
 
 #else // HAVE_DUNE_ISTL
