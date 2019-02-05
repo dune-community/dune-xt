@@ -424,10 +424,10 @@ public:
     : mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     if (prune) {
-      const auto pruned_pattern = pruned_pattern_from_backend(mat, eps);
-      build_sparse_matrix(mat.N(), mat.M(), pruned_pattern);
-      for (size_t ii = 0; ii < pruned_pattern.size(); ++ii) {
-        const auto& row_indices = pruned_pattern.inner(ii);
+      const auto pruned_patt = pruned_pattern_from_backend(mat, eps);
+      build_sparse_matrix(mat.N(), mat.M(), pruned_patt);
+      for (size_t ii = 0; ii < pruned_patt.size(); ++ii) {
+        const auto& row_indices = pruned_patt.inner(ii);
         if (row_indices.size() > 0) {
           const auto& mat_row = mat[ii];
           auto& backend_row = backend_->operator[](ii);
