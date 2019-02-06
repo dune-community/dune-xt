@@ -373,16 +373,15 @@ struct triangular_helper<MatrixType, FirstVectorType, SecondVectorType, triangul
   static void solve(const MatrixType& A, FirstVectorType& x, const SecondVectorType& b)
   {
     // copy data from b to dense x vector
-    const size_t size = V2::size(b);
-    assert(V1::size(x) == size);
-    std::vector<ScalarType> x_dense(size, 0.);
-    for (size_t ii = 0; ii < size; ++ii)
+    assert(x.size() == b.size());
+    std::vector<ScalarType> x_dense(x.size(), 0.);
+    for (size_t ii = 0; ii < x.size(); ++ii)
       x_dense[ii] = V1::get_entry(b, ii);
     // call dense vector specialization
     TriangularSolver<MatrixType, std::vector<ScalarType>, triangular_type, transpose>::solve(A, x_dense);
     // set sparse entries
     x.clear();
-    for (size_t ii = 0; ii < size; ++ii)
+    for (size_t ii = 0; ii < x.size(); ++ii)
       if (Common::FloatCmp::ne(x_dense[ii], 0.))
         x.set_new_entry(ii, x_dense[ii]);
   }
