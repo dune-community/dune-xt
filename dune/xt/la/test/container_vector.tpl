@@ -239,6 +239,17 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
     EXPECT_EQ(3, amax.first);
     EXPECT_DOUBLE_EQ(RealType(3.5), amax.second);
 
+    // test max, min
+    if (!std::is_arithmetic<ScalarType>::value) {
+      EXPECT_THROW(ones.min(), XT::LA::Exceptions::not_available);
+      EXPECT_THROW(ones.max(), XT::LA::Exceptions::not_available);
+    } else {
+      EXPECT_EQ(-2., testvector_4.min());
+      EXPECT_EQ(3., testvector_4.max());
+      EXPECT_EQ(-3.5, testvector_5.min());
+      EXPECT_EQ(2.5, testvector_5.max());
+    }
+
     // test l1_norm()
     RealType l1_norm = zeros.l1_norm();
     EXPECT_DOUBLE_EQ(RealType(0), l1_norm);

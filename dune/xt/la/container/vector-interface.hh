@@ -207,7 +207,7 @@ public:
 
   virtual ScalarType max() const
   {
-    return complex_switch<>::min(this->as_imp());
+    return complex_switch<>::max(this->as_imp());
   }
 
   virtual ScalarType mean() const
