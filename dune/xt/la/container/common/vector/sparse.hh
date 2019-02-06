@@ -490,7 +490,7 @@ template <class T>
 struct VectorAbstraction<LA::CommonSparseVector<T>>
   : public LA::internal::VectorAbstractionBase<LA::CommonSparseVector<T>>
 {
-  static const bool contiguous = false;
+  static const bool is_contiguous = false;
 };
 
 

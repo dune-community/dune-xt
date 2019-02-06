@@ -38,26 +38,16 @@ public:
   typedef VectorInterface<Traits, ScalarImp> VectorType;
   typedef typename VectorType::ScalarType ScalarType;
 
-private:
-  struct ConstHolder
-  {
-    explicit ConstHolder(const VectorType& vec)
-      : element(vec)
-    {}
-
-    const VectorType& element;
-  }; // struct ConstHolder
-
 public:
   explicit VectorInputIterator(const VectorType& vec, const bool end = false)
-    : const_holder_(std::make_shared<ConstHolder>(vec))
+    : const_vec_(vec)
     , position_(0)
     , end_(end)
   {}
 
   ThisType& operator++()
   {
-    if (!end_ && position_ < (const_holder_->element.size() - 1))
+    if (!end_ && position_ < const_vec_.size() - 1)
       ++position_;
     else
       end_ = true;
@@ -78,11 +68,11 @@ public:
   {
     if (end_)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "This is the end!");
-    return const_holder_->element[position_];
+    return const_vec_[position_];
   }
 
 private:
-  std::shared_ptr<ConstHolder> const_holder_;
+  const VectorType& const_vec_;
 
 protected:
   size_t position_;
@@ -104,30 +94,21 @@ public:
 private:
   static_assert(std::is_same<ScalarImp, ScalarType>::value, "");
 
-  struct Holder
-  {
-    explicit Holder(VectorType& vec)
-      : element(vec)
-    {}
-
-    VectorType& element;
-  }; // struct Holder
-
 public:
   explicit VectorOutputIterator(VectorType& vec, const bool end = false)
     : BaseType(vec, end)
-    , holder_(std::make_shared<Holder>(vec))
+    , vec_(vec)
   {}
 
   ScalarType& operator*()
   {
     if (this->end_)
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "This is the end!");
-    return holder_->element[this->position_];
+    return vec_[this->position_];
   } // ... operator*()
 
 private:
-  std::shared_ptr<Holder> holder_;
+  VectorType& vec_;
 }; // class VectorOutputIterator
 
 } // namespace internal
