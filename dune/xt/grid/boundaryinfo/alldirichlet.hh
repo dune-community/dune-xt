@@ -49,7 +49,7 @@ public:
 
   virtual const BoundaryType& type(const IntersectionType& intersection) const override final
   {
-    if (intersection.boundary())
+    if (intersection.boundary() && !intersection.neighbor())
       return dirichlet_boundary_;
     return no_boundary_;
   }
