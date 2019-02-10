@@ -76,6 +76,8 @@ public:
   using typename BaseType::derived_type;
   using typename BaseType::RealType;
   using typename BaseType::ScalarType;
+  static constexpr Backends dense_matrix_type = Traits::dense_matrix_type;
+  static constexpr Backends sparse_matrix_type = Traits::sparse_matrix_type;
   using const_iterator = internal::VectorInputIterator<Traits, ScalarType>;
   using iterator = internal::VectorOutputIterator<Traits, ScalarType>;
   friend const_iterator;
