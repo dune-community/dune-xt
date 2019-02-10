@@ -51,9 +51,9 @@ public:
     return config;
   } // ... defaults(...)
 
-  ConstantFunction(const RangeReturnType& constant, const std::string name_in = static_id())
-    : constant_(constant)
-    , name_(name_in)
+  explicit ConstantFunction(const RangeReturnType& value, const std::string nm = static_id())
+    : value_(value)
+    , name_(nm)
   {}
 
 #if !DUNE_XT_WITH_PYTHON_BINDINGS
@@ -68,7 +68,7 @@ public:
   RangeReturnType evaluate(const DomainType& /*point_in_global_coordinates*/,
                            const Common::Parameter& /*param*/ = {}) const override final
   {
-    return constant_;
+    return value_;
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
@@ -82,7 +82,7 @@ public:
     return name_;
   }
 
-  const RangeReturnType constant_;
+  const RangeReturnType value_;
   const std::string name_;
 };
 
