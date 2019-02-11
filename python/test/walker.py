@@ -36,8 +36,8 @@ def _grid_provider_factory(grid_type, mpi, maker_str='make_cube_grid__{}'):
     return maker(opts, MPI.COMM_WORLD)
 
 
-_dd_subdomain_grid_provider_factory = functools.partial(_grid_provider_factory, maker_str='make_cube_dd_subdomain_grid__{}')
-
+_dd_subdomain_grid_provider_factory = functools.partial(
+    _grid_provider_factory, maker_str='make_cube_dd_subdomain_grid__{}')
 '''
 @pytest.fixture(params=xtg.types.available_types)
 def mpi_grid_provider(request):
@@ -62,6 +62,7 @@ def combined_dd_subdomain_grid_provider(request):
 
 def test_available():
     assert len(xtg.types.available_types) > 0
+
 
 '''
 def test_grid_provider(combined_grid_provider):
@@ -107,4 +108,3 @@ def test_walker(grid_provider):
 
 def test_count():
     pass
-

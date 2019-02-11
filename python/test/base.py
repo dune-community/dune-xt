@@ -13,6 +13,7 @@ import pytest
 from dune.xt.common.test import load_all_submodule
 from dune.xt.grid import types
 
+
 def test_load_all():
     import dune.xt.grid as xtc
     load_all_submodule(xtc)
@@ -20,6 +21,5 @@ def test_load_all():
 
 def test_types():
     cache = {}
-    rt = types.all_types(cache=cache, dims=(2,3))
+    rt = types.all_types(cache=cache, dims=(2, 3))
     assert len(rt) == 0
-

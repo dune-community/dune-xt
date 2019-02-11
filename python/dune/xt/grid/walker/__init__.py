@@ -19,7 +19,7 @@ except ImportError as e:
     logging.error('dune-xt-grid bindings not available')
 
 
-def make_walker(gridprovider, level = 0):
+def make_walker(gridprovider, level=0):
     for factory in [globals()[s] for s in globals().keys() if s.startswith('make_walker_on_')]:
         try:
             return factory(gridprovider, level)
