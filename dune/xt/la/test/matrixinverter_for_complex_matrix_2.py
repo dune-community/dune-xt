@@ -12,14 +12,18 @@
 
 from dune.xt.codegen import typeid_to_typedef_name as safe_name, have_eigen
 
-matrix = ['EigenDenseMatrix<std::complex<double>>', 'FieldMatrix<std::complex<double>, 10, 10>',
-          'CommonDenseMatrix<std::complex<double>>',
-          'CommonDenseMatrix<std::complex<double>, Common::StorageLayout::dense_column_major>',
-          'CommonSparseMatrix<std::complex<double>>']
+matrix = [
+    'EigenDenseMatrix<std::complex<double>>', 'FieldMatrix<std::complex<double>, 10, 10>',
+    'CommonDenseMatrix<std::complex<double>>',
+    'CommonDenseMatrix<std::complex<double>, Common::StorageLayout::dense_column_major>',
+    'CommonSparseMatrix<std::complex<double>>'
+]
+
 
 def _ok(ft):
     if 'Eigen' in ft:
         return have_eigen(cache)
     return True
+
 
 testtypes = [(safe_name('_'.join(ft)), ft) for ft in matrix if _ok(ft)]

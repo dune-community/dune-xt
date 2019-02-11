@@ -12,11 +12,16 @@
 
 from algorithms import la_types, testtypes_creator
 
-common_types = [f.split('_') for f in ['FieldMatrix_FieldVector_FieldVector_double,6,6',
-                                       'BlockedFieldMatrix_FieldVector_FieldVector_double,2,3,3',
-                                       'BlockedFieldMatrix_BlockedFieldVector_BlockedFieldVector_double,2,3,3']]
+common_types = [
+    f.split('_') for f in [
+        'FieldMatrix_FieldVector_FieldVector_double,6,6', 'BlockedFieldMatrix_FieldVector_FieldVector_double,2,3,3',
+        'BlockedFieldMatrix_BlockedFieldVector_BlockedFieldVector_double,2,3,3'
+    ]
+]
 
-dune_types = [f.split('_') for f in ['FieldMatrix_FieldVector_FieldVector_double,6,6',
-                                     'DynamicMatrix_DynamicVector_DynamicVector_double']]
+dune_types = [
+    f.split('_')
+    for f in ['FieldMatrix_FieldVector_FieldVector_double,6,6', 'DynamicMatrix_DynamicVector_DynamicVector_double']
+]
 
 testtypes = testtypes_creator(la_types, common_types, dune_types, cache)
