@@ -387,8 +387,9 @@ protected:
           if (ev < assert_positive_eigenvalues)
             DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested,
                        "These were the given options:\n\n"
-                           << *options_ << "\nThese are the computed eigenvectors:\n\n"
-                           << *eigenvectors_);
+                           << *options_ << "\nThis was the given matrix:\n\n"
+                           << matrix_ << "\nThese are the computed eigenvalues:\n\n"
+                           << *real_eigenvalues_);
         }
       }
       if (assert_negative_eigenvalues > 0) {
@@ -397,8 +398,9 @@ protected:
           if (ev > -1 * assert_negative_eigenvalues)
             DUNE_THROW(Exceptions::eigen_solver_failed_bc_eigenvalues_are_not_negative_as_requested,
                        "These were the given options:\n\n"
-                           << *options_ << "\nThese are the computed eigenvectors:\n\n"
-                           << *eigenvectors_);
+                           << *options_ << "\nThis was the given matrix:\n\n"
+                           << matrix_ << "\nThese are the computed eigenvalues:\n\n"
+                           << *real_eigenvalues_);
         }
       }
       if (options_->get<double>("assert_real_eigenvectors") > 0 || check_real_eigendecomposition > 0)
