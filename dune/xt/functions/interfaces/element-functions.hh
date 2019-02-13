@@ -1,4 +1,4 @@
-// This file is part of the dune-xt-functions project:
+﻿// This file is part of the dune-xt-functions project:
 //   https://github.com/dune-community/dune-xt-functions
 // Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
@@ -37,6 +37,36 @@
 namespace Dune {
 namespace XT {
 namespace Functions {
+
+
+// forwards, required in operator+-*
+template <class MinuendType, class SubtrahendType>
+class ConstDifferenceElementFunction;
+
+template <class MinuendType, class SubtrahendType>
+class DifferenceElementFunction;
+
+template <class LeftSummandType, class RightSummandType>
+class ConstSumElementFunction;
+
+template <class LeftSummandType, class RightSummandType>
+class SumElementFunction;
+
+template <class LeftFactorType, class RightFactorType>
+class ConstProductElementFunction;
+
+template <class LeftFactorType, class RightFactorType>
+class ProductElementFunction;
+
+
+namespace internal {
+
+
+template <class LeftType, class RightType, CombinationType>
+class CombinedElementFunctionHelper;
+
+
+}
 
 
 /**
@@ -431,6 +461,7 @@ private:
   }; // struct single_derivative_helper<..., 1, ...>
 }; // class ElementFunctionSetInterface
 
+
 /**
  *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Element.
  */
@@ -650,7 +681,54 @@ public:
 
   /**
    * \}
+   * \name ´´These operators are provided for convenience.''
+   * \{
    **/
+
+  ConstDifferenceElementFunction<ThisType, ThisType> operator-(const ThisType& other) const
+  {
+    return ConstDifferenceElementFunction<ThisType, ThisType>(*this, other);
+  }
+
+  DifferenceElementFunction<ThisType, ThisType> operator-(ThisType& other)
+  {
+    return DifferenceElementFunction<ThisType, ThisType>(*this, other);
+  }
+
+  ConstSumElementFunction<ThisType, ThisType> operator+(const ThisType& other) const
+  {
+    return ConstSumElementFunction<ThisType, ThisType>(*this, other);
+  }
+
+  SumElementFunction<ThisType, ThisType> operator+(ThisType& other)
+  {
+    return SumElementFunction<ThisType, ThisType>(*this, other);
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
+      ConstProductElementFunction<ThisType, OtherType>>
+  operator*(const OtherType& other) const
+  {
+    return ConstProductElementFunction<ThisType, OtherType>(*this, other);
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
+      ProductElementFunction<ThisType, OtherType>>
+  operator*(OtherType& other)
+  {
+    return ProductElementFunction<ThisType, OtherType>(*this, other);
+  }
+
+  /**
+   * \{
+   **/
+
 private:
   template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
   struct single_evaluate_helper
@@ -696,8 +774,11 @@ private:
   }; // struct single_derivative_helper<..., 1, ...>
 }; // class ElementFunctionInterface
 
+
 } // namespace Functions
 } // namespace XT
 } // namespace Dune
+
+#include <dune/xt/functions/base/combined-element-functions.hh>
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTIONS_HH
