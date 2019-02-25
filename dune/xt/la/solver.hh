@@ -16,6 +16,7 @@
 #include <vector>
 
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/parallel/helper.hh>
 
 #include <dune/xt/la/exceptions.hh>
@@ -140,7 +141,8 @@ public:
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value, Solver<M>>::type make_solver(const M& matrix)
+typename std::enable_if<is_matrix<M>::value || XT::Common::is_matrix<M>::value, Solver<M>>::type
+make_solver(const M& matrix)
 {
   return Solver<M>(matrix);
 }
@@ -188,6 +190,7 @@ solve(const MatrixInterface<M, S>& A,
 } // namespace Dune
 
 #include "solver/common.hh"
+#include "solver/dense.hh"
 #include "solver/eigen.hh"
 #include "solver/istl.hh"
 #include "solver/view.hh"
