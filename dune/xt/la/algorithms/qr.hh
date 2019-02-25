@@ -595,7 +595,7 @@ solve_by_qr_decomposition(MatrixType& A, VectorType& x, const SecondVectorType& 
   std::vector<int> permutations(M::cols(A));
   qr(A, tau, permutations);
   solve_qr_factorized(A, tau, permutations, x, b);
-} // void solve_lower_triangular(...)
+} // void solve_by_qr_decomposition(...)
 
 /**
  *  \brief Performs a QR decomposition to solve AX = B, where A, X and B are matrices
