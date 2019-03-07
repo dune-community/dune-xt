@@ -11,8 +11,8 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2014, 2017)
 
-#ifndef DUNE_XT_FUNCTIONS_GENRIC_FUNCTION_HH
-#define DUNE_XT_FUNCTIONS_GENRIC_FUNCTION_HH
+#ifndef DUNE_XT_FUNCTIONS_GENERIC_FUNCTION_HH
+#define DUNE_XT_FUNCTIONS_GENERIC_FUNCTION_HH
 
 #include <functional>
 
@@ -163,4 +163,4 @@ public:
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_LAMBDA_SMOOTH_FUNCTION_HH
+#endif // DUNE_XT_FUNCTIONS_GENERIC_FUNCTION_HH
