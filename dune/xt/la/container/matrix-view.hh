@@ -14,6 +14,7 @@
 #define DUNE_XT_LA_CONTAINER_MATRIX_VIEW_HH
 
 #include <dune/xt/common/exceptions.hh>
+#include <dune/xt/common/parallel/threadstorage.hh>
 
 #include "matrix-interface.hh"
 
@@ -153,7 +154,7 @@ public:
   inline void mv(const XX& xx, YY& yy) const
   {
     assert(xx.size() == cols() && yy.size() == rows());
-    const auto patt = pattern();
+    const auto& patt = get_pattern();
     for (size_t ii = 0; ii < rows(); ++ii) {
       yy[ii] = 0.;
       for (auto&& jj : patt.inner(ii))
@@ -165,7 +166,7 @@ public:
   inline void mtv(const XX& xx, YY& yy) const
   {
     assert(xx.size() == rows() && yy.size() == cols());
-    const auto patt = pattern();
+    const auto& patt = get_pattern();
     std::fill(yy.begin(), yy.end(), 0.);
     for (size_t ii = 0; ii < rows(); ++ii) {
       for (auto&& jj : patt.inner(ii))
@@ -243,12 +244,24 @@ public:
     return ret;
   } // ... pattern(...)
 
+  const SparsityPatternDefault& get_pattern() const
+  {
+    initialize_pattern();
+    return **pattern_;
+  }
+
 private:
+  void initialize_pattern() const
+  {
+    if (!*pattern_)
+      *pattern_ = std::make_unique<SparsityPatternDefault>(pattern());
+  }
   const Matrix& matrix_;
   const size_t first_row_;
   const size_t past_last_row_;
   const size_t first_col_;
   const size_t past_last_col_;
+  mutable XT::Common::PerThreadValue<std::unique_ptr<SparsityPatternDefault>> pattern_;
 }; // class ConstMatrixView
 
 template <class MatrixImp>
@@ -317,7 +330,7 @@ public:
 
   inline void scal(const ScalarType& alpha)
   {
-    const auto patt = pattern();
+    const auto& patt = const_matrix_view_.get_pattern();
     for (size_t ii = 0; ii < rows(); ++ii)
       for (auto&& jj : patt.inner(ii))
         set_entry(ii, jj, get_entry(ii, jj) * alpha);
@@ -327,7 +340,7 @@ public:
   {
     const auto other_patt = xx.pattern();
 #ifndef NDEBUG
-    const auto patt = pattern();
+    const auto& patt = const_matrix_view_.get_pattern();
     if (xx.rows() != rows() || xx.cols() != cols())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match, "Shapes do not match!");
     for (size_t ii = 0; ii < rows(); ++ii)
@@ -388,14 +401,14 @@ public:
 
   inline void clear_row(const size_t ii)
   {
-    const auto patt = pattern();
+    const auto& patt = const_matrix_view_.get_pattern();
     for (auto&& jj : patt.inner(ii))
       set_entry(ii, jj, 0.);
   }
 
   inline void clear_col(const size_t jj)
   {
-    const auto patt = pattern();
+    const auto& patt = const_matrix_view_.get_pattern();
     for (size_t ii = 0; ii < rows(); ++ii)
       if (std::find(patt.inner(ii).begin(), patt.inner(ii).end(), jj) != patt.inner(ii).end())
         set_entry(ii, jj, 0.);
@@ -414,7 +427,7 @@ public:
   }
 
 private:
-  ConstMatrixView<MatrixImp> const_matrix_view_;
+  ConstMatrixViewType const_matrix_view_;
   Matrix& matrix_;
 }; // class MatrixView
 

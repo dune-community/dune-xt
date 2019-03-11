@@ -190,5 +190,6 @@ solve(const MatrixInterface<M, S>& A,
 #include "solver/common.hh"
 #include "solver/eigen.hh"
 #include "solver/istl.hh"
+#include "solver/view.hh"
 
 #endif // DUNE_XT_LA_SOLVER_HH

@@ -7,8 +7,8 @@
 // Authors:
 //   Tobias Leibner   (2019)
 
-//#ifndef DUNE_XT_LA_SOLVER_VIEW_HH
-//#define DUNE_XT_LA_SOLVER_VIEW_HH
+#ifndef DUNE_XT_LA_SOLVER_VIEW_HH
+#define DUNE_XT_LA_SOLVER_VIEW_HH
 
 #include <string>
 #include <vector>
@@ -138,4 +138,4 @@ private:
 } // namespace Dune
 
 
-//#endif // DUNE_XT_LA_SOLVER_VIEW_HH
+#endif // DUNE_XT_LA_SOLVER_VIEW_HH

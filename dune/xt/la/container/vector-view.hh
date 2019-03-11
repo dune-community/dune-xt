@@ -263,6 +263,40 @@ public:
     return vector_[index(ii)];
   }
 
+  template <class T>
+  ThisType& operator+=(const VectorInterface<T, ScalarType>& other)
+  {
+    iadd(other);
+    return *this;
+  }
+
+  template <class T>
+  ThisType& operator-=(const VectorInterface<T, ScalarType>& other)
+  {
+    isub(other);
+    return *this;
+  }
+
+  template <class T>
+  void iadd(const VectorInterface<T, ScalarType>& other)
+  {
+    if (other.size() != size())
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    for (size_t ii = 0; ii < size(); ++ii)
+      add_to_entry(ii, other.get_entry(ii));
+  } // ... iadd(...)
+
+  template <class T>
+  void isub(const VectorInterface<T, ScalarType>& other)
+  {
+    if (other.size() != size())
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                 "The size of other (" << other.size() << ") does not match the size of this (" << size() << ")!");
+    for (size_t ii = 0; ii < size(); ++ii)
+      add_to_entry(ii, -other.get_entry(ii));
+  } // ... isub(...)
+
 protected:
   inline ScalarType& get_unchecked_ref(const size_t ii)
   {
