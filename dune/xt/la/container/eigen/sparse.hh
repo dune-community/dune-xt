@@ -286,15 +286,16 @@ public:
     yy.backend().transpose() = backend() * xx.backend();
   }
 
-  template <class T1, class T2>
-  inline void mv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  template <class V1, class V2>
+  inline std::enable_if_t<XT::Common::is_vector<V1>::value && XT::Common::is_vector<V2>::value, void> mv(const V1& xx,
+                                                                                                         V2& yy) const
   {
     EigenDenseVector<ScalarType> xx_eigen(xx.size()), yy_eigen(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
-      xx_eigen[ii] = xx[ii];
+      xx_eigen.set_entry(ii, XT::Common::VectorAbstraction<V1>::get_entry(xx, ii));
     mv(xx_eigen, yy_eigen);
     for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy.set_entry(ii, yy_eigen[ii]);
+      XT::Common::VectorAbstraction<V2>::set_entry(yy, ii, yy_eigen[ii]);
   }
 
   template <class T1, class T2>
@@ -303,15 +304,16 @@ public:
     yy.backend().transpose() = backend().transpose() * xx.backend();
   }
 
-  template <class T1, class T2>
-  inline void mtv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  template <class V1, class V2>
+  inline std::enable_if_t<XT::Common::is_vector<V1>::value && XT::Common::is_vector<V2>::value, void> mtv(const V1& xx,
+                                                                                                          V2& yy) const
   {
     EigenDenseVector<ScalarType> xx_eigen(xx.size()), yy_eigen(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
-      xx_eigen[ii] = xx[ii];
+      xx_eigen.set_entry(ii, XT::Common::VectorAbstraction<V1>::get_entry(xx, ii));
     mtv(xx_eigen, yy_eigen);
     for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy.set_entry(ii, yy_eigen[ii]);
+      XT::Common::VectorAbstraction<V2>::set_entry(yy, ii, yy_eigen[ii]);
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)

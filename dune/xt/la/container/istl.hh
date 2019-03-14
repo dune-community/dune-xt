@@ -551,15 +551,16 @@ public:
     backend().mv(xx.backend(), yy.backend());
   }
 
-  template <class T1, class T2>
-  inline void mv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  template <class V1, class V2>
+  inline std::enable_if_t<XT::Common::is_vector<V1>::value && XT::Common::is_vector<V2>::value, void> mv(const V1& xx,
+                                                                                                         V2& yy) const
   {
     IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
-      xx_istl[ii] = xx[ii];
+      xx_istl.set_entry(ii, XT::Common::VectorAbstraction<V1>::get_entry(xx, ii));
     mv(xx_istl, yy_istl);
     for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy.set_entry(ii, yy_istl[ii]);
+      XT::Common::VectorAbstraction<V2>::set_entry(yy, ii, yy_istl[ii]);
   }
 
   inline void mtv(const IstlDenseVector<ScalarType>& xx, IstlDenseVector<ScalarType>& yy) const
@@ -568,15 +569,16 @@ public:
     backend_ref.mtv(xx.backend(), yy.backend());
   }
 
-  template <class T1, class T2>
-  inline void mtv(const VectorInterface<T1, ScalarType>& xx, VectorInterface<T2, ScalarType>& yy) const
+  template <class V1, class V2>
+  inline std::enable_if_t<XT::Common::is_vector<V1>::value && XT::Common::is_vector<V2>::value, void> mtv(const V1& xx,
+                                                                                                          V2& yy) const
   {
     IstlDenseVector<ScalarType> xx_istl(xx.size()), yy_istl(yy.size());
     for (size_t ii = 0; ii < xx.size(); ++ii)
-      xx_istl[ii] = xx[ii];
+      xx_istl.set_entry(ii, XT::Common::VectorAbstraction<V1>::get_entry(xx, ii));
     mtv(xx_istl, yy_istl);
     for (size_t ii = 0; ii < yy.size(); ++ii)
-      yy.set_entry(ii, yy_istl[ii]);
+      XT::Common::VectorAbstraction<V2>::set_entry(yy, ii, yy_istl[ii]);
   }
 
   void add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
