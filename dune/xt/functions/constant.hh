@@ -9,7 +9,7 @@
 //   Kirsten Weber   (2013)
 //   René Fritze     (2013 - 2018)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2014 - 2015, 2017)
+//   Tobias Leibner  (2014 - 2015, 2017, 2019)
 
 #ifndef DUNE_XT_FUNCTIONS_CONSTANT_HH
 #define DUNE_XT_FUNCTIONS_CONSTANT_HH

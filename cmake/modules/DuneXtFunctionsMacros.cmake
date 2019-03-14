@@ -8,6 +8,7 @@
 # Authors:
 #   Felix Schindler (2016 - 2017)
 #   René Fritze     (2018)
+#   Tim Keil        (2018)
 #   Tobias Leibner  (2018)
 #
 # File for module specific CMake tests.
