@@ -36,6 +36,7 @@
 
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
+#include <dune/xt/functions/base/visualization.hh>
 
 #include "element-functions.hh"
 
@@ -43,10 +44,6 @@ namespace Dune {
 namespace XT {
 namespace Functions {
 
-
-// forward, required in GridFunctionInterface::visualize
-template <class GridViewType, size_t range_dim, size_t range_dim_cols, class RangeField>
-class VisualizationAdapter;
 
 template <class MinuendType, class SubtrahendType>
 class DifferenceGridFunction;
@@ -157,7 +154,8 @@ public:
             const std::string path,
             const bool subsampling = true,
             const VTK::OutputType vtk_output_type = VTK::appendedraw,
-            const XT::Common::Parameter& param = {}) const
+            const XT::Common::Parameter& param = {},
+            const VisualizerInterface<r, rC, R>& visualizer = DefaultVisualizer<r, rC, R>()) const
   {
     if (path.empty())
       DUNE_THROW(Exceptions::wrong_input_given, "path must not be empty!");
@@ -168,7 +166,7 @@ public:
     using GridViewType = std::decay_t<decltype(grid_view)>;
     const auto adapter =
         std::make_shared<VisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
-            *this, "", param);
+            *this, visualizer, "", param);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
         subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
                     : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
