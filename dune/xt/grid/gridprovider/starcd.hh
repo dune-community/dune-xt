@@ -8,7 +8,7 @@
 //   Felix Schindler (2012 - 2017)
 //   Kirsten Weber   (2012 - 2013)
 //   René Fritze     (2012 - 2018)
-//   Tobias Leibner  (2014)
+//   Tobias Leibner  (2014, 2018)
 
 #ifndef DUNE_XT_GRID_GRIDPROVIDER_STARCD_HH
 #define DUNE_XT_GRID_GRIDPROVIDER_STARCD_HH

@@ -7,7 +7,7 @@
 // Authors:
 //   Felix Schindler (2016 - 2017)
 //   René Fritze     (2016 - 2018)
-//   Tobias Leibner  (2016 - 2017)
+//   Tobias Leibner  (2016 - 2017, 2019)
 
 #ifndef DUNE_XT_GRID_BOUNDARYINFO_ALLDIRICHLET_HH
 #define DUNE_XT_GRID_BOUNDARYINFO_ALLDIRICHLET_HH

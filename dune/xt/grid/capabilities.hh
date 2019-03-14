@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2017)
 //   René Fritze     (2018)
+//   Tobias Leibner  (2018)
 
 #ifndef DUNE_XT_GRID_CAPABILITIES_HH
 #define DUNE_XT_GRID_CAPABILITIES_HH
