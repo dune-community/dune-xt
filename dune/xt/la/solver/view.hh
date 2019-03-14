@@ -72,12 +72,12 @@ public:
 
   static std::vector<std::string> types()
   {
-    SolverOptions<MatrixType, CommunicatorType>::types();
+    return SolverOptions<MatrixType, CommunicatorType>::types();
   }
 
   static Common::Configuration options(const std::string type = "")
   {
-    SolverOptions<MatrixType, CommunicatorType>::options(type);
+    return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)
 
   template <class VectorType>
