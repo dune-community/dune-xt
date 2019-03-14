@@ -7,8 +7,8 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Felix Schindler (2016)
-#   René Fritze     (2017 - 2018)
-#   Tobias Leibner  (2015)
+#   René Fritze     (2017 - 2019)
+#   Tobias Leibner  (2015, 2019)
 # ~~~
 
 from itertools import product
