@@ -87,6 +87,7 @@ public:
     , past_last_row_(0)
     , first_col_(0)
     , past_last_col_(0)
+    , pattern_(nullptr)
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This constructor does not make sense for MatrixView");
   }
@@ -101,6 +102,7 @@ public:
     , past_last_row_(0)
     , first_col_(0)
     , past_last_col_(0)
+    , pattern_(nullptr)
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This constructor does not make sense for MatrixView");
   }
@@ -116,6 +118,7 @@ public:
     , past_last_row_(past_last_row)
     , first_col_(first_col)
     , past_last_col_(past_last_col)
+    , pattern_(nullptr)
   {}
 
   size_t row_index(const size_t ii) const
@@ -254,14 +257,14 @@ private:
   void initialize_pattern() const
   {
     if (!*pattern_)
-      *pattern_ = std::make_unique<SparsityPatternDefault>(pattern());
+      *pattern_ = std::make_shared<SparsityPatternDefault>(pattern());
   }
   const Matrix& matrix_;
   const size_t first_row_;
   const size_t past_last_row_;
   const size_t first_col_;
   const size_t past_last_col_;
-  mutable XT::Common::PerThreadValue<std::unique_ptr<SparsityPatternDefault>> pattern_;
+  mutable XT::Common::PerThreadValue<std::shared_ptr<SparsityPatternDefault>> pattern_;
 }; // class ConstMatrixView
 
 template <class MatrixImp>
