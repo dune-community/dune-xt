@@ -8,7 +8,7 @@
 //   Felix Schindler (2017 - 2018)
 //   René Fritze     (2018)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2017)
+//   Tobias Leibner  (2017, 2019)
 
 #ifndef DUNE_XT_FUNCTIONS_GENERIC_GRID_FUNCTION_HH
 #define DUNE_XT_FUNCTIONS_GENERIC_GRID_FUNCTION_HH
@@ -75,20 +75,20 @@ private:
     using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
     using GenericOrderFunctionType = std::function<int(const Common::Parameter&)>;
     using GenericJacobianFunctionType =
-        std::function<DerivativeRangeReturnType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
+        std::function<DerivativeRangeReturnType(const DomainType&, const XT::Common::Parameter&)>;
     using GenericDerivativeFunctionType = std::function<DerivativeRangeReturnType(
-        const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
+        const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
     LocalGenericGridFunction(const GenericOrderFunctionType& order_func,
                              const GenericPostBindFunctionType& post_bind_func,
-                             const GenericEvaluateFunctionType& evalaute_func,
+                             const GenericEvaluateFunctionType& evaluate_func,
                              const Common::ParameterType& param_type,
                              const GenericJacobianFunctionType& jacobian_func,
                              const GenericDerivativeFunctionType& derivative_func)
       : BaseType()
       , order_(order_func)
       , post_bind_(post_bind_func)
-      , evaluate_(evalaute_func)
+      , evaluate_(evaluate_func)
       , param_type_(param_type)
       , jacobian_(jacobian_func)
       , derivative_(derivative_func)
@@ -118,7 +118,7 @@ private:
                                        const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return jacobian_(this->element(), point_in_local_coordinates, parsed_param);
+      return jacobian_(point_in_local_coordinates, parsed_param);
     }
 
     DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
@@ -126,7 +126,7 @@ private:
                                          const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return derivative_(this->element(), alpha, point_in_local_coordinates, parsed_param);
+      return derivative_(alpha, point_in_local_coordinates, parsed_param);
     }
 
 
@@ -157,9 +157,9 @@ public:
   using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
   using GenericEvaluateFunctionType = std::function<RangeReturnType(const DomainType&, const Common::Parameter&)>;
   using GenericJacobianFunctionType =
-      std::function<DerivativeRangeReturnType(const ElementType&, const DomainType&, const XT::Common::Parameter&)>;
+      std::function<DerivativeRangeReturnType(const DomainType&, const XT::Common::Parameter&)>;
   using GenericDerivativeFunctionType = std::function<DerivativeRangeReturnType(
-      const ElementType&, const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
+      const std::array<size_t, d>&, const DomainType&, const XT::Common::Parameter&)>;
 
   GenericGridFunction(const int ord,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),

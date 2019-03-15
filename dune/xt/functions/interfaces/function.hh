@@ -100,6 +100,7 @@ public:
 
   using RangeReturnType = typename RangeSelector::return_type;
   using DerivativeRangeReturnType = typename DerivativeRangeSelector::return_type;
+  using RowDerivativeRangeReturnType = typename DerivativeRangeSelector::row_derivative_return_type;
   using SingleDerivativeRangeReturnType = typename DerivativeRangeSelector::return_single_type;
 
   /**

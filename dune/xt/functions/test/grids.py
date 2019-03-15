@@ -6,7 +6,7 @@
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   René Fritze (2018)
+#   René Fritze (2018 - 2019)
 #   Tim Keil    (2018)
 # ~~~
 
@@ -23,8 +23,10 @@ def _make_alu(dimDomain):
         grids.append((tmpl.format(d=d, g='simplex', r=r), d))
     return grids
 
+
 def _if_active(val, guard, cache):
     return val if is_found(cache, guard) else []
+
 
 def is_found(cache, name):
     if name in cache.keys():
@@ -33,13 +35,18 @@ def is_found(cache, name):
         return 'notfound' not in cache[name].lower()
     return False
 
+
 def type_and_dim(cache, dimDomain):
     grid_alu = _if_active(_make_alu(dimDomain), 'dune-alugrid', cache)
-    grid_yasp = [('Dune::YaspGrid<{d},Dune::EquidistantOffsetCoordinates<double,{d}>>'.format(d=d), d) for d in dimDomain]
+    grid_yasp = [
+        ('Dune::YaspGrid<{d},Dune::EquidistantOffsetCoordinates<double,{d}>>'.format(d=d), d) for d in dimDomain
+    ]
     grid_ug = _if_active([('Dune::UGGrid<{}>'.format(d), d) for d in dimDomain if d != 1], 'dune-uggrid', cache)
-    grid_alberta = _if_active([('Dune::AlbertaGrid<{d},{d}>'.format(d=d), d) for d in dimDomain if d != 1], 'ALBERTA_FOUND', cache)
-    grid_oneD = [('Dune::OneDGrid',d) for d in dimDomain if d == 1]
+    grid_alberta = _if_active([('Dune::AlbertaGrid<{d},{d}>'.format(d=d), d) for d in dimDomain if d != 1],
+                              'ALBERTA_FOUND', cache)
+    grid_oneD = [('Dune::OneDGrid', d) for d in dimDomain if d == 1]
     return grid_alberta + grid_alu + grid_yasp + grid_ug + grid_oneD
+
 
 def pretty_print(grid_name, dim):
     if 'Alberta' in grid_name:

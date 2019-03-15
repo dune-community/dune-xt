@@ -126,9 +126,13 @@ struct DerivativeRangeTypeSelector
   using return_single_type = FieldVector<R, d>;
   using dynamic_single_type = DynamicVector<R>;
 
-  using type = FieldVector<FieldMatrix<R, rC, d>, r>;
-  using return_type = XT::Common::FieldVector<XT::Common::FieldMatrix<R, rC, d>, r>;
-  using dynamic_type = DynamicVector<DynamicMatrix<R>>;
+  using row_derivative_type = FieldMatrix<R, rC, d>;
+  using row_derivative_return_type = XT::Common::FieldMatrix<R, rC, d>;
+  using dynamic_row_derivative_type = DynamicMatrix<R>;
+
+  using type = FieldVector<row_derivative_type, r>;
+  using return_type = XT::Common::FieldVector<row_derivative_return_type, r>;
+  using dynamic_type = DynamicVector<dynamic_row_derivative_type>;
 
   static void ensure_size(dynamic_type& arg)
   {
@@ -158,6 +162,10 @@ struct DerivativeRangeTypeSelector<d, R, r, 1>
   using single_type = FieldVector<R, d>;
   using return_single_type = XT::Common::FieldVector<R, d>;
   using dynamic_single_type = DynamicVector<R>;
+
+  using row_derivative_type = FieldMatrix<R, r, d>;
+  using row_derivative_return_type = XT::Common::FieldMatrix<R, r, d>;
+  using dynamic_row_derivative_type = DynamicMatrix<R>;
 
   using type = FieldMatrix<R, r, d>;
   using return_type = XT::Common::FieldMatrix<R, r, d>;
