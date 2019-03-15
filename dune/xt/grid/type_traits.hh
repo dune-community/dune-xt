@@ -201,6 +201,15 @@ struct is_layer
 
 
 template <class T>
+struct is_yaspgrid : public std::false_type
+{};
+
+template <int dim, class Coordinates>
+struct is_yaspgrid<YaspGrid<dim, Coordinates>> : public std::true_type
+{};
+
+
+template <class T>
 struct is_alugrid : public std::false_type
 {};
 
