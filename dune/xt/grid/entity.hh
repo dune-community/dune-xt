@@ -27,6 +27,20 @@
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 namespace Dune {
+
+
+template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
+std::ostream& operator<<(std::ostream& out, const Entity<cd, dim, GridImp, EntityImp>& entity)
+{
+  out << "Entity<" << cd << ", " << dim << ", " << XT::Grid::bindings::grid_name<GridImp>::value() << ">(";
+  out << "{0: [" << entity.geometry().corner(0) << "]";
+  for (int ii = 1; ii < entity.geometry().corners(); ++ii)
+    out << ", " << ii << ": [" << entity.geometry().corner(ii) << "]";
+  out << "})";
+  return out;
+}
+
+
 namespace XT {
 namespace Grid {
 
@@ -44,18 +58,6 @@ void print_entity(const EntityType& entity,
     out << prefix + "  "
         << "corner " + Common::to_string(ii) << " = " << geometry.corner(ii) << "\n";
 } // ... print_entity(...)
-
-
-template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
-std::ostream& operator<<(std::ostream& out, const Entity<cd, dim, GridImp, EntityImp>& entity)
-{
-  out << "Entity<" << cd << ", " << dim << ", " << bindings::grid_name<GridImp>::value() << ">(";
-  for (size_t ii = 0; ii << entity.geometry().corners() - 1; ++ii)
-    out << Common::to_string(ii) << ": {" << entity.geometry().corner(ii) << "}, ";
-  out << Common::to_string(entity.geometry().corners() - 1) << ": {"
-      << entity.geometry().corner(entity.geometry().corners() - 1) << "})";
-  return out;
-}
 
 
 template <int codim, int worlddim, class GridImp, template <int, int, class> class EntityImp>
