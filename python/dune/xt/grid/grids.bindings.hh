@@ -12,6 +12,7 @@
 #define DUNE_XT_GRID_GRIDS_BINDINGS_HH
 
 #include <dune/xt/common/string.hh>
+#include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/layers.hh>
 
 #include <dune/xt/grid/grids.hh>
@@ -32,11 +33,9 @@ namespace bindings {
 template <class G>
 struct grid_name
 {
-  static_assert(AlwaysFalse<G>::value, "Please add a specialization for this grid!");
-
   static std::string value()
   {
-    return "";
+    return Common::Typename<G>::value() + "(missing specialization of grid_name)";
   }
 };
 
@@ -107,6 +106,18 @@ struct grid_name<ALUGrid<dim, dim, cube, conforming, Comm>>
     return Common::to_string(dim) + "d_cube_aluconformgrid";
   }
 };
+
+
+// not optimal
+template<int dim, int dimworld, ALU3dGridElementType elType, class Comm>
+struct grid_name<ALU3dGrid<dim, dimworld, elType, Comm>>
+{
+  static std::string value()
+  {
+    return Common::to_string(dim) + "d_alugrid";
+  }
+};
+
 
 #endif // HAVE_DUNE_ALUGRID
 #if HAVE_ALBERTA
