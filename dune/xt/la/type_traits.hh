@@ -55,6 +55,12 @@ class VectorInterface;
 template <class ScalarType, Backends backend>
 struct Container;
 
+template <class Traits, class ScalarImp>
+class EigenBaseVector;
+
+template <class ScalarImp>
+class IstlDenseVector;
+
 
 namespace internal {
 
@@ -108,6 +114,25 @@ struct is_vector_helper
 }; // class is_vector_helper
 
 
+template <class C>
+struct is_eigen_vector_helper
+{
+  DXTC_has_typedef_initialize_once(Traits);
+  DXTC_has_typedef_initialize_once(ScalarType);
+
+  static const bool is_candidate = DXTC_has_typedef(Traits)<C>::value && DXTC_has_typedef(ScalarType)<C>::value;
+}; // class is_eigen_vector_helper
+
+
+template <class C>
+struct is_istl_dense_vector_helper
+{
+  DXTC_has_typedef_initialize_once(ScalarType);
+
+  static const bool is_candidate = DXTC_has_typedef(ScalarType)<C>::value;
+}; // class is_istl_dense_vector_helper
+
+
 } // namespace internal
 
 
@@ -135,6 +160,24 @@ struct is_vector : public std::is_base_of<VectorInterface<typename V::Traits, ty
 
 template <class V>
 struct is_vector<V, false> : public std::false_type
+{};
+
+
+template <class V, bool candidate = internal::is_eigen_vector_helper<V>::is_candidate>
+struct is_eigen_vector : public std::is_base_of<EigenBaseVector<typename V::Traits, typename V::ScalarType>, V>
+{};
+
+template <class V>
+struct is_eigen_vector<V, false> : public std::false_type
+{};
+
+
+template <class V, bool candidate = internal::is_istl_dense_vector_helper<V>::is_candidate>
+struct is_istl_dense_vector : public std::is_base_of<IstlDenseVector<typename V::ScalarType>, V>
+{};
+
+template <class V>
+struct is_istl_dense_vector<V, false> : public std::false_type
 {};
 
 
