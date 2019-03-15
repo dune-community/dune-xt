@@ -29,7 +29,6 @@
 #include <dune/xt/common/string.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
@@ -67,18 +66,12 @@ double diameter(const Intersection<G, I>& intersection)
 {
   auto max_dist = std::numeric_limits<typename G::ctype>::min();
   const auto& geometry = intersection.geometry();
-  if (geometry.corners() == 1) { // this is the 1d case, return diameter of adjacent elements instead
-    max_dist = diameter(intersection.inside());
-    if (intersection.neighbor())
-      max_dist = std::min(max_dist, diameter(intersection.outside())); // does not really matter if min or max
-  } else {
-    for (auto i : Common::value_range(geometry.corners())) {
-      const auto xi = geometry.corner(i);
-      for (auto j : Common::value_range(i + 1, geometry.corners())) {
-        auto xj = geometry.corner(j);
-        xj -= xi;
-        max_dist = std::max(max_dist, xj.two_norm());
-      }
+  for (auto i : Common::value_range(geometry.corners())) {
+    const auto xi = geometry.corner(i);
+    for (auto j : Common::value_range(i + 1, geometry.corners())) {
+      auto xj = geometry.corner(j);
+      xj -= xi;
+      max_dist = std::max(max_dist, xj.two_norm());
     }
   }
   return max_dist;
