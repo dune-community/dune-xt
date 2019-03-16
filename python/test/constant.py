@@ -6,7 +6,7 @@
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   René Fritze    (2018)
+#   René Fritze    (2018 - 2019)
 #   Tim Keil       (2018)
 #   Tobias Leibner (2018)
 # ~~~
@@ -25,7 +25,7 @@ def function_provider(request):
         dim = 2
     if '3d' in grid_type:
         dim = 3
-    fn = "ConstantFunction__{}d_to_{}x{}".format(dim,1,1)
+    fn = "ConstantFunction__{}d_to_{}x{}".format(dim, 1, 1)
     maker = getattr(xtf, fn)
     return maker([2], 'test_function')
 

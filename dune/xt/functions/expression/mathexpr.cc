@@ -7,6 +7,7 @@
 // Authors:
 //   Felix Schindler (2012 - 2013, 2015 - 2016)
 //   René Fritze     (2012, 2018)
+//   Tim Keil        (2018)
 
 /*
 

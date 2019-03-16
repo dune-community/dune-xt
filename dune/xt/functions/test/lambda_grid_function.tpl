@@ -58,8 +58,22 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
+      [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
+
+  GenericType function2(
+      /*order_func=*/[](const auto& /*param*/) { return 3; },
+      [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
+      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
+      /*parameter=*/{},
+      "element_index_",
+      [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
+
+  // check that defaults are compiling
+  GenericType  function3(/*order=*/0);
+
+  GenericType  function4(/*order_func=*/[](const auto& /*param*/) { return 3; });
 }
 
 TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
@@ -73,8 +87,8 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
+      [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
   auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -94,8 +108,8 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
         [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
         /*parameter=*/{},
         "element_index_",
-        [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
-        [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
+        [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+        [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
 
     auto local_f = function.local_function();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -117,8 +131,8 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
+      [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
   auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
@@ -143,8 +157,8 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
       [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*element*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
-      [](const auto& /*element*/, const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
+      [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
   auto local_f = function.local_function();
   DerivativeRangeReturnType expected_jacobian;
   for (auto&& element : Dune::elements(leaf_view)) {

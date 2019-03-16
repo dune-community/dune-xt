@@ -9,7 +9,7 @@
 //   Kirsten Weber   (2013)
 //   René Fritze     (2013 - 2018)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2014 - 2015, 2017)
+//   Tobias Leibner  (2014 - 2015, 2017, 2019)
 
 #ifndef DUNE_XT_FUNCTIONS_CONSTANT_HH
 #define DUNE_XT_FUNCTIONS_CONSTANT_HH
@@ -84,7 +84,42 @@ public:
 
   const RangeReturnType value_;
   const std::string name_;
-};
+}; // class ConstantFunction
+
+
+template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
+class ConstantGridFunction : public GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>
+{
+  using BaseType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
+
+public:
+  using typename BaseType::LocalFunctionType;
+
+  ConstantGridFunction(const typename LocalFunctionType::RangeReturnType constant,
+                       const std::string name_in = static_id())
+    : constant_function_(constant, name_in)
+    , constant_grid_function_(constant_function_)
+  {}
+
+  static std::string static_id()
+  {
+    return "dune.xt.functions.constantgridfunction";
+  }
+
+  virtual std::unique_ptr<LocalFunctionType> local_function() const override final
+  {
+    return constant_grid_function_.local_function();
+  }
+
+  virtual std::string name() const override final
+  {
+    return constant_function_.name();
+  }
+
+private:
+  ConstantFunction<BaseType::domain_dim, rangeDim, rangeDimCols, RangeField> constant_function_;
+  FunctionAsGridFunctionWrapper<Element, rangeDim, rangeDimCols, RangeField> constant_grid_function_;
+}; // class ConstantGridFunction
 
 
 } // namespace Functions
