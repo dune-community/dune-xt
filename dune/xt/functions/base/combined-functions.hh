@@ -13,6 +13,8 @@
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 
+#include <dune/xt/common/memory.hh>
+
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/type_traits.hh>
 
@@ -300,8 +302,8 @@ class CombinedFunction
 
 public:
   CombinedFunction(const LeftType& left, const RightType& right, const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
     , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '"
                              + right.name() + "'"
                        : nm)
@@ -310,16 +312,16 @@ public:
   CombinedFunction(const std::shared_ptr<const LeftType> left,
                    const std::shared_ptr<const RightType> right,
                    const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
     , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
                              + "' and '" + right_->access().name() + "'"
                        : nm)
   {}
 
   CombinedFunction(LeftType*&& left, RightType*&& right, const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(std::move(left)))
-    , right_(Common::make_unique<RightStorageType>(std::move(right)))
+    : left_(std::make_unique<LeftStorageType>(std::move(left)))
+    , right_(std::make_unique<RightStorageType>(std::move(right)))
     , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
                              + "' and '" + right_->access().name() + "'"
                        : nm)
