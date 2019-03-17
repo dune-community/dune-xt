@@ -84,7 +84,7 @@ public:
 
   const RangeReturnType value_;
   const std::string name_;
-};
+}; // class ConstantFunction
 
 
 template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
@@ -119,7 +119,7 @@ public:
 private:
   ConstantFunction<BaseType::domain_dim, rangeDim, rangeDimCols, RangeField> constant_function_;
   FunctionAsGridFunctionWrapper<Element, rangeDim, rangeDimCols, RangeField> constant_grid_function_;
-};
+}; // class ConstantGridFunction
 
 
 } // namespace Functions
