@@ -87,7 +87,7 @@ public:
     , past_last_row_(0)
     , first_col_(0)
     , past_last_col_(0)
-    , pattern_(nullptr)
+    , pattern_(std::shared_ptr<SparsityPatternDefault>(nullptr))
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This constructor does not make sense for MatrixView");
   }
@@ -102,7 +102,7 @@ public:
     , past_last_row_(0)
     , first_col_(0)
     , past_last_col_(0)
-    , pattern_(nullptr)
+    , pattern_(std::shared_ptr<SparsityPatternDefault>(nullptr))
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "This constructor does not make sense for MatrixView");
   }
@@ -118,7 +118,7 @@ public:
     , past_last_row_(past_last_row)
     , first_col_(first_col)
     , past_last_col_(past_last_col)
-    , pattern_(nullptr)
+    , pattern_(std::shared_ptr<SparsityPatternDefault>(nullptr))
   {}
 
   size_t row_index(const size_t ii) const

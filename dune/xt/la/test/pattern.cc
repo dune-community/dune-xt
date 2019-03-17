@@ -111,15 +111,19 @@ GTEST_TEST(SparsityPatternDefaultTest, test_creation_functions)
   EXPECT_TRUE(diagonal_patt.size() == ROWS);
   EXPECT_TRUE(subdiagonal_patt.size() == ROWS);
   for (size_t ii = 0; ii < ROWS; ++ii) {
-    if (ii < COLS)
+    if (ii < COLS) {
       EXPECT_TRUE(diagonal_patt.contains(ii, ii));
-    if (ii > 0)
+    }
+    if (ii > 0) {
       EXPECT_TRUE(subdiagonal_patt.contains(ii, ii - 1));
+    }
     for (size_t jj = 0; jj < COLS; ++jj) {
-      if (jj != ii)
+      if (jj != ii) {
         EXPECT_FALSE(diagonal_patt.contains(ii, jj));
-      if (jj != ii - 1)
+      }
+      if (jj != ii - 1) {
         EXPECT_FALSE(subdiagonal_patt.contains(ii, jj));
+      }
     } // jj
   } // ii
 
