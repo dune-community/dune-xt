@@ -17,6 +17,8 @@
 #include <dune/xt/common/configuration.hh>
 
 #include <dune/xt/functions/interfaces/function.hh>
+#include <dune/xt/functions/interfaces/flux-function.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 
 namespace Dune {
 namespace XT {
@@ -119,6 +121,41 @@ public:
 private:
   ConstantFunction<BaseType::domain_dim, rangeDim, rangeDimCols, RangeField> constant_function_;
   FunctionAsGridFunctionWrapper<Element, rangeDim, rangeDimCols, RangeField> constant_grid_function_;
+}; // class ConstantGridFunction
+
+
+template <class Element, size_t stateDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
+class ConstantFluxFunction : public FluxFunctionInterface<Element, stateDim, rangeDim, rangeDimCols, RangeField>
+{
+  using BaseType = FluxFunctionInterface<Element, stateDim, rangeDim, rangeDimCols, RangeField>;
+
+public:
+  using typename BaseType::LocalFunctionType;
+
+  ConstantFluxFunction(const typename LocalFunctionType::RangeReturnType constant,
+                       const std::string name_in = static_id())
+    : constant_function_(constant, name_in)
+    , constant_flux_function_(constant_function_)
+  {}
+
+  static std::string static_id()
+  {
+    return "dune.xt.functions.constantfluxfunction";
+  }
+
+  virtual std::unique_ptr<LocalFunctionType> local_function() const override final
+  {
+    return constant_flux_function_.local_function();
+  }
+
+  virtual std::string name() const override final
+  {
+    return constant_function_.name();
+  }
+
+private:
+  ConstantFunction<BaseType::domain_dim, rangeDim, rangeDimCols, RangeField> constant_function_;
+  StateFunctionAsFluxFunctionWrapper<Element, stateDim, rangeDim, rangeDimCols, RangeField> constant_flux_function_;
 }; // class ConstantGridFunction
 
 

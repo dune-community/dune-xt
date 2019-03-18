@@ -269,5 +269,108 @@ TEST_F(ConstantGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacob
 }
 
 
+struct ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testing::Test
+{
+  using GridType = {{GRID}};
+  using ElementType = typename GridType::template Codim<0>::Entity;
+  static const constexpr size_t d = GridType::dimension;
+  static const size_t s = 2;
+  static const size_t r = {{r}};
+  static const size_t rC = {{rC}};
+
+  using FunctionType = Functions::ConstantFluxFunction<ElementType, s, r, rC>;
+
+  using RangeReturnType = typename FunctionType::LocalFunctionType::RangeReturnType;
+  using DomainType = typename FunctionType::LocalFunctionType::DomainType;
+  using StateType = typename FunctionType::LocalFunctionType::StateType;
+  using PartialURangeReturnType = typename FunctionType::LocalFunctionType::PartialURangeReturnType;
+
+  ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
+    : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
+  {
+  }
+
+  const Grid::GridProvider<GridType> grid_;
+};
+
+
+TEST_F(ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
+{
+  // passing FieldType
+  FunctionType function1(0.);
+  FunctionType function2(0., "name");
+  // passing RangeType
+  FunctionType function3(RangeReturnType(0.));
+  FunctionType function4(RangeReturnType(0.), "name");
+}
+
+TEST_F(ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
+{
+  FunctionType function(1.);
+  auto local_f = function.local_function();
+  const auto leaf_view = grid_.leaf_view();
+  for (auto&& element : Dune::elements(leaf_view)) {
+    local_f->bind(element);
+  }
+}
+
+TEST_F(ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
+{
+  const int expected_order = 0;
+  for (auto vv : {-10., 3., 17., 41.}) {
+    const RangeReturnType value(vv);
+    FunctionType function(value);
+    auto local_f = function.local_function();
+    const auto leaf_view = grid_.leaf_view();
+    for (auto&& element : Dune::elements(leaf_view)) {
+      local_f->bind(element);
+      const auto actual_order = local_f->order();
+      EXPECT_EQ(expected_order, actual_order);
+    }
+  }
+}
+
+TEST_F(ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
+{
+  for (auto value : {-10., 3., 17., 41.}) {
+    const RangeReturnType expected_value(value);
+    FunctionType function(expected_value);
+    auto local_f = function.local_function();
+    const auto leaf_view = grid_.leaf_view();
+    StateType u;
+    for (auto&& element : Dune::elements(leaf_view)) {
+      local_f->bind(element);
+      for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
+        const auto local_x = quadrature_point.position();
+        const auto actual_value = local_f->evaluate(local_x, u);
+        EXPECT_EQ(expected_value, actual_value);
+      }
+    }
+  }
+}
+
+TEST_F(ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
+{
+  for (auto vv : {-10., 3., 17., 41.}) {
+    RangeReturnType value(vv);
+    PartialURangeReturnType expected_partial_u;
+    //expected_jacobian *= 0;
+    FunctionType function(value);
+    auto local_f = function.local_function();
+    const auto leaf_view = grid_.leaf_view();
+    StateType u;
+    for (auto&& element : Dune::elements(leaf_view)) {
+      local_f->bind(element);
+      for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
+        const auto local_x = quadrature_point.position();
+        const auto actual_partial_u = local_f->partial_u(local_x, u);
+        EXPECT_EQ(expected_partial_u, actual_partial_u);
+      }
+    }
+  }
+}
+
+
+
 
 {% endfor  %}

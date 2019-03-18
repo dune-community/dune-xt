@@ -362,6 +362,7 @@ private:
 
 #include <dune/xt/functions/base/combined-functions.hh>
 #include <dune/xt/functions/base/function-as-grid-function.hh>
+#include <dune/xt/functions/base/function-as-flux-function.hh>
 
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACES_SMOOTH_FUNCTION_HH
