@@ -9,27 +9,30 @@
 //   René Fritze     (2018)
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
-//
-// reserved.
-// (http://opensource.org/licenses/BSD-2-Clause)
 
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 
-#include <dune/xt/functions/base/combined-grid-functions.hh>
+#include <dune/xt/common/memory.hh>
+
 #include <dune/xt/functions/interfaces/function.hh>
+#include <dune/xt/functions/type_traits.hh>
+
 
 namespace Dune {
 namespace XT {
 namespace Functions {
 namespace internal {
 
+
 /**
  * \brief Helper class defining types of combined functions, if available.
  *
  * \note Most likely you do not want to use this class directly, but Combined.
+ *
+ * \todo Update product handling as in CombinedElementFunctionHelper to allow for more combinations!
  */
-template <class LeftType, class RightType, Combination comb>
+template <class LeftType, class RightType, CombinationType comb>
 class SelectCombined
 {
 
@@ -46,14 +49,14 @@ private:
   template <class L, class R>
   class Choose
   {
-    template <size_t rL, size_t rR, size_t rCL, size_t rcR, Combination cc, bool anything = true>
+    template <size_t rL, size_t rR, size_t rCL, size_t rcR, CombinationType cc, bool anything = true>
     class Dimension
     {
       static_assert(!anything, "No combination for these dimensions available!");
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
-    class Dimension<r_in, r_in, rC_in, rC_in, Combination::difference, anything>
+    class Dimension<r_in, r_in, rC_in, rC_in, CombinationType::difference, anything>
     {
     public:
       static const size_t r = r_in;
@@ -61,7 +64,7 @@ private:
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
-    class Dimension<r_in, r_in, rC_in, rC_in, Combination::sum, anything>
+    class Dimension<r_in, r_in, rC_in, rC_in, CombinationType::sum, anything>
     {
     public:
       static const size_t r = r_in;
@@ -69,7 +72,7 @@ private:
     };
 
     template <size_t r_in, size_t rC_in, bool anything>
-    class Dimension<1, r_in, 1, rC_in, Combination::product, anything>
+    class Dimension<1, r_in, 1, rC_in, CombinationType::product, anything>
     {
     public:
       static const size_t r = r_in;
@@ -91,14 +94,14 @@ public:
   using DerivativeRangeReturnType = typename FunctionInterface<d, r, rC, R>::DerivativeRangeReturnType;
 
 private:
-  template <Combination cc, bool anything = true>
+  template <CombinationType cc, bool anything = true>
   class Call
   {
     static_assert(!anything, "Nothing available for these combinations!");
   }; // class Call
 
   template <bool anything>
-  class Call<Combination::difference, anything>
+  class Call<CombinationType::difference, anything>
   {
   public:
     static std::string type()
@@ -129,7 +132,7 @@ private:
   }; // class Call< ..., difference >
 
   template <bool anything>
-  class Call<Combination::sum, anything>
+  class Call<CombinationType::sum, anything>
   {
   public:
     static std::string type()
@@ -161,7 +164,7 @@ private:
 
   // left only scalar atm
   template <bool anything>
-  class Call<Combination::product, anything>
+  class Call<CombinationType::product, anything>
   {
   public:
     static std::string type()
@@ -225,6 +228,7 @@ public:
   }
 }; // class SelectCombined
 
+
 /**
  * \brief Generic combined function.
  *
@@ -245,7 +249,7 @@ auto difference = one - two;
 // is equivalent to
 Difference< ConstantType, ConstantType > difference(one, two);
 // and
-internal::Combined< ConstantType, ConstantType, Combination::difference >
+internal::Combined< ConstantType, ConstantType, CombinationType::difference >
 difference(one, tow);
 \endcode
  *          In this situation you are responsible to ensure that the arguments
@@ -277,7 +281,7 @@ Difference< ConstantType, ConstantType > stupid_difference()
  * \note  Most likely you do not want to use this class diretly, but one of
 Difference, Sum or Product.
  */
-template <class LeftType, class RightType, Combination comb>
+template <class LeftType, class RightType, CombinationType comb>
 class CombinedFunction
   : public FunctionInterface<LeftType::domain_dim,
                              SelectCombined<LeftType, RightType, comb>::r,
@@ -298,8 +302,8 @@ class CombinedFunction
 
 public:
   CombinedFunction(const LeftType& left, const RightType& right, const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
     , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '"
                              + right.name() + "'"
                        : nm)
@@ -308,8 +312,16 @@ public:
   CombinedFunction(const std::shared_ptr<const LeftType> left,
                    const std::shared_ptr<const RightType> right,
                    const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
+    , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
+                             + "' and '" + right_->access().name() + "'"
+                       : nm)
+  {}
+
+  CombinedFunction(LeftType*&& left, RightType*&& right, const std::string nm = "")
+    : left_(std::make_unique<LeftStorageType>(std::move(left)))
+    , right_(std::make_unique<RightStorageType>(std::move(right)))
     , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
                              + "' and '" + right_->access().name() + "'"
                        : nm)
@@ -357,7 +369,9 @@ private:
   const std::string name_;
 }; // class Combined
 
+
 } // namespace internal
+
 
 /**
  * \brief Function representing the difference between two functions.
@@ -365,10 +379,9 @@ private:
  * \see internal::Combined
  */
 template <class MinuendType, class SubtrahendType>
-class DifferenceFunction
-  : public internal::CombinedFunction<MinuendType, SubtrahendType, internal::Combination::difference>
+class DifferenceFunction : public internal::CombinedFunction<MinuendType, SubtrahendType, CombinationType::difference>
 {
-  using BaseType = internal::CombinedFunction<MinuendType, SubtrahendType, internal::Combination::difference>;
+  using BaseType = internal::CombinedFunction<MinuendType, SubtrahendType, CombinationType::difference>;
 
 public:
   template <class... Args>
@@ -377,15 +390,16 @@ public:
   {}
 }; // class DifferenceFunction
 
+
 /**
  * \brief Function representing the sum of two functions.
  *
  * \see internal::Combined
  */
 template <class LeftSummandType, class RightSummandType>
-class SumFunction : public internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::sum>
+class SumFunction : public internal::CombinedFunction<LeftSummandType, RightSummandType, CombinationType::sum>
 {
-  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::sum>;
+  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType, CombinationType::sum>;
 
 public:
   template <class... Args>
@@ -394,16 +408,16 @@ public:
   {}
 }; // class SumFunction
 
+
 /**
  * \brief Function representing the product of two functions.
  *
  * \see internal::Combined
  */
 template <class LeftSummandType, class RightSummandType>
-class ProductFunction
-  : public internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::product>
+class ProductFunction : public internal::CombinedFunction<LeftSummandType, RightSummandType, CombinationType::product>
 {
-  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType, internal::Combination::product>;
+  using BaseType = internal::CombinedFunction<LeftSummandType, RightSummandType, CombinationType::product>;
 
 public:
   template <class... Args>
@@ -412,11 +426,13 @@ public:
   {}
 }; // class ProductFunction
 
+
 template <class T1, class T2, class... Args>
 std::shared_ptr<DifferenceFunction<T1, T2>> make_difference(const T1& left, const T2& right, Args&&... args)
 {
   return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
+
 
 template <class T1, class T2, class... Args>
 std::shared_ptr<DifferenceFunction<T1, T2>>
@@ -425,11 +441,13 @@ make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... a
   return std::make_shared<DifferenceFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
+
 template <class T1, class T2, class... Args>
 std::shared_ptr<SumFunction<T1, T2>> make_sum(const T1& left, const T2& right, Args&&... args)
 {
   return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
+
 
 template <class T1, class T2, class... Args>
 std::shared_ptr<SumFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
@@ -437,11 +455,13 @@ std::shared_ptr<SumFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::sha
   return std::make_shared<SumFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
+
 template <class T1, class T2, class... Args>
 std::shared_ptr<ProductFunction<T1, T2>> make_product(const T1& left, const T2& right, Args&&... args)
 {
   return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
+
 
 template <class T1, class T2, class... Args>
 std::shared_ptr<ProductFunction<T1, T2>>
@@ -449,6 +469,7 @@ make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args
 {
   return std::make_shared<ProductFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
+
 
 } // namespace Functions
 } // namespace XT

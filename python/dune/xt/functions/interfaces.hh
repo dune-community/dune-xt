@@ -30,12 +30,12 @@ namespace Functions {
 namespace internal {
 
 
-template <class L, class R, internal::Combination comb>
+template <class L, class R, CombinationType comb>
 struct get_combined
 {}; // struct get_combined
 
 template <class L, class R>
-struct get_combined<L, R, internal::Combination::difference>
+struct get_combined<L, R, CombinationType::difference>
 {
   typedef DifferenceFunction<L, R> type;
 
@@ -61,7 +61,7 @@ struct get_combined<L, R, internal::Combination::difference>
 }; // struct get_combined
 
 template <class L, class R>
-struct get_combined<L, R, internal::Combination::sum>
+struct get_combined<L, R, CombinationType::sum>
 {
   typedef SumFunction<L, R> type;
 
@@ -87,7 +87,7 @@ struct get_combined<L, R, internal::Combination::sum>
 }; // struct get_combined
 
 template <class L, class R>
-struct get_combined<L, R, internal::Combination::product>
+struct get_combined<L, R, CombinationType::product>
 {
   typedef ProductFunction<L, R> type;
 
@@ -117,12 +117,12 @@ struct get_combined<L, R, internal::Combination::product>
  * grid_combined
  */
 
-template <class L, class R, internal::Combination comb>
+template <class L, class R, CombinationType comb>
 struct get_grid_combined
 {}; // struct get_grid_combined
 
 template <class L, class R>
-struct get_grid_combined<L, R, internal::Combination::difference>
+struct get_grid_combined<L, R, CombinationType::difference>
 {
   typedef DifferenceGridFunction<L, R> type;
 
@@ -148,7 +148,7 @@ struct get_grid_combined<L, R, internal::Combination::difference>
 }; // struct get_grid_combined
 
 template <class L, class R>
-struct get_grid_combined<L, R, internal::Combination::sum>
+struct get_grid_combined<L, R, CombinationType::sum>
 {
   typedef SumGridFunction<L, R> type;
 
@@ -174,7 +174,7 @@ struct get_grid_combined<L, R, internal::Combination::sum>
 }; // struct get_grid_combined
 
 template <class L, class R>
-struct get_grid_combined<L, R, internal::Combination::product>
+struct get_grid_combined<L, R, CombinationType::product>
 {
   typedef ProductGridFunction<L, R> type;
 
@@ -347,7 +347,7 @@ static const constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
-template <class G, size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
+template <class G, size_t d, CombinationType comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
 pybind11::class_<
     typename internal::get_grid_combined<GridFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
                                          GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
@@ -378,7 +378,7 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 } // ... bind_combined_GridFunction(...)
 
 
-template <size_t d, internal::Combination comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
+template <size_t d, CombinationType comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
 pybind11::class_<typename internal::get_combined<FunctionInterface<d, lr, lrC, double>,
                                                  FunctionInterface<d, rr, rrC, double>,
                                                  comb>::type>
@@ -416,7 +416,7 @@ static const constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
-template <class G, size_t d, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+template <class G, size_t d, CombinationType comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
 void addbind_GridFunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
@@ -432,7 +432,7 @@ void addbind_GridFunctionInterface_combined_op(C& c)
 } // ... addbind_GridFunctionInterface_combined_op(...)
 
 
-template <size_t d, internal::Combination comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
+template <size_t d, CombinationType comb, size_t r, size_t rC, size_t oR, size_t orC, class C>
 void addbind_FunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;

@@ -195,16 +195,38 @@ class ElementFunctionSetInterface;
 template <class E, size_t r, size_t rC, class R>
 class ElementFunctionInterface;
 
+template <size_t d, size_t r, size_t rC, class R>
+class FunctionInterface;
+
 template <class E, size_t r, size_t rC, class R>
 class GridFunctionInterface;
 
-// smooth
-
-// template <class E, class D, size_t d, class U_, size_t s_, class R, size_t r, size_t rC>
-// class LocalizableFluxFunctionInterface;
-
 
 namespace internal {
+
+
+template <class Tt>
+struct is_element_function_helper
+{
+  DXTC_has_typedef_initialize_once(E);
+  DXTC_has_typedef_initialize_once(R);
+  DXTC_has_static_member_initialize_once(r);
+  DXTC_has_static_member_initialize_once(rC);
+  static const bool is_candidate = DXTC_has_typedef(E)<Tt>::value && DXTC_has_typedef(R)<Tt>::value
+                                   && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
+}; // struct is_element_function_helper
+
+
+template <class Tt>
+struct is_function_helper
+{
+  DXTC_has_typedef_initialize_once(R);
+  DXTC_has_static_member_initialize_once(d);
+  DXTC_has_static_member_initialize_once(r);
+  DXTC_has_static_member_initialize_once(rC);
+  static const bool is_candidate = DXTC_has_typedef(R)<Tt>::value && DXTC_has_static_member(d)<Tt>::value
+                                   && DXTC_has_static_member(r)<Tt>::value && DXTC_has_static_member(rC)<Tt>::value;
+}; // struct is_function_helper
 
 
 template <class Tt>
@@ -222,6 +244,31 @@ struct is_grid_function_helper
 } // namespace internal
 
 
+template <class T, bool is_candidate = internal::is_element_function_helper<T>::is_candidate>
+struct is_element_function;
+
+template <class T>
+struct is_element_function<T, false> : public std::false_type
+{};
+
+template <class T>
+struct is_element_function<T, true>
+  : std::is_base_of<ElementFunctionInterface<typename T::E, T::r, T::rC, typename T::R>, T>
+{};
+
+
+template <class T, bool is_candidate = internal::is_function_helper<T>::is_candidate>
+struct is_function;
+
+template <class T>
+struct is_function<T, false> : public std::false_type
+{};
+
+template <class T>
+struct is_function<T, true> : std::is_base_of<FunctionInterface<T::d, T::r, T::rC, typename T::R>, T>
+{};
+
+
 template <class T, bool is_candidate = internal::is_grid_function_helper<T>::is_candidate>
 struct is_grid_function;
 
@@ -234,89 +281,19 @@ struct is_grid_function<T, true> : std::is_base_of<GridFunctionInterface<typenam
 {};
 
 
-// template <class T, bool candidate = internal::is_localfunction_set_helper<T>::is_candidate>
-// struct is_localfunction_set : public std::is_base_of<LocalfunctionSetInterface<typename T::EntityType,
-//                                                                               typename T::DomainFieldType,
-//                                                                               T::dimDomain,
-//                                                                               typename T::RangeFieldType,
-//                                                                               T::dimRange,
-//                                                                               T::dimRangeCols>,
-//                                                     T>
-//{
-//};
-
-// template <class T>
-// struct is_localfunction_set<T, false> : public std::false_type
-//{
-//};
+enum class CombinationType
+{
+  difference,
+  product,
+  sum
+}; // enum class CombinationType
 
 
-// template <class T, bool candidate = internal::is_localfunction_set_helper<T>::is_candidate>
-// struct is_localfunction : public std::is_base_of<LocalfunctionInterface<typename T::EntityType,
-//                                                                        typename T::DomainFieldType,
-//                                                                        T::dimDomain,
-//                                                                        typename T::RangeFieldType,
-//                                                                        T::dimRange,
-//                                                                        T::dimRangeCols>,
-//                                                 T>
-//{
-//};
-
-// template <class T>
-// struct is_localfunction<T, false> : public std::false_type
-//{
-//};
-
-
-// template <class T, bool candidate = internal::is_localfunction_set_helper<T>::is_candidate>
-// struct is_grid_function : public std::is_base_of<GridFunctionInterface<typename T::EntityType,
-//                                                                                     typename T::DomainFieldType,
-//                                                                                     T::dimDomain,
-//                                                                                     typename T::RangeFieldType,
-//                                                                                     T::dimRange,
-//                                                                                     T::dimRangeCols>,
-//                                                        T>
-//{
-//};
-
-// template <class T>
-// struct is_grid_function<T, false> : public std::false_type
-//{
-//};
-
-
-// template <class T, bool candidate = internal::is_localizable_flux_function_helper<T>::is_candidate>
-// struct is_localizable_flux_function
-//    : public std::is_base_of<LocalizableFluxFunctionInterface<typename T::EntityType,
-//                                                              typename T::DomainFieldType,
-//                                                              T::dimDomain,
-//                                                              typename T::StateType,
-//                                                              T::stateDerivativeOrder,
-//                                                              typename T::RangeFieldType,
-//                                                              T::dimRange,
-//                                                              T::dimRangeCols>,
-//                             T>
-//{
-//};
-
-// template <class T>
-// struct is_localizable_flux_function<T, false> : public std::false_type
-//{
-//};
-
-
-////! Utility to generate a complete Function Type from an existing one and a template
-// template <class FunctionImp, template <class, class, size_t, class, size_t, size_t> class OutTemplate>
-// struct FunctionTypeGenerator
-//{
-//  typedef OutTemplate<typename FunctionImp::EntityType,
-//                      typename FunctionImp::DomainFieldType,
-//                      FunctionImp::dimDomain,
-//                      typename FunctionImp::RangeFieldType,
-//                      FunctionImp::dimRange,
-//                      FunctionImp::dimRangeCols>
-//      type;
-//};
+enum class DerivativeType
+{
+  divergence,
+  gradient
+}; // enum class DerivativeType
 
 
 } // namespace Functions
