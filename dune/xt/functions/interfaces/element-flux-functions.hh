@@ -10,8 +10,8 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2017)
 
-#ifndef DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTIONS_HH
-#define DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTIONS_HH
+#ifndef DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FLUX_FUNCTIONS_HH
+#define DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FLUX_FUNCTIONS_HH
 
 #include <array>
 #include <sstream>
@@ -39,55 +39,28 @@ namespace XT {
 namespace Functions {
 
 
-// forwards, required in operator+-*
-template <class MinuendType, class SubtrahendType>
-class ConstDifferenceElementFunction;
-
-template <class MinuendType, class SubtrahendType>
-class DifferenceElementFunction;
-
-template <class LeftSummandType, class RightSummandType>
-class ConstSumElementFunction;
-
-template <class LeftSummandType, class RightSummandType>
-class SumElementFunction;
-
-template <class LeftFactorType, class RightFactorType>
-class ConstProductElementFunction;
-
-template <class LeftFactorType, class RightFactorType>
-class ProductElementFunction;
-
-
-namespace internal {
-
-
-template <class LeftType, class RightType, CombinationType>
-class CombinedElementFunctionHelper;
-}
-
-
 /**
- * \brief Interface for a set of globalvalued functions, which can be evaluated locally on one Element.
- *
- * \sa    RangeTypeSelector
- * \sa    DerivativeRangeTypeSelector
- *
- *        See in particular RangeTypeSelector and DerivativeRangeTypeSelector for the interpretation of a function and
- *        its derivatives.
+ * \brief Interface for a set of globalvalued functions, which are evaluated with two variables, one variable in
+ *element-local coordinates and one grid-independent variable. \sa    RangeTypeSelector \sa    PartialURangeTypeSelector
  **/
-template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
-class ElementFunctionSetInterface
+template <class Element,
+          size_t stateDim = 1,
+          size_t rangeDim = 1,
+          size_t rangeDimCols = 1,
+          class RangeField = double,
+          class StateField = double>
+class ElementFluxFunctionSetInterface
   : public Common::ParametricInterface
   , public XT::Grid::ElementBoundObject<Element>
 {
   static_assert(XT::Grid::is_entity<Element>::value, "");
-  using ThisType = ElementFunctionSetInterface<Element, rangeDim, rangeDimCols, RangeField>;
+  using ThisType = ElementFluxFunctionSetInterface;
 
 public:
   using typename XT::Grid::ElementBoundObject<Element>::ElementType;
   using DomainFieldType = double;
   static const constexpr size_t domain_dim = ElementType::dimension;
+  static const constexpr size_t state_dim = stateDim;
   using RangeFieldType = RangeField;
   static const constexpr size_t range_dim = rangeDim;
   static const constexpr size_t range_dim_cols = rangeDimCols;
@@ -95,14 +68,17 @@ public:
   using E = ElementType;
   using D = DomainFieldType;
   static const constexpr size_t d = domain_dim;
+  static const constexpr size_t s = state_dim;
   using R = RangeFieldType;
+  using S = StateField;
   static const constexpr size_t r = range_dim;
   static const constexpr size_t rC = range_dim_cols;
 
   using DomainType = Dune::FieldVector<D, d>;
+  using StateType = Dune::FieldVector<S, s>;
 
   using RangeSelector = RangeTypeSelector<R, r, rC>;
-  using DerivativeRangeSelector = DerivativeRangeTypeSelector<d, R, r, rC>;
+  using PartialURangeSelector = DerivativeRangeTypeSelector<s, R, r, rC>;
 
   /**
    * \name ``These types are the _standard_ types to be used.''
@@ -110,8 +86,8 @@ public:
    */
 
   using RangeType = typename RangeSelector::type;
-  using DerivativeRangeType = typename DerivativeRangeSelector::type;
-  using SingleDerivativeRangeType = typename DerivativeRangeSelector::single_type;
+  using PartialURangeType = typename PartialURangeSelector::type;
+  using SinglePartialURangeType = typename PartialURangeSelector::single_type;
 
   /**
    * \}
@@ -120,24 +96,24 @@ public:
    */
 
   using DynamicRangeType = typename RangeSelector::dynamic_type;
-  using DynamicDerivativeRangeType = typename DerivativeRangeSelector::dynamic_type;
+  using DynamicPartialURangeType = typename PartialURangeSelector::dynamic_type;
 
   /// \}
 
 
-  ElementFunctionSetInterface(const XT::Common::ParameterType& param_type = {})
+  ElementFluxFunctionSetInterface(const XT::Common::ParameterType& param_type = {})
     : Common::ParametricInterface(param_type)
   {}
 
-  ElementFunctionSetInterface(const ThisType& other)
+  ElementFluxFunctionSetInterface(const ThisType& other)
     : Common::ParametricInterface(other.parameter_type())
   {}
 
-  ElementFunctionSetInterface(ThisType&& source)
+  ElementFluxFunctionSetInterface(ThisType&& source)
     : Common::ParametricInterface(source.parameter_type())
   {}
 
-  virtual ~ElementFunctionSetInterface() = default;
+  virtual ~ElementFluxFunctionSetInterface() = default;
 
   /**
    * \name ´´These methods have to be implemented.''
@@ -178,6 +154,7 @@ assert(max_set_size <= local_function_set.max_size());
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
   virtual void evaluate(const DomainType& /*point_in_reference_element*/,
+                        const StateType& /*u*/,
                         std::vector<RangeType>& /*result*/,
                         const Common::Parameter& /*param*/ = {}) const
   {
@@ -188,28 +165,13 @@ assert(max_set_size <= local_function_set.max_size());
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual void jacobians(const DomainType& /*point_in_reference_element*/,
-                         std::vector<DerivativeRangeType>& /*result*/,
+  virtual void partial_u(const DomainType& /*point_in_reference_element*/,
+                         const StateType& /*u*/,
+                         std::vector<PartialURangeType>& /*result*/,
                          const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
-               "This set of element functions does not provide jacobians, override the 'jacobians' method!");
-  }
-
-  /**
-   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
-   **/
-  virtual void derivatives(const std::array<size_t, d>& alpha,
-                           const DomainType& point_in_reference_element,
-                           std::vector<DerivativeRangeType>& result,
-                           const Common::Parameter& param = {}) const
-  {
-    if (Common::FloatCmp::eq(alpha, FieldVector<size_t, d>(1)))
-      this->jacobians(point_in_reference_element, result, param);
-    else
-      DUNE_THROW(
-          NotImplemented,
-          "This set of element functions does not provide arbitrary derivatives, override the 'derivatives' method!");
+               "This set of element functions does not provide partial_u, override the 'partial_u' method!");
   }
 
   /**
@@ -222,33 +184,23 @@ assert(max_set_size <= local_function_set.max_size());
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
   virtual std::vector<RangeType> evaluate_set(const DomainType& point_in_reference_element,
+                                              const StateType& u,
                                               const Common::Parameter& param = {}) const
   {
     std::vector<RangeType> result(this->size(param));
-    this->evaluate(point_in_reference_element, result, param);
+    this->evaluate(point_in_reference_element, u, result, param);
     return result;
   }
 
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual std::vector<DerivativeRangeType> jacobians_of_set(const DomainType& point_in_reference_element,
-                                                            const Common::Parameter& param = {}) const
+  virtual std::vector<PartialURangeType> partial_u_of_set(const DomainType& point_in_reference_element,
+                                                          const StateType& u,
+                                                          const Common::Parameter& param = {}) const
   {
-    std::vector<DerivativeRangeType> result(this->size(param));
-    this->jacobians(point_in_reference_element, result, param);
-    return result;
-  }
-
-  /**
-   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
-   **/
-  virtual std::vector<DerivativeRangeType> derivatives_of_set(const std::array<size_t, d>& alpha,
-                                                              const DomainType& point_in_reference_element,
-                                                              const Common::Parameter& param = {}) const
-  {
-    std::vector<DerivativeRangeType> result(this->size(param));
-    this->derivatives(alpha, point_in_reference_element, result, param);
+    std::vector<PartialURangeType> result(this->size(param));
+    this->partial_u(point_in_reference_element, u, result, param);
     return result;
   }
 
@@ -263,13 +215,14 @@ assert(max_set_size <= local_function_set.max_size());
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
   virtual void evaluate(const DomainType& point_in_reference_element,
+                        const StateType& u,
                         std::vector<R>& result,
                         const size_t row,
                         const size_t col = 0,
                         const Common::Parameter& param = {}) const
   {
     assert_correct_dims(row, col, "evaluate");
-    const auto tmp_values = this->evaluate_set(point_in_reference_element, param);
+    const auto tmp_values = this->evaluate_set(point_in_reference_element, u, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
     single_evaluate_helper<>::call(tmp_values, row, col, result);
@@ -278,31 +231,15 @@ assert(max_set_size <= local_function_set.max_size());
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual void jacobians(const DomainType& point_in_reference_element,
-                         std::vector<SingleDerivativeRangeType>& result,
+  virtual void partial_u(const DomainType& point_in_reference_element,
+                         const StateType& u,
+                         std::vector<SinglePartialURangeType>& result,
                          const size_t row,
                          const size_t col = 0,
                          const Common::Parameter& param = {}) const
   {
-    assert_correct_dims(row, col, "jacobians");
-    const auto tmp_values = this->jacobians_of_set(point_in_reference_element, param);
-    if (result.size() < tmp_values.size())
-      result.resize(tmp_values.size());
-    single_derivative_helper<>::call(tmp_values, row, col, result);
-  }
-
-  /**
-   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
-   **/
-  virtual void derivatives(const std::array<size_t, d>& alpha,
-                           const DomainType& point_in_reference_element,
-                           std::vector<SingleDerivativeRangeType>& result,
-                           const size_t row,
-                           const size_t col = 0,
-                           const Common::Parameter& param = {}) const
-  {
-    assert_correct_dims(row, col, "derivatives");
-    const auto tmp_values = this->derivatives_of_set(alpha, point_in_reference_element, param);
+    assert_correct_dims(row, col, "partial_u");
+    const auto tmp_values = this->partial_u_of_set(point_in_reference_element, u, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
     single_derivative_helper<>::call(tmp_values, row, col, result);
@@ -310,7 +247,7 @@ assert(max_set_size <= local_function_set.max_size());
 
   /**
    * \{
-   * \name ´´These methods are provided for large dimensions (when RangeType or DerivativeRangeType do not fit on the
+   * \name ´´These methods are provided for large dimensions (when RangeType or PartialURangeType do not fit on the
    *         stack) and should be overridden to improve their performance.''
    * \{
    **/
@@ -319,6 +256,7 @@ assert(max_set_size <= local_function_set.max_size());
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
   virtual void evaluate(const DomainType& point_in_reference_element,
+                        const StateType& u,
                         std::vector<DynamicRangeType>& result,
                         const Common::Parameter& param = {}) const
   {
@@ -330,7 +268,7 @@ assert(max_set_size <= local_function_set.max_size());
       RangeSelector::ensure_size(result[ii]);
     // call actual evaluate
     auto tmp_result = std::make_unique<std::vector<RangeType>>(sz);
-    this->evaluate(point_in_reference_element, *tmp_result, param);
+    this->evaluate(point_in_reference_element, u, *tmp_result, param);
     // convert
     for (size_t ii = 0; ii < sz; ++ii)
       RangeSelector::convert((*tmp_result)[ii], result[ii]);
@@ -339,8 +277,9 @@ assert(max_set_size <= local_function_set.max_size());
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual void jacobians(const DomainType& point_in_reference_element,
-                         std::vector<DynamicDerivativeRangeType>& result,
+  virtual void partial_u(const DomainType& point_in_reference_element,
+                         const StateType& u,
+                         std::vector<DynamicPartialURangeType>& result,
                          const Common::Parameter& param = {}) const
   {
     // prepare result
@@ -348,36 +287,14 @@ assert(max_set_size <= local_function_set.max_size());
     if (result.size() < sz)
       result.resize(sz);
     for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeSelector::ensure_size(result[ii]);
-    // call actual jacobians
-    auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(sz);
-    this->jacobians(point_in_reference_element, *tmp_result, param);
+      PartialURangeSelector::ensure_size(result[ii]);
+    // call actual partial_u
+    auto tmp_result = std::make_unique<std::vector<PartialURangeType>>(sz);
+    this->partial_u(point_in_reference_element, u, *tmp_result, param);
     // convert
     for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeSelector::convert((*tmp_result)[ii], result[ii]);
-  } // ... jacobians(...)
-
-  /**
-   * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
-   **/
-  virtual void derivatives(const std::array<size_t, d>& alpha,
-                           const DomainType& point_in_reference_element,
-                           std::vector<DynamicDerivativeRangeType>& result,
-                           const Common::Parameter& param = {}) const
-  {
-    // prepare result
-    const auto sz = this->size();
-    if (result.size() < sz)
-      result.resize(sz);
-    for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeSelector::ensure_size(result[ii]);
-    // call actual derivatives
-    auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(sz);
-    this->derivatives(alpha, point_in_reference_element, *tmp_result, param);
-    // convert
-    for (size_t ii = 0; ii < sz; ++ii)
-      DerivativeRangeSelector::convert((*tmp_result)[ii], result[ii]);
-  } // ... derivatives(...)
+      PartialURangeSelector::convert((*tmp_result)[ii], result[ii]);
+  } // ... partial_u(...)
 
   /**
    * \}
@@ -457,27 +374,35 @@ private:
         ret[ii] = val[ii][row];
     }
   }; // struct single_derivative_helper<..., 1, ...>
-}; // class ElementFunctionSetInterface
+}; // class ElementFluxFunctionSetInterface
 
 
 /**
  *  \brief  Interface for a globalvalued function, which can be evaluated locally on one Element.
  */
-template <class Element, size_t range_dim = 1, size_t range_dim_cols = 1, class RangeField = double>
-class ElementFunctionInterface : public ElementFunctionSetInterface<Element, range_dim, range_dim_cols, RangeField>
+template <class Element,
+          size_t state_dim = 1,
+          size_t range_dim = 1,
+          size_t range_dim_cols = 1,
+          class RangeField = double>
+class ElementFluxFunctionInterface
+  : public ElementFluxFunctionSetInterface<Element, state_dim, range_dim, range_dim_cols, RangeField>
 {
-  using BaseType = ElementFunctionSetInterface<Element, range_dim, range_dim_cols, RangeField>;
-  using ThisType = ElementFunctionInterface<Element, range_dim, range_dim_cols, RangeField>;
+  using BaseType = ElementFluxFunctionSetInterface<Element, state_dim, range_dim, range_dim_cols, RangeField>;
+  using ThisType = ElementFluxFunctionInterface;
 
 public:
   using BaseType::d;
   using BaseType::r;
   using BaseType::rC;
+  using BaseType::s;
   using typename BaseType::DomainType;
   using typename BaseType::ElementType;
   using typename BaseType::R;
+  using typename BaseType::S;
+  using typename BaseType::StateType;
 
-  using typename BaseType::DerivativeRangeSelector;
+  using typename BaseType::PartialURangeSelector;
   using typename BaseType::RangeSelector;
 
   /**
@@ -485,9 +410,9 @@ public:
    * \{
    */
 
-  using typename BaseType::DerivativeRangeType;
+  using typename BaseType::PartialURangeType;
   using typename BaseType::RangeType;
-  using typename BaseType::SingleDerivativeRangeType;
+  using typename BaseType::SinglePartialURangeType;
 
   /**
    * \}
@@ -495,7 +420,7 @@ public:
    * \{
    */
 
-  using typename BaseType::DynamicDerivativeRangeType;
+  using typename BaseType::DynamicPartialURangeType;
   using typename BaseType::DynamicRangeType;
 
   /**
@@ -504,24 +429,25 @@ public:
    */
 
   using RangeReturnType = typename RangeSelector::return_type;
-  using DerivativeRangeReturnType = typename DerivativeRangeSelector::return_type;
-  using SingleDerivativeRangeReturnType = typename DerivativeRangeSelector::return_single_type;
+  using PartialURangeReturnType = typename PartialURangeSelector::return_type;
+  using SinglePartialURangeReturnType = typename PartialURangeSelector::return_single_type;
 
   /// \}
 
-  ElementFunctionInterface(const XT::Common::ParameterType& param_type = {})
+  ElementFluxFunctionInterface(const XT::Common::ParameterType& param_type = {})
     : BaseType(param_type)
   {}
 
-  ElementFunctionInterface(const ThisType& other) = default;
-  ElementFunctionInterface(ThisType&& source) = default;
+  ElementFluxFunctionInterface(const ThisType& other) = default;
+  ElementFluxFunctionInterface(ThisType&& source) = default;
 
-  virtual ~ElementFunctionInterface() = default;
+  virtual ~ElementFluxFunctionInterface() = default;
 
   ThisType& operator=(const ThisType& other) = default;
   ThisType& operator=(ThisType&& source) = default;
 
   using BaseType::evaluate;
+  using BaseType::partial_u;
 
   /**
    * \}
@@ -530,23 +456,17 @@ public:
    **/
 
   virtual RangeReturnType evaluate(const DomainType& /*point_in_reference_element*/,
+                                   const StateType& /*u*/,
                                    const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented, "This local function does not provide evaluations, override the 'evaluate' method!");
   }
 
-  virtual DerivativeRangeReturnType jacobian(const DomainType& /*point_in_reference_element*/,
-                                             const Common::Parameter& /*param*/ = {}) const
+  virtual PartialURangeReturnType partial_u(const DomainType& /*point_in_reference_element*/,
+                                            const StateType& /*u*/,
+                                            const Common::Parameter& /*param*/ = {}) const
   {
-    DUNE_THROW(NotImplemented, "This local function does not provide a jacobian, override the 'jacobian' method!");
-  }
-
-  virtual DerivativeRangeReturnType derivative(const std::array<size_t, d>& /*alpha*/,
-                                               const DomainType& /*point_in_reference_element*/,
-                                               const Common::Parameter& /*param*/ = {}) const
-  {
-    DUNE_THROW(NotImplemented,
-               "This local function does not provide arbitrary derivatives, override the 'derivative' method!");
+    DUNE_THROW(NotImplemented, "This local function does not provide a partial_u, override the 'partial_u' method!");
   }
 
   /**
@@ -557,43 +477,35 @@ public:
    **/
 
   virtual R evaluate(const DomainType& point_in_reference_element,
+                     const StateType& u,
                      const size_t row,
                      const size_t col = 0,
                      const Common::Parameter& param = {}) const
   {
     this->assert_correct_dims(row, col, "evaluate");
-    return single_evaluate_helper<R>::call(this->evaluate(point_in_reference_element, param), row, col);
+    return single_evaluate_helper<R>::call(this->evaluate(point_in_reference_element, u, param), row, col);
   }
 
-  virtual SingleDerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                                   const size_t row,
-                                                   const size_t col = 0,
-                                                   const Common::Parameter& param = {}) const
+  virtual SinglePartialURangeReturnType partial_u(const DomainType& point_in_reference_element,
+                                                  const StateType& u,
+                                                  const size_t row,
+                                                  const size_t col = 0,
+                                                  const Common::Parameter& param = {}) const
   {
-    this->assert_correct_dims(row, col, "jacobian");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(
-        this->jacobian(point_in_reference_element, param), row, col);
-  }
-
-  virtual SingleDerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
-                                                     const DomainType& point_in_reference_element,
-                                                     const size_t row,
-                                                     const size_t col = 0,
-                                                     const Common::Parameter& param = {}) const
-  {
-    this->assert_correct_dims(row, col, "derivative");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(
-        this->derivative(alpha, point_in_reference_element, param), row, col);
+    this->assert_correct_dims(row, col, "partial_u");
+    return single_derivative_helper<SinglePartialURangeReturnType>::call(
+        this->partial_u(point_in_reference_element, u, param), row, col);
   }
 
   /**
    * \}
-   * \name ´´These methods are provided for large dimensions (when RangeType or DerivativeRangeType do not fit on the
+   * \name ´´These methods are provided for large dimensions (when RangeType or PartialURangeType do not fit on the
    *         stack) and should be overridden to improve their performance.''
    * \{
    **/
 
   virtual void evaluate(const DomainType& point_in_reference_element,
+                        const StateType& u,
                         DynamicRangeType& result,
                         const Common::Parameter& param = {}) const
   {
@@ -601,131 +513,60 @@ public:
     RangeSelector::ensure_size(result);
     // call actual evaluate
     auto tmp_result = std::make_unique<std::vector<RangeType>>(1);
-    this->evaluate(point_in_reference_element, *tmp_result, param);
+    this->evaluate(point_in_reference_element, u, *tmp_result, param);
     // convert
     RangeSelector::convert((*tmp_result)[0], result);
   } // ... evaluate(...)
 
-  virtual void jacobian(const DomainType& point_in_reference_element,
-                        DynamicDerivativeRangeType& result,
-                        const Common::Parameter& param = {}) const
+  virtual void partial_u(const DomainType& point_in_reference_element,
+                         const StateType& u,
+                         DynamicPartialURangeType& result,
+                         const Common::Parameter& param = {}) const
   {
     // prepare result
-    DerivativeRangeSelector::ensure_size(result);
-    // call actual jacobians
-    auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(1);
-    this->jacobians(point_in_reference_element, *tmp_result, param);
+    PartialURangeSelector::ensure_size(result);
+    // call actual partial_u
+    auto tmp_result = std::make_unique<std::vector<PartialURangeType>>(1);
+    this->partial_u(point_in_reference_element, u, *tmp_result, param);
     // convert
-    DerivativeRangeSelector::convert((*tmp_result)[0], result);
-  } // ... jacobians(...)
-
-  virtual void derivative(const std::array<size_t, d>& alpha,
-                          const DomainType& point_in_reference_element,
-                          DynamicDerivativeRangeType& result,
-                          const Common::Parameter& param = {}) const
-  {
-    // prepare result
-    DerivativeRangeSelector::ensure_size(result);
-    // call actual derivatives
-    auto tmp_result = std::make_unique<std::vector<DerivativeRangeType>>(1);
-    this->derivatives(alpha, point_in_reference_element, *tmp_result, param);
-    // convert
-    DerivativeRangeSelector::convert((*tmp_result)[0], result);
-  } // ... derivatives(...)
+    PartialURangeSelector::convert((*tmp_result)[0], result);
+  } // ... partial_u(...)
 
   /**
    * \{
-   * \name ´´These methods are required by ElementFunctionSetInterface and are provided by this interface.''
+   * \name ´´These methods are required by ElementFluxFunctionSetInterface and are provided by this interface.''
    * \{
    **/
 
-  size_t size(const Common::Parameter& /*param*/ = {}) const override
+  virtual size_t size(const Common::Parameter& /*param*/ = {}) const override
   {
     return 1;
   }
 
-  size_t max_size(const Common::Parameter& /*param*/ = {}) const override
+  virtual size_t max_size(const Common::Parameter& /*param*/ = {}) const override
   {
     return 1;
   }
 
-  void evaluate(const DomainType& point_in_reference_element,
-                std::vector<RangeType>& result,
-                const Common::Parameter& param = {}) const override
+  virtual void evaluate(const DomainType& point_in_reference_element,
+                        const StateType& u,
+                        std::vector<RangeType>& result,
+                        const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);
-    result[0] = this->evaluate(point_in_reference_element, param);
+    result[0] = this->evaluate(point_in_reference_element, u, param);
   }
 
-  void jacobians(const DomainType& point_in_reference_element,
-                 std::vector<DerivativeRangeType>& result,
-                 const Common::Parameter& param = {}) const override
+  virtual void partial_u(const DomainType& point_in_reference_element,
+                         const StateType& u,
+                         std::vector<PartialURangeType>& result,
+                         const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);
-    result[0] = this->jacobian(point_in_reference_element, param);
+    result[0] = this->partial_u(point_in_reference_element, u, param);
   }
-
-  void derivatives(const std::array<size_t, d>& alpha,
-                   const DomainType& point_in_reference_element,
-                   std::vector<DerivativeRangeType>& result,
-                   const Common::Parameter& param = {}) const override
-  {
-    if (result.size() < 1)
-      result.resize(1);
-    result[0] = this->derivative(alpha, point_in_reference_element, param);
-  }
-
-  /**
-   * \}
-   * \name ´´These operators are provided for convenience.''
-   * \{
-   **/
-
-  ConstDifferenceElementFunction<ThisType, ThisType> operator-(const ThisType& other) const
-  {
-    return ConstDifferenceElementFunction<ThisType, ThisType>(*this, other);
-  }
-
-  DifferenceElementFunction<ThisType, ThisType> operator-(ThisType& other)
-  {
-    return DifferenceElementFunction<ThisType, ThisType>(*this, other);
-  }
-
-  ConstSumElementFunction<ThisType, ThisType> operator+(const ThisType& other) const
-  {
-    return ConstSumElementFunction<ThisType, ThisType>(*this, other);
-  }
-
-  SumElementFunction<ThisType, ThisType> operator+(ThisType& other)
-  {
-    return SumElementFunction<ThisType, ThisType>(*this, other);
-  }
-
-  template <class OtherType>
-  std::enable_if_t<
-      is_element_function<OtherType>::value
-          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
-      ConstProductElementFunction<ThisType, OtherType>>
-  operator*(const OtherType& other) const
-  {
-    return ConstProductElementFunction<ThisType, OtherType>(*this, other);
-  }
-
-  template <class OtherType>
-  std::enable_if_t<
-      is_element_function<OtherType>::value
-          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
-      ProductElementFunction<ThisType, OtherType>>
-  operator*(OtherType& other)
-  {
-    return ProductElementFunction<ThisType, OtherType>(*this, other);
-  }
-
-  /**
-   * \{
-   **/
 
 private:
   template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
@@ -770,7 +611,7 @@ private:
       return val[row];
     }
   }; // struct single_derivative_helper<..., 1, ...>
-}; // class ElementFunctionInterface
+}; // class ElementFluxFunctionInterface
 
 
 } // namespace Functions
@@ -779,4 +620,4 @@ private:
 
 #include <dune/xt/functions/base/combined-element-functions.hh>
 
-#endif // DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTIONS_HH
+#endif // DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FLUX_FUNCTIONS_HH
