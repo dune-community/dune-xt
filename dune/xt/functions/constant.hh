@@ -154,7 +154,7 @@ public:
   }
 
 private:
-  ConstantFunction<BaseType::domain_dim, rangeDim, rangeDimCols, RangeField> constant_function_;
+  ConstantFunction<stateDim, rangeDim, rangeDimCols, RangeField> constant_function_;
   StateFunctionAsFluxFunctionWrapper<Element, stateDim, rangeDim, rangeDimCols, RangeField> constant_flux_function_;
 }; // class ConstantGridFunction
 
