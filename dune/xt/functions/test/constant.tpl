@@ -283,7 +283,7 @@ struct ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::t
   using RangeReturnType = typename FunctionType::LocalFunctionType::RangeReturnType;
   using DomainType = typename FunctionType::LocalFunctionType::DomainType;
   using StateType = typename FunctionType::LocalFunctionType::StateType;
-  using PartialURangeReturnType = typename FunctionType::LocalFunctionType::PartialURangeReturnType;
+  using JacobianRangeReturnType = typename FunctionType::LocalFunctionType::JacobianRangeReturnType;
 
   ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}()
     : grid_(Grid::make_cube_grid<GridType>(-1., 1., 4))
@@ -353,7 +353,7 @@ TEST_F(ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacob
 {
   for (auto vv : {-10., 3., 17., 41.}) {
     RangeReturnType value(vv);
-    PartialURangeReturnType expected_partial_u;
+    JacobianRangeReturnType expected_jacobian;
     //expected_jacobian *= 0;
     FunctionType function(value);
     auto local_f = function.local_function();
@@ -363,8 +363,8 @@ TEST_F(ConstantFluxFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacob
       local_f->bind(element);
       for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
         const auto local_x = quadrature_point.position();
-        const auto actual_partial_u = local_f->partial_u(local_x, u);
-        EXPECT_EQ(expected_partial_u, actual_partial_u);
+        const auto actual_jacobian = local_f->jacobian(local_x, u);
+        EXPECT_EQ(expected_jacobian, actual_jacobian);
       }
     }
   }

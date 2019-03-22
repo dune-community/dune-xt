@@ -36,8 +36,8 @@ struct GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
   using RangeReturnType = typename GenericType::LocalFunctionType::RangeReturnType;
   using DomainType = typename GenericType::LocalFunctionType::DomainType;
   using StateType = typename GenericType::LocalFunctionType::StateType;
-  using PartialURangeType = typename GenericType::LocalFunctionType::PartialURangeType;
-  using PartialURangeReturnType = typename GenericType::LocalFunctionType::PartialURangeReturnType;
+  using JacobianRangeType = typename GenericType::LocalFunctionType::JacobianRangeType;
+  using JacobianRangeReturnType = typename GenericType::LocalFunctionType::JacobianRangeReturnType;
 
 
   GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}()
@@ -60,7 +60,7 @@ TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
       [&](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return PartialURangeReturnType(); }
+      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return JacobianRangeReturnType(); }
           );
 
   GenericType function2(
@@ -69,7 +69,7 @@ TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
       [&](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return PartialURangeReturnType(); }
+      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return JacobianRangeReturnType(); }
           );
 
   // check that defaults are compiling
@@ -89,7 +89,7 @@ TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
       [&](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return PartialURangeReturnType(); }
+      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return JacobianRangeReturnType(); }
           );
   auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -110,7 +110,7 @@ TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
         [&](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return RangeReturnType(element_index); },
         /*parameter=*/{},
         "element_index_",
-        [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return PartialURangeReturnType(); });
+        [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return JacobianRangeReturnType(); });
 
     auto local_f = function.local_function();
     for (auto&& element : Dune::elements(leaf_view)) {
@@ -132,7 +132,7 @@ TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
       [&](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return PartialURangeReturnType(); }
+      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return JacobianRangeReturnType(); }
   );
   auto local_f = function.local_function();
   for (auto&& element : Dune::elements(leaf_view)) {
@@ -148,7 +148,7 @@ TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
   }
 }
 
-TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}, local_partial_u)
+TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
   size_t element_index = 0;
   const auto leaf_view = grid_.leaf_view();
@@ -159,17 +159,17 @@ TEST_F(GenericFluxFunction_from_{{GRIDNAME}}_and_dim_{{s}}_to_{{r}}_times_{{rC}}
       [&](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return RangeReturnType(element_index); },
       /*parameter=*/{},
       "element_index_",
-      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return PartialURangeReturnType(); }
+      [](const auto& /*xx*/, const auto& /*u*/, const auto& /*param*/) { return JacobianRangeReturnType(); }
           );
   auto local_f = function.local_function();
-  PartialURangeReturnType expected_partial_u;
+  JacobianRangeReturnType expected_jacobian;
   StateType u;
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
-      const auto actual_partial_u = local_f->partial_u(local_x, u);
-      EXPECT_EQ(expected_partial_u, actual_partial_u);
+      const auto actual_jacobian = local_f->jacobian(local_x, u);
+      EXPECT_EQ(expected_jacobian, actual_jacobian);
     }
   }
 }

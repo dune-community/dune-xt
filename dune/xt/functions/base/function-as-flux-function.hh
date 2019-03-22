@@ -82,7 +82,7 @@ private:
 
   public:
     using typename BaseType::DomainType;
-    using typename BaseType::PartialURangeReturnType;
+    using typename BaseType::JacobianRangeReturnType;
     using typename BaseType::RangeReturnType;
     using typename BaseType::StateType;
 
@@ -106,11 +106,11 @@ private:
       return function_.evaluate(u, param);
     }
 
-    using BaseType::partial_u;
+    using BaseType::jacobian;
 
-    PartialURangeReturnType partial_u(const DomainType& /*point_in_reference_element*/,
-                                      const StateType& u,
-                                      const Common::Parameter& param = {}) const override final
+    JacobianRangeReturnType jacobian(const DomainType& /*point_in_reference_element*/,
+                                     const StateType& u,
+                                     const Common::Parameter& param = {}) const override final
     {
       return function_.jacobian(u, param);
     }

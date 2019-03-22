@@ -58,6 +58,8 @@ public:
 
   using ElementType = typename LocalFunctionType::ElementType;
   using DomainFieldType = typename LocalFunctionType::DomainFieldType;
+  using StateType = typename LocalFunctionType::StateType;
+  using DomainType = typename LocalFunctionType::DomainType;
   static const constexpr size_t domain_dim = LocalFunctionType::domain_dim;
   static const constexpr size_t state_dim = LocalFunctionType::state_dim;
   using RangeFieldType = typename LocalFunctionType::RangeFieldType;

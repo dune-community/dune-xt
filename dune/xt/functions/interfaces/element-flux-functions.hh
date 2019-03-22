@@ -41,7 +41,7 @@ namespace Functions {
 
 /**
  * \brief Interface for a set of globalvalued functions, which are evaluated with two variables, one variable in
- *element-local coordinates and one grid-independent variable. \sa    RangeTypeSelector \sa    PartialURangeTypeSelector
+ *element-local coordinates and one grid-independent variable. \sa    RangeTypeSelector \sa    JacobianRangeTypeSelector
  **/
 template <class Element,
           size_t stateDim = 1,
@@ -78,7 +78,7 @@ public:
   using StateType = Dune::FieldVector<S, s>;
 
   using RangeSelector = RangeTypeSelector<R, r, rC>;
-  using PartialURangeSelector = DerivativeRangeTypeSelector<s, R, r, rC>;
+  using JacobianRangeSelector = DerivativeRangeTypeSelector<s, R, r, rC>;
 
   /**
    * \name ``These types are the _standard_ types to be used.''
@@ -86,8 +86,8 @@ public:
    */
 
   using RangeType = typename RangeSelector::type;
-  using PartialURangeType = typename PartialURangeSelector::type;
-  using SinglePartialURangeType = typename PartialURangeSelector::single_type;
+  using JacobianRangeType = typename JacobianRangeSelector::type;
+  using SingleJacobianRangeType = typename JacobianRangeSelector::single_type;
 
   /**
    * \}
@@ -96,7 +96,7 @@ public:
    */
 
   using DynamicRangeType = typename RangeSelector::dynamic_type;
-  using DynamicPartialURangeType = typename PartialURangeSelector::dynamic_type;
+  using DynamicJacobianRangeType = typename JacobianRangeSelector::dynamic_type;
 
   /// \}
 
@@ -165,13 +165,13 @@ assert(max_set_size <= local_function_set.max_size());
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual void partial_u(const DomainType& /*point_in_reference_element*/,
-                         const StateType& /*u*/,
-                         std::vector<PartialURangeType>& /*result*/,
-                         const Common::Parameter& /*param*/ = {}) const
+  virtual void jacobian(const DomainType& /*point_in_reference_element*/,
+                        const StateType& /*u*/,
+                        std::vector<JacobianRangeType>& /*result*/,
+                        const Common::Parameter& /*param*/ = {}) const
   {
     DUNE_THROW(NotImplemented,
-               "This set of element functions does not provide partial_u, override the 'partial_u' method!");
+               "This set of element functions does not provide jacobian, override the 'jacobian' method!");
   }
 
   /**
@@ -195,12 +195,12 @@ assert(max_set_size <= local_function_set.max_size());
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual std::vector<PartialURangeType> partial_u_of_set(const DomainType& point_in_reference_element,
-                                                          const StateType& u,
-                                                          const Common::Parameter& param = {}) const
+  virtual std::vector<JacobianRangeType> jacobian_of_set(const DomainType& point_in_reference_element,
+                                                         const StateType& u,
+                                                         const Common::Parameter& param = {}) const
   {
-    std::vector<PartialURangeType> result(this->size(param));
-    this->partial_u(point_in_reference_element, u, result, param);
+    std::vector<JacobianRangeType> result(this->size(param));
+    this->jacobian(point_in_reference_element, u, result, param);
     return result;
   }
 
@@ -231,15 +231,15 @@ assert(max_set_size <= local_function_set.max_size());
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual void partial_u(const DomainType& point_in_reference_element,
-                         const StateType& u,
-                         std::vector<SinglePartialURangeType>& result,
-                         const size_t row,
-                         const size_t col = 0,
-                         const Common::Parameter& param = {}) const
+  virtual void jacobian(const DomainType& point_in_reference_element,
+                        const StateType& u,
+                        std::vector<SingleJacobianRangeType>& result,
+                        const size_t row,
+                        const size_t col = 0,
+                        const Common::Parameter& param = {}) const
   {
-    assert_correct_dims(row, col, "partial_u");
-    const auto tmp_values = this->partial_u_of_set(point_in_reference_element, u, param);
+    assert_correct_dims(row, col, "jacobian");
+    const auto tmp_values = this->jacobian_of_set(point_in_reference_element, u, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
     single_derivative_helper<>::call(tmp_values, row, col, result);
@@ -247,7 +247,7 @@ assert(max_set_size <= local_function_set.max_size());
 
   /**
    * \{
-   * \name ´´These methods are provided for large dimensions (when RangeType or PartialURangeType do not fit on the
+   * \name ´´These methods are provided for large dimensions (when RangeType or JacobianRangeType do not fit on the
    *         stack) and should be overridden to improve their performance.''
    * \{
    **/
@@ -277,24 +277,24 @@ assert(max_set_size <= local_function_set.max_size());
   /**
    * \note Will throw Exceptions::not_bound_to_an_element_yet error if not bound yet!
    **/
-  virtual void partial_u(const DomainType& point_in_reference_element,
-                         const StateType& u,
-                         std::vector<DynamicPartialURangeType>& result,
-                         const Common::Parameter& param = {}) const
+  virtual void jacobian(const DomainType& point_in_reference_element,
+                        const StateType& u,
+                        std::vector<DynamicJacobianRangeType>& result,
+                        const Common::Parameter& param = {}) const
   {
     // prepare result
     const auto sz = this->size();
     if (result.size() < sz)
       result.resize(sz);
     for (size_t ii = 0; ii < sz; ++ii)
-      PartialURangeSelector::ensure_size(result[ii]);
-    // call actual partial_u
-    auto tmp_result = std::make_unique<std::vector<PartialURangeType>>(sz);
-    this->partial_u(point_in_reference_element, u, *tmp_result, param);
+      JacobianRangeSelector::ensure_size(result[ii]);
+    // call actual jacobian
+    auto tmp_result = std::make_unique<std::vector<JacobianRangeType>>(sz);
+    this->jacobian(point_in_reference_element, u, *tmp_result, param);
     // convert
     for (size_t ii = 0; ii < sz; ++ii)
-      PartialURangeSelector::convert((*tmp_result)[ii], result[ii]);
-  } // ... partial_u(...)
+      JacobianRangeSelector::convert((*tmp_result)[ii], result[ii]);
+  } // ... jacobian(...)
 
   /**
    * \}
@@ -402,7 +402,7 @@ public:
   using typename BaseType::S;
   using typename BaseType::StateType;
 
-  using typename BaseType::PartialURangeSelector;
+  using typename BaseType::JacobianRangeSelector;
   using typename BaseType::RangeSelector;
 
   /**
@@ -410,9 +410,9 @@ public:
    * \{
    */
 
-  using typename BaseType::PartialURangeType;
+  using typename BaseType::JacobianRangeType;
   using typename BaseType::RangeType;
-  using typename BaseType::SinglePartialURangeType;
+  using typename BaseType::SingleJacobianRangeType;
 
   /**
    * \}
@@ -420,7 +420,7 @@ public:
    * \{
    */
 
-  using typename BaseType::DynamicPartialURangeType;
+  using typename BaseType::DynamicJacobianRangeType;
   using typename BaseType::DynamicRangeType;
 
   /**
@@ -429,8 +429,8 @@ public:
    */
 
   using RangeReturnType = typename RangeSelector::return_type;
-  using PartialURangeReturnType = typename PartialURangeSelector::return_type;
-  using SinglePartialURangeReturnType = typename PartialURangeSelector::return_single_type;
+  using JacobianRangeReturnType = typename JacobianRangeSelector::return_type;
+  using SingleJacobianRangeReturnType = typename JacobianRangeSelector::return_single_type;
 
   /// \}
 
@@ -447,7 +447,7 @@ public:
   ThisType& operator=(ThisType&& source) = default;
 
   using BaseType::evaluate;
-  using BaseType::partial_u;
+  using BaseType::jacobian;
 
   /**
    * \}
@@ -462,11 +462,13 @@ public:
     DUNE_THROW(NotImplemented, "This local function does not provide evaluations, override the 'evaluate' method!");
   }
 
-  virtual PartialURangeReturnType partial_u(const DomainType& /*point_in_reference_element*/,
-                                            const StateType& /*u*/,
-                                            const Common::Parameter& /*param*/ = {}) const
+  // This is df/du, so the jacobian with respect to the state variable u. We do not yet provide derivatives in x (feel
+  // free to implement them if you need x-derivatives).
+  virtual JacobianRangeReturnType jacobian(const DomainType& /*point_in_reference_element*/,
+                                           const StateType& /*u*/,
+                                           const Common::Parameter& /*param*/ = {}) const
   {
-    DUNE_THROW(NotImplemented, "This local function does not provide a partial_u, override the 'partial_u' method!");
+    DUNE_THROW(NotImplemented, "This local function does not provide a jacobian, override the 'jacobian' method!");
   }
 
   /**
@@ -486,20 +488,20 @@ public:
     return single_evaluate_helper<R>::call(this->evaluate(point_in_reference_element, u, param), row, col);
   }
 
-  virtual SinglePartialURangeReturnType partial_u(const DomainType& point_in_reference_element,
-                                                  const StateType& u,
-                                                  const size_t row,
-                                                  const size_t col = 0,
-                                                  const Common::Parameter& param = {}) const
+  virtual SingleJacobianRangeReturnType jacobian(const DomainType& point_in_reference_element,
+                                                 const StateType& u,
+                                                 const size_t row,
+                                                 const size_t col = 0,
+                                                 const Common::Parameter& param = {}) const
   {
-    this->assert_correct_dims(row, col, "partial_u");
-    return single_derivative_helper<SinglePartialURangeReturnType>::call(
-        this->partial_u(point_in_reference_element, u, param), row, col);
+    this->assert_correct_dims(row, col, "jacobian");
+    return single_derivative_helper<SingleJacobianRangeReturnType>::call(
+        this->jacobian(point_in_reference_element, u, param), row, col);
   }
 
   /**
    * \}
-   * \name ´´These methods are provided for large dimensions (when RangeType or PartialURangeType do not fit on the
+   * \name ´´These methods are provided for large dimensions (when RangeType or JacobianRangeType do not fit on the
    *         stack) and should be overridden to improve their performance.''
    * \{
    **/
@@ -518,19 +520,19 @@ public:
     RangeSelector::convert((*tmp_result)[0], result);
   } // ... evaluate(...)
 
-  virtual void partial_u(const DomainType& point_in_reference_element,
-                         const StateType& u,
-                         DynamicPartialURangeType& result,
-                         const Common::Parameter& param = {}) const
+  virtual void jacobian(const DomainType& point_in_reference_element,
+                        const StateType& u,
+                        DynamicJacobianRangeType& result,
+                        const Common::Parameter& param = {}) const
   {
     // prepare result
-    PartialURangeSelector::ensure_size(result);
-    // call actual partial_u
-    auto tmp_result = std::make_unique<std::vector<PartialURangeType>>(1);
-    this->partial_u(point_in_reference_element, u, *tmp_result, param);
+    JacobianRangeSelector::ensure_size(result);
+    // call actual jacobian
+    auto tmp_result = std::make_unique<std::vector<JacobianRangeType>>(1);
+    this->jacobian(point_in_reference_element, u, *tmp_result, param);
     // convert
-    PartialURangeSelector::convert((*tmp_result)[0], result);
-  } // ... partial_u(...)
+    JacobianRangeSelector::convert((*tmp_result)[0], result);
+  } // ... jacobian(...)
 
   /**
    * \{
@@ -558,14 +560,14 @@ public:
     result[0] = this->evaluate(point_in_reference_element, u, param);
   }
 
-  virtual void partial_u(const DomainType& point_in_reference_element,
-                         const StateType& u,
-                         std::vector<PartialURangeType>& result,
-                         const Common::Parameter& param = {}) const override
+  virtual void jacobian(const DomainType& point_in_reference_element,
+                        const StateType& u,
+                        std::vector<JacobianRangeType>& result,
+                        const Common::Parameter& param = {}) const override
   {
     if (result.size() < 1)
       result.resize(1);
-    result[0] = this->partial_u(point_in_reference_element, u, param);
+    result[0] = this->jacobian(point_in_reference_element, u, param);
   }
 
 private:
