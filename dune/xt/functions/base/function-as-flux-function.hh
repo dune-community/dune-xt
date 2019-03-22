@@ -50,6 +50,11 @@ public:
     : function_storage_(std::move(function_ptr))
   {}
 
+  virtual bool x_dependent() const override final
+  {
+    return false;
+  }
+
   /**
    * \name ´´This method is required by FluxFunctionInterface.''
    * \{
@@ -95,11 +100,6 @@ private:
     int order(const Common::Parameter& param = {}) const override final
     {
       return function_.order(param);
-    }
-
-    virtual bool x_dependent() const override final
-    {
-      return false;
     }
 
     using BaseType::evaluate;

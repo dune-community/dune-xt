@@ -336,22 +336,22 @@ public:
 template <class LeftType, class RightType>
 struct DualStorageProvider
 {
-  XT::Common::StorageProvider<LeftType> left;
-  XT::Common::StorageProvider<RightType> right;
+  XT::Common::StorageProvider<LeftType> left_;
+  XT::Common::StorageProvider<RightType> right_;
 
   DualStorageProvider(LeftType& left, RightType& right)
-    : left(left)
-    , right(right)
+    : left_(left)
+    , right_(right)
   {}
 
   DualStorageProvider(std::shared_ptr<LeftType> left, std::shared_ptr<RightType> right)
-    : left(left)
-    , right(right)
+    : left_(left)
+    , right_(right)
   {}
 
   DualStorageProvider(std::unique_ptr<LeftType>&& left, std::unique_ptr<RightType>&& right)
-    : left(std::move(left))
-    , right(std::move(right))
+    : left_(std::move(left))
+    , right_(std::move(right))
   {}
 }; // struct DualStorageProvider
 
@@ -478,24 +478,24 @@ public:
 
   CombinedElementFunction(LeftType& left, RightType& right)
     : Storage(left, right)
-    , BaseType(Storage::left.access(), Storage::right.access())
+    , BaseType(Storage::left_.access(), Storage::right_.access())
   {}
 
   CombinedElementFunction(std::shared_ptr<LeftType> left, std::shared_ptr<RightType> right)
     : Storage(left, right)
-    , BaseType(Storage::left.access(), Storage::right.access())
+    , BaseType(Storage::left_.access(), Storage::right_.access())
   {}
 
   CombinedElementFunction(std::unique_ptr<LeftType>&& left, std::unique_ptr<RightType>&& right)
     : Storage(std::move(left), std::move(right))
-    , BaseType(Storage::left.access(), Storage::right.access())
+    , BaseType(Storage::left_.access(), Storage::right_.access())
   {}
 
 protected:
   void post_bind(const ElementType& element) override final
   {
-    Storage::left.access().bind(element);
-    Storage::right.access().bind(element);
+    Storage::left_.access().bind(element);
+    Storage::right_.access().bind(element);
   }
 }; // class CombinedElementFunction
 
