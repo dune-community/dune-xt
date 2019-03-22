@@ -46,9 +46,9 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constru
   RangeType first_value(1.);
   RangeType second_value(2.);
 
-  FunctionType function_first_ctor({{'{{lower_left, upper_right, first_value}}'}});
+  FunctionType function_first_ctor({std::make_tuple(lower_left, upper_right, first_value)});
 
-  FunctionType function_first_ctor_overlap({{'{{lower_left, middle_2, first_value}, {middle_1, upper_right, second_value}}'}});
+  FunctionType function_first_ctor_overlap({std::make_tuple(lower_left, middle_2, first_value), std::make_tuple(middle_1, upper_right, second_value)});
 
   //second constructor (the following functions are equivalent to the ones before (test see below))
   Common::FieldMatrix<double, d, 2> domains(0);
@@ -64,9 +64,9 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constru
     overlap_domains_second[dd][1] = upper_right[dd];
   }
 
-  FunctionType function_second_ctor({{'{{domains, first_value}}'}});
+  FunctionType function_second_ctor({std::make_pair(domains, first_value)});
 
-  FunctionType function_second_ctor_overlap({{'{{overlap_domains_first, first_value}, {overlap_domains_second, second_value}}'}});
+  FunctionType function_second_ctor_overlap({std::make_pair(overlap_domains_first, first_value), std::make_pair(overlap_domains_second, second_value)});
 }
 
 
@@ -101,10 +101,11 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visuali
   RangeType first_value(1.);
   RangeType second_value(2.);
 
-  FunctionType function({{'{{middle_1, upper_right, first_value}}'}});
+  FunctionType function({std::make_tuple(middle_1, upper_right, first_value)});
   function.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 
-  FunctionType function_overlap({{'{{lower_left, middle_2, first_value}, {middle_1, upper_right, second_value}}'}});
+  FunctionType function_overlap({std::make_tuple(lower_left, middle_2, first_value), 
+                                 std::make_tuple(middle_1, upper_right, second_value)});
   function_overlap.visualize(leaf_view, "test__IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
 }
 
@@ -114,7 +115,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindabl
   DomainType upper_right(0.5);
   RangeType first_value(1.);
 
-  FunctionType default_function({{'{{lower_left, upper_right, first_value}}'}});
+  FunctionType default_function({std::make_tuple(lower_left, upper_right, first_value)});
   auto local_f = default_function.local_function();
   const auto leaf_view = grid_.leaf_view();
   for (auto&& element : elements(leaf_view)) {
@@ -132,7 +133,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_orde
       DomainType upper_right(ur);
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
+        FunctionType function({std::make_tuple(lower_left, upper_right, value)});
         auto local_f = function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);
@@ -155,7 +156,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_eval
       DomainType upper_right(ur);
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
+        FunctionType function({std::make_tuple(lower_left, upper_right, value)});
         auto local_f = function.local_function();
         for (auto&& element : elements(leaf_view)) {
           // expected
@@ -180,7 +181,8 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_eval
   DomainType upper_right(0.5);
   RangeType first_value(1.);
   RangeType second_value(2.);
-  FunctionType function_multiple({{'{{lower_left, middle, first_value}, {middle, upper_right, second_value}}'}});
+  FunctionType function_multiple({std::make_tuple(lower_left, middle, first_value), 
+                                  std::make_tuple(middle, upper_right, second_value)});
   auto local_f_mult = function_multiple.local_function();
   for (auto&& element : elements(leaf_view)) {
     // expected
@@ -201,7 +203,9 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_eval
   // overlapping indicators
   DomainType lower_left_ol(-0.5);
   DomainType upper_right_ol(0);
-  FunctionType function_overlap({{'{{lower_left, middle, first_value},{middle, upper_right, second_value},{lower_left_ol, upper_right_ol, first_value}}'}});
+  FunctionType function_overlap({std::make_tuple(lower_left, middle, first_value),
+                                 std::make_tuple(middle, upper_right, second_value),
+                                 std::make_tuple(lower_left_ol, upper_right_ol, first_value)});
   auto local_f_ol = function_overlap.local_function();
   for (auto&& element : elements(leaf_view)) {
     // expected
@@ -232,7 +236,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, ctors_are_
   DomainType upper_right(0.5);
   RangeType first_value(1.);
 
-  FunctionType function_first_ctor({{'{{lower_left, upper_right, first_value}}'}});
+  FunctionType function_first_ctor({std::make_tuple(lower_left, upper_right, first_value)});
 
   //second constructor
   Common::FieldMatrix<double, d, 2> domains(0);
@@ -242,7 +246,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, ctors_are_
     domains[dd][1] = upper_right[dd];
   }
 
-  FunctionType function_second_ctor({{'{{domains, first_value}}'}});
+  FunctionType function_second_ctor({std::make_pair(domains, first_value)});
 
   auto local_f_1 = function_first_ctor.local_function();
   auto local_f_2 = function_second_ctor.local_function();
@@ -269,7 +273,7 @@ TEST_F(IndicatorGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jaco
       DomainType upper_right(ur);
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
+        FunctionType function({std::make_tuple(lower_left, upper_right, value)});
         auto local_f = function.local_function();
         for (auto&& element : elements(leaf_view)) {
           local_f->bind(element);

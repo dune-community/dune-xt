@@ -45,9 +45,9 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructib
   RangeType first_value(1.);
   RangeType second_value(2.);
 
-  FunctionType function_first_ctor({{'{{middle_1, upper_right, first_value}}'}});
+  FunctionType function_first_ctor({std::make_tuple(middle_1, upper_right, first_value)});
 
-  FunctionType function_first_ctor_overlap({{'{{lower_left, middle_2, first_value}, {middle_1, upper_right, second_value}}'}});
+  FunctionType function_first_ctor_overlap({std::make_tuple(lower_left, middle_2, first_value), std::make_tuple(middle_1, upper_right, second_value)});
 
   //second constructor (the following functions are equivalent to the ones before (test see below))
   Common::FieldMatrix<double, d, 2> domains(0);
@@ -63,9 +63,9 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructib
     overlap_domains_second[dd][1] = upper_right[dd];
   }
 
-  FunctionType function_second_ctor({{'{{domains, first_value}}'}});
+  FunctionType function_second_ctor({std::make_pair(domains, first_value)});
 
-  FunctionType function_second_ctor_overlap({{'{{overlap_domains_first, first_value}, {overlap_domains_second, second_value}}'}});
+  FunctionType function_second_ctor_overlap({std::make_pair(overlap_domains_first, first_value), std::make_pair(overlap_domains_second, second_value)});
 }
 
 
@@ -101,10 +101,10 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizabl
   RangeType first_value(1.);
   RangeType second_value(2.);
 
-  FunctionType function({{'{{middle_1, upper_right, first_value}}'}});
+  FunctionType function({std::make_tuple(middle_1, upper_right, first_value)});
   function.visualize(leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable");
 
-  FunctionType function_overlap({{'{{lower_left, middle_2, first_value}, {middle_1, upper_right, second_value}}'}});
+  FunctionType function_overlap({std::make_tuple(lower_left, middle_2, first_value), std::make_tuple(middle_1, upper_right, second_value)});
   function_overlap.visualize(leaf_view, "test__IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__with_overlap__is_visualizable");
 }
 
@@ -114,7 +114,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_order)
   DomainType upper_right(0.5);
   RangeType first_value(1.);
 
-  FunctionType function({{'{{lower_left, upper_right, first_value}}'}});
+  FunctionType function({std::make_tuple(lower_left, upper_right, first_value)});
   const int expected_order = 0;
   const auto actual_order = function.order();
   EXPECT_EQ(expected_order, actual_order);
@@ -129,7 +129,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_evaluat
     for (auto ur : {1., 0.75, 0.5, 0.25}) {
       DomainType upper_right(ur);
       RangeType value(1.);
-      FunctionType function({{'{{lower_left, upper_right, value}}'}});
+      FunctionType function({std::make_tuple(lower_left, upper_right, value)});
       for (auto&& element : elements(leaf_view)) {
         for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
           // expected
@@ -156,7 +156,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, global_jacobia
       DomainType upper_right(ur);
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
+        FunctionType function({std::make_tuple(lower_left, upper_right, value)});
         for (auto&& element : elements(leaf_view)) {
           for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
             const auto actual_jacobian = function.jacobian(element.geometry().global(quadrature_point.position()));
@@ -174,7 +174,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   DomainType upper_right(0.5);
   RangeType first_value(1.);
 
-  FunctionType default_function({{'{{lower_left, upper_right, first_value}}'}});
+  FunctionType default_function({std::make_tuple(lower_left, upper_right, first_value)});
   const auto& localizable_function = default_function.template as_grid_function<ElementType>();
   auto local_f = localizable_function.local_function();
   const auto leaf_view = grid_.leaf_view();
@@ -193,7 +193,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
       DomainType upper_right(ur);
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
+        FunctionType function({std::make_tuple(lower_left, upper_right, value)});
         const auto& localizable_function = function.template as_grid_function<ElementType>();
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
@@ -217,7 +217,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
       DomainType upper_right(ur);
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
+        FunctionType function({std::make_tuple(lower_left, upper_right, value)});
         const auto& localizable_function = function.template as_grid_function<ElementType>();
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
@@ -242,7 +242,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
   DomainType upper_right(0.5);
   RangeType first_value(1.);
   RangeType second_value(2.);
-  FunctionType function_multiple({{'{{lower_left, middle, first_value}, {middle, upper_right, second_value}}'}});
+  FunctionType function_multiple({std::make_tuple(lower_left, middle, first_value), std::make_tuple(middle, upper_right, second_value)});
   const auto& localizable_function_mult = function_multiple.template as_grid_function<ElementType>();
   auto local_f_mult = localizable_function_mult.local_function();
 
@@ -264,7 +264,9 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate
   // overlapping indicators
   DomainType lower_left_ol(-0.5);
   DomainType upper_right_ol(0);
-  FunctionType function_overlap({{'{{lower_left, middle, first_value},{middle, upper_right, second_value},{lower_left_ol, upper_right_ol, first_value}}'}});
+  FunctionType function_overlap({std::make_tuple(lower_left, middle, first_value), 
+                                 std::make_tuple(middle, upper_right, second_value), 
+                                 std::make_tuple(lower_left_ol, upper_right_ol, first_value)});
   const auto& localizable_function_ol = function_overlap.template as_grid_function<ElementType>();
   auto local_f_ol = localizable_function_ol.local_function();
   for (auto&& element : elements(leaf_view)) {
@@ -299,7 +301,7 @@ TEST_F(IndicatorFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian
       DomainType upper_right(ur);
       for (auto vv : {1., 2., 3., 4.}) {
         RangeType value(vv);
-        FunctionType function({{'{{lower_left, upper_right, value}}'}});
+        FunctionType function({std::make_tuple(lower_left, upper_right, value)});
         const auto& localizable_function = function.template as_grid_function<ElementType>();
         auto local_f = localizable_function.local_function();
         for (auto&& element : elements(leaf_view)) {
