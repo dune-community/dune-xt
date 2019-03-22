@@ -10,8 +10,8 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2017, 2019)
 
-#ifndef DUNE_XT_FUNCTIONS_GENERIC_GRID_FUNCTION_HH
-#define DUNE_XT_FUNCTIONS_GENERIC_GRID_FUNCTION_HH
+#ifndef DUNE_XT_FUNCTIONS_GENERIC_FLUX_FUNCTION_HH
+#define DUNE_XT_FUNCTIONS_GENERIC_FLUX_FUNCTION_HH
 
 #include <functional>
 
@@ -252,4 +252,4 @@ private:
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_LAMBDA_LOCAL_FUNCTION_HH
+#endif // DUNE_XT_FUNCTIONS_GENERIC_FLUX_FUNCTION_HH
