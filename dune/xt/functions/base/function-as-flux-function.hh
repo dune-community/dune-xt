@@ -97,6 +97,11 @@ private:
       return function_.order(param);
     }
 
+    virtual bool x_dependent() const override final
+    {
+      return false;
+    }
+
     using BaseType::evaluate;
 
     RangeReturnType evaluate(const DomainType& /*point_in_reference_element*/,

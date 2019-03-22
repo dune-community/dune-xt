@@ -65,8 +65,8 @@ private:
   public:
     using typename BaseType::DomainType;
     using typename BaseType::ElementType;
-    using typename BaseType::PartialURangeReturnType;
-    using typename BaseType::PartialURangeType;
+    using typename BaseType::JacobianRangeReturnType;
+    using typename BaseType::JacobianRangeType;
     using typename BaseType::RangeReturnType;
     using typename BaseType::RangeType;
     using typename BaseType::StateType;
@@ -77,20 +77,20 @@ private:
         std::function<RangeReturnType(const DomainType&, const StateType&, const Common::Parameter&)>;
     using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
     using GenericOrderFunctionType = std::function<int(const Common::Parameter&)>;
-    using GenericPartialUFunctionType =
-        std::function<PartialURangeReturnType(const DomainType&, const StateType&, const XT::Common::Parameter&)>;
+    using GenericJacobianFunctionType =
+        std::function<JacobianRangeReturnType(const DomainType&, const StateType&, const XT::Common::Parameter&)>;
 
     LocalGenericFluxFunction(const GenericOrderFunctionType& order_func,
                              const GenericPostBindFunctionType& post_bind_func,
                              const GenericEvaluateFunctionType& evaluate_func,
                              const Common::ParameterType& param_type,
-                             const GenericPartialUFunctionType& partial_u_func)
+                             const GenericJacobianFunctionType& jacobian_func)
       : BaseType()
       , order_(order_func)
       , post_bind_(post_bind_func)
       , evaluate_(evaluate_func)
       , param_type_(param_type)
-      , partial_u_(partial_u_func)
+      , jacobian_(jacobian_func)
     {}
 
   protected:
@@ -114,12 +114,12 @@ private:
       return evaluate_(point_in_local_coordinates, u, parsed_param);
     }
 
-    virtual PartialURangeReturnType partial_u(const DomainType& point_in_local_coordinates,
-                                              const StateType& u,
-                                              const Common::Parameter& param = {}) const override final
+    virtual JacobianRangeReturnType jacobian(const DomainType& point_in_local_coordinates,
+                                             const StateType& u,
+                                             const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return partial_u_(point_in_local_coordinates, u, parsed_param);
+      return jacobian_(point_in_local_coordinates, u, parsed_param);
     }
 
     virtual const Common::ParameterType& parameter_type() const override final
@@ -132,7 +132,7 @@ private:
     const GenericPostBindFunctionType& post_bind_;
     const GenericEvaluateFunctionType& evaluate_;
     const Common::ParameterType& param_type_;
-    const GenericPartialUFunctionType& partial_u_;
+    const GenericJacobianFunctionType& jacobian_;
   }; // class LocalGenericFluxFunction
 
 public:
@@ -140,30 +140,30 @@ public:
   using DomainType = typename LocalGenericFluxFunction::DomainType;
   using StateType = typename LocalGenericFluxFunction::StateType;
   using RangeType = typename LocalGenericFluxFunction::RangeType;
-  using PartialURangeType = typename LocalGenericFluxFunction::PartialURangeType;
+  using JacobianRangeType = typename LocalGenericFluxFunction::JacobianRangeType;
   using RangeReturnType = typename LocalGenericFluxFunction::RangeReturnType;
-  using PartialURangeReturnType = typename LocalGenericFluxFunction::PartialURangeReturnType;
+  using JacobianRangeReturnType = typename LocalGenericFluxFunction::JacobianRangeReturnType;
 
   // we do not use the typedef from LocalGenericFluxFunction here to document the type of the generic functions
   using GenericOrderFunctionType = std::function<int(const Common::Parameter&)>;
   using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
   using GenericEvaluateFunctionType =
       std::function<RangeReturnType(const DomainType&, const StateType&, const Common::Parameter&)>;
-  using GenericPartialUFunctionType =
-      std::function<PartialURangeReturnType(const DomainType&, const StateType&, const XT::Common::Parameter&)>;
+  using GenericJacobianFunctionType =
+      std::function<JacobianRangeReturnType(const DomainType&, const StateType&, const XT::Common::Parameter&)>;
 
   GenericFluxFunction(const int ord,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
                       const std::string nm = "GenericFluxFunction",
-                      GenericPartialUFunctionType partial_u_func = default_partial_u_function())
+                      GenericJacobianFunctionType jacobian_func = default_jacobian_function())
     : order_(default_order_lambda(ord))
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , param_type_(param_type)
     , name_(nm)
-    , partial_u_(partial_u_func)
+    , jacobian_(jacobian_func)
   {}
 
   GenericFluxFunction(GenericOrderFunctionType order_func,
@@ -171,13 +171,13 @@ public:
                       GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
                       const Common::ParameterType& param_type = Common::ParameterType(),
                       const std::string nm = "GenericFluxFunction",
-                      GenericPartialUFunctionType partial_u_func = default_partial_u_function())
+                      GenericJacobianFunctionType jacobian_func = default_jacobian_function())
     : order_(order_func)
     , post_bind_(post_bind_func)
     , evaluate_(evaluate_func)
     , param_type_(param_type)
     , name_(nm)
-    , partial_u_(partial_u_func)
+    , jacobian_(jacobian_func)
   {}
 
   const Common::ParameterType& parameter_type() const override final
@@ -192,7 +192,7 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<LocalGenericFluxFunction>(order_, post_bind_, evaluate_, param_type_, partial_u_);
+    return std::make_unique<LocalGenericFluxFunction>(order_, post_bind_, evaluate_, param_type_, jacobian_);
   }
 
   /**
@@ -222,15 +222,15 @@ public:
     };
   }
 
-  static GenericPartialUFunctionType default_partial_u_function()
+  static GenericJacobianFunctionType default_jacobian_function()
   {
     return [](const DomainType& /* point_in_local_coordinates*/,
               const StateType& /*u*/,
               const Common::Parameter& /*param*/ = {}) {
       DUNE_THROW(NotImplemented,
-                 "This GenericFluxFunction does not provide partial_u evaluations, provide a "
-                 "partial_u_lambda on construction!");
-      return PartialURangeReturnType();
+                 "This GenericFluxFunction does not provide jacobian evaluations, provide a "
+                 "jacobian_lambda on construction!");
+      return JacobianRangeReturnType();
     };
   }
 
@@ -244,7 +244,7 @@ private:
   const GenericEvaluateFunctionType evaluate_;
   const Common::ParameterType param_type_;
   const std::string name_;
-  GenericPartialUFunctionType partial_u_;
+  GenericJacobianFunctionType jacobian_;
 }; // class GenericFluxFunction
 
 

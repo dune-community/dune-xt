@@ -143,6 +143,11 @@ public:
     return "dune.xt.functions.constantfluxfunction";
   }
 
+  virtual bool x_dependent() const override final
+  {
+    return false;
+  }
+
   virtual std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return constant_flux_function_.local_function();

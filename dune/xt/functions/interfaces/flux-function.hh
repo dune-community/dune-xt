@@ -88,6 +88,11 @@ public:
     return "dune.xt.functions.gridfunction";
   }
 
+  virtual bool x_dependent() const
+  {
+    return true;
+  }
+
   /**
    * \name ´´This method has to be implemented.''
    * \{
