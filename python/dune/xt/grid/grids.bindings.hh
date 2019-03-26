@@ -109,7 +109,7 @@ struct grid_name<ALUGrid<dim, dim, cube, conforming, Comm>>
 
 
 // not optimal
-template<int dim, int dimworld, ALU3dGridElementType elType, class Comm>
+template <int dim, int dimworld, ALU3dGridElementType elType, class Comm>
 struct grid_name<ALU3dGrid<dim, dimworld, elType, Comm>>
 {
   static std::string value()

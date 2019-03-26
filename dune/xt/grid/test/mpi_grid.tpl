@@ -27,7 +27,7 @@ GTEST_TEST(GridProvider_{{name}}, layers)
   MPI_Comm split_comm;
   MPI_Comm_split(MPI_COMM_WORLD, world_rank, world_rank, &split_comm);
 
-  {% if "cube" in type or "UGGrid" in type %}
+  {% if "ALU" in type or "UGGrid" in type %}
     // uggrid + alu cube grids cannot handle non-default comms
     EXPECT_THROW(ProviderFactory::create(config, split_comm), Dune::InvalidStateException);
     return;

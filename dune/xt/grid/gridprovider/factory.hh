@@ -90,6 +90,10 @@ public:
                                                const Common::Configuration config = Common::Configuration(),
                                                MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
+    if (is_alugrid<GridType>::value && mpi_comm != MPIHelper::getCommunicator()) {
+      DUNE_THROW(InvalidStateException,
+                 "Alugrid either ignores, or outright fails with non-world comes when used here");
+    }
     if (CubeType::static_id() == type)
       return call_create<CubeType>(config, mpi_comm);
     else if (DgfType::static_id() == type)
@@ -161,6 +165,11 @@ public:
          const Common::Configuration config = Common::Configuration(),
          MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
+    if (is_alugrid<GridType>::value && mpi_comm != MPIHelper::getCommunicator()) {
+      DUNE_THROW(InvalidStateException,
+                 "Alugrid either ignores, or outright fails with non-world comes when used here");
+    }
+
     if (CubeType::static_id() == type)
       return call_create<CubeType>(config, mpi_comm);
     else if (available().empty())
