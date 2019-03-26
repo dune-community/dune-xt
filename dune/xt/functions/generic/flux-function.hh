@@ -150,7 +150,7 @@ public:
   using GenericEvaluateFunctionType =
       std::function<RangeReturnType(const DomainType&, const StateType&, const Common::Parameter&)>;
   using GenericJacobianFunctionType =
-      std::function<JacobianRangeReturnType(const DomainType&, const StateType&, const XT::Common::Parameter&)>;
+      std::function<JacobianRangeReturnType(const DomainType&, const StateType&, const Common::Parameter&)>;
 
   GenericFluxFunction(const int ord,
                       GenericPostBindFunctionType post_bind_func = default_post_bind_function(),
