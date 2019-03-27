@@ -133,7 +133,7 @@ protected:
   }
 
 public:
-  int order(const XT::Common::Parameter& param = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
   {
     return order_;
   }

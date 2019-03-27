@@ -83,11 +83,6 @@ public:
 
   virtual ~FluxFunctionInterface() = default;
 
-  static std::string static_id()
-  {
-    return "dune.xt.functions.gridfunction";
-  }
-
   virtual bool x_dependent() const
   {
     return true;

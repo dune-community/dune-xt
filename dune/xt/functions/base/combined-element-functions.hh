@@ -336,22 +336,22 @@ public:
 template <class LeftType, class RightType>
 struct DualStorageProvider
 {
-  XT::Common::StorageProvider<LeftType> left_;
-  XT::Common::StorageProvider<RightType> right_;
+  XT::Common::StorageProvider<LeftType> left;
+  XT::Common::StorageProvider<RightType> right;
 
-  DualStorageProvider(LeftType& left, RightType& right)
-    : left_(left)
-    , right_(right)
+  DualStorageProvider(LeftType& lft, RightType& rght)
+    : left(lft)
+    , right(rght)
   {}
 
-  DualStorageProvider(std::shared_ptr<LeftType> left, std::shared_ptr<RightType> right)
-    : left_(left)
-    , right_(right)
+  DualStorageProvider(std::shared_ptr<LeftType> lft, std::shared_ptr<RightType> rght)
+    : left(lft)
+    , right(rght)
   {}
 
-  DualStorageProvider(std::unique_ptr<LeftType>&& left, std::unique_ptr<RightType>&& right)
-    : left_(std::move(left))
-    , right_(std::move(right))
+  DualStorageProvider(std::unique_ptr<LeftType>&& lft, std::unique_ptr<RightType>&& rght)
+    : left(std::move(lft))
+    , right(std::move(rght))
   {}
 }; // struct DualStorageProvider
 
@@ -478,24 +478,24 @@ public:
 
   CombinedElementFunction(LeftType& left, RightType& right)
     : Storage(left, right)
-    , BaseType(Storage::left_.access(), Storage::right_.access())
+    , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
   CombinedElementFunction(std::shared_ptr<LeftType> left, std::shared_ptr<RightType> right)
     : Storage(left, right)
-    , BaseType(Storage::left_.access(), Storage::right_.access())
+    , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
   CombinedElementFunction(std::unique_ptr<LeftType>&& left, std::unique_ptr<RightType>&& right)
     : Storage(std::move(left), std::move(right))
-    , BaseType(Storage::left_.access(), Storage::right_.access())
+    , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
 protected:
   void post_bind(const ElementType& element) override final
   {
-    Storage::left_.access().bind(element);
-    Storage::right_.access().bind(element);
+    Storage::left.access().bind(element);
+    Storage::right.access().bind(element);
   }
 }; // class CombinedElementFunction
 
