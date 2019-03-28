@@ -639,9 +639,9 @@ struct VectorAbstractionBase
 
   static const bool is_contiguous = true;
 
-  using VectorType = typename std::conditional<is_vector, VectorImp, void>::type;
-  using ScalarType = typename std::conditional<is_vector, typename VectorImp::ScalarType, void>::type;
-  using RealType = typename std::conditional<is_vector, typename VectorImp::RealType, void>::type;
+  using VectorType = VectorImp;
+  using ScalarType = typename VectorImp::ScalarType;
+  using RealType = typename VectorImp::RealType;
   using S = ScalarType;
   using R = RealType;
 

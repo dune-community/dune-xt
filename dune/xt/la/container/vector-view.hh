@@ -33,24 +33,43 @@ class VectorView;
 namespace internal {
 
 
+template <class VectorImp, bool is_la_vector = LA::is_vector<VectorImp>::value>
+struct VectorBackendHelper
+{
+  static constexpr Backends backend = default_backend;
+  static constexpr Backends dense_backend = default_dense_backend;
+  static constexpr Backends sparse_backend = default_sparse_backend;
+  using BackendType = void;
+};
+
+template <class VectorImp>
+struct VectorBackendHelper<VectorImp, true>
+{
+  static constexpr Backends backend = VectorImp::Traits::backend_type;
+  static constexpr Backends dense_backend = VectorImp::Traits::dense_matrix_type;
+  static constexpr Backends sparse_backend = VectorImp::Traits::sparse_matrix_type;
+  using BackendType = typename VectorImp::Traits::BackendType;
+};
+
+
 template <class VectorImp>
 class ConstVectorViewTraits
-  : public VectorTraitsBase<typename VectorImp::ScalarType,
+  : public VectorTraitsBase<typename Common::VectorAbstraction<VectorImp>::ScalarType,
                             ConstVectorView<VectorImp>,
-                            typename VectorImp::Traits::BackendType,
-                            VectorImp::Traits::backend_type,
-                            VectorImp::Traits::dense_matrix_type,
-                            VectorImp::Traits::sparse_matrix_type>
+                            typename VectorBackendHelper<VectorImp>::BackendType,
+                            VectorBackendHelper<VectorImp>::backend,
+                            VectorBackendHelper<VectorImp>::dense_backend,
+                            VectorBackendHelper<VectorImp>::sparse_backend>
 {};
 
 template <class VectorImp>
 class VectorViewTraits
-  : public VectorTraitsBase<typename VectorImp::ScalarType,
+  : public VectorTraitsBase<typename Common::VectorAbstraction<VectorImp>::ScalarType,
                             VectorView<VectorImp>,
-                            typename VectorImp::Traits::BackendType,
-                            VectorImp::Traits::backend_type,
-                            VectorImp::Traits::dense_matrix_type,
-                            VectorImp::Traits::sparse_matrix_type>
+                            typename VectorBackendHelper<VectorImp>::BackendType,
+                            VectorBackendHelper<VectorImp>::backend,
+                            VectorBackendHelper<VectorImp>::dense_backend,
+                            VectorBackendHelper<VectorImp>::sparse_backend>
 {};
 
 template <class VectorImp>
@@ -66,9 +85,11 @@ VectorImp& empty_vector_ref()
 
 template <class VectorImp>
 class ConstVectorView
-  : public VectorInterface<internal::ConstVectorViewTraits<VectorImp>, typename VectorImp::ScalarType>
+  : public VectorInterface<internal::ConstVectorViewTraits<VectorImp>,
+                           typename Common::VectorAbstraction<VectorImp>::ScalarType>
 {
-  using BaseType = VectorInterface<internal::ConstVectorViewTraits<VectorImp>, typename VectorImp::ScalarType>;
+  using BaseType = VectorInterface<internal::ConstVectorViewTraits<VectorImp>,
+                                   typename Common::VectorAbstraction<VectorImp>::ScalarType>;
   using ThisType = ConstVectorView;
 
 public:
@@ -121,7 +142,7 @@ public:
 
   inline ScalarType get_entry(const size_t ii) const
   {
-    return vector_.get_entry(index(ii));
+    return vector_[index(ii)];
   }
 
   inline ScalarType& operator[](const size_t /*ii*/)
@@ -187,9 +208,12 @@ private:
 
 
 template <class VectorImp>
-class VectorView : public VectorInterface<internal::VectorViewTraits<VectorImp>, typename VectorImp::ScalarType>
+class VectorView
+  : public VectorInterface<internal::VectorViewTraits<VectorImp>,
+                           typename Common::VectorAbstraction<VectorImp>::ScalarType>
 {
-  using BaseType = VectorInterface<internal::VectorViewTraits<VectorImp>, typename VectorImp::ScalarType>;
+  using BaseType =
+      VectorInterface<internal::VectorViewTraits<VectorImp>, typename Common::VectorAbstraction<VectorImp>::ScalarType>;
   using ConstVectorViewType = ConstVectorView<VectorImp>;
   using ThisType = VectorView;
 
@@ -239,13 +263,13 @@ public:
   inline void add_to_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    vector_.add_to_entry(index(ii), value);
+    vector_[index(ii)] += value;
   }
 
   inline void set_entry(const size_t ii, const ScalarType& value)
   {
     assert(ii < size());
-    vector_.set_entry(index(ii), value);
+    vector_[index(ii)] = value;
   }
 
   inline ScalarType get_entry(const size_t ii) const
@@ -324,7 +348,7 @@ template <class VectorImp>
 struct VectorAbstraction<LA::ConstVectorView<VectorImp>>
   : public LA::internal::VectorAbstractionBase<LA::ConstVectorView<VectorImp>>
 {
-  static const bool is_contiguous = LA::internal::VectorAbstractionBase<VectorImp>::is_contiguous;
+  static const bool is_contiguous = Common::VectorAbstraction<VectorImp>::is_contiguous;
 };
 
 
@@ -332,7 +356,7 @@ template <class VectorImp>
 struct VectorAbstraction<LA::VectorView<VectorImp>>
   : public LA::internal::VectorAbstractionBase<LA::VectorView<VectorImp>>
 {
-  static const bool is_contiguous = LA::internal::VectorAbstractionBase<VectorImp>::is_contiguous;
+  static const bool is_contiguous = Common::VectorAbstraction<VectorImp>::is_contiguous;
 };
 
 

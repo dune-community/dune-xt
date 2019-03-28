@@ -81,7 +81,7 @@ private:
   using MutexesType = typename Traits::MutexesType;
 
 public:
-  explicit CommonDenseVector(const size_t ss = 0, const ScalarType value = ScalarType(0), const size_t num_mutexes = 1)
+  explicit CommonDenseVector(const size_t ss = 0, const ScalarType& value = ScalarType(), const size_t num_mutexes = 1)
     : backend_(new BackendType(ss, value))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}

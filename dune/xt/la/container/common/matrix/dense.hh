@@ -29,6 +29,7 @@
 
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/container/pattern.hh>
+#include <dune/xt/la/container/vector-view.hh>
 
 namespace Dune {
 namespace XT {
@@ -48,6 +49,7 @@ namespace internal {
 template <class ScalarType>
 struct MatrixBackendBase
 {
+  using VectorType = std::vector<ScalarType, boost::alignment::aligned_allocator<ScalarType, 64>>;
   MatrixBackendBase(const size_t num_rows, const size_t num_cols, const ScalarType value)
     : num_rows_(num_rows)
     , num_cols_(num_cols)
@@ -63,7 +65,7 @@ struct MatrixBackendBase
 
   size_t num_rows_;
   size_t num_cols_;
-  std::vector<ScalarType, boost::alignment::aligned_allocator<ScalarType, 64>> entries_;
+  VectorType entries_;
 };
 
 template <class ScalarType, Common::StorageLayout = Common::StorageLayout::dense_row_major>
@@ -74,6 +76,7 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_row_maj
   : public MatrixBackendBase<ScalarType>
 {
   using BaseType = MatrixBackendBase<ScalarType>;
+  using typename BaseType::VectorType;
 
   CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
@@ -87,6 +90,16 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_row_maj
   const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
     return entries_[rr * num_cols_ + cc];
+  }
+
+  VectorView<VectorType> get_view(const size_t row)
+  {
+    return VectorView<VectorType>(entries_, row * num_cols_, (row + 1) * num_cols_);
+  }
+
+  ConstVectorView<VectorType> get_const_view(const size_t row) const
+  {
+    return ConstVectorView<VectorType>(entries_, row * num_cols_, (row + 1) * num_cols_);
   }
 
   using BaseType::entries_;
@@ -99,6 +112,7 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_
   : public MatrixBackendBase<ScalarType>
 {
   using BaseType = MatrixBackendBase<ScalarType>;
+  using typename BaseType::VectorType;
 
   CommonDenseMatrixBackend(const size_t num_rows, const size_t num_cols, const ScalarType value = ScalarType(0))
     : BaseType(num_rows, num_cols, value)
@@ -112,6 +126,16 @@ struct CommonDenseMatrixBackend<ScalarType, Common::StorageLayout::dense_column_
   const ScalarType& get_entry_ref(const size_t rr, const size_t cc) const
   {
     return entries_[cc * num_rows_ + rr];
+  }
+
+  VectorView<VectorType> get_view(const size_t col)
+  {
+    return VectorView<VectorType>(entries_, col * num_rows_, (col + 1) * num_rows_);
+  }
+
+  ConstVectorView<VectorType> get_const_view(const size_t col) const
+  {
+    return ConstVectorView<VectorType>(entries_, col * num_rows_, (col + 1) * num_rows_);
   }
 
   using BaseType::entries_;
@@ -400,12 +424,27 @@ public:
     backend_->get_entry_ref(ii, jj) = value;
   } // ... set_entry(...)
 
+  void set_all_entries(const ScalarType& value)
+  {
+    std::fill(backend_->entries_.begin(), backend_->entries_.end(), value);
+  } // ... set_entry(...)
+
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
     return backend_->get_entry_ref(ii, jj);
   } // ... get_entry(...)
+
+  inline VectorView<typename BackendType::VectorType> operator[](const size_t ii)
+  {
+    return backend_->get_view(ii);
+  }
+
+  inline ConstVectorView<typename BackendType::VectorType> operator[](const size_t ii) const
+  {
+    return backend_->get_const_view(ii);
+  }
 
   void clear_row(const size_t ii)
   {

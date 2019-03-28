@@ -23,22 +23,24 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
+
 // forward
 template <class Traits, class ScalarImp>
 class VectorInterface;
 
+
 namespace internal {
+
 
 template <class Traits, class ScalarImp>
 class VectorInputIterator : public std::iterator<std::input_iterator_tag, typename Traits::ScalarType>
 {
-  typedef VectorInputIterator<Traits, ScalarImp> ThisType;
+  using ThisType = VectorInputIterator<Traits, ScalarImp>;
 
 public:
-  typedef VectorInterface<Traits, ScalarImp> VectorType;
-  typedef typename VectorType::ScalarType ScalarType;
+  using VectorType = VectorInterface<Traits, ScalarImp>;
+  using ScalarType = typename VectorType::ScalarType;
 
-public:
   explicit VectorInputIterator(const VectorType& vec, const bool end = false)
     : const_vec_(vec)
     , position_(0)
@@ -71,45 +73,75 @@ public:
     return const_vec_[position_];
   }
 
+  size_t position() const
+  {
+    return position_;
+  }
+
+  bool end() const
+  {
+    return end_;
+  }
+
 private:
   const VectorType& const_vec_;
-
-protected:
   size_t position_;
   bool end_;
 }; // class VectorInputIterator
 
 template <class Traits, class ScalarImp>
-class VectorOutputIterator
-  : public VectorInputIterator<Traits, ScalarImp>
-  , public std::iterator<std::output_iterator_tag, typename Traits::ScalarType>
+class VectorOutputIterator : public std::iterator<std::output_iterator_tag, typename Traits::ScalarType>
 {
-  typedef VectorInputIterator<Traits, ScalarImp> BaseType;
-  typedef VectorOutputIterator<Traits, ScalarImp> ThisType;
+  using BaseType = std::iterator<std::output_iterator_tag, typename Traits::ScalarType>;
+  using InputIteratorType = VectorInputIterator<Traits, ScalarImp>;
+  using ThisType = VectorOutputIterator;
 
 public:
-  typedef VectorInterface<Traits, ScalarImp> VectorType;
-  typedef typename VectorType::ScalarType ScalarType;
+  using VectorType = VectorInterface<Traits, ScalarImp>;
+  using ScalarType = typename VectorType::ScalarType;
 
 private:
   static_assert(std::is_same<ScalarImp, ScalarType>::value, "");
 
 public:
   explicit VectorOutputIterator(VectorType& vec, const bool end = false)
-    : BaseType(vec, end)
+    : input_iterator_(vec, end)
     , vec_(vec)
   {}
 
+  ThisType& operator++()
+  {
+    ++input_iterator_;
+    return *this;
+  } // ... operator++()
+
+  bool operator==(const ThisType& other)
+  {
+    return input_iterator_ == other.input_iterator_;
+  }
+
+  bool operator!=(const ThisType& other)
+  {
+    return input_iterator_ != other.input_iterator_;
+  }
+
+  const ScalarType& operator*() const
+  {
+    return *input_iterator_;
+  }
+
   ScalarType& operator*()
   {
-    if (this->end_)
+    if (input_iterator_.end())
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong, "This is the end!");
-    return vec_[this->position_];
+    return vec_[input_iterator_.position()];
   } // ... operator*()
 
 private:
+  InputIteratorType input_iterator_;
   VectorType& vec_;
 }; // class VectorOutputIterator
+
 
 } // namespace internal
 } // namespace LA

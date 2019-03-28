@@ -69,7 +69,7 @@ void multiply_householder_from_left(MatrixType& A,
 {
   using M = Common::MatrixAbstraction<MatrixType>;
   using V = Common::VectorAbstraction<VectorType>;
-  using W = Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_cols>>;
+  using W = Common::VectorAbstraction<DynamicVector<typename V::ScalarType>>;
   using ScalarType = typename M::ScalarType;
   // calculate w^T A first
   auto wT_A = W::create(M::cols(A), ScalarType(0.));
@@ -94,7 +94,7 @@ void multiply_householder_from_right(MatrixType& A,
 {
   typedef Common::MatrixAbstraction<MatrixType> M;
   typedef Common::VectorAbstraction<VectorType> V;
-  using W = Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_rows>>;
+  using W = Common::VectorAbstraction<DynamicVector<typename V::ScalarType>>;
   // calculate A w first
   auto Aw = W::create(M::rows(A), 0.);
   for (size_t rr = row_begin; rr < row_end; ++rr)
@@ -134,7 +134,7 @@ void qr_decomposition(MatrixType& A, VectorType& tau, IndexVectorType& permutati
 {
   using M = typename Common::MatrixAbstraction<MatrixType>;
   using V = typename Common::VectorAbstraction<VectorType>;
-  using W = typename Common::VectorAbstraction<typename V::template VectorTypeTemplate<M::static_rows>>;
+  using W = typename Common::VectorAbstraction<DynamicVector<typename V::ScalarType>>;
   using VI = typename Common::VectorAbstraction<IndexVectorType>;
   using IndexType = typename VI::ScalarType;
   using RealType = typename M::RealType;
@@ -239,8 +239,8 @@ struct QrHelper
   using M = Common::MatrixAbstraction<MatrixType>;
   using V = Common::VectorAbstraction<VectorType>;
   using VI = Common::VectorAbstraction<IndexVectorType>;
-  using WVectorType = typename V::template VectorTypeTemplate<M::static_rows>;
-  using W = typename Common::VectorAbstraction<WVectorType>;
+  using ScalarType = typename V::ScalarType;
+  using W = typename Common::VectorAbstraction<DynamicVector<ScalarType>>;
   static const bool is_row_major = (storage_layout == Common::StorageLayout::dense_row_major);
   static const bool has_contiguous_storage = (storage_layout == Common::StorageLayout::dense_row_major)
                                              || (storage_layout == Common::StorageLayout::dense_column_major);
@@ -321,7 +321,6 @@ struct QrHelper
   {
     using V2 = Common::VectorAbstraction<SecondVectorType>;
     using V3 = Common::VectorAbstraction<ThirdVectorType>;
-    using ScalarType = typename V2::ScalarType;
     const size_t num_rows = M::rows(QR);
     const size_t num_cols = M::cols(QR);
     for (size_t ii = 0; ii < M::rows(QR); ++ii)
@@ -366,7 +365,7 @@ struct QrHelper
 
 private:
   // w is the vector [1; QR(j+1:end,j)]
-  static void set_w_vector(const MatrixType& QR, const int jj, WVectorType& w)
+  static void set_w_vector(const MatrixType& QR, const int jj, DynamicVector<ScalarType>& w)
   {
     const size_t num_rows = M::rows(QR);
     W::set_entry(w, jj, 1);
