@@ -364,7 +364,10 @@ public:
     assert(xx.size() == cols() && yy.size() == rows());
     if (storage_layout == Common::StorageLayout::dense_row_major && V1::is_contiguous) {
       for (size_t rr = 0; rr < rows(); ++rr)
-        V2::set_entry(yy, rr, std::inner_product(get_ptr(rr), get_ptr(rr + 1), V1::data(xx), ScalarType(0.)));
+        V2::set_entry(
+            yy,
+            rr,
+            std::inner_product(&get_entry_ref(rr, 0.), &get_entry_ref(rr + 1, 0.), V1::data(xx), ScalarType(0.)));
     } else {
       assert(xx.size() == cols() && yy.size() == rows());
       yy *= ScalarType(0.);
@@ -538,15 +541,10 @@ public:
     return backend_->get_entry_ref(rr, cc);
   }
 
-  // get pointer to begin of row (row major backend) or column (column major backend)
-  ScalarType* get_ptr(const size_t row_or_col)
+  // get pointer to entry
+  ScalarType* get_entry_ptr(const size_t rr, const size_t cc)
   {
-    return &(backend_->get_entry_ref(row_or_col, 0));
-  }
-
-  const ScalarType* get_ptr(const size_t row_or_col) const
-  {
-    return &(backend_->get_entry_ref(row_or_col, 0));
+    return &(backend_->get_entry_ref(rr, cc));
   }
 
 private:
