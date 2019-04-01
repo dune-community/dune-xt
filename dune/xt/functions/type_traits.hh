@@ -15,9 +15,12 @@
 
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/dynvector.hh>
+
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/type_traits.hh>
+
+#include <dune/xt/la/container/common.hh>
 
 namespace Dune {
 namespace XT {
@@ -47,7 +50,7 @@ struct RangeTypeSelector
 {
   using type = FieldMatrix<R, r, rC>;
   using return_type = XT::Common::FieldMatrix<R, r, rC>;
-  using dynamic_type = DynamicMatrix<R>;
+  using dynamic_type = XT::LA::CommonDenseMatrix<R>;
 
   static void ensure_size(dynamic_type& arg)
   {
@@ -61,7 +64,7 @@ struct RangeTypeSelector
     assert(out.cols() >= rC);
     for (size_t ii = 0; ii < r; ++ii)
       for (size_t jj = 0; jj < rC; ++jj)
-        out[ii][jj] = in[ii][jj];
+        out.set_entry(ii, jj, in[ii][jj]);
   }
 }; // struct RangeTypeSelector<...>
 
@@ -128,7 +131,7 @@ struct DerivativeRangeTypeSelector
 
   using row_derivative_type = FieldMatrix<R, rC, d>;
   using row_derivative_return_type = XT::Common::FieldMatrix<R, rC, d>;
-  using dynamic_row_derivative_type = DynamicMatrix<R>;
+  using dynamic_row_derivative_type = XT::LA::CommonDenseMatrix<R>;
 
   using type = FieldVector<row_derivative_type, r>;
   using return_type = XT::Common::FieldVector<row_derivative_return_type, r>;
@@ -151,7 +154,7 @@ struct DerivativeRangeTypeSelector
       assert(out[ii].cols() >= d);
       for (size_t jj = 0; jj < rC; ++jj)
         for (size_t kk = 0; kk < d; ++kk)
-          out[ii][jj][kk] = in[ii][jj][kk];
+          out[ii].set_entry(jj, kk, in[ii][jj][kk]);
     }
   } // ... convert(...)
 }; // struct DerivativeRangeTypeSelector<...>
@@ -165,11 +168,11 @@ struct DerivativeRangeTypeSelector<d, R, r, 1>
 
   using row_derivative_type = FieldMatrix<R, r, d>;
   using row_derivative_return_type = XT::Common::FieldMatrix<R, r, d>;
-  using dynamic_row_derivative_type = DynamicMatrix<R>;
+  using dynamic_row_derivative_type = XT::LA::CommonDenseMatrix<R>;
 
   using type = FieldMatrix<R, r, d>;
-  using return_type = XT::Common::FieldMatrix<R, r, d>;
-  using dynamic_type = DynamicMatrix<R>;
+  using return_type = row_derivative_return_type;
+  using dynamic_type = dynamic_row_derivative_type;
 
   static void ensure_size(dynamic_type& arg)
   {
@@ -183,7 +186,7 @@ struct DerivativeRangeTypeSelector<d, R, r, 1>
     assert(out.cols() >= d);
     for (size_t ii = 0; ii < r; ++ii)
       for (size_t jj = 0; jj < d; ++jj)
-        out[ii][jj] = in[ii][jj];
+        out.set_entry(ii, jj, in[ii][jj]);
   }
 }; // struct DerivativeRangeTypeSelector<..., 1>
 

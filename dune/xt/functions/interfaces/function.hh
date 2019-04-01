@@ -110,7 +110,8 @@ public:
    */
 
   using DynamicRangeType = typename RangeSelector::dynamic_type;
-  using DynamicDerivativeRangeReturnType = typename DerivativeRangeSelector::dynamic_type;
+  using DynamicRowDerivativeRangeType = typename DerivativeRangeSelector::dynamic_row_derivative_type;
+  using DynamicDerivativeRangeType = typename DerivativeRangeSelector::dynamic_type;
 
   /// \}
 
@@ -232,7 +233,7 @@ public:
   }
 
   virtual void jacobian(const DomainType& point_in_reference_element,
-                        DynamicDerivativeRangeReturnType& result,
+                        DynamicDerivativeRangeType& result,
                         const Common::Parameter& param = {}) const
   {
     DerivativeRangeSelector::ensure_size(result);
@@ -241,7 +242,7 @@ public:
 
   virtual void derivative(const std::array<size_t, d>& alpha,
                           const DomainType& point_in_reference_element,
-                          DynamicDerivativeRangeReturnType& result,
+                          DynamicDerivativeRangeType& result,
                           const Common::Parameter& param = {}) const
   {
     DerivativeRangeSelector::ensure_size(result);
