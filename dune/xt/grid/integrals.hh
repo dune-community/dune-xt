@@ -29,20 +29,22 @@ namespace Grid {
 // (note the d), which did not compile for generic lambdas. Thus we use
 //   G::dimension
 // instead.
-template <class FieldType, int d, class G, template <int, int, class> class E>
-FieldType
+template <class RangeType, int d, class G, template <int, int, class> class E>
+RangeType
 element_integral(const Entity<0, d, G, E>& element,
-                 std::function<FieldType(const FieldVector<typename Entity<0, d, G, E>::Geometry::ctype, G::dimension>&
+                 std::function<RangeType(const FieldVector<typename Entity<0, d, G, E>::Geometry::ctype, G::dimension>&
                                              point_in_reference_element)> function,
                  const int polynomial_order_of_the_function)
 {
-  FieldType result = 0.;
+  RangeType result(0.), local_result;
   for (auto&& quadrature_point : QuadratureRules<typename Entity<0, d, G, E>::Geometry::ctype, G::dimension>::rule(
            element.geometry().type(), polynomial_order_of_the_function)) {
     const auto point_in_reference_element = quadrature_point.position();
     const auto quadrature_weight = quadrature_point.weight();
     const auto integration_factor = element.geometry().integrationElement(point_in_reference_element);
-    result += quadrature_weight * integration_factor * function(point_in_reference_element);
+    local_result = function(point_in_reference_element);
+    local_result *= quadrature_weight * integration_factor;
+    result += local_result;
   }
   return result;
 } // ... element_integral(...)
