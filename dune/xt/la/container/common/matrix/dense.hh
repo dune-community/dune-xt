@@ -416,9 +416,20 @@ public:
   {
     assert(ii < rows());
     assert(jj < cols());
-    internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
-    backend_->get_entry_ref(ii, jj) += value;
+    if (mutexes_->size()) {
+      internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
+      backend_->get_entry_ref(ii, jj) += value;
+    } else {
+      backend_->get_entry_ref(ii, jj) += value;
+    }
   } // ... add_to_entry(...)
+
+  void unsafe_add_to_entry(const size_t ii, const size_t jj, const ScalarType& value)
+  {
+    assert(ii < rows());
+    assert(jj < cols());
+    backend_->get_entry_ref(ii, jj) += value;
+  } // ... unsafe_add_to_entry(...)
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
