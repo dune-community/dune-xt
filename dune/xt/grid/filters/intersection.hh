@@ -226,7 +226,7 @@ public:
     return new PartitionSetInnerIntersectionsOnce<GridViewType, PartitionSetType>();
   }
 
-  bool apply_on(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
+  bool contains(const GridViewType& grid_layer, const IntersectionType& intersection) const override final
   {
     if (intersection.neighbor() && !intersection.boundary()
         && PartitionSetType::contains(intersection.inside().partitionType())) {
