@@ -17,8 +17,9 @@
 #include <type_traits>
 
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/common/type_traits.hh>
+#include <dune/xt/common/parallel/communicator.hh>
 #include <dune/xt/common/print.hh>
+#include <dune/xt/common/type_traits.hh>
 
 #include "cube.hh"
 #include "dgf.hh"
