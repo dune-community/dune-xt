@@ -50,6 +50,16 @@ struct grid_name<const G>
 };
 
 
+template <>
+struct grid_name<Dune::OneDGrid>
+{
+  static std::string value()
+  {
+    return "1d_simplex_onedgrid";
+  }
+};
+
+
 template <int dim>
 struct grid_name<YaspGrid<dim, EquidistantOffsetCoordinates<double, dim>>>
 {
