@@ -13,6 +13,8 @@
 #ifndef DUNE_XT_GRID_GRIDS_HH
 #define DUNE_XT_GRID_GRIDS_HH
 
+#include <boost/tuple/tuple.hpp>
+
 #if HAVE_ALBERTA
 #  include <dune/xt/common/disable_warnings.hh>
 #  include <dune/grid/albertagrid.hh>
@@ -58,6 +60,38 @@ typedef Dune::UGGrid<3> UG_3D;
 typedef Dune::AlbertaGrid<2, 2> ALBERTA_2D;
 typedef Dune::AlbertaGrid<3, 3> ALBERTA_3D;
 #endif
+
+
+namespace Dune {
+namespace XT {
+namespace Grid {
+
+
+using AvailableGridTypes = boost::tuple<ONED_1D,
+                                        YASP_1D_EQUIDISTANT_OFFSET,
+                                        YASP_2D_EQUIDISTANT_OFFSET,
+                                        YASP_3D_EQUIDISTANT_OFFSET,
+                                        YASP_4D_EQUIDISTANT_OFFSET
+#if HAVE_DUNE_ALUGRID
+                                        ,
+                                        ALU_2D_SIMPLEX_CONFORMING,
+                                        ALU_2D_SIMPLEX_NONCONFORMING,
+                                        ALU_2D_CUBE,
+                                        ALU_3D_SIMPLEX_CONFORMING,
+                                        ALU_3D_SIMPLEX_NONCONFORMING,
+                                        ALU_3D_CUBE
+#endif
+#if HAVE_DUNE_UGGRID || HAVE_UG
+                                        ,
+                                        UG_2D,
+                                        UG_3D
+#endif
+                                        >;
+
+
+} // namespace Grid
+} // namespace XT
+} // namespace Dune
 
 
 #endif // DUNE_XT_GRID_GRIDS_HH
