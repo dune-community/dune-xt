@@ -18,6 +18,7 @@
 #include <dune/grid/io/file/vtk/function.hh>
 
 #include <dune/xt/common/numeric_cast.hh>
+#include <dune/xt/common/memory.hh>
 #include <dune/xt/common/parameter.hh>
 
 #include <dune/xt/grid/type_traits.hh>
@@ -203,9 +204,18 @@ public:
     , param_(param)
   {}
 
+  VisualizationAdapter(const GridFunctionType& localizable_function,
+                       const std::string nm = "",
+                       const XT::Common::Parameter& param = {})
+    : local_function_(localizable_function.local_function())
+    , visualizer_(new DefaultVisualizer<range_dim, range_dim_cols, RangeField>())
+    , name_(nm.empty() ? localizable_function.name() : nm)
+    , param_(param)
+  {}
+
   int ncomps() const override final
   {
-    return visualizer_.ncomps();
+    return visualizer_.access().ncomps();
   }
 
   std::string name() const override final
@@ -217,12 +227,12 @@ public:
   {
     local_function_->bind(en);
     const auto value = local_function_->evaluate(xx, param_);
-    return visualizer_.evaluate(comp, value);
+    return visualizer_.access().evaluate(comp, value);
   }
 
 private:
   mutable std::unique_ptr<LocalFunctionType> local_function_;
-  const VisualizerInterface<range_dim, range_dim_cols, RangeField>& visualizer_;
+  const Common::ConstStorageProvider<VisualizerInterface<range_dim, range_dim_cols, RangeField>> visualizer_;
   const std::string name_;
   const XT::Common::Parameter param_;
 }; // class VisualizationAdapter
