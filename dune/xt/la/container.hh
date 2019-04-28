@@ -12,6 +12,8 @@
 #ifndef DUNE_XT_LA_CONTAINER_HH
 #define DUNE_XT_LA_CONTAINER_HH
 
+#include <boost/tuple/tuple.hpp>
+
 #include "container/interfaces.hh"
 #include "container/common.hh"
 #include "container/eigen.hh"
@@ -66,6 +68,35 @@ struct Container<ScalarType, Backends::istl_sparse>
   typedef IstlDenseVector<ScalarType> VectorType;
   typedef IstlRowMajorSparseMatrix<ScalarType> MatrixType;
 }; // struct Container<..., istl_sparse>
+
+
+template <class S>
+using AvailableVectorTypes = boost::tuple<CommonDenseVector<S>,
+                                          IstlDenseVector<S>
+#if HAVE_EIGEN
+                                          ,
+                                          EigenDenseVector<S>
+#endif
+                                          >;
+
+
+template <class S>
+using AvailableDenseMatrixTypes = boost::tuple<CommonDenseMatrix<S>
+#if HAVE_EIGEN
+                                               ,
+                                               EigenDenseMatrix<S>
+#endif
+                                               >;
+
+
+template <class S>
+using AvailableSparseMatrixTypes = boost::tuple<CommonSparseMatrix<S>,
+                                                IstlRowMajorSparseMatrix<S>
+#if HAVE_EIGEN
+                                                ,
+                                                EigenRowMajorSparseMatrix<S>
+#endif
+                                                >;
 
 
 } // namespace LA
