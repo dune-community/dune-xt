@@ -54,7 +54,7 @@ struct ElementVisualization
 
     std::vector<double> values(mapper.size());
     for (auto&& entity : elements(gridView)) {
-      values[mapper.map(entity)] = f(entity);
+      values[mapper.index(entity)] = f(entity);
     }
 
     Dune::VTKWriter<typename Grid::LeafGridView> vtkwriter(gridView);
@@ -208,6 +208,23 @@ struct ElementVisualization
     }
   };
 
+  class PartitionTypeFunctor : public FunctorBase
+  {
+  public:
+    PartitionTypeFunctor(const std::string fname, const std::string dname)
+      : FunctorBase(fname, dname)
+    {}
+
+    template <class Entity>
+    double operator()(const Entity& ent) const
+    {
+      const typename Entity::Geometry& geo = ent.geometry();
+      const int type{static_cast<int>(ent.partitionType())};
+      DXTC_LOG_ERROR << "TYPE " << type << std::endl;
+      return static_cast<double>(type);
+    }
+  };
+
   //! supply functor
   template <class Grid>
   static void all(const Grid& grid, const std::string outputDir = "visualisation")
@@ -218,6 +235,7 @@ struct ElementVisualization
     GeometryFunctor geometryFunctor("geometryFunctor", outputDir);
     ProcessIdFunctor processIdFunctor("ProcessIdFunctor", outputDir);
     VolumeFunctor volumeFunctor("volumeFunctor", outputDir);
+    PartitionTypeFunctor partitionTypeFunctor("partitionTypeFunctor", outputDir);
 
     // call the visualization functions
     elementdata(grid, boundaryFunctor);
@@ -225,6 +243,7 @@ struct ElementVisualization
     elementdata(grid, geometryFunctor);
     elementdata(grid, processIdFunctor);
     elementdata(grid, volumeFunctor);
+    elementdata(grid, partitionTypeFunctor);
   }
 };
 
