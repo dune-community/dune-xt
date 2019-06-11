@@ -85,23 +85,20 @@ PYBIND11_MODULE(_functions, m)
 
   bind_ConstantFunction<1, 1, 1>(m);
   bind_ConstantFunction<1, 2, 1>(m);
+  bind_ConstantFunction<1, 2, 2>(m);
   bind_ConstantFunction<1, 3, 1>(m);
-  bind_ConstantFunction<1, 4, 1>(m);
-  bind_ConstantFunction<1, 1, 3>(m);
   bind_ConstantFunction<1, 3, 3>(m);
 
   bind_ConstantFunction<2, 1, 1>(m);
   bind_ConstantFunction<2, 2, 1>(m);
+  bind_ConstantFunction<2, 2, 2>(m);
   bind_ConstantFunction<2, 3, 1>(m);
-  bind_ConstantFunction<2, 4, 1>(m);
-  bind_ConstantFunction<2, 1, 3>(m);
   bind_ConstantFunction<2, 3, 3>(m);
 
   bind_ConstantFunction<3, 1, 1>(m);
   bind_ConstantFunction<3, 2, 1>(m);
+  bind_ConstantFunction<3, 2, 2>(m);
   bind_ConstantFunction<3, 3, 1>(m);
-  bind_ConstantFunction<3, 4, 1>(m);
-  bind_ConstantFunction<3, 1, 3>(m);
   bind_ConstantFunction<3, 3, 3>(m);
 
   bind_IndicatorFunction<1, 1, 1>(m);
