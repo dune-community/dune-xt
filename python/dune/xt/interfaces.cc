@@ -34,10 +34,10 @@ void add_bind_for_Grid_interface(pybind11::module& m)
 {
   using namespace Dune::XT::Functions;
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
-  const auto diff = CombinationType::difference;
-  const auto sum = CombinationType::sum;
-  const auto prod = CombinationType::product;
-  const auto g_dim = G::dimension;
+  constexpr const auto diff = CombinationType::difference;
+  constexpr const auto sum = CombinationType::sum;
+  constexpr const auto prod = CombinationType::product;
+  constexpr const auto g_dim = G::dimension;
 
   auto i_1_1 = bind_GridFunctionInterface<G, 1, 1>(m, grid_id);
   auto i_2_1 = bind_GridFunctionInterface<G, 2, 1>(m, grid_id);
