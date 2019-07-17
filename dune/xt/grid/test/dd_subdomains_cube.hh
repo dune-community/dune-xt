@@ -694,14 +694,14 @@ struct CubeProviderTest : public ::testing::Test
     }
   };
 
-  template <class Comm, bool anything>
-  struct get_num_refinements<Dune::ALUGrid<2, 2, simplex, conforming, Comm>, anything>
-  {
-    unsigned int operator()()
-    {
-      return 1;
-    }
-  };
+  //  template <class Comm, bool anything>
+  //  struct get_num_refinements<Dune::ALUGrid<2, 2, simplex, conforming, Comm>, anything>
+  //  {
+  //    unsigned int operator()()
+  //    {
+  //      return 1;
+  //    }
+  //  };
 
   static unsigned int num_refinements()
   {
