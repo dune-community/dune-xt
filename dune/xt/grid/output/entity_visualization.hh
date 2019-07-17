@@ -189,6 +189,43 @@ struct ElementVisualization
     }
   };
 
+  template <class GridViewType, class BoundaryInfoType>
+  class BoundaryTypeFunctor : public FunctorBase<GridViewType>
+  {
+    const GridViewType& gridview_;
+    const std::string type_;
+    const BoundaryInfoType& boundaryInfo_;
+
+  public:
+    using Element = typename FunctorBase<GridViewType>::Element;
+    BoundaryTypeFunctor(const GridViewType& view,
+                        const BoundaryInfoType& boundaryInfo,
+                        std::string type,
+                        std::string filename = "BoundaryTypeFunctor",
+                        const std::string dirname = ".")
+      : FunctorBase<GridViewType>(filename, dirname)
+      , gridview_(view)
+      , type_(type)
+      , boundaryInfo_(boundaryInfo)
+    {}
+
+    double operator()(const Element& entity) const
+    {
+      static const constexpr DirichletBoundary dirichlet_type{};
+      static const constexpr NeumannBoundary neumann_type{};
+      for (auto intersectionIt = gridview_.ibegin(entity); intersectionIt != gridview_.iend(entity); ++intersectionIt) {
+        if (type_ == "dirichlet") {
+          return (boundaryInfo_.type(*intersectionIt) == dirichlet_type);
+        } else if (type_ == "neumann") {
+          return (boundaryInfo_.type(*intersectionIt) == neumann_type);
+        } else {
+          DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type_ << "'!");
+        }
+      }
+      return 0;
+    }
+  };
+
   template <class GridViewType>
   class AreaMarker : public FunctorBase<GridViewType>
   {
@@ -259,12 +296,30 @@ struct ElementVisualization
 
     double operator()(const Element& ent) const
     {
-      const auto& geo = ent.geometry();
       const int type{static_cast<int>(ent.partitionType())};
       DXTC_LOG_ERROR << "TYPE " << type << std::endl;
       return static_cast<double>(type);
     }
   };
+
+  template <class GridViewType, bool enable = has_boundary_id<GridViewType>::value>
+  class IndexFunctor : public FunctorBase<GridViewType>
+  {
+    const GridViewType& gridview_;
+
+  public:
+    using Element = typename FunctorBase<GridViewType>::Element;
+    IndexFunctor(const GridViewType& view, std::string filename = "IndexFunctor", const std::string dirname = ".")
+      : FunctorBase<GridViewType>(filename, dirname)
+      , gridview_(view)
+    {}
+
+    double operator()(const Element& entity) const
+    {
+      return gridview_.indexSet().index(entity);
+    }
+  };
+
 
   //! supply functor
   template <class Grid>

@@ -366,7 +366,7 @@ private:
       // vtk writer
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
-      std::vector<double> entityId = generateEntityVisualization(grid_view);
+      const auto entityId = ElementVisualization::IndexFunctor<LevelGridViewType>(grid_view).values(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
       const std::vector<double> boundary_ids =
@@ -389,58 +389,25 @@ private:
       // vtk writer
       Dune::VTKWriter<LevelGridViewType> vtkwriter(grid_view);
       // codim 0 entity id
-      std::vector<double> entityId = generateEntityVisualization(grid_view);
+      const auto entityId = ElementVisualization::IndexFunctor<LevelGridViewType>(grid_view).values(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
-      const std::vector<double> boundary_ids =
-          ElementVisualization::BoundaryIDFunctor<LevelGridViewType>(grid_view).values(grid_view);
+      const auto boundary_ids = ElementVisualization::BoundaryIDFunctor<LevelGridViewType>(grid_view).values(grid_view);
       vtkwriter.addCellData(boundary_ids, "boundary_id__level_" + Common::to_string(lvl));
       // dirichlet values
-      const auto dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
+      const auto dirichlet = ElementVisualization::BoundaryTypeFunctor<LevelGridViewType, decltype(*boundary_info_ptr)>(
+                                 grid_view, *boundary_info_ptr, "dirichlet")
+                                 .values(grid_view);
       vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(lvl));
       // neumann values
-      std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
+      const auto neumann = ElementVisualization::BoundaryTypeFunctor<LevelGridViewType, decltype(*boundary_info_ptr)>(
+                               grid_view, *boundary_info_ptr, "neumann")
+                               .values(grid_view);
       vtkwriter.addCellData(neumann, "isNeumannBoundary__level_" + Common::to_string(lvl));
       // write
       vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
   } // ... visualize_with_boundary(...)
-
-  template <class BoundaryInfoType>
-  std::vector<double> generateBoundaryVisualization(const LevelGridViewType& gridView,
-                                                    const BoundaryInfoType& boundaryInfo,
-                                                    const std::string type) const
-  {
-    constexpr DirichletBoundary dirichlet_type{};
-    constexpr NeumannBoundary neumann_type{};
-    std::vector<double> data(gridView.indexSet().size(0));
-    // walk the grid
-    for (auto&& entity : elements(gridView)) {
-      const auto& index = gridView.indexSet().index(entity);
-      data[index] = 0.0;
-      for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != gridView.iend(entity); ++intersectionIt) {
-        if (type == "dirichlet") {
-          if (boundaryInfo.type(*intersectionIt) == dirichlet_type)
-            data[index] = 1.0;
-        } else if (type == "neumann") {
-          if (boundaryInfo.type(*intersectionIt) == neumann_type)
-            data[index] = 1.0;
-        } else
-          DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type << "'!");
-      }
-    } // walk the grid
-    return data;
-  } // std::vector< double > generateBoundaryVisualization(...) const
-
-  std::vector<double> generateEntityVisualization(const LevelGridViewType& gridView) const
-  {
-    std::vector<double> data(gridView.indexSet().size(0));
-    for (auto&& entity : elements(gridView)) {
-      const auto& index = gridView.indexSet().index(entity);
-      data[index] = double(index);
-    } // walk the grid
-    return data;
-  } // ... generateEntityVisualization(...)
 
   std::shared_ptr<GridType> grid_ptr_;
   std::shared_ptr<DdGridType> dd_grid_ptr_;
