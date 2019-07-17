@@ -31,6 +31,7 @@
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/type_traits.hh>
+#include <dune/xt/grid/output/entity_visualization.hh>
 
 namespace Dune {
 namespace XT {
@@ -356,59 +357,6 @@ public:
   }
 
 private:
-  template <class G, bool enable = has_boundary_id<G>::value>
-  struct add_boundary_id_visualization
-  {
-    add_boundary_id_visualization() {}
-
-    template <class V>
-    void operator()(V& vtk_writer, const std::vector<double>& boundary_id, const int lvl) const
-    {
-      vtk_writer.addCellData(boundary_id, "boundary_id__level_" + Common::to_string(lvl));
-    }
-
-    std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType& gridView) const
-    {
-      std::vector<double> data(gridView.indexSet().size(0));
-      // walk the grid
-      const auto it_end = gridView.template end<0>();
-      for (auto it = gridView.template begin<0>(); it != it_end; ++it) {
-        const auto& entity = *it;
-        const auto& index = gridView.indexSet().index(entity);
-        data[index] = 0.0;
-        size_t numberOfBoundarySegments = 0;
-        bool isOnBoundary = false;
-        const auto intersectionItEnd = gridView.iend(entity);
-        for (auto intersectionIt = gridView.ibegin(entity); intersectionIt != intersectionItEnd; ++intersectionIt) {
-          if (!intersectionIt->neighbor() && intersectionIt->boundary()) {
-            isOnBoundary = true;
-            numberOfBoundarySegments += 1;
-            data[index] += double(intersectionIt->boundaryId());
-          }
-        }
-        if (isOnBoundary) {
-          data[index] /= double(numberOfBoundarySegments);
-        }
-      } // walk the grid
-      return data;
-    }
-  }; // struct add_boundary_id_visualization<..., true>
-
-  template <class G>
-  struct add_boundary_id_visualization<G, false>
-  {
-    add_boundary_id_visualization() {}
-
-    template <class V>
-    void operator()(V& /*vtk_writer*/, const std::vector<double>& /*boundary_id*/, const int /*lvl*/) const
-    {}
-
-    std::vector<double> generateBoundaryIdVisualization(const LevelGridViewType&) const
-    {
-      return std::vector<double>();
-    }
-  };
-
   void visualize_plain(const std::string filename) const
   {
     if (GridType::dimension > 3) // give us a call if you have any idea!
@@ -421,9 +369,9 @@ private:
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
-      const add_boundary_id_visualization<GridType> add_boundary_id;
-      const std::vector<double> boundary_id = add_boundary_id.generateBoundaryIdVisualization(grid_view);
-      add_boundary_id(vtkwriter, boundary_id, lvl);
+      const std::vector<double> boundary_ids =
+          ElementVisualization::BoundaryIDFunctor<LevelGridViewType>(grid_view).values(grid_view);
+      vtkwriter.addCellData(boundary_ids, "boundary_id__level_" + Common::to_string(lvl));
       // write
       vtkwriter.write(filename + "__level_" + Common::to_string(lvl), VTK::appendedraw);
     }
@@ -444,11 +392,11 @@ private:
       std::vector<double> entityId = generateEntityVisualization(grid_view);
       vtkwriter.addCellData(entityId, "entity_id__level_" + Common::to_string(lvl));
       // boundary id
-      const add_boundary_id_visualization<GridType> add_boundary_id;
-      const std::vector<double> boundary_id = add_boundary_id.generateBoundaryIdVisualization(grid_view);
-      add_boundary_id(vtkwriter, boundary_id, lvl);
+      const std::vector<double> boundary_ids =
+          ElementVisualization::BoundaryIDFunctor<LevelGridViewType>(grid_view).values(grid_view);
+      vtkwriter.addCellData(boundary_ids, "boundary_id__level_" + Common::to_string(lvl));
       // dirichlet values
-      std::vector<double> dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
+      const auto dirichlet = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "dirichlet");
       vtkwriter.addCellData(dirichlet, "isDirichletBoundary__level_" + Common::to_string(lvl));
       // neumann values
       std::vector<double> neumann = generateBoundaryVisualization(grid_view, *boundary_info_ptr, "neumann");
