@@ -381,9 +381,7 @@ public:
   CombinedGridFunction(const LeftType& left, const RightType& right, const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
-    , name_(nm.empty() ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left.name()
-                             + "' and '" + right.name() + "'"
-                       : nm)
+    , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
   CombinedGridFunction(const std::shared_ptr<const LeftType> left,
@@ -391,9 +389,19 @@ public:
                        const std::string nm = "")
     : left_(Common::make_unique<LeftStorageType>(left))
     , right_(Common::make_unique<RightStorageType>(right))
-    , name_(nm.empty() ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '"
-                             + left_->access().name() + "' and '" + right_->access().name() + "'"
-                       : nm)
+    , name_(get_name(left_->access(), right_->access(), nm))
+  {}
+
+  CombinedGridFunction(const LeftType& left, const std::shared_ptr<const RightType> right, const std::string nm = "")
+    : left_(Common::make_unique<LeftStorageType>(left))
+    , right_(Common::make_unique<RightStorageType>(right))
+    , name_(get_name(left_->access(), right_->access(), nm))
+  {}
+
+  CombinedGridFunction(const std::shared_ptr<const LeftType> left, const RightType& right, const std::string nm = "")
+    : left_(Common::make_unique<LeftStorageType>(left))
+    , right_(Common::make_unique<RightStorageType>(right))
+    , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
   CombinedGridFunction(ThisType&& source) = default;
@@ -418,6 +426,13 @@ public:
   }
 
 private:
+  static std::string get_name(const LeftType& left, const RightType& right, const std::string& nm)
+  {
+    return nm.empty() ? SelectCombinedGridFunction<LeftType, RightType, comb>::type() + " of '" + left.name()
+                            + "' and '" + right.name() + "'"
+                      : nm;
+  }
+
   std::unique_ptr<const LeftStorageType> left_;
   std::unique_ptr<const RightStorageType> right_;
   const std::string name_;

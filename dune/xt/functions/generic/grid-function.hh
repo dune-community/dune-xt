@@ -129,7 +129,6 @@ private:
       return derivative_(alpha, point_in_local_coordinates, parsed_param);
     }
 
-
     virtual const Common::ParameterType& parameter_type() const override final
     {
       return param_type_;
