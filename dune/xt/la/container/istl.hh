@@ -553,7 +553,7 @@ public:
 
   template <class V1, class V2>
   inline std::enable_if_t<XT::Common::is_vector<V1>::value && XT::Common::is_vector<V2>::value
-                              && !is_istl_dense_vector<V1>::value,
+                              && (!is_istl_dense_vector<V1>::value || !is_istl_dense_vector<V2>::value),
                           void>
   mv(const V1& xx, V2& yy) const
   {
