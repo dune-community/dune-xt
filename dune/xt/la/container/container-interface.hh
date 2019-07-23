@@ -102,6 +102,7 @@ public:
   using typename CRTP::derived_type;
   using typename CRTP::Traits;
   using ScalarType = ScalarImp;
+  using field_type = ScalarType;
   using RealType = typename Traits::RealType;
 
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value, "");

@@ -311,6 +311,16 @@ public:
     , matrix_(matrix)
   {}
 
+  ThisType& operator=(const Matrix& other)
+  {
+    const auto& patt = const_matrix_view_.get_pattern();
+    assert(patt == other.pattern());
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (auto&& jj : patt.inner(ii))
+        set_entry(ii, jj, other.get_entry(ii, jj));
+    return *this;
+  }
+
   size_t row_index(const size_t ii) const
   {
     return const_matrix_view_.row_index(ii);

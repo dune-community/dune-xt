@@ -41,12 +41,15 @@ namespace LA {
 
 // Solver for saddle point system (A B1; B2^T C) (u; p) = (f; g) using the Schur complement, i.e., solve (B2^T A^{-1} B1
 // - C) p = B2^T A^{-1} f - g first and then u = A^{-1} (F - B1 p)
-template <class FieldType = double, class CommunicatorType = SequentialCommunication>
+template <class VectorType = IstlDenseVector<double>,
+          class MatrixType = IstlRowMajorSparseMatrix<double>,
+          class CommunicatorType = SequentialCommunication>
 class SaddlePointSolver
 {
 public:
-  using Vector = IstlDenseVector<FieldType>;
-  using Matrix = IstlRowMajorSparseMatrix<FieldType>;
+  using Vector = VectorType;
+  using Matrix = MatrixType;
+  using Field = typename VectorType::ScalarType;
 
   // Matrix and vector dimensions are
   // A: m x m, B1, B2: m x n, C: n x n, f: m, g: n
@@ -156,7 +159,7 @@ public:
       // calculate rhs B2^T A^{-1} f - g
       auto Ainv_f = f;
       auto rhs_p = g;
-      SchurComplementOperator<FieldType, CommunicatorType> schur_complement_op(
+      SchurComplementOperator<Vector, Matrix, CommunicatorType> schur_complement_op(
           A_,
           B1_,
           B2_,
@@ -169,11 +172,11 @@ public:
       rhs_p -= g;
 
       // Solve S p = rhs
-      IdentityPreconditioner<SchurComplementOperator<FieldType, CommunicatorType>> prec(
+      IdentityPreconditioner<SchurComplementOperator<Vector, Matrix, CommunicatorType>> prec(
           SolverCategory::Category::sequential);
-      Dune::CGSolver<typename Vector::BackendType> outer_solver(schur_complement_op, prec, 1e-10, 10000, 0, false);
+      Dune::CGSolver<Vector> outer_solver(schur_complement_op, prec, 1e-10, 10000, 0, false);
       InverseOperatorResult res;
-      outer_solver.apply(p.backend(), rhs_p.backend(), res);
+      outer_solver.apply(p, rhs_p, res);
 
       // Now solve u = A^{-1}(f - B1 p)
       auto rhs_u = f;
@@ -191,12 +194,13 @@ private:
 
 #else // HAVE_DUNE_ISTL
 
-template <class FieldType = double, class CommunicatorType = SequentialCommunication>
+template <class VectorType = IstlDenseVector<double>,
+          class MatrixType = IstlRowMajorSparseMatrix<double>,
+          class CommunicatorType = SequentialCommunication>
 class SaddlePointSolver
 {
-  static_assert(Dune::AlwaysFalse<FieldType>::value, "You are missing dune-istl!");
+  static_assert(Dune::AlwaysFalse<VectorType>::value, "You are missing dune-istl!");
 };
-
 
 #endif // HAVE_DUNE_ISTL
 

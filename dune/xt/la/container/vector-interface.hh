@@ -303,6 +303,12 @@ public:
     return result;
   } // ... l1_norm(...)
 
+  // for compatibility with dune core modules
+  RealType one_norm() const
+  {
+    return l1_norm();
+  }
+
   /**
    *  \brief  The l2-norm of the vector.
    *  \return The l2-norm of the vector.
@@ -316,6 +322,12 @@ public:
     // v.dot(v) should always be a ScalarType with zero imaginary part
   }
 
+  // for compatibility with dune core modules
+  RealType two_norm() const
+  {
+    return l2_norm();
+  }
+
   /**
    *  \brief  The l-infintiy-norm of the vector.
    *  \return The l-infintiy-norm of the vector.
@@ -324,6 +336,12 @@ public:
   virtual RealType sup_norm() const
   {
     return amax().second;
+  }
+
+  // for compatibility with dune core modules
+  RealType inf_norm() const
+  {
+    return sup_norm();
   }
 
   virtual ScalarType standard_deviation() const

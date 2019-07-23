@@ -51,6 +51,36 @@ namespace LA {
 
 #if HAVE_EIGEN
 
+template <class S, class CommunicatorType>
+class SolverOptions<EigenDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
+{
+public:
+  using MatrixType = EigenDenseMatrix<S>;
+
+  static std::vector<std::string> types()
+  {
+    return {"lu.partialpiv",
+            "qr.householder",
+            "llt",
+            "ldlt",
+            "qr.colpivhouseholder",
+            "qr.fullpivhouseholder",
+            "lu.fullpiv"};
+  } // ... types(...)
+
+  static Common::Configuration options(const std::string type = "")
+  {
+    const std::string tp = !type.empty() ? type : types()[0];
+    internal::SolverUtils::check_given(tp, types());
+    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"},
+                                          {tp.c_str(), "1e-5", "1"});
+    // for symmetric matrices
+    if (tp == "ldlt" || tp == "llt") {
+      default_options.set("pre_check_symmetry", "1e-8");
+    }
+    return default_options;
+  }
+};
 
 template <class S, class CommunicatorType>
 class Solver<EigenDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
@@ -69,26 +99,12 @@ public:
 
   static std::vector<std::string> types()
   {
-    return {"lu.partialpiv",
-            "qr.householder",
-            "llt",
-            "ldlt",
-            "qr.colpivhouseholder",
-            "qr.fullpivhouseholder",
-            "lu.fullpiv"};
+    return SolverOptions<MatrixType, CommunicatorType>::types();
   } // ... types()
 
   static Common::Configuration options(const std::string type = "")
   {
-    const std::string tp = !type.empty() ? type : types()[0];
-    internal::SolverUtils::check_given(tp, types());
-    Common::Configuration default_options({"type", "post_check_solves_system", "check_for_inf_nan"},
-                                          {tp.c_str(), "1e-5", "1"});
-    // * for symmetric matrices
-    if (tp == "ldlt" || tp == "llt") {
-      default_options.set("pre_check_symmetry", "1e-8");
-    }
-    return default_options;
+    return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)
 
   template <class T1, class T2>
@@ -233,32 +249,11 @@ private:
 }; // class Solver
 
 
-/**
- *  \note lu.sparse will copy the matrix to column major
- *  \note qr.sparse will copy the matrix to column major
- *  \note ldlt.simplicial will copy the matrix to column major
- *  \note llt.simplicial will copy the matrix to column major
- */
 template <class S, class CommunicatorType>
-class Solver<EigenRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
+class SolverOptions<EigenRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
-  typedef ::Eigen::SparseMatrix<S, ::Eigen::ColMajor> ColMajorBackendType;
-
 public:
-  typedef EigenRowMajorSparseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType R;
-
-private:
-  typedef typename MatrixType::BackendType::Index EIGEN_size_t;
-
-public:
-  Solver(const MatrixType& matrix)
-    : matrix_(matrix)
-  {}
-
-  Solver(const MatrixType& matrix, const CommunicatorType& /*communicator*/)
-    : matrix_(matrix)
-  {}
+  using MatrixType = EigenRowMajorSparseMatrix<S>;
 
   static std::vector<std::string> types()
   {
@@ -291,7 +286,7 @@ public:
         //           , "superlu"               // <- untested
         //#endif
     };
-  } // ... types()
+  } // ... types(...)
 
   static Common::Configuration options(const std::string type = "")
   {
@@ -319,6 +314,45 @@ public:
     } else if (tp.substr(0, 3) == "cg.")
       iterative_options.set("pre_check_symmetry", "1e-8");
     return iterative_options;
+  }
+};
+
+
+/**
+ *  \note lu.sparse will copy the matrix to column major
+ *  \note qr.sparse will copy the matrix to column major
+ *  \note ldlt.simplicial will copy the matrix to column major
+ *  \note llt.simplicial will copy the matrix to column major
+ */
+template <class S, class CommunicatorType>
+class Solver<EigenRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
+{
+  typedef ::Eigen::SparseMatrix<S, ::Eigen::ColMajor> ColMajorBackendType;
+
+public:
+  typedef EigenRowMajorSparseMatrix<S> MatrixType;
+  typedef typename MatrixType::RealType R;
+
+private:
+  typedef typename MatrixType::BackendType::Index EIGEN_size_t;
+
+public:
+  Solver(const MatrixType& matrix)
+    : matrix_(matrix)
+  {}
+
+  Solver(const MatrixType& matrix, const CommunicatorType& /*communicator*/)
+    : matrix_(matrix)
+  {}
+
+  static std::vector<std::string> types()
+  {
+    return SolverOptions<MatrixType, CommunicatorType>::types();
+  } // ... types()
+
+  static Common::Configuration options(const std::string type = "")
+  {
+    return SolverOptions<MatrixType, CommunicatorType>::options(type);
   } // ... options(...)
 
   template <class T1, class T2>

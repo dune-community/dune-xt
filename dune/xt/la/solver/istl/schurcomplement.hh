@@ -29,18 +29,17 @@ namespace LA {
 
 
 // For a saddle point matrix (A B1; B2^T C) this models the Schur complement (B2^T A^{-1} B1 - C)
-template <class FieldType = double, class CommunicatorType = SequentialCommunication>
-class SchurComplementOperator
-  : public Dune::LinearOperator<typename IstlDenseVector<FieldType>::BackendType,
-                                typename IstlDenseVector<FieldType>::BackendType>
+template <class VectorType = IstlDenseVector<double>,
+          class MatrixType = IstlRowMajorSparseMatrix<double>,
+          class CommunicatorType = SequentialCommunication>
+class SchurComplementOperator : public Dune::LinearOperator<VectorType, VectorType>
 {
-  using BaseType = Dune::LinearOperator<typename IstlDenseVector<FieldType>::BackendType,
-                                        typename IstlDenseVector<FieldType>::BackendType>;
+  using BaseType = Dune::LinearOperator<VectorType, VectorType>;
 
 public:
-  using Vector = IstlDenseVector<FieldType>;
-  using VectorBackend = typename Vector::BackendType;
-  using Matrix = IstlRowMajorSparseMatrix<FieldType>;
+  using Vector = VectorType;
+  using Matrix = MatrixType;
+  using Field = typename VectorType::ScalarType;
   using SolverType = Solver<Matrix, CommunicatorType>;
 
   // Matrix dimensions are
@@ -79,15 +78,7 @@ public:
         The input vector is consistent and the output must also be
      consistent on the interior+border partition.
    */
-  virtual void apply(const VectorBackend& x, VectorBackend& y) const override final
-  {
-    Vector x_la_vector(x);
-    Vector y_la_vector(y);
-    apply(x_la_vector, y_la_vector);
-    y = y_la_vector.backend();
-  }
-
-  virtual void apply(const Vector& x, Vector& y) const
+  virtual void apply(const Vector& x, Vector& y) const override final
   {
     // we want to calculate y = (B2^T A^{-1} B1 - C) x
     // calculate B1 x
@@ -104,17 +95,7 @@ public:
     y -= Cx;
   }
 
-
-  //! apply operator to x, scale and add:  \f$ y = y + \alpha S(x) \f$
-  virtual void applyscaleadd(FieldType alpha, const VectorBackend& x, VectorBackend& y) const override final
-  {
-    Vector x_la_vector(x);
-    Vector y_la_vector(y);
-    applyscaleadd(alpha, x_la_vector, y_la_vector);
-    y = y_la_vector.backend();
-  }
-
-  virtual void applyscaleadd(FieldType alpha, const Vector& x, Vector& y) const
+  virtual void applyscaleadd(Field alpha, const Vector& x, Vector& y) const override final
   {
     auto Sx = n_vec_2_;
     apply(x, Sx);
@@ -169,10 +150,12 @@ private:
 
 #else // HAVE_DUNE_ISTL
 
-template <class FieldType = double, class CommunicatorType = SequentialCommunication>
+template <class VectorType = IstlDenseVector<double>,
+          class MatrixType = IstlRowMajorSparseMatrix<double>,
+          class CommunicatorType = SequentialCommunication>
 class SchurComplementOperator
 {
-  static_assert(Dune::AlwaysFalse<FieldType>::value, "You are missing dune-istl!");
+  static_assert(Dune::AlwaysFalse<VectorType>::value, "You are missing dune-istl!");
 };
 
 #endif // HAVE_DUNE_ISTL
