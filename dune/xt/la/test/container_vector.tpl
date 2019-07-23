@@ -69,11 +69,17 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
     D_ScalarType d_dot = d_by_size.dot(d_by_size_and_value);
     EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_dot);
     D_ScalarType d_l1_norm = d_by_size.l1_norm();
+    D_ScalarType d_l1_norm2 = d_by_size.one_norm();
     EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_l1_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(d_l1_norm, d_l1_norm2);
     D_ScalarType d_l2_norm = d_by_size.l2_norm();
+    D_ScalarType d_l2_norm2 = d_by_size.two_norm();
     EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_l2_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(d_l2_norm, d_l2_norm2);
     D_ScalarType d_sup_norm = d_by_size.sup_norm();
+    D_ScalarType d_sup_norm2 = d_by_size.inf_norm();
     EXPECT_DOUBLE_OR_COMPLEX_EQ(D_RealType(0), d_sup_norm);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(d_sup_norm, d_sup_norm2);
     VectorImp d_ones(dim, D_ScalarType(1));
     std::pair<size_t, D_ScalarType> d_amax = d_ones.amax();
     EXPECT_EQ(0, d_amax.first);

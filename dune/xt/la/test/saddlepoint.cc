@@ -22,10 +22,9 @@ using namespace Dune;
 
 // Data for saddle point system (A B; B^T C) (u; p) = (f; g) from Taylor-Hood P2-P1 continuous finite element
 // discretization on a 2x2 cubic grid in 2 dimensions.
+template <class Matrix, class Vector>
 struct SaddlePointTestData
 {
-  using Matrix = XT::LA::IstlRowMajorSparseMatrix<double>;
-  using Vector = XT::LA::IstlDenseVector<double>;
 
   SaddlePointTestData()
     : A_(XT::Common::from_string<Matrix>(
@@ -155,9 +154,22 @@ struct SaddlePointTestData
 
 GTEST_TEST(SaddlePointSolver, test_direct)
 {
-  using Vector = typename SaddlePointTestData::Vector;
-  SaddlePointTestData data;
-  XT::LA::SaddlePointSolver<double> solver(data.A_, data.B_, data.B_, data.C_);
+  using Matrix = XT::LA::IstlRowMajorSparseMatrix<double>;
+  using Vector = XT::LA::IstlDenseVector<double>;
+  SaddlePointTestData<Matrix, Vector> data;
+  XT::LA::SaddlePointSolver<Vector, Matrix> solver(data.A_, data.B_, data.B_, data.C_);
+  Vector u(data.f_.size()), p(data.g_.size());
+  solver.apply(data.f_, data.g_, u, p, "direct");
+  DXTC_EXPECT_FLOAT_EQ(0., (u - data.expected_u_).l2_norm(), 1e-12, 1e-12);
+  DXTC_EXPECT_FLOAT_EQ(0., (p - data.expected_p_).l2_norm(), 1e-12, 1e-12);
+}
+
+GTEST_TEST(SaddlePointSolver, test_direct_eigen)
+{
+  using Matrix = XT::LA::EigenRowMajorSparseMatrix<double>;
+  using Vector = XT::LA::EigenDenseVector<double>;
+  SaddlePointTestData<Matrix, Vector> data;
+  XT::LA::SaddlePointSolver<Vector, Matrix> solver(data.A_, data.B_, data.B_, data.C_);
   Vector u(data.f_.size()), p(data.g_.size());
   solver.apply(data.f_, data.g_, u, p, "direct");
   DXTC_EXPECT_FLOAT_EQ(0., (u - data.expected_u_).l2_norm(), 1e-12, 1e-12);
@@ -166,9 +178,23 @@ GTEST_TEST(SaddlePointSolver, test_direct)
 
 GTEST_TEST(SaddlePointSolver, test_cg_direct_schurcomplement)
 {
-  using Vector = typename SaddlePointTestData::Vector;
-  SaddlePointTestData data;
-  XT::LA::SaddlePointSolver<double> solver(data.A_, data.B_, data.B_, data.C_);
+  using Matrix = XT::LA::IstlRowMajorSparseMatrix<double>;
+  using Vector = XT::LA::IstlDenseVector<double>;
+  SaddlePointTestData<Matrix, Vector> data;
+  XT::LA::SaddlePointSolver<Vector, Matrix> solver(data.A_, data.B_, data.B_, data.C_);
+  Vector u(data.f_.size()), p(data.g_.size());
+  solver.apply(data.f_, data.g_, u, p, "cg_direct_schurcomplement");
+  DXTC_EXPECT_FLOAT_EQ(0., (u - data.expected_u_).l2_norm(), 1e-12, 1e-12);
+  DXTC_EXPECT_FLOAT_EQ(0., (p - data.expected_p_).l2_norm(), 1e-12, 1e-12);
+}
+
+
+GTEST_TEST(SaddlePointSolver, test_cg_direct_schurcomplement_eigen)
+{
+  using Matrix = XT::LA::EigenRowMajorSparseMatrix<double>;
+  using Vector = XT::LA::EigenDenseVector<double>;
+  SaddlePointTestData<Matrix, Vector> data;
+  XT::LA::SaddlePointSolver<Vector, Matrix> solver(data.A_, data.B_, data.B_, data.C_);
   Vector u(data.f_.size()), p(data.g_.size());
   solver.apply(data.f_, data.g_, u, p, "cg_direct_schurcomplement");
   DXTC_EXPECT_FLOAT_EQ(0., (u - data.expected_u_).l2_norm(), 1e-12, 1e-12);
@@ -177,9 +203,10 @@ GTEST_TEST(SaddlePointSolver, test_cg_direct_schurcomplement)
 
 GTEST_TEST(SaddlePointSolver, test_cg_cg_schurcomplement)
 {
-  using Vector = typename SaddlePointTestData::Vector;
-  SaddlePointTestData data;
-  XT::LA::SaddlePointSolver<double> solver(data.A_, data.B_, data.B_, data.C_);
+  using Matrix = XT::LA::IstlRowMajorSparseMatrix<double>;
+  using Vector = XT::LA::IstlDenseVector<double>;
+  SaddlePointTestData<Matrix, Vector> data;
+  XT::LA::SaddlePointSolver<Vector, Matrix> solver(data.A_, data.B_, data.B_, data.C_);
   Vector u(data.f_.size()), p(data.g_.size());
   solver.apply(data.f_, data.g_, u, p, "cg_cg_schurcomplement");
   DXTC_EXPECT_FLOAT_EQ(0., (u - data.expected_u_).l2_norm(), 1e-12, 1e-12);

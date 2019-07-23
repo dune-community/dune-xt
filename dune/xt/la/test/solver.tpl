@@ -59,6 +59,8 @@ struct SolverTest_{{T_NAME}} : public ::testing::Test
     for (auto type : types) {
       out << "solving with type '" << type << "' and options" << std::endl;
       Common::Configuration options = SolverType::options(type);
+      Common::Configuration options2 = SolverOptions<MatrixType>::options(type);
+      EXPECT_TRUE(options == options2);
       options.report(out, "  ");
 
       // dynamic tests
