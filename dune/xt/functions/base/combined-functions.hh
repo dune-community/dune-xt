@@ -304,9 +304,7 @@ public:
   CombinedFunction(const LeftType& left, const RightType& right, const std::string nm = "")
     : left_(std::make_unique<LeftStorageType>(left))
     , right_(std::make_unique<RightStorageType>(right))
-    , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '"
-                             + right.name() + "'"
-                       : nm)
+    , name_(get_name(left, right, nm))
   {}
 
   CombinedFunction(const std::shared_ptr<const LeftType> left,
@@ -314,9 +312,19 @@ public:
                    const std::string nm = "")
     : left_(std::make_unique<LeftStorageType>(left))
     , right_(std::make_unique<RightStorageType>(right))
-    , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
-                             + "' and '" + right_->access().name() + "'"
-                       : nm)
+    , name_(get_name(*left, *right, nm))
+  {}
+
+  CombinedFunction(const LeftType& left, const std::shared_ptr<const RightType> right, const std::string nm = "")
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
+    , name_(get_name(left, *right, nm))
+  {}
+
+  CombinedFunction(const std::shared_ptr<const LeftType> left, const RightType& right, const std::string nm = "")
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
+    , name_(get_name(*left, right, nm))
   {}
 
   CombinedFunction(LeftType*&& left, RightType*&& right, const std::string nm = "")
@@ -364,6 +372,13 @@ public:
   }
 
 private:
+  static std::string get_name(const LeftType& left, const RightType& right, const std::string& nm)
+  {
+    return nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left.name() + "' and '"
+                            + right.name() + "'"
+                      : nm;
+  }
+
   std::unique_ptr<const LeftStorageType> left_;
   std::unique_ptr<const RightStorageType> right_;
   const std::string name_;
