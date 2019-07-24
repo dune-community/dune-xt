@@ -1,0 +1,112 @@
+[supermodule]
+remote = git@zivgitlab.uni-muenster.de:falbr_01/parabolic-lrbms-2017-code.git
+status = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8 bin (heads/master)
+	 5b0bde4070bc5f34516a9774830a2a0dae8480a7 config.opts (heads/master)
+	 76d7f0c9886a061571cb8dc66dd45a4ef86e7a58 dune-common (v2.2.1-2269-g76d7f0c9)
+	 b4a6bce3c064095ca90ddd432683923f26d921f2 dune-gdt (remotes/origin/parabolic-lrbms-2018)
+	 e54b8541ffde1392a734b54f6d3243d616cfd8b6 dune-geometry (v2.2.0-860-ge54b854)
+	 83a70bf70c3815e57e55b9b8eb99dd2522047385 dune-grid (v2.6.0-10-g83a70bf70)
+	 1369ae9329d0928480d6b18ed772fc77e1abf752 dune-grid-glue (v2.4.0-161-g1369ae9)
+	 bb0fee9783873261b7d211d755b32655e0cc7009 dune-istl (v2.6.0-6-gbb0fee97)
+	 ee794bfdfa3d4f674664b4155b6b2df36649435f dune-localfunctions (v2.6.0-4-gee794bf)
+	+a0ff0bec65fbbfa0fc5edadb783b790b41b5757c dune-pybindxi (v2.2.1-31-ga0ff0be)
+	+8469e9f0f96325ca734247051f2914f1f02f4201 dune-testtools (heads/testname_listing_hack2.6)
+	 0bd97b58f2f4b3a470864e704bc74937891a87a6 dune-xt-common (heads/mpi_stuff)
+	 f3a9c3c87ddbe9398111b8f1b17e2be51c5d0f77 dune-xt-data (remotes/origin/hapod2_newgdt)
+	 31f0697a05bb35725a9b5af1097fc1260583a34c dune-xt-functions (heads/misc_updates)
+	 13bdeee2486a598d1b9534173bb33f7cbd91ba64 dune-xt-grid (heads/misc_updates)
+	 03f10b7dcd78c6b95c1c0719227ec3fdafaa5cc6 dune-xt-la (heads/rene/parabolic-lrbms-2017)
+	 fcfc78ddab04755d72f7464eced618012d436599 pymor (0.1.0-3321-gfcfc78dd)
+commit = adcb1c20c77e8c2d722ddbdeedb14dfa601a106d
+
+[submodule.bin]
+remote = https://github.com/dune-community/local-bin.git
+status = 
+commit = 1a3bcab04b011a5d6e44f9983cae6ff89fa695e8
+
+[submodule.config.opts]
+remote = https://github.com/dune-community/config.opts.git
+status = 
+commit = 5b0bde4070bc5f34516a9774830a2a0dae8480a7
+
+[submodule.dune-common]
+remote = https://github.com/dune-community/dune-common.git
+status = 
+commit = 76d7f0c9886a061571cb8dc66dd45a4ef86e7a58
+
+[submodule.dune-gdt]
+remote = https://github.com/dune-community/dune-gdt.git
+status = 7090ef1f15a9be6aeac87b31bc77f549302c7820 .ci/shared (7090ef1)
+	 0fe2d7bb19a198ee8d099ff308b9208af0914eb4 .vcsetup (0fe2d7b)
+commit = b4a6bce3c064095ca90ddd432683923f26d921f2
+
+[submodule.dune-geometry]
+remote = https://github.com/dune-community/dune-geometry.git
+status = 
+commit = e54b8541ffde1392a734b54f6d3243d616cfd8b6
+
+[submodule.dune-grid]
+remote = https://github.com/dune-mirrors/dune-grid.git
+status = 
+commit = 83a70bf70c3815e57e55b9b8eb99dd2522047385
+
+[submodule.dune-grid-glue]
+remote = https://github.com/dune-mirrors/dune-grid-glue.git
+status = 
+commit = 1369ae9329d0928480d6b18ed772fc77e1abf752
+
+[submodule.dune-istl]
+remote = https://github.com/dune-mirrors/dune-istl.git
+status = 
+commit = bb0fee9783873261b7d211d755b32655e0cc7009
+
+[submodule.dune-localfunctions]
+remote = https://github.com/dune-mirrors/dune-localfunctions.git
+status = 
+commit = ee794bfdfa3d4f674664b4155b6b2df36649435f
+
+[submodule.dune-pybindxi]
+remote = https://github.com/dune-community/dune-pybindxi.git
+status = c0b1735fab0ecbd4bb4f1eaa27cb65fe813e98f0 .vcsetup (c0b1735)
+commit = a0ff0bec65fbbfa0fc5edadb783b790b41b5757c
+
+[submodule.dune-testtools]
+remote = https://github.com/dune-community/dune-testtools.git
+status = 
+commit = 8469e9f0f96325ca734247051f2914f1f02f4201
+
+[submodule.dune-xt-common]
+remote = https://github.com/dune-community/dune-xt-common.git
+status = 7090ef1f15a9be6aeac87b31bc77f549302c7820 .ci/shared (7090ef1)
+	 1f967c99ec990e557ad7b39a25c0148886019b79 .vcsetup (heads/master)
+commit = 0bd97b58f2f4b3a470864e704bc74937891a87a6
+
+[submodule.dune-xt-data]
+remote = https://github.com/dune-community/dune-xt-data.git
+status = 7090ef1f15a9be6aeac87b31bc77f549302c7820 .ci/shared (7090ef1)
+	 1f967c99ec990e557ad7b39a25c0148886019b79 .vcsetup (heads/master)
+commit = f3a9c3c87ddbe9398111b8f1b17e2be51c5d0f77
+
+[submodule.dune-xt-functions]
+remote = https://github.com/dune-community/dune-xt-functions.git
+status = 7090ef1f15a9be6aeac87b31bc77f549302c7820 .ci/shared (7090ef1)
+	 1f967c99ec990e557ad7b39a25c0148886019b79 .vcsetup (heads/master)
+commit = 31f0697a05bb35725a9b5af1097fc1260583a34c
+
+[submodule.dune-xt-grid]
+remote = https://github.com/dune-community/dune-xt-grid.git
+status = +7090ef1f15a9be6aeac87b31bc77f549302c7820 .ci/shared (7090ef1)
+	+0fe2d7bb19a198ee8d099ff308b9208af0914eb4 .vcsetup (0fe2d7b)
+commit = 13bdeee2486a598d1b9534173bb33f7cbd91ba64
+
+[submodule.dune-xt-la]
+remote = https://github.com/dune-community/dune-xt-la.git
+status = 7090ef1f15a9be6aeac87b31bc77f549302c7820 .ci/shared (7090ef1)
+	 1f967c99ec990e557ad7b39a25c0148886019b79 .vcsetup (heads/master)
+commit = 03f10b7dcd78c6b95c1c0719227ec3fdafaa5cc6
+
+[submodule.pymor]
+remote = git@zivgitlab.uni-muenster.de:srave_01/pymor.git
+status = 
+commit = fcfc78ddab04755d72f7464eced618012d436599
+
