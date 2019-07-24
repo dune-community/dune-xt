@@ -63,6 +63,8 @@ public:
 
   bool contains(const size_t outer_index, const size_t inner_index) const;
 
+  bool contains(const SparsityPatternDefault& other) const;
+
   SparsityPatternDefault transposed(const size_t cols) const;
 
 private:

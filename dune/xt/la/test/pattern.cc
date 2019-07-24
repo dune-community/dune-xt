@@ -47,12 +47,17 @@ GTEST_TEST(SparsityPatternDefaultTest, test_interface)
     }
   }
   auto pattern2 = pattern;
+  EXPECT_TRUE(pattern2.contains(pattern));
+  EXPECT_TRUE(pattern.contains(pattern2));
+  EXPECT_TRUE(pattern.contains(const_pattern));
   pattern.sort();
   for (size_t ii = 0; ii < ROWS; ++ii)
     pattern2.sort(ii);
   EXPECT_TRUE(pattern == pattern2);
   EXPECT_TRUE(pattern != const_pattern);
   auto test_pattern = pattern + pattern2;
+  EXPECT_TRUE(test_pattern.contains(pattern));
+  EXPECT_TRUE(test_pattern.contains(pattern2));
   EXPECT_TRUE(pattern + pattern2 == pattern);
   Pattern pattern3(ROWS), pattern4(ROWS), pattern5(ROWS);
   for (size_t ii = 0; ii < ROWS; ++ii) {
@@ -126,6 +131,11 @@ GTEST_TEST(SparsityPatternDefaultTest, test_creation_functions)
       }
     } // jj
   } // ii
+  const auto diagonal_subdiagonal_patt = diagonal_patt + subdiagonal_patt;
+  EXPECT_TRUE(diagonal_subdiagonal_patt.contains(diagonal_patt));
+  EXPECT_TRUE(diagonal_subdiagonal_patt.contains(subdiagonal_patt));
+  EXPECT_FALSE(diagonal_patt.contains(diagonal_subdiagonal_patt));
+  EXPECT_FALSE(subdiagonal_patt.contains(diagonal_subdiagonal_patt));
 
   XT::LA::SparsityPatternDefault pattern(ROWS), pattern2(COLS);
   pattern.insert(0, 0);

@@ -117,6 +117,15 @@ bool SparsityPatternDefault::contains(const size_t outer_index, const size_t inn
   return std::find(row.begin(), row.end(), inner_index) != row.end();
 }
 
+bool SparsityPatternDefault::contains(const SparsityPatternDefault& other) const
+{
+  for (size_t rr = 0; rr < size(); ++rr)
+    for (auto&& cc : other.inner(rr))
+      if (!this->contains(rr, cc))
+        return false;
+  return true;
+}
+
 SparsityPatternDefault SparsityPatternDefault::transposed(const size_t cols) const
 {
   SparsityPatternDefault transposed_pattern(cols);

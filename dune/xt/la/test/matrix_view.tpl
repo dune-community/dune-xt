@@ -114,6 +114,24 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), testmatrix_sparse.get_entry(1, 0));
     sparse_view_upperleft.set_entry(1, 0, 1.);
 
+    // test operator=
+    MatrixImp lowerright_saved = view_lowerright;
+    MatrixImp sparse_lowerright_saved = sparse_view_lowerright;
+    MatrixImp zeros_dense(2, 1, 0.);
+    LA::SparsityPatternDefault lowerright_pattern(2);
+    lowerright_pattern.insert(0, 0);
+    MatrixImp zeros_sparse(2, 1, lowerright_pattern);
+    view_lowerright = zeros_dense;
+    sparse_view_lowerright = zeros_sparse;
+    for (size_t ii = 0; ii < 2; ++ii) {
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), view_lowerright.get_entry(ii, 0));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), const_view_lowerright.get_entry(ii, 0));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), sparse_view_lowerright.get_entry(ii, 0));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), sparse_const_view_lowerright.get_entry(ii, 0));
+    }
+    view_lowerright = lowerright_saved;
+    sparse_view_lowerright = sparse_lowerright_saved;
+
     // test scal, operator*
     const auto testmatrix_copy = testmatrix;
     const auto testmatrix_sparse_copy = testmatrix_sparse;

@@ -253,12 +253,23 @@ public:
     return **pattern_;
   }
 
+  operator Matrix() const
+  {
+    const auto& patt = get_pattern();
+    Matrix ret(rows(), cols(), patt);
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (auto&& jj : patt.inner(ii))
+        ret.set_entry(ii, jj, get_entry(ii, jj));
+    return ret;
+  }
+
 private:
   void initialize_pattern() const
   {
     if (!*pattern_)
       *pattern_ = std::make_shared<SparsityPatternDefault>(pattern());
   }
+
   const Matrix& matrix_;
   const size_t first_row_;
   const size_t past_last_row_;
@@ -314,7 +325,7 @@ public:
   ThisType& operator=(const Matrix& other)
   {
     const auto& patt = const_matrix_view_.get_pattern();
-    assert(patt == other.pattern());
+    assert(pattern_assignable(other));
     for (size_t ii = 0; ii < rows(); ++ii)
       for (auto&& jj : patt.inner(ii))
         set_entry(ii, jj, other.get_entry(ii, jj));
@@ -439,7 +450,23 @@ public:
     set_entry(jj, jj, 1.);
   }
 
+  operator Matrix() const
+  {
+    return const_matrix_view_.operator Matrix();
+  }
+
 private:
+  bool pattern_assignable(const Matrix& other) const
+  {
+    const auto& patt = const_matrix_view_.get_pattern();
+    const auto& other_patt = other.pattern();
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (auto&& jj : other_patt.inner(ii))
+        if (!patt.contains(ii, jj) && !XT::Common::is_zero(other.get_entry(ii, jj)))
+          return false;
+    return true;
+  }
+
   ConstMatrixViewType const_matrix_view_;
   Matrix& matrix_;
 }; // class MatrixView
