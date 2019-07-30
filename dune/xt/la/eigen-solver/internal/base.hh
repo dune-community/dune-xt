@@ -50,7 +50,7 @@ static inline void ensure_eigen_solver_type(const std::string& type, const std::
   if (!contained)
     DUNE_THROW(Exceptions::eigen_solver_failed_bc_it_was_not_set_up_correctly,
                "Given type '" << type << "' is not one of the available types: " << available_types);
-} // ... ensure_type(...)
+} // ... ensure_eigen_solver_type(...)
 
 
 static inline Common::Configuration default_eigen_solver_options()
@@ -245,7 +245,7 @@ public:
             *this, check_eigendecomposition > 0 ? check_eigendecomposition : options_->get<double>("real_tolerance"));
     }
     return *eigenvectors_inverse_;
-  } // ... eigenvectors(...)
+  } // ... eigenvectors_inverse(...)
 
   const RealMatrixType& real_eigenvectors() const
   {
@@ -289,7 +289,7 @@ public:
                                   assert_real_eigendecomposition);
     }
     return *real_eigenvectors_inverse_;
-  } // ... eigenvectors(...)
+  } // ... real_eigenvectors_inverse(...)
 
 protected:
   void compute_and_check() const
