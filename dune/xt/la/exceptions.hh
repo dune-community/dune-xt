@@ -67,6 +67,36 @@ class eigen_solver_failed_bc_result_is_not_an_eigendecomposition : public eigen_
 {};
 
 
+class generalized_eigen_solver_failed : public Dune::Exception
+{};
+
+class generalized_eigen_solver_failed_bc_data_did_not_fulfill_requirements : public generalized_eigen_solver_failed
+{};
+
+class generalized_eigen_solver_failed_bc_it_was_not_set_up_correctly : public generalized_eigen_solver_failed
+{};
+
+class generalized_eigen_solver_failed_bc_result_contained_inf_or_nan : public generalized_eigen_solver_failed
+{};
+
+class generalized_eigen_solver_failed_bc_eigenvalues_are_not_real_as_requested : public generalized_eigen_solver_failed
+{};
+
+class generalized_eigen_solver_failed_bc_eigenvalues_are_not_positive_as_requested
+  : public generalized_eigen_solver_failed
+{};
+
+class generalized_eigen_solver_failed_bc_eigenvalues_are_not_negative_as_requested
+  : public generalized_eigen_solver_failed
+{};
+
+class generalized_eigen_solver_failed_bc_eigenvectors_are_not_real_as_requested : public generalized_eigen_solver_failed
+{};
+
+// class generalized_eigen_solver_failed_bc_result_is_not_an_eigendecomposition : public generalized_eigen_solver_failed
+//{};
+
+
 class matrix_invert_failed : public Dune::Exception
 {};
 
