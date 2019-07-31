@@ -10,17 +10,13 @@
 #ifndef DUNE_XT_LA_GENERALIZED_EIGEN_SOLVER_HH
 #define DUNE_XT_LA_GENERALIZED_EIGEN_SOLVER_HH
 
-//#include <complex>
-//#include <limits>
+#include <string>
+#include <vector>
 
-//#include <dune/common/typetraits.hh>
+#include <dune/common/typetraits.hh>
 
-//#include <dune/common/dynvector.hh>
-//#include <dune/common/typetraits.hh>
-
-//#include <dune/xt/common/configuration.hh>
-//#include <dune/xt/la/exceptions.hh>
-//#include <dune/xt/la/container.hh>
+#include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
 namespace XT {

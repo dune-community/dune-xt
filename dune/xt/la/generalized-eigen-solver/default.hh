@@ -10,8 +10,6 @@
 #ifndef DUNE_XT_LA_GENERALIZED_EIGEN_SOLVER_DEFAULT_HH
 #define DUNE_XT_LA_GENERALIZED_EIGEN_SOLVER_DEFAULT_HH
 
-#include "config.h"
-
 #include <vector>
 
 #include <dune/xt/common/matrix.hh>
@@ -36,17 +34,17 @@ public:
     std::vector<std::string> tps;
     if (Common::Lapacke::available())
       tps.push_back("lapack");
-    else
-      DUNE_THROW(Exceptions::generalized_eigen_solver_failed_bc_it_was_not_set_up_correctly,
-                 "No backend available for generalized eigenvalue problems!");
+    DUNE_THROW_IF(tps.empty(),
+                  Exceptions::generalized_eigen_solver_failed,
+                  "No backend available for generalized eigenvalue problems!");
     return tps;
   }
 
   static Common::Configuration options(const std::string type = "")
   {
     const std::string actual_type = type.empty() ? types()[0] : type;
-    internal::ensure_eigen_solver_type(actual_type, types());
-    Common::Configuration opts = internal::default_eigen_solver_options();
+    internal::ensure_generalized_eigen_solver_type(actual_type, types());
+    Common::Configuration opts = internal::default_generalized_eigen_solver_options();
     opts["type"] = actual_type;
     return opts;
   }
@@ -92,8 +90,10 @@ protected:
   void compute() const override final
   {
     const auto type = options_->template get<std::string>("type");
-#if HAVE_LAPACKE || HAVE_MKL
     if (type == "lapack") {
+      DUNE_THROW_IF(!Common::Lapacke::available(),
+                    Exceptions::generalized_eigen_solver_failed_bc_it_was_not_set_up_correctly,
+                    "Lapacke backend not available!");
       if (!options_->template get<bool>("compute_eigenvectors"))
         eigenvalues_ = std::make_unique<std::vector<ComplexType>>(
             internal::compute_generalized_eigenvalues_using_lapack(lhs_matrix_, rhs_matrix_));
@@ -102,7 +102,6 @@ protected:
                    "Eigenvectors of generalized eigenvalue problems are not yet implemented using lapacke!");
       }
     } else
-#endif // HAVE_LAPACKE || HAVE_MKL
       DUNE_THROW(Common::Exceptions::internal_error,
                  "Given type '" << type << "' is none of GeneralizedEigenSolverOptions<...>::types(),"
                                 << " and internal::GeneralizedEigenSolverBase promised to check this!"

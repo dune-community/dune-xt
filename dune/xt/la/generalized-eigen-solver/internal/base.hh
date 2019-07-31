@@ -56,7 +56,7 @@ static inline Common::Configuration default_generalized_eigen_solver_options()
 {
   Common::Configuration opts;
   opts["compute_eigenvalues"] = "true";
-  opts["compute_eigenvectors"] = "true";
+  opts["compute_eigenvectors"] = "false";
   opts["check_for_inf_nan"] = "true";
   opts["real_tolerance"] = "1e-15"; // is only used if the respective assert_... is negative
   opts["assert_real_eigenvalues"] = "-1"; // if positive, this is the check tolerance
