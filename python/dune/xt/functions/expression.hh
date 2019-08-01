@@ -10,8 +10,8 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_PBH
-#define DUNE_XT_FUNCTIONS_EXPRESSION_PBH
+#ifndef PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH
+#define PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
@@ -276,4 +276,4 @@ pybind11::class_<ExpressionFunction<d, r, rC, double>> bind_ExpressionFunction(p
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_EXPRESSION_PBH
+#endif // PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH

@@ -10,6 +10,15 @@
 #   Tim Keil    (2018)
 # ~~~
 
-dune_pybindxi_add_module(_interfaces EXCLUDE_FROM_ALL interfaces.cc)
-dune_pybindxi_add_module(_functions EXCLUDE_FROM_ALL bindings.cc)
+dune_pybindxi_add_module(_function_interface_1d EXCLUDE_FROM_ALL function-interface-1d.cc)
+dune_pybindxi_add_module(_function_interface_2d EXCLUDE_FROM_ALL function-interface-2d.cc)
+dune_pybindxi_add_module(_function_interface_3d EXCLUDE_FROM_ALL function-interface-3d.cc)
+dune_pybindxi_add_module(_gridfunction_interface_1d EXCLUDE_FROM_ALL gridfunction-interface-1d.cc)
+dune_pybindxi_add_module(_gridfunction_interface_2d EXCLUDE_FROM_ALL gridfunction-interface-2d.cc)
+dune_pybindxi_add_module(_gridfunction_interface_3d EXCLUDE_FROM_ALL gridfunction-interface-3d.cc)
+dune_pybindxi_add_module(_checkerboard EXCLUDE_FROM_ALL checkerboard.cc)
+dune_pybindxi_add_module(_constant EXCLUDE_FROM_ALL constant.cc)
+dune_pybindxi_add_module(_expression EXCLUDE_FROM_ALL expression.cc)
+dune_pybindxi_add_module(_indicator EXCLUDE_FROM_ALL indicator.cc)
+dune_pybindxi_add_module(_spe10 EXCLUDE_FROM_ALL spe10.cc)
 

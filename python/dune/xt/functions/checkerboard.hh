@@ -10,8 +10,8 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
-#define DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
+#ifndef PYTHON_DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
+#define PYTHON_DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
 
 #include <dune/pybindxi/pybind11.h>
 
@@ -111,4 +111,4 @@ bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
+#endif // PYTHON_DUNE_XT_FUNCTIONS_CHECKERBOARD_HH

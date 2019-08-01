@@ -10,8 +10,8 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_CONSTANT_PBH
-#define DUNE_XT_FUNCTIONS_CONSTANT_PBH
+#ifndef PYTHON_DUNE_XT_FUNCTIONS_CONSTANT_HH
+#define PYTHON_DUNE_XT_FUNCTIONS_CONSTANT_HH
 
 #include <dune/pybindxi/pybind11.h>
 
@@ -98,4 +98,4 @@ typename pybind11::class_<ConstantFunction<d, r, rC, double>> bind_ConstantFunct
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_CONSTANT_PBH
+#endif // PYTHON_DUNE_XT_FUNCTIONS_CONSTANT_HH
