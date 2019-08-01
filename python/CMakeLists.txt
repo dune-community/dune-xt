@@ -10,5 +10,5 @@
 #   Tobias Leibner (2018)
 # ~~~
 
-add_subdirectory(dune/xt/)
+add_subdirectory(dune/xt/functions/)
 dxt_add_python_tests()
