@@ -14,8 +14,8 @@
 
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/la/container/conversion.hh>
-#include <dune/xt/la/eigen-solver.hh>
 #include <dune/xt/la/exceptions.hh>
+#include <dune/xt/la/generalized-eigen-solver.hh>
 
 #include "internal/base.hh"
 #include "internal/lapacke.hh"
