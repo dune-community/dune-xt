@@ -99,10 +99,21 @@ function(dune_pybindxi_add_module target_name)
   add_library(${target_name} ${lib_type} ${exclude_from_all} ${ARG_UNPARSED_ARGUMENTS})
   dune_target_link_libraries(${target_name} "${DUNE_LIB_ADD_LIBS}")
 
-  target_include_directories(${target_name}
+  if(ARG_SYSTEM)
+    set(inc_isystem SYSTEM)
+  endif()
+
+target_include_directories(${target_name} ${inc_isystem}
     PRIVATE ${PYBIND11_INCLUDE_DIR}  # from project CMakeLists.txt
     PRIVATE ${pybind11_INCLUDE_DIR}  # from pybind11Config
     PRIVATE ${PYTHON_INCLUDE_DIRS})
+
+  # Python debug libraries expose slightly different objects
+  # https://docs.python.org/3.6/c-api/intro.html#debugging-builds
+  # https://stackoverflow.com/questions/39161202/how-to-work-around-missing-pymodule-create2-in-amd64-win-python35-d-lib
+  if(PYTHON_IS_DEBUG)
+    target_compile_definitions(${target_name} PRIVATE Py_DEBUG)
+  endif()
 
   # The prefix and extension are provided by FindPythonLibsNew.cmake
   set_target_properties(${target_name} PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}")
@@ -150,11 +161,14 @@ function(dune_pybindxi_add_module target_name)
 
   if(TARGET bindings)
     add_dependencies(bindings ${target_name})
+    add_dependencies(bindings_no_ext ${target_name})
   else()
     if(DUNE_XT_WITH_PYTHON_BINDINGS)
       add_custom_target(bindings ALL DEPENDS ${target_name})
+      add_custom_target(bindings_no_ext ALL DEPENDS ${target_name})
     else()
       add_custom_target(bindings DEPENDS ${target_name})
+      add_custom_target(bindings_no_ext DEPENDS ${target_name})
     endif()
   endif()
 
@@ -177,6 +191,7 @@ function(dune_pybindxi_add_module target_name)
 
 endfunction()
 
+
 macro(dxt_add_make_dependent_bindings)
     add_custom_target(dependent_bindings)
     if(TARGET bindings AND NOT DXT_NO_AUTO_BINDINGS_DEPENDS)
@@ -189,7 +204,7 @@ macro(dxt_add_make_dependent_bindings)
       set(tdir ${${_mod}_binary_dir})
       if(IS_DIRECTORY ${tdir})
         add_custom_target( ${_mod}_bindings
-                            COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings -- -j1)
+                            COMMAND ${CMAKE_COMMAND} --build ${tdir} --target bindings_no_ext -- -j1)
         add_dependencies(dependent_bindings ${_mod}_bindings)
       endif()
     endforeach()

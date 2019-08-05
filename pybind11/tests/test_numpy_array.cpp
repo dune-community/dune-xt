@@ -68,6 +68,9 @@ template <typename T, typename T2> py::handle auxiliaries(T &&r, T2 &&r2) {
     return l.release();
 }
 
+// note: declaration at local scope would create a dangling reference!
+static int data_i = 42;
+
 TEST_SUBMODULE(numpy_array, sm) {
     try { py::module::import("numpy"); }
     catch (...) { return; }
@@ -101,6 +104,11 @@ TEST_SUBMODULE(numpy_array, sm) {
     // test_make_c_f_array
     sm.def("make_f_array", [] { return py::array_t<float>({ 2, 2 }, { 4, 8 }); });
     sm.def("make_c_array", [] { return py::array_t<float>({ 2, 2 }, { 8, 4 }); });
+
+    // test_empty_shaped_array
+    sm.def("make_empty_shaped_array", [] { return py::array(py::dtype("f"), {}, {}); });
+    // test numpy scalars (empty shape, ndim==0)
+    sm.def("scalar_int", []() { return py::array(py::dtype("i"), {}, {}, &data_i); });
 
     // test_wrap
     sm.def("wrap", [](py::array a) {
@@ -292,4 +300,10 @@ TEST_SUBMODULE(numpy_array, sm) {
         std::fill(a.mutable_data(), a.mutable_data() + a.size(), 42.);
         return a;
     });
+
+#if PY_MAJOR_VERSION >= 3
+        sm.def("index_using_ellipsis", [](py::array a) {
+            return a[py::make_tuple(0, py::ellipsis(), 0)];
+        });
+#endif
 }
