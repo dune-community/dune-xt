@@ -189,7 +189,7 @@ public:
                      const bool subsampling = true,
                      const VTK::OutputType vtk_output_type = VTK::appendedraw,
                      const XT::Common::Parameter& param = {},
-                     const VisualizerInterface<d, r, R>& visualizer = DefaultVisualizer<d, r, R>()) const
+                     const VisualizerInterface<d, 1, R>& visualizer = DefaultVisualizer<d, 1, R>()) const
   {
     if (path.empty())
       DUNE_THROW(Exceptions::wrong_input_given, "path must not be empty!");

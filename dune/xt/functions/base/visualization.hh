@@ -242,7 +242,6 @@ class GradientVisualizationAdapter : public VTKFunction<GridViewType>
 {
   static_assert(XT::Grid::is_view<GridViewType>::value, "");
   static_assert(range_dim_cols == 1, "Not implemented!");
-  static_assert(range_dim == 1, "Not implemented!");
 
 public:
   using EntityType = XT::Grid::extract_entity_t<GridViewType>;
@@ -262,7 +261,10 @@ public:
     , visualizer_(visualizer)
     , name_(nm.empty() ? localizable_function.name() : nm)
     , param_(param)
-  {}
+  {
+    if (range_dim > 1)
+      DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");
+  }
 
   GradientVisualizationAdapter(const GridFunctionType& localizable_function,
                                const std::string nm = "",
@@ -271,7 +273,10 @@ public:
     , visualizer_(new DefaultVisualizer<d, 1, RangeField>())
     , name_(nm.empty() ? localizable_function.name() : nm)
     , param_(param)
-  {}
+  {
+    if (range_dim > 1)
+      DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");
+  }
 
   int ncomps() const override final
   {
@@ -292,7 +297,7 @@ public:
 
 private:
   mutable std::unique_ptr<LocalFunctionType> local_function_;
-  const Common::ConstStorageProvider<VisualizerInterface<d, range_dim, RangeField>> visualizer_;
+  const Common::ConstStorageProvider<VisualizerInterface<d, 1, RangeField>> visualizer_;
   const std::string name_;
   const XT::Common::Parameter param_;
 }; // class GradientVisualizationAdapter

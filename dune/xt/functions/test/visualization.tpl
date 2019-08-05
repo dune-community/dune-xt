@@ -65,9 +65,12 @@ TEST_F(VisualizeGenericGridFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, vis
   Functions::SumVisualizer<r, rC> sum_visualizer;
   function.visualize(leaf_view, "sum", true, Dune::VTK::appendedraw, {}, sum_visualizer);
   Functions::ComponentVisualizer<r, rC> first_comp_visualizer(0);
-  function.visualize(leaf_view, "sum", false, Dune::VTK::appendedraw, {}, first_comp_visualizer);
+  function.visualize(leaf_view, "component", false, Dune::VTK::appendedraw, {}, first_comp_visualizer);
   Functions::GenericVisualizer<r, rC> sin_abs_visualizer(1, [](const int, const RangeType& val) { return std::sin(val.two_norm()); });
-  function.visualize(leaf_view, "sum", false, Dune::VTK::appendedraw, {}, sin_abs_visualizer);
+  function.visualize(leaf_view, "sin_abs", false, Dune::VTK::appendedraw, {}, sin_abs_visualizer);
+
+  if (r == 1)
+    function.visualize_gradient(leaf_view, "gradient");
 }
 
 {% endfor  %}
