@@ -117,7 +117,7 @@ public:
                    "The size of the pattern (" << pattern_in.size() << ") does not match the number of rows of this ("
                                                << rr << ")!");
       for (size_t row = 0; row < size_t(pattern_in.size()); ++row) {
-        backend_->startVec(Common::numeric_cast<EIGEN_size_t>(row));
+        backend_->startVec(static_cast<EIGEN_size_t>(row));
         const auto& columns = pattern_in.inner(row);
         for (auto& column : columns) {
 #  ifndef NDEBUG
@@ -126,12 +126,11 @@ public:
                        "The size of row " << row << " of the pattern does not match the number of columns of this ("
                                           << cc << ")!");
 #  endif // NDEBUG
-          backend_->insertBackByOuterInner(Common::numeric_cast<EIGEN_size_t>(row),
-                                           Common::numeric_cast<EIGEN_size_t>(column));
+          backend_->insertBackByOuterInner(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(column));
         }
         // create entry (insertBackByOuterInner() can not handle empty rows)
         if (columns.size() == 0)
-          backend_->insertBackByOuterInner(Common::numeric_cast<EIGEN_size_t>(row), 0);
+          backend_->insertBackByOuterInner(static_cast<EIGEN_size_t>(row), 0);
       }
       backend_->finalize();
       backend_->makeCompressed();
@@ -139,7 +138,8 @@ public:
   } // EigenRowMajorSparseMatrix(...)
 
   explicit EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0, const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(rr, cc))
+    : backend_(
+          std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
@@ -147,7 +147,8 @@ public:
                                      const size_t cc,
                                      const ScalarType& val,
                                      const size_t num_mutexes = 1)
-    : backend_(std::make_shared<BackendType>(rr, cc))
+    : backend_(
+          std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     if (val != 0.) {
@@ -324,20 +325,20 @@ public:
   {
     assert(these_are_valid_indices(ii, jj));
     internal::LockGuard DUNE_UNUSED(lock)(*mutexes_, ii, rows());
-    backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(jj)) += value;
+    backend().coeffRef(static_cast<EIGEN_size_t>(ii), static_cast<EIGEN_size_t>(jj)) += value;
   }
 
   void set_entry(const size_t ii, const size_t jj, const ScalarType& value)
   {
     assert(these_are_valid_indices(ii, jj));
-    backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(jj)) = value;
+    backend().coeffRef(static_cast<EIGEN_size_t>(ii), static_cast<EIGEN_size_t>(jj)) = value;
   }
 
   ScalarType get_entry(const size_t ii, const size_t jj) const
   {
     assert(ii < rows());
     assert(jj < cols());
-    return backend().coeff(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(jj));
+    return backend().coeff(static_cast<EIGEN_size_t>(ii), static_cast<EIGEN_size_t>(jj));
   }
 
   void clear_row(const size_t ii)
@@ -345,7 +346,7 @@ public:
     if (ii >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given ii (" << ii << ") is larger than the rows of this (" << rows() << ")!");
-    backend().row(Common::numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
+    backend().row(static_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
   }
 
   void clear_col(const size_t jj)
@@ -353,13 +354,11 @@ public:
     if (jj >= cols())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the cols of this (" << cols() << ")!");
-    for (size_t row = 0; Common::numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(backend(), Common::numeric_cast<EIGEN_size_t>(row)); row_it;
-           ++row_it) {
+    for (size_t row = 0; static_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(backend(), static_cast<EIGEN_size_t>(row)); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
-          backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(row), Common::numeric_cast<EIGEN_size_t>(jj)) =
-              ScalarType(0);
+          backend().coeffRef(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -378,8 +377,8 @@ public:
     if (!these_are_valid_indices(ii, ii))
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Diagonal entry (" << ii << ", " << ii << ") is not contained in the sparsity pattern!");
-    backend().row(Common::numeric_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
-    backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(ii), Common::numeric_cast<EIGEN_size_t>(ii)) = ScalarType(1);
+    backend().row(static_cast<EIGEN_size_t>(ii)) *= ScalarType(0);
+    backend().coeffRef(static_cast<EIGEN_size_t>(ii), static_cast<EIGEN_size_t>(ii)) = ScalarType(1);
   } // ... unit_row(...)
 
   void unit_col(const size_t jj)
@@ -390,17 +389,14 @@ public:
     if (jj >= rows())
       DUNE_THROW(Common::Exceptions::index_out_of_range,
                  "Given jj (" << jj << ") is larger than the rows of this (" << rows() << ")!");
-    for (size_t row = 0; Common::numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(backend(), Common::numeric_cast<EIGEN_size_t>(row)); row_it;
-           ++row_it) {
+    for (size_t row = 0; static_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(backend(), static_cast<EIGEN_size_t>(row)); row_it; ++row_it) {
         const size_t col = row_it.col();
         if (col == jj) {
           if (col == row)
-            backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(row), Common::numeric_cast<EIGEN_size_t>(col)) =
-                ScalarType(1);
+            backend().coeffRef(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(col)) = ScalarType(1);
           else
-            backend().coeffRef(Common::numeric_cast<EIGEN_size_t>(row), Common::numeric_cast<EIGEN_size_t>(jj)) =
-                ScalarType(0);
+            backend().coeffRef(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
         } else if (col > jj)
           break;
@@ -438,13 +434,13 @@ public:
           const EIGEN_size_t col = row_it.col();
           const auto val = backend().coeff(row, col);
           if (Common::FloatCmp::ne(val, zero, eps))
-            ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(col));
+            ret.insert(static_cast<size_t>(row), static_cast<size_t>(col));
         }
       }
     } else {
       for (EIGEN_size_t row = 0; row < backend().outerSize(); ++row) {
         for (typename BackendType::InnerIterator row_it(backend(), row); row_it; ++row_it)
-          ret.insert(boost::numeric_cast<size_t>(row), boost::numeric_cast<size_t>(row_it.col()));
+          ret.insert(static_cast<size_t>(row), static_cast<size_t>(row_it.col()));
       }
     }
     ret.sort();
@@ -507,9 +503,8 @@ private:
       return false;
     if (jj >= cols())
       return false;
-    for (size_t row = ii; Common::numeric_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
-      for (typename BackendType::InnerIterator row_it(backend(), Common::numeric_cast<EIGEN_size_t>(row)); row_it;
-           ++row_it) {
+    for (size_t row = ii; static_cast<EIGEN_size_t>(row) < backend().outerSize(); ++row) {
+      for (typename BackendType::InnerIterator row_it(backend(), static_cast<EIGEN_size_t>(row)); row_it; ++row_it) {
         const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
           return true;
