@@ -293,10 +293,24 @@ public:
         grid_layer, path, subsampling, vtk_output_type);
   }
 
+
+  /**
+   * \copydoc GridFunctionInterface::visualize_gradient
+   */
+  template <class GridLayerType>
+  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
+  visualize_gradient(const GridLayerType& grid_layer,
+                     const std::string path,
+                     const bool subsampling = true,
+                     const VTK::OutputType vtk_output_type = VTK::appendedraw) const
+  {
+    this->as_grid_function<XT::Grid::extract_entity_t<GridLayerType>>().visualize_gradient(
+        grid_layer, path, subsampling, vtk_output_type);
+  }
+
   /**
    * \}
    **/
-
 protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
   static void assert_correct_dims(const size_t row, const size_t col, const std::string& caller)
