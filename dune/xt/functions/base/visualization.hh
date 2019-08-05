@@ -237,6 +237,66 @@ private:
   const XT::Common::Parameter param_;
 }; // class VisualizationAdapter
 
+template <class GridViewType, size_t range_dim, size_t range_dim_cols, class RangeField>
+class GradientVisualizationAdapter : public VTKFunction<GridViewType>
+{
+  static_assert(XT::Grid::is_view<GridViewType>::value, "");
+  static_assert(range_dim_cols == 1, "Not implemented!");
+  static_assert(range_dim == 1, "Not implemented!");
+
+public:
+  using EntityType = XT::Grid::extract_entity_t<GridViewType>;
+  using GridFunctionType = GridFunctionInterface<EntityType, range_dim, range_dim_cols, RangeField>;
+  static constexpr size_t d = GridFunctionType::d;
+
+private:
+  using LocalFunctionType = typename GridFunctionType::LocalFunctionType;
+  using DomainType = typename LocalFunctionType::DomainType;
+
+public:
+  GradientVisualizationAdapter(const GridFunctionType& localizable_function,
+                               const VisualizerInterface<d, 1, RangeField>& visualizer,
+                               const std::string nm = "",
+                               const XT::Common::Parameter& param = {})
+    : local_function_(localizable_function.local_function())
+    , visualizer_(visualizer)
+    , name_(nm.empty() ? localizable_function.name() : nm)
+    , param_(param)
+  {}
+
+  GradientVisualizationAdapter(const GridFunctionType& localizable_function,
+                               const std::string nm = "",
+                               const XT::Common::Parameter& param = {})
+    : local_function_(localizable_function.local_function())
+    , visualizer_(new DefaultVisualizer<d, 1, RangeField>())
+    , name_(nm.empty() ? localizable_function.name() : nm)
+    , param_(param)
+  {}
+
+  int ncomps() const override final
+  {
+    return visualizer_.access().ncomps();
+  }
+
+  std::string name() const override final
+  {
+    return name_;
+  }
+
+  double evaluate(int comp, const EntityType& en, const DomainType& xx) const override final
+  {
+    local_function_->bind(en);
+    const auto value = local_function_->jacobian(xx, param_);
+    return visualizer_.access().evaluate(comp, value[0]);
+  }
+
+private:
+  mutable std::unique_ptr<LocalFunctionType> local_function_;
+  const Common::ConstStorageProvider<VisualizerInterface<d, range_dim, RangeField>> visualizer_;
+  const std::string name_;
+  const XT::Common::Parameter param_;
+}; // class GradientVisualizationAdapter
+
 
 } // namespace Functions
 } // namespace XT
