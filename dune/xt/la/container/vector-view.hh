@@ -238,6 +238,13 @@ public:
     , vector_(vector)
   {}
 
+  ThisType& operator=(const Vector& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      set_entry(ii, other.get_entry(ii));
+    return *this;
+  }
+
   size_t index(const size_t ii) const
   {
     return const_vector_view_.index(ii);
