@@ -27,8 +27,13 @@
 
 PYBIND11_MODULE(_function_interface_3d, m)
 {
-  Dune::XT::Common::bindings::addbind_exceptions(m);
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions");
+  namespace py = pybind11;
+
+  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions", "_function_interface_3d");
+
+  py::module::import("dune.xt.common");
+  py::module::import("dune.xt.la");
+  py::module::import("dune.xt.grid");
 
   using namespace Dune::XT::Functions;
 

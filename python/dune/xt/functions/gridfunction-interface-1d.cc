@@ -42,8 +42,14 @@ void bind_all_1d_grids<boost::tuples::null_type>(pybind11::module&)
 
 PYBIND11_MODULE(_gridfunction_interface_1d, m)
 {
-  Dune::XT::Common::bindings::addbind_exceptions(m);
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions");
+  namespace py = pybind11;
+
+  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions", "_gridfunction_interface_1d");
+
+  py::module::import("dune.xt.common");
+  py::module::import("dune.xt.la");
+  py::module::import("dune.xt.grid");
+  py::module::import("dune.xt.functions._function_interface_1d");
 
   bind_all_1d_grids(m);
 } // PYBIND11_MODULE(...)
