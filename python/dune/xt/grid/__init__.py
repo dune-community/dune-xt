@@ -10,4 +10,13 @@
 #   René Fritze     (2018)
 # ~~~
 
-import dune.xt
+from dune.xt import guarded_import
+
+for mod_name in (
+    '_boundaryinfo',
+    '_types',
+    '_walker',
+    '_provider',
+    ):
+    guarded_import(globals(), 'dune.xt.grid', mod_name)
+

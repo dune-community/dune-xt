@@ -79,6 +79,7 @@ void bind_grid_layer(pybind11::module& m, std::integral_constant<size_t, counter
   bind_grid_layer<Grid>(m, std::integral_constant<size_t, counter - 1>());
 }
 
+
 template <class GridTuple = Dune::XT::Grid::bindings::AvailableTypes>
 void bind_grid(pybind11::module& m)
 {
@@ -91,9 +92,14 @@ template <>
 void bind_grid<boost::tuples::null_type>(pybind11::module&)
 {}
 
+
 PYBIND11_MODULE(_boundaryinfo, m)
 {
   namespace py = pybind11;
-  using namespace pybind11::literals;
+
+  py::module::import("dune.xt.common");
+
+  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.grid", "_boundaryinfo");
+
   bind_grid(m);
 }
