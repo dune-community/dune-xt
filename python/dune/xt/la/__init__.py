@@ -10,5 +10,10 @@
 #   René Fritze     (2018)
 # ~~~
 
-import dune.xt
-from dune.xt._la import *
+from dune.xt import guarded_import
+
+for mod_name in (
+        '_la',
+        ):
+    guarded_import(globals(), 'dune.xt.la', mod_name)
+
