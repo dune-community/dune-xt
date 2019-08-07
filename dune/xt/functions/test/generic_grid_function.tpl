@@ -43,6 +43,56 @@ struct GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
   {
   }
 
+  template<size_t range_cols = rC, bool anything = true>
+  struct JacobianHelper
+  {
+    template <class JacobianType = DerivativeRangeReturnType>
+    static JacobianType local_jacobian(const DomainType& local_x)
+    {
+      JacobianType ret;
+      for (size_t rr = 0; rr < r; ++rr)
+        for (size_t ii = 0; ii < rC; ++ii)
+          ret[rr][ii][0] = 2 * local_x[0];
+      return ret;
+    }
+
+    template <class JacobianType = DerivativeRangeReturnType>
+    static JacobianType expected_jacobian(const ElementType& element, const DomainType& local_x)
+    {
+      JacobianType ret;
+      const auto J_inv_T = element.geometry().jacobianInverseTransposed(local_x);
+      for (size_t rr = 0; rr < r; ++rr)
+        for (size_t dd = 0; dd < d; ++dd)
+          for (size_t ii = 0; ii < rC; ++ii)
+            ret[rr][ii][dd] = J_inv_T[dd][0] * 2 * local_x[0];
+      return ret;
+    }
+  };
+
+  template<bool anything>
+  struct JacobianHelper<1, anything>
+  {
+    template <class JacobianType = DerivativeRangeReturnType>
+    static JacobianType local_jacobian(const DomainType& local_x)
+    {
+      JacobianType ret;
+      for (size_t rr = 0; rr < r; ++rr)
+        ret[rr][0] = 2 * local_x[0];
+      return ret;
+    }
+
+    template <class JacobianType = DerivativeRangeReturnType>
+    static JacobianType expected_jacobian(const ElementType& element, const DomainType& local_x)
+    {
+      JacobianType ret;
+      const auto J_inv_T = element.geometry().jacobianInverseTransposed(local_x);
+      for (size_t rr = 0; rr < r; ++rr)
+        for (size_t dd = 0; dd < d; ++dd)
+          ret[rr][dd] = J_inv_T[dd][0] * 2 * local_x[0];
+      return ret;
+    }
+  };
+
   const Grid::GridProvider<GridType> grid_;
 };
 
@@ -148,23 +198,22 @@ TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 
 TEST_F(GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
-  size_t element_index = 0;
   const auto leaf_view = grid_.leaf_view();
 
   GenericType  function(
-      /*order=*/0,
-      [&](const auto& element) { element_index = leaf_view.indexSet().index(element); },
-      [&](const auto& /*xx*/, const auto& /*param*/) { return RangeReturnType(element_index); },
+      /*order=*/2,
+      [](const auto&) {},
+      [](const auto& xx, const auto& /*param*/) { return RangeReturnType(xx[0] * xx[0]); },
       /*parameter=*/{},
-      "element_index_",
-      [](const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); },
+      "x^2",
+      [](const auto& xx, const auto& /*param*/) { return JacobianHelper<>::local_jacobian(xx); },
       [](const auto& /*alpha*/, const auto& /*xx*/, const auto& /*param*/) { return DerivativeRangeReturnType(); });
   auto local_f = function.local_function();
-  DerivativeRangeReturnType expected_jacobian;
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
     for (const auto& quadrature_point : Dune::QuadratureRules<double, d>::rule(element.type(), 3)) {
       const auto local_x = quadrature_point.position();
+      const auto expected_jacobian = JacobianHelper<>::expected_jacobian(element, local_x);
       const auto actual_jacobian = local_f->jacobian(local_x);
       EXPECT_EQ(expected_jacobian, actual_jacobian);
     }
