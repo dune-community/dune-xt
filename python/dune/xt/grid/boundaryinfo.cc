@@ -99,7 +99,5 @@ PYBIND11_MODULE(_boundaryinfo, m)
 
   py::module::import("dune.xt.common");
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.grid", "_boundaryinfo");
-
   bind_grid(m);
 }

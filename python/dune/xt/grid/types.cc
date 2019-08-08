@@ -44,8 +44,6 @@ PYBIND11_MODULE(_types, m)
 
   py::module::import("dune.xt.common");
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.grid", "_types");
-
   std::vector<std::string> available_types;
   addbind_for_Grid(m, available_types);
   m.attr("available_types") = available_types;

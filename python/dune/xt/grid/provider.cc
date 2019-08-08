@@ -53,7 +53,5 @@ PYBIND11_MODULE(_provider, m)
 
   py::module::import("dune.xt.common");
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.grid", "_provider");
-
   addbind_for_Grid(m);
 }

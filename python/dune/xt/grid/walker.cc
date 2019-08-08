@@ -68,8 +68,6 @@ PYBIND11_MODULE(_walker, m)
 
   py::module::import("dune.xt.common");
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.grid", "_walker");
-
   addbind_for_Grid(m);
   DUNE_XT_GRID_WALKER_APPLYON_BIND(m);
 }
