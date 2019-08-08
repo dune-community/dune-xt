@@ -79,6 +79,18 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
         "min"_a = Spe10::internal::model1_min_value,
         "max"_a = Spe10::internal::model1_max_value,
         "name"_a = C::static_id());
+  c.def(py::init([](const Common::FieldVector<D, d>& ll,
+                    const Common::FieldVector<D, d>& up,
+                    const R& min,
+                    const R& max,
+                    const std::string nm) {
+          return std::make_unique<C>(XT::Data::spe10_model1_filename(), ll, up, min, max, nm);
+        }),
+        "lower_left"_a,
+        "upper_right"_a,
+        "min"_a = Spe10::internal::model1_min_value,
+        "max"_a = Spe10::internal::model1_max_value,
+        "name"_a = C::static_id());
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
 

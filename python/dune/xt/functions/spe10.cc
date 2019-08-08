@@ -34,6 +34,7 @@ void addbind_for_Grid(pybind11::module& m)
   const auto g_dim = G::dimension;
 
   bind_Spe10Model1Function<G, g_dim, 1, 1>(m, grid_id);
+  bind_Spe10Model1Function<G, g_dim, g_dim, g_dim>(m, grid_id);
 } // ... addbind_for_Grid(...)
 
 
