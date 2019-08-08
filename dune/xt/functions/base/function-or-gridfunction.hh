@@ -94,7 +94,7 @@ public:
   using BaseType::rC;
   using typename BaseType::LocalFunctionType;
 
-  FunctionOrGridFunction(const typename FunctionInterface<d, 1, 1, R>::RangeReturnType& value)
+  FunctionOrGridFunction(const R& value)
     : storage_(make_product(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value)),
                             unit_matrix()))
   {}
@@ -121,7 +121,7 @@ public:
   {}
 
   FunctionOrGridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
-    : storage_(make_product(func, std::move(unit_matrix())))
+    : storage_(make_product(new FunctionOrGridFunction<E, 1, 1, R>(func), std::move(unit_matrix())))
   {}
 
   FunctionOrGridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr)
