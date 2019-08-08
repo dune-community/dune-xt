@@ -29,8 +29,6 @@ PYBIND11_MODULE(_expression, m)
 {
   namespace py = pybind11;
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions", "_expression");
-
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.functions._function_interface_1d");

@@ -56,8 +56,6 @@ PYBIND11_MODULE(_spe10, m)
 {
   namespace py = pybind11;
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions", "_spe10");
-
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.grid");

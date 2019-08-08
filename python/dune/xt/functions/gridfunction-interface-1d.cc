@@ -44,8 +44,6 @@ PYBIND11_MODULE(_gridfunction_interface_1d, m)
 {
   namespace py = pybind11;
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions", "_gridfunction_interface_1d");
-
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.grid");

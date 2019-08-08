@@ -60,8 +60,6 @@ PYBIND11_MODULE(_indicator, m)
 {
   namespace py = pybind11;
 
-  Dune::XT::Common::bindings::add_initialization(m, "dune.xt.functions", "_indicator");
-
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.grid");
