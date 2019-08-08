@@ -21,7 +21,7 @@
 struct InLevelSearch : public testing::Test
 {
   typedef TESTGRIDTYPE GridType;
-  typedef Dune::XT::Grid::GridProvider<GridType, Dune::XT::Grid::none_t> GridProviderType;
+  typedef Dune::XT::Grid::GridProvider<GridType> GridProviderType;
 
   InLevelSearch()
     : grid_provider_(Dune::XT::Grid::make_cube_grid<TESTGRIDTYPE>())

@@ -20,7 +20,6 @@
 
 #include <python/dune/xt/common/exceptions.bindings.hh>
 
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
 
@@ -47,10 +46,6 @@ void addbind_for_Grid(pybind11::module& m)
   using namespace Dune::XT::Grid;
   using G = typename Tuple::head_type;
 
-  bind_walker<G, Layers::dd_subdomain, Backends::view>(m);
-  bind_walker<G, Layers::dd_subdomain_boundary, Backends::view>(m);
-  bind_walker<G, Layers::dd_subdomain_coupling, Backends::view>(m);
-  bind_walker<G, Layers::dd_subdomain_oversampled, Backends::view>(m);
   bind_walker<G, Layers::leaf, Backends::view>(m);
   bind_walker<G, Layers::level, Backends::view>(m);
 

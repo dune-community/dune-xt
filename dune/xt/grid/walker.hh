@@ -717,12 +717,7 @@ private:
 
       // only walk the intersections, if there are codim1 functors present
       if ((intersection_functor_wrappers.size() + element_and_intersection_functor_wrappers.size()) > 0) {
-        // Do not use intersections(...) here, since that does not work for a SubdomainGridPart which is based on
-        // alugrid and then wrapped as a grid view (see also https://github.com/dune-community/dune-xt-grid/issues/26)
-        const auto intersection_it_end = grid_view_.iend(element);
-        for (auto intersection_it = grid_view_.ibegin(element); intersection_it != intersection_it_end;
-             ++intersection_it) {
-          const auto& intersection = *intersection_it;
+        for (auto&& intersection : intersections(grid_view_, element)) {
           if (intersection.neighbor()) {
             const auto neighbor = intersection.outside();
             apply_local(intersection,

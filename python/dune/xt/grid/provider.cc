@@ -18,7 +18,6 @@
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
 
@@ -34,7 +33,6 @@ void addbind_for_Grid(pybind11::module& m)
   using namespace Dune::XT::Grid;
   using G = typename Tuple::head_type;
   const auto grid_id = Dune::XT::Grid::bindings::grid_name<G>::value();
-  typedef typename Layer<G, Layers::dd_subdomain, Backends::view, DD::SubdomainGrid<G>>::type DdSubdomainPart;
 
   // bind_GridProvider<G>(m, grid_id);
   bind_make_cube_grid<G>(m, grid_id);

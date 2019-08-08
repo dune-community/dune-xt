@@ -68,12 +68,12 @@ public:
     return cfg;
   }
 
-  static GridProvider<GridType, none_t> create(const std::string& filename, MPIHelper::MPICommunicator mpi_comm)
+  static GridProvider<GridType> create(const std::string& filename, MPIHelper::MPICommunicator mpi_comm)
   {
-    return GridProvider<GridType, none_t>(GridPtr<GridType>(filename, mpi_comm).release());
+    return GridProvider<GridType>(GridPtr<GridType>(filename, mpi_comm).release());
   }
 
-  static GridProvider<GridType, none_t> create(const Common::Configuration& cfg, MPIHelper::MPICommunicator mpi_comm)
+  static GridProvider<GridType> create(const Common::Configuration& cfg, MPIHelper::MPICommunicator mpi_comm)
   {
     return create(cfg.get("filename", default_config().template get<std::string>("filename")), mpi_comm);
   }
@@ -81,7 +81,7 @@ public:
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
 make_dgf_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
   return DgfGridProviderFactory<GridType>(filename, mpi_comm);
@@ -89,7 +89,7 @@ make_dgf_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm =
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
 make_dgf_grid(const Common::Configuration& cfg = DgfGridProviderFactory<GridType>::default_config(),
               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {

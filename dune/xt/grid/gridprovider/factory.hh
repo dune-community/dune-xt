@@ -34,8 +34,7 @@ template <class GridType>
 class GridProviderFactory
 {
   template <class G>
-  static GridProvider<GridType, none_t> call_create(const Common::Configuration& cfg,
-                                                    MPIHelper::MPICommunicator mpi_comm)
+  static GridProvider<GridType> call_create(const Common::Configuration& cfg, MPIHelper::MPICommunicator mpi_comm)
   {
     if (cfg.empty())
       return G::create(G::default_config(), mpi_comm);
@@ -81,15 +80,15 @@ public:
                                     << available_as_str());
   } // ... default_config(...)
 
-  static GridProvider<GridType, none_t> create(const Common::Configuration& config,
-                                               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+  static GridProvider<GridType> create(const Common::Configuration& config,
+                                       MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
     return create(config.get<std::string>("type"), config, mpi_comm);
   }
 
-  static GridProvider<GridType, none_t> create(const std::string& type = available()[0],
-                                               const Common::Configuration config = Common::Configuration(),
-                                               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+  static GridProvider<GridType> create(const std::string& type = available()[0],
+                                       const Common::Configuration config = Common::Configuration(),
+                                       MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
   {
     if (is_alugrid<GridType>::value && mpi_comm != MPIHelper::getCommunicator()) {
       DUNE_THROW(InvalidStateException,
@@ -111,78 +110,6 @@ public:
                                     << available_as_str());
   } // ... create(...)
 }; // class GridProviderFactory
-
-
-template <class GridType>
-class DdSubdomainGridProviderFactory
-{
-  template <class G>
-  static GridProvider<GridType, DD::SubdomainGrid<GridType>> call_create(const Common::Configuration& cfg,
-                                                                         MPIHelper::MPICommunicator mpi_comm)
-  {
-    if (cfg.empty())
-      return G::create(G::default_config(), mpi_comm);
-    else
-      return G::create(cfg, mpi_comm);
-  }
-
-  static std::string available_as_str()
-  {
-    std::stringstream ret;
-    std::copy(available().begin(), available().end(), Common::PrefixOutputIterator<std::string>(ret, "\n   "));
-    return ret.str();
-  } // ... available_as_str(...)
-
-  typedef CubeDdSubdomainsGridProviderFactory<GridType> CubeType;
-
-public:
-  static std::vector<std::string> available()
-  {
-    return std::vector<std::string>{CubeType::static_id()};
-  }
-
-  static Common::Configuration default_config(const std::string type)
-  {
-    if (CubeType::static_id() == type)
-      return CubeType::default_config();
-    else if (available().empty())
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "There is no grid provider available for " << Common::Typename<GridType>::value() << "!");
-    else
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of those avaible for "
-                                    << Common::Typename<GridType>::value() << ":\n"
-                                    << available_as_str());
-  } // ... default_config(...)
-
-  static GridProvider<GridType, DD::SubdomainGrid<GridType>>
-  create(const Common::Configuration& config, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
-  {
-    return create(config.get<std::string>("type"), config, mpi_comm);
-  }
-
-  static GridProvider<GridType, DD::SubdomainGrid<GridType>>
-  create(const std::string& type = available()[0],
-         const Common::Configuration config = Common::Configuration(),
-         MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
-  {
-    if (is_alugrid<GridType>::value && mpi_comm != MPIHelper::getCommunicator()) {
-      DUNE_THROW(InvalidStateException,
-                 "Alugrid either ignores, or outright fails with non-world comes when used here");
-    }
-
-    if (CubeType::static_id() == type)
-      return call_create<CubeType>(config, mpi_comm);
-    else if (available().empty())
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "There is no grid provider available for " << Common::Typename<GridType>::value() << "!");
-    else
-      DUNE_THROW(Common::Exceptions::wrong_input_given,
-                 "Requested type '" << type << "' is not one of those avaible for "
-                                    << Common::Typename<GridType>::value() << ":\n"
-                                    << available_as_str());
-  } // ... create(...)
-}; // class DdSubdomainGridProviderFactory
 
 
 } // namespace Grid

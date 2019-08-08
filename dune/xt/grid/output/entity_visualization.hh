@@ -23,8 +23,9 @@
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/logging.hh>
 #include <dune/xt/common/ranges.hh>
-#include <dune/xt/grid/capabilities.hh>
 #include <dune/xt/common/type_traits.hh>
+#include <dune/xt/grid/boundaryinfo/types.hh>
+#include <dune/xt/grid/capabilities.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {

@@ -115,10 +115,8 @@ public:
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, _G, _layer, _backend, _class_name)                               \
   Dune::XT::Grid::bindings::IntersectionFilter<                                                                        \
-      _W<typename Dune::XT::Grid::Layer<_G,                                                                            \
-                                        Dune::XT::Grid::Layers::_layer,                                                \
-                                        Dune::XT::Grid::Backends::_backend,                                            \
-                                        Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>,                                 \
+      _W<typename Dune::XT::Grid::Layer<_G, Dune::XT::Grid::Layers::_layer, Dune::XT::Grid::Backends::_backend>::      \
+             type>,                                                                                                    \
       _w>::bind(_m,                                                                                                    \
                 _class_name,                                                                                           \
                 Dune::XT::Grid::layer_names[Dune::XT::Grid::Layers::_layer] + "_"                                      \
@@ -157,10 +155,7 @@ public:
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, _W, _w, _class_name)                                                 \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, leaf, view, _class_name);                                    \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, view, _class_name);                                   \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain, view, _class_name);                            \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain_boundary, view, _class_name);                   \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain_coupling, view, _class_name)
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, view, _class_name)
 
 #define DUNE_XT_GRID_WALKER_APPLYON_BIND(_m)                                                                           \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, AllIntersections, false, "all_intersections");                             \

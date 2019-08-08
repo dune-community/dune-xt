@@ -59,7 +59,7 @@ public:
 
   static std::string static_id()
   {
-    return "dune.xt.grid.none_t";
+    return "dune.xt.grid.gmsh";
   }
 
   static Common::Configuration default_config()
@@ -67,7 +67,7 @@ public:
     DUNE_THROW(NotImplemented, "No default config for GmshGridProviderFactory Yaspgrid");
   }
   template <class... Args>
-  static GridProvider<Dune::YaspGrid<dim, Coordinates>, none_t> create(Args&&...)
+  static GridProvider<Dune::YaspGrid<dim, Coordinates>> create(Args&&...)
   {
     DUNE_THROW(NotImplemented, "No create impleneted for GmshGridProviderFactory Yaspgrid");
   }
@@ -97,15 +97,15 @@ public:
     return cfg;
   }
 
-  static GridProvider<GridType, none_t> create(const std::string& filename, MPIHelper::MPICommunicator mpi_comm)
+  static GridProvider<GridType> create(const std::string& filename, MPIHelper::MPICommunicator mpi_comm)
   {
     DUNE_THROW_IF(CollectiveCommunication<MPIHelper::MPICommunicator>(mpi_comm).size() > 1,
                   InvalidStateException,
                   "Gmsh reading not implemented in parallel");
-    return GridProvider<GridType, none_t>(GmshReader<GridType>::read(filename));
+    return GridProvider<GridType>(GmshReader<GridType>::read(filename));
   }
 
-  static GridProvider<GridType, none_t> create(const Common::Configuration& cfg, MPIHelper::MPICommunicator mpi_comm)
+  static GridProvider<GridType> create(const Common::Configuration& cfg, MPIHelper::MPICommunicator mpi_comm)
   {
     return create(cfg.get("filename", default_config().template get<std::string>("filename")), mpi_comm);
   }
@@ -113,7 +113,7 @@ public:
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
 make_gmsh_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
   return GmshGridProviderFactory<GridType>(filename, mpi_comm);
@@ -121,7 +121,7 @@ make_gmsh_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm 
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType, none_t>>::type
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
 make_gmsh_grid(const Common::Configuration& cfg = GmshGridProviderFactory<GridType>::default_config(),
                MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {

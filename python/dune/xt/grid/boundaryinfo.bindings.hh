@@ -22,7 +22,6 @@
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/layers.hh>
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <python/dune/xt/common/configuration.hh>
 #include "grids.bindings.hh"
 #include "layers.bindings.hh"
@@ -68,28 +67,6 @@ public:
 }; // class BoundaryInfoFactory
 
 
-template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain, anything>
-{
-public:
-  static void bind(pybind11::module& /*m*/) {}
-};
-
-template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_boundary, anything>
-{
-public:
-  static void bind(pybind11::module& /*m*/) {}
-};
-
-template <class I, class G, bool anything>
-class BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, Layers::dd_subdomain_coupling, anything>
-{
-public:
-  static void bind(pybind11::module& /*m*/) {}
-};
-
-
 } // namespace internal
 
 
@@ -117,8 +94,7 @@ public:
     }
 
     // bind factory
-    internal::BoundaryInfoFactory<I, GridProvider<G, Grid::none_t>, layer>::bind(m);
-    internal::BoundaryInfoFactory<I, GridProvider<G, DD::SubdomainGrid<G>>, layer>::bind(m);
+    internal::BoundaryInfoFactory<I, GridProvider<G>, layer>::bind(m);
 
     // bind class, guard since we might not be the first to do so for this intersection
     try {
