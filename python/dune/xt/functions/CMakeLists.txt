@@ -19,6 +19,7 @@ dune_pybindxi_add_module(_gridfunction_interface_3d EXCLUDE_FROM_ALL gridfunctio
 dune_pybindxi_add_module(_checkerboard EXCLUDE_FROM_ALL checkerboard.cc)
 dune_pybindxi_add_module(_constant EXCLUDE_FROM_ALL constant.cc)
 dune_pybindxi_add_module(_expression EXCLUDE_FROM_ALL expression.cc)
+dune_pybindxi_add_module(_function_as_grid_function EXCLUDE_FROM_ALL function-as-grid-function.cc)
 dune_pybindxi_add_module(_indicator EXCLUDE_FROM_ALL indicator.cc)
 dune_pybindxi_add_module(_spe10 EXCLUDE_FROM_ALL spe10.cc)
 

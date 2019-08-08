@@ -27,6 +27,7 @@ _modules = (
     '_checkerboard',
     '_constant',
     '_expression',
+    '_function_as_grid_function',
     '_indicator',
     '_spe10',
     )
