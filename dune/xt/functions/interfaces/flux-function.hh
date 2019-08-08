@@ -28,7 +28,6 @@
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/common/type_traits.hh>
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
 #include <dune/xt/grid/view/from-part.hh>

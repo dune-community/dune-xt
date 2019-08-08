@@ -16,7 +16,6 @@
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/type_traits.hh>
 
@@ -58,33 +57,20 @@ bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
 
   const std::string make_name = "make_indicator_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/, const CornerVector& values, const std::string& name) {
+        [](const Grid::GridProvider<G>& /*grid*/, const CornerVector& values, const std::string& name) {
           return C(values, name);
         },
         "grid_provider"_a,
         "values"_a,
         "name"_a = C::static_id());
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& /*grid*/,
-           const IntervalVector& value,
-           const std::string& name) { return C(value, name); },
-        "grid_provider"_a,
-        "values"_a,
-        "name"_a = C::static_id());
-  m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/, const CornerVector& values, const std::string& name) {
+        [](const Grid::GridProvider<G>& /*grid*/, const CornerVector& values, const std::string& name) {
           return C(values, name);
         },
         "grid_provider"_a,
         "values"_a,
         "name"_a = C::static_id());
-  m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& /*grid*/,
-           const IntervalVector& value,
-           const std::string& name) { return C(value, name); },
-        "grid_provider"_a,
-        "values"_a,
-        "name"_a = C::static_id());
+
   return c;
 } // ... bind_IndicatorGridFunction(...)
 

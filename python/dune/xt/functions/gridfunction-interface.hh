@@ -18,7 +18,6 @@
 
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <dune/xt/functions/interfaces/grid-function.hh>
@@ -338,7 +337,7 @@ bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
 
   c.def("visualize",
         [](const C& self,
-           const Grid::GridProvider<G, Grid::none_t>& grid_provider,
+           const Grid::GridProvider<G>& grid_provider,
            const std::string& layer,
            const ssize_t lvl,
            const std::string& path,
@@ -357,43 +356,6 @@ bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
         "grid_provider"_a,
         "layer"_a = "leaf",
         "level"_a = -1,
-        "path"_a,
-        "subsampling"_a = true);
-  c.def("visualize",
-        [](const C& self,
-           const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& dd_grid_provider,
-           const std::string& layer,
-           const ssize_t lvl_or_sbdmn,
-           const std::string& path,
-           const bool subsampling) {
-          const auto level_or_subdomain = XT::Common::numeric_cast<int>(lvl_or_sbdmn);
-          if (layer == "leaf")
-            self.visualize(dd_grid_provider.leaf_view(), path, subsampling);
-          else if (layer == "level")
-            self.visualize(
-                dd_grid_provider.template layer<XT::Grid::Layers::level, XT::Grid::Backends::view>(level_or_subdomain),
-                path,
-                subsampling);
-          else if (layer == "dd_subdomain")
-            self.visualize(dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain, XT::Grid::Backends::view>(
-                               level_or_subdomain),
-                           path,
-                           subsampling);
-          else if (layer == "dd_subdomain_oversampled")
-            self.visualize(
-                dd_grid_provider.template layer<XT::Grid::Layers::dd_subdomain_oversampled, XT::Grid::Backends::view>(
-                    level_or_subdomain),
-                path,
-                subsampling);
-          else
-            DUNE_THROW(
-                XT::Common::Exceptions::wrong_input_given,
-                "Given layer has to be one of ('leaf', 'level', 'dd_subdomain', 'dd_subdomain_oversampled'), is '"
-                    << layer << "'!");
-        },
-        "dd_grid_provider"_a,
-        "layer"_a = "leaf",
-        "level_or_subdomain"_a = -1,
         "path"_a,
         "subsampling"_a = true);
 
