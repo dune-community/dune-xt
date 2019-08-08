@@ -49,6 +49,9 @@ public:
     : function_storage_(std::move(function_ptr))
   {}
 
+  FunctionAsGridFunctionWrapper(const ThisType&) = default;
+  FunctionAsGridFunctionWrapper(ThisType&&) = default;
+
   /**
    * \name ´´This method is required by GridFunctionInterface.''
    * \{
@@ -140,7 +143,7 @@ private:
     std::unique_ptr<GeometryType> geometry_;
   }; // class LocalFunction
 
-  const XT::Common::ConstStorageProvider<FunctionType> function_storage_;
+  XT::Common::ConstStorageProvider<FunctionType> function_storage_;
 }; // class FunctionAsGridFunctionWrapper
 
 
