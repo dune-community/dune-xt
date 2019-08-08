@@ -116,18 +116,19 @@ using Available3dGridTypes = boost::tuple<YASP_3D_EQUIDISTANT_OFFSET
 
 /**
  * \note Alberta grids are missing here on purpose, these cannot be handled automatically very well.
+ * \todo Find a tuple implementation which allows for more than 10 elements!
  */
 using AvailableGridTypes = boost::tuple<ONED_1D,
-                                        YASP_1D_EQUIDISTANT_OFFSET,
+                                        /*YASP_1D_EQUIDISTANT_OFFSET,*/
                                         YASP_2D_EQUIDISTANT_OFFSET,
                                         YASP_3D_EQUIDISTANT_OFFSET
 #if HAVE_DUNE_ALUGRID
                                         ,
                                         ALU_2D_SIMPLEX_CONFORMING,
-                                        ALU_2D_SIMPLEX_NONCONFORMING,
+                                        /*ALU_2D_SIMPLEX_NONCONFORMING,*/
                                         ALU_2D_CUBE,
                                         ALU_3D_SIMPLEX_CONFORMING,
-                                        ALU_3D_SIMPLEX_NONCONFORMING,
+                                        /*ALU_3D_SIMPLEX_NONCONFORMING,*/
                                         ALU_3D_CUBE
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
