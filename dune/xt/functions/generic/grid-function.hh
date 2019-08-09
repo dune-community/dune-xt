@@ -47,7 +47,7 @@ param.get("power").at(0)));
  *        passed on to the generic function is of correct type.
  * \note  The Localfunction does not implement derivative.
  */
-template <class E, size_t r, size_t rC = 1, class R = double>
+template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class GenericGridFunction : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
