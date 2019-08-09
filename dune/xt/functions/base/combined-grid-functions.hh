@@ -483,7 +483,7 @@ public:
 
 
 /**
- * \brief Function representing the product of two functions.
+ * \brief Grid function representing the product of two grid functions.
  *
  * \see internal::CombinedGridFunction
  */
