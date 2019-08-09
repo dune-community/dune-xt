@@ -68,7 +68,7 @@ public:
 
   std::string name() const override final
   {
-    storage_.access().name();
+    return storage_.access().name();
   }
 
 private:
@@ -151,7 +151,7 @@ public:
 
   std::string name() const override final
   {
-    storage_.access().name();
+    return storage_.access().name();
   }
 
 private:
@@ -206,7 +206,7 @@ public:
 
   std::string name() const override final
   {
-    storage_.access().name();
+    return storage_.access().name();
   }
 
 private:
