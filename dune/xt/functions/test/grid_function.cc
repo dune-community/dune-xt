@@ -17,6 +17,21 @@
 #include <dune/xt/functions/grid-function.hh>
 
 
+GTEST_TEST(ScalarGridFunction, constructible_from_grid_function_rvalueref)
+{
+  using namespace Dune;
+  using namespace Dune::XT::Functions;
+
+  using G = CUBEGRID_2D;
+  using E = XT::Grid::extract_entity_t<G>;
+
+  const GenericGridFunction<E> scalar_grid_function{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"};
+
+  GridFunction<E> func{scalar_grid_function};
+  EXPECT_EQ(std::string("THE_NAME"), func.name());
+} // GTEST_TEST(ScalarGridFunction, constructible_from_grid_function_rvalueref)
+
+
 GTEST_TEST(MatrixGridFunction, constructible_from_scalar_grid_function_rvalueref)
 {
   using namespace Dune;
@@ -25,7 +40,7 @@ GTEST_TEST(MatrixGridFunction, constructible_from_scalar_grid_function_rvalueref
   using G = CUBEGRID_2D;
   using E = XT::Grid::extract_entity_t<G>;
 
-  const GenericGridFunction<E> scalar_grid_function{0};
+  const GenericGridFunction<E> scalar_grid_function{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"};
 
   GridFunction<E, 2, 2> DXTC_UNUSED(func){scalar_grid_function};
 } // GTEST_TEST(MatrixGridFunction, constructible_from_scalar_grid_function_rvalueref)
