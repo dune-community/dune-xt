@@ -9,5 +9,8 @@
 #   René Fritze (2018)
 # ~~~
 
-add_subdirectory(grid)
+dune_pybindxi_add_module(_boundaryinfo EXCLUDE_FROM_ALL boundaryinfo.cc)
+dune_pybindxi_add_module(_types EXCLUDE_FROM_ALL types.cc)
+dune_pybindxi_add_module(_walker EXCLUDE_FROM_ALL walker.cc)
+dune_pybindxi_add_module(_provider EXCLUDE_FROM_ALL provider.cc)
 

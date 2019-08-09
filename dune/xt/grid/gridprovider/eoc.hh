@@ -29,9 +29,9 @@ namespace Grid {
  *  means to obtain the real grid level corresponding to a refinement level.
  */
 template <class GridImp>
-class LevelBasedEOCGridProvider : public GridProvider<GridImp, none_t>
+class LevelBasedEOCGridProvider : public GridProvider<GridImp>
 {
-  typedef GridProvider<GridImp, none_t> BaseType;
+  typedef GridProvider<GridImp> BaseType;
 
 public:
   using typename BaseType::GridType;
@@ -102,7 +102,7 @@ private:
 template <class GridImp>
 class LeafBasedEOCGridProvider
 {
-  typedef GridProvider<GridImp, none_t> GridProviderType;
+  typedef GridProvider<GridImp> GridProviderType;
 
 public:
   typedef typename GridProviderType::GridType GridType;
@@ -169,79 +169,7 @@ private:
 }; // class LeafBasedEOCGridProvider
 
 
-template <class GridImp>
-class DdSubdomainsBasedEOCGridProvider
-{
-  typedef GridProvider<GridImp, DD::SubdomainGrid<GridImp>> GridProviderType;
-  typedef DdSubdomainGridProviderFactory<GridImp> GridProviderFactoryType;
-
-public:
-  typedef typename GridProviderType::GridType GridType;
-  typedef typename GridProviderType::LeafGridViewType LevelGridViewType;
-
-  static const constexpr Layers layer_type = Layers::leaf;
-
-  DdSubdomainsBasedEOCGridProvider(const Common::Configuration& grid_cfg, const size_t num_refs)
-  {
-    const auto refine_steps_for_half = DGFGridInfo<GridType>::refineStepsForHalf();
-    Common::Configuration cfg = grid_cfg;
-    level_grids_.emplace_back(new GridProviderType(GridProviderFactoryType::create(cfg)));
-    for (size_t rr = 0; rr < num_refs; ++rr) {
-      cfg["num_refinements"] = XT::Common::to_string(cfg.get<size_t>("num_refinements") + refine_steps_for_half);
-      level_grids_.emplace_back(new GridProviderType(GridProviderFactoryType::create(cfg)));
-    }
-    cfg["num_refinements"] = XT::Common::to_string(cfg.get<size_t>("num_refinements") + refine_steps_for_half);
-    reference_grid_ = std::make_unique<GridProviderType>(GridProviderFactoryType::create(cfg));
-  }
-
-  size_t num_refinements() const
-  {
-    assert(level_grids_.size() > 0);
-    return level_grids_.size() - 1;
-  }
-
-  int level_of(const size_t /*refinement*/) const
-  {
-    return -1;
-  }
-
-  int reference_level() const
-  {
-    return -1;
-  }
-
-  const GridProviderType& level_provider(const size_t refinement) const
-  {
-    return *level_grids_.at(refinement);
-  }
-
-  GridProviderType& level_provider(const size_t refinement)
-  {
-    return *level_grids_.at(refinement);
-  }
-
-  const GridProviderType& reference_provider() const
-  {
-    return *reference_grid_;
-  }
-
-  GridProviderType& reference_provider()
-  {
-    return *reference_grid_;
-  }
-
-  LevelGridViewType reference_grid_view() const
-  {
-    return reference_grid_->leaf_view();
-  }
-
-private:
-  std::vector<std::unique_ptr<GridProviderType>> level_grids_;
-  std::unique_ptr<GridProviderType> reference_grid_;
-}; // class DdSubdomainsBasedEOCGridProvider
-
-
-template <class G, class DdGrid = none_t>
+template <class G>
 class EOCGridProvider : public LevelBasedEOCGridProvider<G>
 {
 public:
@@ -251,15 +179,6 @@ public:
   {}
 };
 
-template <class G>
-class EOCGridProvider<G, DD::SubdomainGrid<G>> : public DdSubdomainsBasedEOCGridProvider<G>
-{
-public:
-  template <class... Args>
-  EOCGridProvider(Args&&... args)
-    : DdSubdomainsBasedEOCGridProvider<G>(std::forward<Args>(args)...)
-  {}
-};
 
 #if HAVE_DUNE_ALUGRID
 

@@ -156,8 +156,9 @@ struct PeriodicViewTest : public testing::Test
                             && Dune::XT::Common::FloatCmp::eq(global_intersection_coords[differing_coordinate],
                                                               lower_left[differing_coordinate])));
             ++periodic_count;
-            if (is_partially_periodic)
+            if (is_partially_periodic) {
               EXPECT_EQ(size_t(0), differing_coordinate);
+            }
           }
         }
         if (intersection.boundary() && !intersection.neighbor()) {

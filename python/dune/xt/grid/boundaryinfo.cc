@@ -18,7 +18,6 @@
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/common/tuple.hh>
 
 #include <python/dune/xt/common/exceptions.bindings.hh>
@@ -37,21 +36,14 @@ const std::array<std::string, 4> info_names{"all_dirichlet_boundary_info",
                                             "all_neumann_boundary_info",
                                             "boundary_segment_index_based_boundary_info",
                                             "normal_based_boundary_info"};
-constexpr std::array<Layers, 6> layers{Layers::leaf,
-                                       Layers::level,
-                                       Layers::dd_subdomain,
-                                       Layers::dd_subdomain_oversampled,
-                                       Layers::dd_subdomain_boundary,
-                                       Layers::dd_subdomain_coupling};
+constexpr std::array<Layers, 2> layers{Layers::leaf, Layers::level};
 
 template <class Grid, Layers layer, class InfoTuple = InfoTypes>
 struct bind_grid_layer_info
 {
   static void bind(pybind11::module& m, size_t info_name_no = 0)
   {
-    using I = extract_intersection_t<
-        typename Dune::XT::Grid::
-            Layer<Grid, layer, Dune::XT::Grid::Backends::view, Dune::XT::Grid::DD::SubdomainGrid<Grid>>::type>;
+    using I = extract_intersection_t<typename Dune::XT::Grid::Layer<Grid, layer, Dune::XT::Grid::Backends::view>::type>;
     using Info = typename InfoTuple::template head_type<I>;
     using binder = Dune::XT::Grid::bindings::BoundaryInfo<Info, Grid, layer>;
     binder::bind(m, info_names[info_name_no], layer_names[layer]);
@@ -79,6 +71,7 @@ void bind_grid_layer(pybind11::module& m, std::integral_constant<size_t, counter
   bind_grid_layer<Grid>(m, std::integral_constant<size_t, counter - 1>());
 }
 
+
 template <class GridTuple = Dune::XT::Grid::bindings::AvailableTypes>
 void bind_grid(pybind11::module& m)
 {
@@ -91,9 +84,12 @@ template <>
 void bind_grid<boost::tuples::null_type>(pybind11::module&)
 {}
 
+
 PYBIND11_MODULE(_boundaryinfo, m)
 {
   namespace py = pybind11;
-  using namespace pybind11::literals;
+
+  py::module::import("dune.xt.common");
+
   bind_grid(m);
 }

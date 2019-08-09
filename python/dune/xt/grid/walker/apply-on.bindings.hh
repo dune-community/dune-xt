@@ -45,6 +45,12 @@ public:
 private:
   typedef XT::Grid::BoundaryInfo<extract_intersection_t<GL>> BoundaryInfoType;
 
+  static std::string makename(std::string class_name, std::string layer_name)
+  {
+    return std::string("make_apply_on_") + class_name + "_" + layer_name + "_"
+           + XT::Grid::bindings::grid_name<G>::value();
+  }
+
   template <bool with_bi = ctor_expects_boundary_info, bool anything = true>
   struct addbind // with_bi = false
   {
@@ -52,10 +58,8 @@ private:
     {
       c.def(pybind11::init<>());
 
-      m.def(std::string("make_apply_on_" + class_name + "_" + XT::Grid::bindings::grid_name<G>::value() + "_"
-                        + layer_name)
-                .c_str(),
-            []() { return type(); });
+
+      m.def(makename(class_name, layer_name).c_str(), []() { return type(); });
     }
   };
 
@@ -68,7 +72,7 @@ private:
 
       c.def(pybind11::init<const BoundaryInfoType&, XT::Grid::BoundaryType*&&>());
 
-      m.def(std::string("make_apply_on_" + class_name + "_" + layer_name).c_str(),
+      m.def(makename(class_name, layer_name).c_str(),
             [](const BoundaryInfoType& boundary_info, XT::Grid::BoundaryType*&& boundary_type) {
               return type(boundary_info, std::move(boundary_type));
             },
@@ -111,10 +115,8 @@ public:
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND(_m, _W, _w, _G, _layer, _backend, _class_name)                               \
   Dune::XT::Grid::bindings::IntersectionFilter<                                                                        \
-      _W<typename Dune::XT::Grid::Layer<_G,                                                                            \
-                                        Dune::XT::Grid::Layers::_layer,                                                \
-                                        Dune::XT::Grid::Backends::_backend,                                            \
-                                        Dune::XT::Grid::DD::SubdomainGrid<_G>>::type>,                                 \
+      _W<typename Dune::XT::Grid::Layer<_G, Dune::XT::Grid::Layers::_layer, Dune::XT::Grid::Backends::_backend>::      \
+             type>,                                                                                                    \
       _w>::bind(_m,                                                                                                    \
                 _class_name,                                                                                           \
                 Dune::XT::Grid::layer_names[Dune::XT::Grid::Layers::_layer] + "_"                                      \
@@ -153,10 +155,7 @@ public:
 
 #define _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, _W, _w, _class_name)                                                 \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, leaf, view, _class_name);                                    \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, view, _class_name);                                   \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain, view, _class_name);                            \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain_boundary, view, _class_name);                   \
-  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, dd_subdomain_coupling, view, _class_name)
+  _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL_GRIDS(_m, _W, _w, level, view, _class_name)
 
 #define DUNE_XT_GRID_WALKER_APPLYON_BIND(_m)                                                                           \
   _DUNE_XT_GRID_WALKER_APPLYON_BIND_ALL(_m, AllIntersections, false, "all_intersections");                             \

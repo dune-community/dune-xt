@@ -21,12 +21,6 @@
 namespace Dune {
 namespace XT {
 namespace Grid {
-
-namespace DD {
-template <class G>
-class SubdomainGrid;
-}
-
 namespace bindings {
 
 
@@ -50,21 +44,22 @@ struct grid_name<const G>
 };
 
 
+template <>
+struct grid_name<Dune::OneDGrid>
+{
+  static std::string value()
+  {
+    return "1d_simplex_onedgrid";
+  }
+};
+
+
 template <int dim>
 struct grid_name<YaspGrid<dim, EquidistantOffsetCoordinates<double, dim>>>
 {
   static std::string value()
   {
     return Common::to_string(dim) + "d_cube_yaspgrid";
-  }
-};
-
-template <class G>
-struct grid_name<DD::SubdomainGrid<G>>
-{
-  static std::string value()
-  {
-    return std::string("SubdomainGrid_") + grid_name<G>::value();
   }
 };
 

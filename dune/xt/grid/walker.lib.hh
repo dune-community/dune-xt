@@ -20,11 +20,9 @@
 
 
 #  define _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, _type, _backend)                                                    \
-    _prefix class Dune::XT::Grid::Walker<                                                                              \
-        typename Dune::XT::Grid::Layer<_GRID,                                                                          \
-                                       Dune::XT::Grid::Layers::_type,                                                  \
-                                       Dune::XT::Grid::Backends::_backend,                                             \
-                                       Dune::XT::Grid::DD::SubdomainGrid<_GRID>>::type>
+    _prefix class Dune::XT::Grid::Walker<typename Dune::XT::Grid::Layer<_GRID,                                         \
+                                                                        Dune::XT::Grid::Layers::_type,                 \
+                                                                        Dune::XT::Grid::Backends::_backend>::type>
 
 #  define DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID)                                                                      \
     _DUNE_XT_GRID_WALKER_LIB(_prefix, _GRID, level, view);                                                             \

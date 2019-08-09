@@ -16,21 +16,7 @@
 #if DUNE_XT_WITH_PYTHON_BINDINGS
 
 
-#  define _DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS_DD_SUBDOMAINS_GRID(_prefix, _GRID)                       \
-    _prefix Dune::XT::Grid::GridProvider<_GRID, Dune::XT::Grid::DD::SubdomainGrid<_GRID>>                              \
-    Dune::XT::Grid::make_cube_dd_subdomains_grid<_GRID>(                                                               \
-        const Dune::FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                             \
-        const Dune::FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                             \
-        const std::array<unsigned int, _GRID::dimension>,                                                              \
-        const unsigned int,                                                                                            \
-        const std::array<unsigned int, _GRID::dimension>,                                                              \
-        const std::array<unsigned int, _GRID::dimension>,                                                              \
-        const size_t,                                                                                                  \
-        const size_t)
-
-
 #  define DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS(_prefix, _GRID)                                           \
-    _DUNE_XT_GRID_GRIDPROVIDER_CUBE_LIB_FACTORY_METHODS_DD_SUBDOMAINS_GRID(_prefix, _GRID);                            \
     _prefix Dune::XT::Grid::GridProvider<_GRID> Dune::XT::Grid::make_cube_grid<_GRID>(                                 \
         const FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                                   \
         const Dune::FieldVector<typename _GRID::ctype, _GRID::dimension>&,                                             \
