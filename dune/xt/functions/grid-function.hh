@@ -123,7 +123,7 @@ public:
   using BaseType::d;
   using typename BaseType::LocalFunctionType;
 
-  GridFunction(const typename FunctionInterface<d, r, rC, R>::RangeReturnType& value)
+  GridFunction(const typename RangeTypeSelector<R, r, rC>::type& value)
     : storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(new ConstantFunction<d, r, rC, R>(value)))
   {}
 
@@ -191,21 +191,23 @@ public:
 
   GridFunction(const R& value)
     : storage_(new ProductGridFunction<GridFunction<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
-          new GridFunction<E, 1, 1, R>(value), std::move(unit_matrix())))
+          new GridFunction<E, 1, 1, R>(value), std::move(unit_matrix()), ""))
   {}
 
-  GridFunction(const typename FunctionInterface<d, r, r, R>::RangeReturnType& value)
+  GridFunction(const FieldMatrix<R, r, r>& value) // <- Must not be XT::Common::FIeldMatrix!
     : storage_(new FunctionAsGridFunctionWrapper<E, r, r, R>(new ConstantFunction<d, r, r, R>(value)))
   {}
 
   GridFunction(const FunctionInterface<d, 1, 1, R>& func)
     : storage_(new ProductGridFunction<FunctionAsGridFunctionWrapper<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
-          new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func), std::move(unit_matrix())))
+          new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func), std::move(unit_matrix()), func.name()))
   {}
 
   GridFunction(FunctionInterface<d, 1, 1, R>*&& func_ptr)
     : storage_(new ProductGridFunction<FunctionAsGridFunctionWrapper<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
-          new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)), std::move(unit_matrix())))
+          new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)),
+          std::move(unit_matrix()),
+          func_ptr->name()))
   {}
 
   GridFunction(const FunctionInterface<d, r, r, R>& func)
@@ -218,12 +220,12 @@ public:
 
   GridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
     : storage_(new ProductGridFunction<GridFunction<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
-          new GridFunction<E, 1, 1, R>(func), std::move(unit_matrix())))
+          new GridFunction<E, 1, 1, R>(func), std::move(unit_matrix()), func.name()))
   {}
 
   GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr)
     : storage_(new ProductGridFunction<GridFunctionInterface<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
-          std::move(func_ptr), std::move(unit_matrix())))
+          std::move(func_ptr), std::move(unit_matrix()), func_ptr->name()))
   {}
 
   GridFunction(const GridFunctionInterface<E, r, r, R>& func)
@@ -274,23 +276,27 @@ public:
   using BaseType::rC;
   using typename BaseType::LocalFunctionType;
 
-  GridFunction(const typename FunctionInterface<d, r, rC, R>::RangeReturnType& value)
-    : storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(new ConstantFunction<d, r, rC, R>(value)))
+  GridFunction(const R& value)
+    : storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value)))
   {}
 
-  GridFunction(const FunctionInterface<d, r, rC, R>& func)
-    : storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(func))
+  GridFunction(const FieldVector<R, 1>& value) // <- Must not be XT::Common::FieldVector!
+    : storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value)))
   {}
 
-  GridFunction(FunctionInterface<d, r, rC, R>*&& func_ptr)
-    : storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(std::move(func_ptr)))
+  GridFunction(const FunctionInterface<d, 1, 1, R>& func)
+    : storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func))
   {}
 
-  GridFunction(const GridFunctionInterface<E, r, rC, R>& func)
+  GridFunction(FunctionInterface<d, 1, 1, R>*&& func_ptr)
+    : storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)))
+  {}
+
+  GridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
     : storage_(func)
   {}
 
-  GridFunction(GridFunctionInterface<E, r, rC, R>*&& func_ptr)
+  GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr)
     : storage_(std::move(func_ptr))
   {}
 
