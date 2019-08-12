@@ -93,8 +93,8 @@ typename pybind11::class_<IndicatorFunction<d, r, rC, double>> bind_IndicatorFun
   const std::string classname = std::string("IndicatorFunction__" + Common::to_string(d) + "d_to_"
                                             + Common::to_string(r) + "x" + Common::to_string(rC));
   py::class_<C, I> c(m, classname.c_str(), classname.c_str());
-  c.def(py::init<CornerVector, std::string>(), "values"_a, "name"_a = C::static_id());
-  c.def(py::init<IntervalVector, std::string>(), "values"_a, "name"_a = C::static_id());
+  c.def(py::init<CornerVector, std::string>(), "corner_and_value_pairs"_a, "name"_a = C::static_id());
+  c.def(py::init<IntervalVector, std::string>(), "interval_and_value_pairs"_a, "name"_a = C::static_id());
 
   return c;
 } // ... bind_IndicatorFunction(...)
