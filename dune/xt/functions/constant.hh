@@ -15,6 +15,7 @@
 #define DUNE_XT_FUNCTIONS_CONSTANT_HH
 
 #include <dune/xt/common/configuration.hh>
+#include <dune/xt/common/string.hh>
 
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/interfaces/flux-function.hh>
@@ -53,9 +54,10 @@ public:
     return config;
   } // ... defaults(...)
 
-  explicit ConstantFunction(const RangeReturnType& value, const std::string nm = static_id())
+  explicit ConstantFunction(const RangeReturnType& value, const std::string nm = "")
     : value_(value)
-    , name_(nm)
+    , name_((nm.empty() && r == 1 && rC == 1) ? std::string("ConstantFunction(" + Common::to_string(value) + ")")
+                                              : static_id())
   {}
 
 #if !DUNE_XT_WITH_PYTHON_BINDINGS
