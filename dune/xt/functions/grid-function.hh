@@ -47,14 +47,14 @@ struc Bar {
  * convenience. In case of the function foo, we would thus need to have two additional ones
  *
 \code
-void foo(const double& value)
-{
-  foo(ConstantFunction<d>(value));
-}
-
 void foo(const FunctionInterface<d>& func
 {
   foo(FunctionAsGridFunctionWrapper<E>(func));
+}
+
+void foo(const double& value)
+{
+  foo(ConstantFunction<d>(value));
 }
 \endcode
  *
@@ -81,7 +81,7 @@ struc Bar {
  * value (its copy and movable), so the above examples simplify to
  *
 \code
-void foo(const GridFunction<E> grid_func);
+void foo(GridFunction<E> grid_func);
 \endcode
  *
  * and
