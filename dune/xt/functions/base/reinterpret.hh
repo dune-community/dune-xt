@@ -146,7 +146,7 @@ private:
       DUNE_THROW_IF(!source_element_which_contains_complete_target_element_
                         && !source_element_which_contains_some_point_of_target_element_,
                     Exceptions::not_bound_to_an_element_yet,
-                    "");
+                    source_.name());
       return local_source_->order(param);
     }
 

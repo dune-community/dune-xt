@@ -103,7 +103,7 @@ private:
   public:
     int order(const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, "");
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       return function_.order(param);
     }
 
@@ -112,7 +112,7 @@ private:
     RangeReturnType evaluate(const DomainType& point_in_reference_element,
                              const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, "");
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       this->assert_inside_reference_element(point_in_reference_element);
       return function_.evaluate(geometry_->global(point_in_reference_element), param);
     }
@@ -122,7 +122,7 @@ private:
     DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
                                        const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, "");
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       this->assert_inside_reference_element(point_in_reference_element);
       return function_.jacobian(geometry_->global(point_in_reference_element), param);
     }
@@ -133,7 +133,7 @@ private:
                                          const DomainType& point_in_reference_element,
                                          const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, "");
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       this->assert_inside_reference_element(point_in_reference_element);
       return function_.derivative(alpha, geometry_->global(point_in_reference_element), param);
     }
