@@ -13,11 +13,11 @@
 from dune.xt import guarded_import
 
 for mod_name in (
-    '_boundaryinfo',
-    '_types',
-    '_walker',
-    '_provider',
-    ):
+        '_boundaryinfo',
+        '_types',
+        '_walker',
+        '_provider',
+):
     guarded_import(globals(), 'dune.xt.grid', mod_name)
 
 
@@ -33,4 +33,3 @@ def make_walker(gridprovider, level=0):
 def make_apply_on_dirichlet_intersections(boundaryinfo, grid, layer='leaf_view', *args, **kwargs):
     factory = globals()['make_apply_on_dirichlet_intersections_{}_{}'.format(layer, grid.grid_type)]
     return factory(boundaryinfo, *args, **kwargs)
-

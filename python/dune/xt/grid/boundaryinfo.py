@@ -10,7 +10,7 @@
 # ~~~
 
 try:
-    from dune.xt._boundaryinfo import *
+    from dune.xt.grid._boundaryinfo import *
 except ImportError as e:
     import os
     import logging

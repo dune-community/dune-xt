@@ -10,7 +10,7 @@
 # ~~~
 
 try:
-    from dune.xt._provider import *
+    from dune.xt.grid._provider import *
 except ImportError as e:
     import os
     import logging

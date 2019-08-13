@@ -18,12 +18,14 @@
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
+
 #include <dune/xt/common/tuple.hh>
+
+#include <dune/xt/grid/grids.hh>
 
 #include <python/dune/xt/common/exceptions.bindings.hh>
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/boundaryinfo.bindings.hh>
-#include <python/dune/xt/grid/available_types.hh>
 
 
 using namespace Dune::XT::Common;
@@ -72,7 +74,7 @@ void bind_grid_layer(pybind11::module& m, std::integral_constant<size_t, counter
 }
 
 
-template <class GridTuple = Dune::XT::Grid::bindings::AvailableTypes>
+template <class GridTuple = Dune::XT::Grid::AvailableGridTypes>
 void bind_grid(pybind11::module& m)
 {
   using Grid = typename GridTuple::head_type;

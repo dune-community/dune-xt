@@ -28,8 +28,6 @@
 #include <python/dune/xt/grid/walker.bindings.hh>
 #include <python/dune/xt/grid/walker/apply-on.bindings.hh>
 
-#include <python/dune/xt/grid/available_types.hh>
-
 template <class G, Dune::XT::Grid::Layers layer, Dune::XT::Grid::Backends backend>
 void bind_walker(pybind11::module& m)
 {
@@ -40,7 +38,7 @@ void bind_walker(pybind11::module& m)
 } // ... bind_walker(...)
 
 
-template <class Tuple = Dune::XT::Grid::bindings::AvailableTypes>
+template <class Tuple = Dune::XT::Grid::AvailableGridTypes>
 void addbind_for_Grid(pybind11::module& m)
 {
   using namespace Dune::XT::Grid;

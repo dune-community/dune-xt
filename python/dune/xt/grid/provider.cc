@@ -24,10 +24,9 @@
 #include <python/dune/xt/common/bindings.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 #include <python/dune/xt/grid/gridprovider.hh>
-#include <python/dune/xt/grid/available_types.hh>
 
 
-template <class Tuple = Dune::XT::Grid::bindings::AvailableTypes>
+template <class Tuple = Dune::XT::Grid::AvailableGridTypes>
 void addbind_for_Grid(pybind11::module& m)
 {
   using namespace Dune::XT::Grid;
