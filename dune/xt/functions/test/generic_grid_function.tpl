@@ -61,10 +61,11 @@ struct GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
     {
       JacobianType ret;
       const auto J_inv_T = element.geometry().jacobianInverseTransposed(local_x);
+      const auto local_jac = local_jacobian(local_x);
+      // Jinv^T local_jac[rr]^T = ret[rr]^T
       for (size_t rr = 0; rr < r; ++rr)
-        for (size_t dd = 0; dd < d; ++dd)
-          for (size_t ii = 0; ii < rC; ++ii)
-            ret[rr][ii][dd] = J_inv_T[dd][0] * 2 * local_x[0];
+        for (size_t ii = 0; ii < rC; ++ii)
+          J_inv_T.mv(local_jac[rr][ii], ret[rr][ii]);
       return ret;
     }
   };
@@ -86,9 +87,9 @@ struct GenericFunction_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::testin
     {
       JacobianType ret;
       const auto J_inv_T = element.geometry().jacobianInverseTransposed(local_x);
+      const auto local_jac = local_jacobian(local_x);
       for (size_t rr = 0; rr < r; ++rr)
-        for (size_t dd = 0; dd < d; ++dd)
-          ret[rr][dd] = J_inv_T[dd][0] * 2 * local_x[0];
+        J_inv_T.mv(local_jac[rr], ret[rr]);
       return ret;
     }
   };
