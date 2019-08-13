@@ -56,8 +56,9 @@ public:
 
   explicit ConstantFunction(const RangeReturnType& value, const std::string nm = "")
     : value_(value)
-    , name_((nm.empty() && r == 1 && rC == 1) ? std::string("ConstantFunction(" + Common::to_string(value) + ")")
+    , name_(nm.empty() ? ((r == 1 && rC == 1) ? std::string("ConstantFunction(" + Common::to_string(value) + ")")
                                               : static_id())
+                       : nm)
   {}
 
 #if !DUNE_XT_WITH_PYTHON_BINDINGS

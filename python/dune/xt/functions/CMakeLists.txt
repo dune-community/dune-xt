@@ -22,4 +22,3 @@ dune_pybindxi_add_module(_expression EXCLUDE_FROM_ALL expression.cc)
 dune_pybindxi_add_module(_function_as_grid_function EXCLUDE_FROM_ALL function-as-grid-function.cc)
 dune_pybindxi_add_module(_indicator EXCLUDE_FROM_ALL indicator.cc)
 dune_pybindxi_add_module(_spe10 EXCLUDE_FROM_ALL spe10.cc)
-

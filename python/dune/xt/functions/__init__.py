@@ -30,7 +30,7 @@ _modules = (
     '_function_as_grid_function',
     '_indicator',
     '_spe10',
-    )
+)
 
 # see https://stackoverflow.com/questions/43059267/how-to-do-from-module-import-using-importlib
 for mod_name in _modules:
@@ -48,4 +48,3 @@ for mod_name in _modules:
         if os.environ.get('DXT_PYTHON_DEBUG', False):
             raise e
         logging.error('dune-xt-functions: could not import {} module'.format(mod_name))
-
