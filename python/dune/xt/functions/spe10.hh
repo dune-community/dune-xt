@@ -10,14 +10,13 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_SPE10_PBH
-#define DUNE_XT_FUNCTIONS_SPE10_PBH
+#ifndef PYTHON_DUNE_XT_FUNCTIONS_SPE10_HH
+#define PYTHON_DUNE_XT_FUNCTIONS_SPE10_HH
 
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
 
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
@@ -79,27 +78,24 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
         "min"_a = Spe10::internal::model1_min_value,
         "max"_a = Spe10::internal::model1_max_value,
         "name"_a = C::static_id());
-
-  c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
-
-  const std::string make_name = "make_spe10_model1_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
-  m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::none_t>& /*grid*/,
-           const std::string& filename,
-           const Common::FieldVector<D, d>& lower_left,
-           const Common::FieldVector<D, d>& upper_right,
-           const R& min,
-           const R& max,
-           const std::string& name) { return C(filename, lower_left, upper_right, min, max, name); },
-        "grid_provider"_a,
-        "filename"_a,
+  c.def(py::init([](const Common::FieldVector<D, d>& ll,
+                    const Common::FieldVector<D, d>& up,
+                    const R& min,
+                    const R& max,
+                    const std::string nm) {
+          return std::make_unique<C>(XT::Data::spe10_model1_filename(), ll, up, min, max, nm);
+        }),
         "lower_left"_a,
         "upper_right"_a,
         "min"_a = Spe10::internal::model1_min_value,
         "max"_a = Spe10::internal::model1_max_value,
         "name"_a = C::static_id());
+
+  c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
+
+  const std::string make_name = "make_spe10_model1_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& /*grid*/,
+        [](const Grid::GridProvider<G>& /*grid*/,
            const std::string& filename,
            const Common::FieldVector<D, d>& lower_left,
            const Common::FieldVector<D, d>& upper_right,
@@ -122,4 +118,4 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_SPE10_PBH
+#endif // PYTHON_DUNE_XT_FUNCTIONS_SPE10_HH

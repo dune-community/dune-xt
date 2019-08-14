@@ -29,25 +29,29 @@ namespace Functions {
 /**
  * \brief A function given by a lambda expression or std::function which is evaluated locally on each element.
  *
- *        To model the function f(x) = x^p with a variable exponent p, use as
- * \code
-GenericGridFunction<...> f(
-                           [](const typename F::ElementType& element,
-                              const typename F::DomainType& point_in_local_coordinates,
-                              const XT::Common::Parameter&  param) {
-                             typename F::RangeType ret(std::pow(point_in_local_coordinates[0],
-param.get("power").at(0)));
-                             return ret;
-                           },
-                           integration_order,
-                           XT::Common::ParameterType("power", 1),
-                           "x_power_p");
-\endcode
+ *        To model the function f(x) = x^p (where x is the local coordinate on the reference element) with a variable
+ *        exponent p, use as
+ *        \code
+ *        GenericGridFunction<...> f([](const typename F::DomainType& point_in_local_coordinates,
+ *                                      const XT::Common::Parameter&  param) {
+ *                                     typename F::RangeType ret(std::pow(point_in_local_coordinates[0],
+ *                                             param.get("power").at(0)));
+ *                                     return ret;
+ *                                   },
+ *                                   integration_order,
+ *                                   XT::Common::ParameterType("power", 1),
+ *                                   "x_power_p");
+ *        \endcode
  *        The XT::Common::ParameterType provided on construction ensures that the XT::Common::Parameter param which is
  *        passed on to the generic function is of correct type.
- * \note  The Localfunction does not implement derivative.
+ *        If you want the function to have Jacobians, you have to provide an additional generic function to the
+ *        constructor.
+ *        Note that this generic jacobian function should describe the local jacobian on the reference element (for the
+ *        x^p function in one dimension, this would be p x^{p-1}). The jacobian(...) method of the
+ *        LocalGenericGridFunction will do the transformation for you and return the jacobian on the actual grid
+ *        element.
  */
-template <class E, size_t r, size_t rC = 1, class R = double>
+template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class GenericGridFunction : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
@@ -118,13 +122,18 @@ private:
                                        const Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
-      return jacobian_(point_in_local_coordinates, parsed_param);
+      auto local_jacobian = jacobian_(point_in_local_coordinates, parsed_param);
+      const auto J_inv_T = this->element().geometry().jacobianInverseTransposed(point_in_local_coordinates);
+      return JacobianHelper<>::jacobian(local_jacobian, J_inv_T);
     }
 
     DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                          const DomainType& point_in_local_coordinates,
                                          const Common::Parameter& param = {}) const override final
     {
+      DUNE_THROW(Dune::NotImplemented,
+                 "This function should also transform the derivatives (like the jacobian method), go ahead and "
+                 "implement if you want to use this method!");
       auto parsed_param = this->parse_parameter(param);
       return derivative_(alpha, point_in_local_coordinates, parsed_param);
     }
@@ -135,6 +144,33 @@ private:
     }
 
   private:
+    template <size_t range_cols = rC, bool anything = true>
+    struct JacobianHelper
+    {
+      static DerivativeRangeReturnType jacobian(const DerivativeRangeType& local_jacobian,
+                                                const FieldMatrix<R, d, d>& J_inv_T)
+      {
+        DerivativeRangeReturnType global_jacobian;
+        for (size_t rr = 0; rr < r; ++rr)
+          for (size_t ii = 0; ii < rC; ++ii)
+            J_inv_T.mv(local_jacobian[rr][ii], global_jacobian[rr][ii]);
+        return global_jacobian;
+      }
+    };
+
+    template <bool anything>
+    struct JacobianHelper<1, anything>
+    {
+      static DerivativeRangeReturnType jacobian(const DerivativeRangeType& local_jacobian,
+                                                const FieldMatrix<R, d, d>& J_inv_T)
+      {
+        DerivativeRangeReturnType global_jacobian;
+        for (size_t rr = 0; rr < r; ++rr)
+          J_inv_T.mv(local_jacobian[rr], global_jacobian[rr]);
+        return global_jacobian;
+      }
+    };
+
     const GenericOrderFunctionType& order_;
     const GenericPostBindFunctionType& post_bind_;
     const GenericEvaluateFunctionType& evaluate_;

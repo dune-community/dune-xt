@@ -10,14 +10,13 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_PBH
-#define DUNE_XT_FUNCTIONS_EXPRESSION_PBH
+#ifndef PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH
+#define PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
 #include <dune/xt/common/string.hh>
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/functions/expression.hh>
@@ -276,4 +275,4 @@ pybind11::class_<ExpressionFunction<d, r, rC, double>> bind_ExpressionFunction(p
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_EXPRESSION_PBH
+#endif // PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH

@@ -9,9 +9,6 @@
 //   René Fritze     (2018)
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
-//
-// reserved.
-// (http://opensource.org/licenses/BSD-2-Clause)
 
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_GRID_FUNCTIONS_HH
@@ -404,6 +401,12 @@ public:
     , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
+  CombinedGridFunction(LeftType*&& left, RightType*&& right, const std::string nm = "")
+    : left_(Common::make_unique<LeftStorageType>(std::move(left)))
+    , right_(Common::make_unique<RightStorageType>(std::move(right)))
+    , name_(get_name(left_->access(), right_->access(), nm))
+  {}
+
   CombinedGridFunction(ThisType&& source) = default;
 
   CombinedGridFunction(const ThisType& other) = delete;
@@ -480,7 +483,7 @@ public:
 
 
 /**
- * \brief Function representing the product of two functions.
+ * \brief Grid function representing the product of two grid functions.
  *
  * \see internal::CombinedGridFunction
  */
@@ -504,12 +507,18 @@ std::shared_ptr<DifferenceGridFunction<T1, T2>> make_difference(const T1& left, 
   return std::make_shared<DifferenceGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
-
 template <class T1, class T2, class... Args>
 std::shared_ptr<DifferenceGridFunction<T1, T2>>
 make_difference(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
   return std::make_shared<DifferenceGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<DifferenceGridFunction<T1, T2>> make_difference(T1*&& left, T2*&& right, Args&&... args)
+{
+  return std::make_shared<DifferenceGridFunction<T1, T2>>(
+      std::move(left), std::move(right), std::forward<Args>(args)...);
 }
 
 
@@ -519,11 +528,16 @@ std::shared_ptr<SumGridFunction<T1, T2>> make_sum(const T1& left, const T2& righ
   return std::make_shared<SumGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
-
 template <class T1, class T2, class... Args>
 std::shared_ptr<SumGridFunction<T1, T2>> make_sum(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
   return std::make_shared<SumGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<SumGridFunction<T1, T2>> make_sum(T1*&& left, T2*&& right, Args&&... args)
+{
+  return std::make_shared<SumGridFunction<T1, T2>>(std::move(left), std::move(right), std::forward<Args>(args)...);
 }
 
 
@@ -533,12 +547,17 @@ std::shared_ptr<ProductGridFunction<T1, T2>> make_product(const T1& left, const 
   return std::make_shared<ProductGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
 }
 
-
 template <class T1, class T2, class... Args>
 std::shared_ptr<ProductGridFunction<T1, T2>>
 make_product(std::shared_ptr<T1> left, std::shared_ptr<T2> right, Args&&... args)
 {
   return std::make_shared<ProductGridFunction<T1, T2>>(left, right, std::forward<Args>(args)...);
+}
+
+template <class T1, class T2, class... Args>
+std::shared_ptr<ProductGridFunction<T1, T2>> make_product(T1*&& left, T2*&& right, Args&&... args)
+{
+  return std::make_shared<ProductGridFunction<T1, T2>>(std::move(left), std::move(right), std::forward<Args>(args)...);
 }
 
 

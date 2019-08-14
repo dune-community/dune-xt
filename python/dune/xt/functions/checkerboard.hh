@@ -10,14 +10,13 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
-#define DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
+#ifndef PYTHON_DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
+#define PYTHON_DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
 
 #include <dune/pybindxi/pybind11.h>
 
 #include <dune/xt/common/string.hh>
 
-#include <dune/xt/grid/dd/subdomains/grid.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 
@@ -77,20 +76,7 @@ bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
 
   const std::string make_name = "make_checkerboard_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
   m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::none_t>& /*grid_provider*/,
-           const Common::FieldVector<D, d>& lower_left,
-           const Common::FieldVector<D, d>& upper_right,
-           const Common::FieldVector<size_t, d>& num_elements,
-           const std::vector<typename C::RangeType>& values,
-           const std::string name) { return C(lower_left, upper_right, num_elements, values, name); },
-        "grid_provider"_a,
-        "lower_left"_a,
-        "upper_right"_a,
-        "num_elements"_a,
-        "values"_a,
-        "name"_a = C::static_id());
-  m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G, Grid::DD::SubdomainGrid<G>>& /*grid_provider*/,
+        [](const Grid::GridProvider<G>& /*grid_provider*/,
            const Common::FieldVector<D, d>& lower_left,
            const Common::FieldVector<D, d>& upper_right,
            const Common::FieldVector<size_t, d>& num_elements,
@@ -111,4 +97,4 @@ bind_CheckerboardFunction(pybind11::module& m, const std::string& grid_id)
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTIONS_CHECKERBOARD_PBH
+#endif // PYTHON_DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
