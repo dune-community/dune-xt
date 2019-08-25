@@ -416,15 +416,17 @@ protected:
   template <class MM>
   derived_type& add_assign(const MatrixInterface<MM, ScalarType>& other)
   {
+    const auto& other_pattern = other.pattern();
+#ifndef NDEBUG
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
-    const auto this_pattern = pattern();
-    auto new_pattern = this_pattern + other.pattern();
-    if (new_pattern != this_pattern)
+    const auto& this_pattern = pattern();
+    if (!this_pattern.contains(other_pattern))
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
                  "The matrix to be added contains entries that are not in this' pattern!");
+#endif
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (const auto& cc : this_pattern.inner(rr))
+      for (const auto& cc : other_pattern.inner(rr))
         add_to_entry(rr, cc, other.get_entry(rr, cc));
     return this->as_imp();
   }
@@ -432,15 +434,17 @@ protected:
   template <class MM>
   derived_type& subtract_assign(const MatrixInterface<MM, ScalarType>& other)
   {
+    const auto& other_pattern = other.pattern();
+#ifndef NDEBUG
     if (other.rows() != rows() || other.cols() != cols())
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match, "Dimensions of matrices to be added do not match!");
-    const auto this_pattern = pattern();
-    auto new_pattern = this_pattern + other.pattern();
-    if (new_pattern != this_pattern)
+    const auto& this_pattern = pattern();
+    if (!this_pattern.contains(other_pattern))
       DUNE_THROW(XT::Common::Exceptions::shapes_do_not_match,
-                 "The matrix to be subtracted contains entries that are not in this' pattern!");
+                 "The matrix to be added contains entries that are not in this' pattern!");
+#endif
     for (size_t rr = 0; rr < rows(); ++rr)
-      for (const auto& cc : this_pattern.inner(rr))
+      for (const auto& cc : other_pattern.inner(rr))
         add_to_entry(rr, cc, -other.get_entry(rr, cc));
     return this->as_imp();
   }
