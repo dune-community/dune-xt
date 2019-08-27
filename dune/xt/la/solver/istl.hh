@@ -19,6 +19,7 @@
 #include <dune/istl/operators.hh>
 #include <dune/istl/preconditioners.hh>
 #include <dune/istl/solvers.hh>
+#include <dune/istl/schwarz.hh>
 #include <dune/istl/umfpack.hh>
 #include <dune/istl/superlu.hh>
 
@@ -28,6 +29,7 @@
 #include <dune/xt/la/container/istl.hh>
 
 #include "istl/amg.hh"
+#include "istl/preconditioners.hh"
 #include "../solver.hh"
 
 namespace Dune {
