@@ -13,7 +13,7 @@
 
 #include <dune/common/exceptions.hh>
 
-#include <dune/xt/common/lapacke.hh>
+#include <dune/xt/common/cblas.hh>
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/vector.hh>
@@ -219,26 +219,25 @@ struct TriangularSolver
         x[1] /= M::get_entry(A, 1, 1);
         x[0] = (x[0] - M::get_entry(A, trans ? 1 : 0, trans ? 0 : 1) * x[1]) / M::get_entry(A, 0, 0);
       } // if (solve_forward)
-#if HAVE_MKL || HAVE_CBLAS
-    } else if ((storage_layout == Common::StorageLayout::dense_row_major
-                || storage_layout == Common::StorageLayout::dense_column_major)
-               && num_rows > 10) {
+    } else if (Common::Cblas::available()
+               && (storage_layout == Common::StorageLayout::dense_row_major
+                   || storage_layout == Common::StorageLayout::dense_column_major)
+               && num_rows) {
       const int blas_storage_layout = (storage_layout == Common::StorageLayout::dense_row_major)
-                                          ? Common::Blas::row_major()
-                                          : Common::Blas::col_major();
-      const int blas_triangular =
-          (triangular_type == Common::MatrixPattern::upper_triangular) ? Common::Blas::upper() : Common::Blas::lower();
-      const int blas_trans = (transpose == Common::Transpose::yes) ? Common::Blas::trans() : Common::Blas::no_trans();
+                                          ? Common::Cblas::row_major()
+                                          : Common::Cblas::col_major();
+      const int blas_triangular = (triangular_type == Common::MatrixPattern::upper_triangular) ? Common::Cblas::upper()
+                                                                                               : Common::Cblas::lower();
+      const int blas_trans = (transpose == Common::Transpose::yes) ? Common::Cblas::trans() : Common::Cblas::no_trans();
       trsv(blas_storage_layout,
            blas_triangular,
            blas_trans,
-           Common::Blas::non_unit(),
+           Common::Cblas::non_unit(),
            num_rows,
            M::data(A),
            num_rows,
            rhs,
            1);
-#endif // HAVE_MKL || HAVE_CBLAS
     } else if (storage_layout == Common::StorageLayout::csr) {
       if (lower && !trans) {
         forward_solve_csr(A, xp, rhs);
@@ -275,7 +274,6 @@ struct TriangularSolver
     }
   } // static void solve(...)
 
-#if HAVE_CBLAS || HAVE_MKL
 private:
   template <class ScalarImp = ScalarType>
   static std::enable_if_t<Common::is_arithmetic<ScalarImp>::value, void> trsv(const int layout,
@@ -288,7 +286,7 @@ private:
                                                                               ScalarType* x,
                                                                               const int incx)
   {
-    return Common::Blas::dtrsv(layout, uplo, transa, diag, n, a, lda, x, incx);
+    return Common::Cblas::dtrsv(layout, uplo, transa, diag, n, a, lda, x, incx);
   }
 
   template <class ScalarImp = ScalarType>
@@ -302,10 +300,9 @@ private:
                                                                            ScalarType* x,
                                                                            const int incx)
   {
-    return Common::Blas::ztrsv(
+    return Common::Cblas::ztrsv(
         layout, uplo, transa, diag, n, static_cast<const void*>(a), lda, static_cast<void*>(x), incx);
   }
-#endif // HAVE_CBLAS || HAVE_MKL
 };
 
 // specialization for CommonSparseOrDenseMatrix

@@ -10,10 +10,8 @@
 #ifndef DUNE_XT_LA_SOLVER_ISTL_SCHURCOMPLEMENT_HH
 #define DUNE_XT_LA_SOLVER_ISTL_SCHURCOMPLEMENT_HH
 
-#if HAVE_DUNE_ISTL
-#  include <dune/istl/operators.hh>
-#  include <dune/istl/solvers.hh>
-#endif // HAVE_DUNE_ISTL
+#include <dune/istl/operators.hh>
+#include <dune/istl/solvers.hh>
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
@@ -23,9 +21,6 @@
 namespace Dune {
 namespace XT {
 namespace LA {
-
-
-#if HAVE_DUNE_ISTL
 
 
 // For a saddle point matrix (A B1; B2^T C) this models the Schur complement (B2^T A^{-1} B1 - C)
@@ -148,17 +143,6 @@ private:
   mutable Vector n_vec_2_;
 };
 
-#else // HAVE_DUNE_ISTL
-
-template <class VectorType = IstlDenseVector<double>,
-          class MatrixType = IstlRowMajorSparseMatrix<double>,
-          class CommunicatorType = SequentialCommunication>
-class SchurComplementOperator
-{
-  static_assert(Dune::AlwaysFalse<VectorType>::value, "You are missing dune-istl!");
-};
-
-#endif // HAVE_DUNE_ISTL
 
 } // namespace LA
 } // namespace XT
