@@ -23,10 +23,8 @@ typedef Dune::XT::LA::EigenDenseVector<double> EIGEN_DENSE_VECTOR;
 typedef Dune::XT::LA::EigenDenseMatrix<double> EIGEN_DENSE_MATRIX;
 typedef Dune::XT::LA::EigenRowMajorSparseMatrix<double> EIGEN_SPARSE_MATRIX;
 #endif
-#if HAVE_DUNE_ISTL
 typedef Dune::XT::LA::IstlDenseVector<double> ISTL_DENSE_VECTOR;
 typedef Dune::XT::LA::IstlRowMajorSparseMatrix<double> ISTL_SPARSE_MATRIX;
-#endif
 
 namespace Dune {
 namespace XT {
@@ -178,7 +176,6 @@ struct container_name<EigenRowMajorSparseMatrix<double>>
 };
 
 #endif // HAVE_EIGEN
-#if HAVE_DUNE_ISTL
 
 template <>
 struct container_name<IstlDenseVector<double>>
@@ -198,8 +195,6 @@ struct container_name<IstlRowMajorSparseMatrix<double>>
   }
 };
 
-
-#endif // HAVE_DUNE_ISTL
 
 } // namespace bindings
 } // namespace LA

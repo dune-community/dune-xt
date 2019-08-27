@@ -16,15 +16,12 @@
 #include <type_traits>
 #include <cmath>
 
-#if HAVE_DUNE_ISTL
-#  include <dune/istl/preconditioners.hh>
-#endif // HAVE_DUNE_ISTL
+#include <dune/istl/preconditioners.hh>
 
 namespace Dune {
 namespace XT {
 namespace LA {
 
-#if HAVE_DUNE_ISTL
 
 template <class O>
 class IdentityPreconditioner : public Dune::Preconditioner<typename O::domain_type, typename O::range_type>
@@ -61,7 +58,6 @@ private:
   SolverCategory::Category category_;
 };
 
-#endif // HAVE_DUNE_ISTL
 
 } // namespace LA
 } // namespace XT

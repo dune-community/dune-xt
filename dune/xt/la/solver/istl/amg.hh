@@ -16,12 +16,10 @@
 #include <type_traits>
 #include <cmath>
 
-#if HAVE_DUNE_ISTL
-#  include <dune/istl/operators.hh>
-#  include <dune/istl/solvers.hh>
-#  include <dune/istl/paamg/amg.hh>
-#  include <dune/istl/preconditioners.hh>
-#endif // HAVE_DUNE_ISTL
+#include <dune/istl/operators.hh>
+#include <dune/istl/solvers.hh>
+#include <dune/istl/paamg/amg.hh>
+#include <dune/istl/preconditioners.hh>
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/configuration.hh>
@@ -34,7 +32,6 @@ namespace Dune {
 namespace XT {
 namespace LA {
 
-#if HAVE_DUNE_ISTL
 
 //! the general, parallel case
 template <class S, class CommunicatorType>
@@ -108,11 +105,11 @@ public:
           preconditioner,
           opts.get("precision", default_opts.get<S>("precision")),
           opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-#  if HAVE_MPI
+#if HAVE_MPI
           (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
-#  else // HAVE_MPI
+#else // HAVE_MPI
           opts.get("verbose", default_opts.get<int>("verbose"))
-#  endif
+#endif
       );
 
       InverseOperatorResult stats;
@@ -129,11 +126,11 @@ public:
           preconditioner,
           opts.get("precision", default_opts.get<S>("precision")),
           opts.get("max_iter", default_opts.get<size_t>("max_iter")),
-#  if HAVE_MPI
+#if HAVE_MPI
           (communicator_.communicator().rank() == 0) ? opts.get("verbose", default_opts.get<int>("verbose")) : 0
-#  else // HAVE_MPI
+#else // HAVE_MPI
           opts.get("verbose", default_opts.get<int>("verbose"))
-#  endif
+#endif
       );
 
       InverseOperatorResult stats;
@@ -232,15 +229,6 @@ protected:
   const SequentialCommunication& communicator_;
 };
 
-#else // HAVE_DUNE_ISTL
-
-template <class S, class T>
-class AmgApplicator
-{
-  static_assert(Dune::AlwaysFalse<S>::value, "You are missing dune-istl!");
-};
-
-#endif // HAVE_DUNE_ISTL
 
 } // namespace LA
 } // namespace XT
