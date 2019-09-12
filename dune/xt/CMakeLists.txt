@@ -11,4 +11,5 @@
 #   Tobias Leibner  (2016)
 # ~~~
 
+add_subdirectory(grid)
 add_subdirectory(common)

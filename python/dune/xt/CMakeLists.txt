@@ -9,4 +9,5 @@
 #   René Fritze (2018)
 # ~~~
 
+add_subdirectory(grid)
 add_subdirectory(common)

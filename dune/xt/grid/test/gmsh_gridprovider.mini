@@ -1,0 +1,8 @@
+__exec_suffix = {gridname}_{dimDomain}d
+
+include grids.mini
+
+'{gridname}' != 'alu' | exclude
+
+[__static]
+TESTGRIDTYPE = {grid}

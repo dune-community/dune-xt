@@ -11,10 +11,11 @@
 
 import pytest
 from dune.xt.common.test import load_all_submodule
+from dune.xt.grid import types
 
 
 def test_load_all():
-    import dune.xt.common as xtc
+    import dune.xt.grid as xtc
     load_all_submodule(xtc)
 
 
@@ -50,3 +51,7 @@ def test_timings():
 if __name__ == '__main__':
     from dune.xt.common.test import runmodule
     runmodule(__file__)
+def test_types():
+    cache = {}
+    rt = types.all_types(cache=cache, dims=(2, 3))
+    assert len(rt) == 0

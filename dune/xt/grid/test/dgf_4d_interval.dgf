@@ -1,0 +1,9 @@
+DGF
+INTERVAL
+0 0 0 0 # lower left
+1 1 1 1 # upper right
+2 2 2 2 # number of elements
+#
+BOUNDARYDOMAIN
+default 1
+#

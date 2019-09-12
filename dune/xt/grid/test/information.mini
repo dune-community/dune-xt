@@ -1,0 +1,7 @@
+__name = information_{dimDomain}d
+__exec_suffix = {dimDomain}d
+
+dimDomain = 1, 2, 3 | expand
+
+[__static]
+TESTGRIDDIM = {dimDomain}
