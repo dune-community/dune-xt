@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 requires=['binpacking==1.3', 'cython', 'jinja2', 'docopt', 'pylicense3>=0.4.1',
                         'ipython', 'pytest', 'pytest-cov', 'cmake_format==0.4.1',
-                        'codecov', 'yapf==0.25', 'loguru']
+                        'codecov', 'yapf==0.25', 'loguru', 'numpy', 'scipy']
 if '${HAVE_MPI}' == 'TRUE':
     requires.append('mpi4py')
 
