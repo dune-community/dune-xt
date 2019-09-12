@@ -7,9 +7,11 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   René Fritze (2018)
+#   Tobias Leibner (2018)
 # ~~~
 
 add_subdirectory(dune)
 add_subdirectory(scripts)
 add_subdirectory(wrapper)
+add_subdirectory(dune/xt/functions/)
 dxt_add_python_tests()

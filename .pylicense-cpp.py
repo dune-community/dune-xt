@@ -19,4 +19,5 @@ prefix = '//'
 
 include_patterns = ('*.cc', '*.cxx', '*.hh', '*.hxx', '*cmake_config.h.in', '*headercheck.cpp.in', '*config.h.cmake',
                     '*version.hh.in', '*.pbh')
-exclude_patterns = ('*mathexpr.*', '*gtest-all.cc', '*.vcsetup*', '*gtest-all.cxx')
+exclude_patterns = ('*mathexpr.*', '*gtest-all.cc', '*.vcsetup*', '*gtest-all.cxx', '*dune/xt/functions/expression/mathexpr.cc',
+                    '*dune/xt/functions/expression/mathexpr.hh')
