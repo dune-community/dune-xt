@@ -1,15 +1,15 @@
 # ~~~
-# This file is part of the dune-xt-common project:
-#   https://github.com/dune-community/dune-xt-common
-# Copyright 2009-2018 dune-xt-common developers and contributors. All rights reserved.
+# This file is part of the dune-xt project:
+#   https://github.com/dune-community/dune-xt
+# Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Felix Schindler (2013 - 2014, 2016 - 2017)
-#   René Fritze     (2013 - 2016, 2018)
+#   René Fritze     (2013 - 2016, 2018 - 2019)
 #   Sven Kaulmann   (2014)
-#   Tobias Leibner  (2016, 2018)
+#   Tobias Leibner  (2016, 2018 - 2019)
 # ~~~
 
 # enables "IN_LIST operator
@@ -79,9 +79,9 @@ endif(NOT DS_HEADERCHECK_DISABLE)
 set(DXT_TEST_TIMEOUT 180 CACHE STRING "per-test timeout in seconds")
 set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
 # ~~~
-# This file is part of the dune-xt-functions project:
-#   https://github.com/dune-community/dune-xt-functions
-# Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
+# This file is part of the dune-xt project:
+#   https://github.com/dune-community/dune-xt
+# Copyright 2009-2019 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -94,9 +94,9 @@ set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
 # File for module specific CMake tests.
 # ~~~
 # ~~~
-# This file is part of the dune-xt-grid project:
-#   https://github.com/dune-community/dune-xt-grid
-# Copyright 2009-2018 dune-xt-grid developers and contributors. All rights reserved.
+# This file is part of the dune-xt project:
+#   https://github.com/dune-community/dune-xt
+# Copyright 2009-2019 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -110,9 +110,9 @@ set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
 
 set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
 # ~~~
-# This file is part of the dune-xt-la project:
-#   https://github.com/dune-community/dune-xt-la
-# Copyright 2009-2018 dune-xt-la developers and contributors. All rights reserved.
+# This file is part of the dune-xt project:
+#   https://github.com/dune-community/dune-xt
+# Copyright 2009-2019 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)

@@ -1,6 +1,6 @@
 ```
-# This file is part of the dune-xt-common project:
-#   https://github.com/dune-community/dune-xt-common
+# This file is part of the dune-xt project:
+#   https://github.com/dune-community/dune-xt
 # Copyright 2009-2017 dune-xt-common developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
@@ -13,7 +13,7 @@
 # Help
 
 If you are experiencing problems or would like to get help, open up a new
-[issue](https://github.com/dune-community/dune-xt-common/issues/new) and tag it accordingly
+[issue](https://github.com/dune-community/dune-xt/issues/new) and tag it accordingly
 or ask for help on the [mailinglist](https://listserv.uni-muenster.de/mailman/listinfo/dune-xt-dev).
 Please note that dune-xt-common is not one of the core DUNE modules. Thus, you will not get
 any support from the official channels (such as the DUNE mailinglist, the DUNE bugtracker,
@@ -34,7 +34,7 @@ Fork the repository and open up a pull request, explaining your changes and why 
 ## Mailinglist and issues
 
 Join the [mailinglist](https://listserv.uni-muenster.de/mailman/listinfo/dune-xt-dev) and take a look at the
-[issues](https://github.com/dune-community/dune-xt-common/issues) to help shape the future of this project.
+[issues](https://github.com/dune-community/dune-xt/issues) to help shape the future of this project.
 
 
 # Coding style
