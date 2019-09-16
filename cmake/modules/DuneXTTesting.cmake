@@ -67,29 +67,29 @@ macro(BEGIN_TESTCASES) # https://cmake.org/cmake/help/v3.0/module/FindGTest.html
                    minifile
                    ${source})
     if(EXISTS ${minifile})
-        if(dune-testtools_FOUND)
-              dune_add_system_test(SOURCE
-                                   ${source}
-                                   ${COMMON_HEADER}
-                                   INIFILE
-                                   ${minifile}
-                                   BASENAME
-                                   test_${testbase}
-                                   CREATED_TARGETS
-                                   targetlist_${testbase}
-                                   ADDED_TESTS
-                                   testlist_${testbase}
-                                   SCRIPT
-                                   dune_xt_execute.py
-                                   ${DEBUG_MACRO_TESTS})
-              foreach(target ${targetlist_${testbase}})
-                target_link_libraries(${target} ${ARGN} ${COMMON_LIBS} ${GRID_LIBS} gtest_dune_xt_common)
-                list(APPEND dxt_test_binaries ${target})
-                set(dxt_test_names_${target} ${testlist_${testbase}_${target}})
-              endforeach(target)
-        else(dune-testtools_FOUND)
-            MESSAGE("-- missing dune-testtools, disabling test ${source}")
-        endif(dune-testtools_FOUND)
+      if(dune-testtools_FOUND)
+        dune_add_system_test(SOURCE
+                             ${source}
+                             ${COMMON_HEADER}
+                             INIFILE
+                             ${minifile}
+                             BASENAME
+                             test_${testbase}
+                             CREATED_TARGETS
+                             targetlist_${testbase}
+                             ADDED_TESTS
+                             testlist_${testbase}
+                             SCRIPT
+                             dune_xt_execute.py
+                             ${DEBUG_MACRO_TESTS})
+        foreach(target ${targetlist_${testbase}})
+          target_link_libraries(${target} ${ARGN} ${COMMON_LIBS} ${GRID_LIBS} gtest_dune_xt_common)
+          list(APPEND dxt_test_binaries ${target})
+          set(dxt_test_names_${target} ${testlist_${testbase}_${target}})
+        endforeach(target)
+      else(dune-testtools_FOUND)
+        message("-- missing dune-testtools, disabling test ${source}")
+      endif(dune-testtools_FOUND)
     else(EXISTS ${minifile})
       set(target test_${testbase})
       dune_add_test(NAME
@@ -224,8 +224,7 @@ macro(END_TESTCASES) # this excludes meta-ini variation test cases because  ther
   endforeach(target ${dxt_test_binaries})
   set(dxt_headercheck_targets "")
   get_headercheck_targets(dxt_headercheck_targets)
-  configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/dxt_test_binaries.cmake)
+  configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/dxt_test_binaries.cmake)
   configure_file(${dune-xt-module-path}/dxt_all_sorted_testnames.cmake.in
                  ${CMAKE_CURRENT_BINARY_DIR}/dxt_all_sorted_testnames.cmake)
   configure_file(${dune-xt-module-path}/dxt_headercheck_targets.cmake.in

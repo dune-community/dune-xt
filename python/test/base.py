@@ -51,6 +51,8 @@ def test_timings():
 if __name__ == '__main__':
     from dune.xt.common.test import runmodule
     runmodule(__file__)
+
+
 def test_types():
     cache = {}
     rt = types.all_types(cache=cache, dims=(2, 3))

@@ -11,7 +11,6 @@
 #   Tobias Leibner  (2015 - 2016)
 # ~~~
 
-
 dependencycheck(${xtcommon})
 
 include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)

@@ -1,4 +1,3 @@
-
 enable_testing()
 
 begin_testcases(dunextgrid dunextcommon dunextla)
@@ -10,7 +9,7 @@ add_subdirectory(grid)
 add_subdirectory(la)
 add_subdirectory(functions)
 
-if (ALBERTA_FOUND)
+if(ALBERTA_FOUND)
   add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)
   add_dune_alberta_flags(GRIDDIM 3 test_dd_glued_3d)
 

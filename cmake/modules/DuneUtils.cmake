@@ -53,23 +53,23 @@ include(DuneXTTesting)
 
 macro(add_header_listing) # header
   file(GLOB_RECURSE current_module_header
-       "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh"
-       "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.pbh"
-       "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hxx"
-       "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hh"
-       "${CMAKE_CURRENT_SOURCE_DIR}/python/*.pbh"
-       "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hxx")
+                    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.pbh"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hxx"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hh"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.pbh"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/python/*.hxx")
   set(COMMON_HEADER ${current_module_header} ${DUNE_HEADERS})
 
   # add header of dependent modules for header listing
   foreach(_mod ${ALL_DEPENDENCIES})
     file(GLOB_RECURSE HEADER_LIST
-            "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hh"
-            "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.pbh"
-            "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hxx"
-            "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hh"
-            "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.pbh"
-            "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hxx")
+                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hh"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.pbh"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/dune/*.hxx"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hh"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.pbh"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/python/*.hxx")
     list(APPEND COMMON_HEADER ${HEADER_LIST})
   endforeach(_mod DEPENDENCIES)
   set_source_files_properties(${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1)

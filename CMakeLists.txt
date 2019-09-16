@@ -60,7 +60,10 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
 dune_enable_all_packages(INCLUDE_DIRS
                          ${dune-xt-common_SOURCE_DIR}/dune
                          MODULE_LIBRARIES
-                         dunextcommon dunextgrid dunextfunctions dunextla
+                         dunextcommon
+                         dunextgrid
+                         dunextfunctions
+                         dunextla
                          gtest_dune_xt_common)
 
 include(DunePybindxiInstallPythonPackage)
