@@ -7,10 +7,10 @@
 // Authors:
 //   Tobias Leibner  (2019)
 
-#include <dune/xt/common/test/main.hxx>
-#include <dune/xt/common/test/float_cmp.hh>
+#include <dune/xt/test/main.hxx>
+#include <dune/xt/test/common/float_cmp.hh>
 
-#include <dune/xt/la/test/container.hh>
+#include <dune/xt/test/la/container.hh>
 #include <dune/xt/la/container/matrix-view.hh>
 #include <dune/xt/la/container/vector-view.hh>
 

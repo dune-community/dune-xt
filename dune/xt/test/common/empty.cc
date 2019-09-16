@@ -13,6 +13,6 @@
  * This file is intended as a starting point for quick testing.
  */
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 GTEST_TEST(empty, main) {}

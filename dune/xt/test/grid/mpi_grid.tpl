@@ -7,7 +7,7 @@
 // Authors:
 //   Rene Milk       (2018)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/xt/grid/gridprovider/eoc.hh>
 #include <dune/xt/grid/grids.hh>

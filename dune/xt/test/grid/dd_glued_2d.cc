@@ -8,7 +8,7 @@
 //   Felix Schindler (2017 - 2018)
 //   René Fritze     (2018 - 2019)
 
-#include <dune/xt/common/test/main.hxx> // <- this one has to come first (includes the config.h)!
+#include <dune/xt/test/main.hxx> // <- this one has to come first (includes the config.h)!
 
 #include "dd_glued.hh"
 

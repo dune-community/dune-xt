@@ -10,7 +10,7 @@
 //   Tobias Leibner  (2014, 2016)
 
 // This one has to come first (includes the config.h)!
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <array>
 #include <ostream>
@@ -31,7 +31,7 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/common/validation.hh>
 
-#include <dune/xt/common/test/float_cmp.hh>
+#include <dune/xt/test/common/float_cmp.hh>
 
 // uncomment this for output
 // std::ostream& test_out = std::cout;

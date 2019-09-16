@@ -8,7 +8,7 @@
 //   Felix Schindler (2019)
 //   René Fritze     (2019)
 
-#include <dune/xt/common/test/main.hxx> // <- Has to come first, includes the config.h!
+#include <dune/xt/test/main.hxx> // <- Has to come first, includes the config.h!
 
 #include <dune/xt/common/unused.hh>
 #include <dune/xt/grid/type_traits.hh>

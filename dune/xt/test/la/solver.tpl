@@ -10,7 +10,7 @@
 //   Tobias Leibner  (2014 - 2015, 2017)
 
 // This one has to come first (includes the config.h)!
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <tuple>
 
@@ -19,7 +19,7 @@
 #include <dune/xt/la/container.hh>
 #include <dune/xt/la/solver.hh>
 
-#include <dune/xt/la/test/container.hh>
+#include <dune/xt/test/la/container.hh>
 
 // toggle output
 // std::ostream& out = std::cout;

@@ -12,7 +12,7 @@
 
 #define DUNE_XT_COMMON_TEST_MAIN_CATCH_EXCEPTIONS 1
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <vector>
 
@@ -21,7 +21,7 @@
 #include <dune/common/fmatrix.hh>
 
 #include <dune/xt/common/float_cmp.hh>
-#include <dune/xt/common/test/float_cmp.hh>
+#include <dune/xt/test/common/float_cmp.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/fmatrix.hh>
 

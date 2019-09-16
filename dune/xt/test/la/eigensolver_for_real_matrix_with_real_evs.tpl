@@ -9,9 +9,9 @@
 //   Rene Milk       (2014 - 2016)
 //   Tobias Leibner  (2014 - 2015, 2017)
 
-#include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
+#include <dune/xt/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include <dune/xt/la/test/eigensolver.hh>
+#include <dune/xt/test/la/eigensolver.hh>
 
 {% for T_NAME, TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE in config.testtypes %}
 struct EigenSolverForMatrixFullOfOnes_{{T_NAME}}

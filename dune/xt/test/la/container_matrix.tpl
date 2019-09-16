@@ -9,10 +9,10 @@
 //   Rene Milk       (2016)
 //   Tobias Leibner  (2015, 2017)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
-#include <dune/xt/la/test/container.hh>
-#include <dune/xt/common/test/float_cmp.hh>
+#include <dune/xt/test/la/container.hh>
+#include <dune/xt/test/common/float_cmp.hh>
 
 using namespace Dune;
 using namespace Dune::XT;

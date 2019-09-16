@@ -13,6 +13,19 @@
 
 enable_testing()
 
+
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/gtest)
+dune_library_add_sources(gtest_dune_xt_common SOURCES
+  common.cxx
+  gtest/gtest-all.cxx)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gtest
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/
+        FILES_MATCHING
+        PATTERN "*")
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.hxx DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/)
+
+
 begin_testcases(dunextgrid dunextcommon dunextla)
 
 end_testcases()
@@ -45,3 +58,5 @@ if(ALBERTA_FOUND)
   endforeach()
 
 endif()
+
+dependencycheck(${xtcommon})

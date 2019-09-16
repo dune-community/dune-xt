@@ -9,7 +9,7 @@
 //   Rene Milk       (2014 - 2016, 2018)
 //   Tobias Leibner  (2014 - 2017)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/xt/grid/grids.hh>
 #include <dune/geometry/quadraturerules.hh>

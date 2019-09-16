@@ -9,7 +9,7 @@
 //   Tobias Leibner (2018)
 
 // This one has to come first (includes the config.h)!
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/xt/common/crtp.hh>
 

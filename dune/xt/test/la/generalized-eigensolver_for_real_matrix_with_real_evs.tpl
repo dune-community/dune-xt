@@ -7,9 +7,9 @@
 // Authors:
 //   Felix Schindler (2019)
 
-#include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
+#include <dune/xt/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include <dune/xt/la/test/generalized-eigensolver.hh>
+#include <dune/xt/test/la/generalized-eigensolver.hh>
 
 {% for T_NAME, TESTMATRIXTYPE, TESTFIELDTYPE, TESTCOMPLEXMATRIXTYPE, TESTREALMATRIXTYPE in config.testtypes %}
 struct GeneralizedEigenSolverForMatrixFullOfOnes_{{T_NAME}}

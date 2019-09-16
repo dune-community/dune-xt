@@ -34,7 +34,6 @@ set(lib_dune_xt_common_sources
     python.cc
     signals.cc
     string.cc
-    test_common.cxx
     timedlogging.cc
     timings.cc)
 

@@ -8,7 +8,7 @@
 //   René Fritze    (2018 - 2019)
 //   Tobias Leibner (2018)
 
-#include <dune/xt/common/test/main.hxx> // <- Needs to come first, include the config.h.
+#include <dune/xt/test/main.hxx> // <- Needs to come first, include the config.h.
 
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/float_cmp.hh>

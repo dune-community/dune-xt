@@ -1,4 +1,4 @@
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/xt/grid/grids.hh>
 #include <dune/geometry/quadraturerules.hh>

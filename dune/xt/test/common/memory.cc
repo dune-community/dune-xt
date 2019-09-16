@@ -8,7 +8,7 @@
 //   Felix Schindler (2016 - 2017)
 //   René Fritze     (2016, 2018 - 2019)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/tupleutility.hh>

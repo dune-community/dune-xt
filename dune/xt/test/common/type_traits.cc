@@ -9,7 +9,7 @@
 //   René Fritze     (2012 - 2013, 2015 - 2019)
 //   Tobias Leibner  (2014, 2016)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <iostream>
 

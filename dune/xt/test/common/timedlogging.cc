@@ -15,7 +15,7 @@
 
 #include "config.h"
 
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/gtest/gtest.h>
 #include <dune/xt/common/timedlogging.hh>
 
 #include <dune/xt/test/common/common.hh>

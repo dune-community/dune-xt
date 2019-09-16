@@ -42,7 +42,7 @@
 
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/vector.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/gtest/gtest.h>
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/logging.hh>
@@ -55,7 +55,7 @@
 #  include <tbb/task_scheduler_init.h>
 #endif
 
-#include <dune/xt/common/test_common.hh>
+#include <dune/xt/test/common.hh>
 
 int main(int argc, char** argv)
 {

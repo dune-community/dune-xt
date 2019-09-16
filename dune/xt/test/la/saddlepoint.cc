@@ -12,9 +12,9 @@
 #define DUNE_XT_COMMON_TEST_MAIN_ENABLE_INFO_LOGGING 1
 #define DUNE_XT_COMMON_TEST_MAIN_ENABLE_TIMED_LOGGING 1
 
-#include <dune/xt/common/test/main.hxx> // <- This one has to come first, includes config.h!
-#include <dune/xt/common/test/float_cmp.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/main.hxx> // <- This one has to come first, includes config.h!
+#include <dune/xt/test/common/float_cmp.hh>
+#include <dune/xt/test/gtest/gtest.h>
 
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/la/solver/istl/saddlepoint.hh>

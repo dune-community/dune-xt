@@ -9,7 +9,7 @@
 //   René Fritze     (2018 - 2019)
 //   Tobias Leibner  (2018)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/xt/common/matrix.hh>
 #include <dune/xt/common/fmatrix.hh>

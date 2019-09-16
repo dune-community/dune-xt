@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <complex>
 
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/gtest/gtest.h>
 #include <dune/xt/common/float_cmp.hh>
 
 #include "float_cmp_generated.hxx"

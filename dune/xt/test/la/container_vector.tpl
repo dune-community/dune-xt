@@ -9,10 +9,10 @@
 //   Rene Milk       (2014 - 2016)
 //   Tobias Leibner  (2014 - 2017)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 #include <dune/xt/common/vector.hh>
 
-#include <dune/xt/la/test/container.hh>
+#include <dune/xt/test/la/container.hh>
 
 using namespace Dune;
 using namespace Dune::XT;

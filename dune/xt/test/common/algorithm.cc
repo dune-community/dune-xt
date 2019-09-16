@@ -9,7 +9,7 @@
 //   René Fritze     (2015 - 2016, 2018 - 2019)
 //   Tobias Leibner  (2016)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 #include <vector>
 #include <dune/xt/common/algorithm.hh>
 

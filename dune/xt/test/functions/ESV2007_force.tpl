@@ -11,7 +11,7 @@
 
 #define DUNE_XT_COMMON_TEST_MAIN_CATCH_EXCEPTIONS 1
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/xt/grid/grids.hh>
 #include <dune/geometry/quadraturerules.hh>

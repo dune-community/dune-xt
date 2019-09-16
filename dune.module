@@ -14,5 +14,5 @@
 Module: dune-xt
 Version: 18.11-dev
 Maintainer: dune-xt-dev@listserv.uni-muenster.de
-Depends: dune-common (>= 2.6) dune-testtools (>= 2.6) dune-pybindxi (>= 18.11) dune-istl (>= 2.6)
+Depends: dune-common (>= 2.6) dune-testtools (>= 2.6) dune-pybindxi (>= 18.11) dune-istl (>= 2.6) dune-xt-data
 Suggests: dune-testtools (>= 2.6)

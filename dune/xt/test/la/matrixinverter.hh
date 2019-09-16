@@ -13,7 +13,7 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/logging.hh>
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/gtest/gtest.h>
 #include <dune/xt/common/unused.hh>
 
 #include <dune/xt/la/container/conversion.hh>

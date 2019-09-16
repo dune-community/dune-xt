@@ -11,7 +11,7 @@
 
 #include <tuple>
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/tupleutility.hh>

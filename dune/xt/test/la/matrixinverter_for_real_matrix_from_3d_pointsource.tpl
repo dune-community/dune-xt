@@ -9,9 +9,9 @@
 //   Rene Milk       (2014 - 2016)
 //   Tobias Leibner  (2014 - 2015, 2017)
 
-#include <dune/xt/common/test/main.hxx> // <- has to come first (includes the config.h)!
+#include <dune/xt/test/main.hxx> // <- has to come first (includes the config.h)!
 
-#include <dune/xt/la/test/matrixinverter.hh>
+#include <dune/xt/test/la/matrixinverter.hh>
 
 {% for T_NAME, TESTMATRIXTYPE in config.testtypes %}
 struct MatrixInverterForMatrixFrom3dPointsource_{{T_NAME}}

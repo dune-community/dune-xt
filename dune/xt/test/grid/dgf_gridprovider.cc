@@ -8,7 +8,7 @@
 //   Felix Schindler (2016 - 2017)
 //   René Fritze     (2018 - 2019)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #include "provider.hh"
 

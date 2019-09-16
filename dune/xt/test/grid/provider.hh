@@ -18,7 +18,7 @@
 #include <dune/xt/grid/gridprovider.hh>
 #include <dune/xt/grid/grids.hh>
 
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/gtest/gtest.h>
 
 template <class GridType>
 struct GridProviderBase : public testing::Test

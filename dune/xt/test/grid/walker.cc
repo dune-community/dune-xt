@@ -9,7 +9,7 @@
 //   René Fritze     (2014 - 2019)
 //   Tobias Leibner  (2015 - 2016, 2018)
 
-#include <dune/xt/common/test/main.hxx>
+#include <dune/xt/test/main.hxx>
 
 #if DUNE_VERSION_GTE(DUNE_COMMON, 3, 9) && HAVE_TBB // EXADUNE
 #  include <dune/grid/utility/partitioning/seedlist.hh>

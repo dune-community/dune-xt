@@ -10,14 +10,3 @@
 #   René Fritze     (2012 - 2016, 2018 - 2019)
 #   Tobias Leibner  (2015 - 2016)
 # ~~~
-
-dependencycheck(${xtcommon})
-
-include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
-dune_library_add_sources(gtest_dune_xt_common SOURCES gtest/gtest-all.cxx)
-
-install(DIRECTORY ${DUNE_XT_COMMON_TEST_DIR}/gtest
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/
-        FILES_MATCHING
-        PATTERN "*")
-install(FILES ${DUNE_XT_COMMON_TEST_DIR}/main.hxx DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/)
