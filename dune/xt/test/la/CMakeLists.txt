@@ -7,7 +7,6 @@
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
 #   Felix Schindler (2016 - 2017)
-#   René Fritze     (2018)
-#
-# File for module specific CMake tests.
+#   René Fritze     (2016 - 2018)
+#   Tobias Leibner  (2016, 2018)
 # ~~~

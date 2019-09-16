@@ -26,5 +26,3 @@ endif()
 
 find_package(LAPACKE)
 dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
-
-add_subdirectory(test EXCLUDE_FROM_ALL)

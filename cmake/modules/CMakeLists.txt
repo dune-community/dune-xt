@@ -13,7 +13,7 @@
 install(FILES AddALUGridCompileFlags.cmake
               DuneTBB.cmake
               DuneUtils.cmake
-              DuneXtCommonMacros.cmake
+              DuneXtMacros.cmake
               FindClangFormat.cmake
               FindClangTidy.cmake
               FindEigen3.cmake

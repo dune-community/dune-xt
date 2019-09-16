@@ -12,7 +12,7 @@
 #   Tobias Leibner  (2016, 2018)
 # ~~~
 
-project("dune-xt-common" CXX)
+project("dune-xt" CXX)
 
 # local environment
 set(ENV{PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/bin:$ENV{PATH}")
@@ -60,7 +60,7 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
 dune_enable_all_packages(INCLUDE_DIRS
                          ${dune-xt-common_SOURCE_DIR}/dune
                          MODULE_LIBRARIES
-                         dunextcommon
+                         dunextcommon dunextgrid dunextfunctions dunextla
                          gtest_dune_xt_common)
 
 include(DunePybindxiInstallPythonPackage)

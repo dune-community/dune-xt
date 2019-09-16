@@ -30,6 +30,3 @@ if(DUNE_XT_WITH_PYTHON_BINDINGS)
 endif()
 dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
 add_dune_alberta_flags(GRIDDIM 1 SOURCE_ONLY dunextgrid)
-
-include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
-add_subdirectory(test EXCLUDE_FROM_ALL)

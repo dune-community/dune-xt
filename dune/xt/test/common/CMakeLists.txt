@@ -11,10 +11,14 @@
 #   Tobias Leibner  (2015 - 2016)
 # ~~~
 
-enable_testing()
 
 dependencycheck(${xtcommon})
 
-begin_testcases(dunextcommon)
+include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
+dune_library_add_sources(gtest_dune_xt_common SOURCES gtest/gtest-all.cxx)
 
-end_testcases()
+install(DIRECTORY ${DUNE_XT_COMMON_TEST_DIR}/gtest
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/
+        FILES_MATCHING
+        PATTERN "*")
+install(FILES ${DUNE_XT_COMMON_TEST_DIR}/main.hxx DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/xt/test/)

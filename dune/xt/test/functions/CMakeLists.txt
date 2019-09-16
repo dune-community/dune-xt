@@ -11,24 +11,3 @@
 #   Tim Keil        (2018)
 #   Tobias Leibner  (2016, 2018)
 # ~~~
-
-include_directories(SYSTEM ${DUNE_XT_COMMON_TEST_DIR}/gtest)
-
-enable_testing()
-
-begin_testcases()
-
-end_testcases()
-
-# load binning setup from file
-if(DEFINED ENV{TRAVIS})
-  include("builder_definitions.cmake")
-endif(DEFINED ENV{TRAVIS})
-
-foreach(test ${dxt_test_binaries})
-  if(${test} MATCHES 2d_simplex_alberta)
-    add_dune_alberta_flags(GRIDDIM 2 ${test})
-  elseif(${test} MATCHES 3d_simplex_alberta)
-    add_dune_alberta_flags(GRIDDIM 3 ${test})
-  endif()
-endforeach()

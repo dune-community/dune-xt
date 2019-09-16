@@ -12,3 +12,4 @@
 add_subdirectory(grid)
 add_subdirectory(common)
 add_subdirectory(la)
+add_subdirectory(functions)

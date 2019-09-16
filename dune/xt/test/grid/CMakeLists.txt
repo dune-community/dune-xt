@@ -29,20 +29,3 @@ if("${UG_PARALLEL}" STREQUAL "yes")
 else()
   set(UG_IS_NOT_PARALLEL TRUE)
 endif()
-
-begin_testcases(dunextgrid)
-
-end_testcases()
-
-add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)
-add_dune_alberta_flags(GRIDDIM 3 test_dd_glued_3d)
-
-foreach(test ${dxt_test_binaries})
-  if(${test} MATCHES alberta_1d)
-    add_dune_alberta_flags(GRIDDIM 1 ${test})
-  elseif(${test} MATCHES alberta_2d)
-    add_dune_alberta_flags(GRIDDIM 2 ${test})
-  elseif(${test} MATCHES alberta_3d)
-    add_dune_alberta_flags(GRIDDIM 3 ${test})
-  endif()
-endforeach()

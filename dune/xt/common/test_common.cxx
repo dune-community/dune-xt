@@ -19,11 +19,11 @@
 #include <string>
 #include <sstream>
 
-#include <dune/xt/common/test/gtest/gtest.h>
+#include <dune/xt/test/common/gtest/gtest.h>
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/common/exceptions.hh>
 
-#include "common.hh"
+#include "test_common.hh"
 
 
 void busywait(const size_t ms)

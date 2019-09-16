@@ -71,10 +71,54 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set(DS_MAX_MIC_THREADS CACHE INTEGER 120)
-set(DUNE_XT_COMMON_TEST_DIR ${dune-xt-common_SOURCE_DIR}/dune/xt/common/test)
+set(DUNE_XT_COMMON_TEST_DIR ${dune-xt_SOURCE_DIR}/dune/xt/common/test)
 set(ENABLE_PERFMON 0 CACHE STRING "enable likwid performance monitoring API usage")
 if(NOT DS_HEADERCHECK_DISABLE)
   set(ENABLE_HEADERCHECK 1)
 endif(NOT DS_HEADERCHECK_DISABLE)
 set(DXT_TEST_TIMEOUT 180 CACHE STRING "per-test timeout in seconds")
 set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
+# ~~~
+# This file is part of the dune-xt-functions project:
+#   https://github.com/dune-community/dune-xt-functions
+# Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# Authors:
+#   Felix Schindler (2016 - 2017)
+#   René Fritze     (2018)
+#   Tim Keil        (2018)
+#   Tobias Leibner  (2018)
+#
+# File for module specific CMake tests.
+# ~~~
+# ~~~
+# This file is part of the dune-xt-grid project:
+#   https://github.com/dune-community/dune-xt-grid
+# Copyright 2009-2018 dune-xt-grid developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# Authors:
+#   Felix Schindler (2016 - 2018)
+#   René Fritze     (2017 - 2018)
+#   Tobias Leibner  (2018)
+#
+# File for module specific CMake tests.
+# ~~~
+
+set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
+# ~~~
+# This file is part of the dune-xt-la project:
+#   https://github.com/dune-community/dune-xt-la
+# Copyright 2009-2018 dune-xt-la developers and contributors. All rights reserved.
+# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
+#          with "runtime exception" (http://www.dune-project.org/license.html)
+# Authors:
+#   Felix Schindler (2016 - 2017)
+#   René Fritze     (2018)
+#
+# File for module specific CMake tests.
+# ~~~

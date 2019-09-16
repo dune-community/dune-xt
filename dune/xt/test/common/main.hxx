@@ -55,7 +55,7 @@
 #  include <tbb/task_scheduler_init.h>
 #endif
 
-#include "common.hh"
+#include <dune/xt/common/test_common.hh>
 
 int main(int argc, char** argv)
 {

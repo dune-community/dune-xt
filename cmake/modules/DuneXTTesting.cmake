@@ -224,11 +224,11 @@ macro(END_TESTCASES) # this excludes meta-ini variation test cases because  ther
   endforeach(target ${dxt_test_binaries})
   set(dxt_headercheck_targets "")
   get_headercheck_targets(dxt_headercheck_targets)
-  configure_file(${dune-xt-common-module-path}/dxt_test_binaries.cmake.in
+  configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in
                  ${CMAKE_CURRENT_BINARY_DIR}/dxt_test_binaries.cmake)
-  configure_file(${dune-xt-common-module-path}/dxt_all_sorted_testnames.cmake.in
+  configure_file(${dune-xt-module-path}/dxt_all_sorted_testnames.cmake.in
                  ${CMAKE_CURRENT_BINARY_DIR}/dxt_all_sorted_testnames.cmake)
-  configure_file(${dune-xt-common-module-path}/dxt_headercheck_targets.cmake.in
+  configure_file(${dune-xt-module-path}/dxt_headercheck_targets.cmake.in
                  ${CMAKE_CURRENT_BINARY_DIR}/dxt_headercheck_targets.cmake)
   # we use a scatter/gather setup so this still goes thru (with no new/removed tests) on CI where SRC is mounted ro
   add_custom_target(scatter_pickles_compile
