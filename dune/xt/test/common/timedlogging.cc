@@ -18,7 +18,7 @@
 #include <dune/xt/test/gtest/gtest.h>
 #include <dune/xt/common/timedlogging.hh>
 
-#include <dune/xt/test/common/common.hh>
+#include <dune/xt/test/common.hh>
 
 using namespace Dune;
 using namespace Dune::XT;
