@@ -13,14 +13,6 @@
 
 enable_testing()
 
-# link grid files
-dune_symlink_to_source_files(FILES
-                             gmsh_2d_simplices.msh
-                             dgf_1d_interval.dgf
-                             dgf_2d_interval.dgf
-                             dgf_3d_interval.dgf
-                             dgf_4d_interval.dgf)
-
 dxt_exclude_from_headercheck(dd_subdomains_cube.hh)
 
 # we want to discard one of the tests via cmake_guard if UG is parallel, so define a suitable variable here
