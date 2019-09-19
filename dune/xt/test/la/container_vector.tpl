@@ -181,7 +181,7 @@ struct VectorTest_{{T_NAME}} : public ::testing::Test
         testvector_1.set_entry(dim-1, testvector_1_saved[dim-1]);
         for (size_t ii = 0; ii < dim; ++ii)
           EXPECT_DOUBLE_OR_COMPLEX_EQ(std::real(testvector_1_saved.get_entry(ii)), testvector_1.get_entry(ii));
-        } catch(XT::Common::Exceptions::you_are_using_this_wrong) {
+        } catch(XT::Common::Exceptions::you_are_using_this_wrong&) {
         }
     }
 
