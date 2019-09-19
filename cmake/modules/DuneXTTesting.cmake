@@ -48,14 +48,15 @@ macro(get_headercheck_targets)
       endif() # do some name conversion
       set(targname ${header})
       dxt_headercheck_target_name(${targname})
-      list(APPEND dxt_headercheck_targets "${targname}")
+      list(APPEND ${subdir}_dxt_headercheck_targets "${targname}")
     endforeach(header ${headerlist})
   endif(ENABLE_HEADERCHECK)
 endmacro(get_headercheck_targets)
 
-macro(BEGIN_TESTCASES) # https://cmake.org/cmake/help/v3.0/module/FindGTest.html http://purplekarrot.net/blog/cmake-
-                       # and-test-suites.html
-  file(GLOB_RECURSE test_sources "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
+macro(add_subdir_tests subdir)
+  set(link_xt_libs dunextgrid dunextcommon dunextla)
+  list(APPEND dxt_test_dirs ${subdir})
+  file(GLOB_RECURSE test_sources "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/*.cc")
   foreach(source ${test_sources})
     set(ranks "1")
     if(source MATCHES "mpi")
@@ -83,8 +84,8 @@ macro(BEGIN_TESTCASES) # https://cmake.org/cmake/help/v3.0/module/FindGTest.html
                              dune_xt_execute.py
                              ${DEBUG_MACRO_TESTS})
         foreach(target ${targetlist_${testbase}})
-          target_link_libraries(${target} ${ARGN} ${COMMON_LIBS} ${GRID_LIBS} gtest_dune_xt_common)
-          list(APPEND dxt_test_binaries ${target})
+          target_link_libraries(${target} ${link_xt_libs} ${COMMON_LIBS} ${GRID_LIBS} gtest_dune_xt_common)
+          list(APPEND ${subdir}_dxt_test_binaries ${target})
           set(dxt_test_names_${target} ${testlist_${testbase}_${target}})
         endforeach(target)
       else(dune-testtools_FOUND)
@@ -98,7 +99,7 @@ macro(BEGIN_TESTCASES) # https://cmake.org/cmake/help/v3.0/module/FindGTest.html
                     ${source}
                     ${COMMON_HEADER}
                     LINK_LIBRARIES
-                    ${ARGN}
+                    ${link_xt_libs}
                     ${COMMON_LIBS}
                     ${GRID_LIBS}
                     gtest_dune_xt_common
@@ -111,11 +112,11 @@ macro(BEGIN_TESTCASES) # https://cmake.org/cmake/help/v3.0/module/FindGTest.html
                     ${DXT_TEST_TIMEOUT}
                     MPI_RANKS
                     ${ranks})
-      list(APPEND dxt_test_binaries ${target})
+      list(APPEND ${subdir}_dxt_test_binaries ${target})
       set(dxt_test_names_${target} ${target})
     endif(EXISTS ${minifile})
   endforeach(source)
-  file(GLOB_RECURSE test_templates "${CMAKE_CURRENT_SOURCE_DIR}/*.tpl")
+  file(GLOB_RECURSE test_templates "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/*.tpl")
   foreach(template ${test_templates})
     set(ranks "1")
     if(template MATCHES "mpi")
@@ -185,7 +186,7 @@ macro(BEGIN_TESTCASES) # https://cmake.org/cmake/help/v3.0/module/FindGTest.html
                     ${gen_source}
                     ${COMMON_HEADER}
                     LINK_LIBRARIES
-                    ${ARGN}
+                    ${link_xt_libs}
                     ${COMMON_LIBS}
                     ${GRID_LIBS}
                     gtest_dune_xt_common
@@ -198,72 +199,111 @@ macro(BEGIN_TESTCASES) # https://cmake.org/cmake/help/v3.0/module/FindGTest.html
                     ${DXT_TEST_TIMEOUT}
                     MPI_RANKS
                     ${ranks})
-      list(APPEND dxt_test_binaries ${target})
+      list(APPEND ${subdir}_dxt_test_binaries ${target})
       set(dxt_test_names_${target} ${target})
     endforeach()
   endforeach(template ${test_templates})
-  add_custom_target(test_templates SOURCES ${test_templates})
-endmacro(BEGIN_TESTCASES)
+  add_custom_target(${subdir}_test_templates SOURCES ${test_templates})
 
-macro(END_TESTCASES) # this excludes meta-ini variation test cases because  there binary name != test name
-  foreach(test ${dxt_test_binaries})
+  # this excludes meta-ini variation test cases because  there binary name != test name
+  foreach(test ${${subdir}_xt_test_binaries})
     if(TARGET test)
       set_tests_properties(${test} PROPERTIES TIMEOUT ${DXT_TEST_TIMEOUT})
     endif(TARGET test)
-  endforeach(test ${dxt_test_binaries})
+  endforeach()
 
-  add_custom_target(test_binaries DEPENDS ${dxt_test_binaries}) # add_dependencies(test test_binaries)
-  add_custom_target(check
+  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries}) # add_dependencies(test test_binaries)
+  add_custom_target(${subdir}_check
                     COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} -j ${DXT_TEST_PROCS}
-                    DEPENDS test_binaries USES_TERMINAL)
-  add_custom_target(recheck
+                    DEPENDS ${subdir}_test_binaries USES_TERMINAL)
+  add_custom_target(${subdir}_recheck
                     COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} --rerun-failed -j ${DXT_TEST_PROCS}
-                    DEPENDS test_binaries USES_TERMINAL)
-  foreach(target ${dxt_test_binaries})
+                    DEPENDS ${subdir}_test_binaries USES_TERMINAL)
+  foreach(target ${${subdir}_dxt_test_binaries})
     set(all_sorted_testnames "${all_sorted_testnames}/${dxt_test_names_${target}}")
-  endforeach(target ${dxt_test_binaries})
-  set(dxt_headercheck_targets "")
-  get_headercheck_targets(dxt_headercheck_targets)
-  configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/dxt_test_binaries.cmake)
+  endforeach()
+  set(${subdir}_dxt_headercheck_targets "")
+  get_headercheck_targets(${subdir}_dxt_headercheck_targets)
+  configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_test_binaries.cmake)
   configure_file(${dune-xt-module-path}/dxt_all_sorted_testnames.cmake.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/dxt_all_sorted_testnames.cmake)
+                 ${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_all_sorted_testnames.cmake)
   configure_file(${dune-xt-module-path}/dxt_headercheck_targets.cmake.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/dxt_headercheck_targets.cmake)
+                 ${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_headercheck_targets.cmake)
   # we use a scatter/gather setup so this still goes thru (with no new/removed tests) on CI where SRC is mounted ro
-  add_custom_target(scatter_pickles_compile
-                    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/compiles_totals.pickle"
-                            "${CMAKE_BINARY_DIR}/compiles_totals.pickle")
-  add_custom_target(scatter_pickles_run
-                    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/testruns_totals.pickle"
-                            "${CMAKE_BINARY_DIR}/testruns_totals.pickle")
-  add_custom_target(rerun_test_distribution
+  add_custom_target(${subdir}_scatter_pickles_compile
+                    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_compiles_totals.pickle"
+                            "${CMAKE_BINARY_DIR}/${subdir}_compiles_totals.pickle")
+  add_custom_target(${subdir}_scatter_pickles_run
+                    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_testruns_totals.pickle"
+                            "${CMAKE_BINARY_DIR}/${subdir}_testruns_totals.pickle")
+  add_custom_target(${subdir}_rerun_test_distribution
                     ${CMAKE_BINARY_DIR}/run-in-dune-env
                     distribute_testing.py
                     "${CMAKE_BINARY_DIR}"
                     "${CMAKE_CURRENT_SOURCE_DIR}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/dxt_test_binaries.cmake"
-                    "${CMAKE_CURRENT_BINARY_DIR}/dxt_all_sorted_testnames.cmake"
-                    "${CMAKE_CURRENT_BINARY_DIR}/dxt_headercheck_targets.cmake"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_test_binaries.cmake"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_all_sorted_testnames.cmake"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_headercheck_targets.cmake"
                     "${DXT_BIN_COUNT}"
                     VERBATIM
                     USES_TERMINAL
                     DEPENDS scatter_pickles_compile scatter_pickles_run)
-  add_custom_target(copy_builders_if_different
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/builder_definitions.cmake"
-                            "${CMAKE_CURRENT_SOURCE_DIR}/builder_definitions.cmake")
-  add_custom_target(gather_pickles_compile
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/compiles_totals.pickle"
-                            "${CMAKE_CURRENT_SOURCE_DIR}/compiles_totals.pickle"
+  add_custom_target(${subdir}_copy_builders_if_different
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/${subdir}_builder_definitions.cmake"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_builder_definitions.cmake")
+  add_custom_target(${subdir}_gather_pickles_compile
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/${subdir}_compiles_totals.pickle"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_compiles_totals.pickle"
                     DEPENDS rerun_test_distribution)
-  add_custom_target(gather_pickles_run
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/testruns_totals.pickle"
-                            "${CMAKE_CURRENT_SOURCE_DIR}/testruns_totals.pickle"
+  add_custom_target(${subdir}_gather_pickles_run
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/${subdir}_testruns_totals.pickle"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_testruns_totals.pickle"
                     DEPENDS rerun_test_distribution)
 
-  add_custom_target(refresh_test_timings)
-  add_dependencies(copy_builders_if_different rerun_test_distribution)
-  add_dependencies(refresh_test_timings copy_builders_if_different gather_pickles_compile gather_pickles_run)
-endmacro(END_TESTCASES)
+  add_custom_target(${subdir}_refresh_test_timings)
+  add_dependencies(${subdir}_copy_builders_if_different ${subdir}_rerun_test_distribution)
+  add_dependencies(${subdir}_refresh_test_timings ${subdir}_copy_builders_if_different ${subdir}_gather_pickles_compile ${subdir}_gather_pickles_run)
+endmacro(add_subdir_tests)
+
+macro(finalize_test_setup)
+  set(combine_targets test_templates test_binaries check recheck scatter_pickles_compile scatter_pickles_run
+          rerun_test_distribution copy_builders_if_different gather_pickles_compile gather_pickles_run
+          refresh_test_timings)
+  foreach(target ${combine_targets})
+    add_custom_target(${target})
+    foreach(subdir ${dxt_test_dirs})
+      add_dependencies(${target} ${subdir}_${target})
+    endforeach()
+  endforeach()
+
+  foreach(subdir ${dxt_test_dirs})
+    set(dxt_test_binaries "${dxt_test_binaries} ${${subdir}_dxt_test_binaries}")
+  endforeach()
+#  set(${subdir}_dxt_headercheck_targets "")
+
+  if(ALBERTA_FOUND)
+    add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)
+    add_dune_alberta_flags(GRIDDIM 3 test_dd_glued_3d)
+
+    foreach(test ${dxt_test_binaries})
+      if(${test} MATCHES alberta_1d)
+        add_dune_alberta_flags(GRIDDIM 1 ${test})
+      elseif(${test} MATCHES alberta_2d)
+        add_dune_alberta_flags(GRIDDIM 2 ${test})
+      elseif(${test} MATCHES alberta_3d)
+        add_dune_alberta_flags(GRIDDIM 3 ${test})
+      endif()
+    endforeach()
+
+    foreach(test ${dxt_test_binaries})
+      if(${test} MATCHES 2d_simplex_alberta)
+        add_dune_alberta_flags(GRIDDIM 2 ${test})
+      elseif(${test} MATCHES 3d_simplex_alberta)
+        add_dune_alberta_flags(GRIDDIM 3 ${test})
+      endif()
+    endforeach()
+  endif()
+endmacro()
 
 macro(dxt_exclude_from_headercheck)
   exclude_from_headercheck(${ARGV0}) # make this robust to argument being passed with or without ""
