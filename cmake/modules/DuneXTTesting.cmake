@@ -212,7 +212,8 @@ macro(add_subdir_tests subdir)
     endif(TARGET test)
   endforeach()
 
-  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries}) # add_dependencies(test test_binaries)
+  add_custom_target(${subdir}_test_binaries DEPENDS ${${subdir}_dxt_test_binaries}) # add_dependencies(test
+                                                                                    # test_binaries)
   add_custom_target(${subdir}_check
                     COMMAND ${CMAKE_CTEST_COMMAND} --timeout ${DXT_TEST_TIMEOUT} -j ${DXT_TEST_PROCS}
                     DEPENDS ${subdir}_test_binaries USES_TERMINAL)
@@ -224,7 +225,8 @@ macro(add_subdir_tests subdir)
   endforeach()
   set(${subdir}_dxt_headercheck_targets "")
   get_headercheck_targets(${subdir}_dxt_headercheck_targets)
-  configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_test_binaries.cmake)
+  configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_test_binaries.cmake)
   configure_file(${dune-xt-module-path}/dxt_all_sorted_testnames.cmake.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_all_sorted_testnames.cmake)
   configure_file(${dune-xt-module-path}/dxt_headercheck_targets.cmake.in
@@ -249,26 +251,41 @@ macro(add_subdir_tests subdir)
                     USES_TERMINAL
                     DEPENDS scatter_pickles_compile scatter_pickles_run)
   add_custom_target(${subdir}_copy_builders_if_different
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/${subdir}_builder_definitions.cmake"
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            "${CMAKE_BINARY_DIR}/${subdir}_builder_definitions.cmake"
                             "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_builder_definitions.cmake")
   add_custom_target(${subdir}_gather_pickles_compile
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/${subdir}_compiles_totals.pickle"
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            "${CMAKE_BINARY_DIR}/${subdir}_compiles_totals.pickle"
                             "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_compiles_totals.pickle"
                     DEPENDS rerun_test_distribution)
   add_custom_target(${subdir}_gather_pickles_run
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/${subdir}_testruns_totals.pickle"
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            "${CMAKE_BINARY_DIR}/${subdir}_testruns_totals.pickle"
                             "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}_testruns_totals.pickle"
                     DEPENDS rerun_test_distribution)
 
   add_custom_target(${subdir}_refresh_test_timings)
   add_dependencies(${subdir}_copy_builders_if_different ${subdir}_rerun_test_distribution)
-  add_dependencies(${subdir}_refresh_test_timings ${subdir}_copy_builders_if_different ${subdir}_gather_pickles_compile ${subdir}_gather_pickles_run)
+  add_dependencies(${subdir}_refresh_test_timings
+                   ${subdir}_copy_builders_if_different
+                   ${subdir}_gather_pickles_compile
+                   ${subdir}_gather_pickles_run)
 endmacro(add_subdir_tests)
 
 macro(finalize_test_setup)
-  set(combine_targets test_templates test_binaries check recheck scatter_pickles_compile scatter_pickles_run
-          rerun_test_distribution copy_builders_if_different gather_pickles_compile gather_pickles_run
-          refresh_test_timings)
+  set(combine_targets
+      test_templates
+      test_binaries
+      check
+      recheck
+      scatter_pickles_compile
+      scatter_pickles_run
+      rerun_test_distribution
+      copy_builders_if_different
+      gather_pickles_compile
+      gather_pickles_run
+      refresh_test_timings)
   foreach(target ${combine_targets})
     add_custom_target(${target})
     foreach(subdir ${dxt_test_dirs})
@@ -279,7 +296,7 @@ macro(finalize_test_setup)
   foreach(subdir ${dxt_test_dirs})
     set(dxt_test_binaries "${dxt_test_binaries} ${${subdir}_dxt_test_binaries}")
   endforeach()
-#  set(${subdir}_dxt_headercheck_targets "")
+  # set(${subdir}_dxt_headercheck_targets "")
 
   if(ALBERTA_FOUND)
     add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)

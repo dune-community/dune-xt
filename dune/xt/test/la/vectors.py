@@ -10,4 +10,3 @@
 #   René Fritze     (2016 - 2019)
 #   Tobias Leibner  (2015 - 2017, 2019)
 # ~~~
-

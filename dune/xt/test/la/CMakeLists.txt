@@ -9,4 +9,3 @@
 #   Felix Schindler (2016 - 2017)
 #   René Fritze     (2018 - 2019)
 # ~~~
-

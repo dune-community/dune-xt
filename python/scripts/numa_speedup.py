@@ -12,7 +12,6 @@
 #   René Fritze     (2017 - 2019)
 #   Tobias Leibner  (2019)
 # ~~~
-
 """Run a speedup series benchmark of a given executable on a node with libnuma
 
 Usage: numa_speedup.py MIN_CORE MAX_CORE ARG_FMT...
