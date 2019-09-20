@@ -12,16 +12,16 @@ jobs:
   parameters:
     dockerimage: debian-unstable_gcc_full
     jobname: 'unstable_gcc'
-    module: 'dune-xt-common'
+    module: 'dune-xt'
 
 - template: azure-job-template.yml@templates
   parameters:
     dockerimage: debian_gcc_full
     jobname: 'gcc'
-    module: 'dune-xt-common'
+    module: 'dune-xt'
 
 - template: azure-job-template.yml@templates
   parameters:
     dockerimage: debian_clang_full
     jobname: 'clang'
-    module: 'dune-xt-common'
+    module: 'dune-xt'
