@@ -32,7 +32,6 @@ bind_FunctionAsGridFunctionWrapper(pybind11::module& m, const std::string& grid_
   using namespace pybind11::literals;
 
   using E = typename G::template Codim<0>::Entity;
-  using D = typename G::ctype;
   using R = double;
   using I = GridFunctionInterface<E, r, rC, R>;
   using C = FunctionAsGridFunctionWrapper<E, r, rC, R>;

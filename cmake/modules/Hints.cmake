@@ -16,7 +16,7 @@ macro(append_to_each INPUTLIST POSTFIX OUTPUTLIST)
   endforeach(ENTRY ${INPUTLIST})
 endmacro()
 
-set(hint_prefixes
+set(root_hints
     "${CMAKE_SOURCE_DIR}/../local/"
     "${CMAKE_SOURCE_DIR}/../environments/debian-minimal/local/"
     "${CMAKE_SOURCE_DIR}/../environments/debian-full/local/"
@@ -24,10 +24,10 @@ set(hint_prefixes
     "$ENV{HOME}/Software/")
 
 set(bin_hints "")
-append_to_each("${hint_prefixes}" "bin/" bin_hints)
+append_to_each("${root_hints}" "bin/" bin_hints)
 
 set(lib_hint "")
-append_to_each("${hint_prefixes}" "lib/" lib_hints)
+append_to_each("${root_hints}" "lib/" lib_hints)
 
 set(include_hints "")
-append_to_each("${hint_prefixes}" "include/" include_hints)
+append_to_each("${root_hints}" "include/" include_hints)

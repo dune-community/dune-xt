@@ -108,6 +108,10 @@
 #define HAVE_DUNE_GRID_MULTISCALE 0
 #endif
 
+#ifndef HAVE_DUNE_GRID_GLUE
+#define HAVE_DUNE_GRID_GLUE 0
+#endif
+
 #ifndef HAVE_ALBERTA
 #define HAVE_ALBERTA 0
 #endif
