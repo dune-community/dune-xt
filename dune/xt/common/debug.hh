@@ -39,12 +39,6 @@ inline char* charcopy(const char* s)
 } // ... charcopy(...)
 
 
-DXT_DEPRECATED_MSG("22.08.18") inline std::string __depr_class()
-{
-  DUNE_THROW(Dune::NotImplemented, "use the DXT::Typename mechanism instead");
-}
-#define __CLASS__ __depr_class()
-
 //! try to ensure var is not optimized out
 #define DXTC_DEBUG_AUTO(name) volatile auto DXTC_UNUSED(name)
 
