@@ -30,24 +30,24 @@ GTEST_TEST(GridProvider_{{name}}, layers)
   {% if "ALU" in type or "UGGrid" in type %}
     // uggrid + alu cube grids cannot handle non-default comms
     EXPECT_THROW(ProviderFactory::create(config, split_comm), Dune::InvalidStateException);
-    return;
-  {% endif %}
-  auto local_provider = ProviderFactory::create(config, split_comm);
-  auto global_provider = ProviderFactory::create(config, MPI_COMM_WORLD);
-  auto& local_grid = local_provider.grid();
-  auto& global_grid = global_provider.grid();
-  auto& local_colcom = local_grid.comm();
-  auto& global_colcom = global_grid.comm();
+  {% else %}
+    auto local_provider = ProviderFactory::create(config, split_comm);
+    auto global_provider = ProviderFactory::create(config, MPI_COMM_WORLD);
+    auto& local_grid = local_provider.grid();
+    auto& global_grid = global_provider.grid();
+    auto& local_colcom = local_grid.comm();
+    auto& global_colcom = global_grid.comm();
 
-  const bool actually_parallel = global_grid.comm().size() > 1;
-  if(actually_parallel){
-    EXPECT_NE(local_colcom.size(), global_colcom.size());
-    EXPECT_GE(local_grid.size(0), global_grid.size(0));
-  }
-  else {
-    EXPECT_EQ(local_colcom.size(), global_colcom.size());
-    EXPECT_EQ(global_grid.size(0), local_grid.size(0));
-  }
+    const bool actually_parallel = global_grid.comm().size() > 1;
+    if(actually_parallel){
+      EXPECT_NE(local_colcom.size(), global_colcom.size());
+      EXPECT_GE(local_grid.size(0), global_grid.size(0));
+    }
+    else {
+      EXPECT_EQ(local_colcom.size(), global_colcom.size());
+      EXPECT_EQ(global_grid.size(0), local_grid.size(0));
+    }
+  {% endif %}
 }
 #else
 GTEST_TEST(GridProvider_{{name}}, layers)

@@ -34,25 +34,13 @@ namespace Grid {
 
 struct ElementVisualization
 {
-  //! Parameter for mapper class
-  template <int dim>
-  struct P0Layout
-  {
-    bool contains(const Dune::GeometryType& gt)
-    {
-      if (gt.dim() == dim)
-        return true;
-      return false;
-    }
-  };
-
   // demonstrate attaching data to elements
   template <class View, class F>
   static void elementdata(const View& view, const F& f)
   {
     // make a mapper for codim 0 entities in the leaf grid
     using Grid = extract_grid_t<View>;
-    Dune::LeafMultipleCodimMultipleGeomTypeMapper<Grid, P0Layout> mapper(view.grid());
+    Dune::LeafMultipleCodimMultipleGeomTypeMapper<Grid> mapper(view.grid(), mcmgElementLayout());
 
     std::vector<double> values(mapper.size());
     for (auto&& entity : elements(view)) {

@@ -23,6 +23,8 @@
 
 #include <dune/common/deprecated.hh>
 
+#include <dune/geometry/refinement.hh>
+
 #include <dune/grid/io/file/vtk.hh>
 
 #include <dune/xt/common/filesystem.hh>
@@ -167,7 +169,8 @@ public:
         std::make_shared<VisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
             *this, visualizer, "", param);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
-        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
+        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(
+                          grid_view, /*subsampling_level=*/Dune::refinementLevels(2))
                     : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
     vtk_writer->addVertexData(adapter);
     if (MPIHelper::getCollectiveCommunication().size() == 1)
@@ -201,7 +204,8 @@ public:
         std::make_shared<GradientVisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
             *this, visualizer, "", param);
     std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
-        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
+        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(
+                          grid_view, /*subsampling_level=*/Dune::refinementLevels(2))
                     : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
     vtk_writer->addCellData(adapter);
     if (MPIHelper::getCollectiveCommunication().size() == 1)

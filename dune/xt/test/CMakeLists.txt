@@ -26,11 +26,11 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.hxx DESTINATION ${CMAKE_INSTALL_I
 
 # this should ideally move back into the grid subdir, along with the files
 dune_symlink_to_source_files(FILES
-        gmsh_2d_simplices.msh
-        dgf_1d_interval.dgf
-        dgf_2d_interval.dgf
-        dgf_3d_interval.dgf
-        dgf_4d_interval.dgf)
+                             gmsh_2d_simplices.msh
+                             dgf_1d_interval.dgf
+                             dgf_2d_interval.dgf
+                             dgf_3d_interval.dgf
+                             dgf_4d_interval.dgf)
 
 add_subdir_tests(common)
 add_subdir_tests(grid)

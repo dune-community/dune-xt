@@ -1,6 +1,6 @@
-// This file is part of the dune-xt project:
-//   https://github.com/dune-community/dune-xt
-// Copyright 2009-2019 dune-xt developers and contributors. All rights reserved.
+// This file is part of the dune-xt-functions project:
+//   https://github.com/dune-community/dune-xt-functions
+// Copyright 2009-2018 dune-xt-functions developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -30,6 +30,8 @@ This software comes with absolutely no warranty.
 
 */
 
+
+#include <dune/xt/common/disable_warnings.hh>
 #include "mathexpr.hh"
 
 
@@ -2366,3 +2368,4 @@ void ROperation::BuildCode()
           pinstr, mmb2->pinstr, pvals, mmb2->pvals, ppile, mmb2->ppile, pfuncpile, mmb2->pfuncpile, &FonctionError);
   }
 }
+#include <dune/xt/common/reenable_warnings.hh>
