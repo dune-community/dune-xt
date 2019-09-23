@@ -296,7 +296,7 @@ public:
   {}
 
   ConstStorageProvider(const ConstStorageProvider<T>& other)
-    : storage_(other.storage_->copy())
+    : storage_(other.storage_ ? other.storage_->copy() : nullptr)
   {}
 
   ConstStorageProvider(ConstStorageProvider<T>&& source) = default;
@@ -348,7 +348,7 @@ class StorageProvider
 {
 public:
   explicit StorageProvider()
-    : storage_()
+    : storage_(nullptr)
   {}
 
   explicit StorageProvider(T& tt)
@@ -369,7 +369,7 @@ public:
   StorageProvider(const StorageProvider<T>& other) = delete;
 
   StorageProvider(StorageProvider<T>& other)
-    : storage_(other.storage_->copy())
+    : storage_(other.storage_ ? other.storage_->copy() : nullptr)
   {}
 
   StorageProvider(StorageProvider<T>&& source) = default;

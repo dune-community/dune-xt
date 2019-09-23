@@ -170,7 +170,7 @@ class RFunction
 
 public:
   signed char type;
-  double((*pfuncval)(double));
+  double (*pfuncval)(double);
   ROperation op;
   int nvars;
   RVar** ppvar;
