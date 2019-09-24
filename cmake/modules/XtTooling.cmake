@@ -59,6 +59,8 @@ macro(add_format glob_dir)
                       "${glob_dir}/*.h"
                       "${glob_dir}/*.c"
                       "${glob_dir}/*.pbh")
+    # Formatting gtest.h causes extremely high memory usage and takes a long time
+    list(FILTER _files EXCLUDE REGEX ".*gtest.h$")
     add_custom_target("format_${fn}" ${ClangFormat_EXECUTABLE} -i -style=file -fallback-style=none ${_files})
     add_dependencies(format "format_${fn}")
   else()
