@@ -65,6 +65,8 @@
 # add_dune_tbb_flags(target [target]...)  Adds all flags required to use TBB to the listed targets
 #
 
+include(Hints)
+
 option(TBB_DEBUG "Turn on TBB debugging (modifies compiler flags and links against debug version of libraries)")
 
 # source for our little test program. We have to compile this multiple times, so store it in a variable for DRY and
@@ -128,7 +130,7 @@ if(TBB_VARS_SH)
   parse_tbb_vars_sh()
 else() # Try to find TBB in standard include paths
   find_path(TBB_INCLUDE_DIRS tbb/task_scheduler_init.h
-            PATHS ENV CPATH ${TBB_INCLUDE_DIR}
+            PATHS ENV CPATH ${TBB_INCLUDE_DIR} ${include_hints}
             DOC "Path to TBB include directory") # Try to find some version of the TBB library in standard library
                                                  # paths
   find_path(TBB_LIBRARY_DIR
@@ -136,7 +138,7 @@ else() # Try to find TBB in standard include paths
             "${CMAKE_SHARED_LIBRARY_PREFIX}tbb${CMAKE_SHARED_LIBRARY_SUFFIX}"
             "${CMAKE_SHARED_LIBRARY_PREFIX}tbb_preview_debug${CMAKE_SHARED_LIBRARY_SUFFIX}"
             "${CMAKE_SHARED_LIBRARY_PREFIX}tbb_debug${CMAKE_SHARED_LIBRARY_SUFFIX}"
-            PATHS ENV LIBRARY_PATH
+            PATHS ENV LIBRARY_PATH ${lib_hints}
             DOC "Path to TBB library directory")
 endif()
 
@@ -152,7 +154,7 @@ function(find_tbb_library)
   if(TBB_VARS_SH)
     find_library(${LIB_VAR} ${LIB_NAME} PATHS ${TBB_LIBRARY_DIR} DOC "${LIB_DOC}" NO_DEFAULT_PATH)
   else()
-    find_library(${LIB_VAR} ${LIB_NAME} PATHS ${TBB_LIBRARY_DIR} DOC "${LIB_DOC}")
+    find_library(${LIB_VAR} ${LIB_NAME} PATHS ${TBB_LIBRARY_DIR} ${lib_hints} DOC "${LIB_DOC}")
   endif()
 endfunction()
 
