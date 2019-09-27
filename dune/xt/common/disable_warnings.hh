@@ -23,6 +23,7 @@
 #  pragma GCC diagnostic ignored "-Wdisabled-macro-expansion"
 #  pragma GCC diagnostic ignored "-Wextra"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #  pragma GCC diagnostic ignored "-Wignored-qualifiers"
 #  pragma GCC diagnostic ignored "-Wlogical-not-parentheses"
 #  pragma GCC diagnostic ignored "-Wlogical-op-parentheses"
