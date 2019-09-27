@@ -33,6 +33,7 @@ static inline Common::Configuration allneumann_boundaryinfo_default_config()
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#  pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
 #endif
 template <class IntersectionImp>
 class AllNeumannBoundaryInfo : public BoundaryInfo<IntersectionImp>

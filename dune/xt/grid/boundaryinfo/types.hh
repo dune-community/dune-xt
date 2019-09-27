@@ -23,6 +23,7 @@ namespace Grid {
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#  pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
 #endif
 
 
