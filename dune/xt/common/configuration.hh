@@ -58,7 +58,7 @@ class Configuration : public Dune::ParameterTree
 public:
   Configuration();
 
-  explicit Configuration(const ParameterTree& tree, ConfigurationDefaults defaults = ConfigurationDefaults());
+  Configuration(const ParameterTree& tree, ConfigurationDefaults defaults = ConfigurationDefaults());
 
   Configuration(const ParameterTree& tree_in, const std::string sub_id);
 
