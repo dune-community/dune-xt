@@ -84,7 +84,7 @@ class EigenSolverBase
                     || (XT::Common::is_matrix<MatrixImp>::value && XT::Common::is_matrix<RealMatrixImp>::value
                         && XT::Common::is_matrix<ComplexMatrixImp>::value),
                 "");
-  using ThisType = EigenSolverBase<MatrixImp, FieldImp, RealMatrixImp, ComplexMatrixImp>;
+  using ThisType = EigenSolverBase;
 
 public:
   using MatrixType = MatrixImp;

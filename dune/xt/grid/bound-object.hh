@@ -28,7 +28,7 @@ class ElementBoundObject /*: Common::EnableDebugLoggingForCtors<ElementBoundObje
 {
   static_assert(is_entity<Element>::value, "");
 
-  using ThisType = ElementBoundObject<Element>;
+  using ThisType = ElementBoundObject;
   //  using DebugLogging = Common::EnableDebugLoggingForCtors<ElementBoundObject<Element>>;
 
 public:
@@ -119,7 +119,7 @@ class IntersectionBoundObject
 {
   static_assert(is_intersection<Intersection>::value, "");
 
-  using ThisType = IntersectionBoundObject<Intersection>;
+  using ThisType = IntersectionBoundObject;
 
 public:
   using IntersectionType = Intersection;

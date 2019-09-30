@@ -41,7 +41,7 @@ template <size_t d, class R>
 class FlatTopFunction<d, 1, 1, R> : public FunctionInterface<d, 1, 1, R>
 {
   using BaseType = FunctionInterface<d, 1, 1, R>;
-  using ThisType = FlatTopFunction<d, 1, 1, R>;
+  using ThisType = FlatTopFunction;
 
 public:
   using DomainFieldType = typename BaseType::DomainFieldType;

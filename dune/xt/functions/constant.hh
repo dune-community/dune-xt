@@ -30,7 +30,7 @@ template <size_t d, size_t r = 1, size_t rC = 1, class RangeField = double>
 class ConstantFunction : public FunctionInterface<d, r, rC, RangeField>
 {
   using BaseType = FunctionInterface<d, r, rC, RangeField>;
-  using ThisType = ConstantFunction<d, r, rC, RangeField>;
+  using ThisType = ConstantFunction;
 
 public:
   using DerivativeRangeReturnType = typename BaseType::DerivativeRangeReturnType;

@@ -51,7 +51,7 @@ template <class E, class R>
 class Model2Function<E, 3, 3, R> : public CheckerboardFunction<E, 3, 3, R>
 {
   using BaseType = CheckerboardFunction<E, 3, 3, R>;
-  using ThisType = Model2Function<E, 3, 3, R>;
+  using ThisType = Model2Function;
 
 public:
   using typename BaseType::ElementType;

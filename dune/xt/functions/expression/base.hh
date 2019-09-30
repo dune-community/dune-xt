@@ -49,7 +49,7 @@ class MathExpressionBase
   static_assert((rangeDim > 0), "Really?");
 
 public:
-  using ThisType = MathExpressionBase<DomainField, domainDim, RangeField, rangeDim>;
+  using ThisType = MathExpressionBase;
 
   using DomainFieldType = DomainField;
   static const size_t domain_dim = domainDim;
@@ -228,7 +228,7 @@ template <class D, class R, size_t r, size_t max_d = DUNE_XT_FUNCTIONS_EXPRESSIO
 class DynamicMathExpressionBase
 {
 public:
-  using ThisType = DynamicMathExpressionBase<D, R, r, max_d>;
+  using ThisType = DynamicMathExpressionBase;
 
   using DomainFieldType = D;
   static const size_t maxDimDomain = max_d;

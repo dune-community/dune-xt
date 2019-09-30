@@ -35,7 +35,7 @@ namespace internal {
 template <class Traits, class ScalarImp>
 class VectorInputIterator : public std::iterator<std::input_iterator_tag, typename Traits::ScalarType>
 {
-  using ThisType = VectorInputIterator<Traits, ScalarImp>;
+  using ThisType = VectorInputIterator;
 
 public:
   using VectorType = VectorInterface<Traits, ScalarImp>;

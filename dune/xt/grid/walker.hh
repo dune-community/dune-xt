@@ -67,7 +67,7 @@ template <class GL>
 class ElementFunctorWrapper
 {
   static_assert(is_layer<GL>::value, "");
-  using ThisType = ElementFunctorWrapper<GL>;
+  using ThisType = ElementFunctorWrapper;
 
 public:
   using FunctorType = ElementFunctor<GL>;
@@ -108,7 +108,7 @@ template <class GL>
 class IntersectionFunctorWrapper
 {
   static_assert(is_layer<GL>::value, "");
-  using ThisType = IntersectionFunctorWrapper<GL>;
+  using ThisType = IntersectionFunctorWrapper;
 
 public:
   using FunctorType = IntersectionFunctor<GL>;
@@ -149,7 +149,7 @@ template <class GL>
 class ElementAndIntersectionFunctorWrapper
 {
   static_assert(is_layer<GL>::value, "");
-  using ThisType = ElementAndIntersectionFunctorWrapper<GL>;
+  using ThisType = ElementAndIntersectionFunctorWrapper;
 
 public:
   using FunctorType = ElementAndIntersectionFunctor<GL>;
@@ -199,7 +199,7 @@ template <class GV>
 class Walker : public ElementAndIntersectionFunctor<GV>
 {
   using BaseType = ElementAndIntersectionFunctor<GV>;
-  using ThisType = Walker<GV>;
+  using ThisType = Walker;
 
 public:
   using typename BaseType::ElementType;

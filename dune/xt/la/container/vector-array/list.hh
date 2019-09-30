@@ -56,7 +56,7 @@ template <class Vector>
 class ListVectorArray /*: public VectorArrayInterface<internal::ListVectorArrayTraits<Vector>>*/
 {
   //  using BaseType = VectorArrayInterface<internal::ListVectorArrayTraits<Vector>>;
-  using ThisType = ListVectorArray<Vector>;
+  using ThisType = ListVectorArray;
 
 public:
   //  using Traits = typename BaseType::Traits;

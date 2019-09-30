@@ -30,7 +30,7 @@ template <class E, size_t r, size_t rC = 1, class R = double>
 class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
-  using ThisType = IndicatorGridFunction<E, r, rC, R>;
+  using ThisType = IndicatorGridFunction;
 
   class LocalIndicatorGridFunction : public ElementFunctionInterface<E, r, rC, R>
   {

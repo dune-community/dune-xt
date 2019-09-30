@@ -116,7 +116,7 @@ Bar bar(some_grid_function);
 template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class GridFunction : public GridFunctionInterface<E, r, rC, R>
 {
-  using ThisType = GridFunction<E, r, rC, R>;
+  using ThisType = GridFunction;
   using BaseType = GridFunctionInterface<E, r, rC, R>;
 
 public:
@@ -175,7 +175,7 @@ template <class E, size_t r, class R>
 class GridFunction<E, r, r, R> : public GridFunctionInterface<E, r, r, R>
 {
   using BaseType = GridFunctionInterface<E, r, r, R>;
-  using ThisType = GridFunction<E, r, r, R>;
+  using ThisType = GridFunction;
 
 private:
   static GridFunctionInterface<E, r, r, R>* unit_matrix()
@@ -267,7 +267,7 @@ private:
 template <class E, class R>
 class GridFunction<E, 1, 1, R> : public GridFunctionInterface<E, 1, 1, R>
 {
-  using ThisType = GridFunction<E, 1, 1, R>;
+  using ThisType = GridFunction;
   using BaseType = GridFunctionInterface<E, 1, 1, R>;
 
 public:

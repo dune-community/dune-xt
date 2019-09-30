@@ -71,7 +71,7 @@ const auto& grid_function = function.template as_grid_function<E>();
 template <size_t domainDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
 class FunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = FunctionInterface<domainDim, rangeDim, rangeDimCols, RangeField>;
+  using ThisType = FunctionInterface;
 
 public:
   using DomainFieldType = double;
