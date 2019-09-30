@@ -24,6 +24,7 @@ if '${HAVE_MPI}' == 'TRUE':
 setup(name='dune.xt',
       version='2.4',
       namespace_packages=['dune'],
+      setup_requires=['wheel'],
       description='Python for Dune-Xt',
       author='The dune-xt devs',
       author_email='dune-xt-dev@listserv.uni-muenster.de',
