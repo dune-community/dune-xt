@@ -417,7 +417,7 @@ public:
     return true;
   }
 
-  virtual size_t non_zeros() const override final
+  size_t non_zeros() const override final
   {
     return backend_->nonZeros();
   }

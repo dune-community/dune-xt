@@ -57,12 +57,12 @@ class DefaultVisualizer : public VisualizerInterface<r, rC, R>
 public:
   using typename BaseType::RangeType;
 
-  virtual int ncomps() const override final
+  int ncomps() const override final
   {
     return helper<>::ncomps();
   }
 
-  virtual double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const override final
   {
     return helper<>::evaluate(comp, val);
   }
@@ -109,12 +109,12 @@ class SumVisualizer : public VisualizerInterface<r, rC, R>
 public:
   using typename BaseType::RangeType;
 
-  virtual int ncomps() const override final
+  int ncomps() const override final
   {
     return 1;
   }
 
-  virtual double evaluate(const int& DXTC_DEBUG_ONLY(comp), const RangeType& val) const override final
+  double evaluate(const int& DXTC_DEBUG_ONLY(comp), const RangeType& val) const override final
   {
     assert(comp == 0);
     return std::accumulate(val.begin(), val.end(), 0.);
@@ -135,12 +135,12 @@ public:
     : comp_(comp)
   {}
 
-  virtual int ncomps() const override final
+  int ncomps() const override final
   {
     return 1;
   }
 
-  virtual double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const override final
   {
     return val[comp];
   }
@@ -164,12 +164,12 @@ public:
     , eval_(eval)
   {}
 
-  virtual int ncomps() const override final
+  int ncomps() const override final
   {
     return ncomps_;
   }
 
-  virtual double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const override final
   {
     return eval_(comp, val);
   }

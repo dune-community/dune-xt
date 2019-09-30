@@ -303,7 +303,7 @@ public:
   /// \name These methods override default implementations from VectorInterface..
   /// \{
 
-  virtual ScalarType dot(const ThisType& other) const override final
+  ScalarType dot(const ThisType& other) const override final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -311,22 +311,22 @@ public:
     return backend().dot(other.backend());
   } // ... dot(...)
 
-  virtual RealType l1_norm() const override final
+  RealType l1_norm() const override final
   {
     return backend().one_norm();
   }
 
-  virtual RealType l2_norm() const override final
+  RealType l2_norm() const override final
   {
     return backend().two_norm();
   }
 
-  virtual RealType sup_norm() const override final
+  RealType sup_norm() const override final
   {
     return backend().infinity_norm();
   }
 
-  virtual void iadd(const ThisType& other) override final
+  void iadd(const ThisType& other) override final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -335,7 +335,7 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  virtual void isub(const ThisType& other) override final
+  void isub(const ThisType& other) override final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -674,7 +674,7 @@ public:
    * \attention Use and interprete with care, since the Dune::BCRSMatrix is known to report strange things here,
    * depending on its state!
    */
-  virtual size_t non_zeros() const override final
+  size_t non_zeros() const override final
   {
     return backend_->nonzeroes();
   }

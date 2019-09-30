@@ -74,7 +74,7 @@ public:
         The input vector is consistent and the output must also be
      consistent on the interior+border partition.
    */
-  virtual void apply(const Vector& x, Vector& y) const override final
+  void apply(const Vector& x, Vector& y) const override final
   {
     // we want to calculate y = (B2^T A^{-1} B1 - C) x
     // calculate B1 x
@@ -91,7 +91,7 @@ public:
     y -= Cx;
   }
 
-  virtual void applyscaleadd(Field alpha, const Vector& x, Vector& y) const override final
+  void applyscaleadd(Field alpha, const Vector& x, Vector& y) const override final
   {
     auto Sx = n_vec_2_;
     apply(x, Sx);
@@ -100,7 +100,7 @@ public:
   }
 
   //! Category of the linear operator (see SolverCategory::Category)
-  virtual SolverCategory::Category category() const override final
+  SolverCategory::Category category() const override final
   {
     return SolverCategory::Category::sequential;
   }

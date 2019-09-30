@@ -197,7 +197,7 @@ public:
   /// \name These methods override default implementations from VectorInterface.
   /// \{
 
-  virtual std::pair<size_t, RealType> amax() const override final
+  std::pair<size_t, RealType> amax() const override final
   {
     auto result = std::make_pair(size_t(0), RealType(0));
     size_t min_index = 0;
@@ -223,22 +223,22 @@ public:
     return backend().transpose() * other.backend();
   } // ... dot(...)
 
-  virtual ScalarType dot(const VectorImpType& other) const override final
+  ScalarType dot(const VectorImpType& other) const override final
   {
     return this->template dot<Traits>(other);
   }
 
-  virtual RealType l1_norm() const override final
+  RealType l1_norm() const override final
   {
     return backend().template lpNorm<1>();
   }
 
-  virtual RealType l2_norm() const override final
+  RealType l2_norm() const override final
   {
     return backend().template lpNorm<2>();
   }
 
-  virtual RealType sup_norm() const override final
+  RealType sup_norm() const override final
   {
     return backend().template lpNorm<::Eigen::Infinity>();
   }
@@ -253,7 +253,7 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  virtual void iadd(const VectorImpType& other) override final
+  void iadd(const VectorImpType& other) override final
   {
     return this->template iadd<Traits>(other);
   }
@@ -268,7 +268,7 @@ public:
     backend() -= other.backend();
   } // ... isub(...)
 
-  virtual void isub(const VectorImpType& other) override final
+  void isub(const VectorImpType& other) override final
   {
     this->template isub<Traits>(other);
   }

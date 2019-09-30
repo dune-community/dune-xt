@@ -104,13 +104,13 @@ private:
     {}
 
   protected:
-    virtual void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) override final
     {
       post_bind_(element);
     }
 
   public:
-    virtual int order(const XT::Common::Parameter& param = {}) const override final
+    int order(const XT::Common::Parameter& param = {}) const override final
     {
       auto parsed_param = this->parse_parameter(param);
       return order_(parsed_param);
@@ -151,7 +151,7 @@ private:
     }
 
 
-    virtual const Common::ParameterType& parameter_type() const override final
+    const Common::ParameterType& parameter_type() const override final
     {
       return param_type_;
     }

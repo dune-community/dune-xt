@@ -47,7 +47,7 @@ public:
     : function_storage_(std::move(function_ptr))
   {}
 
-  virtual bool x_dependent() const override final
+  bool x_dependent() const override final
   {
     return false;
   }

@@ -56,7 +56,7 @@ public:
 
   BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other) = default;
 
-  virtual void prepare() override final
+  void prepare() override final
   {
     found_ = 0;
   }

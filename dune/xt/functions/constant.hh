@@ -111,12 +111,12 @@ public:
     return "dune.xt.functions.constantgridfunction";
   }
 
-  virtual std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return constant_grid_function_.local_function();
   }
 
-  virtual std::string name() const override final
+  std::string name() const override final
   {
     return constant_function_.name();
   }
@@ -146,17 +146,17 @@ public:
     return "dune.xt.functions.constantfluxfunction";
   }
 
-  virtual bool x_dependent() const override final
+  bool x_dependent() const override final
   {
     return false;
   }
 
-  virtual std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return constant_flux_function_.local_function();
   }
 
-  virtual std::string name() const override final
+  std::string name() const override final
   {
     return constant_function_.name();
   }

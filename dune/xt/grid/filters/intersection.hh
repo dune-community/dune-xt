@@ -398,7 +398,7 @@ public:
     : filter_(func)
   {}
 
-  virtual IntersectionFilter<GridViewType>* copy() const override final
+  IntersectionFilter<GridViewType>* copy() const override final
   {
     return new GenericFilteredIntersections<GridViewType>(filter_);
   }
