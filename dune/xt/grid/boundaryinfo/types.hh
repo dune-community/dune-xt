@@ -105,7 +105,7 @@ public:
 class ReflectingBoundary : public BoundaryType
 {
 public:
-  virtual std::string id() const override final
+  std::string id() const override final
   {
     return "reflecting_boundary";
   }
@@ -120,7 +120,7 @@ public:
 class AbsorbingBoundary : public BoundaryType
 {
 public:
-  virtual std::string id() const override final
+  std::string id() const override final
   {
     return "absorbing_boundary";
   }

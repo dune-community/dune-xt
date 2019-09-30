@@ -48,7 +48,7 @@ public:
     return allreflecting_boundaryinfo_default_config().template get<std::string>("type");
   }
 
-  virtual const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (intersection.boundary())
       return reflecting_boundary_;

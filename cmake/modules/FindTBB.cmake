@@ -130,7 +130,10 @@ if(TBB_VARS_SH)
   parse_tbb_vars_sh()
 else() # Try to find TBB in standard include paths
   find_path(TBB_INCLUDE_DIRS tbb/task_scheduler_init.h
-            PATHS ENV CPATH ${TBB_INCLUDE_DIR} ${include_hints}
+            PATHS ENV
+                  CPATH
+                  ${TBB_INCLUDE_DIR}
+                  ${include_hints}
             DOC "Path to TBB include directory") # Try to find some version of the TBB library in standard library
                                                  # paths
   find_path(TBB_LIBRARY_DIR

@@ -88,7 +88,7 @@ public:
     , id_map_(id_map)
   {}
 
-  virtual const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const override final
   {
     if (!intersection.boundary() || intersection.neighbor())
       return no_boundary_;

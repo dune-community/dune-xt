@@ -382,7 +382,7 @@ public:
   /// \name These methods override default implementations from VectorInterface.
   /// \{
 
-  virtual ScalarType dot(const ThisType& other) const override final
+  ScalarType dot(const ThisType& other) const override final
   {
     assert(other.size() == size());
     const auto& indices = *indices_;
@@ -403,7 +403,7 @@ public:
     return ret;
   } // ... dot(...)
 
-  virtual RealType l1_norm() const override final
+  RealType l1_norm() const override final
   {
     return std::accumulate(entries_->begin(),
                            entries_->end(),
@@ -411,7 +411,7 @@ public:
                            [](const RealType& a, const ScalarType& b) { return a + std::abs(b); });
   }
 
-  virtual RealType l2_norm() const override final
+  RealType l2_norm() const override final
   {
     return std::sqrt(
         std::accumulate(entries_->begin(), entries_->end(), RealType(0.), [](const RealType& a, const ScalarType& b) {
@@ -419,7 +419,7 @@ public:
         }));
   }
 
-  virtual RealType sup_norm() const override final
+  RealType sup_norm() const override final
   {
     auto it = std::max_element(entries_->begin(), entries_->end(), [](const ScalarType& a, const ScalarType& b) {
       return std::abs(a) < std::abs(b);
@@ -427,7 +427,7 @@ public:
     return entries_->size() > 0 ? std::abs(*it) : 0.;
   }
 
-  virtual ThisType add(const ThisType& other) const override final
+  ThisType add(const ThisType& other) const override final
   {
     ThisType ret = this->copy();
     ret.entries_->reserve(ret.entries_->size() + other.entries_->size());
@@ -436,12 +436,12 @@ public:
     return ret;
   } // ... add(...)
 
-  virtual void add(const ThisType& other, ThisType& result) const override final
+  void add(const ThisType& other, ThisType& result) const override final
   {
     result.deep_copy(add(other));
   } // ... add(...)
 
-  virtual ThisType sub(const ThisType& other) const override final
+  ThisType sub(const ThisType& other) const override final
   {
     ThisType ret = this->copy();
     ret.entries_->reserve(ret.entries_->size() + other.entries_->size());
@@ -450,17 +450,17 @@ public:
     return ret;
   } // ... sub(...)
 
-  virtual void sub(const ThisType& other, ThisType& result) const override final
+  void sub(const ThisType& other, ThisType& result) const override final
   {
     result.deep_copy(sub(other));
   } // ... add(...)
 
-  virtual void iadd(const ThisType& other) override final
+  void iadd(const ThisType& other) override final
   {
     axpy(ScalarType(1), other);
   } // ... iadd(...)
 
-  virtual void isub(const ThisType& other) override final
+  void isub(const ThisType& other) override final
   {
     axpy(ScalarType(-1), other);
   } // ... isub(...)

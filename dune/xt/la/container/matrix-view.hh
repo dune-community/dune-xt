@@ -222,7 +222,7 @@ public:
     return true;
   }
 
-  virtual RealType sup_norm() const override final
+  RealType sup_norm() const override final
   {
     RealType ret = 0;
     for (size_t ii = 0; ii < rows(); ++ii)
@@ -391,7 +391,7 @@ public:
     return const_matrix_view_.valid();
   }
 
-  virtual RealType sup_norm() const override final
+  RealType sup_norm() const override final
   {
     return const_matrix_view_.sup_norm();
   } // ... sup_norm(...)

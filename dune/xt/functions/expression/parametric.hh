@@ -94,7 +94,7 @@ public:
     return name_;
   }
 
-  virtual int order(const Common::Parameter& /*param*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const override final
   {
     return static_cast<int>(order_);
   }
