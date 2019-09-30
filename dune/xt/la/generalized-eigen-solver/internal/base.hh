@@ -83,7 +83,7 @@ class GeneralizedEigenSolverBase
                     || (XT::Common::is_matrix<MatrixImp>::value && XT::Common::is_matrix<RealMatrixImp>::value
                         && XT::Common::is_matrix<ComplexMatrixImp>::value),
                 "");
-  using ThisType = GeneralizedEigenSolverBase<MatrixImp, FieldImp, RealMatrixImp, ComplexMatrixImp>;
+  using ThisType = GeneralizedEigenSolverBase;
 
 public:
   using MatrixType = MatrixImp;

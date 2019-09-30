@@ -30,7 +30,7 @@ template <class E, size_t r = 1, size_t rC = 1, class R = double>
 class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
-  using ThisType = CheckerboardFunction<E, r, rC, R>;
+  using ThisType = CheckerboardFunction;
   using BaseType::domain_dim;
   static_assert(domain_dim <= 3, "Not implemented for domain_dim > 3 (see find_subdomain method)!");
 

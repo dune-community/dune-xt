@@ -29,7 +29,7 @@ template <class E, size_t r, size_t rC, class R>
 class FunctionAsGridFunctionWrapper : public GridFunctionInterface<E, r, rC, R>
 {
   using BaseType = GridFunctionInterface<E, r, rC, R>;
-  using ThisType = FunctionAsGridFunctionWrapper<E, r, rC, R>;
+  using ThisType = FunctionAsGridFunctionWrapper;
 
 public:
   using BaseType::d;

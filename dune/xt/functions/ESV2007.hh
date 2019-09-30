@@ -49,7 +49,7 @@ class Testcase1Force : public FunctionInterface<d, r, rC, R>
 template <class R>
 class Testcase1Force<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
 {
-  using ThisType = Testcase1Force<2, 1, 1, R>;
+  using ThisType = Testcase1Force;
   using BaseType = FunctionInterface<2, 1, 1, R>;
 
 public:
@@ -135,7 +135,7 @@ class Testcase1ExactSolution : public FunctionInterface<d, r, rC, R>
 template <class R>
 class Testcase1ExactSolution<2, 1, 1, R> : public FunctionInterface<2, 1, 1, R>
 {
-  using ThisType = Testcase1ExactSolution<2, 1, 1, R>;
+  using ThisType = Testcase1ExactSolution;
   using BaseType = FunctionInterface<2, 1, 1, R>;
 
 public:
@@ -212,7 +212,7 @@ template <class E, class R = double>
 class CutoffFunction : public GridFunctionInterface<E, 1, 1, R>
 {
   using BaseType = GridFunctionInterface<E, 1, 1, R>;
-  using ThisType = CutoffFunction<E, R>;
+  using ThisType = CutoffFunction;
 
 public:
   using BaseType::d;

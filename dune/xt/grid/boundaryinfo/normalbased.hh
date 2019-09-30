@@ -59,7 +59,7 @@ template <class I>
 class NormalBasedBoundaryInfo : public BoundaryInfo<I>
 {
   using BaseType = BoundaryInfo<I>;
-  using ThisType = NormalBasedBoundaryInfo<I>;
+  using ThisType = NormalBasedBoundaryInfo;
 
 public:
   using typename BaseType::DomainFieldType;

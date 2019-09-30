@@ -193,7 +193,7 @@ class CompositionFunction
                                          OuterType::range_dim,
                                          OuterType::range_dim_cols,
                                          typename OuterType::RangeFieldType>;
-  using ThisType = CompositionFunction<InnerType, OuterType, OuterGridViewType>;
+  using ThisType = CompositionFunction;
 
 public:
   using BaseType::domain_dim;

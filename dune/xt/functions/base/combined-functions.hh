@@ -293,7 +293,7 @@ class CombinedFunction
                                      SelectCombined<LeftType, RightType, comb>::rC,
                                      typename SelectCombined<LeftType, RightType, comb>::R>;
 
-  using ThisType = CombinedFunction<LeftType, RightType, comb>;
+  using ThisType = CombinedFunction;
 
   using Select = SelectCombined<LeftType, RightType, comb>;
 

@@ -82,7 +82,7 @@ class ElementFunctionSetInterface
   , public XT::Grid::ElementBoundObject<Element>
 {
   static_assert(XT::Grid::is_entity<Element>::value, "");
-  using ThisType = ElementFunctionSetInterface<Element, rangeDim, rangeDimCols, RangeField>;
+  using ThisType = ElementFunctionSetInterface;
 
 public:
   using typename XT::Grid::ElementBoundObject<Element>::ElementType;
@@ -467,7 +467,7 @@ template <class Element, size_t range_dim = 1, size_t range_dim_cols = 1, class 
 class ElementFunctionInterface : public ElementFunctionSetInterface<Element, range_dim, range_dim_cols, RangeField>
 {
   using BaseType = ElementFunctionSetInterface<Element, range_dim, range_dim_cols, RangeField>;
-  using ThisType = ElementFunctionInterface<Element, range_dim, range_dim_cols, RangeField>;
+  using ThisType = ElementFunctionInterface;
 
 public:
   using BaseType::d;

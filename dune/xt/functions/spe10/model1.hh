@@ -138,7 +138,7 @@ template <class E, size_t r, class R>
 class Model1Function<E, r, r, R> : public internal::Model1Base<E, r, r, R>
 {
   using BaseType = internal::Model1Base<E, r, r, R>;
-  using ThisType = Model1Function<E, r, r, R>;
+  using ThisType = Model1Function;
 
 public:
   using DomainFieldType = typename BaseType::DomainFieldType;

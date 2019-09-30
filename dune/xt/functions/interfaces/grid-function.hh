@@ -73,7 +73,7 @@ class ProductGridFunction;
 template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
 class GridFunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
+  using ThisType = GridFunctionInterface;
 
 public:
   using LocalFunctionType = ElementFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;

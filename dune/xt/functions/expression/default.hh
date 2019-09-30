@@ -37,7 +37,7 @@ template <size_t d, size_t r = 1, size_t rC = 1, class RangeField = double>
 class ExpressionFunction : public FunctionInterface<d, r, rC, RangeField>
 {
   using BaseType = FunctionInterface<d, r, rC, RangeField>;
-  using ThisType = ExpressionFunction<d, r, rC, RangeField>;
+  using ThisType = ExpressionFunction;
 
   using typename BaseType::DomainFieldType;
   using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeField, r * rC>;
@@ -249,7 +249,7 @@ template <size_t d, size_t r, class RangeField>
 class ExpressionFunction<d, r, 1, RangeField> : public FunctionInterface<d, r, 1, RangeField>
 {
   using BaseType = FunctionInterface<d, r, 1, RangeField>;
-  using ThisType = ExpressionFunction<d, r, 1, RangeField>;
+  using ThisType = ExpressionFunction;
 
   using typename BaseType::DomainFieldType;
   using MathExpressionFunctionType = MathExpressionBase<DomainFieldType, d, RangeField, r>;

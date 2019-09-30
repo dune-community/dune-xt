@@ -31,7 +31,7 @@ template <class ValueType>
 class SimpleDict
 {
 public:
-  using ThisType = SimpleDict<ValueType>;
+  using ThisType = SimpleDict;
 
   SimpleDict() {}
 

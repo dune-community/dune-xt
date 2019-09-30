@@ -369,7 +369,7 @@ class CombinedGridFunction
 
   using LeftStorageType = Common::ConstStorageProvider<LeftType>;
   using RightStorageType = Common::ConstStorageProvider<RightType>;
-  using ThisType = CombinedGridFunction<LeftType, RightType, comb>;
+  using ThisType = CombinedGridFunction;
 
 public:
   using ElementType = typename BaseType::ElementType;
