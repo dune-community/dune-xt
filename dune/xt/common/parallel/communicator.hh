@@ -29,6 +29,17 @@ bool operator!=(const No_Comm& lhs, const No_Comm& rhs)
   return !(lhs == rhs);
 }
 
+// CollectiveCommunication<No_Comm> is also missing a comparison operator (CollectiveCommunication<MPI_Comm> does not
+// have a comparison operator either, but it has a conversion operator to MPI_Comm which does have operator==)
+bool operator==(const CollectiveCommunication<No_Comm>& /*lhs*/, const CollectiveCommunication<No_Comm>& /*rhs*/)
+{
+  return true;
+}
+bool operator!=(const CollectiveCommunication<No_Comm>& lhs, const CollectiveCommunication<No_Comm>& rhs)
+{
+  return !(lhs == rhs);
+}
+
 
 } // namespace Dune
 

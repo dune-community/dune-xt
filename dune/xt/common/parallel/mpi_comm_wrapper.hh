@@ -21,6 +21,8 @@
 #  include <dune/pybindxi/stl.h>
 #endif
 
+#include <dune/xt/common/parallel/communicator.hh>
+
 namespace Dune {
 namespace XT {
 namespace Common {
