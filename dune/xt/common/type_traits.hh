@@ -456,6 +456,22 @@ using real_t = typename field_traits<T>::real_type;
 template <class T>
 using complex_t = typename field_traits<T>::complex_type;
 
+template <class T>
+T create_real_or_complex_number(const std::enable_if_t<std::is_arithmetic<T>::value, real_t<T>> real_part,
+                                const real_t<T> imag_part)
+{
+  DUNE_THROW_IF(std::abs(imag_part) > 1e-15,
+                Dune::MathError,
+                "You are trying to create a real number with non-zero imaginary part!");
+  return real_part;
+}
+
+template <class T>
+T create_real_or_complex_number(const std::enable_if_t<is_complex<T>::value, real_t<T>> real_part,
+                                const real_t<T> imag_part)
+{
+  return T(real_part, imag_part);
+}
 
 template <class L, class R>
 struct plus_promotion
