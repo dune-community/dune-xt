@@ -20,7 +20,7 @@
 #  include <dune/grid/common/rangegenerators.hh>
 
 #  include <dune/xt/common/memory.hh>
-#  include <dune/xt/common/test/gtest/gtest.h>
+#  include <dune/xt/test/gtest/gtest.h>
 #  include <dune/xt/grid/grids.hh>
 #  include <dune/xt/grid/gridprovider.hh>
 #  include <dune/xt/grid/dd/glued.hh>
