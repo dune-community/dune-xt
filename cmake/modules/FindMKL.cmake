@@ -12,7 +12,7 @@
 
 include(Hints)
 
-set(mkl_hints ${hint_prefixes})
+set(mkl_hints ${root_hints})
 set(mkl_lib_hints "")
 set(mkl_include_hints "")
 list(APPEND mkl_hints "/opt/intel/mkl/" "$ENV{HOME}/intel/mkl/")
