@@ -162,6 +162,12 @@ tokenize(const std::string& msg, const std::string& separators, const boost::alg
 }
 
 /**
+  \brief Removes whitespace from front and back of the string.
+  \param[in]  s String to be trimmed
+**/
+void trim(std::string& v);
+
+/**
   \brief Removes whitespace from front and back of each string in the vector.
   \param[in]  v Vector of strings to be trimmed
 **/
