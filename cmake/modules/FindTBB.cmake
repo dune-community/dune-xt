@@ -67,6 +67,15 @@
 
 include(Hints)
 
+set(tbb_hints ${root_hints})
+set(tbb_lib_hints "")
+set(tbb_include_hints "")
+set(tbb_bin_hints "")
+list(APPEND tbb_hints "/opt/intel/tbb/" "$ENV{HOME}/intel/tbb/")
+append_to_each("${tbb_hints}" "lib/intel64" tbb_lib_hints)
+append_to_each("${tbb_hints}" "include/" tbb_include_hints)
+append_to_each("${tbb_hints}" "bin/" tbb_bin_hints)
+
 option(TBB_DEBUG "Turn on TBB debugging (modifies compiler flags and links against debug version of libraries)")
 
 # source for our little test program. We have to compile this multiple times, so store it in a variable for DRY and
@@ -125,6 +134,8 @@ endfunction()
 
 # Check whether the user gave us an existing tbbvars.sh file
 find_file(TBB_VARS_SH tbbvars.sh DOC "Path to tbbvars.sh script" NO_DEFAULT_PATH)
+# now we try to find tbbvars.sh on our own
+find_file(TBB_VARS_SH tbbvars.sh HINTS ${tbb_bin_hints} DOC "Path to tbbvars.sh script")
 
 if(TBB_VARS_SH)
   parse_tbb_vars_sh()
@@ -133,7 +144,7 @@ else() # Try to find TBB in standard include paths
             PATHS ENV
                   CPATH
                   ${TBB_INCLUDE_DIR}
-                  ${include_hints}
+                  ${tbb_include_hints}
             DOC "Path to TBB include directory") # Try to find some version of the TBB library in standard library
                                                  # paths
   find_path(TBB_LIBRARY_DIR
@@ -141,7 +152,7 @@ else() # Try to find TBB in standard include paths
             "${CMAKE_SHARED_LIBRARY_PREFIX}tbb${CMAKE_SHARED_LIBRARY_SUFFIX}"
             "${CMAKE_SHARED_LIBRARY_PREFIX}tbb_preview_debug${CMAKE_SHARED_LIBRARY_SUFFIX}"
             "${CMAKE_SHARED_LIBRARY_PREFIX}tbb_debug${CMAKE_SHARED_LIBRARY_SUFFIX}"
-            PATHS ENV LIBRARY_PATH ${lib_hints}
+            PATHS ENV LIBRARY_PATH ${tbb_lib_hints}
             DOC "Path to TBB library directory")
 endif()
 
