@@ -173,10 +173,16 @@ convert_from_string(std::string ss, const size_t /*size*/ = 0, const size_t /*co
   typedef typename V::value_type T;
   T re(0), im(0);
   const auto sign_pos = ss.find("+", 1) != string::npos ? ss.find("+", 1) : ss.find("-", 1);
-  re = convert_from_string<T>(ss.substr(0, sign_pos));
+  auto im_pos = ss.find("i");
+  if (sign_pos == string::npos && im_pos != string::npos) {
+    // pure virtual case
+    im = convert_from_string<T>(ss.substr(0, im_pos));
+  } else {
+    re = convert_from_string<T>(ss.substr(0, sign_pos));
+  }
   if (sign_pos != string::npos) {
     ss = ss.substr(sign_pos);
-    const auto im_pos = ss.find("i");
+    im_pos = ss.find("i");
     if (im_pos == string::npos)
       DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " no imaginary unit");
     im = convert_from_string<T>(ss.substr(0, im_pos));

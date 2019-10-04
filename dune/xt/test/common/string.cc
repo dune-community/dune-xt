@@ -145,6 +145,7 @@ GTEST_TEST(StringTest, ConvertFrom)
   typedef std::complex<double> Complex;
   EXPECT_EQ(Complex(1, -1), from_string<Complex>("+1-1i"));
   EXPECT_EQ(Complex(1, 0), from_string<Complex>("+1"));
+  EXPECT_EQ(Complex(0, 1), from_string<Complex>("1i"));
   EXPECT_EQ(Complex(0, -1), from_string<Complex>("0-1i"));
 }
 
