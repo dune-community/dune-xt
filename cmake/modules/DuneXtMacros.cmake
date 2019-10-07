@@ -22,7 +22,7 @@ include(Hints)
 # library checks  #########################################################################
 find_package(PkgConfig)
 
-set(DS_REQUIRED_BOOST_LIBS atomic chrono date_time filesystem system thread timer)
+set(DS_REQUIRED_BOOST_LIBS atomic chrono date_time filesystem python system thread timer)
 set(BOOST_ROOT_HINTS "$ENV{BOOST_ROOT}" ${root_hints})
 # FindBoost can only take a single hint directory from BOOST_ROOT, so we loop over all hints
 foreach(BOOST_ROOT_HINT ${BOOST_ROOT_HINTS})
