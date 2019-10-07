@@ -10,8 +10,8 @@
 //   Tim Keil        (2018)
 //   Tobias Leibner  (2016 - 2018)
 
-#ifndef DUNE_XT_FUNCTION_BASE_REINTERPRET_HH
-#define DUNE_XT_FUNCTION_BASE_REINTERPRET_HH
+#ifndef DUNE_XT_FUNCTIONS_BASE_REINTERPRET_HH
+#define DUNE_XT_FUNCTIONS_BASE_REINTERPRET_HH
 
 #include <dune/geometry/referenceelements.hh>
 
@@ -29,9 +29,9 @@ namespace Functions {
  * \brief Reinterprets a given localizable function (associated with a given grid layer), on a different grid layer.
  *
  *        Therefore, we search for the correct element in the original grid layer and use the corresponding
- *        local_function to provide an evaluation for a point on the new grid layer. The physical domain covered by the
- *        new grid layer should thus be contained in the physical domain of the original grid layer. This is mainly used
- *        in the context of prolongations.
+ *        local_function to provide an evaluation for a point on the new grid layer. Zero is returned if no element is
+ *        found. The physical domain covered by the new grid layer should thus be contained in the physical domain of
+ *        the original grid layer. This is mainly used in the context of prolongations.
  */
 template <class SourceGridView,
           class TargetElement = XT::Grid::extract_entity_t<SourceGridView>,
@@ -42,7 +42,7 @@ class ReinterpretLocalizableFunction
   : public GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>
 {
   static_assert(XT::Grid::is_layer<SourceGridView>::value, "");
-  using ThisType = ReinterpretLocalizableFunction;
+  using ThisType = ReinterpretLocalizableFunction<SourceGridView, TargetElement, range_dim, range_dim_cols, RangeField>;
   using BaseType = GridFunctionInterface<TargetElement, range_dim, range_dim_cols, RangeField>;
 
 public:
@@ -94,6 +94,7 @@ private:
       , local_source_(source_.local_function())
       , source_element_which_contains_complete_target_element_(nullptr)
       , source_element_which_contains_some_point_of_target_element_(nullptr)
+      , local_source_valid_for_this_point_(false)
     {}
 
   protected:
@@ -113,6 +114,8 @@ private:
                     Exceptions::reinterpretation_error,
                     "source_element_ptrs.size() = " << source_element_ptrs.size()
                                                     << "\n   num_vertices = " << num_vertices);
+      if (source_element_ptrs[0] == nullptr) // The search failed: abort! local_source_valid_for_this_point_ is false
+        return;
       // * and check if these are all the same
       if (num_vertices == 1) {
         source_element_which_contains_complete_target_element_ = std::move(source_element_ptrs[0]);
@@ -143,27 +146,32 @@ private:
      **/
     int order(const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!source_element_which_contains_complete_target_element_
-                        && !source_element_which_contains_some_point_of_target_element_,
-                    Exceptions::not_bound_to_an_element_yet,
-                    source_.name());
+      if (source_element_which_contains_complete_target_element_ == nullptr
+          && source_element_which_contains_some_point_of_target_element_ == nullptr)
+        return 0;
       return local_source_->order(param);
     }
 
     RangeReturnType evaluate(const DomainType& point_in_target_reference_element,
                              const Common::Parameter& param = {}) const
     {
-      ensure_local_source_is_bound_for_this_point(point_in_target_reference_element);
+      try_to_bind_local_source_for_this_point(point_in_target_reference_element);
+      if (!local_source_valid_for_this_point_)
+        return RangeReturnType(0);
+      local_source_valid_for_this_point_ = false;
       const auto point_in_global_coordinates = this->element().geometry().global(point_in_target_reference_element);
       const auto point_in_source_reference_element =
           local_source_->element().geometry().local(point_in_global_coordinates);
       return local_source_->evaluate(point_in_source_reference_element, param);
-    }
+    } // ... evaluate(...)
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_target_reference_element,
                                        const Common::Parameter& param = {}) const
     {
-      ensure_local_source_is_bound_for_this_point(point_in_target_reference_element);
+      try_to_bind_local_source_for_this_point(point_in_target_reference_element);
+      if (!local_source_valid_for_this_point_)
+        return DerivativeRangeReturnType(0);
+      local_source_valid_for_this_point_ = false;
       const auto point_in_global_coordinates = this->element().geometry().global(point_in_target_reference_element);
       const auto point_in_source_reference_element =
           local_source_->element().geometry().local(point_in_global_coordinates);
@@ -174,7 +182,10 @@ private:
                                          const DomainType& point_in_target_reference_element,
                                          const Common::Parameter& param = {}) const
     {
-      ensure_local_source_is_bound_for_this_point(point_in_target_reference_element);
+      try_to_bind_local_source_for_this_point(point_in_target_reference_element);
+      if (!local_source_valid_for_this_point_)
+        return DerivativeRangeReturnType(0);
+      local_source_valid_for_this_point_ = false;
       const auto point_in_global_coordinates = this->element().geometry().global(point_in_target_reference_element);
       const auto point_in_source_reference_element =
           local_source_->element().geometry().local(point_in_global_coordinates);
@@ -182,10 +193,13 @@ private:
     }
 
   private:
-    void ensure_local_source_is_bound_for_this_point(const DomainType& point_in_target_reference_element) const
+    void try_to_bind_local_source_for_this_point(const DomainType& point_in_target_reference_element) const
     {
-      if (source_element_which_contains_complete_target_element_)
+      local_source_valid_for_this_point_ = false;
+      if (source_element_which_contains_complete_target_element_) {
+        local_source_valid_for_this_point_ = true;
         return;
+      }
       if (single_point_.size() != 1)
         single_point_.resize(1);
       single_point_[0] = this->element().geometry().global(point_in_target_reference_element);
@@ -193,9 +207,12 @@ private:
       DUNE_THROW_IF(source_element_ptrs.size() != 1,
                     Exceptions::reinterpretation_error,
                     "source_element_ptrs.size() = " << source_element_ptrs.size());
-      source_element_which_contains_some_point_of_target_element_ = std::move(source_element_ptrs[0]);
-      local_source_->bind(*source_element_which_contains_some_point_of_target_element_);
-    } // ... ensure_local_source_is_bound_for_this_point(...)
+      if (source_element_ptrs[0] != nullptr) {
+        source_element_which_contains_some_point_of_target_element_ = std::move(source_element_ptrs[0]);
+        local_source_->bind(*source_element_which_contains_some_point_of_target_element_);
+        local_source_valid_for_this_point_ = true;
+      }
+    } // ... try_to_bind_local_source_for_this_point(...)
 
     const SourceType& source_;
     const SourceGridView& source_grid_view_;
@@ -205,6 +222,7 @@ private:
         source_element_which_contains_complete_target_element_;
     mutable std::unique_ptr<XT::Grid::extract_entity_t<SourceGridView>>
         source_element_which_contains_some_point_of_target_element_;
+    mutable bool local_source_valid_for_this_point_;
     mutable std::vector<DomainType> vertices_;
     mutable std::vector<DomainType> single_point_;
   }; // class ReinterpretLocalfunction
@@ -256,4 +274,4 @@ reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridVie
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_FUNCTION_REINTERPRET_HH
+#endif // DUNE_XT_FUNCTIONS_BASE_REINTERPRET_HH

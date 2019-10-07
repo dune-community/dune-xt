@@ -20,6 +20,8 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/functions/expression.hh>
+#include <python/dune/xt/common/fvector.hh>
+#include <python/dune/xt/common/fmatrix.hh>
 
 namespace Dune {
 namespace XT {

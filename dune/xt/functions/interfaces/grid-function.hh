@@ -23,8 +23,6 @@
 
 #include <dune/common/deprecated.hh>
 
-#include <dune/geometry/refinement.hh>
-
 #include <dune/grid/io/file/vtk.hh>
 
 #include <dune/xt/common/filesystem.hh>
@@ -73,7 +71,7 @@ class ProductGridFunction;
 template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
 class GridFunctionInterface : public Common::ParametricInterface
 {
-  using ThisType = GridFunctionInterface;
+  using ThisType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
 
 public:
   using LocalFunctionType = ElementFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
@@ -149,34 +147,18 @@ public:
    * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default: the grid you see in the
    *        visualization may thus be a refinement of the actual grid!
    */
-  template <class GridLayerType>
-  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
-  visualize(const GridLayerType& grid_layer,
+  template <class GridViewType>
+  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
+  visualize(const GridViewType& grid_view,
             const std::string path,
             const bool subsampling = true,
             const VTK::OutputType vtk_output_type = VTK::appendedraw,
             const XT::Common::Parameter& param = {},
             const VisualizerInterface<r, rC, R>& visualizer = DefaultVisualizer<r, rC, R>()) const
   {
-    if (path.empty())
-      DUNE_THROW(Exceptions::wrong_input_given, "path must not be empty!");
-    const auto directory = Common::directory_only(path);
-    Common::test_create_directory(directory);
-    const auto tmp_grid_view = Grid::make_tmp_view(grid_layer);
-    const auto& grid_view = tmp_grid_view.access();
-    using GridViewType = std::decay_t<decltype(grid_view)>;
-    const auto adapter =
-        std::make_shared<VisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
-            *this, visualizer, "", param);
-    std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
-        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(
-                          grid_view, /*subsampling_level=*/Dune::refinementLevels(2))
-                    : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
-    vtk_writer->addVertexData(adapter);
-    if (MPIHelper::getCollectiveCommunication().size() == 1)
-      vtk_writer->write(path, vtk_output_type);
-    else
-      vtk_writer->pwrite(Common::filename_only(path), directory, "", vtk_output_type);
+    auto vtk_writer = create_vtkwriter(grid_view, subsampling);
+    add_to_vtkwriter(*vtk_writer, param, visualizer);
+    write_visualization(*vtk_writer, path, vtk_output_type);
   } // ... visualize(...)
 
   /**
@@ -184,35 +166,67 @@ public:
    *        visualization may thus be a refinement of the actual grid!
    * \note  Not yet implemented for vector-valued functions.
    */
-  template <class GridLayerType>
-  typename std::enable_if<Grid::is_layer<GridLayerType>::value, void>::type
-  visualize_gradient(const GridLayerType& grid_layer,
+  template <class GridViewType>
+  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
+  visualize_gradient(const GridViewType& grid_view,
                      const std::string path,
                      const bool subsampling = true,
                      const VTK::OutputType vtk_output_type = VTK::appendedraw,
                      const XT::Common::Parameter& param = {},
                      const VisualizerInterface<d, 1, R>& visualizer = DefaultVisualizer<d, 1, R>()) const
   {
+    auto vtk_writer = create_vtkwriter(grid_view, subsampling);
+    add_gradient_to_vtkwriter(*vtk_writer, param, visualizer);
+    write_visualization(*vtk_writer, path, vtk_output_type);
+  } // ... visualize_gradient(...)
+
+  template <class GridViewType>
+  typename std::enable_if<Grid::is_view<GridViewType>::value, std::unique_ptr<VTKWriter<GridViewType>>>::type
+  create_vtkwriter(const GridViewType& grid_view, const bool subsampling = true) const
+  {
+    return subsampling ? std::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
+                       : std::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
+  }
+
+  template <class GridViewType>
+  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
+  add_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
+                   const XT::Common::Parameter& param = {},
+                   const VisualizerInterface<r, rC, R>& visualizer = DefaultVisualizer<r, rC, R>()) const
+  {
+    const auto adapter =
+        std::make_shared<VisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
+            *this, visualizer, "", param);
+    vtk_writer.addVertexData(adapter);
+  }
+
+  template <class GridViewType>
+  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
+  add_gradient_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
+                            const XT::Common::Parameter& param = {},
+                            const VisualizerInterface<d, 1, R>& visualizer = DefaultVisualizer<d, 1, R>()) const
+  {
+    const auto adapter =
+        std::make_shared<GradientVisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
+            *this, visualizer, "", param);
+    vtk_writer.addCellData(adapter);
+  }
+
+  template <class GridViewType>
+  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
+  write_visualization(VTKWriter<GridViewType>& vtk_writer,
+                      const std::string path,
+                      const VTK::OutputType vtk_output_type = VTK::appendedraw) const
+  {
     if (path.empty())
       DUNE_THROW(Exceptions::wrong_input_given, "path must not be empty!");
     const auto directory = Common::directory_only(path);
     Common::test_create_directory(directory);
-    const auto tmp_grid_view = Grid::make_tmp_view(grid_layer);
-    const auto& grid_view = tmp_grid_view.access();
-    using GridViewType = std::decay_t<decltype(grid_view)>;
-    const auto adapter =
-        std::make_shared<GradientVisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
-            *this, visualizer, "", param);
-    std::unique_ptr<VTKWriter<GridViewType>> vtk_writer =
-        subsampling ? Common::make_unique<SubsamplingVTKWriter<GridViewType>>(
-                          grid_view, /*subsampling_level=*/Dune::refinementLevels(2))
-                    : Common::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
-    vtk_writer->addCellData(adapter);
     if (MPIHelper::getCollectiveCommunication().size() == 1)
-      vtk_writer->write(path, vtk_output_type);
+      vtk_writer.write(path, vtk_output_type);
     else
-      vtk_writer->pwrite(Common::filename_only(path), directory, "", vtk_output_type);
-  } // ... visualize(...)
+      vtk_writer.pwrite(Common::filename_only(path), directory, "", vtk_output_type);
+  }
 }; // class GridFunctionInterface
 
 
@@ -223,4 +237,4 @@ public:
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/base/visualization.hh>
 
-#endif // DUNE_XT_FUNCTIONS_INTERFACES_LOCALIZABLE_FUNCTION_HH
+#endif // DUNE_XT_FUNCTIONS_INTERFACES_GRID_FUNCTION_HH

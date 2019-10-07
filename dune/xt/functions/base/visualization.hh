@@ -259,7 +259,7 @@ public:
                                const XT::Common::Parameter& param = {})
     : local_function_(localizable_function.local_function())
     , visualizer_(visualizer)
-    , name_(nm.empty() ? localizable_function.name() : nm)
+    , name_(nm.empty() ? "grad_ " + localizable_function.name() : nm)
     , param_(param)
   {
     if (range_dim > 1)
@@ -271,7 +271,7 @@ public:
                                const XT::Common::Parameter& param = {})
     : local_function_(localizable_function.local_function())
     , visualizer_(new DefaultVisualizer<d, 1, RangeField>())
-    , name_(nm.empty() ? localizable_function.name() : nm)
+    , name_(nm.empty() ? "grad_" + localizable_function.name() : nm)
     , param_(param)
   {
     if (range_dim > 1)
