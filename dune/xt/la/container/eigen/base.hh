@@ -83,6 +83,8 @@ public:
 
   EigenBaseVector(EigenBaseVector&& source) = default;
 
+  using InterfaceType::operator=;
+
   VectorImpType& operator=(const ThisType& other)
   {
     if (this != &other) {

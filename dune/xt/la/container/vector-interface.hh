@@ -462,6 +462,15 @@ public:
     return dot(other);
   }
 
+  template <class OtherTraits, class OtherScalarImp>
+  derived_type& operator=(const VectorInterface<OtherTraits, OtherScalarImp>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      set_entry(ii, other.get_entry(ii));
+    return this->as_imp();
+  }
+
+
   /**
    *  \brief  Adds another vector to this, in-place variant.
    *  \param  other The second summand.
@@ -473,6 +482,14 @@ public:
     return this->as_imp();
   }
 
+  template <class OtherTraits, class OtherScalarImp>
+  derived_type& operator+=(const VectorInterface<OtherTraits, OtherScalarImp>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      add_to_entry(ii, other.get_entry(ii));
+    return this->as_imp();
+  }
+
   /**
    *  \brief  Subtracts another vector from this, in-place variant.
    *  \param  other The subtrahend.
@@ -481,6 +498,14 @@ public:
   virtual derived_type& operator-=(const derived_type& other)
   {
     isub(other);
+    return this->as_imp();
+  }
+
+  template <class OtherTraits, class OtherScalarImp>
+  derived_type& operator-=(const VectorInterface<OtherTraits, OtherScalarImp>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      add_to_entry(ii, -other.get_entry(ii));
     return this->as_imp();
   }
 
