@@ -32,7 +32,7 @@ if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
   # The -fsized-deallocation flag is not needed anymore in newer versions of pybind11. 
   # TODO: Remove once we update pybind11.
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    target_compile_options(dunepybindxi INTERFACE -fsized-deallocation)
+    target_compile_options(dunepybindxiinterface INTERFACE -fsized-deallocation)
   endif()
   # Build an interface library target:
   add_library(pybind11::pybind11 ALIAS dunepybindxiinterface)  # to match exported target
@@ -43,7 +43,7 @@ if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
 
   add_library(pybind11::module ALIAS dunepybindximodule)
   if(NOT MSVC)
-    target_compile_options(dunepybindximodule INTERFACE -fvisibility=hidden)
+    target_compile_options(dunepybindximodule PRIVATE -fvisibility=hidden)
   endif()
   target_link_libraries(dunepybindximodule INTERFACE pybind11::pybind11)
   if(WIN32 OR CYGWIN)

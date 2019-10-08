@@ -25,7 +25,7 @@ namespace PybindXI {
  * \note Most likely, you do not want to use this class directly, but
  * GlobalInterpreter instead!
  */
-class ScopedInterpreter
+class DUNE_EXPORT ScopedInterpreter
 {
 public:
   pybind11::module import_module(const std::string& module_name);
