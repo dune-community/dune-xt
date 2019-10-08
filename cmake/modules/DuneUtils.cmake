@@ -38,17 +38,6 @@ endif(DEFINED dune-xt_MODULE_PATH)
 
 enable_testing()
 
-find_package(Clp)
-find_package(Qhull)
-find_package(MKL)
-if(MKL_FOUND)
-  set(HAVE_LAPACKE 0)
-  set(HAVE_CBLAS 0)
-else(MKL_FOUND)
-  find_package(LAPACKE)
-  find_package(CBLAS)
-endif(MKL_FOUND)
-
 include(DuneXTTesting)
 
 macro(add_header_listing) # header
