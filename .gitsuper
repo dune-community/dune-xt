@@ -11,7 +11,7 @@ status = 37afc034878b25dae654557ef95ee36edf9b9e1b .ci/shared (37afc03)
 	 1369ae9329d0928480d6b18ed772fc77e1abf752 dune-grid-glue (v2.4.0-161-g1369ae9)
 	 ef68ae0ec40f9d369e4ea9b31e560af6af545bf6 dune-istl (v2.6.0-4-gef68ae0e)
 	 ee794bfdfa3d4f674664b4155b6b2df36649435f dune-localfunctions (v2.6.0-4-gee794bf)
-	+e61358744175558a9de8a409e0590eef01f6d045 dune-pybindxi (v2.2.1-36-ge613587)
+	+ab9c72ac15807eec3c6f707fad6d44df5d86fd40 dune-pybindxi (v2.2.1-37-gab9c72a)
 	 9543b4e8539dcccadc920ac1ca72c81ad807c73f dune-testtools (heads/testname_listing_hack2.6)
 	 07f9700459c616186737a9a34277f2edee76f475 dune-uggrid (v2.6.0-1-g07f97004)
 	+4c2e6767ee6cb1622a058e73b73d4436ef9ff3e6 dune-xt (post-merger-33-g4c2e6767)
@@ -79,7 +79,7 @@ commit = ee794bfdfa3d4f674664b4155b6b2df36649435f
 [submodule.dune-pybindxi]
 remote = git@github.com:dune-community/dune-pybindxi.git
 status = c0b1735fab0ecbd4bb4f1eaa27cb65fe813e98f0 .vcsetup (c0b1735)
-commit = e61358744175558a9de8a409e0590eef01f6d045
+commit = ab9c72ac15807eec3c6f707fad6d44df5d86fd40
 
 [submodule.dune-testtools]
 remote = git@github.com:dune-community/dune-testtools.git
