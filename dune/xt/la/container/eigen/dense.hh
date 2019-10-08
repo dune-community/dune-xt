@@ -185,6 +185,8 @@ public:
 
   using BaseType::operator=;
 
+  ThisType& operator=(const ThisType& other) = default;
+
   ThisType& operator=(const BackendType& other)
   {
     backend_ = std::make_shared<BackendType>(other);
