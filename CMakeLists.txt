@@ -58,14 +58,7 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
                 ERROR_VARIABLE shell_error
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-dune_enable_all_packages(INCLUDE_DIRS
-                         ${dune-xt-common_SOURCE_DIR}/dune
-                         MODULE_LIBRARIES
-                         dunextcommon
-                         dunextgrid
-                         dunextfunctions
-                         dunextla
-                         gtest_dune_xt_common)
+dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-common_SOURCE_DIR}/dune MODULE_LIBRARIES gtest_dune_xt dunext)
 
 include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the

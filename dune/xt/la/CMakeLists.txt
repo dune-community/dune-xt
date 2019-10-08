@@ -25,4 +25,4 @@ if(DUNE_XT_WITH_PYTHON_BINDINGS)
 endif()
 
 find_package(LAPACKE)
-dune_library_add_sources(dunextla SOURCES ${lib_dune_xt_la_sources})
+dune_library_add_sources(dunext SOURCES ${lib_dune_xt_la_sources})
