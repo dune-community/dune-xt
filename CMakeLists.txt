@@ -28,7 +28,7 @@ dune_project()
 
 if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
   dune_enable_all_packages(INCLUDE_DIRS ${dune-pybindxi_SOURCE_DIR}/dune
-                           MODULE_LIBRARIES dunepybindxi dunepybindxiinterface dunepybindximodule dunepybindxiembed)
+                           MODULE_LIBRARIES dunepybindxiinterface dunepybindximodule dunepybindxiembed dunepybindxi)
   # The -fsized-deallocation flag is not needed anymore in newer versions of pybind11. 
   # TODO: Remove once we update pybind11.
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
