@@ -28,5 +28,5 @@ if(DUNE_XT_WITH_PYTHON_BINDINGS)
               walker.lib/yasp_2d_equidistant_offset.cc
               walker.lib/yasp_3d_equidistant_offset.cc)
 endif()
-dune_library_add_sources(dunextgrid SOURCES ${lib_dune_xt_grid_sources})
+dune_library_add_sources(dunext SOURCES ${lib_dune_xt_grid_sources})
 add_dune_alberta_flags(GRIDDIM 1 SOURCE_ONLY dunextgrid)

@@ -37,6 +37,6 @@ set(lib_dune_xt_common_sources
     timedlogging.cc
     timings.cc)
 
-dune_library_add_sources(dunextcommon SOURCES ${lib_dune_xt_common_sources})
+dune_library_add_sources(dunext SOURCES ${lib_dune_xt_common_sources})
 
 add_analyze(${lib_dune_xt_common_sources})

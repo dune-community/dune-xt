@@ -57,7 +57,7 @@ macro(get_headercheck_targets subdir)
 endmacro(get_headercheck_targets)
 
 macro(add_subdir_tests subdir)
-  set(link_xt_libs dunextgrid dunextcommon dunextla)
+  set(link_xt_libs dunext)
   list(APPEND dxt_test_dirs ${subdir})
   file(GLOB_RECURSE test_sources "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/*.cc")
   foreach(source ${test_sources})
@@ -87,7 +87,7 @@ macro(add_subdir_tests subdir)
                              dune_xt_execute.py
                              ${DEBUG_MACRO_TESTS})
         foreach(target ${targetlist_${testbase}})
-          target_link_libraries(${target} ${link_xt_libs} ${COMMON_LIBS} ${GRID_LIBS} gtest_dune_xt_common)
+          target_link_libraries(${target} ${link_xt_libs} ${COMMON_LIBS} ${GRID_LIBS} gtest_dune_xt)
           list(APPEND ${subdir}_dxt_test_binaries ${target})
           set(dxt_test_names_${target} ${testlist_${testbase}_${target}})
         endforeach(target)
@@ -105,7 +105,7 @@ macro(add_subdir_tests subdir)
                     ${link_xt_libs}
                     ${COMMON_LIBS}
                     ${GRID_LIBS}
-                    gtest_dune_xt_common
+                    gtest_dune_xt
                     COMMAND
                     ${CMAKE_BINARY_DIR}/run-in-dune-env
                     CMD_ARGS
@@ -195,7 +195,7 @@ macro(add_subdir_tests subdir)
                     ${link_xt_libs}
                     ${COMMON_LIBS}
                     ${GRID_LIBS}
-                    gtest_dune_xt_common
+                    gtest_dune_xt
                     COMMAND
                     ${CMAKE_BINARY_DIR}/run-in-dune-env
                     CMD_ARGS
