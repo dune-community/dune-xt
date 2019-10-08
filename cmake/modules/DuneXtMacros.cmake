@@ -59,6 +59,15 @@ else(EIGEN3_FOUND)
   set(HAVE_EIGEN 0)
 endif(EIGEN3_FOUND)
 
+find_package(Clp)
+find_package(Qhull)
+find_package(MKL)
+if(MKL_FOUND)
+  set(HAVE_LAPACKE 0)
+else(MKL_FOUND)
+  find_package(LAPACKE)
+endif(MKL_FOUND)
+
 # intel mic and likwid don't mix
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "k1om")
   include(FindLIKWID)
