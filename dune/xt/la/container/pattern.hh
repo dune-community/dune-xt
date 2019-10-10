@@ -79,6 +79,7 @@ SparsityPatternDefault triangular_pattern(const size_t rows,
                                           const size_t cols,
                                           const Common::MatrixPattern& uplo = Common::MatrixPattern::lower_triangular);
 
+SparsityPatternDefault diagonal_pattern(const size_t rows);
 SparsityPatternDefault diagonal_pattern(const size_t rows, const size_t cols, int offset = 0);
 
 SparsityPatternDefault multiplication_pattern(const SparsityPatternDefault& lhs_pattern,
