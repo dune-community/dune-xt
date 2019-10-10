@@ -55,30 +55,29 @@ struct CommonDenseVectorBackend
     : size_(ss)
     , values_vector_(size_, value)
     , values_ptr_(values_vector_.data())
-    , created_from_ptr_(false)
   {}
 
   CommonDenseVectorBackend(const size_t ss, ScalarType* values_ptr)
     : size_(ss)
     , values_ptr_(values_ptr)
-    , created_from_ptr_(true)
   {}
 
   CommonDenseVectorBackend(const ThisType& other)
     : size_(other.size_)
     , values_vector_(other.size_)
     , values_ptr_(values_vector_.data())
-    , created_from_ptr_(false)
   {
-    std::copy_n(
-        other.created_from_ptr_ ? other.values_ptr_ : other.values_vector_.data(), size_, values_vector_.begin());
+    std::copy_n(other.values_ptr_, size_, values_ptr_);
   }
 
   CommonDenseVectorBackend(ThisType&& other)
     : size_(std::move(other.size_))
     , values_vector_(std::move(other.values_vector_))
-    , values_ptr_(other.created_from_ptr_ ? other.values_ptr_ : values_vector_.data())
-    , created_from_ptr_(other.created_from_ptr_)
+    // If other was created from a ptr, we also want to use that pointer to avoid copying. The following assumes
+    // values_vector_.data() points to the same location as other.values_vector_.data() did before the move. This is not
+    // strictly guaranteed by the standard as of now but fulfilled in all major implementations (see
+    // https://stackoverflow.com/a/25348988 and LWG open issue 2321).
+    , values_ptr_(other.values_ptr_)
   {}
 
   ThisType copy()
@@ -90,12 +89,8 @@ struct CommonDenseVectorBackend
   {
     if (this != &other) {
       size_ = other.size_;
-      if (other.created_from_ptr_) {
-        values_vector_ = std::vector<ScalarType>(size_);
-        std::copy_n(other.values_ptr_, size_, values_vector_.begin());
-      } else {
-        values_vector_ = other.values_vector_;
-      }
+      values_vector_ = std::vector<ScalarType>(size_);
+      std::copy_n(other.values_ptr_, size_, values_vector_.begin());
       values_ptr_ = values_vector_.data();
     }
     return *this;
@@ -192,7 +187,6 @@ struct CommonDenseVectorBackend
   size_t size_;
   std::vector<ScalarType> values_vector_;
   ScalarType* values_ptr_;
-  bool created_from_ptr_;
 };
 
 /// Traits for CommonDenseVector
@@ -442,7 +436,7 @@ public:
   /// \name These methods override default implementations from VectorInterface.
   /// \{
 
-  virtual ScalarType dot(const ThisType& other) const override final
+  ScalarType dot(const ThisType& other) const override final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -450,22 +444,22 @@ public:
     return backend() * other.backend();
   } // ... dot(...)
 
-  virtual RealType l1_norm() const override final
+  RealType l1_norm() const override final
   {
     return backend().l1_norm();
   }
 
-  virtual RealType l2_norm() const override final
+  RealType l2_norm() const override final
   {
     return backend().l2_norm();
   }
 
-  virtual RealType sup_norm() const override final
+  RealType sup_norm() const override final
   {
     return backend().sup_norm();
   }
 
-  virtual void iadd(const ThisType& other) override final
+  void iadd(const ThisType& other) override final
   {
     if (other.size() != size())
       if (other.size() != size())
@@ -475,7 +469,7 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  virtual void isub(const ThisType& other) override final
+  void isub(const ThisType& other) override final
   {
     if (other.size() != size())
       if (other.size() != size())
