@@ -168,6 +168,11 @@ SparsityPatternDefault triangular_pattern(const size_t rows, const size_t cols, 
   return ret;
 }
 
+SparsityPatternDefault diagonal_pattern(const size_t rows)
+{
+  return diagonal_pattern(rows, rows, 0);
+}
+
 SparsityPatternDefault diagonal_pattern(const size_t rows, const size_t cols, const int offset)
 {
   SparsityPatternDefault pattern(rows);

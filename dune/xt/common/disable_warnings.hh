@@ -18,7 +18,7 @@
 #  pragma GCC diagnostic ignored "-Wall"
 #  pragma GCC diagnostic ignored "-Wcovered-switch-default"
 #  pragma clang diagnostic ignored "-Wdelete-non-virtual-dtor"
-#  pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#  pragma GCC diagnostic ignored "-Wdeprecated"
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #  pragma GCC diagnostic ignored "-Wdeprecated-register"
 #  pragma GCC diagnostic ignored "-Wdisabled-macro-expansion"
@@ -51,7 +51,9 @@
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wall"
 #  pragma GCC diagnostic ignored "-Wattributes"
-#  pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#  if (__GNUC__ > 8)
+#    pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#  endif
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #  pragma GCC diagnostic ignored "-Wextra"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
