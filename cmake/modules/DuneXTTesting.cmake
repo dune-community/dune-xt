@@ -37,10 +37,13 @@ endmacro(dxt_headercheck_target_name)
 
 macro(get_headercheck_targets subdir)
   file(GLOB_RECURSE bindir_header "${CMAKE_BINARY_DIR}/*.hh")
-  list(APPEND dxt_ignore_header ${bindir_header}) # this is mostly c&p from dune-common, since we need a way to extract
-                                                  # all target names to pass to our load balancing  script
+  list(APPEND dxt_ignore_header ${bindir_header})
+
   if(ENABLE_HEADERCHECK)
-    get_property(headerlist GLOBAL PROPERTY headercheck_list)
+    file(GLOB_RECURSE headerlist
+                      "${CMAKE_SOURCE_DIR}/dune/xt/${subdir}/*.hh"
+                      "${CMAKE_SOURCE_DIR}/dune/xt/test/${subdir}/*.hh"
+                      "${CMAKE_SOURCE_DIR}/python/dune/xt/${subdir}/*.hh")
     add_custom_target(${subdir}_headercheck)
     foreach(header ${headerlist})
       list(FIND dxt_ignore_header "${header}" _index)
@@ -234,7 +237,7 @@ macro(add_subdir_tests subdir)
     set(all_sorted_testnames "${all_sorted_testnames}/${dxt_test_names_${target}}")
   endforeach()
   set(${subdir}_dxt_headercheck_targets "")
-  get_headercheck_targets(${subdir}_dxt_headercheck_targets ${subdir})
+  get_headercheck_targets(${subdir})
   configure_file(${dune-xt-module-path}/dxt_test_binaries.cmake.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${subdir}_dxt_test_binaries.cmake)
   configure_file(${dune-xt-module-path}/dxt_all_sorted_testnames.cmake.in
