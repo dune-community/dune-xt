@@ -82,8 +82,8 @@ jobs:
     subdir: la
     module: 'dune-xt'
 
-- job: "Misc_Checks"
-  steps:
-    - bash: |
-        [[ -f ./.gitsuper ]] && echo "Please remove .gitsuper from the repo" && exit 1
-      displayName: 'Forbit .gitsuper'
+# - job: "Misc_Checks"
+#   steps:
+#     - bash: |
+#         [[ -f ./.gitsuper ]] && echo "Please remove .gitsuper from the repo" && exit 1
+#       displayName: 'Forbit .gitsuper'
