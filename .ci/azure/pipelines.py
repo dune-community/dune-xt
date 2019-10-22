@@ -20,11 +20,11 @@ jobs:
     subdir: {{ subdir }}
     module: 'dune-xt'
 {% endfor %}
-- job: "Misc_Checks"
-  steps:
-    - bash: |
-        [[ -f ./.gitsuper ]] && echo "Please remove .gitsuper from the repo" && exit 1
-      displayName: 'Forbit .gitsuper'
+# - job: "Misc_Checks"
+#   steps:
+#     - bash: |
+#         [[ -f ./.gitsuper ]] && echo "Please remove .gitsuper from the repo" && exit 1
+#       displayName: 'Forbit .gitsuper'
 '''
 
 import os
