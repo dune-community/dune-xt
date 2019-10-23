@@ -27,8 +27,8 @@
 template <class Tuple = Dune::XT::Grid::Available2dGridTypes>
 void bind_all_2d_grids(pybind11::module& m)
 {
-  Dune::XT::Common::bindings::try_register(m, [](auto& m_) { //  different grids but same entity
-    Dune::XT::Functions::bindings::addbind_GridFunctionInterface_all_dims<typename Tuple::head_type>(m_);
+  Dune::XT::Common::bindings::guarded_bind([&]() { //  different grids but same entity
+    Dune::XT::Functions::bindings::addbind_GridFunctionInterface_all_dims<typename Tuple::head_type>(m);
   });
   bind_all_2d_grids<typename Tuple::tail_type>(m);
 }
