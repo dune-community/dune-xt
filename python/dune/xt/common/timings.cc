@@ -30,8 +30,8 @@ PYBIND11_MODULE(_timings, m)
   using namespace pybind11::literals;
   using namespace Dune::XT::Common;
 
-  bindings::try_register(m, [](auto& m_) {
-    py::class_<Timings>(m_, "Timings")
+  bindings::guarded_bind([&]() {
+    py::class_<Timings>(m, "Timings")
         .def("start", &Timings::start, "set this to begin a named section")
         .def("reset", py::overload_cast<std::string>(&Timings::reset), "set elapsed time back to 0 for section_name")
         .def("reset", py::overload_cast<>(&Timings::reset), "set elapsed time back to 0 for section_name")
@@ -45,6 +45,6 @@ PYBIND11_MODULE(_timings, m)
         .def("output_all_measures",
              [](Timings& self) { self.output_all_measures(); },
              "outputs per rank and global averages of all measures");
-    m_.def("instance", &timings, py::return_value_policy::reference);
+    m.def("instance", &timings, py::return_value_policy::reference);
   });
 }
