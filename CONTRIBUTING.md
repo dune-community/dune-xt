@@ -59,13 +59,13 @@ dimensions, such as `static const size_t dim = 2;`).
 typos.
 * Include guards follow a pattern: file location `dune/xt/common/fvector.hh` turns into `DUNE_XT_COMMON_FVECTOR_HH`
 * Be careful to handle integers corretly, bad integer conversion is bad! Whenever possible, use `size_t` (even for
-`template<class Foo, size_t bar>`) and convert to the correct type using boost:
+`template<class Foo, size_t bar>`) and convert to the correct type using our `numeric_cast` from [dune/xt/common/numeric_cast.hh](https://github.com/dune-community/dune-xt/blob/master/dune/xt/common/numeric_cast.hh):
 ```c++
-#include <boost/numeric/conversion/cast.hpp>
+#include <dune/xt/common/numeric_cast.hh>
 
-const auto unsigned_number = boost::numeric_cast<size_t>(some_vector_size_of_unknown_int_type);
+const auto unsigned_number = Dune::XT::Common::numeric_cast<size_t>(some_vector_size_of_unknown_int_type);
 // work with unsigned_number as size_t
-Dune::function_that_requires_an_int_because_ints_are_cool(boost::numeric_cast<int>(unsigned_number);
+Dune::function_that_requires_an_int_because_ints_are_cool(Dune::XT::Common::numeric_cast<int>(unsigned_number);
 ```
 * Regarding whitespace, the only choice we have is the number of empty lines: one or two.
 Within functions and methods, only very rarely place an empty line!
@@ -142,14 +142,14 @@ For example:
 
 # Project layout
 
-Following the layout of the core modules, all headers are placed below `dune/xt/common`.
+Following the layout of the core modules, all headers are placed below `dune/xt/{common,grid,functions,la}`.
 If extending some functionality from dune-common, the names of the headers should coincide, i.e.
 `dune/xt/common/fvector.hh` for extensions of `dune/common/fvector.hh`.
 In such cases, the first header is expected to include the latter!
 Rather use a subdirectory and several headers than overly large headers.
 
-Tests can be found in `dune/xt/common/test`, where the name of a test source correspond to the full path of the
-corresponding header, e.g. `dune/xt/common/test/foo_bar.cc` contains tests for `dune/xt/common/foo/bar.hh`.
+Tests can be found in `dune/xt/test`, where the name of a test source correspond to the full path of the
+corresponding header, e.g. `dune/xt/test/common/foo_bar.cc` contains tests for `dune/xt/common/foo/bar.hh`.
 
 
 # clang-format
