@@ -698,7 +698,6 @@ public:
   } // ... tbb_walk(...)
 #endif // HAVE_TBB
 
-private:
   template <class ElementRange>
   void walk_range(const ElementRange& element_range)
   {
@@ -736,6 +735,7 @@ private:
     } // .. walk elements
   } // ... walk_range(...)
 
+private:
   GridViewType grid_view_;
   // We want each thread to have its own copy of each functor. However, as we do not know in advance how many different
   // threads we will have (even if DXTC_CONFIG["threading.max_count"] is set, there may be only max_threads at a time,
