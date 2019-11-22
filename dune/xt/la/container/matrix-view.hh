@@ -321,7 +321,7 @@ public:
 
   ThisType& operator=(const Matrix& other)
   {
-    const auto& patt = const_matrix_view_.get_pattern();
+    const auto& patt = get_pattern();
     assert(pattern_assignable(other));
     for (size_t ii = 0; ii < rows(); ++ii)
       for (auto&& jj : patt.inner(ii))
@@ -351,7 +351,7 @@ public:
 
   inline void scal(const ScalarType& alpha)
   {
-    const auto& patt = const_matrix_view_.get_pattern();
+    const auto& patt = get_pattern();
     for (size_t ii = 0; ii < rows(); ++ii)
       for (auto&& jj : patt.inner(ii))
         set_entry(ii, jj, get_entry(ii, jj) * alpha);
@@ -361,7 +361,7 @@ public:
   {
     const auto other_patt = xx.pattern();
 #ifndef NDEBUG
-    const auto& patt = const_matrix_view_.get_pattern();
+    const auto& patt = get_pattern();
     if (xx.rows() != rows() || xx.cols() != cols())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match, "Shapes do not match!");
     for (size_t ii = 0; ii < rows(); ++ii)
@@ -422,14 +422,14 @@ public:
 
   inline void clear_row(const size_t ii)
   {
-    const auto& patt = const_matrix_view_.get_pattern();
+    const auto& patt = get_pattern();
     for (auto&& jj : patt.inner(ii))
       set_entry(ii, jj, 0.);
   }
 
   inline void clear_col(const size_t jj)
   {
-    const auto& patt = const_matrix_view_.get_pattern();
+    const auto& patt = get_pattern();
     for (size_t ii = 0; ii < rows(); ++ii)
       if (std::find(patt.inner(ii).begin(), patt.inner(ii).end(), jj) != patt.inner(ii).end())
         set_entry(ii, jj, 0.);
@@ -452,10 +452,15 @@ public:
     return const_matrix_view_.operator Matrix();
   }
 
+  const SparsityPatternDefault& get_pattern() const
+  {
+    return const_matrix_view_.get_pattern();
+  }
+
 private:
   bool pattern_assignable(const Matrix& other) const
   {
-    const auto& patt = const_matrix_view_.get_pattern();
+    const auto& patt = get_pattern();
     const auto& other_patt = other.pattern();
     for (size_t ii = 0; ii < rows(); ++ii)
       for (auto&& jj : other_patt.inner(ii))
