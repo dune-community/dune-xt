@@ -154,7 +154,7 @@ public:
             const bool subsampling = true,
             const VTK::OutputType vtk_output_type = VTK::appendedraw,
             const XT::Common::Parameter& param = {},
-            const VisualizerInterface<r, rC, R>& visualizer = DefaultVisualizer<r, rC, R>()) const
+            const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
   {
     auto vtk_writer = create_vtkwriter(grid_view, subsampling);
     add_to_vtkwriter(*vtk_writer, param, visualizer);
@@ -173,7 +173,7 @@ public:
                      const bool subsampling = true,
                      const VTK::OutputType vtk_output_type = VTK::appendedraw,
                      const XT::Common::Parameter& param = {},
-                     const VisualizerInterface<d, 1, R>& visualizer = DefaultVisualizer<d, 1, R>()) const
+                     const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
   {
     auto vtk_writer = create_vtkwriter(grid_view, subsampling);
     add_gradient_to_vtkwriter(*vtk_writer, param, visualizer);
@@ -192,7 +192,7 @@ public:
   typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
   add_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
                    const XT::Common::Parameter& param = {},
-                   const VisualizerInterface<r, rC, R>& visualizer = DefaultVisualizer<r, rC, R>()) const
+                   const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
   {
     const auto adapter =
         std::make_shared<VisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
@@ -204,7 +204,7 @@ public:
   typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
   add_gradient_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
                             const XT::Common::Parameter& param = {},
-                            const VisualizerInterface<d, 1, R>& visualizer = DefaultVisualizer<d, 1, R>()) const
+                            const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
   {
     const auto adapter =
         std::make_shared<GradientVisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
