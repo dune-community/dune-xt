@@ -97,8 +97,14 @@ private:
       return val[comp];
     }
   }; // struct helper<..., 1>
-}; // class VisualizerInterface
+}; // class DefaultVisualizer
 
+template <size_t r, size_t rC, class R = double>
+const DefaultVisualizer<r, rC, R>& default_visualizer()
+{
+  static DefaultVisualizer<r, rC, R> default_visualizer_instance_;
+  return default_visualizer_instance_;
+}
 
 template <size_t r, size_t rC = 1, class R = double>
 class SumVisualizer : public VisualizerInterface<r, rC, R>
