@@ -252,6 +252,11 @@ public:
     backend() *= alpha;
   }
 
+  void set_to_zero()
+  {
+    backend() *= 0.;
+  }
+
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     if (!has_equal_shape(xx))
@@ -489,6 +494,11 @@ public:
   {
     backend_->makeCompressed();
     return backend().innerIndexPtr();
+  }
+
+  void set_num_mutexes(const size_t num_mutexes)
+  {
+    mutexes_ = std::make_shared<MutexesType>(num_mutexes);
   }
 
   using InterfaceType::operator+;

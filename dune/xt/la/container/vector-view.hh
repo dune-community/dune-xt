@@ -235,7 +235,8 @@ public:
     , vector_(vector)
   {}
 
-  ThisType& operator=(const Vector& other)
+  template <class Vec>
+  std::enable_if_t<XT::Common::is_vector<Vec>::value, ThisType>& operator=(const Vec& other)
   {
     for (size_t ii = 0; ii < size(); ++ii)
       set_entry(ii, other.get_entry(ii));
