@@ -532,6 +532,11 @@ public:
     backend() *= alpha;
   }
 
+  void set_to_zero()
+  {
+    backend() *= 0.;
+  }
+
   void axpy(const ScalarType& alpha, const ThisType& xx)
   {
     if (!has_equal_shape(xx))

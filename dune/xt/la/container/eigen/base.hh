@@ -19,6 +19,8 @@
 #include <complex>
 #include <mutex>
 
+#include "config.h"
+
 #if HAVE_EIGEN
 #  include <dune/xt/common/disable_warnings.hh>
 #  include <Eigen/Core>
@@ -135,6 +137,20 @@ public:
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
     backend() += alpha * xx.backend();
+  } // ... axpy(...)
+
+  template <class Vec>
+  std::enable_if_t<XT::Common::is_vector<Vec>::value
+                       && !std::is_base_of<EigenBaseVector<typename Vec::Traits, ScalarType>, Vec>::value,
+                   void>
+  axpy(const ScalarType& alpha, const Vec& xx)
+  {
+    if (xx.size() != size())
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                 "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
+    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
+    for (size_t ii = 0; ii < size(); ++ii)
+      set_entry(ii, get_entry(ii) + alpha * xx[ii]);
   } // ... axpy(...)
 
   bool has_equal_shape(const VectorImpType& other) const
