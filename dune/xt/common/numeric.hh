@@ -11,8 +11,9 @@
 #define DUNE_XT_COMMON_NUMERIC_HH
 
 // C++17 parallel TS features
-#if defined __has_include
-#  define CPP17_PARALLELISM_TS_SUPPORTED __has_include(<execution>)
+#if defined(__has_include) && defined(__cpp_lib_execution) && defined(__cpp_lib_parallel_algorithm)
+#  define CPP17_PARALLELISM_TS_SUPPORTED                                                                               \
+    __has_include(<execution>) && __cpp_lib_execution >= 201603 && __cpp_lib_parallel_algorithm >= 201603
 #else
 #  define CPP17_PARALLELISM_TS_SUPPORTED 0
 #endif
