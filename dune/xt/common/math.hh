@@ -14,13 +14,14 @@
 #ifndef DUNE_XT_COMMON_MATH_HH
 #define DUNE_XT_COMMON_MATH_HH
 
-#include <vector>
-#include <limits>
 #include <algorithm>
+#include <complex>
 #include <cstring>
 #include <iostream>
+#include <limits>
+#include <numeric>
 #include <type_traits>
-#include <complex>
+#include <vector>
 
 #include <dune/xt/common/disable_warnings.hh>
 #include <boost/accumulators/accumulators.hpp>
