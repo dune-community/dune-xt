@@ -82,7 +82,7 @@ public:
   {}
 
   GenericFunction(GenericOrderFunctionType order_func,
-                  GenericDynamicEvaluateFunctionType dynamic_evaluate_func = default_dynamic_evaluate_function(),
+                  GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
                   const std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
@@ -97,7 +97,7 @@ public:
   {}
 
   GenericFunction(int ord,
-                  GenericDynamicEvaluateFunctionType dynamic_evaluate_func = default_dynamic_evaluate_function(),
+                  GenericDynamicEvaluateFunctionType dynamic_evaluate_func,
                   const std::string nm = "smooth_lambda_function",
                   const Common::ParameterType& param_type = {},
                   GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
