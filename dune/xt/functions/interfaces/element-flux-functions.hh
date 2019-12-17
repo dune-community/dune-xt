@@ -77,6 +77,7 @@ public:
 
   using DomainType = Dune::FieldVector<D, d>;
   using StateType = Dune::FieldVector<S, s>;
+  using DynamicStateType = Dune::DynamicVector<S>;
 
   using RangeSelector = RangeTypeSelector<R, r, rC>;
   using JacobianRangeSelector = DerivativeRangeTypeSelector<s, R, r, rC>;
@@ -398,6 +399,7 @@ public:
   using BaseType::rC;
   using BaseType::s;
   using typename BaseType::DomainType;
+  using typename BaseType::DynamicStateType;
   using typename BaseType::ElementType;
   using typename BaseType::R;
   using typename BaseType::S;

@@ -166,8 +166,9 @@ public:
 
   virtual void set_all(const ScalarType& val)
   {
-    for (auto& element : *this)
-      element = val;
+    const auto sz = size();
+    for (size_t ii = 0; ii < sz; ++ii)
+      set_entry(ii, val);
   }
 
   virtual bool valid() const
