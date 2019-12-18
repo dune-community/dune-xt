@@ -154,6 +154,34 @@ public:
     return vector_[index(ii)];
   }
 
+  virtual ThisType add(const ThisType& other) const override final
+  {
+    DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
+               "Methods returning a new VectorView are not implemented!");
+    return other;
+  } // ... add(...)
+
+  virtual ThisType sub(const ThisType& other) const override final
+  {
+    DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
+               "Methods returning a new VectorView are not implemented!");
+    return other;
+  } // ... sub(...)
+
+  virtual ThisType operator+(const ThisType& other) const override final
+  {
+    DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
+               "Methods returning a new VectorView are not implemented!");
+    return other;
+  }
+
+  virtual ThisType operator-(const ThisType& other) const
+  {
+    DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
+               "Methods returning a new VectorView are not implemented!");
+    return other;
+  }
+
   inline void scal(const ScalarType& /*alpha*/)
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong, "You cannot use non-const methods on ConstVectorView");
