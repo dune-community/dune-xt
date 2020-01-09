@@ -154,28 +154,28 @@ public:
     return vector_[index(ii)];
   }
 
-  virtual ThisType add(const ThisType& other) const override final
+  ThisType add(const ThisType& other) const override final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");
     return other;
   } // ... add(...)
 
-  virtual ThisType sub(const ThisType& other) const override final
+  ThisType sub(const ThisType& other) const override final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");
     return other;
   } // ... sub(...)
 
-  virtual ThisType operator+(const ThisType& other) const override final
+  ThisType operator+(const ThisType& other) const override final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");
     return other;
   }
 
-  virtual ThisType operator-(const ThisType& other) const
+  ThisType operator-(const ThisType& other) const override final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");
@@ -291,6 +291,12 @@ public:
   {
     for (size_t ii = 0; ii < size(); ++ii)
       add_to_entry(ii, alpha * xx[ii]);
+  }
+
+  void axpy(const ScalarType& alpha, const Vector& xx)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      add_to_entry(ii, alpha * xx.get_entry(ii));
   }
 
   inline void add_to_entry(const size_t ii, const ScalarType& value)

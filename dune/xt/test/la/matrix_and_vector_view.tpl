@@ -63,7 +63,7 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
       vector_countingup.set_entry(ii, ScalarType(ii));
 
     // create VectorViews
-    LA::ConstVectorView<VectorImp> const_vec_view(vector_countingup, 0, 2);
+    const LA::ConstVectorView<VectorImp> const_vec_view(vector_countingup, 0, 2);
     LA::VectorView<VectorImp> vec_view(vector_countingup, 1, 3);
 
     // create MatrixViews
@@ -85,6 +85,8 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(-0.5), sparse_const_view_lowerright.get_entry(0, 0));
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), sparse_view_lowerright.get_entry(1, 0));
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), sparse_const_view_lowerright.get_entry(1, 0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1), const_vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2), vec_view.get_entry(1));
 
     // test add_to_entry()
     view_upperleft.add_to_entry(1, 1, 0.5);
@@ -99,6 +101,10 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.5), sparse_view_upperleft.get_entry(1, 0));
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(1.5), testmatrix_sparse.get_entry(1, 0));
     sparse_view_upperleft.add_to_entry(1, 0, -0.5);
+    vec_view.add_to_entry(1, 2.5);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(4.5), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(4.5), vector_countingup.get_entry(2));
+    vec_view.add_to_entry(1, -2.5);
 
     // test set_entry()
     view_upperleft.set_entry(1, 1, 0.5);
@@ -113,30 +119,47 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), sparse_view_upperleft.get_entry(1, 0));
     EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0.5), testmatrix_sparse.get_entry(1, 0));
     sparse_view_upperleft.set_entry(1, 0, 1.);
+    vec_view.set_entry(1, 2.5);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2.5), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(2.5), vector_countingup.get_entry(2));
+    vec_view.set_entry(1, 2);
 
     // test operator=
     MatrixImp lowerright_saved = view_lowerright;
     MatrixImp sparse_lowerright_saved = sparse_view_lowerright;
     MatrixImp zeros_dense(2, 1, 0.);
+    VectorImp zeros_vec(2, ScalarType(0.));
     LA::SparsityPatternDefault lowerright_pattern(2);
     lowerright_pattern.insert(0, 0);
     MatrixImp zeros_sparse(2, 1, lowerright_pattern);
     view_lowerright = zeros_dense;
     sparse_view_lowerright = zeros_sparse;
+    vec_view = zeros_vec;
     for (size_t ii = 0; ii < 2; ++ii) {
         EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), view_lowerright.get_entry(ii, 0));
         EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), const_view_lowerright.get_entry(ii, 0));
         EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), sparse_view_lowerright.get_entry(ii, 0));
         EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), sparse_const_view_lowerright.get_entry(ii, 0));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), vec_view.get_entry(ii));
+        EXPECT_DOUBLE_OR_COMPLEX_EQ(RealType(0), vector_countingup.get_entry(1+ii));
     }
     view_lowerright = lowerright_saved;
     sparse_view_lowerright = sparse_lowerright_saved;
+    vec_view.set_entry(0, 1.);
+    vec_view.set_entry(1, 2.);
 
     // test scal, operator*
     const auto testmatrix_copy = testmatrix;
     const auto testmatrix_sparse_copy = testmatrix_sparse;
     view_upperleft.scal(ScalarType(5));
     sparse_view_upperleft.scal(ScalarType(5));
+    vec_view.scal(ScalarType(5));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(5), vec_view.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(10), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(5), vector_countingup.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(10), vector_countingup.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(3));
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
         if (ii < 2 && jj < 2) {
@@ -152,9 +175,17 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     }
     view_upperleft.scal(ScalarType(1./5.));
     sparse_view_upperleft.scal(ScalarType(1./5.));
+    vec_view.scal(ScalarType(1./5.));
 
     view_lowerright *= ScalarType(-5);
     sparse_view_lowerright *= ScalarType(-5);
+    vec_view *= ScalarType(-5);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(-5), vec_view.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(-10), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(-5), vector_countingup.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(-10), vector_countingup.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(3));
     for (size_t ii = 0; ii < rows; ++ii)
       for (size_t jj = 0; jj < cols; ++jj)
         if (!((ii == 2 || ii == 3) && jj == 3)) {
@@ -171,10 +202,26 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(testmatrix_sparse_copy.get_entry(3, 3) * -5., sparse_view_lowerright.get_entry(1, 0));
     view_lowerright *= ScalarType(-1./5.);
     sparse_view_lowerright *= ScalarType(-1./5.);
+    vec_view *= ScalarType(-1./5.);
 
     // test axpy
     view_upperleft.axpy(ScalarType(4), view_upperleft);
     sparse_view_upperleft.axpy(ScalarType(4), sparse_view_upperleft);
+    VectorImp test_vec(2, ScalarType(1.));
+    vec_view.axpy(-1., test_vec);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vec_view.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(1), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(1), vector_countingup.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(3));
+    vec_view.axpy(ScalarType(4), vec_view);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vec_view.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(5), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(5), vector_countingup.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(3));
     for (size_t ii = 0; ii < rows; ++ii) {
       for (size_t jj = 0; jj < cols; ++jj) {
         if (ii < 2 && jj < 2) {
@@ -190,6 +237,8 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     }
     view_upperleft.scal(ScalarType(1./5.));
     sparse_view_upperleft.scal(ScalarType(1./5.));
+    vec_view.set_entry(0, 1.);
+    vec_view.set_entry(1, 2.);
 
     view_lowerright.axpy(ScalarType(-6), view_lowerright);
     sparse_view_lowerright.axpy(ScalarType(-6), sparse_view_lowerright);
@@ -209,6 +258,34 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     EXPECT_DOUBLE_OR_COMPLEX_EQ(testmatrix_sparse_copy.get_entry(3, 3) * -5., sparse_view_lowerright.get_entry(1, 0));
     view_lowerright *= ScalarType(-1./5.);
     sparse_view_lowerright *= ScalarType(-1./5.);
+
+    // test operator[]
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), const_vec_view[0]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(1), const_vec_view[1]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(1), vec_view[0]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(2), vec_view[1]);
+    vec_view[1] = ScalarType(70);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(70), vec_view[1]);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(70), vector_countingup[2]);
+    vec_view[1] = ScalarType(2);
+
+    // test operator+=, operator-=
+    vec_view += const_vec_view;
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(1), vec_view.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(1), vector_countingup.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(3));
+    vec_view -= const_vec_view;
+    vec_view += test_vec;
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(2), vec_view.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vec_view.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vector_countingup.get_entry(0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(2), vector_countingup.get_entry(1));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(2));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(3), vector_countingup.get_entry(3));
+    vec_view -= test_vec;
 
     // test mv, mtv
     VectorImp testvec(2), ret(2), ret2(4), ret3(2);

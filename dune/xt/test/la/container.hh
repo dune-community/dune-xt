@@ -193,9 +193,10 @@ public:
 
 #define EXPECT_DOUBLE_OR_COMPLEX_EQ(expected, actual)                                                                  \
   {                                                                                                                    \
-    auto expected_val = expected; /* avoids errors if macro is called e.g. with expected++ */                          \
-    EXPECT_DOUBLE_EQ(std::real(expected_val), std::real(actual));                                                      \
-    EXPECT_DOUBLE_EQ(std::imag(expected_val), std::imag(actual));                                                      \
+    const auto expected_val = expected; /* avoids errors if macro is called e.g. with expected++ */                    \
+    const auto actual_val = actual;                                                                                    \
+    EXPECT_DOUBLE_EQ(std::real(expected_val), std::real(actual_val));                                                  \
+    EXPECT_DOUBLE_EQ(std::imag(expected_val), std::imag(actual_val));                                                  \
   }
 
 #endif // DUNE_XT_TEST_LA_CONTAINER_HH
