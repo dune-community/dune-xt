@@ -374,6 +374,27 @@ public:
         add_to_entry(ii, jj, xx.get_entry(ii, jj) * alpha);
   }
 
+  template <class OtherTraits>
+  inline void axpy(const ScalarType& alpha, const MatrixInterface<OtherTraits, ScalarType>& xx)
+  {
+    const auto& patt = get_pattern();
+#ifndef NDEBUG
+    const auto& other_patt = xx.pattern();
+    if (xx.rows() != rows() || xx.cols() != cols())
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match, "Shapes do not match!");
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (auto&& jj : other_patt.inner(ii)) {
+        // The EigenRowMajorSparseMatrix automatically adds one entry to an empty row
+        if (!patt.contains(ii, jj)
+            && !(patt.inner(ii).size() == 0 && other_patt.inner(ii).size() == 1 && other_patt.inner(ii)[0] == 0))
+          DUNE_THROW(Dune::MathError, "Pattern of xx has to be a subset of this pattern!");
+      }
+#endif
+    for (size_t ii = 0; ii < rows(); ++ii)
+      for (auto&& jj : patt.inner(ii))
+        add_to_entry(ii, jj, xx.get_entry(ii, jj) * alpha);
+  }
+
   template <class XX, class YY>
   inline void mv(const XX& xx, YY& yy) const
   {

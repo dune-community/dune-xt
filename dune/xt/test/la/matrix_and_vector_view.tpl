@@ -207,6 +207,10 @@ struct MatrixViewTest_{{T_NAME}} : public ::testing::Test
     // test axpy
     view_upperleft.axpy(ScalarType(4), view_upperleft);
     sparse_view_upperleft.axpy(ScalarType(4), sparse_view_upperleft);
+    sparse_view_lowerright.axpy(ScalarType(4), sparse_lowerright_saved);
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(5)*sparse_lowerright_saved.get_entry(0, 0), sparse_view_lowerright.get_entry(0, 0));
+    EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(5)*sparse_lowerright_saved.get_entry(1, 0), sparse_view_lowerright.get_entry(1, 0));
+    sparse_view_lowerright.scal(ScalarType(1./5.));
     VectorImp test_vec(2, ScalarType(1.));
     vec_view.axpy(-1., test_vec);
     EXPECT_DOUBLE_OR_COMPLEX_EQ(ScalarType(0), vec_view.get_entry(0));
