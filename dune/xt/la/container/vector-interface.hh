@@ -463,6 +463,14 @@ public:
     return dot(other);
   }
 
+  template <class T, class S>
+  derived_type& operator=(const VectorInterface<T, S>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      set_entry(ii, other.get_entry(ii));
+    return this->as_imp();
+  }
+
   /**
    *  \brief  Adds another vector to this, in-place variant.
    *  \param  other The second summand.
@@ -471,6 +479,14 @@ public:
   virtual derived_type& operator+=(const derived_type& other)
   {
     iadd(other);
+    return this->as_imp();
+  }
+
+  template <class T, class S>
+  derived_type& operator+=(const VectorInterface<T, S>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      add_to_entry(ii, other.get_entry(ii));
     return this->as_imp();
   }
 
@@ -485,6 +501,14 @@ public:
     return this->as_imp();
   }
 
+  template <class T, class S>
+  derived_type& operator-=(const VectorInterface<T, S>& other)
+  {
+    for (size_t ii = 0; ii < size(); ++ii)
+      add_to_entry(ii, -other.get_entry(ii));
+    return this->as_imp();
+  }
+
   /**
    *  \brief  Adds two vectors.
    *  \param  other The second summand.
@@ -495,6 +519,12 @@ public:
     return add(other);
   }
 
+  template <class T, class S>
+  derived_type operator+(const VectorInterface<T, S>& other) const
+  {
+    return *this + as_derived(other);
+  }
+
   /**
    *  \brief  Substracts two vectors.
    *  \param  other The subtrahend
@@ -503,6 +533,12 @@ public:
   virtual derived_type operator-(const derived_type& other) const
   {
     return sub(other);
+  }
+
+  template <class T, class S>
+  derived_type operator-(const VectorInterface<T, S>& other) const
+  {
+    return *this - as_derived(other);
   }
 
   virtual derived_type& operator+=(const ScalarType& scalar)
@@ -575,7 +611,17 @@ public:
     return ret;
   }
 
-private:
+protected:
+  template <class T, class S>
+  derived_type as_derived(const VectorInterface<T, S>& other) const
+  {
+    assert(other.size() == size());
+    derived_type ret(size());
+    for (size_t ii = 0; ii < other.size(); ++ii)
+      ret.set_entry(ii, other.get_entry(ii));
+    return ret;
+  }
+
   template <bool is_complex = Common::is_complex<ScalarType>::value, bool anything = true>
   struct complex_switch
   {
@@ -591,7 +637,8 @@ private:
       return ScalarType();
     }
 
-    static ScalarType dot(const derived_type& self, const derived_type& other)
+    template <class T>
+    static ScalarType dot(const derived_type& self, const VectorInterface<T, ScalarType>& other)
     {
       using std::conj;
       if (other.size() != self.size())
@@ -600,7 +647,7 @@ private:
                                          << ")!");
       ScalarType result = 0;
       for (size_t ii = 0; ii < self.size(); ++ii)
-        result += conj(self.get_unchecked_ref(ii)) * other.get_unchecked_ref(ii);
+        result += conj(self.get_unchecked_ref(ii)) * other.get_entry(ii);
       return result;
     }
   }; // struct complex_switch<true, ...>
@@ -626,7 +673,8 @@ private:
       return ret;
     }
 
-    static ScalarType dot(const derived_type& self, const derived_type& other)
+    template <class T>
+    static ScalarType dot(const derived_type& self, const VectorInterface<T, ScalarType>& other)
     {
       if (other.size() != self.size())
         DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -634,7 +682,7 @@ private:
                                          << ")!");
       ScalarType result = 0;
       for (size_t ii = 0; ii < self.size(); ++ii)
-        result += self.get_unchecked_ref(ii) * other.get_unchecked_ref(ii);
+        result += self.get_unchecked_ref(ii) * other.get_entry(ii);
       return result;
     }
   }; // struct complex_switch<false, ...>

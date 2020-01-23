@@ -289,6 +289,11 @@ public:
     this->template isub<Traits>(other);
   }
 
+  using InterfaceType::add;
+  using InterfaceType::sub;
+  using InterfaceType::operator+;
+  using InterfaceType::operator-;
+
   /// \{
 
   //! disambiguation necessary since it exists in multiple bases

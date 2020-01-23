@@ -217,6 +217,12 @@ public:
     return past_last_entry_;
   }
 
+  template <class T>
+  ScalarType dot(const VectorInterface<T, ScalarType>& other) const
+  {
+    return BaseType::template complex_switch<>::dot(*this, other);
+  }
+
 protected:
   inline const ScalarType& get_unchecked_ref(const size_t ii) const
   {
@@ -324,6 +330,12 @@ public:
   inline const ScalarType& operator[](const size_t ii) const
   {
     return vector_[index(ii)];
+  }
+
+  template <class T>
+  ScalarType dot(const VectorInterface<T, ScalarType>& other) const
+  {
+    return BaseType::template complex_switch<>::dot(*this, other);
   }
 
   template <class T>
