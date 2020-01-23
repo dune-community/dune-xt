@@ -12,6 +12,7 @@
 # ~~~
 
 set(lib_dune_xt_common_sources
+    bisect.cc
     cblas.cc
     color.cc
     configuration.cc
@@ -27,6 +28,7 @@ set(lib_dune_xt_common_sources
     memory.cc
     misc.cc
     mkl.cc
+    parallel/communicator.cc
     parallel/helper.cc
     parallel/mpi_comm_wrapper.cc
     parallel/threadmanager.cc
