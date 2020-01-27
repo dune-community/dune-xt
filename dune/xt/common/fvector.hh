@@ -148,7 +148,7 @@ public:
   }
 
   template <int R>
-  typename std::enable_if<SIZE != 1 && R == SIZE, K>::type operator*(const Dune::FieldMatrix<K, R, 1>& mat) const
+  typename std::enable_if<R == SIZE, K>::type operator*(const Dune::FieldMatrix<K, R, 1>& mat) const
   {
     K ret = 0;
     for (size_t ii = 0; ii < SIZE; ++ii)

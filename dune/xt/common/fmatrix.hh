@@ -35,8 +35,8 @@ namespace Common {
 template <class K, int ROWS, int COLS>
 class FieldMatrix : public Dune::FieldMatrix<K, ROWS, COLS>
 {
-  typedef Dune::FieldMatrix<K, ROWS, COLS> BaseType;
-  typedef FieldMatrix<K, ROWS, COLS> ThisType;
+  using BaseType = Dune::FieldMatrix<K, ROWS, COLS>;
+  using ThisType = FieldMatrix;
 
 public:
   using typename BaseType::field_type;
@@ -130,305 +130,104 @@ public:
     return ret;
   }
 
-  //! This op is not redundant
-  ThisType operator*(const K& scal) const
+  //! vector space addition -- two-argument version
+  template <class OtherScalar>
+  friend auto operator+(const ThisType& matrixA, const Dune::FieldMatrix<OtherScalar, ROWS, COLS>& matrixB)
   {
-    ThisType ret(*this);
-    ret *= scal;
-    return ret;
-  }
-
-  field_type determinant() const;
-
-  template <class Func>
-  void luDecomposition(ThisType& A, Func func) const;
-
-  void invert();
-
-  template <class V, class W>
-  void solve(V& x, const W& b) const;
-
-private:
-  // copy from dune/common/densematrix.hh, we have to copy it as it is a private member of Dune::DenseMatrix
-  struct ElimPivot
-  {
-    ElimPivot(std::vector<size_type>& pivot)
-      : pivot_(pivot)
-    {
-      typedef typename std::vector<size_type>::size_type size_type;
-      for (size_type i = 0; i < pivot_.size(); ++i)
-        pivot_[i] = i;
-    }
-
-    void swap(int i, int j)
-    {
-      pivot_[i] = j;
-    }
-
-    template <typename T>
-    void operator()(const T&, int, int)
-    {}
-
-    std::vector<size_type>& pivot_;
-  }; // struct ElimPivot
-
-  template <typename V>
-  struct Elim
-  {
-    Elim(V& rhs)
-      : rhs_(&rhs)
-    {}
-
-    void swap(int i, int j)
-    {
-      std::swap((*rhs_)[i], (*rhs_)[j]);
-    }
-
-    void operator()(const typename V::field_type& factor, int k, int i)
-    {
-      (*rhs_)[k] -= factor * (*rhs_)[i];
-    }
-
-    V* rhs_;
-  };
-
-  struct ElimDet
-  {
-    ElimDet(field_type& sign)
-      : sign_(sign)
-    {
-      sign_ = 1;
-    }
-
-    void swap(int, int)
-    {
-      sign_ *= -1;
-    }
-
-    void operator()(const field_type&, int, int) {}
-
-    field_type& sign_;
-  };
-}; // class FieldMatrix<...>
-
-// Direct copy of the luDecomposition function in dune/common/densematrix.hh
-// The only (functional) change is that this version always performs pivotization (the version in dune-common only
-// performs pivotization if the diagonal entry is below a certain threshold)
-// See dune/xt/la/test/matrixinverter_for_real_matrix_from_3d_pointsource.tpl for an example where the dune-common
-// version fails due to stability issues.
-// TODO: Fixed in dune-common master (see MR !449 in dune-common's gitlab), remove this copy once we depend on a
-// suitable version of dune-common (probably 2.7).
-template <class K, int ROWS, int COLS>
-template <typename Func>
-inline void FieldMatrix<K, ROWS, COLS>::luDecomposition(FieldMatrix<K, ROWS, COLS>& A, Func func) const
-{
-  typedef typename FieldTraits<value_type>::real_type real_type;
-  real_type norm = A.infinity_norm_real(); // for relative thresholds
-  real_type singthres =
-      std::max(FMatrixPrecision<real_type>::absolute_limit(), norm * FMatrixPrecision<real_type>::singular_limit());
-
-  // LU decomposition of A in A
-  for (size_type i = 0; i < ROWS; i++) // loop over all rows
-  {
-    typename FieldTraits<value_type>::real_type pivmax = fvmeta::absreal(A[i][i]);
-
-    // compute maximum of column
-    size_type imax = i;
-    typename FieldTraits<value_type>::real_type abs(0.0);
-    for (size_type k = i + 1; k < ROWS; k++)
-      if ((abs = fvmeta::absreal(A[k][i])) > pivmax) {
-        pivmax = abs;
-        imax = k;
-      }
-    // swap rows
-    if (imax != i) {
-      for (size_type j = 0; j < ROWS; j++)
-        std::swap(A[i][j], A[imax][j]);
-      assert(imax < std::numeric_limits<int>::max() && i < std::numeric_limits<int>::max());
-      func.swap(static_cast<int>(i), static_cast<int>(imax)); // swap the pivot or rhs
-    }
-
-    // singular ?
-    if (pivmax < singthres)
-      DUNE_THROW(FMatrixError, "matrix is singular");
-
-    // eliminate
-    for (size_type k = i + 1; k < ROWS; k++) {
-      field_type factor = A[k][i] / A[i][i];
-      A[k][i] = factor;
-      for (size_type j = i + 1; j < ROWS; j++)
-        A[k][j] -= factor * A[i][j];
-      assert(k < std::numeric_limits<int>::max() && i < std::numeric_limits<int>::max());
-      func(factor, static_cast<int>(k), static_cast<int>(i));
-    }
-  }
-}
-
-// Direct copy of the invert function in dune/common/densematrix.hh
-// The only (functional) change is the replacement of the luDecomposition of DenseMatrix by our own version.
-// TODO: Fixed in dune-common master (see MR !449 in dune-common's gitlab), remove this copy once we depend on a
-// suitable version of dune-common (probably 2.7).
-template <class K, int ROWS, int COLS>
-inline void FieldMatrix<K, ROWS, COLS>::invert()
-{
-  // never mind those ifs, because they get optimized away
-  if (ROWS != COLS)
-    DUNE_THROW(Dune::FMatrixError, "Can't invert a " << ROWS << "x" << COLS << " matrix!");
-  if (ROWS <= 3) {
-    BaseType::invert();
-  } else {
-    auto A = *this;
-    std::vector<size_type> pivot(ROWS);
-    this->luDecomposition(A, ElimPivot(pivot));
-    auto& L = A;
-    auto& U = A;
-
-    // initialize inverse
-    *this = field_type();
-
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, ROWS, COLS> result;
     for (size_type i = 0; i < ROWS; ++i)
-      (*this)[i][i] = 1;
+      for (size_type j = 0; j < COLS; ++j)
+        result[i][j] = matrixA[i][j] + matrixB[i][j];
+    return result;
+  }
 
-    // L Y = I; multiple right hand sides
-    for (size_type i = 0; i < ROWS; i++)
-      for (size_type j = 0; j < i; j++)
-        for (size_type k = 0; k < ROWS; k++)
-          (*this)[i][k] -= L[i][j] * (*this)[j][k];
+  //! vector space subtraction -- two-argument version
+  template <class OtherScalar>
+  friend auto operator-(const ThisType& matrixA, const Dune::FieldMatrix<OtherScalar, ROWS, COLS>& matrixB)
+  {
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, ROWS, COLS> result;
+    for (size_type i = 0; i < ROWS; ++i)
+      for (size_type j = 0; j < COLS; ++j)
+        result[i][j] = matrixA[i][j] - matrixB[i][j];
+    return result;
+  }
 
-    // U A^{-1} = Y
-    for (size_type i = ROWS; i > 0;) {
-      --i;
-      for (size_type k = 0; k < ROWS; k++) {
-        for (size_type j = i + 1; j < ROWS; j++)
-          (*this)[i][k] -= U[i][j] * (*this)[j][k];
-        (*this)[i][k] /= U[i][i];
+  //! vector space multiplication with scalar
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator*(const ThisType& matrix, Scalar scalar)
+  {
+    FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, ROWS, COLS> result;
+    for (size_type i = 0; i < ROWS; ++i)
+      for (size_type j = 0; j < COLS; ++j)
+        result[i][j] = matrix[i][j] * scalar;
+    return result;
+  }
+
+  //! vector space multiplication with scalar
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator*(Scalar scalar, const ThisType& matrix)
+  {
+    FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, ROWS, COLS> result;
+    for (size_type i = 0; i < ROWS; ++i)
+      for (size_type j = 0; j < COLS; ++j)
+        result[i][j] = scalar * matrix[i][j];
+    return result;
+  }
+
+  //! vector space division by scalar
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator/(const ThisType& matrix, Scalar scalar)
+  {
+    FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, ROWS, COLS> result;
+    for (size_type i = 0; i < ROWS; ++i)
+      for (size_type j = 0; j < COLS; ++j)
+        result[i][j] = matrix[i][j] / scalar;
+    return result;
+  }
+
+  /** \brief Matrix-matrix multiplication
+   */
+  template <class OtherScalar, int otherCols>
+  friend auto operator*(const ThisType& matrixA, const Dune::FieldMatrix<OtherScalar, COLS, otherCols>& matrixB)
+  {
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, ROWS, otherCols> result;
+
+    for (size_type i = 0; i < matrixA.mat_rows(); ++i)
+      for (size_type j = 0; j < matrixB.mat_cols(); ++j) {
+        result[i][j] = 0;
+        for (size_type k = 0; k < matrixA.mat_cols(); ++k)
+          result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
-    }
 
-    for (size_type i = ROWS; i > 0;) {
-      --i;
-      if (i != pivot[i])
-        for (size_type j = 0; j < ROWS; ++j)
-          std::swap((*this)[j][pivot[i]], (*this)[j][i]);
-    }
-  }
-}
-
-// Direct copy of the determinant function in dune/common/densematrix.hh
-// The only (functional) change is the replacement of the luDecomposition of DenseMatrix by our own version.
-// TODO: Fixed in dune-common master (see MR !449 in dune-common's gitlab), remove this copy once we depend on a
-// suitable version of dune-common (probably 2.7).
-template <class K, int ROWS, int COLS>
-inline typename FieldMatrix<K, ROWS, COLS>::field_type FieldMatrix<K, ROWS, COLS>::determinant() const
-{
-  // never mind those ifs, because they get optimized away
-  if (ROWS != COLS)
-    DUNE_THROW(FMatrixError, "There is no determinant for a " << ROWS << "x" << COLS << " matrix!");
-
-  if (ROWS == 1)
-    return (*this)[0][0];
-
-  if (ROWS == 2)
-    return (*this)[0][0] * (*this)[1][1] - (*this)[0][1] * (*this)[1][0];
-
-  if (ROWS == 3) {
-    // code generated by maple
-    field_type t4 = (*this)[0][0] * (*this)[1][1];
-    field_type t6 = (*this)[0][0] * (*this)[1][2];
-    field_type t8 = (*this)[0][1] * (*this)[1][0];
-    field_type t10 = (*this)[0][2] * (*this)[1][0];
-    field_type t12 = (*this)[0][1] * (*this)[2][0];
-    field_type t14 = (*this)[0][2] * (*this)[2][0];
-
-    return (t4 * (*this)[2][2] - t6 * (*this)[2][1] - t8 * (*this)[2][2] + t10 * (*this)[2][1] + t12 * (*this)[1][2]
-            - t14 * (*this)[1][1]);
+    return result;
   }
 
-  auto A = *this;
-  field_type det;
-  try {
-    this->luDecomposition(A, ElimDet(det));
-  } catch (FMatrixError&) {
-    return 0;
+  template <class OtherScalar, int otherRows>
+  friend auto operator*(const Dune::FieldMatrix<OtherScalar, otherRows, ROWS>& matrixA, const ThisType& matrixB)
+  {
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, otherRows, COLS> result;
+    for (size_type i = 0; i < matrixA.mat_rows(); ++i)
+      for (size_type j = 0; j < matrixB.mat_cols(); ++j) {
+        result[i][j] = 0;
+        for (size_type k = 0; k < matrixA.mat_cols(); ++k)
+          result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    return result;
   }
-  for (size_type i = 0; i < ROWS; ++i)
-    det *= A[i][i];
-  return det;
-}
 
-
-// Direct copy of the solve function in dune/common/densematrix.hh
-// The only (functional) change is the replacement of the luDecomposition of DenseMatrix by our own version.
-// TODO: Fixed in dune-common master (see MR !449 in dune-common's gitlab), remove this copy once we depend on a
-// suitable version of dune-common (probably 2.7).
-template <class K, int ROWS, int COLS>
-template <class V, class W>
-inline void FieldMatrix<K, ROWS, COLS>::solve(V& x, const W& b) const
-{
-  // never mind those ifs, because they get optimized away
-  if (ROWS != COLS)
-    DUNE_THROW(FMatrixError, "Can't solve for a " << ROWS << "x" << COLS << " matrix!");
-
-  if (ROWS == 1) {
-
-#ifdef DUNE_FMatrix_WITH_CHECKING
-    if (fvmeta::absreal((*this)[0][0]) < FMatrixPrecision<>::absolute_limit())
-      DUNE_THROW(FMatrixError, "matrix is singular");
-#endif
-    x[0] = b[0] / (*this)[0][0];
-
-  } else if (ROWS == 2) {
-
-    field_type detinv = (*this)[0][0] * (*this)[1][1] - (*this)[0][1] * (*this)[1][0];
-#ifdef DUNE_FMatrix_WITH_CHECKING
-    if (fvmeta::absreal(detinv) < FMatrixPrecision<>::absolute_limit())
-      DUNE_THROW(FMatrixError, "matrix is singular");
-#endif
-    detinv = 1.0 / detinv;
-
-    x[0] = detinv * ((*this)[1][1] * b[0] - (*this)[0][1] * b[1]);
-    x[1] = detinv * ((*this)[0][0] * b[1] - (*this)[1][0] * b[0]);
-
-  } else if (ROWS == 3) {
-
-    field_type d = determinant();
-#ifdef DUNE_FMatrix_WITH_CHECKING
-    if (fvmeta::absreal(d) < FMatrixPrecision<>::absolute_limit())
-      DUNE_THROW(FMatrixError, "matrix is singular");
-#endif
-
-    x[0] = (b[0] * (*this)[1][1] * (*this)[2][2] - b[0] * (*this)[2][1] * (*this)[1][2]
-            - b[1] * (*this)[0][1] * (*this)[2][2] + b[1] * (*this)[2][1] * (*this)[0][2]
-            + b[2] * (*this)[0][1] * (*this)[1][2] - b[2] * (*this)[1][1] * (*this)[0][2])
-           / d;
-
-    x[1] = ((*this)[0][0] * b[1] * (*this)[2][2] - (*this)[0][0] * b[2] * (*this)[1][2]
-            - (*this)[1][0] * b[0] * (*this)[2][2] + (*this)[1][0] * b[2] * (*this)[0][2]
-            + (*this)[2][0] * b[0] * (*this)[1][2] - (*this)[2][0] * b[1] * (*this)[0][2])
-           / d;
-
-    x[2] = ((*this)[0][0] * (*this)[1][1] * b[2] - (*this)[0][0] * (*this)[2][1] * b[1]
-            - (*this)[1][0] * (*this)[0][1] * b[2] + (*this)[1][0] * (*this)[2][1] * b[0]
-            + (*this)[2][0] * (*this)[0][1] * b[1] - (*this)[2][0] * (*this)[1][1] * b[0])
-           / d;
-
-  } else {
-
-    V& rhs = x; // use x to store rhs
-    rhs = b; // copy data
-    Elim<V> elim(rhs);
-    auto A = *this;
-
-    this->luDecomposition(A, elim);
-
-    // backsolve
-    for (int i = ROWS - 1; i >= 0; i--) {
-      for (size_type j = i + 1; j < ROWS; j++)
-        rhs[i] -= A[i][j] * x[j];
-      x[i] = rhs[i] / A[i][i];
-    }
+  template <class OtherScalar, int otherCols>
+  friend auto operator*(const ThisType& matrixA, const FieldMatrix<OtherScalar, COLS, otherCols>& matrixB)
+  {
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, ROWS, otherCols> result;
+    for (size_type i = 0; i < matrixA.mat_rows(); ++i)
+      for (size_type j = 0; j < matrixB.mat_cols(); ++j) {
+        result[i][j] = 0;
+        for (size_type k = 0; k < matrixA.mat_cols(); ++k)
+          result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    return result;
   }
-}
+}; // class FieldMatrix<...>
 
 
 /**
@@ -439,10 +238,12 @@ class FieldMatrix<K, 1, 1> : public Dune::FieldMatrix<K, 1, 1>
 {
   static const int ROWS = 1;
   static const int COLS = 1;
-  typedef Dune::FieldMatrix<K, ROWS, COLS> BaseType;
-  typedef FieldMatrix<K, ROWS, COLS> ThisType;
+  using BaseType = Dune::FieldMatrix<K, ROWS, COLS>;
+  using ThisType = FieldMatrix;
 
 public:
+  using typename BaseType::size_type;
+
   FieldMatrix(const K& kk = suitable_default<K>::value())
     : BaseType()
   {
@@ -514,11 +315,96 @@ public:
     return *this;
   }
 
-  ThisType operator*(const K& scal) const
+  //! vector space addition -- two-argument version
+  template <class OtherScalar>
+  friend auto operator+(const ThisType& matrixA, const Dune::FieldMatrix<OtherScalar, 1, 1>& matrixB)
   {
-    ThisType ret(*this);
-    ret *= scal;
-    return ret;
+    return FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, 1, 1>{matrixA[0][0] + matrixB[0][0]};
+  }
+
+  //! Binary addition when treating FieldMatrix<K,1,1> like K
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator+(const ThisType& matrix, const Scalar& scalar)
+  {
+    return FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, 1, 1>{matrix[0][0] + scalar};
+  }
+
+  //! Binary addition when treating FieldMatrix<K,1,1> like K
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator+(const Scalar& scalar, const ThisType& matrix)
+  {
+    return FieldMatrix<typename PromotionTraits<Scalar, K>::PromotedType, 1, 1>{scalar + matrix[0][0]};
+  }
+
+  //! vector space subtraction -- two-argument version
+  template <class OtherScalar>
+  friend auto operator-(const ThisType& matrixA, const Dune::FieldMatrix<OtherScalar, 1, 1>& matrixB)
+  {
+    return FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, 1, 1>{matrixA[0][0] - matrixB[0][0]};
+  }
+
+  //! Binary subtraction when treating FieldMatrix<K,1,1> like K
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator-(const ThisType& matrix, const Scalar& scalar)
+  {
+    return FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, 1, 1>{matrix[0][0] - scalar};
+  }
+
+  //! Binary subtraction when treating FieldMatrix<K,1,1> like K
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator-(const Scalar& scalar, const ThisType& matrix)
+  {
+    return FieldMatrix<typename PromotionTraits<Scalar, K>::PromotedType, 1, 1>{scalar - matrix[0][0]};
+  }
+
+  //! vector space multiplication with scalar
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator*(const ThisType& matrix, Scalar scalar)
+  {
+    return FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, 1, 1>{matrix[0][0] * scalar};
+  }
+
+  //! vector space multiplication with scalar
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator*(Scalar scalar, const ThisType& matrix)
+  {
+    return FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, 1, 1>{scalar * matrix[0][0]};
+  }
+
+  //! vector space division by scalar
+  template <class Scalar, std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+  friend auto operator/(const ThisType& matrix, Scalar scalar)
+  {
+    return FieldMatrix<typename PromotionTraits<K, Scalar>::PromotedType, 1, 1>{matrix[0][0] / scalar};
+  }
+
+  /** \brief Matrix-matrix multiplication
+   */
+  template <class OtherScalar, int otherCols>
+  friend auto operator*(const ThisType& matrixA, const Dune::FieldMatrix<OtherScalar, 1, otherCols>& matrixB)
+  {
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, 1, otherCols> result;
+    for (size_type j = 0; j < matrixB.mat_cols(); ++j)
+      result[0][j] = matrixA[0][0] * matrixB[0][j];
+    return result;
+  }
+
+  template <class OtherScalar, int otherRows>
+  friend auto operator*(const Dune::FieldMatrix<OtherScalar, otherRows, 1>& matrixA, const ThisType& matrixB)
+  {
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, otherRows, 1> result;
+    for (size_type i = 0; i < matrixA.mat_rows(); ++i)
+      result[i][0] = matrixA[i][0] * matrixB[0][0];
+    return result;
+  }
+
+  template <class OtherScalar, int otherCols>
+  friend auto operator*(const ThisType& matrixA, const FieldMatrix<OtherScalar, 1, otherCols>& matrixB)
+  {
+    FieldMatrix<typename PromotionTraits<K, OtherScalar>::PromotedType, 1, otherCols> result;
+    for (size_type j = 0; j < matrixB.mat_cols(); ++j)
+      result[0][j] = matrixA[0][0] * matrixB[0][j];
+    return result;
   }
 }; // class FieldMatrix
 
@@ -1073,44 +959,6 @@ imag(const FieldMatrix<K, ROWS, COLS>& complex_mat)
 } // namespace Common
 } // namespace XT
 
-
-template <class L, int ROWS, int COLS, class R>
-Dune::XT::Common::FieldMatrix<typename PromotionTraits<L, R>::PromotedType, ROWS, COLS>
-operator-(const Dune::FieldMatrix<L, ROWS, COLS>& left, const Dune::FieldMatrix<R, ROWS, COLS>& right)
-{
-  Dune::XT::Common::FieldMatrix<typename PromotionTraits<L, R>::PromotedType, ROWS, COLS> ret = left;
-  ret -= right;
-  return ret;
-}
-
-
-template <class L, int ROWS, int COLS, class R>
-Dune::XT::Common::FieldMatrix<typename PromotionTraits<L, R>::PromotedType, ROWS, COLS>
-operator+(const Dune::FieldMatrix<L, ROWS, COLS>& left, const Dune::FieldMatrix<R, ROWS, COLS>& right)
-{
-  Dune::XT::Common::FieldMatrix<typename PromotionTraits<L, R>::PromotedType, ROWS, COLS> ret = left;
-  ret += right;
-  return ret;
-}
-
-
-template <class K, int L_ROWS, int L_COLS, int R_COLS>
-Dune::XT::Common::FieldMatrix<K, L_ROWS, R_COLS> operator*(const Dune::FieldMatrix<K, L_ROWS, L_COLS>& left,
-                                                           const Dune::FieldMatrix<K, L_COLS, R_COLS>& right)
-{
-  return left.rightmultiplyany(right);
-}
-
-// we need this explicit overload to fix an ambiguous operator* error due to the automatic conversion from
-// FieldMatrix<K, 1, 1> to K
-template <class K, int L_ROWS>
-Dune::XT::Common::FieldMatrix<K, L_ROWS, 1> operator*(const Dune::XT::Common::FieldMatrix<K, L_ROWS, 1>& left,
-                                                      const Dune::FieldMatrix<K, 1, 1>& right)
-{
-  return left.rightmultiplyany(right);
-}
-
-
 template <class K, int L_ROWS, int L_COLS, int R_COLS>
 void rightmultiply(Dune::FieldMatrix<K, L_ROWS, R_COLS>& ret,
                    const Dune::FieldMatrix<K, L_ROWS, L_COLS>& left,
@@ -1123,17 +971,6 @@ void rightmultiply(Dune::FieldMatrix<K, L_ROWS, R_COLS>& ret,
         ret[ii][jj] += left[ii][kk] * right[kk][jj];
     }
   }
-}
-
-template <class L, int L_ROWS, int L_COLS, class R, int R_COLS>
-typename std::enable_if<
-    !std::is_same<L, R>::value,
-    Dune::XT::Common::FieldMatrix<typename PromotionTraits<L, R>::PromotedType, L_ROWS, R_COLS>>::type
-operator*(const Dune::FieldMatrix<L, L_ROWS, L_COLS>& left, const Dune::FieldMatrix<R, L_COLS, R_COLS>& right)
-{
-  using Promoted = Dune::XT::Common::FieldMatrix<typename PromotionTraits<L, R>::PromotedType, L_ROWS, R_COLS>;
-  using Dune::XT::Common::convert_to;
-  return convert_to<Promoted>(left).rightmultiplyany(convert_to<Promoted>(right));
 }
 
 // versions that do not allocate matrices on the stack (for large matrices)
