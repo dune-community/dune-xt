@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <cassert>
 
-#include <dune/common/parallel/collectivecommunication.hh>
+#include <dune/common/parallel/communication.hh>
 
 #include <dune/istl/paamg/pinfo.hh>
 
