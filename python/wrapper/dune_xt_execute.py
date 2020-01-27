@@ -27,7 +27,7 @@ from dune.testtools.parser import parse_ini_file
 
 def call(executable, inifile=None, *additional_args):
     # If we have an inifile, parse it and look for special keys that modify the execution
-    command = ["./" + executable]
+    command = [executable]
     if inifile:
         iniargument = inifile
         iniinfo = parse_ini_file(inifile)
