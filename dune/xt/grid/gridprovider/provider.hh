@@ -70,6 +70,10 @@ public:
     : grid_ptr_(grd_ptr)
   {}
 
+  GridProvider(Dune::ToUniquePtr<GridType> grd_ptr)
+    : grid_ptr_(std::shared_ptr<GridType>(grd_ptr))
+  {}
+
   GridProvider(const ThisType& other) = default;
 
   // Manual ctor required for clang 3.8.1-12~bpo8+1 (otherwise: undefined reference).
