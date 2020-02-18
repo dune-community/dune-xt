@@ -39,7 +39,7 @@ element_integral(const Entity<0, d, G, E>& element,
 {
   RangeType result(0.), local_result;
   for (auto&& quadrature_point : QuadratureRules<typename Entity<0, d, G, E>::Geometry::ctype, G::dimension>::rule(
-           element.geometry().type(), polynomial_order_of_the_function)) {
+           element.type(), polynomial_order_of_the_function)) {
     const auto point_in_reference_element = quadrature_point.position();
     const auto quadrature_weight = quadrature_point.weight();
     const auto integration_factor = element.geometry().integrationElement(point_in_reference_element);

@@ -102,7 +102,7 @@ private:
     {
       // See if we find a source element which contais target_element completely. Therefore
       // * collect all vertices
-      const auto& reference_element = ReferenceElements<D, d>::general(target_element.geometry().type());
+      const auto& reference_element = ReferenceElements<D, d>::general(target_element.type());
       const auto num_vertices = reference_element.size(1);
       if (vertices_.size() != num_vertices)
         vertices_.resize(num_vertices);
