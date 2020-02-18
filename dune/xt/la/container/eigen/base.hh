@@ -96,8 +96,7 @@ public:
 
   VectorImpType& operator=(const ScalarType& value)
   {
-    for (auto& element : *this)
-      element = value;
+    *backend_ = BackendType::Constant(size(), value);
     return this->as_imp();
   } // ... operator=(...)
 
