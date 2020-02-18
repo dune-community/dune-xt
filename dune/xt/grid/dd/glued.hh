@@ -711,7 +711,7 @@ private:
         subdomain_factory.insertVertex(vertex);
         vertex_ids[local_vertex_id] = local_vertex_id;
       }
-      subdomain_factory.insertElement(macro_entity.geometry().type(), vertex_ids);
+      subdomain_factory.insertElement(macro_entity.type(), vertex_ids);
       return std::make_shared<XT::Grid::GridProvider<LocalGridType>>(subdomain_factory.createGrid());
     } catch (GridError& ee) {
       DUNE_THROW(GridError,
@@ -880,7 +880,7 @@ private:
                                   template count<dimDomain>();
 #  endif
         entity_to_vertex_ids[macro_index][micro_index] = std::vector<unsigned int>(num_vertices);
-        geometry_types[macro_index][micro_index] = micro_entity.geometry().type();
+        geometry_types[macro_index][micro_index] = micro_entity.type();
         for (unsigned int local_vertex_id = 0; local_vertex_id < num_vertices; ++local_vertex_id) {
           const unsigned int global_vertex_id = find_insert_vertex(vertices,
                                                                    micro_entity

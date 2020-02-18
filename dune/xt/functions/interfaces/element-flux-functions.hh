@@ -305,7 +305,7 @@ protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
   void assert_inside_reference_element(const DomainType& point_in_reference_element) const
   {
-    if (!ReferenceElements<D, d>::general(this->element().geometry().type()).checkInside(point_in_reference_element)) {
+    if (!ReferenceElements<D, d>::general(this->element().type()).checkInside(point_in_reference_element)) {
       std::stringstream error_message;
       error_message << "Given point_in_reference_element is not inside the current elements reference element!\n\n";
       XT::Grid::print_entity(this->element(), XT::Common::Typename<E>::value(), error_message, "   ");
