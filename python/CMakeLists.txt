@@ -14,4 +14,7 @@
 add_subdirectory(dune)
 add_subdirectory(scripts)
 add_subdirectory(wrapper)
+if (DUNE_XT_WITH_PYTHON_BINDINGS)
+  add_custom_target(bindings DEPENDS common_bindings grid_bindings functions_bindings la_bindings)
+endif()
 dxt_add_python_tests()

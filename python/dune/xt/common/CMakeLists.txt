@@ -11,10 +11,9 @@
 #   Tobias Leibner  (2018 - 2019)
 # ~~~
 
-dune_pybindxi_add_module(logging EXCLUDE_FROM_ALL logging.cc)
-dune_pybindxi_add_module(timedlogging EXCLUDE_FROM_ALL timedlogging.cc)
-
-dune_pybindxi_add_module(_empty EXCLUDE_FROM_ALL empty.cc)
-dune_pybindxi_add_module(_exceptions EXCLUDE_FROM_ALL exceptions.cc)
-dune_pybindxi_add_module(_mpi EXCLUDE_FROM_ALL mpi.cc)
-dune_pybindxi_add_module(_timings EXCLUDE_FROM_ALL timings.cc)
+dune_pybindxi_add_module(logging LIBNAME common_bindings EXCLUDE_FROM_ALL logging.cc)
+dune_pybindxi_add_module(timedlogging LIBNAME common_bindings EXCLUDE_FROM_ALL timedlogging.cc)
+dune_pybindxi_add_module(_empty LIBNAME common_bindings EXCLUDE_FROM_ALL empty.cc)
+dune_pybindxi_add_module(_exceptions LIBNAME common_bindings EXCLUDE_FROM_ALL exceptions.cc)
+dune_pybindxi_add_module(_mpi LIBNAME common_bindings EXCLUDE_FROM_ALL mpi.cc)
+dune_pybindxi_add_module(_timings LIBNAME common_bindings EXCLUDE_FROM_ALL timings.cc)

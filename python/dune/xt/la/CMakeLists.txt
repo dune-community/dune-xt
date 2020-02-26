@@ -11,4 +11,4 @@
 #   Tim Keil        (2018)
 # ~~~
 
-dune_pybindxi_add_module(_la EXCLUDE_FROM_ALL bindings.cc)
+dune_pybindxi_add_module(_la LIBNAME la_bindings EXCLUDE_FROM_ALL bindings.cc)
