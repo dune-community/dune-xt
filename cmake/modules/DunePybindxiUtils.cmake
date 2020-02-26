@@ -82,7 +82,8 @@ endfunction()
 #
 function(dune_pybindxi_add_module target_name)
   set(options MODULE SHARED EXCLUDE_FROM_ALL NO_EXTRAS THIN_LTO)
-  cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
+  set(oneValueArgs LIBNAME)
+  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "" ${ARGN})
 
   if(ARG_MODULE AND ARG_SHARED)
     message(FATAL_ERROR "Can't be both MODULE and SHARED")
@@ -90,6 +91,12 @@ function(dune_pybindxi_add_module target_name)
     set(lib_type SHARED)
   else()
     set(lib_type MODULE)
+  endif()
+
+  if (NOT ARG_LIBNAME)
+    set(lib_name bindings)
+  else()
+    set(lib_name ${ARG_LIBNAME})
   endif()
 
   if(ARG_EXCLUDE_FROM_ALL)
@@ -103,7 +110,7 @@ function(dune_pybindxi_add_module target_name)
     set(inc_isystem SYSTEM)
   endif()
 
-target_include_directories(${target_name} ${inc_isystem}
+  target_include_directories(${target_name} ${inc_isystem}
     PRIVATE ${PYBIND11_INCLUDE_DIR}  # from project CMakeLists.txt
     PRIVATE ${pybind11_INCLUDE_DIR}  # from pybind11Config
     PRIVATE ${PYTHON_INCLUDE_DIRS})
@@ -159,16 +166,16 @@ target_include_directories(${target_name} ${inc_isystem}
   add_dune_all_flags(${target_name})
   target_include_directories(${target_name} PUBLIC ${MPI4PY_INCLUDE_DIR})
 
-  if(TARGET bindings)
-    add_dependencies(bindings ${target_name})
-    add_dependencies(bindings_no_ext ${target_name})
+  if(TARGET ${lib_name})
+    add_dependencies(${lib_name} ${target_name})
+    add_dependencies(${lib_name}_no_ext ${target_name})
   else()
     if(DUNE_XT_WITH_PYTHON_BINDINGS)
-      add_custom_target(bindings ALL DEPENDS ${target_name})
-      add_custom_target(bindings_no_ext ALL DEPENDS ${target_name})
+      add_custom_target(${lib_name} ALL DEPENDS ${target_name})
+      add_custom_target(${lib_name}_no_ext ALL DEPENDS ${target_name})
     else()
-      add_custom_target(bindings DEPENDS ${target_name})
-      add_custom_target(bindings_no_ext DEPENDS ${target_name})
+      add_custom_target(${lib_name} DEPENDS ${target_name})
+      add_custom_target(${lib_name}_no_ext DEPENDS ${target_name})
     endif()
   endif()
 
