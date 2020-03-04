@@ -33,15 +33,21 @@ variables:
         DOCKER_DRIVER: overlay2
     before_script:
       - |
-        apk --update add openssh-client rsync git file bash python3
+        apk --update add openssh-client rsync git file bash python3 curl
+        curl -o /tmp/env https://raw.githubusercontent.com/codecov/codecov-bash/master/env
+        export ci_env=$(bash /tmp/env)
+        echo 999999999999999999999999999999999999999999999999999999999999
+        echo ${ci_env}
+        echo 999999999999999999999999999999999999999999999999999999999999
         pip3 install -U docker jinja2 docopt
+
         export BASEIMAGE="${MY_MODULE}-testing_${DOCKER_TAG}:${CI_COMMIT_REF_NAME/\//_}"
         export IMAGE="dunecommunity/ci_${MY_MODULE}-testing_${DOCKER_TAG}:${CI_COMMIT_SHA}"
         # get image with fallback to master branch of the super repo
         docker pull dunecommunity/${BASEIMAGE} || export BASEIMAGE="${MY_MODULE}-testing_${DOCKER_TAG}:master" ; docker pull dunecommunity/${BASEIMAGE}
         export ENV_FILE=${HOME}/env
         mkdir ${CI_PROJECT_DIR}/testresults && chmod -R 777 ${CI_PROJECT_DIR}/testresults
-        DOCKER_RUN="docker run -v ${CI_PROJECT_DIR}/testresults:/home/dune-ci/testresults --env-file ${ENV_FILE} ${IMAGE}"
+        DOCKER_RUN="docker run -v ${CI_PROJECT_DIR}/testresults:/home/dune-ci/testresults --env-file ${ENV_FILE} ${ci_env} ${IMAGE}"
         git submodule update --init --recursive
         docker build --build-arg BASE=${BASEIMAGE} -t ${IMAGE} -f .ci/shared/docker/ci_run/Dockerfile .
     script:
