@@ -44,6 +44,61 @@ namespace XT {
 namespace Common {
 
 
+DUNE_EXPORT inline const Timer& SecondsSinceStartup()
+{
+  static Timer timer_;
+  return timer_;
+}
+
+
+/**
+ * \brief A logging manager that provides info, debug and warning streams
+ */
+class DefaultLogger
+{
+  static std::string build_prefix(const std::string& prefix, const std::string& clr)
+  {
+    const std::string actual_color = terminal_supports_color() ? color(clr) : "";
+    if (actual_color.empty())
+      return prefix + ": ";
+    else
+      return actual_color + StreamModifiers::bold + prefix + ": " + StreamModifiers::normal;
+  }
+
+public:
+  DefaultLogger(const std::string& prefix = "",
+                bool start_disabled = false,
+                const std::array<std::string, 3>& colors = {"blue", "darkgray", "red"},
+                bool global_timer = true);
+
+  DefaultLogger(const DefaultLogger&);
+
+private:
+  const Timer timer_;
+  std::string prefix_;
+  const std::array<std::string, 3> colors_;
+  const bool global_timer_;
+  std::shared_ptr<std::ostream> info_;
+  std::shared_ptr<std::ostream> debug_;
+  std::shared_ptr<std::ostream> warn_;
+
+public:
+  bool enable_info;
+  bool enable_debug;
+  bool enable_warn;
+
+  void enable(const std::string& prefix = "");
+
+  void disable();
+
+  std::ostream& info();
+
+  std::ostream& debug();
+
+  std::ostream& warn();
+}; // class DefaultLogger
+
+
 /**
  * \brief A logging manager that provides info, debug and warning streams
  *
@@ -93,6 +148,7 @@ public:
   static const ssize_t default_max_debug_level = -1;
   static const bool default_enable_warnings = true;
   static const bool default_enable_colors = true;
+
   static const std::string default_info_color()
   {
     return "blue";
@@ -358,5 +414,15 @@ private:
 } // namespace Common
 } // namespace XT
 } // namespace Dune
+
+
+#ifdef LOG_
+#  error Macro LOG_ already defined, open an issue at https://github.com/dune-community/dune-xt-common/issues/new !
+#else
+#  define LOG_(type)                                                                                                   \
+    if (this->logger.enable_##type)                                                                                    \
+    this->logger.type()
+#endif
+
 
 #endif // DUNE_XT_COMMON_TIMED_LOGGING_HH

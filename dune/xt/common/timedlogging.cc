@@ -25,6 +25,95 @@ namespace XT {
 namespace Common {
 
 
+DefaultLogger::DefaultLogger(const std::string& prefix,
+                             bool start_disabled,
+                             const std::array<std::string, 3>& colors,
+                             bool global_timer)
+  : timer_()
+  , prefix_(prefix)
+  , colors_(colors)
+  , global_timer_(global_timer)
+  , info_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                   build_prefix(prefix_.empty() ? "info" : prefix_, colors_[0]),
+                                                   std::cout))
+  , debug_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                    build_prefix(prefix_.empty() ? "debug" : prefix_, colors_[1]),
+                                                    std::cout))
+  , warn_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                   build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
+                                                   std::cerr))
+  , enable_info(!start_disabled)
+  , enable_debug(!start_disabled)
+  , enable_warn(!start_disabled)
+{}
+
+DefaultLogger::DefaultLogger(const DefaultLogger& other)
+  : timer_()
+  , prefix_(other.prefix_)
+  , colors_(other.colors_)
+  , global_timer_(other.global_timer_)
+  , info_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                   build_prefix(prefix_.empty() ? "info" : prefix_, colors_[0]),
+                                                   std::cout))
+  , debug_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                    build_prefix(prefix_.empty() ? "debug" : prefix_, colors_[1]),
+                                                    std::cout))
+  , warn_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                   build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
+                                                   std::cerr))
+  , enable_info(other.enable_info)
+  , enable_debug(other.enable_debug)
+  , enable_warn(other.enable_warn)
+{}
+
+void DefaultLogger::enable(const std::string& prefix)
+{
+  enable_info = true;
+  enable_debug = true;
+  enable_warn = true;
+  if (!prefix.empty()) {
+    prefix_ = prefix;
+    info_ = std::make_shared<TimedPrefixedLogStream>(
+        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prefix_, colors_[0]), std::cout);
+    debug_ = std::make_shared<TimedPrefixedLogStream>(
+        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prefix_, colors_[1]), std::cout);
+    warn_ = std::make_shared<TimedPrefixedLogStream>(
+        global_timer_ ? SecondsSinceStartup() : timer_, build_prefix(prefix_, colors_[2]), std::cerr);
+  }
+} // ... enable(...)
+
+void DefaultLogger::disable()
+{
+  enable_info = false;
+  enable_debug = false;
+  enable_warn = false;
+}
+
+std::ostream& DefaultLogger::info()
+{
+  if (enable_info)
+    return *info_;
+  else
+    return dev_null;
+}
+
+std::ostream& DefaultLogger::debug()
+{
+  if (enable_debug)
+    return *debug_;
+  else
+    return dev_null;
+}
+
+std::ostream& DefaultLogger::warn()
+{
+  if (enable_warn)
+    return *warn_;
+  else
+    return dev_null;
+}
+
+
 TimedLogManager::TimedLogManager(const Timer& timer,
                                  const std::string info_prefix,
                                  const std::string debug_prefix,
