@@ -18,6 +18,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/grid/exceptions.hh>
+#include <dune/xt/grid/intersection.hh>
 
 #include "interfaces.hh"
 #include <dune/xt/grid/boundaryinfo/types.hh>
@@ -71,6 +72,8 @@ public:
   using typename BaseType::DomainFieldType;
   using typename BaseType::IntersectionType;
   using typename BaseType::WorldType;
+
+  using BaseType::logger;
 
   static std::string static_id()
   {
@@ -147,10 +150,20 @@ public:
   /**
    * \attention Takes ownership of default_boundary_type, do not delete manually!
    */
-  NormalBasedBoundaryInfo(const DomainFieldType tol = 1e-10, BoundaryType*&& default_boundary_type = new NoBoundary())
-    : tol_(tol)
+  NormalBasedBoundaryInfo(const DomainFieldType tol = 1e-10,
+                          BoundaryType*&& default_boundary_type = new NoBoundary(),
+                          const std::string& log_prefix = "xt.grid.normalbasedboundaryinfo")
+    : BaseType(log_prefix)
+    , tol_(tol)
     , default_boundary_type_(std::move(default_boundary_type))
-  {}
+  {
+    LOG_(debug) << "NormalBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_
+                << ")" << std::endl;
+  }
+
+  NormalBasedBoundaryInfo(const ThisType&) = default;
+
+  NormalBasedBoundaryInfo(ThisType&& source) = default;
 
   /**
    * \attention Takes ownership of boundary_type, do not delete manually!
@@ -158,25 +171,38 @@ public:
   void register_new_normal(const WorldType& normal, BoundaryType*&& boundary_type)
   {
     const auto normalized_normal = normal / normal.two_norm();
+    logger.info() << "register_new_normal(normal=" << normal << ", boundary_type=" << *boundary_type << ")"
+                  << std::endl;
     for (const auto& normal_and_type_pair : normal_to_type_map_) {
       const auto& existing_normal = normal_and_type_pair.first;
       if (XT::Common::FloatCmp::eq(existing_normal, normalized_normal, tol_))
         DUNE_THROW(InvalidStateException, "Given normals are too close for given tolerance '" << tol_ << "'!");
     }
+    LOG_(debug) << "  does not coincide with already registered normal, registering." << std::endl;
     normal_to_type_map_.emplace(normal, std::shared_ptr<BoundaryType>(std::move(boundary_type)));
   } // ... void register_new_normal(...)
 
   const BoundaryType& type(const IntersectionType& intersection) const override final
   {
-    if (!intersection.boundary())
+    LOG_(debug) << "type(intersection=" << intersection << "):" << std::endl;
+    if (!intersection.boundary()) {
+      LOG_(debug) << "  intersection.boundary() = " << intersection.boundary() << ", returning " << no_boundary
+                  << std::endl;
       return no_boundary;
+    }
     const WorldType outer_normal = intersection.centerUnitOuterNormal();
+    LOG_(debug) << "  intersection.centerUnitOuterNormal() = " << intersection.centerUnitOuterNormal()
+                << ", checking registered normals:" << std::endl;
     for (const auto& normal_and_type_pair : normal_to_type_map_) {
       const auto& normal = normal_and_type_pair.first;
       const auto& type_ptr = normal_and_type_pair.second;
-      if (XT::Common::FloatCmp::eq(outer_normal, normal, tol_))
+      if (XT::Common::FloatCmp::eq(outer_normal, normal, tol_)) {
+        LOG_(debug) << "  registered normal " << normal << " matches, returning " << *type_ptr << std::endl;
         return *type_ptr;
+      } else
+        LOG_(debug) << "  registered normal " << normal << " does not match" << std::endl;
     }
+    LOG_(debug) << "  no registered normal matched, returning " << *default_boundary_type_ << std::endl;
     return *default_boundary_type_;
   } // ... type(...)
 

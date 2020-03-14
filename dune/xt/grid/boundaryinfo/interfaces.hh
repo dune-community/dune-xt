@@ -15,7 +15,7 @@
 #include <string>
 
 #include <dune/xt/common/fvector.hh>
-
+#include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/grid/type_traits.hh>
 
 namespace Dune {
@@ -58,6 +58,7 @@ std::ostream& operator<<(std::ostream& out, const BoundaryType& type);
 template <class IntersectionImp>
 class BoundaryInfo
 {
+  using ThisType = BoundaryInfo<IntersectionImp>;
   static_assert(is_intersection<IntersectionImp>::value, "");
 
 public:
@@ -67,6 +68,16 @@ public:
   static const size_t dimWorld = IntersectionType::dimensionworld;
   typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef Common::FieldVector<DomainFieldType, dimWorld> WorldType;
+
+  mutable Common::DefaultLogger logger;
+
+  BoundaryInfo(const std::string& log_prefix = "xt.grid.boundaryinfo")
+    : logger(log_prefix, /*start_disabled=*/true)
+  {}
+
+  BoundaryInfo(const ThisType&) = default;
+
+  BoundaryInfo(ThisType&&) = default;
 
   virtual ~BoundaryInfo() = default;
 
