@@ -57,4 +57,4 @@ def read_vtkfile(filename):
     if vtk_type == 'Collection':
         path, xml = _get_collection_data(filename)
         return _read_collection(xml)
-    return [None, _read_single(filename, vtk_type)]
+    return [[0., _read_single(filename, vtk_type)],]

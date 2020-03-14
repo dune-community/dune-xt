@@ -3,7 +3,7 @@ import warnings
 import IPython
 from ipywidgets import IntSlider, interact, widgets, Play
 from k3d.helpers import minmax
-from k3d_vtk.reader import read_vtkfile
+from .reader import read_vtkfile
 from k3d.plot import Plot as k3dPlot
 import k3d
 from vtk.util import numpy_support
@@ -49,7 +49,7 @@ class VTKPlot(k3dPlot):
         self.idx = 0
 
         if 'transform' in kwargs.keys() and len(vtk_data) > 1:
-            raise RuntimeError('supplying transforms is currently not supported for teim series VTK Data')
+            raise RuntimeError('supplying transforms is currently not supported for time series VTK Data')
 
         self.vtk_data = np.stack([_transform_to_k3d(v[0], v[1], color_attribute_name) for v in vtk_data])
         self.value_minmax = (np.nanmin(self.vtk_data[:, 2]), np.nanmax(self.vtk_data[:, 3]))
