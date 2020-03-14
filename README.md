@@ -13,10 +13,8 @@
 [![Build Status](https://travis-ci.org/dune-community/dune-xt-common.svg?branch=master)](https://travis-ci.org/dune-community/dune-xt-common)
 
 dune-xt-common is an eXTensions module for DUNE (http://www.dune-project.org),
-which is often used together with [dune-xt-grid](https://github.com/dune-community/dune-xt),
-[dune-xt-functions](https://github.com/dune-community/dune-xt) and
-[dune-xt-la](https://github.com/dune-community/dune-xt) in the context of
-the discretization module [dune-gdt](https://github.com/dune-community/dune-gdt).
+which is mainly used in the context of the discretization module
+[dune-gdt](https://github.com/dune-community/dune-gdt).
 
 There is a paper describing some of the concepts behind these extensions. While
 already dated, most ideas still apply:
