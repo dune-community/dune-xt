@@ -241,6 +241,29 @@ public:
       setup_glues(allow_for_broken_orientation_of_coupling_intersections);
   } // Glued(...)
 
+  Glued(MacroGridProviderType& macro_grid_provider,
+        const std::array<unsigned int, dimDomain>& num_elements_per_subdomain,
+        const size_t num_local_refinements = 0,
+        const bool prepare_glues = false,
+        const bool allow_for_broken_orientation_of_coupling_intersections = false,
+        const ctype& allowed_overlap = 10 * XT::Common::FloatCmp::DefaultEpsilon<ctype>::value())
+    : macro_grid_(macro_grid_provider)
+    , allowed_overlap_(allowed_overlap)
+    , macro_leaf_view_(macro_grid_.leaf_view())
+    , macro_leaf_view_size_(macro_leaf_view_.indexSet().size(0))
+    , local_grids_(macro_leaf_view_.indexSet().size(0), nullptr)
+    , glues_(macro_leaf_view_.indexSet().size(0))
+  {
+    setup_local_grids(num_elements_per_subdomain);
+    if (num_local_refinements > 0)
+      for (auto& local_grid_provider : local_grids_) {
+        assert(local_grid_provider);
+        local_grid_provider->grid().globalRefine(boost::numeric_cast<int>(num_local_refinements));
+      }
+    if (prepare_glues)
+      setup_glues(allow_for_broken_orientation_of_coupling_intersections);
+  } // Glued(...)
+
   const MacroGridViewType& macro_grid_view() const
   {
     assert_macro_grid_state();
@@ -722,7 +745,8 @@ private:
   } // ... create_grid_of_simplex(...)
 
   template <class MacroEntityType>
-  static std::shared_ptr<LocalGridProviderType> create_grid_of_cube(const MacroEntityType& macro_entity)
+  static std::shared_ptr<LocalGridProviderType>
+  create_grid_of_cube(const MacroEntityType& macro_entity, const std::array<unsigned int, dimDomain>& num_elements)
   {
     const auto num_vertices = macro_entity.subEntities(dimDomain);
     FieldVector<ctype, dimDomain> lower_left(std::numeric_limits<ctype>::max());
@@ -734,11 +758,17 @@ private:
         upper_right[dd] = std::max(upper_right[dd], vertex[dd]);
       }
     }
-    std::array<unsigned int, dimDomain> num_elements;
-    std::fill(num_elements.begin(), num_elements.end(), 1);
     return std::make_shared<XT::Grid::GridProvider<LocalGridType>>(
         XT::Grid::make_cube_grid<LocalGridType>(lower_left, upper_right, num_elements));
   } // ... create_grid_of_cube(...)
+
+  template <class MacroEntityType>
+  static std::shared_ptr<LocalGridProviderType> create_grid_of_cube(const MacroEntityType& macro_entity)
+  {
+    std::array<unsigned int, dimDomain> num_elements;
+    std::fill(num_elements.begin(), num_elements.end(), 1);
+    return create_grid_of_cube(macro_entity, num_elements);
+  }
 
   void setup_local_grids()
   {
@@ -751,6 +781,18 @@ private:
         local_grids_[macro_entity_index] = create_grid_of_cube(macro_entity);
       else
         DUNE_THROW(GridError, "Unknown entity.type() encountered: " << macro_entity.type());
+    }
+  } // ... setup_local_grids()
+
+  void setup_local_grids(const std::array<unsigned int, dimDomain>& num_elements_per_subdomain)
+  {
+    const auto& macro_index_set = macro_leaf_view_.indexSet();
+    for (auto&& macro_entity : elements(macro_leaf_view_)) {
+      DUNE_THROW_IF(!macro_entity.type().isCube(),
+                    GridError,
+                    "Prescribing number of elements for local subdomain grids only suitable for cubic subdomains!");
+      auto macro_entity_index = macro_index_set.index(macro_entity);
+      local_grids_[macro_entity_index] = create_grid_of_cube(macro_entity, num_elements_per_subdomain);
     }
   } // ... setup_local_grids()
 
