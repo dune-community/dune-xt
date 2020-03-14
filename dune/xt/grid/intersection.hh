@@ -169,6 +169,21 @@ contains(const Dune::Intersection<G, I>& intersection,
 
 } // namespace Grid
 } // namespace XT
+
+
+template <class G, class I>
+std::ostream& operator<<(std::ostream& out, const Dune::Intersection<G, I>& intersection)
+{
+  const auto& geometry = intersection.geometry();
+  const auto num_corners = geometry.corners();
+  out << G::dimension - 1 << "d-intersection{[" << geometry.corner(0) << "]";
+  for (int ii = 1; ii < num_corners; ++ii)
+    out << ", [" << geometry.corner(ii) << "]";
+  out << "}";
+  return out;
+}
+
+
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_INTERSECTION_HH
