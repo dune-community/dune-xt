@@ -15,7 +15,7 @@
 #include <functional>
 
 #include <dune/xt/common/memory.hh>
-
+#include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/grid/common/partitionset.hh>
@@ -126,6 +126,17 @@ class IntersectionFilter
 public:
   using GridViewType = GL;
   using IntersectionType = extract_intersection_t<GridViewType>;
+
+  mutable Common::DefaultLogger logger;
+
+  IntersectionFilter(const std::string& logging_prefix = "xt.grid.intersectionfilter",
+                     const bool logging_disabled = true)
+    : logger(logging_prefix, logging_disabled)
+  {}
+
+  IntersectionFilter(const IntersectionFilter<GL>&) = default;
+
+  IntersectionFilter(IntersectionFilter<GL>&&) = default;
 
   virtual ~IntersectionFilter<GridViewType>() = default;
 

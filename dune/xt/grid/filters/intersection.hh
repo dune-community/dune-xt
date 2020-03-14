@@ -15,9 +15,10 @@
 #include <functional>
 
 #include <dune/xt/common/memory.hh>
-
+#include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/type_traits.hh>
+
 #include <dune/grid/common/partitionset.hh>
 
 #include "base.hh"
@@ -422,9 +423,11 @@ private:
 template <class GL>
 class CustomBoundaryIntersections : public IntersectionFilter<GL>
 {
+  using ThisType = CustomBoundaryIntersections<GL>;
   using BaseType = IntersectionFilter<GL>;
 
 public:
+  using BaseType::logger;
   using typename BaseType::GridViewType;
   using typename BaseType::IntersectionType;
 
@@ -432,24 +435,40 @@ public:
    * \attention Takes ownership of boundary_type, do not delete manually!
    */
   explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                       BoundaryType*&& boundary_type)
-    : boundary_info_(boundary_info)
+                                       BoundaryType*&& boundary_type,
+                                       const std::string& logging_prefix = "")
+    : BaseType(logging_prefix.empty() ? "xt.grid.customboundaryintersections" : logging_prefix,
+               /*logging_disabled=*/logging_prefix.empty())
+    , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
   {}
 
   explicit CustomBoundaryIntersections(const BoundaryInfo<IntersectionType>& boundary_info,
-                                       const std::shared_ptr<BoundaryType>& boundary_type)
-    : boundary_info_(boundary_info)
+                                       const std::shared_ptr<BoundaryType>& boundary_type,
+                                       const std::string& logging_prefix = "")
+    : BaseType(logging_prefix.empty() ? "xt.grid.customboundaryintersections" : logging_prefix,
+               /*logging_disabled=*/logging_prefix.empty())
+    , boundary_info_(boundary_info)
     , boundary_type_(boundary_type)
+  {}
+
+  CustomBoundaryIntersections(const ThisType& other)
+    : BaseType(other)
+    , boundary_info_(other.boundary_info_)
+    , boundary_type_(other.boundary_type_)
   {}
 
   IntersectionFilter<GridViewType>* copy() const override final
   {
-    return new CustomBoundaryIntersections<GridViewType>(boundary_info_, boundary_type_);
+    return new CustomBoundaryIntersections<GridViewType>(*this);
   }
 
   bool contains(const GridViewType& /*grid_layer*/, const IntersectionType& intersection) const override final
   {
+    LOG_(debug) << "contains(intersection=" << intersection
+                << "):\n  boundary_info_.type(intersection) = " << boundary_info_.type(intersection)
+                << ", *boundary_type_ = " << *boundary_type_ << ", returning "
+                << (boundary_info_.type(intersection) == *boundary_type_) << std::endl;
     return boundary_info_.type(intersection) == *boundary_type_;
   }
 
