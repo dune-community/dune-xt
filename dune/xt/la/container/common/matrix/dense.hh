@@ -150,7 +150,10 @@ class CommonDenseMatrixTraits
                             CommonDenseMatrixBackend<ScalarImp, storage_layout>,
                             Backends::common_dense,
                             Backends::common_dense>
-{};
+{
+public:
+  using DataType = ScalarImp;
+};
 
 
 } // namespace internal
@@ -163,6 +166,7 @@ template <class ScalarImp = double, Common::StorageLayout storage_layout = Commo
 class CommonDenseMatrix
   : public MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>
   , public ProvidesBackend<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>>
+  , public ProvidesDataAccess<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>>
 {
   using ThisType = CommonDenseMatrix;
   using InterfaceType = MatrixInterface<internal::CommonDenseMatrixTraits<ScalarImp, storage_layout>, ScalarImp>;
@@ -172,6 +176,7 @@ public:
   using typename InterfaceType::ScalarType;
   using Traits = typename InterfaceType::Traits;
   using typename ProvidesBackend<Traits>::BackendType;
+  using typename ProvidesDataAccess<Traits>::DataType;
 
 private:
   using MutexesType = typename Traits::MutexesType;
@@ -276,6 +281,17 @@ public:
     return *backend_;
   }
 
+  void resize(const size_t ii, const size_t jj)
+  {
+    backend_->resize(ii, jj);
+  }
+
+  /// \}
+  /// \name Required by ProvidesDataAccess.
+  /// \{
+
+  /** \attention This makes only sense for scalar data types, not for complex! **/
+
   ScalarType* data()
   {
     return backend().entries_.data();
@@ -286,9 +302,9 @@ public:
     return backend().entries_.data();
   }
 
-  void resize(const size_t ii, const size_t jj)
+  size_t data_size() const
   {
-    backend_->resize(ii, jj);
+    return rows() * cols();
   }
 
   /// \}

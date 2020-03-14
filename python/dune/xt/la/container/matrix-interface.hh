@@ -93,7 +93,7 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
 
   const auto ClassName = Common::to_camel_case(bindings::container_name<C>::value());
 
-  py::class_<C> c(m, ClassName.c_str(), ClassName.c_str());
+  py::class_<C> c = bind_ProvidesDataAccess<C>(m, ClassName, ClassName);
 
   addbind_ProvidesBackend(c);
 
