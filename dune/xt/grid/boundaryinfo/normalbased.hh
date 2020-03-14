@@ -34,7 +34,13 @@ static inline Common::Configuration normalbased_boundaryinfo_default_config()
   config["default"] = NoBoundary().id();
   config["compare_tolerance"] = "1e-10";
   config["0." + DirichletBoundary().id()] = "[1 0 0 0]";
-  config["1." + NeumannBoundary().id()] = "[0 1 0 0]";
+  config["1." + DirichletBoundary().id()] = "[-1 0 0 0]";
+  config["2." + DirichletBoundary().id()] = "[0 1 0 0]";
+  config["3." + DirichletBoundary().id()] = "[0 -1 0 0]";
+  config["4." + DirichletBoundary().id()] = "[0 0 1 0]";
+  config["5." + DirichletBoundary().id()] = "[0 0 -1 0]";
+  config["6." + DirichletBoundary().id()] = "[0 0 0 1]";
+  config["7." + DirichletBoundary().id()] = "[0 0 0 -1]";
   return config;
 }
 
@@ -71,7 +77,7 @@ public:
     return normalbased_boundaryinfo_default_config().template get<std::string>("type");
   }
 
-  static std::unique_ptr<ThisType> create(const Common::Configuration& cfg = normalbased_boundaryinfo_default_config())
+  static std::unique_ptr<ThisType> create(const Common::Configuration& cfg)
   {
     const Common::Configuration default_cfg = normalbased_boundaryinfo_default_config();
     // get tolerance and default
@@ -111,7 +117,7 @@ public:
                      "and the value determines the normal (see below for a valid default config)."
                   << "\n\n   This was the given config:\n"
                   << cfg << "\n\n   This is a suitable default config:\n"
-                  << default_cfg << "\nn   This was the original error:\n"
+                  << default_cfg << "\n\n   This was the original error:\n"
                   << ee.what());
         }
         try {
@@ -126,7 +132,7 @@ public:
                             "and the value determines the normal (see below for a valid default config)."
                          << "\n\n   This was the given config:\n"
                          << cfg << "\n\n   This is a suitable default config:\n"
-                         << default_cfg << "\nn   This was the original error:\n"
+                         << default_cfg << "\n\n   This was the original error:\n"
                          << ee.what());
         }
         ret->register_new_normal(normal, boundary_type->copy());
@@ -185,8 +191,7 @@ private:
 
 
 template <class I>
-std::unique_ptr<NormalBasedBoundaryInfo<I>>
-make_normalbased_boundaryinfo(const Common::Configuration& cfg = normalbased_boundaryinfo_default_config())
+std::unique_ptr<NormalBasedBoundaryInfo<I>> make_normalbased_boundaryinfo(const Common::Configuration& cfg)
 {
   return NormalBasedBoundaryInfo<I>::create(cfg);
 }

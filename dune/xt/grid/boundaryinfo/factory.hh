@@ -53,13 +53,13 @@ public:
   {
     const auto type = config.get<std::string>("type");
     if (type == AllDirichletBoundaryInfo<I>::static_id())
-      return make_alldirichlet_boundaryinfo<I>();
+      return make_alldirichlet_boundaryinfo<I>(config);
     else if (type == AllNeumannBoundaryInfo<I>::static_id())
-      return make_allneumann_boundaryinfo<I>();
+      return make_allneumann_boundaryinfo<I>(config);
     else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
-      return make_boundarysegment_boundaryinfo<I>();
+      return make_boundarysegment_boundaryinfo<I>(config);
     else if (type == NormalBasedBoundaryInfo<I>::static_id())
-      return make_normalbased_boundaryinfo<I>();
+      return make_normalbased_boundaryinfo<I>(config);
     else
       DUNE_THROW(Common::Exceptions::wrong_input_given,
                  "'" << type << "' is not a valid " << BoundaryInfo<I>::static_id() << "!");
