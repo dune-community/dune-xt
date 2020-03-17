@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 
+#include <dune/common/version.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/common/rangegenerators.hh>
 
@@ -70,9 +71,11 @@ public:
     : grid_ptr_(grd_ptr)
   {}
 
+#if DUNE_VERSION_GTE(DUNE_COMMON, 2, 7)
   GridProvider(Dune::ToUniquePtr<GridType> grd_ptr)
     : grid_ptr_(std::shared_ptr<GridType>(grd_ptr))
   {}
+#endif
 
   GridProvider(const ThisType& other) = default;
 
