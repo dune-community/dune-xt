@@ -15,7 +15,12 @@
 #include <type_traits>
 #include <cassert>
 
-#include <dune/common/parallel/communication.hh>
+#include <dune/common/version.hh>
+#if DUNE_VERSION_GTE(DUNE_COMMON, 2, 7)
+#  include <dune/common/parallel/communication.hh>
+#else
+#  include <dune/common/parallel/collectivecommunication.hh>
+#endif
 
 #include <dune/istl/paamg/pinfo.hh>
 
