@@ -311,9 +311,6 @@ macro(finalize_test_setup)
   # set(${subdir}_dxt_headercheck_targets "")
 
   if(ALBERTA_FOUND)
-    add_dune_alberta_flags(GRIDDIM 2 test_dd_glued_2d)
-    add_dune_alberta_flags(GRIDDIM 3 test_dd_glued_3d)
-
     foreach(test ${dxt_test_binaries})
       if(${test} MATCHES alberta_1d)
         add_dune_alberta_flags(GRIDDIM 1 ${test})
