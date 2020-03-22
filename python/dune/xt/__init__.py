@@ -21,11 +21,7 @@ try:
 except ImportError:
     pass
 
-__import__('pkg_resources').declare_namespace(__name__)
-
 from importlib import import_module
-import os
-import logging
 
 
 def guarded_import(globs, base_name, mod_name):
@@ -39,12 +35,9 @@ def guarded_import(globs, base_name, mod_name):
         # check the rest for duplicity
         for nm in names:
             if nm in globs:
-                logging.error(
-                    '{}: overwriting existing name \'{}\' when importing from \'{}\' (continuing anyway)!'.format(
-                        base_name, nm, mod_name))
+                raise ImportError(
+                f'{base_name}: not overwriting existing name \'{nm}\' when importing from \'{mod_name}\'!' )
         # and finally import
         globs.update({k: getattr(mod, k) for k in names})
     except ImportError as e:
-        logging.error('{}: could not import module \'{}\' (continuing anyway)!'.format(base_name, mod_name))
-        if os.environ.get('DXT_PYTHON_DEBUG', False):
-            raise e
+        raise ImportError(f'{base_name}: could not import module \'{mod_name}\':\n\n{e}')
