@@ -12,9 +12,9 @@
 #   Tobias Leibner  (2019)
 # ~~~
 
-dune_pybindxi_add_module(_boundaryinfo EXCLUDE_FROM_ALL boundaryinfo.cc)
-dune_pybindxi_add_module(_types EXCLUDE_FROM_ALL types.cc)
-dune_pybindxi_add_module(_walker EXCLUDE_FROM_ALL walker.cc)
+dune_pybindxi_add_module(_grid_boundaryinfo EXCLUDE_FROM_ALL boundaryinfo.cc)
 dune_pybindxi_add_module(_grid_gridprovider_cube EXCLUDE_FROM_ALL gridprovider/cube.cc)
 dune_pybindxi_add_module(_grid_gridprovider_provider EXCLUDE_FROM_ALL gridprovider/provider.cc)
 dune_pybindxi_add_module(_grid_traits EXCLUDE_FROM_ALL traits.cc)
+dune_pybindxi_add_module(_grid_types EXCLUDE_FROM_ALL types.cc)
+dune_pybindxi_add_module(_grid_walker EXCLUDE_FROM_ALL walker.cc)

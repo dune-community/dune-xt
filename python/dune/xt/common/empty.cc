@@ -57,7 +57,8 @@ struct Terrier : Dog
   {}
 };
 
-PYBIND11_MODULE(_empty, m)
+
+PYBIND11_MODULE(_common_empty, m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;

@@ -35,7 +35,7 @@
 #include <dune/xt/common/string.hh>
 
 
-PYBIND11_MODULE(_mpi, m)
+PYBIND11_MODULE(_common_mpi, m)
 {
   using namespace Dune;
   namespace py = pybind11;

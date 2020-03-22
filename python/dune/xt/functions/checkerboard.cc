@@ -54,16 +54,16 @@ void all_grids<boost::tuples::null_type>(pybind11::module&)
 {}
 
 
-PYBIND11_MODULE(_checkerboard, m)
+PYBIND11_MODULE(_functions_checkerboard, m)
 {
   namespace py = pybind11;
 
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.grid");
-  py::module::import("dune.xt.functions._gridfunction_interface_1d");
-  py::module::import("dune.xt.functions._gridfunction_interface_2d");
-  py::module::import("dune.xt.functions._gridfunction_interface_3d");
+  py::module::import("dune.xt.functions._functions_gridfunction_interface_1d");
+  py::module::import("dune.xt.functions._functions_gridfunction_interface_2d");
+  py::module::import("dune.xt.functions._functions_gridfunction_interface_3d");
 
   all_grids(m);
 } // PYBIND11_MODULE(...)

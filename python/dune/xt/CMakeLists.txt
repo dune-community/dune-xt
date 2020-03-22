@@ -12,7 +12,7 @@
 #   Tobias Leibner  (2019)
 # ~~~
 
-add_subdirectory(grid)
 add_subdirectory(common)
-add_subdirectory(la)
 add_subdirectory(functions)
+add_subdirectory(grid)
+add_subdirectory(la)

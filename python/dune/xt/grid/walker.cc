@@ -57,7 +57,7 @@ void addbind_for_Grid<boost::tuples::null_type>(pybind11::module&)
 {}
 
 
-PYBIND11_MODULE(_walker, m)
+PYBIND11_MODULE(_grid_walker, m)
 {
   namespace py = pybind11;
 

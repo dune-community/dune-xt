@@ -23,15 +23,15 @@
 #include "expression.hh"
 
 
-PYBIND11_MODULE(_expression, m)
+PYBIND11_MODULE(_functions_expression, m)
 {
   namespace py = pybind11;
 
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.la");
-  py::module::import("dune.xt.functions._function_interface_1d");
-  py::module::import("dune.xt.functions._function_interface_2d");
-  py::module::import("dune.xt.functions._function_interface_3d");
+  py::module::import("dune.xt.functions._functions_function_interface_1d");
+  py::module::import("dune.xt.functions._functions_function_interface_2d");
+  py::module::import("dune.xt.functions._functions_function_interface_3d");
 
   using namespace Dune::XT::Functions;
 

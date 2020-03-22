@@ -24,7 +24,7 @@
 #include <dune/pybindxi/stl.h>
 
 
-PYBIND11_MODULE(_exceptions, m)
+PYBIND11_MODULE(_common_exceptions, m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;

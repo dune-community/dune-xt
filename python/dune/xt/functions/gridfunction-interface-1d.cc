@@ -38,14 +38,14 @@ void bind_all_1d_grids<boost::tuples::null_type>(pybind11::module&)
 {}
 
 
-PYBIND11_MODULE(_gridfunction_interface_1d, m)
+PYBIND11_MODULE(_functions_gridfunction_interface_1d, m)
 {
   namespace py = pybind11;
 
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.grid");
-  py::module::import("dune.xt.functions._function_interface_1d");
+  py::module::import("dune.xt.functions._functions_function_interface_1d");
 
   bind_all_1d_grids(m);
 } // PYBIND11_MODULE(...)

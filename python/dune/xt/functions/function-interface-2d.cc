@@ -23,7 +23,7 @@
 #include "function-interface.hh"
 
 
-PYBIND11_MODULE(_function_interface_2d, m)
+PYBIND11_MODULE(_functions_function_interface_2d, m)
 {
   namespace py = pybind11;
 

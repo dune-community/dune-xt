@@ -11,15 +11,26 @@
 #   Tobias Leibner  (2019)
 # ~~~
 
+from numbers import Number
+
 from dune.xt import guarded_import
 
 for mod_name in (
-        '_boundaryinfo',
-        '_types',
-        '_walker',
-        '_provider',
+            '_grid_boundaryinfo',
+            '_grid_gridprovider_cube',
+            '_grid_gridprovider_provider',
+            '_grid_traits',
+            '_grid_types',
+            '_grid_walker',
 ):
     guarded_import(globals(), 'dune.xt.grid', mod_name)
+
+
+def Dim(d):
+    assert isinstance(d, Number)
+    if f'Dimension{d}' not in globals():
+        raise RuntimeError(f'Dimension {d} not available, extend <python/dune/xt/grid/traits.cc>!')
+    return globals()[f'Dimension{d}']()
 
 
 def make_walker(gridprovider, level=0):

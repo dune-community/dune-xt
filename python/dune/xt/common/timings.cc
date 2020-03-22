@@ -24,7 +24,7 @@
 #include <dune/common/parallel/mpihelper.hh>
 
 
-PYBIND11_MODULE(_timings, m)
+PYBIND11_MODULE(_common_timings, m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
