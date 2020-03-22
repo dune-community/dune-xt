@@ -9,64 +9,74 @@
 //   René Fritze     (2018)
 //   Tobias Leibner  (2018)
 
-#ifndef DUNE_XT_GRID_GRIDPROVIDER_PBH
-#define DUNE_XT_GRID_GRIDPROVIDER_PBH
+#ifndef PYTHON_DUNE_XT_GRID_GRIDPROVIDER_HH
+#define PYTHON_DUNE_XT_GRID_GRIDPROVIDER_HH
 
-#include <algorithm>
+#include <dune/geometry/type.hh>
+#include <dune/grid/common/mcmgmapper.hh>
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
+#include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
+#include <dune/xt/common/numeric_cast.hh>
+#include <dune/xt/grid/entity.hh>
+#include <dune/xt/grid/exceptions.hh>
+#include <dune/xt/grid/gridprovider/provider.hh>
 
 #include <python/dune/xt/common/configuration.hh>
 #include <python/dune/xt/common/fvector.hh>
-#include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
-#include <dune/xt/common/exceptions.hh>
-#include <dune/xt/common/numeric_cast.hh>
-#include <dune/xt/grid/entity.hh>
-
-#include <dune/xt/grid/gridprovider.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 namespace Dune {
 namespace XT {
 namespace Grid {
+namespace bindings {
 
 
 template <class G>
-void bind_make_cube_grid(pybind11::module& m, const std::string& grid_id)
+class GridProvider
 {
-  namespace py = pybind11;
-  using namespace pybind11::literals;
+public:
+  using type = Grid::GridProvider<G>;
+  using bound_type = pybind11::class_<type>;
 
-  m.def(std::string("make_cube_grid__" + grid_id).c_str(),
-        [](const Common::Configuration& cfg, Common::MPI_Comm_Wrapper mpi_comm) {
-          return make_cube_grid<G>(cfg, mpi_comm.get());
-        },
-        "cfg"_a = cube_gridprovider_default_config(),
-        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
+  static bound_type bind(pybind11::module& m,
+                         const std::string& class_id = "grid_provider",
+                         const std::string& grid_id = grid_name<G>::value())
+  {
+    namespace py = pybind11;
+    using namespace pybind11::literals;
+    const size_t dim = type::GridType::dimension;
 
-  m.def(std::string("make_cube_grid__" + grid_id).c_str(),
-        [](const FieldVector<typename G::ctype, G::dimension>& lower_left,
-           const FieldVector<typename G::ctype, G::dimension>& upper_right,
-           const std::array<unsigned int, G::dimension>& num_elements,
-           const unsigned int num_refinements,
-           const std::array<unsigned int, G::dimension>& overlap_size,
-           Common::MPI_Comm_Wrapper mpi_comm) {
-          return make_cube_grid<G>(
-              lower_left, upper_right, num_elements, num_refinements, overlap_size, mpi_comm.get());
-        },
-        "lower_left"_a,
-        "upper_right"_a,
-        "num_elements"_a = XT::Common::make_array<unsigned int, G::dimension>(
-            cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements")),
-        "num_refinements"_a = cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
-        "overlap_size"_a = XT::Common::make_array<unsigned int, G::dimension>(
-            cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size")),
-        "mpi_comm"_a = Common::MPI_Comm_Wrapper());
-} // ... bind_make_cube_grid(...)
+    const std::string class_name = class_id + "_" + grid_id;
+    const auto ClassName = XT::Common::to_camel_case(class_name);
+    bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
+    c.def_property_readonly("dimension", [dim](type&){return dim;});
+    c.def_property_readonly("max_level", &type::max_level);
+    c.def("size", [dim](type& self, const int codim){
+      DUNE_THROW_IF(codim < 0 || codim > dim,
+                    Exceptions::wrong_codimension,
+                    "dim = " << dim << "\n   codim = " << codim);
+      auto grid_view = self.leaf_view();
+      MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(grid_view, [codim](GeometryType gt, int dimgrid) {
+        return dimgrid - gt.dim() == codim;
+      });
+      return mapper.size();
+    }, "codim"_a);
+    c.def("visualize", [](type& self, const std::string& filename, const Common::Configuration& boundary_info_cfg){
+      self.visualize(filename, boundary_info_cfg);
+    },
+    "filename"_a,
+        "boundary_info_cfg"_a = Common::Configuration());
+    c.def("global_refine", [](type& self, const int count){self.global_refine(count);}, "count"_a = 1);
+    return c;
+  } // ... bind(...)
+}; // class GridProvider
 
 
+} // namespace bindings
 } // namespace Grid
 } // namespace XT
 } // namespace Dune
 
-#endif // DUNE_XT_GRID_GRIDPROVIDER_PBH
+#endif // PYTHON_DUNE_XT_GRID_GRIDPROVIDER_HH

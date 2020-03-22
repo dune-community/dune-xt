@@ -88,7 +88,7 @@ void bind_grid<boost::tuples::null_type>(pybind11::module&)
 {}
 
 
-PYBIND11_MODULE(_boundaryinfo, m)
+PYBIND11_MODULE(_grid_boundaryinfo, m)
 {
   namespace py = pybind11;
 
