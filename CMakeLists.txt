@@ -50,6 +50,39 @@ dune_project()
 # dune-xt-common cmake includes
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+if(NOT (CMAKE_VERSION VERSION_LESS 3.0))  # CMake >= 3.0
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-pybindxi_SOURCE_DIR}/dune
+                           MODULE_LIBRARIES dunepybindxiinterface dunepybindximodule dunepybindxiembed dunepybindxi)
+  # The -fsized-deallocation flag is not needed anymore in newer versions of pybind11.
+  # TODO: Remove once we update pybind11.
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    target_compile_options(dunepybindxiinterface INTERFACE -fsized-deallocation)
+  endif()
+  # Build an interface library target:
+  add_library(pybind11::pybind11 ALIAS dunepybindxiinterface)  # to match exported target
+  target_include_directories(dunepybindxiinterface INTERFACE $<BUILD_INTERFACE:${PYBIND11_INCLUDE_DIR}>
+                                                $<BUILD_INTERFACE:${PYTHON_INCLUDE_DIRS}>
+                                                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+  target_compile_options(dunepybindxiinterface INTERFACE $<BUILD_INTERFACE:${PYBIND11_CPP_STANDARD}>)
+
+  add_library(pybind11::module ALIAS dunepybindximodule)
+  if(NOT MSVC)
+    target_compile_options(dunepybindximodule PRIVATE -fvisibility=hidden)
+  endif()
+  target_link_libraries(dunepybindximodule INTERFACE pybind11::pybind11)
+  if(WIN32 OR CYGWIN)
+    target_link_libraries(dunepybindximodule INTERFACE $<BUILD_INTERFACE:${PYTHON_LIBRARIES}>)
+  elseif(APPLE)
+    target_link_libraries(dunepybindximodule INTERFACE "-undefined dynamic_lookup")
+  endif()
+
+  target_link_libraries(dunepybindxiembed INTERFACE pybind11::pybind11 $<BUILD_INTERFACE:${PYTHON_LIBRARIES}>)
+  add_library(pybind11::embed ALIAS dunepybindxiembed)
+  target_link_libraries(dunepybindxi dunepybindxiembed)
+else()
+  dune_enable_all_packages(INCLUDE_DIRS ${dune-pybindxi_SOURCE_DIR}/dune)
+endif()
+
 # ----------------------------------------------------------------------------------------------------
 # General Settings
 # ----------------------------------------------------------------------------------------------------
