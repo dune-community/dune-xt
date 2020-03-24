@@ -23,15 +23,6 @@ namespace XT {
 namespace Common {
 
 
-//! make_unique implementation via herb sutter: http://herbsutter.com/gotw/_102/
-//! \TODO this can be delegated to stdlib with c++14
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
-{
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-
 //! just like boost::noncopyable, but for move assign/ctor
 struct nonmoveable
 {

@@ -357,7 +357,7 @@ public:
   template <int ROWS, int COLS>
   explicit operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>() const
   {
-    auto ret = XT::Common::make_unique<Dune::FieldMatrix<ScalarType, ROWS, COLS>>(ScalarType(0));
+    auto ret = std::make_unique<Dune::FieldMatrix<ScalarType, ROWS, COLS>>(ScalarType(0));
     CHECK_CRTP(this->as_imp().copy_to_densematrix(*ret));
     this->as_imp().copy_to_densematrix(*ret);
     return ret;

@@ -254,7 +254,7 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return Common::make_unique<ElementFunction>(inner_function_, outer_function_, element_search_);
+    return std::make_unique<ElementFunction>(inner_function_, outer_function_, element_search_);
   } // ... local_function(...)
 
 

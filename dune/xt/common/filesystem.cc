@@ -51,14 +51,14 @@ std::unique_ptr<boost::filesystem::ofstream> make_ofstream(const boost::filesyst
                                                            const std::ios_base::openmode mode)
 {
   test_create_directory(path.string());
-  return Dune::XT::Common::make_unique<boost::filesystem::ofstream>(path, mode);
+  return std::make_unique<boost::filesystem::ofstream>(path, mode);
 }
 
 std::unique_ptr<boost::filesystem::ifstream> make_ifstream(const boost::filesystem::path& path,
                                                            const std::ios_base::openmode mode)
 {
   test_create_directory(path.string());
-  return Dune::XT::Common::make_unique<boost::filesystem::ifstream>(path, mode);
+  return std::make_unique<boost::filesystem::ifstream>(path, mode);
 }
 
 //! read a file and output all lines containing filter string to a stream

@@ -376,34 +376,34 @@ public:
   using LocalFunctionType = typename BaseType::LocalFunctionType;
 
   CombinedGridFunction(const LeftType& left, const RightType& right, const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
     , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
   CombinedGridFunction(const std::shared_ptr<const LeftType> left,
                        const std::shared_ptr<const RightType> right,
                        const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
     , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
   CombinedGridFunction(const LeftType& left, const std::shared_ptr<const RightType> right, const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
     , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
   CombinedGridFunction(const std::shared_ptr<const LeftType> left, const RightType& right, const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(left))
-    , right_(Common::make_unique<RightStorageType>(right))
+    : left_(std::make_unique<LeftStorageType>(left))
+    , right_(std::make_unique<RightStorageType>(right))
     , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
   CombinedGridFunction(LeftType*&& left, RightType*&& right, const std::string nm = "")
-    : left_(Common::make_unique<LeftStorageType>(std::move(left)))
-    , right_(Common::make_unique<RightStorageType>(std::move(right)))
+    : left_(std::make_unique<LeftStorageType>(std::move(left)))
+    , right_(std::make_unique<RightStorageType>(std::move(right)))
     , name_(get_name(left_->access(), right_->access(), nm))
   {}
 
@@ -420,7 +420,7 @@ public:
     using RealLocalFunctionType = CombinedLocalFunction<LeftType, RightType, comb>;
     assert(left_);
     assert(right_);
-    return Common::make_unique<RealLocalFunctionType>(left_->access(), right_->access());
+    return std::make_unique<RealLocalFunctionType>(left_->access(), right_->access());
   } // ... local_function(...)
 
   std::string name() const override final
