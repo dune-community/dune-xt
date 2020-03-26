@@ -89,12 +89,20 @@ include(DuneTBB)
 if(HAVE_MPI)
   include(FindMPI4PY)
   if(MPI4PY_FOUND)
+
+  else()
+    execute_process(COMMAND ${CMAKE_BINARY_DIR}/run-in-dune-env pip install mpi4py
+                    ERROR_VARIABLE shell_error
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    myfind_mpi4py()
+  endif()
+  if(MPI4PY_FOUND)
     # this only works in dependent modules
     dune_register_package_flags(INCLUDE_DIRS "${MPI4PY_INCLUDE_DIR}")
     # this only works in dune-xt-common itself
-    include_directories("${MPI4PY_INCLUDE_DIR}")
+    include_directories("${MPI4PY_INCLUDE_DIR}" ${PYTHON_INCLUDE_DIRS})
   else()
-    message(FATAL_ERROR "MPI enabled builds need mpi4py too")
+    message(FATAL_ERROR kaput)
   endif()
 endif()
 # end library checks  #####################################################################
@@ -112,3 +120,5 @@ set(DXT_TEST_TIMEOUT 180 CACHE STRING "per-test timeout in seconds")
 set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
 
 set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
+
+include(DunePybindxiMacros)
