@@ -34,6 +34,7 @@ variables:
     variables:
         DOCKER_HOST: tcp://docker:2375/
         DOCKER_DRIVER: overlay2
+        IMAGE: $CI_REGISTRY/ag-ohlberger/dune-community/dune-xt/ci_testing_${DOCKER_TAG}:${CI_COMMIT_SHORT_SHA}
     before_script:
       - |
         apk --update add openssh-client rsync git file bash python3 curl
@@ -45,7 +46,6 @@ variables:
         pip3 install -U docker jinja2 docopt
 
         export BASEIMAGE="${MY_MODULE}-testing_${DOCKER_TAG}:${CI_COMMIT_REF_NAME/\//_}"
-        export IMAGE="$CI_REGISTRY/dune-xt/ci_${MY_MODULE}-testing_${DOCKER_TAG}:${CI_COMMIT_SHA}"
         # get image with fallback to master branch of the super repo
         docker pull dunecommunity/${BASEIMAGE} || export BASEIMAGE="${MY_MODULE}-testing_${DOCKER_TAG}:master" ; docker pull dunecommunity/${BASEIMAGE}
         export ENV_FILE=${HOME}/env
@@ -59,12 +59,17 @@ variables:
         python3 ./.ci/shared/scripts/make_env_file.py
         ${DOCKER_RUN} /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
         ${DOCKER_RUN} /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+        touch $CI_PROJECT_DIR/success
 
     after_script:
       - |
-        export IMAGE="$CI_REGISTRY/dune-xt/ci_${MY_MODULE}-testing_${DOCKER_TAG}:${CI_COMMIT_SHA}"
-        docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        docker push ${IMAGE}
+        if [ -e $CI_PROJECT_DIR/success ]; then
+            echo "Not pushing ${IMAGE}"
+        else
+            docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+            docker push ${IMAGE}
+        fi
+
     artifacts:
       reports:
         junit: '${CI_PROJECT_DIR}/testresults/*xml'
