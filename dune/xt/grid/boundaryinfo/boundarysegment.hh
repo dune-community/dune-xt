@@ -79,7 +79,7 @@ public:
       }
     }
     // return
-    return Common::make_unique<ThisType>(default_type, id_map);
+    return std::make_unique<ThisType>(default_type, id_map);
   } // ... create(...)
 
   BoundarySegmentIndexBasedBoundaryInfo(const std::string& def,

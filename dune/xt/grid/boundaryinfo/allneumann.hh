@@ -73,7 +73,7 @@ template <class I>
 std::unique_ptr<AllNeumannBoundaryInfo<I>>
 make_allneumann_boundaryinfo(const Common::Configuration& /*cfg*/ = Common::Configuration())
 {
-  return XT::Common::make_unique<AllNeumannBoundaryInfo<I>>();
+  return std::make_unique<AllNeumannBoundaryInfo<I>>();
 }
 
 

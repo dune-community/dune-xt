@@ -73,7 +73,7 @@ template <class I>
 std::unique_ptr<AllReflectingBoundaryInfo<I>>
 make_allreflecting_boundaryinfo(const Common::Configuration& /*cfg*/ = Common::Configuration())
 {
-  return XT::Common::make_unique<AllReflectingBoundaryInfo<I>>();
+  return std::make_unique<AllReflectingBoundaryInfo<I>>();
 }
 
 

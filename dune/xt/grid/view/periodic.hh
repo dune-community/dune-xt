@@ -559,7 +559,7 @@ public:
     , has_boundary_intersections_(other.has_boundary_intersections_)
     , intersection_map_(other.intersection_map_)
     , nonperiodic_pair_(other.nonperiodic_pair_)
-    , current_intersection_(Dune::XT::Common::make_unique<Intersection>(*(other.current_intersection_)))
+    , current_intersection_(std::make_unique<Intersection>(*(other.current_intersection_)))
   {}
 
   // methods that differ from BaseType
@@ -580,7 +580,7 @@ private:
   {
     assert(!has_boundary_intersections_
            || intersection_map_.size() > static_cast<size_t>((BaseType::operator*()).indexInInside()));
-    return Common::make_unique<Intersection>(
+    return std::make_unique<Intersection>(
         IntersectionImp(BaseType::operator*(),
                         real_grid_layer_,
                         has_boundary_intersections_ ? intersection_map_[(BaseType::operator*()).indexInInside()]
@@ -593,11 +593,11 @@ private:
     const RealIntersectionType real_intersection = is_iend ? *real_grid_layer_.ibegin(entity_) : BaseType::operator*();
     assert(is_iend || !has_boundary_intersections_
            || intersection_map_.size() > static_cast<size_t>(real_intersection.indexInInside()));
-    return Common::make_unique<Intersection>(IntersectionImp(real_intersection,
-                                                             real_grid_layer_,
-                                                             has_boundary_intersections_ && !is_iend
-                                                                 ? intersection_map_[real_intersection.indexInInside()]
-                                                                 : (const PeriodicPairType&)nonperiodic_pair_));
+    return std::make_unique<Intersection>(IntersectionImp(real_intersection,
+                                                          real_grid_layer_,
+                                                          has_boundary_intersections_ && !is_iend
+                                                              ? intersection_map_[real_intersection.indexInInside()]
+                                                              : (const PeriodicPairType&)nonperiodic_pair_));
   } // ... create_current_intersection_safely() const
 
   const RealGridLayerType& real_grid_layer_;

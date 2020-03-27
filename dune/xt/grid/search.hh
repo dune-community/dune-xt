@@ -100,7 +100,7 @@ private:
   {
     const auto& geometry = entity.geometry();
     if (CheckInside<codim>::check(geometry, point)) {
-      return Common::make_unique<typename BaseType::EntityType>(entity);
+      return std::make_unique<typename BaseType::EntityType>(entity);
     }
     return nullptr;
   }
@@ -178,7 +178,7 @@ private:
   {
     const auto& geometry = entity.geometry();
     if (CheckInside<codim>::check(geometry, point)) {
-      return Common::make_unique<typename BaseType::EntityType>(entity);
+      return std::make_unique<typename BaseType::EntityType>(entity);
     }
     return nullptr;
   }
