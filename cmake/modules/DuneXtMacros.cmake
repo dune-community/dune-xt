@@ -89,12 +89,20 @@ include(DuneTBB)
 if(HAVE_MPI)
   include(FindMPI4PY)
   if(MPI4PY_FOUND)
+
+  else()
+    execute_process(COMMAND ${CMAKE_BINARY_DIR}/run-in-dune-env pip install mpi4py
+                    ERROR_VARIABLE shell_error
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    myfind_mpi4py()
+  endif()
+  if(MPI4PY_FOUND)
     # this only works in dependent modules
     dune_register_package_flags(INCLUDE_DIRS "${MPI4PY_INCLUDE_DIR}")
     # this only works in dune-xt-common itself
-    include_directories("${MPI4PY_INCLUDE_DIR}")
+    include_directories("${MPI4PY_INCLUDE_DIR}" ${PYTHON_INCLUDE_DIRS})
   else()
-    message(FATAL_ERROR "MPI enabled builds need mpi4py too")
+    message(FATAL_ERROR kaput)
   endif()
 endif()
 # end library checks  #####################################################################
@@ -110,47 +118,7 @@ if(NOT DS_HEADERCHECK_DISABLE)
 endif(NOT DS_HEADERCHECK_DISABLE)
 set(DXT_TEST_TIMEOUT 180 CACHE STRING "per-test timeout in seconds")
 set(DXT_TEST_PROCS 1 CACHE STRING "run N tests in parallel")
-# ~~~
-# This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2019 dune-xt developers and contributors. All rights reserved.
-# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
-#          with "runtime exception" (http://www.dune-project.org/license.html)
-# Authors:
-#   Felix Schindler (2016 - 2017)
-#   René Fritze     (2018)
-#   Tim Keil        (2018)
-#   Tobias Leibner  (2018)
-#
-# File for module specific CMake tests.
-# ~~~
-# ~~~
-# This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2019 dune-xt developers and contributors. All rights reserved.
-# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
-#          with "runtime exception" (http://www.dune-project.org/license.html)
-# Authors:
-#   Felix Schindler (2016 - 2018)
-#   René Fritze     (2017 - 2018)
-#   Tobias Leibner  (2018)
-#
-# File for module specific CMake tests.
-# ~~~
 
 set(DUNE_GRID_EXPERIMENTAL_GRID_EXTENSIONS TRUE)
-# ~~~
-# This file is part of the dune-xt project:
-#   https://github.com/dune-community/dune-xt
-# Copyright 2009-2019 dune-xt developers and contributors. All rights reserved.
-# License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
-#      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
-#          with "runtime exception" (http://www.dune-project.org/license.html)
-# Authors:
-#   Felix Schindler (2016 - 2017)
-#   René Fritze     (2018)
-#
-# File for module specific CMake tests.
-# ~~~
+
+include(DunePybindxiMacros)

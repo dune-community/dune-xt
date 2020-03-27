@@ -14,6 +14,9 @@ install(FILES AddALUGridCompileFlags.cmake
               DuneTBB.cmake
               DuneUtils.cmake
               DuneXtMacros.cmake
+              DunePybindxiMacros.cmake
+              DunePybindxiUtils.cmake
+	      FindPythonLibsNew.cmake
               FindClangFormat.cmake
               FindClangTidy.cmake
               FindEigen3.cmake
