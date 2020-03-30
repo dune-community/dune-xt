@@ -49,8 +49,8 @@ dune_project()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-common_SOURCE_DIR}/dune
-                         MODULE_LIBRARIES gtest_dune_xt dunext
-                                          dunepybindxiinterface dunepybindximodule dunepybindxiembed dunepybindxi)
+                         MODULE_LIBRARIES 
+                                         dunepybindxiinterface dunepybindximodule dunepybindxiembed dunepybindxi gtest_dune_xt dunext)
 # The -fsized-deallocation flag is not needed anymore in newer versions of pybind11.
 # TODO: Remove once we update pybind11.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
