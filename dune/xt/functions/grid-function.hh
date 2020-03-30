@@ -292,6 +292,10 @@ public:
     : storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)))
   {}
 
+  GridFunction(FunctionInterface<d, 1, 1, R>&& func_ptr)
+    : storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)))
+  {}
+
   GridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
     : storage_(func)
   {}

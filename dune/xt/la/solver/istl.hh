@@ -169,7 +169,7 @@ public:
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
-    , communicator_(new CommunicatorType())
+    , communicator_(CommunicatorType())
   {}
 
   Solver(const MatrixType& matrix, const CommunicatorType& communicator)

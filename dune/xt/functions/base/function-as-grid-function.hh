@@ -41,7 +41,7 @@ public:
     : function_storage_(function)
   {}
 
-  FunctionAsGridFunctionWrapper(const FunctionType*&& function_ptr)
+  FunctionAsGridFunctionWrapper(FunctionType*&& function_ptr)
     : function_storage_(std::move(function_ptr))
   {}
 
