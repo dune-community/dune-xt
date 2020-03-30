@@ -21,13 +21,21 @@ using namespace Dune::XT::Common;
 
 struct ScopeTest : public testing::Test
 {
-  typedef int T;
+  using T = int;
   static constexpr T constant = 1;
+
   template <class P>
   void deref(P& p)
   {
     EXPECT_NE(p, nullptr);
     auto g = *p;
+    EXPECT_EQ(constant, g);
+  }
+
+  template <class P>
+  void access(const P& p)
+  {
+    auto g = p.access();
     EXPECT_EQ(constant, g);
   }
 
@@ -46,10 +54,20 @@ struct ScopeTest : public testing::Test
     scope<StorageProvider>(shared);
     deref(shared);
   }
+
+  void check_const()
+  {
+    using CSP = ConstStorageProvider<T>;
+    access(CSP{new T(constant)});
+    CSP{};
+    T e{constant};
+    CSP{e};
+  }
 };
 constexpr typename ScopeTest::T ScopeTest::constant;
 
 TEST_F(ScopeTest, All)
 {
   this->check_shared();
+  this->check_const();
 }
