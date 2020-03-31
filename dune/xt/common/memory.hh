@@ -81,7 +81,7 @@ public:
   /**
    * \attention This ctor transfers ownership to ConstAccessByPointer, do not delete tt manually!
    */
-  explicit ConstAccessByPointer(const T*&& tt)
+  explicit ConstAccessByPointer(T* tt)
     : tt_(tt)
   {}
 
@@ -107,6 +107,27 @@ private:
   std::shared_ptr<const T> tt_;
 }; // class ConstAccessByPointer
 
+template <class T>
+class ConstAccessByValue : public ConstAccessInterface<T>
+{
+public:
+  explicit ConstAccessByValue(T&& tt)
+    : tt_(tt)
+  {}
+
+  const T& access() const override final
+  {
+    return tt_;
+  }
+
+  ConstAccessInterface<T>* copy() const override final
+  {
+    return new ConstAccessByValue<T>(T(tt_));
+  }
+
+private:
+  const T tt_;
+}; // class ConstAccessByValue
 
 template <class T>
 class AccessInterface
@@ -191,6 +212,32 @@ private:
   std::shared_ptr<T> tt_;
 }; // class AccessByPointer
 
+template <class T>
+class AccessByValue : public ConstAccessInterface<T>
+{
+public:
+  explicit AccessByValue(T&& tt)
+    : tt_(tt)
+  {}
+
+  const T& access() const override final
+  {
+    return tt_;
+  }
+
+  T& access() override final
+  {
+    return tt_;
+  }
+
+  AccessInterface<T>* copy() const override final
+  {
+    return new AccessByValue<T>(T(tt_));
+  }
+
+private:
+  T tt_;
+}; // class AccessByValue
 
 } // namespace internal
 
@@ -267,15 +314,12 @@ public:
   /**
    * \attention This ctor transfers ownership to ConstStorageProvider, do not delete tt manually!
    */
-  explicit ConstStorageProvider(const T*&& tt)
-    : storage_(new internal::ConstAccessByPointer<T>(std::move(tt)))
+  explicit ConstStorageProvider(T*&& tt)
+    : storage_(new internal::ConstAccessByPointer<T>(tt))
   {}
 
-  /**
-   * \attention This ctor transfers ownership to ConstStorageProvider, do not delete tt manually!
-   */
-  explicit ConstStorageProvider(T*&& tt)
-    : storage_(new internal::ConstAccessByPointer<T>(std::move(tt)))
+  explicit ConstStorageProvider(T&& tt)
+    : storage_(new internal::ConstAccessByValue<T>(std::move(tt)))
   {}
 
   explicit ConstStorageProvider(std::shared_ptr<const T> tt)
@@ -351,6 +395,10 @@ public:
    */
   explicit StorageProvider(T*&& tt)
     : storage_(new internal::AccessByPointer<T>(std::move(tt)))
+  {}
+
+  explicit StorageProvider(T&& tt)
+    : storage_(new internal::ConstAccessByValue<T>(std::move(tt)))
   {}
 
   explicit StorageProvider(std::shared_ptr<T> tt)
