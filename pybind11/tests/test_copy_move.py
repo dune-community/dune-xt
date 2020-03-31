@@ -44,12 +44,12 @@ def test_move_and_copy_loads():
     cstats = m.move_and_copy_cstats()
     c_m, c_mc, c_c = cstats["MoveOnlyInt"], cstats["MoveOrCopyInt"], cstats["CopyOnlyInt"]
 
-    assert m.move_only(10) == 10  # 1 move, c_m
-    assert m.move_or_copy(11) == 11  # 1 move, c_mc
-    assert m.copy_only(12) == 12  # 1 copy, c_c
-    assert m.move_pair((13, 14)) == 27  # 1 c_m move, 1 c_mc move
-    assert m.move_tuple((15, 16, 17)) == 48  # 2 c_m moves, 1 c_mc move
-    assert m.copy_tuple((18, 19)) == 37  # 2 c_c copies
+    assert m.move_only(10) == 10     # 1 move, c_m
+    assert m.move_or_copy(11) == 11     # 1 move, c_mc
+    assert m.copy_only(12) == 12     # 1 copy, c_c
+    assert m.move_pair((13, 14)) == 27     # 1 c_m move, 1 c_mc move
+    assert m.move_tuple((15, 16, 17)) == 48     # 2 c_m moves, 1 c_mc move
+    assert m.copy_tuple((18, 19)) == 37     # 2 c_c copies
     # Direct constructions: 2 c_m moves, 2 c_mc moves, 1 c_c copy
     # Extra moves/copies when moving pairs/tuples: 3 c_m, 3 c_mc, 2 c_c
     assert m.move_copy_nested((1, ((2, 3, (4,)), 5))) == 15
@@ -74,9 +74,9 @@ def test_move_and_copy_load_optional():
 
     # The extra move/copy constructions below come from the std::optional move (which has to move
     # its arguments):
-    assert m.move_optional(10) == 10  # c_m: 1 move assign, 2 move construct
-    assert m.move_or_copy_optional(11) == 11  # c_mc: 1 move assign, 2 move construct
-    assert m.copy_optional(12) == 12  # c_c: 1 copy assign, 2 copy construct
+    assert m.move_optional(10) == 10     # c_m: 1 move assign, 2 move construct
+    assert m.move_or_copy_optional(11) == 11     # c_mc: 1 move assign, 2 move construct
+    assert m.copy_optional(12) == 12     # c_c: 1 copy assign, 2 copy construct
     # 1 move assign + move construct moves each of c_m, c_mc, 1 c_c copy
     # +1 move/copy construct each from moving the tuple
     # +1 move/copy construct each from moving the optional (which moves the tuple again)

@@ -66,6 +66,7 @@ def test_str(doc):
     assert doc(m.str_from_bytes) == "str_from_bytes() -> str"
 
     class A(object):
+
         def __str__(self):
             return "this is a str"
 
@@ -84,9 +85,7 @@ def test_bytes(doc):
     assert m.bytes_from_string().decode() == "foo"
     assert m.bytes_from_str().decode() == "bar"
 
-    assert doc(m.bytes_from_str) == "bytes_from_str() -> {}".format(
-        "bytes" if sys.version_info[0] == 3 else "str"
-    )
+    assert doc(m.bytes_from_str) == "bytes_from_str() -> {}".format("bytes" if sys.version_info[0] == 3 else "str")
 
 
 def test_capsule(capture):
@@ -120,6 +119,7 @@ def test_capsule(capture):
 
 
 def test_accessors():
+
     class SubTestObject:
         attr_obj = 1
         attr_char = 2
@@ -196,9 +196,18 @@ def test_implicit_casting():
     """Tests implicit casting when assigning or appending to dicts and lists."""
     z = m.get_implicit_casting()
     assert z['d'] == {
-        'char*_i1': 'abc', 'char*_i2': 'abc', 'char*_e': 'abc', 'char*_p': 'abc',
-        'str_i1': 'str', 'str_i2': 'str1', 'str_e': 'str2', 'str_p': 'str3',
-        'int_i1': 42, 'int_i2': 42, 'int_e': 43, 'int_p': 44
+        'char*_i1': 'abc',
+        'char*_i2': 'abc',
+        'char*_e': 'abc',
+        'char*_p': 'abc',
+        'str_i1': 'str',
+        'str_i2': 'str1',
+        'str_e': 'str2',
+        'str_p': 'str3',
+        'int_i1': 42,
+        'int_i2': 42,
+        'int_e': 43,
+        'int_p': 44
     }
     assert z['l'] == [3, 6, 9, 12, 15]
 
@@ -220,13 +229,13 @@ def test_print(capture):
         m.print_failure()
     assert str(excinfo.value) == "make_tuple(): unable to convert " + (
         "argument of type 'UnregisteredType' to Python object"
-        if debug_enabled else
-        "arguments to Python object (compile in debug mode for details)"
-    )
+        if debug_enabled else "arguments to Python object (compile in debug mode for details)")
 
 
 def test_hash():
+
     class Hashable(object):
+
         def __init__(self, value):
             self.value = value
 
@@ -243,8 +252,10 @@ def test_hash():
 
 def test_number_protocol():
     for a, b in [(1, 1), (3, 5)]:
-        li = [a == b, a != b, a < b, a <= b, a > b, a >= b, a + b,
-              a - b, a * b, a / b, a | b, a & b, a ^ b, a >> b, a << b]
+        li = [
+            a == b, a != b, a < b, a <= b, a > b, a >= b, a + b, a - b, a * b, a / b, a | b, a & b, a ^ b, a >> b,
+            a << b
+        ]
         assert m.test_number_protocol(a, b) == li
 
 

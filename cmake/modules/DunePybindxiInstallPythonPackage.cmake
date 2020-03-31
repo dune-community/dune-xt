@@ -18,9 +18,9 @@ macro(include_dependent_binary_python_dirs) # disable most warnings from depende
   endforeach(_mod DEPENDENCIES)
 endmacro(include_dependent_binary_python_dirs)
 
-# copy of dune_python_install_package from dune-common
-# changes: - package is always installed into the dune-env, even if a setup.py.in is found instead of a setup.py
-#          - if a setup.py.in is found, the whole directory is symlinked to the binary dir
+# copy of dune_python_install_package from dune-common changes: - package is always installed into the dune-env, even
+# if a setup.py.in is found instead of a setup.py - if a setup.py.in is found, the whole directory is symlinked to the
+# binary dir
 function(dune_pybindxi_install_python_package)
   # Parse Arguments
   set(OPTION)
@@ -46,7 +46,7 @@ function(dune_pybindxi_install_python_package)
       get_filename_component(directory ${rel_fn} DIRECTORY)
       file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${directory})
       execute_process(COMMAND ${CMAKE_COMMAND} "-E" "create_symlink" "${CMAKE_CURRENT_SOURCE_DIR}/${rel_fn}"
-	      "${CMAKE_CURRENT_BINARY_DIR}/${rel_fn}")
+                              "${CMAKE_CURRENT_BINARY_DIR}/${rel_fn}")
     endforeach()
     configure_file(${PYINST_PATH}/setup.py.in ${PYINST_PATH}/setup.py)
     set(PYINST_FULLPATH ${CMAKE_CURRENT_BINARY_DIR}/${PYINST_PATH})
@@ -54,7 +54,8 @@ function(dune_pybindxi_install_python_package)
   elseif(EXISTS ${PYINST_FULLPATH}/setup.py)
     set(PYINST_PUREPYTHON TRUE)
   else()
-    message(FATAL_ERROR "dune_python_install_package: Requested installations, but neither setup.py nor setup.py.in found!")
+    message(
+      FATAL_ERROR "dune_python_install_package: Requested installations, but neither setup.py nor setup.py.in found!")
   endif()
 
   # Find out whether we should install in editable mode
@@ -65,9 +66,8 @@ function(dune_pybindxi_install_python_package)
   if(IS_DIRECTORY ${DUNE_PYTHON_WHEELHOUSE})
     set(WHEEL_OPTION "--find-links=${DUNE_PYTHON_WHEELHOUSE}")
     #
-    # The following line is a bummer!
-    # We cannot have editable packages once we start using global installations!
-    # This is related to the nightmare that is https://github.com/pypa/pip/issues/3
+    # The following line is a bummer! We cannot have editable packages once we start using global installations! This
+    # is related to the nightmare that is https://github.com/pypa/pip/issues/3
     #
     set(INSTALL_EDITABLE FALSE)
   endif()
@@ -84,10 +84,15 @@ function(dune_pybindxi_install_python_package)
     set(INSTALL_OPTION "--user")
   endif()
 
-  set(INSTALL_CMDLINE -m pip install
-                      "${INSTALL_OPTION}" "${WHEEL_OPTION}" "${EDIT_OPTION}" ${PYINST_ADDITIONAL_PIP_PARAMS}
-                      "${PYINST_FULLPATH}")
-
+  set(INSTALL_CMDLINE
+      -m
+      pip
+      install
+      "${INSTALL_OPTION}"
+      "${WHEEL_OPTION}"
+      "${EDIT_OPTION}"
+      ${PYINST_ADDITIONAL_PIP_PARAMS}
+      "${PYINST_FULLPATH}")
 
   #
   # If requested, install into the configure-time Dune virtualenv
@@ -95,8 +100,11 @@ function(dune_pybindxi_install_python_package)
 
   if(PYINST_PUREPYTHON AND DUNE_PYTHON_VIRTUALENV_SETUP)
     message("-- Installing python package at ${CMAKE_CURRENT_SOURCE_DIR}/${PYINST_PATH} into the virtualenv...")
-    dune_execute_process(COMMAND "${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}" "${INSTALL_CMDLINE}"
-                         ERROR_MESSAGE "dune_python_install_package: Error installing into virtualenv!")
+    dune_execute_process(COMMAND
+                         "${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}"
+                         "${INSTALL_CMDLINE}"
+                         ERROR_MESSAGE
+                         "dune_python_install_package: Error installing into virtualenv!")
   endif()
 
   #
@@ -104,26 +112,25 @@ function(dune_pybindxi_install_python_package)
   #
 
   # Leave this function if no installation rules are required
-  dune_module_path(MODULE dune-common
-                   RESULT scriptdir
-                   SCRIPT_DIR)
+  dune_module_path(MODULE dune-common RESULT scriptdir SCRIPT_DIR)
 
   # Determine a target name for installing this package
-  string(REPLACE "/" "_" targetname "install_python_${CMAKE_CURRENT_SOURCE_DIR}_${PYINST_PATH}")
+  string(REPLACE "/"
+                 "_"
+                 targetname
+                 "install_python_${CMAKE_CURRENT_SOURCE_DIR}_${PYINST_PATH}")
 
   # Add a custom target that globally installs this package if requested
   add_custom_target(${targetname}
-	            COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} ${INSTALL_CMDLINE}
-                    COMMENT "Installing the python package at ${PYINST_FULLPATH}"
-                    )
+                    COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} ${INSTALL_CMDLINE}
+                    COMMENT "Installing the python package at ${PYINST_FULLPATH}")
 
   add_dependencies(install_python ${targetname})
 
   # Define rules for `make install` that install a wheel into a central wheelhouse
   #
-  # NB: This is necessary, to allow mixing installed and non-installed modules
-  #     with python packages. The wheelhouse will allow to install any missing
-  #     python packages into a virtual environment.
+  # NB: This is necessary, to allow mixing installed and non-installed modules with python packages. The wheelhouse
+  # will allow to install any missing python packages into a virtual environment.
   #
 
   # Construct the wheel installation commandline
@@ -133,6 +140,5 @@ function(dune_pybindxi_install_python_package)
   install(CODE "message(\"Installing wheel for python package at ${PYINST_FULLPATH}...\")
                 dune_execute_process(COMMAND ${WHEEL_COMMAND}
                                      ERROR_MESSAGE \"Error installing wheel for python package at ${PYINST_FULLPATH}\"
-                                     )"
-          )
+                                     )")
 endfunction()

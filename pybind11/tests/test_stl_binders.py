@@ -61,7 +61,7 @@ def test_vector_buffer():
     v = m.VectorUChar(b)
     assert v[1] == 2
     v[2] = 5
-    mv = memoryview(v)  # We expose the buffer interface
+    mv = memoryview(v)     # We expose the buffer interface
     if sys.version_info.major > 2:
         assert mv[2] == 5
         mv[2] = 6
@@ -71,7 +71,7 @@ def test_vector_buffer():
     assert v[2] == 6
 
     with pytest.raises(RuntimeError) as excinfo:
-        m.create_undeclstruct()  # Undeclared struct contents, no buffer interface
+        m.create_undeclstruct()     # Undeclared struct contents, no buffer interface
     assert "NumPy type info missing for " in str(excinfo.value)
 
 
@@ -100,8 +100,8 @@ def test_vector_buffer_numpy():
     ma[1]['x'] = 99
     assert v[1].x == 99
 
-    v = m.VectorStruct(np.zeros(3, dtype=np.dtype([('w', 'bool'), ('x', 'I'),
-                                                   ('y', 'float64'), ('z', 'bool')], align=True)))
+    v = m.VectorStruct(
+        np.zeros(3, dtype=np.dtype([('w', 'bool'), ('x', 'I'), ('y', 'float64'), ('z', 'bool')], align=True)))
     assert len(v) == 3
 
 
@@ -175,7 +175,7 @@ def test_noncopyable_containers():
 
     i = 1
     for j in dnc:
-        assert(j.value == i)
+        assert (j.value == i)
         i += 1
 
     # std::map

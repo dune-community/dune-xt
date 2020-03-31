@@ -1,5 +1,5 @@
 if(${PYTHON_MODULE_EXTENSION} MATCHES "pypy")
-  add_custom_target(cpptest)  # Dummy target on PyPy. Embedding is not supported.
+  add_custom_target(cpptest) # Dummy target on PyPy. Embedding is not supported.
   set(_suppress_unused_variable_warning "${DOWNLOAD_CATCH}")
   return()
 endif()
@@ -13,10 +13,7 @@ else()
   return()
 endif()
 
-add_executable(test_embed
-  catch.cpp
-  test_interpreter.cpp
-)
+add_executable(test_embed catch.cpp test_interpreter.cpp)
 target_include_directories(test_embed PRIVATE ${CATCH_INCLUDE_DIR})
 pybind11_enable_warnings(test_embed)
 
@@ -31,8 +28,7 @@ endif()
 find_package(Threads REQUIRED)
 target_link_libraries(test_embed PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(cpptest COMMAND $<TARGET_FILE:test_embed>
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_custom_target(cpptest COMMAND $<TARGET_FILE:test_embed> WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 pybind11_add_module(external_module THIN_LTO external_module.cpp)
 set_target_properties(external_module PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

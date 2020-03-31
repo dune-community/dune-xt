@@ -5,7 +5,9 @@ from pybind11_tests import ConstructorStats
 
 
 def test_override(capture, msg):
+
     class ExtendedExampleVirt(m.ExampleVirt):
+
         def __init__(self, state):
             super(ExtendedExampleVirt, self).__init__(state + 1)
             self.data = "Hello world"
@@ -25,6 +27,7 @@ def test_override(capture, msg):
             print('ExtendedExampleVirt::pure_virtual(): %s' % self.data)
 
     class ExtendedExampleVirt2(ExtendedExampleVirt):
+
         def __init__(self, state):
             super(ExtendedExampleVirt2, self).__init__(state + 1)
 
@@ -79,7 +82,9 @@ def test_alias_delay_initialization1(capture):
     If we just create and use an A instance directly, the trampoline initialization is
     bypassed and we only initialize an A() instead (for performance reasons).
     """
+
     class B(m.A):
+
         def __init__(self):
             super(B, self).__init__()
 
@@ -115,7 +120,9 @@ def test_alias_delay_initialization2(capture):
     performance penalty, it also allows us to do more things with the trampoline
     class such as defining local variables and performing construction/destruction.
     """
+
     class B2(m.A2):
+
         def __init__(self):
             super(B2, self).__init__()
 
@@ -162,7 +169,9 @@ def test_alias_delay_initialization2(capture):
 @pytest.unsupported_on_pypy
 @pytest.mark.skipif(not hasattr(m, "NCVirt"), reason="NCVirt test broken on ICPC")
 def test_move_support():
+
     class NCVirtExt(m.NCVirt):
+
         def get_noncopyable(self, a, b):
             # Constructs and returns a new instance:
             nc = m.NonCopyable(a * a, b * b)
@@ -174,6 +183,7 @@ def test_move_support():
             return self.movable
 
     class NCVirtExt2(m.NCVirt):
+
         def get_noncopyable(self, a, b):
             # Keep a reference: this is going to throw an exception
             self.nc = m.NonCopyable(a, b)
@@ -209,11 +219,14 @@ def test_move_support():
 
 def test_dispatch_issue(msg):
     """#159: virtual function dispatch has problems with similar-named functions"""
+
     class PyClass1(m.DispatchIssue):
+
         def dispatch(self):
             return "Yay.."
 
     class PyClass2(m.DispatchIssue):
+
         def dispatch(self):
             with pytest.raises(RuntimeError) as excinfo:
                 super(PyClass2, self).dispatch()
@@ -243,11 +256,14 @@ def test_override_ref():
 
 
 def test_inherited_virtuals():
+
     class AR(m.A_Repeat):
+
         def unlucky_number(self):
             return 99
 
     class AT(m.A_Tpl):
+
         def unlucky_number(self):
             return 999
 
@@ -274,6 +290,7 @@ def test_inherited_virtuals():
         assert obj.say_everything() == "B says hi 1 times 4444"
 
     class CR(m.C_Repeat):
+
         def lucky_number(self):
             return m.C_Repeat.lucky_number(self) + 1.25
 
@@ -293,6 +310,7 @@ def test_inherited_virtuals():
     assert obj.say_everything() == "B says hi 1 times 4444"
 
     class CCR(CR):
+
         def lucky_number(self):
             return CR.lucky_number(self) * 10
 
@@ -303,6 +321,7 @@ def test_inherited_virtuals():
     assert obj.say_everything() == "B says hi 1 times 4444"
 
     class CCT(CT):
+
         def lucky_number(self):
             return CT.lucky_number(self) * 1000
 
@@ -313,6 +332,7 @@ def test_inherited_virtuals():
     assert obj.say_everything() == "B says hi 1 times 4444"
 
     class DR(m.D_Repeat):
+
         def unlucky_number(self):
             return 123
 
@@ -332,6 +352,7 @@ def test_inherited_virtuals():
     assert obj.say_everything() == "B says hi 1 times 123"
 
     class DT(m.D_Tpl):
+
         def say_something(self, times):
             return "DT says:" + (' quack' * times)
 
@@ -348,6 +369,7 @@ def test_inherited_virtuals():
     assert obj.say_everything() == "DT says: quack 1234"
 
     class DT2(DT):
+
         def say_something(self, times):
             return "DT2: " + ('QUACK' * times)
 
@@ -355,6 +377,7 @@ def test_inherited_virtuals():
             return -3
 
     class BT(m.B_Tpl):
+
         def say_something(self, times):
             return "BT" * times
 

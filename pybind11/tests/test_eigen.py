@@ -7,11 +7,8 @@ with pytest.suppress(ImportError):
     from pybind11_tests import eigen as m
     import numpy as np
 
-    ref = np.array([[ 0.,  3,  0,  0,  0, 11],
-                    [22,  0,  0,  0, 17, 11],
-                    [ 7,  5,  0,  1,  0, 11],
-                    [ 0,  0,  0,  0,  0, 11],
-                    [ 0,  0, 14,  0,  8, 11]])
+    ref = np.array([[0., 3, 0, 0, 0, 11], [22, 0, 0, 0, 17, 11], [7, 5, 0, 1, 0, 11], [0, 0, 0, 0, 0, 11],
+                    [0, 0, 14, 0, 8, 11]])
 
 
 def assert_equal_ref(mat):
@@ -47,22 +44,20 @@ def test_partially_fixed():
     np.testing.assert_array_equal(m.partial_copy_four_rm_r(ref2[:, 1]), ref2[:, [1]])
     np.testing.assert_array_equal(m.partial_copy_four_rm_c(ref2[0, :]), ref2[[0], :])
     np.testing.assert_array_equal(m.partial_copy_four_rm_r(ref2[:, (0, 2)]), ref2[:, (0, 2)])
-    np.testing.assert_array_equal(
-        m.partial_copy_four_rm_c(ref2[(3, 1, 2), :]), ref2[(3, 1, 2), :])
+    np.testing.assert_array_equal(m.partial_copy_four_rm_c(ref2[(3, 1, 2), :]), ref2[(3, 1, 2), :])
 
     np.testing.assert_array_equal(m.partial_copy_four_cm_r(ref2), ref2)
     np.testing.assert_array_equal(m.partial_copy_four_cm_c(ref2), ref2)
     np.testing.assert_array_equal(m.partial_copy_four_cm_r(ref2[:, 1]), ref2[:, [1]])
     np.testing.assert_array_equal(m.partial_copy_four_cm_c(ref2[0, :]), ref2[[0], :])
     np.testing.assert_array_equal(m.partial_copy_four_cm_r(ref2[:, (0, 2)]), ref2[:, (0, 2)])
-    np.testing.assert_array_equal(
-        m.partial_copy_four_cm_c(ref2[(3, 1, 2), :]), ref2[(3, 1, 2), :])
+    np.testing.assert_array_equal(m.partial_copy_four_cm_c(ref2[(3, 1, 2), :]), ref2[(3, 1, 2), :])
 
     # TypeError should be raise for a shape mismatch
-    functions = [m.partial_copy_four_rm_r, m.partial_copy_four_rm_c,
-                 m.partial_copy_four_cm_r, m.partial_copy_four_cm_c]
-    matrix_with_wrong_shape = [[1, 2],
-                               [3, 4]]
+    functions = [
+        m.partial_copy_four_rm_r, m.partial_copy_four_rm_c, m.partial_copy_four_cm_r, m.partial_copy_four_cm_c
+    ]
+    matrix_with_wrong_shape = [[1, 2], [3, 4]]
     for f in functions:
         with pytest.raises(TypeError) as excinfo:
             f(matrix_with_wrong_shape)
@@ -70,8 +65,8 @@ def test_partially_fixed():
 
 
 def test_mutator_descriptors():
-    zr = np.arange(30, dtype='float32').reshape(5, 6)  # row-major
-    zc = zr.reshape(6, 5).transpose()  # column-major
+    zr = np.arange(30, dtype='float32').reshape(5, 6)     # row-major
+    zc = zr.reshape(6, 5).transpose()     # column-major
 
     m.fixed_mutator_r(zr)
     m.fixed_mutator_c(zc)
@@ -79,16 +74,13 @@ def test_mutator_descriptors():
     m.fixed_mutator_a(zc)
     with pytest.raises(TypeError) as excinfo:
         m.fixed_mutator_r(zc)
-    assert ('(arg0: numpy.ndarray[float32[5, 6], flags.writeable, flags.c_contiguous]) -> None'
-            in str(excinfo.value))
+    assert ('(arg0: numpy.ndarray[float32[5, 6], flags.writeable, flags.c_contiguous]) -> None' in str(excinfo.value))
     with pytest.raises(TypeError) as excinfo:
         m.fixed_mutator_c(zr)
-    assert ('(arg0: numpy.ndarray[float32[5, 6], flags.writeable, flags.f_contiguous]) -> None'
-            in str(excinfo.value))
+    assert ('(arg0: numpy.ndarray[float32[5, 6], flags.writeable, flags.f_contiguous]) -> None' in str(excinfo.value))
     with pytest.raises(TypeError) as excinfo:
         m.fixed_mutator_a(np.array([[1, 2], [3, 4]], dtype='float32'))
-    assert ('(arg0: numpy.ndarray[float32[5, 6], flags.writeable]) -> None'
-            in str(excinfo.value))
+    assert ('(arg0: numpy.ndarray[float32[5, 6], flags.writeable]) -> None' in str(excinfo.value))
     zr.flags.writeable = False
     with pytest.raises(TypeError):
         m.fixed_mutator_r(zr)
@@ -181,7 +173,7 @@ def test_negative_stride_from_python(msg):
         double_threer(): incompatible function arguments. The following argument types are supported:
             1. (arg0: numpy.ndarray[float32[1, 3], flags.writeable]) -> None
 
-        Invoked with: """ + repr(np.array([ 5.,  4.,  3.], dtype='float32'))  # noqa: E501 line too long
+        Invoked with: """ + repr(np.array([5., 4., 3.], dtype='float32'))     # noqa: E501 line too long
 
     with pytest.raises(TypeError) as excinfo:
         m.double_threec(second_col)
@@ -189,7 +181,7 @@ def test_negative_stride_from_python(msg):
         double_threec(): incompatible function arguments. The following argument types are supported:
             1. (arg0: numpy.ndarray[float32[3, 1], flags.writeable]) -> None
 
-        Invoked with: """ + repr(np.array([ 7.,  4.,  1.], dtype='float32'))  # noqa: E501 line too long
+        Invoked with: """ + repr(np.array([7., 4., 1.], dtype='float32'))     # noqa: E501 line too long
 
 
 def test_nonunit_stride_to_python():
@@ -245,12 +237,12 @@ def test_eigen_return_references():
     a_copy1 = a.copy_get()
     assert a_copy1.flags.owndata and a_copy1.flags.writeable
     np.testing.assert_array_equal(a_copy1, master)
-    a_copy1[7, 7] = -44  # Shouldn't affect anything else
+    a_copy1[7, 7] = -44     # Shouldn't affect anything else
     c1want = array_copy_but_one(master, 7, 7, -44)
     a_copy2 = a.copy_view()
     assert a_copy2.flags.owndata and a_copy2.flags.writeable
     np.testing.assert_array_equal(a_copy2, master)
-    a_copy2[4, 4] = -22  # Shouldn't affect anything else
+    a_copy2[4, 4] = -22     # Shouldn't affect anything else
     c2want = array_copy_but_one(master, 4, 4, -22)
 
     a_ref1 = a.ref()
@@ -354,16 +346,17 @@ def test_eigen_keepalive():
     cstats = ConstructorStats.get(m.ReturnTester)
     assert cstats.alive() == 1
     unsafe = [a.ref(), a.ref_const(), a.block(1, 2, 3, 4)]
-    copies = [a.copy_get(), a.copy_view(), a.copy_ref(), a.copy_ref_const(),
-              a.copy_block(4, 3, 2, 1)]
+    copies = [a.copy_get(), a.copy_view(), a.copy_ref(), a.copy_ref_const(), a.copy_block(4, 3, 2, 1)]
     del a
     assert cstats.alive() == 0
     del unsafe
     del copies
 
-    for meth in [m.ReturnTester.get, m.ReturnTester.get_ptr, m.ReturnTester.view,
-                 m.ReturnTester.view_ptr, m.ReturnTester.ref_safe, m.ReturnTester.ref_const_safe,
-                 m.ReturnTester.corners, m.ReturnTester.corners_const]:
+    for meth in [
+            m.ReturnTester.get, m.ReturnTester.get_ptr, m.ReturnTester.view, m.ReturnTester.view_ptr,
+            m.ReturnTester.ref_safe, m.ReturnTester.ref_const_safe, m.ReturnTester.corners,
+            m.ReturnTester.corners_const
+    ]:
         assert_keeps_alive(m.ReturnTester, meth)
 
     for meth in [m.ReturnTester.block_safe, m.ReturnTester.block_const]:
@@ -442,7 +435,7 @@ def test_eigen_ref_mutators():
 def test_numpy_ref_mutators():
     """Tests numpy mutating Eigen matrices (for returned Eigen::Ref<...>s)"""
 
-    m.reset_refs()  # In case another test already changed it
+    m.reset_refs()     # In case another test already changed it
 
     zc = m.get_cm_ref()
     zcro = m.get_cm_const_ref()
@@ -483,23 +476,23 @@ def test_numpy_ref_mutators():
     assert y1[1, 2] == 99
     y1[1, 2] += 12
     assert y1[1, 2] == 111
-    assert zc[1, 2] == 99  # Make sure we aren't referencing the original
+    assert zc[1, 2] == 99     # Make sure we aren't referencing the original
 
 
 def test_both_ref_mutators():
     """Tests a complex chain of nested eigen/numpy references"""
 
-    m.reset_refs()  # In case another test already changed it
+    m.reset_refs()     # In case another test already changed it
 
-    z = m.get_cm_ref()  # numpy -> eigen
+    z = m.get_cm_ref()     # numpy -> eigen
     z[0, 2] -= 3
-    z2 = m.incr_matrix(z, 1)  # numpy -> eigen -> numpy -> eigen
+    z2 = m.incr_matrix(z, 1)     # numpy -> eigen -> numpy -> eigen
     z2[1, 1] += 6
-    z3 = m.incr_matrix(z, 2)  # (numpy -> eigen)^3
+    z3 = m.incr_matrix(z, 2)     # (numpy -> eigen)^3
     z3[2, 2] += -5
-    z4 = m.incr_matrix(z, 3)  # (numpy -> eigen)^4
+    z4 = m.incr_matrix(z, 3)     # (numpy -> eigen)^4
     z4[1, 1] -= 1
-    z5 = m.incr_matrix(z, 4)  # (numpy -> eigen)^5
+    z5 = m.incr_matrix(z, 4)     # (numpy -> eigen)^5
     z5[0, 0] = 0
     assert np.all(z == z2)
     assert np.all(z == z3)
@@ -509,11 +502,11 @@ def test_both_ref_mutators():
     assert np.all(z == expect)
 
     y = np.array(range(100), dtype='float64').reshape(10, 10)
-    y2 = m.incr_matrix_any(y, 10)  # np -> eigen -> np
-    y3 = m.incr_matrix_any(y2[0::2, 0::2], -33)  # np -> eigen -> np slice -> np -> eigen -> np
-    y4 = m.even_rows(y3)  # numpy -> eigen slice -> (... y3)
-    y5 = m.even_cols(y4)  # numpy -> eigen slice -> (... y4)
-    y6 = m.incr_matrix_any(y5, 1000)  # numpy -> eigen -> (... y5)
+    y2 = m.incr_matrix_any(y, 10)     # np -> eigen -> np
+    y3 = m.incr_matrix_any(y2[0::2, 0::2], -33)     # np -> eigen -> np slice -> np -> eigen -> np
+    y4 = m.even_rows(y3)     # numpy -> eigen slice -> (... y3)
+    y5 = m.even_cols(y4)     # numpy -> eigen slice -> (... y4)
+    y6 = m.incr_matrix_any(y5, 1000)     # numpy -> eigen -> (... y5)
 
     # Apply same mutations using just numpy:
     yexpect = np.array(range(100), dtype='float64').reshape(10, 10)
@@ -545,32 +538,32 @@ def test_nocopy_wrapper():
     # All but the second should fail with m.get_elem_nocopy:
     with pytest.raises(TypeError) as excinfo:
         m.get_elem_nocopy(int_matrix_colmajor)
-    assert ('get_elem_nocopy(): incompatible function arguments.' in str(excinfo.value) and
-            ', flags.f_contiguous' in str(excinfo.value))
+    assert ('get_elem_nocopy(): incompatible function arguments.' in str(excinfo.value)
+            and ', flags.f_contiguous' in str(excinfo.value))
     assert m.get_elem_nocopy(dbl_matrix_colmajor) == 8
     with pytest.raises(TypeError) as excinfo:
         m.get_elem_nocopy(int_matrix_rowmajor)
-    assert ('get_elem_nocopy(): incompatible function arguments.' in str(excinfo.value) and
-            ', flags.f_contiguous' in str(excinfo.value))
+    assert ('get_elem_nocopy(): incompatible function arguments.' in str(excinfo.value)
+            and ', flags.f_contiguous' in str(excinfo.value))
     with pytest.raises(TypeError) as excinfo:
         m.get_elem_nocopy(dbl_matrix_rowmajor)
-    assert ('get_elem_nocopy(): incompatible function arguments.' in str(excinfo.value) and
-            ', flags.f_contiguous' in str(excinfo.value))
+    assert ('get_elem_nocopy(): incompatible function arguments.' in str(excinfo.value)
+            and ', flags.f_contiguous' in str(excinfo.value))
 
     # For the row-major test, we take a long matrix in row-major, so only the third is allowed:
     with pytest.raises(TypeError) as excinfo:
         m.get_elem_rm_nocopy(int_matrix_colmajor)
-    assert ('get_elem_rm_nocopy(): incompatible function arguments.' in str(excinfo.value) and
-            ', flags.c_contiguous' in str(excinfo.value))
+    assert ('get_elem_rm_nocopy(): incompatible function arguments.' in str(excinfo.value)
+            and ', flags.c_contiguous' in str(excinfo.value))
     with pytest.raises(TypeError) as excinfo:
         m.get_elem_rm_nocopy(dbl_matrix_colmajor)
-    assert ('get_elem_rm_nocopy(): incompatible function arguments.' in str(excinfo.value) and
-            ', flags.c_contiguous' in str(excinfo.value))
+    assert ('get_elem_rm_nocopy(): incompatible function arguments.' in str(excinfo.value)
+            and ', flags.c_contiguous' in str(excinfo.value))
     assert m.get_elem_rm_nocopy(int_matrix_rowmajor) == 8
     with pytest.raises(TypeError) as excinfo:
         m.get_elem_rm_nocopy(dbl_matrix_rowmajor)
-    assert ('get_elem_rm_nocopy(): incompatible function arguments.' in str(excinfo.value) and
-            ', flags.c_contiguous' in str(excinfo.value))
+    assert ('get_elem_rm_nocopy(): incompatible function arguments.' in str(excinfo.value)
+            and ', flags.c_contiguous' in str(excinfo.value))
 
 
 def test_eigen_ref_life_support():
@@ -590,10 +583,7 @@ def test_eigen_ref_life_support():
 def test_special_matrix_objects():
     assert np.all(m.incr_diag(7) == np.diag([1., 2, 3, 4, 5, 6, 7]))
 
-    asymm = np.array([[ 1.,  2,  3,  4],
-                      [ 5,  6,  7,  8],
-                      [ 9, 10, 11, 12],
-                      [13, 14, 15, 16]])
+    asymm = np.array([[1., 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])
     symm_lower = np.array(asymm)
     symm_upper = np.array(asymm)
     for i in range(4):

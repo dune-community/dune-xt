@@ -126,13 +126,15 @@ def test_mismatched_holder():
 
     with pytest.raises(RuntimeError) as excinfo:
         m.mismatched_holder_1()
-    assert re.match('generic_type: type ".*MismatchDerived1" does not have a non-default '
-                    'holder type while its base ".*MismatchBase1" does', str(excinfo.value))
+    assert re.match(
+        'generic_type: type ".*MismatchDerived1" does not have a non-default '
+        'holder type while its base ".*MismatchBase1" does', str(excinfo.value))
 
     with pytest.raises(RuntimeError) as excinfo:
         m.mismatched_holder_2()
-    assert re.match('generic_type: type ".*MismatchDerived2" has a non-default holder type '
-                    'while its base ".*MismatchBase2" does not', str(excinfo.value))
+    assert re.match(
+        'generic_type: type ".*MismatchDerived2" has a non-default holder type '
+        'while its base ".*MismatchBase2" does not', str(excinfo.value))
 
 
 def test_override_static():
@@ -174,10 +176,7 @@ def test_operator_new_delete(capture):
     with capture:
         c = m.AliasedHasOpNewDelSize()
         c2 = SubAliased()
-    assert capture == (
-        "C new " + sz_noalias + "\n" +
-        "C new " + sz_alias + "\n"
-    )
+    assert capture == ("C new " + sz_noalias + "\n" + "C new " + sz_alias + "\n")
 
     with capture:
         del a
@@ -197,10 +196,7 @@ def test_operator_new_delete(capture):
         pytest.gc_collect()
         del c2
         pytest.gc_collect()
-    assert capture == (
-        "C delete " + sz_noalias + "\n" +
-        "C delete " + sz_alias + "\n"
-    )
+    assert capture == ("C delete " + sz_noalias + "\n" + "C delete " + sz_alias + "\n")
 
 
 def test_bind_protected_functions():
@@ -212,6 +208,7 @@ def test_bind_protected_functions():
     assert b.foo() == 42
 
     class C(m.ProtectedB):
+
         def __init__(self):
             m.ProtectedB.__init__(self)
 
@@ -271,8 +268,7 @@ def test_reentrant_implicit_conversion_failure(msg):
 def test_error_after_conversions():
     with pytest.raises(TypeError) as exc_info:
         m.test_error_after_conversions("hello")
-    assert str(exc_info.value).startswith(
-        "Unable to convert function return value to a Python type!")
+    assert str(exc_info.value).startswith("Unable to convert function return value to a Python type!")
 
 
 def test_aligned():

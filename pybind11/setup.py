@@ -42,6 +42,7 @@ else:
 
 class InstallHeaders(install_headers):
     """Use custom header installer because the default one flattens subdirectories"""
+
     def run(self):
         if not self.distribution.headers:
             return
@@ -68,19 +69,12 @@ setup(
     headers=headers,
     cmdclass=dict(install_headers=InstallHeaders),
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Utilities',
-        'Programming Language :: C++',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'License :: OSI Approved :: BSD License'
+        'Development Status :: 5 - Production/Stable', 'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries :: Python Modules', 'Topic :: Utilities',
+        'Programming Language :: C++', 'Programming Language :: Python :: 2.7', 'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2', 'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4', 'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6', 'License :: OSI Approved :: BSD License'
     ],
     keywords='C++11, Python bindings',
     long_description="""pybind11 is a lightweight header-only library that

@@ -60,18 +60,15 @@ def test_index_offset(arr, args, ret):
 
 
 def test_dim_check_fail(arr):
-    for func in (m.index_at, m.index_at_t, m.offset_at, m.offset_at_t, m.data, m.data_t,
-                 m.mutate_data, m.mutate_data_t):
+    for func in (m.index_at, m.index_at_t, m.offset_at, m.offset_at_t, m.data, m.data_t, m.mutate_data,
+                 m.mutate_data_t):
         with pytest.raises(IndexError) as excinfo:
             func(arr, 1, 2, 3)
         assert str(excinfo.value) == 'too many indices for an array: 3 (ndim = 2)'
 
 
-@pytest.mark.parametrize('args, ret',
-                         [([], [1, 2, 3, 4, 5, 6]),
-                          ([1], [4, 5, 6]),
-                          ([0, 1], [2, 3, 4, 5, 6]),
-                          ([1, 2], [6])])
+@pytest.mark.parametrize('args, ret', [([], [1, 2, 3, 4, 5, 6]), ([1], [4, 5, 6]), ([0, 1], [2, 3, 4, 5, 6]),
+                                       ([1, 2], [6])])
 def test_data(arr, args, ret):
     from sys import byteorder
     assert all(m.data_t(arr, *args) == ret)
@@ -118,8 +115,7 @@ def test_mutate_data(arr):
 
 
 def test_bounds_check(arr):
-    for func in (m.index_at, m.index_at_t, m.data, m.data_t,
-                 m.mutate_data, m.mutate_data_t, m.at_t, m.mutate_at_t):
+    for func in (m.index_at, m.index_at_t, m.data, m.data_t, m.mutate_data, m.mutate_data_t, m.at_t, m.mutate_at_t):
         with pytest.raises(IndexError) as excinfo:
             func(arr, 2, 0)
         assert str(excinfo.value) == 'index 2 is out of bounds for axis 0 with size 2'
@@ -145,6 +141,7 @@ def test_make_empty_shaped_array():
 
 
 def test_wrap():
+
     def assert_references(a, b, base=None):
         from distutils.version import LooseVersion
         if base is None:
@@ -386,33 +383,33 @@ def test_initializer_list():
 def test_array_resize(msg):
     a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9], dtype='float64')
     m.array_reshape2(a)
-    assert(a.size == 9)
-    assert(np.all(a == [[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
+    assert (a.size == 9)
+    assert (np.all(a == [[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
 
     # total size change should succced with refcheck off
     m.array_resize3(a, 4, False)
-    assert(a.size == 64)
+    assert (a.size == 64)
     # ... and fail with refcheck on
     try:
         m.array_resize3(a, 3, True)
     except ValueError as e:
-        assert(str(e).startswith("cannot resize an array"))
+        assert (str(e).startswith("cannot resize an array"))
     # transposed array doesn't own data
     b = a.transpose()
     try:
         m.array_resize3(b, 3, False)
     except ValueError as e:
-        assert(str(e).startswith("cannot resize this array: it does not own its data"))
+        assert (str(e).startswith("cannot resize this array: it does not own its data"))
     # ... but reshape should be fine
     m.array_reshape2(b)
-    assert(b.shape == (8, 8))
+    assert (b.shape == (8, 8))
 
 
 @pytest.unsupported_on_pypy
 def test_array_create_and_resize(msg):
     a = m.create_and_resize(2)
-    assert(a.size == 4)
-    assert(np.all(a == 42.))
+    assert (a.size == 4)
+    assert (np.all(a == 42.))
 
 
 @pytest.unsupported_on_py2

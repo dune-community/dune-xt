@@ -131,8 +131,7 @@ def test_nested_throws(capture):
 
     # C++ -> Python -> C++ -> Python
     with capture:
-        m.try_catch(
-            m.MyException5, pycatch, m.MyException, m.try_catch, m.MyException, throw_myex5)
+        m.try_catch(m.MyException5, pycatch, m.MyException, m.try_catch, m.MyException, throw_myex5)
     assert str(capture).startswith("MyException5: nested error 5")
 
     # C++ -> Python -> C++

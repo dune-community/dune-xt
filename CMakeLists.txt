@@ -35,9 +35,7 @@ endif()
 
 # find dune-common and set the module path
 find_package(dune-common REQUIRED)
-list(APPEND CMAKE_MODULE_PATH
-            ${dune-common_MODULE_PATH}
-            ${PROJECT_SOURCE_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${dune-common_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 # include the dune macros
 include(DuneMacros)
@@ -48,19 +46,26 @@ dune_project()
 # dune-xt-common cmake includes
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-dune_enable_all_packages(INCLUDE_DIRS ${dune-xt-common_SOURCE_DIR}/dune
-                         MODULE_LIBRARIES 
-                                         dunepybindxiinterface dunepybindximodule dunepybindxiembed dunepybindxi gtest_dune_xt dunext)
-# The -fsized-deallocation flag is not needed anymore in newer versions of pybind11.
-# TODO: Remove once we update pybind11.
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+dune_enable_all_packages(INCLUDE_DIRS
+                         ${dune-xt-common_SOURCE_DIR}/dune
+                         MODULE_LIBRARIES
+                         dunepybindxiinterface
+                         dunepybindximodule
+                         dunepybindxiembed
+                         dunepybindxi
+                         gtest_dune_xt
+                         dunext)
+# The -fsized-deallocation flag is not needed anymore in newer versions of pybind11. TODO: Remove once we update
+# pybind11.
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   target_compile_options(dunepybindxiinterface INTERFACE -fsized-deallocation)
 endif()
 # Build an interface library target:
-add_library(pybind11::pybind11 ALIAS dunepybindxiinterface)  # to match exported target
-target_include_directories(dunepybindxiinterface INTERFACE $<BUILD_INTERFACE:${PYBIND11_INCLUDE_DIR}>
-                                              $<BUILD_INTERFACE:${PYTHON_INCLUDE_DIRS}>
-                                              $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+add_library(pybind11::pybind11 ALIAS dunepybindxiinterface) # to match exported target
+target_include_directories(dunepybindxiinterface
+                           INTERFACE $<BUILD_INTERFACE:${PYBIND11_INCLUDE_DIR}>
+                                     $<BUILD_INTERFACE:${PYTHON_INCLUDE_DIRS}>
+                                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_compile_options(dunepybindxiinterface INTERFACE $<BUILD_INTERFACE:${PYBIND11_CPP_STANDARD}>)
 
 add_library(pybind11::module ALIAS dunepybindximodule)
@@ -78,7 +83,6 @@ target_link_libraries(dunepybindxiembed INTERFACE pybind11::pybind11 $<BUILD_INT
 add_library(pybind11::embed ALIAS dunepybindxiembed)
 target_link_libraries(dunepybindxi dunepybindxiembed)
 
-
 # ----------------------------------------------------------------------------------------------------
 # General Settings
 # ----------------------------------------------------------------------------------------------------
@@ -86,7 +90,6 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
                 OUTPUT_VARIABLE COMMIT
                 ERROR_VARIABLE shell_error
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-
 
 include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the

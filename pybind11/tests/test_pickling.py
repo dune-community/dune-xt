@@ -2,7 +2,7 @@ import pytest
 from pybind11_tests import pickling as m
 
 try:
-    import cPickle as pickle  # Use cPickle on Python 2.7
+    import cPickle as pickle     # Use cPickle on Python 2.7
 except ImportError:
     import pickle
 
@@ -14,7 +14,7 @@ def test_roundtrip(cls_name):
     p.setExtra1(15)
     p.setExtra2(48)
 
-    data = pickle.dumps(p, 2)  # Must use pickle protocol >= 2
+    data = pickle.dumps(p, 2)     # Must use pickle protocol >= 2
     p2 = pickle.loads(data)
     assert p2.value() == p.value()
     assert p2.extra1() == p.extra1()

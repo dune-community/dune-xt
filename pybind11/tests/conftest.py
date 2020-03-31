@@ -35,6 +35,7 @@ def _make_explanation(a, b):
 
 class Output(object):
     """Basic output post-processing and comparison"""
+
     def __init__(self, string):
         self.string = string
         self.explanation = []
@@ -55,6 +56,7 @@ class Output(object):
 
 class Unordered(Output):
     """Custom comparison for output without strict line ordering"""
+
     def __eq__(self, other):
         a = _split_and_sort(self.string)
         b = _split_and_sort(other)
@@ -66,6 +68,7 @@ class Unordered(Output):
 
 
 class Capture(object):
+
     def __init__(self, capfd):
         self.capfd = capfd
         self.out = ""
@@ -109,6 +112,7 @@ def capture(capsys):
 
 
 class SanitizedString(object):
+
     def __init__(self, sanitizer):
         self.sanitizer = sanitizer
         self.string = ""
@@ -205,13 +209,11 @@ def pytest_configure():
     pytest.suppress = suppress
     pytest.requires_numpy = skipif(not np, reason="numpy is not installed")
     pytest.requires_scipy = skipif(not np, reason="scipy is not installed")
-    pytest.requires_eigen_and_numpy = skipif(not have_eigen or not np,
-                                             reason="eigen and/or numpy are not installed")
+    pytest.requires_eigen_and_numpy = skipif(not have_eigen or not np, reason="eigen and/or numpy are not installed")
     pytest.requires_eigen_and_scipy = skipif(
         not have_eigen or not scipy, reason="eigen and/or scipy are not installed")
     pytest.unsupported_on_pypy = skipif(pypy, reason="unsupported on PyPy")
-    pytest.unsupported_on_py2 = skipif(sys.version_info.major < 3,
-                                       reason="unsupported on Python 2.x")
+    pytest.unsupported_on_py2 = skipif(sys.version_info.major < 3, reason="unsupported on Python 2.x")
     pytest.gc_collect = gc_collect
 
 
@@ -229,7 +231,7 @@ def _test_import_pybind11():
     """
     # noinspection PyBroadException
     try:
-        import pybind11_tests  # noqa: F401 imported but unused
+        import pybind11_tests     # noqa: F401 imported but unused
     except Exception as e:
         print("Failed to import pybind11_tests from pytest:")
         print("  {}: {}".format(type(e).__name__, e))

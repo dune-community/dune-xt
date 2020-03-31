@@ -10,7 +10,7 @@ def test_init_factory_basic():
     """Tests py::init_factory() wrapper around various ways of returning the object"""
 
     cstats = [ConstructorStats.get(c) for c in [m.TestFactory1, m.TestFactory2, m.TestFactory3]]
-    cstats[0].alive()  # force gc
+    cstats[0].alive()     # force gc
     n_inst = ConstructorStats.detail_reg_inst()
 
     x1 = m.TestFactory1(tag.unique_ptr, 3)
@@ -52,11 +52,7 @@ def test_init_factory_basic():
     assert [i.alive() for i in cstats] == [0, 0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [
-        ["3", "hi!"],
-        ["7", "hi again"],
-        ["42", "bye"]
-    ]
+    assert [i.values() for i in cstats] == [["3", "hi!"], ["7", "hi again"], ["42", "bye"]]
     assert [i.default_constructions for i in cstats] == [1, 1, 1]
 
 
@@ -91,7 +87,7 @@ def test_init_factory_casting():
     """Tests py::init_factory() wrapper with various upcasting and downcasting returns"""
 
     cstats = [ConstructorStats.get(c) for c in [m.TestFactory3, m.TestFactory4, m.TestFactory5]]
-    cstats[0].alive()  # force gc
+    cstats[0].alive()     # force gc
     n_inst = ConstructorStats.detail_reg_inst()
 
     # Construction from derived references:
@@ -125,18 +121,14 @@ def test_init_factory_casting():
     assert [i.alive() for i in cstats] == [0, 0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [
-        ["4", "5", "6", "7", "8"],
-        ["4", "5", "8"],
-        ["6", "7"]
-    ]
+    assert [i.values() for i in cstats] == [["4", "5", "6", "7", "8"], ["4", "5", "8"], ["6", "7"]]
 
 
 def test_init_factory_alias():
     """Tests py::init_factory() wrapper with value conversions and alias types"""
 
     cstats = [m.TestFactory6.get_cstats(), m.TestFactory6.get_alias_cstats()]
-    cstats[0].alive()  # force gc
+    cstats[0].alive()     # force gc
     n_inst = ConstructorStats.detail_reg_inst()
 
     a = m.TestFactory6(tag.base, 1)
@@ -169,6 +161,7 @@ def test_init_factory_alias():
     assert ConstructorStats.detail_reg_inst() == n_inst
 
     class MyTest(m.TestFactory6):
+
         def __init__(self, *args):
             m.TestFactory6.__init__(self, *args)
 
@@ -196,10 +189,8 @@ def test_init_factory_alias():
     assert [i.alive() for i in cstats] == [0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [
-        ["1", "8", "3", "4", "5", "6", "123", "10", "47"],
-        ["hi there", "3", "4", "6", "move", "123", "why hello!", "move", "47"]
-    ]
+    assert [i.values() for i in cstats] == [["1", "8", "3", "4", "5", "6", "123", "10", "47"],
+                                            ["hi there", "3", "4", "6", "move", "123", "why hello!", "move", "47"]]
 
 
 def test_init_factory_dual():
@@ -207,10 +198,11 @@ def test_init_factory_dual():
     from pybind11_tests.factory_constructors import TestFactory7
 
     cstats = [TestFactory7.get_cstats(), TestFactory7.get_alias_cstats()]
-    cstats[0].alive()  # force gc
+    cstats[0].alive()     # force gc
     n_inst = ConstructorStats.detail_reg_inst()
 
     class PythFactory7(TestFactory7):
+
         def get(self):
             return 100 + TestFactory7.get(self)
 
@@ -262,8 +254,7 @@ def test_init_factory_dual():
     assert not g1.has_alias()
     with pytest.raises(TypeError) as excinfo:
         PythFactory7(tag.shared_ptr, tag.invalid_base, 14)
-    assert (str(excinfo.value) ==
-            "pybind11::init(): construction failed: returned holder-wrapped instance is not an "
+    assert (str(excinfo.value) == "pybind11::init(): construction failed: returned holder-wrapped instance is not an "
             "alias instance")
 
     assert [i.alive() for i in cstats] == [13, 7]
@@ -276,10 +267,9 @@ def test_init_factory_dual():
     assert [i.alive() for i in cstats] == [0, 0]
     assert ConstructorStats.detail_reg_inst() == n_inst
 
-    assert [i.values() for i in cstats] == [
-        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "100", "11", "12", "13", "14"],
-        ["2", "4", "6", "8", "9", "100", "12"]
-    ]
+    assert [i.values() for i in cstats] == [[
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "100", "11", "12", "13", "14"
+    ], ["2", "4", "6", "8", "9", "100", "12"]]
 
 
 def test_no_placement_new(capture):
@@ -309,7 +299,9 @@ def test_no_placement_new(capture):
 
 
 def test_multiple_inheritance():
+
     class MITest(m.TestFactory1, m.TestFactory2):
+
         def __init__(self):
             m.TestFactory1.__init__(self, tag.unique_ptr, 33)
             m.TestFactory2.__init__(self, tag.move)
@@ -421,11 +413,13 @@ def test_reallocations(capture, msg):
 def test_invalid_self():
     """Tests invocation of the pybind-registered base class with an invalid `self` argument.  You
     can only actually do this on Python 3: Python 2 raises an exception itself if you try."""
+
     class NotPybindDerived(object):
         pass
 
     # Attempts to initialize with an invalid type passed as `self`:
     class BrokenTF1(m.TestFactory1):
+
         def __init__(self, bad):
             if bad == 1:
                 a = m.TestFactory2(tag.pointer, 1)
@@ -436,6 +430,7 @@ def test_invalid_self():
 
     # Same as above, but for a class with an alias:
     class BrokenTF6(m.TestFactory6):
+
         def __init__(self, bad):
             if bad == 1:
                 a = m.TestFactory2(tag.pointer, 1)

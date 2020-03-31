@@ -1,13 +1,11 @@
-# - Find the Catch test framework or download it (single header)
+# * Find the Catch test framework or download it (single header)
 #
-# This is a quick module for internal use. It assumes that Catch is
-# REQUIRED and that a minimum version is provided (not EXACT). If
-# a suitable version isn't found locally, the single header file
-# will be downloaded and placed in the build dir: PROJECT_BINARY_DIR.
+# This is a quick module for internal use. It assumes that Catch is REQUIRED and that a minimum version is provided
+# (not EXACT). If a suitable version isn't found locally, the single header file will be downloaded and placed in the
+# build dir: PROJECT_BINARY_DIR.
 #
-# This code sets the following variables:
-#  CATCH_INCLUDE_DIR      - path to catch.hpp
-#  CATCH_VERSION          - version number
+# This code sets the following variables: CATCH_INCLUDE_DIR      - path to catch.hpp CATCH_VERSION          - version
+# number
 
 if(NOT Catch_FIND_VERSION)
   message(FATAL_ERROR "A version number must be specified.")

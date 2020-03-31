@@ -30,6 +30,7 @@ def test_callbacks():
 def test_bound_method_callback():
     # Bound Python method:
     class MyClass:
+
         def double(self, val):
             return 2 * val
 
@@ -49,10 +50,14 @@ def test_keyword_args_and_generalized_unpacking():
     assert m.test_dict_unpacking(f) == (("positional", 1), {"key": "value", "a": 1, "b": 2})
     assert m.test_keyword_args(f) == ((), {"x": 10, "y": 20})
     assert m.test_unpacking_and_keywords1(f) == ((1, 2), {"c": 3, "d": 4})
-    assert m.test_unpacking_and_keywords2(f) == (
-        ("positional", 1, 2, 3, 4, 5),
-        {"key": "value", "a": 1, "b": 2, "c": 3, "d": 4, "e": 5}
-    )
+    assert m.test_unpacking_and_keywords2(f) == (("positional", 1, 2, 3, 4, 5), {
+        "key": "value",
+        "a": 1,
+        "b": 2,
+        "c": 3,
+        "d": 4,
+        "e": 5
+    })
 
     with pytest.raises(TypeError) as excinfo:
         m.test_unpacking_error1(f)
@@ -83,11 +88,9 @@ def test_cpp_function_roundtrip():
     """Test if passing a function pointer from C++ -> Python -> C++ yields the original pointer"""
 
     assert m.test_dummy_function(m.dummy_function) == "matches dummy_function: eval(1) = 2"
-    assert (m.test_dummy_function(m.roundtrip(m.dummy_function)) ==
-            "matches dummy_function: eval(1) = 2")
+    assert (m.test_dummy_function(m.roundtrip(m.dummy_function)) == "matches dummy_function: eval(1) = 2")
     assert m.roundtrip(None, expect_none=True) is None
-    assert (m.test_dummy_function(lambda x: x + 2) ==
-            "can't convert to function pointer: eval(1) = 3")
+    assert (m.test_dummy_function(lambda x: x + 2) == "can't convert to function pointer: eval(1) = 3")
 
     with pytest.raises(TypeError) as excinfo:
         m.test_dummy_function(m.dummy_function2)
@@ -95,8 +98,8 @@ def test_cpp_function_roundtrip():
 
     with pytest.raises(TypeError) as excinfo:
         m.test_dummy_function(lambda x, y: x + y)
-    assert any(s in str(excinfo.value) for s in ("missing 1 required positional argument",
-                                                 "takes exactly 2 arguments"))
+    assert any(
+        s in str(excinfo.value) for s in ("missing 1 required positional argument", "takes exactly 2 arguments"))
 
 
 def test_function_signatures(doc):
@@ -111,6 +114,7 @@ def test_movable_object():
 def test_async_callbacks():
     # serves as state for async callback
     class Item:
+
         def __init__(self, value):
             self.value = value
 

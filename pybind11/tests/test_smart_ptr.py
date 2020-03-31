@@ -14,8 +14,7 @@ def test_smart_ptr(capture):
             m.print_object_4(o)
         assert capture == "MyObject1[{i}]\n".format(i=i) * 4
 
-    for i, o in enumerate([m.make_myobject1_1(), m.make_myobject1_2(), m.MyObject1(6), 7],
-                          start=4):
+    for i, o in enumerate([m.make_myobject1_1(), m.make_myobject1_2(), m.MyObject1(6), 7], start=4):
         print(o)
         with capture:
             if not isinstance(o, int):
@@ -112,7 +111,7 @@ def test_unique_nodelete():
     cstats = ConstructorStats.get(m.MyObject4)
     assert cstats.alive() == 1
     del o
-    assert cstats.alive() == 1  # Leak, but that's intentional
+    assert cstats.alive() == 1     # Leak, but that's intentional
 
 
 def test_unique_nodelete4a():
@@ -121,19 +120,19 @@ def test_unique_nodelete4a():
     cstats = ConstructorStats.get(m.MyObject4a)
     assert cstats.alive() == 1
     del o
-    assert cstats.alive() == 1  # Leak, but that's intentional
+    assert cstats.alive() == 1     # Leak, but that's intentional
 
 
 def test_unique_deleter():
     o = m.MyObject4b(23)
     assert o.value == 23
     cstats4a = ConstructorStats.get(m.MyObject4a)
-    assert cstats4a.alive() == 2  # Two because of previous test
+    assert cstats4a.alive() == 2     # Two because of previous test
     cstats4b = ConstructorStats.get(m.MyObject4b)
     assert cstats4b.alive() == 1
     del o
-    assert cstats4a.alive() == 1  # Should now only be one leftover from previous test
-    assert cstats4b.alive() == 0  # Should be deleted
+    assert cstats4a.alive() == 1     # Should now only be one leftover from previous test
+    assert cstats4b.alive() == 0     # Should be deleted
 
 
 def test_large_holder():
@@ -150,24 +149,24 @@ def test_shared_ptr_and_references():
     stats = ConstructorStats.get(m.A)
     assert stats.alive() == 2
 
-    ref = s.ref  # init_holder_helper(holder_ptr=false, owned=false)
+    ref = s.ref     # init_holder_helper(holder_ptr=false, owned=false)
     assert stats.alive() == 2
     assert s.set_ref(ref)
     with pytest.raises(RuntimeError) as excinfo:
         assert s.set_holder(ref)
     assert "Unable to cast from non-held to held instance" in str(excinfo.value)
 
-    copy = s.copy  # init_holder_helper(holder_ptr=false, owned=true)
+    copy = s.copy     # init_holder_helper(holder_ptr=false, owned=true)
     assert stats.alive() == 3
     assert s.set_ref(copy)
     assert s.set_holder(copy)
 
-    holder_ref = s.holder_ref  # init_holder_helper(holder_ptr=true, owned=false)
+    holder_ref = s.holder_ref     # init_holder_helper(holder_ptr=true, owned=false)
     assert stats.alive() == 3
     assert s.set_ref(holder_ref)
     assert s.set_holder(holder_ref)
 
-    holder_copy = s.holder_copy  # init_holder_helper(holder_ptr=true, owned=true)
+    holder_copy = s.holder_copy     # init_holder_helper(holder_ptr=true, owned=true)
     assert stats.alive() == 3
     assert s.set_ref(holder_copy)
     assert s.set_holder(holder_copy)
@@ -181,29 +180,29 @@ def test_shared_ptr_from_this_and_references():
     stats = ConstructorStats.get(m.B)
     assert stats.alive() == 2
 
-    ref = s.ref  # init_holder_helper(holder_ptr=false, owned=false, bad_wp=false)
+    ref = s.ref     # init_holder_helper(holder_ptr=false, owned=false, bad_wp=false)
     assert stats.alive() == 2
     assert s.set_ref(ref)
-    assert s.set_holder(ref)  # std::enable_shared_from_this can create a holder from a reference
+    assert s.set_holder(ref)     # std::enable_shared_from_this can create a holder from a reference
 
-    bad_wp = s.bad_wp  # init_holder_helper(holder_ptr=false, owned=false, bad_wp=true)
+    bad_wp = s.bad_wp     # init_holder_helper(holder_ptr=false, owned=false, bad_wp=true)
     assert stats.alive() == 2
     assert s.set_ref(bad_wp)
     with pytest.raises(RuntimeError) as excinfo:
         assert s.set_holder(bad_wp)
     assert "Unable to cast from non-held to held instance" in str(excinfo.value)
 
-    copy = s.copy  # init_holder_helper(holder_ptr=false, owned=true, bad_wp=false)
+    copy = s.copy     # init_holder_helper(holder_ptr=false, owned=true, bad_wp=false)
     assert stats.alive() == 3
     assert s.set_ref(copy)
     assert s.set_holder(copy)
 
-    holder_ref = s.holder_ref  # init_holder_helper(holder_ptr=true, owned=false, bad_wp=false)
+    holder_ref = s.holder_ref     # init_holder_helper(holder_ptr=true, owned=false, bad_wp=false)
     assert stats.alive() == 3
     assert s.set_ref(holder_ref)
     assert s.set_holder(holder_ref)
 
-    holder_copy = s.holder_copy  # init_holder_helper(holder_ptr=true, owned=true, bad_wp=false)
+    holder_copy = s.holder_copy     # init_holder_helper(holder_ptr=true, owned=true, bad_wp=false)
     assert stats.alive() == 3
     assert s.set_ref(holder_copy)
     assert s.set_holder(holder_copy)
