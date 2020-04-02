@@ -11,8 +11,6 @@
 #   Tobias Leibner  (2016, 2018)
 # ~~~
 
-enable_testing()
-
 dxt_exclude_from_headercheck(dd_subdomains_cube.hh)
 
 # we want to discard one of the tests via cmake_guard if UG is parallel, so define a suitable variable here

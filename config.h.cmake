@@ -112,6 +112,10 @@
 #define HAVE_DUNE_GRID_GLUE 0
 #endif
 
+#ifndef ENABLE_ALBERTA
+#define ENABLE_ALBERTA 0
+#endif
+
 #ifndef HAVE_ALBERTA
 #define HAVE_ALBERTA 0
 #endif
