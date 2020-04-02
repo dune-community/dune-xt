@@ -115,7 +115,7 @@ struct container_name<CommonDenseVector<double>>
 {
   static std::string value()
   {
-    return "common_dense_vector_double";
+    return "common_vector";
   }
 };
 
@@ -124,7 +124,7 @@ struct container_name<CommonDenseVector<size_t>>
 {
   static std::string value()
   {
-    return "common_dense_vector_size_t";
+    return "common_vector_size_t";
   }
 };
 
@@ -133,7 +133,7 @@ struct container_name<CommonDenseMatrix<double>>
 {
   static std::string value()
   {
-    return "common_dense_matrix_double";
+    return "common_dense_matrix";
   }
 };
 
@@ -142,7 +142,7 @@ struct container_name<CommonSparseMatrix<double>>
 {
   static std::string value()
   {
-    return "common_sparse_matrix_double";
+    return "common_sparse_matrix";
   }
 };
 
@@ -153,7 +153,7 @@ struct container_name<EigenDenseVector<double>>
 {
   static std::string value()
   {
-    return "eigen_dense_vector_double";
+    return "eigen_vector";
   }
 };
 
@@ -162,7 +162,7 @@ struct container_name<EigenDenseMatrix<double>>
 {
   static std::string value()
   {
-    return "eigen_dense_matrix_double";
+    return "eigen_dense_matrix";
   }
 };
 
@@ -171,7 +171,7 @@ struct container_name<EigenRowMajorSparseMatrix<double>>
 {
   static std::string value()
   {
-    return "eigen_row_major_sparse_matrix_double";
+    return "eigen_sparse_matrix";
   }
 };
 
@@ -182,7 +182,7 @@ struct container_name<IstlDenseVector<double>>
 {
   static std::string value()
   {
-    return "istl_dense_vector_double";
+    return "istl_vector";
   }
 };
 
@@ -191,7 +191,7 @@ struct container_name<IstlRowMajorSparseMatrix<double>>
 {
   static std::string value()
   {
-    return "istl_row_major_sparse_matrix_double";
+    return "istl_sparse_matrix";
   }
 };
 
