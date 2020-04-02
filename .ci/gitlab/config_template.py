@@ -73,13 +73,18 @@ variables:
     environment:
         name: unsafe
 
-{% for image, subdir in matrix -%}
+{% for image, subdir in matrix %}
 {{subdir}} {{ image[image.find('debian')+1+6:] }}:
     extends: .subdir-test
     variables:
         DOCKER_TAG: {{ image }}
         TESTS_MODULE_SUBDIR: {{ subdir }}
+    {%- if subdir in ['functions', 'la'] and 'gcc' in image %}
+    tags:
+        - amm-only
+    {%- endif %}
 {% endfor %}
+
 '''
 
 import os

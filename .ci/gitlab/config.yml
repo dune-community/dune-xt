@@ -70,63 +70,84 @@ variables:
     environment:
         name: unsafe
 
+
 common unstable_gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: common
+
 grid unstable_gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: grid
+
 functions unstable_gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: functions
+    tags:
+        - amm-only
+
 la unstable_gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: la
+    tags:
+        - amm-only
+
 common gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_gcc_full
         TESTS_MODULE_SUBDIR: common
+
 grid gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_gcc_full
         TESTS_MODULE_SUBDIR: grid
+
 functions gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_gcc_full
         TESTS_MODULE_SUBDIR: functions
+    tags:
+        - amm-only
+
 la gcc_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_gcc_full
         TESTS_MODULE_SUBDIR: la
+    tags:
+        - amm-only
+
 common clang_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_clang_full
         TESTS_MODULE_SUBDIR: common
+
 grid clang_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_clang_full
         TESTS_MODULE_SUBDIR: grid
+
 functions clang_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_clang_full
         TESTS_MODULE_SUBDIR: functions
+
 la clang_full:
     extends: .subdir-test
     variables:
         DOCKER_TAG: debian_clang_full
         TESTS_MODULE_SUBDIR: la
+
