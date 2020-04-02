@@ -14,12 +14,16 @@
 
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/timedlogging.hh>
+#include <python/dune/xt/common/timedlogging.hh>
 
 
 PYBIND11_MODULE(timedlogging, m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
+  using namespace Dune::XT::Common;
+
+  bindings::DefaultLogger::bind(m);
 
   m.def(
       "init_logger",
@@ -31,9 +35,9 @@ PYBIND11_MODULE(timedlogging, m)
          const std::string& debug_color,
          const std::string& warning_color) {
         try {
-          Dune::XT::Common::TimedLogger().create(
+          TimedLogger().create(
               max_info_level, max_debug_level, enable_warnings, enable_colors, info_color, debug_color, warning_color);
-        } catch (Dune::XT::Common::Exceptions::logger_error&) {
+        } catch (Exceptions::logger_error&) {
         }
       },
       "max_info_level"_a = std::numeric_limits<ssize_t>::max(),
