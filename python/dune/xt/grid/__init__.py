@@ -16,7 +16,12 @@ from numbers import Number
 from dune.xt import guarded_import
 
 for mod_name in (
-            '_grid_boundaryinfo',
+            '_grid_boundaryinfo_alldirichlet',
+            '_grid_boundaryinfo_allneumann',
+            '_grid_boundaryinfo_allreflecting',
+            '_grid_boundaryinfo_interfaces',
+            '_grid_boundaryinfo_normalbased',
+            '_grid_boundaryinfo_types',
             '_grid_gridprovider_cube',
             '_grid_gridprovider_provider',
             '_grid_traits',

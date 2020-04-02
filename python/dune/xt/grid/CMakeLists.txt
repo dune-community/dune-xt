@@ -12,7 +12,12 @@
 #   Tobias Leibner  (2019)
 # ~~~
 
-dune_pybindxi_add_module(_grid_boundaryinfo EXCLUDE_FROM_ALL boundaryinfo.cc)
+dune_pybindxi_add_module(_grid_boundaryinfo_alldirichlet EXCLUDE_FROM_ALL boundaryinfo/alldirichlet.cc)
+dune_pybindxi_add_module(_grid_boundaryinfo_allneumann EXCLUDE_FROM_ALL boundaryinfo/allneumann.cc)
+dune_pybindxi_add_module(_grid_boundaryinfo_allreflecting EXCLUDE_FROM_ALL boundaryinfo/allreflecting.cc)
+dune_pybindxi_add_module(_grid_boundaryinfo_interfaces EXCLUDE_FROM_ALL boundaryinfo/interfaces.cc)
+dune_pybindxi_add_module(_grid_boundaryinfo_normalbased EXCLUDE_FROM_ALL boundaryinfo/normalbased.cc)
+dune_pybindxi_add_module(_grid_boundaryinfo_types EXCLUDE_FROM_ALL boundaryinfo/types.cc)
 dune_pybindxi_add_module(_grid_gridprovider_cube EXCLUDE_FROM_ALL gridprovider/cube.cc)
 dune_pybindxi_add_module(_grid_gridprovider_provider EXCLUDE_FROM_ALL gridprovider/provider.cc)
 dune_pybindxi_add_module(_grid_traits EXCLUDE_FROM_ALL traits.cc)
