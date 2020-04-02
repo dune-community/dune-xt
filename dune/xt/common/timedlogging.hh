@@ -73,19 +73,21 @@ public:
 
   DefaultLogger(const DefaultLogger&);
 
+  DefaultLogger& operator=(const DefaultLogger& other);
+
 private:
-  const Timer timer_;
+  Timer timer_;
   std::string prefix_;
-  const std::array<std::string, 3> colors_;
-  const bool global_timer_;
+  std::array<std::string, 3> colors_;
+  bool global_timer_;
   std::shared_ptr<std::ostream> info_;
   std::shared_ptr<std::ostream> debug_;
   std::shared_ptr<std::ostream> warn_;
 
 public:
-  bool enable_info;
-  bool enable_debug;
-  bool enable_warn;
+  bool info_enabled;
+  bool debug_enabled;
+  bool warn_enabled;
 
   void enable(const std::string& prefix = "");
 
@@ -97,6 +99,65 @@ public:
 
   std::ostream& warn();
 }; // class DefaultLogger
+
+
+#ifdef LOG_
+#  error Macro LOG_ already defined, open an issue at https://github.com/dune-community/dune-xt-common/issues/new !
+#else
+#  define LOG_(type)                                                                                                   \
+    if (this->logger.type##_enabled)                                                                                   \
+    this->logger.type()
+#endif
+
+
+template <typename T = void>
+class WithLogger
+{
+  using ThisType = WithLogger;
+
+public:
+  mutable DefaultLogger logger;
+
+protected:
+  const std::string logging_id;
+
+public:
+  WithLogger(const std::string& prefix, const std::string& id, const bool start_enabled = false)
+    : logger(prefix, start_enabled)
+    , logging_id(id)
+  {
+    LOG_(debug) << logging_id << "(this=" << this << ")" << std::endl;
+  }
+
+  WithLogger(const ThisType& other)
+    : logger(other.logger)
+    , logging_id(other.logging_id)
+  {
+    LOG_(debug) << logging_id << "(this=" << this << ", other=" << &other << ")" << std::endl;
+  }
+
+  WithLogger(ThisType&& source)
+    : logger(std::move(source.logger))
+    , logging_id(std::move(source.logging_id))
+  {
+    LOG_(debug) << logging_id << "(this=" << this << ", source=" << &source << ")" << std::endl;
+  }
+
+  ~WithLogger()
+  {
+    LOG_(debug) << "~" << logging_id << "(this=" << this << ")" << std::endl;
+  }
+
+  ThisType& operator=(const ThisType& other)
+  {
+    LOG_(debug) << logging_id << "operator=(this=" << this << ", other=" << &other << ")" << std::endl;
+  }
+
+  ThisType& operator=(ThisType&& source)
+  {
+    LOG_(debug) << logging_id << "operator=(this=" << this << ", source=" << &source << ")" << std::endl;
+  }
+}; // class WithLogger
 
 
 /**
@@ -414,15 +475,6 @@ private:
 } // namespace Common
 } // namespace XT
 } // namespace Dune
-
-
-#ifdef LOG_
-#  error Macro LOG_ already defined, open an issue at https://github.com/dune-community/dune-xt-common/issues/new !
-#else
-#  define LOG_(type)                                                                                                   \
-    if (this->logger.enable_##type)                                                                                    \
-    this->logger.type()
-#endif
 
 
 #endif // DUNE_XT_COMMON_TIMED_LOGGING_HH

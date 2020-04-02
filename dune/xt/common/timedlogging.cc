@@ -10,7 +10,8 @@
 //   Tobias Leibner  (2016)
 
 #include "config.h"
-#include "timedlogging.hh"
+
+#include <ostream>
 
 #include <boost/format.hpp>
 
@@ -19,6 +20,7 @@
 #include "memory.hh"
 #include "exceptions.hh"
 #include "filesystem.hh"
+#include "timedlogging.hh"
 
 namespace Dune {
 namespace XT {
@@ -42,9 +44,9 @@ DefaultLogger::DefaultLogger(const std::string& prefix,
   , warn_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
                                                    build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
                                                    std::cerr))
-  , enable_info(!start_disabled)
-  , enable_debug(!start_disabled)
-  , enable_warn(!start_disabled)
+  , info_enabled(!start_disabled)
+  , debug_enabled(!start_disabled)
+  , warn_enabled(!start_disabled)
 {}
 
 DefaultLogger::DefaultLogger(const DefaultLogger& other)
@@ -61,16 +63,39 @@ DefaultLogger::DefaultLogger(const DefaultLogger& other)
   , warn_(std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
                                                    build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
                                                    std::cerr))
-  , enable_info(other.enable_info)
-  , enable_debug(other.enable_debug)
-  , enable_warn(other.enable_warn)
+  , info_enabled(other.info_enabled)
+  , debug_enabled(other.debug_enabled)
+  , warn_enabled(other.warn_enabled)
 {}
+
+DefaultLogger& DefaultLogger::operator=(const DefaultLogger& other)
+{
+  if (&other != this) {
+    timer_ = other.timer_;
+    prefix_ = other.prefix_;
+    colors_ = other.colors_;
+    global_timer_ = other.global_timer_;
+    info_ = std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                     build_prefix(prefix_.empty() ? "info" : prefix_, colors_[0]),
+                                                     std::cout);
+    debug_ = std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                      build_prefix(prefix_.empty() ? "debug" : prefix_, colors_[1]),
+                                                      std::cout);
+    warn_ = std::make_shared<TimedPrefixedLogStream>(global_timer_ ? SecondsSinceStartup() : timer_,
+                                                     build_prefix(prefix_.empty() ? "warn" : prefix_, colors_[2]),
+                                                     std::cerr);
+    info_enabled = other.info_enabled;
+    debug_enabled = other.debug_enabled;
+    warn_enabled = other.warn_enabled;
+  }
+  return *this;
+} // ... operator=(...)
 
 void DefaultLogger::enable(const std::string& prefix)
 {
-  enable_info = true;
-  enable_debug = true;
-  enable_warn = true;
+  info_enabled = true;
+  debug_enabled = true;
+  warn_enabled = true;
   if (!prefix.empty()) {
     prefix_ = prefix;
     info_ = std::make_shared<TimedPrefixedLogStream>(
@@ -84,14 +109,14 @@ void DefaultLogger::enable(const std::string& prefix)
 
 void DefaultLogger::disable()
 {
-  enable_info = false;
-  enable_debug = false;
-  enable_warn = false;
+  info_enabled = false;
+  debug_enabled = false;
+  warn_enabled = false;
 }
 
 std::ostream& DefaultLogger::info()
 {
-  if (enable_info)
+  if (info_enabled)
     return *info_;
   else
     return dev_null;
@@ -99,7 +124,7 @@ std::ostream& DefaultLogger::info()
 
 std::ostream& DefaultLogger::debug()
 {
-  if (enable_debug)
+  if (debug_enabled)
     return *debug_;
   else
     return dev_null;
@@ -107,7 +132,7 @@ std::ostream& DefaultLogger::debug()
 
 std::ostream& DefaultLogger::warn()
 {
-  if (enable_warn)
+  if (warn_enabled)
     return *warn_;
   else
     return dev_null;
