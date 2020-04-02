@@ -152,18 +152,33 @@ public:
    */
   NormalBasedBoundaryInfo(const DomainFieldType tol = 1e-10,
                           BoundaryType*&& default_boundary_type = new NoBoundary(),
-                          const std::string& log_prefix = "xt.grid.normalbasedboundaryinfo")
-    : BaseType(log_prefix)
+                          const std::string& logging_prefix = "")
+    : BaseType(logging_prefix.empty() ? "xt.grid" : "xt.grid.normalbasedboundaryinfo",
+               logging_prefix.empty() ? "NormalBasedBoundaryInfo" : logging_prefix,
+               /*logging_disabled=*/logging_prefix.empty())
     , tol_(tol)
     , default_boundary_type_(std::move(default_boundary_type))
   {
-    LOG_(debug) << "NormalBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_
-                << ")" << std::endl;
+    LOG_(debug) << this->logging_id << "(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_ << ")"
+                << std::endl;
   }
 
-  NormalBasedBoundaryInfo(const ThisType&) = default;
+  NormalBasedBoundaryInfo(const ThisType&) = delete;
 
   NormalBasedBoundaryInfo(ThisType&& source) = default;
+
+  void repr(std::ostream& out) const override final
+  {
+    out << "NormalBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_;
+    if (normal_to_type_map_.size() > 0)
+      out << ",";
+    for (const auto& normal_and_type_ptr : normal_to_type_map_) {
+      const auto& normal = normal_and_type_ptr.first;
+      const auto& type = *normal_and_type_ptr.second;
+      out << "\n                        " << normal << ": " << type;
+    }
+    out << ")";
+  } // ... repr(...)
 
   /**
    * \attention Takes ownership of boundary_type, do not delete manually!
@@ -171,8 +186,7 @@ public:
   void register_new_normal(const WorldType& normal, BoundaryType*&& boundary_type)
   {
     const auto normalized_normal = normal / normal.two_norm();
-    logger.info() << "register_new_normal(normal=" << normal << ", boundary_type=" << *boundary_type << ")"
-                  << std::endl;
+    LOG_(info) << "register_new_normal(normal=" << normal << ", boundary_type=" << *boundary_type << ")" << std::endl;
     for (const auto& normal_and_type_pair : normal_to_type_map_) {
       const auto& existing_normal = normal_and_type_pair.first;
       if (XT::Common::FloatCmp::eq(existing_normal, normalized_normal, tol_))
@@ -191,7 +205,7 @@ public:
       return no_boundary;
     }
     const WorldType outer_normal = intersection.centerUnitOuterNormal();
-    LOG_(debug) << "  intersection.centerUnitOuterNormal() = " << intersection.centerUnitOuterNormal()
+    LOG_(debug) << "  intersection.centerUnitOuterNormal() = " << outer_normal
                 << ", checking registered normals:" << std::endl;
     for (const auto& normal_and_type_pair : normal_to_type_map_) {
       const auto& normal = normal_and_type_pair.first;
