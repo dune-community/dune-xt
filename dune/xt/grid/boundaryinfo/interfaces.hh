@@ -46,20 +46,27 @@ public:
   {
     return !operator==(other);
   }
-
-private:
-  friend std::ostream& operator<<(std::ostream&, const BoundaryType&);
 }; // class BoundaryType
+
+
+#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
+#  pragma GCC diagnostic pop
+#endif
 
 
 std::ostream& operator<<(std::ostream& out, const BoundaryType& type);
 
 
+template <class I>
+class BoundaryInfo;
+
+
 template <class IntersectionImp>
-class BoundaryInfo
+class BoundaryInfo : public Common::WithLogger<BoundaryInfo<IntersectionImp>>
 {
-  using ThisType = BoundaryInfo<IntersectionImp>;
   static_assert(is_intersection<IntersectionImp>::value, "");
+  using ThisType = BoundaryInfo<IntersectionImp>;
+  using Logger = Common::WithLogger<BoundaryInfo<IntersectionImp>>;
 
 public:
   typedef IntersectionImp IntersectionType;
@@ -69,10 +76,12 @@ public:
   typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
   typedef Common::FieldVector<DomainFieldType, dimWorld> WorldType;
 
-  mutable Common::DefaultLogger logger;
-
-  BoundaryInfo(const std::string& log_prefix = "xt.grid.boundaryinfo")
-    : logger(log_prefix, /*start_disabled=*/true)
+  BoundaryInfo(const std::string& logging_prefix = "",
+               const std::string& logging_id = "",
+               const bool logging_disabled = true)
+    : Logger(logging_prefix.empty() ? "xt.grid" : logging_prefix,
+             logging_id.empty() ? "BoundaryInfo" : logging_id,
+             logging_disabled)
   {}
 
   BoundaryInfo(const ThisType&) = default;
@@ -83,6 +92,18 @@ public:
 
   virtual const BoundaryType& type(const IntersectionType& intersection) const = 0;
 
+  virtual void repr(std::ostream& out) const
+  {
+    out << "BoundaryInfo(\?\?\?)";
+  }
+
+  virtual std::string str() const
+  {
+    std::stringstream ss;
+    this->repr(ss);
+    return ss.str();
+  }
+
   static std::string static_id()
   {
     return "xt.grid.boundaryinfo";
@@ -90,9 +111,13 @@ public:
 }; // class BoundaryInfo
 
 
-#if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
-#  pragma GCC diagnostic pop
-#endif
+template <class I>
+std::ostream& operator<<(std::ostream& out, const BoundaryInfo<I>& bi)
+{
+  bi.repr(out);
+  return out;
+}
+
 
 } // namespace Grid
 } // namespace XT
