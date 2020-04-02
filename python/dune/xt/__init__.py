@@ -26,18 +26,15 @@ from importlib import import_module
 
 def guarded_import(globs, base_name, mod_name):
     # see https://stackoverflow.com/questions/43059267/how-to-do-from-module-import-using-importlib
-    try:
-        mod = import_module('.{}'.format(mod_name), base_name)
-        if "__all__" in mod.__dict__:
-            names = mod.__dict__["__all__"]
-        else:
-            names = [x for x in mod.__dict__ if not x.startswith("_")]
-        # check the rest for duplicity
-        for nm in names:
-            if nm in globs:
-                raise ImportError(
-                f'{base_name}: not overwriting existing name \'{nm}\' when importing from \'{mod_name}\'!' )
-        # and finally import
-        globs.update({k: getattr(mod, k) for k in names})
-    except ImportError as e:
-        raise ImportError(f'{base_name}: could not import module \'{mod_name}\':\n\n{e}')
+    mod = import_module('.{}'.format(mod_name), base_name)
+    if "__all__" in mod.__dict__:
+        names = mod.__dict__["__all__"]
+    else:
+        names = [x for x in mod.__dict__ if not x.startswith("_")]
+    # check the rest for duplicity
+    for nm in names:
+        if nm in globs:
+            raise ImportError(
+            f'{base_name}: not overwriting existing name \'{nm}\' when importing from \'{mod_name}\'!' )
+    # and finally import
+    globs.update({k: getattr(mod, k) for k in names})
