@@ -34,7 +34,7 @@
   template <>                                                                                                          \
   struct Typename<NAME>                                                                                                \
   {                                                                                                                    \
-    static const std::string value(bool fail_wo_typeid = false)                                                        \
+    static const std::string value(bool /*fail_wo_typeid*/ = false)                                                    \
     {                                                                                                                  \
       return #NAME;                                                                                                    \
     }                                                                                                                  \
