@@ -12,3 +12,4 @@
 # ~~~
 
 dune_pybindxi_add_module(_la EXCLUDE_FROM_ALL bindings.cc)
+dune_pybindxi_add_module(_la_traits EXCLUDE_FROM_ALL traits.cc)
