@@ -12,9 +12,9 @@
 #ifndef DUNE_XT_GRID_FUNCTORS_BOUNDARY_DETECTOR_HH
 #define DUNE_XT_GRID_FUNCTORS_BOUNDARY_DETECTOR_HH
 
-
-#include <dune/xt/grid/boundaryinfo/interfaces.hh>
 #include <dune/xt/common/parallel/threadstorage.hh>
+#include <dune/xt/grid/boundaryinfo/interfaces.hh>
+#include <dune/xt/grid/intersection.hh>
 
 #include "interfaces.hh"
 
@@ -30,7 +30,6 @@ class BoundaryDetectorFunctor
 {
   using BaseType = IntersectionFunctor<GL>;
   using Propagator = Common::ThreadResultPropagator<BoundaryDetectorFunctor<GL>, size_t>;
-  friend Propagator;
 
 public:
   using typename BaseType::ElementType;
@@ -40,19 +39,35 @@ public:
   /**
    * \attention Takes ownership of boundary_type_ptr, do not delete manually!
    */
-  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, BoundaryType*&& boundary_type_ptr)
-    : Propagator(this)
+  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
+                          BoundaryType*&& boundary_type_ptr,
+                          const std::string& logging_prefix = "")
+    : BaseType(logging_prefix.empty() ? "xt.grid" : "xt.grid.boundarydetectorfunctor",
+               logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix,
+               /*logging_disabled=*/logging_prefix.empty())
+    , Propagator(this)
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type_ptr)
     , found_(0)
-  {}
+  {
+    LOG_(debug) << this->logging_id << "(boundary_info=" << boundary_info_ << ", boundary_type=" << *boundary_type_
+                << ")" << std::endl;
+  }
 
-  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info, const BoundaryType& boundary_type)
-    : Propagator(this)
+  BoundaryDetectorFunctor(const BoundaryInfo<IntersectionType>& boundary_info,
+                          const BoundaryType& boundary_type,
+                          const std::string& logging_prefix = "")
+    : BaseType(logging_prefix.empty() ? "xt.grid" : "xt.grid.boundarydetectorfunctor",
+               logging_prefix.empty() ? "BoundaryDetectorFunctor" : logging_prefix,
+               /*logging_disabled=*/logging_prefix.empty())
+    , Propagator(this)
     , boundary_info_(boundary_info)
     , boundary_type_(boundary_type.copy())
     , found_(0)
-  {}
+  {
+    LOG_(debug) << this->logging_id << std::flush << "(boundary_info=" << std::flush << boundary_info_ << std::flush
+                << ", boundary_type=" << std::flush << *boundary_type_ << ")" << std::endl;
+  }
 
   BoundaryDetectorFunctor(const BoundaryDetectorFunctor& other) = default;
 
@@ -65,13 +80,17 @@ public:
                          const ElementType& /*inside_element*/,
                          const ElementType& /*outside_element*/)
   {
+    LOG_(debug) << "compute_locally(intersection=" << intersection
+                << "):\n  boundary_info_.type(intersection) = " << boundary_info_.type(intersection) << ", returning "
+                << size_t(boundary_info_.type(intersection) == *boundary_type_) << std::endl;
     return boundary_info_.type(intersection) == *boundary_type_;
   }
 
-  virtual void apply_local(const IntersectionType& intersection,
-                           const ElementType& inside_element,
-                           const ElementType& outside_element) override final
+  void apply_local(const IntersectionType& intersection,
+                   const ElementType& inside_element,
+                   const ElementType& outside_element) override final
   {
+    LOG_(debug) << "apply_local(intersection=" << intersection << "): calling compute_locally()" << std::endl;
     found_ += compute_locally(intersection, inside_element, outside_element);
   }
 
@@ -80,12 +99,12 @@ public:
     return found_;
   }
 
-  virtual void finalize() override
+  void finalize() override final
   {
     Propagator::finalize_imp();
   }
 
-  virtual BaseType* copy() override
+  BaseType* copy() override final
   {
     return Propagator::copy_imp();
   }
@@ -97,6 +116,8 @@ protected:
   }
 
 private:
+  friend Propagator;
+
   const BoundaryInfo<IntersectionType>& boundary_info_;
   const std::shared_ptr<BoundaryType> boundary_type_;
   size_t found_;
