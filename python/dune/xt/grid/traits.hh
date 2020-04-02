@@ -10,8 +10,6 @@
 #ifndef PYTHON_DUNE_XT_GRID_TRAITS_HH
 #define PYTHON_DUNE_XT_GRID_TRAITS_HH
 
-//#if HAVE_DUNE_PYBINDXI
-
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/cast.h>
 
@@ -40,30 +38,6 @@ class Prism
 {};
 
 
-class Conforming
-{};
-
-
-class Nonconforming
-{};
-
-
-class OnedGrid
-{};
-
-
-class YaspGrid
-{};
-
-
-class AluGrid
-{};
-
-
-class UgGrid
-{};
-
-
 template <size_t d>
 class Dimension
 {};
@@ -74,7 +48,5 @@ class Dimension
 } // namespace XT
 } // namespace Dune
 
-
-//#endif // HAVE_DUNE_PYBINDXI
 
 #endif // PYTHON_DUNE_XT_GRID_TRAITS_HH

@@ -9,9 +9,7 @@
 
 #include "config.h"
 
-#if HAVE_DUNE_PYBINDXI
-
-#  include "traits.hh"
+#include "traits.hh"
 
 
 PYBIND11_MODULE(_grid_traits, m)
@@ -31,26 +29,6 @@ PYBIND11_MODULE(_grid_traits, m)
   });
   pybind11::class_<Prism>(m, "Prism", "tag: Prism").def(py::init()).def("__repr__", [](const Prism&) {
     return "Prism()";
-  });
-
-  pybind11::class_<Conforming>(m, "Conforming", "tag: Conforming")
-      .def(py::init())
-      .def("__repr__", [](const Conforming&) { return "Conforming()"; });
-  pybind11::class_<Nonconforming>(m, "Nonconforming", "tag: Nonconforming")
-      .def(py::init())
-      .def("__repr__", [](const Nonconforming&) { return "Nonconforming()"; });
-
-  pybind11::class_<OnedGrid>(m, "OnedGrid", "tag: OnedGrid").def(py::init()).def("__repr__", [](const OnedGrid&) {
-    return "OnedGrid()";
-  });
-  pybind11::class_<YaspGrid>(m, "YaspGrid", "tag: YaspGrid").def(py::init()).def("__repr__", [](const YaspGrid&) {
-    return "YaspGrid()";
-  });
-  pybind11::class_<AluGrid>(m, "AluGrid", "tag: AluGrid").def(py::init()).def("__repr__", [](const AluGrid&) {
-    return "AluGrid()";
-  });
-  pybind11::class_<UgGrid>(m, "UgGrid", "tag: UgGrid").def(py::init()).def("__repr__", [](const UgGrid&) {
-    return "UgGrid()";
   });
 
   pybind11::class_<Dimension<0>>(m, "Dimension0", "tag: Dimension0")
@@ -84,6 +62,3 @@ PYBIND11_MODULE(_grid_traits, m)
       .def(py::init())
       .def("__repr__", [](const Dimension<9>&) { return "Dim(9)"; });
 }
-
-
-#endif // HAVE_DUNE_PYBINDXI
