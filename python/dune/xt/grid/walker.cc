@@ -5,64 +5,39 @@
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2016 - 2017, 2019)
-//   René Fritze     (2018)
-//   Tim Keil        (2018)
-//   Tobias Leibner  (2018 - 2019)
+//   Felix Schindler (2020)
 
 #include "config.h"
 
-#include <string>
-#include <vector>
-
-#include <dune/common/parallel/mpihelper.hh>
-
 #include <dune/pybindxi/pybind11.h>
-#include <dune/pybindxi/stl.h>
 
-#include <python/dune/xt/common/exceptions.bindings.hh>
+#include "walker.hh"
 
-#include <dune/xt/grid/grids.hh>
-#include <dune/xt/grid/layers.hh>
 
-#include <python/dune/xt/common/bindings.hh>
-#include <python/dune/xt/grid/boundaryinfo.bindings.hh>
-#include <python/dune/xt/grid/walker.bindings.hh>
-#include <python/dune/xt/grid/walker/apply-on.bindings.hh>
-
-template <class G, Dune::XT::Grid::Layers layer, Dune::XT::Grid::Backends backend>
-void bind_walker(pybind11::module& m)
+template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
+struct Walker_for_all_grids
 {
-  try {
-    Dune::XT::Grid::bindings::Walker<G, layer, backend>::bind(m);
-  } catch (std::runtime_error&) {
+  static void bind(pybind11::module& m)
+  {
+    Dune::XT::Grid::bindings::Walker<typename GridTypes::head_type>::bind(m);
+    Walker_for_all_grids<typename GridTypes::tail_type>::bind(m);
   }
-} // ... bind_walker(...)
-
-
-template <class Tuple = Dune::XT::Grid::AvailableGridTypes>
-void addbind_for_Grid(pybind11::module& m)
-{
-  using namespace Dune::XT::Grid;
-  using G = typename Tuple::head_type;
-
-  bind_walker<G, Layers::leaf, Backends::view>(m);
-  bind_walker<G, Layers::level, Backends::view>(m);
-
-  addbind_for_Grid<typename Tuple::tail_type>(m);
-} // ... addbind_for_Grid(...)
+};
 
 template <>
-void addbind_for_Grid<boost::tuples::null_type>(pybind11::module&)
-{}
+struct Walker_for_all_grids<boost::tuples::null_type>
+{
+  static void bind(pybind11::module& /*m*/) {}
+};
 
 
 PYBIND11_MODULE(_grid_walker, m)
 {
   namespace py = pybind11;
 
-  py::module::import("dune.xt.common");
+  py::module::import("dune.xt.grid._grid_gridprovider_provider");
+  py::module::import("dune.xt.grid._grid_filters_base");
+  py::module::import("dune.xt.grid._grid_functors_interfaces");
 
-  addbind_for_Grid(m);
-  DUNE_XT_GRID_WALKER_APPLYON_BIND(m);
+  Walker_for_all_grids<>::bind(m);
 }
