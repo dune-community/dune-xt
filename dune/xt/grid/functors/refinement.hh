@@ -22,6 +22,8 @@ namespace Grid {
 
 
 //! GridWalk functor that refines all entitites above given volume
+/// \attention Not up to date, has to use ThredResultPropagator!
+/// \todo Bring up to date!
 template <class GridViewType>
 struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
 {
