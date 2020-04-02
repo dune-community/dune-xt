@@ -11,6 +11,7 @@
 #ifndef DUNE_XT_GRID_FUNCTORS_INTERFACES_HH
 #define DUNE_XT_GRID_FUNCTORS_INTERFACES_HH
 
+#include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/grid/boundaryinfo.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/intersection.hh>
@@ -22,6 +23,9 @@ namespace XT {
 namespace Grid {
 
 
+template <class GL>
+class ElementFunctor;
+
 /**
  * \brief Interface for functors which are applied to elements (codim 0 entities) of a grid layer by the Walker.
  *
@@ -30,13 +34,12 @@ namespace Grid {
  * \sa ElementAndIntersectionFunctor
  */
 template <class GL>
-class ElementFunctor
+class ElementFunctor : public Common::WithLogger<ElementFunctor<GL>>
 {
   static_assert(is_layer<GL>::value, "");
 
 protected:
   //! force implementors to use copy() method
-  ElementFunctor(const ElementFunctor<GL>&) = default;
 
 public:
   using GridViewType = GL;
@@ -45,7 +48,13 @@ public:
   using GV = GridViewType;
   using E = ElementType;
 
-  ElementFunctor() = default;
+  ElementFunctor(const std::string& log_prefix = "", const std::string& log_id = "", const bool log_disabled = true)
+    : Common::WithLogger<ElementFunctor<GL>>(
+          log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "ElementFunctor" : log_id, log_disabled)
+  {}
+
+  ElementFunctor(const ElementFunctor<GL>&) = default;
+
   virtual ~ElementFunctor() = default;
 
   virtual ElementFunctor<GridViewType>* copy() = 0;
@@ -58,6 +67,9 @@ public:
 }; // class ElementFunctor
 
 
+template <class GL>
+class IntersectionFunctor;
+
 /**
  * \brief Interface for functors which are applied to intersections (codim 1 entities) of a grid layer by the Walker.
  *
@@ -66,7 +78,7 @@ public:
  * \sa ElementAndIntersectionFunctor
  */
 template <class GL>
-class IntersectionFunctor
+class IntersectionFunctor : public Common::WithLogger<IntersectionFunctor<GL>>
 {
   static_assert(is_layer<GL>::value, "");
 
@@ -83,7 +95,13 @@ public:
   using E = ElementType;
   using I = IntersectionType;
 
-  IntersectionFunctor() = default;
+  IntersectionFunctor(const std::string& log_prefix = "",
+                      const std::string& log_id = "",
+                      const bool log_disabled = true)
+    : Common::WithLogger<IntersectionFunctor<GL>>(
+          log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "IntersectionFunctor" : log_id, log_disabled)
+  {}
+
   virtual ~IntersectionFunctor() = default;
 
   virtual IntersectionFunctor<GridViewType>* copy() = 0;
@@ -104,6 +122,9 @@ public:
 }; // class IntersectionFunctor
 
 
+template <class GL>
+class ElementAndIntersectionFunctor;
+
 /**
  * \brief Interface for functors which are applied to entities and intersections of a grid layer by the Walker.
  *
@@ -112,7 +133,7 @@ public:
  * \sa IntersectionFunctor
  */
 template <class GL>
-class ElementAndIntersectionFunctor
+class ElementAndIntersectionFunctor : public Common::WithLogger<ElementAndIntersectionFunctor<GL>>
 {
   static_assert(is_layer<GL>::value, "");
 
@@ -129,7 +150,14 @@ public:
   using E = ElementType;
   using I = IntersectionType;
 
-  ElementAndIntersectionFunctor() = default;
+  ElementAndIntersectionFunctor(const std::string& log_prefix = "",
+                                const std::string& log_id = "",
+                                const bool log_disabled = true)
+    : Common::WithLogger<ElementAndIntersectionFunctor<GL>>(log_prefix.empty() ? "xt.grid" : log_prefix,
+                                                            log_id.empty() ? "ElementAndIntersectionFunctor" : log_id,
+                                                            log_disabled)
+  {}
+
   virtual ~ElementAndIntersectionFunctor() = default;
 
   virtual ElementAndIntersectionFunctor<GL>* copy() = 0;
