@@ -1,15 +1,15 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Andreas Buhr    (2014)
 //   Felix Schindler (2013 - 2017)
-//   René Fritze     (2013, 2015 - 2016, 2018)
+//   René Fritze     (2013, 2015 - 2016, 2018 - 2019)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2014 - 2015, 2017)
+//   Tobias Leibner  (2014 - 2015, 2017, 2019 - 2020)
 
 #ifndef DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH
 #define DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH
@@ -304,12 +304,11 @@ private:
       if (ex.empty())
         DUNE_THROW(Common::Exceptions::wrong_input_given, "Given expressions must not be empty!");
     if (vars.size() > maxDimDomain)
-      DUNE_THROW(
-          Common::Exceptions::shapes_do_not_match,
-          "This expression function of dynamic size was compiled to work for up to "
-              << DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE << " variables, but you provided " << vars.size()
-              << "!\n\n"
-              << "Configure dune-xt-functions with a larger DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE!");
+      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
+                 "This expression function of dynamic size was compiled to work for up to "
+                     << DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE << " variables, but you provided "
+                     << vars.size() << "!\n\n"
+                     << "Configure dune-xt with a larger DUNE_XT_FUNCTIONS_EXPRESSION_BASE_MAX_DYNAMIC_SIZE!");
     originalvars_ = vars;
     for (const auto& var : originalvars_)
       if (var.empty())

@@ -1,7 +1,7 @@
 # ~~~
 # This file is part of the dune-xt project:
 #   https://github.com/dune-community/dune-xt
-# Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -9,7 +9,7 @@
 #   Felix Schindler (2013 - 2014, 2016 - 2017)
 #   René Fritze     (2013 - 2016, 2018 - 2019)
 #   Sven Kaulmann   (2014)
-#   Tobias Leibner  (2016, 2018 - 2019)
+#   Tobias Leibner  (2016, 2018 - 2020)
 # ~~~
 
 # enables "IN_LIST operator
@@ -99,7 +99,7 @@ if(HAVE_MPI)
   if(MPI4PY_FOUND)
     # this only works in dependent modules
     dune_register_package_flags(INCLUDE_DIRS "${MPI4PY_INCLUDE_DIR}")
-    # this only works in dune-xt-common itself
+    # this only works in dune-xt itself
     include_directories("${MPI4PY_INCLUDE_DIR}" ${PYTHON_INCLUDE_DIRS})
   else()
     message(FATAL_ERROR kaput)
