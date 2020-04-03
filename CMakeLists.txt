@@ -58,7 +58,10 @@ dune_enable_all_packages(INCLUDE_DIRS
 # The -fsized-deallocation flag is not needed anymore in newer versions of pybind11. TODO: Remove once we update
 # pybind11.
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  target_compile_options(dunepybindxi INTERFACE -fsized-deallocation)
   target_compile_options(dunepybindxiinterface INTERFACE -fsized-deallocation)
+  target_compile_options(dunepybindximodule INTERFACE -fsized-deallocation)
+  target_compile_options(dunepybindxiembed INTERFACE -fsized-deallocation)
 endif()
 # Build an interface library target:
 add_library(pybind11::pybind11 ALIAS dunepybindxiinterface) # to match exported target
