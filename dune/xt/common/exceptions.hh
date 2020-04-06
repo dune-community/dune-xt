@@ -82,6 +82,12 @@ if (a.size() != b.size())
     }                                                                                                                  \
   } while (0)
 
+#ifndef NDEBUG
+#  define DEBUG_THROW_IF(condition, E, m) DUNE_THROW_IF(condition, E, m)
+#else
+#  define DEBUG_THROW_IF(condition, E, m) (void)0
+#endif
+
 
 namespace Dune {
 namespace XT {
