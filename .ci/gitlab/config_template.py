@@ -23,7 +23,7 @@ variables:
             - runner_system_failure
             - stuck_or_timeout_failure
             - api_failure
-    only: ['branches', 'tags', 'triggers', 'merge-requests']
+    only: ['branches', 'tags', 'triggers', 'merge_requests']
     except:
         - /^staging/.*$/i
     retry:
