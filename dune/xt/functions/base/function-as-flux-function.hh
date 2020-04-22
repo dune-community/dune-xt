@@ -40,11 +40,7 @@ public:
     : function_storage_(function)
   {}
 
-  StateFunctionAsFluxFunctionWrapper(const FunctionType*&& function_ptr)
-    : function_storage_(std::move(function_ptr))
-  {}
-
-  StateFunctionAsFluxFunctionWrapper(std::unique_ptr<FunctionType>&& function_ptr)
+  StateFunctionAsFluxFunctionWrapper(std::unique_ptr<const FunctionType>&& function_ptr)
     : function_storage_(std::move(function_ptr))
   {}
 

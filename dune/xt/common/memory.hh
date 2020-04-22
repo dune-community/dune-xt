@@ -86,7 +86,7 @@ public:
   {}
 
   explicit ConstAccessByPointer(std::unique_ptr<const T>&& tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
   explicit ConstAccessByPointer(std::shared_ptr<const T> tt)
@@ -186,7 +186,7 @@ public:
   {}
 
   explicit AccessByPointer(std::unique_ptr<T>&& tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
   explicit AccessByPointer(std::shared_ptr<T> tt)
@@ -318,7 +318,9 @@ public:
     : storage_(new internal::ConstAccessByPointer<T>(tt))
   {}
 
-  explicit ConstStorageProvider(T&& tt)
+  // We have to disable this constructor if T is not a complete type to avoid compilation failures
+  template <class S, typename std::enable_if_t<std::is_constructible<T, S&&>::value, bool> = true>
+  explicit ConstStorageProvider(S&& tt)
     : storage_(new internal::ConstAccessByValue<T>(std::move(tt)))
   {}
 
@@ -327,7 +329,7 @@ public:
   {}
 
   explicit ConstStorageProvider(std::unique_ptr<const T>&& tt)
-    : storage_(tt)
+    : storage_(new internal::ConstAccessByPointer<T>(std::move(tt)))
   {}
 
   ConstStorageProvider(const ConstStorageProvider<T>& other)
