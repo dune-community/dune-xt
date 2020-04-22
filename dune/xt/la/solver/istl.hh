@@ -61,11 +61,14 @@ struct IstlSolverTraits
   }
 
   template <class SequentialPreconditionerType>
-  static BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialPreconditionerType>
-  make_preconditioner(SequentialPreconditionerType& seq_preconditioner, const CommunicatorType& communicator)
+  static std::shared_ptr<
+      BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialPreconditionerType>>
+  make_preconditioner(const std::shared_ptr<SequentialPreconditionerType>& seq_preconditioner,
+                      const CommunicatorType& communicator)
   {
-    return BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialPreconditionerType>(
-        seq_preconditioner, communicator);
+    return std::make_shared<
+        BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialPreconditionerType>>(
+        *seq_preconditioner, communicator);
   }
 };
 
@@ -89,8 +92,9 @@ struct IstlSolverTraits<S, SequentialCommunication>
   }
 
   template <class SequentialPreconditionerType>
-  static SequentialPreconditionerType make_preconditioner(const SequentialPreconditionerType& seq_preconditioner,
-                                                          const SequentialCommunication& /*communicator*/)
+  static std::shared_ptr<SequentialPreconditionerType>
+  make_preconditioner(const std::shared_ptr<SequentialPreconditionerType>& seq_preconditioner,
+                      const SequentialCommunication& /*communicator*/)
   {
     return seq_preconditioner;
   }
@@ -239,15 +243,15 @@ public:
                             .call(writable_rhs, solution, opts, default_opts, type.substr(13));
       } else if (type == "bicgstab.ilut") {
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
-        typedef SeqILUn<typename MatrixType::BackendType, IstlVectorType, IstlVectorType> SequentialPreconditionerType;
-        SequentialPreconditionerType seq_preconditioner(
+        typedef SeqILU<typename MatrixType::BackendType, IstlVectorType, IstlVectorType> SequentialPreconditionerType;
+        auto seq_preconditioner = std::make_shared<SequentialPreconditionerType>(
             matrix_.backend(),
             opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
             opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         BiCgSolverType solver(matrix_operator,
                               scalar_product,
-                              preconditioner,
+                              *preconditioner,
                               opts.get("precision", default_opts.get<R>("precision")),
                               opts.get("max_iter", default_opts.get<int>("max_iter")),
                               verbosity(opts, default_opts));
@@ -255,14 +259,14 @@ public:
       } else if (type == "bicgstab.ssor") {
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         typedef SeqSSOR<typename MatrixType::BackendType, IstlVectorType, IstlVectorType> SequentialPreconditionerType;
-        SequentialPreconditionerType seq_preconditioner(
+        auto seq_preconditioner = std::make_shared<SequentialPreconditionerType>(
             matrix_.backend(),
             opts.get("preconditioner.iterations", default_opts.get<int>("preconditioner.iterations")),
             opts.get("preconditioner.relaxation_factor", default_opts.get<S>("preconditioner.relaxation_factor")));
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         BiCgSolverType solver(matrix_operator,
                               scalar_product,
-                              preconditioner,
+                              *preconditioner,
                               opts.get("precision", default_opts.get<S>("precision")),
                               opts.get("max_iter", default_opts.get<int>("max_iter")),
                               verbosity(opts, default_opts));
@@ -271,12 +275,12 @@ public:
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         const auto cat = matrix_operator.category();
         typedef IdentityPreconditioner<MatrixOperatorType> SequentialPreconditioner;
-        SequentialPreconditioner seq_preconditioner(cat);
+        auto seq_preconditioner = std::make_shared<SequentialPreconditioner>(cat);
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         // define the BiCGStab as the actual solver
         BiCgSolverType solver(matrix_operator,
                               scalar_product,
-                              preconditioner,
+                              *preconditioner,
                               opts.get("precision", default_opts.get<S>("precision")),
                               opts.get("max_iter", default_opts.get<int>("max_iter")),
                               verbosity(opts, default_opts));
@@ -285,12 +289,12 @@ public:
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         const auto cat = matrix_operator.category();
         typedef IdentityPreconditioner<MatrixOperatorType> SequentialPreconditioner;
-        SequentialPreconditioner seq_preconditioner(cat);
+        auto seq_preconditioner = std::make_shared<SequentialPreconditioner>(cat);
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         // define the CG as the actual solver
         CgSolverType solver(matrix_operator,
                             scalar_product,
-                            preconditioner,
+                            *preconditioner,
                             opts.get("precision", default_opts.get<S>("precision")),
                             opts.get("max_iter", default_opts.get<int>("max_iter")),
                             verbosity(opts, default_opts),

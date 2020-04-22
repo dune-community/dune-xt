@@ -64,7 +64,7 @@ public:
     OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
 
     // ILU0 as the smoother for the AMG
-    typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType_ILU;
+    typedef SeqILU<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType_ILU;
     typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType_ILU>
         SmootherType_ILU;
     typename Amg::SmootherTraits<SmootherType_ILU>::Arguments smoother_parameters_ILU;
@@ -186,7 +186,7 @@ public:
 
     InverseOperatorResult stats;
     if (smoother_type == "ilu0") {
-      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
+      typedef SeqILU<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
 
       typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
       smoother_parameters.iterations = opts.get("smoother.iterations", default_opts.get<int>("smoother.iterations"));
