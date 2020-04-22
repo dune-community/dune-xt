@@ -17,6 +17,10 @@
 #  define DUNE_XT_COMMON_DO_PROFILE 0
 #endif
 
+#ifndef DUNE_XT_COMMON_DO_TIMING
+#  define DUNE_XT_COMMON_DO_TIMING 0
+#endif
+
 #include <string>
 #include <map>
 #include <vector>
