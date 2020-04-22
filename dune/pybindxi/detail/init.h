@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/detail/init.h: init factory function implementation and support code.
 

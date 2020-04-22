@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/embed.h: Support for embedding the interpreter
 

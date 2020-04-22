@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/std_bind.h: Binding generators for STL data types
 

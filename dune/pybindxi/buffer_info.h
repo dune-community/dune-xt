@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/buffer_info.h: Python buffer object interface
 

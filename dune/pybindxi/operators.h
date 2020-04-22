@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/operator.h: Metatemplates for operator overloading
 

@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/detail/internals.h: Internal data structure and related functions
 

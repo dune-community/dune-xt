@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/iostream.h -- Tools to assist with redirecting cout and cerr to Python
 

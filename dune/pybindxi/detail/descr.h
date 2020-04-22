@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/detail/descr.h: Helper type for concatenating type signatures at compile time
 

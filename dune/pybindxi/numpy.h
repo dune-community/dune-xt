@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/numpy.h: Basic NumPy support, vectorize() wrapper
 
