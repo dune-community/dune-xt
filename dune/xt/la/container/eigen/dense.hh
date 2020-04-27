@@ -225,6 +225,11 @@ public:
     return backend().data();
   }
 
+  const DataType* data() const
+  {
+    return backend().data();
+  }
+
   size_t data_size() const
   {
     return this->size();
