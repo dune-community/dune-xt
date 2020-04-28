@@ -192,7 +192,7 @@ bool Parameter::operator<(const Parameter& other) const
 ParameterType Parameter::type() const
 {
   ParameterType ret;
-  for (const auto key_value_pairs : dict_)
+  for (const auto& key_value_pairs : dict_)
     ret.set(key_value_pairs.first, key_value_pairs.second.size());
   return ret;
 }
