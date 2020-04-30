@@ -12,6 +12,8 @@
 #   Tobias Leibner  (2019)
 # ~~~
 
+dune_pybindxi_add_module(userbindings EXCLUDE_FROM_ALL userbindings.cc)
+
 add_subdirectory(common)
 add_subdirectory(functions)
 add_subdirectory(grid)
