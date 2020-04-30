@@ -59,6 +59,12 @@ public:
     return keys_;
   }
 
+  void clear()
+  {
+    keys_.clear();
+    dict_.clear();
+  }
+
   bool empty() const
   {
     return dict_.size() == 0;
