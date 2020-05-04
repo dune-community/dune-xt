@@ -10,10 +10,12 @@
 #ifndef DUNE_XT_COMMON_NUMERIC_HH
 #define DUNE_XT_COMMON_NUMERIC_HH
 
+#if defined(__has_include) && __has_include(<version>)
+#  include <version>
+#endif
 // C++17 parallel TS features
-#if defined(__has_include) && defined(__cpp_lib_execution) && defined(__cpp_lib_parallel_algorithm)
-#  define CPP17_PARALLELISM_TS_SUPPORTED                                                                               \
-    __has_include(<execution>) && __cpp_lib_execution >= 201603 && __cpp_lib_parallel_algorithm >= 201603
+#if defined(__has_include) && (defined(__cpp_lib_execution) || __has_include(<execution>)) && defined(__cpp_lib_parallel_algorithm)
+#  define CPP17_PARALLELISM_TS_SUPPORTED __has_include(<execution>) && __cpp_lib_parallel_algorithm >= 201603
 #else
 #  define CPP17_PARALLELISM_TS_SUPPORTED 0
 #endif
