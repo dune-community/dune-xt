@@ -25,6 +25,7 @@
 #include <dune/common/typetraits.hh>
 #include <dune/common/unused.hh>
 
+#include <dune/xt/common/exceptions.hh>
 
 /** use this to define Typename specializations in the GLOBAL namespace ONLY **/
 #define DUNE_XT_COMMON_TYPENAME(NAME)                                                                                  \

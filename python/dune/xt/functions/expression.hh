@@ -79,8 +79,8 @@ static const constexpr size_t d = G::dimension;
  *       everywhere: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <size_t d, size_t r>
-pybind11::class_<ExpressionFunction<d, r, 3, double>> bind_ExpressionFunction(pybind11::module& m,
-                                                                              std::integral_constant<int, 3>)
+pybind11::class_<ExpressionFunction<d, r, 3, double>, FunctionInterface<d, r, 3, double>>
+bind_ExpressionFunction(pybind11::module& m, std::integral_constant<int, 3>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -141,8 +141,8 @@ pybind11::class_<ExpressionFunction<d, r, 3, double>> bind_ExpressionFunction(py
 } // ... bind_ExpressionFunction(...)
 
 template <size_t d, size_t r>
-pybind11::class_<ExpressionFunction<d, r, 2, double>> bind_ExpressionFunction(pybind11::module& m,
-                                                                              std::integral_constant<int, 2>)
+pybind11::class_<ExpressionFunction<d, r, 2, double>, FunctionInterface<d, r, 2, double>>
+bind_ExpressionFunction(pybind11::module& m, std::integral_constant<int, 2>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -204,8 +204,8 @@ pybind11::class_<ExpressionFunction<d, r, 2, double>> bind_ExpressionFunction(py
 } // ... bind_ExpressionFunction(...)
 
 template <size_t d, size_t r>
-pybind11::class_<ExpressionFunction<d, r, 1, double>> bind_ExpressionFunction(pybind11::module& m,
-                                                                              std::integral_constant<int, 1>)
+pybind11::class_<ExpressionFunction<d, r, 1, double>, FunctionInterface<d, r, 1, double>>
+bind_ExpressionFunction(pybind11::module& m, std::integral_constant<int, 1>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;

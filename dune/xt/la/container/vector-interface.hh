@@ -229,7 +229,7 @@ public:
    */
   virtual std::pair<size_t, RealType> amax() const
   {
-    using std::abs;
+    using XT::Common::abs;
     auto result = std::make_pair(size_t(0), RealType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
       const auto value = abs(get_unchecked_ref(ii));
@@ -297,7 +297,7 @@ public:
    */
   virtual RealType l1_norm() const
   {
-    using std::abs;
+    using XT::Common::abs;
     RealType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
       result += abs(get_unchecked_ref(ii));
@@ -317,8 +317,8 @@ public:
    */
   virtual RealType l2_norm() const
   {
-    using std::abs;
     using std::sqrt;
+    using XT::Common::abs;
     return sqrt(abs(dot(this->as_imp()))); // std::abs is only needed for the right return type:
     // v.dot(v) should always be a ScalarType with zero imaginary part
   }

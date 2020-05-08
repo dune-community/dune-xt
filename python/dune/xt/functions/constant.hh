@@ -38,7 +38,8 @@ static const constexpr size_t d = G::dimension;
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <size_t d, size_t r, size_t rC>
-typename pybind11::class_<ConstantFunction<d, r, rC, double>> bind_ConstantFunction(pybind11::module& m)
+typename pybind11::class_<ConstantFunction<d, r, rC, double>, FunctionInterface<d, r, rC, double>>
+bind_ConstantFunction(pybind11::module& m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;

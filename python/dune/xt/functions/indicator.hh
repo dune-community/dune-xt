@@ -32,7 +32,8 @@ namespace Functions {
 template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<
     Grid::is_grid<G>::value,
-    pybind11::class_<IndicatorGridFunction<typename G::template Codim<0>::Entity, r, rC, double>>>::type
+    pybind11::class_<IndicatorGridFunction<typename G::template Codim<0>::Entity, r, rC, double>,
+                     GridFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>>::type
 bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
@@ -76,7 +77,8 @@ bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
 
 
 template <size_t d, size_t r, size_t rC>
-typename pybind11::class_<IndicatorFunction<d, r, rC, double>> bind_IndicatorFunction(pybind11::module& m)
+typename pybind11::class_<IndicatorFunction<d, r, rC, double>, FunctionInterface<d, r, rC, double>>
+bind_IndicatorFunction(pybind11::module& m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;

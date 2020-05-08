@@ -13,7 +13,7 @@
 
 #include <cmath>
 
-// Due to probles with old cblas versions, we only use the MKL cblas for the moment. See also
+// Due to problems with old cblas versions, we only use the MKL cblas for the moment. See also
 // https://github.com/dune-community/dune-xt/pull/198.
 #if HAVE_MKL
 #  include <mkl.h>

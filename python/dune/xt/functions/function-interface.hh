@@ -113,10 +113,15 @@ struct get_combined<L, R, CombinationType::product>
 } // namespace internal
 
 
-template <size_t d, CombinationType comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
-pybind11::class_<typename internal::get_combined<FunctionInterface<d, lr, lrC, double>,
-                                                 FunctionInterface<d, rr, rrC, double>,
-                                                 comb>::type>
+template <size_t d,
+          CombinationType comb,
+          size_t lr,
+          size_t lrC,
+          size_t rr,
+          size_t rrC,
+          class C = typename internal::
+              get_combined<FunctionInterface<d, lr, lrC, double>, FunctionInterface<d, rr, rrC, double>, comb>::type>
+pybind11::class_<C, FunctionInterface<d, C::range_dim, C::range_dim_cols, double>>
 bind_combined_Function(pybind11::module& m)
 {
   namespace py = pybind11;
@@ -124,7 +129,6 @@ bind_combined_Function(pybind11::module& m)
   typedef double R;
   typedef FunctionInterface<d, lr, lrC, R> Left;
   typedef FunctionInterface<d, rr, rrC, R> Right;
-  typedef typename internal::get_combined<Left, Right, comb>::type C;
   static const size_t r = C::range_dim;
   static const size_t rC = C::range_dim_cols;
   const std::string id = internal::get_combined<Left, Right, comb>::id();
