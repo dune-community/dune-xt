@@ -261,11 +261,19 @@ static const constexpr size_t d = G::dimension;
 \endcode
  *       but this triggers a bug in gcc-4.9, see e.g.: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
-template <class G, size_t d, CombinationType comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
-pybind11::class_<
-    typename internal::get_grid_combined<GridFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
-                                         GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
-                                         comb>::type>
+template <class G,
+          size_t d,
+          CombinationType comb,
+          size_t lr,
+          size_t lrC,
+          size_t rr,
+          size_t rrC,
+          class C = typename internal::get_grid_combined<
+              GridFunctionInterface<typename G::template Codim<0>::Entity, lr, lrC, double>,
+              GridFunctionInterface<typename G::template Codim<0>::Entity, rr, rrC, double>,
+              comb>::type>
+pybind11::class_<C,
+                 GridFunctionInterface<typename G::template Codim<0>::Entity, C::range_dim, C::range_dim_cols, double>>
 bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
@@ -274,7 +282,6 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
   typedef double R;
   typedef GridFunctionInterface<E, lr, lrC, R> Left;
   typedef GridFunctionInterface<E, rr, rrC, R> Right;
-  typedef typename internal::get_grid_combined<Left, Right, comb>::type C;
   static const size_t r = C::range_dim;
   static const size_t rC = C::range_dim_cols;
   const std::string id = internal::get_grid_combined<Left, Right, comb>::id();

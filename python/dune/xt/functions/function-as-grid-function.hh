@@ -29,7 +29,8 @@ namespace bindings {
 template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<
     Grid::is_grid<G>::value,
-    pybind11::class_<FunctionAsGridFunctionWrapper<typename G::template Codim<0>::Entity, r, rC, double>>>::type
+    pybind11::class_<FunctionAsGridFunctionWrapper<typename G::template Codim<0>::Entity, r, rC, double>,
+                     GridFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>>::type
 bind_FunctionAsGridFunctionWrapper(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
