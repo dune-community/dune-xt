@@ -33,6 +33,7 @@ function(dune_pybindxi_install_python_package)
   endif()
 
   # Check for the presence of the pip package
+  dune_python_find_package(PACKAGE pip INTERPRETER ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE})
   if(NOT DUNE_PYTHON_pip_FOUND)
     message(FATAL_ERROR "dune_python_install_package: Requested installations, but pip was not found!")
   endif()
