@@ -329,6 +329,20 @@ struct is_hashable<T, typename std::enable_if<!!sizeof(std::declval<std::hash<T>
 #endif
 
 
+// from https://github.com/mnafees/cpp_utils/blob/master/is_printable/is_printable.hpp
+template <typename _Tp, typename dummy = void>
+struct is_printable : std::false_type
+{};
+
+template <typename _Tp>
+struct is_printable<
+    _Tp,
+    typename std::enable_if_t<
+        std::is_same<std::remove_reference_t<decltype(std::cout << std::declval<_Tp>())>, std::ostream>::value>>
+  : std::true_type
+{};
+
+
 template <class T>
 struct is_complex : public std::false_type
 {};
