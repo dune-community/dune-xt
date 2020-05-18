@@ -13,6 +13,7 @@
  * This file is intended as a starting point for quick testing.
  */
 
-#include <dune/xt/test/main.hxx>
+#include <dune/xt/test/main.hxx> // <- has to come first, include config.h!
+
 
 GTEST_TEST(empty, main) {}
