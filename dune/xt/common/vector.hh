@@ -165,8 +165,7 @@ struct VectorAbstraction
 template <class T, class Allocator>
 struct VectorAbstraction<std::vector<T, Allocator>>
   : public internal::VectorAbstractionBase<std::vector<T, Allocator>, T>
-  , public internal::HasSubscriptOperatorForVectorAbstraction<std::vector<T, Allocator>,
-                                                              typename Dune::FieldTraits<T>::field_type>
+  , public internal::HasSubscriptOperatorForVectorAbstraction<std::vector<T, Allocator>, T>
 {
   static const constexpr bool is_contiguous = true;
   static const constexpr bool static_size = std::numeric_limits<size_t>::max();
