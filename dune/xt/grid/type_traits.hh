@@ -222,26 +222,33 @@ struct is_cube_alugrid<ALUGrid<dim, dimworld, ALUGridElementType::cube, refineTy
 template <class T,
           bool view = is_view<T>::value,
           bool part = is_part<T>::value,
-          bool intersection = is_intersection<T>::value>
+          bool intersection = is_intersection<T>::value,
+          bool entity = is_entity<T>::value>
 struct extract_grid : public AlwaysFalse<T>
 {};
 
 template <class T>
-struct extract_grid<T, true, false, false>
+struct extract_grid<T, true, false, false, false>
 {
   typedef typename T::Grid type;
 };
 
 template <class T>
-struct extract_grid<T, false, true, false>
+struct extract_grid<T, false, true, false, false>
 {
   typedef typename T::GridType type;
 };
 
 template <class T>
-struct extract_grid<T, false, false, true>
+struct extract_grid<T, false, false, true, false>
 {
   typedef typename is_intersection<T>::GridType type;
+};
+
+template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
+struct extract_grid<Dune::Entity<cd, dim, GridImp, EntityImp>, false, false, false, true>
+{
+  using type = GridImp;
 };
 
 template <class T>
