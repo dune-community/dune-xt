@@ -16,6 +16,25 @@
 using namespace Dune::XT::Common;
 using namespace std;
 
+
+GTEST_TEST(print, some_types)
+{
+  std::cout << print(int(1)) << std::endl;
+  std::cout << print(double(2)) << std::endl;
+  std::cout << print(std::string("foo")) << std::endl;
+  std::cout << print(std::vector<double>({1, 2})) << std::endl;
+}
+
+
+GTEST_TEST(repr, some_types)
+{
+  std::cout << repr(int(1)) << std::endl;
+  std::cout << repr(double(2)) << std::endl;
+  std::cout << repr(std::string("foo")) << std::endl;
+  std::cout << repr(std::vector<double>({1, 2})) << std::endl;
+}
+
+
 GTEST_TEST(OutputIterator, All)
 {
   const vector<int> ints{0, 1, 2};
