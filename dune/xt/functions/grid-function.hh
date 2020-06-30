@@ -194,7 +194,7 @@ public:
           new GridFunction<E, 1, 1, R>(value), std::move(unit_matrix()), ""))
   {}
 
-  GridFunction(const FieldMatrix<R, r, r>& value) // <- Must not be XT::Common::FIeldMatrix!
+  GridFunction(const FieldMatrix<R, r, r>& value) // <- Must not be XT::Common::FieldMatrix!
     : storage_(new FunctionAsGridFunctionWrapper<E, r, r, R>(new ConstantFunction<d, r, r, R>(value)))
   {}
 
