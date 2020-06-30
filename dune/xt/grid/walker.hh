@@ -198,7 +198,10 @@ private:
 template <class GV>
 class Walker : public ElementAndIntersectionFunctor<GV>
 {
+protected:
   using BaseType = ElementAndIntersectionFunctor<GV>;
+
+private:
   using ThisType = Walker;
 
 public:
@@ -735,7 +738,7 @@ public:
     } // .. walk elements
   } // ... walk_range(...)
 
-private:
+protected:
   GridViewType grid_view_;
   // We want each thread to have its own copy of each functor. However, as we do not know in advance how many different
   // threads we will have (even if DXTC_CONFIG["threading.max_count"] is set, there may be only max_threads at a time,
