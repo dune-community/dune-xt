@@ -230,25 +230,25 @@ struct extract_grid : public AlwaysFalse<T>
 template <class T>
 struct extract_grid<T, true, false, false, false>
 {
-  typedef typename T::Grid type;
+  typedef std::decay_t<typename T::Grid> type;
 };
 
 template <class T>
 struct extract_grid<T, false, true, false, false>
 {
-  typedef typename T::GridType type;
+  typedef std::decay_t<typename T::GridType> type;
 };
 
 template <class T>
 struct extract_grid<T, false, false, true, false>
 {
-  typedef typename is_intersection<T>::GridType type;
+  typedef std::decay_t<typename is_intersection<T>::GridType> type;
 };
 
 template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
 struct extract_grid<Dune::Entity<cd, dim, GridImp, EntityImp>, false, false, false, true>
 {
-  using type = GridImp;
+  using type = std::decay_t<GridImp>;
 };
 
 template <class T>
