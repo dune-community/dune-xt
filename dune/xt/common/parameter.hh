@@ -35,6 +35,10 @@ public:
 
   SimpleDict() {}
 
+  SimpleDict(const ThisType& other) = default;
+
+  SimpleDict(ThisType&& source) = default;
+
   SimpleDict(const std::string& key, const ValueType& value)
     : dict_({std::make_pair(key, value)})
   {
@@ -48,10 +52,8 @@ public:
     update_keys();
   }
 
-  SimpleDict(const ThisType& other) = default;
-  SimpleDict(ThisType&& source) = default;
-
   ThisType& operator=(const ThisType& other) = default;
+
   ThisType& operator=(ThisType&& source) = default;
 
   const std::vector<std::string>& keys() const
@@ -178,6 +180,14 @@ class ParameterType : public internal::SimpleDict<size_t>
 public:
   ParameterType();
 
+  ParameterType(const ParameterType& other) = default;
+
+  ParameterType(ParameterType&& source) = default;
+
+private:
+  ParameterType(BaseType&& source);
+
+public:
   ParameterType(const std::string& key);
 
   ParameterType(const std::string& key, const size_t& sz);
@@ -188,14 +198,8 @@ public:
 
   ParameterType(const std::vector<std::pair<std::string, size_t>>& key_size_pairs);
 
-private:
-  ParameterType(BaseType&& source);
-
-public:
-  ParameterType(const ParameterType& other) = default;
-  ParameterType(ParameterType&& source) = default;
-
   ParameterType& operator=(const ParameterType& other) = default;
+
   ParameterType& operator=(ParameterType&& source) = default;
 
   ParameterType operator+(const ParameterType& other) const;
@@ -230,6 +234,17 @@ class Parameter : public internal::SimpleDict<std::vector<double>>
   typedef std::vector<double> ValueType;
 
 public:
+  Parameter(const Parameter& other) = default;
+
+  Parameter(Parameter&& source) = default;
+
+private:
+  Parameter(BaseType&& source);
+
+public:
+  /// \note this is somehow necessary to make clang 3.8 happy (and cannot be defaulted)
+  ~Parameter() {}
+
   Parameter(const std::vector<std::pair<std::string, ValueType>>& key_value_pairs = {});
 
   Parameter(const std::initializer_list<std::pair<std::string, ValueType>>& key_value_pairs);
@@ -245,17 +260,8 @@ public:
 
   Parameter(const std::string& key, const ValueType& value);
 
-private:
-  Parameter(BaseType&& source);
-
-public:
-  Parameter(const Parameter& other) = default;
-  Parameter(Parameter&& source) = default;
-
-  /// \note this is somehow necessary to make clang 3.8 happy (and cannot be defaulted)
-  ~Parameter() {}
-
   Parameter& operator=(const Parameter& other) = default;
+
   Parameter& operator=(Parameter&& source) = default;
 
   Parameter operator+(const Parameter& other) const;
@@ -276,7 +282,15 @@ class ParametricInterface
 public:
   ParametricInterface(const ParameterType& param_type = {});
 
+  ParametricInterface(const ParametricInterface& other) = default;
+
+  ParametricInterface(ParametricInterface&& source) = default;
+
   virtual ~ParametricInterface() = default;
+
+  ParametricInterface& operator=(const ParametricInterface& other) = default;
+
+  ParametricInterface& operator=(ParametricInterface&& source) = default;
 
   virtual bool is_parametric() const;
 
