@@ -1,11 +1,13 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2019)
+//   René Fritze     (2019)
+//   Tobias Leibner  (2019 - 2020)
 
 #ifndef PYTHON_DUNE_XT_FUNCTIONS_FUNCTION_AS_GRID_FUNCTION_HH
 #define PYTHON_DUNE_XT_FUNCTIONS_FUNCTION_AS_GRID_FUNCTION_HH
@@ -27,7 +29,8 @@ namespace bindings {
 template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<
     Grid::is_grid<G>::value,
-    pybind11::class_<FunctionAsGridFunctionWrapper<typename G::template Codim<0>::Entity, r, rC, double>>>::type
+    pybind11::class_<FunctionAsGridFunctionWrapper<typename G::template Codim<0>::Entity, r, rC, double>,
+                     GridFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>>::type
 bind_FunctionAsGridFunctionWrapper(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;

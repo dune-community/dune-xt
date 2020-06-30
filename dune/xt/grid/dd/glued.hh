@@ -1,13 +1,13 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017 - 2018)
-//   René Fritze     (2018)
-//   Tobias Leibner  (2017 - 2019)
+//   René Fritze     (2018 - 2019)
+//   Tobias Leibner  (2017 - 2020)
 
 #ifndef DUNE_XT_GRID_DD_GLUED_HH
 #define DUNE_XT_GRID_DD_GLUED_HH
@@ -734,7 +734,7 @@ private:
         subdomain_factory.insertVertex(vertex);
         vertex_ids[local_vertex_id] = local_vertex_id;
       }
-      subdomain_factory.insertElement(macro_entity.geometry().type(), vertex_ids);
+      subdomain_factory.insertElement(macro_entity.type(), vertex_ids);
       return std::make_shared<XT::Grid::GridProvider<LocalGridType>>(subdomain_factory.createGrid());
     } catch (GridError& ee) {
       DUNE_THROW(GridError,
@@ -922,7 +922,7 @@ private:
                                   template count<dimDomain>();
 #  endif
         entity_to_vertex_ids[macro_index][micro_index] = std::vector<unsigned int>(num_vertices);
-        geometry_types[macro_index][micro_index] = micro_entity.geometry().type();
+        geometry_types[macro_index][micro_index] = micro_entity.type();
         for (unsigned int local_vertex_id = 0; local_vertex_id < num_vertices; ++local_vertex_id) {
           const unsigned int global_vertex_id = find_insert_vertex(vertices,
                                                                    micro_entity

@@ -1,14 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017 - 2019)
-//   René Fritze     (2016, 2018)
+//   René Fritze     (2016, 2018 - 2019)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2016 - 2018)
+//   Tobias Leibner  (2016 - 2020)
 
 #ifndef DUNE_XT_FUNCTIONS_BASE_REINTERPRET_HH
 #define DUNE_XT_FUNCTIONS_BASE_REINTERPRET_HH
@@ -102,7 +102,7 @@ private:
     {
       // See if we find a source element which contais target_element completely. Therefore
       // * collect all vertices
-      const auto& reference_element = ReferenceElements<D, d>::general(target_element.geometry().type());
+      const auto& reference_element = ReferenceElements<D, d>::general(target_element.type());
       const auto num_vertices = reference_element.size(1);
       if (vertices_.size() != num_vertices)
         vertices_.resize(num_vertices);

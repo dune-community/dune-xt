@@ -1,13 +1,13 @@
 ```
 # This file is part of the dune-xt project:
 #   https://github.com/dune-community/dune-xt
-# Copyright 2009-2017 dune-xt-common developers and contributors. All rights reserved.
+# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   Felix Schindler (2016 - 2017)
-#   Rene Milk       (2016)
+#   Felix Schindler (2013 - 2014, 2016 - 2017, 2019)
+#   René Fritze     (2009, 2015, 2016, 2019)
 ```
 
 # Help
@@ -15,7 +15,7 @@
 If you are experiencing problems or would like to get help, open up a new
 [issue](https://github.com/dune-community/dune-xt/issues/new) and tag it accordingly
 or ask for help on the [mailinglist](https://listserv.uni-muenster.de/mailman/listinfo/dune-xt-dev).
-Please note that dune-xt-common is not one of the core DUNE modules. Thus, you will not get
+Please note that dune-xt is not one of the core DUNE modules. Thus, you will not get
 any support from the official channels (such as the DUNE mailinglist, the DUNE bugtracker,
 etc...).
 When submitting bugs, please read these
@@ -120,7 +120,7 @@ Sort the groups by
   * stl
   * other external dependency
   * dune core modules
-  * dune-xt-common
+  * dune-xt
   * local header within the same (sub)folder
 
 For example:

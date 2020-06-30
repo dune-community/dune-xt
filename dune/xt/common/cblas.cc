@@ -1,18 +1,19 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2019)
 //   René Fritze     (2019)
+//   Tobias Leibner  (2020)
 
 #include "config.h"
 
 #include <cmath>
 
-// Due to probles with old cblas versions, we only use the MKL cblas for the moment. See also
+// Due to problems with old cblas versions, we only use the MKL cblas for the moment. See also
 // https://github.com/dune-community/dune-xt/pull/198.
 #if HAVE_MKL
 #  include <mkl.h>

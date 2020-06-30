@@ -1,7 +1,7 @@
 # ~~~
 # This file is part of the dune-xt project:
 #   https://github.com/dune-community/dune-xt
-# Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+# Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 # License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -9,7 +9,7 @@
 #   Felix Schindler (2012 - 2017, 2019)
 #   René Fritze     (2010 - 2019)
 #   Sven Kaulmann   (2013)
-#   Tobias Leibner  (2015 - 2019)
+#   Tobias Leibner  (2015 - 2020)
 # ~~~
 
 macro(dxt_headercheck_target_name arg)
@@ -54,7 +54,6 @@ macro(get_headercheck_targets subdir)
       dxt_headercheck_target_name(${targname})
       list(APPEND ${subdir}_dxt_headercheck_targets "${targname}")
       add_dependencies(${subdir}_headercheck ${targname})
-      message(STATUS "${subdir}_headercheck FOOBAR ${subdir}_headercheck || ${targname}")
     endforeach(header ${headerlist})
   endif(ENABLE_HEADERCHECK)
 endmacro(get_headercheck_targets)

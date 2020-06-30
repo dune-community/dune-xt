@@ -1,13 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2017 dune-xt-la developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
-//   Felix Schindler (2013 - 2017)
-//   Rene Milk       (2014 - 2016)
-//   Tobias Leibner  (2014 - 2015, 2017)
+//   Felix Schindler (2017)
+//   René Fritze     (2017, 2019)
+//   Tim Keil        (2018)
+//   Tobias Leibner  (2018)
 
 #include <dune/xt/test/main.hxx> // <- has to come first (includes the config.h)!
 
@@ -153,12 +154,12 @@ TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, is_constructible)
 
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigenvalues)
 {
-  gives_correct_eigenvalues({ {"lapack", "1e-14"}, {"eigen", "1e-15"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_eigenvalues({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 TEST_F(EigenSolverForMatrixFromEigensExample_{{T_NAME}}, gives_correct_eigendecomposition)
 {
-  gives_correct_eigendecomposition({ {"lapack", "1e-14"}, {"eigen", "1e-14"}, {"numpy", "1e-14"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
+  gives_correct_eigendecomposition({ {"lapack", "1e-6"}, {"eigen", "1e-6"}, {"numpy", "1e-6"}, {"shifted_qr", /*we_expect_a_failure: */ "-1"} });
 }
 
 {% endfor %}

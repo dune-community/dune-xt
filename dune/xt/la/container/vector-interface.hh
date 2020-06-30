@@ -1,14 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Barbara Verfürth (2015)
 //   Felix Schindler  (2012 - 2019)
-//   René Fritze      (2013 - 2018)
-//   Tobias Leibner   (2014, 2017 - 2019)
+//   René Fritze      (2013 - 2019)
+//   Tobias Leibner   (2014, 2017 - 2020)
 
 #ifndef DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_HH
 #define DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_HH
@@ -229,7 +229,7 @@ public:
    */
   virtual std::pair<size_t, RealType> amax() const
   {
-    using std::abs;
+    using XT::Common::abs;
     auto result = std::make_pair(size_t(0), RealType(0));
     for (size_t ii = 0; ii < size(); ++ii) {
       const auto value = abs(get_unchecked_ref(ii));
@@ -297,7 +297,7 @@ public:
    */
   virtual RealType l1_norm() const
   {
-    using std::abs;
+    using XT::Common::abs;
     RealType result = 0;
     for (size_t ii = 0; ii < size(); ++ii)
       result += abs(get_unchecked_ref(ii));
@@ -317,8 +317,8 @@ public:
    */
   virtual RealType l2_norm() const
   {
-    using std::abs;
     using std::sqrt;
+    using XT::Common::abs;
     return sqrt(abs(dot(this->as_imp()))); // std::abs is only needed for the right return type:
     // v.dot(v) should always be a ScalarType with zero imaginary part
   }

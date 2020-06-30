@@ -1,13 +1,13 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2012, 2014 - 2019)
 //   René Fritze     (2011 - 2012, 2014 - 2019)
-//   Tobias Leibner  (2017, 2019)
+//   Tobias Leibner  (2017, 2019 - 2020)
 
 #ifndef DUNE_XT_COMMON_MEMORY_HH
 #define DUNE_XT_COMMON_MEMORY_HH
@@ -21,15 +21,6 @@
 namespace Dune {
 namespace XT {
 namespace Common {
-
-
-//! make_unique implementation via herb sutter: http://herbsutter.com/gotw/_102/
-//! \TODO this can be delegated to stdlib with c++14
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
-{
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
 
 
 //! just like boost::noncopyable, but for move assign/ctor
@@ -90,12 +81,12 @@ public:
   /**
    * \attention This ctor transfers ownership to ConstAccessByPointer, do not delete tt manually!
    */
-  explicit ConstAccessByPointer(const T*&& tt)
+  explicit ConstAccessByPointer(T* tt)
     : tt_(tt)
   {}
 
   explicit ConstAccessByPointer(std::unique_ptr<const T>&& tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
   explicit ConstAccessByPointer(std::shared_ptr<const T> tt)
@@ -116,6 +107,27 @@ private:
   std::shared_ptr<const T> tt_;
 }; // class ConstAccessByPointer
 
+template <class T>
+class ConstAccessByValue : public ConstAccessInterface<T>
+{
+public:
+  explicit ConstAccessByValue(T&& tt)
+    : tt_(tt)
+  {}
+
+  const T& access() const override final
+  {
+    return tt_;
+  }
+
+  ConstAccessInterface<T>* copy() const override final
+  {
+    return new ConstAccessByValue<T>(T(tt_));
+  }
+
+private:
+  const T tt_;
+}; // class ConstAccessByValue
 
 template <class T>
 class AccessInterface
@@ -174,7 +186,7 @@ public:
   {}
 
   explicit AccessByPointer(std::unique_ptr<T>&& tt)
-    : tt_(tt)
+    : tt_(std::move(tt))
   {}
 
   explicit AccessByPointer(std::shared_ptr<T> tt)
@@ -200,6 +212,32 @@ private:
   std::shared_ptr<T> tt_;
 }; // class AccessByPointer
 
+template <class T>
+class AccessByValue : public ConstAccessInterface<T>
+{
+public:
+  explicit AccessByValue(T&& tt)
+    : tt_(tt)
+  {}
+
+  const T& access() const override final
+  {
+    return tt_;
+  }
+
+  T& access() override final
+  {
+    return tt_;
+  }
+
+  AccessInterface<T>* copy() const override final
+  {
+    return new AccessByValue<T>(T(tt_));
+  }
+
+private:
+  T tt_;
+}; // class AccessByValue
 
 } // namespace internal
 
@@ -276,15 +314,14 @@ public:
   /**
    * \attention This ctor transfers ownership to ConstStorageProvider, do not delete tt manually!
    */
-  explicit ConstStorageProvider(const T*&& tt)
-    : storage_(new internal::ConstAccessByPointer<T>(std::move(tt)))
+  explicit ConstStorageProvider(T*&& tt)
+    : storage_(new internal::ConstAccessByPointer<T>(tt))
   {}
 
-  /**
-   * \attention This ctor transfers ownership to ConstStorageProvider, do not delete tt manually!
-   */
-  explicit ConstStorageProvider(T*&& tt)
-    : storage_(new internal::ConstAccessByPointer<T>(std::move(tt)))
+  // We have to disable this constructor if T is not a complete type to avoid compilation failures
+  template <class S, typename std::enable_if_t<std::is_constructible<T, S&&>::value, bool> = true>
+  explicit ConstStorageProvider(S&& tt)
+    : storage_(new internal::ConstAccessByValue<T>(std::move(tt)))
   {}
 
   explicit ConstStorageProvider(std::shared_ptr<const T> tt)
@@ -292,7 +329,7 @@ public:
   {}
 
   explicit ConstStorageProvider(std::unique_ptr<const T>&& tt)
-    : storage_(tt)
+    : storage_(new internal::ConstAccessByPointer<T>(std::move(tt)))
   {}
 
   ConstStorageProvider(const ConstStorageProvider<T>& other)
@@ -360,6 +397,10 @@ public:
    */
   explicit StorageProvider(T*&& tt)
     : storage_(new internal::AccessByPointer<T>(std::move(tt)))
+  {}
+
+  explicit StorageProvider(T&& tt)
+    : storage_(new internal::ConstAccessByValue<T>(std::move(tt)))
   {}
 
   explicit StorageProvider(std::shared_ptr<T> tt)

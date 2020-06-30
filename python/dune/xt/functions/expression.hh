@@ -1,14 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2016 - 2017, 2019)
-//   René Fritze     (2018)
+//   René Fritze     (2018 - 2019)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2018 - 2019)
+//   Tobias Leibner  (2018 - 2020)
 
 #ifndef PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH
 #define PYTHON_DUNE_XT_FUNCTIONS_EXPRESSION_HH
@@ -79,8 +79,8 @@ static const constexpr size_t d = G::dimension;
  *       everywhere: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <size_t d, size_t r>
-pybind11::class_<ExpressionFunction<d, r, 3, double>> bind_ExpressionFunction(pybind11::module& m,
-                                                                              std::integral_constant<int, 3>)
+pybind11::class_<ExpressionFunction<d, r, 3, double>, FunctionInterface<d, r, 3, double>>
+bind_ExpressionFunction(pybind11::module& m, std::integral_constant<int, 3>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -141,8 +141,8 @@ pybind11::class_<ExpressionFunction<d, r, 3, double>> bind_ExpressionFunction(py
 } // ... bind_ExpressionFunction(...)
 
 template <size_t d, size_t r>
-pybind11::class_<ExpressionFunction<d, r, 2, double>> bind_ExpressionFunction(pybind11::module& m,
-                                                                              std::integral_constant<int, 2>)
+pybind11::class_<ExpressionFunction<d, r, 2, double>, FunctionInterface<d, r, 2, double>>
+bind_ExpressionFunction(pybind11::module& m, std::integral_constant<int, 2>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -204,8 +204,8 @@ pybind11::class_<ExpressionFunction<d, r, 2, double>> bind_ExpressionFunction(py
 } // ... bind_ExpressionFunction(...)
 
 template <size_t d, size_t r>
-pybind11::class_<ExpressionFunction<d, r, 1, double>> bind_ExpressionFunction(pybind11::module& m,
-                                                                              std::integral_constant<int, 1>)
+pybind11::class_<ExpressionFunction<d, r, 1, double>, FunctionInterface<d, r, 1, double>>
+bind_ExpressionFunction(pybind11::module& m, std::integral_constant<int, 1>)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;

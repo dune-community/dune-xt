@@ -1,14 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2017 - 2019)
-//   René Fritze     (2018)
+//   René Fritze     (2018 - 2019)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2017, 2019)
+//   Tobias Leibner  (2017, 2019 - 2020)
 
 #ifndef DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_INTERFACES_ELEMENT_FUNCTIONS_HH
@@ -386,7 +386,7 @@ protected:
 #ifndef DUNE_XT_FUNCTIONS_DISABLE_CHECKS
   void assert_inside_reference_element(const DomainType& point_in_reference_element) const
   {
-    if (!ReferenceElements<D, d>::general(this->element().geometry().type()).checkInside(point_in_reference_element)) {
+    if (!ReferenceElements<D, d>::general(this->element().type()).checkInside(point_in_reference_element)) {
       std::stringstream error_message;
       error_message << "Given point_in_reference_element is not inside the current elements reference element!\n\n";
       XT::Grid::print_entity(this->element(), XT::Common::Typename<E>::value(), error_message, "   ");

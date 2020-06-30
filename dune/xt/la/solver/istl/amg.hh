@@ -1,14 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Barbara Verfürth (2015)
 //   Felix Schindler  (2014 - 2017, 2019)
-//   René Fritze      (2014 - 2016, 2018)
-//   Tobias Leibner   (2014, 2017 - 2019)
+//   René Fritze      (2014 - 2016, 2018 - 2019)
+//   Tobias Leibner   (2014, 2017 - 2020)
 
 #ifndef DUNE_XT_LA_SOLVER_ISTL_AMG_HH
 #define DUNE_XT_LA_SOLVER_ISTL_AMG_HH
@@ -64,7 +64,7 @@ public:
     OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> scalar_product(communicator_);
 
     // ILU0 as the smoother for the AMG
-    typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType_ILU;
+    typedef SeqILU<IstlMatrixType, IstlVectorType, IstlVectorType, 1> SequentialSmootherType_ILU;
     typedef BlockPreconditioner<IstlVectorType, IstlVectorType, CommunicatorType, SequentialSmootherType_ILU>
         SmootherType_ILU;
     typename Amg::SmootherTraits<SmootherType_ILU>::Arguments smoother_parameters_ILU;
@@ -186,7 +186,7 @@ public:
 
     InverseOperatorResult stats;
     if (smoother_type == "ilu0") {
-      typedef SeqILU0<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
+      typedef SeqILU<IstlMatrixType, IstlVectorType, IstlVectorType> SmootherType;
 
       typename Amg::SmootherTraits<SmootherType>::Arguments smoother_parameters;
       smoother_parameters.iterations = opts.get("smoother.iterations", default_opts.get<int>("smoother.iterations"));

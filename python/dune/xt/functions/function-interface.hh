@@ -1,11 +1,13 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2019)
+//   René Fritze     (2019)
+//   Tobias Leibner  (2020)
 
 #ifndef PYTHON_DUNE_XT_FUNCTIONS_FUNCTION_INTERFACE_HH
 #define PYTHON_DUNE_XT_FUNCTIONS_FUNCTION_INTERFACE_HH
@@ -111,10 +113,15 @@ struct get_combined<L, R, CombinationType::product>
 } // namespace internal
 
 
-template <size_t d, CombinationType comb, size_t lr, size_t lrC, size_t rr, size_t rrC>
-pybind11::class_<typename internal::get_combined<FunctionInterface<d, lr, lrC, double>,
-                                                 FunctionInterface<d, rr, rrC, double>,
-                                                 comb>::type>
+template <size_t d,
+          CombinationType comb,
+          size_t lr,
+          size_t lrC,
+          size_t rr,
+          size_t rrC,
+          class C = typename internal::
+              get_combined<FunctionInterface<d, lr, lrC, double>, FunctionInterface<d, rr, rrC, double>, comb>::type>
+pybind11::class_<C, FunctionInterface<d, C::range_dim, C::range_dim_cols, double>>
 bind_combined_Function(pybind11::module& m)
 {
   namespace py = pybind11;
@@ -122,7 +129,6 @@ bind_combined_Function(pybind11::module& m)
   typedef double R;
   typedef FunctionInterface<d, lr, lrC, R> Left;
   typedef FunctionInterface<d, rr, rrC, R> Right;
-  typedef typename internal::get_combined<Left, Right, comb>::type C;
   static const size_t r = C::range_dim;
   static const size_t rC = C::range_dim_cols;
   const std::string id = internal::get_combined<Left, Right, comb>::id();

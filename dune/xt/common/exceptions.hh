@@ -1,6 +1,6 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -8,7 +8,7 @@
 //   Felix Schindler (2013 - 2019)
 //   René Fritze     (2014 - 2019)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2014, 2017 - 2019)
+//   Tobias Leibner  (2014, 2017 - 2020)
 
 #ifndef DUNE_XT_COMMON_EXCEPTIONS_HH
 #define DUNE_XT_COMMON_EXCEPTIONS_HH
@@ -82,6 +82,12 @@ if (a.size() != b.size())
     }                                                                                                                  \
   } while (0)
 
+#ifndef NDEBUG
+#  define DEBUG_THROW_IF(condition, E, m) DUNE_THROW_IF(condition, E, m)
+#else
+#  define DEBUG_THROW_IF(condition, E, m) (void)0
+#endif
+
 
 namespace Dune {
 namespace XT {
@@ -131,15 +137,7 @@ class debug_assertion : public Dune::Exception
 class bisection_error : public wrong_input_given
 {};
 
-class DUNE_DEPRECATED_MSG("Use Dune::XT::Functions::Exceptions:;reinterpretation_error (09.04.2018)!")
-    reinterpretation_error : public Dune::Exception
-{};
-
 class parameter_error : public Dune::Exception
-{};
-
-class DXT_DEPRECATED_MSG("moved into dune-xt-functions Dune::XT::Functions::Exceptions (2018/03/16")
-    spe10_data_file_missing : public Dune::IOError
 {};
 
 class dependency_missing : public Dune::Exception

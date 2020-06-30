@@ -1,14 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Barbara Verfürth (2015)
 //   Felix Schindler  (2014 - 2018)
-//   René Fritze      (2015 - 2016, 2018)
-//   Tobias Leibner   (2014, 2017 - 2019)
+//   René Fritze      (2015 - 2016, 2018 - 2019)
+//   Tobias Leibner   (2014, 2017 - 2020)
 
 #ifndef DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_HH
 #define DUNE_XT_LA_CONTAINER_MATRIX_INTERFACE_HH
@@ -357,7 +357,7 @@ public:
   template <int ROWS, int COLS>
   explicit operator std::unique_ptr<Dune::FieldMatrix<ScalarType, ROWS, COLS>>() const
   {
-    auto ret = XT::Common::make_unique<Dune::FieldMatrix<ScalarType, ROWS, COLS>>(ScalarType(0));
+    auto ret = std::make_unique<Dune::FieldMatrix<ScalarType, ROWS, COLS>>(ScalarType(0));
     CHECK_CRTP(this->as_imp().copy_to_densematrix(*ret));
     this->as_imp().copy_to_densematrix(*ret);
     return ret;

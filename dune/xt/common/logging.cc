@@ -1,12 +1,13 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2012 - 2014, 2016 - 2017)
 //   René Fritze     (2012 - 2016, 2018 - 2019)
+//   Tobias Leibner  (2020)
 
 #include "config.h"
 
@@ -29,7 +30,7 @@ Logging::Logging()
   , emptyLogStream_(logflags_)
 {
   for (const auto id : streamIDs_)
-    streammap_[id] = Dune::XT::Common::make_unique<EmptyLogStream>(logflags_);
+    streammap_[id] = std::make_unique<EmptyLogStream>(logflags_);
 }
 
 void Logging::deinit()
@@ -67,7 +68,7 @@ void Logging::create(int logflags, const std::string logfile, const std::string 
 
   for (const auto id : streamIDs_) {
     flagmap_[id] = logflags;
-    streammap_[id] = Dune::XT::Common::make_unique<DualLogStream>(id, flagmap_[id], std::cout, logfile_);
+    streammap_[id] = std::make_unique<DualLogStream>(id, flagmap_[id], std::cout, logfile_);
   }
 } // create
 
@@ -120,8 +121,7 @@ int Logging::add_stream(int flags)
   int streamID = streamID_int;
   streamIDs_.push_back(streamID);
   flagmap_[streamID] = (flags | streamID);
-  streammap_[streamID] =
-      Dune::XT::Common::make_unique<DualLogStream>(streamID, flagmap_[streamID], std::cout, logfile_);
+  streammap_[streamID] = std::make_unique<DualLogStream>(streamID, flagmap_[streamID], std::cout, logfile_);
   return streamID_int;
 } // add_stream
 

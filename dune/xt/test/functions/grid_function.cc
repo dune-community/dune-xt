@@ -1,12 +1,13 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2019)
 //   René Fritze     (2019)
+//   Tobias Leibner  (2020)
 
 #include <dune/xt/test/main.hxx> // <- Has to come first, includes the config.h!
 
@@ -96,7 +97,7 @@ GTEST_TEST(ScalarGridFunction, constructible_from_function_lvalueptr)
 }
 GTEST_TEST(ScalarGridFunction, convertible_from_function_lvalueptr)
 {
-  accepts_scalar_grid_function(new GenericFunction<d>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
+  accepts_scalar_grid_function(GenericFunction<d>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
 }
 GTEST_TEST(ScalarGridFunction, constructible_from_grid_function_rvalueref)
 {
@@ -118,7 +119,7 @@ GTEST_TEST(ScalarGridFunction, constructible_from_grid_function_lvalueptr)
 GTEST_TEST(ScalarGridFunction, convertible_from_grid_function_lvalueptr)
 {
   accepts_scalar_grid_function(
-      new GenericGridFunction<E>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
+      GenericGridFunction<E>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
 }
 
 
@@ -159,7 +160,7 @@ GTEST_TEST(VectorGridFunction, constructible_from_function_lvalueptr)
 }
 GTEST_TEST(VectorGridFunction, convertible_from_function_lvalueptr)
 {
-  accepts_vector_grid_function(new GenericFunction<d, r>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
+  accepts_vector_grid_function(GenericFunction<d, r>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
 }
 GTEST_TEST(VectorGridFunction, constructible_from_grid_function_rvalueref)
 {
@@ -182,7 +183,7 @@ GTEST_TEST(VectorGridFunction, constructible_from_grid_function_lvalueptr)
 GTEST_TEST(VectorGridFunction, convertible_from_grid_function_lvalueptr)
 {
   accepts_vector_grid_function(
-      new GenericGridFunction<E, r>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
+      GenericGridFunction<E, r>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
 }
 
 
@@ -231,7 +232,7 @@ GTEST_TEST(SquareMatrixGridFunction, constructible_from_function_lvalueptr)
 }
 GTEST_TEST(SquareMatrixGridFunction, convertible_from_function_lvalueptr)
 {
-  accepts_square_matrix_grid_function(new GenericFunction<d, r, r>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
+  accepts_square_matrix_grid_function(GenericFunction<d, r, r>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
 }
 GTEST_TEST(SquareMatrixGridFunction, constructible_from_grid_function_rvalueref)
 {
@@ -254,7 +255,7 @@ GTEST_TEST(SquareMatrixGridFunction, constructible_from_grid_function_lvalueptr)
 GTEST_TEST(SquareMatrixGridFunction, convertible_from_grid_function_lvalueptr)
 {
   accepts_square_matrix_grid_function(
-      new GenericGridFunction<E, r, r>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
+      GenericGridFunction<E, r, r>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
 }
 
 
@@ -295,7 +296,7 @@ GTEST_TEST(MatrixGridFunction, constructible_from_function_lvalueptr)
 }
 GTEST_TEST(MatrixGridFunction, convertible_from_function_lvalueptr)
 {
-  accepts_matrix_grid_function(new GenericFunction<d, r, rC>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
+  accepts_matrix_grid_function(GenericFunction<d, r, rC>{0, [](auto&, auto&) { return 1.; }, "THE_NAME"});
 }
 GTEST_TEST(MatrixGridFunction, constructible_from_grid_function_rvalueref)
 {
@@ -318,5 +319,5 @@ GTEST_TEST(MatrixGridFunction, constructible_from_grid_function_lvalueptr)
 GTEST_TEST(MatrixGridFunction, convertible_from_grid_function_lvalueptr)
 {
   accepts_matrix_grid_function(
-      new GenericGridFunction<E, r, rC>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
+      GenericGridFunction<E, r, rC>{0, [](auto&) {}, [](auto&, auto&) { return 1.; }, {}, "THE_NAME"});
 }

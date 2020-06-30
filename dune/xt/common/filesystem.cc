@@ -1,6 +1,6 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
@@ -8,6 +8,7 @@
 //   Felix Schindler (2012, 2014, 2016 - 2017)
 //   René Fritze     (2010 - 2016, 2018 - 2019)
 //   Sven Kaulmann   (2011)
+//   Tobias Leibner  (2020)
 
 #include "config.h"
 
@@ -51,14 +52,14 @@ std::unique_ptr<boost::filesystem::ofstream> make_ofstream(const boost::filesyst
                                                            const std::ios_base::openmode mode)
 {
   test_create_directory(path.string());
-  return Dune::XT::Common::make_unique<boost::filesystem::ofstream>(path, mode);
+  return std::make_unique<boost::filesystem::ofstream>(path, mode);
 }
 
 std::unique_ptr<boost::filesystem::ifstream> make_ifstream(const boost::filesystem::path& path,
                                                            const std::ios_base::openmode mode)
 {
   test_create_directory(path.string());
-  return Dune::XT::Common::make_unique<boost::filesystem::ifstream>(path, mode);
+  return std::make_unique<boost::filesystem::ifstream>(path, mode);
 }
 
 //! read a file and output all lines containing filter string to a stream

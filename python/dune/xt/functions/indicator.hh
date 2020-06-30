@@ -1,14 +1,14 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2018 - 2019)
-//   René Fritze     (2018)
+//   René Fritze     (2018 - 2019)
 //   Tim Keil        (2018)
-//   Tobias Leibner  (2018 - 2019)
+//   Tobias Leibner  (2018 - 2020)
 
 #ifndef PYTHON_DUNE_XT_FUNCTIONS_INDICATOR_HH
 #define PYTHON_DUNE_XT_FUNCTIONS_INDICATOR_HH
@@ -32,7 +32,8 @@ namespace Functions {
 template <class G, size_t d, size_t r, size_t rC>
 typename std::enable_if<
     Grid::is_grid<G>::value,
-    pybind11::class_<IndicatorGridFunction<typename G::template Codim<0>::Entity, r, rC, double>>>::type
+    pybind11::class_<IndicatorGridFunction<typename G::template Codim<0>::Entity, r, rC, double>,
+                     GridFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>>::type
 bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
@@ -76,7 +77,8 @@ bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
 
 
 template <size_t d, size_t r, size_t rC>
-typename pybind11::class_<IndicatorFunction<d, r, rC, double>> bind_IndicatorFunction(pybind11::module& m)
+typename pybind11::class_<IndicatorFunction<d, r, rC, double>, FunctionInterface<d, r, rC, double>>
+bind_IndicatorFunction(pybind11::module& m)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;

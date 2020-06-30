@@ -1,13 +1,13 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2015 - 2018)
-//   René Fritze     (2015 - 2018)
-//   Tobias Leibner  (2015 - 2018)
+//   René Fritze     (2015 - 2019)
+//   Tobias Leibner  (2015 - 2018, 2020)
 
 #ifndef DUNE_XT_GRID_VIEW_PERIODIC_HH
 #define DUNE_XT_GRID_VIEW_PERIODIC_HH
@@ -190,7 +190,7 @@ struct IndexMapCreatorBase
     const auto& type_index = index.first;
     const auto& entity_index = index.second;
     const auto periodic_entity_index = real_index_set_.index(periodic_entity);
-    const auto& periodic_entity_type_index = GlobalGeometryTypeIndex::index(periodic_entity.geometry().type());
+    const auto& periodic_entity_type_index = GlobalGeometryTypeIndex::index(periodic_entity.type());
     new_indices_[type_index][entity_index] = new_indices_[periodic_entity_type_index][periodic_entity_index];
   }
 
@@ -253,7 +253,7 @@ struct IndexMapCreator
       for (IndexType local_index = 0; local_index < codim0_entity.subEntities(codim); ++local_index) {
         const auto& entity = codim0_entity.template subEntity<codim>(local_index);
         const auto old_index = real_grid_layer_.indexSet().index(entity);
-        const auto type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
+        const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
         if (!visited_entities_[type_index].count(old_index)) {
           this->loop_body(entity, type_index, old_index);
           visited_entities_[type_index].insert(old_index);
@@ -283,7 +283,7 @@ struct IndexMapCreator<true, codim, DomainType, dimDomain, RealGridLayerType, In
   {
     for (const auto& entity : entities(real_grid_layer_, Dune::Codim<codim>())) {
       const auto old_index = real_grid_layer_.indexSet().index(entity);
-      const auto type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
+      const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
       this->loop_body(entity, type_index, old_index);
     }
     this->after_loop();
@@ -345,7 +345,7 @@ public:
     if (cd == 0)
       return real_entity_index;
     else {
-      const auto type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
+      const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
       return new_indices_[type_index][real_entity_index];
     }
   }
@@ -559,7 +559,7 @@ public:
     , has_boundary_intersections_(other.has_boundary_intersections_)
     , intersection_map_(other.intersection_map_)
     , nonperiodic_pair_(other.nonperiodic_pair_)
-    , current_intersection_(Dune::XT::Common::make_unique<Intersection>(*(other.current_intersection_)))
+    , current_intersection_(std::make_unique<Intersection>(*(other.current_intersection_)))
   {}
 
   // methods that differ from BaseType
@@ -580,7 +580,7 @@ private:
   {
     assert(!has_boundary_intersections_
            || intersection_map_.size() > static_cast<size_t>((BaseType::operator*()).indexInInside()));
-    return Common::make_unique<Intersection>(
+    return std::make_unique<Intersection>(
         IntersectionImp(BaseType::operator*(),
                         real_grid_layer_,
                         has_boundary_intersections_ ? intersection_map_[(BaseType::operator*()).indexInInside()]
@@ -593,11 +593,11 @@ private:
     const RealIntersectionType real_intersection = is_iend ? *real_grid_layer_.ibegin(entity_) : BaseType::operator*();
     assert(is_iend || !has_boundary_intersections_
            || intersection_map_.size() > static_cast<size_t>(real_intersection.indexInInside()));
-    return Common::make_unique<Intersection>(IntersectionImp(real_intersection,
-                                                             real_grid_layer_,
-                                                             has_boundary_intersections_ && !is_iend
-                                                                 ? intersection_map_[real_intersection.indexInInside()]
-                                                                 : (const PeriodicPairType&)nonperiodic_pair_));
+    return std::make_unique<Intersection>(IntersectionImp(real_intersection,
+                                                          real_grid_layer_,
+                                                          has_boundary_intersections_ && !is_iend
+                                                              ? intersection_map_[real_intersection.indexInInside()]
+                                                              : (const PeriodicPairType&)nonperiodic_pair_));
   } // ... create_current_intersection_safely() const
 
   const RealGridLayerType& real_grid_layer_;
@@ -661,7 +661,7 @@ public:
       {
         BaseType::operator++();
         while (cd > 0 && *this != *real_it_end_
-               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->geometry().type())].count(
+               && (*entities_to_skip_)[GlobalGeometryTypeIndex::index((*this)->type())].count(
                       real_index_set_->index(this->operator*())))
           BaseType::operator++();
         return *this;
@@ -885,7 +885,7 @@ public:
 
   IntersectionIterator ibegin(const typename Codim<0>::Entity& entity) const
   {
-    const auto& type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
+    const auto& type_index = GlobalGeometryTypeIndex::index(entity.type());
     assert(!entity.hasBoundaryIntersections()
            || (*entity_to_intersection_map_map_)[type_index].count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::ibegin(entity),
@@ -900,7 +900,7 @@ public:
 
   IntersectionIterator iend(const typename Codim<0>::Entity& entity) const
   {
-    const auto& type_index = GlobalGeometryTypeIndex::index(entity.geometry().type());
+    const auto& type_index = GlobalGeometryTypeIndex::index(entity.type());
     assert(!entity.hasBoundaryIntersections()
            || (*entity_to_intersection_map_map_)[type_index].count(this->indexSet().index(entity)));
     return IntersectionIterator(BaseType::iend(entity),

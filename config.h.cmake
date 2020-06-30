@@ -1,28 +1,28 @@
 // This file is part of the dune-xt project:
 //   https://github.com/dune-community/dune-xt
-// Copyright 2009-2018 dune-xt developers and contributors. All rights reserved.
+// Copyright 2009-2020 dune-xt developers and contributors. All rights reserved.
 // License: Dual licensed as BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 //      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 //          with "runtime exception" (http://www.dune-project.org/license.html)
 // Authors:
 //   Felix Schindler (2013 - 2018)
 //   René Fritze     (2013 - 2019)
-//   Tobias Leibner  (2014, 2016 - 2019)
+//   Tobias Leibner  (2014, 2016 - 2020)
 
-/* begin dune-xt-common */
+/* begin dune-xt */
 // NEVER delete/alter above comment, dune's cmake relies on it
 
-/* Define to the version of dune-xt-common */
-#define DUNE_XT_COMMON_VERSION ${DUNE_XT_COMMON_VERSION}
+/* Define to the version of dune-xt */
+#define DUNE_XT_VERSION ${DUNE_XT_VERSION}
 
-/* Define to the major version of dune-xt-common */
-#define DUNE_XT_COMMON_VERSION_MAJOR ${DUNE_XT_COMMON_VERSION_MAJOR}
+/* Define to the major version of dune-xt */
+#define DUNE_XT_VERSION_MAJOR ${DUNE_XT_VERSION_MAJOR}
 
-/* Define to the minor version of dune-xt-common */
-#define DUNE_XT_COMMON_VERSION_MINOR ${DUNE_XT_COMMON_VERSION_MINOR}
+/* Define to the minor version of dune-xt */
+#define DUNE_XT_VERSION_MINOR ${DUNE_XT_VERSION_MINOR}
 
-/* Define to the revision of dune-xt-common */
-#define DUNE_XT_COMMON_VERSION_REVISION ${DUNE_XT_COMMON_VERSION_REVISION}
+/* Define to the revision of dune-xt */
+#define DUNE_XT_VERSION_REVISION ${DUNE_XT_VERSION_REVISION}
 
 #ifndef HAVE_CBLAS
 #cmakedefine01 HAVE_CBLAS
@@ -93,8 +93,8 @@
 #endif
 
 /* needed in dune/xt/common/profiler.hh */
-#ifndef DUNE_XT_COMMON_DO_TIMING
-#define DUNE_XT_COMMON_DO_TIMING 0
+#ifndef DUNE_XT_DO_TIMING
+#define DUNE_XT_DO_TIMING 0
 #endif
 
 #cmakedefine01 DUNE_XT_WITH_PYTHON_BINDINGS
@@ -214,5 +214,5 @@
 // This is an unfortunate hack, see the header for an explanation.
 #include <dune/xt/common/fix-ambiguous-std-math-overloads.hh>
 
-/* end dune-xt-common */
+/* end dune-xt */
 // NEVER delete/alter above comment, dune's cmake relies on it
