@@ -116,14 +116,14 @@ bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const 
 
   py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::buffer_protocol());
 
-  c.def_buffer([](C &m) -> py::buffer_info {
+  c.def_buffer([](C &mat) -> py::buffer_info {
     return py::buffer_info(
-        m.data(),                               /* Pointer to buffer */
+        mat.data(),                         /* Pointer to buffer */
         sizeof(D),                          /* Size of one scalar */
         py::format_descriptor<D>::format(), /* Python struct-style format descriptor */
-        2,                                      /* Number of dimensions */
-        { m.rows(), m.cols() },                 /* Buffer dimensions */
-        { sizeof(D) * m.cols(),             /* Strides (in bytes) for each index */
+        2,                                  /* Number of dimensions */
+        { mat.rows(), mat.cols() },         /* Buffer dimensions */
+        { sizeof(D) * mat.cols(),           /* Strides (in bytes) for each index */
           sizeof(D) }
     );
 });

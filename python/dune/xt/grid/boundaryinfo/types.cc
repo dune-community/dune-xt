@@ -39,7 +39,7 @@ PYBIND11_MODULE(_grid_boundaryinfo_types, m)
 #define BIND_(NAME)                                                                                                    \
   py::class_<NAME, BoundaryType>(m, #NAME, #NAME)                                                                      \
       .def(py::init([]() { return std::make_unique<NAME>(); }))                                                        \
-      .def("__repr__", [](const NAME& self) { return std::string(#NAME) + "()"; })
+      .def("__repr__", [](const NAME&) { return std::string(#NAME) + "()"; })
 
   BIND_(NoBoundary);
   BIND_(UnknownBoundary);

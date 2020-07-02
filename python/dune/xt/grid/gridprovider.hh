@@ -46,7 +46,7 @@ public:
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
-    const size_t dim = type::GridType::dimension;
+    const int dim = type::GridType::dimension;
 
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
@@ -59,7 +59,7 @@ public:
                     "dim = " << dim << "\n   codim = " << codim);
       auto grid_view = self.leaf_view();
       MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(grid_view, [codim](GeometryType gt, int dimgrid) {
-        return dimgrid - gt.dim() == codim;
+        return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim;
       });
       return mapper.size();
     }, "codim"_a);
