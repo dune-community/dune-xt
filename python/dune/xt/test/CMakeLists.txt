@@ -6,16 +6,7 @@
 #      or  GPL-2.0+ (http://opensource.org/licenses/gpl-license)
 #          with "runtime exception" (http://www.dune-project.org/license.html)
 # Authors:
-#   Felix Schindler (2019)
-#   René Fritze     (2018 - 2019)
-#   Tim Keil        (2018)
-#   Tobias Leibner  (2019 - 2020)
+#   Felix Schindler (2020)
 # ~~~
 
-dune_pybindxi_add_module(userbindings EXCLUDE_FROM_ALL userbindings.cc)
-
-add_subdirectory(common)
-add_subdirectory(functions)
-add_subdirectory(grid)
-add_subdirectory(la)
-add_subdirectory(test)
+dune_pybindxi_add_module(_test_grid_intersection EXCLUDE_FROM_ALL grid_intersection.cc)
