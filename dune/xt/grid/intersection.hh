@@ -30,6 +30,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 #include <dune/xt/grid/type_traits.hh>
+#include <python/dune/xt/grid/grids.bindings.hh>
 
 namespace Dune {
 namespace XT {
@@ -172,14 +173,10 @@ contains(const Dune::Intersection<G, I>& intersection,
 
 
 template <class G, class I>
-std::ostream& operator<<(std::ostream& out, const Dune::Intersection<G, I>& intersection)
+std::ostream& DUNE_DEPRECATED_MSG("Use out << print(intersection) from <dune/xt/grid/print.hh> instead (05.07.2020)!")
+operator<<(std::ostream& out, const Dune::Intersection<G, I>& intersection)
 {
-  const auto& geometry = intersection.geometry();
-  const auto num_corners = geometry.corners();
-  out << G::dimension - 1 << "d-intersection{[" << geometry.corner(0) << "]";
-  for (int ii = 1; ii < num_corners; ++ii)
-    out << ", [" << geometry.corner(ii) << "]";
-  out << "}";
+  XT::Common::print(intersection);
   return out;
 }
 
