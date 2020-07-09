@@ -31,10 +31,9 @@ def guarded_import(globs, base_name, mod_name):
         names = mod.__dict__["__all__"]
     else:
         names = [x for x in mod.__dict__ if not x.startswith("_")]
-    # check the rest for duplicity
+    # check for duplicity
     for nm in names:
         if nm in globs:
-            raise ImportError(
-            f'{base_name}: not overwriting existing name \'{nm}\' when importing from \'{mod_name}\'!' )
-    # and finally import
+            raise ImportError(f'{base_name}: name \'{nm}\' already exists (when importing from \'{mod_name}\'!)')
+    # and import
     globs.update({k: getattr(mod, k) for k in names})
