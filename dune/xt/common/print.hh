@@ -164,7 +164,7 @@ public:
 <code>
   void repr(std::ostream& out) const
   {
-    out << "detailed and aunambigous description";
+    out << "detailed and unambiguous description";
   }
 
   void str(std::ostream& out) const
