@@ -307,6 +307,11 @@ public:
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value)))
   {}
 
+  GridFunction(const FieldMatrix<R, 1, 1>& value) // <- Must not be XT::Common::FieldMatrix!
+    : BaseType()
+    , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value[0][0])))
+  {}
+
   GridFunction(const FunctionInterface<d, 1, 1, R>& func)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func))
