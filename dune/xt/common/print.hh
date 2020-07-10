@@ -20,6 +20,7 @@
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/string.hh>
+#include <dune/xt/common/vector.hh>
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
@@ -99,10 +100,6 @@ public:
 template <class T, bool use_repr>
 class VectorPrinter : public internal::DefaultPrinter<T, use_repr>
 {
-  static_assert(is_vector<T>::value, "");
-
-  using V = VectorAbstraction<T>;
-
 public:
   const std::string class_name;
 
@@ -118,9 +115,9 @@ public:
     if (sz > 0) {
       const std::string delim =
           (std::use_facet<std::numpunct<char>>(std::cout.getloc()).decimal_point() == ',') ? ";" : ",";
-      out << "{" << V::get_entry(this->value, 0);
+      out << "{" << print(this->value[0], this->opts) /*V::get_entry(this->value, 0)*/;
       for (auto&& ii : value_range(decltype(sz)(1), sz))
-        out << delim << " " << V::get_entry(this->value, ii);
+        out << delim << " " << print(this->value[ii], this->opts) /*V::get_entry(this->value, ii)*/;
       out << "}";
     }
     out << ")";
@@ -134,13 +131,73 @@ public:
     else {
       const std::string delim =
           (std::use_facet<std::numpunct<char>>(std::cout.getloc()).decimal_point() == ',') ? ";" : ",";
-      out << "[" << V::get_entry(this->value, 0);
+      out << "[" << print(this->value[0], this->opts) /*V::get_entry(this->value, 0)*/;
       for (auto&& ii : value_range(decltype(sz)(1), sz))
-        out << delim << " " << V::get_entry(this->value, ii);
+        out << delim << " " << print(this->value[ii], this->opts) /*V::get_entry(this->value, ii)*/;
       out << "]";
     }
   } // ... str(...)
 }; // class VectorPrinter
+
+
+/// \note Should be used to derive from when specializing Printer for matrices.
+/// \sa Printer
+/// \sa DefaultPrinter
+template <class T, bool use_repr>
+class MatrixPrinter : public internal::DefaultPrinter<T, use_repr>
+{
+  static_assert(is_matrix<T>::value, "");
+
+  using M = MatrixAbstraction<T>;
+
+public:
+  const std::string class_name;
+
+  MatrixPrinter(const T& val, const Configuration& cfg = {}, const std::string& clss_nm = Typename<T>::value())
+    : internal::DefaultPrinter<T, use_repr>(val, cfg)
+    , class_name(clss_nm)
+  {}
+
+  void repr(std::ostream& out) const override
+  {
+    out << class_name << "(";
+    const auto rows = M::rows(this->value);
+    const auto cols = M::cols(this->value);
+    if (rows * cols > 0) {
+      out << "{";
+      const std::string delim =
+          (std::use_facet<std::numpunct<char>>(std::cout.getloc()).decimal_point() == ',') ? ";" : ",";
+      const std::string newline = "\n";
+      for (auto&& ii : value_range(rows)) {
+        out << (ii == 0 ? "{" : " ") << "{" << print(M::get_entry(this->value, ii, 0), this->opts);
+        for (auto&& jj : value_range(decltype(cols)(1), cols))
+          out << delim << " " << print(M::get_entry(this->value, ii, jj), this->opts);
+        out << "}" << ((ii == rows - 1) ? "" : ",") << ((ii == rows - 1) ? "" : newline);
+      }
+      out << "}";
+    }
+    out << ")";
+  } // ... repr(...)
+
+  void str(std::ostream& out) const override
+  {
+    const auto rows = M::rows(this->value);
+    const auto cols = M::cols(this->value);
+    out << "[";
+    if (rows * cols > 0) {
+      const std::string delim =
+          (std::use_facet<std::numpunct<char>>(std::cout.getloc()).decimal_point() == ',') ? ";" : ",";
+      const std::string newline = this->opts.get("oneline", false) ? "" : "\n";
+      for (auto&& ii : value_range(rows)) {
+        out << (ii == 0 ? "" : " ") << "[" << print(M::get_entry(this->value, ii, 0), this->opts);
+        for (auto&& jj : value_range(decltype(cols)(1), cols))
+          out << delim << " " << print(M::get_entry(this->value, ii, jj), this->opts);
+        out << "]" << ((ii == rows - 1) ? "" : ",") << ((ii == rows - 1) ? "" : newline);
+      }
+    }
+    out << "]";
+  } // ... str(...)
+}; // class MatrixPrinter
 
 
 } // namespace internal
@@ -192,14 +249,24 @@ public:
 };
 
 
-/// Specialization of Printer for std::vector<T> with arithmetic T
-template <class T, bool use_repr>
-class Printer<std::vector<T>, use_repr, std::enable_if_t<std::is_arithmetic<T>::value>>
-  : public internal::VectorPrinter<std::vector<T>, use_repr>
+/// Specialization of Printer for all our vectors
+template <class V, bool use_repr>
+class Printer<V, use_repr, std::enable_if_t<is_vector<V>::value>> : public internal::VectorPrinter<V, use_repr>
 {
 public:
-  Printer(const std::vector<T>& val, const Configuration& param = {})
-    : internal::VectorPrinter<std::vector<T>, use_repr>(val, param)
+  Printer(const V& val, const Configuration& param)
+    : internal::VectorPrinter<V, use_repr>(val, param)
+  {}
+}; // class Printer
+
+
+/// Specialization of Printer for all our matrices
+template <class M, bool use_repr>
+class Printer<M, use_repr, std::enable_if_t<is_matrix<M>::value>> : public internal::MatrixPrinter<M, use_repr>
+{
+public:
+  Printer(const M& val, const Configuration& param = {{"oneline", "false"}})
+    : internal::MatrixPrinter<M, use_repr>(val, param)
   {}
 }; // class Printer
 
