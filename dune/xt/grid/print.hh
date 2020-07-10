@@ -56,6 +56,26 @@ public:
 
 
 } // namespace Common
+namespace Grid {
+
+
+/// \sa Common::print
+template <class T>
+Common::Printer<T, false> print(const T& value, const Common::Configuration& param = {})
+{
+  return Common::Printer<T, false>(value, param);
+}
+
+
+/// \sa Common::repr
+template <class T>
+Common::Printer<T, true> repr(const T& value, const Common::Configuration& param = {})
+{
+  return Common::Printer<T, true>(value, param);
+}
+
+
+} // namespace Grid
 } // namespace XT
 } // namespace Dune
 
