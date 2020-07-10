@@ -129,13 +129,9 @@ public:
     : Common::ParametricInterface(param_type)
   {}
 
-  ElementFunctionSetInterface(const ThisType& other)
-    : Common::ParametricInterface(other.parameter_type())
-  {}
+  ElementFunctionSetInterface(const ThisType& other) = default;
 
-  ElementFunctionSetInterface(ThisType&& source)
-    : Common::ParametricInterface(source.parameter_type())
-  {}
+  ElementFunctionSetInterface(ThisType&& source) = default;
 
   virtual ~ElementFunctionSetInterface() = default;
 

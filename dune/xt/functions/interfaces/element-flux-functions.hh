@@ -106,13 +106,9 @@ public:
     : Common::ParametricInterface(param_type)
   {}
 
-  ElementFluxFunctionSetInterface(const ThisType& other)
-    : Common::ParametricInterface(other.parameter_type())
-  {}
+  ElementFluxFunctionSetInterface(const ThisType& other) = default;
 
-  ElementFluxFunctionSetInterface(ThisType&& source)
-    : Common::ParametricInterface(source.parameter_type())
-  {}
+  ElementFluxFunctionSetInterface(ThisType&& source) = default;
 
   virtual ~ElementFluxFunctionSetInterface() = default;
 
