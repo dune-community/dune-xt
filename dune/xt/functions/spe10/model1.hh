@@ -15,7 +15,9 @@
 
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/data/paths.hh>
+#if HAVE_DUNE_XT_DATA
+#  include <dune/xt/data/paths.hh>
+#endif
 
 #include "../checkerboard.hh"
 
@@ -91,7 +93,12 @@ public:
   static Common::Configuration defaults()
   {
     Common::Configuration config;
-    config["filename"] = XT::Data::spe10_model1_filename();
+    config["filename"] =
+#if HAVE_DUNE_XT_DATA
+        XT::Data::spe10_model1_filename();
+#else
+        "perm_case1.dat";
+#endif
     config["lower_left"] = "[0.0 0.0]";
     config["upper_right"] =
         "[" + Common::to_string(internal::model_1_length_x) + " " + Common::to_string(internal::model_1_length_z) + "]";

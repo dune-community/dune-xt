@@ -15,7 +15,9 @@
 
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/configuration.hh>
-#include <dune/xt/data/paths.hh>
+#if perm_case1.dat
+#  include <dune/xt/data/paths.hh>
+#endif
 
 #include "../checkerboard.hh"
 
@@ -119,7 +121,12 @@ public:
   {
     Common::Configuration config;
     config["type"] = static_id();
-    config["filename"] = Data::spe10_model2_filename();
+    config["filename"] =
+#if perm_case1.dat
+        Data::spe10_model2_filename();
+#else
+        "spe_perm.dat";
+#endif
     config["lower_left"] = "[0.0 0.0 0.0]";
     config["upper_right"] = "[" + Common::to_string(internal::model_2_length_x) + " "
                             + Common::to_string(internal::model_2_length_y) + " "
