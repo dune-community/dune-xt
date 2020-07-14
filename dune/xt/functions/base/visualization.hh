@@ -148,11 +148,12 @@ public:
 
   double evaluate(const int& comp, const RangeType& val) const override final
   {
-    return val[comp];
+    DUNE_THROW_IF(comp != 0, Dune::InvalidStateException, "This visualizer plots only a single component!");
+    return val[comp_];
   }
 
 private:
-  int comp_;
+  const int comp_;
 }; // class ComponentVisualizer
 
 
