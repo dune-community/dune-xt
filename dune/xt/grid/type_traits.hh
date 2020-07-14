@@ -21,7 +21,27 @@
 #include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/type_traits.hh>
 
-#include <dune/xt/grid/grids.hh>
+#if HAVE_ALBERTA
+#  include <dune/xt/common/disable_warnings.hh>
+#  include <dune/grid/albertagrid.hh>
+#  include <dune/xt/common/reenable_warnings.hh>
+#endif
+
+#if HAVE_DUNE_ALUGRID
+#  include <dune/alugrid/grid.hh>
+#endif
+
+#if HAVE_DUNE_SPGRID
+#  include <dune/grid/spgrid.hh>
+#  include <dune/grid/spgrid/dgfparser.hh>
+#endif
+
+#if HAVE_DUNE_UGGRID || HAVE_UG
+#  include <dune/grid/uggrid.hh>
+#endif
+
+#include <dune/grid/onedgrid.hh>
+#include <dune/grid/yaspgrid.hh>
 
 namespace Dune {
 namespace GridGlue {
@@ -62,7 +82,7 @@ struct is_intersection : public std::false_type
 template <class G, class I>
 struct is_intersection<Dune::Intersection<G, I>> : public std::true_type
 {
-  typedef std::remove_const_t<G> GridType;
+  using GridType = std::remove_const_t<G>;
   using InsideElementType = typename Dune::Intersection<G, I>::Entity;
   using OutsideElementType = typename Dune::Intersection<G, I>::Entity;
 };
@@ -70,7 +90,7 @@ struct is_intersection<Dune::Intersection<G, I>> : public std::true_type
 template <typename P0, typename P1, int I, int O>
 struct is_intersection<Dune::GridGlue::Intersection<P0, P1, I, O>> : public std::true_type
 {
-  typedef typename Dune::GridGlue::Intersection<P0, P1, I, O>::InsideGridView::Grid GridType;
+  using GridType = typename Dune::GridGlue::Intersection<P0, P1, I, O>::InsideGridView::Grid;
   using InsideElementType = typename Dune::GridGlue::Intersection<P0, P1, I, O>::InsideEntity;
   using OutsideElementType = typename Dune::GridGlue::Intersection<P0, P1, I, O>::OutsideEntity;
 };
@@ -111,6 +131,11 @@ struct is_grid<Dune::AlbertaGrid<dim, dimworld>> : public std::true_type
 template <int dim, int dimworld, ALUGridElementType elType, ALUGridRefinementType refineType, class Comm>
 struct is_grid<Dune::ALUGrid<dim, dimworld, elType, refineType, Comm>> : public std::true_type
 {};
+
+template <int dim, int dimworld, ALU3dGridElementType elType, class Comm>
+struct is_grid<Dune::ALU3dGrid<dim, dimworld, elType, Comm>> : public true_type
+{};
+
 
 #endif // HAVE_DUNE_ALUGRID
 #if HAVE_DUNE_UGGRID || HAVE_UG
