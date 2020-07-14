@@ -97,17 +97,16 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
 include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the
 # compiled extensions directly usable from the venv
-make_dependent_modules_sys_included()
 dune_pybindxi_install_python_package(PATH python)
 include_dependent_binary_python_dirs()
 # do not change order here
-include(DuneUtils)
 add_subdirectory(python)
 
+include(DuneUtils)
+make_dependent_modules_sys_included()
 include(GridUtils)
 
 add_header_listing()
-make_dependent_modules_sys_included()
 
 add_subdirectory(dune)
 add_subdirectory("cmake/modules")

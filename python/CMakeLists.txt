@@ -11,6 +11,8 @@
 #   Tobias Leibner  (2018, 2020)
 # ~~~
 
+include(DuneXTTesting)
+
 # Currently, the python libraries do not have access to the config.h variables, see
 # https://github.com/dune-community/dune-xt-common/issues/120
 # The following silences all the resulting -Wundef warnings in this directory
