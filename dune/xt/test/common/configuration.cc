@@ -285,9 +285,12 @@ struct StaticCheck
   template <class MatrixType>
   static void check_matrix_static_size(const Configuration& config)
   {
-    typedef MatrixAbstraction<MatrixType> MT;
-    const auto r = MT::rows(MatrixType());
-    const auto c = MT::cols(MatrixType());
+    using MT = MatrixAbstraction<MatrixType>;
+    // r and c are non-const to avoid a warning that the lambda capture is unused
+    // Maybe we could remove the capture and make r and c const, but then we
+    // would have to test that it works with all relevant compilers
+    auto r = MT::rows(MatrixType());
+    auto c = MT::cols(MatrixType());
 
     const auto check = [&r, &c](const MatrixType& mat) {
       for (size_t cc = 0; cc < c; ++cc) {
