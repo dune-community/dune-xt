@@ -34,7 +34,7 @@ macro(add_analyze)
   endif(EXISTS ${ANALYZER})
 endmacro(add_analyze)
 
-find_package(ClangFormat 6 EXACT)
+find_package(ClangFormat 8 EXACT)
 macro(add_format glob_dir)
   if(${ARGC} GREATER 1)
     message(WARNING "'add_format' API has changed. Please provide a single "
