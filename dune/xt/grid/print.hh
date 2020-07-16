@@ -11,6 +11,7 @@
 #define DUNE_XT_GRID_PRINT_HH
 
 #include <dune/grid/common/intersection.hh>
+#include <dune/grid/common/entity.hh>
 
 #include <dune/xt/common/print.hh>
 
@@ -52,27 +53,57 @@ public:
       out << ", " << print(geometry.corner(ii));
     out << "}";
   } // ... str(...)
-}; // class Printer
+}; // class Printer<Dune::Intersection<G, I>, ...>
+
+
+/// \sa Common::Printer
+template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp, bool use_repr, typename anything>
+class Printer<Dune::Entity<cd, dim, GridImp, EntityImp>, use_repr, anything>
+  : public internal::DefaultPrinter<Dune::Entity<cd, dim, GridImp, EntityImp>, use_repr>
+{
+public:
+  using T = Dune::Entity<cd, dim, GridImp, EntityImp>;
+
+  const std::string grid_name;
+
+  Printer(const T& val, const Configuration& cfg = {})
+    : internal::DefaultPrinter<T, use_repr>(val, cfg)
+  {}
+
+  void repr(std::ostream& out) const override final
+  {
+    const auto& geometry = this->value.geometry();
+    const auto num_corners = geometry.corners();
+    out << dim - cd << "d";
+    if (cd != 0)
+      out << "(" << dim << "d-" << cd << "d)";
+    out << "-entity{corners=" << print(geometry.corner(0));
+    for (int ii = 1; ii < num_corners; ++ii)
+      out << ", " << print(geometry.corner(ii));
+    out << "}";
+  }
+
+  void str(std::ostream& out) const override final
+  {
+    const auto& geometry = this->value.geometry();
+    const auto num_corners = geometry.corners();
+    out << dim - cd << "d";
+    if (cd != 0)
+      out << "(" << dim << "d-" << cd << "d)";
+    out << "-entity{corners=" << print(geometry.corner(0));
+    for (int ii = 1; ii < num_corners; ++ii)
+      out << ", " << print(geometry.corner(ii));
+    out << "}";
+  } // ... str(...)
+}; // class Printer<Entity<cd, dim, GridImp, EntityImp>, ...>
 
 
 } // namespace Common
 namespace Grid {
 
 
-/// \sa Common::print
-template <class T>
-Common::Printer<T, false> print(const T& value, const Common::Configuration& param = {})
-{
-  return Common::Printer<T, false>(value, param);
-}
-
-
-/// \sa Common::repr
-template <class T>
-Common::Printer<T, true> repr(const T& value, const Common::Configuration& param = {})
-{
-  return Common::Printer<T, true>(value, param);
-}
+using Common::print;
+using Common::repr;
 
 
 } // namespace Grid
