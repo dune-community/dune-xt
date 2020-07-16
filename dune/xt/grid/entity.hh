@@ -32,7 +32,7 @@ namespace Dune {
 template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
 std::ostream& operator<<(std::ostream& out, const Entity<cd, dim, GridImp, EntityImp>& entity)
 {
-  out << "Entity<" << cd << ", " << dim << ", " << XT::Grid::bindings::grid_name<GridImp>::value() << ">(";
+  out << "Entity<" << cd << ", " << dim << ", " << XT::Common::Typename<GridImp>::value() << ">(";
   out << "{0: [" << entity.geometry().corner(0) << "]";
   for (int ii = 1; ii < entity.geometry().corners(); ++ii)
     out << ", " << ii << ": [" << entity.geometry().corner(ii) << "]";
