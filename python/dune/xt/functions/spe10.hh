@@ -79,6 +79,7 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
         "min"_a = Spe10::internal::model1_min_value,
         "max"_a = Spe10::internal::model1_max_value,
         "name"_a = C::static_id());
+#if HAVE_DUNE_XT_DATA
   c.def(py::init([](const Common::FieldVector<D, d>& ll,
                     const Common::FieldVector<D, d>& up,
                     const R& min,
@@ -91,6 +92,7 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
         "min"_a = Spe10::internal::model1_min_value,
         "max"_a = Spe10::internal::model1_max_value,
         "name"_a = C::static_id());
+#endif // HAVE_DUNE_XT_DATA
 
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
 
