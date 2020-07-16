@@ -66,12 +66,13 @@ public:
   {
     DUNE_THROW(NotImplemented, "No default config for GmshGridProviderFactory Yaspgrid");
   }
+
   template <class... Args>
   static GridProvider<Dune::YaspGrid<dim, Coordinates>> create(Args&&...)
   {
-    DUNE_THROW(NotImplemented, "No create impleneted for GmshGridProviderFactory Yaspgrid");
+    DUNE_THROW(NotImplemented, "No create implemeted for GmshGridProviderFactory Yaspgrid");
   }
-};
+}; // class GmshGridProviderFactory<Dune::YaspGrid<...>>
 
 
 template <class GridType>
@@ -116,7 +117,7 @@ template <class GridType>
 typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
 make_gmsh_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
-  return GmshGridProviderFactory<GridType>(filename, mpi_comm);
+  return GmshGridProviderFactory<GridType>::create(filename, mpi_comm);
 }
 
 
@@ -127,6 +128,7 @@ make_gmsh_grid(const Common::Configuration& cfg = GmshGridProviderFactory<GridTy
 {
   return GmshGridProviderFactory<GridType>::create(cfg, mpi_comm);
 }
+
 
 } // namespace Grid
 } // namespace XT
