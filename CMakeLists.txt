@@ -94,16 +94,18 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/getRevision.sh
                 ERROR_VARIABLE shell_error
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+# silence most warnings we are not responsible for
+include(DuneUtils)
+make_dependent_modules_sys_included()
+
 include(DunePybindxiInstallPythonPackage)
 # this symlinks all files in python/ to the binary dir and install into the virtualenv from there thereby making the
 # compiled extensions directly usable from the venv
 dune_pybindxi_install_python_package(PATH python)
 include_dependent_binary_python_dirs()
-# do not change order here
+
 add_subdirectory(python)
 
-include(DuneUtils)
-make_dependent_modules_sys_included()
 include(GridUtils)
 
 add_header_listing()
