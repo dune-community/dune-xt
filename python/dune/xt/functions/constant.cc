@@ -95,6 +95,7 @@ PYBIND11_MODULE(_functions_constant, m)
   namespace py = pybind11;
 
   py::module::import("dune.xt.common");
+  py::module::import("dune.xt.grid");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.functions._functions_function_interface_1d");
   py::module::import("dune.xt.functions._functions_function_interface_2d");
