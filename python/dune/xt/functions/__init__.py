@@ -15,19 +15,18 @@
 from dune.xt import guarded_import
 
 for mod_name in (
-    '_functions_function_interface_1d',
-    '_functions_function_interface_2d',
-    '_functions_checkerboard',
-    '_functions_constant',
-    '_functions_expression',
-    '_functions_function_as_grid_function',
-    '_functions_function_interface_3d',
-    '_functions_gridfunction',
-    '_functions_gridfunction_interface_1d',
-    '_functions_gridfunction_interface_2d',
-    '_functions_gridfunction_interface_3d',
-    '_functions_indicator',
-    '_functions_spe10',
-    ):
+        '_functions_function_interface_1d',
+        '_functions_function_interface_2d',
+        '_functions_checkerboard',
+        '_functions_constant',
+        '_functions_expression',
+        '_functions_function_as_grid_function',
+        '_functions_function_interface_3d',
+        '_functions_gridfunction',
+        '_functions_gridfunction_interface_1d',
+        '_functions_gridfunction_interface_2d',
+        '_functions_gridfunction_interface_3d',
+        '_functions_indicator',
+        '_functions_spe10',
+):
     guarded_import(globals(), 'dune.xt.functions', mod_name)
-

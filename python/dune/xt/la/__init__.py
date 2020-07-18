@@ -16,5 +16,5 @@ from dune.xt import guarded_import
 for mod_name in (
         '_la',
         '_la_traits',
-        ):
+):
     guarded_import(globals(), 'dune.xt.la', mod_name)

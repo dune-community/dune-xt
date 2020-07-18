@@ -16,16 +16,15 @@ import pytest
 
 def test_tags():
     from dune.xt.grid import (
-            Simplex,
-            Cube,
-            Pyramid,
-            Prism,
-            Dim,
-            )
+        Simplex,
+        Cube,
+        Pyramid,
+        Prism,
+        Dim,
+    )
     Simplex()
     Cube()
     Pyramid()
     Prism()
     for dd in range(10):
         Dim(dd)
-

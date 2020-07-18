@@ -8,4 +8,3 @@
 # Authors:
 #   Felix Schindler (2020)
 # ~~~
-

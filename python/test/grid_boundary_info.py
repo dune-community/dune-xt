@@ -15,18 +15,18 @@ import pytest
 
 def test_types():
     from dune.xt.grid import (
-            NoBoundary,
-            UnknownBoundary,
-            DirichletBoundary,
-            NeumannBoundary,
-            RobinBoundary,
-            ReflectingBoundary,
-            AbsorbingBoundary,
-            InflowBoundary,
-            OutflowBoundary,
-            InflowOutflowBoundary,
-            ImpermeableBoundary,
-            )
+        NoBoundary,
+        UnknownBoundary,
+        DirichletBoundary,
+        NeumannBoundary,
+        RobinBoundary,
+        ReflectingBoundary,
+        AbsorbingBoundary,
+        InflowBoundary,
+        OutflowBoundary,
+        InflowOutflowBoundary,
+        ImpermeableBoundary,
+    )
     NoBoundary()
     UnknownBoundary()
     DirichletBoundary()
@@ -42,10 +42,10 @@ def test_types():
 
 def test_initless_boundary_infos():
     from dune.xt.grid import (
-            AllDirichletBoundaryInfo,
-            AllNeumannBoundaryInfo,
-            AllReflectingBoundaryInfo,
-            )
+        AllDirichletBoundaryInfo,
+        AllNeumannBoundaryInfo,
+        AllReflectingBoundaryInfo,
+    )
     from dune.xt.grid import make_cube_grid
     from grid_provider_cube import init_args as grid_init_args
     for args in grid_init_args:
@@ -62,14 +62,6 @@ def test_normalbased_boundary_inf():
     for args in grid_init_args:
         grid = make_cube_grid(*args)
         NormalBaseBoundaryInfo(
-                grid_provider=grid,
-                default_boundary_type=NoBoundary(),
-                tolerance=1e-10,
-                logging_prefix='')
-        NormalBaseBoundaryInfo(
-                grid_provider=grid,
-                default_boundary_type=NoBoundary(),
-                tolerance=1e-10)
-        NormalBaseBoundaryInfo(
-                grid_provider=grid,
-                default_boundary_type=NoBoundary())
+            grid_provider=grid, default_boundary_type=NoBoundary(), tolerance=1e-10, logging_prefix='')
+        NormalBaseBoundaryInfo(grid_provider=grid, default_boundary_type=NoBoundary(), tolerance=1e-10)
+        NormalBaseBoundaryInfo(grid_provider=grid, default_boundary_type=NoBoundary())

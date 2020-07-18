@@ -16,12 +16,11 @@ import pytest
 
 from dune.xt.grid import Dim, Cube, Simplex, make_cube_grid
 
-
 init_args = (
-        (Dim(1), [0], [1], [2]),
-        (Dim(2), Cube(), [0, 0], [1, 1], [2, 2]),
-        (Dim(3), Cube(), [0, 0, 0], [1, 1, 1], [2, 2, 2]),
-        )
+    (Dim(1), [0], [1], [2]),
+    (Dim(2), Cube(), [0, 0], [1, 1], [2, 2]),
+    (Dim(3), Cube(), [0, 0, 0], [1, 1, 1], [2, 2, 2]),
+)
 
 
 def test_init():

@@ -16,26 +16,26 @@ from numbers import Number
 from dune.xt import guarded_import
 
 for mod_name in (
-            '_grid_boundaryinfo_alldirichlet',
-            '_grid_boundaryinfo_allneumann',
-            '_grid_boundaryinfo_allreflecting',
-            '_grid_boundaryinfo_interfaces',
-            '_grid_boundaryinfo_normalbased',
-            '_grid_boundaryinfo_types',
-            '_grid_filters_base',
-            '_grid_filters_element',
-            '_grid_filters_intersection',
-            '_grid_functors_boundary_detector',
-            # '_grid_functors_bounding_box',
-            '_grid_functors_interfaces',
-            # '_grid_functors_refinement',
-            '_grid_gridprovider_cube',
-            '_grid_gridprovider_gmsh',
-            '_grid_gridprovider_provider',
-            '_grid_intersection',
-            '_grid_traits',
-            '_grid_types',
-            '_grid_walker',
+        '_grid_boundaryinfo_alldirichlet',
+        '_grid_boundaryinfo_allneumann',
+        '_grid_boundaryinfo_allreflecting',
+        '_grid_boundaryinfo_interfaces',
+        '_grid_boundaryinfo_normalbased',
+        '_grid_boundaryinfo_types',
+        '_grid_filters_base',
+        '_grid_filters_element',
+        '_grid_filters_intersection',
+        '_grid_functors_boundary_detector',
+     # '_grid_functors_bounding_box',
+        '_grid_functors_interfaces',
+     # '_grid_functors_refinement',
+        '_grid_gridprovider_cube',
+        '_grid_gridprovider_gmsh',
+        '_grid_gridprovider_provider',
+        '_grid_intersection',
+        '_grid_traits',
+        '_grid_types',
+        '_grid_walker',
 ):
     guarded_import(globals(), 'dune.xt.grid', mod_name)
 
@@ -45,4 +45,3 @@ def Dim(d):
     if f'Dimension{d}' not in globals():
         raise RuntimeError(f'Dimension {d} not available, extend <python/dune/xt/grid/traits.cc>!')
     return globals()[f'Dimension{d}']()
-
