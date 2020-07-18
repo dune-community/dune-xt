@@ -126,10 +126,10 @@ using AvailableGridTypes = boost::tuple<ONED_1D,
                                         ,
                                         ALU_2D_SIMPLEX_CONFORMING,
                                         /*ALU_2D_SIMPLEX_NONCONFORMING,*/
-                                        ALU_2D_CUBE,
-                                        ALU_3D_SIMPLEX_CONFORMING,
-                                        /*ALU_3D_SIMPLEX_NONCONFORMING,*/
-                                        ALU_3D_CUBE
+                                        /*ALU_2D_CUBE,*/
+                                        ALU_3D_SIMPLEX_CONFORMING /*,*/
+/*ALU_3D_SIMPLEX_NONCONFORMING,*/
+/*ALU_3D_CUBE*/
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
                                         ,
