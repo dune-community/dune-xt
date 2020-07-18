@@ -49,6 +49,9 @@ PYBIND11_MODULE(_common_mpi, m)
         },
         "args"_a = std::vector<std::string>());
 
+  py::class_<XT::Common::MPI_Comm_Wrapper> mpi_comm_wrapper(m, "MPI_Comm_Wrapper", "MPI_Comm_Wrapper");
+  mpi_comm_wrapper.def(py::init());
+
   XT::Common::bindings::guarded_bind([&]() {
     using Comm = CollectiveCommunication<MPIHelper::MPICommunicator>;
     py::class_<Comm> cls(m, "CollectiveCommunication", "CollectiveCommunication");
