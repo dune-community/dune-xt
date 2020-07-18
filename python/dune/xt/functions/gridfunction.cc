@@ -34,10 +34,9 @@ namespace Functions {
 namespace bindings {
 
 
-template <class E, size_t r = 1, size_t rC = 1, class R = double>
+template <class G, class E, size_t r = 1, size_t rC = 1, class R = double>
 class GridFunction
 {
-  using G = XT::Grid::extract_grid_t<E>;
   using GP = XT::Grid::GridProvider<G>;
   static const size_t d = G::dimension;
 
@@ -425,9 +424,9 @@ private:
 
 public:
   static bound_type bind(pybind11::module& m,
-                         const std::string& class_id = "grid_function",
                          const std::string& grid_id = Grid::bindings::grid_name<G>::value(),
-                         const std::string& layer_id = "")
+                         const std::string& layer_id = "",
+                         const std::string& class_id = "grid_function")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -468,15 +467,18 @@ struct GridFunction_for_all_grids
 
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Functions::bindings::GridFunction<E, 1, 1>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 1, 2>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 1, 3>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 2, 1>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 2, 2>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 2, 3>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 3, 1>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 3, 2>::bind(m);
-    Dune::XT::Functions::bindings::GridFunction<E, 3, 3>::bind(m);
+    using Dune::XT::Functions::bindings::GridFunction;
+    using Dune::XT::Grid::bindings::grid_name;
+
+    GridFunction<G, E, 1, 1>::bind(m);
+    GridFunction<G, E, 1, 2>::bind(m);
+    GridFunction<G, E, 1, 3>::bind(m);
+    GridFunction<G, E, 2, 1>::bind(m);
+    GridFunction<G, E, 2, 2>::bind(m);
+    GridFunction<G, E, 2, 3>::bind(m);
+    GridFunction<G, E, 3, 1>::bind(m);
+    GridFunction<G, E, 3, 2>::bind(m);
+    GridFunction<G, E, 3, 3>::bind(m);
 
     GridFunction_for_all_grids<typename GridTypes::tail_type>::bind(m);
   }
@@ -494,6 +496,7 @@ PYBIND11_MODULE(_functions_gridfunction, m)
   namespace py = pybind11;
 
   py::module::import("dune.xt.common");
+  py::module::import("dune.xt.grid");
   py::module::import("dune.xt.la");
   py::module::import("dune.xt.functions._functions_gridfunction_interface_1d");
   py::module::import("dune.xt.functions._functions_gridfunction_interface_2d");
