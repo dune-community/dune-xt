@@ -30,6 +30,7 @@ for mod_name in (
             '_grid_functors_interfaces',
             # '_grid_functors_refinement',
             '_grid_gridprovider_cube',
+            '_grid_gridprovider_gmsh',
             '_grid_gridprovider_provider',
             '_grid_intersection',
             '_grid_traits',
