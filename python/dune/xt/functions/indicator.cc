@@ -11,16 +11,10 @@
 
 #include "config.h"
 
-#include <string>
-#include <vector>
-
-#include <dune/common/parallel/mpihelper.hh>
-
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
 
-#include <python/dune/xt/common/bindings.hh>
-#include <python/dune/xt/common/exceptions.bindings.hh>
+#include <dune/xt/common/python.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
 #include "indicator.hh"
