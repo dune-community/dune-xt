@@ -37,8 +37,8 @@ variables:
         IMAGE: $CI_REGISTRY/ag-ohlberger/dune-community/dune-xt/ci_testing_${DOCKER_TAG}:${CI_COMMIT_SHORT_SHA}
     before_script:
       - |
-        apk --update add openssh-client rsync git file bash python3 curl
-        pip install -U docker jinja2 docopt
+        apk --update add py3-pip openssh-client rsync git file bash python3 curl
+        pip3 install -U docker jinja2 docopt
 
         export BASEIMAGE="${MY_MODULE}-testing_${DOCKER_TAG}:${CI_COMMIT_REF_NAME/\//_}"
         # get image with fallback to master branch of the super repo
