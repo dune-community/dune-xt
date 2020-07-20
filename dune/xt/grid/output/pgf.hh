@@ -327,15 +327,17 @@ public:
       MinMaxCoordinateFunctor<LeafView> minMaxCoord;
       leafWalk.append(minMaxCoord);
       leafWalk.walk();
+      const auto minima = minMaxCoord.result()[0];
+      const auto maxima = minMaxCoord.result()[1];
 
       switch (int(GridType::dimensionworld)) {
         case 1: {
           char buffer[80] = {'\0'};
           const double offset = 0.2;
           const char* format = "\\node[scale=\\gridcoordscale] at (%f,0) {(%d)};\n";
-          std::snprintf(buffer, 80, format, minMaxCoord.minima_[0] - offset, minMaxCoord.minima_[0]);
+          std::snprintf(buffer, 80, format, minima[0] - offset, minima[0]);
           file << buffer;
-          std::snprintf(buffer, 80, format, minMaxCoord.maxima_[0] - offset, minMaxCoord.maxima_[0]);
+          std::snprintf(buffer, 80, format, maxima[0] - offset, maxima[0]);
           file << buffer;
           break;
         }
@@ -344,21 +346,9 @@ public:
           const double offset = 0.2;
           const char* format = "\\node[scale=\\gridcoordscale] at (%f,%f) {(%d,%d)};\n";
           char buffer[100] = {'\0'};
-          std::snprintf(buffer,
-                        100,
-                        format,
-                        minMaxCoord.minima_[0] - offset,
-                        minMaxCoord.minima_[1] - offset,
-                        minMaxCoord.minima_[0],
-                        minMaxCoord.minima_[1]);
+          std::snprintf(buffer, 100, format, minima[0] - offset, minima[1] - offset, minima[0], minima[1]);
           file << buffer;
-          std::snprintf(buffer,
-                        100,
-                        format,
-                        minMaxCoord.maxima_[0] - offset,
-                        minMaxCoord.maxima_[1] - offset,
-                        minMaxCoord.maxima_[0],
-                        minMaxCoord.maxima_[1]);
+          std::snprintf(buffer, 100, format, maxima[0] - offset, maxima[1] - offset, maxima[0], maxima[1]);
           file << buffer;
           break;
         }
