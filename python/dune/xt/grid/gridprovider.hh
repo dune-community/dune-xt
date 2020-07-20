@@ -68,6 +68,27 @@ public:
         },
         "codim"_a);
     c.def(
+        "centers",
+        [dim](type& self, const int codim) {
+          DUNE_THROW_IF(codim != 0, NotImplemented, "Only for codim 0 at the moment!");
+          DUNE_THROW_IF(
+              codim < 0 || codim > dim, Exceptions::wrong_codimension, "dim = " << dim << "\n   codim = " << codim);
+          auto grid_view = self.leaf_view();
+          MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(
+              grid_view,
+              [codim](GeometryType gt, int dimgrid) { return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim; });
+          XT::LA::CommonDenseMatrix<double> centers(mapper.size(), size_t(d), 0.);
+          for (auto&& element : elements(grid_view)) {
+            auto index = mapper.index(element);
+            auto center = element.geometry().center();
+            for (size_t jj = 0; jj < d; ++jj)
+              centers.set_entry(index, jj, center[jj]);
+          }
+          return centers;
+        },
+        "codim"_a = 0,
+        py::call_guard<py::gil_scoped_release>());
+    c.def(
         "visualize",
         [](type& self, const std::string& filename, const std::string& layer) {
           DUNE_THROW_IF(layer != "leaf", NotImplemented, "Visualization of level views not implemented yet!");
@@ -85,9 +106,13 @@ public:
           element_index_function.visualize(grid_view, filename, /*subsampling=*/false);
         },
         "filename"_a,
-        "layer"_a = "leaf");
+        "layer"_a = "leaf",
+        py::call_guard<py::gil_scoped_release>());
     c.def(
-        "global_refine", [](type& self, const int count) { self.global_refine(count); }, "count"_a = 1);
+        "global_refine",
+        [](type& self, const int count) { self.global_refine(count); },
+        "count"_a = 1,
+        py::call_guard<py::gil_scoped_release>());
     c.def("refine_steps_for_half", [](type& /*self*/) { return DGFGridInfo<G>::refineStepsForHalf(); });
     return c;
   } // ... bind(...)
