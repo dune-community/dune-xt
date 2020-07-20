@@ -262,7 +262,11 @@ public:
                  const Dune::FieldVector<ctype, GridType::dimension>& upperRight,
                  const std::array<unsigned int, GridType::dimension>& elements,
                  std::array<unsigned int, GridType::dimension> = default_overlap<GridType>(),
-                 Dune::MPIHelper::MPICommunicator mpi_comm = Dune::MPIHelper::getCommunicator())
+                 Dune::MPIHelper::MPICommunicator
+#  if HAVE_MPI
+                     mpi_comm
+#  endif
+                 = Dune::MPIHelper::getCommunicator())
   {
     if (Dune::MPIHelper::isFake)
       return Dune::StructuredGridFactory<GridType>::createCubeGrid(lowerLeft, upperRight, elements);
