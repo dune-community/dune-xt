@@ -51,12 +51,16 @@ struct Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}} : public ::te
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_constructible)
 {
+#if HAVE_DUNE_XT_DATA
   FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
                          Dune::XT::Functions::Spe10::internal::model_2_length_y,
                          Dune::XT::Functions::Spe10::internal::model_2_length_z},
                         {6, 22, 8});
+#else
+  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+#endif
 }
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, has_default_config)
