@@ -21,7 +21,9 @@
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/grid/entity.hh>
 #include <dune/xt/grid/exceptions.hh>
+#include <dune/xt/grid/gridprovider/dgf.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
+#include <dune/xt/functions/generic/grid-function.hh>
 
 #include <python/dune/xt/common/configuration.hh>
 #include <python/dune/xt/common/fvector.hh>
@@ -51,24 +53,42 @@ public:
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
-    c.def_property_readonly("dimension", [dim](type&){return dim;});
+    c.def_property_readonly("dimension", [dim](type&) { return dim; });
     c.def_property_readonly("max_level", &type::max_level);
-    c.def("size", [dim](type& self, const int codim){
-      DUNE_THROW_IF(codim < 0 || codim > dim,
-                    Exceptions::wrong_codimension,
-                    "dim = " << dim << "\n   codim = " << codim);
-      auto grid_view = self.leaf_view();
-      MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(grid_view, [codim](GeometryType gt, int dimgrid) {
-        return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim;
-      });
-      return mapper.size();
-    }, "codim"_a);
-    c.def("visualize", [](type& self, const std::string& filename, const Common::Configuration& boundary_info_cfg){
-      self.visualize(filename, boundary_info_cfg);
-    },
-    "filename"_a,
-        "boundary_info_cfg"_a = Common::Configuration());
-    c.def("global_refine", [](type& self, const int count){self.global_refine(count);}, "count"_a = 1);
+    c.def(
+        "size",
+        [dim](type& self, const int codim) {
+          DUNE_THROW_IF(
+              codim < 0 || codim > dim, Exceptions::wrong_codimension, "dim = " << dim << "\n   codim = " << codim);
+          auto grid_view = self.leaf_view();
+          MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(
+              grid_view,
+              [codim](GeometryType gt, int dimgrid) { return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim; });
+          return mapper.size();
+        },
+        "codim"_a);
+    c.def(
+        "visualize",
+        [](type& self, const std::string& filename, const std::string& layer) {
+          DUNE_THROW_IF(layer != "leaf", NotImplemented, "Visualization of level views not implemented yet!");
+          auto grid_view = self.leaf_view();
+          using GV = decltype(grid_view);
+          const MultipleCodimMultipleGeomTypeMapper<GV> mapper(
+              grid_view, [](GeometryType gt, int dimgrid) { return dimgrid == Common::numeric_cast<int>(gt.dim()); });
+          double element_index = 0;
+          Functions::GenericGridFunction<extract_entity_t<GV>> element_index_function(
+              /*order=*/[](const auto&) { return 0; },
+              /*post_bind=*/[&mapper, &element_index](const auto& element) { element_index = mapper.index(element); },
+              /*evaluate=*/[&element_index](const auto&, const auto&) { return element_index; },
+              /*param_type=*/{},
+              /*name=*/"Element index");
+          element_index_function.visualize(grid_view, filename, /*subsampling=*/false);
+        },
+        "filename"_a,
+        "layer"_a = "leaf");
+    c.def(
+        "global_refine", [](type& self, const int count) { self.global_refine(count); }, "count"_a = 1);
+    c.def("refine_steps_for_half", [](type& /*self*/) { return DGFGridInfo<G>::refineStepsForHalf(); });
     return c;
   } // ... bind(...)
 }; // class GridProvider
