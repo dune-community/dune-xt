@@ -11,7 +11,7 @@
 # ~~~
 
 import pytest
-from dune.xt.common.test import load_all_submodule
+from dune.xt.test.base import load_all_submodule
 
 
 def test_mpi4py():

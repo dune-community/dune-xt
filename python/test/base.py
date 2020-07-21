@@ -12,8 +12,8 @@
 # ~~~
 
 import pytest
-from dune.xt.common.test import load_all_submodule
-from dune.xt.grid import types
+from dune.xt.test.base import load_all_submodule
+from dune.xt.test.grid_types import types
 
 
 def test_load_all():
@@ -51,7 +51,7 @@ def test_timings():
 
 
 if __name__ == '__main__':
-    from dune.xt.common.test import runmodule
+    from dune.xt.test.base import runmodule
     runmodule(__file__)
 
 
