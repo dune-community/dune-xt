@@ -9,4 +9,5 @@
 #   Felix Schindler (2020)
 # ~~~
 
-dune_pybindxi_add_module(_test_grid_intersection EXCLUDE_FROM_ALL grid_intersection.cc)
+dune_pybindxi_add_module(_test_grid_intersection grid_intersection.cc)
+dune_pybindxi_add_module(_test_grid_types grid_types.cc)

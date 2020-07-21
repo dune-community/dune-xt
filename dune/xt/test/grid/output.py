@@ -10,7 +10,7 @@
 #   Tobias Leibner (2020)
 # ~~~
 
-import dune.xt.grid.types as grid_types
+import dune.xt.test.grid_types as grid_types
 from dune.xt.codegen import typeid_to_typedef_name as safe_name
 
 # alberta needs manual flag adding in cmake, so we skip it here

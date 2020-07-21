@@ -12,7 +12,7 @@
 # ~~~
 
 try:
-    from dune.xt.grid._types import *
+    from dune.xt.test._test_grid_types import *
 except ImportError as e:
     import os
     import logging

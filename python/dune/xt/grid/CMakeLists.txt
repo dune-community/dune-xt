@@ -30,5 +30,4 @@ dune_pybindxi_add_module(_grid_gridprovider_gmsh EXCLUDE_FROM_ALL gridprovider/g
 dune_pybindxi_add_module(_grid_intersection EXCLUDE_FROM_ALL intersection.cc)
 dune_pybindxi_add_module(_grid_gridprovider_provider EXCLUDE_FROM_ALL gridprovider/provider.cc)
 dune_pybindxi_add_module(_grid_traits EXCLUDE_FROM_ALL traits.cc)
-dune_pybindxi_add_module(_grid_types EXCLUDE_FROM_ALL types.cc)
 dune_pybindxi_add_module(_grid_walker EXCLUDE_FROM_ALL walker.cc)
