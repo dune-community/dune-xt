@@ -327,8 +327,8 @@ public:
       MinMaxCoordinateFunctor<LeafView> minMaxCoord;
       leafWalk.append(minMaxCoord);
       leafWalk.walk();
-      const auto minima = minMaxCoord.result()[0];
-      const auto maxima = minMaxCoord.result()[1];
+      const auto minima = minMaxCoord.result().first;
+      const auto maxima = minMaxCoord.result().second;
 
       switch (int(GridType::dimensionworld)) {
         case 1: {
