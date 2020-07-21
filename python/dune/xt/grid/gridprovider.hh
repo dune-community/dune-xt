@@ -77,11 +77,11 @@ public:
           MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(
               grid_view,
               [codim](GeometryType gt, int dimgrid) { return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim; });
-          XT::LA::CommonDenseMatrix<double> centers(mapper.size(), size_t(d), 0.);
+          XT::LA::CommonDenseMatrix<double> centers(mapper.size(), Common::numeric_cast<size_t>(dim), 0.);
           for (auto&& element : elements(grid_view)) {
             auto index = mapper.index(element);
             auto center = element.geometry().center();
-            for (size_t jj = 0; jj < d; ++jj)
+            for (size_t jj = 0; jj < Common::numeric_cast<size_t>(dim); ++jj)
               centers.set_entry(index, jj, center[jj]);
           }
           return centers;
