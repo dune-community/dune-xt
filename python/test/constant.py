@@ -13,7 +13,7 @@
 
 import pytest
 import dune.xt.grid as xtg
-from dune.xt.grid import types
+from dune.xt.test import grid_types as types
 import dune.xt.functions as xtf
 
 
