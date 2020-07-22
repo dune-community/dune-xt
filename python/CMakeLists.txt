@@ -16,7 +16,11 @@ include(DuneXTTesting)
 # Currently, the python libraries do not have access to the config.h variables, see https://github.com/dune-
 # community/dune-xt-common/issues/120 The following silences all the resulting -Wundef warnings in this directory
 add_compile_options(-Wno-undef)
+
+dune_pybindxi_add_module(dunextusercode EXCLUDE_FROM_ALL dunextusercode.cc)
+
 add_subdirectory(dune)
 add_subdirectory(scripts)
 add_subdirectory(wrapper)
+
 dxt_add_python_tests()
