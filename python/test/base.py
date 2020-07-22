@@ -12,17 +12,18 @@
 # ~~~
 
 import pytest
-from dune.xt.test.base import load_all_submodule
-from dune.xt.test.grid_types import types
+from dune.xt.test import grid_types as types
 
 
 def test_load_all():
-    import dune.xt.grid as xtc
-    load_all_submodule(xtc)
+    import dune.xt.common
+    import dune.xt.la
+    import dune.xt.grid
+    import dune.xt.functions
 
 
 def test_empty():
-    from dune.xt.common._empty import Dog, Pet, Terrier
+    from dune.xt.common._common_empty import Dog, Pet, Terrier
 
     dog = Dog('Susi')
     pet = Pet('Bello')

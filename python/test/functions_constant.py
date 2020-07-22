@@ -12,12 +12,11 @@
 # ~~~
 
 import pytest
-import dune.xt.grid as xtg
 from dune.xt.test import grid_types as types
 import dune.xt.functions as xtf
 
 
-@pytest.fixture(params=xtg.types.available_types)
+@pytest.fixture(params=types.available_types)
 def function_provider(request):
     grid_type = request.param
     dim = 1
@@ -25,13 +24,13 @@ def function_provider(request):
         dim = 2
     if '3d' in grid_type:
         dim = 3
-    fn = "ConstantFunction__{}d_to_{}x{}".format(dim, 1, 1)
+    fn = "ConstantFunction{}To{}d".format(dim, 1)
     maker = getattr(xtf, fn)
     return maker([2], 'test_function')
 
 
 def test_available():
-    assert len(xtg.types.available_types) > 0
+    assert len(types.available_types) > 0
 
 
 def test_grid_provider(function_provider):

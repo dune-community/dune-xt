@@ -41,7 +41,7 @@ template <>
 void addbind_for_Grid<boost::tuples::null_type>(pybind11::module&, std::vector<std::string>&)
 {}
 
-PYBIND11_MODULE(_grid_types, m)
+PYBIND11_MODULE(_test_grid_types, m)
 {
   namespace py = pybind11;
 

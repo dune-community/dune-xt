@@ -26,7 +26,7 @@ PYBIND11_MODULE(_test_grid_intersection, m)
   using namespace pybind11::literals;
   using namespace Dune::XT;
 
-  using G = GRID_2D;
+  using G = YASP_2D_EQUIDISTANT_OFFSET;
   using I = Grid::extract_intersection_t<typename G::LeafGridView>;
 
   py::module::import("dune.xt.common");

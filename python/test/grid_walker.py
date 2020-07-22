@@ -10,8 +10,7 @@
 #   Tobias Leibner (2018 - 2020)
 # ~~~
 
-from pymortests.base import runmodule
-
+from dune.xt.test.base import runmodule
 from dune.xt.grid import Dim, Cube, Simplex, make_cube_grid, Walker
 
 init_args = (
