@@ -83,6 +83,7 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_creatable
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualizable)
 {
+#if HAVE_DUNE_XT_DATA
   FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
@@ -91,10 +92,14 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_visualiza
                         {6, 22, 8});
   const auto leaf_view = grid_.leaf_view();
   function.visualize(leaf_view, "test__Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}__is_visualizable", /*subsampling=*/false);
+#else
+  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+#endif
 }
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
 {
+#if HAVE_DUNE_XT_DATA
   FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
@@ -107,10 +112,14 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, is_bindable)
   for (auto&& element : Dune::elements(leaf_view)) {
     local_f->bind(element);
   }
+#else
+  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+#endif
 }
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
 {
+#if HAVE_DUNE_XT_DATA
   FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
@@ -125,11 +134,15 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_order)
     const auto actual_order = local_f->order();
     EXPECT_EQ(expected_order, actual_order);
   }
+#else
+  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+#endif
 }
 
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evaluate)
 {
+#if HAVE_DUNE_XT_DATA
   const auto leaf_view = grid_.leaf_view();
   FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
@@ -145,11 +158,15 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_evalua
       const auto actual_value DUNE_UNUSED = local_f->evaluate(local_x);
     }
   }
+#else
+  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+#endif
 }
 
 
 TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobian)
 {
+#if HAVE_DUNE_XT_DATA
   FunctionType function(Dune::XT::Data::spe10_model2_filename(),
                         {0, 0, 0},
                         {Dune::XT::Functions::Spe10::internal::model_2_length_x,
@@ -167,6 +184,9 @@ TEST_F(Spe10Model2Function_from_{{GRIDNAME}}_to_{{r}}_times_{{rC}}, local_jacobi
       EXPECT_EQ(expected_jacobian, actual_jacobian);
     }
   }
+#else
+  std::cout << "Test disabled, missing dune-xt-data!" << std::endl;
+#endif
 }
 
 {% endfor  %}
