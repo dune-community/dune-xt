@@ -767,7 +767,4 @@ Walker<GV> make_walker(GV grid_view)
 } // namespace Dune
 
 
-#include "walker.lib.hh"
-
-
 #endif // DUNE_XT_GRID_WALKER_HH

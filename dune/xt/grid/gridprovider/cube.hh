@@ -264,7 +264,4 @@ make_cube_grid(const Common::Configuration& cfg = cube_gridprovider_default_conf
 } // namespace Dune
 
 
-#include "cube.lib.hh"
-
-
 #endif // DUNE_XT_GRID_GRIDPROVIDER_CUBE_HH

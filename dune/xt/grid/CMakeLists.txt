@@ -12,20 +12,4 @@
 # ~~~
 
 set(lib_dune_xt_grid_sources boundaryinfo/interfaces.cc)
-
-if(DUNE_XT_WITH_PYTHON_BINDINGS)
-  list(APPEND lib_dune_xt_grid_sources
-              gridprovider/cube.lib/alu_2d_simplex_conforming.cc
-              gridprovider/cube.lib/yasp_1d_equidistant_offset.cc
-              gridprovider/cube.lib/yasp_2d_equidistant_offset.cc
-              gridprovider/cube.lib/yasp_3d_equidistant_offset.cc
-              gridprovider/provider.lib/alu_2d_simplex_conforming.cc
-              gridprovider/provider.lib/yasp_1d_equidistant_offset.cc
-              gridprovider/provider.lib/yasp_2d_equidistant_offset.cc
-              gridprovider/provider.lib/yasp_3d_equidistant_offset.cc
-              walker.lib/alu_2d_simplex_conforming.cc
-              walker.lib/yasp_1d_equidistant_offset.cc
-              walker.lib/yasp_2d_equidistant_offset.cc
-              walker.lib/yasp_3d_equidistant_offset.cc)
-endif()
 dune_library_add_sources(dunext SOURCES ${lib_dune_xt_grid_sources})

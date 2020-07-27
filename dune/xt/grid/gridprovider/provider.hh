@@ -244,7 +244,4 @@ private:
 } // namespace Dune
 
 
-#include "provider.lib.hh"
-
-
 #endif // DUNE_XT_GRID_PROVIDER_PROVIDER_HH
