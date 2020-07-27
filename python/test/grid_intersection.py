@@ -30,7 +30,8 @@ def test_boundary():
 
 def test_boundary_segment_index():
     grid = make_cube_grid(Dim(2), Cube(), [0, 0], [1, 1], [2, 2])
-    call_on_each_intersection(grid, lambda intersection: intersection.boundary and print(intersection.boundary_segment_index))
+    call_on_each_intersection(
+        grid, lambda intersection: intersection.boundary and print(intersection.boundary_segment_index))
 
 
 def test_neighbor():

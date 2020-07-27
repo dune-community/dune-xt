@@ -27,12 +27,13 @@ def test_init():
         grid = make_cube_grid(*args)
         walker = Walker(grid)
 
+
 def test_walk():
     for args in init_args:
         grid = make_cube_grid(*args)
         walker = Walker(grid)
         walker.walk()
 
+
 if __name__ == "__main__":
     runmodule(filename=__file__)
-
