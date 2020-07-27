@@ -157,7 +157,7 @@ public:
 
   explicit IstlDenseVector(std::shared_ptr<BackendType> backend_ptr, const size_t num_mutexes = 1)
     : backend_(backend_ptr)
-    , mutexes_(std::unique_ptr<MutexesType>(num_mutexes))
+    , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
   ThisType& operator=(const ThisType& other)
