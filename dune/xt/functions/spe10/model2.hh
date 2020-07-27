@@ -15,7 +15,7 @@
 
 #include <dune/xt/common/color.hh>
 #include <dune/xt/common/configuration.hh>
-#if DUNE_DUNE_XT_DATA
+#if HAVE_DUNE_XT_DATA
 #  include <dune/xt/data/paths.hh>
 #endif
 
@@ -121,7 +121,7 @@ public:
     Common::Configuration config;
     config["type"] = static_id();
     config["filename"] =
-#if DUNE_DUNE_XT_DATA
+#if HAVE_DUNE_XT_DATA
         Data::spe10_model2_filename();
 #else
         "spe_perm.dat";
