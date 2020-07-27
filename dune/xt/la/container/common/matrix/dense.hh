@@ -260,6 +260,7 @@ public:
   ThisType& copy_backend(const ThisType& other)
   {
     *backend_ = *other.backend_;
+    return *this;
   }
 
   ThisType& operator=(const BackendType& other)
