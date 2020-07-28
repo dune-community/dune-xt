@@ -19,8 +19,9 @@ requires=['binpacking==1.3', 'cython', 'jinja2', 'docopt', 'pylicense3>=0.4.1',
                         'ipython', 'pytest', 'pytest-cov', 'cmake_format==0.4.1',
                         'codecov', 'yapf==0.25', 'loguru', 'numpy', 'scipy',
                         'k3d==2.6.6', 'vtk', 'ipywidgets', 'lxml', 'xmljson']
+extras_requires=[]
 if '${HAVE_MPI}' == 'TRUE':
-    requires.append('mpi4py')
+    extras_requires.append('mpi4py')
 
 setup(name='dune.xt',
       version='2.4',
@@ -34,6 +35,7 @@ setup(name='dune.xt',
       zip_safe = 0,
       package_data = {'': ['*.so']},
       install_requires=requires,
+      extras_requires={'parallel': extras_requires},
       scripts=['./scripts/generate_compare_functions.py',
                './scripts/distribute_testing.py',
                './scripts/dxt_code_generation.py',
