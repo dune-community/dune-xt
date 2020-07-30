@@ -38,6 +38,7 @@ PYBIND11_MODULE(_grid_gridprovider_provider, m)
   namespace py = pybind11;
 
   py::module::import("dune.xt.common");
+  py::module::import("dune.xt.la");
 
   GridProvider_for_all_grids<>::bind(m);
 }
