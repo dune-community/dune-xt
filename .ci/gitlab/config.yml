@@ -2,7 +2,8 @@
 # Edit and Re-run .ci/gitlab/config_tpl.py instead  #
 stages:
   - images
-  - test
+  - cpp
+  - python
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -21,9 +22,10 @@ variables:
             - runner_system_failure
             - stuck_or_timeout_failure
             - api_failure
-    only: ['branches', 'tags', 'triggers', 'merge_requests']
-    except:
-        - /^staging/.*$/i
+    rules:
+        - if: '$CI_COMMIT_REF_NAME =~ /^staging.*/'
+          when: never
+        - when: on_success
     retry:
         max: 2
         when:
@@ -62,9 +64,10 @@ variables:
             - runner_system_failure
             - stuck_or_timeout_failure
             - api_failure
-    only: ['branches', 'tags', 'triggers', 'merge-requests']
-    except:
-        - /^staging/.*$/i
+    rules:
+        - if: '$CI_COMMIT_REF_NAME =~ /^staging.*/'
+          when: never
+        - when: on_success
     retry:
         max: 2
         when:
@@ -72,19 +75,15 @@ variables:
     image: $CI_REGISTRY/ag-ohlberger/dune-community/dune-xt/ci_testing_${CI_IMAGE}:${CI_COMMIT_SHORT_SHA}
 
     before_script:
-      - mkdir /home/dune-ci/testresults && chmod -R 777 /home/dune-ci/testresults
-    script:
       - |
+        mkdir /home/dune-ci/testresults && chmod -R 777 /home/dune-ci/testresults
         [[ -f ./.gitsuper ]] && echo "Please remove .gitsuper from the repo" && exit 1
-        /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
-        /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
 
     artifacts:
       reports:
         junit: '/home/dune-ci/testresults/*xml'
     environment:
         name: unsafe
-    stage: test
 
 debian-unstable_gcc_full:
     extends: .image_builder
@@ -101,83 +100,235 @@ debian_clang_full:
 
 
 
-common unstable_gcc_full:
+common unstable_gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: common
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-grid unstable_gcc_full:
+common unstable_gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian-unstable_gcc_full
+        TESTS_MODULE_SUBDIR: common
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+grid unstable_gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-functions unstable_gcc_full:
+grid unstable_gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian-unstable_gcc_full
+        TESTS_MODULE_SUBDIR: grid
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+functions unstable_gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
         - amm-only
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-la unstable_gcc_full:
+functions unstable_gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian-unstable_gcc_full
+        TESTS_MODULE_SUBDIR: functions
+    tags:
+        - amm-only
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+la unstable_gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
         - amm-only
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-common gcc_full:
+la unstable_gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian-unstable_gcc_full
+        TESTS_MODULE_SUBDIR: la
+    tags:
+        - amm-only
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+common gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: common
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-grid gcc_full:
+common gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_gcc_full
+        TESTS_MODULE_SUBDIR: common
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+grid gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-functions gcc_full:
+grid gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_gcc_full
+        TESTS_MODULE_SUBDIR: grid
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+functions gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
         - amm-only
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-la gcc_full:
+functions gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_gcc_full
+        TESTS_MODULE_SUBDIR: functions
+    tags:
+        - amm-only
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+la gcc_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
         - amm-only
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-common clang_full:
+la gcc_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_gcc_full
+        TESTS_MODULE_SUBDIR: la
+    tags:
+        - amm-only
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+common clang_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_clang_full
         TESTS_MODULE_SUBDIR: common
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-grid clang_full:
+common clang_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_clang_full
+        TESTS_MODULE_SUBDIR: common
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+grid clang_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_clang_full
         TESTS_MODULE_SUBDIR: grid
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-functions clang_full:
+grid clang_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_clang_full
+        TESTS_MODULE_SUBDIR: grid
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+functions clang_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_clang_full
         TESTS_MODULE_SUBDIR: functions
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
 
-la clang_full:
+functions clang_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_clang_full
+        TESTS_MODULE_SUBDIR: functions
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
+
+la clang_full cpp:
     extends: .subdir-test
     variables:
         CI_IMAGE: debian_clang_full
         TESTS_MODULE_SUBDIR: la
+    stage: cpp
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
+
+la clang_full python:
+    extends: .subdir-test
+    variables:
+        CI_IMAGE: debian_clang_full
+        TESTS_MODULE_SUBDIR: la
+    stage: python
+    script:
+          - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
 
