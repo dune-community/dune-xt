@@ -17,13 +17,16 @@
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/pybindxi/stl.h>
-#include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
 #include <dune/xt/common/numeric_cast.hh>
+#include <dune/xt/common/parallel/mpi_comm_wrapper.hh>
+#include <dune/xt/common/ranges.hh>
+#include <dune/xt/functions/generic/grid-function.hh>
 #include <dune/xt/grid/entity.hh>
+#include <dune/xt/grid/element.hh>
 #include <dune/xt/grid/exceptions.hh>
 #include <dune/xt/grid/gridprovider/dgf.hh>
 #include <dune/xt/grid/gridprovider/provider.hh>
-#include <dune/xt/functions/generic/grid-function.hh>
+#include <dune/xt/grid/mapper.hh>
 
 #include <python/dune/xt/common/configuration.hh>
 #include <python/dune/xt/common/fvector.hh>
@@ -60,29 +63,36 @@ public:
         [dim](type& self, const int codim) {
           DUNE_THROW_IF(
               codim < 0 || codim > dim, Exceptions::wrong_codimension, "dim = " << dim << "\n   codim = " << codim);
-          auto grid_view = self.leaf_view();
-          MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(
-              grid_view,
-              [codim](GeometryType gt, int dimgrid) { return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim; });
+          DUNE_THROW_IF(codim != dim && codim != 0 && !G::LeafGridView::conforming,
+                        XT::Common::Exceptions::requirements_not_met,
+                        "This is not yet implemented for non-conforming grids and codim " << codim << "!");
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), [codim](GeometryType gt, int dimgrid) {
+            return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim;
+          });
           return mapper.size();
         },
         "codim"_a);
     c.def(
         "centers",
         [dim](type& self, const int codim) {
-          DUNE_THROW_IF(codim != 0, NotImplemented, "Only for codim 0 at the moment!");
           DUNE_THROW_IF(
               codim < 0 || codim > dim, Exceptions::wrong_codimension, "dim = " << dim << "\n   codim = " << codim);
+          DUNE_THROW_IF(codim != dim && codim != 0 && !G::LeafGridView::conforming,
+                        XT::Common::Exceptions::requirements_not_met,
+                        "This is not yet implemented for non-conforming grids and codim " << codim << "!");
           auto grid_view = self.leaf_view();
-          MultipleCodimMultipleGeomTypeMapper<decltype(grid_view)> mapper(
-              grid_view,
-              [codim](GeometryType gt, int dimgrid) { return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim; });
-          XT::LA::CommonDenseMatrix<double> centers(mapper.size(), Common::numeric_cast<size_t>(dim), 0.);
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), [codim](GeometryType gt, int dimgrid) {
+            return dimgrid - Common::numeric_cast<int>(gt.dim()) == codim;
+          });
+          auto centers =
+              std::make_unique<XT::LA::CommonDenseMatrix<double>>(mapper.size(), Common::numeric_cast<size_t>(dim), 0.);
           for (auto&& element : elements(grid_view)) {
-            auto index = mapper.index(element);
-            auto center = element.geometry().center();
-            for (size_t jj = 0; jj < Common::numeric_cast<size_t>(dim); ++jj)
-              centers.set_entry(index, jj, center[jj]);
+            for (auto&& ii : Common::value_range(element.subEntities(codim))) {
+              auto index = sub_entity_index(mapper, element, codim, ii);
+              auto center = sub_entity_center(element, codim, ii);
+              for (size_t jj = 0; jj < Common::numeric_cast<size_t>(dim); ++jj)
+                centers->set_entry(index, jj, center[jj]);
+            }
           }
           return centers;
         },
@@ -90,23 +100,24 @@ public:
         py::call_guard<py::gil_scoped_release>());
     c.def(
         "visualize",
-        [](type& self, const std::string& filename, const std::string& layer) {
-          DUNE_THROW_IF(layer != "leaf", NotImplemented, "Visualization of level views not implemented yet!");
-          auto grid_view = self.leaf_view();
-          using GV = decltype(grid_view);
-          const MultipleCodimMultipleGeomTypeMapper<GV> mapper(
-              grid_view, [](GeometryType gt, int dimgrid) { return dimgrid == Common::numeric_cast<int>(gt.dim()); });
-          double element_index = 0;
-          Functions::GenericGridFunction<extract_entity_t<GV>> element_index_function(
+        [](type& self, const std::string& filename) {
+          const LeafMultipleCodimMultipleGeomTypeMapper<G> mapper(self.grid(), [](GeometryType gt, int dimgrid) {
+            return dimgrid - Common::numeric_cast<int>(gt.dim()) == 0;
+          });
+          double element_index = 0; // not thread safe!
+          Functions::GenericGridFunction<extract_entity_t<typename G::LeafGridView>> element_index_function(
               /*order=*/[](const auto&) { return 0; },
-              /*post_bind=*/[&mapper, &element_index](const auto& element) { element_index = mapper.index(element); },
-              /*evaluate=*/[&element_index](const auto&, const auto&) { return element_index; },
+              /*post_bind=*/
+              [&mapper, &element_index](const auto& element) { element_index = mapper.index(element); },
+              /*evaluate=*/
+              [&element_index](const auto&, const auto&) { return element_index; },
               /*param_type=*/{},
               /*name=*/"Element index");
-          element_index_function.visualize(grid_view, filename, /*subsampling=*/false);
+          element_index_function.visualize(self.leaf_view(),
+                                           filename,
+                                           /*subsampling=*/false);
         },
         "filename"_a,
-        "layer"_a = "leaf",
         py::call_guard<py::gil_scoped_release>());
     c.def(
         "global_refine",
