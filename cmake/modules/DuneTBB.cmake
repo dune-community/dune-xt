@@ -20,7 +20,7 @@
 # tries to link _debug libraries if cmake build mode matches DEBUG
 # ~~~
 
-find_package(TBB)
+find_package(TBB 2020.2)
 
 # add all TBB related flags to ALL_PKG_FLAGS, this must happen regardless of a target using add_dune_tbb_flags
 if(TBB_FOUND)
