@@ -19,6 +19,7 @@
 #include <iostream>
 #include <type_traits>
 #include <mutex>
+#include <list>
 
 #include <dune/common/timer.hh>
 
