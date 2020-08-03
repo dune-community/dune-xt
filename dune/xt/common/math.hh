@@ -30,8 +30,6 @@
 #include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/format.hpp>
-#include <boost/fusion/include/void.hpp>
-#include <boost/geometry.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/static_assert.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
