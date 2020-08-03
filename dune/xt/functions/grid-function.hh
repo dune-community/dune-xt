@@ -128,35 +128,49 @@ public:
   using typename BaseType::LocalFunctionType;
   using GenericFunctionType = GenericFunction<d, r, rC>;
 
-  GridFunction(const typename RangeTypeSelector<R, r, rC>::type& value)
+  GridFunction(const typename RangeTypeSelector<R, r, rC>::type& value, const std::string nm = "GridFunction")
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(new ConstantFunction<d, r, rC, R>(value)))
+    , name_(nm)
   {}
 
   GridFunction(const FunctionInterface<d, r, rC, R>& func)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(func))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, r, rC, R>*&& func_ptr)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(std::move(func_ptr)))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, r, rC, R>& func)
     : BaseType()
     , storage_(func)
+    , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, r, rC, R>*&& func_ptr)
     : BaseType()
     , storage_(std::move(func_ptr))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType> order_evaluate)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
           new GenericFunctionType(std::get<0>(order_evaluate), std::get<1>(order_evaluate))))
+    , name_("GridFunction")
+  {}
+
+  GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType, const std::string&>
+                   order_evaluate_name)
+    : BaseType()
+    , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
+          new GenericFunctionType(std::get<0>(order_evaluate_name), std::get<1>(order_evaluate_name))))
+    , name_(std::get<2>(order_evaluate_name))
   {}
 
   GridFunction(std::tuple<int,
@@ -169,16 +183,33 @@ public:
                                                                                  /*name=*/"",
                                                                                  /*param_type=*/{},
                                                                                  std::get<2>(order_evaluate_jacobian))))
+    , name_("GridFunction")
+  {}
+
+  GridFunction(std::tuple<int,
+                          typename GenericFunctionType::GenericEvaluateFunctionType,
+                          typename GenericFunctionType::GenericJacobianFunctionType,
+                          const std::string&> order_evaluate_jacobian_name)
+    : BaseType()
+    , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
+          new GenericFunctionType(std::get<0>(order_evaluate_jacobian_name),
+                                  std::get<1>(order_evaluate_jacobian_name),
+                                  /*name=*/"",
+                                  /*param_type=*/{},
+                                  std::get<2>(order_evaluate_jacobian_name))))
+    , name_(std::get<3>(order_evaluate_jacobian_name))
   {}
 
   GridFunction(const ThisType& other)
     : BaseType(other)
     , storage_(other.storage_)
+    , name_(other.name_)
   {}
 
   GridFunction(ThisType&& source)
     : BaseType(source)
     , storage_(std::move(source.storage_))
+    , name_(std::move(source.name_))
   {}
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
@@ -188,11 +219,12 @@ public:
 
   std::string name() const override final
   {
-    return storage_.access().name();
+    return name_;
   }
 
 private:
   Common::ConstStorageProvider<GridFunctionInterface<E, r, rC, R>> storage_;
+  std::string name_;
 }; // class GridFunction<..., r, rC, ...>
 
 
@@ -220,21 +252,25 @@ public:
   using typename BaseType::LocalFunctionType;
   using GenericFunctionType = GenericFunction<d, r, rC>;
 
-  GridFunction(const R& value)
+  GridFunction(const R& value, const std::string nm = "GridFunction")
     : BaseType()
     , storage_(new ProductGridFunction<GridFunction<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           new GridFunction<E, 1, 1, R>(value), std::move(unit_matrix()), ""))
+    , name_(nm)
   {}
 
-  GridFunction(const FieldMatrix<R, r, r>& value) // <- Must not be XT::Common::FieldMatrix!
+  GridFunction(const FieldMatrix<R, r, r>& value, // <- Must not be XT::Common::FieldMatrix!
+               const std::string nm = "GridFunction")
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, r, R>(new ConstantFunction<d, r, r, R>(value)))
+    , name_(nm)
   {}
 
   GridFunction(const FunctionInterface<d, 1, 1, R>& func)
     : BaseType()
     , storage_(new ProductGridFunction<FunctionAsGridFunctionWrapper<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func), std::move(unit_matrix()), func.name()))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, 1, 1, R>*&& func_ptr)
@@ -243,44 +279,60 @@ public:
           new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)),
           std::move(unit_matrix()),
           func_ptr->name()))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(const FunctionInterface<d, r, r, R>& func)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, r, R>(func))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, r, r, R>*&& func_ptr)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, r, R>(std::move(func_ptr)))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
     : BaseType()
     , storage_(new ProductGridFunction<GridFunction<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           new GridFunction<E, 1, 1, R>(func), std::move(unit_matrix()), func.name()))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr)
     : BaseType()
     , storage_(new ProductGridFunction<GridFunctionInterface<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           std::move(func_ptr), std::move(unit_matrix()), func_ptr->name()))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, r, r, R>& func)
     : BaseType()
     , storage_(func)
+    , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, r, r, R>*&& func_ptr)
     : BaseType()
     , storage_(std::move(func_ptr))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType> order_evaluate)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
           new GenericFunctionType(std::get<0>(order_evaluate), std::get<1>(order_evaluate))))
+    , name_("GridFunction")
+  {}
+
+  GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType, const std::string&>
+                   order_evaluate_name)
+    : BaseType()
+    , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
+          new GenericFunctionType(std::get<0>(order_evaluate_name), std::get<1>(order_evaluate_name))))
+    , name_(std::get<2>(order_evaluate_name))
   {}
 
   GridFunction(std::tuple<int,
@@ -293,16 +345,33 @@ public:
                                                                                  /*name=*/"",
                                                                                  /*param_type=*/{},
                                                                                  std::get<2>(order_evaluate_jacobian))))
+    , name_("GridFunction")
+  {}
+
+  GridFunction(std::tuple<int,
+                          typename GenericFunctionType::GenericEvaluateFunctionType,
+                          typename GenericFunctionType::GenericJacobianFunctionType,
+                          const std::string&> order_evaluate_jacobian_name)
+    : BaseType()
+    , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
+          new GenericFunctionType(std::get<0>(order_evaluate_jacobian_name),
+                                  std::get<1>(order_evaluate_jacobian_name),
+                                  /*name=*/"",
+                                  /*param_type=*/{},
+                                  std::get<2>(order_evaluate_jacobian_name))))
+    , name_(std::get<3>(order_evaluate_jacobian_name))
   {}
 
   GridFunction(const ThisType& other)
     : BaseType(other)
     , storage_(other.storage_)
+    , name_(other.name_)
   {}
 
   GridFunction(ThisType&& source)
     : BaseType(source)
     , storage_(std::move(source.storage_))
+    , name_(std::move(source.name_))
   {}
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
@@ -312,11 +381,12 @@ public:
 
   std::string name() const override final
   {
-    return storage_.access().name();
+    return name_;
   }
 
 private:
   Common::ConstStorageProvider<GridFunctionInterface<E, r, rC, R>> storage_;
+  std::string name_;
 }; // class GridFunction<..., r, r, ...>
 
 
@@ -338,45 +408,63 @@ public:
   using typename BaseType::LocalFunctionType;
   using GenericFunctionType = GenericFunction<d, r, rC>;
 
-  GridFunction(const R& value)
+  GridFunction(const R& value, const std::string nm = "GridFunction")
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value)))
+    , name_(nm)
   {}
 
-  GridFunction(const FieldVector<R, 1>& value) // <- Must not be XT::Common::FieldVector!
+  GridFunction(const FieldVector<R, 1>& value, // <- Must not be XT::Common::FieldVector!
+               const std::string nm = "GridFunction")
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value)))
+    , name_(nm)
   {}
 
-  GridFunction(const FieldMatrix<R, 1, 1>& value) // <- Must not be XT::Common::FieldMatrix!
+  GridFunction(const FieldMatrix<R, 1, 1>& value, // <- Must not be XT::Common::FieldMatrix!
+               const std::string nm = "GridFunction")
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(new ConstantFunction<d, 1, 1, R>(value[0][0])))
+    , name_(nm)
   {}
 
   GridFunction(const FunctionInterface<d, 1, 1, R>& func)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, 1, 1, R>*&& func_ptr)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
     : BaseType()
     , storage_(func)
+    , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr)
     : BaseType()
     , storage_(std::move(func_ptr))
+    , name_(storage_.access().name())
   {}
 
   GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType> order_evaluate)
     : BaseType()
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
           new GenericFunctionType(std::get<0>(order_evaluate), std::get<1>(order_evaluate))))
+    , name_("GridFunction")
+  {}
+
+  GridFunction(std::tuple<int, typename GenericFunctionType::GenericEvaluateFunctionType, const std::string&>
+                   order_evaluate_name)
+    : BaseType()
+    , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
+          new GenericFunctionType(std::get<0>(order_evaluate_name), std::get<1>(order_evaluate_name))))
+    , name_(std::get<2>(order_evaluate_name))
   {}
 
   GridFunction(std::tuple<int,
@@ -389,16 +477,33 @@ public:
                                                                                  /*name=*/"",
                                                                                  /*param_type=*/{},
                                                                                  std::get<2>(order_evaluate_jacobian))))
+    , name_("GridFunction")
+  {}
+
+  GridFunction(std::tuple<int,
+                          typename GenericFunctionType::GenericEvaluateFunctionType,
+                          typename GenericFunctionType::GenericJacobianFunctionType,
+                          const std::string&> order_evaluate_jacobian_name)
+    : BaseType()
+    , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(
+          new GenericFunctionType(std::get<0>(order_evaluate_jacobian_name),
+                                  std::get<1>(order_evaluate_jacobian_name),
+                                  /*name=*/"",
+                                  /*param_type=*/{},
+                                  std::get<2>(order_evaluate_jacobian_name))))
+    , name_(std::get<3>(order_evaluate_jacobian_name))
   {}
 
   GridFunction(const ThisType& other)
     : BaseType(other)
     , storage_(other.storage_)
+    , name_(other.name_)
   {}
 
   GridFunction(ThisType&& source)
     : BaseType(source)
     , storage_(std::move(source.storage_))
+    , name_(std::move(source.name_))
   {}
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
@@ -408,11 +513,12 @@ public:
 
   std::string name() const override final
   {
-    return storage_.access().name();
+    return name_;
   }
 
 private:
   Common::ConstStorageProvider<GridFunctionInterface<E, 1, 1, R>> storage_;
+  std::string name_;
 }; // class GridFunction<..., 1, 1, ...>
 
 
