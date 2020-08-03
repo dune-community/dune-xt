@@ -32,19 +32,21 @@ def _process_sources(df, strip_dir, detail_name):
     grouped = grouped[['dur']].sum().sort_values(by=['dur'], ascending=False).reset_index()
     sl = grouped.head(20)
     sl['count'] = [counts[f] for f in sl['detail']]
-    print(sl.rename(columns={'detail': detail_name, 'dur': 'cum. time (s)', 'count': 'event count'}).to_markdown(index=False))
+    sl = sl.rename(columns={'detail': detail_name, 'dur': 'cum. time (s)', 'count': 'event count'})
+    return sl
 
-
-def report(trace_files, min_time=None, top_percentile=None, strip_dir=''):
+def report(trace_files, out_fn_base='time_trace_results', strip_dir=''):
     df = read_files(trace_files)
+    df.to_pickle(f'{out_fn_base}.dataframe.pickle.xz')
     totals = df[df['name'].str.contains('Total')]
     for cat in categories:
-        _process_sources(df, strip_dir, detail_name=cat)
-        print('\n')
-    print('\nTotals:')
-    print(totals.groupby(['name'])[['dur']].sum().rename(columns={'dur': 'cum. time (s)'}).to_markdown())
+        with open(f'{out_fn_base}.{cat.lower()}.md', 'wt') as out:
+            data = _process_sources(df, strip_dir, detail_name=cat)
+            out.write(data.to_markdown(index=False))
+    with open(f'{out_fn_base}.totals.md', 'wt') as out:
+        out.write('Totals:\n')
+        out.write(totals.groupby(['name'])[['dur']].sum().rename(columns={'dur': 'cum. time (s)'}).to_markdown())
 
 if __name__ == '__main__':
-    percent = 90
     strip_dir = '/home/r_milk01/master_xt/'
-    report(sys.argv[1:], top_percentile=percent, strip_dir=strip_dir)
+    report(sys.argv[1:], strip_dir=strip_dir)
