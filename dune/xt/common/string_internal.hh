@@ -79,7 +79,7 @@ static inline T convert_safely(std::string ss)
 } // ... convert_safely(...)
 
 // unspecialized variant
-template <class T, bool anything = true>
+template <class T>
 struct Helper
 {
   static inline T convert_from_string(std::string ss)
@@ -89,8 +89,8 @@ struct Helper
 }; // struct Helper
 
 // variant for bool, to correctly parse true and false
-template <bool anything>
-struct Helper<bool, anything>
+template <>
+struct Helper<bool>
 {
   static inline bool convert_from_string(std::string ss)
   {
@@ -107,8 +107,8 @@ struct Helper<bool, anything>
 
 // variant for all basic types supported by std::sto*
 #define DUNE_XT_COMMON_STRING_GENERATE_HELPER(tn, tns)                                                                 \
-  template <bool anything>                                                                                             \
-  struct Helper<tn, anything>                                                                                          \
+  template <>                                                                                                          \
+  struct Helper<tn>                                                                                                    \
   {                                                                                                                    \
     static inline tn convert_from_string(std::string ss)                                                               \
     {                                                                                                                  \
@@ -133,8 +133,8 @@ DUNE_XT_COMMON_STRING_GENERATE_HELPER(long double, ld)
 #undef DUNE_XT_COMMON_STRING_GENERATE_HELPER
 
 // variant for unsigned int as there is no stoui
-template <bool anything>
-struct Helper<unsigned int, anything>
+template <>
+struct Helper<unsigned int>
 {
   static inline unsigned int convert_from_string(std::string ss)
   {
