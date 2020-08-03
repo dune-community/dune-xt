@@ -78,6 +78,9 @@ static inline T convert_safely(std::string ss)
   return T();
 } // ... convert_safely(...)
 
+template <class T>
+T convert_from_string(std::string ss, const size_t rows = 0, const size_t cols = 0);
+
 // unspecialized variant
 template <class T>
 struct Helper
@@ -152,25 +155,14 @@ struct Helper<unsigned int>
   }
 };
 
-// variant for everything that is not a matrix or a vector or complex value
-template <class T>
-static inline typename std::enable_if<!is_vector<T>::value && !is_matrix<T>::value && !is_complex<T>::value, T>::type
-convert_from_string(std::string ss, const size_t DXTC_DEBUG_ONLY(rows) = 0, const size_t DXTC_DEBUG_ONLY(cols) = 0)
-{
-  DXT_ASSERT(rows == 0);
-  DXT_ASSERT(cols == 0);
-  return Helper<T>::convert_from_string(ss);
-}
-
-template <class V>
-static inline typename std::enable_if<is_complex<V>::value, V>::type
-convert_from_string(std::string ss, const size_t /*size*/ = 0, const size_t /*cols*/ = 0)
+template <class ComplexType>
+ComplexType complex_from_string(std::string ss, const size_t /*size*/ = 0, const size_t /*cols*/ = 0)
 {
   boost::algorithm::trim(ss);
   if (ss.size() < 1)
     DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " (too short)");
   using namespace std;
-  typedef typename V::value_type T;
+  typedef typename ComplexType::value_type T;
   T re(0), im(0);
   const auto sign_pos = ss.find("+", 1) != string::npos ? ss.find("+", 1) : ss.find("-", 1);
   auto im_pos = ss.find("i");
@@ -187,14 +179,12 @@ convert_from_string(std::string ss, const size_t /*size*/ = 0, const size_t /*co
       DUNE_THROW(Exceptions::conversion_error, "Error converting " << ss << " no imaginary unit");
     im = convert_from_string<T>(ss.substr(0, im_pos));
   }
-  return V(re, im);
+  return ComplexType(re, im);
 }
 
 template <class VectorType>
-static inline typename std::enable_if<is_vector<VectorType>::value, VectorType>::type
-convert_from_string(std::string ss, const size_t size, const size_t DXTC_DEBUG_ONLY(cols) = 0)
+VectorType vector_from_string(std::string vector_str, const size_t size, const size_t DXTC_DEBUG_ONLY(cols) = 0)
 {
-  auto vector_str = ss;
   typedef typename VectorAbstraction<VectorType>::S S;
   DXT_ASSERT(cols == 0);
   // check if this is a vector
@@ -243,8 +233,7 @@ convert_from_string(std::string ss, const size_t size, const size_t DXTC_DEBUG_O
 } // ... convert_from_string(...)
 
 template <class MatrixType>
-static inline typename std::enable_if<is_matrix<MatrixType>::value, MatrixType>::type
-convert_from_string(std::string matrix_str, const size_t rows, const size_t cols)
+MatrixType matrix_from_string(std::string matrix_str, const size_t rows, const size_t cols)
 {
   typedef typename MatrixAbstraction<MatrixType>::S S;
   // check if this is a matrix
@@ -332,6 +321,23 @@ convert_from_string(std::string matrix_str, const size_t rows, const size_t cols
     return ret;
   }
 } // ... convert_from_string(...)
+
+// main function that dispatches to specializations
+template <class T>
+T convert_from_string(std::string ss, const size_t rows, const size_t cols)
+{
+  if constexpr (is_complex<T>::value) {
+    return complex_from_string<T>(ss);
+  } else if constexpr (is_vector<T>::value) {
+    return vector_from_string<T>(ss, rows, cols);
+  } else if constexpr (is_matrix<T>::value) {
+    return matrix_from_string<T>(ss, rows, cols);
+  } else {
+    DXT_ASSERT(rows == 0);
+    DXT_ASSERT(cols == 0);
+    return Helper<T>::convert_from_string(ss);
+  }
+}
 
 // variant for everything that is not a matrix, a vector or any of the types specified below
 template <class T>
