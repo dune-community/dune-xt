@@ -316,10 +316,11 @@ void addbind_GridFunctionInterface_combined_op(C& c)
   typedef GridFunctionInterface<E, r, rC, double> S;
   typedef GridFunctionInterface<E, oR, orC, double> O;
 
-  c.def(internal::get_grid_combined<S, O, comb>::op().c_str(),
-        [](const S& self, const O& other) { return internal::get_grid_combined<S, O, comb>::call(self, other); },
-        py::keep_alive<0, 1>(),
-        py::keep_alive<0, 2>());
+  c.def(
+      internal::get_grid_combined<S, O, comb>::op().c_str(),
+      [](const S& self, const O& other) { return internal::get_grid_combined<S, O, comb>::call(self, other); },
+      py::keep_alive<0, 1>(),
+      py::keep_alive<0, 2>());
 } // ... addbind_GridFunctionInterface_combined_op(...)
 
 
@@ -342,29 +343,15 @@ bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
   c.def_property_readonly("name", [](const C& self) { return self.name(); });
 
-  c.def("visualize",
-        [](const C& self,
-           const Grid::GridProvider<G>& grid_provider,
-           const std::string& layer,
-           const ssize_t lvl,
-           const std::string& path,
-           const bool subsampling) {
-          const auto level = XT::Common::numeric_cast<int>(lvl);
-          if (layer == "leaf")
-            self.visualize(grid_provider.leaf_view(), path, subsampling);
-          else if (layer == "level")
-            self.visualize(grid_provider.template layer<XT::Grid::Layers::level, XT::Grid::Backends::view>(level),
-                           path,
-                           subsampling);
-          else
-            DUNE_THROW(XT::Common::Exceptions::wrong_input_given,
-                       "Given layer has to be one of ('leaf', 'level'), is '" << layer << "'!");
-        },
-        "grid_provider"_a,
-        "layer"_a = "leaf",
-        "level"_a = -1,
-        "path"_a,
-        "subsampling"_a = true);
+  c.def(
+      "visualize",
+      [](const C& self,
+         const Grid::GridProvider<G>& grid_provider,
+         const std::string& filename,
+         const bool subsampling) { self.visualize(grid_provider.leaf_view(), filename, subsampling); },
+      "grid"_a,
+      "filename"_a,
+      "subsampling"_a = true);
 
   // internal::Divergence<G>::addbind(m, c);
 
