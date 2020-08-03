@@ -12,7 +12,10 @@
 #   Tobias Leibner  (2019 - 2020)
 # ~~~
 
+from tempfile import NamedTemporaryFile
+
 from dune.xt import guarded_import
+from dune.xt.common.vtk.plot import plot
 
 for mod_name in (
         '_functions_function_interface_1d',
@@ -30,3 +33,18 @@ for mod_name in (
         '_functions_spe10',
 ):
     guarded_import(globals(), 'dune.xt.functions', mod_name)
+
+
+from dune.xt.functions._functions_gridfunction import GridFunction
+
+
+def visualize_function(function, grid, subsampling=False):
+    assert function.dim_domain == 2, f'Not implemented yet for {function.dim_domain}-dimensional grids!'
+    assert function.dim_range == 1, f'Not implemented yet for {function.dim_domain}-dimensional functions!'
+    tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
+    try:
+        function.visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
+    except AttributeError:
+        GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
+    return plot(tmpfile, color_attribute_name=function.name)
+
