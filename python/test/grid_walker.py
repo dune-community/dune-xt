@@ -14,12 +14,14 @@
 from dune.xt.test.base import runmodule
 from dune.xt.grid import Dim, Cube, Simplex, make_cube_grid, Walker
 
+grid_elements_per_dim = 10
+
 init_args = (
-    (Dim(1), [0], [1], [2]),
-    (Dim(2), Cube(), [0, 0], [1, 1], [2, 2]),
-    (Dim(2), Simplex(), [0, 0], [1, 1], [2, 2]),
-    (Dim(3), Cube(), [0, 0, 0], [1, 1, 1], [2, 2, 2]),
-    (Dim(3), Simplex(), [0, 0, 0], [1, 1, 1], [2, 2, 2]),
+    (Dim(1), [0], [1], [grid_elements_per_dim]),
+    (Dim(2), Cube(), [0, 0], [1, 1], [grid_elements_per_dim]*2),
+    (Dim(2), Simplex(), [0, 0], [1, 1], [grid_elements_per_dim]*2),
+    (Dim(3), Cube(), [0, 0, 0], [1, 1, 1], [grid_elements_per_dim]*3),
+    (Dim(3), Simplex(), [0, 0, 0], [1, 1, 1], [grid_elements_per_dim]*3),
 )
 
 
@@ -33,7 +35,7 @@ def test_walk():
     for args in init_args:
         grid = make_cube_grid(*args)
         walker = Walker(grid)
-        walker.walk()
+        walker.walk(True)
 
 
 if __name__ == "__main__":
