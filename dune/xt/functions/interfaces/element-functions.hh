@@ -418,7 +418,7 @@ private:
   void single_derivative_helper_call(const std::vector<FullType>& val,
                                      const size_t row,
                                      const size_t col,
-                                     std::vector<SingleType>& ret)
+                                     std::vector<SingleType>& ret) const
   {
     if constexpr (rC == 1) {
       for (size_t ii = 0; ii < val.size(); ++ii)

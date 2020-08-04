@@ -469,7 +469,7 @@ public:
     if constexpr (rC == 1) {
       return val[row];
     } else {
-      SingleType ret;
+      SingleJacobianRangeReturnType ret;
       for (size_t dd = 0; dd < d; ++dd)
         ret[dd] = val[row][col][dd];
       return ret;
