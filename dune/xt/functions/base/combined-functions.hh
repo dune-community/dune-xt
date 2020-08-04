@@ -49,6 +49,7 @@ private:
   template <class L, class R>
   class Choose
   {
+    //! last tpl arg cannot be dropped due to gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
     template <size_t rL, size_t rR, size_t rCL, size_t rcR, CombinationType cc, bool anything = true>
     class Dimension
     {
