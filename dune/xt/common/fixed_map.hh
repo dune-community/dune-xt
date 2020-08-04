@@ -126,28 +126,17 @@ private:
 
   typedef FixedMap<key_imp, T, nin> ThisType;
 
-  template <class K> // for sfinae to work this needs to be a template although the type is already fixed
-  typename std::enable_if<std::is_convertible<K, std::string>::value, std::string>::type
-  range_error_message(K key) const
+  std::string range_error_message(key_imp key) const
   {
     std::stringstream ss;
-    ss << "missing key '" << key << "' in FixedMap!";
+    if constexpr (std::is_convertible<key_imp, std::string>::value) {
+      ss << "missing key '" << key << "' in FixedMap!";
+    } else if constexpr (std::is_convertible<key_imp, int>::value) {
+      ss << "missing key (converted to int)'" << int(key) << "' in FixedMap!";
+    } else {
+      ss << "missing key is not printable";
+    }
     return ss.str();
-  }
-
-  template <class K>
-  typename std::enable_if<std::is_convertible<K, int>::value, std::string>::type range_error_message(K key) const
-  {
-    std::stringstream ss;
-    ss << "missing key (converted to int)'" << int(key) << "' in FixedMap!";
-    return ss.str();
-  }
-
-  template <class K>
-  typename std::enable_if<!(std::is_convertible<K, int>::value || std::is_convertible<K, std::string>::value),
-                          std::string>::type range_error_message(K /*key*/) const
-  {
-    return "missing key is not printable";
   }
 
 public:
