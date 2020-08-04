@@ -81,7 +81,7 @@ namespace XT {
 namespace Grid {
 
 
-template <class M, class L, bool anything = true>
+template <class M, class L>
 struct ExpectedResults
 {
   static_assert(AlwaysFalse<M>::value, "Please add me for this grid!");
