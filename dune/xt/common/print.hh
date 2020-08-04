@@ -37,27 +37,6 @@ class DefaultPrinter
 {
   using ThisType = DefaultPrinter;
 
-  template <bool has_ostream = is_printable<T>::value, bool anything = true>
-  struct call_ostream;
-
-  template <bool anything>
-  struct call_ostream<true, anything>
-  {
-    static void or_print_error(std::ostream& out, const T& val)
-    {
-      out << val;
-    }
-  };
-
-  template <bool anything>
-  struct call_ostream<false, anything>
-  {
-    static void or_print_error(std::ostream& out, const T& /*val*/)
-    {
-      out << "missing specialization for Printer<T> with T=" << Typename<T>::value();
-    }
-  };
-
 public:
   using ValueType = T;
 
@@ -76,7 +55,11 @@ public:
 
   virtual void repr(std::ostream& out) const
   {
-    call_ostream<>::or_print_error(out, value);
+    if constexpr (is_printable<T>::value) {
+      out << value;
+    } else {
+      out << "missing specialization for Printer<T> with T=" << Typename<T>::value();
+    }
   }
 
   virtual void str(std::ostream& out) const
