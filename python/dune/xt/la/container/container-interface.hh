@@ -77,69 +77,35 @@ void addbind_ContainerInterface(pybind11::class_<C>& c)
 
 } // ... addbind_ContainerInterface(...)
 
-
 template <class C>
-typename std::enable_if<provides_backend<C>::value, void>::type addbind_ProvidesBackend(pybind11::class_<C>& c)
+auto bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const std::string& help_id)
 {
   namespace py = pybind11;
-
-  c.def_property_readonly_static("backend_type", [](py::object /*self*/) { return C::backend_type; });
+  if constexpr (!provides_data_access<C>::value) {
+    return py::class_<C>(m, class_id.c_str(), help_id.c_str());
+  } else {
+    namespace py = pybind11;
+    typedef typename C::DataType D;
+    py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::buffer_protocol());
+    if constexpr (is_vector<C>::value) {
+      c.def_buffer([](C& vec) -> py::buffer_info {
+        return py::buffer_info(
+            vec.data(), sizeof(D), py::format_descriptor<D>::format(), 1, {vec.data_size()}, {sizeof(D)});
+      });
+    } else if constexpr (is_matrix<C>::value) {
+      c.def_buffer([](C& mat) -> py::buffer_info {
+        return py::buffer_info(mat.data(), /* Pointer to buffer */
+                               sizeof(D), /* Size of one scalar */
+                               py::format_descriptor<D>::format(), /* Python struct-style format descriptor */
+                               2, /* Number of dimensions */
+                               {mat.rows(), mat.cols()}, /* Buffer dimensions */
+                               {sizeof(D) * mat.cols(), /* Strides (in bytes) for each index */
+                                sizeof(D)});
+      });
+    }
+    return c;
+  }
 }
-
-template <class C>
-typename std::enable_if<!provides_backend<C>::value, void>::type addbind_ProvidesBackend(pybind11::class_<C>& /*c*/)
-{}
-
-
-/**
- * \brief Allows the resulting container to be convertible into a NumPy array as in `np.array(c, copy = False)`.
- */
-template <class C>
-typename std::enable_if<provides_data_access<C>::value && is_vector<C>::value, pybind11::class_<C>>::type
-bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const std::string& help_id)
-{
-  namespace py = pybind11;
-  typedef typename C::DataType D;
-
-  py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::buffer_protocol());
-
-  c.def_buffer([](C& vec) -> py::buffer_info {
-    return py::buffer_info(
-        vec.data(), sizeof(D), py::format_descriptor<D>::format(), 1, {vec.data_size()}, {sizeof(D)});
-  });
-
-  return c;
-}
-
-template <class C>
-typename std::enable_if<provides_data_access<C>::value && is_matrix<C>::value, pybind11::class_<C>>::type
-bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const std::string& help_id)
-{
-  namespace py = pybind11;
-  typedef typename C::DataType D;
-
-  py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::buffer_protocol());
-
-  c.def_buffer([](C& mat) -> py::buffer_info {
-    return py::buffer_info(mat.data(), /* Pointer to buffer */
-                           sizeof(D), /* Size of one scalar */
-                           py::format_descriptor<D>::format(), /* Python struct-style format descriptor */
-                           2, /* Number of dimensions */
-                           {mat.rows(), mat.cols()}, /* Buffer dimensions */
-                           {sizeof(D) * mat.cols(), /* Strides (in bytes) for each index */
-                            sizeof(D)});
-  });
-  return c;
-}
-
-template <class C>
-typename std::enable_if<!provides_data_access<C>::value, pybind11::class_<C>>::type
-bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const std::string& help_id)
-{
-  namespace py = pybind11;
-  return py::class_<C>(m, class_id.c_str(), help_id.c_str());
-}
-
 
 } // namespace LA
 } // namespace XT
