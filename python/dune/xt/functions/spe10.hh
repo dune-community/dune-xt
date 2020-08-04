@@ -30,9 +30,12 @@ namespace Functions {
 
 
 template <class G, size_t d, size_t r, size_t rC>
-typename std::enable_if<Grid::is_grid<G>::value && d != 2, void>::type
-bind_Spe10Model1Function(pybind11::module& /*m*/, const std::string& /*grid_id*/)
-{}
+void bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
+{
+  if constexpr (Grid::is_grid<G>::value && d == 2) {
+    bind_Spe10Model1Function_2D<G, d, r, rC>(m, grid_id)
+  }
+}
 
 /**
  * \note We would like to drop the d template parameter and use either of
@@ -44,11 +47,7 @@ static const constexpr size_t d = G::dimension;
  *       everywhere: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59937
  */
 template <class G, size_t d, size_t r, size_t rC>
-typename std::enable_if<
-    Grid::is_grid<G>::value && d == 2,
-    pybind11::class_<Spe10::Model1Function<typename G::template Codim<0>::Entity, r, rC, double>,
-                     GridFunctionInterface<typename G::template Codim<0>::Entity, r, rC, double>>>::type
-bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
+auto bind_Spe10Model1Function_2D(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
   using namespace pybind11::literals;
@@ -113,8 +112,6 @@ bind_Spe10Model1Function(pybind11::module& m, const std::string& grid_id)
       "min"_a = Spe10::internal::model1_min_value,
       "max"_a = Spe10::internal::model1_max_value,
       "name"_a = C::static_id());
-
-  return c;
 } // ... bind_Spe10Model1Function(...)
 
 
