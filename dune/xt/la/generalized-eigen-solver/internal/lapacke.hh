@@ -123,35 +123,20 @@ struct generalized_eigenvalues_lapack_helper
 {
   static_assert(Common::is_matrix<MatrixType>::value, "");
 
-  template <bool is_complex = Common::is_complex<typename Common::MatrixAbstraction<MatrixType>::S>::value,
-            bool anything = true>
-  struct dtype_switch;
-
-  template <bool anything>
-  struct dtype_switch<true, anything>
+  template <class MatrixImp>
+  static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& lhs_matrix, MatrixImp&& rhs_matrix)
   {
-    template <class MatrixImp>
-    static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& /*lhs_matrix*/, MatrixImp&& /*rhs_matrix*/)
-    {
+    if constexpr (Common::is_complex<typename Common::MatrixAbstraction<MatrixType>::S>::value) {
       static_assert(AlwaysFalse<MatrixImp>::value,
                     "Not yet implemented for complex matrices, take a look at "
                     "https://software.intel.com/en-us/mkl-developer-reference-c-sygv "
                     "and add a corresponding free function like "
                     "compute_generalized_eigenvalues_of_real_matrices_using_lapack(...)!");
-      return std::vector<std::complex<double>>();
-    }
-  };
-
-  template <bool anything>
-  struct dtype_switch<false, anything>
-  {
-    template <class MatrixImp>
-    static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& lhs_matrix, MatrixImp&& rhs_matrix)
-    {
+    } else {
       return compute_generalized_eigenvalues_of_real_matrices_using_lapack(std::forward<MatrixImp>(lhs_matrix),
                                                                            std::forward<MatrixImp>(rhs_matrix));
     }
-  };
+  }
 }; // class generalized_eigenvalues_lapack_helper
 
 
@@ -159,7 +144,7 @@ template <class MatrixType>
 typename std::enable_if<Common::is_matrix<std::decay_t<MatrixType>>::value, std::vector<std::complex<double>>>::type
 compute_generalized_eigenvalues_using_lapack(MatrixType&& lhs_matrix, MatrixType&& rhs_matrix)
 {
-  return generalized_eigenvalues_lapack_helper<std::decay_t<MatrixType>>::template dtype_switch<>::eigenvalues(
+  return generalized_eigenvalues_lapack_helper<std::decay_t<MatrixType>>::eigenvalues(
       std::forward<MatrixType>(lhs_matrix), std::forward<MatrixType>(rhs_matrix));
 }
 
