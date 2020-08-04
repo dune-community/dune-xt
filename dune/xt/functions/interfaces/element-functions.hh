@@ -536,9 +536,9 @@ public:
     this->assert_correct_dims(row, col, "evaluate");
     const auto value = this->evaluate(point_in_reference_element, param);
     if constexpr (rC == 1) {
-      return val[row];
+      return value[row];
     } else {
-      return val[row][col];
+      return value[row][col];
     }
   }
 
