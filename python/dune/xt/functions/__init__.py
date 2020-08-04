@@ -30,6 +30,7 @@ for mod_name in (
         '_functions_gridfunction_interface_2d',
         '_functions_gridfunction_interface_3d',
         '_functions_indicator',
+        '_functions_parametric_expression',
         '_functions_spe10',
 ):
     guarded_import(globals(), 'dune.xt.functions', mod_name)
