@@ -97,8 +97,6 @@ auto bind_Matrix(pybind11::module& m)
 
   py::class_<C> c = bind_ProvidesDataAccess<C>(m, ClassName, ClassName);
 
-  addbind_ProvidesBackend(c);
-
   internal::addbind_Matrix<C, sparse>::template ctor<S>(c);
   c.def(py::init([](const ssize_t rows, const ssize_t cols, const SparsityPatternDefault& pattern) {
           return new C(Common::numeric_cast<size_t>(rows), Common::numeric_cast<size_t>(cols), pattern);
