@@ -111,17 +111,17 @@ MatrixInverter<M> make_matrix_inverter(const M& matrix, const Common::Configurat
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value || Common::is_matrix<M>::value, M>::type
-invert_matrix(const M& matrix, const std::string& inversion_type = "")
+auto invert_matrix(const M& matrix, const std::string& inversion_type = "")
 {
+  static_assert(is_matrix<M>::value || Common::is_matrix<M>::value);
   return MatrixInverter<M>(matrix, inversion_type).inverse();
 }
 
 
 template <class M>
-typename std::enable_if<is_matrix<M>::value || Common::is_matrix<M>::value, M>::type
-invert_matrix(const M& matrix, const Common::Configuration& inversion_options)
+auto invert_matrix(const M& matrix, const Common::Configuration& inversion_options)
 {
+  static_assert(is_matrix<M>::value || Common::is_matrix<M>::value);
   return MatrixInverter<M>(matrix, inversion_options).inverse();
 }
 
