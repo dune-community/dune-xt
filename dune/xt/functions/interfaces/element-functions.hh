@@ -268,7 +268,13 @@ assert(max_set_size <= local_function_set.max_size());
     const auto tmp_values = this->evaluate_set(point_in_reference_element, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
-    single_evaluate_helper<>::call(tmp_values, row, col, result);
+    if constexpr (rC == 1) {
+      for (size_t ii = 0; ii < tmp_values.size(); ++ii)
+        result[ii] = tmp_values[ii][row];
+    } else {
+      for (size_t ii = 0; ii < tmp_values.size(); ++ii)
+        result[ii] = tmp_values[ii][row][col];
+    }
   }
 
   /**
@@ -284,7 +290,7 @@ assert(max_set_size <= local_function_set.max_size());
     const auto tmp_values = this->jacobians_of_set(point_in_reference_element, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
-    single_derivative_helper<>::call(tmp_values, row, col, result);
+    single_derivative_helper_call(tmp_values, row, col, result);
   }
 
   /**
@@ -301,7 +307,7 @@ assert(max_set_size <= local_function_set.max_size());
     const auto tmp_values = this->derivatives_of_set(alpha, point_in_reference_element, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
-    single_derivative_helper<>::call(tmp_values, row, col, result);
+    single_derivative_helper_call(tmp_values, row, col, result);
   }
 
   /**
@@ -408,51 +414,21 @@ protected:
 #endif
 
 private:
-  template <size_t _r = r, size_t _rC = rC, bool anything = true>
-  struct single_evaluate_helper
+  template <class FullType, class SingleType>
+  void single_derivative_helper_call(const std::vector<FullType>& val,
+                                     const size_t row,
+                                     const size_t col,
+                                     std::vector<SingleType>& ret)
   {
-    template <class FullType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<R>& ret)
-    {
-      for (size_t ii = 0; ii < val.size(); ++ii)
-        ret[ii] = val[ii][row][col];
-    }
-  }; // struct single_evaluate_helper<...>
-
-  template <size_t _r, bool anything>
-  struct single_evaluate_helper<_r, 1, anything>
-  {
-    template <class FullType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t /*col*/, std::vector<R>& ret)
-    {
+    if constexpr (rC == 1) {
       for (size_t ii = 0; ii < val.size(); ++ii)
         ret[ii] = val[ii][row];
-    }
-  }; // struct single_evaluate_helper<..., 1, ...>
-
-  template <size_t _r = r, size_t _rC = rC, bool anything = true>
-  struct single_derivative_helper
-  {
-    template <class FullType, class SingleType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<SingleType>& ret)
-    {
+    } else {
       for (size_t ii = 0; ii < val.size(); ++ii)
         for (size_t dd = 0; dd < d; ++dd)
           ret[ii][dd] = val[ii][row][col][dd];
     }
-  }; // struct single_derivative_helper<...>
-
-  template <size_t _r, bool anything>
-  struct single_derivative_helper<_r, 1, anything>
-  {
-    template <class FullType, class SingleType>
-    static void
-    call(const std::vector<FullType>& val, const size_t row, const size_t /*col*/, std::vector<SingleType>& ret)
-    {
-      for (size_t ii = 0; ii < val.size(); ++ii)
-        ret[ii] = val[ii][row];
-    }
-  }; // struct single_derivative_helper<..., 1, ...>
+  }
 }; // class ElementFunctionSetInterface
 
 
@@ -558,7 +534,12 @@ public:
                      const Common::Parameter& param = {}) const
   {
     this->assert_correct_dims(row, col, "evaluate");
-    return single_evaluate_helper<R>::call(this->evaluate(point_in_reference_element, param), row, col);
+    const auto value = this->evaluate(point_in_reference_element, param);
+    if constexpr (rC == 1) {
+      return val[row];
+    } else {
+      return val[row][col];
+    }
   }
 
   virtual SingleDerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
@@ -567,8 +548,7 @@ public:
                                                    const Common::Parameter& param = {}) const
   {
     this->assert_correct_dims(row, col, "jacobian");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(
-        this->jacobian(point_in_reference_element, param), row, col);
+    return single_derivative_helper_call(this->jacobian(point_in_reference_element, param), row, col);
   }
 
   virtual SingleDerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
@@ -578,8 +558,7 @@ public:
                                                      const Common::Parameter& param = {}) const
   {
     this->assert_correct_dims(row, col, "derivative");
-    return single_derivative_helper<SingleDerivativeRangeType>::call(
-        this->derivative(alpha, point_in_reference_element, param), row, col);
+    return single_derivative_helper_call(this->derivative(alpha, point_in_reference_element, param), row, col);
   }
 
   /**
@@ -724,48 +703,19 @@ public:
    **/
 
 private:
-  template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
-  struct single_evaluate_helper
+  template <class FullType>
+  static SingleDerivativeRangeType
+  single_derivative_helper_call(const FullType& val, const size_t row, const size_t col)
   {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t col)
-    {
-      return val[row][col];
-    }
-  }; // struct single_evaluate_helper<...>
-
-  template <class SingleType, size_t _r, bool anything>
-  struct single_evaluate_helper<SingleType, _r, 1, anything>
-  {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
-    {
-      return val[row];
-    }
-  }; // struct single_evaluate_helper<..., 1, ...>
-
-  template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
-  struct single_derivative_helper
-  {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t col)
-    {
-      SingleType ret;
+    if constexpr (rC == 1) {
+      SingleDerivativeRangeType ret;
       for (size_t dd = 0; dd < d; ++dd)
         ret[dd] = val[row][col][dd];
       return ret;
-    }
-  }; // struct single_derivative_helper<...>
-
-  template <class SingleType, size_t _r, bool anything>
-  struct single_derivative_helper<SingleType, _r, 1, anything>
-  {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
-    {
+    } else {
       return val[row];
     }
-  }; // struct single_derivative_helper<..., 1, ...>
+  }
 }; // class ElementFunctionInterface
 
 

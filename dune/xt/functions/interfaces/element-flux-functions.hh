@@ -222,7 +222,13 @@ assert(max_set_size <= local_function_set.max_size());
     const auto tmp_values = this->evaluate_set(point_in_reference_element, u, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
-    single_evaluate_helper<>::call(tmp_values, row, col, result);
+    if constexpr (rC == 1) {
+      for (size_t ii = 0; ii < tmp_values.size(); ++ii)
+        result[ii] = tmp_values[ii][row];
+    } else {
+      for (size_t ii = 0; ii < tmp_values.size(); ++ii)
+        result[ii] = tmp_values[ii][row][col];
+    }
   }
 
   /**
@@ -239,7 +245,14 @@ assert(max_set_size <= local_function_set.max_size());
     const auto tmp_values = this->jacobian_of_set(point_in_reference_element, u, param);
     if (result.size() < tmp_values.size())
       result.resize(tmp_values.size());
-    single_derivative_helper<>::call(tmp_values, row, col, result);
+    if constexpr (rC == 1) {
+      for (size_t ii = 0; ii < tmp_values.size(); ++ii)
+        result[ii] = tmp_values[ii][row];
+    } else {
+      for (size_t ii = 0; ii < tmp_values.size(); ++ii)
+        for (size_t dd = 0; dd < d; ++dd)
+          result[ii][dd] = tmp_values[ii][row][col][dd];
+    }
   }
 
   /**
@@ -324,53 +337,6 @@ protected:
 #else // DUNE_XT_FUNCTIONS_DISABLE_CHECKS
   static void assert_correct_dims(const size_t /*row*/, const size_t /*col*/, const std::string& /*caller*/) {}
 #endif
-
-private:
-  template <size_t _r = r, size_t _rC = rC, bool anything = true>
-  struct single_evaluate_helper
-  {
-    template <class FullType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<R>& ret)
-    {
-      for (size_t ii = 0; ii < val.size(); ++ii)
-        ret[ii] = val[ii][row][col];
-    }
-  }; // struct single_evaluate_helper<...>
-
-  template <size_t _r, bool anything>
-  struct single_evaluate_helper<_r, 1, anything>
-  {
-    template <class FullType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t /*col*/, std::vector<R>& ret)
-    {
-      for (size_t ii = 0; ii < val.size(); ++ii)
-        ret[ii] = val[ii][row];
-    }
-  }; // struct single_evaluate_helper<..., 1, ...>
-
-  template <size_t _r = r, size_t _rC = rC, bool anything = true>
-  struct single_derivative_helper
-  {
-    template <class FullType, class SingleType>
-    static void call(const std::vector<FullType>& val, const size_t row, const size_t col, std::vector<SingleType>& ret)
-    {
-      for (size_t ii = 0; ii < val.size(); ++ii)
-        for (size_t dd = 0; dd < d; ++dd)
-          ret[ii][dd] = val[ii][row][col][dd];
-    }
-  }; // struct single_derivative_helper<...>
-
-  template <size_t _r, bool anything>
-  struct single_derivative_helper<_r, 1, anything>
-  {
-    template <class FullType, class SingleType>
-    static void
-    call(const std::vector<FullType>& val, const size_t row, const size_t /*col*/, std::vector<SingleType>& ret)
-    {
-      for (size_t ii = 0; ii < val.size(); ++ii)
-        ret[ii] = val[ii][row];
-    }
-  }; // struct single_derivative_helper<..., 1, ...>
 }; // class ElementFluxFunctionSetInterface
 
 
@@ -483,7 +449,13 @@ public:
                      const Common::Parameter& param = {}) const
   {
     this->assert_correct_dims(row, col, "evaluate");
-    return single_evaluate_helper<R>::call(this->evaluate(point_in_reference_element, u, param), row, col);
+
+    const auto val = this->evaluate(point_in_reference_element, u, param);
+    if constexpr (rC == 1) {
+      return val[row];
+    } else {
+      return val[row][col];
+    }
   }
 
   virtual SingleJacobianRangeReturnType jacobian(const DomainType& point_in_reference_element,
@@ -493,8 +465,15 @@ public:
                                                  const Common::Parameter& param = {}) const
   {
     this->assert_correct_dims(row, col, "jacobian");
-    return single_derivative_helper<SingleJacobianRangeReturnType>::call(
-        this->jacobian(point_in_reference_element, u, param), row, col);
+    const auto val = this->jacobian(point_in_reference_element, u, param);
+    if constexpr (rC == 1) {
+      return val[row];
+    } else {
+      SingleType ret;
+      for (size_t dd = 0; dd < d; ++dd)
+        ret[dd] = val[row][col][dd];
+      return ret;
+    }
   }
 
   /**
@@ -567,50 +546,6 @@ public:
       result.resize(1);
     result[0] = this->jacobian(point_in_reference_element, u, param);
   }
-
-private:
-  template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
-  struct single_evaluate_helper
-  {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t col)
-    {
-      return val[row][col];
-    }
-  }; // struct single_evaluate_helper<...>
-
-  template <class SingleType, size_t _r, bool anything>
-  struct single_evaluate_helper<SingleType, _r, 1, anything>
-  {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
-    {
-      return val[row];
-    }
-  }; // struct single_evaluate_helper<..., 1, ...>
-
-  template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>
-  struct single_derivative_helper
-  {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t col)
-    {
-      SingleType ret;
-      for (size_t dd = 0; dd < d; ++dd)
-        ret[dd] = val[row][col][dd];
-      return ret;
-    }
-  }; // struct single_derivative_helper<...>
-
-  template <class SingleType, size_t _r, bool anything>
-  struct single_derivative_helper<SingleType, _r, 1, anything>
-  {
-    template <class FullType>
-    static SingleType call(const FullType& val, const size_t row, const size_t /*col*/)
-    {
-      return val[row];
-    }
-  }; // struct single_derivative_helper<..., 1, ...>
 }; // class ElementFluxFunctionInterface
 
 
