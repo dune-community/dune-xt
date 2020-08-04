@@ -51,24 +51,26 @@ struct NormalBasedBoundaryInfo_for_all_grids
         "default_boundary_type"_a,
         "tolerance"_a = 1e-10,
         "logging_prefix"_a = "");
-    c.def("register_new_normal",
-          [](type& self, const typename type::WorldType& normal, const Grid::BoundaryType& boundary_type) {
-            self.register_new_normal(normal, boundary_type.copy());
-          },
-          "normal"_a,
-          "boundary_type"_a);
+    c.def(
+        "register_new_normal",
+        [](type& self, const typename type::WorldType& normal, const Grid::BoundaryType& boundary_type) {
+          self.register_new_normal(normal, boundary_type.copy());
+        },
+        "normal"_a,
+        "boundary_type"_a);
 
-    m.def(Common::to_camel_case(class_id).c_str(),
-          [](const Grid::GridProvider<G>&,
-             const Grid::BoundaryType& default_boundary_type,
-             const D& tol,
-             const std::string& logging_prefix) {
-            return std::make_unique<type>(tol, default_boundary_type.copy(), logging_prefix);
-          },
-          "grid_provider"_a,
-          "default_boundary_type"_a,
-          "tolerance"_a = 1e-10,
-          "logging_prefix"_a = "");
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](const Grid::GridProvider<G>&,
+           const Grid::BoundaryType& default_boundary_type,
+           const D& tol,
+           const std::string& logging_prefix) {
+          return std::make_unique<type>(tol, default_boundary_type.copy(), logging_prefix);
+        },
+        "grid_provider"_a,
+        "default_boundary_type"_a,
+        "tolerance"_a = 1e-10,
+        "logging_prefix"_a = "");
 
     NormalBasedBoundaryInfo_for_all_grids<typename GridTypes::tail_type>::bind(m);
   }

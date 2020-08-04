@@ -108,7 +108,7 @@ public:
                             const SparsityPatternDefault& pattern_in,
                             const size_t num_mutexes = 1)
     : backend_(
-          std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
+        std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     if (rr > 0 && cc > 0) {
@@ -139,7 +139,7 @@ public:
 
   explicit EigenRowMajorSparseMatrix(const size_t rr = 0, const size_t cc = 0, const size_t num_mutexes = 1)
     : backend_(
-          std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
+        std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {}
 
@@ -148,7 +148,7 @@ public:
                                      const ScalarType& val,
                                      const size_t num_mutexes = 1)
     : backend_(
-          std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
+        std::make_shared<BackendType>(Common::numeric_cast<EIGEN_size_t>(rr), Common::numeric_cast<EIGEN_size_t>(cc)))
     , mutexes_(std::make_unique<MutexesType>(num_mutexes))
   {
     if (val != 0.) {

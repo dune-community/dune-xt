@@ -78,21 +78,22 @@ public:
           "values"_a,
           "name"_a = type::static_id());
 
-    m.def(Common::to_camel_case(class_id).c_str(),
-          [](const GP& /*grid*/,
-             const typename type::DomainType& lower_left,
-             const typename type::DomainType& upper_right,
-             const FieldVector<size_t, d>& num_elements,
-             const std::vector<typename type::RangeType>& values,
-             const std::string name = "checkerboard") {
-            return new type(lower_left, upper_right, num_elements, values, name);
-          },
-          "grid"_a,
-          "lower_left"_a,
-          "upper_right"_a,
-          "num_elements"_a,
-          "values"_a,
-          "name"_a = type::static_id());
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](const GP& /*grid*/,
+           const typename type::DomainType& lower_left,
+           const typename type::DomainType& upper_right,
+           const FieldVector<size_t, d>& num_elements,
+           const std::vector<typename type::RangeType>& values,
+           const std::string name = "checkerboard") {
+          return new type(lower_left, upper_right, num_elements, values, name);
+        },
+        "grid"_a,
+        "lower_left"_a,
+        "upper_right"_a,
+        "num_elements"_a,
+        "values"_a,
+        "name"_a = type::static_id());
     return c;
   }
 }; // class CheckerboardFunction

@@ -1152,11 +1152,11 @@ public:
       bool type_error = py_err
                         && PyErr_ExceptionMatches(
 #if PY_VERSION_HEX < 0x03000000 && !defined(PYPY_VERSION)
-                               PyExc_SystemError
+                            PyExc_SystemError
 #else
-                               PyExc_TypeError
+                            PyExc_TypeError
 #endif
-                           );
+                        );
       PyErr_Clear();
       if (type_error && convert && PyNumber_Check(src.ptr())) {
         auto tmp = reinterpret_steal<object>(std::is_floating_point<T>::value ? PyNumber_Float(src.ptr())

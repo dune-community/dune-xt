@@ -250,9 +250,10 @@ TEST_SUBMODULE(sequences_and_iterators, m)
            })
       .def("__len__", &Sequence::size)
       /// Optional sequence protocol operations
-      .def("__iter__",
-           [](const Sequence& s) { return py::make_iterator(s.begin(), s.end()); },
-           py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+      .def(
+          "__iter__",
+          [](const Sequence& s) { return py::make_iterator(s.begin(), s.end()); },
+          py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
       .def("__contains__", [](const Sequence& s, float v) { return s.contains(v); })
       .def("__reversed__", [](const Sequence& s) -> Sequence { return s.reversed(); })
       /// Slicing protocol (optional)
@@ -336,12 +337,14 @@ TEST_SUBMODULE(sequences_and_iterators, m)
            })
       .def("__setitem__", &StringMap::set)
       .def("__len__", &StringMap::size)
-      .def("__iter__",
-           [](const StringMap& map) { return py::make_key_iterator(map.begin(), map.end()); },
-           py::keep_alive<0, 1>())
-      .def("items",
-           [](const StringMap& map) { return py::make_iterator(map.begin(), map.end()); },
-           py::keep_alive<0, 1>());
+      .def(
+          "__iter__",
+          [](const StringMap& map) { return py::make_key_iterator(map.begin(), map.end()); },
+          py::keep_alive<0, 1>())
+      .def(
+          "items",
+          [](const StringMap& map) { return py::make_iterator(map.begin(), map.end()); },
+          py::keep_alive<0, 1>());
 
   // test_generalized_iterators
   class IntPairs
@@ -360,16 +363,18 @@ TEST_SUBMODULE(sequences_and_iterators, m)
   };
   py::class_<IntPairs>(m, "IntPairs")
       .def(py::init<std::vector<std::pair<int, int>>>())
-      .def("nonzero",
-           [](const IntPairs& s) {
-             return py::make_iterator(NonZeroIterator<std::pair<int, int>>(s.begin()), NonZeroSentinel());
-           },
-           py::keep_alive<0, 1>())
-      .def("nonzero_keys",
-           [](const IntPairs& s) {
-             return py::make_key_iterator(NonZeroIterator<std::pair<int, int>>(s.begin()), NonZeroSentinel());
-           },
-           py::keep_alive<0, 1>());
+      .def(
+          "nonzero",
+          [](const IntPairs& s) {
+            return py::make_iterator(NonZeroIterator<std::pair<int, int>>(s.begin()), NonZeroSentinel());
+          },
+          py::keep_alive<0, 1>())
+      .def(
+          "nonzero_keys",
+          [](const IntPairs& s) {
+            return py::make_key_iterator(NonZeroIterator<std::pair<int, int>>(s.begin()), NonZeroSentinel());
+          },
+          py::keep_alive<0, 1>());
 
 
 #if 0

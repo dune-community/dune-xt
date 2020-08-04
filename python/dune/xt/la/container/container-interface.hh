@@ -52,17 +52,20 @@ typename std::enable_if<is_container<C>::value, void>::type addbind_ContainerInt
 
   typedef typename C::ScalarType S;
 
-  c.def("copy",
-        [](C& self, const bool deep) {
-          if (deep)
-            return self.copy();
-          else
-            return C(self);
-        },
-        "deep"_a = false);
-  c.def("scal", [](C& self, const S& alpha) { self.scal(alpha); }, "alpha"_a);
+  c.def(
+      "copy",
+      [](C& self, const bool deep) {
+        if (deep)
+          return self.copy();
+        else
+          return C(self);
+      },
+      "deep"_a = false);
+  c.def(
+      "scal", [](C& self, const S& alpha) { self.scal(alpha); }, "alpha"_a);
   c.def("axpy", [](C& self, const S& alpha, const C& xx) { self.axpy(alpha, xx); });
-  c.def("has_equal_shape", [](const C& self, const C& other) { return self.has_equal_shape(other); }, "other"_a);
+  c.def(
+      "has_equal_shape", [](const C& self, const C& other) { return self.has_equal_shape(other); }, "other"_a);
   c.def(py::self *= S());
   c.def(py::self * S());
   c.def("__sub__", [](const C& self, const C& other) {
@@ -116,17 +119,15 @@ bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, const 
 
   py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::buffer_protocol());
 
-  c.def_buffer([](C &mat) -> py::buffer_info {
-    return py::buffer_info(
-        mat.data(),                         /* Pointer to buffer */
-        sizeof(D),                          /* Size of one scalar */
-        py::format_descriptor<D>::format(), /* Python struct-style format descriptor */
-        2,                                  /* Number of dimensions */
-        { mat.rows(), mat.cols() },         /* Buffer dimensions */
-        { sizeof(D) * mat.cols(),           /* Strides (in bytes) for each index */
-          sizeof(D) }
-    );
-});
+  c.def_buffer([](C& mat) -> py::buffer_info {
+    return py::buffer_info(mat.data(), /* Pointer to buffer */
+                           sizeof(D), /* Size of one scalar */
+                           py::format_descriptor<D>::format(), /* Python struct-style format descriptor */
+                           2, /* Number of dimensions */
+                           {mat.rows(), mat.cols()}, /* Buffer dimensions */
+                           {sizeof(D) * mat.cols(), /* Strides (in bytes) for each index */
+                            sizeof(D)});
+  });
   return c;
 }
 

@@ -44,9 +44,10 @@ struct AllDirichletBoundaryInfo_for_all_grids
     pybind11::class_<type, base_type> c(m, ClassName.c_str(), ClassName.c_str());
     c.def(py::init([]() { return std::make_unique<type>(); }));
 
-    m.def(Common::to_camel_case(class_id).c_str(),
-          [](const Grid::GridProvider<G>&) { return type(); },
-          "grid_provider"_a);
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](const Grid::GridProvider<G>&) { return type(); },
+        "grid_provider"_a);
 
     AllDirichletBoundaryInfo_for_all_grids<typename GridTypes::tail_type>::bind(m);
   }

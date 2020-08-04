@@ -155,10 +155,11 @@ void addbind_FunctionInterface_combined_op(C& c)
   typedef FunctionInterface<d, r, rC, double> S;
   typedef FunctionInterface<d, oR, orC, double> O;
 
-  c.def(internal::get_combined<S, O, comb>::op().c_str(),
-        [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
-        py::keep_alive<0, 1>(),
-        py::keep_alive<0, 2>());
+  c.def(
+      internal::get_combined<S, O, comb>::op().c_str(),
+      [](const S& self, const O& other) { return internal::get_combined<S, O, comb>::call(self, other); },
+      py::keep_alive<0, 1>(),
+      py::keep_alive<0, 2>());
 } // ... addbind_FunctionInterface_combined_op(...)
 
 

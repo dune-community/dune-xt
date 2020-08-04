@@ -160,7 +160,7 @@ public:
           C_,
           opts.has_sub("inner_solver") ? opts.sub("inner_solver")
                                        : XT::LA::SolverOptions<Matrix, CommunicatorType>::options(
-                                             type == "cg_direct_schurcomplement" ? "" : "cg"));
+                                           type == "cg_direct_schurcomplement" ? "" : "cg"));
       schur_complement_op.A_inv().apply(f, Ainv_f);
       B2_.mtv(Ainv_f, rhs_p);
       rhs_p -= g;

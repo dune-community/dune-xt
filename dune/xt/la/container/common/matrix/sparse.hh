@@ -188,7 +188,7 @@ public:
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
         if (!prune
             || XT::Common::FloatCmp::ne(
-                   value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
+                value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
           entries_->push_back(value);
           column_indices_->push_back(cc);
           ++index;
@@ -656,7 +656,7 @@ public:
         const auto& value = Common::MatrixAbstraction<OtherMatrixType>::get_entry(mat, rr, cc);
         if (!prune
             || XT::Common::FloatCmp::ne(
-                   value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
+                value, ScalarType(0), 0., eps / Common::MatrixAbstraction<OtherMatrixType>::cols(mat))) {
           entries_->push_back(value);
           row_indices_->push_back(rr);
           ++index;

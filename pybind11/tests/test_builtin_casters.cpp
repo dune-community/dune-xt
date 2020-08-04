@@ -108,14 +108,16 @@ TEST_SUBMODULE(builtin_casters, m)
   m.def("u64_str", [](std::uint64_t v) { return std::to_string(v); });
 
   // test_tuple
-  m.def("pair_passthrough",
-        [](std::pair<bool, std::string> input) { return std::make_pair(input.second, input.first); },
-        "Return a pair in reversed order");
-  m.def("tuple_passthrough",
-        [](std::tuple<bool, std::string, int> input) {
-          return std::make_tuple(std::get<2>(input), std::get<1>(input), std::get<0>(input));
-        },
-        "Return a triple in reversed order");
+  m.def(
+      "pair_passthrough",
+      [](std::pair<bool, std::string> input) { return std::make_pair(input.second, input.first); },
+      "Return a pair in reversed order");
+  m.def(
+      "tuple_passthrough",
+      [](std::tuple<bool, std::string, int> input) {
+        return std::make_tuple(std::get<2>(input), std::get<1>(input), std::get<0>(input));
+      },
+      "Return a triple in reversed order");
   m.def("empty_tuple", []() { return std::tuple<>(); });
   static std::pair<RValueCaster, RValueCaster> lvpair;
   static std::tuple<RValueCaster, RValueCaster, RValueCaster> lvtuple;
@@ -151,7 +153,8 @@ TEST_SUBMODULE(builtin_casters, m)
 
   // test_bool_caster
   m.def("bool_passthrough", [](bool arg) { return arg; });
-  m.def("bool_passthrough_noconvert", [](bool arg) { return arg; }, py::arg().noconvert());
+  m.def(
+      "bool_passthrough_noconvert", [](bool arg) { return arg; }, py::arg().noconvert());
 
   // test_reference_wrapper
   m.def("refwrap_builtin", [](std::reference_wrapper<int> p) { return 10 * p.get(); });
@@ -160,16 +163,17 @@ TEST_SUBMODULE(builtin_casters, m)
   // triggers static_assert failure.
   // m.def("refwrap_pair", [](std::reference_wrapper<std::pair<int, int>>) { });
 
-  m.def("refwrap_list",
-        [](bool copy) {
-          static IncType x1(1), x2(2);
-          py::list l;
-          for (auto& f : {std::ref(x1), std::ref(x2)}) {
-            l.append(py::cast(f, copy ? py::return_value_policy::copy : py::return_value_policy::reference));
-          }
-          return l;
-        },
-        "copy"_a);
+  m.def(
+      "refwrap_list",
+      [](bool copy) {
+        static IncType x1(1), x2(2);
+        py::list l;
+        for (auto& f : {std::ref(x1), std::ref(x2)}) {
+          l.append(py::cast(f, copy ? py::return_value_policy::copy : py::return_value_policy::reference));
+        }
+        return l;
+      },
+      "copy"_a);
 
   m.def("refwrap_iiw", [](const IncType& w) { return w.value(); });
   m.def("refwrap_call_iiw", [](IncType& w, py::function f) {

@@ -197,9 +197,9 @@ int CombinedBuffer::sync()
 
 DualLogStream::DualLogStream(int loglevel, int& logflags, std::ostream& outstream, std::ofstream& file)
   : LogStream(new CombinedBuffer(
-        loglevel,
-        logflags,
-        {new OstreamBuffer(loglevel, logflags, outstream), new OstreamBuffer(loglevel, logflags, file)}))
+      loglevel,
+      logflags,
+      {new OstreamBuffer(loglevel, logflags, outstream), new OstreamBuffer(loglevel, logflags, file)}))
 {}
 
 OstreamLogStream::OstreamLogStream(int loglevel, int& logflags, std::ostream& outstream)

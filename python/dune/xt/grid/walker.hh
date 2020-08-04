@@ -39,31 +39,35 @@ public:
     namespace py = pybind11;
     using namespace pybind11::literals;
 
-    c.def("append",
-          [](T& self, ElementFunctor<GV>& functor, const ElementFilter<GV>& filter) { self.append(functor, filter); },
-          "element_functor"_a,
-          "element_filter"_a = ApplyOn::AllElements<GV>());
-    c.def("append",
-          [](T& self, IntersectionFunctor<GV>& functor, const IntersectionFilter<GV>& filter) {
-            self.append(functor, filter);
-          },
-          "intersection_functor"_a,
-          "intersection_filter"_a = ApplyOn::AllIntersections<GV>());
-    c.def("append",
-          [](T& self,
-             ElementAndIntersectionFunctor<GV>& functor,
-             const IntersectionFilter<GV>& intersection_filter,
-             const ElementFilter<GV>& element_filter) { self.append(functor, intersection_filter, element_filter); },
-          "element_and_intersection_functor"_a,
-          "intersection_filter"_a = ApplyOn::AllIntersections<GV>(),
-          "element_filter"_a = ApplyOn::AllElements<GV>());
-    c.def("walk",
-          [](T& self, const bool thread_parallel = false, const bool clear_functors_after_walk = true) {
-            self.walk(thread_parallel, clear_functors_after_walk);
-          },
-          "thread_parallel"_a = false,
-          "clear_functors_after_walk"_a = true,
-          py::call_guard<py::gil_scoped_release>());
+    c.def(
+        "append",
+        [](T& self, ElementFunctor<GV>& functor, const ElementFilter<GV>& filter) { self.append(functor, filter); },
+        "element_functor"_a,
+        "element_filter"_a = ApplyOn::AllElements<GV>());
+    c.def(
+        "append",
+        [](T& self, IntersectionFunctor<GV>& functor, const IntersectionFilter<GV>& filter) {
+          self.append(functor, filter);
+        },
+        "intersection_functor"_a,
+        "intersection_filter"_a = ApplyOn::AllIntersections<GV>());
+    c.def(
+        "append",
+        [](T& self,
+           ElementAndIntersectionFunctor<GV>& functor,
+           const IntersectionFilter<GV>& intersection_filter,
+           const ElementFilter<GV>& element_filter) { self.append(functor, intersection_filter, element_filter); },
+        "element_and_intersection_functor"_a,
+        "intersection_filter"_a = ApplyOn::AllIntersections<GV>(),
+        "element_filter"_a = ApplyOn::AllElements<GV>());
+    c.def(
+        "walk",
+        [](T& self, const bool thread_parallel = false, const bool clear_functors_after_walk = true) {
+          self.walk(thread_parallel, clear_functors_after_walk);
+        },
+        "thread_parallel"_a = false,
+        "clear_functors_after_walk"_a = true,
+        py::call_guard<py::gil_scoped_release>());
   } // ... addbind_methods(...)
 
   static bound_type
@@ -79,9 +83,10 @@ public:
     addbind_methods(c);
 
     // factories
-    m.def(Common::to_camel_case(class_id).c_str(),
-          [](GridProvider<G>& grid_provider) { return type(grid_provider.leaf_view()); },
-          "grid_provider"_a);
+    m.def(
+        Common::to_camel_case(class_id).c_str(),
+        [](GridProvider<G>& grid_provider) { return type(grid_provider.leaf_view()); },
+        "grid_provider"_a);
 
     return c;
   } // ... bind(...)

@@ -52,13 +52,14 @@ public:
     c.def("__repr__", [ClassId](type&) { return ClassId + "(grid_provider=\?\?\?, volume=\?\?\?)"; });
     c.def_property_readonly("result", [](const type& self) { return self.result(); });
 
-    m.def(ClassId.c_str(),
-          [](GridProvider<G>& grid_provider, const double& volume) {
-            return std::make_unique<type>(grid_provider.grid(), volume, 1.);
-          },
-          "grid_provider"_a,
-          "volume"_a,
-          py::keep_alive<0, 1>());
+    m.def(
+        ClassId.c_str(),
+        [](GridProvider<G>& grid_provider, const double& volume) {
+          return std::make_unique<type>(grid_provider.grid(), volume, 1.);
+        },
+        "grid_provider"_a,
+        "volume"_a,
+        py::keep_alive<0, 1>());
 
     return c;
   } // ... bind(...)

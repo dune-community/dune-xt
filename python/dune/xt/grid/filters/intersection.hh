@@ -44,7 +44,7 @@ public:
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
-    c.def(py::init([](){return std::make_unique<type>();}));
+    c.def(py::init([]() { return std::make_unique<type>(); }));
     c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
 
     m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&) { return type(); });
@@ -87,15 +87,16 @@ public:
     c.def("__repr__", [ClassId](type&) { return ClassId + "(boundary_info=, boundary_type=, logging_prefix=)"; });
     c.def_property_readonly("logger", [](type& self) { return self.logger; });
 
-    m.def(ClassId.c_str(),
-          [](const Grid::GridProvider<G>&,
-             const BoundaryInfo<I>& boundary_info,
-             const BoundaryType& boundary_type,
-             const std::string& logging_prefix) { return type(boundary_info, boundary_type.copy(), logging_prefix); },
-          "grid_provider"_a,
-          "boundary_info"_a,
-          "boundary_type"_a,
-          "logging_prefix"_a = "");
+    m.def(
+        ClassId.c_str(),
+        [](const Grid::GridProvider<G>&,
+           const BoundaryInfo<I>& boundary_info,
+           const BoundaryType& boundary_type,
+           const std::string& logging_prefix) { return type(boundary_info, boundary_type.copy(), logging_prefix); },
+        "grid_provider"_a,
+        "boundary_info"_a,
+        "boundary_type"_a,
+        "logging_prefix"_a = "");
 
     return c;
   } // ... bind(...)

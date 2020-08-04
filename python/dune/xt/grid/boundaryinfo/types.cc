@@ -28,12 +28,14 @@ PYBIND11_MODULE(_grid_boundaryinfo_types, m)
   py::module::import("dune.xt.common");
 
   py::class_<BoundaryType>(m, "BoundaryType", "BoundaryType")
-      .def("__eq__",
-           [](const BoundaryType& self, const BoundaryType& other) { return self == other; },
-           py::is_operator())
-      .def("__neq__",
-           [](const BoundaryType& self, const BoundaryType& other) { return self != other; },
-           py::is_operator())
+      .def(
+          "__eq__",
+          [](const BoundaryType& self, const BoundaryType& other) { return self == other; },
+          py::is_operator())
+      .def(
+          "__neq__",
+          [](const BoundaryType& self, const BoundaryType& other) { return self != other; },
+          py::is_operator())
       .def_property_readonly("id", &BoundaryType::id);
 
 #define BIND_(NAME)                                                                                                    \

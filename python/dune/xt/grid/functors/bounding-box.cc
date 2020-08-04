@@ -48,7 +48,8 @@ public:
     c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
     c.def_property_readonly("result", [](const type& self) { return self.result(); });
 
-    m.def(ClassId.c_str(), [](const GridProvider<G>&) { return type(); }, "grid_provider"_a);
+    m.def(
+        ClassId.c_str(), [](const GridProvider<G>&) { return type(); }, "grid_provider"_a);
 
     return c;
   } // ... bind(...)

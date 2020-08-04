@@ -147,36 +147,40 @@ TEST_SUBMODULE(eigen, m)
   m.def("reset_refs", reset_refs); // Restores get_{cm,rm}_ref to original values
 
   // Increments and returns ref to (same) matrix
-  m.def("incr_matrix",
-        [](Eigen::Ref<Eigen::MatrixXd> m, double v) {
-          m += Eigen::MatrixXd::Constant(m.rows(), m.cols(), v);
-          return m;
-        },
-        py::return_value_policy::reference);
+  m.def(
+      "incr_matrix",
+      [](Eigen::Ref<Eigen::MatrixXd> m, double v) {
+        m += Eigen::MatrixXd::Constant(m.rows(), m.cols(), v);
+        return m;
+      },
+      py::return_value_policy::reference);
 
   // Same, but accepts a matrix of any strides
-  m.def("incr_matrix_any",
-        [](py::EigenDRef<Eigen::MatrixXd> m, double v) {
-          m += Eigen::MatrixXd::Constant(m.rows(), m.cols(), v);
-          return m;
-        },
-        py::return_value_policy::reference);
+  m.def(
+      "incr_matrix_any",
+      [](py::EigenDRef<Eigen::MatrixXd> m, double v) {
+        m += Eigen::MatrixXd::Constant(m.rows(), m.cols(), v);
+        return m;
+      },
+      py::return_value_policy::reference);
 
   // Returns an eigen slice of even rows
-  m.def("even_rows",
-        [](py::EigenDRef<Eigen::MatrixXd> m) {
-          return py::EigenDMap<Eigen::MatrixXd>(
-              m.data(), (m.rows() + 1) / 2, m.cols(), py::EigenDStride(m.outerStride(), 2 * m.innerStride()));
-        },
-        py::return_value_policy::reference);
+  m.def(
+      "even_rows",
+      [](py::EigenDRef<Eigen::MatrixXd> m) {
+        return py::EigenDMap<Eigen::MatrixXd>(
+            m.data(), (m.rows() + 1) / 2, m.cols(), py::EigenDStride(m.outerStride(), 2 * m.innerStride()));
+      },
+      py::return_value_policy::reference);
 
   // Returns an eigen slice of even columns
-  m.def("even_cols",
-        [](py::EigenDRef<Eigen::MatrixXd> m) {
-          return py::EigenDMap<Eigen::MatrixXd>(
-              m.data(), m.rows(), (m.cols() + 1) / 2, py::EigenDStride(2 * m.outerStride(), m.innerStride()));
-        },
-        py::return_value_policy::reference);
+  m.def(
+      "even_cols",
+      [](py::EigenDRef<Eigen::MatrixXd> m) {
+        return py::EigenDMap<Eigen::MatrixXd>(
+            m.data(), m.rows(), (m.cols() + 1) / 2, py::EigenDStride(2 * m.outerStride(), m.innerStride()));
+      },
+      py::return_value_policy::reference);
 
   // Returns diagonals: a vector-like object with an inner stride != 1
   m.def("diagonal", [](const Eigen::Ref<const Eigen::MatrixXd>& x) { return x.diagonal(); });
@@ -338,13 +342,15 @@ TEST_SUBMODULE(eigen, m)
   // that would allow copying (if types or strides don't match) for comparison:
   m.def("get_elem", &get_elem);
   // Now this alternative that calls the tells pybind to fail rather than copy:
-  m.def("get_elem_nocopy",
-        [](Eigen::Ref<const Eigen::MatrixXd> m) -> double { return get_elem(m); },
-        py::arg().noconvert());
+  m.def(
+      "get_elem_nocopy",
+      [](Eigen::Ref<const Eigen::MatrixXd> m) -> double { return get_elem(m); },
+      py::arg().noconvert());
   // Also test a row-major-only no-copy const ref:
-  m.def("get_elem_rm_nocopy",
-        [](Eigen::Ref<const Eigen::Matrix<long, -1, -1, Eigen::RowMajor>>& m) -> long { return m(2, 1); },
-        py::arg().noconvert());
+  m.def(
+      "get_elem_rm_nocopy",
+      [](Eigen::Ref<const Eigen::Matrix<long, -1, -1, Eigen::RowMajor>>& m) -> long { return m(2, 1); },
+      py::arg().noconvert());
 
   // test_issue738
   // Issue #738: 1xN or Nx1 2D matrices were neither accepted nor properly copied with an
@@ -364,15 +370,16 @@ TEST_SUBMODULE(eigen, m)
 
   // test_named_arguments
   // Make sure named arguments are working properly:
-  m.def("matrix_multiply",
-        [](const py::EigenDRef<const Eigen::MatrixXd> A,
-           const py::EigenDRef<const Eigen::MatrixXd> B) -> Eigen::MatrixXd {
-          if (A.cols() != B.rows())
-            throw std::domain_error("Nonconformable matrices!");
-          return A * B;
-        },
-        py::arg("A"),
-        py::arg("B"));
+  m.def(
+      "matrix_multiply",
+      [](const py::EigenDRef<const Eigen::MatrixXd> A,
+         const py::EigenDRef<const Eigen::MatrixXd> B) -> Eigen::MatrixXd {
+        if (A.cols() != B.rows())
+          throw std::domain_error("Nonconformable matrices!");
+        return A * B;
+      },
+      py::arg("A"),
+      py::arg("B"));
 
   // test_custom_operator_new
   py::class_<CustomOperatorNew>(m, "CustomOperatorNew")

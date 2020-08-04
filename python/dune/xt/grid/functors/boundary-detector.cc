@@ -55,18 +55,19 @@ public:
     c.def("__repr__", [ClassId](type&) { return ClassId + "(boundary_info=, boundary_type=)"; });
     c.def_property_readonly("result", [](const type& self) { return self.result(); });
 
-    m.def(ClassId.c_str(),
-          [](const GridProvider<G>&,
-             const BoundaryInfo<I>& boundary_info,
-             const BoundaryType& boundary_type,
-             const std::string& logging_prefix) {
-            return std::make_unique<type>(boundary_info, boundary_type, logging_prefix);
-          },
-          "grid_provider"_a,
-          "boundary_info"_a,
-          "boundary_type"_a,
-          "logging_prefix"_a = "",
-          py::keep_alive<0, 2>());
+    m.def(
+        ClassId.c_str(),
+        [](const GridProvider<G>&,
+           const BoundaryInfo<I>& boundary_info,
+           const BoundaryType& boundary_type,
+           const std::string& logging_prefix) {
+          return std::make_unique<type>(boundary_info, boundary_type, logging_prefix);
+        },
+        "grid_provider"_a,
+        "boundary_info"_a,
+        "boundary_type"_a,
+        "logging_prefix"_a = "",
+        py::keep_alive<0, 2>());
 
     return c;
   } // ... bind(...)

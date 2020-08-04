@@ -57,20 +57,22 @@ bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
 
   const std::string make_name = "make_indicator_function_" + Common::to_string(r) + "x" + Common::to_string(rC);
-  m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/, const CornerVector& values, const std::string& name) {
-          return C(values, name);
-        },
-        "grid_provider"_a,
-        "values"_a,
-        "name"_a = C::static_id());
-  m.def(std::string(make_name).c_str(),
-        [](const Grid::GridProvider<G>& /*grid*/, const CornerVector& values, const std::string& name) {
-          return C(values, name);
-        },
-        "grid_provider"_a,
-        "values"_a,
-        "name"_a = C::static_id());
+  m.def(
+      std::string(make_name).c_str(),
+      [](const Grid::GridProvider<G>& /*grid*/, const CornerVector& values, const std::string& name) {
+        return C(values, name);
+      },
+      "grid_provider"_a,
+      "values"_a,
+      "name"_a = C::static_id());
+  m.def(
+      std::string(make_name).c_str(),
+      [](const Grid::GridProvider<G>& /*grid*/, const CornerVector& values, const std::string& name) {
+        return C(values, name);
+      },
+      "grid_provider"_a,
+      "values"_a,
+      "name"_a = C::static_id());
 
   return c;
 } // ... bind_IndicatorGridFunction(...)

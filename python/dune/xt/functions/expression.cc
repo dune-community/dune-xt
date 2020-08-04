@@ -76,30 +76,32 @@ class ExpressionFunction
       namespace py = pybind11;
       using namespace pybind11::literals;
 
-      m.def(ClassId.c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               const std::string& variable,
-               const Common::FieldMatrix<std::string, r, rC>& expressions,
-               const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
-               const size_t order,
-               const std::string& name) { return type(variable, expressions, gradient_expressions, order, name); },
-            "dim_domain"_a,
-            "variable"_a,
-            "expressions"_a,
-            "gradient_expressions"_a,
-            "order"_a,
-            "name"_a = type::static_id());
-      m.def(ClassId.c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               const std::string& variable,
-               const Common::FieldMatrix<std::string, r, rC>& expressions,
-               const size_t order,
-               const std::string& name) { return type(variable, expressions, order, name); },
-            "dim_domain"_a,
-            "variable"_a,
-            "expressions"_a,
-            "order"_a,
-            "name"_a = type::static_id());
+      m.def(
+          ClassId.c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             const std::string& variable,
+             const Common::FieldMatrix<std::string, r, rC>& expressions,
+             const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
+             const size_t order,
+             const std::string& name) { return type(variable, expressions, gradient_expressions, order, name); },
+          "dim_domain"_a,
+          "variable"_a,
+          "expressions"_a,
+          "gradient_expressions"_a,
+          "order"_a,
+          "name"_a = type::static_id());
+      m.def(
+          ClassId.c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             const std::string& variable,
+             const Common::FieldMatrix<std::string, r, rC>& expressions,
+             const size_t order,
+             const std::string& name) { return type(variable, expressions, order, name); },
+          "dim_domain"_a,
+          "variable"_a,
+          "expressions"_a,
+          "order"_a,
+          "name"_a = type::static_id());
     } // ... factory(...)
   }; // struct addbind, the matrix-valued case
 
@@ -133,30 +135,32 @@ class ExpressionFunction
       namespace py = pybind11;
       using namespace pybind11::literals;
 
-      m.def(ClassId.c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               const std::string& variable,
-               const Common::FieldVector<std::string, r>& expressions,
-               const Common::FieldMatrix<std::string, r, d>& gradient_expressions,
-               const size_t order,
-               const std::string& name) { return type(variable, expressions, gradient_expressions, order, name); },
-            "dim_domain"_a,
-            "variable"_a,
-            "expressions"_a,
-            "gradient_expressions"_a,
-            "order"_a,
-            "name"_a = type::static_id());
-      m.def(ClassId.c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               const std::string& variable,
-               const Common::FieldVector<std::string, r>& expressions,
-               const size_t order,
-               const std::string& name) { return type(variable, expressions, order, name); },
-            "dim_domain"_a,
-            "variable"_a,
-            "expressions"_a,
-            "order"_a,
-            "name"_a = type::static_id());
+      m.def(
+          ClassId.c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             const std::string& variable,
+             const Common::FieldVector<std::string, r>& expressions,
+             const Common::FieldMatrix<std::string, r, d>& gradient_expressions,
+             const size_t order,
+             const std::string& name) { return type(variable, expressions, gradient_expressions, order, name); },
+          "dim_domain"_a,
+          "variable"_a,
+          "expressions"_a,
+          "gradient_expressions"_a,
+          "order"_a,
+          "name"_a = type::static_id());
+      m.def(
+          ClassId.c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             const std::string& variable,
+             const Common::FieldVector<std::string, r>& expressions,
+             const size_t order,
+             const std::string& name) { return type(variable, expressions, order, name); },
+          "dim_domain"_a,
+          "variable"_a,
+          "expressions"_a,
+          "order"_a,
+          "name"_a = type::static_id());
     } // ... factory(...)
   }; // struct addbind, the vector-valued case
 
@@ -200,35 +204,37 @@ class ExpressionFunction
       namespace py = pybind11;
       using namespace pybind11::literals;
 
-      m.def(ClassId.c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               const std::string& variable,
-               const std::string& expression,
-               const Common::FieldVector<std::string, d>& gradient_expressions,
-               const size_t order,
-               const std::string& name) {
-              Common::FieldMatrix<std::string, 1, d> gradient_expressions_mat;
-              gradient_expressions_mat[0] = gradient_expressions;
-              return new type(
-                  variable, Common::FieldVector<std::string, 1>(expression), gradient_expressions_mat, order, name);
-            },
-            "dim_domain"_a,
-            "variable"_a,
-            "expression"_a,
-            "gradient_expressions"_a,
-            "order"_a,
-            "name"_a = type::static_id());
-      m.def(ClassId.c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               const std::string& variable,
-               const std::string& expression,
-               const size_t order,
-               const std::string& name) { return new type(variable, expression, order, name); },
-            "dim_domain"_a,
-            "variable"_a,
-            "expression"_a,
-            "order"_a,
-            "name"_a = type::static_id());
+      m.def(
+          ClassId.c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             const std::string& variable,
+             const std::string& expression,
+             const Common::FieldVector<std::string, d>& gradient_expressions,
+             const size_t order,
+             const std::string& name) {
+            Common::FieldMatrix<std::string, 1, d> gradient_expressions_mat;
+            gradient_expressions_mat[0] = gradient_expressions;
+            return new type(
+                variable, Common::FieldVector<std::string, 1>(expression), gradient_expressions_mat, order, name);
+          },
+          "dim_domain"_a,
+          "variable"_a,
+          "expression"_a,
+          "gradient_expressions"_a,
+          "order"_a,
+          "name"_a = type::static_id());
+      m.def(
+          ClassId.c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             const std::string& variable,
+             const std::string& expression,
+             const size_t order,
+             const std::string& name) { return new type(variable, expression, order, name); },
+          "dim_domain"_a,
+          "variable"_a,
+          "expression"_a,
+          "order"_a,
+          "name"_a = type::static_id());
     } // ... factory(...)
   }; // struct addbind, the scalar case
 

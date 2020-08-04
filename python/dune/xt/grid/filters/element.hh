@@ -23,20 +23,19 @@ namespace Grid {
 namespace bindings {
 
 
-template <template<class>class Filter, class G>
+template <template <class> class Filter, class G>
 class InitlessElementFilter
 {
   static_assert(is_grid<G>::value, "");
   using GV = typename G::LeafGridView;
-public:
 
+public:
   using type = Filter<GV>;
   using base_type = Grid::ElementFilter<GV>;
   using bound_type = pybind11::class_<type, base_type>;
 
-  static bound_type bind(pybind11::module& m,
-                         const std::string& class_id,
-                         const std::string& grid_id = grid_name<G>::value())
+  static bound_type
+  bind(pybind11::module& m, const std::string& class_id, const std::string& grid_id = grid_name<G>::value())
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
@@ -44,10 +43,10 @@ public:
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
     bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
-    c.def(py::init([](){return std::make_unique<type>();}));
-    c.def("__repr__", [ClassId](type&){ return ClassId + "()";});
+    c.def(py::init([]() { return std::make_unique<type>(); }));
+    c.def("__repr__", [ClassId](type&) { return ClassId + "()"; });
 
-    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&){return type();});
+    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&) { return type(); });
 
     return c;
   } // ... bind(...)

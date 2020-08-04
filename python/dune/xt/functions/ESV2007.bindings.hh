@@ -81,29 +81,31 @@ class CutoffFunction
       c.def_property_readonly("static_id", [](const type& /*self*/) { return type::static_id(); });
 
       const std::string make_name = "make_esv2007_cutoff_function";
-      m.def(std::string(make_name + "_single_diffusion_to_1x1").c_str(),
-            [](const Grid::GridProvider<G>& /*grid*/,
-               const ScalarFunction& diffusion,
-               const R& poincare_constant,
-               const std::string& name) { return type_single_diffusion(diffusion, poincare_constant, name); },
-            "grid_provider"_a,
-            "diffusion"_a,
-            "poincare_constant"_a = 1.0 / (M_PIl * M_PIl),
-            "name"_a = type_single_diffusion::static_id(),
-            py::keep_alive<0, 2>());
-      m.def(std::string(make_name + "_diffusion_factor_and_tensor_to_1x1").c_str(),
-            [](const Grid::GridProvider<G>& /*grid*/,
-               const ScalarFunction& diffusion_factor,
-               const TensorFunction& diffusion_tensor,
-               const R& poincare_constant,
-               const std::string& name) { return type(diffusion_factor, diffusion_tensor, poincare_constant, name); },
-            "grid_provider"_a,
-            "diffusion_factor"_a,
-            "diffusion_tesor"_a,
-            "poincare_constant"_a = 1.0 / (M_PIl * M_PIl),
-            "name"_a = type::static_id(),
-            py::keep_alive<0, 2>(),
-            py::keep_alive<0, 3>());
+      m.def(
+          std::string(make_name + "_single_diffusion_to_1x1").c_str(),
+          [](const Grid::GridProvider<G>& /*grid*/,
+             const ScalarFunction& diffusion,
+             const R& poincare_constant,
+             const std::string& name) { return type_single_diffusion(diffusion, poincare_constant, name); },
+          "grid_provider"_a,
+          "diffusion"_a,
+          "poincare_constant"_a = 1.0 / (M_PIl * M_PIl),
+          "name"_a = type_single_diffusion::static_id(),
+          py::keep_alive<0, 2>());
+      m.def(
+          std::string(make_name + "_diffusion_factor_and_tensor_to_1x1").c_str(),
+          [](const Grid::GridProvider<G>& /*grid*/,
+             const ScalarFunction& diffusion_factor,
+             const TensorFunction& diffusion_tensor,
+             const R& poincare_constant,
+             const std::string& name) { return type(diffusion_factor, diffusion_tensor, poincare_constant, name); },
+          "grid_provider"_a,
+          "diffusion_factor"_a,
+          "diffusion_tesor"_a,
+          "poincare_constant"_a = 1.0 / (M_PIl * M_PIl),
+          "name"_a = type::static_id(),
+          py::keep_alive<0, 2>(),
+          py::keep_alive<0, 3>());
     }
   }; // struct helper<true, ...>
 

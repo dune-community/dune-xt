@@ -44,21 +44,25 @@ typename std::enable_if<is_matrix<M>::value, pybind11::class_<Solver<M>>>::type 
 
   c.def(py::init<M>());
 
-  c.def("apply", [](const C& self, const V& rhs, V& solution) { self.apply(rhs, solution); }, "rhs"_a, "solution"_a);
-  c.def("apply",
-        [](const C& self, const V& rhs, V& solution, const std::string& type) { self.apply(rhs, solution, type); },
-        "rhs"_a,
-        "solution"_a,
-        "type"_a);
-  c.def("apply",
-        [](const C& self, const V& rhs, V& solution, const Common::Configuration& options) {
-          self.apply(rhs, solution, options);
-        },
-        "rhs"_a,
-        "solution"_a,
-        "options"_a);
+  c.def(
+      "apply", [](const C& self, const V& rhs, V& solution) { self.apply(rhs, solution); }, "rhs"_a, "solution"_a);
+  c.def(
+      "apply",
+      [](const C& self, const V& rhs, V& solution, const std::string& type) { self.apply(rhs, solution, type); },
+      "rhs"_a,
+      "solution"_a,
+      "type"_a);
+  c.def(
+      "apply",
+      [](const C& self, const V& rhs, V& solution, const Common::Configuration& options) {
+        self.apply(rhs, solution, options);
+      },
+      "rhs"_a,
+      "solution"_a,
+      "options"_a);
 
-  m.def("make_solver", [](const M& matrix) { return C(matrix); }, pybind11::keep_alive<0, 1>());
+  m.def(
+      "make_solver", [](const M& matrix) { return C(matrix); }, pybind11::keep_alive<0, 1>());
 
   return c;
 } // ... bind_Solver(...)
