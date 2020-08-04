@@ -251,29 +251,35 @@ private:
 
 
 template <class E, size_t r, size_t rC, class R>
-std::enable_if_t<internal::InverseFunctionHelper<ElementFunctionInterface<E, r, rC, R>>::available,
-                 InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>>
-inverse(ElementFunctionInterface<E, r, rC, R>& func, const int order)
+auto inverse(ElementFunctionInterface<E, r, rC, R>& func, const int order)
 {
-  return InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>(func, order);
+  if constexpr (internal::InverseFunctionHelper<ElementFunctionInterface<E, r, rC, R>>::available) {
+    return InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>(func, order);
+  } else {
+    static_assert("No inverse implementation available");
+  }
 }
 
 
 template <size_t d, size_t r, size_t rC, class R>
-std::enable_if_t<internal::InverseFunctionHelper<FunctionInterface<d, r, rC, R>>::available,
-                 InverseFunction<FunctionInterface<d, r, rC, R>>>
-inverse(const FunctionInterface<d, r, rC, R>& func, const int order)
+auto inverse(const FunctionInterface<d, r, rC, R>& func, const int order)
 {
-  return InverseFunction<FunctionInterface<d, r, rC, R>>(func, order);
+  if constexpr (internal::InverseFunctionHelper<FunctionInterface<d, r, rC, R>>::available) {
+    return InverseFunction<FunctionInterface<d, r, rC, R>>(func, order);
+  } else {
+    static_assert("No inverse implementation available");
+  }
 }
 
 
 template <class E, size_t r, size_t rC, class R>
-std::enable_if_t<internal::InverseFunctionHelper<GridFunctionInterface<E, r, rC, R>>::available,
-                 InverseGridFunction<GridFunctionInterface<E, r, rC, R>>>
-inverse(const GridFunctionInterface<E, r, rC, R>& func, const int order)
+auto inverse(const GridFunctionInterface<E, r, rC, R>& func, const int order)
 {
-  return InverseGridFunction<GridFunctionInterface<E, r, rC, R>>(func, order);
+  if constexpr (internal::InverseFunctionHelper<GridFunctionInterface<E, r, rC, R>>::available) {
+    return InverseGridFunction<GridFunctionInterface<E, r, rC, R>>(func, order);
+  } else {
+    static_assert("No inverse implementation available");
+  }
 }
 
 
