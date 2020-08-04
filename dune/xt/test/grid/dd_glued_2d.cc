@@ -20,10 +20,9 @@ namespace XT {
 namespace Grid {
 
 
-template <bool anything>
+template <>
 struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
-                       YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
-                       anything>
+                       YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>>
 {
   static int num_coarse_refinements()
   {
@@ -49,8 +48,8 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>,
 
 #  if HAVE_DUNE_UGGRID || HAVE_UG
 
-template <bool anything>
-struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>, anything>
+template <>
+struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGGrid<2>>
 {
   static int num_coarse_refinements()
   {
@@ -76,8 +75,8 @@ struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, UGG
 #  endif // HAVE_DUNE_UGGRID || HAVE_UG
 #  if HAVE_ALBERTA
 
-template <bool anything>
-struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>, anything>
+template <>
+struct ExpectedResults<YaspGrid<2, EquidistantOffsetCoordinates<double, 2>>, AlbertaGrid<2, 2>>
 {
   static int num_coarse_refinements()
   {
