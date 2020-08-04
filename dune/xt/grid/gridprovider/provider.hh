@@ -148,7 +148,7 @@ public:
   }
 
 private:
-  template <class G, bool anything = true>
+  template <class G>
   struct global_refine_helper
   {
     void operator()(G& g, int count)
@@ -162,8 +162,8 @@ private:
 
 #if HAVE_ALBERTA
 
-  template <int d, int dW, bool anything>
-  struct global_refine_helper<AlbertaGrid<d, dW>, anything>
+  template <int d, int dW>
+  struct global_refine_helper<AlbertaGrid<d, dW>>
   {
     typedef AlbertaGrid<d, dW> G;
 
