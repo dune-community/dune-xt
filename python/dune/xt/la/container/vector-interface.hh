@@ -34,8 +34,9 @@ namespace LA {
 
 
 template <class C>
-typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vector(pybind11::module& m)
+auto bind_Vector(pybind11::module& m)
 {
+  static_assert(is_vector<C>::value);
   namespace py = pybind11;
   using namespace pybind11::literals;
 
