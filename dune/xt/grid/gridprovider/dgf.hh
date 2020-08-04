@@ -81,18 +81,18 @@ public:
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
-make_dgf_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+auto make_dgf_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
+  static_assert(is_grid<GridType>::value);
   return DgfGridProviderFactory<GridType>(filename, mpi_comm);
 }
 
 
 template <class GridType>
-typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
-make_dgf_grid(const Common::Configuration& cfg = DgfGridProviderFactory<GridType>::default_config(),
-              MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+auto make_dgf_grid(const Common::Configuration& cfg = DgfGridProviderFactory<GridType>::default_config(),
+                   MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
+  static_assert(is_grid<GridType>::value);
   return DgfGridProviderFactory<GridType>::create(cfg, mpi_comm);
 }
 

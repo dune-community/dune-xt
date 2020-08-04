@@ -232,9 +232,9 @@ public:
   }
 
   template <class OtherMatrixImp>
-  typename std::enable_if_t<XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix, ThisType>&
-  assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
+  ThisType& assign(const OtherMatrixImp& other, const SparsityPatternDefault& pattern)
   {
+    static_assert(XT::Common::MatrixAbstraction<OtherMatrixImp>::is_matrix);
     clear();
     using MatAbstrType = XT::Common::MatrixAbstraction<OtherMatrixImp>;
     num_rows_ = MatAbstrType::rows(other);

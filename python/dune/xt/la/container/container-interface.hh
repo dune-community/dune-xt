@@ -45,8 +45,9 @@ pybind11::enum_<Backends> bind_Backends(pybind11::module& m)
 
 
 template <class C>
-typename std::enable_if<is_container<C>::value, void>::type addbind_ContainerInterface(pybind11::class_<C>& c)
+void addbind_ContainerInterface(pybind11::class_<C>& c)
 {
+  static_assert(is_container<C>::value);
   namespace py = pybind11;
   using namespace pybind11::literals;
 
