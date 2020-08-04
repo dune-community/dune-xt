@@ -52,6 +52,7 @@ private:
   template <class L, class R>
   class dim_switch
   {
+    //! last tpl arg cannot be dropped due to gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282
     template <CombinationType cc = comb,
               size_t rL = L::r,
               size_t rCL = L::rC,
