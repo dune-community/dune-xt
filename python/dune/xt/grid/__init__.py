@@ -12,7 +12,6 @@
 # ~~~
 
 from numbers import Number
-import os
 from tempfile import NamedTemporaryFile
 
 from dune.xt import guarded_import
