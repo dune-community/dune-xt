@@ -708,12 +708,12 @@ private:
   single_derivative_helper_call(const FullType& val, const size_t row, const size_t col)
   {
     if constexpr (rC == 1) {
+      return val[row];
+    } else {
       SingleDerivativeRangeType ret;
       for (size_t dd = 0; dd < d; ++dd)
         ret[dd] = val[row][col][dd];
       return ret;
-    } else {
-      return val[row];
     }
   }
 }; // class ElementFunctionInterface
