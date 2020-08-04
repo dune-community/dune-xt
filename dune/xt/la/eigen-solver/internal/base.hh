@@ -241,7 +241,7 @@ public:
     if (!disable_checks_) {
       const double check_eigendecomposition = options_->get<double>("assert_eigendecomposition");
       if (check_eigendecomposition > 0)
-        complex_eigendecomposition_helper<>::check(
+        complex_eigendecomposition_check(
             *this, check_eigendecomposition > 0 ? check_eigendecomposition : options_->get<double>("real_tolerance"));
     }
     return *eigenvectors_inverse_;
@@ -407,7 +407,7 @@ protected:
         compute_real_eigenvectors();
       const double check_eigendecomposition = options_->get<double>("assert_eigendecomposition");
       if (check_eigendecomposition > 0)
-        complex_eigendecomposition_helper<>::check(*this, check_eigendecomposition);
+        complex_eigendecomposition_check(*this, check_eigendecomposition);
       if (check_real_eigendecomposition > 0) {
         invert_real_eigenvectors();
         assert_eigendecomposition(matrix_,
@@ -686,33 +686,22 @@ protected:
                                      << "\n\n(T * (lambda * T^-1)) - matrix = " << decomposition_error);
   } // ... assert_eigendecomposition(...)
 
-  template <bool upcast_required = !std::is_same<MatrixType, ComplexMatrixType>::value, bool anything = true>
-  struct complex_eigendecomposition_helper;
-
-  template <bool anything>
-  struct complex_eigendecomposition_helper<true, anything>
+  static void complex_eigendecomposition_check(const ThisType& self, const double& tolerance)
   {
-    static void check(const ThisType& self, const double& tolerance)
-    {
-      self.invert_eigenvectors();
+    const constexpr bool upcast_required = !std::is_same<MatrixType, ComplexMatrixType>::value;
+    self.invert_eigenvectors();
+    if constexpr (upcast_required) {
       self.assert_eigendecomposition(Dune::XT::LA::convert_to<ComplexMatrixType>(self.matrix_),
                                      *self.eigenvalues_,
                                      *self.eigenvectors_,
                                      *self.eigenvectors_inverse_,
                                      tolerance);
-    }
-  };
-
-  template <bool anything>
-  struct complex_eigendecomposition_helper<false, anything>
-  {
-    static void check(const ThisType& self, const double& tolerance)
-    {
-      self.invert_eigenvectors();
+    } else {
       self.assert_eigendecomposition(
           self.matrix_, *self.eigenvalues_, *self.eigenvectors_, *self.eigenvectors_inverse_, tolerance);
     }
-  };
+  }
+
 
   template <class M>
   void check_size(const MatrixInterface<M>& mat) const

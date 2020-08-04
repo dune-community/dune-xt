@@ -338,50 +338,33 @@ struct lapack_helper
 {
   static_assert(Common::is_matrix<MatrixType>::value, "");
 
-  template <bool is_complex = Common::is_complex<typename Common::MatrixAbstraction<MatrixType>::S>::value,
-            bool anything = true>
-  struct dtype_switch;
-
-  template <bool anything>
-  struct dtype_switch<true, anything>
+  template <class MatrixImp>
+  static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& matrix)
   {
-    template <class MatrixImp>
-    static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& /*matrix*/)
-    {
+    if constexpr (Common::is_complex<typename Common::MatrixAbstraction<MatrixType>::S>::value) {
       static_assert(AlwaysFalse<MatrixImp>::value,
                     "Not yet implemented for complex matrices, take a look at "
                     "https://software.intel.com/en-us/mkl-developer-reference-c-geev "
                     "and add a corresponding free function like "
                     "compute_eigenvalues_of_a_real_matrix_using_lapack(...)!");
-      return std::vector<std::complex<double>>();
+    } else {
+      return compute_eigenvalues_of_a_real_matrix_using_lapack(std::forward<MatrixImp>(matrix));
     }
+  }
 
-    template <class V, class E, class MatrixImp>
-    static inline void eigenvectors(MatrixImp&& /*matrix*/, V& /*eigenvalues*/, E& /*eigenvectors*/)
-    {
+  template <class V, class E, class MatrixImp>
+  static inline void eigenvectors(MatrixImp&& matrix, V& eigenvalues, E& eigenvectors)
+  {
+    if constexpr (Common::is_complex<typename Common::MatrixAbstraction<MatrixType>::S>::value) {
       static_assert(AlwaysFalse<MatrixImp>::value,
                     "Not yet implemented for complex matrices, take a look at "
                     "https://software.intel.com/en-us/mkl-developer-reference-c-geev and add a corresponding free "
                     "function like compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(...)!");
-    }
-  };
-
-  template <bool anything>
-  struct dtype_switch<false, anything>
-  {
-    template <class MatrixImp>
-    static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& matrix)
-    {
-      return compute_eigenvalues_of_a_real_matrix_using_lapack(std::forward<MatrixImp>(matrix));
-    }
-
-    template <class V, class E, class MatrixImp>
-    static inline void eigenvectors(MatrixImp&& matrix, V& eigenvalues, E& eigenvectors)
-    {
+    } else {
       compute_eigenvalues_and_right_eigenvectors_of_a_real_matrix_using_lapack(
           std::forward<MatrixImp>(matrix), eigenvalues, eigenvectors);
     }
-  };
+  }
 }; // class lapack_helper
 
 
@@ -389,8 +372,7 @@ template <class MatrixType>
 typename std::enable_if<Common::is_matrix<std::decay_t<MatrixType>>::value, std::vector<std::complex<double>>>::type
 compute_eigenvalues_using_lapack(MatrixType&& matrix)
 {
-  return lapack_helper<std::decay_t<MatrixType>>::template dtype_switch<>::eigenvalues(
-      std::forward<MatrixType>(matrix));
+  return lapack_helper<std::decay_t<MatrixType>>::eigenvalues(std::forward<MatrixType>(matrix));
 }
 
 
@@ -402,7 +384,7 @@ compute_eigenvalues_and_right_eigenvectors_using_lapack(MatrixType&& matrix,
                                                         std::vector<std::complex<double>>& eigenvalues,
                                                         ComplexMatrixType& right_eigenvectors)
 {
-  lapack_helper<std::decay_t<MatrixType>>::template dtype_switch<>::eigenvectors(
+  lapack_helper<std::decay_t<MatrixType>>::eigenvectors(
       std::forward<MatrixType>(matrix), eigenvalues, right_eigenvectors);
 }
 
