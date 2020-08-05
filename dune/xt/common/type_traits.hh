@@ -250,31 +250,12 @@ std::string get_template_basename(const T&)
   return str.substr(0, r);
 }
 
-template <class T, class Ptr = void>
+template <class T>
 struct is_smart_ptr
 {
-  static const bool value = false;
-  typedef T type;
-};
-
-template <class T>
-struct is_smart_ptr<T, typename std::enable_if<std::is_same<std::unique_ptr<typename T::element_type>, T>::value>::type>
-{
-  static const bool value = true;
-  typedef T type;
-};
-
-template <class T>
-struct is_smart_ptr<T, typename std::enable_if<std::is_same<std::shared_ptr<typename T::element_type>, T>::value>::type>
-{
-  static const bool value = true;
-  typedef T type;
-};
-
-template <class T>
-struct is_smart_ptr<T, typename std::enable_if<std::is_same<std::weak_ptr<typename T::element_type>, T>::value>::type>
-{
-  static const bool value = true;
+  static const bool value = std::is_same<std::unique_ptr<typename T::element_type>, T>::value
+                            || std::is_same<std::shared_ptr<typename T::element_type>, T>::value
+                            || std::is_same<std::weak_ptr<typename T::element_type>, T>::value;
   typedef T type;
 };
 
