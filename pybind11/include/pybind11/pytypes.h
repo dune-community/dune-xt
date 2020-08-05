@@ -1732,6 +1732,10 @@ public:
   {
     return (size_t)PyTuple_Size(m_ptr);
   }
+  bool empty() const
+  {
+    return size() == 0;
+  }
   detail::tuple_accessor operator[](size_t index) const
   {
     return {*this, index};
@@ -1772,6 +1776,10 @@ public:
   {
     return (size_t)PyDict_Size(m_ptr);
   }
+  bool empty() const
+  {
+    return size() == 0;
+  }
   detail::dict_iterator begin() const
   {
     return {*this, 0};
@@ -1784,13 +1792,10 @@ public:
   {
     PyDict_Clear(ptr());
   }
-  bool contains(handle key) const
+  template <typename T>
+  bool contains(T&& key) const
   {
-    return PyDict_Contains(ptr(), key.ptr()) == 1;
-  }
-  bool contains(const char* key) const
-  {
-    return PyDict_Contains(ptr(), pybind11::str(key).ptr()) == 1;
+    return PyDict_Contains(m_ptr, detail::object_or_cast(std::forward<T>(key)).ptr()) == 1;
   }
 
 private:
@@ -1810,6 +1815,10 @@ public:
   size_t size() const
   {
     return (size_t)PySequence_Size(m_ptr);
+  }
+  bool empty() const
+  {
+    return size() == 0;
   }
   detail::sequence_accessor operator[](size_t index) const
   {
@@ -1843,6 +1852,10 @@ public:
   {
     return (size_t)PyList_Size(m_ptr);
   }
+  bool empty() const
+  {
+    return size() == 0;
+  }
   detail::list_accessor operator[](size_t index) const
   {
     return {*this, index};
@@ -1863,6 +1876,11 @@ public:
   void append(T&& val) const
   {
     PyList_Append(m_ptr, detail::object_or_cast(std::forward<T>(val)).ptr());
+  }
+  template <typename T>
+  void insert(size_t index, T&& val) const
+  {
+    PyList_Insert(m_ptr, static_cast<ssize_t>(index), detail::object_or_cast(std::forward<T>(val)).ptr());
   }
 };
 
@@ -1889,6 +1907,10 @@ public:
   {
     return (size_t)PySet_Size(m_ptr);
   }
+  bool empty() const
+  {
+    return size() == 0;
+  }
   template <typename T>
   bool add(T&& val) const
   {
@@ -1897,6 +1919,11 @@ public:
   void clear() const
   {
     PySet_Clear(m_ptr);
+  }
+  template <typename T>
+  bool contains(T&& val) const
+  {
+    return PySet_Contains(m_ptr, detail::object_or_cast(std::forward<T>(val)).ptr()) == 1;
   }
 };
 
@@ -1928,7 +1955,7 @@ class buffer : public object
 public:
   PYBIND11_OBJECT_DEFAULT(buffer, object, PyObject_CheckBuffer)
 
-  buffer_info request(bool writable = false)
+  buffer_info request(bool writable = false) const
   {
     int flags = PyBUF_STRIDES | PyBUF_FORMAT;
     if (writable)
@@ -1965,7 +1992,7 @@ public:
     buf.strides = py_strides.data();
     buf.shape = py_shape.data();
     buf.suboffsets = nullptr;
-    buf.readonly = false;
+    buf.readonly = info.readonly;
     buf.internal = nullptr;
 
     m_ptr = PyMemoryView_FromBuffer(&buf);

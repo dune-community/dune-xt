@@ -59,6 +59,10 @@ public:
     return "[" + std::to_string(x) + ", " + std::to_string(y) + "]";
   }
 
+  Vector2 operator-() const
+  {
+    return Vector2(-x, -y);
+  }
   Vector2 operator+(const Vector2& v) const
   {
     return Vector2(x + v.x, y + v.y);
@@ -226,6 +230,7 @@ TEST_SUBMODULE(operators, m)
       .def(float() - py::self)
       .def(float() * py::self)
       .def(float() / py::self)
+      .def(-py::self)
       .def("__str__", &Vector2::toString)
       .def(hash(py::self));
 
