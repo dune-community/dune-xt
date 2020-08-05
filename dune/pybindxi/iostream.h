@@ -1,4 +1,3 @@
-#pragma GCC system_header
 /*
     pybind11/iostream.h -- Tools to assist with redirecting cout and cerr to Python
 
@@ -67,6 +66,8 @@ public:
   {
     setp(d_buffer.get(), d_buffer.get() + buf_size - 1);
   }
+
+  pythonbuf(pythonbuf&&) = default;
 
   /// Sync before destroy
   ~pythonbuf()

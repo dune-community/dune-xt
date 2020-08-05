@@ -1,4 +1,3 @@
-#pragma GCC system_header
 /*
     pybind11/eigen.h: Transparent conversion for dense and sparse Eigen matrices
 

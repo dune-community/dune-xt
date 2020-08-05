@@ -1,4 +1,3 @@
-#pragma GCC system_header
 /*
     pybind11/options.h: global settings that are configurable at runtime.
 

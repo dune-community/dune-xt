@@ -1,4 +1,3 @@
-#pragma GCC system_header
 /*
     pybind11/std_bind.h: Binding generators for STL data types
 
@@ -133,6 +132,14 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
   using SizeType = typename Vector::size_type;
   using DiffType = typename Vector::difference_type;
 
+  auto wrap_i = [](DiffType i, SizeType n) {
+    if (i < 0)
+      i += n;
+    if (i < 0 || (SizeType)i >= n)
+      throw index_error();
+    return i;
+  };
+
   cl.def(
       "append", [](Vector& v, const T& value) { v.push_back(value); }, arg("x"), "Add an item to the end of the list");
 
@@ -143,6 +150,9 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
       v->push_back(h.cast<T>());
     return v.release();
   }));
+
+  cl.def(
+      "clear", [](Vector& v) { v.clear(); }, "Clear the contents");
 
   cl.def(
       "extend",
@@ -174,10 +184,13 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
 
   cl.def(
       "insert",
-      [](Vector& v, SizeType i, const T& x) {
-        if (i > v.size())
+      [](Vector& v, DiffType i, const T& x) {
+        // Can't use wrap_i; i == v.size() is OK
+        if (i < 0)
+          i += v.size();
+        if (i < 0 || (SizeType)i > v.size())
           throw index_error();
-        v.insert(v.begin() + (DiffType)i, x);
+        v.insert(v.begin() + i, x);
       },
       arg("i"),
       arg("x"),
@@ -196,20 +209,18 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
 
   cl.def(
       "pop",
-      [](Vector& v, SizeType i) {
-        if (i >= v.size())
-          throw index_error();
-        T t = v[i];
-        v.erase(v.begin() + (DiffType)i);
+      [wrap_i](Vector& v, DiffType i) {
+        i = wrap_i(i, v.size());
+        T t = v[(SizeType)i];
+        v.erase(v.begin() + i);
         return t;
       },
       arg("i"),
       "Remove and return the item at index ``i``");
 
-  cl.def("__setitem__", [](Vector& v, SizeType i, const T& t) {
-    if (i >= v.size())
-      throw index_error();
-    v[i] = t;
+  cl.def("__setitem__", [wrap_i](Vector& v, DiffType i, const T& t) {
+    i = wrap_i(i, v.size());
+    v[(SizeType)i] = t;
   });
 
   /// Slicing protocol
@@ -252,10 +263,9 @@ void vector_modifiers(enable_if_t<is_copy_constructible<typename Vector::value_t
 
   cl.def(
       "__delitem__",
-      [](Vector& v, SizeType i) {
-        if (i >= v.size())
-          throw index_error();
-        v.erase(v.begin() + DiffType(i));
+      [wrap_i](Vector& v, DiffType i) {
+        i = wrap_i(i, v.size());
+        v.erase(v.begin() + i);
       },
       "Delete the list elements at index ``i``");
 
@@ -291,14 +301,22 @@ void vector_accessor(enable_if_t<!vector_needs_copy<Vector>::value, Class_>& cl)
 {
   using T = typename Vector::value_type;
   using SizeType = typename Vector::size_type;
+  using DiffType = typename Vector::difference_type;
   using ItType = typename Vector::iterator;
+
+  auto wrap_i = [](DiffType i, SizeType n) {
+    if (i < 0)
+      i += n;
+    if (i < 0 || (SizeType)i >= n)
+      throw index_error();
+    return i;
+  };
 
   cl.def(
       "__getitem__",
-      [](Vector& v, SizeType i) -> T& {
-        if (i >= v.size())
-          throw index_error();
-        return v[i];
+      [wrap_i](Vector& v, DiffType i) -> T& {
+        i = wrap_i(i, v.size());
+        return v[(SizeType)i];
       },
       return_value_policy::reference_internal // ref + keepalive
   );
@@ -318,11 +336,14 @@ void vector_accessor(enable_if_t<vector_needs_copy<Vector>::value, Class_>& cl)
 {
   using T = typename Vector::value_type;
   using SizeType = typename Vector::size_type;
+  using DiffType = typename Vector::difference_type;
   using ItType = typename Vector::iterator;
-  cl.def("__getitem__", [](const Vector& v, SizeType i) -> T {
-    if (i >= v.size())
+  cl.def("__getitem__", [](const Vector& v, DiffType i) -> T {
+    if (i < 0 && (i += v.size()) < 0)
       throw index_error();
-    return v[i];
+    if ((SizeType)i >= v.size())
+      throw index_error();
+    return v[(SizeType)i];
   });
 
   cl.def(
@@ -514,7 +535,7 @@ void map_assignment(const Args&...)
 
 // Map assignment when copy-assignable: just copy the value
 template <typename Map, typename Class_>
-void map_assignment(enable_if_t<std::is_copy_assignable<typename Map::mapped_type>::value, Class_>& cl)
+void map_assignment(enable_if_t<is_copy_assignable<typename Map::mapped_type>::value, Class_>& cl)
 {
   using KeyType = typename Map::key_type;
   using MappedType = typename Map::mapped_type;
@@ -530,7 +551,7 @@ void map_assignment(enable_if_t<std::is_copy_assignable<typename Map::mapped_typ
 
 // Not copy-assignable, but still copy-constructible: we can update the value by erasing and reinserting
 template <typename Map, typename Class_>
-void map_assignment(enable_if_t<!std::is_copy_assignable<typename Map::mapped_type>::value
+void map_assignment(enable_if_t<!is_copy_assignable<typename Map::mapped_type>::value
                                     && is_copy_constructible<typename Map::mapped_type>::value,
                                 Class_>& cl)
 {

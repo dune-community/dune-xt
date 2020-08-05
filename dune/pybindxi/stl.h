@@ -1,4 +1,3 @@
-#pragma GCC system_header
 /*
     pybind11/stl.h: Transparent conversion for STL data types
 
