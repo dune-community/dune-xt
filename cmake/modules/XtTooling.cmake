@@ -36,12 +36,16 @@ endmacro(add_analyze)
 
 find_package(ClangFormat 8 EXACT)
 macro(add_format glob_dir)
-  if(${ARGC} GREATER 1)
-    message(WARNING "'add_format' API has changed. Please provide a single "
-                    "search directory instead of multiple filenames")
-  endif()
   if(NOT TARGET format)
-    add_custom_target(format)
+    if(NOT ClangFormat_FOUND)
+      message(WARNING "clang-format not found, not adding format target")
+    else()
+      add_custom_target(format)
+    endif()
+  else()
+    if(NOT ClangFormat_FOUND)
+      message(FATAL "clang-format not found but format target already exists")
+    endif()
   endif(NOT TARGET format)
   string(REPLACE "/"
                  "_"
