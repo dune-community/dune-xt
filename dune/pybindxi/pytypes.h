@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/pytypes.h: Convenience wrapper classes for basic Python types
 

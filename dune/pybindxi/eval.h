@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/exec.h: Support for evaluating Python expressions and statements
     from strings and files

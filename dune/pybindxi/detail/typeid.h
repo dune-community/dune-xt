@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/detail/typeid.h: Compiler-independent access to type identifiers
 

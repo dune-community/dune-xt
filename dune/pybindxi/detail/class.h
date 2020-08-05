@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/detail/class.h: Python C API implementation details for py::class_
 

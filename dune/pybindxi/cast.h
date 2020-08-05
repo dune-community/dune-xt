@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/cast.h: Partial template specializations to cast between
     C++ and Python types

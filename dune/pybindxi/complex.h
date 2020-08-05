@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/complex.h: Complex number support
 

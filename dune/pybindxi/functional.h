@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/functional.h: std::function<> support
 

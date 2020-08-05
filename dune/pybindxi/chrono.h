@@ -1,3 +1,4 @@
+#pragma GCC system_header
 /*
     pybind11/chrono.h: Transparent conversion between std::chrono and python's datetime
 
