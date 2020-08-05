@@ -93,20 +93,14 @@ macro(add_format glob_dir)
   add_dependencies(format "format_${fn}_cmake")
 endmacro(add_format)
 
-find_package(ClangTidy 3.7)
+find_package(ClangTidy 8)
 macro(add_tidy glob_dir)
   if(ClangTidy_FOUND)
+    dune_symlink_to_source_files(FILES .clang-tidy)
     message(STATUS "adding tidy target")
-    if(NOT TARGET tidy)
-      add_custom_target(tidy)
-    endif(NOT TARGET tidy)
-    string(REPLACE "/"
-                   "_"
-                   fn
-                   ${glob_dir})
-    file(GLOB_RECURSE _files "${glob_dir}/*.cc" "${glob_dir}/*.c")
-    add_custom_target("tidy_${fn}" ${ClangTidy_EXECUTABLE} -p=${CMAKE_CURRENT_BINARY_DIR} ${_files})
-    add_dependencies(tidy "tidy_${fn}")
+    set(TIDY_ARGS -config= -style=file -p=${CMAKE_CURRENT_BINARY_DIR} -j ${DXT_TEST_PROCS})
+    add_custom_target("tidy" ${RunTidy_EXECUTABLE} ${TIDY_ARGS} -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes)
+    add_custom_target("fix_tidy" ${RunTidy_EXECUTABLE} ${TIDY_ARGS} -fix)
   else()
     message(WARNING "not adding tidy target because clang-tidy is missing or"
                     "wrong version: ${ClangTidy_EXECUTABLE} ${ClangTidy_VERSION}")
