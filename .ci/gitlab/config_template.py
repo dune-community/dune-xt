@@ -102,9 +102,9 @@ variables:
     variables:
         CI_IMAGE: {{ image }}
         TESTS_MODULE_SUBDIR: {{ subdir }}
-    {%- if subdir in ['functions', 'la'] and 'gcc' in image %}
+    {%- if 'gcc' in image %}
     tags:
-        - amm-only
+        - dustin
     {%- endif %}
     stage: {{kind}}
     script:
