@@ -63,7 +63,7 @@ public:
       }
       return inverse_matrix;
     } else {
-      static_assert(false, "compute not available");
+      static_assert(AlwaysFalse<FunctionType>::value, "compute not available");
     }
   }
 }; // class InverseFunctionHelper
@@ -234,7 +234,7 @@ auto inverse(ElementFunctionInterface<E, r, rC, R>& func, const int order)
   if constexpr (internal::InverseFunctionHelper<ElementFunctionInterface<E, r, rC, R>>::available) {
     return InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>(func, order);
   } else {
-    static_assert(false, "No inverse implementation available");
+    static_assert(AlwaysFalse<R>::value, "No inverse implementation available");
   }
 }
 
@@ -245,7 +245,7 @@ auto inverse(const FunctionInterface<d, r, rC, R>& func, const int order)
   if constexpr (internal::InverseFunctionHelper<FunctionInterface<d, r, rC, R>>::available) {
     return InverseFunction<FunctionInterface<d, r, rC, R>>(func, order);
   } else {
-    static_assert(false, "No inverse implementation available");
+    static_assert(AlwaysFalse<R>::value, "No inverse implementation available");
   }
 }
 
@@ -256,7 +256,7 @@ auto inverse(const GridFunctionInterface<E, r, rC, R>& func, const int order)
   if constexpr (internal::InverseFunctionHelper<GridFunctionInterface<E, r, rC, R>>::available) {
     return InverseGridFunction<GridFunctionInterface<E, r, rC, R>>(func, order);
   } else {
-    static_assert(false, "No inverse implementation available");
+    static_assert(AlwaysFalse<R>::value, "No inverse implementation available");
   }
 }
 
