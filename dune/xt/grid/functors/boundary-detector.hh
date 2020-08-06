@@ -15,6 +15,7 @@
 #include <dune/xt/common/parallel/threadstorage.hh>
 #include <dune/xt/grid/boundaryinfo/interfaces.hh>
 #include <dune/xt/grid/intersection.hh>
+#include <dune/xt/grid/print.hh>
 
 #include "interfaces.hh"
 
@@ -80,7 +81,7 @@ public:
                          const ElementType& /*inside_element*/,
                          const ElementType& /*outside_element*/)
   {
-    LOG_(debug) << "compute_locally(intersection=" << intersection
+    LOG_(debug) << "compute_locally(intersection=" << print(intersection)
                 << "):\n  boundary_info_.type(intersection) = " << boundary_info_.type(intersection) << ", returning "
                 << size_t(boundary_info_.type(intersection) == *boundary_type_) << std::endl;
     return boundary_info_.type(intersection) == *boundary_type_;
@@ -90,7 +91,7 @@ public:
                    const ElementType& inside_element,
                    const ElementType& outside_element) override final
   {
-    LOG_(debug) << "apply_local(intersection=" << intersection << "): calling compute_locally()" << std::endl;
+    LOG_(debug) << "apply_local(intersection=" << print(intersection) << "): calling compute_locally()" << std::endl;
     found_ += compute_locally(intersection, inside_element, outside_element);
   }
 

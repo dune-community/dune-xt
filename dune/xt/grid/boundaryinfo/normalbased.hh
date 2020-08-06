@@ -19,6 +19,7 @@
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/grid/exceptions.hh>
 #include <dune/xt/grid/intersection.hh>
+#include <dune/xt/grid/print.hh>
 
 #include "interfaces.hh"
 #include <dune/xt/grid/boundaryinfo/types.hh>
@@ -198,7 +199,7 @@ public:
 
   const BoundaryType& type(const IntersectionType& intersection) const override final
   {
-    LOG_(debug) << "type(intersection=" << intersection << "):" << std::endl;
+    LOG_(debug) << "type(intersection=" << print(intersection) << "):" << std::endl;
     if (!intersection.boundary()) {
       LOG_(debug) << "  intersection.boundary() = " << intersection.boundary() << ", returning " << no_boundary
                   << std::endl;

@@ -18,7 +18,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/intersection.hh>
-#include <dune/xt/common/print.hh>
+#include <dune/xt/grid/print.hh>
 
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
@@ -72,30 +72,36 @@ public:
     // special methods/operators
     c.def("__str__", [](type& self) {
       std::stringstream ss;
-      ss << Common::print(self);
+      ss << print(self);
       return ss.str();
     });
     c.def("__repr__", [](type& self) {
       std::stringstream ss;
-      ss << Common::repr(self);
+      ss << repr(self);
       return ss.str();
     });
-    c.def("__eq__", [](type& self, const type& other) { return self == other; }, py::is_operator());
-    c.def("__neq__", [](type& self, const type& other) { return self != other; }, py::is_operator());
+    c.def(
+        "__eq__", [](type& self, const type& other) { return self == other; }, py::is_operator());
+    c.def(
+        "__neq__", [](type& self, const type& other) { return self != other; }, py::is_operator());
 
     // methods
-    c.def("to_global",
-          [](type& self, const LocalCoordinateType& x) { return self.geometry().global(x); },
-          "point_in_reference_intersection"_a);
-    c.def("to_local",
-          [](type& self, const GlobalCoordinateType& x) { return self.geometry().local(x); },
-          "point_in_physical_space"_a);
-    c.def("outer_normal",
-          [](type& self, const LocalCoordinateType& x) { return self.outerNormal(x); },
-          "point_in_reference_intersection"_a);
-    c.def("unit_outer_normal",
-          [](type& self, const LocalCoordinateType& x) { return self.unitOuterNormal(x); },
-          "point_in_reference_intersection"_a);
+    c.def(
+        "to_global",
+        [](type& self, const LocalCoordinateType& x) { return self.geometry().global(x); },
+        "point_in_reference_intersection"_a);
+    c.def(
+        "to_local",
+        [](type& self, const GlobalCoordinateType& x) { return self.geometry().local(x); },
+        "point_in_physical_space"_a);
+    c.def(
+        "outer_normal",
+        [](type& self, const LocalCoordinateType& x) { return self.outerNormal(x); },
+        "point_in_reference_intersection"_a);
+    c.def(
+        "unit_outer_normal",
+        [](type& self, const LocalCoordinateType& x) { return self.unitOuterNormal(x); },
+        "point_in_reference_intersection"_a);
 
     return c;
   } // ... bind(...)
