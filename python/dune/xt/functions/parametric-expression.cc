@@ -25,6 +25,7 @@
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/common/fmatrix.hh>
 #include <python/dune/xt/common/bindings.hh>
+#include <python/dune/xt/common/parameter.hh>
 #include <python/dune/xt/grid/traits.hh>
 #include <python/dune/xt/common/exceptions.bindings.hh>
 
@@ -44,12 +45,12 @@ class ParametricExpressionFunction
   using bound_type = pybind11::class_<type, base_type>;
 
 public:
-  static bound_type bind(pybind11::module& m, const std::string& class_id = "expression_function")
+  static bound_type bind(pybind11::module& m, const std::string& class_id = "parametric_expression_function")
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
 
-    std::string class_name = class_id + "_" + Common::to_string(d) + "_to_" + Common::to_string(r);
+    std::string class_name = class_id + "_" + Common::to_string(d) + "d_to_" + Common::to_string(r);
     if (rC > 1)
       class_name += "x" + Common::to_string(rC);
     class_name += "d";
@@ -92,7 +93,7 @@ public:
 } // namespace Dune
 
 
-PYBIND11_MODULE(_functions_expression, m)
+PYBIND11_MODULE(_functions_parametric_expression, m)
 {
   namespace py = pybind11;
 
