@@ -56,11 +56,11 @@ public:
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);
     bound_type c(m, ClassName.c_str(), (XT::Common::to_camel_case(class_id) + " (" + grid_id + " variant)").c_str());
-    c.def_property_readonly("dimension", [dim](type&) { return dim; });
+    c.def_property_readonly("dimension", [](type&) { return dim; });
     c.def_property_readonly("max_level", &type::max_level);
     c.def(
         "size",
-        [dim](type& self, const int codim) {
+        [](type& self, const int codim) {
           DUNE_THROW_IF(
               codim < 0 || codim > dim, Exceptions::wrong_codimension, "dim = " << dim << "\n   codim = " << codim);
           DUNE_THROW_IF(codim != dim && codim != 0 && !G::LeafGridView::conforming,
@@ -74,7 +74,7 @@ public:
         "codim"_a);
     c.def(
         "centers",
-        [dim](type& self, const int codim) {
+        [](type& self, const int codim) {
           DUNE_THROW_IF(
               codim < 0 || codim > dim, Exceptions::wrong_codimension, "dim = " << dim << "\n   codim = " << codim);
           DUNE_THROW_IF(codim != dim && codim != 0 && !G::LeafGridView::conforming,
