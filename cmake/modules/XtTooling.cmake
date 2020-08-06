@@ -94,17 +94,55 @@ macro(add_format glob_dir)
 endmacro(add_format)
 
 find_package(ClangTidy 8)
-macro(add_tidy glob_dir)
+macro(add_tidy)
   if(ClangTidy_FOUND)
     dune_symlink_to_source_files(FILES .clang-tidy)
     message(STATUS "adding tidy target")
-    set(TIDY_ARGS -config= -style=file -p=${CMAKE_CURRENT_BINARY_DIR} -j ${DXT_TEST_PROCS})
-    add_custom_target("tidy" ${RunTidy_EXECUTABLE} ${TIDY_ARGS} -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes)
-    add_custom_target("fix_tidy" ${RunTidy_EXECUTABLE} ${TIDY_ARGS} -fix)
+    add_custom_target(tidy)
+    add_custom_target(fix_tidy)
+    add_tidy_subdir(common)
+    add_tidy_subdir(grid)
+    add_tidy_subdir(la)
+    add_tidy_subdir(functions)
   else()
     message(WARNING "not adding tidy target because clang-tidy is missing or"
                     "wrong version: ${ClangTidy_EXECUTABLE} ${ClangTidy_VERSION}")
   endif(ClangTidy_FOUND)
+endmacro()
+
+macro(add_tidy_subdir _dxt_subdir)
+  set(BASE ${PROJECT_SOURCE_DIR}/dune/xt/${_dxt_subdir})
+  file(GLOB_RECURSE _files
+                    "${BASE}/*.hh"
+                    "${BASE}/*.cc"
+                    "${BASE}/*.cxx"
+                    "${BASE}/*.cpp"
+                    "${BASE}/*.hpp"
+                    "${BASE}/*.h"
+                    "${BASE}/*.c"
+                    "${BASE}/*.pbh")
+  set(BASE ${PROJECT_SOURCE_DIR}/python/dune/xt/${_dxt_subdir})
+  file(GLOB_RECURSE _pyfiles
+                    "${BASE}/*.hh"
+                    "${BASE}/*.cc"
+                    "${BASE}/*.cxx"
+                    "${BASE}/*.cpp"
+                    "${BASE}/*.hpp"
+                    "${BASE}/*.h"
+                    "${BASE}/*.c"
+                    "${BASE}/*.pbh")
+  list(APPEND _files ${_pyfiles})
+  list(REMOVE_DUPLICATES _files)
+  set(TIDY_ARGS -config= -format-style=file -p=${CMAKE_CURRENT_BINARY_DIR} )
+  add_custom_target(tidy_${_dxt_subdir}
+                    COMMAND ${ClangTidy_EXECUTABLE} ${TIDY_ARGS}
+                            -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes ${_files}
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  add_custom_target(fix_tidy_${_dxt_subdir}
+                    COMMAND ${ClangTidy_EXECUTABLE} ${TIDY_ARGS} -fix ${_files}
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  add_dependencies(tidy tidy_${_dxt_subdir})
+  add_dependencies(fix_tidy fix_tidy_${_dxt_subdir})
 endmacro(add_tidy)
 
 macro(add_forced_doxygen_target)

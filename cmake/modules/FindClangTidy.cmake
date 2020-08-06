@@ -33,14 +33,13 @@ find_program(ClangTidy_EXECUTABLE
 if(EXISTS ${ClangTidy_EXECUTABLE})
   execute_process(COMMAND ${ClangTidy_EXECUTABLE} -version OUTPUT_VARIABLE clang_out)
   string(REGEX
-         REPLACE ".*LLVM version ([0-9]+\\.[0-9]+).*"
+         REPLACE ".*LLVM version ([0-9]+)\.[0-9]+\.[0-9]*.*"
                  "\\1"
                  ClangTidy_VERSION
                  ${clang_out})
 endif()
 
-find_program(RunTidy_EXECUTABLE
-NAMES run-clang-tidy-${ClangTidy_VERSION})
+find_program(RunTidy_EXECUTABLE NAMES run-clang-tidy-${ClangTidy_VERSION})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ClangTidy REQUIRED_VARS ClangTidy_EXECUTABLE VERSION_VAR ClangTidy_VERSION)
