@@ -23,6 +23,7 @@
 #include <dune/grid/common/intersection.hh>
 #include <dune/grid/common/gridview.hh>
 
+#include <dune/xt/common/deprecated.hh>
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/print.hh>
 #include <dune/xt/common/ranges.hh>
@@ -172,6 +173,7 @@ contains(const Dune::Intersection<G, I>& intersection,
 } // namespace XT
 
 
+// DXT_DEPRECATED_MSG did not work here
 template <class G, class I>
 std::ostream& DUNE_DEPRECATED_MSG("Use out << print(intersection) from <dune/xt/grid/print.hh> instead (05.07.2020)!")
 operator<<(std::ostream& out, const Dune::Intersection<G, I>& intersection)
