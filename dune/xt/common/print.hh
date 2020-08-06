@@ -30,6 +30,8 @@ namespace internal {
 
 
 /// \note Should be used to derive from (except for vectors and matrices), when specializing Printer.
+/// \todo Drop silenced warnings once all operator<< overloads in dune-xt and dune-gdt which are deprecated due to this
+///       DefaultPrinter are removed!
 /// \sa Printer
 /// \sa VectorPrinter
 template <class T, bool use_repr = false>
@@ -45,7 +47,10 @@ class DefaultPrinter
   {
     static void or_print_error(std::ostream& out, const T& val)
     {
+      // There are some operator<< overloads that are deprecated due to the introduction of this Printer.
+#include <dune/xt/common/disable_warnings.hh>
       out << val;
+#include <dune/xt/common/reenable_warnings.hh>
     }
   };
 
