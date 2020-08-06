@@ -37,7 +37,7 @@ class SubEntityIndex
         DUNE_THROW_IF(i >= element.subEntities(codim),
                       Common::Exceptions::index_out_of_range,
                       "element.subEntities(" << codim << ") = " << element.subEntities(codim) << "\n   i = " << i);
-        return Common::numeric_cast<size_t>(mapper.index(element.subEntity<cd>(i)));
+        return Common::numeric_cast<size_t>(mapper.index(element.subEntity<cd>(Common::numeric_cast<int>(i))));
       } else
         return subEntity<cd - 1>::index(mapper, element, codim, i);
     } // ... center(...)
@@ -52,7 +52,7 @@ class SubEntityIndex
       DUNE_THROW_IF(i >= element.subEntities(0),
                     Common::Exceptions::index_out_of_range,
                     "element.subEntities(0) = " << element.subEntities(0) << "\n   i = " << i);
-      return Common::numeric_cast<size_t>(mapper.index(element.subEntity<0>(i)));
+      return Common::numeric_cast<size_t>(mapper.index(element.subEntity<0>(Common::numeric_cast<int>(i))));
     }
   }; // struct subEntity
 
