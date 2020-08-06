@@ -58,38 +58,40 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
         }),
         "Assigns the elements of the iterable to the vector.");
 
-  c.def("__repr__",
-        [ClassName](const C& self) {
-          std::stringstream ss;
-          ss << ClassName << "([";
-          if (self.size() > 0)
-            ss << self[0];
-          for (size_t ii = 1; ii < std::min(size_t(3), self.size()); ++ii)
+  c.def(
+      "__repr__",
+      [ClassName](const C& self) {
+        std::stringstream ss;
+        ss << ClassName << "([";
+        if (self.size() > 0)
+          ss << self[0];
+        for (size_t ii = 1; ii < std::min(size_t(3), self.size()); ++ii)
+          ss << " " << self[ii];
+        if (self.size() > 8) {
+          ss << " ...";
+        } else {
+          for (ssize_t ii = std::min(size_t(3), self.size()); ii < ssize_t(self.size()) - 3; ++ii)
             ss << " " << self[ii];
-          if (self.size() > 8) {
-            ss << " ...";
-          } else {
-            for (ssize_t ii = std::min(size_t(3), self.size()); ii < ssize_t(self.size()) - 3; ++ii)
-              ss << " " << self[ii];
-          }
-          for (size_t ii = std::max(ssize_t(3), ssize_t(self.size()) - 3); ii < self.size(); ++ii)
-            ss << " " << self[ii];
-          ss << "])";
-          return ss.str();
-        },
-        "A compact representation of the vector (only the first and last three elements).");
-  c.def("__str__",
-        [ClassName](const C& self) {
-          std::stringstream ss;
-          ss << ClassName << "([";
-          if (self.size() > 0)
-            ss << self[0];
-          for (size_t ii = 1; ii < self.size(); ++ii)
-            ss << " " << self[ii];
-          ss << "])";
-          return ss.str();
-        },
-        "A full representation of the vector.");
+        }
+        for (size_t ii = std::max(ssize_t(3), ssize_t(self.size()) - 3); ii < self.size(); ++ii)
+          ss << " " << self[ii];
+        ss << "])";
+        return ss.str();
+      },
+      "A compact representation of the vector (only the first and last three elements).");
+  c.def(
+      "__str__",
+      [ClassName](const C& self) {
+        std::stringstream ss;
+        ss << ClassName << "([";
+        if (self.size() > 0)
+          ss << self[0];
+        for (size_t ii = 1; ii < self.size(); ++ii)
+          ss << " " << self[ii];
+        ss << "])";
+        return ss.str();
+      },
+      "A full representation of the vector.");
   c.def("__len__", [](const C& self) { return self.size(); });
   c.def("__getitem__", [](const C& vec, size_t ii) -> S {
     if (ii >= vec.size())
@@ -101,60 +103,108 @@ typename std::enable_if<is_vector<C>::value, pybind11::class_<C>>::type bind_Vec
       throw pybind11::index_error();
     vec[ii] = value;
   });
-  c.def("__iter__",
-        [](C& vec) {
-          return py::
-              make_iterator<py::return_value_policy::reference_internal, typename C::iterator, typename C::iterator, S>(
-                  vec.begin(), vec.end());
-        },
-        pybind11::keep_alive<0, 1>() /*Essential: keep object alive while iterator exists!*/);
+  c.def(
+      "__iter__",
+      [](C& vec) {
+        return py::
+            make_iterator<py::return_value_policy::reference_internal, typename C::iterator, typename C::iterator, S>(
+                vec.begin(), vec.end());
+      },
+      pybind11::keep_alive<0, 1>() /*Essential: keep object alive while iterator exists!*/);
 
-  c.def(py::self == py::self);
-  c.def(py::self != py::self);
-  c.def(py::self + py::self);
-  c.def(py::self += py::self);
-  c.def(py::self -= py::self);
-  c.def(py::self * py::self);
-  c.def(py::self *= R());
-  c.def(py::self /= R());
+  c.def(
+      "__add__", [](const C& self, const C& other) { return std::make_unique<C>(self + other); }, py::is_operator());
+  c.def("__iadd__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator+=,
+        py::is_operator());
+  c.def(
+      "__sub__", [](const C& self, const C& other) { return std::make_unique<C>(self - other); }, py::is_operator());
+  c.def("__isub__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator-=,
+        py::is_operator());
+  c.def(
+      "__mul__",
+      [](const C& self, const R& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def(
+      "__rmul__",
+      [](const C& self, const R& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__imul__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator*=,
+        py::is_operator());
+  c.def(
+      "__truediv__",
+      [](const C& self, const R& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) /= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__itruediv__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator/=,
+        py::is_operator());
+  c.def(
+      "neg",
+      [](const C& self) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= -1;
+        return ret;
+      },
+      py::is_operator());
 
   c.def_property_readonly("size", [](const C& self) { return self.size(); });
-  c.def("add_to_entry",
-        [](C& self, const ssize_t ii, const S& value) { self.add_to_entry(Common::numeric_cast<size_t>(ii), value); },
-        "ii"_a,
-        "value"_a);
-  c.def("set_entry",
-        [](C& self, const ssize_t ii, const S& value) { self.set_entry(Common::numeric_cast<size_t>(ii), value); },
-        "ii"_a,
-        "value"_a);
-  c.def("get_entry",
-        [](const C& self, const ssize_t ii) { return self.get_entry(Common::numeric_cast<size_t>(ii)); },
-        "jj"_a);
-  c.def("set_all", [](C& self, const S& value) { self.set_all(value); }, "value"_a);
+  c.def(
+      "add_to_entry",
+      [](C& self, const ssize_t ii, const S& value) { self.add_to_entry(Common::numeric_cast<size_t>(ii), value); },
+      "ii"_a,
+      "value"_a);
+  c.def(
+      "set_entry",
+      [](C& self, const ssize_t ii, const S& value) { self.set_entry(Common::numeric_cast<size_t>(ii), value); },
+      "ii"_a,
+      "value"_a);
+  c.def(
+      "get_entry",
+      [](const C& self, const ssize_t ii) { return self.get_entry(Common::numeric_cast<size_t>(ii)); },
+      "jj"_a);
+  c.def(
+      "set_all", [](C& self, const S& value) { self.set_all(value); }, "value"_a);
   c.def("valid", [](const C& self) { return self.valid(); });
   c.def("dim", [](const C& self) { return self.size(); });
   c.def("mean", [](const C& self) { return self.mean(); });
   c.def("amax", [](const C& self) { return self.amax(); });
-  c.def("almost_equal",
-        [](const C& self, const C& other, const S& epsilon) { return self.almost_equal(other, epsilon); },
-        "other"_a,
-        "epsilon"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
+  c.def(
+      "almost_equal",
+      [](const C& self, const C& other, const S& epsilon) { return self.almost_equal(other, epsilon); },
+      "other"_a,
+      "epsilon"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
   c.def("dot", [](const C& self, const C& other) { return self.dot(other); });
   c.def("l1_norm", [](const C& self) { return self.l1_norm(); });
   c.def("l2_norm", [](const C& self) { return self.l2_norm(); });
   c.def("sup_norm", [](const C& self) { return self.sup_norm(); });
   c.def("standard_deviation", [](const C& self) { return self.standard_deviation(); });
-  c.def("to_file",
-        [](const C& self, const std::string& filename, const std::string& mode) { to_file(self, filename, mode); },
-        "filename"_a,
-        "mode"_a = "ascii");
-  c.def_static("from_file",
-               [](const std::string& filename, const ssize_t min_size, const std::string& mode) {
-                 return from_file<C>(filename, min_size, mode);
-               },
-               "filename"_a,
-               "min_size"_a = -1,
-               "mode"_a = "ascii");
+  c.def(
+      "to_file",
+      [](const C& self, const std::string& filename, const std::string& mode) { to_file(self, filename, mode); },
+      "filename"_a,
+      "mode"_a = "ascii");
+  c.def_static(
+      "from_file",
+      [](const std::string& filename, const ssize_t min_size, const std::string& mode) {
+        return from_file<C>(filename, min_size, mode);
+      },
+      "filename"_a,
+      "min_size"_a = -1,
+      "mode"_a = "ascii");
 
   c.def(py::pickle([](const C& self) { return py::make_tuple(std::vector<S>(self)); },
                    [](py::tuple t) {

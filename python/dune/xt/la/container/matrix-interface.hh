@@ -106,87 +106,99 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
         "cols"_a,
         "pattern"_a);
 
-  c.def("__repr__",
-        [ClassName](const C& self) {
-          std::stringstream ss;
-          ss << ClassName << "(";
-          if (self.rows() > 0) {
-            ss << "\n  ";
-            internal::print_row_sparsely(self, 0, ss);
-            ss << "\n";
-          }
-          for (size_t ii = 1; ii < std::min(size_t(3), self.rows()); ++ii) {
+  c.def(
+      "__repr__",
+      [ClassName](const C& self) {
+        std::stringstream ss;
+        ss << ClassName << "(";
+        if (self.rows() > 0) {
+          ss << "\n  ";
+          internal::print_row_sparsely(self, 0, ss);
+          ss << "\n";
+        }
+        for (size_t ii = 1; ii < std::min(size_t(3), self.rows()); ++ii) {
+          ss << "  ";
+          internal::print_row_sparsely(self, ii, ss);
+          ss << "\n";
+        }
+        if (self.rows() > 8) {
+          ss << "   ...\n";
+        } else {
+          for (ssize_t ii = std::min(size_t(3), self.rows()); ii < ssize_t(self.rows()) - 3; ++ii) {
             ss << "  ";
             internal::print_row_sparsely(self, ii, ss);
             ss << "\n";
           }
-          if (self.rows() > 8) {
-            ss << "   ...\n";
-          } else {
-            for (ssize_t ii = std::min(size_t(3), self.rows()); ii < ssize_t(self.rows()) - 3; ++ii) {
-              ss << "  ";
-              internal::print_row_sparsely(self, ii, ss);
-              ss << "\n";
-            }
-          }
-          for (size_t ii = std::max(ssize_t(3), ssize_t(self.rows()) - 3); ii < self.rows(); ++ii) {
-            ss << "  ";
-            internal::print_row_sparsely(self, ii, ss);
-            ss << "\n";
-          }
-          ss << ")";
-          return ss.str();
-        },
-        "A compact representation of the matrix (only the outer three elements).");
-  c.def("__str__",
-        [ClassName](const C& self) {
-          std::stringstream ss;
-          ss << ClassName << "(\n" << self << "\n)";
-          return ss.str();
-        },
-        "A full representation of the matrix.");
+        }
+        for (size_t ii = std::max(ssize_t(3), ssize_t(self.rows()) - 3); ii < self.rows(); ++ii) {
+          ss << "  ";
+          internal::print_row_sparsely(self, ii, ss);
+          ss << "\n";
+        }
+        ss << ")";
+        return ss.str();
+      },
+      "A compact representation of the matrix (only the outer three elements).");
+  c.def(
+      "__str__",
+      [ClassName](const C& self) {
+        std::stringstream ss;
+        ss << ClassName << "(\n" << self << "\n)";
+        return ss.str();
+      },
+      "A full representation of the matrix.");
 
   c.def_property_readonly("rows", [](const C& self) { return self.rows(); });
   c.def_property_readonly("cols", [](const C& self) { return self.cols(); });
-  c.def("add_to_entry",
-        [](C& self, const ssize_t ii, const ssize_t jj, const S& value) {
-          self.add_to_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj), value);
-        },
-        "ii"_a,
-        "jj"_a,
-        "value"_a);
-  c.def("set_entry",
-        [](C& self, const ssize_t ii, const ssize_t jj, const S& value) {
-          self.set_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj), value);
-        },
-        "ii"_a,
-        "jj"_a,
-        "value"_a);
-  c.def("get_entry",
-        [](const C& self, const ssize_t ii, const ssize_t jj) {
-          return self.get_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj));
-        },
-        "ii"_a,
-        "jj"_a);
-  c.def("clear_row", [](C& self, const ssize_t ii) { self.clear_row(Common::numeric_cast<size_t>(ii)); }, "ii"_a);
-  c.def("clear_col", [](C& self, const ssize_t jj) { self.clear_row(Common::numeric_cast<size_t>(jj)); }, "jj"_a);
-  c.def("unit_row", [](C& self, const ssize_t ii) { self.unit_row(Common::numeric_cast<size_t>(ii)); }, "ii"_a);
-  c.def("unit_col", [](C& self, const ssize_t jj) { self.unit_col(Common::numeric_cast<size_t>(jj)); }, "jj"_a);
+  c.def(
+      "add_to_entry",
+      [](C& self, const ssize_t ii, const ssize_t jj, const S& value) {
+        self.add_to_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj), value);
+      },
+      "ii"_a,
+      "jj"_a,
+      "value"_a);
+  c.def(
+      "set_entry",
+      [](C& self, const ssize_t ii, const ssize_t jj, const S& value) {
+        self.set_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj), value);
+      },
+      "ii"_a,
+      "jj"_a,
+      "value"_a);
+  c.def(
+      "get_entry",
+      [](const C& self, const ssize_t ii, const ssize_t jj) {
+        return self.get_entry(Common::numeric_cast<size_t>(ii), Common::numeric_cast<size_t>(jj));
+      },
+      "ii"_a,
+      "jj"_a);
+  c.def(
+      "clear_row", [](C& self, const ssize_t ii) { self.clear_row(Common::numeric_cast<size_t>(ii)); }, "ii"_a);
+  c.def(
+      "clear_col", [](C& self, const ssize_t jj) { self.clear_row(Common::numeric_cast<size_t>(jj)); }, "jj"_a);
+  c.def(
+      "unit_row", [](C& self, const ssize_t ii) { self.unit_row(Common::numeric_cast<size_t>(ii)); }, "ii"_a);
+  c.def(
+      "unit_col", [](C& self, const ssize_t jj) { self.unit_col(Common::numeric_cast<size_t>(jj)); }, "jj"_a);
   c.def("valid", [](const C& self) { return self.valid(); });
   c.def("sup_norm", [](const C& self) { return self.sup_norm(); });
   c.def_property_readonly("non_zeros", [](const C& self) { return self.non_zeros(); });
-  c.def("pattern",
-        [](const C& self, const bool prune, const S& eps) { return self.pattern(prune, eps); },
-        "prune"_a = false,
-        "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
-  c.def("pruned",
-        [](const C& self, const S& eps) { return self.pruned(eps); },
-        "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
+  c.def(
+      "pattern",
+      [](const C& self, const bool prune, const S& eps) { return self.pattern(prune, eps); },
+      "prune"_a = false,
+      "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
+  c.def(
+      "pruned",
+      [](const C& self, const S& eps) { return self.pruned(eps); },
+      "eps"_a = Common::FloatCmp::DefaultEpsilon<S>::value());
   c.def("almost_equal", [](const C& self, const C& other) { return self.almost_equal(other); });
-  c.def("to_file",
-        [](const C& self, const std::string& filename, const std::string& mode) { to_file(self, filename, mode); },
-        "filename"_a,
-        "mode"_a = "ascii");
+  c.def(
+      "to_file",
+      [](const C& self, const std::string& filename, const std::string& mode) { to_file(self, filename, mode); },
+      "filename"_a,
+      "mode"_a = "ascii");
   c.def_static(
       "from_file",
       [](const std::string& filename, const ssize_t min_rows, const ssize_t min_cols, const std::string& mode) {
@@ -196,6 +208,55 @@ typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Mat
       "min_rows"_a = -1,
       "min_cols"_a = -1,
       "mode"_a = "ascii");
+
+  c.def(
+      "__add__", [](const C& self, const C& other) { return std::make_unique<C>(self + other); }, py::is_operator());
+  c.def("__iadd__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator+=,
+        py::is_operator());
+  c.def(
+      "__sub__", [](const C& self, const C& other) { return std::make_unique<C>(self - other); }, py::is_operator());
+  c.def("__isub__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator-=,
+        py::is_operator());
+  c.def(
+      "__mul__",
+      [](const C& self, const S& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def(
+      "__rmul__",
+      [](const C& self, const S& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__imul__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator*=,
+        py::is_operator());
+  c.def(
+      "__truediv__",
+      [](const C& self, const S& alpha) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) /= alpha;
+        return ret;
+      },
+      py::is_operator());
+  c.def("__itruediv__", // function ptr signature required for the right return type
+        (C & (C::*)(const C&)) & C::operator/=,
+        py::is_operator());
+  c.def(
+      "neg",
+      [](const C& self) {
+        auto ret = std::make_unique<C>(self.copy());
+        (*ret) *= -1;
+        return ret;
+      },
+      py::is_operator());
 
   addbind_ContainerInterface(c);
 
@@ -208,10 +269,26 @@ void addbind_Matrix_Vector_interaction(pybind11::class_<M>& mat, pybind11::class
 {
   namespace py = pybind11;
 
-  mat.def("mv", [](const M& self, const V& xx, V& yy) { self.mv(xx, yy); }, "source", "range");
-  mat.def("mtv", [](const M& self, const V& xx, V& yy) { self.mtv(xx, yy); }, "source", "range");
-
-  mat.def(py::self * V());
+  mat.def(
+      "mv", [](const M& self, const V& xx, V& yy) { self.mv(xx, yy); }, "source", "range");
+  mat.def(
+      "dot",
+      [](const M& self, const V& xx) {
+        V yy(self.rows());
+        self.mv(xx, yy);
+        return yy;
+      },
+      "source");
+  mat.def(
+      "__matmul__",
+      [](const M& self, const V& xx) {
+        V yy(self.rows());
+        self.mv(xx, yy);
+        return yy;
+      },
+      "source");
+  mat.def(
+      "mtv", [](const M& self, const V& xx, V& yy) { self.mtv(xx, yy); }, "source", "range");
 
   mat.def("vector_type", [vec](M& /*self*/) { return vec; });
   vec.def("matrix_type", [mat](V& /*self*/) { return mat; });
