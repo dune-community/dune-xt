@@ -276,6 +276,41 @@ public:
 }; // class Printer
 
 
+template <bool use_repr, typename anything>
+class Printer<Configuration, use_repr, anything> : public internal::DefaultPrinter<Configuration, use_repr>
+{
+public:
+  Printer(const Configuration& val, const Configuration& param = {{"oneline", "false"}})
+    : internal::DefaultPrinter<Configuration, use_repr>(val, param)
+  {}
+
+  // let repr() default to operator<<, handled in internal::DefaultPrinter
+
+  void str(std::ostream& out) const override
+  {
+    if (!this->opts.get("oneline", false))
+      this->repr(out);
+    else {
+      const auto key_value_map = this->value.flatten();
+      const auto sz = key_value_map.size();
+      if (sz == 0)
+        out << "{}";
+      else {
+        out << "{";
+        size_t counter = 0;
+        for (const auto& key_value_pair : key_value_map) {
+          out << "\"" << key_value_pair.first << "\": \"" << key_value_pair.second << "\"";
+          if (counter < sz - 1)
+            out << ", ";
+          ++counter;
+        }
+        out << "}";
+      }
+    }
+  } // ... str(...)
+}; // class Printer
+
+
 /// \sa Printer
 template <class T, bool use_repr>
 std::ostream& operator<<(std::ostream& out, const Printer<T, use_repr>& printer)
