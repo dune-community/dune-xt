@@ -169,17 +169,17 @@ public:
     const auto rows = M::rows(this->value);
     const auto cols = M::cols(this->value);
     if (rows * cols > 0) {
-      out << "{";
+      out << "[";
       const std::string delim =
           (std::use_facet<std::numpunct<char>>(std::cout.getloc()).decimal_point() == ',') ? ";" : ",";
       const std::string newline = "\n";
       for (auto&& ii : value_range(rows)) {
-        out << (ii == 0 ? "{" : " ") << "{" << print(M::get_entry(this->value, ii, 0), this->opts);
+        out << (ii == 0 ? "[" : " ") << "[" << print(M::get_entry(this->value, ii, 0), this->opts);
         for (auto&& jj : value_range(decltype(cols)(1), cols))
           out << delim << " " << print(M::get_entry(this->value, ii, jj), this->opts);
-        out << "}" << ((ii == rows - 1) ? "" : ",") << ((ii == rows - 1) ? "" : newline);
+        out << "]" << ((ii == rows - 1) ? "" : ",") << ((ii == rows - 1) ? "" : newline);
       }
-      out << "}";
+      out << "]";
     }
     out << ")";
   } // ... repr(...)
