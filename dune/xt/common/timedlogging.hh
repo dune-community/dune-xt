@@ -165,6 +165,13 @@ public:
   {
     LOG_(debug) << logging_id << "operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }
+
+  void enable_logging_like(const ThisType& other)
+  {
+    this->logger.info_enabled = this->logger.info_enabled || other.logger.info_enabled;
+    this->logger.debug_enabled = this->logger.debug_enabled || other.logger.debug_enabled;
+    this->logger.warn_enabled = this->logger.warn_enabled || other.logger.warn_enabled;
+  }
 }; // class WithLogger
 
 
