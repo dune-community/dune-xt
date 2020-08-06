@@ -135,25 +135,25 @@ public:
   {}
 
   GridFunction(const FunctionInterface<d, r, rC, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(func))
     , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, r, rC, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(new FunctionAsGridFunctionWrapper<E, r, rC, R>(std::move(func_ptr)))
     , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, r, rC, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(func)
     , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, r, rC, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(std::move(func_ptr))
     , name_(storage_.access().name())
   {}
@@ -267,14 +267,14 @@ public:
   {}
 
   GridFunction(const FunctionInterface<d, 1, 1, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(new ProductGridFunction<FunctionAsGridFunctionWrapper<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func), std::move(unit_matrix()), func.name()))
     , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, 1, 1, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(new ProductGridFunction<FunctionAsGridFunctionWrapper<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)),
           std::move(unit_matrix()),
@@ -283,39 +283,39 @@ public:
   {}
 
   GridFunction(const FunctionInterface<d, r, r, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(new FunctionAsGridFunctionWrapper<E, r, r, R>(func))
     , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, r, r, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(new FunctionAsGridFunctionWrapper<E, r, r, R>(std::move(func_ptr)))
     , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(new ProductGridFunction<GridFunction<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           new GridFunction<E, 1, 1, R>(func), std::move(unit_matrix()), func.name()))
     , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(new ProductGridFunction<GridFunctionInterface<E, 1, 1, R>, GridFunctionInterface<E, r, r, R>>(
           std::move(func_ptr), std::move(unit_matrix()), func_ptr->name()))
     , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, r, r, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(func)
     , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, r, r, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(std::move(func_ptr))
     , name_(storage_.access().name())
   {}
@@ -429,25 +429,25 @@ public:
   {}
 
   GridFunction(const FunctionInterface<d, 1, 1, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(func))
     , name_(storage_.access().name())
   {}
 
   GridFunction(FunctionInterface<d, 1, 1, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(new FunctionAsGridFunctionWrapper<E, 1, 1, R>(std::move(func_ptr)))
     , name_(storage_.access().name())
   {}
 
   GridFunction(const GridFunctionInterface<E, 1, 1, R>& func)
-    : BaseType()
+    : BaseType(func.parameter_type())
     , storage_(func)
     , name_(storage_.access().name())
   {}
 
   GridFunction(GridFunctionInterface<E, 1, 1, R>*&& func_ptr)
-    : BaseType()
+    : BaseType(func_ptr->parameter_type())
     , storage_(std::move(func_ptr))
     , name_(storage_.access().name())
   {}
