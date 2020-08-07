@@ -340,6 +340,11 @@ bind_GridFunctionInterface(pybind11::module& m, const std::string& grid_id)
       std::string("GridFunctionInterface__" + grid_id + "_to_" + Common::to_string(r) + "x" + Common::to_string(rC))
           .c_str());
 
+  c.def_property_readonly("dim_domain", [](const C& /*self*/) { return size_t(G::dimension); });
+  if (rC == 1)
+    c.def_property_readonly("dim_range", [](const C& /*self*/) { return size_t(r); });
+  else
+    c.def_property_readonly("dim_range", [](const C& /*self*/) { return std::make_pair(size_t(r), size_t(rC)); });
   c.def_property_readonly("static_id", [](const C& /*self*/) { return C::static_id(); });
   c.def_property_readonly("name", [](const C& self) { return self.name(); });
 
