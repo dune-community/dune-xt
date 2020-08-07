@@ -112,28 +112,29 @@ endmacro()
 
 macro(add_tidy_subdir _dxt_subdir)
   set(BASE ${PROJECT_SOURCE_DIR}/dune/xt/${_dxt_subdir})
+  # including the headercheck sources works around our headers needing included config.h to function adding "-extra-
+  # arg-before='-include config.h'" to TIDY_ARGS results in a tidy error despite the arg actually being applied
+  # correctly
   file(GLOB_RECURSE _files
-                    "${BASE}/*.hh"
+                    "${PROJECT_BINARY_DIR}/headercheck/dune/xt/${_dxt_subdir}/*.cc"
                     "${BASE}/*.cc"
                     "${BASE}/*.cxx"
                     "${BASE}/*.cpp"
-                    "${BASE}/*.hpp"
-                    "${BASE}/*.h"
-                    "${BASE}/*.c"
-                    "${BASE}/*.pbh")
+                    "${BASE}/*.c")
   set(BASE ${PROJECT_SOURCE_DIR}/python/dune/xt/${_dxt_subdir})
   file(GLOB_RECURSE _pyfiles
-                    "${BASE}/*.hh"
+                    "${PROJECT_BINARY_DIR}/headercheck/python/dune/xt/${_dxt_subdir}/*.cc"
                     "${BASE}/*.cc"
                     "${BASE}/*.cxx"
                     "${BASE}/*.cpp"
-                    "${BASE}/*.hpp"
-                    "${BASE}/*.h"
-                    "${BASE}/*.c"
-                    "${BASE}/*.pbh")
+                    "${BASE}/*.c")
   list(APPEND _files ${_pyfiles})
   list(REMOVE_DUPLICATES _files)
-  set(TIDY_ARGS -config= -format-style=file -p=${CMAKE_CURRENT_BINARY_DIR} )
+  set(TIDY_ARGS
+      -config=
+      -format-style=file
+      -p=${CMAKE_CURRENT_BINARY_DIR}
+      -header-filter=\".*/dune/xt/${_dxt_subdir}.*\")
   add_custom_target(tidy_${_dxt_subdir}
                     COMMAND ${ClangTidy_EXECUTABLE} ${TIDY_ARGS}
                             -export-fixes=${CMAKE_CURRENT_BINARY_DIR}/clang-tidy.fixes ${_files}
