@@ -39,7 +39,7 @@
 
 
 // this is used by other headers
-typedef Dune::OneDGrid ONED_1D;
+using ONED_1D = Dune::OneDGrid;
 typedef Dune::YaspGrid<1, Dune::EquidistantOffsetCoordinates<double, 1>> YASP_1D_EQUIDISTANT_OFFSET;
 typedef Dune::YaspGrid<2, Dune::EquidistantOffsetCoordinates<double, 2>> YASP_2D_EQUIDISTANT_OFFSET;
 typedef Dune::YaspGrid<3, Dune::EquidistantOffsetCoordinates<double, 3>> YASP_3D_EQUIDISTANT_OFFSET;
@@ -53,8 +53,8 @@ typedef Dune::ALUGrid<3, 3, Dune::simplex, Dune::nonconforming> ALU_3D_SIMPLEX_N
 typedef Dune::ALUGrid<3, 3, Dune::cube, Dune::nonconforming> ALU_3D_CUBE;
 #endif
 #if HAVE_DUNE_UGGRID || HAVE_UG
-typedef Dune::UGGrid<2> UG_2D;
-typedef Dune::UGGrid<3> UG_3D;
+using UG_2D = Dune::UGGrid<2>;
+using UG_3D = Dune::UGGrid<3>;
 #endif
 #if HAVE_ALBERTA
 typedef Dune::AlbertaGrid<2, 2> ALBERTA_2D;

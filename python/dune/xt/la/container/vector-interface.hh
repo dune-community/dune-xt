@@ -40,8 +40,8 @@ auto bind_Vector(pybind11::module& m)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef typename C::ScalarType S;
-  typedef typename C::RealType R;
+  using S = typename C::ScalarType;
+  using R = typename C::RealType;
 
   const auto ClassName = Common::to_camel_case(bindings::container_name<C>::value());
 

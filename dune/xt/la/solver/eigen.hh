@@ -86,8 +86,8 @@ template <class S, class CommunicatorType>
 class Solver<EigenDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
-  typedef EigenDenseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType R;
+  using MatrixType = EigenDenseMatrix<S>;
+  using R = typename MatrixType::RealType;
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
@@ -330,11 +330,11 @@ class Solver<EigenRowMajorSparseMatrix<S>, CommunicatorType> : protected interna
   typedef ::Eigen::SparseMatrix<S, ::Eigen::ColMajor> ColMajorBackendType;
 
 public:
-  typedef EigenRowMajorSparseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType R;
+  using MatrixType = EigenRowMajorSparseMatrix<S>;
+  using R = typename MatrixType::RealType;
 
 private:
-  typedef typename MatrixType::BackendType::Index EIGEN_size_t;
+  using EIGEN_size_t = typename MatrixType::BackendType::Index;
 
 public:
   Solver(const MatrixType& matrix)
@@ -382,7 +382,7 @@ public:
     const bool check_for_inf_nan = opts.get("check_for_inf_nan", default_opts.get<bool>("check_for_inf_nan"));
     if (check_for_inf_nan) {
       // iterates over the non-zero entries of matrix_.backend() and checks them
-      typedef typename MatrixType::BackendType::InnerIterator InnerIterator;
+      using InnerIterator = typename MatrixType::BackendType::InnerIterator;
       for (EIGEN_size_t ii = 0; ii < matrix_.backend().outerSize(); ++ii) {
         for (InnerIterator it(matrix_.backend(), ii); it; ++it) {
           if (Common::isnan(std::real(it.value())) || Common::isnan(std::imag(it.value()))
@@ -411,7 +411,7 @@ public:
         ColMajorBackendType colmajor_copy(matrix_.backend());
         colmajor_copy -= matrix_.backend().adjoint();
         // iterates over non-zero entries as above
-        typedef typename ColMajorBackendType::InnerIterator InnerIterator;
+        using InnerIterator = typename ColMajorBackendType::InnerIterator;
         for (EIGEN_size_t ii = 0; ii < colmajor_copy.outerSize(); ++ii) {
           for (InnerIterator it(colmajor_copy, ii); it; ++it) {
             if (std::max(std::abs(std::real(it.value())), std::abs(std::imag(it.value())))
@@ -427,43 +427,39 @@ public:
     }
     ::Eigen::ComputationInfo info;
     if (type == "cg.diagonal.lower") {
-      typedef ::Eigen::
-          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::DiagonalPreconditioner<S>>
-              SolverType;
+      using SolverType = ::Eigen::
+          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::DiagonalPreconditioner<S>>;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "cg.diagonal.upper") {
-      typedef ::Eigen::
-          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Upper, ::Eigen::DiagonalPreconditioner<S>>
-              SolverType;
+      using SolverType = ::Eigen::
+          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Upper, ::Eigen::DiagonalPreconditioner<S>>;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "cg.identity.lower") {
-      typedef ::Eigen::
-          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::IdentityPreconditioner>
-              SolverType;
+      using SolverType =
+          ::Eigen::ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::IdentityPreconditioner>;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "cg.identity.upper") {
-      typedef ::Eigen::
-          ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::IdentityPreconditioner>
-              SolverType;
+      using SolverType =
+          ::Eigen::ConjugateGradient<typename MatrixType::BackendType, ::Eigen::Lower, ::Eigen::IdentityPreconditioner>;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.ilut") {
-      typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<S>> SolverType;
+      using SolverType = ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IncompleteLUT<S>>;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
@@ -474,14 +470,14 @@ public:
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.diagonal") {
-      typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<S>> SolverType;
+      using SolverType = ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::DiagonalPreconditioner<S>>;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
       solution.backend() = solver.solve(rhs.backend());
       info = solver.info();
     } else if (type == "bicgstab.identity") {
-      typedef ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner> SolverType;
+      using SolverType = ::Eigen::BiCGSTAB<typename MatrixType::BackendType, ::Eigen::IdentityPreconditioner>;
       SolverType solver(matrix_.backend());
       solver.setMaxIterations(opts.get("max_iter", default_opts.get<int>("max_iter")));
       solver.setTolerance(opts.get("precision", default_opts.get<R>("precision")));
@@ -490,7 +486,7 @@ public:
     } else if (type == "lu.sparse") {
       ColMajorBackendType colmajor_copy(matrix_.backend());
       colmajor_copy.makeCompressed();
-      typedef ::Eigen::SparseLU<ColMajorBackendType> SolverType;
+      using SolverType = ::Eigen::SparseLU<ColMajorBackendType>;
       SolverType solver;
       solver.analyzePattern(colmajor_copy);
       solver.factorize(colmajor_copy);
@@ -499,7 +495,7 @@ public:
     } else if (type == "qr.sparse") {
       ColMajorBackendType colmajor_copy(matrix_.backend());
       colmajor_copy.makeCompressed();
-      typedef ::Eigen::SparseQR<ColMajorBackendType, ::Eigen::COLAMDOrdering<int>> SolverType;
+      using SolverType = ::Eigen::SparseQR<ColMajorBackendType, ::Eigen::COLAMDOrdering<int>>;
       SolverType solver;
       solver.analyzePattern(colmajor_copy);
       solver.factorize(colmajor_copy);
@@ -508,7 +504,7 @@ public:
     } else if (type == "ldlt.simplicial") {
       ColMajorBackendType colmajor_copy(matrix_.backend());
       colmajor_copy.makeCompressed();
-      typedef ::Eigen::SimplicialLDLT<ColMajorBackendType> SolverType;
+      using SolverType = ::Eigen::SimplicialLDLT<ColMajorBackendType>;
       SolverType solver;
       solver.analyzePattern(colmajor_copy);
       solver.factorize(colmajor_copy);
@@ -517,7 +513,7 @@ public:
     } else if (type == "llt.simplicial") {
       ColMajorBackendType colmajor_copy(matrix_.backend());
       colmajor_copy.makeCompressed();
-      typedef ::Eigen::SimplicialLLT<ColMajorBackendType> SolverType;
+      using SolverType = ::Eigen::SimplicialLLT<ColMajorBackendType>;
       SolverType solver;
       solver.analyzePattern(colmajor_copy);
       solver.factorize(colmajor_copy);

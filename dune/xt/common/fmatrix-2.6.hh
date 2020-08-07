@@ -155,7 +155,7 @@ private:
     ElimPivot(std::vector<size_type>& pivot)
       : pivot_(pivot)
     {
-      typedef typename std::vector<size_type>::size_type size_type;
+      using size_type = typename std::vector<size_type>::size_type;
       for (size_type i = 0; i < pivot_.size(); ++i)
         pivot_[i] = i;
     }
@@ -222,7 +222,7 @@ template <class K, int ROWS, int COLS>
 template <typename Func>
 inline void FieldMatrix<K, ROWS, COLS>::luDecomposition(FieldMatrix<K, ROWS, COLS>& A, Func func) const
 {
-  typedef typename FieldTraits<value_type>::real_type real_type;
+  using real_type = typename FieldTraits<value_type>::real_type;
   real_type norm = A.infinity_norm_real(); // for relative thresholds
   real_type singthres =
       std::max(FMatrixPrecision<real_type>::absolute_limit(), norm * FMatrixPrecision<real_type>::singular_limit());
@@ -779,10 +779,10 @@ template <class K, int N, int M>
 struct MatrixAbstraction<Dune::XT::Common::FieldMatrix<K, N, M>>
 {
   typedef Dune::XT::Common::FieldMatrix<K, N, M> MatrixType;
-  typedef typename Dune::FieldTraits<K>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<K>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using ScalarType = typename Dune::FieldTraits<K>::field_type;
+  using RealType = typename Dune::FieldTraits<K>::real_type;
+  using S = ScalarType;
+  using R = RealType;
   template <size_t rows = N, size_t cols = M, class FieldType = K>
   using MatrixTypeTemplate = Dune::XT::Common::FieldMatrix<FieldType, rows, cols>;
 
@@ -857,10 +857,10 @@ template <class K, size_t num_blocks, size_t block_rows, size_t block_cols>
 struct MatrixAbstraction<Dune::XT::Common::BlockedFieldMatrix<K, num_blocks, block_rows, block_cols>>
 {
   typedef Dune::XT::Common::BlockedFieldMatrix<K, num_blocks, block_rows, block_cols> MatrixType;
-  typedef typename Dune::FieldTraits<K>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<K>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using ScalarType = typename Dune::FieldTraits<K>::field_type;
+  using RealType = typename Dune::FieldTraits<K>::real_type;
+  using S = ScalarType;
+  using R = RealType;
 
   static const bool is_matrix = true;
 

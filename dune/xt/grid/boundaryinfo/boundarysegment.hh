@@ -43,8 +43,8 @@ static inline Common::Configuration boundarysegment_boundaryinfo_default_config(
 template <class IntersectionImp>
 class BoundarySegmentIndexBasedBoundaryInfo : public BoundaryInfo<IntersectionImp>
 {
-  typedef BoundaryInfo<IntersectionImp> BaseType;
-  typedef BoundarySegmentIndexBasedBoundaryInfo<IntersectionImp> ThisType;
+  using BaseType = BoundaryInfo<IntersectionImp>;
+  using ThisType = BoundarySegmentIndexBasedBoundaryInfo<IntersectionImp>;
 
 public:
   using BaseType::dimDomain;

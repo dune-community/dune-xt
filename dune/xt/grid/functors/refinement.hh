@@ -29,7 +29,7 @@ template <class GridViewType>
 struct MaximumEntityVolumeRefineFunctor : public ElementFunctor<GridViewType>
 {
   typedef ElementFunctor<GridViewType> BaseType;
-  typedef typename GridViewType::GridType GridType;
+  using GridType = typename extract_grid<GridViewType>::type;
 
   MaximumEntityVolumeRefineFunctor(GridType& grid, double volume, double factor)
     : threshold_volume_(volume * factor)

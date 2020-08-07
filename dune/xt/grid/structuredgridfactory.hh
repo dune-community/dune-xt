@@ -134,7 +134,7 @@ static std::array<unsigned int, GridType::dimension> default_overlap()
 template <class GridType>
 class StructuredGridFactory : public Dune::StructuredGridFactory<GridType>
 {
-  typedef typename GridType::ctype ctype;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -161,8 +161,8 @@ public:
 template <int dim>
 class StructuredGridFactory<UGGrid<dim>> : public Dune::StructuredGridFactory<UGGrid<dim>>
 {
-  typedef UGGrid<dim> GridType;
-  typedef typename GridType::ctype ctype;
+  using GridType = UGGrid<dim>;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -254,7 +254,7 @@ class StructuredGridFactory<ALUGrid<dim, dim_world, Dune::cube, refineType, Comm
   : public Dune::StructuredGridFactory<ALUGrid<dim, dim_world, Dune::cube, refineType, Comm>>
 {
   typedef ALUGrid<dim, dim_world, Dune::cube, refineType, Comm> GridType;
-  typedef typename GridType::ctype ctype;
+  using ctype = typename GridType::ctype;
 
 public:
   static std::shared_ptr<GridType>
@@ -307,7 +307,7 @@ class StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
   : public Dune::StructuredGridFactory<Dune::YaspGrid<dim, Coords>>
 {
   typedef Dune::YaspGrid<dim, Coords> GridType;
-  typedef typename GridType::ctype ctype;
+  using ctype = typename GridType::ctype;
 
 public:
   //! creates a non-periodic Yasp grid

@@ -30,43 +30,43 @@ struct Container;
 template <class ScalarType>
 struct Container<ScalarType, Backends::common_dense>
 {
-  typedef CommonDenseVector<ScalarType> VectorType;
-  typedef CommonDenseMatrix<ScalarType> MatrixType;
+  using VectorType = CommonDenseVector<ScalarType>;
+  using MatrixType = CommonDenseMatrix<ScalarType>;
 }; // struct Container<..., common_dense>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::common_sparse>
 {
-  typedef CommonDenseVector<ScalarType> VectorType;
-  typedef CommonSparseMatrix<ScalarType> MatrixType;
+  using VectorType = CommonDenseVector<ScalarType>;
+  using MatrixType = CommonSparseMatrix<ScalarType>;
 }; // struct Container<..., common_sparse>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::eigen_dense>
 {
-  typedef EigenDenseVector<ScalarType> VectorType;
-  typedef EigenDenseMatrix<ScalarType> MatrixType;
+  using VectorType = EigenDenseVector<ScalarType>;
+  using MatrixType = EigenDenseMatrix<ScalarType>;
 }; // struct Container<..., eigen_dense>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::eigen_sparse>
 {
-  typedef EigenDenseVector<ScalarType> VectorType;
-  typedef EigenRowMajorSparseMatrix<ScalarType> MatrixType;
+  using VectorType = EigenDenseVector<ScalarType>;
+  using MatrixType = EigenRowMajorSparseMatrix<ScalarType>;
 }; // struct Container<..., eigen_sparse>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::istl_dense>
 {
-  typedef IstlDenseVector<ScalarType> VectorType;
-  typedef IstlRowMajorSparseMatrix<ScalarType> MatrixType;
+  using VectorType = IstlDenseVector<ScalarType>;
+  using MatrixType = IstlRowMajorSparseMatrix<ScalarType>;
 }; // struct Container<..., istl_dense>
 
 template <class ScalarType>
 struct Container<ScalarType, Backends::istl_sparse>
 {
-  typedef IstlDenseVector<ScalarType> VectorType;
-  typedef IstlRowMajorSparseMatrix<ScalarType> MatrixType;
+  using VectorType = IstlDenseVector<ScalarType>;
+  using MatrixType = IstlRowMajorSparseMatrix<ScalarType>;
 }; // struct Container<..., istl_sparse>
 
 

@@ -390,7 +390,7 @@ int main() {
 template <typename T = void>
 class EnableDebugLoggingForCtors
 {
-  typedef EnableDebugLoggingForCtors<T> ThisType;
+  using ThisType = EnableDebugLoggingForCtors<T>;
 
 public:
   EnableDebugLoggingForCtors(const std::string&

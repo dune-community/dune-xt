@@ -665,10 +665,10 @@ template <class K, int N, int M>
 struct MatrixAbstraction<Dune::XT::Common::FieldMatrix<K, N, M>>
 {
   typedef Dune::XT::Common::FieldMatrix<K, N, M> MatrixType;
-  typedef typename Dune::FieldTraits<K>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<K>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using ScalarType = typename Dune::FieldTraits<K>::field_type;
+  using RealType = typename Dune::FieldTraits<K>::real_type;
+  using S = ScalarType;
+  using R = RealType;
   template <size_t rows = N, size_t cols = M, class FieldType = K>
   using MatrixTypeTemplate = Dune::XT::Common::FieldMatrix<FieldType, rows, cols>;
 
@@ -743,10 +743,10 @@ template <class K, size_t num_blocks, size_t block_rows, size_t block_cols>
 struct MatrixAbstraction<Dune::XT::Common::BlockedFieldMatrix<K, num_blocks, block_rows, block_cols>>
 {
   typedef Dune::XT::Common::BlockedFieldMatrix<K, num_blocks, block_rows, block_cols> MatrixType;
-  typedef typename Dune::FieldTraits<K>::field_type ScalarType;
-  typedef typename Dune::FieldTraits<K>::real_type RealType;
-  typedef ScalarType S;
-  typedef RealType R;
+  using ScalarType = typename Dune::FieldTraits<K>::field_type;
+  using RealType = typename Dune::FieldTraits<K>::real_type;
+  using S = ScalarType;
+  using R = RealType;
 
   static const bool is_matrix = true;
 

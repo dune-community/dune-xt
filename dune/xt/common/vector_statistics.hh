@@ -28,7 +28,7 @@ typename std::enable_if<is_vector<VectorType>::value, typename VectorAbstraction
 standard_deviation(const VectorType& vector)
 {
   using namespace boost::accumulators;
-  typedef typename VectorAbstraction<VectorType>::S FieldType;
+  using FieldType = typename VectorAbstraction<VectorType>::S;
   accumulator_set<FieldType, stats<tag::lazy_variance>> acc;
   std::for_each(vector.begin(), vector.end(), [&](FieldType value) { acc(value); });
   return std::sqrt(variance(acc));

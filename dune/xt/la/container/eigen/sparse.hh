@@ -175,7 +175,7 @@ public:
     if (prune) {
       // we do this here instead of using pattern(true), since we can build the triplets along the way which is more
       // efficient
-      typedef ::Eigen::Triplet<ScalarType> TripletType;
+      using TripletType = ::Eigen::Triplet<ScalarType>;
       const ScalarType zero(0);
       std::vector<TripletType> triplets;
       triplets.reserve(mat.nonZeros());
@@ -412,7 +412,7 @@ public:
   bool valid() const
   {
     // iterate over non-zero entries
-    typedef typename BackendType::InnerIterator InnerIterator;
+    using InnerIterator = typename BackendType::InnerIterator;
     for (EIGEN_size_t ii = 0; ii < backend().outerSize(); ++ii) {
       for (InnerIterator it(backend(), ii); it; ++it) {
         if (Common::isnan(it.value()) || Common::isinf(it.value()))

@@ -91,7 +91,7 @@ auto bind_Matrix(pybind11::module& m)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef typename C::ScalarType S;
+  using S = typename C::ScalarType;
 
   const auto ClassName = Common::to_camel_case(bindings::container_name<C>::value());
 

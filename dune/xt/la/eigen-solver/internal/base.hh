@@ -509,7 +509,7 @@ protected:
         // and imaginary parts of the complex eigenvectors
         for (size_t kk = 0; kk < eigenvalue_groups.size(); ++kk) {
           const auto& group = eigenvalue_groups[kk];
-          typedef typename XT::LA::CommonDenseVector<RealType> RealVectorType;
+          using RealVectorType = typename XT::LA::CommonDenseVector<RealType>;
           std::vector<RealVectorType> input_vectors(2 * eigenvalue_multiplicity[kk], RealVectorType(rows, 0.));
           size_t index = 0;
           for (const auto& jj : group) {

@@ -44,9 +44,9 @@ auto bind_Spe10Model1Function_2D(pybind11::module& m, const std::string& grid_id
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef typename G::template Codim<0>::Entity E;
-  typedef typename G::ctype D;
-  typedef double R;
+  using E = typename G::template Codim<0>::Entity;
+  using D = typename G::ctype;
+  using R = double;
 
   typedef GridFunctionInterface<E, r, rC, R> I;
   typedef Spe10::Model1Function<E, r, rC, R> C;

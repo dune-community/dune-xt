@@ -265,12 +265,12 @@ template <class ValueImp>
 class UnsafePerThreadValue : public boost::noncopyable
 {
 public:
-  typedef ValueImp ValueType;
+  using ValueType = ValueImp;
   typedef typename std::conditional<std::is_const<ValueImp>::value, ValueImp, const ValueImp>::type ConstValueType;
 
 private:
-  typedef UnsafePerThreadValue<ValueImp> ThisType;
-  typedef std::deque<std::unique_ptr<ValueType>> ContainerType;
+  using ThisType = UnsafePerThreadValue<ValueImp>;
+  using ContainerType = std::deque<std::unique_ptr<ValueType>>;
 
 public:
   //! Initialization by copy construction of ValueType
@@ -328,7 +328,7 @@ public:
   template <class BinaryOperation>
   ValueType accumulate(ValueType init, BinaryOperation op) const
   {
-    typedef const typename ContainerType::value_type ptr;
+    using ptr = const typename ContainerType::value_type;
     auto l = [&](ConstValueType& a, ptr& b) { return op(a, *b); };
     return std::accumulate(values_.begin(), values_.end(), init, l);
   }

@@ -126,7 +126,7 @@ bind_combined_Function(pybind11::module& m)
 {
   namespace py = pybind11;
 
-  typedef double R;
+  using R = double;
   typedef FunctionInterface<d, lr, lrC, R> Left;
   typedef FunctionInterface<d, rr, rrC, R> Right;
   static const size_t r = C::range_dim;

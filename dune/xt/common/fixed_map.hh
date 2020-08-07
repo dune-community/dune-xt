@@ -31,7 +31,7 @@ class FixedMapIterator
   : public boost::
         iterator_facade<FixedMapIterator<FixedMapType>, typename FixedMapType::value_type, boost::forward_traversal_tag>
 {
-  typedef FixedMapIterator<FixedMapType> ThisType;
+  using ThisType = FixedMapIterator<FixedMapType>;
 
 public:
   FixedMapIterator()
@@ -73,7 +73,7 @@ class ConstFixedMapIterator
                                   const typename FixedMapType::value_type,
                                   boost::forward_traversal_tag>
 {
-  typedef ConstFixedMapIterator<FixedMapType> ThisType;
+  using ThisType = ConstFixedMapIterator<FixedMapType>;
 
 public:
   ConstFixedMapIterator()
@@ -140,10 +140,10 @@ private:
   }
 
 public:
-  typedef key_imp key_type;
-  typedef T mapped_type;
-  typedef FixedMapIterator<ThisType> iterator;
-  typedef ConstFixedMapIterator<ThisType> const_iterator;
+  using key_type = key_imp;
+  using mapped_type = T;
+  using iterator = FixedMapIterator<ThisType>;
+  using const_iterator = ConstFixedMapIterator<ThisType>;
 
   FixedMap() {}
   /** inserts key-value value pairs from  initializer list

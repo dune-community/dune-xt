@@ -102,11 +102,11 @@ template <class GridLayerType>
 struct Dimensions
 {
   static_assert(is_layer<GridLayerType>::value, "");
-  typedef extract_grid_t<GridLayerType> GridType;
+  using GridType = extract_grid_t<GridLayerType>;
   //! automatic running min/max
-  typedef Dune::XT::Common::MinMaxAvg<typename GridType::ctype> MinMaxAvgType;
+  using MinMaxAvgType = Dune::XT::Common::MinMaxAvg<typename GridType::ctype>;
   typedef std::array<MinMaxAvgType, GridType::dimensionworld> CoordLimitsType;
-  typedef typename GridType::template Codim<0>::Entity ElementType;
+  using ElementType = typename GridType::template Codim<0>::Entity;
   using BoundingBoxType = std::array<FieldVector<typename GridType::ctype, GridType::dimensionworld>, 2>;
   CoordLimitsType coord_limits;
   MinMaxAvgType entity_volume;

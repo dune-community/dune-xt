@@ -29,7 +29,7 @@ template <class T>
 struct EpsilonType<std::complex<T>>
 {
   //! The epsilon type corresponding to value type std::complex<T>
-  typedef std::complex<T> Type;
+  using Type = std::complex<T>;
 };
 } // namespace FloatCmp
 namespace XT {

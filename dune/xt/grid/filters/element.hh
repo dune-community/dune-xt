@@ -163,7 +163,7 @@ class PartitionSetElements : public ElementFilter<GL>
 
 public:
   using typename BaseType::GridViewType;
-  typedef typename BaseType::ElementType ElementType;
+  using ElementType = typename BaseType::ElementType;
 
   explicit PartitionSetElements() = default;
 

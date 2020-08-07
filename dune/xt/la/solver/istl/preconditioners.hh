@@ -27,12 +27,12 @@ class IdentityPreconditioner : public Dune::Preconditioner<typename O::domain_ty
 {
 public:
   //! \brief The domain type of the preconditioner.
-  typedef typename O::domain_type domain_type;
+  using domain_type = typename O::domain_type;
   //! \brief The range type of the preconditioner.
-  typedef typename O::range_type range_type;
+  using range_type = typename O::range_type;
   //! \brief The field type of the preconditioner.
-  typedef typename range_type::field_type field_type;
-  typedef O InverseOperator;
+  using field_type = typename range_type::field_type;
+  using InverseOperator = O;
 
   IdentityPreconditioner(const SolverCategory::Category cat)
     : category_(cat)

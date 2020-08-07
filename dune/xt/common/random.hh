@@ -32,12 +32,12 @@ struct UniformDistributionSelector
 template <typename T>
 struct UniformDistributionSelector<T, true>
 {
-  typedef std::uniform_int_distribution<T> type;
+  using type = std::uniform_int_distribution<T>;
 };
 template <typename T>
 struct UniformDistributionSelector<T, false>
 {
-  typedef std::uniform_real_distribution<T> type;
+  using type = std::uniform_real_distribution<T>;
 };
 
 /** RandomNumberGenerator adapter
@@ -49,8 +49,8 @@ struct UniformDistributionSelector<T, false>
 template <class T, class DistributionImp, class EngineImp = std::mt19937>
 struct RNG
 {
-  typedef DistributionImp DistributionType;
-  typedef EngineImp EngineType;
+  using DistributionType = DistributionImp;
+  using EngineType = EngineImp;
   EngineType generator;
   DistributionType distribution;
   RNG(EngineType g, DistributionType d)
@@ -67,8 +67,8 @@ struct RNG
 template <class T, class DistributionImp, class EngineImp>
 struct RNG<std::complex<T>, DistributionImp, EngineImp>
 {
-  typedef DistributionImp DistributionType;
-  typedef EngineImp EngineType;
+  using DistributionType = DistributionImp;
+  using EngineType = EngineImp;
   EngineType generator;
   DistributionType distribution;
   RNG(EngineType g, DistributionType d)
@@ -141,8 +141,8 @@ public:
 template <class VectorType>
 class DefaultRNG<VectorType, true>
 {
-  typedef typename VectorAbstraction<VectorType>::S T;
-  typedef DefaultRNG<T> RngType;
+  using T = typename VectorAbstraction<VectorType>::S;
+  using RngType = DefaultRNG<T>;
 
 public:
   DefaultRNG(VectorType min_vec = VectorAbstraction<VectorType>::create(VectorAbstraction<VectorType>::has_static_size

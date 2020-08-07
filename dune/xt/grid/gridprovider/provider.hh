@@ -44,13 +44,13 @@ class GridProvider
   static_assert(is_grid<GridImp>::value, "");
 
 public:
-  typedef GridProvider<GridImp> ThisType;
+  using ThisType = GridProvider<GridImp>;
 
-  typedef GridImp GridType;
+  using GridType = GridImp;
   static const size_t dimDomain = GridImp::dimension;
-  typedef typename GridType::ctype DomainFieldType;
+  using DomainFieldType = typename GridType::ctype;
   typedef FieldVector<DomainFieldType, dimDomain> DomainType;
-  typedef typename GridType::template Codim<0>::Entity EntityType;
+  using EntityType = typename GridType::template Codim<0>::Entity;
   typedef typename Layer<GridType, Layers::level, Backends::view>::type LevelGridViewType;
   typedef typename Layer<GridType, Layers::leaf, Backends::view>::type LeafGridViewType;
 
@@ -208,7 +208,7 @@ private:
     if (GridType::dimension > 3) // give us a call if you have any idea!
       DUNE_THROW(NotImplemented, "For grids of dimension > 3!");
     // boundary info
-    typedef XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection> BoundaryInfoFactory;
+    using BoundaryInfoFactory = XT::Grid::BoundaryInfoFactory<typename LevelGridViewType::Intersection>;
     auto boundary_info_ptr = BoundaryInfoFactory::create(boundary_info_cfg);
     for (auto lvl : Common::value_range(max_level() + 1)) {
       auto grid_view = level_view(lvl);

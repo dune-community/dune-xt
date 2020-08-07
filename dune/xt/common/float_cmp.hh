@@ -34,7 +34,7 @@ namespace FloatCmp {
 template <class T, Style style = Style::defaultStyle, bool = std::is_integral<T>::value>
 struct DefaultEpsilon
 {
-  typedef typename Dune::FloatCmp::EpsilonType<T>::Type Type;
+  using Type = typename Dune::FloatCmp::EpsilonType<T>::Type;
   static Type value()
   {
     return Dune::FloatCmp::DefaultEpsilon<T, internal::ConvertStyle<style>::value>::value();
@@ -44,7 +44,7 @@ struct DefaultEpsilon
 template <class T, Style style>
 struct DefaultEpsilon<std::complex<T>, style, false>
 {
-  typedef typename Dune::FloatCmp::EpsilonType<std::complex<T>>::Type Type;
+  using Type = typename Dune::FloatCmp::EpsilonType<std::complex<T>>::Type;
   static Type value()
   {
     const auto val = Dune::FloatCmp::DefaultEpsilon<T, internal::ConvertStyle<style>::value>::value();
@@ -55,7 +55,7 @@ struct DefaultEpsilon<std::complex<T>, style, false>
 template <class T>
 struct DefaultEpsilon<T, Style::numpy, false>
 {
-  typedef typename Dune::FloatCmp::EpsilonType<T>::Type Type;
+  using Type = typename Dune::FloatCmp::EpsilonType<T>::Type;
   static Type value()
   {
     return Dune::FloatCmp::DefaultEpsilon<T, Dune::FloatCmp::relativeStrong>::value();
@@ -66,7 +66,7 @@ struct DefaultEpsilon<T, Style::numpy, false>
 template <class T>
 struct DefaultEpsilon<std::complex<T>, Style::numpy, false>
 {
-  typedef typename Dune::FloatCmp::EpsilonType<std::complex<T>>::Type Type;
+  using Type = typename Dune::FloatCmp::EpsilonType<std::complex<T>>::Type;
   static Type value()
   {
     const auto val = Dune::FloatCmp::DefaultEpsilon<T, Dune::FloatCmp::relativeStrong>::value();
@@ -79,7 +79,7 @@ struct DefaultEpsilon<std::complex<T>, Style::numpy, false>
 template <class T, Style style>
 struct DefaultEpsilon<T, style, true>
 {
-  typedef T Type;
+  using Type = T;
   static T value()
   {
     return std::numeric_limits<T>::epsilon();
@@ -89,7 +89,7 @@ struct DefaultEpsilon<T, style, true>
 template <class T>
 struct DefaultEpsilon<T, Style::numpy, true>
 {
-  typedef T Type;
+  using Type = T;
   static T value()
   {
     return std::numeric_limits<T>::epsilon();
@@ -102,7 +102,7 @@ struct MT
   typedef typename std::conditional<Dune::XT::Common::is_matrix<V>::value,
                                     typename Dune::XT::Common::MatrixAbstraction<V>::S,
                                     typename Dune::XT::Common::VectorAbstraction<V>::S>::type T;
-  typedef typename Dune::FloatCmp::EpsilonType<typename MT<V>::T>::Type Eps;
+  using Eps = typename Dune::FloatCmp::EpsilonType<typename MT<V>::T>::Type;
 };
 
 #include "float_cmp_generated.hxx"

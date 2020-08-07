@@ -168,7 +168,7 @@ std::pair<typename MapType::iterator, bool> map_emplace(MapType& map_in,
 template <typename T>
 struct remove_const_reference
 {
-  typedef typename std::remove_reference<typename std::remove_const<T>::type>::type type;
+  using type = typename std::remove_reference<typename std::remove_const<T>::type>::type;
 };
 
 } // namespace Common

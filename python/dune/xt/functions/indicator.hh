@@ -36,9 +36,9 @@ auto bind_IndicatorGridFunction(pybind11::module& m, const std::string& grid_id)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef typename G::template Codim<0>::Entity E;
-  typedef typename G::ctype D;
-  typedef double R;
+  using E = typename G::template Codim<0>::Entity;
+  using D = typename G::ctype;
+  using R = double;
   typedef GridFunctionInterface<E, r, rC, R> I;
   typedef IndicatorGridFunction<E, r, rC, R> C;
   using DomainType = typename C::DomainType;
@@ -82,8 +82,8 @@ bind_IndicatorFunction(pybind11::module& m)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef double D;
-  typedef double R;
+  using D = double;
+  using R = double;
   typedef FunctionInterface<d, r, rC, R> I;
   typedef IndicatorFunction<d, r, rC, R> C;
   using DomainType = typename C::DomainType;

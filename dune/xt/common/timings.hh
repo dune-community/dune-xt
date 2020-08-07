@@ -61,7 +61,7 @@ public:
 
   void stop();
 
-  typedef boost::timer::nanosecond_type TimeType;
+  using TimeType = boost::timer::nanosecond_type;
   typedef std::array<TimeType, 3> DeltaType;
 
   /** \return array{wall,user,sys}: times elapsed since object construction in

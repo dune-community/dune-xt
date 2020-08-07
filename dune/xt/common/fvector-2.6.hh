@@ -802,8 +802,8 @@ typename std::enable_if<SIZE != 1, K>::type operator*(const Dune::FieldVector<K,
 template <class K, int SIZE>
 struct FieldTraits<XT::Common::FieldVector<K, SIZE>>
 {
-  typedef typename FieldTraits<K>::field_type field_type;
-  typedef typename FieldTraits<K>::real_type real_type;
+  using field_type = typename FieldTraits<K>::field_type;
+  using real_type = typename FieldTraits<K>::real_type;
 };
 
 
@@ -819,7 +819,7 @@ template <class K, int SIZE>
 struct hash<Dune::FieldVector<K, SIZE>>
 {
   typedef Dune::FieldVector<K, SIZE> argument_type;
-  typedef std::size_t result_type;
+  using result_type = std::size_t;
 
   result_type operator()(argument_type const& s) const noexcept
   {
@@ -839,7 +839,7 @@ template <class K, int SIZE>
 struct hash<Dune::XT::Common::FieldVector<K, SIZE>>
 {
   typedef Dune::XT::Common::FieldVector<K, SIZE> argument_type;
-  typedef std::size_t result_type;
+  using result_type = std::size_t;
 
   result_type operator()(argument_type const& s) const noexcept
   {

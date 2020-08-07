@@ -87,7 +87,7 @@ struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 2>
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 1>
 {
-  typedef std::tuple<T1> type;
+  using type = std::tuple<T1>;
 };
 
 #define TUPLE_TYPEDEFS_2_TUPLE(t_, s_)                                                                                 \
@@ -193,13 +193,13 @@ struct Combine
     // u_begin is not necessary ;)
     // it would be cheaper not to pre-declare all of them since we force evaluation
     // however this dramatically increase the readability
-    typedef typename begin<VTypes>::type v_begin;
+    using v_begin = typename begin<VTypes>::type;
 
-    typedef typename end<UTypes>::type u_end;
-    typedef typename end<VTypes>::type v_end;
+    using u_end = typename end<UTypes>::type;
+    using v_end = typename end<VTypes>::type;
 
-    typedef typename next<UIterator>::type u_next;
-    typedef typename next<VIterator>::type v_next;
+    using u_next = typename next<UIterator>::type;
+    using v_next = typename next<VIterator>::type;
 
     typedef
         typename if_<boost::is_same<v_next, v_end>,

@@ -52,8 +52,8 @@ template <class MatrixImp, class CommunicatorType>
 class Solver<MatrixView<MatrixImp>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
-  typedef MatrixView<MatrixImp> MatrixType;
-  typedef typename MatrixType::RealType R;
+  using MatrixType = MatrixView<MatrixImp>;
+  using R = typename MatrixType::RealType;
   using ActualSolver = Solver<MatrixImp, CommunicatorType>;
 
   Solver(const MatrixType& matrix_view)

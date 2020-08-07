@@ -141,7 +141,7 @@ private:
   FlagMap flagmap_;
   typedef std::map<int, std::unique_ptr<LogStream>> StreamMap;
   StreamMap streammap_;
-  typedef std::vector<int> IdVec;
+  using IdVec = std::vector<int>;
   IdVec streamIDs_;
   int logflags_;
   EmptyLogStream emptyLogStream_;

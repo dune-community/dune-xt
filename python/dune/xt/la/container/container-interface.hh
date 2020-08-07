@@ -51,7 +51,7 @@ void addbind_ContainerInterface(pybind11::class_<C>& c)
   namespace py = pybind11;
   using namespace pybind11::literals;
 
-  typedef typename C::ScalarType S;
+  using S = typename C::ScalarType;
 
   c.def(
       "copy",
@@ -85,7 +85,7 @@ auto bind_ProvidesDataAccess(pybind11::module& m, const std::string& class_id, c
     return py::class_<C>(m, class_id.c_str(), help_id.c_str());
   } else {
     namespace py = pybind11;
-    typedef typename C::DataType D;
+    using D = typename C::DataType;
     py::class_<C> c(m, class_id.c_str(), help_id.c_str(), py::buffer_protocol());
     if constexpr (is_vector<C>::value) {
       c.def_buffer([](C& vec) -> py::buffer_info {

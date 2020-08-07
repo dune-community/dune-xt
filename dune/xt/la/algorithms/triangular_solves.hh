@@ -33,7 +33,7 @@ namespace internal {
 template <class MatrixType, class VectorType, bool transposed>
 void forward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
 {
-  typedef Common::MatrixAbstraction<MatrixType> M;
+  using M = Common::MatrixAbstraction<MatrixType>;
   for (size_t ii = 0; ii < M::rows(A); ++ii) {
     for (size_t jj = 0; jj < ii; ++jj)
       rhs[ii] -= M::get_entry(A, transposed ? jj : ii, transposed ? ii : jj) * x[jj];
@@ -49,7 +49,7 @@ void forward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
 template <class MatrixType, class VectorType, bool transposed>
 void backward_solve(const MatrixType& A, VectorType& x, VectorType& rhs)
 {
-  typedef Common::MatrixAbstraction<MatrixType> M;
+  using M = Common::MatrixAbstraction<MatrixType>;
   const size_t num_rows = M::rows(A);
   const size_t num_cols = num_rows;
   assert(num_rows < std::numeric_limits<int>::max());
@@ -319,8 +319,8 @@ class TriangularSolver<CommonSparseOrDenseMatrix<DenseMatrixType, SparseMatrixTy
                        Common::StorageLayout::other>
 {
   typedef CommonSparseOrDenseMatrix<DenseMatrixType, SparseMatrixType> MatrixType;
-  typedef Common::VectorAbstraction<MatrixType> M;
-  typedef Common::VectorAbstraction<VectorType> V;
+  using M = Common::VectorAbstraction<MatrixType>;
+  using V = Common::VectorAbstraction<VectorType>;
 
   static void solve(const MatrixType& A, VectorType& x)
   {
@@ -364,9 +364,9 @@ struct triangular_helper<MatrixType, FirstVectorType, SecondVectorType, triangul
                     || triangular_type == Common::MatrixPattern::upper_triangular,
                 "The matrix has to be either upper or lower triangular!");
 
-  typedef Common::VectorAbstraction<FirstVectorType> V1;
-  typedef Common::VectorAbstraction<SecondVectorType> V2;
-  typedef typename V1::ScalarType ScalarType;
+  using V1 = Common::VectorAbstraction<FirstVectorType>;
+  using V2 = Common::VectorAbstraction<SecondVectorType>;
+  using ScalarType = typename V1::ScalarType;
 
   static void solve(const MatrixType& A, FirstVectorType& x, const SecondVectorType& b)
   {

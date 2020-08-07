@@ -41,9 +41,7 @@ namespace XT {
       class Partition;
 
       //! type used to count partitions
-      typedef typename std::iterator_traits<
-          typename std::vector<Iterator>::iterator
-      >::difference_type Size;
+      using Size = typename std::iterator_traits<typename std::vector<Iterator>::iterator>::difference_type;
 
       //! construct
       RangedPartitioning(const GridView &gv, Size partitions) {
@@ -106,9 +104,9 @@ namespace XT {
       //! type of iterator
       typedef XT::Grid::extract_iterator_t<GridView, codim, pit> Iterator;
       //! type of entity
-      typedef XT::Grid::extract_entity_t<GridView> Entity;
+      using Entity = XT::Grid::extract_entity_t<GridView>;
       //! type used to count entites
-      typedef typename std::iterator_traits<Iterator>::difference_type Size;
+      using Size = typename std::iterator_traits<Iterator>::difference_type;
 
       //! Construct partition from scratch
       Partition(const RangedPartitioning &partitioning,

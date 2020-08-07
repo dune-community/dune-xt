@@ -227,7 +227,7 @@ struct ElementVisualization
 
     double operator()(const Element& entity) const
     {
-      typedef typename Element::Geometry EntityGeometryType;
+      using EntityGeometryType = typename Element::Geometry;
       typedef Dune::FieldVector<typename EntityGeometryType::ctype, EntityGeometryType::coorddimension> DomainType;
       const EntityGeometryType& geometry = entity.geometry();
       DomainType baryCenter(0.0);

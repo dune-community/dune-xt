@@ -106,13 +106,13 @@ struct AbsoluteValue<T, true>
 template <class T, bool is_enum = std::is_enum<T>::value>
 struct Absretval
 {
-  typedef T type;
+  using type = T;
 };
 
 template <class T>
 struct Absretval<T, true>
 {
-  typedef typename underlying_type<T>::type type;
+  using type = typename underlying_type<T>::type;
 };
 
 
@@ -123,7 +123,7 @@ struct Absretval<T, true>
 template <class T>
 typename internal::Absretval<T>::type abs(const T& val)
 {
-  typedef typename internal::Absretval<T>::type R;
+  using R = typename internal::Absretval<T>::type;
   return internal::AbsoluteValue<R>::result(static_cast<R>(val));
 }
 
@@ -143,7 +143,7 @@ class MinMaxAvg
   static_assert(!is_complex<ElementType>::value, "complex accumulation not supported");
 
 protected:
-  typedef MinMaxAvg<ElementType> ThisType;
+  using ThisType = MinMaxAvg<ElementType>;
 
 public:
   MinMaxAvg() {}

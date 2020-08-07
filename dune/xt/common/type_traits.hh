@@ -256,7 +256,7 @@ struct is_smart_ptr
   static const bool value = std::is_same<std::unique_ptr<typename T::element_type>, T>::value
                             || std::is_same<std::shared_ptr<typename T::element_type>, T>::value
                             || std::is_same<std::weak_ptr<typename T::element_type>, T>::value;
-  typedef T type;
+  using type = T;
 };
 
 
@@ -514,7 +514,7 @@ struct dependent
   template <T S>
   struct _typename
   {
-    typedef void type;
+    using type = void;
   };
 };
 

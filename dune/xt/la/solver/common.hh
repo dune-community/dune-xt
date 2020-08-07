@@ -56,8 +56,8 @@ template <class S, class CommunicatorType>
 class Solver<CommonDenseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
-  typedef CommonDenseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType R;
+  using MatrixType = CommonDenseMatrix<S>;
+  using R = typename MatrixType::RealType;
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)

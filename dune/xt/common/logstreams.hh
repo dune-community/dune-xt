@@ -50,7 +50,7 @@ class SuspendableStrBuffer : public std::basic_stringbuf<char, std::char_traits<
   typedef std::basic_stringbuf<char, std::char_traits<char>> BaseType;
 
 public:
-  typedef int PriorityType;
+  using PriorityType = int;
   static const PriorityType default_suspend_priority = 0;
 
   SuspendableStrBuffer(int loglevel, int& logflags);
@@ -171,11 +171,11 @@ class LogStream
   : StorageProvider<SuspendableStrBuffer>
   , public std::basic_ostream<char, std::char_traits<char>>
 {
-  typedef StorageProvider<SuspendableStrBuffer> StorageBaseType;
+  using StorageBaseType = StorageProvider<SuspendableStrBuffer>;
   typedef std::basic_ostream<char, std::char_traits<char>> BaseType;
 
 public:
-  typedef SuspendableStrBuffer::PriorityType PriorityType;
+  using PriorityType = SuspendableStrBuffer::PriorityType;
   static const PriorityType default_suspend_priority = SuspendableStrBuffer::default_suspend_priority;
 
   explicit LogStream(SuspendableStrBuffer*&& buffer)
@@ -236,7 +236,7 @@ class TimedPrefixedLogStream
   : StorageProvider<TimedPrefixedStreamBuffer>
   , public std::basic_ostream<char, std::char_traits<char>>
 {
-  typedef StorageProvider<TimedPrefixedStreamBuffer> StorageBaseType;
+  using StorageBaseType = StorageProvider<TimedPrefixedStreamBuffer>;
   typedef std::basic_ostream<char, std::char_traits<char>> OstreamBaseType;
 
 public:

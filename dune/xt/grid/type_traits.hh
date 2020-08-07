@@ -254,19 +254,19 @@ struct extract_grid : public AlwaysFalse<T>
 template <class T>
 struct extract_grid<T, true, false, false, false>
 {
-  typedef std::decay_t<typename T::Grid> type;
+  using type = std::decay_t<typename T::Grid>;
 };
 
 template <class T>
 struct extract_grid<T, false, true, false, false>
 {
-  typedef std::decay_t<typename T::GridType> type;
+  using type = std::decay_t<typename T::GridType>;
 };
 
 template <class T>
 struct extract_grid<T, false, false, true, false>
 {
-  typedef std::decay_t<typename is_intersection<T>::GridType> type;
+  using type = std::decay_t<typename is_intersection<T>::GridType>;
 };
 
 template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp>
@@ -286,13 +286,13 @@ struct extract_collective_communication : public AlwaysFalse<T>
 template <class T>
 struct extract_collective_communication<T, true, false>
 {
-  typedef typename T::CollectiveCommunication type;
+  using type = typename T::CollectiveCommunication;
 };
 
 template <class T>
 struct extract_collective_communication<T, false, true>
 {
-  typedef typename T::CollectiveCommunicationType type;
+  using type = typename T::CollectiveCommunicationType;
 };
 
 template <class T>
@@ -306,13 +306,13 @@ struct extract_index_set : public AlwaysFalse<T>
 template <class T>
 struct extract_index_set<T, true, false>
 {
-  typedef typename T::IndexSet type;
+  using type = typename T::IndexSet;
 };
 
 template <class T>
 struct extract_index_set<T, false, true>
 {
-  typedef typename T::IndexSetType type;
+  using type = typename T::IndexSetType;
 };
 
 template <class T>
@@ -326,13 +326,13 @@ struct extract_intersection : public AlwaysFalse<T>
 template <class T>
 struct extract_intersection<T, true, false>
 {
-  typedef typename T::Intersection type;
+  using type = typename T::Intersection;
 };
 
 template <class T>
 struct extract_intersection<T, false, true>
 {
-  typedef typename T::IntersectionType type;
+  using type = typename T::IntersectionType;
 };
 
 template <class T>
@@ -346,13 +346,13 @@ struct extract_intersection_iterator : public AlwaysFalse<T>
 template <class T>
 struct extract_intersection_iterator<T, true, false>
 {
-  typedef typename T::IntersectionIterator type;
+  using type = typename T::IntersectionIterator;
 };
 
 template <class T>
 struct extract_intersection_iterator<T, false, true>
 {
-  typedef typename T::IntersectionIteratorType type;
+  using type = typename T::IntersectionIteratorType;
 };
 
 template <class T>
@@ -374,19 +374,19 @@ struct extract_entity : public AlwaysFalse<T>
 template <class T, size_t codim>
 struct extract_entity<T, codim, true, false, false>
 {
-  typedef typename T::template Codim<codim>::Entity type;
+  using type = typename T::template Codim<codim>::Entity;
 };
 
 template <class T, size_t codim>
 struct extract_entity<T, codim, false, true, false>
 {
-  typedef typename T::template Codim<codim>::EntityType type;
+  using type = typename T::template Codim<codim>::EntityType;
 };
 
 template <class T, size_t codim>
 struct extract_entity<T, codim, false, false, true>
 {
-  typedef typename T::template Codim<codim>::Entity type;
+  using type = typename T::template Codim<codim>::Entity;
 };
 
 template <class T, size_t codim = 0>
@@ -400,13 +400,13 @@ struct extract_local_geometry : public AlwaysFalse<T>
 template <class T, size_t codim>
 struct extract_local_geometry<T, codim, true, false>
 {
-  typedef typename T::template Codim<codim>::LocalGeometry type;
+  using type = typename T::template Codim<codim>::LocalGeometry;
 };
 
 template <class T, size_t codim>
 struct extract_local_geometry<T, codim, false, true>
 {
-  typedef typename T::template Codim<codim>::LocalGeometryType type;
+  using type = typename T::template Codim<codim>::LocalGeometryType;
 };
 
 template <class T, size_t codim = 0>
@@ -420,13 +420,13 @@ struct extract_geometry : public AlwaysFalse<T>
 template <class T, size_t codim>
 struct extract_geometry<T, codim, true, false>
 {
-  typedef typename T::template Codim<codim>::Geometry type;
+  using type = typename T::template Codim<codim>::Geometry;
 };
 
 template <class T, size_t codim>
 struct extract_geometry<T, codim, false, true>
 {
-  typedef typename T::template Codim<codim>::GeometryType type;
+  using type = typename T::template Codim<codim>::GeometryType;
 };
 
 template <class T, size_t codim = 0>
@@ -444,13 +444,13 @@ struct extract_iterator : public AlwaysFalse<T>
 template <class T, int c, PartitionIteratorType pit>
 struct extract_iterator<T, c, pit, true, false>
 {
-  typedef typename T::template Codim<c>::template Partition<pit>::Iterator type;
+  using type = typename T::template Codim<c>::template Partition<pit>::Iterator;
 };
 
 template <class T, int c, PartitionIteratorType pit>
 struct extract_iterator<T, c, pit, false, true>
 {
-  typedef typename T::template Codim<c>::template Partition<pit>::IteratorType type;
+  using type = typename T::template Codim<c>::template Partition<pit>::IteratorType;
 };
 
 template <class T, int c = 0, PartitionIteratorType pit = All_Partition>

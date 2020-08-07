@@ -70,7 +70,7 @@ public:
   double* pval;
 };
 
-typedef RVar* PRVar;
+using PRVar = RVar*;
 
 enum ROperator
 {
@@ -99,12 +99,12 @@ enum ROperator
   Fun
 };
 
-typedef void((*pfoncld)(double*&));
+using pfoncld = void((*)(double*&));
 
 class ROperation;
-typedef ROperation* PROperation;
+using PROperation = ROperation*;
 class RFunction;
-typedef RFunction* PRFunction;
+using PRFunction = RFunction*;
 
 class ROperation
 {

@@ -39,9 +39,9 @@ class EntitySearchBase
 
 public:
   typedef extract_entity_t<GridLayerType, codim> EntityType;
-  typedef typename EntityType::Geometry::LocalCoordinate LocalCoordinateType;
-  typedef typename EntityType::Geometry::GlobalCoordinate GlobalCoordinateType;
-  typedef std::vector<std::unique_ptr<EntityType>> EntityVectorType;
+  using LocalCoordinateType = typename EntityType::Geometry::LocalCoordinate;
+  using GlobalCoordinateType = typename EntityType::Geometry::GlobalCoordinate;
+  using EntityVectorType = std::vector<std::unique_ptr<EntityType>>;
 }; // class EntitySearchBase
 
 
@@ -92,7 +92,7 @@ class EntityInlevelSearch : public EntitySearchBase<GridLayerType, codim>
   typedef extract_iterator_t<GridLayerType, codim> IteratorType;
 
 public:
-  typedef typename BaseType::EntityVectorType EntityVectorType;
+  using EntityVectorType = typename BaseType::EntityVectorType;
 
 private:
   inline typename EntityVectorType::value_type check_add(const typename BaseType::EntityType& entity,
@@ -170,7 +170,7 @@ class FallbackEntityInlevelSearch : public EntitySearchBase<GridLayerType>
   typedef typename extract_iterator<GridLayerType, 0>::type IteratorType;
 
 public:
-  typedef typename BaseType::EntityVectorType EntityVectorType;
+  using EntityVectorType = typename BaseType::EntityVectorType;
 
 private:
   inline typename EntityVectorType::value_type check_add(const typename BaseType::EntityType& entity,
@@ -252,7 +252,7 @@ private:
 template <class GridLayerType>
 class EntityHierarchicSearch : public EntitySearchBase<GridLayerType>
 {
-  typedef EntitySearchBase<GridLayerType> BaseType;
+  using BaseType = EntitySearchBase<GridLayerType>;
 
   const GridLayerType grid_layer_;
   const int start_level_;
@@ -263,7 +263,7 @@ public:
     , start_level_(0)
   {}
 
-  typedef typename BaseType::EntityVectorType EntityVectorType;
+  using EntityVectorType = typename BaseType::EntityVectorType;
 
   template <class PointContainerType>
   EntityVectorType operator()(const PointContainerType& points) const

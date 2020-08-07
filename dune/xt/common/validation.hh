@@ -58,7 +58,7 @@ protected:
 template <class T>
 class ValidateAny : public ValidatorInterface<T, ValidateAny<T>>
 {
-  typedef ValidateAny<T> ThisType;
+  using ThisType = ValidateAny<T>;
   typedef ValidatorInterface<T, ThisType> BaseType;
 
 public:
@@ -82,7 +82,7 @@ class ValidateInList : public ValidatorInterface<T, ValidateInList<T, ListImp>>
 {
   typedef ValidateInList<T, ListImp> ThisType;
   typedef ValidatorInterface<T, ThisType> BaseType;
-  typedef ListImp ListType;
+  using ListType = ListImp;
   ListType valid_list_;
 
 public:

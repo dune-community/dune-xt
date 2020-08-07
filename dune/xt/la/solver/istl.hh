@@ -44,8 +44,8 @@ namespace internal {
 template <class S, class CommunicatorType>
 struct IstlSolverTraits
 {
-  typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
-  typedef typename IstlRowMajorSparseMatrix<S>::BackendType IstlMatrixType;
+  using IstlVectorType = typename IstlDenseVector<S>::BackendType;
+  using IstlMatrixType = typename IstlRowMajorSparseMatrix<S>::BackendType;
   typedef OverlappingSchwarzOperator<IstlMatrixType, IstlVectorType, IstlVectorType, CommunicatorType>
       MatrixOperatorType;
   typedef OverlappingSchwarzScalarProduct<IstlVectorType, CommunicatorType> ScalarproductType;
@@ -76,10 +76,10 @@ struct IstlSolverTraits
 template <class S>
 struct IstlSolverTraits<S, SequentialCommunication>
 {
-  typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
-  typedef typename IstlRowMajorSparseMatrix<S>::BackendType IstlMatrixType;
+  using IstlVectorType = typename IstlDenseVector<S>::BackendType;
+  using IstlMatrixType = typename IstlRowMajorSparseMatrix<S>::BackendType;
   typedef MatrixAdapter<IstlMatrixType, IstlVectorType, IstlVectorType> MatrixOperatorType;
-  typedef SeqScalarProduct<IstlVectorType> ScalarproductType;
+  using ScalarproductType = SeqScalarProduct<IstlVectorType>;
 
   static MatrixOperatorType make_operator(const IstlMatrixType& matrix, const SequentialCommunication& /*communicator*/)
   {
@@ -168,8 +168,8 @@ template <class S, class CommunicatorType>
 class Solver<IstlRowMajorSparseMatrix<S>, CommunicatorType> : protected internal::SolverUtils
 {
 public:
-  typedef IstlRowMajorSparseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType R;
+  using MatrixType = IstlRowMajorSparseMatrix<S>;
+  using R = typename MatrixType::RealType;
 
   Solver(const MatrixType& matrix)
     : matrix_(matrix)
@@ -274,7 +274,7 @@ public:
       } else if (type == "bicgstab") {
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         const auto cat = matrix_operator.category();
-        typedef IdentityPreconditioner<MatrixOperatorType> SequentialPreconditioner;
+        using SequentialPreconditioner = IdentityPreconditioner<MatrixOperatorType>;
         auto seq_preconditioner = std::make_shared<SequentialPreconditioner>(cat);
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         // define the BiCGStab as the actual solver
@@ -288,7 +288,7 @@ public:
       } else if (type == "cg") {
         auto matrix_operator = Traits::make_operator(matrix_.backend(), communicator_.access());
         const auto cat = matrix_operator.category();
-        typedef IdentityPreconditioner<MatrixOperatorType> SequentialPreconditioner;
+        using SequentialPreconditioner = IdentityPreconditioner<MatrixOperatorType>;
         auto seq_preconditioner = std::make_shared<SequentialPreconditioner>(cat);
         auto preconditioner = Traits::make_preconditioner(seq_preconditioner, communicator_.access());
         // define the CG as the actual solver

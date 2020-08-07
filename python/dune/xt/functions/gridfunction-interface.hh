@@ -278,8 +278,8 @@ bind_combined_GridFunction(pybind11::module& m, const std::string& grid_id)
 {
   namespace py = pybind11;
 
-  typedef typename G::template Codim<0>::Entity E;
-  typedef double R;
+  using E = typename G::template Codim<0>::Entity;
+  using R = double;
   typedef GridFunctionInterface<E, lr, lrC, R> Left;
   typedef GridFunctionInterface<E, rr, rrC, R> Right;
   static const size_t r = C::range_dim;
@@ -312,7 +312,7 @@ void addbind_GridFunctionInterface_combined_op(C& c)
 {
   namespace py = pybind11;
 
-  typedef typename G::template Codim<0>::Entity E;
+  using E = typename G::template Codim<0>::Entity;
   typedef GridFunctionInterface<E, r, rC, double> S;
   typedef GridFunctionInterface<E, oR, orC, double> O;
 

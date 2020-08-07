@@ -37,10 +37,10 @@ namespace LA {
 template <class S, class CommunicatorType>
 class AmgApplicator
 {
-  typedef IstlRowMajorSparseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType R;
-  typedef typename MatrixType::BackendType IstlMatrixType;
-  typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
+  using MatrixType = IstlRowMajorSparseMatrix<S>;
+  using R = typename MatrixType::RealType;
+  using IstlMatrixType = typename MatrixType::BackendType;
+  using IstlVectorType = typename IstlDenseVector<S>::BackendType;
 
 public:
   AmgApplicator(const MatrixType& matrix, const CommunicatorType& comm)
@@ -148,10 +148,10 @@ protected:
 template <class S>
 class AmgApplicator<S, SequentialCommunication>
 {
-  typedef IstlRowMajorSparseMatrix<S> MatrixType;
-  typedef typename MatrixType::RealType R;
-  typedef typename MatrixType::BackendType IstlMatrixType;
-  typedef typename IstlDenseVector<S>::BackendType IstlVectorType;
+  using MatrixType = IstlRowMajorSparseMatrix<S>;
+  using R = typename MatrixType::RealType;
+  using IstlMatrixType = typename MatrixType::BackendType;
+  using IstlVectorType = typename IstlDenseVector<S>::BackendType;
 
 public:
   AmgApplicator(const MatrixType& matrix, const SequentialCommunication& comm)

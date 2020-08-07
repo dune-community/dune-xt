@@ -69,8 +69,8 @@ class BoundaryInfo : public Common::WithLogger<BoundaryInfo<IntersectionImp>>
   using Logger = Common::WithLogger<BoundaryInfo<IntersectionImp>>;
 
 public:
-  typedef IntersectionImp IntersectionType;
-  typedef typename IntersectionType::ctype DomainFieldType;
+  using IntersectionType = IntersectionImp;
+  using DomainFieldType = typename IntersectionType::ctype;
   static const size_t dimDomain = IntersectionType::Entity::dimension;
   static const size_t dimWorld = IntersectionType::dimensionworld;
   typedef Common::FieldVector<DomainFieldType, dimDomain> DomainType;
