@@ -14,10 +14,7 @@
 
 #include <dune/xt/grid/layers.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <Backends backend>
@@ -53,9 +50,6 @@ struct layer_name
 };
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 #endif // DUNE_XT_GRID_LAYERS_BINDINGS_HH

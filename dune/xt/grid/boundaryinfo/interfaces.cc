@@ -15,9 +15,7 @@
 
 #include "interfaces.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 std::ostream& operator<<(std::ostream& out, const BoundaryType& type)
@@ -27,6 +25,4 @@ std::ostream& operator<<(std::ostream& out, const BoundaryType& type)
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid

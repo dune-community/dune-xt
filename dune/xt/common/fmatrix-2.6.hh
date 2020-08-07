@@ -25,8 +25,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 
 /**
@@ -1070,8 +1069,7 @@ imag(const FieldMatrix<K, ROWS, COLS>& complex_mat)
 }
 
 
-} // namespace Common
-} // namespace XT
+} // namespace XT::Common
 
 
 template <class L, int ROWS, int COLS, class R>

@@ -18,9 +18,7 @@
 
 #include <dune/xt/common/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 class SparsityPatternDefault
@@ -87,8 +85,6 @@ SparsityPatternDefault multiplication_pattern(const SparsityPatternDefault& lhs_
                                               const size_t rhs_cols);
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_PATTERN_HH

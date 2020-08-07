@@ -22,8 +22,7 @@
 #include "../vector/sparse.hh"
 #include "dense.hh"
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace LA {
 
 
@@ -1515,8 +1514,7 @@ struct MatrixAbstraction<LA::CommonSparseOrDenseMatrix<DenseMatrixImp, SparseMat
 
 
 } // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 
 // begin: this is what we need for the lib

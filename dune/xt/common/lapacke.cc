@@ -34,10 +34,7 @@
 #  define DXTC_LAPACKE_ONLY(param) DXTC_UNUSED(param)
 #endif
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Lapacke {
+namespace Dune::XT::Common::Lapacke {
 
 
 bool available()
@@ -545,7 +542,4 @@ int zunmqr(int DXTC_LAPACKE_ONLY(matrix_layout),
 }
 
 
-} // namespace Lapacke
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::Lapacke

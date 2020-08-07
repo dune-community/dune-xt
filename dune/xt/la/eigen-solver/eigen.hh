@@ -25,9 +25,7 @@
 #include "internal/lapacke.hh"
 #include "internal/shifted-qr.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 #if HAVE_EIGEN
 
@@ -162,8 +160,6 @@ class EigenSolver<EigenDenseMatrix<S>, true>
 #endif // HAVE_EIGEN
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_EIGEN_HH

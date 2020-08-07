@@ -20,9 +20,7 @@
 
 #include "base.hh"
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
@@ -182,8 +180,6 @@ private:
 }; // class ParametricExpressionFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_PARAMETRIC_HH

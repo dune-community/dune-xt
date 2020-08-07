@@ -18,9 +18,7 @@
 #include <dune/xt/functions/type_traits.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 namespace internal {
 
 
@@ -281,9 +279,7 @@ public:
 }; // class GradientElementFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 
 #endif // DUNE_XT_FUNCTIONS_DERIVED_HH

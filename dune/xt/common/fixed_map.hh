@@ -21,9 +21,7 @@
 #include <boost/assign/list_of.hpp>
 #include <dune/common/exceptions.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! custom iterator for \ref FixedMap
 template <class FixedMapType>
@@ -235,9 +233,7 @@ private:
 template <class K, class T, std::size_t nin>
 const std::size_t FixedMap<K, T, nin>::N = nin;
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 namespace std {
 template <class key_imp, class T, std::size_t nin>

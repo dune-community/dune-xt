@@ -18,9 +18,7 @@
 #include "boundarysegment.hh"
 #include "normalbased.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class I>
@@ -73,8 +71,6 @@ public:
 }; // class BoundaryInfoFactory
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_FACTORY_HH

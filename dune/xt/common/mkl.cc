@@ -19,10 +19,7 @@
 
 #include "mkl.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Mkl {
+namespace Dune::XT::Common::Mkl {
 
 
 bool available()
@@ -46,7 +43,4 @@ void exp(const int n, const double* a, double* y)
 }
 
 
-} // namespace Mkl
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::Mkl

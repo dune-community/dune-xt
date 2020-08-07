@@ -22,9 +22,7 @@
 
 #include "../solver.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class Matrix>
@@ -133,8 +131,6 @@ private:
 }; // class Solver<...>
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_SOLVER_DENSE_HH

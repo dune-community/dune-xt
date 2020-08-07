@@ -30,10 +30,7 @@
 #  define DXTC_CBLAS_ONLY(param) DXTC_UNUSED(param)
 #endif
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Cblas {
+namespace Dune::XT::Common::Cblas {
 
 
 /**
@@ -329,7 +326,4 @@ void ztrsv(const int DXTC_CBLAS_ONLY(layout),
 }
 
 
-} // namespace Cblas
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::Cblas

@@ -19,10 +19,7 @@
 #include <dune/xt/la/type_traits.hh>
 #include <dune/xt/la/container/eye-matrix.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace internal {
+namespace Dune::XT::LA::internal {
 
 
 // A shifted QR eigensolver for real matrices with real eigenvalues. Complex matrices and real matrices with complex
@@ -424,9 +421,6 @@ void fmatrix_compute_real_eigenvalues_and_real_right_eigenvectors_using_qr(
 }
 
 
-} // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::internal
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_SHIFTEDQR_HH

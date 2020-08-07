@@ -29,8 +29,7 @@
 
 #include <dune/xt/la/container/vector-interface.hh>
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace LA {
 
 
@@ -341,8 +340,7 @@ struct VectorAbstraction<LA::CommonDenseVector<T>>
 
 
 } // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 
 // begin: this is what we need for the lib

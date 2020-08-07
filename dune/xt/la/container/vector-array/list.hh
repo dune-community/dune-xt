@@ -19,9 +19,7 @@
 
 //#include "interface.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 // forward, needed for the Traits
@@ -310,8 +308,6 @@ private:
 }; // class ListVectorArray
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_VECTOR_ARRAY_LIST_HH

@@ -21,8 +21,7 @@
 #include "configuration.hh"
 
 namespace Dune {
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 ConfigurationDefaults::ConfigurationDefaults(bool warn_on_default_access_in,
                                              bool log_on_exit_in,
@@ -387,8 +386,7 @@ bool operator!=(const Configuration& left, const Configuration& right)
   return !(left == right);
 }
 
-} // namespace Common
-} // namespace XT
+} // namespace XT::Common
 
 bool operator==(const ParameterTree& left, const ParameterTree& right)
 {

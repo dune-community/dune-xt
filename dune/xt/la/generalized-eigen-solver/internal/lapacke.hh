@@ -30,10 +30,7 @@
 
 #include <dune/xt/la/eigen-solver/internal/lapacke.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace internal {
+namespace Dune::XT::LA::internal {
 
 
 /**
@@ -149,9 +146,6 @@ compute_generalized_eigenvalues_using_lapack(MatrixType&& lhs_matrix, MatrixType
 }
 
 
-} // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::internal
 
 #endif // DUNE_XT_LA_GENERALIZED_EIGEN_SOLVER_INTERNAL_LAPACKE_HH

@@ -45,9 +45,7 @@
 #include <dune/xt/common/logging.hh>
 #include <dune/xt/common/deprecated.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! element-index-in-container search
 template <class StlSequence>
@@ -171,8 +169,6 @@ struct remove_const_reference
   using type = typename std::remove_reference<typename std::remove_const<T>::type>::type;
 };
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_MISC_HH

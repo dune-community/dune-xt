@@ -31,9 +31,7 @@
 #include <boost/noncopyable.hpp>
 #include <dune/xt/common/parallel/threadmanager.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 namespace internal {
 
 
@@ -415,8 +413,6 @@ struct concatenate_container
 }; // struct concatenate_container
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_PARALLEL_THREADSTORAGE_HH

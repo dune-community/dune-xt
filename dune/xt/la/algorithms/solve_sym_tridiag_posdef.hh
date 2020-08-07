@@ -21,9 +21,7 @@
 
 #include <dune/xt/la/algorithms/cholesky.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 /**  \brief Solves linear equation for tridiagonal symmetric positive definite matrix.
@@ -62,8 +60,6 @@ solve_sym_tridiag_posdef(const MatrixType& A, VectorType& x, const RhsVectorType
 }
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_ALGORITHMS_SOLVE_SYM_TRIDIAG_POSDEF_HH

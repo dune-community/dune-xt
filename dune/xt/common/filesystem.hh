@@ -22,9 +22,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! strip filename from \path if present, return empty string if only filename present
 std::string directory_only(std::string _path);
@@ -50,8 +48,6 @@ void file_to_stream_filtered(std::ostream& stream, std::string filename, std::st
 //! output programs mem usage stats by reading from /proc
 void meminfo(LogStream& stream);
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_FILESYSTEM_HH

@@ -22,9 +22,7 @@
 
 #include <numeric>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 template <class... Args>
@@ -48,8 +46,6 @@ decltype(auto) transform_reduce(Args&&... args)
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_NUMERIC_HH

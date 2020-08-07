@@ -16,9 +16,7 @@
 #include <dune/xt/common/logging.hh>
 #include <dune/xt/common/string.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! reset given signal to default handler
 void reset_signal(int signal)
@@ -56,6 +54,4 @@ void install_signal_handler(int signal, handler_type handler)
   sigaction(signal, &new_action, nullptr);
 } // install_signal_handler
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

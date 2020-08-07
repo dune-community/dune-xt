@@ -20,9 +20,7 @@
 #include <dune/xt/la/container/matrix-interface.hh>
 #include <dune/xt/la/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 // "pull in" the vector variant from Common, cannot be done with using (would pull the matrix one, too)
@@ -139,8 +137,6 @@ typename std::enable_if<is_matrix<RangeType>::value, RangeType>::type convert_to
 } // ... convert_to(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_EIGEN_CONTAINER_CONVERSION_HH

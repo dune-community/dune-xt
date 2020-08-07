@@ -19,9 +19,7 @@
 
 #include <dune/xt/common/logging.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 class ConvergenceStudy
@@ -152,8 +150,6 @@ public:
 }; // class ConvergenceStudy
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_CONVERGENCE_STUDY_HH

@@ -25,9 +25,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/la/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 
@@ -242,8 +240,6 @@ public:
 }; // class ProvidesDataAccess
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // #ifndef DUNE_XT_LA_CONTAINER_CONTAINER_INTERFACE_HH

@@ -21,10 +21,7 @@
 
 #include "../checkerboard.hh"
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace Spe10 {
+namespace Dune::XT::Functions::Spe10 {
 namespace internal {
 
 
@@ -192,10 +189,7 @@ private:
 }; // class Model1< ..., 2, ..., r, r >
 
 
-} // namespace Spe10
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::Spe10
 
 
 #endif // DUNE_XT_FUNCTIONS_SPE10_MODEL1_HH

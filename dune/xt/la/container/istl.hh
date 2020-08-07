@@ -34,8 +34,7 @@
 #include "interfaces.hh"
 #include "pattern.hh"
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace LA {
 
 
@@ -837,8 +836,7 @@ struct MatrixAbstraction<LA::IstlRowMajorSparseMatrix<T>>
 };
 
 } // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 
 // begin: this is what we need for the lib

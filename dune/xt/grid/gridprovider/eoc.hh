@@ -19,9 +19,7 @@
 #include <dune/xt/grid/gridprovider/provider.hh>
 #include <dune/xt/grid/gridprovider/factory.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 /**
@@ -196,8 +194,6 @@ public:
 #endif // HAVE_DUNE_ALUGRID
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_PROVIDER_EOC_HH

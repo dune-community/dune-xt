@@ -19,9 +19,7 @@
 
 #include <boost/accumulators/statistics/variance.hpp>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 template <class VectorType>
 typename std::enable_if<is_vector<VectorType>::value, typename VectorAbstraction<VectorType>::S>::type
@@ -35,8 +33,6 @@ standard_deviation(const VectorType& vector)
 }
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_VECTOR_STATISTICS_HH

@@ -22,9 +22,7 @@
 #include "internal/base.hh"
 #include "internal/lapacke.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class MatrixType>
@@ -119,8 +117,6 @@ protected:
 }; // class GeneralizedEigenSolver<MatrixType, true>
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_GENERALIZED_EIGEN_SOLVER_DEFAULT_HH

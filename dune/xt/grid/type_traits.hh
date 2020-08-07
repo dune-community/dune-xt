@@ -53,8 +53,7 @@ class Intersection;
 
 
 } // namespace GridGlue
-namespace XT {
-namespace Grid {
+namespace XT::Grid {
 
 
 namespace internal {
@@ -467,8 +466,7 @@ using extract_partition_iterator_t
     DXT_DEPRECATED_MSG("Use extract_iterator_t instead (24.04.2018)!") = extract_iterator_t<T, c, pit>;
 
 
-} // namespace Grid
-} // namespace XT
+} // namespace XT::Grid
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_TYPE_TRAITS_HH

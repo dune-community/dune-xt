@@ -62,9 +62,7 @@ typedef Dune::AlbertaGrid<3, 3> ALBERTA_3D;
 #endif
 
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 namespace internal {
 
 
@@ -139,9 +137,7 @@ using AvailableGridTypes = boost::tuple<ONED_1D,
                                         >;
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 
 using SIMPLEXGRID_1D = ONED_1D;

@@ -21,9 +21,7 @@
 #include "float_cmp.hh"
 #include "string.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 namespace internal {
 
 
@@ -306,8 +304,6 @@ private:
 }; // class ParametricInterface
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_PARAMETER_HH

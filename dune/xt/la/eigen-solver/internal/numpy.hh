@@ -26,10 +26,7 @@
 #include <python/dune/xt/common/fvector.hh>
 #include <python/dune/xt/common/fmatrix.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace internal {
+namespace Dune::XT::LA::internal {
 
 
 bool numpy_eigensolver_available();
@@ -72,9 +69,6 @@ void compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(
 } // ... compute_eigenvalues_and_right_eigenvectors_of_a_fieldmatrix_using_numpy(...)
 
 
-} // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::internal
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_NUMPY_HH

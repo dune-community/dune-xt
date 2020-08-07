@@ -52,9 +52,7 @@
 #include <boost/timer/timer.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 TimingData::TimingData(std::string _name)
   : timer_(new boost::timer::cpu_timer)
@@ -248,6 +246,4 @@ OutputScopedTiming::~OutputScopedTiming()
   out_ << "Executing " << section_name_ << " took " << duration / 1000.f << "s\n";
 }
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

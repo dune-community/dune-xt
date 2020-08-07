@@ -18,10 +18,7 @@
 #include <python/dune/xt/common/timedlogging.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <template <class> class Filter, class G>
@@ -103,9 +100,6 @@ public:
 }; // class CustomBoundaryIntersectionsFilter
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 #endif // PYTHON_DUNE_XT_GRID_FILTERS_INTERSECTION_HH

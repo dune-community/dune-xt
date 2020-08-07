@@ -29,9 +29,7 @@
 
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-  namespace Grid {
+namespace Dune::XT::Grid {
     //! Partioning base on remembering iterator ranges
     template<class GridView, int codim, PartitionIteratorType pit = All_Partition>
     class RangedPartitioning {
@@ -169,9 +167,7 @@ namespace XT {
       RangedPartitioning::Size lastPartition_;
     };
 
-  } // namespace Grid
-} // namespace XT
-} // namespace Dune
+  } // namespace Dune
 
 #include <dune/xt/common/reenable_warnings.hh>
 // clang-format on

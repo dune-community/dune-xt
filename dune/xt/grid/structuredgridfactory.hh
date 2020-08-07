@@ -40,7 +40,7 @@
 #include <dune/xt/common/ranges.hh>
 #include <dune/xt/common/logging.hh>
 
-namespace Dune {
+namespace Dune { // NOLINT
 
 #if HAVE_DUNE_SPGRID
 
@@ -118,8 +118,7 @@ public:
 
 #endif // HAVE_DUNE_SPGRID
 
-namespace XT {
-namespace Grid {
+namespace XT::Grid { // NOLINT
 
 
 template <class GridType>
@@ -338,8 +337,7 @@ public:
   }
 };
 
-} // namespace Grid
-} // namespace XT
+} // namespace XT::Grid
 } // namespace Dune
 
 #endif // DUNE_XT_GRID_STRUCTUREDGRIDFACTORY_HH

@@ -18,9 +18,7 @@
 #include "exceptions.hh"
 #include "type_traits.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class Element>
@@ -193,8 +191,6 @@ protected:
 }; // class IntersectionBoundObject
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_BOUND_OBJECTS_HH

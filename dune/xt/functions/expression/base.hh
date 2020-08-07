@@ -33,9 +33,7 @@
 #endif
 
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -351,8 +349,6 @@ private:
 }; // class DynamicMathExpressionBase
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_EXPRESSION_BASE_HH

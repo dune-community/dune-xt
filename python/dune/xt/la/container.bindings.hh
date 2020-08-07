@@ -27,10 +27,7 @@ using EIGEN_SPARSE_MATRIX = Dune::XT::LA::EigenRowMajorSparseMatrix<double>;
 using ISTL_DENSE_VECTOR = Dune::XT::LA::IstlDenseVector<double>;
 using ISTL_SPARSE_MATRIX = Dune::XT::LA::IstlRowMajorSparseMatrix<double>;
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace bindings {
+namespace Dune::XT::LA::bindings {
 
 
 template <Backends bb>
@@ -197,10 +194,7 @@ struct container_name<IstlRowMajorSparseMatrix<double>>
 };
 
 
-} // namespace bindings
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::bindings
 
 
 #endif // DUNE_XT_LA_CONTAINER_BINDINGS_HH

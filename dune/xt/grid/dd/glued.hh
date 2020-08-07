@@ -38,10 +38,7 @@
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace DD {
+namespace Dune::XT::Grid::DD {
 namespace Exceptions {
 
 
@@ -1235,9 +1232,6 @@ class Glued
 #endif // HAVE_DUNE_GRID_GLUE
 
 
-} // namespace DD
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::DD
 
 #endif // DUNE_XT_GRID_DD_GLUED_HH

@@ -27,9 +27,7 @@
 
 #include "provider.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 static inline std::string gmsh_gridprovider_id()
@@ -130,8 +128,6 @@ auto make_gmsh_grid(const Common::Configuration& cfg = GmshGridProviderFactory<G
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_GRIDPROVIDER_GMSH_HH

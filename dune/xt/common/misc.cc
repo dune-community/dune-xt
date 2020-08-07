@@ -22,9 +22,7 @@
 
 extern char** environ;
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 void dump_environment(boost::filesystem::ofstream& file, std::string csv_sep)
 {
@@ -43,6 +41,4 @@ void dump_environment(boost::filesystem::ofstream& file, std::string csv_sep)
   std::copy(values.begin(), values.end(), PrefixOutputIterator<string>(file, csv_sep));
 }
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

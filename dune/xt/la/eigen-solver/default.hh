@@ -23,9 +23,7 @@
 #include "internal/shifted-qr.hh"
 #include "internal/lapacke.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class MatrixType>
@@ -132,8 +130,6 @@ protected:
 }; // class EigenSolver<MatrixType, true>
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_DEFAULT_HH

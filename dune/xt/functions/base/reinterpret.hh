@@ -20,9 +20,7 @@
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -269,8 +267,6 @@ auto reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGr
 }
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_BASE_REINTERPRET_HH

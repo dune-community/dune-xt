@@ -16,9 +16,7 @@
 
 #include <dune/xt/common/float_cmp.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 /**
@@ -35,8 +33,6 @@ double find_largest_by_bisection(const double& left,
                                  const double abs_error = FloatCmp::DefaultEpsilon<double>::value());
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_BISECT_HH

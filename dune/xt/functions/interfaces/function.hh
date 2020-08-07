@@ -26,9 +26,7 @@
 #include <dune/xt/functions/type_traits.hh>
 #include <dune/grid/io/file/vtk/common.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 // forwards, required in operator+-*
@@ -370,9 +368,7 @@ private:
 }; // class FunctionInterface
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 
 #include <dune/xt/functions/base/combined-functions.hh>

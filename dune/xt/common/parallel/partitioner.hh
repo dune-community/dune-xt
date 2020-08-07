@@ -14,9 +14,7 @@
 
 #include <cstddef>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 /** \brief Partition that assigns each codim-0 entity in a \ref IndexSet a unique partition number,
  * its index in the set
@@ -28,6 +26,7 @@ struct IndexSetPartitioner
 {
   using IndexSetType = typename GridViewType::IndexSet;
   using EntityType = typename GridViewType::template Codim<0>::Entity;
+
   explicit IndexSetPartitioner(const IndexSetType& index_set)
     : index_set_(index_set)
   {}
@@ -46,8 +45,6 @@ private:
   const IndexSetType& index_set_;
 };
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_PARALLEL_PARTITIONER_HH

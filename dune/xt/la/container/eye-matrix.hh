@@ -18,9 +18,7 @@
 
 #include "pattern.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 
@@ -72,9 +70,7 @@ eye_matrix(const size_t size, const SparsityPatternDefault& pattern = SparsityPa
 }
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 #endif // DUNE_XT_LA_CONTAINER_EYE_MATRIX_HH

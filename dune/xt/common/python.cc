@@ -16,10 +16,7 @@
 
 #include "python.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace bindings {
+namespace Dune::XT::Common::bindings {
 
 
 void guarded_bind(const std::function<void()>& registrar)
@@ -75,7 +72,4 @@ void try_register(pybind11::module& m, const std::function<void(pybind11::module
 } // ... try_register(...)
 
 
-} // namespace bindings
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::bindings

@@ -14,9 +14,7 @@
 
 #include <thread>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 struct ThreadManager;
 //! global singleton ThreadManager
@@ -57,8 +55,6 @@ inline ThreadManager& threadManager()
   return tm;
 }
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_THREADMANAGER_HH

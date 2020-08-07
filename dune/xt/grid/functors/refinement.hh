@@ -17,9 +17,7 @@
 
 #include "interfaces.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 //! GridWalk functor that refines all entitites above given volume
@@ -76,8 +74,6 @@ void enforce_maximum_entity_volume(GridType& grid, const double size_factor)
 } // enforce_maximum_entity_volume
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_FUNCTORS_REFINEMENT_HH

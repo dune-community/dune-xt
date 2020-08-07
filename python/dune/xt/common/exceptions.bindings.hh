@@ -18,19 +18,13 @@ namespace pybind11 {
 class module;
 }
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace bindings {
+namespace Dune::XT::Common::bindings {
 
 
 DXT_DEPRECATED_MSG("you no longer need to call this for your module")
 void addbind_exceptions(pybind11::module&) {} // ... addbind_exceptions(...)
 
 
-} // namespace bindings
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::bindings
 
 #endif // DUNE_XT_COMMON_EXCEPTIONS_BINDINGS_HH

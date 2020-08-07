@@ -19,9 +19,7 @@
 #include <dune/xt/grid/type_traits.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 template <class GL>
@@ -176,8 +174,6 @@ public:
 }; // class ElementAndIntersectionFunctor
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_FUNCTORS_INTERFACES_HH

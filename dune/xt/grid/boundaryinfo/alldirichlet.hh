@@ -18,9 +18,7 @@
 #include "interfaces.hh"
 #include <dune/xt/grid/boundaryinfo/types.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 static inline Common::Configuration alldirichlet_boundaryinfo_default_config()
@@ -112,8 +110,6 @@ constexpr NoBoundary ProcessBoundaryInfo<I>::no_boundary_;
 template <class I>
 constexpr DirichletBoundary ProcessBoundaryInfo<I>::dirichlet_boundary_;
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_ALLDIRICHLET_HH

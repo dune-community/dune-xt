@@ -27,10 +27,7 @@
 #include <dune/xt/la/exceptions.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace internal {
+namespace Dune::XT::LA::internal {
 
 
 #if HAVE_EIGEN
@@ -116,9 +113,6 @@ compute_right_eigenvectors_using_eigen(
 
 #endif // HAVE_EIGEN
 
-} // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::internal
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_INTERNAL_EIGEN_HH

@@ -29,9 +29,7 @@
 
 #include <dune/xt/common/logstreams.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 class Logging;
 //! global Logging instance
@@ -158,9 +156,7 @@ DUNE_EXPORT inline Logging& Logger()
   return log;
 }
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #define DXTC_LOG Dune::XT::Common::Logger()
 #define DXTC_LOG_INFO DXTC_LOG.info()

@@ -20,9 +20,7 @@
 #include <dune/xt/common/numeric_cast.hh>
 #include <dune/xt/common/vector.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! Helper class to abstract away selecting an integer or real valued distribution
 template <typename T, bool = std::is_integral<T>::value>
@@ -186,8 +184,6 @@ public:
   {}
 };
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_RANDOM_HH

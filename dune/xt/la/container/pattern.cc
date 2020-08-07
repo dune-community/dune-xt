@@ -15,9 +15,7 @@
 #include "config.h"
 #include "pattern.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 // ================================
@@ -200,6 +198,4 @@ SparsityPatternDefault multiplication_pattern(const SparsityPatternDefault& lhs_
 }
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA

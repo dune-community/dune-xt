@@ -19,10 +19,7 @@
 #include <python/dune/xt/common/timedlogging.hh>
 #include <python/dune/xt/grid/grids.bindings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
-namespace bindings {
+namespace Dune::XT::Grid::bindings {
 
 
 template <class G>
@@ -97,9 +94,6 @@ public:
 }; // class ElementAndIntersectionFunctor
 
 
-} // namespace bindings
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid::bindings
 
 #endif // PYTHON_DUNE_XT_GRID_FUNCTORS_INTERFACES_HH

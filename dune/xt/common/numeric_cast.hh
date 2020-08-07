@@ -17,9 +17,7 @@
 #include "exceptions.hh"
 #include "type_traits.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 /**
@@ -40,9 +38,7 @@ T numeric_cast(S source)
 } // ... numeric_cast(...)
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 
 #endif // DUNE_XT_COMMON_NUMERIC_CAST_HH

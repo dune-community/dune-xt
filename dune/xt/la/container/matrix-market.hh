@@ -23,9 +23,7 @@
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/la/container/pattern.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class MatrixType>
@@ -265,8 +263,6 @@ void write_matrix_market(const MatrixType& mat, const std::string filename, cons
 } // ... write_matrix_market(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_MATRIX_MARKET_HH

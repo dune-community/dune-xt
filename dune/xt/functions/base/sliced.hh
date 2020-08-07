@@ -19,9 +19,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class LF, size_t r, size_t rC = 1>
@@ -144,8 +142,6 @@ SlicedGridFunction<GridFunctionInterface<E, r>, sliced_r> make_sliced_function(
 }
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_SLICED_HH

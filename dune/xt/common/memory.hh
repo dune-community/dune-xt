@@ -18,9 +18,7 @@
 
 #include <dune/xt/common/debug.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 //! just like boost::noncopyable, but for move assign/ctor
@@ -536,8 +534,6 @@ void mem_usage(std::string filename);
 void mem_usage();
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_MEMORY_HH

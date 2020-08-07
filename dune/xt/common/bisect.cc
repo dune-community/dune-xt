@@ -16,9 +16,7 @@
 #include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/float_cmp.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 double find_largest_by_bisection(const double& left,
@@ -44,6 +42,4 @@ double find_largest_by_bisection(const double& left,
 } // ... find_largest_by_bisection(...)
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

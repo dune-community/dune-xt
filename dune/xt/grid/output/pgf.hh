@@ -24,9 +24,7 @@
 #include <dune/xt/grid/functors/bounding-box.hh>
 #include <dune/xt/grid/walker.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 typedef std::array<std::string, 7> TexColorArrayType;
 namespace {
@@ -367,8 +365,6 @@ private:
   GridType& grid_;
 };
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_OUTPUT_PGF_HH

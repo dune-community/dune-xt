@@ -155,9 +155,7 @@ struct RightTrimTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, 1>
  * of the tuple @c MyTuple. Enjoy it!
  */
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 // reduced from
 // http://stackoverflow.com/questions/1492204/is-it-possible-to-generate-types-with-all-combinations-of-template-arguments
@@ -424,8 +422,6 @@ public:
 
 using null_template_tuple = template_tuple<boost::tuples::null_type>;
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_TUPLE_HH

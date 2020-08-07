@@ -28,8 +28,7 @@
 #include <dune/xt/common/validation.hh>
 
 namespace Dune {
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 
 struct ConfigurationDefaults
@@ -366,8 +365,7 @@ DUNE_EXPORT inline Configuration& Config()
   return parameters;
 }
 
-} // namespace Common
-} // namespace XT
+} // namespace XT::Common
 
 bool operator==(const ParameterTree& left, const ParameterTree& right);
 

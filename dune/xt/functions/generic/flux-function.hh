@@ -21,9 +21,7 @@
 #include <dune/xt/functions/interfaces/flux-function.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -374,8 +372,6 @@ private:
 }; // class GenericFluxFunction
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_GENERIC_FLUX_FUNCTION_HH

@@ -23,10 +23,7 @@
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/interfaces/function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
+namespace Dune::XT::Functions::bindings {
 namespace internal {
 
 
@@ -453,9 +450,6 @@ void addbind_GridFunctionInterface_all_dims(pybind11::module& m)
 } // ... addbind_GridFunctionInterface_all_dims(...)
 
 
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings
 
 #endif // DUNE_XT_FUNCTIONS_INTERFACE_PBH

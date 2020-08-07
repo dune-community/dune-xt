@@ -23,9 +23,7 @@
 #include <dune/xt/la/container/eye-matrix.hh>
 #include <dune/xt/la/algorithms/triangular_solves.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 // computes the LDL^T factorization of a tridiagonal matrix
@@ -332,8 +330,6 @@ solve_tridiagonal_ldlt_factorized(const FirstVectorType& diag, const SecondVecto
 } // void tridiagonal_ldlt(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_ALGORITHMS_CHOLESKY_HH

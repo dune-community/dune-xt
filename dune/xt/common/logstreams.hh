@@ -26,9 +26,7 @@
 #include "memory.hh"
 #include "string.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 enum LogFlags
 {
@@ -271,8 +269,6 @@ int dev_null_logflag;
 EmptyLogStream dev_null(dev_null_logflag);
 } // namespace
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // LOGSTREAMS_HH

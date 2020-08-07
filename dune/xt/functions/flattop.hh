@@ -17,9 +17,7 @@
 
 #include <dune/xt/functions/interfaces/function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 /**
@@ -179,8 +177,6 @@ private:
 }; // class FlatTopFunction< ..., 1, 1 >
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_FLATTOP_HH

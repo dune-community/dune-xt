@@ -21,9 +21,7 @@
 #include "internal/base.hh"
 #include "internal/eigen.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 #if HAVE_EIGEN
 
@@ -116,9 +114,7 @@ class MatrixInverter<EigenDenseMatrix<S>, true>
 
 #endif // HAVE_EIGEN
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 #endif // DUNE_XT_LA_MATRIX_INVERTER_EIGEN_HH

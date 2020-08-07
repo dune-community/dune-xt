@@ -39,9 +39,7 @@
 
 #include "element-functions.hh"
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class MinuendType, class SubtrahendType>
@@ -231,9 +229,7 @@ public:
 }; // class GridFunctionInterface
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #include <dune/xt/functions/base/combined-grid-functions.hh>
 #include <dune/xt/functions/base/visualization.hh>

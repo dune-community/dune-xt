@@ -31,9 +31,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <dune/xt/common/reenable_warnings.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 // forward, std::string variant needed in internal::convert_from_string
@@ -53,15 +51,11 @@ tokenize(const std::string& msg,
          const boost::algorithm::token_compress_mode_type mode = boost::algorithm::token_compress_off);
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #include "string_internal.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 static constexpr const std::size_t default_to_string_precision = 6u;
@@ -210,8 +204,6 @@ static inline char** vector_to_main_args(const std::vector<std::string>& args)
 } // ... vector_to_main_args(...)
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_STRING_HH

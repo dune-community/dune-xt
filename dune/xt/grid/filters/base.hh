@@ -20,9 +20,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/grid/common/partitionset.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 namespace internal {
 
 
@@ -357,8 +355,6 @@ private:
 
 
 } // namespace internal
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_FILTERS_BASE_HH

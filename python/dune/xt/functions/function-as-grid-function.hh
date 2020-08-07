@@ -20,10 +20,7 @@
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
-namespace bindings {
+namespace Dune::XT::Functions::bindings {
 
 
 template <class G, size_t d, size_t r, size_t rC>
@@ -54,9 +51,6 @@ auto bind_FunctionAsGridFunctionWrapper(pybind11::module& m, const std::string& 
 } // ... bind_FunctionAsGridFunctionWrapper(...)
 
 
-} // namespace bindings
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions::bindings
 
 #endif // PYTHON_DUNE_XT_FUNCTIONS_FUNCTION_AS_GRID_FUNCTION_HH

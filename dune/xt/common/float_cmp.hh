@@ -25,10 +25,7 @@
 #include "float_cmp_style.hh"
 #include "float_cmp_internal.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace FloatCmp {
+namespace Dune::XT::Common::FloatCmp {
 
 
 template <class T, Style style = Style::defaultStyle, bool = std::is_integral<T>::value>
@@ -107,9 +104,6 @@ struct MT
 
 #include "float_cmp_generated.hxx"
 
-} // namespace FloatCmp
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::FloatCmp
 
 #endif // DUNE_XT_COMMON_FLOAT_CMP_HH

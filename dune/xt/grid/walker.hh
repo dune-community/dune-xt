@@ -42,9 +42,7 @@
 #include <dune/xt/grid/functors/generic.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 
 // forward
@@ -762,9 +760,7 @@ Walker<GV> make_walker(GV grid_view)
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 
 #endif // DUNE_XT_GRID_WALKER_HH

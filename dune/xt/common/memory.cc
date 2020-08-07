@@ -21,9 +21,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 void mem_usage(std::string filename)
 {
@@ -50,6 +48,4 @@ void mem_usage()
   mem_usage(std::string(DXTC_CONFIG_GET("global.datadir", "data/")) + std::string("/memory.csv"));
 }
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

@@ -15,9 +15,7 @@
 #include <dune/xt/functions/base/derivatives-of-element-functions.hh>
 #include <dune/xt/functions/interfaces/element-functions.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 template <class E, class R>
@@ -35,8 +33,6 @@ GradientElementFunction<ElementFunctionInterface<E, 1, 1, R>> gradient(ElementFu
 }
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_DERIVATIVES_HH

@@ -14,9 +14,7 @@
 #include <dune/xt/common/vector.hh>
 #include <dune/xt/common/float_cmp.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 //! struct to be used as comparison function e.g. in a std::map<FieldVector<...>, ..., VectorLess>
@@ -56,8 +54,6 @@ struct VectorFloatLess
 };
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_VECTOR_LESS_HH

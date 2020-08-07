@@ -27,9 +27,7 @@
 
 #include "../solver.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class S, class CommunicatorType>
@@ -133,9 +131,7 @@ private:
 }; // class Solver< CommonDenseMatrix< ... > >
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 // begin: this is what we need for the lib

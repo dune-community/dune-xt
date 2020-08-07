@@ -32,9 +32,7 @@
 #include "internal/numpy.hh"
 #include "internal/shifted-qr.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class K, int SIZE>
@@ -184,8 +182,6 @@ public:
 };
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_EIGEN_SOLVER_FMATRIX_HH

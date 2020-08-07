@@ -63,8 +63,7 @@
 #endif
 
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace Common {
 
 
@@ -122,7 +121,6 @@ using CRTPInterface DXT_DEPRECATED_MSG("CRTPInterface was moved into Dune::XT:Co
     Common::CRTPInterface<I, T>;
 
 
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 #endif // DUNE_XT_COMMON_CRTP_HH

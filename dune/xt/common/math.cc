@@ -13,15 +13,11 @@
 
 #include "math.hh"
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 
 // this is just for the test to compile
 const std::string Epsilon<std::string, false>::value = "_";
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

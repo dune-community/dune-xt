@@ -32,9 +32,7 @@
 #include "istl/preconditioners.hh"
 #include "../solver.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 namespace internal {
 
 
@@ -355,9 +353,7 @@ private:
   const Common::ConstStorageProvider<CommunicatorType> communicator_;
 }; // class Solver
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 // begin: this is what we need for the lib

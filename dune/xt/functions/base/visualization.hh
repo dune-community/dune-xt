@@ -24,9 +24,7 @@
 #include <dune/xt/grid/type_traits.hh>
 #include <dune/xt/functions/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Functions {
+namespace Dune::XT::Functions {
 
 
 // forward
@@ -310,8 +308,6 @@ private:
 }; // class GradientVisualizationAdapter
 
 
-} // namespace Functions
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Functions
 
 #endif // DUNE_XT_FUNCTIONS_VISUALIZATION_HH

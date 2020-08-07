@@ -15,8 +15,7 @@
 
 #include <dune/xt/common/print.hh>
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 namespace Common {
 
 
@@ -106,7 +105,6 @@ using Common::repr;
 
 
 } // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 #endif // DUNE_XT_GRID_PRINT_HH

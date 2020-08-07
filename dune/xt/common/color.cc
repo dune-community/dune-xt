@@ -15,9 +15,7 @@
 #include <stdlib.h>
 #include <string>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 // foreground colors
 const char* Colors::black = "\033[30m";
@@ -195,6 +193,4 @@ std::string color_string_red(const std::string str)
   return color_string(str, Colors::red);
 }
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common

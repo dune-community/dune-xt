@@ -22,9 +22,7 @@
 #include <dune/xt/la/type_traits.hh>
 #include <dune/xt/la/solver.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class M, class V = typename Container<typename M::ScalarType, M::vector_type>::VectorType>
@@ -69,8 +67,6 @@ auto bind_Solver(pybind11::module& m)
 } // ... bind_Solver(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_SOLVER_PBH

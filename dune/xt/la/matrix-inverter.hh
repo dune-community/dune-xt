@@ -18,9 +18,7 @@
 
 #include <dune/xt/la/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 /**
@@ -126,9 +124,7 @@ auto invert_matrix(const M& matrix, const Common::Configuration& inversion_optio
 }
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #include "matrix-inverter/default.hh"
 #include "matrix-inverter/eigen.hh"

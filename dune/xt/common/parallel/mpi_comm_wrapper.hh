@@ -23,9 +23,7 @@
 
 #include <dune/xt/common/parallel/communicator.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 
 //! this class is needed because pybind11 cannot directly use the real mpi_comm type
 class MPI_Comm_Wrapper
@@ -41,14 +39,11 @@ private:
   WrappedComm comm_;
 };
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #if HAVE_MPI
 
-namespace pybind11 {
-namespace detail {
+namespace pybind11::detail {
 
 template <>
 class type_caster<Dune::XT::Common::MPI_Comm_Wrapper>
@@ -82,8 +77,7 @@ public:
     return this->value;
   }
 };
-} // namespace detail
-} // namespace pybind11
+} // namespace pybind11::detail
 #endif // HAVE_MPI
 
 #endif // DUNE_XT_COMMON_MPI_COMM_WRAPPER_HH

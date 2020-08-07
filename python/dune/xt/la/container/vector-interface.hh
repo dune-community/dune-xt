@@ -28,9 +28,7 @@
 #include <python/dune/xt/la/container/container-interface.hh>
 
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class C>
@@ -184,8 +182,6 @@ auto bind_Vector(pybind11::module& m)
 } // ... bind_Vector(...)
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_VECTOR_INTERFACE_PBH

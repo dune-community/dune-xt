@@ -28,9 +28,7 @@
 
 #include "preconditioners.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 //! the general, parallel case
@@ -230,8 +228,6 @@ protected:
 };
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_SOLVER_ISTL_AMG_HH

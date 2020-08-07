@@ -13,10 +13,7 @@
 
 #include <dune/pybindxi/interpreter.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
-namespace internal {
+namespace Dune::XT::LA::internal {
 
 
 bool numpy_eigensolver_available()
@@ -30,7 +27,4 @@ bool numpy_eigensolver_available()
 } // ... numpy_eigensolver_available(...)
 
 
-} // namespace internal
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA::internal

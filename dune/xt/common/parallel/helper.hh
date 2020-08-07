@@ -27,8 +27,7 @@
 #include <dune/common/parallel/communicator.hh>
 #include <dune/istl/paamg/pinfo.hh>
 
-namespace Dune {
-namespace XT {
+namespace Dune::XT {
 
 //! marker for sequential in MPI-enabled solver stuffs
 struct SequentialCommunication : public Dune::Amg::SequentialInformation
@@ -50,7 +49,6 @@ struct UseParallelCommunication
  **/
 int abort_all_mpi_processes();
 
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT
 
 #endif // DUNE_XT_COMMON_PARALLEL_HELPER_HH

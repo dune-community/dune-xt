@@ -45,9 +45,7 @@
 
 #include "../solver.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 #if HAVE_EIGEN
 
@@ -637,9 +635,7 @@ class Solver<EigenRowMajorSparseMatrix<S>>
 
 #endif // HAVE_EIGEN
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 
 // begin: this is what we need for the lib

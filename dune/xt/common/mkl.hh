@@ -12,10 +12,7 @@
 #ifndef DUNE_XT_COMMON_MKL_HH
 #define DUNE_XT_COMMON_MKL_HH
 
-namespace Dune {
-namespace XT {
-namespace Common {
-namespace Mkl {
+namespace Dune::XT::Common::Mkl {
 
 
 /**
@@ -31,9 +28,6 @@ bool available();
 void exp(const int n, const double* a, double* y);
 
 
-} // namespace Mkl
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common::Mkl
 
 #endif // DUNE_XT_COMMON_MKL_HH

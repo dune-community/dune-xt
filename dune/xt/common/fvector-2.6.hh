@@ -33,8 +33,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 
 /**
@@ -785,8 +784,7 @@ hstack(const L& left, const R& right, Vectors&&... vectors)
 }
 
 
-} // namespace Common
-} // namespace XT
+} // namespace XT::Common
 
 
 template <class K, int SIZE>

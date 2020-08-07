@@ -25,8 +25,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 
 /**
@@ -956,8 +955,7 @@ imag(const FieldMatrix<K, ROWS, COLS>& complex_mat)
 }
 
 
-} // namespace Common
-} // namespace XT
+} // namespace XT::Common
 
 template <class K, int L_ROWS, int L_COLS, int R_COLS>
 void rightmultiply(Dune::FieldMatrix<K, L_ROWS, R_COLS>& ret,

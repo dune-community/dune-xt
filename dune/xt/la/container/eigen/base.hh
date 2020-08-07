@@ -37,9 +37,7 @@
 
 #include "dune/xt/la/container/interfaces.hh"
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 template <class ScalarImp>
@@ -317,8 +315,6 @@ class EigenBaseVector
 
 #endif // HAVE_EIGEN
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // DUNE_XT_LA_CONTAINER_EIGEN_BASE_HH

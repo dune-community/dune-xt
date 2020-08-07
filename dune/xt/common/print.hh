@@ -23,9 +23,7 @@
 #include <dune/xt/common/vector.hh>
 #include <dune/xt/common/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Common {
+namespace Dune::XT::Common {
 namespace internal {
 
 
@@ -393,8 +391,6 @@ public:
 }; // class PrefixOutputIterator
 
 
-} // namespace Common
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Common
 
 #endif // DUNE_XT_COMMON_PRINT_HH

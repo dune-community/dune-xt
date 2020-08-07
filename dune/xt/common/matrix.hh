@@ -25,8 +25,7 @@
 #include <dune/xt/common/type_traits.hh>
 
 namespace Dune {
-namespace XT {
-namespace Common {
+namespace XT::Common {
 
 
 // Sparsity pattern placeholder representing a dense matrix pattern.
@@ -520,8 +519,7 @@ std::basic_ostream<CharType, CharTraits>& output_matrix(std::basic_ostream<CharT
 }
 
 
-} // namespace Common
-} // namespace XT
+} // namespace XT::Common
 
 
 template <class K>

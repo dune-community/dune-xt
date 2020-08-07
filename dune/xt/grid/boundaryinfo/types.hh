@@ -15,9 +15,7 @@
 #include <dune/xt/grid/exceptions.hh>
 #include "interfaces.hh"
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 
 // We do not want to add a virtual destructor (to be able to use this as constexpr), so just silence the warning.
 #if (defined(BOOST_CLANG) && BOOST_CLANG) || (defined(BOOST_GCC) && BOOST_GCC)
@@ -234,8 +232,6 @@ static constexpr NoBoundary no_boundary{};
 static constexpr ReflectingBoundary reflecting_boundary{};
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_BOUNDARYINFO_TYPES_HH

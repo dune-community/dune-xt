@@ -14,9 +14,7 @@
 
 #include <dune/xt/common/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace LA {
+namespace Dune::XT::LA {
 
 
 enum class Backends
@@ -237,8 +235,6 @@ template <class M>
 using vector_t = typename extract_vector<M>::type;
 
 
-} // namespace LA
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::LA
 
 #endif // #ifndef DUNE_XT_LA_TYPE_TRAITS_HH

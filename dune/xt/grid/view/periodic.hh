@@ -32,9 +32,7 @@
 #include <dune/xt/grid/search.hh>
 #include <dune/xt/grid/type_traits.hh>
 
-namespace Dune {
-namespace XT {
-namespace Grid {
+namespace Dune::XT::Grid {
 namespace internal {
 
 
@@ -1056,8 +1054,6 @@ make_periodic_grid_layer(const GP& real_grid_layer,
 }
 
 
-} // namespace Grid
-} // namespace XT
-} // namespace Dune
+} // namespace Dune::XT::Grid
 
 #endif // DUNE_XT_GRID_VIEW_PERIODIC_HH
