@@ -59,7 +59,7 @@ static inline Common::Configuration cube_gridprovider_default_config()
 template <class GridType>
 class CubeGridProviderFactory
 {
-  static_assert(is_grid<GridType>::value, "");
+  static_assert(is_grid<GridType>::value);
 
   template <typename G>
   struct ElementVariant;

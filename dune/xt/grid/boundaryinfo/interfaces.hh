@@ -62,7 +62,7 @@ class BoundaryInfo;
 template <class IntersectionImp>
 class BoundaryInfo : public Common::WithLogger<BoundaryInfo<IntersectionImp>>
 {
-  static_assert(is_intersection<IntersectionImp>::value, "");
+  static_assert(is_intersection<IntersectionImp>::value);
   using ThisType = BoundaryInfo<IntersectionImp>;
   using Logger = Common::WithLogger<BoundaryInfo<IntersectionImp>>;
 

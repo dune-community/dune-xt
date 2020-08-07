@@ -99,7 +99,7 @@ public:
   using ScalarType = typename VectorType::ScalarType;
 
 private:
-  static_assert(std::is_same<ScalarImp, ScalarType>::value, "");
+  static_assert(std::is_same<ScalarImp, ScalarType>::value);
 
 public:
   explicit VectorOutputIterator(VectorType& vec, const bool end = false)

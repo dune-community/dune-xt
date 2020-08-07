@@ -290,8 +290,8 @@ public:
 private:
   void setup(const std::vector<std::string>& vars, const std::vector<std::string>& exprs)
   {
-    static_assert((maxDimDomain > 0), "");
-    static_assert((range_dim > 0), "");
+    static_assert((maxDimDomain > 0));
+    static_assert((range_dim > 0));
     // set expressions
     if (exprs.size() != range_dim)
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,

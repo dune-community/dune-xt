@@ -45,7 +45,7 @@ auto energy                 = XT::Functions::make_sliced_function<1>(u, {3},    
 template <class LF, size_t r>
 class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface<typename LF::E, r, 1, typename LF::R>
 {
-  static_assert(is_grid_function<LF>::value, "");
+  static_assert(is_grid_function<LF>::value);
   static_assert(r <= LF::r, "Does not make sense!");
   using BaseType = XT::Functions::GridFunctionInterface<typename LF::E, r, 1, typename LF::R>;
 

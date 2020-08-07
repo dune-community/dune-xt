@@ -24,7 +24,7 @@ namespace Dune::XT::Grid::bindings {
 template <template <class> class Filter, class G>
 class InitlessIntersectionFilter
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
 
 public:
@@ -54,7 +54,7 @@ public:
 template <class G>
 class CustomBoundaryIntersectionsFilter
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
   using I = Grid::extract_intersection_t<GV>;
 

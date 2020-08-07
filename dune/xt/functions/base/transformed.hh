@@ -50,7 +50,7 @@ auto u_primitive = XT::Functions::make_transformed_function<d + 2, 1, R>(u_conse
 template <class LF, size_t r = LF::r, size_t rC = LF::rC, class R = typename LF::R>
 class TransformedGridFunction : public XT::Functions::GridFunctionInterface<typename LF::E, r, rC, R>
 {
-  static_assert(is_grid_function<LF>::value, "");
+  static_assert(is_grid_function<LF>::value);
   using BaseType = XT::Functions::GridFunctionInterface<typename LF::E, r, rC, R>;
 
   class TransformedLocalFunction : public XT::Functions::ElementFunctionInterface<typename LF::E, r, rC, R>

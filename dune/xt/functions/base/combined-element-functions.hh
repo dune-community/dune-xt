@@ -30,8 +30,8 @@ namespace internal {
 template <class LeftType, class RightType, CombinationType comb>
 class CombinedElementFunctionHelper
 {
-  static_assert(is_element_function<LeftType>::value, "");
-  static_assert(is_element_function<RightType>::value, "");
+  static_assert(is_element_function<LeftType>::value);
+  static_assert(is_element_function<RightType>::value);
 
 public:
   using E = typename LeftType::E;
@@ -42,10 +42,10 @@ private:
   static const constexpr size_t d = LeftType::d;
 
 private:
-  static_assert(std::is_same<typename RightType::E, E>::value, "");
-  static_assert(std::is_same<typename RightType::D, D>::value, "");
-  static_assert(RightType::d == d, "");
-  static_assert(std::is_same<typename RightType::R, R>::value, "");
+  static_assert(std::is_same<typename RightType::E, E>::value);
+  static_assert(std::is_same<typename RightType::D, D>::value);
+  static_assert(RightType::d == d);
+  static_assert(std::is_same<typename RightType::R, R>::value);
 
   template <class L, class R>
   class dim_switch

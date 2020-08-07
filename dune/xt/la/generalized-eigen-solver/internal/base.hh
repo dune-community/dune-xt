@@ -74,13 +74,12 @@ static inline Common::Configuration default_generalized_eigen_solver_options()
 template <class MatrixImp, class FieldImp, class RealMatrixImp, class ComplexMatrixImp>
 class GeneralizedEigenSolverBase
 {
-  static_assert(is_matrix<MatrixImp>::value || XT::Common::is_matrix<MatrixImp>::value, "");
-  static_assert(is_matrix<RealMatrixImp>::value || XT::Common::is_matrix<RealMatrixImp>::value, "");
-  static_assert(is_matrix<ComplexMatrixImp>::value || XT::Common::is_matrix<ComplexMatrixImp>::value, "");
+  static_assert(is_matrix<MatrixImp>::value || XT::Common::is_matrix<MatrixImp>::value);
+  static_assert(is_matrix<RealMatrixImp>::value || XT::Common::is_matrix<RealMatrixImp>::value);
+  static_assert(is_matrix<ComplexMatrixImp>::value || XT::Common::is_matrix<ComplexMatrixImp>::value);
   static_assert((is_matrix<MatrixImp>::value && is_matrix<RealMatrixImp>::value && is_matrix<ComplexMatrixImp>::value)
-                    || (XT::Common::is_matrix<MatrixImp>::value && XT::Common::is_matrix<RealMatrixImp>::value
-                        && XT::Common::is_matrix<ComplexMatrixImp>::value),
-                "");
+                || (XT::Common::is_matrix<MatrixImp>::value && XT::Common::is_matrix<RealMatrixImp>::value
+                    && XT::Common::is_matrix<ComplexMatrixImp>::value));
   using ThisType = GeneralizedEigenSolverBase;
 
 public:

@@ -369,7 +369,7 @@ public:
   {
     using V1 = typename Common::VectorAbstraction<FirstVectorType>;
     using V2 = typename Common::VectorAbstraction<SecondVectorType>;
-    static_assert(V1::is_vector && V2::is_vector, "");
+    static_assert(V1::is_vector && V2::is_vector);
     assert(xx.size() == cols() && yy.size() == rows());
     if (storage_layout == Common::StorageLayout::dense_row_major && V1::is_contiguous) {
       for (size_t rr = 0; rr < rows(); ++rr)
@@ -393,7 +393,7 @@ public:
   {
     using V1 = typename Common::VectorAbstraction<FirstVectorType>;
     using V2 = typename Common::VectorAbstraction<SecondVectorType>;
-    static_assert(V1::is_vector && V2::is_vector, "");
+    static_assert(V1::is_vector && V2::is_vector);
     assert(xx.size() == rows() && yy.size() == cols());
     yy *= ScalarType(0.);
     for (size_t cc = 0; cc < cols(); ++cc) {
@@ -529,7 +529,7 @@ public:
   void rightmultiply(const OtherMatrixType& other)
   {
     using M = typename Common::MatrixAbstraction<OtherMatrixType>;
-    static_assert(M::is_matrix, "");
+    static_assert(M::is_matrix);
     BackendType new_backend(rows(), M::cols(other), ScalarType(0.));
     if (M::rows(other) != cols())
       DUNE_THROW(Dune::XT::Common::Exceptions::shapes_do_not_match,

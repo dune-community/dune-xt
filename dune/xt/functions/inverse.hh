@@ -27,8 +27,7 @@ template <class FunctionType>
 class InverseFunctionHelper
 {
   static_assert(is_element_function<FunctionType>::value || is_function<FunctionType>::value
-                    || is_grid_function<FunctionType>::value,
-                "");
+                || is_grid_function<FunctionType>::value);
 
 public:
   static const constexpr size_t d = FunctionType::d;

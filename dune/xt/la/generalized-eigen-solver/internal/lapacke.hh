@@ -118,7 +118,7 @@ compute_generalized_eigenvalues_of_real_matrices_using_lapack_impl(
 template <class MatrixType>
 struct generalized_eigenvalues_lapack_helper
 {
-  static_assert(Common::is_matrix<MatrixType>::value, "");
+  static_assert(Common::is_matrix<MatrixType>::value);
 
   template <class MatrixImp>
   static inline std::vector<std::complex<double>> eigenvalues(MatrixImp&& lhs_matrix, MatrixImp&& rhs_matrix)

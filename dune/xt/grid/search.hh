@@ -33,7 +33,7 @@ namespace Dune::XT::Grid {
 template <class GridLayerType, int codim = 0>
 class EntitySearchBase
 {
-  static_assert(is_layer<GridLayerType>::value, "");
+  static_assert(is_layer<GridLayerType>::value);
 
 public:
   typedef extract_entity_t<GridLayerType, codim> EntityType;

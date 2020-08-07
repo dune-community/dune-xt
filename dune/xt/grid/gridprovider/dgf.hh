@@ -49,7 +49,7 @@ static inline Common::Configuration dgf_gridprovider_default_config()
 template <class GridType>
 class DgfGridProviderFactory
 {
-  static_assert(is_grid<GridType>::value, "");
+  static_assert(is_grid<GridType>::value);
 
 public:
   static const bool available = true;

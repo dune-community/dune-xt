@@ -30,8 +30,8 @@ namespace internal {
 template <class LeftType, class RightType, CombinationType comb>
 class SelectCombinedGridFunction
 {
-  static_assert(is_grid_function<LeftType>::value, "");
-  static_assert(is_grid_function<RightType>::value, "");
+  static_assert(is_grid_function<LeftType>::value);
+  static_assert(is_grid_function<RightType>::value);
 
 public:
   using E = typename LeftType::ElementType;

@@ -35,7 +35,7 @@ class ElementFunctor;
 template <class GL>
 class ElementFunctor : public Common::WithLogger<ElementFunctor<GL>>
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
 
 protected:
   //! force implementors to use copy() method
@@ -79,7 +79,7 @@ class IntersectionFunctor;
 template <class GL>
 class IntersectionFunctor : public Common::WithLogger<IntersectionFunctor<GL>>
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
 
 protected:
   //! force implementors to use copy() method
@@ -134,7 +134,7 @@ class ElementAndIntersectionFunctor;
 template <class GL>
 class ElementAndIntersectionFunctor : public Common::WithLogger<ElementAndIntersectionFunctor<GL>>
 {
-  static_assert(is_layer<GL>::value, "");
+  static_assert(is_layer<GL>::value);
 
 protected:
   //! force implementors to use copy() method

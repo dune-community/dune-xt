@@ -975,7 +975,7 @@ class PeriodicGridView
   : XT::Common::StorageProvider<internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>>
   , public Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>
 {
-  static_assert(is_layer<RealGridLayerImp>::value, "");
+  static_assert(is_layer<RealGridLayerImp>::value);
   using Implementation = internal::PeriodicGridLayerWrapper<RealGridLayerImp, codim_iters_provided>;
   using ImplementationStorage = typename XT::Common::StorageProvider<Implementation>;
   using BaseType = Dune::GridView<internal::PeriodicGridLayerWrapperTraits<RealGridLayerImp, codim_iters_provided>>;

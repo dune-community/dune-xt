@@ -23,7 +23,7 @@ namespace Dune::XT::Grid::bindings {
 template <template <class> class Filter, class G>
 class InitlessElementFilter
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
 
 public:

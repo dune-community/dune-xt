@@ -22,7 +22,7 @@ namespace Dune::XT::Grid::bindings {
 template <class G>
 class Walker
 {
-  static_assert(is_grid<G>::value, "");
+  static_assert(is_grid<G>::value);
   using GV = typename G::LeafGridView;
 
 public:
