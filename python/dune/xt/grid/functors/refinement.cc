@@ -11,6 +11,8 @@
 
 #include <dune/pybindxi/pybind11.h>
 #include <dune/xt/grid/functors/refinement.hh>
+#include <dune/xt/grid/grids.hh>
+#include <dune/xt/grid/type_traits.hh>
 
 #include "interfaces.hh"
 
@@ -22,14 +24,14 @@ namespace bindings {
 
 
 template <class G>
-class MaximumEntityVolumeRefineFunctorFunctor
+class MaximumEntityVolumeRefineFunctor
 {
   static_assert(is_grid<G>::value, "");
   using GV = typename G::LeafGridView;
   using I = extract_intersection_t<GV>;
 
 public:
-  using type = Grid::MaximumEntityVolumeRefineFunctorFunctor<GV>;
+  using type = Grid::MaximumEntityVolumeRefineFunctor<GV>;
   using base_type = Grid::ElementFunctor<GV>;
   using bound_type = pybind11::class_<type, base_type>;
 
@@ -50,7 +52,8 @@ public:
           "volume"_a,
           py::keep_alive<0, 1>());
     c.def("__repr__", [ClassId](type&) { return ClassId + "(grid_provider=\?\?\?, volume=\?\?\?)"; });
-    c.def_property_readonly("result", [](const type& self) { return self.result(); });
+    // there's no result member in the functor??
+    // c.def_property_readonly("result", [](const type& self) { return self.result(); });
 
     m.def(
         ClassId.c_str(),
@@ -63,7 +66,7 @@ public:
 
     return c;
   } // ... bind(...)
-}; // class MaximumEntityVolumeRefineFunctorFunctor
+}; // class MaximumEntityVolumeRefineFunctor
 
 
 } // namespace bindings
@@ -73,17 +76,17 @@ public:
 
 
 template <class GridTypes = Dune::XT::Grid::AvailableGridTypes>
-struct MaximumEntityVolumeRefineFunctorFunctor_for_all_grids
+struct MaximumEntityVolumeRefineFunctor_for_all_grids
 {
   static void bind(pybind11::module& m)
   {
-    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctorFunctor<typename GridTypes::head_type>::bind(m);
-    MaximumEntityVolumeRefineFunctorFunctor_for_all_grids<typename GridTypes::tail_type>::bind(m);
+    Dune::XT::Grid::bindings::MaximumEntityVolumeRefineFunctor<typename GridTypes::head_type>::bind(m);
+    MaximumEntityVolumeRefineFunctor_for_all_grids<typename GridTypes::tail_type>::bind(m);
   }
 };
 
 template <>
-struct MaximumEntityVolumeRefineFunctorFunctor_for_all_grids<boost::tuples::null_type>
+struct MaximumEntityVolumeRefineFunctor_for_all_grids<boost::tuples::null_type>
 {
   static void bind(pybind11::module& /*m*/) {}
 };
@@ -98,5 +101,5 @@ PYBIND11_MODULE(_grid_functors_refinement, m)
   py::module::import("dune.xt.grid._grid_gridprovider_provider");
   py::module::import("dune.xt.grid._grid_functors_interfaces");
 
-  MaximumEntityVolumeRefineFunctorFunctor_for_all_grids<>::bind(m);
+  MaximumEntityVolumeRefineFunctor_for_all_grids<>::bind(m);
 }
