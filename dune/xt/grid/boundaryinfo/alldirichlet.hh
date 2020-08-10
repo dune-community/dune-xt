@@ -48,7 +48,7 @@ public:
     return alldirichlet_boundaryinfo_default_config().template get<std::string>("type");
   }
 
-  const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const final
   {
     if (intersection.boundary() && !intersection.neighbor())
       return dirichlet_boundary_;
@@ -96,7 +96,7 @@ public:
     return "xt.grid.boundaryinfo.process";
   }
 
-  const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const final
   {
     if (!intersection.neighbor() && !intersection.boundary())
       return dirichlet_boundary_;

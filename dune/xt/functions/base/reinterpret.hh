@@ -64,7 +64,7 @@ public:
     , source_grid_view_(source_grid_view)
   {}
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<ReinterpretLocalfunction>(source_, source_grid_view_);
   }
@@ -144,7 +144,7 @@ private:
      * \note In some special situations (e.g., if the target element is not completely contained in one source
      *       element), this may give inaccurate results.
      **/
-    int order(const Common::Parameter& param = {}) const override final
+    int order(const Common::Parameter& param = {}) const final
     {
       if (source_element_which_contains_complete_target_element_ == nullptr
           && source_element_which_contains_some_point_of_target_element_ == nullptr)

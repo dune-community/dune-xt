@@ -39,19 +39,19 @@ public:
   {}
 
   //! Category of the preconditioner (see SolverCategory::Category)
-  SolverCategory::Category category() const override final
+  SolverCategory::Category category() const final
   {
     return category_;
   }
 
-  void pre(domain_type&, range_type&) override final {}
+  void pre(domain_type&, range_type&) final {}
 
-  void apply(domain_type& v, const range_type& d) override final
+  void apply(domain_type& v, const range_type& d) final
   {
     v = d;
   }
 
-  void post(domain_type&) override final {}
+  void post(domain_type&) final {}
 
 private:
   SolverCategory::Category category_;

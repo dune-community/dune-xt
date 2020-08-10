@@ -133,7 +133,7 @@ public:
 
   ElementFunctionSetInterface(ThisType&& source) = default;
 
-  virtual ~ElementFunctionSetInterface() = default;
+  ~ElementFunctionSetInterface() override = default;
 
   /**
    * \name ´´These methods have to be implemented.''

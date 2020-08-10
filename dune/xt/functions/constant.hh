@@ -65,24 +65,24 @@ public:
   ConstantFunction(const ThisType& other) = default;
 #endif
 
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return 0;
   }
 
   RangeReturnType evaluate(const DomainType& /*point_in_global_coordinates*/,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     return value_;
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     return DerivativeRangeReturnType(); // defaults to 0
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -111,12 +111,12 @@ public:
     return "dune.xt.functions.constantgridfunction";
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return constant_grid_function_.local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return constant_function_.name();
   }
@@ -146,17 +146,17 @@ public:
     return "dune.xt.functions.constantfluxfunction";
   }
 
-  bool x_dependent() const override final
+  bool x_dependent() const final
   {
     return false;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return constant_flux_function_.local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return constant_function_.name();
   }

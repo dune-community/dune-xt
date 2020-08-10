@@ -155,28 +155,28 @@ public:
     return vector_[index(ii)];
   }
 
-  ThisType add(const ThisType& other) const override final
+  ThisType add(const ThisType& other) const final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");
     return other;
   } // ... add(...)
 
-  ThisType sub(const ThisType& other) const override final
+  ThisType sub(const ThisType& other) const final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");
     return other;
   } // ... sub(...)
 
-  ThisType operator+(const ThisType& other) const override final
+  ThisType operator+(const ThisType& other) const final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");
     return other;
   }
 
-  ThisType operator-(const ThisType& other) const override final
+  ThisType operator-(const ThisType& other) const final
   {
     DUNE_THROW(XT::Common::Exceptions::you_are_using_this_wrong,
                "Methods returning a new VectorView are not implemented!");

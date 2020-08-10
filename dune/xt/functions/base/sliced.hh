@@ -71,18 +71,18 @@ class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       local_function_->bind(element);
     }
 
   public:
-    int order(const XT::Common::Parameter& = {}) const override final
+    int order(const XT::Common::Parameter& = {}) const final
     {
       return local_function_->order();
     }
 
-    RangeReturnType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
+    RangeReturnType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const final
     {
       RangeReturnType ret;
       const auto value = local_function_->evaluate(xx, param);
@@ -92,7 +92,7 @@ class SlicedGridFunction<LF, r, 1> : public XT::Functions::GridFunctionInterface
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& /*xx*/,
-                                       const XT::Common::Parameter& /*param*/ = {}) const override final
+                                       const XT::Common::Parameter& /*param*/ = {}) const final
     {
       DUNE_THROW(NotImplemented, "Yet!");
     }
@@ -119,12 +119,12 @@ public:
                               << "dims[" << ii << "] = " << dims_[ii]);
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_.empty() ? "sliced " + function_.name() : name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<SlicedLocalFunction>(function_, dims_);
   }

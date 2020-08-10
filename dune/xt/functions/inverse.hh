@@ -113,12 +113,12 @@ protected:
   }
 
 public:
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return order_;
   }
 
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Helper::compute(func_.access(), xx, param);
   }
@@ -162,12 +162,12 @@ public:
     , order_(ord)
   {}
 
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return order_;
   }
 
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Helper::compute(func_.access(), xx, param);
   }
@@ -210,13 +210,13 @@ public:
     , order_(ord)
   {}
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     using LocalFunction = InverseElementFunction<typename GridFunctionType::LocalFunctionType>;
     return std::unique_ptr<LocalFunction>(new LocalFunction(std::move(func_.access().local_function()), order_));
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     auto func_name = func_.access().name();
     return func_name.empty() ? ("dune.xt.functions.inversegridfunction") : ("inverse of " + func_name);

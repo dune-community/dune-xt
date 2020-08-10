@@ -89,28 +89,28 @@ public:
     function_ = std::make_shared<ActualFunctionType>(variables, expression);
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const Common::Parameter& /*param*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const final
   {
     return static_cast<int>(order_);
   }
 
-  bool is_parametric() const override final
+  bool is_parametric() const final
   {
     return !param_type_.empty();
   }
 
-  const Common::ParameterType& parameter_type() const override final
+  const Common::ParameterType& parameter_type() const final
   {
     return param_type_;
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     RangeReturnType ret(0.);
     Common::Parameter parsed_param;
@@ -168,7 +168,7 @@ public:
   } // ... evaluate(...)
 
   DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     DUNE_THROW(NotImplemented, "Not yet, at least...");
   }

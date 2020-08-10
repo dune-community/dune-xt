@@ -167,7 +167,7 @@ public:
 
   NormalBasedBoundaryInfo(ThisType&& source) = default;
 
-  void repr(std::ostream& out) const override final
+  void repr(std::ostream& out) const final
   {
     out << "NormalBasedBoundaryInfo(tol=" << tol_ << ", default_boundary_type=" << *default_boundary_type_;
     if (normal_to_type_map_.size() > 0)
@@ -196,7 +196,7 @@ public:
     normal_to_type_map_.emplace(normal, std::shared_ptr<BoundaryType>(std::move(boundary_type)));
   } // ... void register_new_normal(...)
 
-  const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const final
   {
     LOG_(debug) << "type(intersection=" << intersection << "):" << std::endl;
     if (!intersection.boundary()) {

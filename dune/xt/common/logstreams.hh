@@ -70,8 +70,8 @@ public:
 
 protected:
   friend class CombinedBuffer;
-  virtual std::streamsize xsputn(const char_type* s, std::streamsize count);
-  virtual int_type overflow(int_type ch = traits_type::eof());
+  std::streamsize xsputn(const char_type* s, std::streamsize count) override;
+  int_type overflow(int_type ch = traits_type::eof()) override;
 
 private:
   inline bool enabled() const
@@ -103,7 +103,7 @@ private:
   std::mutex sync_mutex_;
 
 protected:
-  virtual int sync();
+  int sync() override;
 }; // class FileBuffer
 
 class CombinedBuffer : public SuspendableStrBuffer
@@ -120,9 +120,9 @@ public:
   int pubsync();
 
 protected:
-  virtual std::streamsize xsputn(const char_type* s, std::streamsize count);
-  virtual int_type overflow(int_type ch = traits_type::eof());
-  virtual int sync();
+  std::streamsize xsputn(const char_type* s, std::streamsize count) override;
+  int_type overflow(int_type ch = traits_type::eof()) override;
+  int sync() override;
 
 private:
   std::list<std::unique_ptr<SuspendableStrBuffer>> buffer_;
@@ -138,7 +138,7 @@ public:
   {}
 
 protected:
-  virtual int sync();
+  int sync() override;
 }; // class EmptyBuffer
 
 /**
@@ -153,7 +153,7 @@ class TimedPrefixedStreamBuffer : public std::basic_stringbuf<char, std::char_tr
 public:
   TimedPrefixedStreamBuffer(const Timer& timer, const std::string prefix, std::ostream& out = std::cout);
 
-  virtual int sync();
+  int sync() override;
 
 private:
   TimedPrefixedStreamBuffer(const TimedPrefixedStreamBuffer&) = delete;
@@ -183,7 +183,7 @@ public:
     , BaseType(&this->access())
   {}
 
-  virtual ~LogStream()
+  ~LogStream() override
   {
     flush();
   }
@@ -242,7 +242,7 @@ class TimedPrefixedLogStream
 public:
   TimedPrefixedLogStream(const Timer& timer, const std::string prefix, std::ostream& outstream);
 
-  virtual ~TimedPrefixedLogStream();
+  ~TimedPrefixedLogStream() override;
 }; // TimedPrefixedLogStream
 
 //! ostream compatible class wrapping file and console output

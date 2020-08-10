@@ -57,12 +57,12 @@ class DefaultVisualizer : public VisualizerInterface<r, rC, R>
 public:
   using typename BaseType::RangeType;
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return helper<>::ncomps();
   }
 
-  double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const final
   {
     return helper<>::evaluate(comp, val);
   }
@@ -115,12 +115,12 @@ class SumVisualizer : public VisualizerInterface<r, rC, R>
 public:
   using typename BaseType::RangeType;
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return 1;
   }
 
-  double evaluate(const int& DXTC_DEBUG_ONLY(comp), const RangeType& val) const override final
+  double evaluate(const int& DXTC_DEBUG_ONLY(comp), const RangeType& val) const final
   {
     assert(comp == 0);
     return std::accumulate(val.begin(), val.end(), 0.);
@@ -141,12 +141,12 @@ public:
     : comp_(comp)
   {}
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return 1;
   }
 
-  double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const final
   {
     DUNE_THROW_IF(comp != 0, Dune::InvalidStateException, "This visualizer plots only a single component!");
     return val[comp_];
@@ -171,12 +171,12 @@ public:
     , eval_(eval)
   {}
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return ncomps_;
   }
 
-  double evaluate(const int& comp, const RangeType& val) const override final
+  double evaluate(const int& comp, const RangeType& val) const final
   {
     return eval_(comp, val);
   }
@@ -220,17 +220,17 @@ public:
     , param_(param)
   {}
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return visualizer_.access().ncomps();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  double evaluate(int comp, const EntityType& en, const DomainType& xx) const override final
+  double evaluate(int comp, const EntityType& en, const DomainType& xx) const final
   {
     local_function_->bind(en);
     const auto value = local_function_->evaluate(xx, param_);
@@ -285,17 +285,17 @@ public:
       DUNE_THROW(Dune::NotImplemented, "Only implemented for scalar functions by now!");
   }
 
-  int ncomps() const override final
+  int ncomps() const final
   {
     return visualizer_.access().ncomps();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  double evaluate(int comp, const EntityType& en, const DomainType& xx) const override final
+  double evaluate(int comp, const EntityType& en, const DomainType& xx) const final
   {
     local_function_->bind(en);
     const auto value = local_function_->jacobian(xx, param_);

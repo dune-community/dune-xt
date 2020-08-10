@@ -30,12 +30,12 @@ namespace Grid {
 class NoBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "no_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new NoBoundary();
   }
@@ -45,12 +45,12 @@ public:
 class UnknownBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "unknown_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new UnknownBoundary();
   }
@@ -60,12 +60,12 @@ public:
 class DirichletBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "dirichlet_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new DirichletBoundary();
   }
@@ -75,12 +75,12 @@ public:
 class NeumannBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "neumann_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new NeumannBoundary();
   }
@@ -90,12 +90,12 @@ public:
 class RobinBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "robin_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new RobinBoundary();
   }
@@ -105,12 +105,12 @@ public:
 class ReflectingBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "reflecting_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new ReflectingBoundary();
   }
@@ -120,12 +120,12 @@ public:
 class AbsorbingBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "absorbing_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new AbsorbingBoundary();
   }
@@ -135,12 +135,12 @@ public:
 class InflowBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "inflow_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new InflowBoundary();
   }
@@ -150,12 +150,12 @@ public:
 class OutflowBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "outflow_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new OutflowBoundary();
   }
@@ -165,12 +165,12 @@ public:
 class InflowOutflowBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "inflow_outflow_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new InflowOutflowBoundary();
   }
@@ -180,12 +180,12 @@ public:
 class ImpermeableBoundary : public BoundaryType
 {
 public:
-  std::string id() const override final
+  std::string id() const final
   {
     return "impermeable_boundary";
   }
 
-  BoundaryType* copy() const override final
+  BoundaryType* copy() const final
   {
     return new ImpermeableBoundary();
   }

@@ -59,7 +59,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element)
     {
       current_value_ = 0;
       if (is_in_checkerboard(element)) {
@@ -69,20 +69,20 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     }
 
   public:
-    int order(const Common::Parameter& /*param*/ = {}) const override final
+    int order(const Common::Parameter& /*param*/ = {}) const
     {
       return 0;
     }
 
     RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                             const Common::Parameter& /*param*/ = {}) const override final
+                             const Common::Parameter& /*param*/ = {}) const
     {
       this->assert_inside_reference_element(point_in_reference_element);
       return current_value_;
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                       const Common::Parameter& /*param*/ = {}) const override final
+                                       const Common::Parameter& /*param*/ = {}) const
     {
       this->assert_inside_reference_element(point_in_reference_element);
       return DerivativeRangeReturnType();
@@ -194,7 +194,7 @@ public:
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const override
   {
     return std::make_unique<LocalCheckerboardFunction>(lower_left_, upper_right_, num_elements_, *values_);
   }
@@ -244,7 +244,7 @@ private:
   const FieldVector<size_t, domain_dim> num_elements_;
   std::shared_ptr<std::vector<RangeType>> values_;
   std::string name_;
-}; // class CheckerboardFunction
+}; // namespace Functions
 
 
 } // namespace Functions

@@ -492,7 +492,7 @@ public:
    * \{
    */
 
-  virtual void prepare() override
+  void prepare() override
   {
     auto prep = [](auto& wrapper_list) {
       for (auto&& wrapper : wrapper_list)
@@ -517,7 +517,7 @@ public:
     prep(*element_and_intersection_functor_wrappers_);
   }
 
-  virtual void apply_local(const ElementType& element) override
+  void apply_local(const ElementType& element) override
   {
     apply_local(element, *element_functor_wrappers_, *element_and_intersection_functor_wrappers_);
   } // ... apply_local(...)
@@ -537,9 +537,9 @@ public:
     }
   } // ... apply_local(...)
 
-  virtual void apply_local(const IntersectionType& intersection,
-                           const ElementType& inside_element,
-                           const ElementType& outside_element) override
+  void apply_local(const IntersectionType& intersection,
+                   const ElementType& inside_element,
+                   const ElementType& outside_element) override
   {
     apply_local(intersection,
                 inside_element,
@@ -566,7 +566,7 @@ public:
   } // ... apply_local(...)
 
   // finalize all threads
-  virtual void finalize() override
+  void finalize() override
   {
     auto fin = [](auto& per_thread_value) {
       for (auto&& list : per_thread_value) {

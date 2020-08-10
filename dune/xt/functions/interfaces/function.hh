@@ -120,7 +120,7 @@ public:
     : Common::ParametricInterface(param_type)
   {}
 
-  virtual ~FunctionInterface() = default;
+  ~FunctionInterface() override = default;
 
   /**
    * \name ´´These methods have to be implemented.''

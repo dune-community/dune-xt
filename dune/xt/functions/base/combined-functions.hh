@@ -344,7 +344,7 @@ public:
 
   ThisType& operator=(ThisType&& other) = delete;
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
@@ -353,7 +353,7 @@ public:
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
 
-  int order(const XT::Common::Parameter& param = {}) const override final
+  int order(const XT::Common::Parameter& param = {}) const final
   {
     auto ret = Select::order(left_->access().order(param), right_->access().order(param));
     assert(ret < std::numeric_limits<int>::max());
@@ -361,13 +361,13 @@ public:
   }
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return Select::evaluate(left_->access(), right_->access(), point_in_global_coordinates, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return Select::jacobian(left_->access(), right_->access(), point_in_global_coordinates, param);
   }

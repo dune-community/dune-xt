@@ -77,24 +77,24 @@ class TransformedGridFunction : public XT::Functions::GridFunctionInterface<type
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       local_function_->bind(element);
     }
 
   public:
-    int order(const XT::Common::Parameter& param = {}) const override final
+    int order(const XT::Common::Parameter& param = {}) const final
     {
       return local_function_->order(param);
     }
 
-    RangeReturnType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const override final
+    RangeReturnType evaluate(const DomainType& xx, const XT::Common::Parameter& param = {}) const final
     {
       return transformation_(local_function_->evaluate(xx, param));
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& /*xx*/,
-                                       const XT::Common::Parameter& /*param*/ = {}) const override final
+                                       const XT::Common::Parameter& /*param*/ = {}) const final
     {
       DUNE_THROW(NotImplemented, "TransformedLocalFunction does not provide jacobian evaluations (yet)!");
     }
@@ -118,12 +118,12 @@ public:
     , name_(nm)
   {}
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_.empty() ? "transformed " + function_.name() : name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<TransformedLocalFunction>(function_, transformation_);
   }

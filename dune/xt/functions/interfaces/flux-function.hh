@@ -80,7 +80,7 @@ public:
     : Common::ParametricInterface(param_type)
   {}
 
-  virtual ~FluxFunctionInterface() = default;
+  ~FluxFunctionInterface() override = default;
 
   virtual bool x_dependent() const
   {

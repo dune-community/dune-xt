@@ -303,7 +303,7 @@ public:
   /// \name These methods override default implementations from VectorInterface..
   /// \{
 
-  ScalarType dot(const ThisType& other) const override final
+  ScalarType dot(const ThisType& other) const final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -311,22 +311,22 @@ public:
     return backend().dot(other.backend());
   } // ... dot(...)
 
-  RealType l1_norm() const override final
+  RealType l1_norm() const final
   {
     return backend().one_norm();
   }
 
-  RealType l2_norm() const override final
+  RealType l2_norm() const final
   {
     return backend().two_norm();
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     return backend().infinity_norm();
   }
 
-  void iadd(const ThisType& other) override final
+  void iadd(const ThisType& other) final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -335,7 +335,7 @@ public:
     backend() += other.backend();
   } // ... iadd(...)
 
-  void isub(const ThisType& other) override final
+  void isub(const ThisType& other) final
   {
     if (other.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
@@ -674,14 +674,14 @@ public:
    * \attention Use and interprete with care, since the Dune::BCRSMatrix is known to report strange things here,
    * depending on its state!
    */
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return backend_->nonzeroes();
   }
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                             Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     SparsityPatternDefault ret(rows());
     if (prune) {
@@ -700,8 +700,8 @@ public:
     return ret;
   } // ... pattern(...)
 
-  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                      Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     return ThisType(*backend_, true, eps);
   }

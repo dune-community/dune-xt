@@ -51,7 +51,7 @@ class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
     {}
 
   protected:
-    void post_bind(const ElementType& element) override final
+    void post_bind(const ElementType& element) final
     {
       current_value_ = 0.;
       const auto center = element.geometry().center();
@@ -64,20 +64,20 @@ class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
     } // ... post_bind(...)
 
   public:
-    int order(const Common::Parameter& /*param*/ = {}) const override final
+    int order(const Common::Parameter& /*param*/ = {}) const final
     {
       return 0;
     }
 
     RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                             const Common::Parameter& /*param*/ = {}) const override final
+                             const Common::Parameter& /*param*/ = {}) const final
     {
       this->assert_inside_reference_element(point_in_reference_element);
       return current_value_;
     }
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                       const Common::Parameter& /*param*/ = {}) const override final
+                                       const Common::Parameter& /*param*/ = {}) const final
     {
       this->assert_inside_reference_element(point_in_reference_element);
       return DerivativeRangeReturnType();
@@ -144,12 +144,12 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
     , name_(name_in)
   {}
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalIndicatorGridFunction>(subdomain_and_value_tuples_);
   }
@@ -199,7 +199,7 @@ public:
     , name_(nm)
   {}
 
-  int order(const XT::Common::Parameter& /*param*/ = {}) const override final
+  int order(const XT::Common::Parameter& /*param*/ = {}) const final
   {
     return 0;
   }
@@ -221,7 +221,7 @@ public:
     return config;
   } // ... defaults(...)
 
-  std::string name() const override final
+  std::string name() const final
   {
     return "dune.xt.functions.indicatorfunction";
   }
@@ -229,7 +229,7 @@ public:
   using BaseType::evaluate;
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType value(0.);
     for (const auto& subdomain_and_value_tuple : subdomain_and_value_tuples_) {
@@ -245,7 +245,7 @@ public:
   using BaseType::jacobian;
 
   DerivativeRangeReturnType jacobian(const DomainType& /*point_in_global_coordinates*/,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     return DerivativeRangeReturnType(); // <- defaults to 0
   }

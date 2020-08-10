@@ -87,7 +87,7 @@ public:
   {}
 
 protected:
-  void compute() const override final
+  void compute() const final
   {
     const auto type = options_->template get<std::string>("type");
     const auto rows = M::rows(matrix_);

@@ -91,7 +91,7 @@ public:
    */
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     post_bind_(element);
   }
@@ -103,24 +103,24 @@ public:
    * \{
    */
 
-  size_t size(const Common::Parameter& param = {}) const override final
+  size_t size(const Common::Parameter& param = {}) const final
   {
     return size_(this->parse_parameter(param));
   }
 
-  size_t max_size(const Common::Parameter& param = {}) const override final
+  size_t max_size(const Common::Parameter& param = {}) const final
   {
     return max_size_(this->parse_parameter(param));
   }
 
-  int order(const Common::Parameter& param = {}) const override final
+  int order(const Common::Parameter& param = {}) const final
   {
     return order_(this->parse_parameter(param));
   }
 
   void evaluate(const DomainType& point_in_reference_element,
                 std::vector<RangeType>& result,
-                const Common::Parameter& param = {}) const override final
+                const Common::Parameter& param = {}) const final
   {
     const auto sz = this->size(param);
     if (result.size() < sz)
@@ -130,7 +130,7 @@ public:
 
   void jacobians(const DomainType& point_in_reference_element,
                  std::vector<DerivativeRangeType>& result,
-                 const Common::Parameter& param = {}) const override final
+                 const Common::Parameter& param = {}) const final
   {
     const auto sz = this->size(param);
     if (result.size() < sz)
@@ -141,7 +141,7 @@ public:
   void derivatives(const std::array<size_t, d>& alpha,
                    const DomainType& point_in_reference_element,
                    std::vector<DerivativeRangeType>& result,
-                   const Common::Parameter& param = {}) const override final
+                   const Common::Parameter& param = {}) const final
   {
     const auto sz = this->size(param);
     if (result.size() < sz)
@@ -262,7 +262,7 @@ public:
    */
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     post_bind_(element);
   }
@@ -274,26 +274,26 @@ public:
    * \{
    */
 
-  int order(const Common::Parameter& param = {}) const override final
+  int order(const Common::Parameter& param = {}) const final
   {
     return order_(this->parse_parameter(param));
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return evaluate_(point_in_reference_element, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return jacobian_(point_in_reference_element, this->parse_parameter(param));
   }
 
   DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                        const DomainType& point_in_reference_element,
-                                       const Common::Parameter& param = {}) const override final
+                                       const Common::Parameter& param = {}) const final
   {
     return derivative_(alpha, point_in_reference_element, this->parse_parameter(param));
   }

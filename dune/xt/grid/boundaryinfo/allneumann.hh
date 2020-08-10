@@ -48,7 +48,7 @@ public:
     return allneumann_boundaryinfo_default_config().template get<std::string>("type");
   }
 
-  const BoundaryType& type(const IntersectionType& intersection) const override final
+  const BoundaryType& type(const IntersectionType& intersection) const final
   {
     if (intersection.boundary())
       return neumann_boundary_;

@@ -414,14 +414,14 @@ public:
     return true;
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return entries_->size();
   }
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
-                                                             / 1000.) const override
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
+                                                     / 1000.) const override
   {
     SparsityPatternDefault ret(num_rows_);
     for (size_t rr = 0; rr < num_rows_; ++rr) {
@@ -933,14 +933,14 @@ public:
     return true;
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return entries_->size();
   }
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
-                                                             / 1000.) const override
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()
+                                                     / 1000.) const override
   {
     SparsityPatternDefault ret(num_rows_);
     for (size_t cc = 0; cc < num_cols_; ++cc) {
@@ -1351,12 +1351,12 @@ public:
     return sparse_ ? sparse_matrix_.valid() : dense_matrix_.valid();
   }
 
-  size_t non_zeros() const override final
+  size_t non_zeros() const final
   {
     return sparse_ ? sparse_matrix_.non_zeros() : dense_matrix_.non_zeros();
   }
 
-  virtual SparsityPatternDefault
+  SparsityPatternDefault
   pattern(const bool prune = false,
           const EpsType eps = Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {

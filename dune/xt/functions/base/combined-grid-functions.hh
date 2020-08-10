@@ -271,14 +271,14 @@ public:
   {}
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     left_local_->bind(element);
     right_local_->bind(element);
   }
 
 public:
-  int order(const XT::Common::Parameter& param = {}) const override final
+  int order(const XT::Common::Parameter& param = {}) const final
   {
     const auto ret = Select::order(left_local_->order(param), right_local_->order(param));
     assert(ret < std::numeric_limits<int>::max());
@@ -286,13 +286,13 @@ public:
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return Select::evaluate(*left_local_, *right_local_, point_in_reference_element, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return Select::jacobian(*left_local_, *right_local_, point_in_reference_element, param);
   }
@@ -415,7 +415,7 @@ public:
 
   ThisType& operator=(ThisType&& other) = delete;
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     using RealLocalFunctionType = CombinedLocalFunction<LeftType, RightType, comb>;
     assert(left_);
@@ -423,7 +423,7 @@ public:
     return std::make_unique<RealLocalFunctionType>(left_->access(), right_->access());
   } // ... local_function(...)
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }

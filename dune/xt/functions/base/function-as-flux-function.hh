@@ -44,7 +44,7 @@ public:
     : function_storage_(std::move(function_ptr))
   {}
 
-  bool x_dependent() const override final
+  bool x_dependent() const final
   {
     return false;
   }
@@ -54,7 +54,7 @@ public:
    * \{
    **/
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalFunction>(function_storage_.access());
   }
@@ -65,7 +65,7 @@ public:
    * \{
    **/
 
-  std::string name() const override final
+  std::string name() const final
   {
     return function_storage_.access().name();
   }
@@ -91,7 +91,7 @@ private:
     {}
 
   public:
-    int order(const Common::Parameter& param = {}) const override final
+    int order(const Common::Parameter& param = {}) const final
     {
       return function_.order(param);
     }
@@ -100,7 +100,7 @@ private:
 
     RangeReturnType evaluate(const DomainType& /*point_in_reference_element*/,
                              const StateType& u,
-                             const Common::Parameter& param = {}) const override final
+                             const Common::Parameter& param = {}) const final
     {
       return function_.evaluate(u, param);
     }
@@ -109,7 +109,7 @@ private:
 
     JacobianRangeReturnType jacobian(const DomainType& /*point_in_reference_element*/,
                                      const StateType& u,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
     {
       return function_.jacobian(u, param);
     }

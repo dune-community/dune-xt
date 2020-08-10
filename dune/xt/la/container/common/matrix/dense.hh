@@ -542,8 +542,8 @@ public:
     *backend_ = new_backend;
   }
 
-  virtual ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                              Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
+  ThisType pruned(const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                      Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override
   {
     auto ret = this->copy();
     for (auto& entry : ret.backend_->entries_)

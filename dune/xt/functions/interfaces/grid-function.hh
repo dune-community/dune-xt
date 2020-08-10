@@ -99,7 +99,7 @@ public:
     : Common::ParametricInterface(param_type)
   {}
 
-  virtual ~GridFunctionInterface() = default;
+  ~GridFunctionInterface() override = default;
 
   static std::string static_id()
   {

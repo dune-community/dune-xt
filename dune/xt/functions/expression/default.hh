@@ -141,12 +141,12 @@ public:
     return *this;
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const Common::Parameter& /*param*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const final
   {
     return static_cast<int>(order_);
   }
@@ -154,7 +154,7 @@ public:
   using BaseType::evaluate;
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType ret(0.);
     Common::FieldVector<RangeFieldType, r * rC> tmp_vector_;
@@ -172,7 +172,7 @@ public:
   using BaseType::jacobian;
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");
@@ -337,12 +337,12 @@ public:
     return *this;
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return name_;
   }
 
-  int order(const Common::Parameter& /*param*/ = {}) const override final
+  int order(const Common::Parameter& /*param*/ = {}) const final
   {
     return static_cast<int>(order_);
   }
@@ -350,7 +350,7 @@ public:
   using BaseType::evaluate;
 
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
-                           const Common::Parameter& /*param*/ = {}) const override final
+                           const Common::Parameter& /*param*/ = {}) const final
   {
     RangeReturnType ret(0.);
     function_->evaluate(point_in_global_coordinates, ret);
@@ -361,7 +361,7 @@ public:
   using BaseType::jacobian;
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
-                                     const Common::Parameter& /*param*/ = {}) const override final
+                                     const Common::Parameter& /*param*/ = {}) const final
   {
     if (gradients_.size() != r)
       DUNE_THROW(NotImplemented, "Do not call jacobian() if no gradients are given on construction!");

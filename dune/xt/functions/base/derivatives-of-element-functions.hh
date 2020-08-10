@@ -208,17 +208,17 @@ protected:
   }
 
 public:
-  int order(const XT::Common::Parameter& param = {}) const override final
+  int order(const XT::Common::Parameter& param = {}) const final
   {
     return Select::order(func_.access().order(param));
   }
 
-  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  RangeReturnType evaluate(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Select::evaluate(func_.access(), xx, param);
   }
 
-  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& param = {}) const override final
+  DerivativeRangeReturnType jacobian(const DomainType& xx, const Common::Parameter& param = {}) const final
   {
     return Select::jacobian(func_.access(), xx, param);
   }

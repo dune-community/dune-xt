@@ -181,12 +181,12 @@ public:
     , storage_(std::move(source.storage_))
   {}
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return storage_.access().local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return storage_.access().name();
   }
@@ -305,12 +305,12 @@ public:
     , storage_(std::move(source.storage_))
   {}
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return storage_.access().local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return storage_.access().name();
   }
@@ -401,12 +401,12 @@ public:
     , storage_(std::move(source.storage_))
   {}
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return storage_.access().local_function();
   }
 
-  std::string name() const override final
+  std::string name() const final
   {
     return storage_.access().name();
   }

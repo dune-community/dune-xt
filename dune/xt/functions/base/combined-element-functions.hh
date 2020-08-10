@@ -420,19 +420,19 @@ protected:
   }
 
 public:
-  int order(const XT::Common::Parameter& param = {}) const override final
+  int order(const XT::Common::Parameter& param = {}) const final
   {
     return Select::order(left_.access(), right_.access(), param);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                           const Common::Parameter& param = {}) const override final
+                           const Common::Parameter& param = {}) const final
   {
     return Select::evaluate(left_.access(), right_.access(), point_in_reference_element, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                     const Common::Parameter& param = {}) const override final
+                                     const Common::Parameter& param = {}) const final
   {
     return Select::jacobian(left_.access(), right_.access(), point_in_reference_element, param);
   }
@@ -495,7 +495,7 @@ public:
   {}
 
 protected:
-  void post_bind(const ElementType& element) override final
+  void post_bind(const ElementType& element) final
   {
     Storage::left.access().bind(element);
     Storage::right.access().bind(element);

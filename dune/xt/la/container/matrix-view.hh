@@ -223,7 +223,7 @@ public:
     return true;
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     RealType ret = 0;
     for (size_t ii = 0; ii < rows(); ++ii)
@@ -232,9 +232,9 @@ public:
     return ret;
   } // ... sup_norm(...)
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                             Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     SparsityPatternDefault ret(rows());
     auto matrix_patt = matrix_.pattern(prune, eps);
@@ -413,14 +413,14 @@ public:
     return const_matrix_view_.valid();
   }
 
-  RealType sup_norm() const override final
+  RealType sup_norm() const final
   {
     return const_matrix_view_.sup_norm();
   } // ... sup_norm(...)
 
-  virtual SparsityPatternDefault pattern(const bool prune = false,
-                                         const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
-                                             Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const override final
+  SparsityPatternDefault pattern(const bool prune = false,
+                                 const typename Common::FloatCmp::DefaultEpsilon<ScalarType>::Type eps =
+                                     Common::FloatCmp::DefaultEpsilon<ScalarType>::value()) const final
   {
     return const_matrix_view_.pattern(prune, eps);
   } // ... pattern(...)

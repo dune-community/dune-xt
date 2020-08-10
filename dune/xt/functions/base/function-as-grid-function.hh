@@ -57,7 +57,7 @@ public:
    * \{
    **/
 
-  std::unique_ptr<LocalFunctionType> local_function() const override final
+  std::unique_ptr<LocalFunctionType> local_function() const final
   {
     return std::make_unique<LocalFunction>(function_storage_.access());
   }
@@ -68,7 +68,7 @@ public:
    * \{
    **/
 
-  std::string name() const override final
+  std::string name() const final
   {
     return function_storage_.access().name();
   }
@@ -95,13 +95,13 @@ private:
     {}
 
   protected:
-    void post_bind(const ElementType& el) override final
+    void post_bind(const ElementType& el) final
     {
       geometry_ = std::make_unique<GeometryType>(el.geometry());
     }
 
   public:
-    int order(const Common::Parameter& param = {}) const override final
+    int order(const Common::Parameter& param = {}) const final
     {
       DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       return function_.order(param);
@@ -110,7 +110,7 @@ private:
     using BaseType::evaluate;
 
     RangeReturnType evaluate(const DomainType& point_in_reference_element,
-                             const Common::Parameter& param = {}) const override final
+                             const Common::Parameter& param = {}) const final
     {
       DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       this->assert_inside_reference_element(point_in_reference_element);
@@ -120,7 +120,7 @@ private:
     using BaseType::jacobian;
 
     DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
-                                       const Common::Parameter& param = {}) const override final
+                                       const Common::Parameter& param = {}) const final
     {
       DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       this->assert_inside_reference_element(point_in_reference_element);
@@ -131,7 +131,7 @@ private:
 
     DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
                                          const DomainType& point_in_reference_element,
-                                         const Common::Parameter& param = {}) const override final
+                                         const Common::Parameter& param = {}) const final
     {
       DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
       this->assert_inside_reference_element(point_in_reference_element);
