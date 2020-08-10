@@ -44,7 +44,8 @@ public:
 
     auto ClassId = Common::to_camel_case(class_id);
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
-    bound_type c(m, ClassName.c_str(), std::string(ClassId + "( " + grid_id + " variant)").c_str());
+    const std::string doc{ClassId + "( " + grid_id + " variant)"};
+    bound_type c(m, ClassName.c_str(), doc.c_str());
     c.def(py::init([](GridProvider<G>& grid_provider, const double& volume) {
             return std::make_unique<type>(grid_provider.grid(), volume, 1.);
           }),
