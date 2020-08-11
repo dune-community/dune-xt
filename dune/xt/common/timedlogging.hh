@@ -226,7 +226,7 @@ public:
   /**
    * \brief sets the state
    *
-   *        This methos is mainly intended to be used on the global TimedLogger() instance. Before calling this method
+   *        This method is mainly intended to be used on the global TimedLogger() instance. Before calling this method
    *        the state is set according to the defaults default_max_info_level, default_max_debug_level and
    *        default_enable_warnings.
    * \note  Calling this method more than once will throw an Exceptions::you_are_using_this_wrong, following the idea of
@@ -236,11 +236,11 @@ public:
               const ssize_t max_debug_level = default_max_debug_level,
               const bool enable_warnings = default_enable_warnings,
               const bool enable_colors = default_enable_colors,
-              const std::string info_color = default_info_color(),
-              const std::string debug_color = default_debug_color(),
-              const std::string warning_color = default_warning_color());
+              const std::string& info_color = default_info_color(),
+              const std::string& debug_color = default_debug_color(),
+              const std::string& warning_color = default_warning_color());
 
-  TimedLogManager get(const std::string id);
+  TimedLogManager get(const std::string& id);
 
 private:
   void update_colors();
