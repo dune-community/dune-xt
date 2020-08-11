@@ -47,7 +47,7 @@ public:
     c.def(py::init([](){return std::make_unique<type>();}));
     c.def("__repr__", [ClassId](type&){ return ClassId + "()";});
 
-    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&){return type();});
+    m.def(ClassId.c_str(), [](const Grid::GridProvider<G>&){return new type();});
 
     return c;
   } // ... bind(...)
