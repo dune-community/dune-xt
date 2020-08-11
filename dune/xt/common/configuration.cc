@@ -126,7 +126,7 @@ bool Configuration::has_key(const std::string& key) const
   return BaseType::hasKey(key);
 }
 
-Configuration Configuration::sub(const std::string sub_id, bool fail_if_missing, Configuration default_value) const
+Configuration Configuration::sub(const std::string& sub_id, bool fail_if_missing, Configuration default_value) const
 {
   if ((empty() || !has_sub(sub_id)) && !fail_if_missing)
     return default_value;
@@ -146,7 +146,7 @@ Configuration Configuration::sub(const std::string sub_id, bool fail_if_missing,
   return Configuration(BaseType::sub(sub_id));
 } // ... sub(...)
 
-bool Configuration::has_sub(const std::string subTreeName) const
+bool Configuration::has_sub(const std::string& subTreeName) const
 {
   return BaseType::hasSub(subTreeName);
 }
