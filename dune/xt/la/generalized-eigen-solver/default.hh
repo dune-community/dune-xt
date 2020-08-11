@@ -33,7 +33,7 @@ public:
   {
     std::vector<std::string> tps;
     if (Common::Lapacke::available())
-      tps.push_back("lapack");
+      tps.emplace_back("lapack");
     DUNE_THROW_IF(tps.empty(),
                   Exceptions::generalized_eigen_solver_failed,
                   "No backend available for generalized eigenvalue problems!");

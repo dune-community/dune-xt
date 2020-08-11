@@ -38,8 +38,8 @@ public:
   {
     std::vector<std::string> tps = {"eigen"};
     if (Common::Lapacke::available())
-      tps.push_back("lapack");
-    tps.push_back("shifted_qr");
+      tps.emplace_back("lapack");
+    tps.emplace_back("shifted_qr");
     return tps;
   }
 

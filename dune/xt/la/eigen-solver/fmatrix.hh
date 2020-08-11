@@ -43,13 +43,13 @@ public:
   {
     std::vector<std::string> tps;
     if (Common::Lapacke::available())
-      tps.push_back("lapack");
+      tps.emplace_back("lapack");
 #if HAVE_EIGEN
-    tps.push_back("eigen");
+    tps.emplace_back("eigen");
 #endif
     if (internal::numpy_eigensolver_available())
-      tps.push_back("numpy");
-    tps.push_back("shifted_qr");
+      tps.emplace_back("numpy");
+    tps.emplace_back("shifted_qr");
     return tps;
   }
 
