@@ -54,8 +54,8 @@ class RVar
 public:
   RVar()
   {
-    name = NULL;
-    pval = NULL;
+    name = nullptr;
+    pval = nullptr;
   }
 
   RVar(const RVar&);
@@ -127,7 +127,7 @@ public:
   ROperation(const ROperation&);
   ROperation(double);
   ROperation(const RVar&);
-  ROperation(const char* sp, int nvarp = 0, PRVar* ppvarp = NULL, int nfuncp = 0, PRFunction* ppfuncp = NULL);
+  ROperation(const char* sp, int nvarp = 0, PRVar* ppvarp = nullptr, int nfuncp = 0, PRFunction* ppfuncp = nullptr);
   ~ROperation();
   double Val() const;
   signed char ContainVar(const RVar&) const;
@@ -135,7 +135,7 @@ public:
   signed char ContainFuncNoRec(const RFunction&) const; // No recursive test on subfunctions
   ROperation NthMember(int) const;
   int NMembers() const;
-  signed char HasError(const ROperation* = NULL) const;
+  signed char HasError(const ROperation* = nullptr) const;
   ROperation& operator=(const ROperation&);
   friend int operator==(const ROperation&, const double);
   friend int operator==(const ROperation&, const ROperation&);

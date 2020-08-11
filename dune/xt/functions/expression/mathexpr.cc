@@ -116,7 +116,7 @@ RVar::RVar(const char* namep, double* pvalp)
 
 RVar::~RVar()
 {
-  if (name != NULL)
+  if (name != nullptr)
     delete[] name;
 }
 
@@ -126,10 +126,10 @@ RFunction::RFunction()
   name = new char[1];
   name[0] = 0;
   nvars = 0;
-  ppvar = NULL;
-  pfuncval = NULL;
+  ppvar = nullptr;
+  pfuncval = nullptr;
   op = ErrVal;
-  buf = NULL;
+  buf = nullptr;
 }
 
 RFunction::RFunction(double((*pfuncvalp)(double)))
@@ -139,9 +139,9 @@ RFunction::RFunction(double((*pfuncvalp)(double)))
   name = new char[1];
   name[0] = 0;
   nvars = 1;
-  ppvar = NULL;
+  ppvar = nullptr;
   op = ErrVal;
-  buf = NULL;
+  buf = nullptr;
 }
 
 RFunction::RFunction(const RFunction& rfunc)
@@ -153,15 +153,15 @@ RFunction::RFunction(const RFunction& rfunc)
   pfuncval = rfunc.pfuncval;
   name = CopyStr(rfunc.name);
   nvars = rfunc.nvars;
-  if (rfunc.ppvar != NULL && nvars) {
+  if (rfunc.ppvar != nullptr && nvars) {
     ppvar = new PRVar[nvars];
     int i;
     for (i = 0; i < nvars; i++)
       ppvar[i] = rfunc.ppvar[i];
     buf = new double[nvars];
   } else {
-    ppvar = NULL;
-    buf = NULL;
+    ppvar = nullptr;
+    buf = nullptr;
   }
 }
 
@@ -191,18 +191,18 @@ RFunction::RFunction(const ROperation& opp, int nvarsp, RVar** ppvarp)
       ppvar[i] = ppvarp[i];
     buf = new double[nvars];
   } else {
-    ppvar = NULL;
-    buf = NULL;
+    ppvar = nullptr;
+    buf = nullptr;
   }
 }
 
 RFunction::~RFunction()
 {
-  if (name != NULL)
+  if (name != nullptr)
     delete[] name;
-  if (ppvar != NULL)
+  if (ppvar != nullptr)
     delete[] ppvar;
-  if (buf != NULL)
+  if (buf != nullptr)
     delete[] buf;
 }
 
@@ -215,12 +215,12 @@ RFunction& RFunction::operator=(const RFunction& rfunc)
   pfuncval = rfunc.pfuncval;
   delete[] name;
   name = CopyStr(rfunc.name);
-  if (ppvar != NULL)
+  if (ppvar != nullptr)
     delete[] ppvar;
-  ppvar = NULL;
-  if (buf != NULL)
+  ppvar = nullptr;
+  if (buf != nullptr)
     delete[] buf;
-  buf = NULL;
+  buf = nullptr;
   nvars = rfunc.nvars;
   if (type == 1 && nvars) {
     ppvar = new PRVar[nvars];
@@ -234,7 +234,7 @@ RFunction& RFunction::operator=(const RFunction& rfunc)
 
 void RFunction::SetName(const char* s)
 {
-  if (name != NULL)
+  if (name != nullptr)
     delete[] name;
   name = CopyStr(s);
 }
@@ -274,17 +274,17 @@ double RFunction::Val(double* pv) const
 ROperation::ROperation()
 {
   op = ErrOp;
-  mmb1 = NULL;
-  mmb2 = NULL;
+  mmb1 = nullptr;
+  mmb2 = nullptr;
   ValC = ErrVal;
-  pvar = NULL;
-  pvarval = NULL;
-  pfunc = NULL;
+  pvar = nullptr;
+  pvarval = nullptr;
+  pfunc = nullptr;
   containfuncflag = 0;
-  pinstr = NULL;
-  pvals = NULL;
-  ppile = NULL;
-  pfuncpile = NULL;
+  pinstr = nullptr;
+  pvals = nullptr;
+  ppile = nullptr;
+  pfuncpile = nullptr;
   BuildCode();
 }
 
@@ -301,18 +301,18 @@ ROperation::ROperation(const ROperation& ROp)
   ValC = ROp.ValC;
   pfunc = ROp.pfunc;
   containfuncflag = 0;
-  pinstr = NULL;
-  pvals = NULL;
-  ppile = NULL;
-  pfuncpile = NULL;
-  if (ROp.mmb1 != NULL)
+  pinstr = nullptr;
+  pvals = nullptr;
+  ppile = nullptr;
+  pfuncpile = nullptr;
+  if (ROp.mmb1 != nullptr)
     mmb1 = new ROperation(*(ROp.mmb1));
   else
-    mmb1 = NULL;
-  if (ROp.mmb2 != NULL)
+    mmb1 = nullptr;
+  if (ROp.mmb2 != nullptr)
     mmb2 = new ROperation(*(ROp.mmb2));
   else
-    mmb2 = NULL;
+    mmb2 = nullptr;
   BuildCode();
 }
 
@@ -320,45 +320,45 @@ ROperation::ROperation(double x)
 {
   if (x == ErrVal) {
     op = ErrOp;
-    mmb1 = NULL;
-    mmb2 = NULL;
+    mmb1 = nullptr;
+    mmb2 = nullptr;
     ValC = ErrVal;
   } else if (x >= 0) {
     op = Num;
-    mmb1 = NULL;
-    mmb2 = NULL;
+    mmb1 = nullptr;
+    mmb2 = nullptr;
     ValC = x;
   } else {
     op = Opp;
-    mmb1 = NULL;
+    mmb1 = nullptr;
     mmb2 = new ROperation(-x);
     ValC = ErrVal;
   }
-  pvar = NULL;
-  pvarval = NULL;
-  pfunc = NULL;
+  pvar = nullptr;
+  pvarval = nullptr;
+  pfunc = nullptr;
   containfuncflag = 0;
-  pinstr = NULL;
-  pvals = NULL;
-  ppile = NULL;
-  pfuncpile = NULL;
+  pinstr = nullptr;
+  pvals = nullptr;
+  ppile = nullptr;
+  pfuncpile = nullptr;
   BuildCode();
 }
 
 ROperation::ROperation(const RVar& varp)
 {
   op = Var;
-  mmb1 = NULL;
-  mmb2 = NULL;
+  mmb1 = nullptr;
+  mmb2 = nullptr;
   ValC = ErrVal;
   pvar = &varp;
   pvarval = varp.pval;
   containfuncflag = 0;
-  pfunc = NULL;
-  pinstr = NULL;
-  pvals = NULL;
-  ppile = NULL;
-  pfuncpile = NULL;
+  pfunc = nullptr;
+  pinstr = nullptr;
+  pvals = nullptr;
+  ppile = nullptr;
+  pfuncpile = nullptr;
   BuildCode();
 }
 
@@ -373,18 +373,18 @@ ROperation& ROperation::operator=(const ROperation& ROp)
   ValC = ROp.ValC;
   pfunc = ROp.pfunc;
   containfuncflag = 0;
-  pinstr = NULL;
-  pvals = NULL;
-  ppile = NULL;
-  pfuncpile = NULL;
-  if (ROp.mmb1 != NULL)
+  pinstr = nullptr;
+  pvals = nullptr;
+  ppile = nullptr;
+  pfuncpile = nullptr;
+  if (ROp.mmb1 != nullptr)
     mmb1 = new ROperation(*(ROp.mmb1));
   else
-    mmb1 = NULL;
-  if (ROp.mmb2 != NULL)
+    mmb1 = nullptr;
+  if (ROp.mmb2 != nullptr)
     mmb2 = new ROperation(*(ROp.mmb2));
   else
-    mmb2 = NULL;
+    mmb2 = nullptr;
   BuildCode();
   return *this;
 }
@@ -404,16 +404,16 @@ int operator==(const ROperation& op1, const ROperation& op2)
     return (op1.pfunc == op2.pfunc); // *op1.pfunc==*op2.pfunc could imply infinite loops in cases of self-dependence
   if (op1.op == Num)
     return (op1.ValC == op2.ValC);
-  if (op1.mmb1 == NULL && op2.mmb1 != NULL)
+  if (op1.mmb1 == nullptr && op2.mmb1 != nullptr)
     return 0;
-  if (op1.mmb2 == NULL && op2.mmb2 != NULL)
+  if (op1.mmb2 == nullptr && op2.mmb2 != nullptr)
     return 0;
-  if (op2.mmb1 == NULL && op1.mmb1 != NULL)
+  if (op2.mmb1 == nullptr && op1.mmb1 != nullptr)
     return 0;
-  if (op2.mmb2 == NULL && op1.mmb2 != NULL)
+  if (op2.mmb2 == nullptr && op1.mmb2 != nullptr)
     return 0;
-  return (((op1.mmb1 == NULL && op2.mmb1 == NULL) || (*(op1.mmb1) == *(op2.mmb1)))
-          && ((op1.mmb2 == NULL && op2.mmb2 == NULL) || (*(op1.mmb2) == *(op2.mmb2))));
+  return (((op1.mmb1 == nullptr && op2.mmb1 == nullptr) || (*(op1.mmb1) == *(op2.mmb1)))
+          && ((op1.mmb2 == nullptr && op2.mmb2 == nullptr) || (*(op1.mmb2) == *(op2.mmb2))));
 }
 
 int operator!=(const ROperation& op1, const ROperation& op2)
@@ -426,16 +426,16 @@ int operator!=(const ROperation& op1, const ROperation& op2)
     return (!(op1.pfunc == op2.pfunc)); // *op1.pfunc==*op2.pfunc could imply infinite loops in cases of self-dependence
   if (op1.op == Num)
     return (op1.ValC != op2.ValC);
-  if (op1.mmb1 == NULL && op2.mmb1 != NULL)
+  if (op1.mmb1 == nullptr && op2.mmb1 != nullptr)
     return 1;
-  if (op1.mmb2 == NULL && op2.mmb2 != NULL)
+  if (op1.mmb2 == nullptr && op2.mmb2 != nullptr)
     return 1;
-  if (op2.mmb1 == NULL && op1.mmb1 != NULL)
+  if (op2.mmb1 == nullptr && op1.mmb1 != nullptr)
     return 1;
-  if (op2.mmb2 == NULL && op1.mmb2 != NULL)
+  if (op2.mmb2 == nullptr && op1.mmb2 != nullptr)
     return 1;
-  return (((op1.mmb1 != NULL || op2.mmb1 != NULL) && (*(op1.mmb1) != *(op2.mmb1)))
-          || ((op1.mmb2 != NULL || op2.mmb2 != NULL) && (*(op1.mmb2) != *(op2.mmb2))));
+  return (((op1.mmb1 != nullptr || op2.mmb1 != nullptr) && (*(op1.mmb1) != *(op2.mmb1)))
+          || ((op1.mmb2 != nullptr || op2.mmb2 != nullptr) && (*(op1.mmb2) != *(op2.mmb2))));
 }
 
 ROperation ROperation::operator+() const
@@ -936,20 +936,20 @@ void IsolateNumbers(char*& s, int nvar, RVar** ppvar, int nfunc, RFunction** ppf
 ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFunction* ppfuncp)
 {
   ValC = ErrVal;
-  mmb1 = NULL;
-  mmb2 = NULL;
-  pvar = NULL;
+  mmb1 = nullptr;
+  mmb2 = nullptr;
+  pvar = nullptr;
   op = ErrOp;
-  pvarval = NULL;
+  pvarval = nullptr;
   containfuncflag = 0;
-  pfunc = NULL;
-  pinstr = NULL;
-  pvals = NULL;
-  ppile = NULL;
-  pfuncpile = NULL;
+  pfunc = nullptr;
+  pinstr = nullptr;
+  pvals = nullptr;
+  ppile = nullptr;
+  pfuncpile = nullptr;
   int i, j, k, l;
   signed char flag = 1;
-  char *s = CopyStr(sp), *s1 = NULL, *s2 = NULL;
+  char *s = CopyStr(sp), *s1 = nullptr, *s2 = nullptr;
   SimplifyStr(s);
   if (!s[0] || !strcmp(s, "Error")) {
     goto fin;
@@ -958,7 +958,7 @@ ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFu
     s1 = CopyStr(s + 1);
     delete[] s;
     s = s1;
-    s1 = NULL;
+    s1 = nullptr;
     SimplifyStr(s);
     if (!s[0] || !strcmp(s, "Error")) {
       goto fin;
@@ -967,15 +967,15 @@ ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFu
   if (IsTNumeric(s)) {
     op = Num;
     ValC = atof(s);
-    mmb1 = NULL;
-    mmb2 = NULL;
+    mmb1 = nullptr;
+    mmb2 = nullptr;
     goto fin;
   };
   if (EqStr(s, "pi") || EqStr(s, "PI") || EqStr(s, "Pi")) {
     op = Num;
     ValC = 3.141592653589793238462643383279L;
-    mmb1 = NULL;
-    mmb2 = NULL;
+    mmb1 = nullptr;
+    mmb2 = nullptr;
     goto fin;
   };
   if (IsFunction(s, 0, nfuncp, ppfuncp) < IsVar(s, 0, nvar, ppvarp))
@@ -984,8 +984,8 @@ ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFu
         pvar = ppvarp[i];
         pvarval = pvar->pval;
         op = Var;
-        mmb1 = NULL;
-        mmb2 = NULL;
+        mmb1 = nullptr;
+        mmb2 = nullptr;
         goto fin;
       };
   for (k = 0; s[k]; k++) {
@@ -1046,7 +1046,7 @@ ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFu
   if (s[0] == '-') {
     s2 = MidStr(s, 1, strlen(s) - 1);
     op = Opp;
-    mmb1 = NULL;
+    mmb1 = nullptr;
     mmb2 = new ROperation(s2, nvar, ppvarp, nfuncp, ppfuncp);
     goto fin;
   };
@@ -1174,13 +1174,13 @@ ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFu
         pfunc = ppfuncp[i];
       }
     }
-    mmb1 = NULL;
+    mmb1 = nullptr;
     mmb2 = new ROperation(s2, nvar, ppvarp, nfuncp, ppfuncp);
     if (op == Fun)
       if (mmb2->NMembers() != pfunc->nvars) {
         op = ErrOp;
-        mmb1 = NULL;
-        mmb2 = NULL;
+        mmb1 = nullptr;
+        mmb2 = nullptr;
         goto fin;
       }
     goto fin;
@@ -1218,7 +1218,7 @@ ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFu
     s2 = MidStr(s, i + 1, strlen(s) - 1);
     if (i == 0 || s[i - 1] != ')') {
       op = Sqrt;
-      mmb1 = NULL;
+      mmb1 = nullptr;
     } else {
       op = NthRoot;
       mmb1 = new ROperation(s1, nvar, ppvarp, nfuncp, ppfuncp);
@@ -1236,48 +1236,48 @@ ROperation::ROperation(const char* sp, int nvar, PRVar* ppvarp, int nfuncp, PRFu
     goto fin;
   };
   op = ErrOp;
-  mmb1 = NULL;
-  mmb2 = NULL;
+  mmb1 = nullptr;
+  mmb2 = nullptr;
 fin:
   BuildCode();
   delete[] s;
-  if (s1 != NULL)
+  if (s1 != nullptr)
     delete[] s1;
-  if (s2 != NULL)
+  if (s2 != nullptr)
     delete[] s2;
 }
 
 void ROperation::Destroy()
 {
-  if (mmb1 != NULL && mmb2 != NULL && mmb1 != mmb2) {
+  if (mmb1 != nullptr && mmb2 != nullptr && mmb1 != mmb2) {
     delete mmb1;
     delete mmb2;
-    mmb1 = NULL;
-    mmb2 = NULL;
-  } else if (mmb1 != NULL) {
+    mmb1 = nullptr;
+    mmb2 = nullptr;
+  } else if (mmb1 != nullptr) {
     delete mmb1;
-    mmb1 = NULL;
-  } else if (mmb2 != NULL) {
+    mmb1 = nullptr;
+  } else if (mmb2 != nullptr) {
     delete mmb2;
-    mmb2 = NULL;
+    mmb2 = nullptr;
   }
-  if (pinstr != NULL) {
+  if (pinstr != nullptr) {
     delete[] pinstr;
-    pinstr = NULL;
+    pinstr = nullptr;
   }
-  if (pvals != NULL) {
+  if (pvals != nullptr) {
     if (op == ErrOp || op == Num)
       delete pvals[0];
     delete[] pvals;
-    pvals = NULL;
+    pvals = nullptr;
   }
-  if (ppile != NULL) {
+  if (ppile != nullptr) {
     delete[] ppile;
-    ppile = NULL;
+    ppile = nullptr;
   }
-  if (pfuncpile != NULL) {
+  if (pfuncpile != nullptr) {
     delete[] pfuncpile;
-    pfuncpile = NULL;
+    pfuncpile = nullptr;
   }
 }
 
@@ -1355,9 +1355,9 @@ signed char ROperation::ContainVar(const RVar& varp) const
     else
       return 0;
   };
-  if (mmb1 != NULL && mmb1->ContainVar(varp))
+  if (mmb1 != nullptr && mmb1->ContainVar(varp))
     return 1;
-  if (mmb2 != NULL && mmb2->ContainVar(varp))
+  if (mmb2 != nullptr && mmb2->ContainVar(varp))
     return 1;
   return 0;
 }
@@ -1370,9 +1370,9 @@ signed char ROperation::ContainFuncNoRec(const RFunction& func) const // No recu
     else
       return 0;
   }
-  if (mmb1 != NULL && mmb1->ContainFuncNoRec(func))
+  if (mmb1 != nullptr && mmb1->ContainFuncNoRec(func))
     return 1;
-  if (mmb2 != NULL && mmb2->ContainFuncNoRec(func))
+  if (mmb2 != nullptr && mmb2->ContainFuncNoRec(func))
     return 1;
   return 0;
 }
@@ -1389,11 +1389,11 @@ signed char ROperation::ContainFunc(const RFunction& func) const // Recursive te
       containfuncflag = 0;
       return 1;
     }
-  if (mmb1 != NULL && mmb1->ContainFunc(func)) {
+  if (mmb1 != nullptr && mmb1->ContainFunc(func)) {
     containfuncflag = 0;
     return 1;
   }
-  if (mmb2 != NULL && mmb2->ContainFunc(func)) {
+  if (mmb2 != nullptr && mmb2->ContainFunc(func)) {
     containfuncflag = 0;
     return 1;
   }
@@ -1405,13 +1405,13 @@ signed char ROperation::HasError(const ROperation* pop) const
 {
   if (op == ErrOp)
     return 1;
-  if (op == Fun && pfunc->type == 1 && pfunc->op == *(pop == NULL ? this : pop))
+  if (op == Fun && pfunc->type == 1 && pfunc->op == *(pop == nullptr ? this : pop))
     return 1;
-  if (op == Fun && pfunc->type == 1 && pfunc->op.HasError((pop == NULL ? this : pop)))
+  if (op == Fun && pfunc->type == 1 && pfunc->op.HasError((pop == nullptr ? this : pop)))
     return 1;
-  if (mmb1 != NULL && mmb1->HasError((pop == NULL ? this : pop)))
+  if (mmb1 != nullptr && mmb1->HasError((pop == nullptr ? this : pop)))
     return 1;
-  if (mmb2 != NULL && mmb2->HasError((pop == NULL ? this : pop)))
+  if (mmb2 != nullptr && mmb2->HasError((pop == nullptr ? this : pop)))
     return 1;
   if (op == Fun && pfunc->type == -1)
     return 1;
@@ -1424,7 +1424,7 @@ int ROperation::NMembers() const // Number of members for an operation like a,b,
     return (pfunc->type == 1 ? pfunc->op.NMembers() : pfunc->type == 0 ? 1 : 0);
   if (op != Juxt)
     return 1;
-  else if (mmb2 == NULL)
+  else if (mmb2 == nullptr)
     return 0;
   else
     return 1 + mmb2->NMembers();
@@ -1444,14 +1444,14 @@ ROperation ROperation::NthMember(int n) const
   if (n == 1) {
     if (op != Juxt)
       return *this;
-    else if (mmb1 != NULL)
+    else if (mmb1 != nullptr)
       return *mmb1;
     else
       return ErrVal;
   };
   if (op != Juxt)
     return ErrVal;
-  if (n > 1 && mmb2 != NULL)
+  if (n > 1 && mmb2 != nullptr)
     return mmb2->NthMember(n - 1);
   return ErrVal;
 }
@@ -1469,14 +1469,14 @@ ROperation ROperation::Substitute(const RVar& var,
   r.pvarval = pvarval;
   r.ValC = ValC;
   r.pfunc = pfunc;
-  if (mmb1 != NULL)
+  if (mmb1 != nullptr)
     r.mmb1 = new ROperation(mmb1->Substitute(var, rop));
   else
-    r.mmb1 = NULL;
-  if (mmb2 != NULL)
+    r.mmb1 = nullptr;
+  if (mmb2 != nullptr)
     r.mmb2 = new ROperation(mmb2->Substitute(var, rop));
   else
-    r.mmb2 = NULL;
+    r.mmb2 = nullptr;
   return r;
 }
 
@@ -1591,18 +1591,18 @@ char* ValToStr(double x)
 
 char* ROperation::Expr() const
 {
-  char *s = NULL, *s1 = NULL, *s2 = NULL;
+  char *s = nullptr, *s1 = nullptr, *s2 = nullptr;
   int n = 10;
   signed char f = 0, g = 0;
   if (op == Fun)
     if (strlen(pfunc->name) > 4)
       n += strlen(pfunc->name) - 4;
-  if (mmb1 != NULL) {
+  if (mmb1 != nullptr) {
     s1 = mmb1->Expr();
     n += strlen(s1);
     f = IsFunction(mmb1->op);
   }
-  if (mmb2 != NULL) {
+  if (mmb2 != nullptr) {
     s2 = mmb2->Expr();
     n += strlen(s2);
     g = IsFunction(mmb2->op);
@@ -1784,9 +1784,9 @@ char* ROperation::Expr() const
     default:
       return CopyStr("Error");
   };
-  if (s1 != NULL)
+  if (s1 != nullptr)
     delete[] s1;
-  if (s2 != NULL)
+  if (s2 != nullptr)
     delete[] s2;
   return s;
 }
@@ -1971,7 +1971,7 @@ double ROperation::Val() const
   pfoncld* p1 = pinstr;
   double **p2 = pvals, *p3 = ppile - 1;
   PRFunction* p4 = pfuncpile;
-  for (; *p1 != NULL; p1++)
+  for (; *p1 != nullptr; p1++)
     if (*p1 == &NextVal)
       *(++p3) = **(p2++);
     else if (*p1 == &RFunc)
@@ -1997,28 +1997,28 @@ void BCDouble(pfoncld*& pf,
 {
   pfoncld *pf3, *pf4 = pf1;
   long n1, n2;
-  for (n1 = 0; *pf4 != NULL; pf4++, n1++)
+  for (n1 = 0; *pf4 != nullptr; pf4++, n1++)
     ;
-  for (n2 = 0, pf4 = pf2; *pf4 != NULL; pf4++, n2++)
+  for (n2 = 0, pf4 = pf2; *pf4 != nullptr; pf4++, n2++)
     ;
   pf = new pfoncld[n1 + n2 + 2];
-  for (pf3 = pf, pf4 = pf1; *pf4 != NULL; pf3++, pf4++)
+  for (pf3 = pf, pf4 = pf1; *pf4 != nullptr; pf3++, pf4++)
     *pf3 = *pf4;
-  for (pf4 = pf2; *pf4 != NULL; pf3++, pf4++)
+  for (pf4 = pf2; *pf4 != nullptr; pf3++, pf4++)
     *pf3 = *pf4;
   *pf3++ = f;
-  *pf3 = NULL; // delete[]pf1,pf2;
+  *pf3 = nullptr; // delete[]pf1,pf2;
   double **pv3, **pv4 = pv1;
-  for (n1 = 0; *pv4 != NULL; pv4++, n1++)
+  for (n1 = 0; *pv4 != nullptr; pv4++, n1++)
     ;
-  for (n2 = 0, pv4 = pv2; *pv4 != NULL; pv4++, n2++)
+  for (n2 = 0, pv4 = pv2; *pv4 != nullptr; pv4++, n2++)
     ;
   pv = new double*[n1 + n2 + 1];
-  for (pv3 = pv, pv4 = pv1; *pv4 != NULL; pv3++, pv4++)
+  for (pv3 = pv, pv4 = pv1; *pv4 != nullptr; pv3++, pv4++)
     *pv3 = *pv4;
-  for (pv4 = pv2; *pv4 != NULL; pv3++, pv4++)
+  for (pv4 = pv2; *pv4 != nullptr; pv3++, pv4++)
     *pv3 = *pv4;
-  *pv3 = NULL; // delete[]pv1,pv2;
+  *pv3 = nullptr; // delete[]pv1,pv2;
   double *pp3, *pp4 = pp1;
   for (n1 = 0; *pp4 != ErrVal; pp4++, n1++)
     ;
@@ -2031,16 +2031,16 @@ void BCDouble(pfoncld*& pf,
     *pp3 = 0;
   *pp3 = ErrVal; // delete[]pp1,pp2;
   PRFunction *prf3, *prf4 = prf1;
-  for (n1 = 0; *prf4 != NULL; prf4++, n1++)
+  for (n1 = 0; *prf4 != nullptr; prf4++, n1++)
     ;
-  for (n2 = 0, prf4 = prf2; *prf4 != NULL; prf4++, n2++)
+  for (n2 = 0, prf4 = prf2; *prf4 != nullptr; prf4++, n2++)
     ;
   prf = new PRFunction[n1 + n2 + 1];
-  for (prf3 = prf, prf4 = prf1; *prf4 != NULL; prf3++, prf4++)
+  for (prf3 = prf, prf4 = prf1; *prf4 != nullptr; prf3++, prf4++)
     *prf3 = *prf4;
-  for (prf4 = prf2; *prf4 != NULL; prf3++, prf4++)
+  for (prf4 = prf2; *prf4 != nullptr; prf3++, prf4++)
     *prf3 = *prf4;
-  *prf3 = NULL; // delete[]prf1,prf2;
+  *prf3 = nullptr; // delete[]prf1,prf2;
 }
 
 void BCSimple(pfoncld*& pf,
@@ -2055,20 +2055,20 @@ void BCSimple(pfoncld*& pf,
 {
   pfoncld *pf3, *pf4 = pf1;
   long n;
-  for (n = 0; *pf4 != NULL; pf4++, n++)
+  for (n = 0; *pf4 != nullptr; pf4++, n++)
     ;
   pf = new pfoncld[n + 2];
-  for (pf4 = pf1, pf3 = pf; *pf4 != NULL; pf3++, pf4++)
+  for (pf4 = pf1, pf3 = pf; *pf4 != nullptr; pf3++, pf4++)
     *pf3 = *pf4;
   *pf3++ = f;
-  *pf3 = NULL; // delete[]pf1;
+  *pf3 = nullptr; // delete[]pf1;
   double **pv3, **pv4 = pv1;
-  for (n = 0; *pv4 != NULL; pv4++, n++)
+  for (n = 0; *pv4 != nullptr; pv4++, n++)
     ;
   pv = new double*[n + 1];
-  for (pv3 = pv, pv4 = pv1; *pv4 != NULL; pv3++, pv4++)
+  for (pv3 = pv, pv4 = pv1; *pv4 != nullptr; pv3++, pv4++)
     *pv3 = *pv4;
-  *pv3 = NULL; // delete[]pv1;
+  *pv3 = nullptr; // delete[]pv1;
   double *pp3, *pp4 = pp1;
   for (n = 0; *pp4 != ErrVal; pp4++, n++)
     ;
@@ -2077,12 +2077,12 @@ void BCSimple(pfoncld*& pf,
     *pp3 = 0;
   *pp3 = ErrVal; // delete[]pp1;
   RFunction **prf3, **prf4 = prf1;
-  for (n = 0; *prf4 != NULL; prf4++, n++)
+  for (n = 0; *prf4 != nullptr; prf4++, n++)
     ;
   prf = new RFunction*[n + 1];
-  for (prf3 = prf, prf4 = prf1; *prf4 != NULL; prf3++, prf4++)
+  for (prf3 = prf, prf4 = prf1; *prf4 != nullptr; prf3++, prf4++)
     *prf3 = *prf4;
-  *prf3 = NULL; // delete[]prf1;
+  *prf3 = nullptr; // delete[]prf1;
 }
 
 void BCFun(pfoncld*& pf,
@@ -2097,20 +2097,20 @@ void BCFun(pfoncld*& pf,
 {
   pfoncld *pf3, *pf4 = pf1;
   long n;
-  for (n = 0; *pf4 != NULL; pf4++, n++)
+  for (n = 0; *pf4 != nullptr; pf4++, n++)
     ;
   pf = new pfoncld[n + 2];
-  for (pf4 = pf1, pf3 = pf; *pf4 != NULL; pf3++, pf4++)
+  for (pf4 = pf1, pf3 = pf; *pf4 != nullptr; pf3++, pf4++)
     *pf3 = *pf4;
   *pf3++ = &RFunc;
-  *pf3 = NULL; // delete[]pf1;
+  *pf3 = nullptr; // delete[]pf1;
   double **pv3, **pv4 = pv1;
-  for (n = 0; *pv4 != NULL; pv4++, n++)
+  for (n = 0; *pv4 != nullptr; pv4++, n++)
     ;
   pv = new double*[n + 1];
-  for (pv3 = pv, pv4 = pv1; *pv4 != NULL; pv3++, pv4++)
+  for (pv3 = pv, pv4 = pv1; *pv4 != nullptr; pv3++, pv4++)
     *pv3 = *pv4;
-  *pv3 = NULL; // delete[]pv1;
+  *pv3 = nullptr; // delete[]pv1;
   double *pp3, *pp4 = pp1;
   for (n = 0; *pp4 != ErrVal; pp4++, n++)
     ;
@@ -2119,73 +2119,73 @@ void BCFun(pfoncld*& pf,
     *pp3 = 0;
   *pp3 = ErrVal; // delete[]pp1;
   PRFunction *prf3, *prf4 = prf1;
-  for (n = 0; *prf4 != NULL; prf4++, n++)
+  for (n = 0; *prf4 != nullptr; prf4++, n++)
     ;
   prf = new PRFunction[n + 2];
-  for (prf4 = prf1, prf3 = prf; *prf4 != NULL; prf3++, prf4++)
+  for (prf4 = prf1, prf3 = prf; *prf4 != nullptr; prf3++, prf4++)
     *prf3 = *prf4;
   *prf3++ = rf;
-  *prf3 = NULL; // delete[]pf1;
+  *prf3 = nullptr; // delete[]pf1;
 }
 
 void ROperation::BuildCode()
 {
   //  if(mmb1!=NULL)mmb1->BuildCode();if(mmb2!=NULL)mmb2->BuildCode();
-  if (pinstr != NULL) {
+  if (pinstr != nullptr) {
     delete[] pinstr;
-    pinstr = NULL;
+    pinstr = nullptr;
   }
-  if (pvals != NULL) {
+  if (pvals != nullptr) {
     delete[] pvals;
-    pvals = NULL;
+    pvals = nullptr;
   } // does not delete pvals[0] in case it was to be deleted... (no way to know)
-  if (ppile != NULL) {
+  if (ppile != nullptr) {
     delete[] ppile;
-    ppile = NULL;
+    ppile = nullptr;
   }
-  if (pfuncpile != NULL) {
+  if (pfuncpile != nullptr) {
     delete[] pfuncpile;
-    pfuncpile = NULL;
+    pfuncpile = nullptr;
   }
   switch (op) {
     case ErrOp:
       pinstr = new pfoncld[2];
       pinstr[0] = &NextVal;
-      pinstr[1] = NULL;
+      pinstr[1] = nullptr;
       pvals = new double*[2];
       pvals[0] = new double(ErrVal);
-      pvals[1] = NULL;
+      pvals[1] = nullptr;
       ppile = new double[2];
       ppile[0] = 0;
       ppile[1] = ErrVal;
       pfuncpile = new RFunction*[1];
-      pfuncpile[0] = NULL;
+      pfuncpile[0] = nullptr;
       break;
     case Num:
       pinstr = new pfoncld[2];
       pinstr[0] = &NextVal;
-      pinstr[1] = NULL;
+      pinstr[1] = nullptr;
       pvals = new double*[2];
       pvals[0] = new double(ValC);
-      pvals[1] = NULL;
+      pvals[1] = nullptr;
       ppile = new double[2];
       ppile[0] = 0;
       ppile[1] = ErrVal;
       pfuncpile = new RFunction*[1];
-      pfuncpile[0] = NULL;
+      pfuncpile[0] = nullptr;
       break;
     case Var:
       pinstr = new pfoncld[2];
       pinstr[0] = &NextVal;
-      pinstr[1] = NULL;
+      pinstr[1] = nullptr;
       pvals = new double*[2];
       pvals[0] = pvarval;
-      pvals[1] = NULL;
+      pvals[1] = nullptr;
       ppile = new double[2];
       ppile[0] = 0;
       ppile[1] = ErrVal;
       pfuncpile = new RFunction*[1];
-      pfuncpile[0] = NULL;
+      pfuncpile[0] = nullptr;
       break;
     case Juxt:
       BCDouble(pinstr,

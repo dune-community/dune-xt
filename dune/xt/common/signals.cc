@@ -26,7 +26,7 @@ void reset_signal(int signal)
   new_action.sa_handler = SIG_DFL;
   sigemptyset(&new_action.sa_mask);
   new_action.sa_flags = 0;
-  sigaction(signal, &new_action, NULL);
+  sigaction(signal, &new_action, nullptr);
 } // reset_signal
 
 //! example signal handler
