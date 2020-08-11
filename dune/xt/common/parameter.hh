@@ -31,7 +31,7 @@ class SimpleDict
 public:
   using ThisType = SimpleDict;
 
-  SimpleDict() {}
+  SimpleDict() = default;
 
   SimpleDict(const ThisType& other) = default;
 
@@ -241,7 +241,7 @@ private:
 
 public:
   /// \note this is somehow necessary to make clang 3.8 happy (and cannot be defaulted)
-  ~Parameter() {}
+  ~Parameter() = default;
 
   Parameter(const std::vector<std::pair<std::string, ValueType>>& key_value_pairs = {});
 

@@ -86,7 +86,7 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  virtual ~FlatTopFunction() {}
+  virtual ~FlatTopFunction() = default;
 
   std::string name() const final
   {

@@ -144,7 +144,7 @@ protected:
   using ThisType = MinMaxAvg<ElementType>;
 
 public:
-  MinMaxAvg() {}
+  MinMaxAvg() = default;
 
   template <class stl_container_type>
   MinMaxAvg(const stl_container_type& elements)

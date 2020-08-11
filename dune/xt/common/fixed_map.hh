@@ -143,7 +143,7 @@ public:
   using iterator = FixedMapIterator<ThisType>;
   using const_iterator = ConstFixedMapIterator<ThisType>;
 
-  FixedMap() {}
+  FixedMap() = default;
   /** inserts key-value value pairs from  initializer list
    * if list.size() > N only the first N elements are considered
    * if list.size() < N the Map is padded with default constructed elements

@@ -25,7 +25,7 @@ LocalizationStudy::LocalizationStudy(const std::vector<std::string> only_these_i
   : only_these_indicators_(only_these_indicators)
 {}
 
-LocalizationStudy::~LocalizationStudy() {}
+LocalizationStudy::~LocalizationStudy() = default;
 
 std::vector<std::string> LocalizationStudy::used_indicators() const
 {

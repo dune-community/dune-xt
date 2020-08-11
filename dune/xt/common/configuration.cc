@@ -60,11 +60,8 @@ Configuration::Configuration(const ParameterTree& tree_in, const std::string sub
 }
 
 Configuration::Configuration(const Configuration& other)
-  : BaseType(other)
-  , warn_on_default_access_(other.warn_on_default_access_)
-  , log_on_exit_(other.log_on_exit_)
-  , logfile_(other.logfile_)
-{}
+
+    = default;
 
 Configuration::Configuration(const std::initializer_list<std::pair<std::string, std::string>>& key_value_pairs)
   : BaseType()

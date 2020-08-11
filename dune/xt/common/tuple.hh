@@ -310,7 +310,8 @@ namespace internal {
 template <std::size_t>
 struct Any
 {
-  Any(...) {}
+  // this cannot be defaulted
+  Any(...) {} // NOLINT
 };
 
 template <typename T>
@@ -342,7 +343,7 @@ struct tuple_element<N, std::tuple<Ts...>>
 
 /** These classes allow recursively visiting a typelist that may contain templates names
  *  So if you ever wanted to iterate over "AllDirichletBoundaryInfo, AllNeumannBoundaryInfo, etc"
- *  and then input another type as tpl arg, sthis is for you.
+ *  and then input another type as tpl arg, this is for you.
  *
  * **/
 

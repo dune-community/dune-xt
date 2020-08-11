@@ -60,7 +60,7 @@ class ValidateAny : public ValidatorInterface<T, ValidateAny<T>>
   typedef ValidatorInterface<T, ThisType> BaseType;
 
 public:
-  inline ValidateAny() {}
+  inline ValidateAny() = default;
   inline ValidateAny(const ThisType&) {}
 
   inline bool operator()(const T&) const

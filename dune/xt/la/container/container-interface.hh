@@ -105,7 +105,7 @@ public:
 
   static_assert(std::is_same<ScalarType, typename Traits::ScalarType>::value);
 
-  virtual ~ContainerInterface() {}
+  virtual ~ContainerInterface() = default;
 
   /// \name Have to be implemented by a derived class!
   /// \{
