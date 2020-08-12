@@ -100,7 +100,7 @@ struct Helper<bool>
     std::transform(ss_lower_case.begin(), ss_lower_case.end(), ss_lower_case.begin(), ::tolower);
     if (ss_lower_case == "true")
       return true;
-    else if (ss_lower_case == "false")
+    if (ss_lower_case == "false")
       return false;
     else
       return convert_safely<bool>(ss);
@@ -211,24 +211,23 @@ VectorType vector_from_string(std::string vector_str, const size_t size, const s
     for (size_t ii = 0; ii < actual_size; ++ii)
       ret[ii] = convert_from_string<S>(trim_copy_safely(tokens[ii]));
     return ret;
-  } else {
-    // we treat this as a scalar
-    const auto val = convert_from_string<S>(trim_copy_safely(vector_str));
-    const size_t automatic_size = (size == 0 ? 1 : size);
-    const size_t actual_size =
-        VectorAbstraction<VectorType>::has_static_size ? VectorAbstraction<VectorType>::static_size : automatic_size;
-    if (actual_size > automatic_size && automatic_size != 1)
-      DUNE_THROW(Exceptions::conversion_error,
-                 "Vector expression (see below) has only " << automatic_size << " elements but " << actual_size
-                                                           << " elements are required for this VectorType ("
-                                                           << Typename<VectorType>::value() << ")!"
-                                                           << "\n"
-                                                           << "'[" << vector_str << "]'");
-    VectorType ret = VectorAbstraction<VectorType>::create(actual_size);
-    for (size_t ii = 0; ii < std::min(actual_size, ret.size()); ++ii)
-      ret[ii] = val;
-    return ret;
-  }
+  } // we treat this as a scalar
+  const auto val = convert_from_string<S>(trim_copy_safely(vector_str));
+  const size_t automatic_size = (size == 0 ? 1 : size);
+  const size_t actual_size =
+      VectorAbstraction<VectorType>::has_static_size ? VectorAbstraction<VectorType>::static_size : automatic_size;
+  if (actual_size > automatic_size && automatic_size != 1)
+    DUNE_THROW(Exceptions::conversion_error,
+               "Vector expression (see below) has only " << automatic_size << " elements but " << actual_size
+                                                         << " elements are required for this VectorType ("
+                                                         << Typename<VectorType>::value() << ")!"
+                                                         << "\n"
+                                                         << "'[" << vector_str << "]'");
+  VectorType ret = VectorAbstraction<VectorType>::create(actual_size);
+  for (size_t ii = 0; ii < std::min(actual_size, ret.size()); ++ii)
+    ret[ii] = val;
+  return ret;
+
 } // ... convert_from_string(...)
 
 template <class MatrixType>
@@ -290,35 +289,34 @@ MatrixType matrix_from_string(std::string matrix_str, const size_t rows, const s
             ret, rr, cc, convert_from_string<S>(trim_copy_safely(column_tokens[cc])));
     }
     return ret;
-  } else {
-    // we treat this as a scalar
-    const S val = convert_from_string<S>(trim_copy_safely(matrix_str));
-    const size_t automatic_rows = (rows == 0 ? 1 : rows);
-    const size_t actual_rows =
-        MatrixAbstraction<MatrixType>::has_static_size ? MatrixAbstraction<MatrixType>::static_rows : automatic_rows;
-    if (actual_rows > automatic_rows)
-      DUNE_THROW(Exceptions::conversion_error,
-                 "Matrix expression (see below) has only " << automatic_rows << " rows but " << actual_rows
-                                                           << " rows are required for this MatrixType ("
-                                                           << Typename<MatrixType>::value() << ")!"
-                                                           << "\n"
-                                                           << "'[" << matrix_str << "]'");
-    const size_t automatic_cols = (cols == 0 ? 1 : cols);
-    const size_t actual_cols =
-        MatrixAbstraction<MatrixType>::has_static_size ? MatrixAbstraction<MatrixType>::static_cols : automatic_cols;
-    if (actual_cols > automatic_cols)
-      DUNE_THROW(Exceptions::conversion_error,
-                 "Matrix expression (see below) has only " << automatic_cols << " cols but " << actual_cols
-                                                           << " cols are required for this MatrixType ("
-                                                           << Typename<MatrixType>::value() << ")!"
-                                                           << "\n"
-                                                           << "'[" << matrix_str << "]'");
-    MatrixType ret = MatrixAbstraction<MatrixType>::create(actual_rows, actual_cols);
-    for (size_t rr = 0; rr < std::min(actual_rows, MatrixAbstraction<MatrixType>::rows(ret)); ++rr)
-      for (size_t cc = 0; cc < std::min(actual_cols, MatrixAbstraction<MatrixType>::cols(ret)); ++cc)
-        MatrixAbstraction<MatrixType>::set_entry(ret, rr, cc, val);
-    return ret;
-  }
+  } // we treat this as a scalar
+  const S val = convert_from_string<S>(trim_copy_safely(matrix_str));
+  const size_t automatic_rows = (rows == 0 ? 1 : rows);
+  const size_t actual_rows =
+      MatrixAbstraction<MatrixType>::has_static_size ? MatrixAbstraction<MatrixType>::static_rows : automatic_rows;
+  if (actual_rows > automatic_rows)
+    DUNE_THROW(Exceptions::conversion_error,
+               "Matrix expression (see below) has only " << automatic_rows << " rows but " << actual_rows
+                                                         << " rows are required for this MatrixType ("
+                                                         << Typename<MatrixType>::value() << ")!"
+                                                         << "\n"
+                                                         << "'[" << matrix_str << "]'");
+  const size_t automatic_cols = (cols == 0 ? 1 : cols);
+  const size_t actual_cols =
+      MatrixAbstraction<MatrixType>::has_static_size ? MatrixAbstraction<MatrixType>::static_cols : automatic_cols;
+  if (actual_cols > automatic_cols)
+    DUNE_THROW(Exceptions::conversion_error,
+               "Matrix expression (see below) has only " << automatic_cols << " cols but " << actual_cols
+                                                         << " cols are required for this MatrixType ("
+                                                         << Typename<MatrixType>::value() << ")!"
+                                                         << "\n"
+                                                         << "'[" << matrix_str << "]'");
+  MatrixType ret = MatrixAbstraction<MatrixType>::create(actual_rows, actual_cols);
+  for (size_t rr = 0; rr < std::min(actual_rows, MatrixAbstraction<MatrixType>::rows(ret)); ++rr)
+    for (size_t cc = 0; cc < std::min(actual_cols, MatrixAbstraction<MatrixType>::cols(ret)); ++cc)
+      MatrixAbstraction<MatrixType>::set_entry(ret, rr, cc, val);
+  return ret;
+
 } // ... convert_from_string(...)
 
 // main function that dispatches to specializations

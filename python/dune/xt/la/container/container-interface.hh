@@ -56,8 +56,7 @@ void addbind_ContainerInterface(pybind11::class_<C>& c)
       [](C& self, const bool deep) {
         if (deep)
           return self.copy();
-        else
-          return C(self);
+        return C(self);
       },
       "deep"_a = false);
   c.def(

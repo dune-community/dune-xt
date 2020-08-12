@@ -37,7 +37,7 @@ public:
   {
     if (type == AllDirichletBoundaryInfo<I>::static_id())
       return alldirichlet_boundaryinfo_default_config();
-    else if (type == AllNeumannBoundaryInfo<I>::static_id())
+    if (type == AllNeumannBoundaryInfo<I>::static_id())
       return allneumann_boundaryinfo_default_config();
     else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
       return boundarysegment_boundaryinfo_default_config();
@@ -53,7 +53,7 @@ public:
     const auto type = config.get<std::string>("type");
     if (type == AllDirichletBoundaryInfo<I>::static_id())
       return make_alldirichlet_boundaryinfo<I>(config);
-    else if (type == AllNeumannBoundaryInfo<I>::static_id())
+    if (type == AllNeumannBoundaryInfo<I>::static_id())
       return make_allneumann_boundaryinfo<I>(config);
     else if (type == BoundarySegmentIndexBasedBoundaryInfo<I>::static_id())
       return make_boundarysegment_boundaryinfo<I>(config);

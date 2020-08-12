@@ -59,8 +59,7 @@ class DefaultLogger
     const std::string actual_color = terminal_supports_color() ? color(clr) : "";
     if (actual_color.empty())
       return prefix + ": ";
-    else
-      return actual_color + StreamModifiers::bold + prefix + ": " + StreamModifiers::normal;
+    return actual_color + StreamModifiers::bold + prefix + ": " + StreamModifiers::normal;
   }
 
 public:

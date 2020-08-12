@@ -36,8 +36,7 @@ class GridProviderFactory
   {
     if (cfg.empty())
       return G::create(G::default_config(), mpi_comm);
-    else
-      return G::create(cfg, mpi_comm);
+    return G::create(cfg, mpi_comm);
   }
 
   static std::string available_as_str()
@@ -64,7 +63,7 @@ public:
   {
     if (CubeType::static_id() == type)
       return CubeType::default_config();
-    else if (DgfType::static_id() == type)
+    if (DgfType::static_id() == type)
       return DgfType::default_config();
     else if (GmshType::static_id() == type)
       return GmshType::default_config();
@@ -94,7 +93,7 @@ public:
     }
     if (CubeType::static_id() == type)
       return call_create<CubeType>(config, mpi_comm);
-    else if (DgfType::static_id() == type)
+    if (DgfType::static_id() == type)
       return call_create<DgfType>(config, mpi_comm);
     else if (GmshType::static_id() == type)
       return call_create<GmshType>(config, mpi_comm);

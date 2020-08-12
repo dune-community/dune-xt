@@ -31,14 +31,13 @@ std::vector<std::string> LocalizationStudy::used_indicators() const
 {
   if (only_these_indicators_.empty())
     return provided_indicators();
-  else {
-    std::vector<std::string> ret;
-    for (auto indicator : provided_indicators())
-      if (std::find(only_these_indicators_.begin(), only_these_indicators_.end(), indicator)
-          != only_these_indicators_.end())
-        ret.push_back(indicator);
-    return ret;
-  }
+  std::vector<std::string> ret;
+  for (auto indicator : provided_indicators())
+    if (std::find(only_these_indicators_.begin(), only_these_indicators_.end(), indicator)
+        != only_these_indicators_.end())
+      ret.push_back(indicator);
+  return ret;
+
 } // ... used_indicators(...)
 
 void LocalizationStudy::run(std::ostream& out)

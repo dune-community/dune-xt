@@ -118,22 +118,22 @@ typename std::enable_if<is_matrix<RangeType>::value, RangeType>::type convert_to
 #endif
         );
     return ret;
-  } else {
-    RangeType ret(rows, cols);
-    for (size_t ii = 0; ii < rows; ++ii)
-      for (size_t jj = 0; jj < cols; ++jj)
-        ret.set_entry(ii,
-                      jj,
-#ifndef DXT_DISABLE_CHECKS
-                      Common::numeric_cast<typename Common::MatrixAbstraction<RangeType>::S>(
-#endif
-                          source.get_entry(ii, jj)
-#ifndef DXT_DISABLE_CHECKS
-                              )
-#endif
-        );
-    return ret;
   }
+  RangeType ret(rows, cols);
+  for (size_t ii = 0; ii < rows; ++ii)
+    for (size_t jj = 0; jj < cols; ++jj)
+      ret.set_entry(ii,
+                    jj,
+#ifndef DXT_DISABLE_CHECKS
+                    Common::numeric_cast<typename Common::MatrixAbstraction<RangeType>::S>(
+#endif
+                        source.get_entry(ii, jj)
+#ifndef DXT_DISABLE_CHECKS
+                            )
+#endif
+      );
+  return ret;
+
 } // ... convert_to(...)
 
 

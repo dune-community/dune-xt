@@ -203,7 +203,8 @@ struct ElementVisualization
       for (auto intersectionIt = gridview_.ibegin(entity); intersectionIt != gridview_.iend(entity); ++intersectionIt) {
         if (type_ == "dirichlet") {
           return (boundaryInfo_.type(*intersectionIt) == dirichlet_type);
-        } else if (type_ == "neumann") {
+        }
+        if (type_ == "neumann") {
           return (boundaryInfo_.type(*intersectionIt) == neumann_type);
         } else {
           DUNE_THROW(Common::Exceptions::internal_error, "Unknown type '" << type_ << "'!");

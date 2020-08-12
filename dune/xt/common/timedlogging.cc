@@ -116,24 +116,21 @@ std::ostream& DefaultLogger::info()
 {
   if (info_enabled)
     return *info_;
-  else
-    return dev_null;
+  return dev_null;
 }
 
 std::ostream& DefaultLogger::debug()
 {
   if (debug_enabled)
     return *debug_;
-  else
-    return dev_null;
+  return dev_null;
 }
 
 std::ostream& DefaultLogger::warn()
 {
   if (warn_enabled)
     return *warn_;
-  else
-    return dev_null;
+  return dev_null;
 }
 
 

@@ -39,7 +39,6 @@ public:
   using RangeType = typename RangeTypeSelector<R, r, rC>::type;
 
   virtual ~VisualizerInterface() = default;
-  ;
 
   virtual int ncomps() const = 0;
 

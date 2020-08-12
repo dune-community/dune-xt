@@ -364,7 +364,8 @@ public:
         if (col == jj) {
           backend().coeffRef(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
-        } else if (col > jj)
+        }
+        if (col > jj)
           break;
       }
     }
@@ -402,7 +403,8 @@ public:
           else
             backend().coeffRef(static_cast<EIGEN_size_t>(row), static_cast<EIGEN_size_t>(jj)) = ScalarType(0);
           break;
-        } else if (col > jj)
+        }
+        if (col > jj)
           break;
       }
     }
@@ -516,7 +518,7 @@ private:
         const size_t col = row_it.col();
         if ((ii == row) && (jj == col))
           return true;
-        else if ((row > ii) && (col > jj))
+        if ((row > ii) && (col > jj))
           return false;
       }
     }

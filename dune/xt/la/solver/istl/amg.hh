@@ -113,7 +113,8 @@ public:
       InverseOperatorResult stats;
       solver.apply(solution.backend(), rhs.backend(), stats);
       return stats;
-    } else if (smoother_type == "ssor") {
+    }
+    if (smoother_type == "ssor") {
       typedef Amg::AMG<MatrixOperatorType, IstlVectorType, SmootherType_SSOR, CommunicatorType> PreconditionerType_SSOR;
       PreconditionerType_SSOR preconditioner(matrix_operator, amg_criterion, smoother_parameters_ILU, communicator_);
 

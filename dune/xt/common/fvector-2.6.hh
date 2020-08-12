@@ -400,7 +400,7 @@ struct FieldVectorLess
     for (size_t dd = 0; dd < dimDomain; ++dd) {
       if (a[dd] < b[dd])
         return true;
-      else if (a[dd] > b[dd])
+      if (a[dd] > b[dd])
         return false;
     }
     return false;
@@ -416,7 +416,7 @@ struct FieldVectorFloatLess
     for (size_t dd = 0; dd < dimDomain; ++dd) {
       if (XT::Common::FloatCmp::lt(a[dd], b[dd]))
         return true;
-      else if (XT::Common::FloatCmp::gt(a[dd], b[dd]))
+      if (XT::Common::FloatCmp::gt(a[dd], b[dd]))
         return false;
     }
     return false;

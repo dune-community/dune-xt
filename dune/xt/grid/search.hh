@@ -51,16 +51,14 @@ struct CheckInside
   {
     if (codim == point.size()) {
       return Common::FloatCmp::eq(geometry.center(), point);
-    } else {
-      if (Common::FloatCmp::ne(
-              geometry.global(geometry.local(point)),
-              point,
-              2. * Common::FloatCmp::DefaultEpsilon<typename GlobalCoordinateType::value_type>::value(),
-              2. * Common::FloatCmp::DefaultEpsilon<typename GlobalCoordinateType::value_type>::value()))
-        return false;
-      const auto& refElement = reference_element(geometry);
-      return refElement.checkInside(geometry.local(point));
     }
+    if (Common::FloatCmp::ne(geometry.global(geometry.local(point)),
+                             point,
+                             2. * Common::FloatCmp::DefaultEpsilon<typename GlobalCoordinateType::value_type>::value(),
+                             2. * Common::FloatCmp::DefaultEpsilon<typename GlobalCoordinateType::value_type>::value()))
+      return false;
+    const auto& refElement = reference_element(geometry);
+    return refElement.checkInside(geometry.local(point));
   }
 };
 

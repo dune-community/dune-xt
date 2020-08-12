@@ -332,8 +332,7 @@ std::string Configuration::find_common_prefix(const BaseType& subtree, const std
     // we append the subs name
     if (previous_prefix.empty())
       return find_common_prefix(subtree.sub(subkeys[0]), subkeys[0]);
-    else
-      return find_common_prefix(subtree.sub(subkeys[0]), previous_prefix + "." + subkeys[0]);
+    return find_common_prefix(subtree.sub(subkeys[0]), previous_prefix + "." + subkeys[0]);
   } else {
     // end of the recursion, return the previous prefix
     return previous_prefix;

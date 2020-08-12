@@ -144,7 +144,7 @@ public:
     compute_and_check();
     if (eigenvalues_)
       return *eigenvalues_;
-    else if (options_->get<bool>("compute_eigenvalues"))
+    if (options_->get<bool>("compute_eigenvalues"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvalues_ member is not filled after calling compute()!");
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,
@@ -212,7 +212,7 @@ public:
     compute_and_check();
     if (eigenvectors_)
       return *eigenvectors_;
-    else if (options_->get<bool>("compute_eigenvectors"))
+    if (options_->get<bool>("compute_eigenvectors"))
       DUNE_THROW(Common::Exceptions::internal_error, "The eigenvectors_ member is not filled after calling compute()!");
     else
       DUNE_THROW(Common::Exceptions::you_are_using_this_wrong,

@@ -33,14 +33,13 @@ std::vector<std::string> ConvergenceStudy::filter(const std::vector<std::string>
 {
   if (only_these.empty())
     return vec;
-  else {
-    std::vector<std::string> ret;
-    for (const auto& element : vec) {
-      if (std::find(only_these.begin(), only_these.end(), element) != only_these.end())
-        ret.emplace_back(element);
-    }
-    return ret;
+  std::vector<std::string> ret;
+  for (const auto& element : vec) {
+    if (std::find(only_these.begin(), only_these.end(), element) != only_these.end())
+      ret.emplace_back(element);
   }
+  return ret;
+
 } // ... filter(...)
 
 std::vector<std::pair<std::string, std::string>>
@@ -49,23 +48,22 @@ ConvergenceStudy::filter(const std::vector<std::pair<std::string, std::string>>&
 {
   if (only_these.empty())
     return vec;
-  else {
-    std::vector<std::pair<std::string, std::string>> ret;
-    for (const auto& element : vec) {
-      const auto& key = element.first;
-      const auto& value = element.second;
-      if (std::find(only_these.begin(), only_these.end(), key) != only_these.end())
-        ret.emplace_back(std::make_pair(key, value));
-    }
-    return ret;
+  std::vector<std::pair<std::string, std::string>> ret;
+  for (const auto& element : vec) {
+    const auto& key = element.first;
+    const auto& value = element.second;
+    if (std::find(only_these.begin(), only_these.end(), key) != only_these.end())
+      ret.emplace_back(std::make_pair(key, value));
   }
+  return ret;
+
 } // ... filter(...)
 
 std::string ConvergenceStudy::lfill(const std::string& id, const size_t len) const
 {
   if (id.size() == len)
     return id;
-  else if (id.size() > len)
+  if (id.size() > len)
     return id.substr(0, len - 1) + ".";
   else /*if (id.size() < len_)*/
     return std::string(len - id.size(), ' ') + id;
@@ -75,10 +73,8 @@ std::string ConvergenceStudy::cfill(const std::string& id, const size_t len) con
 {
   if (id.size() > len)
     return id.substr(0, len - 1) + ".";
-  else {
-    const size_t rpadd = std::ceil((len - id.size()) / 2);
-    return std::string(len - rpadd - id.size(), ' ') + id + std::string(rpadd, ' ');
-  }
+  const size_t rpadd = std::ceil((len - id.size()) / 2);
+  return std::string(len - rpadd - id.size(), ' ') + id + std::string(rpadd, ' ');
 }
 
 double ConvergenceStudy::extract(const std::map<std::string, std::map<std::string, double>>& level_data,

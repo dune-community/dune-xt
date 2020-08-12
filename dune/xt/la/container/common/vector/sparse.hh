@@ -301,8 +301,7 @@ public:
     auto it = std::lower_bound(indices_->begin(), indices_->end(), ii);
     if (it == indices_->end() || *it != ii)
       return ScalarType(0.);
-    else
-      return (*entries_)[std::distance(indices_->begin(), it)];
+    return (*entries_)[std::distance(indices_->begin(), it)];
   }
 
 protected:
@@ -314,7 +313,8 @@ protected:
       indices_->push_back(ii);
       entries_->push_back(0.);
       return entries_->back();
-    } else if (*it != ii) {
+    }
+    if (*it != ii) {
       indices_->insert(it, ii);
       entries_->insert(entries_->begin() + index, 0.);
       return (*entries_)[index];
@@ -331,7 +331,8 @@ protected:
       indices_->push_back(ii);
       entries_->push_back(0.);
       return entries_->back();
-    } else if (*it != ii) {
+    }
+    if (*it != ii) {
       indices_->insert(it, ii);
       entries_->insert(entries_->begin() + index, 0.);
       return (*entries_)[index];

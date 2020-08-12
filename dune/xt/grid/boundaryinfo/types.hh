@@ -199,7 +199,7 @@ static inline BoundaryType* make_boundary_type(const std::string& id)
 {
   if (id == NoBoundary().id())
     return new NoBoundary();
-  else if (id == UnknownBoundary().id())
+  if (id == UnknownBoundary().id())
     return new UnknownBoundary();
   else if (id == DirichletBoundary().id())
     return new DirichletBoundary();

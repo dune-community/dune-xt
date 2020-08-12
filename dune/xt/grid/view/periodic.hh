@@ -342,10 +342,8 @@ public:
     IndexType real_entity_index = real_index_set_.template index<cd>(entity);
     if (cd == 0)
       return real_entity_index;
-    else {
-      const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
-      return new_indices_[type_index][real_entity_index];
-    }
+    const auto type_index = GlobalGeometryTypeIndex::index(entity.type());
+    return new_indices_[type_index][real_entity_index];
   }
 
   template <class EntityType>
@@ -360,11 +358,9 @@ public:
     IndexType real_sub_index = real_index_set_.template subIndex<cd>(entity, i, codim);
     if (codim == 0)
       return real_sub_index;
-    else {
-      const auto& ref_element = reference_element(entity);
-      const auto type_index = GlobalGeometryTypeIndex::index(ref_element.type(i, codim));
-      return new_indices_[type_index][real_sub_index];
-    }
+    const auto& ref_element = reference_element(entity);
+    const auto type_index = GlobalGeometryTypeIndex::index(ref_element.type(i, codim));
+    return new_indices_[type_index][real_sub_index];
   }
 
   template <class EntityType>
@@ -447,34 +443,32 @@ public:
   {
     if (periodic_)
       return true;
-    else
-      return BaseType::neighbor();
+    return BaseType::neighbor();
   } // bool neighbor() const
 
   EntityType outside() const
   {
     if (periodic_)
       return outside_;
-    else
-      return EntityType(BaseType::outside());
+    return EntityType(BaseType::outside());
   } // ... outside() const
 
   LocalGeometry geometryInOutside() const
   {
     if (periodic_) {
       return intersection_in_outside_.geometryInInside();
-    } else {
-      return BaseType::geometryInOutside();
     }
+    return BaseType::geometryInOutside();
+
   } // ... geometryInOutside() const
 
   int indexInOutside() const
   {
     if (periodic_) {
       return intersection_in_outside_.indexInInside();
-    } else {
-      return BaseType::indexInOutside();
     }
+    return BaseType::indexInOutside();
+
   } // int indexInOutside() const
 
 private:

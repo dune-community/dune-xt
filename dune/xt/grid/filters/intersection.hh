@@ -83,11 +83,9 @@ public:
   {
     if (!intersection.neighbor())
       return true;
-    else {
-      const auto inside_element = intersection.inside();
-      const auto outside_element = intersection.outside();
-      return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    }
+    const auto inside_element = intersection.inside();
+    const auto outside_element = intersection.outside();
+    return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
   }
 }; // class AllIntersectionsOnce
 
@@ -193,8 +191,8 @@ public:
       const auto inside_element = intersection.inside();
       const auto outside_element = intersection.outside();
       return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    } else
-      return false;
+    }
+    return false;
   }
 }; // class InnerIntersectionsOnce
 
@@ -233,8 +231,8 @@ public:
       if (!PartitionSetType::contains(intersection.outside().partitionType()))
         return true;
       return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    } else
-      return false;
+    }
+    return false;
   }
 }; // class PartitionSetInnerIntersectionsOnce
 
@@ -369,9 +367,8 @@ public:
       const auto inside_element = intersection.inside();
       const auto outside_element = intersection.outside();
       return grid_layer.indexSet().index(inside_element) < grid_layer.indexSet().index(outside_element);
-    } else {
-      return false;
     }
+    return false;
   }
 }; // class PeriodicBoundaryIntersectionsOnce
 
