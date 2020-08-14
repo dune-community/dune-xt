@@ -22,6 +22,9 @@
 #  include <dune/common/parallel/collectivecommunication.hh>
 #endif
 
+// pinfo does not source deprecated.hh and therefore errors out on tidy/headercheck
+#include <dune/common/deprecated.hh>
+#include <dune/common/parallel/communicator.hh>
 #include <dune/istl/paamg/pinfo.hh>
 
 namespace Dune {

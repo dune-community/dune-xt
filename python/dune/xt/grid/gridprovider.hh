@@ -51,7 +51,7 @@ public:
   {
     namespace py = pybind11;
     using namespace pybind11::literals;
-    const int dim = type::GridType::dimension;
+    constexpr const int dim = type::GridType::dimension;
 
     const std::string class_name = class_id + "_" + grid_id;
     const auto ClassName = XT::Common::to_camel_case(class_name);

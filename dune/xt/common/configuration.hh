@@ -124,7 +124,7 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
   bool has_key(const std::string& key) const;
 
   //! check if sub is existing in tree_
-  bool has_sub(const std::string subTreeName) const;
+  bool has_sub(const std::string& subTreeName) const;
 
   /** \brief print the ParameterTree
    *  \param out output stream
@@ -136,7 +136,7 @@ some_function_which_expects_a_config({{"type", "custom"}, {"tolerance", "1e-10"}
    * @attention Please note the difference to Dune::ParameterTree::sub (return: value vs. reference)!
    */
   Configuration
-  sub(const std::string sub_id, bool fail_if_missing = true, Configuration default_value = Configuration()) const;
+  sub(const std::string& sub_id, bool fail_if_missing = true, Configuration default_value = Configuration()) const;
 
   /**
    * \}

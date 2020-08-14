@@ -263,7 +263,7 @@ public:
   /**
    * \brief sets the state
    *
-   *        This methos is mainly intended to be used on the global TimedLogger() instance. Before calling this method
+   *        This method is mainly intended to be used on the global TimedLogger() instance. Before calling this method
    *        the state is set according to the defaults default_max_info_level, default_max_debug_level and
    *        default_enable_warnings.
    * \note  Calling this method more than once will throw an Exceptions::you_are_using_this_wrong, following the idea of
@@ -273,11 +273,11 @@ public:
               const ssize_t max_debug_level = default_max_debug_level,
               const bool enable_warnings = default_enable_warnings,
               const bool enable_colors = default_enable_colors,
-              const std::string info_color = default_info_color(),
-              const std::string debug_color = default_debug_color(),
-              const std::string warning_color = default_warning_color());
+              const std::string& info_color = default_info_color(),
+              const std::string& debug_color = default_debug_color(),
+              const std::string& warning_color = default_warning_color());
 
-  TimedLogManager get(const std::string id);
+  TimedLogManager get(const std::string& id);
 
 private:
   void update_colors();
@@ -423,89 +423,81 @@ int main() {
  * The same holds for the move ctor as well as move and assignment operators.
  */
 template <typename T = void>
-class EnableDebugLoggingForCtors
+class NoOpEnableDebugLoggingForCtors
 {
-  typedef EnableDebugLoggingForCtors<T> ThisType;
+  using ThisType = NoOpEnableDebugLoggingForCtors<T>;
 
 public:
-  EnableDebugLoggingForCtors(const std::string&
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
-                                 prefix
-#endif
-                             ,
-                             const std::string&
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
-                                 class_id
-#endif
-                             )
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  NoOpEnableDebugLoggingForCtors(const std::string&, const std::string&) {}
+
+  NoOpEnableDebugLoggingForCtors(const ThisType& other) = default;
+
+  NoOpEnableDebugLoggingForCtors(ThisType&& source) = default;
+
+  ~NoOpEnableDebugLoggingForCtors() = default;
+
+  ThisType& operator=(const ThisType& other) = default;
+
+  ThisType& operator=(ThisType&& source) = default;
+
+}; // class NoOpEnableDebugLoggingForCtors
+
+template <typename T = void>
+class ActiveEnableDebugLoggingForCtors
+{
+  using ThisType = ActiveEnableDebugLoggingForCtors<T>;
+
+public:
+  ActiveEnableDebugLoggingForCtors(const std::string& prefix, const std::string& class_id)
     : logger_(TimedLogger().get(prefix))
     , class_id_(class_id)
   {
     logger_.debug() << class_id_ << "(this=" << this << ")" << std::endl;
   }
-#else
-  {}
-#endif
 
-  EnableDebugLoggingForCtors(const ThisType& other)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  ActiveEnableDebugLoggingForCtors(const ThisType& other)
     : logger_(other.logger_)
     , class_id_(other.class_id_)
   {
     logger_.debug() << class_id_ << "(this=" << this << ", other=" << &other << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
-  EnableDebugLoggingForCtors(ThisType&& source)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  ActiveEnableDebugLoggingForCtors(ThisType&& source)
     : logger_(std::move(source.logger_))
     , class_id_(std::move(source.class_id_))
   {
     logger_.debug() << class_id_ << "(this=" << this << ", source=" << &source << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
-  ~EnableDebugLoggingForCtors()
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+  ~ActiveEnableDebugLoggingForCtors()
   {
     logger_.debug() << "~" << class_id_ << "(this=" << this << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
   ThisType& operator=(const ThisType& other)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
   {
     logger_.debug() << class_id_ << "operator=(this=" << this << ", other=" << &other << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
   ThisType& operator=(ThisType&& source)
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
   {
     logger_.debug() << class_id_ << "operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }
-#else
-      = default;
-#endif
 
-#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
 protected:
   TimedLogManager logger_;
 
 private:
   const std::string class_id_;
-#endif
-}; // class EnableDebugLoggingForCtors
+}; // class ActiveEnableDebugLoggingForCtors
 
+#if DUNE_XT_COMMON_TIMEDLOGGING_ENABLE_DEBUG
+template <class T>
+using EnableDebugLoggingForCtors = ActiveEnableDebugLoggingForCtors<T>;
+#else
+template <class T>
+using EnableDebugLoggingForCtors = NoOpEnableDebugLoggingForCtors<T>;
+#endif
 
 } // namespace Common
 } // namespace XT

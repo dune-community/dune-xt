@@ -100,7 +100,7 @@ if(HAVE_MPI)
     # this only works in dependent modules
     dune_register_package_flags(INCLUDE_DIRS "${MPI4PY_INCLUDE_DIR}")
     # this only works in dune-xt itself
-    include_directories("${MPI4PY_INCLUDE_DIR}" ${PYTHON_INCLUDE_DIRS})
+    include_directories(SYSTEM "${MPI4PY_INCLUDE_DIR}" ${PYTHON_INCLUDE_DIRS})
   else()
     message(FATAL_ERROR kaput)
   endif()
