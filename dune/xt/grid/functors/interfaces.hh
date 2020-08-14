@@ -51,7 +51,7 @@ public:
 
   ElementFunctor(const std::string& log_prefix = "", const std::string& log_id = "", const bool log_disabled = true)
     : Common::WithLogger<ElementFunctor<GL>>(
-          log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "ElementFunctor" : log_id, log_disabled)
+        log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "ElementFunctor" : log_id, log_disabled)
   {}
 
   ElementFunctor(const ElementFunctor<GL>&) = default;
@@ -100,7 +100,7 @@ public:
                       const std::string& log_id = "",
                       const bool log_disabled = true)
     : Common::WithLogger<IntersectionFunctor<GL>>(
-          log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "IntersectionFunctor" : log_id, log_disabled)
+        log_prefix.empty() ? "xt.grid" : log_prefix, log_id.empty() ? "IntersectionFunctor" : log_id, log_disabled)
   {}
 
   virtual ~IntersectionFunctor() = default;

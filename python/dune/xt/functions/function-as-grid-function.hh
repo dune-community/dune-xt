@@ -45,12 +45,13 @@ bind_FunctionAsGridFunctionWrapper(pybind11::module& m, const std::string& grid_
                                             + "x" + Common::to_string(rC));
   py::class_<C, I> c(m, classname.c_str(), classname.c_str());
 
-  m.def("function_to_grid_function",
-        [](XT::Functions::FunctionInterface<d, r, rC, R>& func,
-           const XT::Grid::GridProvider<G>& /*only_here_to_select_grid_type*/) { return std::make_unique<C>(func); },
-        py::keep_alive<0, 1>(),
-        "function"_a,
-        "grid_provider"_a);
+  m.def(
+      "function_to_grid_function",
+      [](XT::Functions::FunctionInterface<d, r, rC, R>& func,
+         const XT::Grid::GridProvider<G>& /*only_here_to_select_grid_type*/) { return std::make_unique<C>(func); },
+      py::keep_alive<0, 1>(),
+      "function"_a,
+      "grid_provider"_a);
 
   return c;
 } // ... bind_FunctionAsGridFunctionWrapper(...)

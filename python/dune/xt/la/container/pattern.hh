@@ -48,7 +48,8 @@ pybind11::class_<SparsityPatternDefault> bind_SparsityPatternDefault(pybind11::m
         "size"_a = 0);
 
   c.def("insert", &C::insert, "outer_index"_a, "inner_index"_a);
-  c.def("sort", [](C& self, const size_t outer_index) { self.sort(outer_index); }, "outer_index"_a);
+  c.def(
+      "sort", [](C& self, const size_t outer_index) { self.sort(outer_index); }, "outer_index"_a);
   c.def("sort", [](C& self) { self.sort(); });
 
   c.def(py::self == py::self);

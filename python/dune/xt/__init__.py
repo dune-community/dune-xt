@@ -20,7 +20,7 @@ try:
     import metis
 except ImportError:
     pass
-except RuntimeError: # metis actually fires a RuntimeError if the module is installed but the system package not
+except RuntimeError:     # metis actually fires a RuntimeError if the module is installed but the system package not
     pass
 
 from importlib import import_module

@@ -27,8 +27,8 @@ class ElementFilter
 {
   static_assert(is_grid<G>::value, "");
   using GV = typename G::LeafGridView;
-public:
 
+public:
   using type = Grid::ElementFilter<GV>;
   using bound_type = pybind11::class_<type>;
 
@@ -42,9 +42,11 @@ public:
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
 
-    c.def("not", [](type& self){return !self;});
-    c.def("and", [](type& self, const type& other){return self && other;}, "other"_a);
-    c.def("or", [](type& self, const type& other){return self || other;}, "other_a");
+    c.def("not", [](type& self) { return !self; });
+    c.def(
+        "and", [](type& self, const type& other) { return self && other; }, "other"_a);
+    c.def(
+        "or", [](type& self, const type& other) { return self || other; }, "other_a");
 
     return c;
   } // ... bind(...)
@@ -56,8 +58,8 @@ class IntersectionFilter
 {
   static_assert(is_grid<G>::value, "");
   using GV = typename G::LeafGridView;
-public:
 
+public:
   using type = Grid::IntersectionFilter<GV>;
   using bound_type = pybind11::class_<type>;
 
@@ -71,9 +73,11 @@ public:
     auto ClassName = Common::to_camel_case(class_id + "_" + grid_id);
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
 
-    c.def("not", [](type& self){return !self;});
-    c.def("and", [](type& self, const type& other){return self && other;}, "other"_a);
-    c.def("or", [](type& self, const type& other){return self || other;}, "other_a");
+    c.def("not", [](type& self) { return !self; });
+    c.def(
+        "and", [](type& self, const type& other) { return self && other; }, "other"_a);
+    c.def(
+        "or", [](type& self, const type& other) { return self || other; }, "other_a");
 
     return c;
   } // ... bind(...)

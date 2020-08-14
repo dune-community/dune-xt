@@ -211,8 +211,10 @@ TEST_SUBMODULE(numpy_array, sm)
   sm.def("overloaded2", [](py::array_t<float>) { return "float"; });
 
   // Only accept the exact types:
-  sm.def("overloaded3", [](py::array_t<int>) { return "int"; }, py::arg().noconvert());
-  sm.def("overloaded3", [](py::array_t<double>) { return "double"; }, py::arg().noconvert());
+  sm.def(
+      "overloaded3", [](py::array_t<int>) { return "int"; }, py::arg().noconvert());
+  sm.def(
+      "overloaded3", [](py::array_t<double>) { return "double"; }, py::arg().noconvert());
 
   // Make sure we don't do unsafe coercion (e.g. float to int) when not using forcecast, but
   // rather that float gets converted via the safe (conversion to double) overload:
@@ -231,15 +233,16 @@ TEST_SUBMODULE(numpy_array, sm)
   sm.def("issue685", [](py::object) { return "other"; });
 
   // test_array_unchecked_fixed_dims
-  sm.def("proxy_add2",
-         [](py::array_t<double> a, double v) {
-           auto r = a.mutable_unchecked<2>();
-           for (ssize_t i = 0; i < r.shape(0); i++)
-             for (ssize_t j = 0; j < r.shape(1); j++)
-               r(i, j) += v;
-         },
-         py::arg().noconvert(),
-         py::arg());
+  sm.def(
+      "proxy_add2",
+      [](py::array_t<double> a, double v) {
+        auto r = a.mutable_unchecked<2>();
+        for (ssize_t i = 0; i < r.shape(0); i++)
+          for (ssize_t j = 0; j < r.shape(1); j++)
+            r(i, j) += v;
+      },
+      py::arg().noconvert(),
+      py::arg());
 
   sm.def("proxy_init3", [](double start) {
     py::array_t<double, py::array::c_style> a({3, 3, 3});
@@ -275,17 +278,18 @@ TEST_SUBMODULE(numpy_array, sm)
 
   // test_array_unchecked_dyn_dims
   // Same as the above, but without a compile-time dimensions specification:
-  sm.def("proxy_add2_dyn",
-         [](py::array_t<double> a, double v) {
-           auto r = a.mutable_unchecked();
-           if (r.ndim() != 2)
-             throw std::domain_error("error: ndim != 2");
-           for (ssize_t i = 0; i < r.shape(0); i++)
-             for (ssize_t j = 0; j < r.shape(1); j++)
-               r(i, j) += v;
-         },
-         py::arg().noconvert(),
-         py::arg());
+  sm.def(
+      "proxy_add2_dyn",
+      [](py::array_t<double> a, double v) {
+        auto r = a.mutable_unchecked();
+        if (r.ndim() != 2)
+          throw std::domain_error("error: ndim != 2");
+        for (ssize_t i = 0; i < r.shape(0); i++)
+          for (ssize_t j = 0; j < r.shape(1); j++)
+            r(i, j) += v;
+      },
+      py::arg().noconvert(),
+      py::arg());
   sm.def("proxy_init3_dyn", [](double start) {
     py::array_t<double, py::array::c_style> a({3, 3, 3});
     auto r = a.mutable_unchecked();

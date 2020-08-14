@@ -546,9 +546,10 @@ TEST_SUBMODULE(methods_and_attributes, m)
                                     [](py::object) { return TestProperties::static_get(); })
       .def_property_static(
           "def_property_writeonly_static", nullptr, [](py::object, int v) { return TestProperties::static_set(v); })
-      .def_property_static("def_property_static",
-                           [](py::object) { return TestProperties::static_get(); },
-                           [](py::object, int v) { TestProperties::static_set(v); })
+      .def_property_static(
+          "def_property_static",
+          [](py::object) { return TestProperties::static_get(); },
+          [](py::object, int v) { TestProperties::static_set(v); })
       .def_property_static(
           "static_cls", [](py::object cls) { return cls; }, [](py::object cls, py::function f) { f(cls); });
 
@@ -641,16 +642,21 @@ TEST_SUBMODULE(methods_and_attributes, m)
            "d"_a = ArgInspector2(),
            py::arg() = ArgAlwaysConverts())
       .def_static("h", &ArgInspector::h, py::arg().noconvert(), py::arg() = ArgAlwaysConverts());
-  m.def("arg_inspect_func",
-        [](ArgInspector2 a, ArgInspector1 b, ArgAlwaysConverts) { return a.arg + "\n" + b.arg; },
-        py::arg().noconvert(false),
-        py::arg_v(nullptr, ArgInspector1()).noconvert(true),
-        py::arg() = ArgAlwaysConverts());
+  m.def(
+      "arg_inspect_func",
+      [](ArgInspector2 a, ArgInspector1 b, ArgAlwaysConverts) { return a.arg + "\n" + b.arg; },
+      py::arg().noconvert(false),
+      py::arg_v(nullptr, ArgInspector1()).noconvert(true),
+      py::arg() = ArgAlwaysConverts());
 
-  m.def("floats_preferred", [](double f) { return 0.5 * f; }, py::arg("f"));
-  m.def("floats_only", [](double f) { return 0.5 * f; }, py::arg("f").noconvert());
-  m.def("ints_preferred", [](int i) { return i / 2; }, py::arg("i"));
-  m.def("ints_only", [](int i) { return i / 2; }, py::arg("i").noconvert());
+  m.def(
+      "floats_preferred", [](double f) { return 0.5 * f; }, py::arg("f"));
+  m.def(
+      "floats_only", [](double f) { return 0.5 * f; }, py::arg("f").noconvert());
+  m.def(
+      "ints_preferred", [](int i) { return i / 2; }, py::arg("i"));
+  m.def(
+      "ints_only", [](int i) { return i / 2; }, py::arg("i").noconvert());
 
   // test_bad_arg_default
   // Issue/PR #648: bad arg default debugging output
@@ -661,11 +667,13 @@ TEST_SUBMODULE(methods_and_attributes, m)
 #endif
   m.def("bad_arg_def_named", [] {
     auto m = py::module::import("pybind11_tests");
-    m.def("should_fail", [](int, UnregisteredType) {}, py::arg(), py::arg("a") = UnregisteredType());
+    m.def(
+        "should_fail", [](int, UnregisteredType) {}, py::arg(), py::arg("a") = UnregisteredType());
   });
   m.def("bad_arg_def_unnamed", [] {
     auto m = py::module::import("pybind11_tests");
-    m.def("should_fail", [](int, UnregisteredType) {}, py::arg(), py::arg() = UnregisteredType());
+    m.def(
+        "should_fail", [](int, UnregisteredType) {}, py::arg(), py::arg() = UnregisteredType());
   });
 
   // test_accepts_none
@@ -719,11 +727,13 @@ TEST_SUBMODULE(methods_and_attributes, m)
     return dt;
   });
 
-  m.def("custom_caster_destroy",
-        []() { return new DestructionTester(); },
-        py::return_value_policy::take_ownership); // Takes ownership: destroy when finished
-  m.def("custom_caster_destroy_const",
-        []() -> const DestructionTester* { return new DestructionTester(); },
-        py::return_value_policy::take_ownership); // Likewise (const doesn't inhibit destruction)
+  m.def(
+      "custom_caster_destroy",
+      []() { return new DestructionTester(); },
+      py::return_value_policy::take_ownership); // Takes ownership: destroy when finished
+  m.def(
+      "custom_caster_destroy_const",
+      []() -> const DestructionTester* { return new DestructionTester(); },
+      py::return_value_policy::take_ownership); // Likewise (const doesn't inhibit destruction)
   m.def("destruction_tester_cstats", &ConstructorStats::get<DestructionTester>, py::return_value_policy::reference);
 }

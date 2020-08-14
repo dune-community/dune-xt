@@ -32,13 +32,14 @@ struct make_gmsh_grid
     namespace py = pybind11;
     using namespace pybind11::literals;
 
-    m.def("make_gmsh_grid",
-          [](const std::string& filename, const Dimension<d>&, const element_type&) {
-            return XT::Grid::make_gmsh_grid<G>(filename);
-          },
-          "filename"_a,
-          "dim"_a,
-          "element_type"_a);
+    m.def(
+        "make_gmsh_grid",
+        [](const std::string& filename, const Dimension<d>&, const element_type&) {
+          return XT::Grid::make_gmsh_grid<G>(filename);
+        },
+        "filename"_a,
+        "dim"_a,
+        "element_type"_a);
   } // ... bind(...)
 }; // struct make_gmsh_grid
 

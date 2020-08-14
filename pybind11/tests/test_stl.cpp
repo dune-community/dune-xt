@@ -184,7 +184,8 @@ TEST_SUBMODULE(stl, m)
   using opt_no_assign = std::optional<NoAssign>;
   m.def("double_or_zero", [](const opt_int& x) -> int { return x.value_or(0) * 2; });
   m.def("half_or_none", [](int x) -> opt_int { return x ? opt_int(x / 2) : opt_int(); });
-  m.def("test_nullopt", [](opt_int x) { return x.value_or(42); }, py::arg_v("x", std::nullopt, "None"));
+  m.def(
+      "test_nullopt", [](opt_int x) { return x.value_or(42); }, py::arg_v("x", std::nullopt, "None"));
   m.def(
       "test_no_assign", [](const opt_no_assign& x) { return x ? x->value : 42; }, py::arg_v("x", std::nullopt, "None"));
 
@@ -200,12 +201,14 @@ TEST_SUBMODULE(stl, m)
   using exp_opt_no_assign = std::experimental::optional<NoAssign>;
   m.def("double_or_zero_exp", [](const exp_opt_int& x) -> int { return x.value_or(0) * 2; });
   m.def("half_or_none_exp", [](int x) -> exp_opt_int { return x ? exp_opt_int(x / 2) : exp_opt_int(); });
-  m.def("test_nullopt_exp",
-        [](exp_opt_int x) { return x.value_or(42); },
-        py::arg_v("x", std::experimental::nullopt, "None"));
-  m.def("test_no_assign_exp",
-        [](const exp_opt_no_assign& x) { return x ? x->value : 42; },
-        py::arg_v("x", std::experimental::nullopt, "None"));
+  m.def(
+      "test_nullopt_exp",
+      [](exp_opt_int x) { return x.value_or(42); },
+      py::arg_v("x", std::experimental::nullopt, "None"));
+  m.def(
+      "test_no_assign_exp",
+      [](const exp_opt_no_assign& x) { return x ? x->value : 42; },
+      py::arg_v("x", std::experimental::nullopt, "None"));
 #endif
 
 #ifdef PYBIND11_HAS_VARIANT
@@ -265,7 +268,8 @@ TEST_SUBMODULE(stl, m)
   });
 
   // test_stl_pass_by_pointer
-  m.def("stl_pass_by_pointer", [](std::vector<int>* v) { return *v; }, "v"_a = nullptr);
+  m.def(
+      "stl_pass_by_pointer", [](std::vector<int>* v) { return *v; }, "v"_a = nullptr);
 
   // #1258: pybind11/stl.h converts string to vector<string>
   m.def("func_with_string_or_vector_string_arg_overload", [](std::vector<std::string>) { return 1; });
@@ -288,13 +292,14 @@ TEST_SUBMODULE(stl, m)
   py::class_<Placeholder>(m, "Placeholder");
 
   /// test_stl_vector_ownership
-  m.def("test_stl_ownership",
-        []() {
-          std::vector<Placeholder*> result;
-          result.push_back(new Placeholder());
-          return result;
-        },
-        py::return_value_policy::take_ownership);
+  m.def(
+      "test_stl_ownership",
+      []() {
+        std::vector<Placeholder*> result;
+        result.push_back(new Placeholder());
+        return result;
+      },
+      py::return_value_policy::take_ownership);
 
   m.def("array_cast_sequence", [](std::array<int, 3> x) { return x; });
 

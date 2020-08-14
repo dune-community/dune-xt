@@ -365,7 +365,8 @@ TEST_SUBMODULE(smart_ptr, m)
   py::class_<SharedPtrRef>(m, "SharedPtrRef")
       .def(py::init<>())
       .def_readonly("ref", &SharedPtrRef::value)
-      .def_property_readonly("copy", [](const SharedPtrRef& s) { return s.value; }, py::return_value_policy::copy)
+      .def_property_readonly(
+          "copy", [](const SharedPtrRef& s) { return s.value; }, py::return_value_policy::copy)
       .def_readonly("holder_ref", &SharedPtrRef::shared)
       .def_property_readonly(
           "holder_copy", [](const SharedPtrRef& s) { return s.shared; }, py::return_value_policy::copy)
@@ -406,7 +407,8 @@ TEST_SUBMODULE(smart_ptr, m)
       .def(py::init<>())
       .def_readonly("bad_wp", &SharedFromThisRef::value)
       .def_property_readonly("ref", [](const SharedFromThisRef& s) -> const B& { return *s.shared; })
-      .def_property_readonly("copy", [](const SharedFromThisRef& s) { return s.value; }, py::return_value_policy::copy)
+      .def_property_readonly(
+          "copy", [](const SharedFromThisRef& s) { return s.value; }, py::return_value_policy::copy)
       .def_readonly("holder_ref", &SharedFromThisRef::shared)
       .def_property_readonly(
           "holder_copy", [](const SharedFromThisRef& s) { return s.shared; }, py::return_value_policy::copy)

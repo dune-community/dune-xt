@@ -1806,20 +1806,21 @@ iterator make_iterator(Iterator first, Sentinel last, Extra&&... extra)
   if (!detail::get_type_info(typeid(state), false)) {
     class_<state>(handle(), "iterator", pybind11::module_local())
         .def("__iter__", [](state& s) -> state& { return s; })
-        .def("__next__",
-             [](state& s) -> ValueType {
-               if (!s.first_or_done)
-                 ++s.it;
-               else
-                 s.first_or_done = false;
-               if (s.it == s.end) {
-                 s.first_or_done = true;
-                 throw stop_iteration();
-               }
-               return *s.it;
-             },
-             std::forward<Extra>(extra)...,
-             Policy);
+        .def(
+            "__next__",
+            [](state& s) -> ValueType {
+              if (!s.first_or_done)
+                ++s.it;
+              else
+                s.first_or_done = false;
+              if (s.it == s.end) {
+                s.first_or_done = true;
+                throw stop_iteration();
+              }
+              return *s.it;
+            },
+            std::forward<Extra>(extra)...,
+            Policy);
   }
 
   return cast(state{first, last, true});
@@ -1839,20 +1840,21 @@ iterator make_key_iterator(Iterator first, Sentinel last, Extra&&... extra)
   if (!detail::get_type_info(typeid(state), false)) {
     class_<state>(handle(), "iterator", pybind11::module_local())
         .def("__iter__", [](state& s) -> state& { return s; })
-        .def("__next__",
-             [](state& s) -> KeyType {
-               if (!s.first_or_done)
-                 ++s.it;
-               else
-                 s.first_or_done = false;
-               if (s.it == s.end) {
-                 s.first_or_done = true;
-                 throw stop_iteration();
-               }
-               return (*s.it).first;
-             },
-             std::forward<Extra>(extra)...,
-             Policy);
+        .def(
+            "__next__",
+            [](state& s) -> KeyType {
+              if (!s.first_or_done)
+                ++s.it;
+              else
+                s.first_or_done = false;
+              if (s.it == s.end) {
+                s.first_or_done = true;
+                throw stop_iteration();
+              }
+              return (*s.it).first;
+            },
+            std::forward<Extra>(extra)...,
+            Policy);
   }
 
   return cast(state{first, last, true});

@@ -41,13 +41,14 @@ PYBIND11_MODULE(_common_mpi, m)
   namespace py = pybind11;
   using pybind11::operator""_a;
 
-  m.def("init_mpi",
-        [](const std::vector<std::string>& args) {
-          int argc = XT::Common::numeric_cast<int>(args.size());
-          char** argv = XT::Common::vector_to_main_args(args);
-          MPIHelper::instance(argc, argv);
-        },
-        "args"_a = std::vector<std::string>());
+  m.def(
+      "init_mpi",
+      [](const std::vector<std::string>& args) {
+        int argc = XT::Common::numeric_cast<int>(args.size());
+        char** argv = XT::Common::vector_to_main_args(args);
+        MPIHelper::instance(argc, argv);
+      },
+      "args"_a = std::vector<std::string>());
 
   py::class_<XT::Common::MPI_Comm_Wrapper> mpi_comm_wrapper(m, "MPI_Comm_Wrapper", "MPI_Comm_Wrapper");
   mpi_comm_wrapper.def(py::init());
@@ -63,9 +64,12 @@ PYBIND11_MODULE(_common_mpi, m)
 
     cls.def("barrier", &Comm::barrier);
 
-    cls.def("min", [](const Comm& self, double x) { return self.min(x); }, "x"_a);
-    cls.def("max", [](const Comm& self, double x) { return self.max(x); }, "x"_a);
-    cls.def("sum", [](const Comm& self, double x) { return self.sum(x); }, "x"_a);
+    cls.def(
+        "min", [](const Comm& self, double x) { return self.min(x); }, "x"_a);
+    cls.def(
+        "max", [](const Comm& self, double x) { return self.max(x); }, "x"_a);
+    cls.def(
+        "sum", [](const Comm& self, double x) { return self.sum(x); }, "x"_a);
   });
 
   XT::Common::bindings::guarded_bind([&]() {

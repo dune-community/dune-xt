@@ -115,13 +115,15 @@ TEST_SUBMODULE(call_policies, m)
   m.def("unguarded_call", &CustomGuard::report_status);
   m.def("guarded_call", &CustomGuard::report_status, py::call_guard<CustomGuard>());
 
-  m.def("multiple_guards_correct_order",
-        []() { return CustomGuard::report_status() + std::string(" & ") + DependentGuard::report_status(); },
-        py::call_guard<CustomGuard, DependentGuard>());
+  m.def(
+      "multiple_guards_correct_order",
+      []() { return CustomGuard::report_status() + std::string(" & ") + DependentGuard::report_status(); },
+      py::call_guard<CustomGuard, DependentGuard>());
 
-  m.def("multiple_guards_wrong_order",
-        []() { return DependentGuard::report_status() + std::string(" & ") + CustomGuard::report_status(); },
-        py::call_guard<DependentGuard, CustomGuard>());
+  m.def(
+      "multiple_guards_wrong_order",
+      []() { return DependentGuard::report_status() + std::string(" & ") + CustomGuard::report_status(); },
+      py::call_guard<DependentGuard, CustomGuard>());
 
 #if defined(WITH_THREAD) && !defined(PYPY_VERSION)
   // `py::call_guard<py::gil_scoped_release>()` should work in PyPy as well,

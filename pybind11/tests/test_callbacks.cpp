@@ -115,14 +115,15 @@ TEST_SUBMODULE(callbacks, m)
   /* Test if passing a function pointer from C++ -> Python -> C++ yields the original pointer */
   m.def("dummy_function", &dummy_function);
   m.def("dummy_function2", [](int i, int j) { return i + j; });
-  m.def("roundtrip",
-        [](std::function<int(int)> f, bool expect_none = false) {
-          if (expect_none && f)
-            throw std::runtime_error("Expected None to be converted to empty std::function");
-          return f;
-        },
-        py::arg("f"),
-        py::arg("expect_none") = false);
+  m.def(
+      "roundtrip",
+      [](std::function<int(int)> f, bool expect_none = false) {
+        if (expect_none && f)
+          throw std::runtime_error("Expected None to be converted to empty std::function");
+        return f;
+      },
+      py::arg("f"),
+      py::arg("expect_none") = false);
   m.def("test_dummy_function", [](const std::function<int(int)>& f) -> std::string {
     using fn_type = int (*)(int);
     auto result = f.target<fn_type>();

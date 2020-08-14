@@ -40,12 +40,14 @@ PYBIND11_MODULE(_common_timings, m)
         .def("stop", py::overload_cast<>(&Timings::stop), "stop all running timers")
         .def("walltime", &Timings::walltime, "get runtime of section in milliseconds")
         //! TODO this actually accepts an ostream
-        .def("output_simple", [](Timings& self) { self.output_simple(); }, "outputs per-rank csv-file")
+        .def(
+            "output_simple", [](Timings& self) { self.output_simple(); }, "outputs per-rank csv-file")
         .def("output_per_rank", &Timings::output_per_rank, "outputs walltime only")
         //! TODO this actually accepts an MPICOMM and an ostream too
-        .def("output_all_measures",
-             [](Timings& self) { self.output_all_measures(); },
-             "outputs per rank and global averages of all measures");
+        .def(
+            "output_all_measures",
+            [](Timings& self) { self.output_all_measures(); },
+            "outputs per rank and global averages of all measures");
     m.def("instance", &timings, py::return_value_policy::reference);
   });
 }

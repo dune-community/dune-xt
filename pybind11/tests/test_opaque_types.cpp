@@ -30,7 +30,8 @@ TEST_SUBMODULE(opaque_types, m)
       .def("push_back", (void (StringList::*)(const std::string&)) & StringList::push_back)
       .def("back", (std::string & (StringList::*)()) & StringList::back)
       .def("__len__", [](const StringList& v) { return v.size(); })
-      .def("__iter__", [](StringList& v) { return py::make_iterator(v.begin(), v.end()); }, py::keep_alive<0, 1>());
+      .def(
+          "__iter__", [](StringList& v) { return py::make_iterator(v.begin(), v.end()); }, py::keep_alive<0, 1>());
 
   class ClassWithSTLVecProperty
   {

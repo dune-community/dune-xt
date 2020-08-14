@@ -48,14 +48,15 @@ public:
       const std::array<size_t, d>&, const DomainType&, std::vector<DerivativeRangeType>&, const Common::Parameter&)>;
   using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
 
-  GenericElementFunctionSet(GenericSizeFunctionType size_func,
-                            GenericSizeFunctionType max_size_func,
-                            GenericOrderFunctionType order_func,
-                            GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                            const Common::ParameterType& param_type = {},
-                            GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
-                            GenericDerivativeFunctionType derivative_func = default_derivative_function(),
-                            GenericPostBindFunctionType post_bind_func = [](const auto&) {})
+  GenericElementFunctionSet(
+      GenericSizeFunctionType size_func,
+      GenericSizeFunctionType max_size_func,
+      GenericOrderFunctionType order_func,
+      GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
+      const Common::ParameterType& param_type = {},
+      GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
+      GenericDerivativeFunctionType derivative_func = default_derivative_function(),
+      GenericPostBindFunctionType post_bind_func = [](const auto&) {})
     : BaseType(param_type)
     , size_(size_func)
     , max_size_(max_size_func)
@@ -66,13 +67,14 @@ public:
     , post_bind_(post_bind_func)
   {}
 
-  GenericElementFunctionSet(const size_t fixed_size,
-                            const int ord,
-                            GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
-                            const Common::ParameterType& param_type = {},
-                            GenericJacobianFunctionType jacobian_lambda = default_jacobian_function(),
-                            GenericDerivativeFunctionType derivative_lambda = default_derivative_function(),
-                            GenericPostBindFunctionType post_bind_func = [](const auto&) {})
+  GenericElementFunctionSet(
+      const size_t fixed_size,
+      const int ord,
+      GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
+      const Common::ParameterType& param_type = {},
+      GenericJacobianFunctionType jacobian_lambda = default_jacobian_function(),
+      GenericDerivativeFunctionType derivative_lambda = default_derivative_function(),
+      GenericPostBindFunctionType post_bind_func = [](const auto&) {})
     : BaseType(param_type)
     , size_([=](const auto& /*param*/) { return fixed_size; })
     , max_size_([=](const auto& /*param*/) { return fixed_size; })
@@ -224,12 +226,13 @@ public:
       const std::array<size_t, d>&, const DomainType&, const Common::Parameter&)>;
   using GenericPostBindFunctionType = std::function<void(const ElementType&)>;
 
-  GenericElementFunction(GenericOrderFunctionType order_func,
-                         GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
-                         const Common::ParameterType& param_type = {},
-                         GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
-                         GenericDerivativeFunctionType derivative_func = default_derivative_function(),
-                         GenericPostBindFunctionType post_bind_func = [](const auto&) {})
+  GenericElementFunction(
+      GenericOrderFunctionType order_func,
+      GenericEvaluateFunctionType evaluate_func = default_evaluate_function(),
+      const Common::ParameterType& param_type = {},
+      GenericJacobianFunctionType jacobian_func = default_jacobian_function(),
+      GenericDerivativeFunctionType derivative_func = default_derivative_function(),
+      GenericPostBindFunctionType post_bind_func = [](const auto&) {})
     : BaseType(param_type)
     , order_(order_func)
     , evaluate_(evaluate_func)
@@ -238,12 +241,13 @@ public:
     , post_bind_(post_bind_func)
   {}
 
-  GenericElementFunction(const int ord,
-                         GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
-                         const Common::ParameterType& param_type = {},
-                         GenericJacobianFunctionType jacobian_lambda = default_jacobian_function(),
-                         GenericDerivativeFunctionType derivative_lambda = default_derivative_function(),
-                         GenericPostBindFunctionType post_bind_func = [](const auto&) {})
+  GenericElementFunction(
+      const int ord,
+      GenericEvaluateFunctionType evaluate_lambda = default_evaluate_function(),
+      const Common::ParameterType& param_type = {},
+      GenericJacobianFunctionType jacobian_lambda = default_jacobian_function(),
+      GenericDerivativeFunctionType derivative_lambda = default_derivative_function(),
+      GenericPostBindFunctionType post_bind_func = [](const auto&) {})
     : BaseType(param_type)
     , order_([=](const auto& /*param*/) { return ord; })
     , evaluate_(evaluate_lambda)

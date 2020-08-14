@@ -17,7 +17,6 @@ from tempfile import NamedTemporaryFile
 from dune.xt import guarded_import
 from dune.xt.common.vtk.plot import plot
 
-
 for mod_name in (
         '_grid_boundaryinfo_alldirichlet',
         '_grid_boundaryinfo_allneumann',
@@ -52,5 +51,5 @@ def Dim(d):
 def visualize_grid(grid):
     tmpfile = NamedTemporaryFile(mode='wb', delete=False, suffix='.vtu').name
     grid.visualize(tmpfile[:-4])
-    return plot(tmpfile, color_attribute_name='Element index') # see visualize in python/dune/xt/grid/gridprovider.hh
-
+    return plot(
+        tmpfile, color_attribute_name='Element index')     # see visualize in python/dune/xt/grid/gridprovider.hh

@@ -257,7 +257,7 @@ unsigned int grid_elements()
 {
   return DXTC_CONFIG.has_key("test.gridelements") // <- doing this so complicated to
              ? DXTC_CONFIG.get<unsigned int>(
-                   "test.gridelements", 3u, Common::ValidateLess<unsigned int>(2u)) //    silence the WARNING: ...
+                 "test.gridelements", 3u, Common::ValidateLess<unsigned int>(2u)) //    silence the WARNING: ...
              : 3u;
 } // ... grid_elements(...)
 

@@ -59,25 +59,27 @@ public:
         py::init<const typename type::RangeReturnType&, const std::string&>(), "value"_a, "name"_a = type::static_id());
 
     if (rC == 1)
-      m.def(XT::Common::to_camel_case(class_id).c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               Grid::bindings::Dimension<r> /*dim_range*/,
-               const typename type::RangeReturnType& value,
-               const std::string& name) { return type(value, name); },
-            "dim_domain"_a,
-            "dim_range"_a,
-            "value"_a,
-            "name"_a = type::static_id());
+      m.def(
+          XT::Common::to_camel_case(class_id).c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             Grid::bindings::Dimension<r> /*dim_range*/,
+             const typename type::RangeReturnType& value,
+             const std::string& name) { return type(value, name); },
+          "dim_domain"_a,
+          "dim_range"_a,
+          "value"_a,
+          "name"_a = type::static_id());
     else
-      m.def(XT::Common::to_camel_case(class_id).c_str(),
-            [](Grid::bindings::Dimension<d> /*dim_domain*/,
-               std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>> /*dim_range*/,
-               const typename type::RangeReturnType& value,
-               const std::string& name) { return type(value, name); },
-            "dim_domain"_a,
-            "dim_range"_a,
-            "value"_a,
-            "name"_a = type::static_id());
+      m.def(
+          XT::Common::to_camel_case(class_id).c_str(),
+          [](Grid::bindings::Dimension<d> /*dim_domain*/,
+             std::pair<Grid::bindings::Dimension<r>, Grid::bindings::Dimension<rC>> /*dim_range*/,
+             const typename type::RangeReturnType& value,
+             const std::string& name) { return type(value, name); },
+          "dim_domain"_a,
+          "dim_range"_a,
+          "value"_a,
+          "name"_a = type::static_id());
 
     return c;
   }

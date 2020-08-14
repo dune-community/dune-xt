@@ -19,19 +19,21 @@ TEST_SUBMODULE(kwargs_and_defaults, m)
   m.def("kw_func0", kw_func);
   m.def("kw_func1", kw_func, py::arg("x"), py::arg("y"));
   m.def("kw_func2", kw_func, py::arg("x") = 100, py::arg("y") = 200);
-  m.def("kw_func3", [](const char*) {}, py::arg("data") = std::string("Hello world!"));
+  m.def(
+      "kw_func3", [](const char*) {}, py::arg("data") = std::string("Hello world!"));
 
   /* A fancier default argument */
   std::vector<int> list{{13, 17}};
-  m.def("kw_func4",
-        [](const std::vector<int>& entries) {
-          std::string ret = "{";
-          for (int i : entries)
-            ret += std::to_string(i) + " ";
-          ret.back() = '}';
-          return ret;
-        },
-        py::arg("myList") = list);
+  m.def(
+      "kw_func4",
+      [](const std::vector<int>& entries) {
+        std::string ret = "{";
+        for (int i : entries)
+          ret += std::to_string(i) + " ";
+        ret.back() = '}';
+        return ret;
+      },
+      py::arg("myList") = list);
 
   m.def("kw_func_udl", kw_func, "x"_a, "y"_a = 300);
   m.def("kw_func_udl_z", kw_func, "x"_a, "y"_a = 0);

@@ -294,12 +294,13 @@ TEST_SUBMODULE(copy_move_policies, m)
   };
   py::class_<PrivateOpNew>(m, "PrivateOpNew").def_readonly("value", &PrivateOpNew::value);
   m.def("private_op_new_value", []() { return PrivateOpNew(); });
-  m.def("private_op_new_reference",
-        []() -> const PrivateOpNew& {
-          static PrivateOpNew x{};
-          return x;
-        },
-        py::return_value_policy::reference);
+  m.def(
+      "private_op_new_reference",
+      []() -> const PrivateOpNew& {
+        static PrivateOpNew x{};
+        return x;
+      },
+      py::return_value_policy::reference);
 
   // test_move_fallback
   // #389: rvp::move should fall-through to copy on non-movable objects
@@ -324,6 +325,8 @@ TEST_SUBMODULE(copy_move_policies, m)
   };
   py::class_<MoveIssue2>(m, "MoveIssue2").def(py::init<int>()).def_readwrite("value", &MoveIssue2::v);
 
-  m.def("get_moveissue1", [](int i) { return new MoveIssue1(i); }, py::return_value_policy::move);
-  m.def("get_moveissue2", [](int i) { return MoveIssue2(i); }, py::return_value_policy::move);
+  m.def(
+      "get_moveissue1", [](int i) { return new MoveIssue1(i); }, py::return_value_policy::move);
+  m.def(
+      "get_moveissue2", [](int i) { return MoveIssue2(i); }, py::return_value_policy::move);
 }

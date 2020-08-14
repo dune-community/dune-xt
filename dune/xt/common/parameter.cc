@@ -70,11 +70,12 @@ ParameterType::ParameterType(BaseType&& source)
 
 ParameterType ParameterType::operator+(const ParameterType& other) const
 {
-  return this->merge(other,
-                     [](const auto& left, const auto& right) { return left == right; },
-                     [](const auto& /*left*/, const auto& /*right*/) {
-                       return "cannot add parameter types which contain the same key with different sizes:";
-                     });
+  return this->merge(
+      other,
+      [](const auto& left, const auto& right) { return left == right; },
+      [](const auto& /*left*/, const auto& /*right*/) {
+        return "cannot add parameter types which contain the same key with different sizes:";
+      });
 } // ... operator+(...)
 
 bool ParameterType::operator==(const ParameterType& other) const
@@ -170,18 +171,19 @@ Parameter::Parameter(BaseType&& source)
 
 Parameter Parameter::operator+(const Parameter& other) const
 {
-  return this->merge(other,
-                     [](const auto& left, const auto& right) {
-                       if (left.size() != right.size())
-                         return false;
-                       return FloatCmp::eq(left, right);
-                     },
-                     [](const auto& left, const auto& right) {
-                       if (left.size() != right.size())
-                         return "cannot add parameters which contain the same key with different sizes:";
-                       else
-                         return "cannot add parameters which contain the same key with different values:";
-                     });
+  return this->merge(
+      other,
+      [](const auto& left, const auto& right) {
+        if (left.size() != right.size())
+          return false;
+        return FloatCmp::eq(left, right);
+      },
+      [](const auto& left, const auto& right) {
+        if (left.size() != right.size())
+          return "cannot add parameters which contain the same key with different sizes:";
+        else
+          return "cannot add parameters which contain the same key with different values:";
+      });
 } // ... operator+(...)
 
 bool Parameter::operator<(const Parameter& other) const

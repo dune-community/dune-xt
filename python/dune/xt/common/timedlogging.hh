@@ -36,11 +36,12 @@ public:
     c.def_readwrite("info_enabled", &type::info_enabled);
     c.def_readwrite("debug_enabled", &type::debug_enabled);
     c.def_readwrite("warn_enabled", &type::warn_enabled);
-    c.def("enable", [](type& self, const std::string& prefix){self.enable(prefix);}, ""_a = "");
-    c.def("disable", [](type& self){self.disable();});
-    c.def("info", [](type& self, const std::string& to_print){self.info() << to_print << std::endl;});
-    c.def("debug", [](type& self, const std::string& to_print){self.debug() << to_print << std::endl;});
-    c.def("warn", [](type& self, const std::string& to_print){self.warn() << to_print << std::endl;});
+    c.def(
+        "enable", [](type& self, const std::string& prefix) { self.enable(prefix); }, ""_a = "");
+    c.def("disable", [](type& self) { self.disable(); });
+    c.def("info", [](type& self, const std::string& to_print) { self.info() << to_print << std::endl; });
+    c.def("debug", [](type& self, const std::string& to_print) { self.debug() << to_print << std::endl; });
+    c.def("warn", [](type& self, const std::string& to_print) { self.warn() << to_print << std::endl; });
 
     return c;
   }

@@ -28,7 +28,8 @@ PYBIND11_MODULE(userbindings, m)
   py::module::import("dune.xt.functions");
 
   // your code goes here ...
-  m.def("example_function",
-        [](Dune::XT::Common::Parameter param) { std::cout << "param = " << param << std::endl; },
-        "param"_a);
+  m.def(
+      "example_function",
+      [](Dune::XT::Common::Parameter param) { std::cout << "param = " << param << std::endl; },
+      "param"_a);
 } // PYBIND11_MODULE(userbindings, ...)

@@ -39,7 +39,6 @@ for mod_name in (
 ):
     guarded_import(globals(), 'dune.xt.functions', mod_name)
 
-
 from dune.xt.functions._functions_gridfunction import GridFunction
 
 
@@ -52,4 +51,3 @@ def visualize_function(function, grid, subsampling=False):
     except AttributeError:
         GridFunction(grid, function).visualize(grid, filename=tmpfile[:-4], subsampling=subsampling)
     return plot(tmpfile, color_attribute_name=function.name)
-
