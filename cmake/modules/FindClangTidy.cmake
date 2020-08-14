@@ -23,11 +23,13 @@
 
 find_program(ClangTidy_EXECUTABLE
              NAMES clang-tidy
-                   clang-tidy-3.6
-                   clang-tidy-3.7
-                   clang-tidy-3.8
-                   clang-tidy-3.9
-                   clang-tidy-4.0)
+                   clang-tidy-8
+                   clang-tidy-9
+                   clang-tidy-10
+                   clang-tidy-11
+                   clang-tidy-12
+                   clang-tidy-13
+                   clang-tidy-14)
 if(EXISTS ${ClangTidy_EXECUTABLE})
   execute_process(COMMAND ${ClangTidy_EXECUTABLE} -version OUTPUT_VARIABLE clang_out)
   string(REGEX
@@ -36,6 +38,9 @@ if(EXISTS ${ClangTidy_EXECUTABLE})
                  ClangTidy_VERSION
                  ${clang_out})
 endif()
+
+find_program(RunTidy_EXECUTABLE
+NAMES run-clang-tidy-${ClangTidy_VERSION})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ClangTidy REQUIRED_VARS ClangTidy_EXECUTABLE VERSION_VAR ClangTidy_VERSION)

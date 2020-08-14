@@ -86,10 +86,9 @@ double diameter(const Intersection<G, I>& intersection)
  *        Returns true, if global_point and intersection coincide.
  */
 template <class G, class I, class D>
-typename std::enable_if<G::dimension == 1, bool>::type
-contains(const Dune::Intersection<G, I>& intersection,
-         const Dune::FieldVector<D, 1>& global_point,
-         const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
+bool contains(const Dune::Intersection<G, I>& intersection,
+              const Dune::FieldVector<D, 1>& global_point,
+              const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
 {
   return Common::FloatCmp::eq(intersection.geometry().center(), global_point, tolerance);
 }
@@ -101,10 +100,9 @@ contains(const Dune::Intersection<G, I>& intersection,
  *        Returns true if global_point lies on the line between the corners of intersection.
  */
 template <class G, class I, class D>
-typename std::enable_if<G::dimension == 2, bool>::type
-contains(const Dune::Intersection<G, I>& intersection,
-         const Dune::FieldVector<D, 2>& global_point,
-         const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
+bool contains(const Dune::Intersection<G, I>& intersection,
+              const Dune::FieldVector<D, 2>& global_point,
+              const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
 {
   const auto& geometry = intersection.geometry();
   // get the global coordinates of the intersections corners
@@ -140,10 +138,9 @@ contains(const Dune::Intersection<G, I>& intersection,
  * http://math.stackexchange.com/questions/684141/check-if-a-point-is-on-a-plane-minimize-the-use-of-multiplications-and-divisio
  */
 template <class G, class I, class D>
-typename std::enable_if<G::dimension == 3, bool>::type
-contains(const Dune::Intersection<G, I>& intersection,
-         const Dune::FieldVector<D, 3>& global_point,
-         const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
+bool contains(const Dune::Intersection<G, I>& intersection,
+              const Dune::FieldVector<D, 3>& global_point,
+              const D& tolerance = Common::FloatCmp::DefaultEpsilon<D>::value())
 {
   const auto& geometry = intersection.geometry();
   // get the global coordinates of the intersections corners, there should be at least 3 (ignore the fourth if there is

@@ -128,28 +128,22 @@ public:
     backend() *= alpha;
   }
 
-  template <class T>
-  void axpy(const ScalarType& alpha, const EigenBaseVector<T, ScalarType>& xx)
-  {
-    if (xx.size() != size())
-      DUNE_THROW(Common::Exceptions::shapes_do_not_match,
-                 "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
-    const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-    backend() += alpha * xx.backend();
-  } // ... axpy(...)
-
   template <class Vec>
-  std::enable_if_t<XT::Common::is_vector<Vec>::value
-                       && !std::is_base_of<EigenBaseVector<typename Vec::Traits, ScalarType>, Vec>::value,
-                   void>
-  axpy(const ScalarType& alpha, const Vec& xx)
+  void axpy(const ScalarType& alpha, const Vec& xx)
   {
     if (xx.size() != size())
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The size of xx (" << xx.size() << ") does not match the size of this (" << size() << ")!");
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-    for (size_t ii = 0; ii < size(); ++ii)
-      set_entry(ii, get_entry(ii) + alpha * xx[ii]);
+    if constexpr (XT::Common::is_vector<Vec>::value
+                  && !std::is_base_of<EigenBaseVector<typename Vec::Traits, ScalarType>, Vec>::value) {
+      for (size_t ii = 0; ii < size(); ++ii)
+        set_entry(ii, get_entry(ii) + alpha * xx[ii]);
+    } else if constexpr (std::is_base_of<EigenBaseVector<typename Vec::Traits, ScalarType>, Vec>::value) {
+      backend() += alpha * xx.backend();
+    } else {
+      static_assert(AlwaysFalse<Vec>::value, "Not Implemented");
+    }
   } // ... axpy(...)
 
   bool has_equal_shape(const VectorImpType& other) const

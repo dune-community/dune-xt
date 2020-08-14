@@ -106,6 +106,8 @@ common unstable_gcc_full cpp:
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: common
+    tags:
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -115,6 +117,8 @@ common unstable_gcc_full python:
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: common
+    tags:
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -124,6 +128,8 @@ common unstable_gcc_full headercheck:
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: common
+    tags:
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
@@ -133,6 +139,8 @@ grid unstable_gcc_full cpp:
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    tags:
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -142,6 +150,8 @@ grid unstable_gcc_full python:
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    tags:
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -151,6 +161,8 @@ grid unstable_gcc_full headercheck:
     variables:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    tags:
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
@@ -161,7 +173,7 @@ functions unstable_gcc_full cpp:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
-        - amm-only
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -172,7 +184,7 @@ functions unstable_gcc_full python:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
-        - amm-only
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -183,7 +195,7 @@ functions unstable_gcc_full headercheck:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
-        - amm-only
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
@@ -194,7 +206,7 @@ la unstable_gcc_full cpp:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
-        - amm-only
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -205,7 +217,7 @@ la unstable_gcc_full python:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
-        - amm-only
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -216,7 +228,7 @@ la unstable_gcc_full headercheck:
         CI_IMAGE: debian-unstable_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
-        - amm-only
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
@@ -226,6 +238,8 @@ common gcc_full cpp:
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: common
+    tags:
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -235,6 +249,8 @@ common gcc_full python:
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: common
+    tags:
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -244,6 +260,8 @@ common gcc_full headercheck:
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: common
+    tags:
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
@@ -253,6 +271,8 @@ grid gcc_full cpp:
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    tags:
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -262,6 +282,8 @@ grid gcc_full python:
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    tags:
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -271,6 +293,8 @@ grid gcc_full headercheck:
     variables:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: grid
+    tags:
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
@@ -281,7 +305,7 @@ functions gcc_full cpp:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
-        - amm-only
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -292,7 +316,7 @@ functions gcc_full python:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
-        - amm-only
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -303,7 +327,7 @@ functions gcc_full headercheck:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: functions
     tags:
-        - amm-only
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash
@@ -314,7 +338,7 @@ la gcc_full cpp:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
-        - amm-only
+        - dustin
     stage: cpp
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_cpp.bash
@@ -325,7 +349,7 @@ la gcc_full python:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
-        - amm-only
+        - dustin
     stage: python
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_python.bash
@@ -336,7 +360,7 @@ la gcc_full headercheck:
         CI_IMAGE: debian_gcc_full
         TESTS_MODULE_SUBDIR: la
     tags:
-        - amm-only
+        - dustin
     stage: headercheck
     script:
           - /home/dune-ci/src/${MY_MODULE}/.ci/shared/scripts/test_headercheck.bash

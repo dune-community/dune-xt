@@ -12,6 +12,9 @@
 /* begin dune-xt */
 // NEVER delete/alter above comment, dune's cmake relies on it
 
+// this precludes clang-tidy and co. from issuing warnings for this file
+#pragma GCC system_header
+
 /* Define to the version of dune-xt */
 #define DUNE_XT_VERSION ${DUNE_XT_VERSION}
 

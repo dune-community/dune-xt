@@ -17,6 +17,7 @@
 #include <limits>
 #include <iostream>
 #include <type_traits>
+#include <set>
 
 #include <dune/common/ftraits.hh>
 

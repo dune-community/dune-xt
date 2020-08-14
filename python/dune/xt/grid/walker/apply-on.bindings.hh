@@ -51,27 +51,11 @@ private:
            + XT::Grid::bindings::grid_name<G>::value();
   }
 
-  template <bool with_bi = ctor_expects_boundary_info, bool anything = true>
-  struct addbind // with_bi = false
+  static void addbind(pybind11::module& m, bound_type& c, const std::string& class_name, const std::string& layer_name)
   {
-    void operator()(pybind11::module& m, bound_type& c, const std::string& class_name, const std::string& layer_name)
-    {
-      c.def(pybind11::init<>());
-
-
-      m.def(makename(class_name, layer_name).c_str(), []() { return new type(); });
-    }
-  };
-
-  template <bool anything>
-  struct addbind<true, anything>
-  {
-    void operator()(pybind11::module& m, bound_type& c, const std::string& class_name, const std::string& layer_name)
-    {
+    if constexpr (ctor_expects_boundary_info) {
       using namespace pybind11::literals;
-
       c.def(pybind11::init<const BoundaryInfoType&, XT::Grid::BoundaryType*&&>());
-
       m.def(
           makename(class_name, layer_name).c_str(),
           [](const BoundaryInfoType& boundary_info, XT::Grid::BoundaryType*&& boundary_type) {
@@ -79,8 +63,11 @@ private:
           },
           "boundary_info"_a,
           "boundary_type"_a);
+    } else {
+      c.def(pybind11::init<>());
+      m.def(makename(class_name, layer_name).c_str(), []() { return new type(); });
     }
-  };
+  }
 
 public:
   static bound_type bind(pybind11::module& m, const std::string& class_name, const std::string& layer_name)
@@ -99,7 +86,7 @@ public:
     // bind class
     const auto ClassName = Common::to_camel_case("apply_on_" + class_name + "_" + grid_name + "_" + layer_name);
     bound_type c(m, ClassName.c_str(), ClassName.c_str());
-    addbind<>()(m, c, class_name, layer_name);
+    addbind(m, c, class_name, layer_name);
 
     return c;
   } // ... bind(...)

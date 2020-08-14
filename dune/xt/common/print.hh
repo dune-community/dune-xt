@@ -39,30 +39,6 @@ class DefaultPrinter
 {
   using ThisType = DefaultPrinter;
 
-  template <bool has_ostream = is_printable<T>::value, bool anything = true>
-  struct call_ostream;
-
-  template <bool anything>
-  struct call_ostream<true, anything>
-  {
-    static void or_print_error(std::ostream& out, const T& val)
-    {
-      // There are some operator<< overloads that are deprecated due to the introduction of this Printer.
-#include <dune/xt/common/disable_warnings.hh>
-      out << val;
-#include <dune/xt/common/reenable_warnings.hh>
-    }
-  };
-
-  template <bool anything>
-  struct call_ostream<false, anything>
-  {
-    static void or_print_error(std::ostream& out, const T& /*val*/)
-    {
-      out << "missing specialization for Printer<T> with T=" << Typename<T>::value();
-    }
-  };
-
 public:
   using ValueType = T;
 
@@ -81,7 +57,14 @@ public:
 
   virtual void repr(std::ostream& out) const
   {
-    call_ostream<>::or_print_error(out, value);
+    if constexpr (is_printable<T>::value) {
+      // There are some of our operator<< overloads that are deprecated due to the introduction of this Printer.
+#include <dune/xt/common/disable_warnings.hh>
+      out << value;
+#include <dune/xt/common/reenable_warnings.hh>
+    } else {
+      out << "missing specialization for Printer<T> with T=" << Typename<T>::value();
+    }
   }
 
   virtual void str(std::ostream& out) const

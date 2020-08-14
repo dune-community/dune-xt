@@ -21,7 +21,7 @@ namespace XT {
 namespace Grid {
 
 
-template <class G, bool anything = true>
+template <class G>
 struct has_boundary_id
 {
 #if DUNE_VERSION_GTE(DUNE_GRID, 2, 6)
@@ -38,8 +38,8 @@ struct has_boundary_id
 
 #if HAVE_DUNE_UGGRID || HAVE_UG
 
-template <int dim, bool anything>
-struct has_boundary_id<UGGrid<dim>, anything>
+template <int dim>
+struct has_boundary_id<UGGrid<dim>>
 {
   static const constexpr bool value = false;
 };

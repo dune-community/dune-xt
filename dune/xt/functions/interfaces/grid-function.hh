@@ -264,14 +264,14 @@ public:
    *        visualization may thus be a refinement of the actual grid!
    */
   template <class GridViewType>
-  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
-  visualize(const GridViewType& grid_view,
-            const std::string path,
-            const bool subsampling = true,
-            const VTK::OutputType vtk_output_type = VTK::appendedraw,
-            const XT::Common::Parameter& param = {},
-            const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
+  void visualize(const GridViewType& grid_view,
+                 const std::string path,
+                 const bool subsampling = true,
+                 const VTK::OutputType vtk_output_type = VTK::appendedraw,
+                 const XT::Common::Parameter& param = {},
+                 const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
   {
+    static_assert(Grid::is_view<GridViewType>::value);
     auto vtk_writer = create_vtkwriter(grid_view, subsampling);
     add_to_vtkwriter(*vtk_writer, param, visualizer);
     write_visualization(*vtk_writer, path, vtk_output_type);
@@ -283,33 +283,34 @@ public:
    * \note  Not yet implemented for vector-valued functions.
    */
   template <class GridViewType>
-  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
-  visualize_gradient(const GridViewType& grid_view,
-                     const std::string path,
-                     const bool subsampling = true,
-                     const VTK::OutputType vtk_output_type = VTK::appendedraw,
-                     const XT::Common::Parameter& param = {},
-                     const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
+  void visualize_gradient(const GridViewType& grid_view,
+                          const std::string path,
+                          const bool subsampling = true,
+                          const VTK::OutputType vtk_output_type = VTK::appendedraw,
+                          const XT::Common::Parameter& param = {},
+                          const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
   {
+    static_assert(Grid::is_view<GridViewType>::value);
     auto vtk_writer = create_vtkwriter(grid_view, subsampling);
     add_gradient_to_vtkwriter(*vtk_writer, param, visualizer);
     write_visualization(*vtk_writer, path, vtk_output_type);
   } // ... visualize_gradient(...)
 
   template <class GridViewType>
-  typename std::enable_if<Grid::is_view<GridViewType>::value, std::unique_ptr<VTKWriter<GridViewType>>>::type
-  create_vtkwriter(const GridViewType& grid_view, const bool subsampling = true) const
+  std::unique_ptr<VTKWriter<GridViewType>> create_vtkwriter(const GridViewType& grid_view,
+                                                            const bool subsampling = true) const
   {
+    static_assert(Grid::is_view<GridViewType>::value);
     return subsampling ? std::make_unique<SubsamplingVTKWriter<GridViewType>>(grid_view, /*subsampling_level=*/2)
                        : std::make_unique<VTKWriter<GridViewType>>(grid_view, VTK::nonconforming);
   }
 
   template <class GridViewType>
-  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
-  add_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
-                   const XT::Common::Parameter& param = {},
-                   const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
+  void add_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
+                        const XT::Common::Parameter& param = {},
+                        const VisualizerInterface<r, rC, R>& visualizer = default_visualizer<r, rC, R>()) const
   {
+    static_assert(Grid::is_view<GridViewType>::value);
     const auto adapter =
         std::make_shared<VisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
             *this, visualizer, "", param);
@@ -317,11 +318,11 @@ public:
   }
 
   template <class GridViewType>
-  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
-  add_gradient_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
-                            const XT::Common::Parameter& param = {},
-                            const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
+  void add_gradient_to_vtkwriter(VTKWriter<GridViewType>& vtk_writer,
+                                 const XT::Common::Parameter& param = {},
+                                 const VisualizerInterface<d, 1, R>& visualizer = default_visualizer<d, 1, R>()) const
   {
+    static_assert(Grid::is_view<GridViewType>::value);
     const auto adapter =
         std::make_shared<GradientVisualizationAdapter<GridViewType, range_dim, range_dim_cols, RangeFieldType>>(
             *this, visualizer, "", param);
@@ -329,11 +330,11 @@ public:
   }
 
   template <class GridViewType>
-  typename std::enable_if<Grid::is_view<GridViewType>::value, void>::type
-  write_visualization(VTKWriter<GridViewType>& vtk_writer,
-                      const std::string path,
-                      const VTK::OutputType vtk_output_type = VTK::appendedraw) const
+  auto write_visualization(VTKWriter<GridViewType>& vtk_writer,
+                           const std::string path,
+                           const VTK::OutputType vtk_output_type = VTK::appendedraw) const
   {
+    static_assert(Grid::is_view<GridViewType>::value);
     if (path.empty())
       DUNE_THROW(Exceptions::wrong_input_given, "path must not be empty!");
     const auto directory = Common::directory_only(path);

@@ -30,6 +30,7 @@ endif()
 
 # Full set of test files (you can override these; see below)
 set(PYBIND11_TEST_FILES
+    test_async.cpp
     test_buffers.cpp
     test_builtin_casters.cpp
     test_call_policies.cpp
@@ -72,6 +73,13 @@ if(PYBIND11_TEST_OVERRIDE)
   set(PYBIND11_TEST_FILES ${PYBIND11_TEST_OVERRIDE})
 endif()
 
+# Skip test_async for Python < 3.5
+list(FIND PYBIND11_TEST_FILES test_async.cpp PYBIND11_TEST_FILES_ASYNC_I)
+if((PYBIND11_TEST_FILES_ASYNC_I GREATER -1) AND ("${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}" VERSION_LESS 3.5))
+  message(STATUS "Skipping test_async because Python version ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR} < 3.5")
+  list(REMOVE_AT PYBIND11_TEST_FILES ${PYBIND11_TEST_FILES_ASYNC_I})
+endif()
+
 string(REPLACE ".cpp"
                ".py"
                PYBIND11_PYTEST_FILES
@@ -80,6 +88,8 @@ string(REPLACE ".cpp"
 # Contains the set of test files that require pybind11_cross_module_tests to be built; if none of these are built (i.e.
 # because TEST_OVERRIDE is used and doesn't include them) the second module doesn't get built.
 set(PYBIND11_CROSS_MODULE_TESTS test_exceptions.py test_local_bindings.py test_stl.py test_stl_binders.py)
+
+set(PYBIND11_CROSS_MODULE_GIL_TESTS test_gil_scoped.py)
 
 # Check if Eigen is available; if not, remove from PYBIND11_TEST_FILES (but keep it in PYBIND11_PYTEST_FILES, so that
 # we get the "eigen is not installed" skip message).
@@ -145,6 +155,14 @@ foreach(t ${PYBIND11_CROSS_MODULE_TESTS})
   list(FIND PYBIND11_PYTEST_FILES ${t} i)
   if(i GREATER -1)
     list(APPEND test_targets pybind11_cross_module_tests)
+    break()
+  endif()
+endforeach()
+
+foreach(t ${PYBIND11_CROSS_MODULE_GIL_TESTS})
+  list(FIND PYBIND11_PYTEST_FILES ${t} i)
+  if(i GREATER -1)
+    list(APPEND test_targets cross_module_gil_utils)
     break()
   endif()
 endforeach()

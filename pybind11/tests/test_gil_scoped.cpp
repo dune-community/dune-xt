@@ -42,4 +42,10 @@ TEST_SUBMODULE(gil_scoped, m)
   m.def("test_callback_std_func", [](const std::function<void()>& func) { func(); });
   m.def("test_callback_virtual_func", [](VirtClass& virt) { virt.virtual_func(); });
   m.def("test_callback_pure_virtual_func", [](VirtClass& virt) { virt.pure_virtual_func(); });
+  m.def("test_cross_module_gil", []() {
+    auto cm = py::module::import("cross_module_gil_utils");
+    auto gil_acquire = reinterpret_cast<void (*)()>(PyLong_AsVoidPtr(cm.attr("gil_acquire_funcaddr").ptr()));
+    py::gil_scoped_release gil_release;
+    gil_acquire();
+  });
 }

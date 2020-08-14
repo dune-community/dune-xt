@@ -43,34 +43,18 @@ public:
   using DomainType = Dune::FieldVector<double, d>;
   using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
 
-  template <size_t r_ = r, size_t rC_ = rC, bool anything = true>
-  struct dim_switch
-  {
-    static const constexpr bool available = false;
-  };
+public:
+  static const constexpr bool available = (FunctionType::rC == FunctionType::r);
 
-  template <bool anything>
-  struct dim_switch<1, 1, anything>
+  static RangeReturnType compute(const FunctionType& func, const DomainType& xx, const XT::Common::Parameter& param)
   {
-    static const constexpr bool available = true;
-
-    static RangeReturnType compute(const FunctionType& func, const DomainType& xx, const XT::Common::Parameter& param)
-    {
+    if constexpr (FunctionType::rC == 1 && FunctionType::r == 1) {
       auto value_to_invert = func.evaluate(xx, param)[0];
       DUNE_THROW_IF(XT::Common::FloatCmp::eq(value_to_invert, 0.),
                     Exceptions::wrong_input_given,
                     "Scalar function value was not invertible!\n\nvalue_to_invert = " << value_to_invert);
       return 1. / value_to_invert;
-    }
-  };
-
-  template <size_t r_, bool anything>
-  struct dim_switch<r_, r_, anything>
-  {
-    static const constexpr bool available = true;
-
-    static RangeReturnType compute(const FunctionType& func, const DomainType& xx, const XT::Common::Parameter& param)
-    {
+    } else if constexpr (available) {
       auto matrix_to_invert = func.evaluate(xx, param);
       RangeReturnType inverse_matrix;
       try {
@@ -81,15 +65,9 @@ public:
                        << matrix_to_invert << "\n\nThis was the original error: " << ee.what());
       }
       return inverse_matrix;
+    } else {
+      static_assert(AlwaysFalse<FunctionType>::value, "Not available for these dimensions!");
     }
-  };
-
-public:
-  static const constexpr bool available = dim_switch<>::available;
-
-  static RangeReturnType compute(const FunctionType& func, const DomainType& xx, const XT::Common::Parameter& param)
-  {
-    return dim_switch<>::compute(func, xx, param);
   }
 }; // class InverseFunctionHelper
 
@@ -260,29 +238,35 @@ private:
 
 
 template <class E, size_t r, size_t rC, class R>
-std::enable_if_t<internal::InverseFunctionHelper<ElementFunctionInterface<E, r, rC, R>>::available,
-                 InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>>
-inverse(ElementFunctionInterface<E, r, rC, R>& func, const int order)
+auto inverse(ElementFunctionInterface<E, r, rC, R>& func, const int order)
 {
-  return InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>(func, order);
+  if constexpr (internal::InverseFunctionHelper<ElementFunctionInterface<E, r, rC, R>>::available) {
+    return InverseElementFunction<ElementFunctionInterface<E, r, rC, R>>(func, order);
+  } else {
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimensions!");
+  }
 }
 
 
 template <size_t d, size_t r, size_t rC, class R>
-std::enable_if_t<internal::InverseFunctionHelper<FunctionInterface<d, r, rC, R>>::available,
-                 InverseFunction<FunctionInterface<d, r, rC, R>>>
-inverse(const FunctionInterface<d, r, rC, R>& func, const int order)
+auto inverse(const FunctionInterface<d, r, rC, R>& func, const int order)
 {
-  return InverseFunction<FunctionInterface<d, r, rC, R>>(func, order);
+  if constexpr (internal::InverseFunctionHelper<FunctionInterface<d, r, rC, R>>::available) {
+    return InverseFunction<FunctionInterface<d, r, rC, R>>(func, order);
+  } else {
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimensions!");
+  }
 }
 
 
 template <class E, size_t r, size_t rC, class R>
-std::enable_if_t<internal::InverseFunctionHelper<GridFunctionInterface<E, r, rC, R>>::available,
-                 InverseGridFunction<GridFunctionInterface<E, r, rC, R>>>
-inverse(const GridFunctionInterface<E, r, rC, R>& func, const int order)
+auto inverse(const GridFunctionInterface<E, r, rC, R>& func, const int order)
 {
-  return InverseGridFunction<GridFunctionInterface<E, r, rC, R>>(func, order);
+  if constexpr (internal::InverseFunctionHelper<GridFunctionInterface<E, r, rC, R>>::available) {
+    return InverseGridFunction<GridFunctionInterface<E, r, rC, R>>(func, order);
+  } else {
+    static_assert(AlwaysFalse<R>::value, "Not available for these dimensions!");
+  }
 }
 
 

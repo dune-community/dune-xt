@@ -21,9 +21,8 @@ namespace Common {
 
 
 /// \sa Common::Printer
-template <class G, class I, bool use_repr, typename anything>
-class Printer<Dune::Intersection<G, I>, use_repr, anything>
-  : public internal::DefaultPrinter<Dune::Intersection<G, I>, use_repr>
+template <class G, class I, bool use_repr>
+class Printer<Dune::Intersection<G, I>, use_repr> : public internal::DefaultPrinter<Dune::Intersection<G, I>, use_repr>
 {
 public:
   using T = Dune::Intersection<G, I>;
@@ -57,8 +56,8 @@ public:
 
 
 /// \sa Common::Printer
-template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp, bool use_repr, typename anything>
-class Printer<Dune::Entity<cd, dim, GridImp, EntityImp>, use_repr, anything>
+template <int cd, int dim, class GridImp, template <int, int, class> class EntityImp, bool use_repr>
+class Printer<Dune::Entity<cd, dim, GridImp, EntityImp>, use_repr>
   : public internal::DefaultPrinter<Dune::Entity<cd, dim, GridImp, EntityImp>, use_repr>
 {
 public:

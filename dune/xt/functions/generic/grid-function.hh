@@ -124,7 +124,16 @@ private:
       auto parsed_param = this->parse_parameter(param);
       auto local_jacobian = jacobian_(point_in_local_coordinates, parsed_param);
       const auto J_inv_T = this->element().geometry().jacobianInverseTransposed(point_in_local_coordinates);
-      return JacobianHelper<>::jacobian(local_jacobian, J_inv_T);
+      DerivativeRangeReturnType global_jacobian;
+      if constexpr (rC == 1) {
+        for (size_t rr = 0; rr < r; ++rr)
+          J_inv_T.mv(local_jacobian[rr], global_jacobian[rr]);
+      } else {
+        for (size_t rr = 0; rr < r; ++rr)
+          for (size_t ii = 0; ii < rC; ++ii)
+            J_inv_T.mv(local_jacobian[rr][ii], global_jacobian[rr][ii]);
+      }
+      return global_jacobian;
     }
 
     DerivativeRangeReturnType derivative(const std::array<size_t, d>& alpha,
@@ -144,33 +153,6 @@ private:
     }
 
   private:
-    template <size_t range_cols = rC, bool anything = true>
-    struct JacobianHelper
-    {
-      static DerivativeRangeReturnType jacobian(const DerivativeRangeType& local_jacobian,
-                                                const FieldMatrix<R, d, d>& J_inv_T)
-      {
-        DerivativeRangeReturnType global_jacobian;
-        for (size_t rr = 0; rr < r; ++rr)
-          for (size_t ii = 0; ii < rC; ++ii)
-            J_inv_T.mv(local_jacobian[rr][ii], global_jacobian[rr][ii]);
-        return global_jacobian;
-      }
-    };
-
-    template <bool anything>
-    struct JacobianHelper<1, anything>
-    {
-      static DerivativeRangeReturnType jacobian(const DerivativeRangeType& local_jacobian,
-                                                const FieldMatrix<R, d, d>& J_inv_T)
-      {
-        DerivativeRangeReturnType global_jacobian;
-        for (size_t rr = 0; rr < r; ++rr)
-          J_inv_T.mv(local_jacobian[rr], global_jacobian[rr]);
-        return global_jacobian;
-      }
-    };
-
     const GenericOrderFunctionType& order_;
     const GenericPostBindFunctionType& post_bind_;
     const GenericEvaluateFunctionType& evaluate_;

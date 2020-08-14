@@ -325,36 +325,29 @@ public:
   }
 
   template <class OtherMatrixType>
-  std::enable_if_t<Common::is_matrix<OtherMatrixType>::value, void> axpy(const ScalarType& alpha,
-                                                                         const OtherMatrixType& xx)
+  void axpy(const ScalarType& alpha, const OtherMatrixType& xx)
   {
+    static_assert(Common::is_matrix<OtherMatrixType>::value);
     if (!has_equal_shape(xx))
       DUNE_THROW(Common::Exceptions::shapes_do_not_match,
                  "The shape of xx (" << xx.rows() << "x" << xx.cols() << ") does not match the shape of this ("
                                      << rows() << "x" << cols() << ")!");
     const internal::VectorLockGuard DUNE_UNUSED(guard)(*mutexes_);
-    axpy_impl(alpha, xx);
+    if constexpr (std::is_same<ThisType, OtherMatrixType>::value) {
+      for (size_t ii = 0; ii < backend_->entries_.size(); ++ii)
+        backend_->entries_[ii] += alpha * xx.backend_->entries_[ii];
+    } else {
+      for (size_t ii = 0; ii < rows(); ++ii)
+        for (size_t jj = 0; jj < cols(); ++jj)
+          backend_->get_entry_ref(ii, jj) += alpha * Common::MatrixAbstraction<OtherMatrixType>::get_entry(xx, ii, jj);
+    }
   } // ... axpy(...)
-
-private:
-  void axpy_impl(const ScalarType& alpha, const ThisType& xx)
-  {
-    for (size_t ii = 0; ii < backend_->entries_.size(); ++ii)
-      backend_->entries_[ii] += alpha * xx.backend_->entries_[ii];
-  }
-
-  template <class OtherMatrixType>
-  void axpy_impl(const ScalarType& alpha, const OtherMatrixType& xx)
-  {
-    for (size_t ii = 0; ii < rows(); ++ii)
-      for (size_t jj = 0; jj < cols(); ++jj)
-        backend_->get_entry_ref(ii, jj) += alpha * Common::MatrixAbstraction<OtherMatrixType>::get_entry(xx, ii, jj);
-  }
 
 public:
   template <class OtherMatrixType>
-  std::enable_if_t<Common::is_matrix<OtherMatrixType>::value, bool> has_equal_shape(const OtherMatrixType& other) const
+  bool has_equal_shape(const OtherMatrixType& other) const
   {
+    static_assert(Common::is_matrix<OtherMatrixType>::value);
     return (rows() == other.rows()) && (cols() == other.cols());
   }
 

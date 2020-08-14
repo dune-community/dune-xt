@@ -68,7 +68,7 @@ public:
   }
 
 private:
-  template <size_t r_ = r, size_t rC_ = rC, bool anything = true>
+  template <size_t r_ = r, size_t rC_ = rC>
   struct helper
   {
     static int ncomps()
@@ -82,8 +82,8 @@ private:
     }
   }; // class helper<...>
 
-  template <size_t r_, bool anything>
-  struct helper<r_, 1, anything>
+  template <size_t r_>
+  struct helper<r_, 1>
   {
     static int ncomps()
     {
