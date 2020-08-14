@@ -30,6 +30,7 @@ for mod_name in (
         '_functions_interfaces_grid_function_1d',
         '_functions_interfaces_grid_function_2d',
         '_functions_interfaces_grid_function_3d',
+        '_functions_inverse',
         '_functions_parametric_expression',
         '_functions_spe10',
 ):
