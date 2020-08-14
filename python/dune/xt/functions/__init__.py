@@ -22,6 +22,7 @@ for mod_name in (
         '_functions_function_interface_2d',
         '_functions_checkerboard',
         '_functions_constant',
+        '_functions_elementwise_diameter',
         '_functions_elementwise_minimum',
         '_functions_expression',
         '_functions_divergence',
