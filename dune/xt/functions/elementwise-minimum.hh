@@ -35,7 +35,6 @@ public:
   using E = typename FunctionType::E;
   using R = typename FunctionType::R;
   using DomainType = Dune::FieldVector<double, d>;
-  //  using RangeReturnType = typename RangeTypeSelector<R, r, rC>::return_type;
 
   template <size_t r_ = r, size_t rC_ = rC, bool anything = true>
   struct dim_switch
@@ -116,10 +115,10 @@ private:
     using typename BaseType::ElementType;
     using typename BaseType::RangeReturnType;
 
-    LocalFunction(std::unique_ptr<typename SomeFunction::LocalFunctionType>&& some_lf,
-                  const int search_quadrature_order)
+    LocalFunction(const GridFunctionInterface<E, r_, rC_, R>& some_func, const int search_quadrature_order)
       : BaseType()
-      , some_lf_(std::move(some_lf))
+      , some_func_(some_func.copy_as_grid_function())
+      , some_lf_(some_func_->local_function())
       , search_quadrature_order_(search_quadrature_order)
       , min_(0)
     {}
@@ -144,7 +143,8 @@ private:
     }
 
   private:
-    std::unique_ptr<typename SomeFunction::LocalFunctionType> some_lf_;
+    std::unique_ptr<GridFunctionInterface<E, r_, rC_, R>> some_func_;
+    std::unique_ptr<typename GridFunctionInterface<E, r_, rC_, R>::LocalFunctionType> some_lf_;
     const int search_quadrature_order_;
     double min_;
   }; // class LocalFunction
@@ -154,18 +154,32 @@ public:
                              const int search_quadrature_order,
                              const std::string nm = "ElementwiseMinimumFunction")
     : BaseType()
-    , some_func_(some_func)
+    , some_func_(some_func.copy_as_grid_function())
     , search_quadrature_order_(search_quadrature_order)
     , name_(nm)
   {
-    DUNE_THROW_IF(!some_func_.parameter_type().empty(),
+    DUNE_THROW_IF(!some_func_->parameter_type().empty(),
                   Exceptions::parameter_error,
                   "Not available for parametric functions yet!");
   }
 
+  ElementwiseMinimumFunction(const ThisType& other)
+    : BaseType(other)
+    , some_func_(other.some_func_->copy_as_grid_function())
+    , search_quadrature_order_(other.search_quadrature_order_)
+    , name_(other.name_)
+  {}
+
+  ElementwiseMinimumFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
+
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<LocalFunction>(some_func_.local_function(), search_quadrature_order_);
+    return std::make_unique<LocalFunction>(*some_func_, search_quadrature_order_);
   }
 
   std::string name() const override final
@@ -174,7 +188,7 @@ public:
   }
 
 private:
-  GridFunction<E, r_, rC_> some_func_;
+  std::unique_ptr<GridFunctionInterface<E, r_, rC_, R>> some_func_;
   const int search_quadrature_order_;
   const std::string name_;
 }; // class ElementwiseMinimumFunction

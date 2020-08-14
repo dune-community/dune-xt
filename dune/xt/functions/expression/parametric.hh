@@ -39,17 +39,21 @@ public:
 template <size_t d, size_t r, class R>
 class ParametricExpressionFunction<d, r, 1, R> : public FunctionInterface<d, r, 1, R>
 {
+  using ThisType = ParametricExpressionFunction;
   using BaseType = FunctionInterface<d, r, 1, R>;
-  using typename BaseType::D;
-  using ActualFunctionType = DynamicMathExpressionBase<D, R, r>;
 
 public:
   using BaseType::domain_dim;
   using BaseType::range_dim;
+  using typename BaseType::D;
   using typename BaseType::DerivativeRangeReturnType;
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
 
+private:
+  using ActualFunctionType = DynamicMathExpressionBase<D, R, r>;
+
+public:
   static std::string static_id()
   {
     return BaseType::static_id() + ".parametricexpression";
@@ -60,20 +64,19 @@ public:
                                const Common::FieldVector<std::string, r>& expressions,
                                const size_t ord = 0,
                                const std::string nm = static_id())
-    : order_(ord)
+    : BaseType(param_type)
+    , order_(ord)
     , name_(nm)
-    , param_type_(param_type)
     , num_parameter_variables_(0)
   {
-    if (variable.empty())
-      DUNE_THROW(Common::Exceptions::wrong_input_given, "Given variable must not be empty!");
+    DUNE_THROW_IF(variable.empty(), Common::Exceptions::wrong_input_given, "Given variable must not be empty!");
 
     std::vector<std::string> variables;
     std::vector<std::string> expression;
     for (size_t rr = 0; rr < r; ++rr)
       expression.emplace_back(expressions[rr]);
-    for (const auto& key : param_type_.keys()) {
-      const size_t value_size = param_type_.get(key);
+    for (const auto& key : this->parameter_type().keys()) {
+      const size_t value_size = this->parameter_type().get(key);
       if (value_size == 1) {
         variables.push_back(key);
         ++num_parameter_variables_;
@@ -86,7 +89,22 @@ public:
     }
     for (size_t ii = 0; ii < domain_dim; ++ii)
       variables.push_back(variable + "[" + Common::to_string(ii) + "]");
-    function_ = std::make_shared<ActualFunctionType>(variables, expression);
+    function_ = std::make_unique<ActualFunctionType>(variables, expression);
+  }
+
+  ParametricExpressionFunction(const ThisType& other)
+    : BaseType(other)
+    , order_(other.order_)
+    , name_(other.name_)
+    , num_parameter_variables_(other.num_parameter_variables_)
+    , function_(new ActualFunctionType(*other.function_))
+  {}
+
+  ParametricExpressionFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
   }
 
   std::string name() const override final
@@ -99,31 +117,21 @@ public:
     return static_cast<int>(order_);
   }
 
-  bool is_parametric() const override final
-  {
-    return !param_type_.empty();
-  }
-
-  const Common::ParameterType& parameter_type() const override final
-  {
-    return param_type_;
-  }
-
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
                            const Common::Parameter& param = {}) const override final
   {
     RangeReturnType ret(0.);
     Common::Parameter parsed_param;
-    if (!param_type_.empty()) {
+    if (!this->parameter_type().empty()) {
       parsed_param = this->parse_parameter(param);
-      if (parsed_param.type() != param_type_)
+      if (parsed_param.type() != this->parameter_type())
         DUNE_THROW(Common::Exceptions::parameter_error,
-                   "parameter_type(): " << param_type_ << "\n   "
+                   "parameter_type(): " << this->parameter_type() << "\n   "
                                         << "param.type(): " << param.type());
     }
     DynamicVector<D> args(num_parameter_variables_ + domain_dim);
     size_t II = 0;
-    for (const auto& key : param_type_.keys()) {
+    for (const auto& key : this->parameter_type().keys()) {
       for (const auto& value : parsed_param.get(key)) {
         args[II] = value;
         ++II;
@@ -176,9 +184,8 @@ public:
 private:
   size_t order_;
   std::string name_;
-  Common::ParameterType param_type_;
   size_t num_parameter_variables_;
-  std::shared_ptr<const ActualFunctionType> function_;
+  std::unique_ptr<ActualFunctionType> function_;
 }; // class ParametricExpressionFunction
 
 

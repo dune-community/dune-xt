@@ -26,10 +26,10 @@ namespace XT {
 namespace Functions {
 
 
-template <size_t d, size_t r = 1, size_t rC = 1, class RangeField = double>
-class ConstantFunction : public FunctionInterface<d, r, rC, RangeField>
+template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
+class ConstantFunction : public FunctionInterface<d, r, rC, R>
 {
-  using BaseType = FunctionInterface<d, r, rC, RangeField>;
+  using BaseType = FunctionInterface<d, r, rC, R>;
   using ThisType = ConstantFunction;
 
 public:
@@ -57,13 +57,18 @@ public:
   explicit ConstantFunction(const RangeReturnType& value, const std::string nm = "")
     : value_(value)
     , name_(nm.empty() ? ((r == 1 && rC == 1) ? std::string("ConstantFunction(" + Common::to_string(value) + ")")
-                                              : static_id())
+                                              : "ConstantFunction")
                        : nm)
   {}
 
-#if !DUNE_XT_WITH_PYTHON_BINDINGS
-  ConstantFunction(const ThisType& other) = default;
-#endif
+  ConstantFunction(const ThisType&) = default;
+
+  ConstantFunction(ThisType&) = default;
+
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   int order(const XT::Common::Parameter& /*param*/ = {}) const override final
   {
@@ -92,45 +97,29 @@ public:
 }; // class ConstantFunction
 
 
-template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
-class ConstantGridFunction : public GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>
+template <class E, size_t r = 1, size_t rC = 1, class R = double>
+class ConstantGridFunction : public FunctionAsGridFunctionWrapper<E, r, rC, R>
 {
-  using BaseType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
+  using ThisType = ConstantGridFunction;
+  using BaseType = GridFunctionInterface<E, r, rC, R>;
 
 public:
   using typename BaseType::LocalFunctionType;
 
-  ConstantGridFunction(const typename LocalFunctionType::RangeReturnType constant,
-                       const std::string name_in = static_id())
-    : constant_function_(constant, name_in)
-    , constant_grid_function_(constant_function_)
+  ConstantGridFunction(const typename LocalFunctionType::RangeReturnType value, const std::string nm = "")
+    : BaseType(ConstantFunction<E::dimension, r, rC, R>(
+        value,
+        nm.empty() ? ((r == 1 && rC == 1) ? std::string("ConstantGridFunction(" + Common::to_string(value) + ")")
+                                          : "ConstantGridFunction")
+                   : nm))
   {}
-
-  static std::string static_id()
-  {
-    return "dune.xt.functions.constantgridfunction";
-  }
-
-  std::unique_ptr<LocalFunctionType> local_function() const override final
-  {
-    return constant_grid_function_.local_function();
-  }
-
-  std::string name() const override final
-  {
-    return constant_function_.name();
-  }
-
-private:
-  ConstantFunction<BaseType::domain_dim, rangeDim, rangeDimCols, RangeField> constant_function_;
-  FunctionAsGridFunctionWrapper<Element, rangeDim, rangeDimCols, RangeField> constant_grid_function_;
 }; // class ConstantGridFunction
 
 
-template <class Element, size_t stateDim, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
-class ConstantFluxFunction : public FluxFunctionInterface<Element, stateDim, rangeDim, rangeDimCols, RangeField>
+template <class E, size_t stateDim, size_t r = 1, size_t rC = 1, class R = double>
+class ConstantFluxFunction : public FluxFunctionInterface<E, stateDim, r, rC, R>
 {
-  using BaseType = FluxFunctionInterface<Element, stateDim, rangeDim, rangeDimCols, RangeField>;
+  using BaseType = FluxFunctionInterface<E, stateDim, r, rC, R>;
 
 public:
   using typename BaseType::LocalFunctionType;
@@ -162,8 +151,8 @@ public:
   }
 
 private:
-  ConstantFunction<stateDim, rangeDim, rangeDimCols, RangeField> constant_function_;
-  StateFunctionAsFluxFunctionWrapper<Element, stateDim, rangeDim, rangeDimCols, RangeField> constant_flux_function_;
+  ConstantFunction<stateDim, r, rC, R> constant_function_;
+  StateFunctionAsFluxFunctionWrapper<E, stateDim, r, rC, R> constant_flux_function_;
 }; // class ConstantGridFunction
 
 

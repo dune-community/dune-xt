@@ -60,10 +60,10 @@ public:
   } // ... static_id(...)
 
 private:
-  static std::vector<RangeType> read_values_from_file(const std::string& filename,
-                                                      const RangeFieldType& min,
-                                                      const RangeFieldType& max,
-                                                      const RangeType& unit_range)
+  static std::shared_ptr<std::vector<RangeType>> read_values_from_file(const std::string& filename,
+                                                                       const RangeFieldType& min,
+                                                                       const RangeFieldType& max,
+                                                                       const RangeType& unit_range)
 
   {
     if (!(max > min))
@@ -76,11 +76,11 @@ private:
       DUNE_THROW(Exceptions::spe10_data_file_missing, "could not open '" << filename << "'!");
     static const size_t entriesPerDim = model1_x_elements * model1_y_elements * model1_z_elements;
     // create storage (there should be exactly 6000 values in the file, but we only read the first 2000)
-    std::vector<RangeType> data(entriesPerDim, unit_range);
+    auto data = std::make_shared<std::vector<RangeType>>(entriesPerDim, unit_range);
     double tmp = 0;
     size_t counter = 0;
     while (datafile >> tmp && counter < entriesPerDim)
-      data[counter++] *= (tmp * scale) + shift;
+      (*data)[counter++] *= (tmp * scale) + shift;
     datafile.close();
     if (counter != entriesPerDim)
       DUNE_THROW(Dune::IOError,

@@ -120,12 +120,29 @@ public:
     : Common::ParametricInterface(param_type)
   {}
 
+  FunctionInterface(const ThisType& other)
+    : Common::ParametricInterface(other)
+  {}
+
+  FunctionInterface(ThisType&) = default;
+
   virtual ~FunctionInterface() = default;
+
+  ThisType& operator=(const ThisType&) = delete;
+
+  ThisType& operator=(ThisType&&) = delete;
 
   /**
    * \name ´´These methods have to be implemented.''
    * \{
    **/
+
+  /**
+   * \brief Returns a (shallow) copy of the function.
+   *
+   * \note This is intended to be cheap, so make sure to share resources (but in a thread-safe way)!
+   */
+  virtual std::unique_ptr<ThisType> copy_as_function() const = 0;
 
   virtual int order(const XT::Common::Parameter& /*param*/ = {}) const = 0;
 

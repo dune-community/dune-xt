@@ -57,12 +57,6 @@ public:
   using RangeFieldType = RangeField;
   static const size_t range_dim = rangeDim;
 
-  //  MathExpressionBase(const std::string var, const std::string expr)
-  //  {
-  //    const std::vector<std::string> expressions(1, expr);
-  //    setup(var, expressions);
-  //  }
-
   MathExpressionBase(const std::string& var, const Common::FieldVector<std::string, range_dim>& exprs)
     : variable_(var)
     , expressions_(exprs)
@@ -71,8 +65,10 @@ public:
   }
 
   MathExpressionBase(const ThisType& other)
+    : variable_(other.variable_)
+    , expressions_(other.expressions_)
   {
-    setup(other.variable(), other.expression());
+    setup();
   }
 
   ThisType& operator=(const ThisType& other)
@@ -246,17 +242,7 @@ public:
     setup(other.variables(), other.expressions());
   }
 
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      cleanup();
-      originalvars_ = other.originalvars_;
-      variables_ = std::vector<std::string>();
-      expressions_ = std::vector<std::string>();
-      setup(other.originalvars_, other.expressions_);
-    }
-    return this;
-  }
+  DynamicMathExpressionBase(ThisType&&) = default;
 
   ~DynamicMathExpressionBase()
   {

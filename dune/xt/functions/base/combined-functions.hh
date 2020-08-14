@@ -13,8 +13,6 @@
 #ifndef DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 #define DUNE_XT_FUNCTIONS_BASE_COMBINED_FUNCTIONS_HH
 
-#include <dune/xt/common/memory.hh>
-
 #include <dune/xt/functions/interfaces/function.hh>
 #include <dune/xt/functions/type_traits.hh>
 
@@ -30,7 +28,7 @@ namespace internal {
  *
  * \note Most likely you do not want to use this class directly, but Combined.
  *
- * \todo Update product handling as in CombinedElementFunctionHelper to allow for more combinations!
+ * \todo Update as in CombinedElementFunctionHelper to allow for more combinations!
  */
 template <class LeftType, class RightType, CombinationType comb>
 class SelectCombined
@@ -289,73 +287,49 @@ class CombinedFunction
                              SelectCombined<LeftType, RightType, comb>::rC,
                              typename SelectCombined<LeftType, RightType, comb>::R>
 {
+  static_assert(is_function<LeftType>::value, "");
+  static_assert(is_function<RightType>::value, "");
+
   using BaseType = FunctionInterface<LeftType::domain_dim,
                                      SelectCombined<LeftType, RightType, comb>::r,
                                      SelectCombined<LeftType, RightType, comb>::rC,
                                      typename SelectCombined<LeftType, RightType, comb>::R>;
-
   using ThisType = CombinedFunction;
 
-  using Select = SelectCombined<LeftType, RightType, comb>;
-
-  using LeftStorageType = Common::ConstStorageProvider<LeftType>;
-  using RightStorageType = Common::ConstStorageProvider<RightType>;
+  using Helper = SelectCombined<LeftType, RightType, comb>;
 
 public:
+  using typename BaseType::DerivativeRangeReturnType;
+  using typename BaseType::DomainType;
+  using typename BaseType::RangeReturnType;
+
   CombinedFunction(const LeftType& left, const RightType& right, const std::string nm = "")
-    : left_(std::make_unique<LeftStorageType>(left))
-    , right_(std::make_unique<RightStorageType>(right))
-    , name_(get_name(left, right, nm))
+    : left_(left.copy_as_function())
+    , right_(right.copy_as_function())
+    , name_(get_name(*left_, *right_, nm))
   {}
 
-  CombinedFunction(const std::shared_ptr<const LeftType> left,
-                   const std::shared_ptr<const RightType> right,
-                   const std::string nm = "")
-    : left_(std::make_unique<LeftStorageType>(left))
-    , right_(std::make_unique<RightStorageType>(right))
-    , name_(get_name(*left, *right, nm))
-  {}
-
-  CombinedFunction(const LeftType& left, const std::shared_ptr<const RightType> right, const std::string nm = "")
-    : left_(std::make_unique<LeftStorageType>(left))
-    , right_(std::make_unique<RightStorageType>(right))
-    , name_(get_name(left, *right, nm))
-  {}
-
-  CombinedFunction(const std::shared_ptr<const LeftType> left, const RightType& right, const std::string nm = "")
-    : left_(std::make_unique<LeftStorageType>(left))
-    , right_(std::make_unique<RightStorageType>(right))
-    , name_(get_name(*left, right, nm))
-  {}
-
-  CombinedFunction(LeftType*&& left, RightType*&& right, const std::string nm = "")
-    : left_(std::make_unique<LeftStorageType>(std::move(left)))
-    , right_(std::make_unique<RightStorageType>(std::move(right)))
-    , name_(nm.empty() ? SelectCombined<LeftType, RightType, comb>::type() + " of '" + left_->access().name()
-                             + "' and '" + right_->access().name() + "'"
-                       : nm)
+  CombinedFunction(const ThisType& other)
+    : left_(other.left_->copy_as_function())
+    , right_(other.right_->copy_as_function())
+    , name_(other.name_)
   {}
 
   CombinedFunction(ThisType&& source) = default;
 
-  CombinedFunction(const ThisType& other) = delete;
-
-  ThisType& operator=(const ThisType& other) = delete;
-
-  ThisType& operator=(ThisType&& other) = delete;
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override final
   {
     return name_;
   }
 
-  using typename BaseType::DerivativeRangeReturnType;
-  using typename BaseType::DomainType;
-  using typename BaseType::RangeReturnType;
-
   int order(const XT::Common::Parameter& param = {}) const override final
   {
-    auto ret = Select::order(left_->access().order(param), right_->access().order(param));
+    auto ret = Helper::order(left_->order(param), right_->order(param));
     assert(ret < std::numeric_limits<int>::max());
     return static_cast<int>(ret);
   }
@@ -363,13 +337,13 @@ public:
   RangeReturnType evaluate(const DomainType& point_in_global_coordinates,
                            const Common::Parameter& param = {}) const override final
   {
-    return Select::evaluate(left_->access(), right_->access(), point_in_global_coordinates, param);
+    return Helper::evaluate(*left_, *right_, point_in_global_coordinates, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_global_coordinates,
                                      const Common::Parameter& param = {}) const override final
   {
-    return Select::jacobian(left_->access(), right_->access(), point_in_global_coordinates, param);
+    return Helper::jacobian(*left_, *right_, point_in_global_coordinates, param);
   }
 
 private:
@@ -380,8 +354,8 @@ private:
                       : nm;
   }
 
-  std::unique_ptr<const LeftStorageType> left_;
-  std::unique_ptr<const RightStorageType> right_;
+  std::unique_ptr<LeftType> left_;
+  std::unique_ptr<RightType> right_;
   const std::string name_;
 }; // class Combined
 

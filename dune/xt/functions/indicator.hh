@@ -45,7 +45,7 @@ class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
     using GeometryType = typename ElementType::Geometry;
 
     LocalIndicatorGridFunction(
-        const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples)
+        const std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeType>>> subdomain_and_value_tuples)
       : InterfaceType()
       , subdomain_and_value_tuples_(subdomain_and_value_tuples)
     {}
@@ -55,7 +55,7 @@ class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
     {
       current_value_ = 0.;
       const auto center = element.geometry().center();
-      for (const auto& subdomain_and_value_tuple : subdomain_and_value_tuples_) {
+      for (const auto& subdomain_and_value_tuple : *subdomain_and_value_tuples_) {
         const auto& subdomain_ll = std::get<0>(subdomain_and_value_tuple);
         const auto& subdomain_ur = std::get<1>(subdomain_and_value_tuple);
         if (Common::FloatCmp::le(subdomain_ll, center) && Common::FloatCmp::lt(center, subdomain_ur))
@@ -84,7 +84,7 @@ class IndicatorGridFunction : public GridFunctionInterface<E, r, rC, R>
     }
 
   private:
-    const std::vector<std::tuple<DomainType, DomainType, RangeType>>& subdomain_and_value_tuples_;
+    const std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeType>>> subdomain_and_value_tuples_;
     RangeType current_value_;
   }; // class LocalIndicatorGridFunction
 
@@ -117,6 +117,12 @@ public:
     return config;
   } // ... defaults(...)
 
+  IndicatorGridFunction(std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeType>>> values,
+                        const std::string name_in = "IndicatorGridFunction")
+    : subdomain_and_value_tuples_(values)
+    , name_(name_in)
+  {}
+
   /**
    *        Can be used for declaration of lower left corner and upper right corner of the desired domains.
 \code
@@ -124,9 +130,8 @@ FunctionType function({{lowerleft_1, upperright_1, value_1}, {lowerleft_2, upper
 \endcode
    */
   IndicatorGridFunction(const std::vector<std::tuple<DomainType, DomainType, RangeType>>& values,
-                        const std::string name_in = "indicator")
-    : subdomain_and_value_tuples_(values)
-    , name_(name_in)
+                        const std::string nm = "IndicatorGridFunction")
+    : IndicatorGridFunction(std::make_shared<std::vector<std::tuple<DomainType, DomainType, RangeType>>>(values), nm)
   {}
 
   /**
@@ -139,10 +144,18 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
    * if you want to set indicator intervals [0,1] x [0,1] with value 0.7 and [6,10] x [8,10] with value 0.9.
    */
   IndicatorGridFunction(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeType>>& values,
-                        const std::string name_in = "indicator")
-    : subdomain_and_value_tuples_(convert_from_domains(values))
-    , name_(name_in)
+                        const std::string nm = "IndicatorGridFunction")
+    : IndicatorGridFunction(convert_from_domains(values), nm)
   {}
+
+  IndicatorGridFunction(const ThisType&) = default;
+
+  IndicatorGridFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override final
   {
@@ -155,10 +168,10 @@ FunctionType function({{{{0., 1.}, {0., 1.}}, 0.7}, {{{6., 10.}, {8., 10.}}, 0.9
   }
 
 private:
-  static std::vector<std::tuple<DomainType, DomainType, RangeType>>
+  static std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeType>>>
   convert_from_domains(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeType>>& values)
   {
-    std::vector<std::tuple<DomainType, DomainType, RangeType>> ret;
+    auto ret = std::make_shared<std::vector<std::tuple<DomainType, DomainType, RangeType>>>();
     for (const auto& element : values) {
       DomainType tmp_coordinates_ll(0.);
       DomainType tmp_coordinates_ur(0.);
@@ -166,12 +179,12 @@ private:
         tmp_coordinates_ll[dd] = element.first[dd][0];
         tmp_coordinates_ur[dd] = element.first[dd][1];
       }
-      ret.emplace_back(tmp_coordinates_ll, tmp_coordinates_ur, element.second);
+      ret->emplace_back(tmp_coordinates_ll, tmp_coordinates_ur, element.second);
     }
     return ret;
   } // convert_from_tuples(...)
 
-  const std::vector<std::tuple<DomainType, DomainType, RangeType>> subdomain_and_value_tuples_;
+  const std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeType>>> subdomain_and_value_tuples_;
   const std::string name_;
 }; // class IndicatorGridFunction
 
@@ -179,6 +192,7 @@ private:
 template <size_t d, size_t r = 1, size_t rC = 1, class R = double>
 class IndicatorFunction : public FunctionInterface<d, r, rC, R>
 {
+  using ThisType = IndicatorFunction;
   using BaseType = FunctionInterface<d, r, rC, R>;
 
 public:
@@ -187,17 +201,30 @@ public:
   using typename BaseType::DomainType;
   using typename BaseType::RangeReturnType;
 
-  IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>& values,
-                    const std::string nm = "indicator")
+  IndicatorFunction(std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>> values,
+                    const std::string nm = "IndicatorFunction")
     : subdomain_and_value_tuples_(values)
     , name_(nm)
   {}
 
-  IndicatorFunction(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeReturnType>>& values,
-                    const std::string nm = "indicator")
-    : subdomain_and_value_tuples_(convert_from_domains(values))
-    , name_(nm)
+  IndicatorFunction(const std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>& values,
+                    const std::string nm = "IndicatorFunction")
+    : IndicatorFunction(std::make_shared<std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>>(values), nm)
   {}
+
+  IndicatorFunction(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeReturnType>>& values,
+                    const std::string nm = "IndicatorFunction")
+    : IndicatorFunction(convert_from_domains(values), nm)
+  {}
+
+  IndicatorFunction(const ThisType&) = default;
+
+  IndicatorFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   int order(const XT::Common::Parameter& /*param*/ = {}) const override final
   {
@@ -223,7 +250,7 @@ public:
 
   std::string name() const override final
   {
-    return "dune.xt.functions.indicatorfunction";
+    return name_;
   }
 
   using BaseType::evaluate;
@@ -232,7 +259,7 @@ public:
                            const Common::Parameter& /*param*/ = {}) const override final
   {
     RangeReturnType value(0.);
-    for (const auto& subdomain_and_value_tuple : subdomain_and_value_tuples_) {
+    for (const auto& subdomain_and_value_tuple : *subdomain_and_value_tuples_) {
       const auto& subdomain_ll = std::get<0>(subdomain_and_value_tuple);
       const auto& subdomain_ur = std::get<1>(subdomain_and_value_tuple);
       if (Common::FloatCmp::le(subdomain_ll, point_in_global_coordinates)
@@ -251,10 +278,10 @@ public:
   }
 
 private:
-  static std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>
+  static std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>>
   convert_from_domains(const std::vector<std::pair<Common::FieldMatrix<D, d, 2>, RangeReturnType>>& values)
   {
-    std::vector<std::tuple<DomainType, DomainType, RangeReturnType>> ret;
+    auto ret = std::make_shared<std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>>();
     for (const auto& element : values) {
       DomainType tmp_coordinates_ll(0.);
       DomainType tmp_coordinates_ur(0.);
@@ -262,12 +289,12 @@ private:
         tmp_coordinates_ll[dd] = element.first[dd][0];
         tmp_coordinates_ur[dd] = element.first[dd][1];
       }
-      ret.emplace_back(tmp_coordinates_ll, tmp_coordinates_ur, element.second);
+      ret->emplace_back(tmp_coordinates_ll, tmp_coordinates_ur, element.second);
     }
     return ret;
   } // convert_from_tuples(...)
 
-  const std::vector<std::tuple<DomainType, DomainType, RangeReturnType>> subdomain_and_value_tuples_;
+  const std::shared_ptr<std::vector<std::tuple<DomainType, DomainType, RangeReturnType>>> subdomain_and_value_tuples_;
   const std::string name_;
 }; // class IndicatorFunction
 

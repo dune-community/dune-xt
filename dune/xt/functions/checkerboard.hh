@@ -15,7 +15,6 @@
 #define DUNE_XT_FUNCTIONS_CHECKERBOARD_HH
 
 #include <dune/xt/common/configuration.hh>
-
 #include <dune/xt/functions/interfaces/grid-function.hh>
 
 namespace Dune {
@@ -50,7 +49,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     LocalCheckerboardFunction(const DomainType& lower_left,
                               const DomainType& upper_right,
                               const FieldVector<size_t, domain_dim>& num_elements,
-                              std::vector<RangeType>& values)
+                              std::shared_ptr<std::vector<RangeType>> values)
       : InterfaceType()
       , lower_left_(lower_left)
       , upper_right_(upper_right)
@@ -64,7 +63,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
       current_value_ = 0;
       if (is_in_checkerboard(element)) {
         const size_t subdomain = find_subdomain(element);
-        current_value_ = values_[subdomain];
+        current_value_ = (*values_)[subdomain];
       }
     }
 
@@ -126,7 +125,7 @@ class CheckerboardFunction : public GridFunctionInterface<E, r, rC, R>
     const DomainType lower_left_;
     const DomainType upper_right_;
     const FieldVector<size_t, domain_dim> num_elements_;
-    const std::vector<RangeType>& values_;
+    const std::shared_ptr<std::vector<RangeType>> values_;
     RangeType current_value_;
   }; // class LocalCheckerboardFunction
 
@@ -158,12 +157,12 @@ public:
   CheckerboardFunction(const DomainType& lower_left,
                        const DomainType& upper_right,
                        const FieldVector<size_t, domain_dim>& num_elements,
-                       const std::vector<RangeType>& values,
-                       const std::string nm = "checkerboard")
+                       std::shared_ptr<std::vector<RangeType>> values,
+                       const std::string nm = "CheckerboardFunction")
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , num_elements_(num_elements)
-    , values_(new std::vector<RangeType>(values))
+    , values_(values)
     , name_(nm)
   {
 #ifndef NDEBUG
@@ -183,11 +182,22 @@ public:
 #endif
   } // CheckerboardFunction(...)
 
+  CheckerboardFunction(const DomainType& lower_left,
+                       const DomainType& upper_right,
+                       const FieldVector<size_t, domain_dim>& num_elements,
+                       const std::vector<RangeType>& values,
+                       const std::string nm = "CheckerboardFunction")
+    : CheckerboardFunction(lower_left, upper_right, num_elements, std::make_shared<std::vector<RangeType>>(values), nm)
+  {}
+
   CheckerboardFunction(const ThisType& other) = default;
+
   CheckerboardFunction(ThisType&& source) = default;
 
-  ThisType& operator=(const ThisType& other) = delete;
-  ThisType& operator=(ThisType&& source) = delete;
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override
   {
@@ -196,7 +206,7 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<LocalCheckerboardFunction>(lower_left_, upper_right_, num_elements_, *values_);
+    return std::make_unique<LocalCheckerboardFunction>(lower_left_, upper_right_, num_elements_, values_);
   }
 
   size_t subdomain(const ElementType& element) const

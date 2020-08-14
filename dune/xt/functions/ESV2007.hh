@@ -26,6 +26,7 @@
 #include <dune/xt/common/configuration.hh>
 #include <dune/xt/la/eigen-solver.hh>
 
+#include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/interfaces/function.hh>
 
@@ -74,14 +75,19 @@ public:
   } // ... defaults(...)
 
   Testcase1Force(const size_t ord = defaults().template get<int>("integration_order"),
-                 const std::string nm = static_id())
+                 const std::string nm = "ESV2007Testcase1Force")
     : order_(static_cast<int>(ord))
     , name_(nm)
   {}
 
-  Testcase1Force(const ThisType& /*other*/) = default;
+  Testcase1Force(const ThisType&) = default;
 
-  ThisType& operator=(const ThisType& /*other*/) = delete;
+  Testcase1Force(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override final
   {
@@ -160,14 +166,19 @@ public:
   } // ... defaults(...)
 
   Testcase1ExactSolution(const size_t ord = defaults().template get<int>("integration_order"),
-                         const std::string nm = static_id())
+                         const std::string nm = "ESV2007Testcase1ExactSolution")
     : order_(static_cast<int>(ord))
     , name_(nm)
   {}
 
-  Testcase1ExactSolution(const ThisType& /*other*/) = default;
+  Testcase1ExactSolution(const ThisType&) = default;
 
-  ThisType& operator=(const ThisType& /*other*/) = delete;
+  Testcase1ExactSolution(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override final
   {
@@ -223,7 +234,7 @@ private:
   class LocalCutoffFunction : public ElementFunctionInterface<E, 1, 1, R>
   {
     using BaseType = ElementFunctionInterface<E, 1, 1, R>;
-
+    using DiffusionType = GridFunctionInterface<E, d, d, R>;
 
   public:
     using typename BaseType::DerivativeRangeReturnType;
@@ -234,10 +245,11 @@ private:
     using typename BaseType::RangeReturnType;
 
     LocalCutoffFunction(const DiffusionType& diffusion, const RangeFieldType poincare_constant)
-      : BaseType()
-      , value_(0)
-      , local_diffusion_(diffusion.local_function())
+      : BaseType(diffusion.parameter_type())
+      , diffusion_(diffusion.copy_as_grid_function())
+      , local_diffusion_(diffusion_->local_function())
       , poincare_constant_(poincare_constant)
+      , value_(0)
     {}
 
   protected:
@@ -314,9 +326,10 @@ private:
       }
     };
 
-    RangeFieldType value_;
-    std::unique_ptr<typename DiffusionType::LocalFunctionType> local_diffusion_;
+    const std::unique_ptr<DiffusionType> diffusion_;
+    const std::unique_ptr<typename DiffusionType::LocalFunctionType> local_diffusion_;
     const RangeFieldType poincare_constant_;
+    RangeFieldType value_;
   }; // class LocalCutoffFunction
 
 public:
@@ -329,17 +342,28 @@ public:
     return BaseType::static_id() + ".ESV2007.cutoff";
   }
 
-  CutoffFunction(const DiffusionType& diffusion,
+  CutoffFunction(GridFunction<E, d, d, R> diffusion,
                  const RangeFieldType poincare_constant = 1.0 / (M_PIl * M_PIl),
-                 const std::string nm = static_id())
-    : diffusion_(diffusion)
+                 const std::string nm = "ESV2007CutoffFunction")
+    : BaseType(diffusion.parameter_type())
+    , diffusion_(diffusion.copy_as_grid_function())
     , poincare_constant_(poincare_constant)
     , name_(nm)
   {}
 
-  CutoffFunction(const ThisType& other) = default;
+  CutoffFunction(const ThisType& other)
+    : BaseType(other)
+    , diffusion_(other.diffusion_.copy_as_grid_function())
+    , poincare_constant_(other.poincare_constant_)
+    , name_(other.name_)
+  {}
 
-  ThisType& operator=(const ThisType& other) = delete;
+  CutoffFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override final
   {
@@ -348,11 +372,11 @@ public:
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<LocalCutoffFunction>(diffusion_, poincare_constant_);
+    return std::make_unique<LocalCutoffFunction>(*diffusion_, poincare_constant_);
   }
 
 private:
-  const DiffusionType& diffusion_;
+  std::unique_ptr<GridFunctionInterface<E, d, d, R>> diffusion_;
   const RangeFieldType poincare_constant_;
   std::string name_;
 }; // class Cutoff

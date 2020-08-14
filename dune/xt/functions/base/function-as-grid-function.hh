@@ -38,44 +38,41 @@ public:
   using FunctionType = FunctionInterface<d, r, rC, R>;
 
   FunctionAsGridFunctionWrapper(const FunctionType& function)
-    : function_storage_(function)
+    : BaseType(function.parameter_type())
+    , function_(function.copy_as_function())
   {}
 
   FunctionAsGridFunctionWrapper(FunctionType*&& function_ptr)
-    : function_storage_(std::move(function_ptr))
+    : BaseType(function_ptr->parameter_type())
+    , function_(std::move(function_ptr))
   {}
 
   FunctionAsGridFunctionWrapper(std::unique_ptr<FunctionType>&& function_ptr)
-    : function_storage_(std::move(function_ptr))
+    : BaseType(function_ptr->parameter_type())
+    , function_(std::move(function_ptr))
   {}
 
-  FunctionAsGridFunctionWrapper(const ThisType&) = default;
+  FunctionAsGridFunctionWrapper(const ThisType& other)
+    : BaseType(other)
+    , function_(other.function_->copy_as_function())
+  {}
+
   FunctionAsGridFunctionWrapper(ThisType&&) = default;
 
-  /**
-   * \name ´´This method is required by GridFunctionInterface.''
-   * \{
-   **/
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
-    return std::make_unique<LocalFunction>(function_storage_.access());
+    return std::make_unique<LocalFunction>(*function_);
   }
-
-  /**
-   * \}
-   * \name ´´These methods are optionally required by GridFunctionInterface.''
-   * \{
-   **/
 
   std::string name() const override final
   {
-    return function_storage_.access().name();
+    return function_->name();
   }
-
-  /**
-   * \}
-   **/
 
 private:
   class LocalFunction : public LocalFunctionType
@@ -90,7 +87,7 @@ private:
 
     LocalFunction(const FunctionType& function)
       : BaseType()
-      , function_(function)
+      , function_(function.copy_as_function())
       , geometry_(nullptr)
     {}
 
@@ -103,8 +100,8 @@ private:
   public:
     int order(const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
-      return function_.order(param);
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_->name());
+      return function_->order(param);
     }
 
     using BaseType::evaluate;
@@ -112,9 +109,9 @@ private:
     RangeReturnType evaluate(const DomainType& point_in_reference_element,
                              const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_->name());
       this->assert_inside_reference_element(point_in_reference_element);
-      return function_.evaluate(geometry_->global(point_in_reference_element), param);
+      return function_->evaluate(geometry_->global(point_in_reference_element), param);
     }
 
     using BaseType::jacobian;
@@ -122,9 +119,9 @@ private:
     DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
                                        const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_->name());
       this->assert_inside_reference_element(point_in_reference_element);
-      return function_.jacobian(geometry_->global(point_in_reference_element), param);
+      return function_->jacobian(geometry_->global(point_in_reference_element), param);
     }
 
     using BaseType::derivative;
@@ -133,17 +130,17 @@ private:
                                          const DomainType& point_in_reference_element,
                                          const Common::Parameter& param = {}) const override final
     {
-      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_.name());
+      DUNE_THROW_IF(!(geometry_), Exceptions::not_bound_to_an_element_yet, function_->name());
       this->assert_inside_reference_element(point_in_reference_element);
-      return function_.derivative(alpha, geometry_->global(point_in_reference_element), param);
+      return function_->derivative(alpha, geometry_->global(point_in_reference_element), param);
     }
 
   private:
-    const FunctionType& function_;
+    std::unique_ptr<FunctionType> function_;
     std::unique_ptr<GeometryType> geometry_;
   }; // class LocalFunction
 
-  XT::Common::ConstStorageProvider<FunctionType> function_storage_;
+  std::unique_ptr<FunctionType> function_;
 }; // class FunctionAsGridFunctionWrapper
 
 

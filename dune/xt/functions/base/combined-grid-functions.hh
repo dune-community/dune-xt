@@ -66,6 +66,8 @@ Difference<IndicatorType, IndicatorType> stupid_difference()
 \endcode
  *
  * \note  Most likely you do not want to use this class diretly, but one of Difference, Fraction, Sum or Product.
+ *
+ * \todo Implement custom local function to hold a copy of this!
  */
 template <class LeftType, class RightType, CombinationType combination>
 class CombinedGridFunction
@@ -93,50 +95,12 @@ public:
                logging_prefix.empty() ? Common::to_camel_case(GetCombination<combination>::name() + "GridFunction")
                                       : logging_prefix,
                logging_prefix.empty())
-    , left_(left)
-    , right_(right)
-    , name_(nm.empty()
-                ? "(" + left_.access().name() + GetCombination<combination>::symbol() + right_.access().name() + ")"
-                : nm)
+    , left_(left.copy_as_grid_function())
+    , right_(right.copy_as_grid_function())
+    , name_(nm.empty() ? "(" + left_->name() + GetCombination<combination>::symbol() + right_->name() + ")" : nm)
   {
     LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction") << "(left=" << &left
                 << ", right=" << &right << ", nm=\"" << nm << "\")" << std::endl;
-  }
-
-  CombinedGridFunction(const LeftType& left,
-                       RightType&& right,
-                       const std::string nm = "",
-                       const std::string& logging_prefix = "")
-    : BaseType(left.parameter_type() + right.parameter_type(),
-               logging_prefix.empty() ? Common::to_camel_case(GetCombination<combination>::name() + "GridFunction")
-                                      : logging_prefix,
-               logging_prefix.empty())
-    , left_(left)
-    , right_(std::move(right))
-    , name_(nm.empty()
-                ? "(" + left_.access().name() + GetCombination<combination>::symbol() + right_.access().name() + ")"
-                : nm)
-  {
-    LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction") << "(left=" << &left
-                << ", right=" << &right << ", nm=\"" << nm << "\")" << std::endl;
-  }
-
-  CombinedGridFunction(std::shared_ptr<const LeftType> left,
-                       std::shared_ptr<const RightType> right,
-                       const std::string nm = "",
-                       const std::string& logging_prefix = "")
-    : BaseType(left->parameter_type() + right->parameter_type(),
-               logging_prefix.empty() ? Common::to_camel_case(GetCombination<combination>::name() + "GridFunction")
-                                      : logging_prefix,
-               logging_prefix.empty())
-    , left_(left)
-    , right_(right)
-    , name_(nm.empty()
-                ? "(" + left_.access().name() + GetCombination<combination>::symbol() + right_.access().name() + ")"
-                : nm)
-  {
-    LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction")
-                << "(left_shrd_ptr=" << left << ", right_shrd_ptr=" << right << ", nm=\"" << nm << "\")" << std::endl;
   }
 
   CombinedGridFunction(LeftType*&& left,
@@ -149,15 +113,18 @@ public:
                logging_prefix.empty())
     , left_(std::move(left))
     , right_(std::move(right))
-    , name_(nm.empty()
-                ? "(" + left_.access().name() + GetCombination<combination>::symbol() + right_.access().name() + ")"
-                : nm)
+    , name_(nm.empty() ? "(" + left_->name() + GetCombination<combination>::symbol() + right_->name() + ")" : nm)
   {
-    LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction")
-                << "(left_raw_ptr=" << left << ", right_raw_ptr=" << right << ", nm=\"" << nm << "\")" << std::endl;
+    LOG_(debug) << Common::to_camel_case(GetCombination<combination>::name() + "GridFunction") << "(left=" << left
+                << ", right=" << right << ", nm=\"" << nm << "\")" << std::endl;
   }
 
-  CombinedGridFunction(const ThisType& other) = default;
+  CombinedGridFunction(const ThisType& other)
+    : BaseType(other)
+    , left_(other.left_->copy_as_grid_function())
+    , right_(other.right_->copy_as_grid_function())
+    , name_(other.name_)
+  {}
 
   CombinedGridFunction(ThisType&& source) = default;
 
@@ -167,9 +134,14 @@ public:
                 << std::endl;
     using LeftLF = typename LeftType::LocalFunctionType;
     using RightLF = typename RightType::LocalFunctionType;
-    return std::make_unique<CombinedElementFunction<LeftLF, RightLF, combination>>(
-        std::move(left_.access().local_function()), std::move(right_.access().local_function()));
+    return std::make_unique<CombinedElementFunction<LeftLF, RightLF, combination>>(std::move(left_->local_function()),
+                                                                                   std::move(right_->local_function()));
   } // ... local_function(...)
+
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override final
   {
@@ -177,8 +149,9 @@ public:
   }
 
 private:
-  Common::ConstStorageProvider<LeftType> left_;
-  Common::ConstStorageProvider<RightType> right_;
+  std::unique_ptr<GridFunctionInterface<typename LeftType::E, LeftType::r, LeftType::rC, typename LeftType::R>> left_;
+  std::unique_ptr<GridFunctionInterface<typename RightType::E, RightType::r, RightType::rC, typename RightType::R>>
+      right_;
   const std::string name_;
 }; // class CombinedGridFunction
 

@@ -76,6 +76,15 @@ public:
     , name_(nm)
   {}
 
+  ElementwiseDiameterFunction(const ThisType&) = default;
+
+  ElementwiseDiameterFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
+
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<LocalFunction>();

@@ -113,7 +113,18 @@ public:
     LOG_(debug) << logging_id() << "(param_type=" << param_type << ")" << std::endl;
   }
 
+  GridFunctionInterface(const ThisType& other)
+    : Common::ParametricInterface(other)
+    , Logger(other)
+  {}
+
+  GridFunctionInterface(ThisType&) = default;
+
   virtual ~GridFunctionInterface() = default;
+
+  ThisType& operator=(const ThisType&) = delete;
+
+  ThisType& operator=(ThisType&&) = delete;
 
   static std::string static_id()
   {
@@ -121,10 +132,22 @@ public:
   }
 
   /**
-   * \name ´´This method has to be implemented.''
+   * \name ´´These methods have to be implemented.''
    * \{
    **/
 
+  /**
+   * \brief Returns a (shallow) copy of the function.
+   *
+   * \note This is intended to be cheap, so make sure to share resources (but in a thread-safe way)!
+   */
+  virtual std::unique_ptr<ThisType> copy_as_grid_function() const = 0;
+
+  /**
+   * \brief Returns the local function which can be bound to grid elements.
+   *
+   * \note If possible, the returned function should be able to live on its own, e.g. by copying the grid function.
+   */
   virtual std::unique_ptr<LocalFunctionType> local_function() const = 0;
 
   /**

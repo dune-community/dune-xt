@@ -108,11 +108,19 @@ public:
                      const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions,
                      const size_t ord,
                      const std::string nm = static_id())
-    : function_(new MathExpressionFunctionType(variable, matrix_to_vector(expressions)))
+    : BaseType()
+    , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
     , name_(nm)
   {
-    build_gradients(variable, gradient_expressions);
+    for (size_t cc = 0; cc < r; ++cc) {
+      gradients_.emplace_back(std::vector<MathExpressionGradientType>());
+      for (size_t rr = 0; rr < rC; ++rr) {
+        const auto& gradient_expression = gradient_expressions[cc][rr];
+        assert(gradient_expression.size() >= d);
+        gradients_[cc].emplace_back(variable, gradient_expression);
+      }
+    }
   }
 
   /**
@@ -123,22 +131,30 @@ public:
                      const Common::FieldMatrix<std::string, r, rC>& expressions,
                      const size_t ord,
                      const std::string nm = static_id())
-    : function_(new MathExpressionFunctionType(variable, matrix_to_vector(expressions)))
+    : BaseType()
+    , function_(variable, matrix_to_vector(expressions))
     , order_(ord)
     , name_(nm)
   {}
 
-  ExpressionFunction(const ThisType& other) = default;
-
-  ThisType& operator=(const ThisType& other)
+  ExpressionFunction(const ThisType& other)
+    : BaseType(other)
+    , function_(other.function_)
+    , order_(other.order_)
+    , name_(other.name_)
   {
-    if (this != &other) {
-      function_ = other.function_;
-      order_ = other.order_;
-      name_ = other.name_;
-      gradients_ = other.gradients_;
+    for (size_t cc = 0; cc < other.gradients_.size(); ++cc) {
+      gradients_.emplace_back(std::vector<MathExpressionGradientType>());
+      for (size_t rr = 0; rr < other.gradients_[cc].size(); ++rr)
+        gradients_[cc].emplace_back(other.gradients_[cc][rr]);
     }
-    return *this;
+  }
+
+  ExpressionFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
   }
 
   std::string name() const override final
@@ -158,7 +174,7 @@ public:
   {
     RangeReturnType ret(0.);
     Common::FieldVector<RangeFieldType, r * rC> tmp_vector_;
-    function_->evaluate(point_in_global_coordinates, tmp_vector_);
+    function_.evaluate(point_in_global_coordinates, tmp_vector_);
     for (size_t rr = 0; rr < r; ++rr) {
       auto& retRow = ret[rr];
       for (size_t cc = 0; cc < rC; ++cc) {
@@ -181,7 +197,7 @@ public:
     for (size_t cc = 0; cc < r; ++cc) {
       assert(gradients_[cc].size() == rC);
       for (size_t rr = 0; rr < rC; ++rr) {
-        gradients_[cc][rr]->evaluate(point_in_global_coordinates, ret[cc][rr]);
+        gradients_[cc][rr].evaluate(point_in_global_coordinates, ret[cc][rr]);
         check_value(point_in_global_coordinates, ret[cc][rr]);
       }
     }
@@ -192,12 +208,10 @@ public:
   template <class V>
   void check_value(const DomainType& point_in_global_coordinates, const V& value) const
   {
-    size_t range = value.size();
-#ifndef NDEBUG
-#  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
-    for (size_t rr = 0; rr < range; ++rr) {
+    for (size_t rr = 0; rr < value.size(); ++rr) {
       if (Common::isnan(value[rr])) {
         failure = true;
         error_type = "NaN";
@@ -208,40 +222,26 @@ public:
         failure = true;
         error_type = "an unlikely value";
       }
-      if (failure)
-        DUNE_THROW(Common::Exceptions::internal_error,
-                   "evaluating this function yielded "
-                       << error_type << "!\n"
-                       << "The variable of this function is:     " << function_->variable() << "\n"
-                       << "The expression of this function is: " << function_->expression() // at
-                       << "\n"
-                       << "You tried to evaluate it with:   point_in_global_coordinates = "
-                       << point_in_global_coordinates << "\n"
-                       << "The result was:                       " << value[rr] << "\n\n"
-                       << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
+      DUNE_THROW_IF(failure,
+                    Common::Exceptions::internal_error,
+                    "evaluating this function yielded "
+                        << error_type << "!\n"
+                        << "The variable of this function is:     " << function_.variable() << "\n"
+                        << "The expression of this function is: " << function_.expression() // at
+                        << "\n"
+                        << "You tried to evaluate it with:   point_in_global_coordinates = "
+                        << point_in_global_coordinates << "\n"
+                        << "The result was:                       " << value[rr] << "\n\n"
+                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     } // check_value(...)
-#  endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
-#endif // NDEBUG
+#endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
   }
 
 private:
-  void build_gradients(const std::string& variable,
-                       const Common::FieldVector<Common::FieldMatrix<std::string, rC, d>, r>& gradient_expressions)
-  {
-    for (size_t cc = 0; cc < r; ++cc) {
-      gradients_.emplace_back(std::vector<std::shared_ptr<const MathExpressionGradientType>>());
-      for (size_t rr = 0; rr < rC; ++rr) {
-        const auto& gradient_expression = gradient_expressions[cc][rr];
-        assert(gradient_expression.size() >= d);
-        gradients_[cc].emplace_back(new MathExpressionGradientType(variable, gradient_expression));
-      }
-    }
-  } // ... build_gradients(...)
-
-  std::shared_ptr<const MathExpressionFunctionType> function_;
+  MathExpressionFunctionType function_;
   size_t order_;
   std::string name_;
-  std::vector<std::vector<std::shared_ptr<const MathExpressionGradientType>>> gradients_;
+  std::vector<std::vector<MathExpressionGradientType>> gradients_;
 }; // class ExpressionFunction
 
 
@@ -302,11 +302,13 @@ public:
                      const Common::FieldMatrix<std::string, r, d>& gradient_expressions,
                      const size_t ord,
                      const std::string nm = static_id())
-    : function_(new MathExpressionFunctionType(variable, expressions))
+    : BaseType()
+    , function_(variable, expressions)
     , order_(ord)
     , name_(nm)
   {
-    build_gradients(variable, gradient_expressions);
+    for (size_t rr = 0; rr < r; ++rr)
+      gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expressions[rr]));
   }
 
   /**
@@ -317,24 +319,27 @@ public:
                      const Common::FieldVector<std::string, r>& expressions,
                      const size_t ord,
                      const std::string nm = static_id())
-    : function_(new MathExpressionFunctionType(variable, expressions))
+    : BaseType()
+    , function_(variable, expressions)
     , order_(ord)
     , name_(nm)
   {}
 
-#if !DUNE_XT_WITH_PYTHON_BINDINGS
-  ExpressionFunction(const ThisType& other) = default;
-#endif
-
-  ThisType& operator=(const ThisType& other)
+  ExpressionFunction(const ThisType& other)
+    : BaseType()
+    , function_(other.function_)
+    , order_(other.order_)
+    , name_(other.name_)
   {
-    if (this != &other) {
-      function_ = other.function_;
-      order_ = other.order_;
-      name_ = other.name_;
-      gradients_ = other.gradients_;
-    }
-    return *this;
+    for (size_t ii = 0; ii < other.gradients_.size(); ++ii)
+      gradients_.emplace_back(new MathExpressionGradientType(*other.gradients_[ii]));
+  }
+
+  ExpressionFunction(ThisType&&) = default;
+
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
   }
 
   std::string name() const override final
@@ -353,7 +358,7 @@ public:
                            const Common::Parameter& /*param*/ = {}) const override final
   {
     RangeReturnType ret(0.);
-    function_->evaluate(point_in_global_coordinates, ret);
+    function_.evaluate(point_in_global_coordinates, ret);
     check_value(point_in_global_coordinates, ret);
     return ret;
   } // ... evaluate(...)
@@ -377,12 +382,10 @@ private:
   template <class V>
   void check_value(const DomainType& point_in_global_coordinates, const V& value) const
   {
-    size_t range = value.size();
-#ifndef NDEBUG
-#  ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+#ifndef DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
     bool failure = false;
     std::string error_type;
-    for (size_t rr = 0; rr < range; ++rr) {
+    for (size_t rr = 0; rr < value.size(); ++rr) {
       if (Common::isnan(value[rr])) {
         failure = true;
         error_type = "NaN";
@@ -393,38 +396,25 @@ private:
         failure = true;
         error_type = "an unlikely value";
       }
-      if (failure)
-        DUNE_THROW(Common::Exceptions::internal_error,
-                   "evaluating this function yielded "
-                       << error_type << "!\n"
-                       << "The variable of this function is:     " << function_->variable() << "\n"
-                       << "The expression of this function is: " << function_->expression() // at
-                       << "\n"
-                       << "You tried to evaluate it with:   point_in_global_coordinates = "
-                       << point_in_global_coordinates << "\n"
-                       << "The result was:                       " << value[rr] << "\n\n"
-                       << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
+      DUNE_THROW_IF(failure,
+                    Common::Exceptions::internal_error,
+                    "evaluating this function yielded "
+                        << error_type << "!\n"
+                        << "The variable of this function is:     " << function_.variable() << "\n"
+                        << "The expression of this function is: " << function_.expression() << "\n"
+                        << "You tried to evaluate it with:   point_in_global_coordinates = "
+                        << point_in_global_coordinates << "\n"
+                        << "The result was:                       " << value[rr] << "\n\n"
+                        << "You can disable this check by defining DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS\n");
     } // check_value(...)
-#  endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
-#endif // NDEBUG
-  }
+#endif // DUNE_XT_FUNCTIONS_EXPRESSION_DISABLE_CHECKS
+  } // ... check_value(...)
 
 private:
-  void build_gradients(const std::string& variable, const Common::FieldMatrix<std::string, r, d>& gradient_expressions)
-  {
-    for (size_t rr = 0; rr < r; ++rr)
-      gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expressions[rr]));
-  }
-
-  void build_gradients(const std::string& variable, const Common::FieldVector<std::string, d>& gradient_expression)
-  {
-    gradients_.emplace_back(new MathExpressionGradientType(variable, gradient_expression));
-  }
-
-  std::shared_ptr<const MathExpressionFunctionType> function_;
+  MathExpressionFunctionType function_;
   size_t order_;
   std::string name_;
-  std::vector<std::shared_ptr<const MathExpressionGradientType>> gradients_;
+  std::vector<std::shared_ptr<MathExpressionGradientType>> gradients_;
 }; // class ExpressionFunction
 
 

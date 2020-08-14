@@ -73,8 +73,8 @@ public:
   FlatTopFunction(const DomainType& lower_left,
                   const DomainType& upper_right,
                   const DomainType& boundary_layer,
-                  const RangeReturnType& value = defaults().template get<RangeReturnType>("value"),
-                  const std::string name_in = defaults().template get<std::string>("name"))
+                  const RangeReturnType& value = RangeReturnType(1),
+                  const std::string name_in = "FlatTopFunction")
     : lower_left_(lower_left)
     , upper_right_(upper_right)
     , boundary_layer_(boundary_layer)
@@ -84,11 +84,14 @@ public:
     check_input();
   }
 
-  FlatTopFunction(const ThisType& other) = default;
+  FlatTopFunction(const ThisType&) = default;
 
-  ThisType& operator=(const ThisType& other) = delete;
+  FlatTopFunction(ThisType&&) = default;
 
-  virtual ~FlatTopFunction() {}
+  std::unique_ptr<BaseType> copy_as_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
+  }
 
   std::string name() const override final
   {

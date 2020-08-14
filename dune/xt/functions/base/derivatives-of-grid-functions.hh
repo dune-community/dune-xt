@@ -35,6 +35,7 @@ class DerivativeGridFunction
 {
   static_assert(is_grid_function<GridFunctionType>::value, "");
 
+  using ThisType = DerivativeGridFunction;
   using BaseType =
       GridFunctionInterface<typename internal::DerivativeElementFunctionHelper<GridFunctionType, derivative>::E,
                             internal::DerivativeElementFunctionHelper<GridFunctionType, derivative>::r,
@@ -54,15 +55,26 @@ public:
   using typename BaseType::R;
 
   DerivativeGridFunction(GridFunction<E, r_, rC_, R> grid_function, const std::string& nm = "")
-    : BaseType()
-    , grid_function_(grid_function)
-    , name_(nm.empty() ? "dune.xt.functions.derivativegridfunction" : nm)
+    : BaseType(grid_function.parameter_type())
+    , grid_function_(grid_function.copy_as_grid_function())
+    , name_(nm.empty() ? "DerivativeGridFunction" : nm)
+  {}
+
+  DerivativeGridFunction(const ThisType& other)
+    : BaseType(other)
+    , grid_function_(other.grid_function_->copy_as_grid_function())
+    , name_(other.name_)
   {}
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     return std::make_unique<DerivativeElementFunction<typename GridFunctionType::LocalFunctionType, derivative>>(
-        grid_function_.local_function());
+        grid_function_->local_function());
+  }
+
+  std::unique_ptr<BaseType> copy_as_grid_function() const override final
+  {
+    return std::make_unique<ThisType>(*this);
   }
 
   std::string name() const override final
@@ -71,7 +83,7 @@ public:
   }
 
 private:
-  GridFunction<E, r_, rC_, R> grid_function_;
+  std::unique_ptr<GridFunctionInterface<E, r_, rC_, R>> grid_function_;
   const std::string name_;
 }; // class DerivativeGridFunction
 
