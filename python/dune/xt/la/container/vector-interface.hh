@@ -46,7 +46,6 @@ auto bind_Vector(pybind11::module& m)
   const auto ClassName = Common::to_camel_case(bindings::container_name<C>::value());
 
   py::class_<C> c = bind_ProvidesDataAccess<C>(m, ClassName, ClassName);
-  addbind_ProvidesBackend(c);
 
   c.def(py::init([](const ssize_t size, const S& value) { return new C(Common::numeric_cast<size_t>(size), value); }),
         "size"_a = 0,
