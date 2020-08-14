@@ -27,6 +27,7 @@
 
 #include <dune/xt/common/filesystem.hh>
 #include <dune/xt/common/memory.hh>
+#include <dune/xt/common/timedlogging.hh>
 #include <dune/xt/common/type_traits.hh>
 #include <dune/xt/grid/grids.hh>
 #include <dune/xt/grid/layers.hh>
@@ -44,17 +45,18 @@ namespace XT {
 namespace Functions {
 
 
-template <class MinuendType, class SubtrahendType>
+// forwards, includes are below
+template <class, class>
 class DifferenceGridFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class SumGridFunction;
 
-template <class LeftSummandType, class RightSummandType>
+template <class, class>
 class ProductGridFunction;
 
-// template <class Function>
-// class DivergenceFunction;
+template <class, class>
+class FractionGridFunction;
 
 
 /**
@@ -69,9 +71,12 @@ class ProductGridFunction;
  *        situations which could not be handled generically later on.
  */
 template <class Element, size_t rangeDim = 1, size_t rangeDimCols = 1, class RangeField = double>
-class GridFunctionInterface : public Common::ParametricInterface
+class GridFunctionInterface
+  : public Common::ParametricInterface
+  , public Common::WithLogger<GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>>
 {
-  using ThisType = GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
+  using ThisType = GridFunctionInterface;
+  using Logger = Common::WithLogger<GridFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>>;
 
 public:
   using LocalFunctionType = ElementFunctionInterface<Element, rangeDim, rangeDimCols, RangeField>;
@@ -92,12 +97,21 @@ public:
 
   static const constexpr bool available = false;
 
-  using DifferenceType = Functions::DifferenceGridFunction<ThisType, ThisType>;
-  using SumType = Functions::SumGridFunction<ThisType, ThisType>;
+private:
+  std::string logging_id() const
+  {
+    return "GridFunctionInterface<" + Common::to_string(size_t(r)) + "," + Common::to_string(size_t(rC)) + ">";
+  }
 
-  GridFunctionInterface(const Common::ParameterType& param_type = {})
+public:
+  GridFunctionInterface(const Common::ParameterType& param_type = {},
+                        const std::string& logging_prefix = "",
+                        const bool logging_disabled = true)
     : Common::ParametricInterface(param_type)
-  {}
+    , Logger(logging_prefix.empty() ? "GridFunctionInterface" : logging_prefix, logging_disabled)
+  {
+    LOG_(debug) << logging_id() << "(param_type=" << param_type << ")" << std::endl;
+  }
 
   virtual ~GridFunctionInterface() = default;
 
@@ -121,27 +135,129 @@ public:
 
   virtual std::string name() const
   {
-    return "dune.xt.functions.gridfunction";
+    LOG_(debug) << logging_id() << "::name()\n   returning \"GridFunction\"" << std::endl;
+    return "GridFunction";
   }
 
   /// \}
 
-  DifferenceType operator-(const ThisType& other) const
+  /// \name Numerical operators (const other& variants).
+  /// \{
+
+  Functions::DifferenceGridFunction<ThisType, ThisType> operator-(const ThisType& other) const
   {
-    return DifferenceType(*this, other);
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator-(other=" << &other << ")" << std::endl;
+    }
+    return Functions::DifferenceGridFunction<ThisType, ThisType>(
+        *this, other, "(" + this->name() + " - " + other.name() + ")", derived_logging_prefix);
   }
 
-  SumType operator+(const ThisType& other) const
+  Functions::SumGridFunction<ThisType, ThisType> operator+(const ThisType& other) const
   {
-    return SumType(*this, other);
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator+(other=" << &other << ")" << std::endl;
+    }
+    return Functions::SumGridFunction<ThisType, ThisType>(
+        *this, other, "(" + this->name() + " + " + other.name() + ")", derived_logging_prefix);
   }
 
   template <class OtherType>
-  typename std::enable_if<is_grid_function<OtherType>::value, Functions::ProductGridFunction<ThisType, OtherType>>::type
+  std::enable_if_t<
+      is_grid_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
+      Functions::ProductGridFunction<ThisType, OtherType>>
   operator*(const OtherType& other) const
   {
-    return Functions::ProductGridFunction<ThisType, OtherType>(*this, other);
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + "*" + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator*(other=" << &other << ")" << std::endl;
+    }
+    return Functions::ProductGridFunction<ThisType, OtherType>(
+        *this, other, "(" + this->name() + "*" + other.name() + ")", derived_logging_prefix);
   }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_grid_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::fraction>::available,
+      Functions::FractionGridFunction<ThisType, OtherType>>
+  operator/(const OtherType& other) const
+  {
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + "/" + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator/(other=" << &other << ")" << std::endl;
+    }
+    return Functions::FractionGridFunction<ThisType, OtherType>(
+        *this, other, "(" + this->name() + "/" + other.name() + ")", derived_logging_prefix);
+  }
+
+  /// \}
+
+  /// \name Numerical operators (lvalue variants to handle storage of temporaries on the right).
+  /// \{
+
+  Functions::DifferenceGridFunction<ThisType, ThisType> operator-(ThisType&& other) const
+  {
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator-(other=" << &other << ")" << std::endl;
+    }
+    return Functions::DifferenceGridFunction<ThisType, ThisType>(
+        *this, std::move(other), "(" + this->name() + " - " + other.name() + ")", derived_logging_prefix);
+  }
+
+  Functions::SumGridFunction<ThisType, ThisType> operator+(ThisType&& other) const
+  {
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + " - " + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator+(other=" << &other << ")" << std::endl;
+    }
+    return Functions::SumGridFunction<ThisType, ThisType>(
+        *this, std::move(other), "(" + this->name() + " + " + other.name() + ")", derived_logging_prefix);
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_grid_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
+      Functions::ProductGridFunction<ThisType, OtherType>>
+  operator*(OtherType&& other) const
+  {
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + "*" + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator*(other=" << &other << ")" << std::endl;
+    }
+    return Functions::ProductGridFunction<ThisType, OtherType>(
+        *this, std::move(other), "(" + this->name() + "*" + other.name() + ")", derived_logging_prefix);
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_grid_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::fraction>::available,
+      Functions::FractionGridFunction<ThisType, OtherType>>
+  operator/(OtherType&& other) const
+  {
+    std::string derived_logging_prefix = "";
+    if (this->logger.debug_enabled || other.logger.debug_enabled) {
+      derived_logging_prefix = "(" + this->logger.prefix + "/" + other.logger.prefix + ")";
+      this->logger.debug() << logging_id() << "::operator/(other=" << &other << ")" << std::endl;
+    }
+    return Functions::FractionGridFunction<ThisType, OtherType>(
+        *this, std::move(other), "(" + this->name() + "/" + other.name() + ")", derived_logging_prefix);
+  }
+
+  /// \}
 
   /**
    * \note  We use the SubsamplingVTKWriter (which is better for higher orders) by default: the grid you see in the
