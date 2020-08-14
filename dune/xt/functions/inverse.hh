@@ -15,7 +15,10 @@
 #include <dune/xt/common/float_cmp.hh>
 #include <dune/xt/common/memory.hh>
 #include <dune/xt/la/matrix-inverter.hh>
+#include <dune/xt/functions/grid-function.hh>
 #include <dune/xt/functions/interfaces/element-functions.hh>
+#include <dune/xt/functions/interfaces/function.hh>
+#include <dune/xt/functions/interfaces/grid-function.hh>
 #include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
@@ -53,7 +56,7 @@ public:
 
     static RangeReturnType compute(const FunctionType& func, const DomainType& xx, const XT::Common::Parameter& param)
     {
-      auto value_to_invert = func.evaluate(xx, param);
+      auto value_to_invert = func.evaluate(xx, param)[0];
       DUNE_THROW_IF(XT::Common::FloatCmp::eq(value_to_invert, 0.),
                     Exceptions::wrong_input_given,
                     "Scalar function value was not invertible!\n\nvalue_to_invert = " << value_to_invert);
@@ -129,7 +132,7 @@ public:
   {}
 
 protected:
-  void post_bind(const ElementType& element)
+  void post_bind(const ElementType& element) override final
   {
     func_.access().bind(element);
   }
@@ -207,46 +210,52 @@ class InverseGridFunction
                                  internal::InverseFunctionHelper<GridFunctionType>::rC,
                                  typename internal::InverseFunctionHelper<GridFunctionType>::R>
 {
+  using Helper = internal::InverseFunctionHelper<GridFunctionType>;
+  static const constexpr size_t r_ = GridFunctionType::r;
+  static const constexpr size_t rC_ = GridFunctionType::rC;
+
+public:
   using BaseType = GridFunctionInterface<typename GridFunctionType::E,
                                          internal::InverseFunctionHelper<GridFunctionType>::r,
                                          internal::InverseFunctionHelper<GridFunctionType>::rC,
                                          typename internal::InverseFunctionHelper<GridFunctionType>::R>;
-
-  using Helper = internal::InverseFunctionHelper<GridFunctionType>;
-
-public:
+  using typename BaseType::E;
   using typename BaseType::LocalFunctionType;
+  using typename BaseType::R;
 
-  InverseGridFunction(const GridFunctionType& func, const int ord)
+  InverseGridFunction(GridFunction<E, r_, rC_, R> func, const int ord, const std::string nm = "")
     : func_(func)
     , order_(ord)
+    , name_(nm.empty() ? ("inverse of " + func_.name()) : nm)
   {}
 
-  InverseGridFunction(std::shared_ptr<const GridFunctionType> func, const int ord)
+  InverseGridFunction(std::shared_ptr<const GridFunctionType> func, const int ord, const std::string nm = "")
     : func_(func)
     , order_(ord)
+    , name_(nm.empty() ? ("inverse of " + func_.name()) : nm)
   {}
 
-  InverseGridFunction(std::unique_ptr<const GridFunctionType>&& func, const int ord)
+  InverseGridFunction(std::unique_ptr<const GridFunctionType>&& func, const int ord, const std::string nm = "")
     : func_(std::move(func))
     , order_(ord)
+    , name_(nm.empty() ? ("inverse of " + func_.name()) : nm)
   {}
 
   std::unique_ptr<LocalFunctionType> local_function() const override final
   {
     using LocalFunction = InverseElementFunction<typename GridFunctionType::LocalFunctionType>;
-    return std::unique_ptr<LocalFunction>(new LocalFunction(std::move(func_.access().local_function()), order_));
+    return std::unique_ptr<LocalFunction>(new LocalFunction(func_.local_function(), order_));
   }
 
   std::string name() const override final
   {
-    auto func_name = func_.access().name();
-    return func_name.empty() ? ("dune.xt.functions.inversegridfunction") : ("inverse of " + func_name);
+    return name_;
   }
 
 private:
-  const XT::Common::ConstStorageProvider<GridFunctionType> func_;
+  const GridFunction<E, r_, rC_, R> func_;
   const int order_;
+  const std::string name_;
 }; // class InverseGridFunction
 
 
