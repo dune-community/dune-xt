@@ -26,10 +26,10 @@ for mod_name in (
         '_functions_function_as_grid_function',
         '_functions_function_interface_3d',
         '_functions_gridfunction',
-        '_functions_gridfunction_interface_1d',
-        '_functions_gridfunction_interface_2d',
-        '_functions_gridfunction_interface_3d',
         '_functions_indicator',
+        '_functions_interfaces_grid_function_1d',
+        '_functions_interfaces_grid_function_2d',
+        '_functions_interfaces_grid_function_3d',
         '_functions_parametric_expression',
         '_functions_spe10',
 ):

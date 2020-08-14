@@ -145,9 +145,9 @@ PYBIND11_MODULE(_functions_checkerboard, m)
   py::module::import("dune.xt.common");
   py::module::import("dune.xt.grid");
   py::module::import("dune.xt.la");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_1d");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_2d");
-  py::module::import("dune.xt.functions._functions_gridfunction_interface_3d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_1d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_2d");
+  py::module::import("dune.xt.functions._functions_interfaces_grid_function_3d");
 
   CheckerboardFunction_for_all_grids<>::bind(m);
 } // PYBIND11_MODULE(...)
