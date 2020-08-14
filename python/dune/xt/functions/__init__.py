@@ -23,6 +23,7 @@ for mod_name in (
         '_functions_checkerboard',
         '_functions_constant',
         '_functions_expression',
+        '_functions_divergence',
         '_functions_function_as_grid_function',
         '_functions_function_interface_3d',
         '_functions_gridfunction',

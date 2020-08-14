@@ -15,6 +15,7 @@
 dune_pybindxi_add_module(_functions_checkerboard EXCLUDE_FROM_ALL checkerboard.cc)
 dune_pybindxi_add_module(_functions_constant EXCLUDE_FROM_ALL constant.cc)
 dune_pybindxi_add_module(_functions_expression EXCLUDE_FROM_ALL expression.cc)
+dune_pybindxi_add_module(_functions_divergence EXCLUDE_FROM_ALL divergence.cc)
 dune_pybindxi_add_module(_functions_function_as_grid_function EXCLUDE_FROM_ALL function-as-grid-function.cc)
 dune_pybindxi_add_module(_functions_function_interface_1d EXCLUDE_FROM_ALL function-interface-1d.cc)
 dune_pybindxi_add_module(_functions_function_interface_2d EXCLUDE_FROM_ALL function-interface-2d.cc)
