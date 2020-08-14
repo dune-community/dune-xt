@@ -56,17 +56,26 @@ DUNE_EXPORT inline const Timer& SecondsSinceStartup()
  */
 class DefaultLogger
 {
-  static std::string build_prefix(const std::string& prefix, const std::string& clr)
+  static std::string build_prefix(const std::string& prfx, const size_t cnt, const std::string& clr)
   {
     const std::string actual_color = terminal_supports_color() ? color(clr) : "";
+    std::string copy_count_str = "";
+    if (cnt > 0)
+      copy_count_str += "[" + to_string(cnt) + "]";
+    std::string ret;
     if (actual_color.empty())
-      return prefix + ": ";
+      ret = prfx + copy_count_str + ": ";
     else
-      return actual_color + StreamModifiers::bold + prefix + ": " + StreamModifiers::normal;
-  }
+      ret = actual_color + StreamModifiers::bold + prfx + StreamModifiers::normal + copy_count_str
+            + StreamModifiers::bold + ": " + StreamModifiers::normal;
+    return ret;
+  } // ... build_prefix(...)
 
 public:
-  DefaultLogger(const std::string& prefix = "",
+  std::string prefix;
+  size_t copy_count;
+
+  DefaultLogger(const std::string& prfx = "",
                 bool start_disabled = false,
                 const std::array<std::string, 3>& colors = {"blue", "darkgray", "red"},
                 bool global_timer = true);
@@ -77,7 +86,6 @@ public:
 
 private:
   Timer timer_;
-  std::string prefix_;
   std::array<std::string, 3> colors_;
   bool global_timer_;
   std::shared_ptr<std::ostream> info_;
@@ -89,7 +97,14 @@ public:
   bool debug_enabled;
   bool warn_enabled;
 
-  void enable(const std::string& prefix = "");
+  void enable(const std::string& prfx = "");
+
+  void enable_like(const DefaultLogger& other)
+  {
+    this->info_enabled = this->info_enabled || other.info_enabled;
+    this->debug_enabled = this->debug_enabled || other.debug_enabled;
+    this->warn_enabled = this->warn_enabled || other.warn_enabled;
+  }
 
   void disable();
 
@@ -126,51 +141,56 @@ class WithLogger
 public:
   mutable DefaultLogger logger;
 
-protected:
-  const std::string logging_id;
+  DXT_DEPRECATED_MSG("Use this.logger.prefix instead (12.08.2020)!") const std::string logging_id;
 
-public:
-  WithLogger(const std::string& prefix, const std::string& id, const bool start_enabled = false)
-    : logger(prefix, start_enabled)
+  DXT_DEPRECATED_MSG("Use WithLogger(id, start_enabled) instead (12.08.2020)!")
+  WithLogger(const std::string& /*prefix*/, const std::string& id, const bool start_enabled = false)
+    : logger(id, start_enabled)
     , logging_id(id)
   {
-    LOG_(debug) << logging_id << "(this=" << this << ")" << std::endl;
+    LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
+  }
+
+  WithLogger(const std::string& id, const bool start_enabled = false)
+    : logger(id, start_enabled)
+    , logging_id(id)
+  {
+    LOG_(debug) << "WithLogger(this=" << this << ")" << std::endl;
   }
 
   WithLogger(const ThisType& other)
     : logger(other.logger)
-    , logging_id(other.logging_id)
+    , logging_id(other.logger.prefix)
   {
-    LOG_(debug) << logging_id << "(this=" << this << ", other=" << &other << ")" << std::endl;
+    LOG_(debug) << "WithLogger(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
   WithLogger(ThisType&& source)
     : logger(std::move(source.logger))
     , logging_id(std::move(source.logging_id))
   {
-    LOG_(debug) << logging_id << "(this=" << this << ", source=" << &source << ")" << std::endl;
+    LOG_(debug) << "WithLogger(this=" << this << ", source=" << &source << ")" << std::endl;
   }
 
   ~WithLogger()
   {
-    LOG_(debug) << "~" << logging_id << "(this=" << this << ")" << std::endl;
+    LOG_(debug) << "~WithLogger(this=" << this << ")" << std::endl;
   }
 
   ThisType& operator=(const ThisType& other)
   {
-    LOG_(debug) << logging_id << "operator=(this=" << this << ", other=" << &other << ")" << std::endl;
+    LOG_(debug) << "WithLogger.operator=(this=" << this << ", other=" << &other << ")" << std::endl;
   }
 
   ThisType& operator=(ThisType&& source)
   {
-    LOG_(debug) << logging_id << "operator=(this=" << this << ", source=" << &source << ")" << std::endl;
+    LOG_(debug) << "WithLogger.operator=(this=" << this << ", source=" << &source << ")" << std::endl;
   }
 
+  DXT_DEPRECATED_MSG("Use this.logger.enable_like(other.logger) instead (12.08.2020)!")
   void enable_logging_like(const ThisType& other)
   {
-    this->logger.info_enabled = this->logger.info_enabled || other.logger.info_enabled;
-    this->logger.debug_enabled = this->logger.debug_enabled || other.logger.debug_enabled;
-    this->logger.warn_enabled = this->logger.warn_enabled || other.logger.warn_enabled;
+    this->logger.enable_like(other.logger);
   }
 }; // class WithLogger
 
