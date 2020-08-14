@@ -14,6 +14,7 @@
 
 #include <dune/xt/common/memory.hh>
 
+#include <dune/xt/functions/exceptions.hh>
 #include <dune/xt/functions/interfaces/element-functions.hh>
 #include <dune/xt/functions/type_traits.hh>
 
@@ -28,12 +29,17 @@ namespace internal {
  *
  * \note Most likely you do not want to use this class directly, but CombinedConstElementFunction or
  *       CombinedElementFunction.
+ *
+ * \todo Think about the order of the fraction of two functions!
  */
-template <class LeftType, class RightType, CombinationType comb>
+template <class LeftType_, class RightType_, CombinationType comb>
 class CombinedElementFunctionHelper
 {
-  static_assert(is_element_function<LeftType>::value, "");
-  static_assert(is_element_function<RightType>::value, "");
+  using LeftType = std::decay_t<LeftType_>;
+  using RightType = std::decay_t<RightType_>;
+
+  static_assert(is_element_function<LeftType>::value || is_grid_function<LeftType>::value, "");
+  static_assert(is_element_function<RightType>::value || is_grid_function<RightType>::value, "");
 
 public:
   using E = typename LeftType::E;
@@ -74,7 +80,7 @@ private:
     };
 
     template <size_t r_, size_t rC_, bool anything>
-    class Dimension<CombinationType::sum, r_, rC_, r_, rC_, anything>
+    class Dimension<CombinationType::fraction, r_, rC_, 1, 1, anything>
     {
     public:
       static const bool available = true;
@@ -109,6 +115,15 @@ private:
       static const size_t rC = rC_;
     };
 
+    template <size_t rC_, bool anything>
+    class Dimension<CombinationType::product, 1, 1, 1, rC_, anything> // to avoid ambiguos specialization
+    {
+    public:
+      static const bool available = true;
+      static const size_t r = 1;
+      static const size_t rC = rC_;
+    };
+
     template <size_t rL, size_t c, size_t rR, bool anything>
     class Dimension<CombinationType::product, rL, c, c, rR, anything>
     {
@@ -116,6 +131,15 @@ private:
       static const bool available = true;
       static const size_t r = rL;
       static const size_t rC = rR;
+    };
+
+    template <size_t r_, size_t rC_, bool anything>
+    class Dimension<CombinationType::sum, r_, rC_, r_, rC_, anything>
+    {
+    public:
+      static const bool available = true;
+      static const size_t r = r_;
+      static const size_t rC = rC_;
     };
 
   public:
@@ -142,7 +166,7 @@ private:
             bool anything = true>
   class CombinationTypeSwitch
   {
-    static_assert(!anything, "Nothing available for these CombinationType!");
+    static_assert(!anything, "Nothing available for these combinations!");
   };
 
   template <size_t r_, size_t rC_, bool anything>
@@ -174,12 +198,12 @@ private:
   }; // class CombinationTypeSwitch< ..., difference >
 
   template <size_t r_, size_t rC_, bool anything>
-  class CombinationTypeSwitch<CombinationType::sum, r_, rC_, r_, rC_, anything>
+  class CombinationTypeSwitch<CombinationType::fraction, r_, rC_, 1, 1, anything>
   {
   public:
     static int order(const int left_order, const int right_order)
     {
-      return std::max(left_order, right_order);
+      return left_order + right_order;
     }
 
     static RangeReturnType evaluate(const LeftType& left_local,
@@ -187,17 +211,19 @@ private:
                                     const DomainType& point_in_reference_element,
                                     const Common::Parameter& param)
     {
-      return left_local.evaluate(point_in_reference_element, param)
-             + right_local.evaluate(point_in_reference_element, param);
+      RangeReturnType ret = left_local.evaluate(point_in_reference_element, param);
+      ret /= right_local.evaluate(point_in_reference_element, param)[0];
+      return ret;
     }
 
-    static DerivativeRangeReturnType jacobian(const LeftType& left_local,
-                                              const RightType& right_local,
-                                              const DomainType& point_in_reference_element,
-                                              const Common::Parameter& param)
+    static DerivativeRangeReturnType jacobian(const LeftType& /*left_local*/,
+                                              const RightType& /*right_local*/,
+                                              const DomainType& /*point_in_reference_element*/,
+                                              const Common::Parameter& /*param*/)
     {
-      return left_local.jacobian(point_in_reference_element, param)
-             + right_local.jacobian(point_in_reference_element, param);
+      DUNE_THROW(Exceptions::element_function_error,
+                 "The jacobian of the fraction of two functions is not (yet) implemented!");
+      return DerivativeRangeReturnType();
     }
   }; // class CombinationTypeSwitch< ..., sum >
 
@@ -224,7 +250,8 @@ private:
                                               const DomainType& /*point_in_reference_element*/,
                                               const Common::Parameter& /*param*/)
     {
-      DUNE_THROW(NotImplemented, "If you need this, implement it!");
+      DUNE_THROW(Exceptions::element_function_error,
+                 "The jacobian of the product of two functions is not (yet) implemented!");
       return DerivativeRangeReturnType();
     }
   }; // class CombinationTypeSwitch< ..., product >
@@ -253,7 +280,8 @@ private:
                                               const DomainType& /*point_in_reference_element*/,
                                               const Common::Parameter& /*param*/)
     {
-      DUNE_THROW(NotImplemented, "If you need this, implement it!");
+      DUNE_THROW(Exceptions::element_function_error,
+                 "The jacobian of the product of two functions is not (yet) implemented!");
       return DerivativeRangeReturnType();
     }
   }; // class CombinationTypeSwitch< ..., product >
@@ -282,7 +310,38 @@ private:
                                               const DomainType& /*point_in_reference_element*/,
                                               const Common::Parameter& /*param*/)
     {
-      DUNE_THROW(NotImplemented, "If you need this, implement it!");
+      DUNE_THROW(Exceptions::element_function_error,
+                 "The jacobian of the product of two functions is not (yet) implemented!");
+      return DerivativeRangeReturnType();
+    }
+  }; // class CombinationTypeSwitch< ..., product >
+
+  template <size_t rC_, bool anything> // to avoid ambiguous specialization, sigh
+  class CombinationTypeSwitch<CombinationType::product, 1, 1, 1, rC_, anything>
+  {
+  public:
+    static int order(const int left_order, const int right_order)
+    {
+      return left_order + right_order;
+    }
+
+    static RangeReturnType evaluate(const LeftType& left_local,
+                                    const RightType& right_local,
+                                    const DomainType& point_in_reference_element,
+                                    const Common::Parameter& param)
+    {
+      auto result = right_local.evaluate(point_in_reference_element, param);
+      result *= left_local.evaluate(point_in_reference_element, param);
+      return result;
+    }
+
+    static DerivativeRangeReturnType jacobian(const LeftType& /*left_local*/,
+                                              const RightType& /*right_local*/,
+                                              const DomainType& /*point_in_reference_element*/,
+                                              const Common::Parameter& /*param*/)
+    {
+      DUNE_THROW(Exceptions::element_function_error,
+                 "The jacobian of the product of two functions is not (yet) implemented!");
       return DerivativeRangeReturnType();
     }
   }; // class CombinationTypeSwitch< ..., product >
@@ -310,10 +369,39 @@ private:
                                               const DomainType& /*xx*/,
                                               const Common::Parameter& /*param*/)
     {
-      DUNE_THROW(NotImplemented, "If you need this, implement it!");
+      DUNE_THROW(Exceptions::element_function_error,
+                 "The jacobian of the product of two functions is not (yet) implemented!");
       return DerivativeRangeReturnType();
     }
   }; // class CombinationTypeSwitch< ..., product >
+
+  template <size_t r_, size_t rC_, bool anything>
+  class CombinationTypeSwitch<CombinationType::sum, r_, rC_, r_, rC_, anything>
+  {
+  public:
+    static int order(const int left_order, const int right_order)
+    {
+      return std::max(left_order, right_order);
+    }
+
+    static RangeReturnType evaluate(const LeftType& left_local,
+                                    const RightType& right_local,
+                                    const DomainType& point_in_reference_element,
+                                    const Common::Parameter& param)
+    {
+      return left_local.evaluate(point_in_reference_element, param)
+             + right_local.evaluate(point_in_reference_element, param);
+    }
+
+    static DerivativeRangeReturnType jacobian(const LeftType& left_local,
+                                              const RightType& right_local,
+                                              const DomainType& point_in_reference_element,
+                                              const Common::Parameter& param)
+    {
+      return left_local.jacobian(point_in_reference_element, param)
+             + right_local.jacobian(point_in_reference_element, param);
+    }
+  }; // class CombinationTypeSwitch< ..., sum >
 
 public:
   static int order(const LeftType& left, const RightType& right, const Common::Parameter& param)
@@ -338,6 +426,8 @@ public:
 template <class LeftType, class RightType>
 struct DualStorageProvider
 {
+  using ThisType = DualStorageProvider;
+
   XT::Common::StorageProvider<LeftType> left;
   XT::Common::StorageProvider<RightType> right;
 
@@ -355,6 +445,12 @@ struct DualStorageProvider
     : left(std::move(lft))
     , right(std::move(rght))
   {}
+
+  DualStorageProvider(const ThisType&) = default;
+
+  DualStorageProvider(ThisType&) = default;
+
+  DualStorageProvider(ThisType&&) = default;
 }; // struct DualStorageProvider
 
 
@@ -369,13 +465,14 @@ class CombinedConstElementFunction
         internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::rC,
         typename internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::R>
 {
+  using ThisType = CombinedConstElementFunction;
   using BaseType =
       ElementFunctionInterface<typename internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::E,
                                internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::r,
                                internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::rC,
                                typename internal::CombinedElementFunctionHelper<LeftType, RightType, combination>::R>;
 
-  using Select = internal::CombinedElementFunctionHelper<LeftType, RightType, combination>;
+  using Helper = internal::CombinedElementFunctionHelper<LeftType, RightType, combination>;
 
 public:
   using typename BaseType::DerivativeRangeReturnType;
@@ -386,7 +483,7 @@ public:
   using typename BaseType::RangeType;
 
   CombinedConstElementFunction(const LeftType& left, const RightType& right)
-    : BaseType()
+    : BaseType(left.parameter_type() + right.parameter_type())
     , left_(left)
     , right_(right)
     , bind_is_temporarily_ok_(false)
@@ -394,8 +491,17 @@ public:
     bind_if_arguments_were_bound();
   }
 
+  CombinedConstElementFunction(const LeftType& left, RightType&& right)
+    : BaseType(left.parameter_type() + right.parameter_type())
+    , left_(left)
+    , right_(std::move(right))
+    , bind_is_temporarily_ok_(false)
+  {
+    bind_if_arguments_were_bound();
+  }
+
   CombinedConstElementFunction(std::shared_ptr<const LeftType> left, std::shared_ptr<const RightType> right)
-    : BaseType()
+    : BaseType(left->parameter_type() + right->parameter_type())
     , left_(left)
     , right_(right)
     , bind_is_temporarily_ok_(false)
@@ -404,13 +510,17 @@ public:
   }
 
   CombinedConstElementFunction(std::unique_ptr<const LeftType>&& left, std::unique_ptr<const RightType>&& right)
-    : BaseType()
+    : BaseType(left->parameter_type() + right->parameter_type())
     , left_(std::move(left))
     , right_(std::move(right))
     , bind_is_temporarily_ok_(false)
   {
     bind_if_arguments_were_bound();
   }
+
+  CombinedConstElementFunction(const ThisType&) = default;
+
+  CombinedConstElementFunction(ThisType&&) = default;
 
 protected:
   void post_bind(const ElementType& /*element*/) override
@@ -421,19 +531,19 @@ protected:
 public:
   int order(const XT::Common::Parameter& param = {}) const override final
   {
-    return Select::order(left_.access(), right_.access(), param);
+    return Helper::order(left_.access(), right_.access(), param);
   }
 
   RangeReturnType evaluate(const DomainType& point_in_reference_element,
                            const Common::Parameter& param = {}) const override final
   {
-    return Select::evaluate(left_.access(), right_.access(), point_in_reference_element, param);
+    return Helper::evaluate(left_.access(), right_.access(), point_in_reference_element, param);
   }
 
   DerivativeRangeReturnType jacobian(const DomainType& point_in_reference_element,
                                      const Common::Parameter& param = {}) const override final
   {
-    return Select::jacobian(left_.access(), right_.access(), point_in_reference_element, param);
+    return Helper::jacobian(left_.access(), right_.access(), point_in_reference_element, param);
   }
 
 private:
@@ -472,6 +582,7 @@ class CombinedElementFunction
   : internal::DualStorageProvider<LeftType, RightType>
   , public CombinedConstElementFunction<LeftType, RightType, combination>
 {
+  using ThisType = CombinedElementFunction;
   using Storage = internal::DualStorageProvider<LeftType, RightType>;
   using BaseType = CombinedConstElementFunction<LeftType, RightType, combination>;
 
@@ -480,6 +591,11 @@ public:
 
   CombinedElementFunction(LeftType& left, RightType& right)
     : Storage(left, right)
+    , BaseType(Storage::left.access(), Storage::right.access())
+  {}
+
+  CombinedElementFunction(LeftType& left, RightType&& right)
+    : Storage(left, std::move(right))
     , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
@@ -493,6 +609,10 @@ public:
     , BaseType(Storage::left.access(), Storage::right.access())
   {}
 
+  CombinedElementFunction(const ThisType&) = default;
+
+  CombinedElementFunction(ThisType&&) = default;
+
 protected:
   void post_bind(const ElementType& element) override final
   {
@@ -503,7 +623,7 @@ protected:
 
 
 /**
- * \brief Element function representing the difference between two element functions.
+ * \brief Element function representing the difference between two element functions (const variant).
  *
  * \sa CombinedConstElementFunction
  */
@@ -541,7 +661,7 @@ public:
 
 
 /**
- * \brief Element function representing the sum of two element functions.
+ * \brief Element function representing the sum of two element functions (const variant).
  *
  * \sa CombinedConstElementFunction
  */
@@ -578,6 +698,25 @@ public:
 
 
 /**
+ * \brief Element function representing the product of two element functions (const variant).
+ *
+ * \sa CombinedElementFunction
+ */
+template <class LeftFactorType, class RightFactorType>
+class ConstProductElementFunction
+  : public CombinedConstElementFunction<LeftFactorType, RightFactorType, CombinationType::product>
+{
+  using BaseType = CombinedConstElementFunction<LeftFactorType, RightFactorType, CombinationType::product>;
+
+public:
+  template <class... Args>
+  explicit ConstProductElementFunction(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {}
+};
+
+
+/**
  * \brief Element function representing the product of two element functions.
  *
  * \sa CombinedElementFunction
@@ -590,6 +729,44 @@ class ProductElementFunction : public CombinedElementFunction<LeftFactorType, Ri
 public:
   template <class... Args>
   explicit ProductElementFunction(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {}
+};
+
+
+/**
+ * \brief Element function representing the fraction of two element functions (const variant).
+ *
+ * \sa CombinedElementFunction
+ */
+template <class LeftFactorType, class RightFactorType>
+class ConstFractionElementFunction
+  : public CombinedConstElementFunction<LeftFactorType, RightFactorType, CombinationType::fraction>
+{
+  using BaseType = CombinedConstElementFunction<LeftFactorType, RightFactorType, CombinationType::fraction>;
+
+public:
+  template <class... Args>
+  explicit ConstFractionElementFunction(Args&&... args)
+    : BaseType(std::forward<Args>(args)...)
+  {}
+};
+
+
+/**
+ * \brief Element function representing the fraction of two element functions.
+ *
+ * \sa CombinedElementFunction
+ */
+template <class LeftFactorType, class RightFactorType>
+class FractionElementFunction
+  : public CombinedElementFunction<LeftFactorType, RightFactorType, CombinationType::fraction>
+{
+  using BaseType = CombinedElementFunction<LeftFactorType, RightFactorType, CombinationType::fraction>;
+
+public:
+  template <class... Args>
+  explicit FractionElementFunction(Args&&... args)
     : BaseType(std::forward<Args>(args)...)
   {}
 };

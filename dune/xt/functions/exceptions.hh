@@ -37,6 +37,18 @@ class parameter_error : public Common::Exceptions::parameter_error
 class spe10_data_file_missing : public Dune::IOError
 {};
 
+class element_function_error : public Dune::Exception
+{};
+
+class function_error : public Dune::Exception
+{};
+
+class grid_function_error : public Dune::Exception
+{};
+
+class flux_function_error : public Dune::Exception
+{};
+
 
 } // namespace Exceptions
 } // namespace Functions

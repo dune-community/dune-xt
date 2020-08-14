@@ -58,6 +58,12 @@ class ConstProductElementFunction;
 template <class LeftFactorType, class RightFactorType>
 class ProductElementFunction;
 
+template <class LeftFactorType, class RightFactorType>
+class ConstFractionElementFunction;
+
+template <class LeftFactorType, class RightFactorType>
+class FractionElementFunction;
+
 
 namespace internal {
 
@@ -673,30 +679,19 @@ public:
     result[0] = this->derivative(alpha, point_in_reference_element, param);
   }
 
-  /**
-   * \}
-   * \name ´´These operators are provided for convenience.''
-   * \{
-   **/
+  /// \}
+
+  /// \name Numerical operators (const this and other variants).
+  /// \{
 
   ConstDifferenceElementFunction<ThisType, ThisType> operator-(const ThisType& other) const
   {
     return ConstDifferenceElementFunction<ThisType, ThisType>(*this, other);
   }
 
-  DifferenceElementFunction<ThisType, ThisType> operator-(ThisType& other)
-  {
-    return DifferenceElementFunction<ThisType, ThisType>(*this, other);
-  }
-
   ConstSumElementFunction<ThisType, ThisType> operator+(const ThisType& other) const
   {
     return ConstSumElementFunction<ThisType, ThisType>(*this, other);
-  }
-
-  SumElementFunction<ThisType, ThisType> operator+(ThisType& other)
-  {
-    return SumElementFunction<ThisType, ThisType>(*this, other);
   }
 
   template <class OtherType>
@@ -712,6 +707,66 @@ public:
   template <class OtherType>
   std::enable_if_t<
       is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::fraction>::available,
+      ConstFractionElementFunction<ThisType, OtherType>>
+  operator/(const OtherType& other) const
+  {
+    return ConstFractionElementFunction<ThisType, OtherType>(*this, other);
+  }
+
+  /// \}
+
+  /// \name Numerical operators (const this and lvalue other variants to handle storage of temporaries on the right).
+  /// \{
+
+  ConstDifferenceElementFunction<ThisType, ThisType> operator-(ThisType&& other) const
+  {
+    return ConstDifferenceElementFunction<ThisType, ThisType>(*this, std::move(other));
+  }
+
+  ConstSumElementFunction<ThisType, ThisType> operator+(ThisType& other) const
+  {
+    return ConstSumElementFunction<ThisType, ThisType>(*this, std::move(other));
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
+      ConstProductElementFunction<ThisType, OtherType>>
+  operator*(OtherType&& other) const
+  {
+    return ConstProductElementFunction<ThisType, OtherType>(*this, std::move(other));
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::fraction>::available,
+      ConstFractionElementFunction<ThisType, OtherType>>
+  operator/(OtherType& other) const
+  {
+    return ConstFractionElementFunction<ThisType, OtherType>(*this, std::move(other));
+  }
+
+  /// \}
+
+  /// \name Numerical operators (mutable this and other variants).
+  /// \{
+
+  DifferenceElementFunction<ThisType, ThisType> operator-(ThisType& other)
+  {
+    return DifferenceElementFunction<ThisType, ThisType>(*this, other);
+  }
+
+  SumElementFunction<ThisType, ThisType> operator+(ThisType& other)
+  {
+    return SumElementFunction<ThisType, ThisType>(*this, other);
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
           && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
       ProductElementFunction<ThisType, OtherType>>
   operator*(OtherType& other)
@@ -719,9 +774,52 @@ public:
     return ProductElementFunction<ThisType, OtherType>(*this, other);
   }
 
-  /**
-   * \{
-   **/
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::fraction>::available,
+      FractionElementFunction<ThisType, OtherType>>
+  operator/(OtherType& other)
+  {
+    return FractionElementFunction<ThisType, OtherType>(*this, other);
+  }
+
+  /// \}
+
+  /// \name Numerical operators (mutable this and lvalue other variants to handle storage of temporaries on the right).
+  /// \{
+
+  DifferenceElementFunction<ThisType, ThisType> operator-(ThisType&& other)
+  {
+    return DifferenceElementFunction<ThisType, ThisType>(*this, std::move(other));
+  }
+
+  SumElementFunction<ThisType, ThisType> operator+(ThisType&& other)
+  {
+    return SumElementFunction<ThisType, ThisType>(*this, std::move(other));
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::product>::available,
+      ProductElementFunction<ThisType, OtherType>>
+  operator*(OtherType&& other)
+  {
+    return ProductElementFunction<ThisType, OtherType>(*this, std::move(other));
+  }
+
+  template <class OtherType>
+  std::enable_if_t<
+      is_element_function<OtherType>::value
+          && internal::CombinedElementFunctionHelper<ThisType, OtherType, CombinationType::fraction>::available,
+      FractionElementFunction<ThisType, OtherType>>
+  operator/(OtherType&& other)
+  {
+    return FractionElementFunction<ThisType, OtherType>(*this, std::move(other));
+  }
+
+  /// \}
 
 private:
   template <class SingleType, size_t _r = BaseType::r, size_t _rC = BaseType::rC, bool anything = true>

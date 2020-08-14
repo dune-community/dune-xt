@@ -16,6 +16,7 @@
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/dynvector.hh>
 
+#include <dune/xt/common/exceptions.hh>
 #include <dune/xt/common/fmatrix.hh>
 #include <dune/xt/common/fvector.hh>
 #include <dune/xt/common/type_traits.hh>
@@ -287,9 +288,84 @@ struct is_grid_function<T, true> : std::is_base_of<GridFunctionInterface<typenam
 enum class CombinationType
 {
   difference,
+  fraction,
   product,
-  sum
+  sum,
 }; // enum class CombinationType
+
+
+template <CombinationType>
+struct GetCombination
+{
+  static std::string name()
+  {
+    DUNE_THROW(Common::Exceptions::this_should_not_happen, "Unknonw combination!");
+    return "";
+  }
+
+  static std::string symbol()
+  {
+    DUNE_THROW(Common::Exceptions::this_should_not_happen, "Unknonw combination!");
+    return "";
+  }
+}; // struct GetCombination
+
+
+template <>
+struct GetCombination<CombinationType::difference>
+{
+  static std::string name()
+  {
+    return "difference";
+  }
+
+  static std::string symbol()
+  {
+    return "-";
+  }
+}; // struct GetCombination<CombinationType::difference>
+
+template <>
+struct GetCombination<CombinationType::fraction>
+{
+  static std::string name()
+  {
+    return "fraction";
+  }
+
+  static std::string symbol()
+  {
+    return "/";
+  }
+}; // struct GetCombination<CombinationType::fraction>
+
+template <>
+struct GetCombination<CombinationType::product>
+{
+  static std::string name()
+  {
+    return "product";
+  }
+
+  static std::string symbol()
+  {
+    return "*";
+  }
+}; // struct GetCombination<CombinationType::product>
+
+template <>
+struct GetCombination<CombinationType::sum>
+{
+  static std::string name()
+  {
+    return "sum";
+  }
+
+  static std::string symbol()
+  {
+    return "+";
+  }
+}; // struct GetCombination<CombinationType::sum>
 
 
 enum class DerivativeType
