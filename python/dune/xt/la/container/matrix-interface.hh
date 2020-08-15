@@ -85,9 +85,8 @@ void print_row_sparsely(const M& self, const size_t row, std::stringstream& ss)
 
 
 template <class C, bool sparse>
-auto bind_Matrix(pybind11::module& m)
+typename std::enable_if<is_matrix<C>::value, pybind11::class_<C>>::type bind_Matrix(pybind11::module& m)
 {
-  static_assert(is_matrix<C>::value);
   namespace py = pybind11;
   using namespace pybind11::literals;
 

@@ -217,7 +217,7 @@ public:
 
 
 template <class GridType>
-auto make_cube_grid(
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type make_cube_grid(
     const FieldVector<typename GridType::ctype, GridType::dimension>& lower_left,
     const FieldVector<typename GridType::ctype, GridType::dimension>& upper_right,
     const std::array<unsigned int, GridType::dimension> num_elements =
@@ -228,35 +228,33 @@ auto make_cube_grid(
         cube_gridprovider_default_config().template get<std::array<unsigned int, GridType::dimension>>("overlap_size"),
     MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
-  static_assert(is_grid<GridType>::value);
   return CubeGridProviderFactory<GridType>::create(
       lower_left, upper_right, num_elements, num_refinements, overlap_size, mpi_comm);
 }
 
 
 template <class GridType>
-auto make_cube_grid(
-    const typename GridType::ctype& lower_left,
-    const typename GridType::ctype& upper_right,
-    const unsigned int num_elements =
-        cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements").at(0),
-    const unsigned int num_refinements =
-        cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
-    const unsigned int overlap_size =
-        cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size").at(0),
-    MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+make_cube_grid(const typename GridType::ctype& lower_left,
+               const typename GridType::ctype& upper_right,
+               const unsigned int num_elements =
+                   cube_gridprovider_default_config().template get<std::vector<unsigned int>>("num_elements").at(0),
+               const unsigned int num_refinements =
+                   cube_gridprovider_default_config().template get<unsigned int>("num_refinements"),
+               const unsigned int overlap_size =
+                   cube_gridprovider_default_config().template get<std::vector<unsigned int>>("overlap_size").at(0),
+               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
-  static_assert(is_grid<GridType>::value);
   return CubeGridProviderFactory<GridType>::create(
       lower_left, upper_right, num_elements, num_refinements, overlap_size, mpi_comm);
 }
 
 
 template <class GridType>
-auto make_cube_grid(const Common::Configuration& cfg = cube_gridprovider_default_config(),
-                    MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+make_cube_grid(const Common::Configuration& cfg = cube_gridprovider_default_config(),
+               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
-  static_assert(is_grid<GridType>::value);
   return CubeGridProviderFactory<GridType>::create(cfg, mpi_comm);
 }
 

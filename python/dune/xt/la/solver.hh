@@ -28,9 +28,8 @@ namespace LA {
 
 
 template <class M, class V = typename Container<typename M::ScalarType, M::vector_type>::VectorType>
-auto bind_Solver(pybind11::module& m)
+typename std::enable_if<is_matrix<M>::value, pybind11::class_<Solver<M>>>::type bind_Solver(pybind11::module& m)
 {
-  static_assert(is_matrix<M>::value);
   typedef Solver<M> C;
 
   namespace py = pybind11;

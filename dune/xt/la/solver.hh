@@ -141,17 +141,17 @@ public:
 
 
 template <class M>
-auto make_solver(const M& matrix)
+typename std::enable_if<is_matrix<M>::value || XT::Common::is_matrix<M>::value, Solver<M>>::type
+make_solver(const M& matrix)
 {
-  static_assert(is_matrix<M>::value || XT::Common::is_matrix<M>::value);
   return Solver<M>(matrix);
 }
 
 
 template <class M, class V, class... Args>
-void solve(const M& A, const V& b, V& x, Args&&... args)
+typename std::enable_if<is_matrix<M>::value && is_vector<V>::value, void>::type
+solve(const M& A, const V& b, V& x, Args&&... args)
 {
-  static_assert(is_matrix<M>::value && is_vector<V>::value);
   make_solver(A).apply(b, x, std::forward<Args>(args)...);
 }
 

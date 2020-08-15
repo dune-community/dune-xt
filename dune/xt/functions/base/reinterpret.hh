@@ -253,10 +253,11 @@ auto reinterpreted_source = reinterpret<TargetElement>(source, source_grid_view)
  * \sa ReinterpretLocalizableFunction
  */
 template <class TargetElement, class SourceGridView, size_t r, size_t rC, class R>
-auto reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridView>, r, rC, R>& source,
-                 const SourceGridView& source_grid_view)
+std::enable_if_t<XT::Grid::is_layer<SourceGridView>::value,
+                 ReinterpretLocalizableFunction<SourceGridView, TargetElement, r, rC, R>>
+reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridView>, r, rC, R>& source,
+            const SourceGridView& source_grid_view)
 {
-  static_assert(XT::Grid::is_layer<SourceGridView>::value);
   return ReinterpretLocalizableFunction<SourceGridView, TargetElement, r, rC, R>(source, source_grid_view);
 }
 
@@ -268,12 +269,12 @@ auto reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGr
  * \sa ReinterpretLocalizableFunction
  */
 template <class SourceGridView, size_t r, size_t rC, class R, class TargetGridView>
-auto reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridView>, r, rC, R>& source,
-                 const SourceGridView& source_grid_view,
-                 const TargetGridView& /*target_grid_view*/)
+std::enable_if_t<XT::Grid::is_layer<SourceGridView>::value && XT::Grid::is_layer<TargetGridView>::value,
+                 ReinterpretLocalizableFunction<SourceGridView, XT::Grid::extract_entity_t<TargetGridView>, r, rC, R>>
+reinterpret(const GridFunctionInterface<XT::Grid::extract_entity_t<SourceGridView>, r, rC, R>& source,
+            const SourceGridView& source_grid_view,
+            const TargetGridView& /*target_grid_view*/)
 {
-  static_assert(XT::Grid::is_layer<SourceGridView>::value);
-  static_assert(XT::Grid::is_layer<TargetGridView>::value);
   return reinterpret<XT::Grid::extract_entity_t<TargetGridView>>(source, source_grid_view);
 }
 

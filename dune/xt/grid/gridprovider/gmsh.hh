@@ -114,18 +114,18 @@ public:
 
 
 template <class GridType>
-auto make_gmsh_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+make_gmsh_grid(const std::string& filename, MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
-  static_assert(is_grid<GridType>::value);
   return GmshGridProviderFactory<GridType>::create(filename, mpi_comm);
 }
 
 
 template <class GridType>
-auto make_gmsh_grid(const Common::Configuration& cfg = GmshGridProviderFactory<GridType>::default_config(),
-                    MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
+typename std::enable_if<is_grid<GridType>::value, GridProvider<GridType>>::type
+make_gmsh_grid(const Common::Configuration& cfg = GmshGridProviderFactory<GridType>::default_config(),
+               MPIHelper::MPICommunicator mpi_comm = MPIHelper::getCommunicator())
 {
-  static_assert(is_grid<GridType>::value);
   return GmshGridProviderFactory<GridType>::create(cfg, mpi_comm);
 }
 

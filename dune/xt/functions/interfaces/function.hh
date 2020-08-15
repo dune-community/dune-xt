@@ -199,7 +199,8 @@ public:
   }
 
   template <class OtherType>
-  auto operator*(const OtherType& other) const
+  typename std::enable_if<true, Functions::ProductFunction<ThisType, OtherType>>::type
+  operator*(const OtherType& other) const
   {
     return Functions::ProductFunction<ThisType, OtherType>(*this, other);
   }

@@ -292,33 +292,31 @@ struct MatrixAbstraction<Dune::FieldMatrix<K, N, M>>
 
 
 template <class MatrixType>
-auto get_matrix_rows(const MatrixType& matrix)
+typename std::enable_if<is_matrix<MatrixType>::value, size_t>::type get_matrix_rows(const MatrixType& matrix)
 {
-  static_assert(is_matrix<MatrixType>::value);
   return MatrixAbstraction<MatrixType>::rows(matrix);
 }
 
 
 template <class MatrixType>
-auto get_matrix_cols(const MatrixType& matrix)
+typename std::enable_if<is_matrix<MatrixType>::value, size_t>::type get_matrix_cols(const MatrixType& matrix)
 {
-  static_assert(is_matrix<MatrixType>::value);
   return MatrixAbstraction<MatrixType>::cols(matrix);
 }
 
 
 template <class MatrixType>
-auto get_matrix_entry(const MatrixType& matrix, const size_t ii, const size_t jj)
+typename std::enable_if<is_matrix<MatrixType>::value, typename MatrixAbstraction<MatrixType>::S>::type
+get_matrix_entry(const MatrixType& matrix, const size_t ii, const size_t jj)
 {
-  static_assert(is_matrix<MatrixType>::value);
   return MatrixAbstraction<MatrixType>::get_entry(matrix, ii, jj);
 }
 
 
 template <class MatrixType, class S>
-auto set_matrix_entry(MatrixType& matrix, const size_t ii, const size_t jj, const S& value)
+typename std::enable_if<is_matrix<MatrixType>::value, void>::type
+set_matrix_entry(MatrixType& matrix, const size_t ii, const size_t jj, const S& value)
 {
-  static_assert(is_matrix<MatrixType>::value);
   MatrixAbstraction<MatrixType>::set_entry(matrix, ii, jj, value);
 }
 
@@ -328,12 +326,14 @@ template <class MatrixType,
           size_t COLS = MatrixAbstraction<MatrixType>::static_cols,
           class FieldType = typename MatrixAbstraction<MatrixType>::S,
           class SparsityPatternType = FullPattern>
-auto create(const size_t rows,
-            const size_t cols,
-            const FieldType& val = 0,
-            const SparsityPatternType& pattern = SparsityPatternType())
+typename std::enable_if<
+    is_matrix<MatrixType>::value,
+    typename MatrixAbstraction<MatrixType>::template MatrixTypeTemplate<ROWS, COLS, FieldType>>::type
+create(const size_t rows,
+       const size_t cols,
+       const FieldType& val = 0,
+       const SparsityPatternType& pattern = SparsityPatternType())
 {
-  static_assert(is_matrix<MatrixType>::value);
   return MatrixAbstraction<
       typename MatrixAbstraction<MatrixType>::template MatrixTypeTemplate<ROWS, COLS, FieldType>>::create(rows,
                                                                                                           cols,
@@ -343,18 +343,18 @@ auto create(const size_t rows,
 
 
 template <class TargetMatrixType, class SourceMatrixType>
-auto zeros_like(const SourceMatrixType& source)
+typename std::enable_if<is_matrix<TargetMatrixType>::value && is_matrix<SourceMatrixType>::value,
+                        TargetMatrixType>::type
+zeros_like(const SourceMatrixType& source)
 {
-  static_assert(is_matrix<TargetMatrixType>::value && is_matrix<SourceMatrixType>::value);
   return create<TargetMatrixType>(
       get_matrix_rows(source), get_matrix_cols(source), typename MatrixAbstraction<TargetMatrixType>::S(0));
 }
 
 
 template <class MatrixType>
-auto zeros_like(const MatrixType& source)
+typename std::enable_if<is_matrix<MatrixType>::value, MatrixType>::type zeros_like(const MatrixType& source)
 {
-  static_assert(is_matrix<MatrixType>::value);
   return zeros_like<MatrixType, MatrixType>(source);
 }
 
