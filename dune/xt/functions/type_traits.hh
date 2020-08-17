@@ -126,8 +126,8 @@ struct RangeTypeSelector<R, r, 1>
 template <size_t d, class R, size_t r, size_t rC>
 struct DerivativeRangeTypeSelector
 {
-  using single_type = XT::Common::FieldVector<R, d>;
-  using return_single_type = FieldVector<R, d>;
+  using single_type = FieldVector<R, d>;
+  using return_single_type = XT::Common::FieldVector<R, d>;
   using dynamic_single_type = DynamicVector<R>;
 
   using row_derivative_type = FieldMatrix<R, rC, d>;
