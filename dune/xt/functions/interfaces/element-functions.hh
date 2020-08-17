@@ -69,7 +69,7 @@ namespace internal {
 
 
 template <class, class, CombinationType>
-class CombinedHelper;
+struct CombinedHelper;
 
 
 }
